@@ -128,7 +128,7 @@ import { ImpostorAtlas } from './impostor.js';
 import { loadThree, loadBoardPack, webgl2Available, boardArtListed } from './board3d/load.js';
 import { BoardScene } from './board3d/scene.js';
 import { AREAS, areaFor, unionAreas } from './board3d/layout.js';
-import { layoutPen, penSignature } from './pen.js';
+import { layoutPen, penSignature, bossPenStage, BOSS_PEN_RECT, parsePenRect } from './pen.js';
 import { IDENTITY, bossPrepField, tilesToDisp, leaderStand } from './prepfield.js';
 import { pickOnTile, pickBattle, hitRectAt, hitTiles } from './pick.js';
 import { promotionsOf } from './promote.js';
@@ -222,7 +222,11 @@ export function viewKind(kind, opts) {
 }
 
 /** 3D areas without the enemy preview pen block (the own field / both normal halves); see `boardArea`. */
-const BOSS_PREP_AREA = AREAS.boss;
+const BOSS_PREP_AREA = Object.freeze([
+  ...AREAS.boss,
+  Object.freeze({r0:BOSS_PEN_RECT.r0-1,r1:BOSS_PEN_RECT.r0-1,c0:6,c1:14}),
+  Object.freeze({...BOSS_PEN_RECT,c0:6,c1:14}),
+]);
 const AREA_NO_PEN = Object.freeze({
   normal: Object.freeze(AREAS.normal.filter((a) => a.r1 <= 13)),
   unite: Object.freeze(AREAS.unite.filter((a) => a.r1 <= 13)),
@@ -232,10 +236,10 @@ const AREA_NO_PEN = Object.freeze({
  * 3D area built for a view kind (viewKind): prep / normal / pen retain the same field + preview geometry.
  * Cooperative views retain their field area with separator rows 6 and 13 (the row-13
  * devices blow into the field: act2 m01's blowers, user playtest #5 item 6; the boss field's row-6 devices are drawn
- * with the boss field only — board3d/layout.js stageDevices); the boss kinds build the boss field.
+ * with the boss field only — board3d/layout.js stageDevices); boss views add only the attached central preview pen.
  */
 export function boardArea(vk) {
-  if (vk === 'bossPrep') return BOSS_PREP_AREA;
+  if (['bossPrep','boss','hidden'].includes(vk)) return BOSS_PREP_AREA;
   if (vk === 'pen') return AREAS.normal;
   if (vk === 'prep' || vk === 'normal') return AREAS.normal;
   if (vk === 'unite') return AREA_NO_PEN.unite.length ? AREA_NO_PEN.unite : AREAS.unite;
@@ -244,7 +248,7 @@ export function boardArea(vk) {
 
 /** Boss intel builds only its field and the separate preview floor, never the normal battlefield. */
 export function boardAreaForView(vk, previousKind) {
-  if (vk === 'pen' && previousKind === 'bossPrep') return [...AREAS.boss, {r0:14,r1:18,c0:6,c1:14}];
+  if (vk === 'pen' && ['bossPrep','boss','hidden'].includes(previousKind)) return BOSS_PREP_AREA;
   return boardArea(vk);
 }
 
@@ -253,8 +257,7 @@ export function boardAreaForView(vk, previousKind) {
  * with its own separator row; other fields are excluded.
  */
 export function bandFor(kind) {
-  if (kind === 'bossPrep') return [0,6];
-  if (kind === 'boss' || kind === 'hidden') return [0, 6];
+  if (['bossPrep','boss','hidden'].includes(kind)) return [0,12];
   return ['pen','prep','normal'].includes(kind) ? [6, 18] : [6, 13];
 }
 
@@ -448,11 +451,11 @@ export async function createFieldView(host, options = {}) {
   const settings = { damageNumbers: true, quality: 'high', ...(opts.settings || {}) };
   // the 3D board (three.js + the official art) loads in parallel with everything else
   const boardPref = boardPreference(opts.board);
-  const want3d = boardPref !== '2d' && webgl2Available(boardPref === '3d');
+  const want3d = settings.mapQuality !== 'minimal' && boardPref !== '2d' && webgl2Available(boardPref === '3d');
   // three.js (~2 MB) is fetched only when the local-art manifest lists the board atlas (in parallel with the art)
   const artListed = want3d ? boardArtListed(assets).catch(() => false) : Promise.resolve(false);
   const threePromise = artListed.then((ok) => (ok ? loadThree() : null)).catch(() => null);
-  const packPromise = artListed.then((ok) => (ok ? Promise.resolve(assets.ready ? assets.ready() : null).catch(() => null).then(() => loadBoardPack(assets)) : null)).catch(() => null);
+  const packPromise = artListed.then((ok) => (ok ? Promise.resolve(assets.ready ? assets.ready() : null).catch(() => null).then(() => loadBoardPack(assets,{native:settings.mapQuality!=='low'})) : null)).catch(() => null);
   // the manifest, and the optional local-art manifest in parallel: unit views pick an enemy's local-client model by it
   // (assets.js spineEntry, DESIGN §13 — 灼热源石虫 / 炽焰源石虫); absent or slow, they draw the web models
   await withTimeout(Promise.all([assets.ready ? assets.ready() : null, assets.local ? assets.local() : null]
@@ -463,8 +466,8 @@ export async function createFieldView(host, options = {}) {
   signal?.throwIfAborted();
 
   const size = () => ({ width: Math.max(1, host.clientWidth || 1), height: Math.max(1, host.clientHeight || 1) });
-  const dpr = () => Math.min(globalThis.devicePixelRatio || 1, QUALITY_RES[settings.quality] || 2);
-  const boardDpr = () => Math.min(globalThis.devicePixelRatio || 1, BOARD_RES[settings.quality] || 2);
+  const dpr = () => Math.min(4, Math.min(globalThis.devicePixelRatio || 1, QUALITY_RES[settings.quality] || 2) * (settings.renderScale || 1));
+  const boardDpr = () => Math.min(4, Math.min(globalThis.devicePixelRatio || 1, settings.mapQuality === 'medium' ? 1 : BOARD_RES[settings.quality] || 2) * (settings.renderScale || 1));
   const s0 = size();
   // Construction is synchronous until the complete view can own cancellation. If setup throws,
   // dispose only the resources acquired by this attempt, never another view's host contents.
@@ -523,6 +526,7 @@ export async function createFieldView(host, options = {}) {
   let mountainsAsked = false;
   /** The backdrop's mountain silhouette (optional art; asked again when the manifest arrives late). */
   function loadMountains() {
+    if (settings.mapQuality === 'minimal') return;
     const mountainUrl = !mountainsAsked && assets.ui ? assets.ui('entry/bg_mountains_tiled') : null;
     if (!mountainUrl || !assets.image) return;
     mountainsAsked = true;
@@ -629,8 +633,8 @@ export async function createFieldView(host, options = {}) {
   tiles.setView(bandFor('prep'), camRect(), fieldRows('prep'));
   // the real board art of the local client (optional): wait briefly so the first frame already uses it; a late
   // arrival swaps the atlas in place
-  const artPromise = loadBoardArt(assets).then((art) => {
-    if (art && !destroyed) { tiles.setArt(art); tiles.project(cam, true); }
+  const artPromise = (settings.mapQuality === 'minimal' ? Promise.resolve(null) : loadBoardArt(assets)).then((art) => {
+    if (art && !destroyed && settings.mapQuality !== 'minimal') { tiles.setArt(art); tiles.project(cam, true); }
     return art;
   }, () => null);
 
@@ -642,7 +646,7 @@ export async function createFieldView(host, options = {}) {
   const recover = { THREE: null, pack: null, timer: 0, tries: 0, since: 0, off: false, count: 0 };
   setupCleanup.push(() => { clearTimeout(recover.timer); disable3d(); });
   function enable3d(THREE, pack) {
-    if (destroyed || board3d || !THREE || !pack) return false;
+    if (destroyed || board3d || !THREE || !pack || settings.mapQuality === 'minimal') return false;
     recover.THREE = THREE; recover.pack = pack;
     try {
       try { if (getComputedStyle(host).position === 'static') host.style.position = 'relative'; } catch { /* ignore */ }
@@ -652,15 +656,17 @@ export async function createFieldView(host, options = {}) {
       host.insertBefore(c3, canvas);
       board3dCanvas = c3;
       const b = new BoardScene(THREE, pack, {
-        canvas: c3, antialias: settings.quality !== 'low' && (globalThis.devicePixelRatio || 1) < 2, shadows: settings.quality !== 'low',
+        canvas: c3, antialias: settings.quality !== 'low' && (globalThis.devicePixelRatio || 1) < 2, shadows: settings.shadows !== false,
       });
       const sz = size();
       b.resize(sz.width, sz.height, boardDpr());
       board3d = b;
+      b.mapQuality = settings.mapQuality || 'high';
+      b.setQuality(settings.shadows === false ? 'low' : 'high');
       tiles.setExternal(true);
       backdrop.visible = false;
       b.setArea(viewBoardArea(viewKind(camKind, camOpts)));
-      if (stageRec) b.setStage(stageRec);
+      if (stageRec) b.setStage(visualStage());
       b.setFocus(camRect());
       b.setBattleRect(mode === 'battle' && battleMeta && !battleMeta.prep ? battleMeta.rect : null);
       tiles.project(cam, true);
@@ -763,7 +769,7 @@ export async function createFieldView(host, options = {}) {
 
   function camRect() {
     const k = viewKind(camKind, camOpts);
-    if (k === 'pen') return { r0: 14, r1: 18, c0: 7, c1: 13 };
+    if (k === 'pen') return parsePenRect(visualStage()?.config?.enemy_place_rect) || { r0:14,r1:18,c0:7,c1:13 };
     // prep lights the bench (hand row 7 / temp row 8) with the field, like the official prep view
     if (camOpts.rect) { const r = normRect(camOpts.rect); return k === 'prep' ? { ...r, r0: Math.min(r.r0, GEO.HAND_ROW) } : r; }
     if (k === 'bossPrep') return camOpts.side === 'R' ? { r0: 0, r1: 5, c0: 10, c1: 20 } : { r0: 0, r1: 5, c0: 0, c1: 10 };
@@ -784,6 +790,7 @@ export async function createFieldView(host, options = {}) {
       rect, side: o.side, half: !!o.half, shop: o.shop, fit: !!o.fit, observedBench: !!o.observedBench, config: stageRec?.config || null,
       hud: hudBands(vk, sz, { shop: o.shop !== false }),
     });
+    if (k === 'pen' && bossPreview()) { camera.ty -= visualStage()?.previewLayout?.offset || 0; camera.update(); }
     // HUD clearance includes the back row's operator heads; do not pan upward after fitting it.
     return camera;
   }
@@ -812,6 +819,7 @@ export async function createFieldView(host, options = {}) {
     camOpts = { ...o };
     // the field actually shown (a 'prep' camera on the boss rows is the Final Assault prep: boss field built / drawn)
     const vk = viewKind(camKind, camOpts);
+    applyVisualStage();
     if (vk === 'prep') setPrepField(IDENTITY);
     else if (vk === 'bossPrep') setPrepField(bossPrepField(camOpts.side === 'R' ? 'R' : 'L'));
     const target = targetCamera(camKind, camOpts);
@@ -906,12 +914,26 @@ export async function createFieldView(host, options = {}) {
 
   // ---- stage ----------------------------------------------------------------------------------------------
 
+  function bossPreview() {
+    const k=viewKind(camKind,camOpts);
+    const previous=camBeforePen && viewKind(camBeforePen.kind,camBeforePen.opts);
+    return ['bossPrep','boss','hidden'].includes(k) || k==='pen' && ['bossPrep','boss','hidden'].includes(previous);
+  }
+  function visualStage() { return bossPreview() ? bossPenStage(stageRec) : stageRec; }
+  function applyVisualStage() {
+    const visual=visualStage();
+    if (!visual) return;
+    tiles.setStage(visual);
+    board3d?.setStage(visual);
+    if (penList) { const list=penList; clearPen(); setPenList(list); }
+  }
+
   function setStage(st) {
     if (!st || typeof st !== 'object' || !Array.isArray(st.rows)) return false;
     stageRec = st;
-    tiles.setStage(st);
+    tiles.setStage(visualStage());
     tiles.setBattleRect(mode === 'battle' && battleMeta && !battleMeta.prep ? battleMeta.rect : null);
-    if (board3d) { board3d.setStage(st); board3d.setBattleRect(mode === 'battle' && battleMeta && !battleMeta.prep ? battleMeta.rect : null); }
+    if (board3d) { board3d.setStage(visualStage()); board3d.setBattleRect(mode === 'battle' && battleMeta && !battleMeta.prep ? battleMeta.rect : null); }
     tiles.project(cam, true);
     // a pen laid out before the stage arrived (setPrep / a scouting board first) used the default zones and the old
     // tile heights: lay it out again on this stage
@@ -1157,7 +1179,7 @@ export async function createFieldView(host, options = {}) {
     // the leader with a spawn tile stands on the boss field (setLeader), not in the pen
     const stand = leaderStand(list, (k) => data.enemy(k)?.hitArea ?? null, hitTiles);
     setLeader(stand);
-    const pen = layoutPen(stand ? list.filter((e) => e !== stand.entry) : list, { stage: stageRec });
+    const pen = layoutPen(stand ? list.filter((e) => e !== stand.entry) : list, { stage: visualStage() });
     for (const f of pen.figures) {
       const rec = data.enemy(f.enemyKey);
       const rank = rec?.rank;
@@ -1798,7 +1820,7 @@ export async function createFieldView(host, options = {}) {
         if (url) { try { tex = P.Texture.from(url); } catch { tex = null; } }
         const owner = e[4] != null ? infos.get(e[4]) : null;
         const at = Number.isFinite(e[5]) && Number.isFinite(e[6]) ? [e[5],e[6]] : owner ? [owner.x,owner.y] : null;
-        fx.pop(tex, `+${n}`, 0xffffff, layerPops.size, at);
+        fx.pop(tex, `+${n}`, 0xffffff, layerPops.size, at, e[4] ?? null);
         break;
       }
       case 'bounty': {
@@ -1913,10 +1935,12 @@ export async function createFieldView(host, options = {}) {
   // impostors earlier and animates small / far units at a lower rate (units.js); it steps back after a calm spell.
   let loadLevel = 0, slowFor = 0, fastFor = 0;
   function adaptLoad(dtRaw) {
+    if (settings.adaptiveQuality === false) { loadLevel=0; return; }
     if (!(dtRaw > 0) || dtRaw > 0.25 || globalThis.document?.hidden) return;
     const busy = views.size + penViews.size > 8;
-    if (frameMs > 19.5 && busy) { slowFor += dtRaw; fastFor = 0; }
-    else if (frameMs < 17.6) { fastFor += dtRaw; slowFor = 0; }
+    const budget=1000/(settings.frameLimit || 60);
+    if (frameMs > budget*1.17 && busy) { slowFor += dtRaw; fastFor = 0; }
+    else if (frameMs < budget*1.06) { fastFor += dtRaw; slowFor = 0; }
     if (slowFor > 1 && loadLevel < 3) { loadLevel++; slowFor = 0; fastFor = 0; impInterval = pickImpostorInterval(); }
     else if (loadLevel > 0 && (fastFor > 6 * loadLevel || !busy && fastFor > 2)) { loadLevel--; fastFor = 0; impInterval = pickImpostorInterval(); }
   }
@@ -1932,7 +1956,7 @@ export async function createFieldView(host, options = {}) {
   function pickImpostorInterval() {
     let n = 0;
     for (const v of views.values()) if (v.actor && v.spineReady) n++;
-    const q = settings.quality;
+    const q = settings.animationQuality || settings.quality;
     const base = (q === 'low' ? 12 : q === 'medium' ? 26 : 44) / (1 + loadLevel);
     if (n <= base) return 0;
     // a struggling device (load level ≥ 2) may refresh a big crowd more rarely (10 Hz at worst)
@@ -2014,6 +2038,7 @@ export async function createFieldView(host, options = {}) {
       }
     }
   }
+  app.ticker.maxFPS = settings.frameLimit || 60;
   app.ticker.add(frame);
   // render-cost probe (PIXI renders at UPDATE_PRIORITY.LOW = -25)
   let renderT0 = 0, renderMs = 0;
@@ -2029,6 +2054,7 @@ export async function createFieldView(host, options = {}) {
     const sz = size();
     const res = dpr();
     if (app.renderer.resolution !== res) app.renderer.resolution = res;
+    impostors.setResolution?.(res);
     app.renderer.resize(sz.width, sz.height);
     board3d?.resize(sz.width, sz.height, boardDpr());
     layoutBackdrop();
@@ -2171,11 +2197,20 @@ export async function createFieldView(host, options = {}) {
     },
     setSettings(s) {
       if (!s || typeof s !== 'object') return;
-      const q = settings.quality;
-      if (typeof s.damageNumbers === 'boolean') settings.damageNumbers = s.damageNumbers;
-      if (DAMAGE_NUMBER_MODES.includes(s.damageNumberMode)) settings.damageNumberMode = s.damageNumberMode;
-      if (s.quality === 'high' || s.quality === 'medium' || s.quality === 'low') settings.quality = s.quality;
-      if (q !== settings.quality) { board3d?.setQuality?.(settings.quality); resize(); }
+      const previousMap=settings.mapQuality || 'high';
+      Object.assign(settings,s);
+      app.ticker.maxFPS = settings.frameLimit || 60;
+      board3d?.setQuality?.(settings.shadows === false ? 'low' : 'high');
+      if (previousMap !== settings.mapQuality) {
+        if (settings.mapQuality === 'minimal') {
+          recover.off=true; clearTimeout(recover.timer); disable3d(); tiles.setArt(null); tiles.project(cam,true);
+        } else {
+          recover.off=true; clearTimeout(recover.timer); disable3d();
+          loadBoardArt(assets).then(art=>{if(!destroyed && settings.mapQuality !== 'minimal' && art){tiles.setArt(art);tiles.project(cam,true);}});
+          view?.setBoardMode('3d').catch(()=>{});
+        }
+      }
+      resize();
     },
     resize,
     /** Dev / settings: switch the board layer ('3d' loads three.js + the art when available; '2d' = atlas board). */
@@ -2183,9 +2218,12 @@ export async function createFieldView(host, options = {}) {
       if (destroyed) return false;
       if (m === '2d') { recover.off = true; clearTimeout(recover.timer); disable3d(); return false; }
       recover.off = false; recover.tries = 0;
+      if (settings.mapQuality === 'minimal') return false;
       if (board3d) return true;
       if (!webgl2Available(true)) return false; // an explicit request: a slow GPU is the caller's choice
-      const [THREE, pack] = await Promise.all([loadThree(), loadBoardPack(assets)]);
+      const requestedQuality = settings.mapQuality;
+      const [THREE, pack] = await Promise.all([loadThree(), loadBoardPack(assets,{native:requestedQuality!=='low'})]);
+      if (destroyed || settings.mapQuality !== requestedQuality) return false;
       return enable3d(THREE, pack);
     },
     destroy() {

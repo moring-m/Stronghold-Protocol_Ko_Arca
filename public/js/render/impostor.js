@@ -32,11 +32,23 @@ export class ImpostorAtlas {
     this.P = globalThis.PIXI;
     this.R = renderer;
     this.isolated = isolated;
-    this.res = Math.max(1, Math.min(2, renderer.resolution || 1));
+    this.res = Math.max(.5, Math.min(4, renderer.resolution || 1));
     this.pages = [];
     this.parked = new this.P.Container(); // skeletons of impostor units (never rendered directly)
     this.parked.visible = false;
     this.stats = { pages: 0, slots: 0, drawn: 0, full: 0 };
+  }
+
+  setResolution(res) {
+    const next=Math.max(.5,Math.min(4,res || 1));
+    if(next===this.res)return;
+    // Retire slots so every unit reacquires a target at the same resolution.
+    for(const page of this.pages) {
+      for(const slot of page.slots || []) slot.freed=true;
+      for(const body of [...page.bodies.children]) this.park(body);
+      page.rt.destroy(true); page.batch.destroy({children:true});
+    }
+    this.pages=[]; this.stats.pages=0; this.stats.slots=0; this.res=next;
   }
 
   /** CSS px per side of a page of `kind`. */
@@ -52,7 +64,7 @@ export class ImpostorAtlas {
     const erasers = new P.Container();
     const bodies = new P.Container();
     batch.addChild(erasers, bodies);
-    const page = { kind, size, rt, batch, erasers, bodies, shelves: [], nextY: 0, queued: 0, cleared: false, index: this.pages.length };
+    const page = { kind, size, rt, batch, erasers, bodies, shelves: [], nextY: 0, queued: 0, cleared: false, index: this.pages.length, slots: [] };
     this.pages.push(page);
     this.stats.pages = this.pages.length;
     return page;
@@ -103,12 +115,14 @@ export class ImpostorAtlas {
     page.erasers.addChild(eraser);
     const tex = new P.Texture(page.rt.baseTexture, new P.Rectangle(x, y, w, h));
     sh.live = (sh.live || 0) + 1;
-    return { page, shelf: sh, clip: page.kind === 'clip', x, y, w, h, eraser, tex, freed: false };
+    const slot = { page, shelf: sh, clip: page.kind === 'clip', x, y, w, h, eraser, tex, freed: false };
+    page.slots.push(slot); return slot;
   }
 
   free(slot) {
     if (!slot || slot.freed) return;
     slot.freed = true;
+    slot.page.slots = slot.page.slots.filter(s=>s!==slot);
     this.stats.slots = Math.max(0, this.stats.slots - 1);
     try { slot.eraser.destroy(); } catch { /* ignore */ }
     try { slot.tex.destroy(false); } catch { /* ignore */ }

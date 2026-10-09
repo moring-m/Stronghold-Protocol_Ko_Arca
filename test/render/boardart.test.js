@@ -240,6 +240,16 @@ describe('impostor atlas allocator', () => {
       atlas.draw(c, body, { a: 0.3, d: 0.3, tx: 40, ty: 90 });
       atlas.flush();
       assert.deepEqual(rendered, [true, false], 'later passes only erase their slots');
+      // A resolution change invalidates old images without destroying live skeletons.
+      atlas.draw(c, body, { a: 0.3, d: 0.3, tx: 40, ty: 90 });
+      atlas.setResolution(4);
+      assert.equal(c.freed, true);
+      assert.equal(k.freed, true);
+      assert.equal(body.parent, atlas.parked);
+      assert.equal(atlas.res, 4);
+      const sharp = atlas.alloc(100, 110);
+      assert.equal(sharp.page.rt.resolution, 4);
+      atlas.free(sharp);
       // fill everything: eventually null, never throws
       let n = 0;
       while (atlas.alloc(500, 500) && n < 1000) n++;

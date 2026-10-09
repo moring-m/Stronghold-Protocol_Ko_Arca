@@ -2401,6 +2401,8 @@ function buildEnemies(ctx) {
     const be = beFactor > 0 ? Math.round((stats.maxHp * hpF + stats.atk * atkF + stats.def * defF + stats.res * resF) / beFactor) : null;
     const talents = flattenBB(data.talentBlackboard, `enemy ${key} talents`);
     const abilities = (hb?.abilityList || []).map((a) => ({ text: stripRich(a.text), textRaw: richRaw(a.text), format: a.textFormat || 'NORMAL' }));
+    // PRTS death-explosion mechanism: silence suppresses the pollution release.
+    if (['enemy_1267_nhpbr','enemy_1267_nhpbr_2'].includes(key)) for (const a of abilities) if (a.text.includes('污染秽蚀')) a.format='SILENCE';
     const name = mv(data.name) || hb?.name || key;
     const descRaw = mv(data.description);
     const hitArea = HIT_AREAS[mv(data.prefabKey) || key] || null;
@@ -3384,8 +3386,8 @@ function buildChoices(ctx, effects, items, chess) {
     pools: {
       pool_equip_normal: { kind: 'equip', rule: 'shopEligible', maxTier: 'shopLevel', assumed: true },
       pool_equip_shop_1: { kind: 'equip', rule: 'shopEligible', tiers: [1], assumed: true },
-      pool_equip_kathe: { kind: 'equip', rule: 'shopEligible', maxTier: 'shopLevel', assumed: true },
-      pool_equip_narant: { kind: 'equip', rule: 'shopEligible', maxTier: 'shopLevel', assumed: true },
+      pool_equip_kathe: { kind: 'equip', rule: 'shopEligible', assumed: true },
+      pool_equip_narant: { kind: 'equip', rule: 'shopEligible', assumed: true },
       // "获得一件带有随机特殊效果的维式重锤": the 4 hammers with a special effect (never sold, SHOP_EXCLUDED_ITEMS); the
       // weights are server-side (PRTS 11-25 note: "装备【灼燃维式重锤】的出现概率调整") — uniform [ASSUMED]
       pool_equip_vict: { kind: 'equip', items: ['灼燃维式重锤', '坚固维式重锤', '加速维式重锤', '战栗维式重锤'].map(itemByName), assumed: true },

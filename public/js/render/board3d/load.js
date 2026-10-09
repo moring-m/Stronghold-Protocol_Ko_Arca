@@ -69,7 +69,7 @@ export const GATE_NODES = Object.freeze({
   startDown: 'Start_down', startUp: 'Start_up', startBack: 'Start_back', endDown: 'Start_down1', endUp: 'Start_up1',
 });
 
-let cached = null;
+let cached = {};
 
 /**
  * Does the local-art manifest list the board atlas? Reads the manifest only (no images): decides whether the
@@ -98,9 +98,10 @@ async function fetchJson(url) {
  * Load the board pack through the asset store of public/js/assets.js (needs local(), localUrl(), image()).
  * @returns {Promise<object|null>}
  */
-export function loadBoardPack(assets) {
-  if (cached) return cached;
-  cached = (async () => {
+export function loadBoardPack(assets, { native = true } = {}) {
+  const cacheKey = native ? 'native' : 'simple';
+  if (cached[cacheKey]) return cached[cacheKey];
+  cached[cacheKey] = (async () => {
     if (!assets || typeof assets.local !== 'function' || typeof assets.localUrl !== 'function' || typeof assets.image !== 'function') return null;
     const manifest = await assets.local().catch(() => null);
     if (!isObj(manifest)) return null;
@@ -127,6 +128,7 @@ export function loadBoardPack(assets) {
     // The tile-grid builder remains a fallback for installations without these optional assets.
     const original = { scenes: {}, materials: {}, images: {}, pending: {}, recent: [] };
     original.loadStage = (id) => {
+      if (!native) return Promise.resolve(null);
       const u = url('map/original', id);
       if (!u) return Promise.resolve(null);
       if (original.scenes[id]) {
@@ -143,7 +145,7 @@ export function loadBoardPack(assets) {
         return original.scenes[id] || null;
       }).finally(() => { delete original.pending[id]; });
     };
-    const originalEntries = manifest.groups?.['map/original'] || {};
+    const originalEntries = native ? manifest.groups?.['map/original'] || {} : {};
     // Optional scene files warm in a bounded background queue. The fallback board
     // and input stay available while any scene or its textures are downloading.
     const sceneQueue = Object.entries(originalEntries).filter(([,entry]) => entry.kind === 'original-unity-scene');
@@ -181,8 +183,8 @@ export function loadBoardPack(assets) {
       materials: { theme: isObj(theme) ? theme : null, fx: isObj(fxMats) ? fxMats : null },
     };
   })().catch((err) => { console.warn('[board3d] art load failed', err); return null; });
-  return cached;
+  return cached[cacheKey];
 }
 
 /** Forget the cached pack (tests / hot reload). */
-export function resetBoardPack() { cached = null; threePromise = null; }
+export function resetBoardPack() { cached = {}; threePromise = null; }

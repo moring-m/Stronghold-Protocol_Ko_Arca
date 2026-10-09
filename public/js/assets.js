@@ -545,6 +545,28 @@ export function loadImageElement(url) {
   });
 }
 
+/** Preserve the source atlas alpha convention and avoid sampling neighbouring
+ * atlas regions through generated mipmaps. Apply once to each shared page. */
+export function configureSpineTextures(data, entry, P = globalThis.PIXI) {
+  const pages=new Set();
+  for(const skin of data?.skins || []) {
+    const attachments=typeof skin.getAttachments==='function' ? skin.getAttachments().map(x=>x.attachment) :
+      (skin.attachments || []).flatMap(slot=>Object.values(slot || {}));
+    for(const a of attachments) {
+      const base=a?.region?.texture?.baseTexture || a?.region?.page?.baseTexture;
+      if(base)pages.add(base);
+    }
+  }
+  for(const base of pages) {
+    const alpha=entry.pma ? P.ALPHA_MODES.PMA : P.ALPHA_MODES.UNPACK;
+    if(base.alphaMode!==alpha) { base.alphaMode=alpha; base.update?.(); }
+    base.scaleMode=P.SCALE_MODES.LINEAR;
+    base.mipmap=P.MIPMAP_MODES.OFF;
+    base.wrapMode=P.WRAP_MODES.CLAMP;
+  }
+  return pages.size;
+}
+
 /** Default Spine loader: PIXI.Assets.load(skel) → spineData (needs globalThis.PIXI + PIXI.spine). */
 export async function loadSpineData(entry, opts) {
   const PIXI = globalThis.PIXI;
@@ -553,6 +575,7 @@ export async function loadSpineData(entry, opts) {
   const res = await PIXI.Assets.load(entry.skel);
   const data = res && (res.spineData || res);
   if (!data || !Array.isArray(data.animations)) throw new Error(`bad spine data: ${entry.skel}`);
+  configureSpineTextures(data, entry, PIXI);
   return data;
 }
 

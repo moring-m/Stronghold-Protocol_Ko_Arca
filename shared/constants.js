@@ -227,13 +227,14 @@ export const EMOTE_THEMES = Object.freeze([
 ].map((t) => Object.freeze({ ...t, emotes: Object.freeze(t.emotes) })));
 /** Every emote with its theme: `{ id, sortId, picId, label, themeId, dir }`, in wheel order. */
 export const EMOTE_CATALOG = Object.freeze(EMOTE_THEMES.flatMap((t) => t.emotes.map((e) => Object.freeze({ ...e, themeId: t.themeId, dir: t.dir }))));
-/** The 36 official emote ids (protocol whitelist: `EMOTES.includes(id)`). */
-export const EMOTES = Object.freeze(EMOTE_CATALOG.map((e) => e.id));
-const EMOTE_INDEX = new Map(EMOTE_CATALOG.map((e) => [e.id, e]));
+/** Separate IDs preserve the 36 replacement pictures while adding the six original basic pictures. */
+export const ORIGINAL_EMOTES = Object.freeze(EMOTE_THEMES[0].emotes.map(e=>Object.freeze({...e,id:'original_'+e.id,themeId:'emoticon_autochess_original',dir:'basic'})));
+export const EMOTES = Object.freeze([...EMOTE_CATALOG, ...ORIGINAL_EMOTES].map((e) => e.id));
+const EMOTE_INDEX = new Map([...EMOTE_CATALOG,...ORIGINAL_EMOTES].map((e) => [e.id, e]));
 /** Catalog record of an emote id, or null (safe for any input, including '__proto__'). */
 export const emoteInfo = (id) => (typeof id === 'string' && EMOTE_INDEX.get(id)) || null;
 // id-keyed maps without a prototype: a wire id like '__proto__' / 'toString' looks up undefined, never an Object method
-const emoteMap = (pick) => Object.freeze(Object.assign(Object.create(null), Object.fromEntries(EMOTE_CATALOG.map((e) => [e.id, pick(e)]))));
+const emoteMap = (pick) => Object.freeze(Object.assign(Object.create(null), Object.fromEntries([...EMOTE_CATALOG,...ORIGINAL_EMOTES].map((e) => [e.id, pick(e)]))));
 /** Emote id → theme id. */
 export const EMOTE_THEME = emoteMap((e) => e.themeId);
 /** Emote id → our aria-label (never displayed). */

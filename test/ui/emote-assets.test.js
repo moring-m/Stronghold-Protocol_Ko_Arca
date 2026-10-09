@@ -6,7 +6,7 @@ import { bundledEmoteArt, EMOTE_PAGES } from '../../shared/emote-art.js';
 import { startServer } from '../../server/index.js';
 
 test('all 36 replacement emotes have distinct, valid WebP files and safe lookups', () => {
-  const paths = EMOTES.map(bundledEmoteArt);
+  const paths = EMOTES.filter(id=>!id.startsWith('original_')).map(bundledEmoteArt);
   assert.equal(new Set(paths).size, 36);
   for (const path of paths) {
     assert.match(path, /^\/assets\/emotes\/[a-h]\d+\.webp$/);
@@ -14,7 +14,7 @@ test('all 36 replacement emotes have distinct, valid WebP files and safe lookups
     assert.equal(bytes.toString('ascii', 0, 4), 'RIFF');
     assert.equal(bytes.toString('ascii', 8, 12), 'WEBP');
   }
-  const displayed = EMOTE_PAGES.flatMap(page=>page.emotes.map(e=>bundledEmoteArt(e.id)));
+  const displayed = EMOTE_PAGES.slice(1).flatMap(page=>page.emotes.map(e=>bundledEmoteArt(e.id)));
   assert.deepEqual(displayed, [...paths].sort((a,b)=>a.localeCompare(b,'en',{numeric:true})));
   assert.ok(EMOTE_PAGES.every(page=>page.emotes.length===6));
   for (const id of ['unknown', '__proto__', 'constructor', null, undefined]) assert.equal(bundledEmoteArt(id), null);
@@ -41,12 +41,14 @@ test('browser renders every replacement image without the extracted asset manife
     });
     await page.waitForFunction(() => {
       const images=[...document.querySelectorAll('#replacement-art img')];
-      return images.length===36 && images.every(img=>img.complete && img.naturalWidth>0);
+      return images.length===42 && images.every(img=>img.complete && img.naturalWidth>0);
     });
     await page.addStyleTag({url:`http://127.0.0.1:${server.port}/css/emotes.css`});
     assert.equal(await page.$eval('#replacement-art img', img=>getComputedStyle(img).backgroundColor), 'rgb(255, 255, 255)');
-    assert.equal(await page.$$eval('#replacement-art img', imgs=>new Set(imgs.map(i=>i.src)).size),36);
+    assert.equal(await page.$$eval('#replacement-art img', imgs=>new Set(imgs.map(i=>i.src)).size),42);
     const ids=[];
+    ids.push(...await page.$$eval('#replacement-wheel .ewheel__item',els=>els.map(el=>el.dataset.emote)));
+    await page.click('#replacement-wheel .ewheel__tabs button:nth-child(2)');
     for (let i=0;i<6;i++) {
       await page.waitForFunction(index=>document.querySelectorAll('#replacement-wheel .ewheel__dot')[index]?.getAttribute('aria-selected')==='true',{},i);
       ids.push(...await page.$$eval('#replacement-wheel .ewheel__item',els=>els.map(el=>el.dataset.emote)));

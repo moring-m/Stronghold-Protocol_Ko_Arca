@@ -1,0 +1,79 @@
+[
+  {
+    "id": "act1autochess_m01",
+    "nativeMeshes": 10,
+    "proceduralOverlay": false,
+    "rearMeshes": 4,
+    "errors": []
+  },
+  {
+    "id": "act1autochess_m02",
+    "nativeMeshes": 11,
+    "proceduralOverlay": false,
+    "rearMeshes": 4,
+    "errors": []
+  },
+  {
+    "id": "act1autochess_m03",
+    "nativeMeshes": 8,
+    "proceduralOverlay": false,
+    "rearMeshes": 3,
+    "errors": []
+  },
+  {
+    "id": "act1autochess_m04",
+    "nativeMeshes": 8,
+    "proceduralOverlay": false,
+    "rearMeshes": 3,
+    "errors": []
+  },
+  {
+    "id": "act1autochess_m05",
+    "nativeMeshes": 10,
+    "proceduralOverlay": false,
+    "rearMeshes": 3,
+    "errors": []
+  },
+  {
+    "id": "act1autochess_m06",
+    "nativeMeshes": 9,
+    "proceduralOverlay": false,
+    "rearMeshes": 3,
+    "errors": []
+  },
+  {
+    "id": "act1autochess_m07",
+    "nativeMeshes": 8,
+    "proceduralOverlay": false,
+    "rearMeshes": 3,
+    "errors": []
+  },
+  {
+    "id": "act2autochess_m01",
+    "nativeMeshes": 9,
+    "proceduralOverlay": false,
+    "rearMeshes": 5,
+    "errors": []
+  },
+  {
+    "id": "act2autochess_m02",
+    "nativeMeshes": 18,
+    "proceduralOverlay": false,
+    "rearMeshes": 6,
+    "errors": []
+  },
+  {
+    "id": "act2autochess_m03",
+    "nativeMeshes": 10,
+    "proceduralOverlay": false,
+    "rearMeshes": 4,
+    "errors": []
+  },
+  {
+    "id": "act2autochess_m04",
+    "nativeMeshes": 13,
+    "proceduralOverlay": false,
+    "rearMeshes": 4,
+    "errors": []
+  }
+]

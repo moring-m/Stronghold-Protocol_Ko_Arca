@@ -1724,7 +1724,7 @@ export function shortcutBlocked(act, { modal = false, drawer = false } = {}) {
 
 // ---- settings ------------------------------------------------------------------------------------------------------
 
-export const DEFAULT_SETTINGS = Object.freeze({ bgm: 0.6, sfx: 0.8, voice: 0.6, voiceLanguage: 'kr', chatVolume: 0.5, chatSound: 'emote', chatSoundCustomized: false, chatFactionNotifications: false, chatCooldown: defaultChatCooldown('emote'), muted: false, damageNumbers: true, damageNumberMode: 'basic', quality: 'high' });
+export const DEFAULT_SETTINGS = Object.freeze({ bgm: 0.6, sfx: 0.8, voice: 0.6, voiceLanguage: 'kr', chatVolume: 0.5, chatSound: 'emote', chatSoundCustomized: false, chatFactionNotifications: false, chatCooldown: defaultChatCooldown('emote'), muted: false, damageNumbers: true, damageNumberMode: 'basic', quality: 'high', mapQuality: 'high', renderScale: 1, effectsQuality: 'high', shadows: true, skillRanges: true, unitRanges: true, animationQuality: 'high', frameLimit: 60, adaptiveQuality: true });
 const QUALITIES = ['high', 'medium', 'low'];
 
 /**
@@ -1750,6 +1750,15 @@ export function sanitizeSettings(raw) {
     damageNumbers: damageNumberMode(r) !== 'none',
     damageNumberMode: DAMAGE_NUMBER_MODES.includes(r.damageNumberMode) || typeof r.damageNumbers === 'boolean' ? damageNumberMode(r) : DEFAULT_SETTINGS.damageNumberMode,
     quality: QUALITIES.includes(r.quality) ? r.quality : DEFAULT_SETTINGS.quality,
+    mapQuality: ['high','medium','low','minimal'].includes(r.mapQuality) ? r.mapQuality : 'high',
+    renderScale: [.5,.75,1,1.25,1.5,2].includes(r.renderScale) ? r.renderScale : 1,
+    effectsQuality: QUALITIES.includes(r.effectsQuality) ? r.effectsQuality : (QUALITIES.includes(r.quality) ? r.quality : 'high'),
+    shadows: typeof r.shadows === 'boolean' ? r.shadows : r.quality !== 'low',
+    skillRanges: r.skillRanges !== false,
+    unitRanges: r.unitRanges !== false,
+    animationQuality: QUALITIES.includes(r.animationQuality) ? r.animationQuality : 'high',
+    frameLimit: [30,60,120].includes(r.frameLimit) ? r.frameLimit : 60,
+    adaptiveQuality: r.adaptiveQuality !== false,
   };
 }
 

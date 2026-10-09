@@ -592,6 +592,12 @@ export class Match {
         return;
       }
       this._quit(ps);
+      for (const f of this.fields) {
+        if (!f.live || f.done || f.endRequested) continue;
+        const votes = f.kind === 'boss' || f.kind === 'hidden' ? this._endBattleVotes : f.endVotes;
+        const voter = this.order.find(p=>!p.isBot && !p.left && p.alive && f.players.includes(p.playerId) && votes?.has(p.playerId));
+        if (voter) this.endBattle(voter, f.fieldId);
+      }
     });
   }
 
@@ -954,7 +960,7 @@ export class Match {
         ...this._pendingLpView(ps),
       })),
       fields: this.fields.map((f) => {
-        const v = { fieldId: f.fieldId, kind: f.kind, players: f.players.slice(), live: !!f.live };
+        const v = { fieldId: f.fieldId, kind: f.kind, players: f.players.slice(), live: !!f.live, endVotes:[...(f.endVotes || this._endBattleVotes || [])] };
         const pr = this._fieldProgress(f);
         if (pr) v.progress = pr;
         return v;
@@ -1169,11 +1175,41 @@ export class Match {
       case 'g.pause': return this.setPause(ps, !!msg.on);
       // the stats the board's units start their next battle with (the detail card in prep, user playtest #4 item 7)
       case 'g.unitStats': return this.unitStats(ps, msg.seq ?? null);
+      case 'g.endBattle': return this.endBattle(ps, msg.fieldId);
       case 'g.leave': this.onLeave(ps.playerId); return OK;
       case 'b.progress': return this._onProgress(ps, msg);
       case 'b.result': return this._onResult(ps, msg);
       default: return fail(ERR.BAD_MSG);
     }
+  }
+
+  endBattle(ps, fieldId) {
+    const f = this.fields.find(f=>f.fieldId===fieldId && f.live && !f.done);
+    if (!ps.alive || !f || !f.players.includes(ps.playerId) || ![PHASE.COMBAT,PHASE.UNITE,PHASE.FINAL_ASSAULT,PHASE.HIDDEN_CORE].includes(this.phase)) return fail(ERR.WRONG_PHASE);
+    if (f.endRequested) return OK;
+    const boss = f.kind === 'boss' || f.kind === 'hidden';
+    const required = (boss ? this.alivePlayers() : f.players.map(id=>this.players.get(id))).filter(p=>p && !p.isBot && !p.left && p.alive);
+    const votes = boss ? (this._endBattleVotes ||= new Set()) : (f.endVotes ||= new Set());
+    votes.add(ps.playerId); this.markPublic();
+    if (!required.every(p=>votes.has(p.playerId))) return OK;
+    if (boss) { if(this.clientCombat)this._endFinal('forced');else this.runner?.forceAll('forced'); return OK; }
+    if (!this.clientCombat) { f.battle?.forceEnd('timeout'); return OK; }
+    f.endRequested=true;
+    // Reconstruct only the elapsed fight on the authority; never grant future kills.
+    const elapsed = Math.max(.01,this._fieldElapsed(f));
+    const battle = this._specBattle(f.spec);
+    const job = new HeadlessJob(battle,{players:f.players,onError:e=>this.reportError('end battle',e)});
+    job.cap = Math.max(1,Math.ceil(elapsed / (battle.dt || 1/30)));
+    this._clearFieldTimers(f); f.mode='server'; f.authority=null; f.job=job;
+    for (const pid of this._humansShowing(f)) this.sendTo(pid,{t:'b.end',battleId:f.battleId,fieldId:f.fieldId,reason:'timeout'});
+    const step = () => {
+      if (this.disposed || this.ended || f.done || f.job!==job) return;
+      if (!job.run(this.headlessSliceMs)) { f.sliceTimer=this.later(0,step); return; }
+      const out=job.output(); f.battle=out.battle; f.result=out.result; f.resultSource='server'; f.timeline=out.timeline;
+      if (f.cc) this._fieldDone(f);
+
+    };
+    step(); return OK;
   }
 
   chat(ps, text) {
@@ -3053,6 +3089,7 @@ export class Match {
   _endFinal(reason) {
     if (this._finalEnding) return;
     this._finalEnding = reason;
+    this._endBattleVotes = null;
     this._broadcastPool(true);
     for (const f of this.fields) {
       if (!f.cc || f.done) continue;

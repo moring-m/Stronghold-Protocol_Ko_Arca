@@ -7062,7 +7062,6 @@
     "pool_equip_narant": {
       "kind": "equip",
       "rule": "shopEligible",
-      "maxTier": "shopLevel",
       "assumed": true
     },
     "pool_equip_vict": {

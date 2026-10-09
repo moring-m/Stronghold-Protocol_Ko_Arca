@@ -11,7 +11,7 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { presetCamera, OFFICIAL_PARAMS, parseCameraParam } from '../../public/js/render/projection.js';
-import { bandFor, boardArea, penShown, viewKind } from '../../public/js/render/app.js';
+import { bandFor, boardArea, fieldRows, penShown, viewKind } from '../../public/js/render/app.js';
 import { AREAS } from '../../public/js/render/board3d/layout.js';
 import { underframeRect } from '../../public/js/ui/underframe.js';
 import { panelSide, panelSlots, chessLoadout, prepCamera, bondPopupPlace, BPOP } from '../../public/js/ui/gameLogic.js';
@@ -31,12 +31,13 @@ describe('6: the enemy pen only with the pen camera', () => {
       assert.equal(penShown(k), false, `${k}: pen figures hidden`);
     }
     for (const k of ['boss', 'hidden']) {
-      assert.deepEqual(bandFor(k), [0, 13], k);
-      assert.ok(maxRow(boardArea(viewKind(k))) <= 6, `${k}: boss field only`);
+      assert.deepEqual(bandFor(k), [0, 12], k);
+      assert.equal(maxRow(boardArea(viewKind(k))),12);
+      assert.deepEqual(fieldRows(k),[0,6]);
       assert.equal(penShown(viewKind(k)), false);
     }
-    assert.deepEqual(bandFor('bossPrep'),[0,18]);
-    assert.equal(maxRow(boardArea('bossPrep')),18);
+    assert.deepEqual(bandFor('bossPrep'),[0,12]);
+    assert.equal(maxRow(boardArea('bossPrep')),12);
     assert.deepEqual(bandFor('pen'), [6, 18]);
     assert.equal(maxRow(boardArea('pen')), 18);
     assert.equal(boardArea('pen'), AREAS.normal, 'the pen view keeps the field + pen block');

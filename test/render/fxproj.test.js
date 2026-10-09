@@ -64,6 +64,20 @@ test('a growing alchemy field updates one circle per cast and keeps operator-the
  fx.simFx('zone',6,10,{...extra,zoneKey:2});assert.equal(fx.zones.length,2,'separate casts remain distinct');
  run(fx,13);assert.equal(fx.zones.length,0);fx.clear();
 });
+
+test('Thorns alchemy key updates its existing zone rather than stacking one per tick',()=>{
+ const v=unit(905,3,10,{info:{charId:'char_1039_thorn2'}}),{fx}=makeFx({views:[v],ts:1});
+ const key='thorn2:905:1';
+ fx.simFx('zone',5,10,{id:v.id,key,r:1,duration:12});const disc=fx.zones[0].disc;
+ for(let i=1;i<12;i++){
+  run(fx,1);fx.simFx('zone',5+i*.05,10,{id:v.id,key,r:1+i*.1,duration:12-i});
+  assert.equal(fx.zones.length,1);assert.equal(fx.zones[0].disc,disc);
+ }
+ assert.equal(fx.zones[0].r,2.1);
+ fx.simFx('zone',6,10,{id:v.id,key:'thorn2:905:2',r:1,duration:4});
+ assert.equal(fx.zones.length,2,'independent casts remain separate');
+ run(fx,5);assert.equal(fx.zones.length,0);fx.clear();
+});
 test('ongoing skill hexagons keep the default gold and rotate in world space',()=>{
  const v=unit(904,5,10,{info:{charId:'char_4064_mlynar'}}),{fx}=makeFx({views:[v]});
  fx.skill(v,true);const a=fx.auras.get(v.id);let color,first,second;
@@ -666,5 +680,13 @@ test('boss model, impact, lock, projectile and text align in both halves and who
   assert.ok(Math.abs(n._x-text.x)<1e-6&&Math.abs(n._y-text.y)<1e-6);
   assert.ok(Math.abs(n._x-foot.x)<1e-6,'text stays above the model, including while changing a live number camera');
  }
+ fx.clear();
+});
+
+test('garrison/layer pop follows its owner in world space for every bond source',()=>{
+ const v=unit(912,3,10),{fx}=makeFx({views:[v]});
+ fx.pop(null,'+5',0xffffff,0,[v.x,v.y],v.id);fx._updatePops(.1);
+ const first=fx.pops[0].c.position.x;v.x+=2;fx._updatePops(.1);
+ assert.notEqual(fx.pops[0].c.position.x,first,'moving owners retain their own pop');
  fx.clear();
 });

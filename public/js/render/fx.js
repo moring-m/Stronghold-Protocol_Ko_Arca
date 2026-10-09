@@ -380,7 +380,7 @@ export class FxSystem {
     this._g = { x: 0, y: 0, s: 0, depth: 0 };
   }
 
-  get quality() { return this.ctx.settings?.quality || 'high'; }
+  get quality() { return this.ctx.settings?.effectsQuality || this.ctx.settings?.quality || 'high'; }
   /** The view's adaptive load level (0–3, render/app.js): a struggling device gets fewer particles / numbers. */
   get load() { return this.ctx.loadLevel ? this.ctx.loadLevel() | 0 : 0; }
   get maxParticles() { return Math.round((MAX_PARTICLES[this.quality] || MAX_PARTICLES.high) * LOAD_PARTICLES[Math.min(3, this.load)]); }
@@ -1811,7 +1811,7 @@ export class FxSystem {
         if(source && !source.isEnemy)loadRangeArtColor(source.info,this.ctx.assets);
         const theme=source && !source.isEnemy ? skillRangeStyle(source.info) : null;
         this.zone(at.x,at.y,this._groundZ(at.x,at.y),r,theme?.color ?? col,Math.max(.1,dur || 1.5),spec.tex,false,{
-          key:ex.zoneKey!=null?`${ex.id ?? ex.src}:${ex.zoneKey}`:null,
+          key:(ex.zoneKey ?? ex.key)!=null?`${ex.id ?? ex.src}:${ex.zoneKey ?? ex.key}`:null,
           theme,themeInfo:theme ? source.info : null,grow:num(ex.grow)*ts,vx:num(ex.vx)*ts,vy:num(ex.vy)*ts,bounds:ex.bounds,
         });break;
       }
@@ -2262,7 +2262,7 @@ export class FxSystem {
   }
 
   /** Screen-space pop (bond layer gain / bounty coins). `icon` = texture or null. */
-  pop(icon, label, tint, i = 0, at = null) {
+  pop(icon, label, tint, i = 0, at = null, ownerId = null) {
     const P = this.P;
     const size = this.ctx.screenSize();
     const top = this.ctx.fieldTop ? this.ctx.fieldTop() : size.height * 0.2;
@@ -2296,7 +2296,7 @@ export class FxSystem {
       c.addChild(t);
     }
     this.ctx.layers.screen.addChild(c);
-    this.pops.push({ c, t: 0, dur: 1.4, y0: c.position.y, at });
+    this.pops.push({ c, t: 0, dur: 1.4, y0: c.position.y, at, ownerId });
     if (this.pops.length > 12) { const o = this.pops.shift(); o.c.destroy({ children: true }); }
   }
 
@@ -2306,7 +2306,9 @@ export class FxSystem {
       p.t += dt;
       if (p.t >= p.dur) { p.c.destroy({ children: true }); continue; }
       const k = p.t / p.dur;
-      if(p.at){const a=this._proj(p.at[0],p.at[1],this._groundZ(p.at[0],p.at[1]));p.c.position.x=a.x;p.y0=a.y-65;}
+      const owner=p.ownerId!=null ? this._viewOf(p.ownerId) : null;
+      if(owner){const world=bodyPoint(this.ctx.cam(),owner,1.08);const a=this._proj(world.x,world.y,world.z);p.c.position.x=a.x;p.y0=a.y-18;}
+      else if(p.at){const a=this._proj(p.at[0],p.at[1],this._groundZ(p.at[0],p.at[1]));p.c.position.x=a.x;p.y0=a.y-65;}
       p.c.position.y = p.y0 - 40 * easeOut(k);
       p.c.alpha = k < 0.15 ? k / 0.15 : k > 0.7 ? 1 - (k - 0.7) / 0.3 : 1;
       const s = k < 0.15 ? 0.6 + (k / 0.15) * 0.5 : 1.1 - Math.min(0.1, (k - 0.15));

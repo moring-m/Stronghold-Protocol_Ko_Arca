@@ -326,10 +326,10 @@ export class SkillRuntime {
     if (changesRange(this.spec.targeting)) this.battle._refreshRange(this.unit);
   }
 
-  /** Add SP (fires the `spGain` hook). Ignored while a duration/ammo/toggle skill runs (its bar shows the skill). */
-  gainSp(amount, reason = 'time', silent = false) {
+  /** Add SP (fires the `spGain` hook). Ordinary recovery pauses during an active skill; explicit item effects may bypass that pause. */
+  gainSp(amount, reason = 'time', silent = false, { duringSkill = false } = {}) {
     if (this.noSkill || this.kind === 'passive' || !(amount > 0)) return 0;
-    if (this.active && this.isTimed && reason !== 'init') return 0;
+    if (this.active && this.isTimed && reason !== 'init' && !duringSkill) return 0;
     // 阻回 (the operators' 凋亡 burst, damage.js): "停止并阻止任意形式的技力回复" — no SP of any kind (time, attack, hurt, gifts)
     if (reason !== 'init' && this.unit.s.flags.noSp) return 0;
     let cost = this.spCost;

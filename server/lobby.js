@@ -513,7 +513,18 @@ export class Lobby {
     if (!room) return fail(ERR.ROOM_NOT_FOUND);
     const cur = this.roomOf(session);
     if (cur === room) {
-      if (!room.spectatorOf(session.playerId)) return fail(ERR.ALREADY, 'seated as a player');
+      if (!room.spectatorOf(session.playerId)) {
+        if (room.match) return fail(ERR.ROOM_STARTED);
+        if (room.mode === 'solo' || room.spectatorCap <= room.spectators.length) return fail(ERR.ROOM_FULL);
+        const seat = room.seatOf(session.playerId);
+        if (!seat || seat.isBot) return fail(ERR.BAD_TARGET);
+        cancelVote(this, room);
+        room.seats[seat.seat] = null;
+        room.spectators.push({playerId:session.playerId,name:session.name,connected:session.connected});
+        if (room.hostId === session.playerId) this.migrateHost(room);
+        this.broadcastState(room);
+        return OK;
+      }
       this.sendState(room, session);
       return OK;
     }

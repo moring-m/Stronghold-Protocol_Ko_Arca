@@ -66,3 +66,11 @@ test('Vendela active buff timing uses Attack, not its short activation gesture',
  const timing=spineAttackTiming(sp);assert.deepEqual(timing.skills,{});
  assert.equal(attackWindup({def:{attackTiming:{front:timing},skill:{index:1}},s:{interval:1.6},skill:{active:true}}),.567);
 });
+
+test('legacy enemy strike metadata supplies wind-up, including Big Bob',()=>{
+ assert.equal(attackWindup({kind:'enemy',def:{attackAnim:{dur:1,hit:.167}},s:{interval:4}}),.167);
+ const h=scenario('enemy');h.step();const e=h.enemies()[0];e.def={...e.def,attackTiming:null,attackAnim:{dur:1,hit:.167}};delete e.mem.attackWindup;e.atkCd=0;
+ const u=h.unit('timed');const before=u.hp;
+ h.run(.1);assert.equal(u.hp,before,'no damage before the strike frame');
+ h.run(.2);assert.ok(u.hp<before,'strike lands after the wind-up');
+});

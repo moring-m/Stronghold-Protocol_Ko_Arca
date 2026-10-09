@@ -606,3 +606,55 @@ test('inactive field vertices are discarded before GPU geometry is created',asyn
  for(let i=1;i<filtered.position.length;i+=3)assert.ok(filtered.position[i]<=6.5);
  assert.equal(filtered.uv.length,6);
 });
+
+test('native preview floors remain visible without a procedural glass overlay; fallback retains its floor',()=>{
+ const geom={position:[8,15,0,9,15,0,8,16,0],index:[0,1,2],platform:true,material:'floor'};
+ const pack=fakePack();
+ pack.original={images:{},materials:{floor:{}},scenes:{[stages.act1autochess_m01.id]:{stageId:stages.act1autochess_m01.id,buckets:{floor:geom}}}};
+ const scene=new BoardScene(THREE,pack,{renderer:stubRenderer()});
+ scene.setStage(stages.act1autochess_m01);
+ assert.ok(scene.meshes['original:floor']);
+ assert.equal(scene.meshes.previewGlass,undefined);
+ scene.setArea([...AREAS.boss,{r0:14,r1:18,c0:6,c1:14}]);
+ assert.ok(scene.meshes['original:floor']);
+ assert.equal(scene.meshes.previewGlass,undefined);
+ scene.destroy();
+ const fallback=new BoardScene(THREE,fakePack(),{renderer:stubRenderer()});
+ fallback.setStage(stages.act1autochess_m01);
+ assert.ok(fallback.meshes.glass);
+ fallback.destroy();
+});
+
+test('cooperative background translation preserves whole geometry and all render attributes',async()=>{
+ const {translateEnvironment}=await import('../../public/js/render/board3d/scene.js');
+ const src={position:[8,14,0,9,14,0,8,15,1,0,10,0,1,10,0,0,11,1],index:[0,1,2,3,4,5],uv:[0,0,1,0,0,1,0,0,1,0,0,1]};
+ const out=translateEnvironment(src,6);
+ assert.deepEqual(out.index,src.index);
+ assert.deepEqual(out.position.slice(0,9),[8,8,0,9,8,0,8,9,1]);
+ assert.deepEqual(out.uv,src.uv);
+ assert.equal(src.position[1],14);
+});
+
+test('cooperative surroundings exclude combat decorations and retain the rear border',()=>{
+ const src={position:[8,9,0,9,9,0,8,10,1, 8,13,0,9,13,0,8,14,1],index:[0,1,2,3,4,5]};
+ const surroundings=sceneryForArea(src,AREAS.unite,{surroundOnly:true});
+ assert.deepEqual(surroundings.index,[3,4,5]);
+ const boss={position:[8,2,0,9,2,0,8,3,1, -2,9,0,-1,9,0,-2,10,1],index:[0,1,2,3,4,5]};
+ assert.deepEqual(sceneryForArea(boss,AREAS.boss,{interiorOnly:true}).index,[0,1,2]);
+});
+
+test('rear terrain crossing the cooperative border remains whole to support both fields',()=>{
+ const src={position:[14,12,-1,18,12,-1,14,16,.5],index:[0,1,2]};
+ assert.deepEqual(sceneryForArea(src,AREAS.unite,{surroundOnly:true}).index,src.index);
+});
+
+test('native field support retains nearby underground faces but excludes inactive field tops',()=>{
+ const src={position:[14,5,-.49,15,5,-.04,14,5.3,-.04,14,5,0,15,5,0,14,5.3,0,14,2,-1,15,2,-1,14,2.3,-1],index:[0,1,2,3,4,5,6,7,8]};
+ assert.deepEqual(geometryForArea(src,AREAS.unite).index,[]);
+ assert.deepEqual(geometryForArea(src,AREAS.unite,{support:true}).index,[0,1,2]);
+});
+
+ test('rear decoration selection preserves complete border props without copying terrain',()=>{
+ const src={position:[3,12,0,4,12,0,3,13,1, -2,12,0,5,12,0,-2,15,1, 8,12,0,9,12,0,8,13,1],index:[0,1,2,3,4,5,6,7,8]};
+ assert.deepEqual(sceneryForArea(src,[{c0:3,c1:5,r0:12,r1:13}],{decorationOnly:true}).index,[0,1,2]);
+ });

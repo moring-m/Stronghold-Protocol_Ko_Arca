@@ -7,7 +7,7 @@ import { readFileSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
-  avatarUrl, portraitUrl, enemyIconUrl, tokenAvatarUrl, bondIconUrl, bandIconUrl, itemIconUrl, skillIconUrl, uiUrl,
+  configureSpineTextures, avatarUrl, portraitUrl, enemyIconUrl, tokenAvatarUrl, bondIconUrl, bandIconUrl, itemIconUrl, skillIconUrl, uiUrl,
   profIconUrl, subProfIconUrl, spineEntry, hasBackSpine, unitPictureUrl, bgmEntry, sfxUrl, unitSfxUrl, baseCharId,
   validSpine, RefLru, createAssets, unloadSpineData, spinePages, spineDataWeight, SPINE_WEIGHT_MIN, SPINE_IDLE_BYTES,
   SPINE_IDLE_GRACE_MS, SPINE_EVICT_DELAY_MS, SPINE_QUIET_DELAY_MS,
@@ -592,4 +592,14 @@ describe('spine unload frees the atlas page images too', () => {
       assert.equal((await p2).from, e.skel);
     } finally { f.restore(); }
   });
+});
+
+test('Spine pages preserve straight/PMA alpha without mipmap bleed between attachments',()=>{
+ const P={ALPHA_MODES:{UNPACK:1,PMA:2},SCALE_MODES:{LINEAR:1},MIPMAP_MODES:{OFF:0},WRAP_MODES:{CLAMP:33071}};
+ let updates=0;const base={alphaMode:0,update(){updates++}};
+ const attachment={region:{texture:{baseTexture:base}}};
+ const data={skins:[{getAttachments:()=>[{attachment},{attachment}]}]};
+ assert.equal(configureSpineTextures(data,{pma:false},P),1);
+ assert.equal(base.alphaMode,1);assert.equal(updates,1);assert.equal(base.mipmap,0);
+ configureSpineTextures(data,{pma:true},P);assert.equal(base.alphaMode,2);assert.equal(updates,2);
 });

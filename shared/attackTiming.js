@@ -101,7 +101,9 @@ export function attackClipTiming(unit) {
   const timing = (unit.form && all?.forms?.[unit.form]) || (unit.dir === 'UP' && all?.back) || all?.front;
   const melee=unit.profile?.fortress && unit.blocking?.length>0;
   const clip = (unit.skill?.active && (melee?timing?.meleeSkills:timing?.skills)?.[unit.def?.skill?.index]) || (melee?timing?.melee||timing?.attack:timing?.attack);
-  return clip || null;
+  if (clip) return clip;
+  const legacy=unit.kind==='enemy' ? unit.def?.attackAnim : null;
+  return legacy?.dur>0 ? {...legacy,hit:Number.isFinite(legacy.hit)?Math.max(0,Math.min(legacy.dur,legacy.hit)):legacy.dur/2} : null;
 }
 export function attackWindup(unit) {
   const clip = attackClipTiming(unit);

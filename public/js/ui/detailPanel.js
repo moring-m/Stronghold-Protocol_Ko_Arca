@@ -697,10 +697,7 @@ export function resolveDetail(target, pieces) {
 }
 
 /**
- * The 选中干员 key of a resolved detail (null: nothing to say). The panel says the line once per opened operator and stays
- * mounted while its target changes, so the key carries what identifies the opening: the chess record, the piece / battle
- * unit, and the card tap (`tap`, game.js) — two shop / reward cards of one operator (the pool deals duplicates) carry the
- * same chess id and no piece, so without it the second card's tap said nothing, nor replaced the first one's line.
+ * Stable selection identity for a resolved operator detail. Playback is handled by direct field/bench clicks.
  * @param {any} detail resolveDetail's result
  * @returns {string|null}
  */
@@ -719,10 +716,7 @@ export function selectVoiceKey(detail) {
  *   resolved as another player's carries its own, `detail.cultOpts`)
  *   live: the unit's live stats (unitStatsEntry + src 'battle' | 'prep') — an object, or a getter the panel re-reads 4×
  *   a second (the battle's own sim, battle/runner.js unitStats); null ⇒ the record's numbers
- *   voice: whether the panel may speak — 选中干员 (audio.voice 'select') when it opens on an operator the player tapped:
- *   a piece on the field or in the hand, a shop / reward card, a bond member. The game screen passes true in every phase
- *   (the owner's request of 2026-10-08 「添加一下干员点击上去的语气一样的语音」 lifted 2026-10-03's 「整备阶段不需要干员语音」
- *   for this line only; [ASSUMED] the official prep tap says 选中干员 like the battle's FOCUS_CHAR)
+ *   voice: retained for caller compatibility; this panel does not initiate playback. Shop portrait taps open details only.
  */
 export function DetailPanel({ detail, editable, snapHp, onClose, onSell, onDestroy, bonds = [], offBonds = null, loadout = null, ops = null, onBond = null, side = 'left', shopOpen = false, live = null, voice = false }) {
   const getter = typeof live === 'function' ? live : null;

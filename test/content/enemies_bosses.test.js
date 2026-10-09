@@ -684,6 +684,17 @@ for (const key of ['enemy_1267_nhpbr', 'enemy_1267_nhpbr_2']) {
   });
 }
 
+for (const key of ['enemy_1267_nhpbr', 'enemy_1267_nhpbr_2']) {
+  test(`${nm(key)}: silenced death does not create a pollution zone`, () => {
+    const h = arena({ units: [{ chessId: 't_wall', row: 10, col: 6 }] }); h.step();
+    const e = put(h, key, [10, 7]);
+    h.b.applyStatus(e, 'silence', { duration: 10 });
+    killed(h, e, null); h.run(3.05);
+    approx(h.unit('t_wall').stats.taken, 0);
+    assert.equal(h.eventsOf('fx').filter(f => f[1] === 'zone' && f[4].kind === 'pollution').length, 0);
+  });
+}
+
 for (const key of ['enemy_1270_nhstlk', 'enemy_1270_nhstlk_2']) {
   test(`${nm(key)}: attacks inflict bleeding (${tb(key, 'Bleeding.attack@bleeding_damage')} arts/s), removed by healing`, () => {
     const h = arena({ units: [{ chessId: 't_wall', row: 9, col: 5 }] });

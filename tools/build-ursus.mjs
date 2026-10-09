@@ -47,24 +47,24 @@ export async function buildUrsus(){
   const id=`chess_custom_ursus_${o.key}_${suffix}`,r=generated[id];
   if(!r?.stats || !r.skill)throw Error(`Incomplete generated operator ${id}`);
   r.name=o.name;localizeOperator(r,korean,a.charChessDataDict[id].status);chess[id]=r;
-  const elite=suffix==='b', count=o.key==='turdus'?(elite?6:3):o.key==='leto'?(elite?6:3):elite?4:2;
+  const elite=suffix==='b', count=o.key==='turdus'?(elite?6:3):o.key==='leto'?(elite?4:2):elite?4:2;
   let source,desc;
   if(o.trait==='power'){source='garrison_100_a';desc=`[우르수스] 맹약이 3회 중첩할 때마다 공격 속도 +${elite?4:2}`}
   else if(o.trait==='scale'){source='garrison_100_a';desc=`[우르수스]/[정밀] 맹약이 3회 중첩할 때마다 공격력 +${elite?2:1}%`}
-  else if(o.trait==='slowedDeaths'){source='garrison_42_a';desc=`<전투 중> 공격 범위 내 정지 상태의 적이 사망할 때마다 활성화된 [우르수스]/[예견] 맹약의 중첩 수 각각 +${count}/+${elite?2:1} (전투당 최대 10회 발동)`}
-  else if(o.key==='leto'){source='garrison_42_a';desc=`<전투 중> 아군 [우르수스] 오퍼레이터가 스킬을 발동할 때마다 활성화된 [우르수스] 맹약의 중첩 수 +${count} (전투당 최대 7회 발동)`}
+  else if(o.trait==='slowedDeaths'){source='garrison_42_a';desc=`<전투 중> 공격 범위 내 정지 상태의 적이 사망할 때마다 활성화된 [우르수스]/[예견] 맹약의 중첩 수 각각 +${count}/+${elite?2:1} (전투당 최대 8회 발동)`}
+  else if(o.key==='leto'){source='garrison_42_a';desc=`<전투 중> 아군 [우르수스] 오퍼레이터가 스킬을 발동할 때마다 활성화된 [우르수스] 맹약의 중첩 수 +${count} (전투당 최대 8회 발동)`}
   else if(o.trait==='all'){source='garrison_80_a';desc=`<휴식 기간 진입 시> 자신의 활성화된 맹약 중첩 수 +${count}`}
   else if(o.trait==='gainWeakness'){source='garrison_35_a';desc=`<획득 시> [우르수스]/[기습] 맹약의 중첩 수 +${elite?10:5} (맹약 활성화 불필요)`}
-  else if(o.key==='botany'){source='garrison_42_a';desc=`<전투 중> 처음 스킬을 발동할 때 활성화된 [우르수스] 맹약의 중첩 수 +${elite?16:8}`}
+  else if(o.key==='botany'){source='garrison_42_a';desc=`<전투 중> 처음 스킬을 발동할 때 활성화된 [우르수스] 맹약의 중첩 수 +${elite?14:7}`}
   else if(o.trait==='ursusStart'){source='garrison_69_a';desc=`<휴식 기간 진입·종료 시> 활성화된 [우르수스] 맹약의 중첩 수 +${elite?12:6}`}
   else {source='garrison_69_a';desc=`<휴식 기간 ${o.trait==='ursusStart'||o.trait==='swift'?'진입':'종료'} 시>${o.trait==='ursusStart'?'<휴식 기간 종료 시>':''} 활성화된 [${o.trait==='swift'?'신속':'우르수스'}] 맹약의 중첩 수 +${o.trait==='ursusStart'?(elite?12:6):count}`}
   const gar=structuredClone(garrisons[source]);gar.garrisonId=r.garrisonIds[0];gar.name=o.name;gar.desc=desc;gar.descRaw=desc.replace(/\+\d+%?/g,'<@ba.vup>$&</>').replace('정지 상태','<@ba.vup>정지</> 상태');gar.requireActive=o.trait!=='gainWeakness';
   // Every effect carries its own blackboard; update both top-level and nested representations.
   const change=e=>{if(!e||typeof e!=='object')return;
-   if(o.key==='botany'){if(e.bb)Object.assign(e.bb,{bond_add_count:elite?16:8,max_add_count_per_battle:elite?16:8});if(e.bbStr)Object.assign(e.bbStr,{bond_id:'ursusShip'});return;}
+   if(o.key==='botany'){if(e.bb)Object.assign(e.bb,{bond_add_count:elite?14:7,max_add_count_per_battle:elite?14:7});if(e.bbStr)Object.assign(e.bbStr,{bond_id:'ursusShip'});return;}
    if(o.trait==='gainWeakness'){if(e.bb)e.bb.count=elite?10:5;if(e.bbStr)e.bbStr.bond='ursusShip,raidShip';return;}
-   if(o.trait==='slowedDeaths'){e.effectKey='custom_ursus_slowed_death';if(e.bbStr)Object.assign(e.bbStr,{key:'custom_ursus_slowed_death',bond_type:'bond_by_id',bond_id:'ursusShip,visiShip',bond_add_type:'by_count'});if(e.bb)Object.assign(e.bb,{bond_add_count:count,visi_add_count:elite?2:1,max_add_count_per_battle:count*10,max_trigger_count:10});return;}
-   if(o.key==='leto'){e.effectKey='custom_ursus_ally_skill';if(e.bbStr)Object.assign(e.bbStr,{key:'custom_ursus_ally_skill',bond_id:'ursusShip'});if(e.bb)Object.assign(e.bb,{bond_add_count:count,max_add_count_per_battle:count*7,max_trigger_count:7});return;}
+   if(o.trait==='slowedDeaths'){e.effectKey='custom_ursus_slowed_death';if(e.bbStr)Object.assign(e.bbStr,{key:'custom_ursus_slowed_death',bond_type:'bond_by_id',bond_id:'ursusShip,visiShip',bond_add_type:'by_count'});if(e.bb)Object.assign(e.bb,{bond_add_count:count,visi_add_count:elite?2:1,max_add_count_per_battle:count*8,max_trigger_count:8});return;}
+   if(o.key==='leto'){e.effectKey='custom_ursus_ally_skill';if(e.bbStr)Object.assign(e.bbStr,{key:'custom_ursus_ally_skill',bond_id:'ursusShip'});if(e.bb)Object.assign(e.bb,{bond_add_count:count,max_add_count_per_battle:count*8,max_trigger_count:8});return;}
    if(e.bb){if(o.trait==='power')Object.assign(e.bb,{divide_num:3,atk:0,max_hp:0,attack_speed:elite?4:2});else if(o.trait==='scale')e.bb.atk=elite?.02:.01;else e.bb.count=o.key==='botany'?(elite?12:6):o.trait==='ursusStart'?(elite?12:6):count;}
    if(e.bbStr){if(o.trait==='power')e.bbStr.bond_id='ursusShip';else if(o.key==='botany')e.bbStr.bond='ursusShip,miraShip';else if(o.trait==='scale')e.bbStr.bond_id='ursusShip,preciShip';else if(['ursus','ursusStart','swift'].includes(o.trait))e.bbStr.bond=o.trait==='swift'?'swiftShip':'ursusShip';}
    if(o.trait==='ursusStart'){e.eventType='SERVER_PREP_START';e.eventTypes=['SERVER_PREP_START','SERVER_PREP_FIN'];}
@@ -73,10 +73,10 @@ export async function buildUrsus(){
  }
  for(const r of Object.values(chess))if(['char_196_sunbr','char_4207_branch'].includes(r.charId)&&!r.bonds.includes('ursusShip'))r.bonds.push('ursusShip');
  const members=Object.values(chess).filter(c=>!c.isGolden&&c.bonds.includes('ursusShip')).map(c=>c.chessId);
- const desc='<전장에 서로 다른 [우르수스] 오퍼레이터 3명> 전투 시작 시 제국 드론 소환. 제국 드론과 [우르수스] 오퍼레이터의 공격력·최대 HP +20% (중첩당 +1%p). 제국 드론의 이동 속도 +50%\n<전장에 서로 다른 [우르수스] 오퍼레이터 6명> 제국 드론의 공격 속도 +50. 제국 드론의 공격 범위 내 적의 은신 무효화. 배치된 [우르수스] 오퍼레이터의 총 공격력의 5%를 제국 드론의 기본 공격력에 가산 (중첩당 +0.025%p)';
- const effectDesc='<전장에 서로 다른 [우르수스] 오퍼레이터 3명> 전투 시작 시 제국 드론 소환. 제국 드론과 [우르수스] 오퍼레이터의 공격력 +{0:0%}, 최대 HP +{1:0%} (중첩 수에 따라 변경). 제국 드론의 이동 속도 +50%\n<전장에 서로 다른 [우르수스] 오퍼레이터 6명> 제국 드론의 공격 속도 +50. 제국 드론의 공격 범위 내 적의 은신 무효화. 배치된 [우르수스] 오퍼레이터의 총 공격력의 {2:0.00%}를 제국 드론의 기본 공격력에 가산 (중첩 수에 따라 변경)';
+ const desc='<전장에 서로 다른 [우르수스] 오퍼레이터 3명> 전투 시작 시 제국 드론 소환. 제국 드론과 [우르수스] 오퍼레이터의 공격력·최대 HP +20% (중첩당 공격력 +1%p, 최대 HP +0.8%p). 제국 드론의 이동 속도 +50%\n<전장에 서로 다른 [우르수스] 오퍼레이터 6명> 제국 드론의 공격 속도 +50. 제국 드론의 공격 범위 내 적의 은신 무효화. 배치된 [우르수스] 오퍼레이터의 총 공격력의 10%를 제국 드론의 기본 공격력에 가산 (중첩당 +0.015%p)';
+ const effectDesc='<전장에 서로 다른 [우르수스] 오퍼레이터 3명> 전투 시작 시 제국 드론 소환. 제국 드론과 [우르수스] 오퍼레이터의 공격력 +{0:0%}, 최대 HP +{1:0.00%} (중첩 수에 따라 변경). 제국 드론의 이동 속도 +50%\n<전장에 서로 다른 [우르수스] 오퍼레이터 6명> 제국 드론의 공격 속도 +50. 제국 드론의 공격 범위 내 적의 은신 무효화. 배치된 [우르수스] 오퍼레이터의 총 공격력의 {2:0.00%}를 제국 드론의 기본 공격력에 가산 (중첩 수에 따라 변경)';
  const rich=s=>s.replace(/([36])명>/g,'<@autochess.dgreen>$1</>명>').replace(/\+\d+(?:\.\d+)?%?p?|\{\d+:[^}]+\}/g,'<@ba.vup>$&</>').replaceAll('(중첩 수에 따라 변경)','<@ba.acrem>(중첩 수에 따라 변경)</>');
- bonds.ursusShip={...structuredClone(bonds.yanShip),bondId:'ursusShip',name:'우르수스',identifier:90,powerIdList:['ursus'],iconId:'icon_ursusShip',thresholds:[3,6],activeCount:3,members,visibleMembers:members,desc,descRaw:rich(desc),effectName:'우르수스',effectId:'bondeffect_ursus',effectDesc,effectDescRaw:rich(effectDesc),effectDescParams:[{index:0,base:'base_bonus',perStack:'atk_per_stack',format:'0%'},{index:1,base:'base_bonus',perStack:'hp_per_stack',format:'0%'},{index:2,base:'donation_ratio',perStack:'donation_per_stack',format:'0.00%'}],bb:{base_bonus:.2,bonus_per_stack:.01,atk_per_stack:.01,hp_per_stack:.01,move_speed_bonus:.5,power_bond_char_cnt:6,attack_speed:50,donation_ratio:.05,donation_per_stack:.00025},bbStr:{},buffs:[],baseParams:['base_bonus','base_bonus','donation_ratio'],perStackParams:['atk_per_stack','hp_per_stack','donation_per_stack'],spec:{tiers:[{count:3},{count:6}]}};
+ bonds.ursusShip={...structuredClone(bonds.yanShip),bondId:'ursusShip',name:'우르수스',identifier:90,powerIdList:['ursus'],iconId:'icon_ursusShip',thresholds:[3,6],activeCount:3,members,visibleMembers:members,desc,descRaw:rich(desc),effectName:'우르수스',effectId:'bondeffect_ursus',effectDesc,effectDescRaw:rich(effectDesc),effectDescParams:[{index:0,base:'base_bonus',perStack:'atk_per_stack',format:'0%'},{index:1,base:'base_bonus',perStack:'hp_per_stack',format:'0.00%'},{index:2,base:'donation_ratio',perStack:'donation_per_stack',format:'0.00%'}],bb:{base_bonus:.2,bonus_per_stack:.01,atk_per_stack:.01,hp_per_stack:.008,move_speed_bonus:.5,power_bond_char_cnt:6,attack_speed:50,donation_ratio:.1,donation_per_stack:.00015},bbStr:{},buffs:[],baseParams:['base_bonus','base_bonus','donation_ratio'],perStackParams:['atk_per_stack','hp_per_stack','donation_per_stack'],spec:{tiers:[{count:3},{count:6}]}};
  for(const id of Object.keys(bonds)) if(id!=='ursusShip')for(const o of ops)if(o.bonds.includes(id)){const cid=`chess_custom_ursus_${o.key}_a`;for(const k of ['members','visibleMembers'])if(bonds[id][k]&&!bonds[id][k].includes(cid))bonds[id][k].push(cid);}
  const enemy=await json(join(URSUS_DIR,'enemies.json'));
  const drone=enemy.enemy_1112_emppnt;

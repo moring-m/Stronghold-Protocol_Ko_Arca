@@ -531,6 +531,10 @@ describe('keyboard & settings', () => {
     assert.deepEqual(sanitizeSettings({ bgm: 3, sfx: -1, muted: 'yes', damageNumbers: false, quality: 'ultra' }),
       { ...DEFAULT_SETTINGS, bgm: 1, sfx: 0, muted: false, damageNumbers: false, damageNumberMode: 'none', quality: 'high' });
     assert.equal(sanitizeSettings({ bgm: 0.333 }).bgm, 0.33);
+    const graphics=sanitizeSettings({mapQuality:'minimal',renderScale:.75,effectsQuality:'low',shadows:false,frameLimit:30,skillRanges:false,unitRanges:false,animationQuality:'medium',adaptiveQuality:false});
+    assert.equal(graphics.mapQuality,'minimal');assert.equal(graphics.renderScale,.75);assert.equal(graphics.shadows,false);assert.equal(graphics.frameLimit,30);
+    assert.equal(graphics.skillRanges,false);assert.equal(graphics.unitRanges,false);assert.equal(graphics.adaptiveQuality,false);
+    const invalid=sanitizeSettings({mapQuality:'bad',renderScale:999,frameLimit:10});assert.equal(invalid.mapQuality,'high');assert.equal(invalid.renderScale,1);assert.equal(invalid.frameLimit,60);
     assert.equal(sanitizeSettings({ quality: 'low' }).quality, 'low');
     assert.equal(sanitizeSettings({chatVolume: 3}).chatVolume, 1);
     assert.equal(sanitizeSettings({chatVolume: -1}).chatVolume, 0);

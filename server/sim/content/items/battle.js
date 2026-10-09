@@ -756,7 +756,7 @@ const BY_ITEM = {
       const n = num(p.addition_sp);
       if (!(n > 0)) return;
       for (const a of battle.allyUnits) {
-        if (a.kind === 'op' && a.ownerId === u.ownerId && onField(a) && a.skill && memberOf(battle, a, 'sargonShip')) a.skill.gainSp(n, 'item');
+        if (a.kind === 'op' && a.ownerId === u.ownerId && onField(a) && a.skill && memberOf(battle, a, 'sargonShip')) a.skill.gainSp(n, 'item', false, { duringSkill: true });
       }
     });
   },

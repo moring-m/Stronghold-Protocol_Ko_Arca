@@ -1,0 +1,21 @@
+minimal undefined
+low {
+  calls: 14,
+  triangles: 5592,
+  textures: 12,
+  geometries: 10,
+  frames: 1,
+  cpuMs: 41.72,
+  lost: false,
+  originalStage: null
+}
+high {
+  calls: 15,
+  triangles: 19325,
+  textures: 24,
+  geometries: 16,
+  frames: 4,
+  cpuMs: 49.62,
+  lost: false,
+  originalStage: 'act1autochess_m01'
+}

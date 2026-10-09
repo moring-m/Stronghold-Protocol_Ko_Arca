@@ -1,0 +1,26 @@
+✔ 沉默: exactly the abilities whose handbook line is SILENCE-flagged can be silenced (every authored enemy) (77.52145ms)
+✔ enemy_1160_hvyslr 码头水手: silenced, its stun attack (SILENCE-flagged) never comes (19.709801ms)
+✔ enemy_1267_nhpbr 萨卡兹枯朽战士: silenced death does not create a pollution zone (1.743197ms)
+✔ enemy_1267_nhpbr_2 萨卡兹枯朽战士组长: silenced death does not create a pollution zone (1.101209ms)
+✔ enemy_1165_duhond 深池侦察犬: 折射 — RES +70 while not silenced (2.622542ms)
+✔ enemy_1165_duhond_2 深池侦察犬pro: 折射 — RES +70 while not silenced (1.130394ms)
+✔ enemy_1166_dusbr 深池侦察兵: 折射 — RES +70 while not silenced (0.897563ms)
+✔ enemy_1166_dusbr_2 深池侦察队长: 折射 — RES +70 while not silenced (0.780556ms)
+✔ enemy_1168_dumage 深池暗影术师: 折射 — RES +70 while not silenced (0.807637ms)
+✔ enemy_1168_dumage_2 深池暗影术师队长: 折射 — RES +70 while not silenced (0.843181ms)
+✔ enemy_1170_dushld 深池重甲卫士: 折射 — RES +70 while not silenced (0.632654ms)
+✔ enemy_1170_dushld_2 深池重甲卫士队长: 折射 — RES +70 while not silenced (0.582658ms)
+✔ enemy_1017_defdrn 御4: nearby enemies get DEF +300 (silence stops it) (1.038445ms)
+✔ enemy_10044_wintun 咸鳞汁推荐者: its first attack (SILENCE-flagged) is plain while silenced — the barrel is kept for later (2.260476ms)
+✔ enemy_2050_smsha 陷落雪祀: 【反自然馈赠】 chains over 3 enemies (move ×2, ASPD +100); silence stops it (9.802993ms)
+✔ 奥术法阵: attacks silence the target (失去特殊能力) for 5 s (39.266472ms)
+✔ hidden drone visual scale grows from 85 percent by 0.2 percent of that base per layer and is serialized (33.851192ms)
+✔ hidden drone range grows by 0.1 percent per layer and updates selection, reveal and snapshots (7.894356ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 490.906707

@@ -1,11 +1,6 @@
-const cx = (...parts) => parts.flat().filter(Boolean).join(' ');
-import { useRef } from '../../vendor/hooks.module.js';
-import { store } from '../store.js';
 
 
-import { t, N_ } from '../../../shared/i18n.js';
-import { errorCount, currentBattle, diagnosticsText } from '../diag.js';
-import { copyText } from './clipboard.js';
+import { t } from '../../../shared/i18n.js';
 // Player settings (BGM/SFX/voice volume, mute, damage numbers, render quality): a tiny observable store
 // persisted in localStorage (`sp.pref.settings`), applied to the audio manager on every change, plus
 // the settings modal.
@@ -64,55 +59,8 @@ function Toggle({ label, micro, value, onChange, id }) {
   </div>`;
 }
 
-const QUALITY = [['high', '高'], ['medium', '中'], ['low', '低']];
-
-/** Where a report goes: the upstream issue tracker (shown as text the player can select; a link may open nothing). */
-export const ISSUES_URL = 'https://github.com/sganggs/Stronghold-Protocol/issues';
-
-/**
- * 问题反馈: copy the diagnostics of this page (diag.js) for a GitHub issue — the errors recorded since the page opened,
- * this browser and device, where the player is, and, switched on by default while a battle is on screen, that battle's
- * spec (the dev tools replay it). Player names, the room code and the token are replaced; nothing is uploaded. Laid out
- * like 快捷键 above it (a head with its button, a hint, the result line); the battle switch is the settings' Toggle, and
- * when the clipboard refuses (some in-app browsers), the report is shown selected in a box styled like 干员调配's 导出.
- */
-/** The result line of 复制诊断信息, by outcome (msgids: translated when shown, so a language switch reaches it). */
-const DIAG_NOTES = { copied: N_('已复制诊断信息，可以粘贴到 GitHub issue 中'), refused: N_('无法写入剪贴板，请手动复制下面的内容') };
-
-function DiagSection() {
-  const [attach, setAttach] = useState(true);
-  const [note, setNote] = useState(null);       // 'copied' | 'refused' | null: the result line
-  const [manual, setManual] = useState(null);   // the report, when the clipboard refused it
-  const boxRef = useRef(null);
-  // the box opens selected for a manual copy, scrolled to its first line (select() leaves it at the end)
-  useLayoutEffect(() => {
-    const el = boxRef.current;
-    if (manual && el) { el.focus(); el.select(); el.scrollTop = 0; }
-  }, [manual]);
-  const n = errorCount();
-  const battle = currentBattle();
-  const copy = async () => {
-    const text = diagnosticsText({ state: store.get(), settings: settingsStore.get(), attachBattle: attach && !!battle });
-    const ok = await copyText(text);
-    setManual(ok ? null : text);
-    setNote(ok ? 'copied' : 'refused');
-  };
-  return html`<section class="set-diag" aria-labelledby="set-diag-title">
-    <div class="set-keys__head">
-      <span class="set-row__label" id="set-diag-title">${t('问题反馈')}<${MicroLabel}>DIAGNOSTICS<//></span>
-      <${Button} variant="ghost" size="sm" icon="copy" class="set-diag__copy" data-testid="diag-copy" onClick=${copy}>${t('复制诊断信息')}<//>
-    </div>
-    <p class="set-hint">${t('遇到问题时，复制诊断信息并粘贴到 GitHub issue 中，开发者就能看到出错时的情况。诊断信息只在本机生成，不会自动上传；玩家名和房间号会被替换。')}</p>
-    <div class="set-diag__meta">
-      <span class="set-diag__stat">${t('已记录的错误')}<b class=${cx('set-diag__count num', n > 0 && 'is-warn')} data-testid="diag-count">${n}</b></span>
-      <span class="set-diag__url">${ISSUES_URL.replace(/^https:\/\//, '')}</span>
-    </div>
-    ${battle ? html`<${Toggle} label=${t('附上本场战斗')} micro="BATTLE DATA" value=${attach} onChange=${setAttach} />
-      <p class="set-hint set-diag__battle-hint">${t('开发者可以用附上的战斗数据重现这场战斗。')}</p>` : null}
-    ${note ? html`<p class=${cx('set-keys__note', note === 'refused' && 'is-warn')} role="status" aria-live="polite">${t(DIAG_NOTES[note])}</p>` : null}
-    ${manual ? html`<textarea ref=${boxRef} class="set-diag__text" data-testid="diag-text" spellcheck=${false} readOnly
-      aria-label=${t('诊断信息')} value=${manual}></textarea>` : null}
-  </section>`;
+function Choice({label,value,options,onChange}) {
+  return html`<div class="set-row" data-i18n-skip><label class="set-row__label">${label}</label><select aria-label=${label} value=${value} onChange=${e=>onChange(e.currentTarget.value)}>${options.map(([id,text])=>html`<option value=${id}>${text}</option>`)}</select></div>`;
 }
 
 /**
@@ -121,6 +69,7 @@ function DiagSection() {
  */
 export function SettingsModal({ open, onClose }) {
   const s = useSettings();
+  const [category,setCategory] = useState('graphics');
   const [candidateSound, setCandidateSound] = useState(s.chatSound);
   useLayoutEffect(() => { setCandidateSound(s.chatSound); if (!open) audio.stopChatNotification(); }, [open, s.chatSound]);
   const [tested, setTested] = useState(false);
@@ -128,13 +77,18 @@ export function SettingsModal({ open, onClose }) {
   return html`<${Modal} open=${open} onClose=${onClose} title="设置" micro="SETTINGS" width="7.4rem"
     actions=${html`<${Button} variant="secondary" icon="book" class="set-guide" onClick=${() => openGuide(0)}>玩法说明<//>
       <${Button} variant="primary" icon="check" onClick=${onClose}>完成<//>`}>
+    <nav class="set-categories" aria-label="설정 종류" data-i18n-skip>
+      ${[['graphics','그래픽'],['audio','소리'],['chat','채팅'],['controls','조작·언어']].map(([id,label])=>html`<button type="button" class=${category===id?'is-on':''} aria-pressed=${category===id} onClick=${()=>setCategory(id)}>${label}</button>`)}
+    </nav>
     <div class="set-list">
+    <section hidden=${category!=='audio'} class="set-category" data-category="audio">
       <${Slider} label="背景音乐" micro="BGM" icon="play" value=${s.bgm} onInput=${(v) => updateSettings({ bgm: v })} />
       <${Slider} label="오퍼레이터 음성" micro="VOICE" icon="signal" value=${s.voice} onInput=${v=>updateSettings({voice:v})} />
       <div class="set-row" data-i18n-skip><span class="set-row__label">음성 언어<${MicroLabel}>VOICE LANGUAGE<//></span><div class="set-seg" role="radiogroup">${[['kr','한국어'],['jp','日本語']].map(([id,label])=>html`<button type="button" role="radio" aria-checked=${s.voiceLanguage===id} class=${s.voiceLanguage===id?'is-on':''} onClick=${()=>updateSettings({voiceLanguage:id})}>${label}</button>`)}</div></div>
       <${Slider} label="音效" micro="SFX" icon="signal" value=${s.sfx}
         onInput=${(v) => { updateSettings({ sfx: v }); if (!tested) { setTested(true); setTimeout(() => setTested(false), 400); audio.sfx('click'); } }} />
       <${Toggle} label="静音" micro="MUTE" value=${s.muted} onChange=${(v) => updateSettings({ muted: v })} />
+    </section><section hidden=${category!=='chat'} class="set-category" data-category="chat">
       <div class="set-row set-row--chat-sound" data-i18n-skip>
         <label class="set-row__label" for="chat-notification-sound">채팅 알림음<${MicroLabel}>CHAT SOUND<//></label>
         <select id="chat-notification-sound" value=${candidateSound} onChange=${e => { audio.stopChatNotification(); setCandidateSound(e.currentTarget.value); }}>
@@ -157,6 +111,17 @@ export function SettingsModal({ open, onClose }) {
       <${Slider} label="채팅 알림음 크기" micro="CHAT VOLUME" icon="signal" value=${s.chatVolume} onInput=${v => updateSettings({chatVolume: v})} />
       <${Toggle} id="chat-faction-notifications" label="진영 선택·취소 알림" micro="FACTION NOTIFICATIONS" value=${s.chatFactionNotifications} onChange=${v => updateSettings({chatFactionNotifications: v})} />
       <p class="set-hint" data-i18n-skip>대기실과 게임에서 다른 참가자의 새 메시지를 알립니다. 후보를 미리 듣고 적용하세요. 알림음을 변경하면 대기시간이 권장값으로 초기화됩니다. 재생 중에는 알림이 겹치지 않습니다.</p>
+    </section><section hidden=${category!=='graphics'} class="set-category" data-category="graphics">
+      <${Choice} label="맵 품질" value=${s.mapQuality} options=${[['high','높음 · 원본'],['medium','중간 · 원본'],['low','낮음 · 단순 3D'],['minimal','최하 · 경량 2D']]} onChange=${v=>updateSettings({mapQuality:v})} />
+      <p class="set-hint" data-i18n-skip>높음·중간은 원본 맵을 사용합니다. 낮음은 장식을 생략한 단순 3D 맵, 최하는 가장 가벼운 기본 2D 맵을 사용합니다. 전투 타일과 배치 규칙은 동일합니다.</p>
+      <${Choice} label="렌더링 해상도" value=${s.renderScale} options=${[[.5,'50%'],[.75,'75%'],[1,'100%'],[1.25,'125%'],[1.5,'150%'],[2,'200%']]} onChange=${v=>updateSettings({renderScale:Number(v)})} />
+      <${Choice} label="최대 프레임" value=${s.frameLimit} options=${[[30,'30 FPS'],[60,'60 FPS'],[120,'120 FPS']]} onChange=${v=>updateSettings({frameLimit:Number(v)})} />
+      <${Choice} label="애니메이션 품질" value=${s.animationQuality} options=${[['high','높음'],['medium','중간'],['low','낮음']]} onChange=${v=>updateSettings({animationQuality:v})} />
+      <${Choice} label="이펙트 품질" value=${s.effectsQuality} options=${[['high','높음'],['medium','중간'],['low','낮음']]} onChange=${v=>updateSettings({effectsQuality:v})} />
+      <${Toggle} label="그림자" value=${s.shadows} onChange=${v=>updateSettings({shadows:v})} />
+      <${Toggle} label="스킬 범위 표시" value=${s.skillRanges} onChange=${v=>updateSettings({skillRanges:v})} />
+      <${Toggle} label="유닛 공격 범위 표시" value=${s.unitRanges} onChange=${v=>updateSettings({unitRanges:v})} />
+      <${Toggle} label="자동 성능 조절" value=${s.adaptiveQuality} onChange=${v=>updateSettings({adaptiveQuality:v})} />
       <div class="set-row" data-i18n-skip>
         <span class="set-row__label">대미지 표시<${MicroLabel}>DAMAGE NUMBERS<//></span>
         <div id="damage-number-mode" class="set-seg" role="radiogroup" aria-label="대미지 표시">
@@ -164,13 +129,7 @@ export function SettingsModal({ open, onClose }) {
         </div>
       </div>
       <p class="set-hint" data-i18n-skip>합산: 연속 피해를 묶어 표시 · 모두: 타격마다 표시 · 기본: 명일방주의 붉은 대미지 표시 판정(예상 피해의 1.5배 이상)을 적용합니다.</p>
-      <div class="set-row">
-        <span class="set-row__label">画面质量<${MicroLabel}>QUALITY<//></span>
-        <div class="set-seg" role="radiogroup">
-          ${QUALITY.map(([id, label]) => html`<button key=${id} type="button" role="radio" aria-checked=${s.quality === id ? 'true' : 'false'}
-            class=${s.quality === id ? 'is-on' : ''} onClick=${() => updateSettings({ quality: id })}>${label}</button>`)}
-        </div>
-      </div>
+    </section><section hidden=${category!=='controls'} class="set-category" data-category="controls">
       <div class="set-row" data-i18n-skip>
         <span class="set-row__label">${lang === 'ko' ? '언어' : '语言'}<${MicroLabel}>LANGUAGE<//></span>
         <div class="set-seg" role="radiogroup">
@@ -181,8 +140,8 @@ export function SettingsModal({ open, onClose }) {
       ${touchUi
         ? html`<p class="set-hint">触屏操作：点击单位选中（撤退 / 出售）· 长按单位或卡牌查看详情 · 拖动部署后滑动选择朝向</p>`
         : html`<p class="set-hint">快捷键：<kbd>R</kbd> 刷新 · <kbd>F</kbd> 冻结 · <kbd>D</kbd> 升级 · <kbd>Q</kbd> 撤退选中干员 · <kbd>X</kbd> 出售选中干员 · <kbd>Space</kbd> 准备就绪 · <kbd>Esc</kbd> 关闭弹窗 · 右键查看详情</p>`}
-      <${DiagSection} />
-    </div>
+
+    </section></div>
   <//>`;
 }
 

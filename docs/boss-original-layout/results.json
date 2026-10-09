@@ -1,0 +1,101 @@
+[
+  {
+    "id": "act1autochess_m01",
+    "nativeMeshes": 10,
+    "duplicatedScenery": 0,
+    "upperLeft": 43,
+    "upperRight": 28,
+    "pen": 35,
+    "errors": []
+  },
+  {
+    "id": "act1autochess_m02",
+    "nativeMeshes": 11,
+    "duplicatedScenery": 0,
+    "upperLeft": 42,
+    "upperRight": 27,
+    "pen": 35,
+    "errors": []
+  },
+  {
+    "id": "act1autochess_m03",
+    "nativeMeshes": 8,
+    "duplicatedScenery": 0,
+    "upperLeft": 42,
+    "upperRight": 27,
+    "pen": 35,
+    "errors": []
+  },
+  {
+    "id": "act1autochess_m04",
+    "nativeMeshes": 8,
+    "duplicatedScenery": 0,
+    "upperLeft": 40,
+    "upperRight": 25,
+    "pen": 35,
+    "errors": []
+  },
+  {
+    "id": "act1autochess_m05",
+    "nativeMeshes": 10,
+    "duplicatedScenery": 0,
+    "upperLeft": 46,
+    "upperRight": 31,
+    "pen": 35,
+    "errors": []
+  },
+  {
+    "id": "act1autochess_m06",
+    "nativeMeshes": 9,
+    "duplicatedScenery": 0,
+    "upperLeft": 46,
+    "upperRight": 31,
+    "pen": 35,
+    "errors": []
+  },
+  {
+    "id": "act1autochess_m07",
+    "nativeMeshes": 8,
+    "duplicatedScenery": 0,
+    "upperLeft": 46,
+    "upperRight": 31,
+    "pen": 35,
+    "errors": []
+  },
+  {
+    "id": "act2autochess_m01",
+    "nativeMeshes": 9,
+    "duplicatedScenery": 0,
+    "upperLeft": 37,
+    "upperRight": 22,
+    "pen": 35,
+    "errors": []
+  },
+  {
+    "id": "act2autochess_m02",
+    "nativeMeshes": 18,
+    "duplicatedScenery": 0,
+    "upperLeft": 40,
+    "upperRight": 25,
+    "pen": 35,
+    "errors": []
+  },
+  {
+    "id": "act2autochess_m03",
+    "nativeMeshes": 10,
+    "duplicatedScenery": 0,
+    "upperLeft": 44,
+    "upperRight": 29,
+    "pen": 35,
+    "errors": []
+  },
+  {
+    "id": "act2autochess_m04",
+    "nativeMeshes": 13,
+    "duplicatedScenery": 0,
+    "upperLeft": 46,
+    "upperRight": 31,
+    "pen": 35,
+    "errors": []
+  }
+]

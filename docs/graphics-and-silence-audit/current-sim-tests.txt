@@ -1,0 +1,651 @@
+Sarkaz lancer DEF comparison: [{"def":0,"atk":450,"raw":1500,"total":1950,"old":1950},{"def":500,"atk":450,"raw":1500,"total":1022.5,"old":1450},{"def":1000,"atk":450,"raw":1500,"total":522.5,"old":950}]
+✔ every enemy key is authored (enemies.js / bosses.js) or listed as stats-only with a reason (3.116697ms)
+✔ stats-only enemies attach no ability and fight with their data stats (34.896861ms)
+✔ 沉默: exactly the abilities whose handbook line is SILENCE-flagged can be silenced (every authored enemy) (38.167311ms)
+✔ enemy_1009_lurker 潜伏者: 隐匿 — ranged operators cannot target it until it is blocked (10.690161ms)
+✔ enemy_1019_jshoot 隐形弩手: 隐匿 — ranged operators cannot target it until it is blocked (12.843837ms)
+✔ enemy_1019_jshoot_2 隐形弩手组长: 隐匿 — ranged operators cannot target it until it is blocked (4.38644ms)
+✔ enemy_1023_jmage 隐形术师: 隐匿 — ranged operators cannot target it until it is blocked (4.943461ms)
+✔ enemy_1283_sgkill 家族灭迹人: 隐匿 — ranged operators cannot target it until it is blocked (4.177757ms)
+✔ enemy_1283_sgkill_2 家族暗影灭迹人: 隐匿 — ranged operators cannot target it until it is blocked (4.703728ms)
+✔ enemy_1389_winbab_2 访问团强攻冠军: 隐匿 — ranged operators cannot target it until it is blocked (4.331348ms)
+✔ enemy_10031_cnvsld 业余竞演者: 隐匿 — ranged operators cannot target it until it is blocked (3.89471ms)
+✔ enemy_10042_prtrop 架桥船工: 隐匿 — ranged operators cannot target it until it is blocked (4.158968ms)
+✔ enemy_10042_prtrop_2 扶桥老手: 隐匿 — ranged operators cannot target it until it is blocked (4.843579ms)
+✔ enemy_1299_ymkilr 山海众头目: 隐匿; first attack after its stealth is broken (blocked) deals ×InvisibleCombat.atk_scale (22.914493ms)
+✔ enemy_1299_ymkilr_2 山海众秘使: 隐匿; first attack after its stealth is broken (blocked) deals ×InvisibleCombat.atk_scale (1.12139ms)
+✔ enemy_1404_msnip 重弩突袭者: 直击 — 1.4 s after the cast a unit in line is shot (arts ATK×atk_scale) and stunned; revealed and standing for the skill's 2.5 s (3.181474ms)
+✔ enemy_10034_cnvsax 节日爵士乐手: never attacks while stealthed; once blocked it counter-attacks and burns its locked target (3.287435ms)
+✔ enemy_10034_cnvsax 节日爵士乐手: revealed (反隐) and not blocked it makes no normal attack and walks on — 反击模式 "仅进行阻挡攻击" (1.66557ms)
+✔ enemy_9008_acbunn 假想敌：骨刺: attacks several targets at once while stealthed (1.434933ms)
+✔ enemy_1175_dushdo_2 深池伙友影刃精英: stealth; next to 深池伙友卫队精英 its attack interval drops by traitAbility.base_attack_time (1.02915ms)
+✔ enemy_2034_sythef 流泪小子: stealth and every attack stuns (Combat.attack@stun s) (0.729429ms)
+✔ enemy_2034_sythef_2 流泪小子: stealth and every attack stuns (Combat.attack@stun s) (0.511751ms)
+✔ enemy_1196_msfyin 木制瑞印: 频次 — needs 2 fixed hits, unblockable (0.738774ms)
+✔ enemy_1196_msfyin_2 红木瑞印: 频次 — needs 3 fixed hits, unblockable (0.785444ms)
+✔ enemy_1198_msfshu 小说卷轴: 频次 — needs 3 fixed hits, unblockable (0.598472ms)
+✔ enemy_1198_msfshu_2 诗画卷轴: 频次 — needs 4 fixed hits, unblockable (0.572443ms)
+✔ enemy_1200_msfjin 青铜镜: 频次 — needs 30 fixed hits, unblockable (0.626444ms)
+✔ enemy_1200_msfjin_2 黄铜镜: 频次 — needs 35 fixed hits, unblockable (0.641567ms)
+✔ enemy_1202_msfzhi 木制镇纸: 频次 — needs 3 fixed hits, unblockable (0.486473ms)
+✔ enemy_1202_msfzhi_2 红木镇纸: 频次 — needs 4 fixed hits, unblockable (0.460624ms)
+✔ enemy_1204_msfhu 青瓷茶器: 频次 — needs 4 fixed arts/true hits, unblockable (0.518401ms)
+✔ enemy_1204_msfhu_2 彩瓷茶器: 频次 — needs 6 fixed arts/true hits, unblockable (0.470168ms)
+✔ enemy_1208_msfji 铜矛头: 频次 — needs 25 fixed hits, unblockable (0.55788ms)
+✔ enemy_1208_msfji_2 铁矛头: 频次 — needs 30 fixed hits, unblockable (16.089037ms)
+✔ enemy_1210_msfden 铜灯盘: 频次 — needs 35 fixed hits, unblockable (0.783621ms)
+✔ enemy_1210_msfden_2 铁灯盘: 频次 — needs 45 fixed hits, unblockable (0.586444ms)
+✔ 频次 器物 vs the round effects: the 14 kitTimes keys are exactly 补给线 / 补给线II's enemy_exclude (+ 炎佑); 攻坚装备 / II / III / 急行军 leave out only 炎佑 (0.823481ms)
+✔ hit-count HP remains fixed through difficulty scaling, death summons and HP buffs (3.065209ms)
+✔ enemy_1200_msfjin 青铜镜: 频次 hits keep their DamageInfo — a self-excluding bonus-on-damaged attacker never recurses, death hooks fire (5.184514ms)
+✔ enemy_1204_msfhu 青瓷茶器: 频次 hits keep their DamageInfo — a self-excluding bonus-on-damaged attacker never recurses, death hooks fire (0.624912ms)
+✔ enemy_1288_duskls 深池逐火战士: 频次 hits keep their DamageInfo — a self-excluding bonus-on-damaged attacker never recurses, death hooks fire (1.207069ms)
+✔ 茶器 (hitCountArts): physical instances remove nothing, true / elemental remove 1 each; element fills do not count (0.896972ms)
+✔ enemy_1195_sfyin 磨砻: when knocked out spawns 2× 木制瑞印 that continue its route (1.438098ms)
+✔ enemy_1195_sfyin_2 明鉴: when knocked out spawns 2× 红木瑞印 that continue its route (1.531599ms)
+✔ enemy_1197_sfshu 俗心: when knocked out spawns 3× 小说卷轴 that continue its route (1.196533ms)
+✔ enemy_1197_sfshu_2 雅气: when knocked out spawns 3× 诗画卷轴 that continue its route (1.193669ms)
+✔ enemy_1199_sfjin 身观: when knocked out spawns 1× 青铜镜 that continue its route (0.778373ms)
+✔ enemy_1209_sfden 清明: when knocked out spawns 1× 铜灯盘 that continue its route (0.963913ms)
+✔ enemy_1209_sfden_2 堂皇: when knocked out spawns 1× 铁灯盘 that continue its route (1.817098ms)
+✔ enemy_1207_sfji 沉沙: each attack spends a blade (+ATK); unspent blades become 矛头 on death (at least 1) (1.566311ms)
+✔ enemy_1207_sfji_2 新硎: each attack spends a blade (+ATK); unspent blades become 矛头 on death (at least 1) (1.153729ms)
+✔ enemy_1209_sfden 清明: InvisibleShield veils nearby enemies (stealth) for the talent's 3 s (2.180245ms)
+✔ enemy_1209_sfden_2 堂皇: InvisibleShield veils nearby enemies (stealth) for the talent's 3 s (2.315369ms)
+✔ enemy_1203_sfhu 烹泉: death spawns 4 茶器; the blast (r 1.25, ATK arts) gives each unit hit one 15 s layer of ASPD -40; its attacks splash r 1.0 (11.165627ms)
+✔ enemy_1203_sfhu_2 沏虹: death spawns 4 茶器; the blast (r 1.25, ATK arts) gives each unit hit one 15 s layer of ASPD -50; its attacks splash r 1.0 (13.537712ms)
+✔ enemy_1288_duskls 深池逐火战士: knocked out ⇒ 1 s 重生, then a walking, disarmed, 隐匿 ember needing 5 hits; full HP again 10 s later (4.286379ms)
+✔ enemy_1288_duskls_2 深池逐火精锐战士: knocked out ⇒ 1 s 重生, then a walking, disarmed, 隐匿 ember needing 5 hits; full HP again 10 s later (3.432193ms)
+✔ enemy_1292_duskld 深池逐火护卫: knocked out ⇒ 1 s 重生, then a walking, disarmed, 隐匿 ember needing 10 hits; full HP again 10 s later (3.342528ms)
+✔ enemy_9010_acpupp 假想敌：再生: knocked out ⇒ an unblockable 15-hit 傀儡 that walks on and revives, and nearby enemies get a 5-hit shield (5.535543ms)
+✔ enemy_1148_dssbr 底海滑动者: attacks add ATK×0.15 neural to the target's gauge (1.065305ms)
+✔ enemy_1148_dssbr_2 富营养的滑动者: attacks add ATK×0.15 neural to the target's gauge (0.747767ms)
+✔ enemy_1305_mhslim 灼热源石虫: attacks add ATK×1 burn to the target's gauge (0.739975ms)
+✔ enemy_1305_mhslim_2 炽焰源石虫: attacks add ATK×1 burn to the target's gauge (7.461495ms)
+✔ enemy_2021_syfish 骨海漂流体: attacks add ATK×0.2 侵蚀 (erosion) to the target's gauge (0.437509ms)
+✔ enemy_1229_darmy 萨卡兹王庭军战士: attacks add ATK×0.37 apoptosis to the target's gauge (0.441775ms)
+✔ enemy_1229_darmy_2 萨卡兹王庭军精锐战士: attacks add ATK×0.37 apoptosis to the target's gauge (0.47091ms)
+✔ enemy_2009_csaudc 骇笑看客: attacks add ATK×0.2 neural to the target's gauge (0.352582ms)
+✔ enemy_10094_crstf 临时收音师: attacks add ATK×0.2 neural to the target's gauge (0.368786ms)
+✔ enemy_10098_crhro 主角阵营角色: attacks add ATK×0.15 neural to the target's gauge (0.429488ms)
+✔ enemy_10099_crvln 反派阵营角色: attacks add ATK×0.15 neural to the target's gauge (0.38511ms)
+✔ enemy_1183_mlasrt 无胄盟清扫小队: attacks add ATK×0.35 侵蚀 (erosion) to the target's gauge (0.492442ms)
+✔ 侵蚀 burst: 1000 erosion permanently lowers DEF by 100 and deals 800 physical damage (official term) (0.82923ms)
+✔ enemy_1158_divman 潜水员: in deep water ATK +Swim.atk and stealth; immune to the deep-water damage (0.993878ms)
+✔ enemy_1160_hvyslr 码头水手: after 3 attacks the next one stuns its blocker (7 s); loses Drown.damage HP/s in deep water (13.276028ms)
+✔ enemy_1160_hvyslr_2 码头水手长: after 3 attacks the next one stuns its blocker (7 s); loses Drown.damage HP/s in deep water (1.671919ms)
+✔ enemy_1160_hvyslr 码头水手: silenced, its stun attack (SILENCE-flagged) never comes (2.314919ms)
+✔ enemy_1161_tidmag 控潮术师: attack hits the target and the 4 neighbouring tiles, adding erosion to each (0.845074ms)
+✔ enemy_1161_tidmag_2 领潮员: attack hits the target and the 4 neighbouring tiles, adding erosion to each (0.606003ms)
+✔ enemy_1162_magmot 术师快艇: attack hits the target and the 4 neighbouring tiles, adding erosion to each (0.932996ms)
+✔ enemy_2025_syufo 掠海漂移体: 近地悬浮 — unblockable, immune to melee attacks; erosion on hit (1.779561ms)
+✔ enemy_1275_dwlock_2 萨卡兹王庭军精锐术师: apoptosis on hit; DeathEye channels arts damage then bursts apoptosis ATK×2 on the group (2.827651ms)
+✔ enemy_1439_dslntf 元核孽生者: first damage ⇒ combat state (move ×4) and a neural pulse around it every s (0.861568ms)
+✔ enemy_1439_dslntf_2 异光体孽生者: first damage ⇒ combat state (move ×4) and a neural pulse around it every s (0.562368ms)
+✔ enemy_9007_acelem 假想敌：淤困: harder to target (taunt −1); parasitises its blocker (arts/s, element damage taken ×) (0.879916ms)
+✔ enemy_10067_ftsjc 灼藤 + enemy_10065_ftzlc 卷心籽: ATK ramps until the first attack (AoE arts + burn); ignites 卷心籽, whose ignited death blasts (2.251574ms)
+✔ enemy_1234_dsubrl 深溟巢涌者: pulses hit every ally in range with neural damage; 抵抗 halves stun; immune to 停顿 (0.974338ms)
+✔ enemy_1234_dsubrl 深溟巢涌者: no normal attack — walks on past an unblocking operator while it pulses 100 % ATK arts + 5 % neural each second; no pulse while hidden (1.336384ms)
+✔ enemy_1234_dsubrl_2 富营养的巢涌者: pulses hit every ally in range with neural damage; 抵抗 halves stun; immune to 停顿 (0.627786ms)
+✔ enemy_1234_dsubrl_2 富营养的巢涌者: no normal attack — walks on past an unblocking operator while it pulses 100 % ATK arts + 5 % neural each second; no pulse while hidden (1.065516ms)
+✔ GitHub #93: 深溟巢涌者 keeps walking with the 炎佑 dragon in range; only its pulse (no attack) reaches the dragon (7.65044ms)
+✔ enemy_1267_nhpbr 萨卡兹枯朽战士: death releases 污染秽蚀 — ground allies within 2 lose 50 HP/s (0.88952ms)
+✔ enemy_1267_nhpbr_2 萨卡兹枯朽战士组长: death releases 污染秽蚀 — ground allies within 2 lose 50 HP/s (0.671602ms)
+✔ enemy_1267_nhpbr 萨卡兹枯朽战士: silenced death does not create a pollution zone (0.541776ms)
+✔ enemy_1267_nhpbr_2 萨卡兹枯朽战士组长: silenced death does not create a pollution zone (0.388165ms)
+✔ enemy_1270_nhstlk 逐腐兽: attacks inflict bleeding (100 arts/s), removed by healing (0.781157ms)
+✔ enemy_1270_nhstlk_2 疯狂的逐腐兽: attacks inflict bleeding (150 arts/s), removed by healing (0.565191ms)
+✔ enemy_1272_nhtank 萨卡兹枯朽战车: ground targets only, melee hits ×2, 秽蚀轰击 (a pollution zone) on the 1st attack, then every 3rd (4.090725ms)
+✔ enemy_1272_nhtank_2 尖端萨卡兹枯朽战车: ground targets only, melee hits ×2, 秽蚀轰击 (a pollution zone) on the 1st attack, then every 3rd (4.711791ms)
+✔ enemy_9006_actoxi 假想敌：蚀裂: when knocked out it throws a poison cloud at its killer (arts ATK×0.15/s) (1.487071ms)
+✔ enemy_10122_uacann_2 集团军重型火炮: each hit leaves a burning zone (150/s) (1.195141ms)
+✔ enemy_10054_cjhot 鼎沸: pulses arts + burn around itself; immune to 停顿 (0.984583ms)
+✔ enemy_1165_duhond 深池侦察犬: 折射 — RES +70 while not silenced (0.944052ms)
+✔ enemy_1165_duhond_2 深池侦察犬pro: 折射 — RES +70 while not silenced (0.755268ms)
+✔ enemy_1166_dusbr 深池侦察兵: 折射 — RES +70 while not silenced (0.764683ms)
+✔ enemy_1166_dusbr_2 深池侦察队长: 折射 — RES +70 while not silenced (0.805364ms)
+✔ enemy_1168_dumage 深池暗影术师: 折射 — RES +70 while not silenced (0.852214ms)
+✔ enemy_1168_dumage_2 深池暗影术师队长: 折射 — RES +70 while not silenced (0.884242ms)
+✔ enemy_1170_dushld 深池重甲卫士: 折射 — RES +70 while not silenced (0.840847ms)
+✔ enemy_1170_dushld_2 深池重甲卫士队长: 折射 — RES +70 while not silenced (0.731502ms)
+✔ enemy_1169_duphlx 深池方阵步兵: refraction; DEF +200 per other 深池方阵步兵 nearby (stacking) (0.941569ms)
+✔ enemy_1169_duphlx_2 深池方阵指挥官: refraction; DEF +200 per other 深池方阵指挥官 nearby (stacking) (0.747967ms)
+✔ enemy_1172_dugago 守墓石像: melee only while blocked; first knock-out ⇒ unblockable statue (DEF +800, 失衡 / 浮空 immune) for 10 s, then a flyer with ranged arts attacks that skip flyers (PRTS 天赋) (5.588762ms)
+✔ enemy_1172_dugago_2 愤怒的守墓石像: melee only while blocked; first knock-out ⇒ unblockable statue (DEF +800, 失衡 / 浮空 immune) for 10 s, then a flyer with ranged arts attacks that skip flyers (PRTS 天赋) (5.236882ms)
+✔ enemy_1174_duholy 深池伙友卫队: refraction + taunt; with 影刃 nearby its force field lowers operators' ASPD by 30 (1.276354ms)
+✔ enemy_1174_duholy_2 深池伙友卫队精英: refraction + taunt; with 影刃 nearby its force field lowers operators' ASPD by 30 (1.120549ms)
+✔ enemy_9011_acrefr 假想敌：镜膜: refraction also doubles max HP while active (0.774117ms)
+✔ enemy_1017_defdrn 御4: nearby enemies get DEF +300 (silence stops it) (1.261862ms)
+✔ enemy_1355_mrfly 护障: nearby enemies get RES +30 (1.073879ms)
+✔ enemy_1355_mrfly_2 护障·P: nearby enemies get RES +30 (0.780236ms)
+✔ enemy_1042_frostd 寒霜: operators within 2.5 tiles lose 50 ASPD (30.593106ms)
+✔ enemy_1040_bombd 暴鸰: no normal attack; ONE bomb on the target + its 8 tiles, then move speed ×2 (7.124017ms)
+✔ enemy_10083_hlbird “萨科塔之翼”: first time below half HP ⇒ fear 5 s and flees faster (1.035511ms)
+✔ enemy_10084_hlegle “萨科塔之眼”: first time below half HP ⇒ fear 5 s and flees faster (0.427174ms)
+✔ enemy_10085_hllevi_2 “萨科塔昂首”: first time below half HP ⇒ fear 5 s and flees faster (0.41151ms)
+✔ enemy_10084_hlegle “萨科塔之眼”: steals one bullet from an ammo skill instead of hitting (1.389554ms)
+✔ enemy_10085_hllevi_2 “萨科塔昂首”: 祈祷邀约 lowers every operator's ASPD by 30 (4.699071ms)
+✔ enemy_1407_hummbd 远眺: death exposes nearby operators (damage taken ×1.2 for 8 s) (0.702349ms)
+✔ enemy_9009_acfort 假想敌：黑云: grabs ≤ 3 normal flyers within 2.5 × range_radius for ammo, then fires one ATK×1.3 hit per ammo at random allies (5.386367ms)
+✔ enemy_1112_emppnt 帝国炮火先兆者 / 中枢: every attack is a shell that lands 3 s later on the target's spot (all allies within 1.2) (2.454119ms)
+✔ enemy_10084_hlegle “萨科塔之眼”: never attacks a flying ally (不会攻击飞行单位) — a ground one in range instead (0.92276ms)
+✔ enemy_1321_wdarft 枯朽萃聚使徒 + enemy_1269_nhfly 枯朽之种: the apostle spawns seeds that dive onto operators and self-destruct (4.160991ms)
+✔ enemy_1045_hammer 粉碎攻坚手: after 2 attacks the next one stuns (7 s) (1.282173ms)
+✔ enemy_1045_hammer_2 粉碎攻坚组长: after 2 attacks the next one stuns (7 s) (0.976842ms)
+✔ enemy_1116_liprr 普通囚犯: confined (ASPD -50) until 4 attacks, then freed (ATK +50 %) (2.26929ms)
+✔ enemy_1116_liprr_2 老练囚犯: confined (ASPD -50) until 4 attacks, then freed (ATK +50 %) (2.463183ms)
+✔ enemy_1118_lidbox_2 拳师囚犯: confined (ASPD -50) until 4 attacks, then freed (ATK +50 %) (1.258167ms)
+✔ enemy_1119_vofsd 强壮囚犯: confined (ASPD -50) until 4 attacks, then freed (ATK +50 %) (3.688799ms)
+✔ enemy_1121_lifbos 重犯: confined (ASPD -50) until 4 attacks, then freed (ATK +50 %) (2.334949ms)
+✔ enemy_1121_lifbos_2 传奇重犯: confined (ASPD -50) until 4 attacks, then freed (ATK +50 %) (2.219545ms)
+✔ enemy_1072_dlancer 萨卡兹穿刺手: accelerates while walking; the first hit after being blocked scales with the build-up (1.901856ms)
+✔ enemy_1320_wdrrl_2 萨卡兹悖谬暴虐兵长: only blockers with block ≥3; first attack splashes ATK×1.5 around the target (1.179598ms)
+✔ enemy_1302_ymtro_2 “越长尘”: only blockers with block ≥4 (0.39804ms)
+✔ enemy_1329_cbshld 弧光镜卫: DEF/RES drop with every damage instance (−4000 DEF over 80 hits) (1.352248ms)
+✔ enemy_1329_cbshld_2 弧光镜卫长: DEF/RES drop with every damage instance (−4250 DEF over 85 hits) (1.34656ms)
+✔ enemy_1249_lysdb_2 莱茵生命防卫科高级成员: negates one physical or arts hit (0.281644ms)
+✔ enemy_1402_tgshd_2 重装侦察兵: attackers are exposed (damage taken ×1.2 for 5 s) (0.778903ms)
+✔ enemy_1081_sotisd 游击队盾卫: taunt +1 (operators prefer it) (0.934589ms)
+✔ enemy_1427_lrnazg “灵幛”: its attack hits every operator around it (0.672403ms)
+✔ enemy_1422_lrsldr 萨卡兹枯朽前锋: attacks deal arts damage while it stands on 源石污染区 (infection tiles) (0.635447ms)
+✔ enemy_1422_lrsldr_2 萨卡兹枯朽辟路前锋: attacks deal arts damage while it stands on 源石污染区 (infection tiles) (0.520024ms)
+✔ enemy_1425_lrcmra 孽罪奇美拉: after touching 源石污染区 it attacks with arts and pollutes around itself (HP loss, SP recovery −80 %) (0.914798ms)
+✔ enemy_1425_lrcmra_2 渎罪奇美拉: after touching 源石污染区 it attacks with arts and pollutes around itself (HP loss, SP recovery −80 %) (0.551211ms)
+✔ enemy_1430_lrrook 愧悔魂灵圣杯: absorbs 5 % of the damage dealt to nearby ground enemies (0.390889ms)
+✔ enemy_1025_reveng 寻仇者: ATK +100 % below half HP (0.323027ms)
+✔ enemy_1021_bslime 高能源石虫: death blast deals ATK×4 physical around it (0.425631ms)
+✔ enemy_1067_snslime 冰爆源石虫: death blast deals ATK×2 physical and chills (cold 10 s) (0.422798ms)
+✔ enemy_1069_icebrk_2 雪怪小队破冰者: ×3 damage against frozen targets (0.790091ms)
+✔ enemy_1026_aghost 幽灵组长: unblockable (0.471882ms)
+✔ enemy_1062_rager_2 狂暴宿主组长: loses 500 HP per second (0.662559ms)
+✔ enemy_1273_stmgun_2 高准度伦蒂尼姆城防自行炮: Cannon locks the highest-max-HP unit in range, bombards the highest HP% of its 9 tiles every 0.5 s up to 10 times (arts ATK×0.55), 失衡免疫 + control immunity meanwhile (PRTS) (15.698048ms)
+✔ enemy_1501_demonk 萨卡兹百夫长: attacks two targets at once (0.75001ms)
+✔ enemy_10018_sgrobh “独轮车玩具”: attacks two targets at once (0.58422ms)
+✔ enemy_2001_duckmi 鸭爵: unblockable, no attack; runs ×5 once hit (0.473614ms)
+✔ enemy_2001_duckmi_2 鸭爵: unblockable, no attack; runs ×4 once hit (0.354164ms)
+✔ enemy_10159_mntrjn 伊利昂的木驮兽: unblockable (0.313843ms)
+✖ enemy_10001_trslim 简饲源石虫: below half HP it runs (move ×2.5, unblockable 3 s) (4.89681ms)
+✖ enemy_10027_vtsk “帝国的甲胄”: entrance barrage (8 hits on the highest-HP unit); ranged hits ×0.8; charged triple attack (12.866119ms)
+✖ entrance barrage retains its fixed zone and cached damage after the shooter dies (0.760086ms)
+✔ enemy_10044_wintun 咸鳞汁推荐者: fast with its barrel; first hit ×2.8 and a buff zone for enemies (1.085215ms)
+✔ enemy_10045_parrot 吉兆飞鳞: 近地悬浮; sprints when first hit (final ×M0SpeedUp.move_speed — PRTS "最终提升至300%") (1.062752ms)
+✔ enemy_10087_hlchgr 圣堂剑士: spends ammo every 6 s for permanent speed and ATK (1.733612ms)
+✔ enemy_10097_crshd 心虚设计师: neural damage to its blocker every second (0.827718ms)
+✔ enemy_10116_ymgtop 水遁忍者: spinning phase deals ATK×1.2 physical around it every second; 失衡 stops it (3.159892ms)
+✔ enemy_10116_ymgtop 水遁忍者: 漩涡形态 — no normal attack on its blocker while it spins; no spin damage while stunned (阻止攻击) (2.004881ms)
+✔ enemy_10118_ymgprc 澪: double hits; after 3 attacks the next double hit is ×1.5 (1.579159ms)
+✔ enemy_10127_rkmbst_2 异质裂兽·α: M0 shield — damage taken ×0.5, ASPD +100, barrier (0.327443ms)
+✔ enemy_10156_mncrer 新手祭司学徒: death heals nearby enemies (ATK×5) (0.554075ms)
+✔ enemy_10162_mnctpt 自制投石机: three hits per attack with a small splash (1.092487ms)
+✔ enemy_2010_csdcr 绯红歌伶: neural on hit; after 20 hits taken every enemy gets ASPD +100 (1.055761ms)
+✔ enemy_1364_spnaxe_2 萨卡兹骸骨拷打者: heals and stacks ATK when a unit within 1 tile is knocked out; leaves 2 inert 血珀 in place (2.368649ms)
+✔ enemy_1050_lslime “庞贝”: 4 targets, burning DoT on hit, ASPD up below half, self-blast while blocked (2.329892ms)
+✔ enemy_1500_skulsr 碎骨: an unblocked attack is a grenade — 26 % ATK on the target and on its 8 surrounding tiles, DEF −50 % for 5 s; blocked a plain hit; ATK up below half (1.557868ms)
+✔ enemy_1502_crowns 弑君者: blinks past its blocker (1.513792ms)
+✔ enemy_1504_cqbw W: C4 blasts (ATK×1.8) after a fuse (1.285287ms)
+✔ enemy_1509_mousek 鼠王: opening arts-only barrier (4667) with DEF +3000 while it holds; ×1.5 damage below half (0.872555ms)
+✔ enemy_1509_mousek 鼠王: 【唱沙】 800 physical on the highest-max-HP unit's cross; 【沙狱】 ATK -70 % and 70 arts/s on the lowest-max-HP unit and those around it (7.872544ms)
+✔ enemy_1511_mdrock 泥岩: stacking ATK on attacks; barrier raises max HP and ASPD while it holds (1.075791ms)
+✔ enemy_1513_dekght 腐败骑士 + enemy_1513_dekght_2 凋零骑士: plus-shaped hits / two targets; each rages when the other dies (0.947708ms)
+✔ enemy_1539_reid “复仇者”: ATK up below half; first KO ⇒ 5 s rebirth (invulnerable, inert), back at 50 %; 【冲锋】 speeds up near a unit (3.040372ms)
+✔ enemy_2003_rockman 迷路的巨像: boulder stuns a non-stunned unit for 25 s (1.256103ms)
+✔ enemy_2004_balloon 喷气人: takes off (unblockable) when blocked (0.551731ms)
+✔ enemy_2005_axetro “遗弃者”: stacking ATK/ASPD while attacking, reset after 4 s idle (1.928706ms)
+✔ enemy_2008_flking “墓碑”: operators' ATK and DEF are halved while it lives; periodic barrier (3.070247ms)
+✔ enemy_2048_smgrd “邪魔的利刃”: 国度 lowers ASPD around it; ×2.5 against units inside (0.805694ms)
+✔ enemy_2050_smsha 陷落雪祀: attacks chill and chain to 3 targets (0.840286ms)
+✔ enemy_2052_smgia 纠缠藤蔓: every 3rd attack stuns 15 s (0.923292ms)
+✔ enemy_1275_dwlock_2 萨卡兹王庭军精锐术师: a stun during 死亡之眼 interrupts the channel — no apoptosis burst (1.916298ms)
+✔ enemy_10044_wintun 咸鳞汁推荐者: its first attack (SILENCE-flagged) is plain while silenced — the barrel is kept for later (1.272257ms)
+✔ enemy_1203_sfhu 烹泉: one arts blast (ATK) on death; the steam keeps ASPD -40 for 15 s (3.442588ms)
+✔ enemy_1511_mdrock 泥岩: the barrier absorbs arts only (after RES); 刷新屏障 restores it (1.9843ms)
+✔ enemy_1513_dekght 腐败骑士: 蓄力攻击 — 4 s charge (no attacks), then ATK×3 on its blocker's cross (3.723912ms)
+✔ enemy_1513_dekght_2 凋零骑士: 爆炸箭 — 3 targets, 2.5 s later ATK×1.6 arts on each cross (3.805665ms)
+✔ enemy_2008_flking “墓碑”: redeploy time doubled and DP recovery halved while it lives (2.110821ms)
+✔ enemy_2048_smgrd “邪魔的利刃”: 【国度】 covers the 8 tiles around it (diagonals included) (0.667386ms)
+✔ enemy_2050_smsha 陷落雪祀: 【反自然馈赠】 chains over 3 enemies (move ×2, ASPD +100); silence stops it (5.932561ms)
+✔ enemy_2052_smgia 纠缠藤蔓: terrain damage ⇒ damage taken ×2 for 10 s (1.203975ms)
+✔ enemy_10097_crshd 心虚设计师 / enemy_2085_skzjxd 圆仔: physical / arts damage from the front ×0.19999999999999996 (walking direction / the side with more operators) (1.482454ms)
+✔ enemy_2085_skzjxd 圆仔: 无法攻击/被阻挡 (PRTS 天赋) — walks through a blocker, never attacks (1.827144ms)
+✔ enemy_2085_skzjxd_2 圆仔: 无法攻击/被阻挡 (PRTS 天赋) — walks through a blocker, never attacks (1.543666ms)
+✔ enemy_10098_crhro 主角阵营角色: 重生 once after 3 s at full HP (0.627406ms)
+✖ 失衡: 弧光锋卫 bleeds per tile pushed; 冒失的小弟 is stunned; 拥霜羽兽 drops its egg (faster, unblockable) (1.003803ms)
+✔ enemy_1512_mcmstr “巨大的丑东西”: melee ×3; KO ⇒ self-destruct (stun 16 s) and after 10 s the fleeing 大祭司 (no attack, unblockable, −1300 HP/s) (1.761134ms)
+✔ enemy_1516_jakill 杰斯顿·威廉姆斯: 狱警 — RES +50, ranged arts, every 4th attack stuns 2 units; KO frees every prisoner ⇒ 杀手 — melee phys, DEF +1000, every 4th attack twice ignoring 60 % DEF (5.42718ms)
+✔ enemy_1517_xi “自在”: 纬地经天 cross on the nearest unit; 破桎而出 barrier unbroken ⇒ ATK×6 arts around; KO ⇒ form 2 (invincible 10 s, double hits, crosses on nearest + farthest) (20.262887ms)
+✔ enemy_1525_blkswb 锏: 抵抗; ignores 20 % of its blocker's DEF; 速杀 passes through the blocker (ATK×1.5); KO ⇒ stealth, double hits, SP cleared + disarm at every 25 % HP lost (6.294546ms)
+✔ enemy_1535_wlfmster 扎罗，“狼之主” : −30 % damage and not stunnable; 溶血骇惧 (3 units, ASPD -70, HP loss rising to 30 %/s over 40 s, no end, cured after it loses 20 %); KO ⇒ 40 s 远古威慑 (r 1.5, −50) ⇒ ranged double hits within 1.25, 远古威慑 still on (29.476192ms)
+✔ enemy_10081_mpplai 转译基底·α: original form cancels every damage instance; 4th physical hit ⇒ 寻仇者 (melee), 4th arts hit ⇒ 特战术师 (ranged arts), blocked ⇒ 幽灵 (unblockable) — each after a 2 s change (3.780197ms)
+✔ enemy_10144_xdelk_2 乌顶巨角卢鲁: 角力对决 — blocked ⇒ 8 s charge; the push fails ⇒ ×2 damage and a 5 s stun; a stun interrupts (2.045974ms)
+✔ 最终攻势: leaders take no 侵蚀 (erosion) damage; other enemies do (1.131996ms)
+✔ template overrides of talents/skills are honoured (卢西恩 evade 0.2 in act2autochess_h07_05) (0.929861ms)
+✔ leader summons take the round's enemy effects (flags.enemyScale): HP — hit counts too — ATK, speed; the leader keeps the pool (27.226261ms)
+✔ 假想敌：胄: arts ray on a random target in range; <20 % pool: damage taken ×0.5, still one 刺胄之弹 (PRTS 能力修正) (9.292975ms)
+✔ 假想敌：胄 + 刺胄之弹: the shell flies to the highest-ATK operator; on arrival 3×3 stun + physical DoT; 8 hits shoot it down (24.311038ms)
+✔ 假想敌：胄 死亡集群: drones from the branch; a drone that dies (whoever kills it) costs the leader 2 % max HP, a leak nothing (23.457452ms)
+✔ 假想敌：胄 死亡集群: the 2 % reads the leader's shown max HP (the pool) (2.144212ms)
+✔ 假想敌：胄 (隐秘核心) 死亡集群: summon.hp_ratio scales the drone HP (2.268569ms)
+✔ enemy_9013_acstmk 假想敌：胄: shells only at operators within its range (PRTS 技能 "选择攻击范围内攻击力最高的1名我方干员") (3.248385ms)
+✔ enemy_9013_acstmk_2 假想敌：胄: shells only at operators within its range (PRTS 技能 "选择攻击范围内攻击力最高的1名我方干员") (2.506868ms)
+✔ enemy_9014_acstma “斩胄之剑”: 初始模式 invulnerable; 掷 blinks to its preset route at the lowest-ATK operator, no normal attack; damage passes 100 % to 胄; 15 hits → 【瘫痪】 (stun 10 s, ground, ×1.3), then a new 初始模式 copy with its HP replaces it (14.952254ms)
+✔ enemy_9015_acstmb “破胄之锤”: 初始模式 invulnerable; 掷 blinks to its preset route at the lowest-ATK operator, no normal attack; damage passes 100 % to 胄; 15 hits → 【瘫痪】 (stun 10 s, ground, ×1.3), then a new 初始模式 copy with its HP replaces it (21.517107ms)
+✔ “斩胄之剑” dive that lands: 3×3 stun + physical DoT at the lowest-ATK operator, then a new copy with its HP at home (17.280913ms)
+✖ “斩胄之剑” / “破胄之锤” 初始模式 attack: every ally in range, 锤 150 % ATK (PRTS 天赋) (1.697298ms)
+✔ 假想敌：铳: unblockable, targets the highest DEF in range, ASPD ramps on the same target, erosion on hit (1.909017ms)
+✔ 假想敌：铳 最终之罚: charges at the highest-DEF ground unit, trampling units on the way (ATK×1.2) (2.197692ms)
+✔ 假想敌：铳 (h07_02 override) never uses 最终之罚 in the regular boss round (3.519594ms)
+✔ hidden gun: overlapping faith chains cause only one damage tick (0.950843ms)
+✔ 假想敌：铳 (隐秘核心): damage ×0.2 while springs live; 盲信之誓 lines hurt operators on them; 末日布道 dash (3.418511ms)
+✔ “碎铳之簧” 法术护盾 (9018): barrier absorbs arts, physical ×0.1 with a counter; damage passes to 铳 (1.039506ms)
+✔ “碎铳之簧” 元素护盾 (9019): phys/arts ×0.1 until its own element burst breaks the shield; every (spCost+1)-th attack adds a bouncing erosion shot (3.062215ms)
+✔ “碎铳之簧” 频次护盾 (9020): negates 5 hits, then comes back 25 s after breaking; every (spCost+1)-th attack adds a ten-hit combo while shielded (2.716324ms)
+✔ “碎铳之簧”: damage taken costs 假想敌：铳 as much (等量, 无来源) and, split, the other springs (never passed on twice) (1.279448ms)
+✔ 假想敌：管: strikes dark 余音 (their pulse hurts operators); 裂管之奏 at 40 s; summons 余音 every 40 s (6.829944ms)
+✔ 假想敌：管 (隐秘核心) + 假想敌：弦: 弦 is invulnerable, 断弦之奏 flips gold 余音 dark; 弦 leaves when 管 falls (3.037117ms)
+✔ “余音”: 10-hit unit held only by block ≥2; pulses when hit; forms swap after 10 strikes; 合奏 every 5 s (1.723858ms)
+✔ 盐风主教昆图斯: 2 highest-DEF targets + neural; 崩坍 / 大潮 / 断裂生殖; growth by lost HP; 物种爆发 LP loss (9.605937ms)
+✔ 卢西恩: evades 40 % while unblocked, ignores 40 % DEF, neural on hit; blinks past its blocker leaving a 不祥幻影 (2.636974ms)
+✔ 不祥幻影: same evade / DEF penetration / AoE skill (radius 2) as 卢西恩, no blink (1.097474ms)
+✔ 阿利斯泰尔: 王权号令 strikes a plus shape (ATK×2) and drops equipment; 莫非王土 animates it; ≤50 %: DEF/RES up; 斥退 LP loss (4.741957ms)
+✔ enemy_10028_vtswd 未装配刀片: dropped equipment is inert (invulnerable, untargetable, never moves) until animated (0.847378ms)
+✔ enemy_10029_vtshld 防护背心: dropped equipment is inert (invulnerable, untargetable, never moves) until animated (0.725494ms)
+✔ enemy_10030_vtwand 冲击式施术单元: dropped equipment is inert (invulnerable, untargetable, never moves) until animated (0.743661ms)
+✔ 阿利斯泰尔 防护背心: an animated vest gives a barrier and −80 % damage from its side (1.365007ms)
+✔ 阿利斯泰尔 未装配刀片 / 冲击式施术单元: sword strike (ATK×2) / next attack becomes arts and disarms (2.160075ms)
+✔ “萨米的意志”: 冰凌 hits a whole column; 自然涌动 stun + arts/s; <50 %: damage ×(1−0.6) and 2 columns; Doom LP loss (5.533349ms)
+✔ “萨米的意志” on a two-player field: 冰凌 columns alternate between the players (both deploy at t = 0) (2.639388ms)
+✔ boss template: patrol leaders loop instead of leaking, and the mirrored copy spawns for two players (49.925851ms)
+✔ determinism: the same boss round with the same seed produces the same outcome (85.66336ms)
+✔ enemy_1050_lslime “庞贝”: the self-blast while blocked — radius 1.4, every 10 s of block (the clock restarts on a new block, stands still while stunned) (2.36873ms)
+✔ enemy_10122_uacann_2 集团军重型火炮: the shell hits every unit within 1.0 of its target (100 % ATK, not flyers); the burning zone has radius 1.5 (1.196163ms)
+✖ enemy_2008_flking “墓碑”: unblocked, a ranged attack at 40 % ATK on the target and its 8 surrounding tiles; blocked, a melee hit at 100 % (2.507439ms)
+✔ enemy_1512_mcmstr “巨大的丑东西”: unblocked, a ranged attack (radius 2.5, ground units) on the target and its 8 surrounding tiles at 100 %; the self-destruct reaches 3.0 (1.024194ms)
+✔ enemy_1535_wlfmster 扎罗，“狼之主” : leaking in its first form ends every 溶血骇惧 it cast — no drain afterwards (4.640503ms)
+✔ enemy_1203_sfhu 烹泉: its attack splash (法术普通伤害) can be dodged; its death blast (法术溅射伤害) cannot (1.342914ms)
+✔ enemy_10122_uacann_2 集团军重型火炮: its 燃烧区域 (不可对空) spares a flying ally standing in it (2.10346ms)
+✔ Mudrock attack charge adds 60% each time, saturates at six and remains visible (1.713903ms)
+✔ enemy_1329_cbshld: first decay layer is inert; crack effects follow the enemy-specific thresholds (0.931664ms)
+✔ enemy_1329_cbshld_2: first decay layer is inert; crack effects follow the enemy-specific thresholds (0.794457ms)
+✖ catapult follow-up stones use the data hit interval, and already launched stones survive the shooter death (1.173658ms)
+✔ Sarkaz lancer additional damage uses effective movement speed, including Sluggish (4.87681ms)
+✔ Sarkaz lancer basic and rush damage each apply DEF once, and charge does not recur on the second attack (5.569323ms)
+✔ Sarkaz lancer stun/bind cancels charge within 0.1 seconds instead of waiting for the next speed stack (0.943772ms)
+✔ useskill (莎草 42 / 菲莱 43 / 百炼嘉维尔 128 / 塑心 90 / 纯烬艾雅法拉 140): per-id amount per skill and per-battle cap (46.5274ms)
+✔ selfkillenemy (送葬人 / 休谟斯 / 斯卡蒂 / 海霓 / 伺夜 / 风笛 / 荒芜拉普兰德): every check_cnt kills, per-id caps (24.018677ms)
+✔ selfdead (幽灵鲨 46 / 砾 75 / 归溟幽灵鲨 40): per knock-out; 归溟幽灵鲨 also on every substitute ⇄ body swap (12.308039ms)
+✔ consume_ammo (莫斯提马 22 x-5 / 圣约送葬人 23+55 / 蕾缪安 24 row of 3): per consume_count ammo, per-id caps (17.963963ms)
+✔ enemy_abflag_inrange (初雪 / 银灰 28): entering 冻结 in range × prob; a refreshed freeze is not a new entry (5.230883ms)
+✔ onstart (砾 143 / 瑕光 106 / 史尔特尔 107 / 锏 155): every deploy, per-id caps (25.160304ms)
+✔ allyenemy_sleepstun_inrange (缇缇 125): enemies or operators entering 沉睡 / 晕眩 in range; cap 24 / 48 (6.943704ms)
+✖ 缇缇 125 + S2 封护 (GitHub #162): every 0.25 s sleep pulse of the ward is a new entry — 8 s climb to the cap; a sleeper outside her range does not count (4.588836ms)
+✔ ADD_BOND 华法琳 72: the front operator gets garrison_95 (own active bonds +1 / +2), capped at 7 / 14 (#175) (4.499451ms)
+✔ ADD_BOND 寒芒克洛丝 73 (front → 精准 +1 / +2, cap 10 / 20) and 凛御银灰 126 (front 【谢拉格】 → 60 % freeze trait) (36.137762ms)
+✔ ADD_BOND 荒芜拉普兰德 118_b: every 【叙拉古】 operator (herself included) gets "击倒敌人时 叙拉古 +2" (garrison_117_b) (1.859323ms)
+✔ ADD_BOND 远牙 148: the rightmost operator of the row gets "<部署时>卡西米尔/精准 +4 / +8 (cap 24 / 48)" (4.117035ms)
+✔ ADD_BOND 耀骑士临光 145 / 160 (real chess): self + front get 144 (redeploy) and 159 (ASPD) once each (4.212528ms)
+✔ 魔王 59: +1 / +2 on trait gains of the operator in front (not counted toward its cap); not on other reasons (1.516456ms)
+✔ regression: 魔王 also boosts the "被击倒时" gain of the operator that was knocked out in front of it (1.237245ms)
+✔ no IN_BATTLE gains in 联防 / boss fields (0.823711ms)
+✔ GAIN_BUFF (哈洛德 / 锡人 / 迷迭香 03, 流星 137) and 古米 08: direct multipliers / SP regen from the blackboard (3.747728ms)
+✔ attrByBond (26 ids): floor(Σ layers of the listed ACTIVE bonds / divide_num) × per-step values; live recompute (30.208095ms)
+✔ respawnTimeByBond 144, attrByBond_add_onstart 115 (玛恩纳, 100 s after each deploy), ab_damageScaleByBond 101 (仇白) (14.692533ms)
+✔ attack_enemy (深巡 18 海怪, 跃跃 19 无人机): ATK ×1.5 / ×2 against tagged enemies only (2.20276ms)
+✔ 弱点伤害 (宴 / 流星 / 伺夜 garrison_01): phys / arts become whichever deals more; ties keep the type (1.329694ms)
+✔ regression: 弱点伤害 keeps the type on a tie, counts the attacker's DEF ignore, and runs after ATK multipliers (0.905425ms)
+✔ 风丸 93 (NONE): no battle effect (the 2-copy merge is a prep rule, see garrisons_meta) (1.086448ms)
+✔ real data: every owned IN_BATTLE garrison installs without errors on its real chess (538.746923ms)
+✔ coverage: every IN_BATTLE garrison id of a visible chess (and every id they grant) was exercised above (0.259321ms)
+✔ stat equipment: percentages are 直接乘算 — additive with each other (normal / golden numbers from data) (66.928024ms)
+✔ 源石溶剂: −60 HP per second on the field (无来源真实伤害, not 流失 — feedback1d-solvent.test.js), ATK +40 % (3.306493ms)
+✔ 不屈弹射器 / 骑士戒律: redeploy time ×(1 + respawn_time) (2.069579ms)
+✔ 叙拉古正装: allies on the two tiles beside the carrier (perpendicular to its facing) ASPD +10 / +15 (2.366777ms)
+✔ 精准狙击镜: damage ×1.3 / ×1.5 against targets ≥ 3 tiles away (6.747179ms)
+✔ 激光发射器: attacks ignore 25 % / 45 % of the target RES (2.060185ms)
+✔ 炎国短刀: each skill activation ATK +5 % / +8 % (one multiplier), at most 10 stacks per battle (1.500421ms)
+✖ 炎国短刀: timed deployment skill adds one stack per deployment, including carry.skillActive (2.178674ms)
+✔ 迅捷作战粮: on deploy SP +3 / +6, plus as much per other operator sharing a bond (1.305387ms)
+✔ 歌利亚头盔: HP +25 % / +45 %, and +15 % / +25 % more when nobody stands on the tile in front at deploy (1.791029ms)
+✔ 奥术法阵: attacks silence the target (失去特殊能力) for 5 s (9.955104ms)
+✔ 坚固维式重锤: the first lethal hit leaves the carrier at ≥ 1 HP for 8 s; afterwards it can die (6.682641ms)
+✔ 突袭手雷: within 10 s / 15 s after each deploy, attacks stun the target for 2 s (11.963209ms)
+✔ 有限加速器: every attack ASPD +1 / +2 for the battle, at most 60 stacks (33.624704ms)
+✔ 伪装服: the first damage taken gives 隐匿 for 15 s / 25 s, once per battle (6.585534ms)
+✔ 防暴盾: while blocking, damage from units it does not block ×0.6 / ×0.3 (blocked sources and sourceless damage unchanged) (3.78857ms)
+✔ 休眠子裔: each attacked target heals the carrier 2 % / 4 % of its max HP (2.055909ms)
+✔ 卡西米尔竞技旗: damage ×1.35 / ×1.6 for 15 s after deploying, then −0.04 / −0.07 every 0.5 s down to ×1 (36.107936ms)
+✔ 拉特兰桥夹: an ammo skill down to 1 bullet regains ceil(40 % / 60 %) of its ammo (prob), ≤ 3 times per deploy (24.273286ms)
+✔ 灼燃维式重锤: arts damage also deals 10 % of it as 灼燃损伤 (physical does not) (5.524056ms)
+✔ 浓缩嗅盐: above 70 % / 40 % HP immune to stun, freeze, sleep, levitate (寒冷 still applies) (4.396416ms)
+✔ 护盾无人机: a heal by the carrier gives the target 1 shield layer (prob), at most 1 (4.739332ms)
+✔ M3茧甲: knocked down ⇒ revives at once at full HP, 1 / 2 times per battle; a free skill undying never spends it (2.696083ms)
+✔ 催泪瓦斯 / 谢拉格不融冰: attacks proc 麻痹 (3 % / 5 %) and 寒冷 1.5 s (12 % / 20 %) (17.589248ms)
+✔ 双模机械臂: physical / arts damage is dealt as whichever the target resists less (弱点伤害) (11.736027ms)
+✔ 天马之盔 + 天马之枪 (either quality): regen 8 % max HP / s and +30 % ATK true damage per damage instance (25.988997ms)
+✔ 铳骑之威 (拉特兰): 35 % per attack an extra bullet of 150 % ATK (300 % with 拉特兰桥夹) at an enemy in range (12.576443ms)
+✔ 天师古鼎 (炎): battle start ASPD +25 per operator gained this round (max 3) (2.504214ms)
+✔ 海沟实验体: −180 / −300 per damage instance; (阿戈尔) hit taken ⇒ 50 % ATK arts to the source (0.5 s CD), ×2 with 阿戈尔重刃 (14.218218ms)
+✔ 蒸汽之心 (维多利亚): hammers equipped on the field are granted; the carrier's own hammer counts twice (46.902264ms)
+✔ 耶拉冈德之泪 (谢拉格): cold / frozen enemies in range take 30 % ATK arts per second (100 % with 谢拉格不融冰) (25.803508ms)
+✔ 黄沙罗盘: initial SP +30 / +50; (萨尔贡) first skill end +30 SP; + 萨尔贡浓茶 each cast ⇒ every 萨尔贡 operator +3 SP (4.108192ms)
+✔ 骑士戒律 (卡西米尔): 20 s after a skill starts enemies in range ASPD −35 %, move ×0.65; + 竞技旗: ATK ×2 in the skill, no death until it ends (10.822029ms)
+✔ 家族徽章 (叙拉古): ATK +2 %/s while 隐匿 (max +100 %) until the first damage after; + 叙拉古正装 ⇒ that hit +800 % ATK true (7.7837ms)
+✔ 变形同构体: carrier counts as a member of the other item's giveBondId bond (battle + prep), never merges (31.293982ms)
+✔ lendItemEffects (萨尔贡 × 娜仁图亚): tier ≤ V battle effects lent for 60 s, then removed (12.067967ms)
+✔ consume-on-equip items resolve once, are destroyed and never take a slot (46.399086ms)
+✔ 盟约之币 +1 / +2, 骑士储蓄罐 1–6 / 2–12 funds (random, both ends reachable) (106.123975ms)
+✔ 随身身份牌: every bond of the target +3 / +6 layers, active or not (13.278031ms)
+✔ 紧急调度券: takes 1 / 2 random shop operators for free (their slots empty); a slot whose chess cannot be granted stays (30.145701ms)
+✔ 精打细算玩偶 +1 / +2 funds at every later round start; 见钱眼开玩偶 +2 / +4 next round only (66.062911ms)
+✔ 简易通讯机: 1 / 2 random operators sharing a bond with the target, tier ≤ shop level (73.976757ms)
+✔ 寻呼模块: a pick-one offer of 3 different same-bond operators (tier ≤ shop level), the pick is free (5.693781ms)
+✔ 信标: target and item destroyed, offer of 2 same-tier operators; co-op: the original goes to the teammate with most of its bonds next round (10.449067ms)
+✔ pick-one chess offers never repeat an operator — 信标, 寻呼模块, any offer list (user playtest #6 item 19) (482.34414ms)
+✔ 拟态物质: owning 2 copies gives the 3rd (→ elite); otherwise a random same-bond normal operator (5.601171ms)
+✔ 博士投影: golden promotes at once; normal stays equipped and promotes at the next round start (4.548165ms)
+✔ 商业包装方案: every 8 / 7 operators sold ⇒ 1 normal operator sharing a bond with the carrier (≤ shop level) (9.290551ms)
+✔ 突变细胞: after a battle the carrier becomes a random NORMAL tier+1 operator; its equipment, the cell included, returns to the hand (3.691424ms)
+✔ 突变细胞: a DEPLOYED carrier leaves the field — the new operator is gained into the 整备区, the deploy slot comes back (PR #2) (10.551301ms)
+✔ 人事部文档: deploy cap becomes 9 (a second copy adds nothing) (2.97226ms)
+✔ 天师古鼎 + 炎国短刀 (炎 carrier): +2 funds per operator gained, at most 3 times per round (11.410947ms)
+✖ 画卷 (Art): copies the operator on the tile / in front with its elite status and equipment into the hand (4.366981ms)
+✖ 教鞭 (Art): a 战术特训 bounty (PRTS "于3个战术特训的悬赏任务中选择一项": extra enemies, coins for a perfect own phase); “神秘顾客”: a band bounty; destroyed ⇒ +1 fund, passes on (4.050404ms)
+✔ merging: two identical normal items become the golden one (upgradeNum 2); upgradeNum-100 items never merge (2.855584ms)
+✖ coverage: every equipment (normal + golden) and every Art is exercised by a test above (0.267994ms)
+✔ Ursus 2: no drone or speed buff (27.175645ms)
+✔ Ursus 3: one drone, layer scaling, selective +50 ASPD (5.094047ms)
+✔ Ursus 5: one drone, layer scaling, selective +50 ASPD (1.740283ms)
+✔ Ursus 6: one drone, layer scaling, selective +50 ASPD (1.506871ms)
+✔ Default official data has no experimental faction, operators, or drone (10.577591ms)
+✔ Coop Ursus effects and live layer gains stay with the owning player (2.495811ms)
+✔ Drone +50 ASPD shortens actual launches from five seconds to 3.33 seconds (35.743708ms)
+✔ drone pursues a priority boss despite other enemies in range, fires while travelling, and resumes (3.801139ms)
+✔ drone cannot receive external heals and targets large enemy bodies intersecting its radius (1.452379ms)
+✔ Ursus shell excludes concealed enemies at impact and hits them after reveal (5.694242ms)
+✔ six Ursus reveals only enemies inside the live drone radius (2.779158ms)
+✔ drone ASPD shortens the shell delay as well as attack cooldown (4.909899ms)
+✔ drone movement gets a fixed 50 percent boost, independent of Ursus layers (2.331745ms)
+✔ drone prioritizes main leaders by distance, but bounty bosses use base distance (1.613712ms)
+✔ attack speed debuffs and increased attack intervals cannot slow the drone, buffs still work (1.143093ms)
+✔ aim follows a moving target and changes dead or out-of-range targets without resetting its deadline (6.1377ms)
+✔ six Ursus adds donated total ATK before the three-member percentage, tracks skill buffs and deaths without recursion (1.525239ms)
+✔ hidden drone visual scale grows from 85 percent by 0.2 percent of that base per layer and is serialized (2.039443ms)
+✔ hidden drone range grows by 0.1 percent per layer and updates selection, reveal and snapshots (2.066545ms)
+ℹ tests 371
+ℹ suites 0
+ℹ pass 359
+ℹ fail 12
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1746.539695
+
+✖ failing tests:
+
+test at test/content/enemies_bosses.test.js:1295:1
+✖ enemy_10001_trslim 简饲源石虫: below half HP it runs (move ×2.5, unblockable 3 s) (4.89681ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+    assert.ok(e.s.flags.noMove)
+
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/content/enemies_bosses.test.js:1302:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at test/content/enemies_bosses.test.js:1307:1
+✖ enemy_10027_vtsk “帝国的甲胄”: entrance barrage (8 hits on the highest-HP unit); ranged hits ×0.8; charged triple attack (12.866119ms)
+  AssertionError [ERR_ASSERTION]: no damage before the first shell
+
+  8 !== 0
+
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/content/enemies_bosses.test.js:1312:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 8,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/content/enemies_bosses.test.js:1326:1
+✖ entrance barrage retains its fixed zone and cached damage after the shooter dies (0.760086ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  0 !== 8
+
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/content/enemies_bosses.test.js:1330:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 8,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/content/enemies_bosses.test.js:1910:1
+✖ 失衡: 弧光锋卫 bleeds per tile pushed; 冒失的小弟 is stunned; 拥霜羽兽 drops its egg (faster, unblockable) (1.003803ms)
+  AssertionError [ERR_ASSERTION]:  0 ≈ 1212.1212121212118
+      at approx (file:///workspace/Stronghold-Protocol_Ko_Arca/test/content/enemies_bosses.test.js:45:55)
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/content/enemies_bosses.test.js:1922:3)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at test/content/enemies_bosses.test.js:2484:1
+✖ “斩胄之剑” / “破胄之锤” 初始模式 attack: every ally in range, 锤 150 % ATK (PRTS 天赋) (1.697298ms)
+  AssertionError [ERR_ASSERTION]: enemy_9015_acstmb 0 ≈ 525
+      at approx (file:///workspace/Stronghold-Protocol_Ko_Arca/test/content/enemies_bosses.test.js:45:55)
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/content/enemies_bosses.test.js:2491:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at test/content/enemies_bosses.test.js:2939:1
+✖ enemy_2008_flking “墓碑”: unblocked, a ranged attack at 40 % ATK on the target and its 8 surrounding tiles; blocked, a melee hit at 100 % (2.507439ms)
+  AssertionError [ERR_ASSERTION]: blocked: its blocker only
+  + actual - expected
+
+    [
+      [
+        't_wall',
+        true
+      ],
+  +   [
+  +     't_wall',
+  +     true
+  +   ]
+    ]
+
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/content/enemies_bosses.test.js:2964:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: [ [ 't_wall', true ], [ 't_wall', true ] ],
+    expected: [ [ 't_wall', true ] ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at test/content/enemies_bosses.test.js:3063:1
+✖ catapult follow-up stones use the data hit interval, and already launched stones survive the shooter death (1.173658ms)
+  AssertionError [ERR_ASSERTION]: first stone only 2250 ≈ 750
+      at approx (file:///workspace/Stronghold-Protocol_Ko_Arca/test/content/enemies_bosses.test.js:45:55)
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/content/enemies_bosses.test.js:3066:2)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at test/content/garrisons_battle.test.js:305:1
+✖ 缇缇 125 + S2 封护 (GitHub #162): every 0.25 s sleep pulse of the ward is a new entry — 8 s climb to the cap; a sleeper outside her range does not count (4.588836ms)
+  AssertionError [ERR_ASSERTION]: chess_char_5_02_a: S2 cast
+      at run (file:///workspace/Stronghold-Protocol_Ko_Arca/test/content/garrisons_battle.test.js:323:14)
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/content/garrisons_battle.test.js:329:25)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at test/content/items.test.js:168:1
+✖ 炎国短刀: timed deployment skill adds one stack per deployment, including carry.skillActive (2.178674ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  0 !== 1
+
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/content/items.test.js:174:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/content/items.test.js:1072:1
+✖ 画卷 (Art): copies the operator on the tile / in front with its elite status and equipment into the hand (4.366981ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+
+  + []
+  - [
+  -   'chess_item_6_09_e_a'
+  - ]
+
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/content/items.test.js:1084:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [],
+    expected: [ 'chess_item_6_09_e_a' ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at test/content/items.test.js:1092:1
+✖ 教鞭 (Art): a 战术特训 bounty (PRTS "于3个战术特训的悬赏任务中选择一项": extra enemies, coins for a perfect own phase); “神秘顾客”: a band bounty; destroyed ⇒ +1 fund, passes on (4.050404ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+
+    {
+  +   detail: '请先完成当前教鞭选择',
+  +   error: 'BAD_TARGET'
+  -   ok: true
+    }
+
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/content/items.test.js:1101:14)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { error: 'BAD_TARGET', detail: '请先完成当前教鞭选择' },
+    expected: { ok: true },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at test/content/items.test.js:1139:1
+✖ coverage: every equipment (normal + golden) and every Art is exercised by a test above (0.267994ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+
+  + [
+  +   'chess_item_6_01_m',
+  +   'chess_item_6_02_m',
+  +   'chess_item_6_03_m'
+  + ]
+  - []
+
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/content/items.test.js:1142:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [ 'chess_item_6_01_m', 'chess_item_6_02_m', 'chess_item_6_03_m' ],
+    expected: [],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }

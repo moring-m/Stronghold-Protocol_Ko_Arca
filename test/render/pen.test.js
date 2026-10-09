@@ -167,3 +167,27 @@ describe('Final Assault prep field (board ⇄ boss field)', () => {
     assert.deepEqual(tilesToDisp(IDENTITY, [[6, 4], [14, 7]]), [[6, 4], [14, 7]], 'the own board keeps every tile');
   });
 });
+
+test('boss preview relocates the pen without mutating simulation rows or duplicating normal fields',async()=>{
+ const {bossPenStage}=await import('../../public/js/render/pen.js');
+ for(const stage of stageList){
+  const original=JSON.stringify(stage),visual=bossPenStage(stage);
+  assert.deepEqual(visual.rows.slice(0,7),stage.rows.slice(0,7));
+  assert.equal(JSON.stringify(stage),original);
+  assert.equal(bossPenStage(stage),visual);
+  const source=parsePenRect(stage.config?.enemy_place_rect)||{r0:14,r1:18,c0:7,c1:13};
+  assert.equal(visual.rows[7].slice(0,6),'######','rear lateral spaces stay scenery');
+  assert.equal(visual.rows[7].slice(6,15),stage.rows[source.r0-1].slice(6,15),'central pen border remains');
+  assert.equal(parsePenRect(visual.config.enemy_place_rect).r0,8);
+  for(let r=8;r<=12;r++){
+   assert.equal(visual.rows[r].slice(0,source.c0-1),'#'.repeat(source.c0-1));
+   assert.equal(visual.rows[r].slice(source.c1+2),'#'.repeat(visual.rows[r].length-source.c1-2));
+  }
+  const before=layoutPen([{enemyKey:'dummy',count:20}],{stage}),after=layoutPen([{enemyKey:'dummy',count:20}],{stage:visual});
+  assert.equal(after.figures.length,before.figures.length);
+  for(let i=0;i<before.figures.length;i++){
+   assert.equal(after.figures[i].x,before.figures[i].x);
+   assert.ok(Math.abs(after.figures[i].y-(before.figures[i].y-visual.previewLayout.offset))<1e-8);
+  }
+ }
+});

@@ -449,6 +449,7 @@ export const C2S = {
   'g.reward': { idx: (v) => isInt(v, 0, 5) },
   'g.choice': { idx: (v) => isInt(v, 0, 5), choiceId: isId, $optional: ['choiceId'] },
   'g.ready': { ready: isBool },
+  'g.endBattle': { fieldId: isId },
   'g.emote': { id: (v) => EMOTES.includes(v) },
   'g.chat': { text: (v) => !!normalizeChatText(v) },
   'g.chatFaction': { faction: (v) => v === null || !!chatFaction(v) },

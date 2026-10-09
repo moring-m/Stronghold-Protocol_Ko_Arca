@@ -26,6 +26,6 @@ test('favor + cutlass counts actual separate strikes, stops at 100, and never re
 });
 test('updated roster uses new tiers and real trait blackboards, with existing elite multipliers',()=>{
  for(const [key,tier,n]of [['turdus',2,3],['brownb',3,5]])for(const suffix of ['a','b']){const c=data.chess[`chess_custom_ursus_${key}_${suffix}`];assert.equal(c.tier,tier);const g=data.garrisons[c.garrisonIds[0]];assert.equal(g.bb.count,n*(suffix==='b'?2:1));assert.match(g.desc,new RegExp(`\\+${n*(suffix==='b'?2:1)}`));}
- const bot=data.chess.chess_custom_ursus_botany_a;assert.deepEqual(bot.bonds,['ursusShip','miraShip']);const g=data.garrisons[bot.garrisonIds[0]];assert.equal(g.bbStr.bond_id,'ursusShip');assert.equal(g.bb.bond_add_count,8);assert.equal(g.bb.max_add_count_per_battle,8);assert.ok(!g.desc.includes('신속'));
+ const bot=data.chess.chess_custom_ursus_botany_a;assert.deepEqual(bot.bonds,['ursusShip','miraShip']);const g=data.garrisons[bot.garrisonIds[0]];assert.equal(g.bbStr.bond_id,'ursusShip');assert.equal(g.bb.bond_add_count,7);assert.equal(g.bb.max_add_count_per_battle,7);assert.ok(!g.desc.includes('신속'));
  const item=data.items[ITEM];assert.equal(item.tier,6);assert.equal(item.giveBondId,null);assert.equal(data.assets.items.ursus_favor,'/assets/custom/ursus/item/emperors-favor.png');
 });

@@ -1,0 +1,10 @@
+{
+  hiddenCategories: [
+    [ 'audio', 'none' ],
+    [ 'chat', 'none' ],
+    [ 'graphics', 'flex' ],
+    [ 'controls', 'none' ]
+  ],
+  overflow: false,
+  bugReport: false
+}

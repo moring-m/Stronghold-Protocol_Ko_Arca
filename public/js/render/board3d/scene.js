@@ -78,13 +78,18 @@ export function compactGeometry(src) {
 /** Exclude inactive field platforms and props from both the visible pass and shadow pass.
  * Scenic background is handled separately by sceneryForArea; platform meshes outside the board envelope are still platforms.
  * Sub-floor triangles inside an inactive field are still platform geometry: depth alone must not preserve them. */
-export function geometryForArea(src, areas) {
+export function geometryForArea(src, areas, {support=false}={}) {
   const p = src.position, index = [];
   for (let i = 0; i < src.index.length; i += 3) {
     const ids = src.index.slice(i, i + 3);
     const x = ids.reduce((v, k) => v + p[k * 3], 0) / 3;
     const y = ids.reduce((v, k) => v + p[k * 3 + 1], 0) / 3;
-    if (areas.some(a => x >= a.c0 - 0.5 && x <= a.c1 + 0.5 && y >= a.r0 - 0.5 && y <= a.r1 + 0.5)) index.push(...ids);
+    const inArea=areas.some(a => x >= a.c0 - 0.5 && x <= a.c1 + 0.5 && y >= a.r0 - 0.5 && y <= a.r1 + 0.5);
+    // Native slabs extend below the field edge. Preserve their underground
+    // support without exposing the top surfaces of another battlefield.
+    const underEdge=support && ids.every(k=>p[k*3+2]<-.01) && areas.some(a=>
+      x>=a.c0-1.5 && x<=a.c1+1.5 && y>=a.r0-1.5 && y<=a.r1+1.5);
+    if (inArea || underEdge) index.push(...ids);
   }
   return { ...src, index };
 }
@@ -126,7 +131,7 @@ export function surfaceForArea(src, areas) {
 
 /** Keep decorative mesh components whole. Only hide components wholly inside an
  * inactive board region; landscape and components crossing its boundary stay intact. */
-export function sceneryForArea(src, areas) {
+export function sceneryForArea(src, areas, {interiorOnly=false, surroundOnly=false, decorationOnly=false}={}) {
   const count = src.position.length / 3;
   const parent = Int32Array.from({length:count}, (_, i) => i);
   const find = i => { while (parent[i] !== i) { parent[i] = parent[parent[i]]; i = parent[i]; } return i; };
@@ -151,11 +156,25 @@ export function sceneryForArea(src, areas) {
   const keep = new Set();
   for (const [root,b] of bounds) {
     const landscape = b.x0 < -.5 || b.x1 > 20.5 || b.y0 < -.5 || b.y1 > 18.5;
+    if (decorationOnly) {
+      if (!landscape && b.x1-b.x0 < 3.5 && b.y1-b.y0 < 2.5 && areas.some(a=>b.x0>=a.c0-.5 && b.x1<=a.c1+.5 && b.y0>=a.r0-.5 && b.y1<=a.r1+.5)) keep.add(root);
+      continue;
+    }
+    if (interiorOnly && landscape && b.y1 > 6.5) continue;
+    if (surroundOnly && landscape && b.y1 < 6.5) continue;
+    // Rear rocks and the terrain supporting the pen extend into the last
+    // cooperative row. Keep that overlap whole instead of opening a seam.
+    if (surroundOnly && !landscape && b.y0 < 11.5 && b.x1 >= -.5 && b.x0 <= 20.5) continue;
     if (landscape || areas.some(a=>b.x1>=a.c0-.5 && b.x0<=a.c1+.5 && b.y1>=a.r0-.5 && b.y0<=a.r1+.5)) keep.add(root);
   }
   const index=[];
   for(let i=0;i<src.index.length;i+=3) if(keep.has(find(src.index[i]))) index.push(src.index[i],src.index[i+1],src.index[i+2]);
   return {...src,index};
+}
+
+/** Translate the complete cooperative background without changing UVs or lighting. */
+export function translateEnvironment(src, offset) {
+  return {...src,position:Array.from(src.position,(v,i)=>i%3===1?v-offset:v)};
 }
 
 const mergeInto = (list) => {
@@ -441,7 +460,7 @@ export class BoardScene {
     this.stage = stage || null;
     this._clear();
     if (!stage) return;
-    if (this.pack?.original?.loadStage && !this.pack.original.scenes[stage.id]) {
+    if (this.mapQuality !== 'low' && this.pack?.original?.loadStage && !this.pack.original.scenes[stage.id]) {
       this.pack.original.loadStage(stage.id).then((scene) => {
         if (scene && !this.destroyed && this.stage?.id === stage.id) {
           this.stageKey = null;
@@ -452,7 +471,7 @@ export class BoardScene {
     const board = buildBoard(stage, { uv: this.pack?.uv || null, area: this.area });
     this.board = board;
     const M = this.meshes = {};
-    const candidate = this.pack?.original?.scenes?.[stage.id];
+    const candidate = this.mapQuality === 'low' ? null : this.pack?.original?.scenes?.[stage.id];
     // Missing/invalid material metadata must retain the working reconstructed board.
     const original = candidate && Object.entries(candidate.buckets).every(([k,g]) => this.originalMaterials[g.material || k]) ? candidate : null;
     this.originalStage = original?.stageId || null;
@@ -512,8 +531,42 @@ export class BoardScene {
         // Retain it only for normal/cooperative framing; never add platform tiles.
         const scenicArea = stage.id === 'act2autochess_m01' && this.area.some(a=>a.r1 >= 13)
           ? [...this.area, {r0:14,r1:18,c0:0,c1:5}] : this.area;
-        const visibleGeometry = waterSurface ? surfaceForArea(geometry, this.area) : geometry.platform ? geometryForArea(geometry, this.area) : sceneryForArea(geometry, scenicArea);
+        const nativeArea = stage.previewLayout ? AREAS.boss : this.area;
+        let visibleGeometry;
+        if (stage.previewLayout && !geometry.platform) {
+          // Reuse the cooperative environment as one layout, translated into
+          // boss world space. Combat tiles and simulation coordinates stay put.
+          const environmentArea=stage.id==='act2autochess_m01'
+            ? [...AREAS.unite,{r0:14,r1:18,c0:0,c1:5}] : AREAS.unite;
+          if (!waterSurface) {
+            // Reuse the opposite border's complete props, preserving their UVs,
+            // material and baked lighting instead of duplicating playable tiles.
+            const decor=sceneryForArea(geometry,[{c0:3,c1:5,r0:12,r1:13}],{decorationOnly:true});
+            for (const shift of [4,7,10]) {
+              const moved={...decor,position:Array.from(decor.position,(v,i)=>i%3===0?v+shift:i%3===1?v-stage.previewLayout.offset:v)};
+              M[`preview-decor:${material}:${shift}`]=this._mesh(moved,runtimeMaterial,{cast:!runtimeMaterial.isShaderMaterial});
+            }
+          }
+          const environment=waterSurface ? surfaceForArea(geometry,environmentArea) : sceneryForArea(geometry,environmentArea,{surroundOnly:true});
+          M[`cooperative:${material}`]=this._mesh(translateEnvironment(environment,stage.previewLayout.offset),runtimeMaterial,{cast:!runtimeMaterial.isShaderMaterial});
+          visibleGeometry=waterSurface ? {...geometry,index:[]} : sceneryForArea(geometry,AREAS.boss,{interiorOnly:true});
+        } else {
+          visibleGeometry=waterSurface ? surfaceForArea(geometry,nativeArea) : geometry.platform ? geometryForArea(geometry,nativeArea,{support:true}) : sceneryForArea(geometry,scenicArea);
+        }
         M[`original:${material}`] = this._mesh(visibleGeometry, runtimeMaterial, { cast: !runtimeMaterial.isShaderMaterial });
+        if (stage.previewLayout && geometry.platform) {
+          const {source,offset}=stage.previewLayout;
+          const x0=source.c0-1.5,x1=source.c1+1.5,y0=source.r0-offset-1.5,y1=y0+1;
+          const trim={position:[x0,y0,-.4,x1,y0,-.4,x1,y1,-.4,x0,y1,-.4,x0,y0,.06,x1,y0,.06,x1,y1,.06,x0,y1,.06],index:[4,5,6,4,6,7,0,2,1,0,3,2,0,1,5,0,5,4,1,2,6,1,6,5,2,3,7,2,7,6,3,0,4,3,4,7]};
+          // This is scenery: omit the playable tile texture and lower its surface.
+          const trimMaterial=new this.THREE.MeshStandardMaterial({color:stage.id==='act2autochess_m01'||stage.id==='act2autochess_m03'?0x778880:0xc5a77a,roughness:1,metalness:0});
+          this.lightmapMaterials.push(trimMaterial);
+          const trimMoved=trim;
+          if (!M['preview-trim']) M['preview-trim']=this._mesh(trimMoved,trimMaterial,{cast:true});
+          const floor=geometryForArea(geometry,[{...source,c0:source.c0-1,c1:source.c1+1}],{support:true});
+          const moved={...floor,position:floor.position.map((v,i)=>i%3===1?v-offset:v)};
+          M[`preview:${material}`]=this._mesh(moved,runtimeMaterial,{cast:!runtimeMaterial.isShaderMaterial});
+        }
       }
     } else {
       M.board = this._mesh(board.buckets.board, this.mat.board);
@@ -522,11 +575,13 @@ export class BoardScene {
       M.pipe = this._mesh(board.buckets.pipe, this.mat.pipe);
     }
     if (original) {
-      // Preview floor is procedural and independent of the original battle map.
-      M.previewGlass = this._mesh(board.buckets.glass, this.mat.glass);
+      // Original scenes already contain their theme-specific preview floor.
+      // Procedural glass belongs only to the fallback board (above); adding it
+      // here covers the native sand/city floor and its baked lighting.
       const slabs = buildDeviceSlabs(board.devices.filter(d=>!this.nativeDevice(d)), board.grid, this.pack?.uv);
       M.deviceSlabs = this._mesh(slabs.board, this.mat.board);
       M.deviceDecals = this._mesh(slabs.decal, this.mat.decal, { cast: false });
+
     }
     this._buildDevices(board);
     this._buildGates(board);

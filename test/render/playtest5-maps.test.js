@@ -141,11 +141,15 @@ describe('#6 audit: every device of every stage is drawn in the views of the fie
   });
 });
 
-test('boss intel builds a preview floor without rebuilding the normal battlefield',async()=>{
+test('boss intel attaches only the central preview pen behind the unchanged arena',async()=>{
  const {boardAreaForView}=await import('../../public/js/render/app.js');
+ const {bossPenStage}=await import('../../public/js/render/pen.js');
  const area=boardAreaForView('pen','bossPrep');
- assert.ok(area.some(a=>15>=a.r0&&15<=a.r1&&10>=a.c0&&10<=a.c1));
- assert.ok(!area.some(a=>10>=a.r0&&10<=a.r1));
- const grid=classifyStage(M01,area);
- for(const row of grid.slice(7,13))for(const tile of row)assert.equal(tile.content,false);
+ assert.ok(area.some(a=>a.r0===7&&a.r1===7&&a.c0===6&&a.c1===14),'border belongs only to central preview');
+ assert.ok(area.some(a=>8>=a.r0&&8<=a.r1&&10>=a.c0&&10<=a.c1));
+ assert.ok(!area.some(a=>8>=a.r0&&8<=a.r1&&2>=a.c0&&2<=a.c1));
+ assert.ok(!area.some(a=>15>=a.r0&&15<=a.r1));
+ const grid=classifyStage(bossPenStage(M01),area);
+ for(const row of grid.slice(7,13))for(const tile of row)if(tile.c<6||tile.c>14)assert.equal(tile.content,false);
+ assert.deepEqual(fieldRows('bossPrep'),[0,6]);
 });

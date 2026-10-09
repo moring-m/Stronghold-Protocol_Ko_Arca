@@ -79,6 +79,7 @@ test('useskill (莎草 42 / 菲莱 43 / 百炼嘉维尔 128 / 塑心 90 / 纯烬
     const per = row ? 3 * num(g.bb.bond_add_count_multi) : num(g.bb.bond_add_count);
     skill(h, h.unit('op'));
     expectAll(h, sc.targets, Math.min(per, capOf(gid)), gid);
+    for(const event of h.eventsOf('layer')) { assert.equal(event[4],h.unit('op').id,`${gid}: owner anchoring is independent of bond`); assert.equal(event[5],h.unit('op').x); assert.equal(event[6],h.unit('op').y); }
     for (let i = 0; i < 29; i++) skill(h, h.unit('op'));
     expectAll(h, sc.targets, Math.min(30 * per, capOf(gid)), `${gid} ×30`);
     cover(gid);

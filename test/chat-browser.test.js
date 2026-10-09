@@ -196,3 +196,28 @@ test('two browsers chat over real game sockets: toggle, unread, safe text, Korea
       await guest.evaluate(() => window.request('room.leave'));
     } finally { if (browser) await browser.close(); await server.close(); await rm(fixtureDir, { recursive: true, force: true }); }
   });
+
+test('opening chat and restart controls does not move the corner buttons',
+  {skip:!existsSync(chrome),timeout:30000},async()=>{
+    const dir=await mkdtemp(path.join(tmpdir(),'stronghold-chat-corner-'));
+    const publicDir=fileURLToPath(new URL('../public/',import.meta.url));
+    for(const name of ['js','vendor','css','assets','audio'])await symlink(path.join(publicDir,name),path.join(dir,name));
+    await writeFile(path.join(dir,'corner.html'),`<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="/css/theme.css"><link rel="stylesheet" href="/css/screens/game.css"><link rel="stylesheet" href="/css/chat.css"><style>html{font-size:100px}</style><div id="app"></div><script type="module">
+      import {render} from '/vendor/preact.module.js';import {html} from '/js/ui/components.js';import {ChatPanel} from '/js/ui/chat.js';import {store,emptyMatch} from '/js/store.js';
+      store.set({me:{playerId:'self'},connection:{status:'online'},room:{code:'fixture',matchNo:1,inMatch:true,seats:[{playerId:'self'}]},match:{...emptyMatch(),public:{phase:'PREP'}}});
+      window.store=store;render(html\`<div class="gm__corner"><\${ChatPanel}/><button class="gm__gear" id="next">⚙</button></div>\`,document.getElementById('app'));window.ready=true;
+    </script>`);
+    const server=await startServer({port:0,host:'127.0.0.1',quiet:true,publicDir:dir});let browser;
+    try{
+      const P=(await import('puppeteer-core')).default;browser=await P.launch({executablePath:chrome,args:['--no-sandbox']});const page=await browser.newPage();
+      await page.goto(`http://127.0.0.1:${server.port}/corner.html`);await page.waitForFunction(()=>window.ready);
+      const position=()=>page.$eval('#next',e=>{const r=e.getBoundingClientRect();return{x:r.x,y:r.y};});
+      for(const width of [1280,390]){
+        await page.setViewport({width,height:720});const closed=await position();await page.click('.game-chat__toggle');await page.waitForSelector('.game-chat__panel > .restart-controls > button');
+        assert.deepEqual(await position(),closed,'opening chat with an eligible restart request must preserve the toolbar');
+        assert.equal(await page.$eval('.game-chat__panel > .restart-controls',e=>{const p=e.parentElement.getBoundingClientRect(),r=e.getBoundingClientRect();return r.left>=p.left&&r.right<=p.right;}),true,'restart request stays inside chat');
+        await page.evaluate(()=>store.set({restartOutcome:'failed'}));await page.click('.game-chat__toggle');await page.waitForSelector('.game-chat > .restart-controls small');
+        assert.deepEqual(await position(),closed,'restart outcome does not add a blank button slot');
+      }
+    }finally{await browser?.close();await server.close();await rm(dir,{recursive:true,force:true});}
+  });

@@ -1206,7 +1206,7 @@ export class UnitView {
     }
     const P = this.P;
     // Ground overlays have their own layer: invalidate before any off-screen early return.
-    if (this.skillZone && (!this.alive || this.down || (!this.statuses.has('skill') && !this.skillTiles?.length))) { this.skillZone.clear(); this.skillZone.visible = false; }
+    if (this.skillZone && (this.ctx.settings?.skillRanges === false || !this.alive || this.down || (!this.statuses.has('skill') && !this.skillTiles?.length))) { this.skillZone.clear(); this.skillZone.visible = false; }
     if (!this.alive) this.snowFx.clear();
     if (!this.skillZone && this.skillTiles?.length) { this.skillZone = new P.Graphics(); this.ctx.layers.groundFx.addChild(this.skillZone); }
     // the model for the state the frame's events and snapshot left (Front ⇄ Back when it went down / stood up: die, revive)
@@ -1369,7 +1369,7 @@ export class UnitView {
     this.shadow.position.set(sh.x, sh.y);
     const shw = s * (this.isBoss ? 1.6 : 0.95) / this.shadow.texture.width;
     this.shadow.scale.set(shw, shw * (this.shadow.texture === shadowTexture() ? 1 : 1.05));
-    this.shadow.alpha = 0.5 * alpha * (this.lift > 0 ? 0.6 : 1);
+    this.shadow.alpha = this.ctx.settings?.shadows === false ? 0 : 0.5 * alpha * (this.lift > 0 ? 0.6 : 1);
 
     this.snowFx.clear();
     if(this.alive && this.snowTiles.length){
@@ -1382,7 +1382,7 @@ export class UnitView {
       }
     }
     if(this.skillZone){
-      const g=this.skillZone;g.clear();g.visible=this.alive&&!this.down&&!this.info.skillUnlimitedRange&&(this.statuses.has('skill')||!!this.skillTiles?.length);
+      const g=this.skillZone;g.clear();g.visible=this.ctx.settings?.skillRanges !== false && this.alive&&!this.down&&!this.info.skillUnlimitedRange&&(this.statuses.has('skill')||!!this.skillTiles?.length);
       for(const extra of this.skillZoneExtra.values()){extra.clear();extra.visible=false;}
       if(g.visible){
         placeOnGround(this.ctx,g,this.ctx.layers.groundFx,this.y,0);
@@ -1439,7 +1439,7 @@ export class UnitView {
       }
     }
     if(this.attackRange){
-      const g=this.attackRange,r=Number(this.info.rangeRadius);g.clear();g.visible=this.alive&&!this.down;
+      const g=this.attackRange,r=Number(this.info.rangeRadius);g.clear();g.visible=this.ctx.settings?.unitRanges !== false && this.alive&&!this.down;
       if(g.visible&&this.info.hitArea){const a=this.info.hitArea;placeOnGround(this.ctx,g,this.ctx.layers.groundFx,this.y,this.z);g.lineStyle(2,0xff9c33,.8*alpha);const x=this.x+(a.dx||0),y=this.y+(a.dy||0);for(const [i,p]of [[x-a.w/2,y-a.h/2],[x+a.w/2,y-a.h/2],[x+a.w/2,y+a.h/2],[x-a.w/2,y+a.h/2],[x-a.w/2,y-a.h/2]].entries()){const q=cam.project(p[0],p[1],this.z+.015);if(!i)g.moveTo(q.x,q.y);else g.lineTo(q.x,q.y)}}
       else if(g.visible){placeOnGround(this.ctx,g,this.ctx.layers.groundFx,this.y,this.z);
         const drone=/emppnt|ursus_drone/.test(this.info.spine||this.info.defId||'');
@@ -1902,7 +1902,7 @@ export class UnitView {
     // a context without slots keeps the random phase. A unit whose slot keeps moving with the frame (the units before it
     // culled on and off in step) is still refreshed after 2 intervals at the latest.
     const turn = this.ctx.impostorSlot ? this.ctx.impostorSlot() : imp.phase;
-    const due = imp.dirty || interval <= 1 || (frame + turn) % interval === 0 || frame - imp.last >= 2 * interval
+    const due = imp.dirty || imp.slot?.freed || (imp.rt && imp.rt.baseTexture?.resolution !== this.ctx.renderer.resolution) || interval <= 1 || (frame + turn) % interval === 0 || frame - imp.last >= 2 * interval
       || Math.abs(sc - imp.sc) > imp.sc * 0.12;
     if (due) {
       this.actor.update(imp.acc);
@@ -1930,7 +1930,7 @@ export class UnitView {
     if (atlas) {
       let slot = imp.slot;
       const clip = !!(this.actor.clipped && this.actor.clipOn);
-      if (!slot || w > slot.w || h > slot.h || w < slot.w * 0.6 || h < slot.h * 0.6 || slot.clip !== clip) {
+      if (!slot || slot.freed || w > slot.w || h > slot.h || w < slot.w * 0.6 || h < slot.h * 0.6 || slot.clip !== clip) {
         if (slot) atlas.free(slot);
         slot = imp.slot = atlas.alloc(w, h, { clip });
         if (slot && imp.rt) { imp.rt.destroy(true); imp.rt = null; }
@@ -1945,7 +1945,7 @@ export class UnitView {
     }
     // private render target (no atlas / atlas full)
     let rt = imp.rt;
-    if (!rt || w > rt.width || h > rt.height || w < rt.width * 0.6 || h < rt.height * 0.6) {
+    if (!rt || rt.baseTexture?.resolution !== R.resolution || w > rt.width || h > rt.height || w < rt.width * 0.6 || h < rt.height * 0.6) {
       if (rt) rt.destroy(true);
       rt = imp.rt = P.RenderTexture.create({ width: Math.ceil(w / 8) * 8, height: Math.ceil(h / 8) * 8, resolution: R.resolution });
       imp.sprite.texture = rt;

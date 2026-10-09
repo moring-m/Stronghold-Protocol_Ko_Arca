@@ -261,6 +261,7 @@ function MatchScreen() {
   const phase = pub?.phase;
   const mode = phaseMode(phase);
   const combat = isCombatPhase(phase);
+  const endField = pub.fields?.find(f=>f.live && f.players?.includes(myId));
   const solo = roomSolo || String(pub?.modeId || '').includes('single');
   const players = sortedPlayers(pub);
   const meP = players.find((p) => p.playerId === myId) || null;
@@ -1473,7 +1474,7 @@ function MatchScreen() {
       ${showShop ? html`<${ShopBar} priv=${priv} editable=${editable} collapsed=${collapsed} onCollapse=${setCollapsed}
         barRef=${barRef} offBonds=${offBonds}
         onBuy=${buy} onLevel=${() => actions.levelUp()} onRefresh=${() => actions.refresh()} onFreeze=${() => actions.freeze()}
-        onDetail=${(id, kind, hint) => { const rec = kind === 'chess' ? gd.chess(id) : null; if (rec?.charId && !rec.recruitPrototype && !rec.recruitReserve) audio.voice(rec.charId, 'select', {unitKey:`card:${id}`}); setDetail({ kind: kind === 'item' ? 'item' : 'chess', id, hint: hint || null }); }}
+        onDetail=${(id, kind, hint) => setDetail({ kind: kind === 'item' ? 'item' : 'chess', id, hint: hint || null })}
         onDetailClose=${() => setDetail((d) => (d?.kind === 'chess' || d?.kind === 'item' ? null : d))}
         onRefuse=${(reason) => { toast(reason, 'warn'); audio.sfx('error', { volume: 0.5 }); }}
         reward=${phase === PHASE.PREP && !rewardMin ? priv?.shop?.rewardOffer || null : null}
@@ -1491,6 +1492,13 @@ function MatchScreen() {
 
       ${!spectator && showDeadPill(alive, phase) ? html`<div class="gm__dead" role="status"><${Icon} name="close" />你已被淘汰 · 可继续观战队友</div>` : null}
 
+      ${combat && alive && !spectator && !myDone && endField ? html`<button type="button" class="gm__end-battle" data-i18n-skip disabled=${endField.endVotes?.includes(myId)} onClick=${async()=>{
+        const f=pub.fields?.find(f=>f.live && f.players?.includes(myId)); if(!f)return;
+        const shared=f.kind==='boss'||f.kind==='hidden'||f.players.length>1;
+        if(await confirmDialog({title:'현재 전투 종료',text:shared?'모든 참가자가 종료를 요청하면 전투를 끝냅니다. 남은 적은 미처치로 정산되며, 보스전은 패배합니다.':'지금 전투를 끝내고 다음 단계로 넘어갑니다. 남은 적은 미처치로 정산됩니다.',okText:'전투 종료',danger:true})) {
+          try {await net.request('g.endBattle',{fieldId:f.fieldId}); if(shared)toast('전투 종료를 요청했습니다. 동료의 요청을 기다립니다.','info');}catch(e){toast(e.message,'error');}
+        }
+      }}><${Icon} name="close" />${endField.endVotes?.includes(myId)?'종료 요청됨':'전투 종료'}</button>` : null}
       <${Ticker} />
 
       <div class="gm__corner">

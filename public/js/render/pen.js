@@ -29,6 +29,36 @@ export const PEN_RECT = Object.freeze({ r0: 14, r1: 18, c0: 7, c1: 13 });
 export const MAX_PREVIEW = 50;
 export const PER_TILE = 3;
 
+export const BOSS_PEN_RECT = Object.freeze({r0:8,r1:12,c0:7,c1:13});
+const bossStages = new WeakMap();
+
+/** Display-only stage: attach the original preview pen behind the boss arena.
+ * Simulation data and the boss arena rows are never modified. */
+export function bossPenStage(stage) {
+  if (!stage?.rows) return stage;
+  if (bossStages.has(stage)) return bossStages.get(stage);
+  const source = parsePenRect(stage.config?.enemy_place_rect) || PEN_RECT;
+  const offset = source.r0 - BOSS_PEN_RECT.r0;
+  const rows = stage.rows.map((line,r)=>r<=6?line:'#'.repeat(line.length));
+  // Only the central pen gets a border. The lateral rear gap is scenery,
+  // not an extra row of playable-looking tiles.
+  const border=rows[BOSS_PEN_RECT.r0-1].split('');
+  for(let c=source.c0-1;c<=source.c1+1;c++)border[c]=stage.rows[source.r0-1][c];
+  rows[BOSS_PEN_RECT.r0-1]=border.join('');
+  for (let r=source.r0;r<=source.r1;r++) {
+    const target=r-offset;
+    const line=rows[target].split('');
+    for (let c=source.c0-1;c<=source.c1+1;c++) line[c]=stage.rows[r][c];
+    rows[target]=line.join('');
+  }
+  const rect={...source,r0:source.r0-offset,r1:source.r1-offset};
+  const visual={...stage,rows,devices:(stage.devices||[]).filter(d=>d.pos?.[0]<=6),
+    config:{...stage.config,enemy_place_rect:`((${rect.r0},${rect.c0}),(${rect.r1},${rect.c1}))`},
+    previewLayout:{source,rect,offset}};
+  bossStages.set(stage,visual);
+  return visual;
+}
+
 /** Cluster offsets (tiles; x = col, y = row) of 1–6 figures sharing a tile (deeper ones a bit to the right). */
 const CLUSTER = Object.freeze([
   Object.freeze([[0, 0]]),

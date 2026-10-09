@@ -1,0 +1,13 @@
+▶ impostor atlas allocator
+  ✔ shelf packing, reuse of freed slots, clip pages separate, full ⇒ null (2.844166ms)
+  ✔ zoom churn (the enemy pen camera: 50 figures grow and shrink again and again) never exhausts the atlas; freeing every slot resets the pages (8.840402ms)
+✔ impostor atlas allocator (12.525134ms)
+✔ test/ui/gameLogic.test.js (102.105437ms)
+ℹ tests 3
+ℹ suites 1
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 122.854655

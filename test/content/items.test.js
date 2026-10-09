@@ -607,8 +607,10 @@ test('黄沙罗盘: initial SP +30 / +50; (萨尔贡) first skill end +30 SP; + 
   const h = fight({ ops, units: [{ chessId: 't_op', row: 10, col: 4, items: [A('6_07'), A('2_04')] }, { chessId: 't_a', row: 11, col: 4 }, { chessId: 't_b', row: 12, col: 4 }] });
   h.step(1);
   const u = h.unit('t_op'), a = h.unit('t_a'), b = h.unit('t_b');
+  a.skill.activate('test', { free: true });
   const a0 = a.skill.sp, b0 = b.skill.sp;
   u.skill.activate('test', { free: true });
+  assert.equal(a.skill.active, true, 'recipient is still using its skill');
   close(a.skill.sp - a0, 3, '萨尔贡 ally +3');
   close(b.skill.sp - b0, 0, 'non-萨尔贡 ally +0');
   u.skill.sp = 0;
@@ -617,7 +619,7 @@ test('黄沙罗盘: initial SP +30 / +50; (萨尔贡) first skill end +30 SP; + 
   u.skill.sp = 0;
   u.skill.activate('test', { free: true });
   u.skill.end('test');
-  close(u.skill.sp, 0, 'only the first skill end');
+  close(u.skill.sp, 3, 'later cast keeps its own set SP; first-end refund is not repeated');
   cover(A('6_07'), B('6_07'), A('2_04'), B('2_04'));
 });
 

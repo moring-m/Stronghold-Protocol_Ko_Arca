@@ -165,7 +165,7 @@ function SeatCard({ seat, index, room, facts, myId, busy, onAddBot, onRemoveBot,
 
 /** 观战席: the room's spectators (host: ✕ frees a seat), and 入座 for a spectator while a player seat is free.
  *  The host's own cap (`facts.spectatorCap`, room.create {spectators}) labels the counter; a cap of 0 hides the strip. */
-function SpectatorBar({ facts, myId, busy, onRemove, onSit }) {
+function SpectatorBar({ facts, myId, busy, onRemove, onSit, onSpectate }) {
   if (!facts.spectators.length && facts.spectatorCap <= 0) return null;
   return html`<section class="specbar" aria-label="观战席">
     <span class="specbar__label"><${Icon} name="eye" />观战席<b class="num">${facts.spectators.length}</b><span class="num t-dim">/${facts.spectatorCap}</span></span>
@@ -175,6 +175,7 @@ function SpectatorBar({ facts, myId, busy, onRemove, onSit }) {
       ${facts.isHost ? html`<${Button} variant="ghost" size="sm" square=${true} icon="close" loading=${busy === `rs${s.playerId}`}
         onClick=${() => onRemove(s.playerId)} aria-label=${`移出观战者 ${s.name || ''}`} title="移出该观战者" />` : null}
     </span>`)}
+    ${!facts.spectating && facts.spectators.length < facts.spectatorCap ? html`<${Button} size="sm" icon="eye" loading=${busy === 'spectate'} onClick=${onSpectate}>관전으로 전환<//>` : null}
     ${facts.spectating && facts.emptySeats > 0 ? html`<${Button} size="sm" icon="user" loading=${busy === 'sit'} onClick=${onSit}>入座<//>` : null}
   </section>`;
 }
@@ -282,6 +283,7 @@ export function RoomScreen() {
   const setAiLast = (on) => run('ailast', () => net.request('room.setAiPicksLast', { on }));
   // spectator seats: the host frees one; a spectator takes a free player seat with room.join of this room
   const removeSpectator = (playerId) => run(`rs${playerId}`, () => net.request('room.removeSpectator', { playerId }));
+  const spectate = () => run('spectate', () => net.request('room.spectate', {code:room.code}));
   const sit = () => run('sit', () => net.request('room.join', { code: room.code }));
   const leave = async () => {
     if (inFlight.current) return;
@@ -354,7 +356,7 @@ export function RoomScreen() {
         </ul>
       </aside>`}
     </main>
-    <${SpectatorBar} facts=${facts} myId=${me.playerId} busy=${busy} onRemove=${removeSpectator} onSit=${sit} />
+    <${SpectatorBar} facts=${facts} myId=${me.playerId} busy=${busy} onRemove=${removeSpectator} onSit=${sit} onSpectate=${spectate} />
 
     <${CustomExtensionsDialog} open=${extensionsOpen} room=${room} isHost=${facts.isHost} disabled=${!!busy || !online} onClose=${()=>setExtensionsOpen(false)}
       onSave=${selection=>run('extensions',async()=>{await net.request('room.setCustomExtensions',{selection});saveCustomExtensionPrefs(selection);setExtensionsOpen(false);})} />

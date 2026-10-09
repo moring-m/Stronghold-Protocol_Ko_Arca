@@ -30,3 +30,10 @@ test('凯瑟琳 定向投放: the level 1 → 2 offer draws from every tier, the
   assert.ok([...tiers.keys()].some((t) => t > 2), `items above the shop level (the parent: tiers I–II only) — ${JSON.stringify([...tiers])}`);
   assert.ok(tiers.has(6), 'tier VI among them');
 });
+
+test('Narantuya special equipment pool includes tier VI at shop level I',()=>{
+ const h=makeMatch({mode:'solo',difficulty:'NORMAL',humans:1,seed:1,fake:true}).start();
+ assert.equal(DATA.choices.pools.pool_equip_narant.maxTier,undefined);
+ const tiers=new Set();for(let i=0;i<200;i++){const id=h.m.rollItemId({pool:'pool_equip_narant',shopLevel:1});tiers.add(h.m.gd.item(id).tier);}
+ assert.ok(tiers.has(6));
+});

@@ -102,8 +102,14 @@
 /* The in-game chat toggle participates in the same flex row as the other tools. */
 .gm__corner > .game-chat {
   position:relative; left:auto; bottom:auto; flex:none; line-height:1.45; z-index:auto;
+  width:var(--chat-button-size);
 }
 .gm__corner > .game-chat > .game-chat__panel,
 .gm__corner > .game-chat > .game-chat__preview {
   position:absolute; left:0; bottom:calc(var(--chat-button-size) + 8px); margin-bottom:0;
 }
+.gm__corner > .game-chat > .restart-controls {
+  position:absolute; left:0; bottom:calc(var(--chat-button-size) + 8px); width:360px;
+  max-width:calc(100vw - 2 * var(--chat-corner-inset)); margin-bottom:0;
+}
+.game-chat__panel > .restart-controls { margin:0; padding:8px 10px; border-bottom:1px solid var(--line); }

@@ -98,23 +98,23 @@ export function install(battle){
   const active=()=>S.bondActive(battle,pid,'ursusShip');
   const six=()=>active()&&(S.bondState(battle,pid,'ursusShip').count>=6||S.bondTier(battle,pid,'ursusShip')>=2);
   const refresh=()=>{
-   const layers=S.bondLayers(battle,pid,'ursusShip'),bonus=active() ? .2+.01*layers : 0;
+   const layers=S.bondLayers(battle,pid,'ursusShip'),bonus=active() ? .2+.01*layers : 0,hpBonus=active() ? .2+.008*layers : 0;
    const members=battle.allyUnits.filter(u=>u.ownerId===pid&&u.kind==='op'&&S.unitBonds(u).includes('ursusShip'));
    // Apply the faction bonus first; donations use current total ATK of live, deployed operators only.
    // The drone is not an operator and cannot recursively contribute its own donation.
    for(const u of members){
     const old=u.findBuff('bond:ursus:stats');
     if(!bonus){if(old)battle.removeBuff(u,'bond:ursus:stats');continue;}
-    if(old?.mods?.atkPct!==bonus)S.passiveBuff(battle,u,'bond:ursus:stats',S.directMods({atk:bonus,hp:bonus}));
+    if(old?.mods?.atkPct!==bonus||old?.mods?.hpPct!==hpBonus)S.passiveBuff(battle,u,'bond:ursus:stats',S.directMods({atk:bonus,hp:hpBonus}));
    }
    if(drone){
-    drone.mem.visualScale=.85*(1+.0025*layers);
-    drone.mem.attackRangeRadius=DRONE_RANGE*(1+.0015*layers);
+    drone.mem.visualScale=.85*(1+.002*layers);
+    drone.mem.attackRangeRadius=DRONE_RANGE*(1+.001*layers);
     drone.profile.visibleRangeRadius=drone.mem.attackRangeRadius;
-    const atkFlat=six()?members.filter(u=>u.alive&&u.deployed&&!u.hidden).reduce((sum,u)=>sum+u.s.atk,0)*(.05+.00025*layers):0;
+    const atkFlat=six()?members.filter(u=>u.alive&&u.deployed&&!u.hidden).reduce((sum,u)=>sum+u.s.atk,0)*(.1+.00015*layers):0;
     const aspd=six()?50:0,old=drone.findBuff('bond:ursus:drone');
-    if(old?.mods?.atkPct!==bonus||old?.mods?.atkFlat!==atkFlat||old?.mods?.aspd!==aspd)
-     S.passiveBuff(battle,drone,'bond:ursus:drone',S.directMods({atk:bonus,hp:bonus},{atkFlat,aspd}));
+    if(old?.mods?.atkPct!==bonus||old?.mods?.hpPct!==hpBonus||old?.mods?.atkFlat!==atkFlat||old?.mods?.aspd!==aspd)
+     S.passiveBuff(battle,drone,'bond:ursus:drone',S.directMods({atk:bonus,hp:hpBonus},{atkFlat,aspd}));
    }
   };
   battle.on('battleStart',()=>{

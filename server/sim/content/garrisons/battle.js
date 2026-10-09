@@ -238,7 +238,7 @@ const INSTALLERS = {
       // AK's 停顿 (정지) is distinct from stun/freeze and ordinary movement reductions.
       if(target?.side!=='enemy'||reason!=='killed'||!target.findBuff('sluggish'))return;
       for(const it of list){
-        if(!S.onField(it.unit)||!S.inRange(it.unit,target)||(it.cnt||0)>=S.num(it.bb.max_trigger_count,10))continue;
+        if(!S.onField(it.unit)||!S.inRange(it.unit,target)||(it.cnt||0)>=S.num(it.bb.max_trigger_count,8))continue;
         const active=targetBonds(battle,it);
         let added=0;
         for(const bond of active)added+=fireGain(battle,it,{bonds:[bond],n:bond==='visiShip'?S.num(it.bb.visi_add_count,1):amountOf(battle,it)});
@@ -249,7 +249,7 @@ const INSTALLERS = {
   custom_ursus_ally_skill(battle,list){
     battle.on('skillStart',({unit})=>{
       if(!S.isOp(unit)||!S.onField(unit)||!S.unitBonds(unit).includes('ursusShip'))return;
-      for(const it of list)if(S.onField(it.unit)&&it.unit.ownerId===unit.ownerId&&(it.cnt||0)<S.num(it.bb.max_trigger_count,7)){
+      for(const it of list)if(S.onField(it.unit)&&it.unit.ownerId===unit.ownerId&&(it.cnt||0)<S.num(it.bb.max_trigger_count,8)){
         if(fireGain(battle,it)>0)it.cnt=(it.cnt||0)+1;
       }
     });
