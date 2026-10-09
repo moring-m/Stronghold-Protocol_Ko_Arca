@@ -1,5 +1,5 @@
 import { useEffect, useState } from '../../vendor/hooks.module.js';
-import { html, confirmDialog } from './components.js';
+import { html, Button, confirmDialog } from './components.js';
 import { store, useStore, emptyMatch } from '../store.js';
 import { net } from '../net.js';
 import { audio } from '../audio.js';
@@ -27,7 +27,7 @@ store.subscribe((s, prev) => {
     store.set({ restartVote: null, restartOutcome: null });
 });
 
-export function RestartVoteControls({ requestVisible = true }) {
+export function RestartVoteControls({ requestVisible = true, voteVisible = true, onRequested, label = '리방 투표 요청' }) {
   const frame = useStore(s => s.restartVote), room = useStore(s => s.room);
   const outcome = useStore(s => s.restartOutcome);
   const online = useStore(s => s.connection.status === 'online');
@@ -44,7 +44,7 @@ export function RestartVoteControls({ requestVisible = true }) {
   const request = async () => {
     if (!await confirmDialog({ title: '리방 투표 요청', text: '전원 동의하면 현재 시뮬레이션을 중단하고 같은 방 대기실로 이동합니다. 방 전체 120초, 개인 180초 간격이며 개인당 시뮬레이션당 2회 요청할 수 있습니다.', okText: '투표 요청', cancelText: '취소' })) return;
     setBusy(true);
-    try { await net.request('room.requestRestart', { matchNo: room.matchNo }); }
+    try { await net.request('room.requestRestart', { matchNo: room.matchNo }); onRequested?.(); }
     catch (e) { toastError(e); } finally { setBusy(false); }
   };
   const answer = async agree => {
@@ -53,15 +53,15 @@ export function RestartVoteControls({ requestVisible = true }) {
     catch (e) { toastError(e); } finally { setBusy(false); }
   };
   return html`<div class="restart-controls">
-    ${requestVisible ? html`<button type="button" disabled=${busy || !online || !!vote || wait > 0 || frame?.remaining === 0} onClick=${request}>
-      ${vote ? '리방 투표 진행 중' : wait ? `리방 요청 · ${wait}초 후` : frame?.remaining === 0 ? '리방 요청 횟수 소진' : '리방 투표 요청'}
-    </button>` : null}
-    ${vote ? html`<section class="restart-vote" aria-label="익명 리방 투표" aria-live="polite">
+    ${requestVisible ? html`<${Button} variant="secondary" disabled=${busy || !online || !!vote || wait > 0 || frame?.remaining === 0} onClick=${request}>
+      ${vote ? '리방 투표 진행 중' : wait ? `리방 요청 · ${wait}초 후` : frame?.remaining === 0 ? '리방 요청 횟수 소진' : label}
+    <//>` : null}
+    ${voteVisible && vote ? html`<section class="restart-vote" aria-label="익명 리방 투표" aria-live="polite">
       <strong>익명 리방 투표</strong><span>${Math.max(0,Math.ceil((vote.deadline-serverNow)/1000))}초</span>
       <div class="restart-vote__slots" aria-label=${`동의 ${vote.yes}명, 반대 ${vote.no}명, 대기 ${vote.total-vote.yes-vote.no}명`}>
         ${Array.from({length:vote.total},(_,i)=>html`<span class=${i<vote.yes?'yes':i<vote.yes+vote.no?'no':'pending'}>${i<vote.yes?'동의':i<vote.yes+vote.no?'반대':'대기'}</span>`)}
       </div><p>전원 동의 시 대기실로 이동 · 현재 시뮬레이션 초기화</p>
       ${vote.answered ? html`<small>투표 완료 · 결과 대기 중</small>` : html`<button disabled=${busy||!online} onClick=${()=>answer(false)}>반대</button><button disabled=${busy||!online} onClick=${()=>answer(true)}>동의</button>`}
-    </section>` : outcome ? html`<small role="status">${outcome==='failed'?'전원 동의가 성립하지 않았습니다.':outcome==='cancelled'?'리방 투표가 취소되었습니다.':'대기실로 이동합니다.'}</small>` : null}
+    </section>` : voteVisible && outcome ? html`<small role="status">${outcome==='failed'?'전원 동의가 성립하지 않았습니다.':outcome==='cancelled'?'리방 투표가 취소되었습니다.':'대기실로 이동합니다.'}</small>` : null}
   </div>`;
 }

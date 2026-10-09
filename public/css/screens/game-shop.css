@@ -399,3 +399,67 @@
   .extensions-menu > button { flex:0 0 auto; }
   .extensions-nav .extension-presets { flex:1 0 100%; }
 }
+
+/* Keep artwork and labels readable with the viewport-scaled root font. */
+.custom-ext .extension-grid { grid-template-columns:repeat(auto-fill,minmax(min(100%,max(260px,2.8rem)),1fr)); align-items:start; }
+.custom-ext .extension-grid .custom-ext__card { min-width:0; box-sizing:border-box; gap:12px; padding:12px; min-height:88px; }
+.custom-ext .extension-art:not(.extension-art--map) { flex:0 0 56px; width:56px; height:56px; box-sizing:border-box; }
+.custom-ext .custom-ext__card > input { flex:0 0 auto; width:16px; height:16px; margin:0; }
+.custom-ext .extension-card__text { min-width:0; }
+.custom-ext .extension-card__text strong { word-break:keep-all; overflow-wrap:break-word; line-height:1.4; }
+.custom-ext .extension-card__text small { word-break:keep-all; overflow-wrap:break-word; }
+.custom-ext .extension-card--ban { display:grid; grid-template-columns:56px minmax(0,1fr); }
+.custom-ext .extension-card--ban .extension-card__text { display:contents; }
+.custom-ext .extension-card--ban strong { align-self:center; margin:0; }
+.custom-ext .extension-ban-options { grid-column:1/-1; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; margin:0; }
+.custom-ext .extension-ban-options button { white-space:nowrap; min-height:36px; padding:6px 4px; font-size:clamp(12px,.13rem,16px); cursor:pointer; }
+.custom-ext .extension-ban-options button:disabled { opacity:.45; cursor:default; }
+.custom-ext .extension-ban-options button:focus-visible { outline:2px solid var(--mint-400); outline-offset:2px; }
+.custom-ext .editor-minimums { flex:none; line-height:1.5; gap:6px 12px; }
+.custom-ext .editor-minimums > span:first-child,.custom-ext .editor-minimums b { color:#e4bc76; }
+.custom-ext .editor-limit-note { flex-basis:100%; color:#e4bc76; word-break:keep-all; }
+.custom-ext .extension-grid--disabledStages,.custom-ext .extension-grid--stages { grid-template-columns:repeat(auto-fill,minmax(min(100%,max(280px,3rem)),1fr)); }
+.custom-ext .extension-grid--disabledStages .custom-ext__card,.custom-ext .extension-grid--stages .custom-ext__card { padding:0; gap:0; }
+.custom-ext .extension-grid--disabledStages .custom-ext__card > input,.custom-ext .extension-grid--stages .custom-ext__card > input { width:20px; height:20px; }
+@media(max-width:650px) { .custom-ext .extension-grid { grid-template-columns:1fr; } }
+
+/* Size scrollable rows by their full contents so following cards cannot cover controls. */
+.custom-ext .extension-grid { grid-auto-rows:max-content; }
+.custom-ext .extension-grid .extension-card--ban { grid-template-rows:56px minmax(36px,auto); min-height:128px; }
+.custom-ext .editor-minimums > span:first-child,.custom-ext .editor-minimums b { color:var(--text-md); }
+
+@media(max-height:600px) {
+ .custom-ext.ui-editor .modal__body { overflow:auto; }
+ .custom-ext .extensions-layout { flex:0 0 auto; min-height:420px; overflow:visible; }
+ .custom-ext .extensions-editor { min-height:320px; }
+}
+
+/* Short screens keep preset controls fixed while only the card list scrolls. */
+@media(max-height:600px) {
+ .custom-ext.ui-editor .modal__body { overflow:hidden; }
+ .custom-ext .extensions-layout { flex:1; min-height:0; overflow:hidden; }
+ .custom-ext .extensions-editor { min-height:0; }
+ .custom-ext .extensions-nav { min-height:0; }
+ .custom-ext .extensions-menu { overflow:auto; }
+}
+@media(max-height:600px) and (max-width:650px) {
+ .custom-ext .extensions-nav { display:block; overflow:visible; padding:6px; }
+ .custom-ext .extensions-menu { display:flex; flex-wrap:nowrap; overflow:auto; padding-bottom:4px; }
+ .custom-ext .extensions-menu > button { min-height:32px; padding:6px 8px; }
+ .custom-ext .extension-presets { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto; gap:4px; margin-top:4px; padding-top:4px; }
+ .custom-ext .extension-presets select,.custom-ext .extension-presets input { min-width:0; margin:0; height:30px; }
+ .custom-ext .extension-presets__actions { margin:0; }
+ .custom-ext .extension-presets__actions .btn { min-height:30px; padding:4px 6px; }
+ .custom-ext .editor-toolbar { flex-wrap:wrap; }
+ .custom-ext .editor-help { margin:4px 0; }
+}
+@media(max-height:600px) {
+ .custom-ext .extensions-editor { display:block; overflow:auto; }
+ .custom-ext .extension-grid { height:auto; max-height:none; overflow:visible; margin:8px 0; }
+ .custom-ext .editor-minimums { margin-top:8px; }
+}
+@media(max-height:600px) and (max-width:650px) {
+ .custom-ext .extensions-layout { grid-template-columns:minmax(0,1fr)!important; }
+ .custom-ext .extensions-nav { min-width:0; }
+ .custom-ext .extension-presets__actions { grid-column:auto; }
+}
