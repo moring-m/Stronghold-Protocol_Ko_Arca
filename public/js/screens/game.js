@@ -80,7 +80,7 @@ import { html, Spinner, PhaseBanner, Icon, Button, MicroLabel, confirmDialog, cl
 import { useGameData, GIcon } from '../ui/gameComponents.js';
 import { useFieldView } from '../ui/fieldHost.js';
 import { TopBar, liveLp, ownLeaks, uniteRemaining, tempInfo, tempReadyReason } from '../ui/hud.js';
-import { BondStrip, BondPopup } from '../ui/bondStrip.js';
+import { BondStrip, BondPopup, FitBondStrip } from '../ui/bondStrip.js';
 import { TeamPanel } from '../ui/teamPanel.js';
 import { ShopBar } from '../ui/shopBar.js';
 import { DetailPanel, resolveDetail } from '../ui/detailPanel.js';
@@ -235,6 +235,7 @@ function MatchScreen() {
   // deals duplicates) carry the same chess id and no piece, and each must say its 选中干员 (detailPanel selectVoiceKey)
   const cardTap = useRef(0);
   const [collapsed, setCollapsed] = useState(false);
+  const [bondsHidden, setBondsHidden] = useState(false);
   const [rewardMin, setRewardMin] = useState(false);
   const [emoteOpen, setEmoteOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -1454,10 +1455,13 @@ function MatchScreen() {
         onRemoveSpectator=${(playerId) => actions.removeSpectator(playerId)} />
 
       <div class="gm__bonds">
-        <div id="match-bond-strip" class="gm__bond-list" tabIndex=${0} aria-label="맹약 목록" onWheel=${e => { const el=e.currentTarget; if(el.scrollWidth>el.clientWidth){el.scrollLeft+=e.deltaX || e.deltaY;e.preventDefault();} }}>
+        <${FitBondStrip} folded=${bondsHidden}>
           <${BondStrip} bonds=${stripBonds} layersDisabled=${layersDisabled} openId=${bondPop && bondPop.ownerId === strip.ownerId ? bondPop.bondId : null}
             owner=${strip.name} onOpen=${(id) => openBond(id, strip.ownerId, 'strip')} />
-        </div>
+        <//>
+        <button type="button" class="gm__bond-toggle" aria-controls="match-bond-strip" aria-expanded=${!bondsHidden}
+          title=${bondsHidden ? '맹약 목록 펼치기' : '맹약 목록 접기'}
+          onClick=${() => { setBondsHidden(!bondsHidden); setBondOpen(null); }}>${bondsHidden ? '▾' : '▴'}</button>
       </div>
 
       <${TeamPanel} pub=${pub} myId=${myId} watching=${watchingNow} bubbles=${bubbles} onWatch=${watchPlayer} cap=${gd.config?.lpCapPerRound ?? 10} uniteLocal=${uniteLocal} normalLeaks=${battleState?.leaks}

@@ -6,5 +6,6 @@ export function customFactionData(raw, enabled) {
   const bonds = Object.fromEntries(Object.entries(raw.bonds || {}).filter(([id])=>id!=='ursusShip').map(([id,b])=>[id,{...b,members:b.members?.filter(x=>!custom(x)),visibleMembers:b.visibleMembers?.filter(x=>!custom(x))}]));
   const items = Object.fromEntries(Object.entries(raw.items || {}).filter(([id])=>!custom(id)).map(([id,item])=>[id,item.giveBondId==='ursusShip'?{...item,giveBondId:null}:item]));
   const bands = Object.fromEntries(Object.entries(raw.bands || {}).filter(([id]) => !custom(id)));
-  return {...raw,chess,bonds,items,bands};
+  const choices=raw.choices?{...raw.choices,cards:{...raw.choices.cards,tactic:(raw.choices.cards?.tactic||[]).filter(c=>!custom(c.effectId))}}:raw.choices;
+  return {...raw,chess,bonds,items,bands,choices};
 }

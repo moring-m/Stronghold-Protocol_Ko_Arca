@@ -1,0 +1,9 @@
+{"bond":"yanShip","pool":5,"counts":[["yanShip",4],["victoriaShip",1],["steadShip",1],["visiShip",1],["investShip",1],["suntShip",1]],"got":[{"id":"chess_char_3_04_a","bonds":["yanShip","investShip"]}]}
+{"bond":"sargonShip","pool":10,"counts":[["sargonShip",3],["steadShip",2],["yanShip",1],["suntShip",1]],"got":[{"id":"chess_char_3_06_a","bonds":["sargonShip"]}]}
+{"bond":"victoriaShip","pool":10,"counts":[["victoriaShip",3],["yanShip",1],["kjeragShip",1],["arcaneShip",1],["steadShip",1],["deputShip",1],["suntShip",1]],"got":[{"id":"chess_char_3_08_a","bonds":["victoriaShip"]}]}
+{"bond":"kjeragShip","pool":10,"counts":[["kjeragShip",3],["steadShip",2],["yanShip",1],["victoriaShip",1],["preciShip",1],["suntShip",1]],"got":[{"id":"chess_char_3_14_a","bonds":["kjeragShip","visiShip"]}]}
+{"bond":"lateranoShip","pool":5,"counts":[["lateranoShip",3],["yanShip",1],["preciShip",1],["swiftShip",1],["arcaneShip",1],["steadShip",1],["suntShip",1]],"got":[{"id":"chess_char_2_01_a","bonds":["lateranoShip","preciShip"]}]}
+{"bond":"egirShip","pool":3,"counts":[["egirShip",3],["steadShip",2],["yanShip",1],["arcaneShip",1],["raidShip",1],["indomShip",1],["suntShip",1]],"got":[{"id":"chess_char_3_09_a","bonds":["egirShip","arcaneShip"]}]}
+{"bond":"siracusaShip","pool":10,"counts":[["siracusaShip",3],["yanShip",1],["steadShip",1],["soloShip",1],["suntShip",1]],"got":[{"id":"chess_char_3_18_a","bonds":["siracusaShip","swiftShip"]}]}
+{"bond":"kazimierzShip","pool":6,"counts":[["kazimierzShip",3],["yanShip",1],["swiftShip",1],["steadShip",1],["raidShip",1],["indomShip",1],["suntShip",1]],"got":[{"id":"chess_char_3_12_a","bonds":["kazimierzShip","raidShip"]}]}
+{"bond":"ursusShip","pool":10,"counts":[["steadShip",3],["ursusShip",3],["yanShip",1],["miraShip",1],["soloShip",1],["suntShip",1]],"got":[{"id":"chess_custom_ursus_leto_a","bonds":["ursusShip"]}]}

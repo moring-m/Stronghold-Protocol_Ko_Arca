@@ -15,7 +15,6 @@ import { audio } from '../audio.js';
 import { CHAT_NOTIFICATION_SOUNDS, defaultChatCooldown } from '../chatNotificationSounds.js';
 import { openGuide } from './guide.js';
 import { detectFeatures } from './device.js';
-import { lang, setLang } from '../i18n/i18n.js';
 
 /** Settings store: { bgm, sfx, voice, muted, damageNumbers, quality }. */
 export const settingsStore = createStore(migrateSavedSettings(loadPref('settings', null)));
@@ -131,13 +130,6 @@ export function SettingsModal({ open, onClose }) {
       </div>
       <p class="set-hint" data-i18n-skip>합산: 연속 피해를 묶어 표시 · 모두: 타격마다 표시 · 기본: 명일방주의 붉은 대미지 표시 판정(예상 피해의 1.5배 이상)을 적용합니다.</p>
     </section><section hidden=${category!=='controls'} class="set-category" data-category="controls">
-      <div class="set-row" data-i18n-skip>
-        <span class="set-row__label">${lang === 'ko' ? '언어' : '语言'}<${MicroLabel}>LANGUAGE<//></span>
-        <div class="set-seg" role="radiogroup">
-          ${[['ko', '한국어'], ['zh', '中文']].map(([id, label]) => html`<button key=${id} type="button" role="radio" aria-checked=${lang === id ? 'true' : 'false'}
-            class=${lang === id ? 'is-on' : ''} onClick=${() => { if (lang !== id) setLang(id); }}>${label}</button>`)}
-        </div>
-      </div>
       ${touchUi
         ? html`<p class="set-hint">触屏操作：点击单位选中（撤退 / 出售）· 长按单位或卡牌查看详情 · 拖动部署后滑动选择朝向</p>`
         : html`<p class="set-hint">快捷键：<kbd>R</kbd> 刷新 · <kbd>F</kbd> 冻结 · <kbd>D</kbd> 升级 · <kbd>Q</kbd> 撤退选中干员 · <kbd>X</kbd> 出售选中干员 · <kbd>Space</kbd> 准备就绪 · <kbd>Esc</kbd> 关闭弹窗 · 右键查看详情</p>`}

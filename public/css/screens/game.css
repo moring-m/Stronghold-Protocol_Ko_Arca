@@ -701,3 +701,13 @@
 .gm__end-battle { position:absolute; right:.2rem; top:1.25rem; z-index:8; display:flex; align-items:center; gap:.08rem; min-height:.38rem; padding:.06rem .14rem; border:1px solid #865957; background:rgba(28,17,17,.9); color:#ffd9d3; font:inherit; font-size:.16rem; cursor:pointer; }
 .gm__end-battle .icon { width:.18rem; height:.18rem; }
 .gm__end-battle:disabled { opacity:.6; cursor:default; }
+
+/* Fit one row; folding slides it upward while preserving its fading lower third. */
+.gm__bonds { flex-direction: column; align-items: center; gap: 3px; }
+.gm__bonds > .gm__bond-list { width: 100%; max-width: 100%; height: var(--bond-fit-height, .9rem); padding: 0; overflow: hidden; transition: height .18s ease; }
+.gm__bond-fit { position: absolute; width: max-content; left: 50%; top: 0; transform-origin: top center; transform: translateX(-50%) scale(var(--bond-fit-scale,1)); padding: .12rem .08rem .05rem; }
+.gm__bond-list .bstrip { width: max-content; flex-wrap: nowrap; }
+.gm__bond-list.is-folded { height: calc(var(--bond-fit-height, .9rem) / 3); mask-image: linear-gradient(to bottom, transparent, rgba(0,0,0,.5)); }
+.gm__bond-list.is-folded .gm__bond-fit { top: calc(var(--bond-fit-height, .9rem) * -2 / 3); }
+.gm__bond-list.is-folded .bslot { pointer-events: none; }
+.gm__bonds > .gm__bond-toggle { pointer-events: auto; width: 38px; height: 18px; padding: 0; border: 1px solid #4ed8af66; background: #091b18dd; color: var(--mint-500,#4ed8af); line-height: 14px; cursor: pointer; }

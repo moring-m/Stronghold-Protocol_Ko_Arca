@@ -1,3 +1,4 @@
+import { rangeTileInside, clipRangeSegment } from './rangeClip.js';
 export const STEALTH_FORMS = Object.freeze({ enemy_9008_acbunn: 'revealed' });
 import { unlimitedSkillRange } from '../../../shared/skillRangeDisplay.js';
 // render/units.js — per-unit views for battle units and prep pieces (DESIGN §9).
@@ -1231,7 +1232,7 @@ export class UnitView {
     const hoverTo = this.flying && (this.alive || (this.dying > DIE_FADE_TAIL && !this.down)) ? FLY_HOVER : 0;
     if (this.hover !== hoverTo) this.hover = Math.abs(hoverTo - this.hover) < 1e-3 ? hoverTo : this.hover + (hoverTo - this.hover) * Math.min(1, dt * 6);
     const submerged = submergedVisual(this.ctx, this);
-    const sinkTo = submerged ? -.18 : 0;
+    const sinkTo = submerged ? (this.isEnemy ? -.28 : -.18) : 0;
     this.waterSink = (this.waterSink || 0) + (sinkTo - (this.waterSink || 0)) * Math.min(1, dt * 12);
     if (Math.abs(this.waterSink - sinkTo) < .001) this.waterSink = sinkTo;
     const visualX = this.x + (this.bossArea?.dx || 0);
@@ -1341,7 +1342,7 @@ export class UnitView {
       sp.visible = mistOn;
       if (!mistOn) return;
       sp.position.set(Math.sin(t*.55+i*2.1)*s*.16, -s*(.22+i*.20)+Math.sin(t*.4+i)*s*.035);
-      sp.width=s*(1.50+i*.07);sp.height=s*(.82+i*.035);
+      sp.width=s*(1.50+i*.07)*.8;sp.height=s*(.82+i*.035)*.8;
       sp.rotation=Math.sin(t*.16+i)*.16;
       sp.alpha=.82+.07*Math.sin(t*.65+i);
     });
@@ -1390,7 +1391,7 @@ export class UnitView {
         const style = skillRangeStyle(this.info);
         style.inset=.065;
         const edgeWidth = clamp(s*.043, 3, 5);
-        const tiles=(this.skillTiles || this.info.skillZoneGrid || []).map(([dr,dc])=>this.skillTiles ? [dr-this.y,dc-this.x] : this.dir==='UP'?[dc,-dr]:this.dir==='LEFT'?[-dr,-dc]:this.dir==='DOWN'?[-dc,dr]:[dr,dc]);
+        const tiles=(this.skillTiles || this.info.skillZoneGrid || []).map(([dr,dc])=>this.skillTiles ? [dr-this.y,dc-this.x] : this.dir==='UP'?[dc,-dr]:this.dir==='LEFT'?[-dr,-dc]:this.dir==='DOWN'?[-dc,dr]:[dr,dc]).filter(([r,c]) => rangeTileInside(this.ctx.rangeRect?.(),this.y+r,this.x+c));
         const boundary=skillRangeEdges(tiles,style.inset);
         for(const [r,c] of tiles){
           const tileX=this.x+c,tileY=this.y+r,z=groundZ(this.ctx,tileX,tileY),h=.5;
@@ -1440,13 +1441,27 @@ export class UnitView {
     }
     if(this.attackRange){
       const g=this.attackRange,r=Number(this.info.rangeRadius);g.clear();g.visible=this.ctx.settings?.unitRanges !== false && this.alive&&!this.down;
-      if(g.visible&&this.info.hitArea){const a=this.info.hitArea;placeOnGround(this.ctx,g,this.ctx.layers.groundFx,this.y,this.z);g.lineStyle(2,0xff9c33,.8*alpha);const x=this.x+(a.dx||0),y=this.y+(a.dy||0);for(const [i,p]of [[x-a.w/2,y-a.h/2],[x+a.w/2,y-a.h/2],[x+a.w/2,y+a.h/2],[x-a.w/2,y+a.h/2],[x-a.w/2,y-a.h/2]].entries()){const q=cam.project(p[0],p[1],this.z+.015);if(!i)g.moveTo(q.x,q.y);else g.lineTo(q.x,q.y)}}
-      else if(g.visible){placeOnGround(this.ctx,g,this.ctx.layers.groundFx,this.y,this.z);
-        const drone=/emppnt|ursus_drone/.test(this.info.spine||this.info.defId||'');
-        const color=this.info.side==='enemy'?0xff654a:0x4ed8af;
-        for(const pass of drone?[[1.5,color,.95]]:[[1.5,0x4ed8af,.65]]){
-          g.lineStyle(pass[0],pass[1],pass[2]*alpha);
-          for(let i=0;i<=96;i++){const a=i/96*Math.PI*2,q=cam.project(this.x+Math.cos(a)*r,this.y+Math.sin(a)*r,this.z+.015);if(i===0)g.moveTo(q.x,q.y);else g.lineTo(q.x,q.y)}
+      if(g.visible){
+        placeOnGround(this.ctx,g,this.ctx.layers.groundFx,this.y,this.z);
+        const segment=(x0,y0,x1,y1)=>{
+          const p=clipRangeSegment(this.ctx.rangeRect?.(),x0,y0,x1,y1);
+          if(!p)return;
+          const a=cam.project(p[0],p[1],this.z+.015),b=cam.project(p[2],p[3],this.z+.015);
+          g.moveTo(a.x,a.y);g.lineTo(b.x,b.y);
+        };
+        if(this.info.hitArea){
+          const a=this.info.hitArea,x=this.x+(a.dx||0),y=this.y+(a.dy||0);
+          const points=[[x-a.w/2,y-a.h/2],[x+a.w/2,y-a.h/2],[x+a.w/2,y+a.h/2],[x-a.w/2,y+a.h/2]];
+          g.lineStyle(2,0xff9c33,.8*alpha);
+          for(let i=0;i<4;i++)segment(...points[i],...points[(i+1)%4]);
+        }else{
+          const drone=/emppnt|ursus_drone/.test(this.info.spine||this.info.defId||'');
+          const color=drone&&this.info.side==='enemy'?0xff654a:0x4ed8af;
+          g.lineStyle(1.5,color,(drone?.95:.65)*alpha);
+          for(let i=0;i<96;i++){
+            const a=i/96*Math.PI*2,b=(i+1)/96*Math.PI*2;
+            segment(this.x+Math.cos(a)*r,this.y+Math.sin(a)*r,this.x+Math.cos(b)*r,this.y+Math.sin(b)*r);
+          }
         }
       }
     }

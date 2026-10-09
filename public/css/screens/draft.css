@@ -135,3 +135,8 @@
 .minfo-dlg .brief-banned__group h4 { margin-bottom: max(.12rem, 7px); }
 .minfo-dlg .brief-banned__grid { grid-template-columns: repeat(auto-fill, minmax(max(.72rem, 42px), 1fr)); gap: max(.12rem, 7px); }
 .minfo-dlg .brief-banned__grid .uthumb { --ut: max(.72rem, 42px); }
+
+.draft-order__settings { display:flex; flex-wrap:wrap; gap:8px; }
+.draft-order__settings > .btn { flex:1 1 120px; min-width:0; min-height:36px; height:auto; padding:8px; font-size:max(.16rem,12px); white-space:nowrap; }
+
+.draft-order__settings > .btn { letter-spacing:0; gap:4px; padding:6px; }

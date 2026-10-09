@@ -16,7 +16,7 @@ import { addMessages, setLang as setSharedLang } from '../../../shared/i18n.js';
 // A key "<ctx>|<text>" translates <text> only inside an element carrying data-i18n-ctx="<ctx>" (one Chinese word with
 // two Korean meanings: "toggle|关闭" is 꺼짐 on a switch, plain "关闭" is 닫기 on a close button).
 //
-// 언어 설정: localStorage `sp.pref.lang` = 'ko' | 'zh' (기본 'ko'). setLang()은 저장 후 새로고침한다.
+// 한국어판은 저장된 이전 언어 설정과 관계없이 한국어로 시작한다.
 // Node(단위 테스트)에서는 아무것도 하지 않는다: tr()은 입력을 그대로 돌려준다.
 
 const LANG_KEY = 'sp.pref.lang';
@@ -34,12 +34,9 @@ const hasDom = typeof document !== 'undefined' && typeof window !== 'undefined';
 
 function readLang() {
   if (!hasDom) return 'zh';
-  try {
-    const v = localStorage.getItem(LANG_KEY);
-    return v === 'zh' ? 'zh' : 'ko';
-  } catch {
-    return 'ko';
-  }
+  // This Korean edition starts in Korean even with an old Chinese preference.
+  try { localStorage.setItem(LANG_KEY, 'ko'); } catch { /* Storage may be unavailable. */ }
+  return 'ko';
 }
 
 /** 현재 언어 ('ko' | 'zh'). */

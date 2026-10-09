@@ -32,8 +32,8 @@ describe('emote catalog (shared/constants.js)', () => {
       const sorts = t.emotes.map((e) => e.sortId);
       assert.deepEqual(sorts, [...sorts].sort((a, b) => a - b), `${t.themeId} by sortId`);
     }
-    assert.equal(EMOTES.length, 42);
-    assert.equal(new Set(EMOTES).size, 42);
+    assert.equal(EMOTES.length, 72);
+    assert.equal(new Set(EMOTES).size, 72);
     assert.deepEqual(EMOTES.slice(0,36), EMOTE_CATALOG.map((e) => e.id));
     for (const id of EMOTES) assert.match(id, /^(original_)?(slug_)?autochess_battle_[a-z0-9_]+$/, id);
     assert.ok(Object.isFrozen(EMOTES) && Object.isFrozen(EMOTE_THEMES) && Object.isFrozen(EMOTE_THEMES[0].emotes));
@@ -63,7 +63,7 @@ describe('emote catalog (shared/constants.js)', () => {
       assert.equal(EMOTE_THEME[bad], undefined, `EMOTE_THEME[${bad}]`);
       assert.equal(EMOTE_LABEL[bad], undefined, `EMOTE_LABEL[${bad}]`);
     }
-    assert.equal(Object.keys(EMOTE_THEME).length, 42);
+    assert.equal(Object.keys(EMOTE_THEME).length, 72);
     assert.ok(Object.isFrozen(EMOTE_THEME) && Object.isFrozen(EMOTE_LABEL));
   });
 
@@ -269,16 +269,16 @@ describe('public/js/ui/emotes.js helpers', () => {
 
   test('pager helpers: clamp, swipe threshold, remembered theme', async () => {
     const { clampPage, swipeStep, themeIndex, lastThemeIndex, rememberTheme } = await import('../../public/js/ui/emotes.js');
-    assert.deepEqual([clampPage(-3), clampPage(2), clampPage(99), clampPage('x'), clampPage(2.7)], [0, 2, 6, 0, 2]);
+    assert.deepEqual([clampPage(-3), clampPage(2), clampPage(99), clampPage('x'), clampPage(2.7)], [0, 2, 11, 0, 2]);
     assert.deepEqual([swipeStep(-60), swipeStep(60), swipeStep(-10), swipeStep(0), swipeStep(-40)], [1, -1, 0, 0, 1]);
-    assert.equal(themeIndex('emoticon_foolsday_amiya'), 5);
+    assert.equal(themeIndex('emoticon_foolsday_amiya'), 10);
     assert.equal(themeIndex('nope'), 0);
     store.clear();
     assert.equal(lastThemeIndex(), 0, 'first page by default');
     rememberTheme('emoticon_foolsday_wisdel');
-    assert.equal(lastThemeIndex(), 6);
+    assert.equal(lastThemeIndex(), 11);
     rememberTheme('bogus');
-    assert.equal(lastThemeIndex(), 6, 'unknown themes are not stored');
+    assert.equal(lastThemeIndex(), 11, 'unknown themes are not stored');
     store.set('sp.pref.emoteTheme', '"emoticon_gone"');
     assert.equal(lastThemeIndex(), 0, 'a stale theme falls back to the first page');
     store.set('sp.pref.emoteTheme', '{bad json');

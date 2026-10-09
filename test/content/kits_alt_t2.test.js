@@ -316,7 +316,7 @@ test('2_11 风丸 S1 纸艺·迅击: next attack atk_scale × ATK, loses hp_rati
     const h = run({ defs: { enemies: { e: dummy('e') } }, units: [U(id, 9, 5, { carryState: READY })], enemies: [{ key: 'e', pos: [9, 6] }] });
     const u = h.unit(id);
     usesAlt(u, id);
-    h.step();
+    assert.ok(h.runUntil(() => dealt(h, u, (c) => c.dmg.isAttack).length > 0, 5));
     const first = h.hooksOf('attack').find((c) => c.attacker === u);
     assert.ok(first && first.isSkill);
     approx(dealt(h, u, (c) => c.dmg.isAttack)[0].amount, u.s.atk * bb.atk_scale, `${id} ×${bb.atk_scale}`);
@@ -327,7 +327,7 @@ test('2_11 风丸 S1 纸艺·迅击: next attack atk_scale × ATK, loses hp_rati
     // a cast at low HP is fatal ⇒ the dollkeeper substitution
     u.hp = u.s.maxHp * bb.hp_ratio * 0.5;
     assert.ok(h.runUntil(() => started(h, u).length >= 2, 15));
-    h.step();
+    assert.ok(h.runUntil(() => u.trait.doll, 5));
     assert.ok(u.alive && u.findBuff('trait:substitute'), 'switched to the <替身>');
     done(h);
   }

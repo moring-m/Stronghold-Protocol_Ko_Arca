@@ -236,6 +236,7 @@ export function RoomScreen() {
   const [busy, setBusy] = useState(null);
   const alive = useRef(true);
   const footerRef = useRef(null);
+  const seatsRef = useRef(null);
   const inFlight = useRef(false); // synchronous guard against double clicks (state updates are async)
   useEffect(() => () => { alive.current = false; }, []);
 
@@ -243,11 +244,24 @@ export function RoomScreen() {
     const footer=footerRef.current;
     if(!footer)return;
     const root=document.documentElement;
-    const measure=()=>root.style.setProperty('--room-bar-height',`${footer.getBoundingClientRect().height}px`);
+    const measure=()=>{
+      root.style.setProperty('--room-bar-height',`${footer.getBoundingClientRect().height}px`);
+      const card=seatsRef.current?.querySelector('.seat');
+      const screen=footer.closest('.room-screen');
+      if(card&&screen){
+        const bounds=card.getBoundingClientRect();
+        screen.style.setProperty('--room-seat-top',`${bounds.top}px`);
+        screen.style.setProperty('--room-seat-height',`${bounds.height}px`);
+      }
+    };
     measure();
     const observer=typeof ResizeObserver==='function'?new ResizeObserver(measure):null;
-    observer?.observe(footer);window.addEventListener('resize',measure);
-    return()=>{observer?.disconnect();window.removeEventListener('resize',measure);root.style.removeProperty('--room-bar-height');};
+    observer?.observe(footer);
+    if(seatsRef.current)observer?.observe(seatsRef.current);
+    const card=seatsRef.current?.querySelector('.seat');if(card)observer?.observe(card);
+    card?.addEventListener('animationend',measure);
+    window.addEventListener('resize',measure);
+    return()=>{observer?.disconnect();card?.removeEventListener('animationend',measure);window.removeEventListener('resize',measure);root.style.removeProperty('--room-bar-height');};
   },[room?.code]);
 
   if (!room) return null;
@@ -342,7 +356,7 @@ export function RoomScreen() {
       </div>
     </header>
 
-    <main class=${`seats${coop ? '' : ' seats--solo'}`}>
+    <main ref=${seatsRef} class=${`seats${coop ? '' : ' seats--solo'}`}>
       ${facts.seats.map((s, i) => html`<${SeatCard} key=${s ? `p${s.playerId}` : `e${i}`} seat=${s} index=${i} room=${room} facts=${facts}
         myId=${me.playerId} busy=${busy} onAddBot=${addBot} onRemoveBot=${removeBot} onKick=${kick} />`)}
       ${coop ? null : html`<aside class="solo-brief brackets">
@@ -366,7 +380,6 @@ export function RoomScreen() {
           <span class="room-bar__label">模拟难度<${MicroLabel}>DIFFICULTY<//></span>
           <${DifficultyPicker} room=${room} isHost=${facts.isHost} busy=${busy} onPick=${setDifficulty} />
         </div>
-          <${AiLastToggle} option=${aiLastOption(room, me.playerId)} busy=${busy} onToggle=${setAiLast} />
         <div class="room-bar__reroll">
           <span class="room-bar__label">리롤 횟수<${MicroLabel}>REROLL LIMIT<//></span>
           ${facts.isHost ? html`<div class="dpick rpick" role="radiogroup" aria-label="리롤 허용 횟수">
@@ -392,6 +405,7 @@ export function RoomScreen() {
           </span>
         </div>
         <div class="room-bar__status">${statusLine}</div>
+        <${AiLastToggle} option=${aiLastOption(room, me.playerId)} busy=${busy} onToggle=${setAiLast} />
       </div>
       <div class="room-bar__right">
         <div class="room-bar__settings">

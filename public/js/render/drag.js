@@ -83,13 +83,14 @@ export function resolveDrop(p) {
 }
 
 /**
- * The tile a dragged UNIT is drawn standing on, from a `pieceDragMove` payload: the drop target under the pointer while
+ * The tile a touch-dragged UNIT is drawn standing on, from a `pieceDragMove` payload: the drop target under the pointer while
  * it is legal — a board tile, or a bench slot (row HAND_ROW) — as `{ row, col, bench }` in board space; null otherwise
  * (no target, an illegal tile, a temp slot, the pointer over DOM UI such as the shop bar): the unit is then held under
  * the pointer. As in the official deploy drag (the owner's recording of 2026-10-09) the model stands on the tile the
  * finger is on, and moving within that tile leaves it where it is. app.js never snaps an item plate.
  */
 export function dragStandTile(move, geo = GEO) {
+  if (move?.pointerType !== 'touch') return null;
   const t = move && move.legal === true ? move.target : null;
   if (!t) return null;
   if (t.area === 'board' && Number.isInteger(t.row) && Number.isInteger(t.col)) return { row: t.row, col: t.col, bench: false };
@@ -167,7 +168,7 @@ export function createDragController(hooks) {
     const slot = over && tile ? tileSlot(tile) : null;
     const legal = !!slot && slot.area !== 'temp' && (slot.area === 'board' || !sameSlot(slot, st.from)) && isLegal(canPlace, st.piece, slot);
     setHoverTile(over ? tile : null);
-    emit('pieceDragMove', { uid: st.piece.uid, piece: st.piece, x: e.x, y: e.y, clientX: e.clientX, clientY: e.clientY, target: slot, legal });
+    emit('pieceDragMove', { uid: st.piece.uid, piece: st.piece, x: e.x, y: e.y, clientX: e.clientX, clientY: e.clientY, target: slot, legal, pointerType: st.pointerType });
   }
 
   function endDrag(e, cancelled) {

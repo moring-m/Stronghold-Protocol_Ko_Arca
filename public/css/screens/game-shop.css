@@ -1,5 +1,4 @@
-/* ==========================================================================================
-   screens/game-shop.css — bottom shop bar (js/ui/shopBar.js) + merge reward overlay (rewardOverlay.js).
+/* ===================================================================================   screens/game-shop.css — bottom shop bar (js/ui/shopBar.js) + merge reward overlay (rewardOverlay.js).
    Research 06 §11.2: LEVEL card, operator cards (tier chip, price hexagon, half-body art, bond & class
    rows, icy frozen overlay), item card, funds card with ✕ 收起; 冻结 (ice) / 刷新 (amber) above.
    ========================================================================================== */
@@ -463,3 +462,24 @@
  .custom-ext .extensions-nav { min-width:0; }
  .custom-ext .extension-presets__actions { grid-column:auto; }
 }
+.preset-faction-link { padding:.12rem; margin:.08rem 0; border:1px solid var(--line-2); background:rgba(79,210,177,.05); }
+.preset-faction-link label { display:flex; align-items:center; gap:.12rem; flex-wrap:wrap; font-size:max(.14rem,12px); }
+.preset-faction-link select { min-width:1.6rem; max-width:100%; background:var(--panel,#111c19); color:var(--text-hi); border:1px solid var(--line-2); padding:.06rem; }
+.preset-faction-link p { margin:.08rem 0 0; color:var(--text-lo); font-size:max(.12rem,11px); line-height:1.5; }
+.lo-preset-actions { display:flex; gap:.08rem; flex-wrap:wrap; }
+.recruit-preset-tier { margin:.14rem 0; }
+.recruit-preset-tier h3 { margin:0 0 .08rem; font-size:max(.16rem,13px); }
+.recruit-preset-tier h3 span { color:var(--mint); }
+.recruit-preset-cards { display:flex; gap:.12rem; flex-wrap:wrap; }
+.recruit-preset-card { width:1.4rem; border:1px solid var(--line-2); background:rgba(0,0,0,.25); }
+.recruit-preset-card img { width:100%; height:1.2rem; object-fit:cover; object-position:center 35%; }
+.recruit-preset-card span { display:block; padding:.06rem; font-size:max(.13rem,12px); }
+@media(max-width:600px){ .lo-toolbar { flex-wrap:wrap; gap:8px; } .preset-faction-link select{min-width:120px;} .recruit-preset-card{width:110px;} }
+.recruit-presets-modal .favorites-editor { overflow:auto; }
+.recruit-presets-modal .favorites-presets > .btn { font-size:max(.13rem,12px); }
+.recruit-presets-modal .favorites-preset strong { font-size:max(.15rem,12px); }
+.recruit-presets-modal .favorites-preset small { font-size:max(.12rem,11px); }
+
+.favorites-preset .preset-name-row { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.preset-name-row > span { min-width:0; overflow-wrap:anywhere; }
+.preset-name-row .preset-faction-icon { width:max(.24rem,20px); height:max(.24rem,20px); flex:none; object-fit:contain; }

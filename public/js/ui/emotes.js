@@ -21,7 +21,7 @@
 
 import { useEffect, useRef, useState } from '../../vendor/hooks.module.js';
 import { EMOTE_COOLDOWN_MS, EMOTE_BUBBLE_MS, emoteInfo, emoteArtGroup } from '../../../shared/constants.js';
-import { bundledEmoteArt, EMOTE_PAGES as EMOTE_THEMES } from '../../../shared/emote-art.js';
+import { bundledEmoteArt, ORIGINAL_PAGE_COUNT, EMOTE_PAGES as EMOTE_THEMES } from '../../../shared/emote-art.js';
 import { html } from './components.js';
 import { GIcon } from './gameComponents.js';
 import { data, useData, localAsset, artUrls, nextArtUrl } from '../data.js';
@@ -221,7 +221,8 @@ export function EmoteWheel({ onSend, open, onToggle, disabled = false, cooldownM
   live.current = { page, onToggle };
 
   const go = (to) => {
-    const next = Math.max(live.current.page === 0 ? 0 : 1, Math.min(live.current.page === 0 ? 0 : EMOTE_THEMES.length - 1, clampPage(to)));
+    const original = live.current.page < ORIGINAL_PAGE_COUNT;
+    const next = Math.max(original ? 0 : ORIGINAL_PAGE_COUNT, Math.min(original ? ORIGINAL_PAGE_COUNT - 1 : EMOTE_THEMES.length - 1, clampPage(to)));
     if (next === live.current.page) return;
     setDir(next > live.current.page ? 1 : -1);
     setPage(next);
@@ -281,7 +282,9 @@ export function EmoteWheel({ onSend, open, onToggle, disabled = false, cooldownM
     const off = e.clientX - d.x0;
     if (!d.moved && Math.abs(off) < DRAG_SLOP_PX) return;
     if (!d.moved) { d.moved = true; try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* ignore */ } }
-    const edge = (off > 0 && live.current.page === 0) || (off < 0 && live.current.page === EMOTE_THEMES.length - 1);
+    const first=live.current.page < ORIGINAL_PAGE_COUNT ? 0 : ORIGINAL_PAGE_COUNT;
+    const last=first===0 ? ORIGINAL_PAGE_COUNT-1 : EMOTE_THEMES.length-1;
+    const edge = (off > 0 && live.current.page === first) || (off < 0 && live.current.page === last);
     setDx(edge ? off / 3 : off); // rubber band at the first / last page
   };
   const endDrag = (e, cancelled) => {
@@ -315,8 +318,8 @@ export function EmoteWheel({ onSend, open, onToggle, disabled = false, cooldownM
     </button>
     ${open ? html`<div class=${cx('ewheel__panel', panelBg && 'has-sprite', cellBg && 'has-cell')} style=${panelStyle} role="dialog" aria-label="交流">
       <div class="ewheel__tabs" role="tablist" aria-label="이모티콘 종류">
-        <button type="button" role="tab" aria-selected=${page === 0} onClick=${() => { setPage(0); setDir(0); }}>명일방주</button>
-        <button type="button" role="tab" aria-selected=${page !== 0} onClick=${() => { setPage(page || 1); setDir(0); }}>커스텀</button>
+        <button type="button" role="tab" aria-selected=${page < ORIGINAL_PAGE_COUNT} onClick=${() => { setPage(0); setDir(0); }}>명일방주</button>
+        <button type="button" role="tab" aria-selected=${page >= ORIGINAL_PAGE_COUNT} onClick=${() => { setPage(page >= ORIGINAL_PAGE_COUNT ? page : ORIGINAL_PAGE_COUNT); setDir(0); }}>커스텀</button>
       </div>
       <div class="ewheel__viewport" onPointerDown=${onPointerDown} onPointerMove=${onPointerMove}
         onPointerUp=${(e) => endDrag(e, false)} onPointerCancel=${(e) => endDrag(e, true)} onWheel=${onWheel}>
@@ -328,10 +331,10 @@ export function EmoteWheel({ onSend, open, onToggle, disabled = false, cooldownM
           </button>`)}
         </div>
       </div>
-      <button type="button" class="ewheel__nav is-prev" aria-label="이전 이모티콘" disabled=${page <= 1} onClick=${() => go(page - 1)}><${GIcon} name="chevronLeft" /></button>
-      <button type="button" class="ewheel__nav is-next" aria-label="다음 이모티콘" disabled=${page === 0 || page >= EMOTE_THEMES.length - 1} onClick=${() => go(page + 1)}><${GIcon} name="chevronRight" /></button>
+      <button type="button" class="ewheel__nav is-prev" aria-label="이전 이모티콘" disabled=${page === 0 || page === ORIGINAL_PAGE_COUNT} onClick=${() => go(page - 1)}><${GIcon} name="chevronLeft" /></button>
+      <button type="button" class="ewheel__nav is-next" aria-label="다음 이모티콘" disabled=${page === ORIGINAL_PAGE_COUNT - 1 || page >= EMOTE_THEMES.length - 1} onClick=${() => go(page + 1)}><${GIcon} name="chevronRight" /></button>
       <div class="ewheel__dots" role="tablist" aria-label="이모티콘 페이지">
-        ${EMOTE_THEMES.map((t, i) => (page === 0 ? i === 0 : i > 0) ? html`<button key=${t.themeId} type="button" role="tab" class=${cx('ewheel__dot', i === page && 'is-on')}
+        ${EMOTE_THEMES.map((t, i) => (page < ORIGINAL_PAGE_COUNT ? i < ORIGINAL_PAGE_COUNT : i >= ORIGINAL_PAGE_COUNT) ? html`<button key=${t.themeId} type="button" role="tab" class=${cx('ewheel__dot', i === page && 'is-on')}
           aria-selected=${i === page ? 'true' : 'false'} aria-label=${`${t.name} ${i + 1}/${EMOTE_THEMES.length}`} onClick=${() => go(i)}></button>` : null)}
       </div>
     </div>` : null}

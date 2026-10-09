@@ -5059,6 +5059,22 @@
         "kind": "terrain",
         "stageId": "act1autochess_m07",
         "team": false
+      },
+      {
+        "effectId": "allybuff_custom_ursus_oath",
+        "name": "이스티나의 맹세",
+        "desc": "자신의 우르수스, 기습, 불굴 맹약 중첩 +8. 다른 아군이 있으면 해당 아군도 획득.",
+        "kind": "ally",
+        "stageId": null,
+        "team": true
+      },
+      {
+        "effectId": "allybuff_custom_ursus_support",
+        "name": "우르수스 지원",
+        "desc": "우르수스 맹약의 무작위 오퍼레이터 1명 획득.",
+        "kind": "ally",
+        "stageId": null,
+        "team": false
       }
     ]
   },

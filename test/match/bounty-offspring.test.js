@@ -159,3 +159,21 @@ test('ordinary non-bounty death spawns retain their 联防 wave count', () => {
   assert.equal(b.enemies.filter((e) => e.defId === CUP && e.counted).length, 4);
   assert.equal(checked(spec, b).perPlayer.p_0.leaked.length, 4);
 });
+
+test('four ordinary death-spawned cups cost four base HP after surviving cooperative defense', () => {
+  const n=normal();
+  const spec=structuredClone(n.spec);
+  spec.spawns[0].mods=COMBAT_MODS;
+  delete spec.spawns[0].bounty;
+  const b=start(spec);
+  b.kill(b.enemies[0],killer(b));
+  const normalResult=checked(spec,b);
+  assert.equal(normalResult.perPlayer.p_0.leaked.filter(e=>e.counted).length,4);
+  const u=coop(normalResult);
+  const result=checked(u.spec,u.b);
+  assert.equal(uniteSurvivors(u.plan,result).get('p_0'),4);
+  const hp=u.h.ps('p_0').lp;
+  u.h.m.settle(u.plan,result);
+  assert.equal(u.h.ps('p_0').lp,hp-4);
+  u.h.m.dispose();
+});

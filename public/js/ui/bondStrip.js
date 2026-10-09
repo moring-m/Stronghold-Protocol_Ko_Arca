@@ -1,3 +1,4 @@
+import { useEffect, useRef } from '../../vendor/hooks.module.js';
 
 
 // Bond strip (active-bond discs under the top bar) and the bond detail popup: the key facts first (user playtest #2
@@ -150,5 +151,26 @@ export function BondPopup({ bondId, entry, priv, banned = [], onClose, onMember,
         </button>`)}
       </div>
     </section>
+  </div>`;
+}
+
+/** Keep the strip on one line, fitting its natural size to the available HUD width. */
+export function FitBondStrip({ folded = false, children }) {
+  const host = useRef(null), content = useRef(null);
+  useEffect(() => {
+    const outer=host.current,inner=content.current;
+    if(!outer||!inner)return;
+    const fit=()=>{
+      const scale=Math.min(1,outer.clientWidth/Math.max(1,inner.offsetWidth));
+      outer.style.setProperty('--bond-fit-scale',scale);
+      outer.style.setProperty('--bond-fit-height',`${inner.offsetHeight*scale}px`);
+    };
+    fit();
+    const observer=new ResizeObserver(fit);
+    observer.observe(outer);observer.observe(inner);
+    return ()=>observer.disconnect();
+  },[children]);
+  return html`<div id="match-bond-strip" ref=${host} class=${cx('gm__bond-list',folded&&'is-folded')} aria-label="맹약 목록">
+    <div ref=${content} class="gm__bond-fit">${children}</div>
   </div>`;
 }

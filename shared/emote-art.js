@@ -40,13 +40,17 @@ const ART = new Map([
   ["autochess_battle_foolwisdel_05", '/assets/emotes/g5.webp'],
   ["autochess_battle_foolwisdel_06", '/assets/emotes/e3.webp'],
 ]);
-for (const e of ORIGINAL_EMOTES) ART.set(e.id, `/assets/emotes/original/${e.picId}.png`);
+for (const e of ORIGINAL_EMOTES) ART.set(e.id, `/assets/emotes/original/${e.dir==='basic'?'':e.dir+'/'}${e.picId}.png`);
 export const bundledEmoteArt = (id) => ART.get(id) || null;
 
 // Natural filename order: c2 precedes c10, matching file managers. Six pictures per page.
 const sorted = [...EMOTE_CATALOG].sort((a, b) => bundledEmoteArt(a.id).localeCompare(bundledEmoteArt(b.id), 'en', { numeric: true }));
-export const EMOTE_PAGES = Object.freeze([Object.freeze({themeId:'emoticon_autochess_original',name:'위수협약 기본',emotes:ORIGINAL_EMOTES}),...EMOTE_THEMES.map((theme, i) => Object.freeze({
-  themeId: theme.themeId,
-  name: `소통 ${i + 1}`,
-  emotes: Object.freeze(sorted.slice(i * 6, (i + 1) * 6)),
-}))]);
+export const ORIGINAL_PAGE_COUNT = EMOTE_THEMES.length;
+export const EMOTE_PAGES = Object.freeze([
+  ...EMOTE_THEMES.map(theme => Object.freeze({
+    themeId: 'emoticon_autochess_original'+(theme.dir==='basic'?'':'_'+theme.dir),
+    name: `명일방주 ${theme.dir}`,
+    emotes: Object.freeze(ORIGINAL_EMOTES.filter(e=>e.dir===theme.dir)),
+  })),
+  ...EMOTE_THEMES.map((theme,i)=>Object.freeze({themeId:theme.themeId,name:`커스텀 ${i+1}`,emotes:Object.freeze(sorted.slice(i*6,(i+1)*6))})),
+]);

@@ -217,3 +217,24 @@ test('风丸: her 替身 still attacks (PRTS "<替身>状态下可对空"); the 
   assert.ok(log.attacksAsDoll > 0, 'the 替身 attacks');
   assert.ok(!g.s.flags.silence && !g.s.flags.disarm);
 });
+
+test('all playable dollkeepers: every normal/elite skill and module preserves substitution and return', {skip}, () => {
+  for(const id of ['chess_char_2_11_a','chess_char_2_11_b','chess_char_5_13_a','chess_char_5_13_b']) {
+    const base=makeBattle({units:[{chessId:id,row:9,col:5}],autoFinish:false});
+    const rec=base.unit(id).def.raw;
+    const skills=rec.skills?.map(s=>s.index) || [rec.skill.index];
+    const modules=['none',...(rec.modules || []).map(m=>m.uniEquipId)];
+    for(const skillIndex of skills)for(const moduleId of new Set(modules)) {
+      const h=makeBattle({units:[{chessId:id,row:9,col:5,skillIndex,moduleId,carryState:{sp:0}}],autoFinish:false,timeLimit:60});
+      h.step();const unit=h.unit(id),label=`${id}/${skillIndex}/${moduleId}`;
+      h.b.dealDamage(null,unit,{amount:1e9,type:'true'});
+      assert.ok(unit.alive&&unit.form==='doll',label+' substitutes');
+      assert.equal(unit.s.blockCnt,0,label+' does not block');
+      h.run(DOLL_SWITCH+20.1);
+      assert.ok(unit.alive&&!unit.trait.doll&&unit.form===null,label+' returns');
+      h.run(DOLL_SWITCH);
+      assert.equal(unit.hp,unit.s.maxHp,label+' returns at full HP');
+      checkInvariants(h.b);
+    }
+  }
+});

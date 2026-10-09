@@ -227,8 +227,8 @@ export const EMOTE_THEMES = Object.freeze([
 ].map((t) => Object.freeze({ ...t, emotes: Object.freeze(t.emotes) })));
 /** Every emote with its theme: `{ id, sortId, picId, label, themeId, dir }`, in wheel order. */
 export const EMOTE_CATALOG = Object.freeze(EMOTE_THEMES.flatMap((t) => t.emotes.map((e) => Object.freeze({ ...e, themeId: t.themeId, dir: t.dir }))));
-/** Separate IDs preserve the 36 replacement pictures while adding the six original basic pictures. */
-export const ORIGINAL_EMOTES = Object.freeze(EMOTE_THEMES[0].emotes.map(e=>Object.freeze({...e,id:'original_'+e.id,themeId:'emoticon_autochess_original',dir:'basic'})));
+/** Separate IDs preserve the 36 replacement pictures while adding all 36 original pictures. */
+export const ORIGINAL_EMOTES = Object.freeze(EMOTE_CATALOG.map(e=>Object.freeze({...e,id:'original_'+e.id,themeId:'emoticon_autochess_original'+(e.dir==='basic'?'':'_'+e.dir)})));
 export const EMOTES = Object.freeze([...EMOTE_CATALOG, ...ORIGINAL_EMOTES].map((e) => e.id));
 const EMOTE_INDEX = new Map([...EMOTE_CATALOG,...ORIGINAL_EMOTES].map((e) => [e.id, e]));
 /** Catalog record of an emote id, or null (safe for any input, including '__proto__'). */

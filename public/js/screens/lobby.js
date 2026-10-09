@@ -19,7 +19,6 @@ import { toast, toastError } from '../ui/toasts.js';
 import { GuideButton } from '../ui/guide.js';
 import { SettingsButton } from '../ui/settings.js';
 import { PatchNotesButton } from '../ui/patchNotes.js';
-import { LangButton } from '../i18n/LangButton.js';
 import { LoadoutButton } from './loadout.js';
 import { net, identity } from '../net.js';
 import { store, useStore, shallowEqual, loadPref, savePref } from '../store.js';
@@ -326,14 +325,14 @@ export function LobbyScreen() {
         <${Button} variant="ghost" size="sm" icon="chevronLeft" onClick=${backToTitle} title="返回标题">返回<//>
         <${PingPill} ms=${conn.ping} online=${online} />
         <${PatchNotesButton} autoOpen=${true} />
+        <${Button} variant="secondary" size="sm" onClick=${openStats}>통계<//>
       </div>
       <div class="topbar__center">
         <${MicroLabel} tone="mint">SIMULATION PROTOCOL SELECT<//>
         <h1 class="topbar__title">选择模拟协议</h1>
       </div>
       <div class="topbar__right">
-        <${LangButton} class="lobby-lang" variant="secondary" />
-        <${Button} variant="secondary" size="sm" onClick=${openStats}>통계<//><${SettingsButton} />
+        <${SettingsButton} />
         <${GuideButton} class="lobby-guide" variant="secondary" />
         <${LoadoutButton} from="lobby" size="sm" class="lobby-loadout" />
         <div class="me-chip">

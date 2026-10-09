@@ -1,3 +1,4 @@
+import {buildUrsusChoices} from './build-ursus-choices.mjs';
 import {applyGlobalOperatorList} from './apply-global-operator-list.mjs';
 // Opt-in local overlay. Never writes the committed data/ directory.
 import {readFile, writeFile, mkdir, readdir, copyFile} from 'node:fs/promises';
@@ -98,7 +99,7 @@ export async function buildUrsus(){
  for(const suffix of ['a','b']){
   const elite=suffix==='b',id=`chess_item_custom_ursus_favor_${suffix}`,rec=structuredClone(items[`chess_item_1_01_e_${suffix}`]);
   const desc='최대 HP +30%, 공격 속도 +30.\n착용자가 [우르수스] 오퍼레이터일 경우, 공격할 때마다 공격 대상에게 자신의 최대 HP의 5%에 해당하는 트루 대미지를 입힘.\n우르수스 곡도와 함께 장착 시, 공격할 때마다 자신의 제국 드론의 공격 속도 +1 (전투당 최대 100회 발동).';
-  Object.assign(rec,{id,baseId:'chess_item_custom_ursus_favor_a',goldenId:'chess_item_custom_ursus_favor_b',upgradeChessId:elite?null:'chess_item_custom_ursus_favor_b',identifier:9510+Number(elite),name:'황제의 은총',effectName:'황제의 은총',tier:6,shopSortId:91,trapId:'ursus_favor',iconId:'ursus_favor',effectId:'eff_custom_ursus_favor',desc,descRaw:desc,giveBondId:null,category:'DAMAGE',implFormula:null,flavor:'우르수스의 선황이 애용했던 날카로운 편지칼.',source:{relicId:'rogue_1_relic_a14',name:'皇帝的恩宠',mode:'Integrated Strategies',effects:'custom'}});
+  Object.assign(rec,{id,baseId:'chess_item_custom_ursus_favor_a',goldenId:'chess_item_custom_ursus_favor_b',upgradeChessId:elite?null:'chess_item_custom_ursus_favor_b',identifier:9510+Number(elite),name:'황제의 은총',effectName:'황제의 은총',tier:6,price:5,shopSortId:91,trapId:'ursus_favor',iconId:'ursus_favor',effectId:'eff_custom_ursus_favor',desc,descRaw:desc,giveBondId:null,category:'DAMAGE',implFormula:null,flavor:'우르수스의 선황이 애용했던 날카로운 편지칼.',source:{relicId:'rogue_1_relic_a14',name:'皇帝的恩宠',mode:'Integrated Strategies',effects:'custom'}});
   rec.buffs=[{key:'attr_common_global_buff',bb:{max_hp:.3,attack_speed:30},bbStr:{key:'attr_common_global_buff'}}];rec.params={max_hp:.3,attack_speed:30,key:'attr_common_global_buff'};items[id]=rec;
  }
  assets.items.ursus_favor='/assets/custom/ursus/item/emperors-favor.png';
@@ -110,6 +111,7 @@ export async function buildUrsus(){
  await writeFile(join(ROOT,'.cache/ursus-band-resources.json'),JSON.stringify({files:[{path:assets.bands[bandId],local:true,sources:[]}]}));
  for(const [id,rec]of Object.entries(chess))if(previousChess[id]?.charId===rec.charId&&previousChess[id]?.skins)rec.skins=previousChess[id].skins;
  for(const [key,value]of Object.entries({chess,bonds,garrisons,tokens,assets,items,bands}))await writeFile(join(URSUS_DIR,`${key}.json`),JSON.stringify(value));
+ await buildUrsusChoices(URSUS_DIR);
  await buildRecruits(ROOT,URSUS_DIR);
  await buildUpstreamRecruits(ROOT,URSUS_DIR);
  await applyGlobalOperatorList(ROOT,URSUS_DIR);

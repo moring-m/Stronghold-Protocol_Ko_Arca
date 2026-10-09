@@ -1,3 +1,4 @@
+import { rangeTileInside } from './rangeClip.js';
 import { t } from '../../../shared/i18n.js';
 import { DAMAGE_NUMBER_MODES } from '../../../shared/damageDisplay.js';
 import {resolveLoadout} from '../../../shared/protocol.js';
@@ -592,7 +593,7 @@ export async function createFieldView(host, options = {}) {
   const heightAt = (r, c) => (tiles ? tiles.heightAt(r, c) : 0);
   const ctx = {
     P, layers, assets, settings, fx: null, shadowTex: shadowTexture(),
-    cam: () => cam, heightAt, tileAt: (r,c) => tiles.tile(r,c),
+    cam: () => cam, rangeRect: () => battleMeta?.rect || (prepXf !== IDENTITY ? GEO.BOSS_RECT : GEO.NORMAL_RECT), heightAt, tileAt: (r,c) => tiles.tile(r,c),
     animRate: () => (mode === 'battle' && !battleMeta?.prep ? interp.rate : 1),
     timeScale: () => (mode === 'battle' && !battleMeta?.prep ? interp.rate : 1),
     lookupDef: (info) => (info.side === 'enemy' ? data.enemy(info.defId) : data.chess(info.defId) || data.token(info.defId)),
@@ -1353,8 +1354,8 @@ export async function createFieldView(host, options = {}) {
     const key = hlKey(style, group);
     const range = RANGE_GROUPS.has(key) || style === 'range';
     let t = tilesToDisp(IDENTITY, list);
-    if (range) t = t.filter(([r]) => r !== GEO.HAND_ROW && r !== GEO.TEMP_ROW);
     if (mode === 'prep' && prepXf !== IDENTITY) t = tilesToDisp(prepXf, t);
+    if (range) t = t.filter(([r,c]) => rangeTileInside(ctx.rangeRect(),r,c));
     tiles.setHighlights(t, style, key, { stripes: range && key !== 'rangeStand' && !board3d });
   }
   function clearHl(group) {
@@ -1393,9 +1394,7 @@ export async function createFieldView(host, options = {}) {
     if (!dragState) return;
     const v = dragState.view;
     const item = v instanceof ItemView;
-    // a unit over a legal drop target — the tile under the pointer, on the board or the bench (render/drag.js
-    // dragStandTile) — stands on it, lifted, as in the official deploy drag (the owner's recording of 2026-10-09): the
-    // world point the drop tween goes to (boardWorld, the prep field transform applied), set at once, no tween
+    // Touch previews the legal tile. Mouse and pen models follow the pointer continuously.
     const stand = item ? null : dragStandTile(p);
     if (stand) {
       const w = boardWorld(stand.row, stand.col, stand.bench);

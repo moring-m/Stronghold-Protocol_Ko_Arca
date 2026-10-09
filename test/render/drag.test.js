@@ -293,3 +293,12 @@ describe('drag controller', () => {
     } finally { console.error = orig; }
   });
 });
+
+test('mouse and pen drags follow the pointer while touch keeps its tile preview', async()=>{
+ const {dragStandTile}=await import('../../public/js/render/drag.js');
+ const target={area:'board',row:10,col:4};
+ assert.equal(dragStandTile({target,legal:true,pointerType:'mouse'}),null);
+ assert.equal(dragStandTile({target,legal:true,pointerType:'pen'}),null);
+ assert.deepEqual(dragStandTile({target,legal:true,pointerType:'touch'}),{row:10,col:4,bench:false});
+ assert.equal(dragStandTile({target,legal:false,pointerType:'touch'}),null);
+});

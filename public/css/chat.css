@@ -113,3 +113,6 @@
   max-width:calc(100vw - 2 * var(--chat-corner-inset)); margin-bottom:0;
 }
 .game-chat__panel > .restart-controls { margin:0; padding:8px 10px; border-bottom:1px solid var(--line); }
+
+/* Align the entire waiting-room chat with the actual participant card bounds. */
+.room-screen .game-chat--room { top:var(--room-seat-top,1.6rem); height:var(--room-seat-height,auto); bottom:auto; }

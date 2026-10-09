@@ -212,11 +212,11 @@ const TIMES_KEYS = ['enemy_1196_msfyin', 'enemy_1196_msfyin_2', 'enemy_1198_msfs
   'enemy_1202_msfzhi', 'enemy_1202_msfzhi_2', 'enemy_1204_msfhu', 'enemy_1204_msfhu_2', 'enemy_1208_msfji', 'enemy_1208_msfji_2', 'enemy_1210_msfden', 'enemy_1210_msfden_2'];
 for (const key of TIMES_KEYS) {
   const artsOnly = /1204/.test(key);
-  test(`${nm(key)}: 频次 — needs ${E[key].stats.maxHp} fixed ${artsOnly ? 'arts/true ' : ''}hits, unblockable`, () => {
+  test(`${nm(key)}: 频次 — needs ${E[key].stats.maxHp * 3} scaled ${artsOnly ? 'arts/true ' : ''}hits, unblockable`, () => {
     const h = arena({ units: [{ chessId: 't_gun', row: 12, col: 3 }], hooks: ['death'], mods: { hpMul: 3 } });
     h.step();
-    const e = put(h, key, [10, 7], { mods: { hpMul: 3 } });   // ordinary HP scaling must not change the hit count
-    const n = E[key].stats.maxHp;
+    const e = put(h, key, [10, 7], { mods: { hpMul: 3 } });   // non-supply HP scaling applies in the original
+    const n = E[key].stats.maxHp * 3;
     assert.equal(e.s.maxHp, n);
     assert.ok(e.s.flags.unblockable);
     const g = h.unit('t_gun');
@@ -238,22 +238,20 @@ test('频次 器物 vs the round effects: the 14 kitTimes keys are exactly 补�
   for (const id of ['aceffect_enemy_1', 'aceffect_enemy_3', 'aceffect_enemy_4', 'aceffect_enemy_5']) assert.deepEqual([...excludeOf(id)], ['enemy_9012_acloon'], id);
 });
 
-test('hit-count HP remains fixed through difficulty scaling, death summons and HP buffs', () => {
-  const h = arena();h.step();
-  const mods = { hpMul: 2.239488, atkMul: 1.4641, speedMul: 0, supplyHpMul: 1.08 };
+test('hit-count HP applies original round scaling, excluding supply-line HP boosts, including death summons', () => {
+  const h=arena();h.step();
+  const mods={hpMul:2.239488,atkMul:1.4641,speedMul:0,supplyHpMul:1.08};
   const jin=put(h,'enemy_1200_msfjin',[10,7],{mods});
-  assert.equal(jin.s.maxHp,30);
-  h.b.addBuff(jin,{key:'test:hp',mods:{hpMul:3,hpPct:1,hpFlat:50},persist:true});
-  assert.equal(jin.s.maxHp,30,'HP bonuses do not add hit points');
+  const expected=Math.round(E.enemy_1200_msfjin.stats.maxHp*mods.hpMul/mods.supplyHpMul);
+  assert.equal(jin.s.maxHp,expected);
   const parent=put(h,'enemy_1199_sfjin',[10,9],{mods});
-  approx(parent.s.maxHp,E.enemy_1199_sfjin.stats.maxHp*mods.hpMul,1e-9,'ordinary parent HP still scales');
   h.b.kill(parent,null);h.step();
   const child=h.enemies().find(e=>e.defId==='enemy_1200_msfjin'&&e!==jin);
-  assert.ok(child);assert.equal(child.s.maxHp,30);
+  assert.ok(child);assert.equal(child.s.maxHp,expected);
   for(const key of TIMES_KEYS)for(const hpMul of [.75,1,1.5,3]) {
     const enemy=put(h,key,[11,7],{mods:{hpMul,supplyHpMul:1.08}});
-    assert.equal(enemy.hp,E[key].stats.maxHp,key+' HP');
-    assert.equal(enemy.s.maxHp,E[key].stats.maxHp,key+' maximum');
+    const n=Math.max(1,Math.round(E[key].stats.maxHp*hpMul/1.08));
+    assert.equal(enemy.hp,n,key+' HP');assert.equal(enemy.s.maxHp,n,key+' maximum');
   }
 });
 

@@ -457,3 +457,6 @@
 .lo-sec--cult.is-moot .lo-cult__note { color: var(--ice); }
 .diy-slot__cult { display: block; margin-top: .03rem; font-size: max(.12rem, 9px); }
 .diy-slot__cult .lo-cult { max-width: max(2.6rem, 200px); }
+
+/* Preset actions share the same dimensions, including the mobile layout. */
+.lo-toolbar .lo-preset-actions .btn { height:max(.42rem,32px); min-width:max(1.5rem,112px); padding:0 .16rem; font-size:max(.16rem,12px); white-space:nowrap; margin-left:0; }

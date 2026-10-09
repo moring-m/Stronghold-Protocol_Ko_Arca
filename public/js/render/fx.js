@@ -2387,7 +2387,7 @@ export class FxSystem {
       let g=this.noteSprites.get(key);
       if(!g){g=new this.P.Graphics();g.blendMode=this.P.BLEND_MODES.NORMAL;this.projLayer.addChild(g);this.noteSprites.set(key,g);}
       const p=cam.project(x,y,.55),base=cam.project(x,y,0),s=Math.max(10,base.s*.19),tint=type==='arts'?0xd5a1ff:0x99eaff;
-      g.clear();g.position.set(p.x,p.y);g.scale.set(.5);
+      g.clear();g.position.set(p.x,p.y);g.scale.set(.65);
       g.lineStyle(1.6,tint,.94);g.beginFill(tint,.13);g.drawCircle(0,0,s);g.endFill();
       g.lineStyle(2,0xffffff,.85);g.arc(0,0,s*.82,Math.PI*1.08,Math.PI*1.55);
       g.lineStyle(1,0xffb8e8,.8);g.arc(0,0,s*.92,.12,.95);

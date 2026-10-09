@@ -85,11 +85,13 @@ export function hudBands(kind, size, opts) {
   let safeTop = 0;
   let safeBottom = 0;
   let corner = 0;
+  let bondBottom = 0;
   try {
     rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 100;
     // the HUD layer starts below the top safe-area inset and ends above the bottom one (css/devices.css .gm__hud)
     const hud = document.querySelector('.gm__hud')?.getBoundingClientRect();
     safeTop = Math.max(0, hud?.top || 0);
+    bondBottom = document.querySelector('.gm__bonds')?.getBoundingClientRect()?.bottom || 0;
     if (folded) {
       if (hud && hud.bottom > 0) safeBottom = Math.max(0, h - hud.bottom);
       corner = cornerBand(h);
@@ -99,7 +101,7 @@ export function hudBands(kind, size, opts) {
     ? Math.max(safeBottom + rem * HUD_REM.shopTabTop + HUD_REM.shopTabBorderPx, corner || safeBottom + rem * HUD_REM.cornerTop)
     : rem * HUD_REM.shopBarTop + HUD_REM.shopBarBorderPx;
   return {
-    top: Math.min(h * 0.4, safeTop + rem * HUD_REM.bondStripBottom),
+    top: Math.min(h * 0.4, bondBottom > 0 ? bondBottom + 8 : safeTop + rem * HUD_REM.bondStripBottom),
     bottom: Math.min(h * 0.4, bottom),
   };
 }

@@ -932,8 +932,7 @@ test('2_11 风丸: 纸艺·双影 −50 % HP, ATK +atk, summons the <替身> who
   const id = 'chess_char_2_11_a', bb = bbOf(id), t = tal(id);
   const h = run({ defs: { enemies: { e: dummy('e') } }, units: [{ chessId: id, row: 9, col: 5, carryState: READY }], enemies: [{ key: 'e', pos: [9, 6] }, { key: 'e', pos: [9, 9] }] });
   const u = h.unit(id);
-  h.step();
-  assert.ok(u.skill.active);
+  assert.ok(h.runUntil(() => u.skill.active, 5), 'casts after the deployment delay');
   approx(u.hpRatio, 1 - bb.hp_ratio, 'HP loss');
   approx(u.s.atk, u.base.atk * (1 + bb.atk));
   const doll = h.b.allyUnits.find((x) => x.kind === 'token');

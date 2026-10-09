@@ -869,3 +869,21 @@ test('coverage: every SERVER_* garrison id of a visible chess was exercised abov
   assert.deepEqual(missing, []);
   assert.ok(VISIBLE_IDS.size >= 100, `${VISIBLE_IDS.size} ids`);
 });
+
+test('Yu most-member trait rewards every eligible faction, not only Yan',()=>{
+ const factions=['yanShip','sargonShip','victoriaShip','kjeragShip','lateranoShip','egirShip','siracusaShip','kazimierzShip'];
+ for(const bond of factions)for(const {gid,g,owners} of idsOf('SERVER_PREP_START','SERVER_MOST_BOND')){
+  let s;
+  for(let seed=0;seed<100;seed++){
+   const candidate=setup(seed);
+   if([...candidate.ps.pool.entries.keys()].some(id=>CH(id)?.bonds.includes(bond))){s=candidate;break;}
+   candidate.h.m.dispose();
+  }
+  assert.ok(s,`${bond}: eligible pool`);
+  give(s.m,s.ps,owners[0],'board',[10,4]);
+  if(g.bbStr.conditionkey==='character_same_row')for(const [i,id] of plain().slice(0,2).entries())give(s.m,s.ps,id,'board',[10,6+i*2]);
+  s.ps.bondCountBonus[bond]=9;s.ps.recompute();s.roundStart();
+  const got=handChess(s.ps);assert.equal(got.length,1,`${gid}: ${bond}`);assert.ok(CH(got[0]).bonds.includes(bond),`${gid}: ${bond}`);
+  s.h.m.dispose();
+ }
+});
