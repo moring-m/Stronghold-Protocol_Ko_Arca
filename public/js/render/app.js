@@ -1994,7 +1994,7 @@ export async function createFieldView(host, options = {}) {
     const dtRaw = (now - lastNow) / 1000;
     lastNow = now;
     const dt = Math.min(0.1, Math.max(0, dtRaw));
-    if (dtRaw > 0 && dtRaw < 1 && !globalThis.document?.hidden) frameMs = frameMs * 0.9 + dtRaw * 1000 * 0.1;
+    if (Number.isFinite(dtRaw) && dtRaw > 0 && !globalThis.document?.hidden) frameMs = frameMs * 0.9 + Math.min(dtRaw, 5) * 1000 * 0.1;
     fps = 1000 / Math.max(1, frameMs);
     adaptLoad(dtRaw);
     vp.width = Math.max(1, host.clientWidth || 1); vp.height = Math.max(1, host.clientHeight || 1);
@@ -2106,6 +2106,7 @@ export async function createFieldView(host, options = {}) {
   setupCleanup.push(() => offAssets?.());
   const onVisible = () => {
     if (destroyed || globalThis.document?.visibilityState !== 'visible') return;
+    lastNow = performance.now(); // Ignore the hidden-tab pause without ignoring real visible stalls.
     if (assets.loaded === false && typeof assets.ready === 'function') assets.ready();
     for (const v of views.values()) v.retryAssets?.();
     for (const v of penViews.values()) v.retryAssets?.();

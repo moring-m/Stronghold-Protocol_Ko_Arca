@@ -1,0 +1,5427 @@
+{
+  "results": [
+    {
+      "mode": "normal",
+      "stage": "act1autochess_m01",
+      "entryMs": 9617.900000035763,
+      "frames": 7,
+      "frameMs": {
+        "median": 600,
+        "p95": 683.3000000000029,
+        "max": 783.2999999999993
+      },
+      "over250ms": 7,
+      "over1000ms": 0,
+      "stats": {
+        "fps": 1.5,
+        "frameMs": 646.55,
+        "cpuMs": 13.85,
+        "renderMs": 1.35,
+        "mode": "battle",
+        "units": 11,
+        "impostor": 0,
+        "impostorAtlas": {
+          "pages": 1,
+          "slots": 11,
+          "drawn": 11,
+          "full": 0
+        },
+        "boardArt": true,
+        "board3d": {
+          "on": true,
+          "calls": 14,
+          "triangles": 61626,
+          "textures": 28,
+          "geometries": 14,
+          "frames": 36,
+          "cpuMs": 5.46,
+          "lost": false,
+          "originalStage": "act2autochess_m01",
+          "losses": 0
+        },
+        "pen": 0,
+        "prepField": null,
+        "lod": 3,
+        "culled": 0,
+        "particles": 0,
+        "projectiles": 0,
+        "numbers": 0,
+        "rings": 0,
+        "auras": 0,
+        "locks": 0,
+        "flames": 0,
+        "promotions": 0,
+        "spine": {
+          "size": 9,
+          "ready": 9,
+          "loading": 0,
+          "failed": 0,
+          "refs": 11,
+          "holds": 1,
+          "weight": 13084368,
+          "idleWeight": 0,
+          "active": 0,
+          "queued": 0,
+          "unloading": 0
+        },
+        "renderT": 8.966181315572651,
+        "rate": 0.35650485234403095,
+        "buffered": 10,
+        "camera": {
+          "tx": 6,
+          "ty": 10.92664825042527,
+          "tz": 0,
+          "tilt": 30,
+          "dist": 9.65329650085054,
+          "scale": 102.46156542653759,
+          "cx": 640,
+          "cy": 360
+        }
+      },
+      "longTasks": [
+        {
+          "start": 5458.899999976158,
+          "duration": 295
+        },
+        {
+          "start": 5805.699999988079,
+          "duration": 342
+        },
+        {
+          "start": 6154.800000011921,
+          "duration": 60
+        },
+        {
+          "start": 6220,
+          "duration": 258
+        },
+        {
+          "start": 6485.599999964237,
+          "duration": 484
+        },
+        {
+          "start": 6970.399999976158,
+          "duration": 1592
+        },
+        {
+          "start": 8572.800000011921,
+          "duration": 990
+        },
+        {
+          "start": 9571.199999988079,
+          "duration": 1042
+        },
+        {
+          "start": 10617.099999964237,
+          "duration": 1029
+        },
+        {
+          "start": 11652.399999976158,
+          "duration": 805
+        },
+        {
+          "start": 12462.199999988079,
+          "duration": 837
+        },
+        {
+          "start": 13302,
+          "duration": 815
+        },
+        {
+          "start": 14121.399999976158,
+          "duration": 818
+        },
+        {
+          "start": 14939.5,
+          "duration": 484
+        },
+        {
+          "start": 15423.599999964237,
+          "duration": 1154
+        },
+        {
+          "start": 16587.19999998808,
+          "duration": 854
+        },
+        {
+          "start": 17483.899999976158,
+          "duration": 832
+        },
+        {
+          "start": 18324.80000001192,
+          "duration": 788
+        },
+        {
+          "start": 19114.099999964237,
+          "duration": 794
+        },
+        {
+          "start": 19977.099999964237,
+          "duration": 860
+        },
+        {
+          "start": 20844.30000001192,
+          "duration": 819
+        },
+        {
+          "start": 21664.899999976158,
+          "duration": 653
+        },
+        {
+          "start": 22321,
+          "duration": 606
+        },
+        {
+          "start": 22928.599999964237,
+          "duration": 636
+        },
+        {
+          "start": 23566,
+          "duration": 656
+        },
+        {
+          "start": 24223.80000001192,
+          "duration": 639
+        },
+        {
+          "start": 24892.69999998808,
+          "duration": 603
+        },
+        {
+          "start": 25497.19999998808,
+          "duration": 567
+        },
+        {
+          "start": 26065.099999964237,
+          "duration": 785
+        },
+        {
+          "start": 26851.5,
+          "duration": 671
+        },
+        {
+          "start": 27523.30000001192,
+          "duration": 631
+        },
+        {
+          "start": 28154.599999964237,
+          "duration": 605
+        },
+        {
+          "start": 28760.599999964237,
+          "duration": 454
+        }
+      ],
+      "mapBuilds": [
+        {
+          "method": "setStage",
+          "ms": 484.80000001192093
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 25.30000001192093
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 452.9000000357628
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        }
+      ]
+    },
+    {
+      "mode": "normal",
+      "stage": "act1autochess_m02",
+      "entryMs": 3655.5,
+      "frames": 9,
+      "frameMs": {
+        "median": 483.20000000000437,
+        "p95": 483.3000000000029,
+        "max": 500
+      },
+      "over250ms": 9,
+      "over1000ms": 0,
+      "stats": {
+        "fps": 2,
+        "frameMs": 497.61,
+        "cpuMs": 10.6,
+        "renderMs": 0.61,
+        "mode": "battle",
+        "units": 11,
+        "impostor": 0,
+        "impostorAtlas": {
+          "pages": 1,
+          "slots": 11,
+          "drawn": 11,
+          "full": 0
+        },
+        "boardArt": true,
+        "board3d": {
+          "on": true,
+          "calls": 14,
+          "triangles": 61626,
+          "textures": 28,
+          "geometries": 14,
+          "frames": 61,
+          "cpuMs": 5,
+          "lost": false,
+          "originalStage": "act2autochess_m01",
+          "losses": 0
+        },
+        "pen": 0,
+        "prepField": null,
+        "lod": 3,
+        "culled": 0,
+        "particles": 0,
+        "projectiles": 0,
+        "numbers": 0,
+        "rings": 0,
+        "auras": 0,
+        "locks": 0,
+        "flames": 0,
+        "promotions": 0,
+        "spine": {
+          "size": 9,
+          "ready": 9,
+          "loading": 0,
+          "failed": 0,
+          "refs": 11,
+          "holds": 1,
+          "weight": 13084368,
+          "idleWeight": 0,
+          "active": 0,
+          "queued": 0,
+          "unloading": 0
+        },
+        "renderT": 7.654744133664596,
+        "rate": 0.463539070914214,
+        "buffered": 13,
+        "camera": {
+          "tx": 6,
+          "ty": 10.92664825042527,
+          "tz": 0,
+          "tilt": 30,
+          "dist": 9.65329650085054,
+          "scale": 102.46156542653759,
+          "cx": 640,
+          "cy": 360
+        }
+      },
+      "longTasks": [
+        {
+          "start": 32017.099999964237,
+          "duration": 427
+        },
+        {
+          "start": 32445.899999976158,
+          "duration": 472
+        },
+        {
+          "start": 32922.30000001192,
+          "duration": 487
+        },
+        {
+          "start": 33418.19999998808,
+          "duration": 487
+        },
+        {
+          "start": 33906.5,
+          "duration": 424
+        },
+        {
+          "start": 34335.19999998808,
+          "duration": 471
+        },
+        {
+          "start": 34812.5,
+          "duration": 426
+        },
+        {
+          "start": 35238.59999996424,
+          "duration": 433
+        },
+        {
+          "start": 35672.30000001192,
+          "duration": 774
+        },
+        {
+          "start": 36447.89999997616,
+          "duration": 420
+        },
+        {
+          "start": 36911.30000001192,
+          "duration": 438
+        },
+        {
+          "start": 37350.09999996424,
+          "duration": 453
+        },
+        {
+          "start": 37804.39999997616,
+          "duration": 438
+        },
+        {
+          "start": 38244.19999998808,
+          "duration": 489
+        },
+        {
+          "start": 38734.09999996424,
+          "duration": 465
+        },
+        {
+          "start": 39200,
+          "duration": 444
+        },
+        {
+          "start": 39644.5,
+          "duration": 480
+        },
+        {
+          "start": 40125,
+          "duration": 502
+        },
+        {
+          "start": 40627.80000001192,
+          "duration": 488
+        },
+        {
+          "start": 41116.19999998808,
+          "duration": 479
+        }
+      ],
+      "mapBuilds": [
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 9.5
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 420.60000002384186
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        }
+      ]
+    },
+    {
+      "mode": "normal",
+      "stage": "act1autochess_m03",
+      "entryMs": 3266.2999999523163,
+      "frames": 10,
+      "frameMs": {
+        "median": 433.29999999999563,
+        "p95": 466.6999999999971,
+        "max": 516.6000000000058
+      },
+      "over250ms": 10,
+      "over1000ms": 0,
+      "stats": {
+        "fps": 2.2,
+        "frameMs": 446.86,
+        "cpuMs": 10.32,
+        "renderMs": 0.5,
+        "mode": "battle",
+        "units": 11,
+        "impostor": 0,
+        "impostorAtlas": {
+          "pages": 1,
+          "slots": 11,
+          "drawn": 11,
+          "full": 0
+        },
+        "boardArt": true,
+        "board3d": {
+          "on": true,
+          "calls": 14,
+          "triangles": 61626,
+          "textures": 28,
+          "geometries": 14,
+          "frames": 88,
+          "cpuMs": 5.43,
+          "lost": false,
+          "originalStage": "act2autochess_m01",
+          "losses": 0
+        },
+        "pen": 0,
+        "prepField": null,
+        "lod": 3,
+        "culled": 0,
+        "particles": 0,
+        "projectiles": 0,
+        "numbers": 0,
+        "rings": 0,
+        "auras": 0,
+        "locks": 0,
+        "flames": 0,
+        "promotions": 0,
+        "spine": {
+          "size": 9,
+          "ready": 9,
+          "loading": 0,
+          "failed": 0,
+          "refs": 11,
+          "holds": 1,
+          "weight": 13084368,
+          "idleWeight": 0,
+          "active": 0,
+          "queued": 0,
+          "unloading": 0
+        },
+        "renderT": 8.049593116771891,
+        "rate": 0.4852240171013923,
+        "buffered": 14,
+        "camera": {
+          "tx": 6,
+          "ty": 10.92664825042527,
+          "tz": 0,
+          "tilt": 30,
+          "dist": 9.65329650085054,
+          "scale": 102.46156542653759,
+          "cx": 640,
+          "cy": 360
+        }
+      },
+      "longTasks": [
+        {
+          "start": 44342,
+          "duration": 465
+        },
+        {
+          "start": 44808.39999997616,
+          "duration": 523
+        },
+        {
+          "start": 45336.09999996424,
+          "duration": 480
+        },
+        {
+          "start": 45820.09999996424,
+          "duration": 426
+        },
+        {
+          "start": 46247.69999998808,
+          "duration": 393
+        },
+        {
+          "start": 46642.09999996424,
+          "duration": 423
+        },
+        {
+          "start": 47068.09999996424,
+          "duration": 496
+        },
+        {
+          "start": 47607.89999997616,
+          "duration": 94
+        },
+        {
+          "start": 47703.30000001192,
+          "duration": 124
+        },
+        {
+          "start": 47914.39999997616,
+          "duration": 113
+        },
+        {
+          "start": 48029.09999996424,
+          "duration": 61
+        },
+        {
+          "start": 48091.30000001192,
+          "duration": 120
+        },
+        {
+          "start": 48211.5,
+          "duration": 438
+        },
+        {
+          "start": 48650.19999998808,
+          "duration": 776
+        },
+        {
+          "start": 49432.09999996424,
+          "duration": 388
+        },
+        {
+          "start": 49821.30000001192,
+          "duration": 423
+        },
+        {
+          "start": 50245.09999996424,
+          "duration": 427
+        },
+        {
+          "start": 50672.89999997616,
+          "duration": 457
+        },
+        {
+          "start": 51131.59999996424,
+          "duration": 427
+        },
+        {
+          "start": 51559.5,
+          "duration": 410
+        },
+        {
+          "start": 51970,
+          "duration": 452
+        },
+        {
+          "start": 52422.39999997616,
+          "duration": 419
+        },
+        {
+          "start": 52842.09999996424,
+          "duration": 471
+        },
+        {
+          "start": 53314.19999998808,
+          "duration": 518
+        }
+      ],
+      "mapBuilds": [
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "setStage",
+          "ms": 30.299999952316284
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 9.399999976158142
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 438.39999997615814
+        }
+      ]
+    },
+    {
+      "mode": "normal",
+      "stage": "act1autochess_m04",
+      "entryMs": 3472.5,
+      "frames": 9,
+      "frameMs": {
+        "median": 449.90000000000873,
+        "p95": 466.70000000000437,
+        "max": 500
+      },
+      "over250ms": 9,
+      "over1000ms": 0,
+      "stats": {
+        "fps": 2.1,
+        "frameMs": 467.76,
+        "cpuMs": 8.24,
+        "renderMs": 0.57,
+        "mode": "battle",
+        "units": 11,
+        "impostor": 0,
+        "impostorAtlas": {
+          "pages": 1,
+          "slots": 11,
+          "drawn": 11,
+          "full": 0
+        },
+        "boardArt": true,
+        "board3d": {
+          "on": true,
+          "calls": 14,
+          "triangles": 61626,
+          "textures": 28,
+          "geometries": 14,
+          "frames": 113,
+          "cpuMs": 4.47,
+          "lost": false,
+          "originalStage": "act2autochess_m01",
+          "losses": 0
+        },
+        "pen": 0,
+        "prepField": null,
+        "lod": 3,
+        "culled": 0,
+        "particles": 0,
+        "projectiles": 0,
+        "numbers": 0,
+        "rings": 0,
+        "auras": 0,
+        "locks": 0,
+        "flames": 0,
+        "promotions": 0,
+        "spine": {
+          "size": 9,
+          "ready": 9,
+          "loading": 0,
+          "failed": 0,
+          "refs": 11,
+          "holds": 1,
+          "weight": 13084368,
+          "idleWeight": 0,
+          "active": 0,
+          "queued": 0,
+          "unloading": 0
+        },
+        "renderT": 7.652101469806808,
+        "rate": 0.4918267974954591,
+        "buffered": 14,
+        "camera": {
+          "tx": 6,
+          "ty": 10.92664825042527,
+          "tz": 0,
+          "tilt": 30,
+          "dist": 9.65329650085054,
+          "scale": 102.46156542653759,
+          "cx": 640,
+          "cy": 360
+        }
+      },
+      "longTasks": [
+        {
+          "start": 55732.59999996424,
+          "duration": 437
+        },
+        {
+          "start": 56171.30000001192,
+          "duration": 451
+        },
+        {
+          "start": 56624.19999998808,
+          "duration": 437
+        },
+        {
+          "start": 57065.69999998808,
+          "duration": 467
+        },
+        {
+          "start": 57536.59999996424,
+          "duration": 411
+        },
+        {
+          "start": 57949,
+          "duration": 415
+        },
+        {
+          "start": 58365.5,
+          "duration": 444
+        },
+        {
+          "start": 58812.89999997616,
+          "duration": 424
+        },
+        {
+          "start": 59237.59999996424,
+          "duration": 405
+        },
+        {
+          "start": 59643.19999998808,
+          "duration": 755
+        },
+        {
+          "start": 60400.39999997616,
+          "duration": 409
+        },
+        {
+          "start": 60810.80000001192,
+          "duration": 51
+        },
+        {
+          "start": 60871.59999996424,
+          "duration": 392
+        },
+        {
+          "start": 61265.80000001192,
+          "duration": 481
+        },
+        {
+          "start": 61748.5,
+          "duration": 415
+        },
+        {
+          "start": 62165.39999997616,
+          "duration": 467
+        },
+        {
+          "start": 62632.80000001192,
+          "duration": 463
+        },
+        {
+          "start": 63096.80000001192,
+          "duration": 467
+        },
+        {
+          "start": 63564,
+          "duration": 436
+        },
+        {
+          "start": 64000.5,
+          "duration": 501
+        },
+        {
+          "start": 64502.19999998808,
+          "duration": 448
+        },
+        {
+          "start": 64950.80000001192,
+          "duration": 413
+        }
+      ],
+      "mapBuilds": [
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 11.100000023841858
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 388.60000002384186
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0.09999996423721313
+        },
+        {
+          "method": "setArea",
+          "ms": 0.10000002384185791
+        }
+      ]
+    },
+    {
+      "mode": "normal",
+      "stage": "act2autochess_m01",
+      "entryMs": 3445.800000011921,
+      "frames": 9,
+      "frameMs": {
+        "median": 449.8999999999942,
+        "p95": 500,
+        "max": 516.6999999999971
+      },
+      "over250ms": 9,
+      "over1000ms": 0,
+      "stats": {
+        "fps": 2.2,
+        "frameMs": 446.69,
+        "cpuMs": 4.47,
+        "renderMs": 0.41,
+        "mode": "battle",
+        "units": 11,
+        "impostor": 0,
+        "impostorAtlas": {
+          "pages": 1,
+          "slots": 11,
+          "drawn": 11,
+          "full": 0
+        },
+        "boardArt": true,
+        "board3d": {
+          "on": true,
+          "calls": 14,
+          "triangles": 61626,
+          "textures": 28,
+          "geometries": 14,
+          "frames": 139,
+          "cpuMs": 0.81,
+          "lost": false,
+          "originalStage": "act2autochess_m01",
+          "losses": 0
+        },
+        "pen": 0,
+        "prepField": null,
+        "lod": 3,
+        "culled": 0,
+        "particles": 0,
+        "projectiles": 0,
+        "numbers": 0,
+        "rings": 0,
+        "auras": 0,
+        "locks": 0,
+        "flames": 0,
+        "promotions": 0,
+        "spine": {
+          "size": 9,
+          "ready": 9,
+          "loading": 0,
+          "failed": 0,
+          "refs": 11,
+          "holds": 1,
+          "weight": 13084368,
+          "idleWeight": 0,
+          "active": 0,
+          "queued": 0,
+          "unloading": 0
+        },
+        "renderT": 7.65038837990678,
+        "rate": 0.5081856958532298,
+        "buffered": 14,
+        "camera": {
+          "tx": 6,
+          "ty": 10.92664825042527,
+          "tz": 0,
+          "tilt": 30,
+          "dist": 9.65329650085054,
+          "scale": 102.46156542653759,
+          "cx": 640,
+          "cy": 360
+        }
+      },
+      "longTasks": [
+        {
+          "start": 68056.59999996424,
+          "duration": 456
+        },
+        {
+          "start": 68514.39999997616,
+          "duration": 449
+        },
+        {
+          "start": 68968.19999998808,
+          "duration": 444
+        },
+        {
+          "start": 69416.5,
+          "duration": 398
+        },
+        {
+          "start": 69816.30000001192,
+          "duration": 406
+        },
+        {
+          "start": 70222.89999997616,
+          "duration": 420
+        },
+        {
+          "start": 70644.80000001192,
+          "duration": 422
+        },
+        {
+          "start": 71069.89999997616,
+          "duration": 428
+        },
+        {
+          "start": 71502,
+          "duration": 424
+        },
+        {
+          "start": 71926.80000001192,
+          "duration": 417
+        },
+        {
+          "start": 72345,
+          "duration": 451
+        },
+        {
+          "start": 72797.30000001192,
+          "duration": 437
+        },
+        {
+          "start": 73235.5,
+          "duration": 494
+        },
+        {
+          "start": 73729.89999997616,
+          "duration": 494
+        },
+        {
+          "start": 74225,
+          "duration": 471
+        },
+        {
+          "start": 74697.30000001192,
+          "duration": 512
+        },
+        {
+          "start": 75209.89999997616,
+          "duration": 430
+        },
+        {
+          "start": 75641.30000001192,
+          "duration": 456
+        },
+        {
+          "start": 76098.09999996424,
+          "duration": 420
+        },
+        {
+          "start": 76518.80000001192,
+          "duration": 425
+        },
+        {
+          "start": 76944.09999996424,
+          "duration": 421
+        }
+      ],
+      "mapBuilds": [
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0.09999996423721313
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        }
+      ]
+    },
+    {
+      "mode": "normal",
+      "stage": "act2autochess_m02",
+      "entryMs": 3469.600000023842,
+      "frames": 9,
+      "frameMs": {
+        "median": 450,
+        "p95": 483.40000000000873,
+        "max": 500
+      },
+      "over250ms": 9,
+      "over1000ms": 0,
+      "stats": {
+        "fps": 2.1,
+        "frameMs": 485.64,
+        "cpuMs": 8.6,
+        "renderMs": 0.44,
+        "mode": "battle",
+        "units": 11,
+        "impostor": 0,
+        "impostorAtlas": {
+          "pages": 1,
+          "slots": 11,
+          "drawn": 11,
+          "full": 0
+        },
+        "boardArt": true,
+        "board3d": {
+          "on": true,
+          "calls": 14,
+          "triangles": 61626,
+          "textures": 28,
+          "geometries": 14,
+          "frames": 164,
+          "cpuMs": 5.18,
+          "lost": false,
+          "originalStage": "act2autochess_m01",
+          "losses": 0
+        },
+        "pen": 0,
+        "prepField": null,
+        "lod": 3,
+        "culled": 0,
+        "particles": 0,
+        "projectiles": 0,
+        "numbers": 0,
+        "rings": 0,
+        "auras": 0,
+        "locks": 0,
+        "flames": 0,
+        "promotions": 0,
+        "spine": {
+          "size": 9,
+          "ready": 9,
+          "loading": 0,
+          "failed": 0,
+          "refs": 11,
+          "holds": 1,
+          "weight": 13084368,
+          "idleWeight": 0,
+          "active": 0,
+          "queued": 0,
+          "unloading": 0
+        },
+        "renderT": 7.652843047764053,
+        "rate": 0.4787105753879294,
+        "buffered": 13,
+        "camera": {
+          "tx": 6,
+          "ty": 10.92664825042527,
+          "tz": 0,
+          "tilt": 30,
+          "dist": 9.65329650085054,
+          "scale": 102.46156542653759,
+          "cx": 640,
+          "cy": 360
+        }
+      },
+      "longTasks": [
+        {
+          "start": 79209.19999998808,
+          "duration": 430
+        },
+        {
+          "start": 79641.30000001192,
+          "duration": 423
+        },
+        {
+          "start": 80066.39999997616,
+          "duration": 431
+        },
+        {
+          "start": 80502.39999997616,
+          "duration": 441
+        },
+        {
+          "start": 80946.59999996424,
+          "duration": 403
+        },
+        {
+          "start": 81350.89999997616,
+          "duration": 462
+        },
+        {
+          "start": 81814.80000001192,
+          "duration": 436
+        },
+        {
+          "start": 82253.5,
+          "duration": 416
+        },
+        {
+          "start": 82670.09999996424,
+          "duration": 440
+        },
+        {
+          "start": 83110.59999996424,
+          "duration": 955
+        },
+        {
+          "start": 84067.09999996424,
+          "duration": 474
+        },
+        {
+          "start": 84583.30000001192,
+          "duration": 530
+        },
+        {
+          "start": 85117.09999996424,
+          "duration": 475
+        },
+        {
+          "start": 85593.09999996424,
+          "duration": 440
+        },
+        {
+          "start": 86034.39999997616,
+          "duration": 503
+        },
+        {
+          "start": 86538,
+          "duration": 491
+        },
+        {
+          "start": 87030.09999996424,
+          "duration": 424
+        },
+        {
+          "start": 87455.30000001192,
+          "duration": 456
+        },
+        {
+          "start": 87911.80000001192,
+          "duration": 483
+        },
+        {
+          "start": 88395.69999998808,
+          "duration": 440
+        },
+        {
+          "start": 88836.39999997616,
+          "duration": 488
+        },
+        {
+          "start": 89324.89999997616,
+          "duration": 427
+        }
+      ],
+      "mapBuilds": [
+        {
+          "method": "setStage",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "setStage",
+          "ms": 32.299999952316284
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 406
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        }
+      ]
+    },
+    {
+      "mode": "normal",
+      "stage": "act2autochess_m03",
+      "entryMs": 2612.400000035763,
+      "frames": 10,
+      "frameMs": {
+        "median": 433.3000000000029,
+        "p95": 450,
+        "max": 466.59999999999127
+      },
+      "over250ms": 10,
+      "over1000ms": 0,
+      "stats": {
+        "fps": 2.3,
+        "frameMs": 436.52,
+        "cpuMs": 9.35,
+        "renderMs": 0.47,
+        "mode": "battle",
+        "units": 11,
+        "impostor": 0,
+        "impostorAtlas": {
+          "pages": 1,
+          "slots": 11,
+          "drawn": 11,
+          "full": 0
+        },
+        "boardArt": true,
+        "board3d": {
+          "on": true,
+          "calls": 14,
+          "triangles": 61626,
+          "textures": 28,
+          "geometries": 14,
+          "frames": 190,
+          "cpuMs": 5.46,
+          "lost": false,
+          "originalStage": "act2autochess_m01",
+          "losses": 0
+        },
+        "pen": 0,
+        "prepField": null,
+        "lod": 3,
+        "culled": 0,
+        "particles": 0,
+        "projectiles": 0,
+        "numbers": 2,
+        "rings": 0,
+        "auras": 0,
+        "locks": 0,
+        "flames": 0,
+        "promotions": 0,
+        "spine": {
+          "size": 9,
+          "ready": 9,
+          "loading": 0,
+          "failed": 0,
+          "refs": 11,
+          "holds": 1,
+          "weight": 13084368,
+          "idleWeight": 0,
+          "active": 0,
+          "queued": 0,
+          "unloading": 0
+        },
+        "renderT": 8.050790601576711,
+        "rate": 0.48954340854121803,
+        "buffered": 14,
+        "camera": {
+          "tx": 6,
+          "ty": 10.92664825042527,
+          "tz": 0,
+          "tilt": 30,
+          "dist": 9.65329650085054,
+          "scale": 102.46156542653759,
+          "cx": 640,
+          "cy": 360
+        }
+      },
+      "longTasks": [
+        {
+          "start": 91716.09999996424,
+          "duration": 490
+        },
+        {
+          "start": 92208.19999998808,
+          "duration": 424
+        },
+        {
+          "start": 92633.09999996424,
+          "duration": 413
+        },
+        {
+          "start": 93051.09999996424,
+          "duration": 457
+        },
+        {
+          "start": 93511.30000001192,
+          "duration": 407
+        },
+        {
+          "start": 93919.80000001192,
+          "duration": 414
+        },
+        {
+          "start": 94335.19999998808,
+          "duration": 415
+        },
+        {
+          "start": 94754.09999996424,
+          "duration": 66
+        },
+        {
+          "start": 94820.19999998808,
+          "duration": 97
+        },
+        {
+          "start": 94919.59999996424,
+          "duration": 132
+        },
+        {
+          "start": 95055.5,
+          "duration": 51
+        },
+        {
+          "start": 95155.09999996424,
+          "duration": 112
+        },
+        {
+          "start": 95267.80000001192,
+          "duration": 61
+        },
+        {
+          "start": 95329.09999996424,
+          "duration": 106
+        },
+        {
+          "start": 95436,
+          "duration": 417
+        },
+        {
+          "start": 95853.39999997616,
+          "duration": 758
+        },
+        {
+          "start": 96617.39999997616,
+          "duration": 428
+        },
+        {
+          "start": 97046.5,
+          "duration": 413
+        },
+        {
+          "start": 97460.59999996424,
+          "duration": 438
+        },
+        {
+          "start": 97898.89999997616,
+          "duration": 406
+        },
+        {
+          "start": 98306,
+          "duration": 423
+        },
+        {
+          "start": 98729.69999998808,
+          "duration": 423
+        },
+        {
+          "start": 99153.39999997616,
+          "duration": 450
+        },
+        {
+          "start": 99604.39999997616,
+          "duration": 452
+        },
+        {
+          "start": 100057.19999998808,
+          "duration": 471
+        },
+        {
+          "start": 100529.30000001192,
+          "duration": 427
+        }
+      ],
+      "mapBuilds": [
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 51.10000002384186
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 11.5
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0.09999996423721313
+        },
+        {
+          "method": "setStage",
+          "ms": 417.30000001192093
+        }
+      ]
+    },
+    {
+      "mode": "normal",
+      "stage": "act2autochess_m04",
+      "entryMs": 4040.399999976158,
+      "frames": 9,
+      "frameMs": {
+        "median": 466.6999999999971,
+        "p95": 483.3000000000029,
+        "max": 516.7000000000116
+      },
+      "over250ms": 9,
+      "over1000ms": 0,
+      "stats": {
+        "fps": 2,
+        "frameMs": 493.3,
+        "cpuMs": 8.61,
+        "renderMs": 0.41,
+        "mode": "battle",
+        "units": 11,
+        "impostor": 0,
+        "impostorAtlas": {
+          "pages": 1,
+          "slots": 11,
+          "drawn": 11,
+          "full": 0
+        },
+        "boardArt": true,
+        "board3d": {
+          "on": true,
+          "calls": 14,
+          "triangles": 61626,
+          "textures": 28,
+          "geometries": 14,
+          "frames": 214,
+          "cpuMs": 4.91,
+          "lost": false,
+          "originalStage": "act2autochess_m01",
+          "losses": 0
+        },
+        "pen": 0,
+        "prepField": null,
+        "lod": 3,
+        "culled": 0,
+        "particles": 0,
+        "projectiles": 0,
+        "numbers": 0,
+        "rings": 0,
+        "auras": 0,
+        "locks": 0,
+        "flames": 0,
+        "promotions": 0,
+        "spine": {
+          "size": 9,
+          "ready": 9,
+          "loading": 0,
+          "failed": 0,
+          "refs": 11,
+          "holds": 1,
+          "weight": 13084368,
+          "idleWeight": 0,
+          "active": 0,
+          "queued": 0,
+          "unloading": 0
+        },
+        "renderT": 7.650485381372131,
+        "rate": 0.4845810709589995,
+        "buffered": 14,
+        "camera": {
+          "tx": 6,
+          "ty": 10.92664825042527,
+          "tz": 0,
+          "tilt": 30,
+          "dist": 9.65329650085054,
+          "scale": 102.46156542653759,
+          "cx": 640,
+          "cy": 360
+        }
+      },
+      "longTasks": [
+        {
+          "start": 102970.30000001192,
+          "duration": 523
+        },
+        {
+          "start": 103494.09999996424,
+          "duration": 557
+        },
+        {
+          "start": 104056,
+          "duration": 511
+        },
+        {
+          "start": 104571.09999996424,
+          "duration": 538
+        },
+        {
+          "start": 105110.59999996424,
+          "duration": 500
+        },
+        {
+          "start": 105612.89999997616,
+          "duration": 489
+        },
+        {
+          "start": 106106.39999997616,
+          "duration": 494
+        },
+        {
+          "start": 106600.5,
+          "duration": 409
+        },
+        {
+          "start": 107010.5,
+          "duration": 889
+        },
+        {
+          "start": 107904,
+          "duration": 458
+        },
+        {
+          "start": 108415.89999997616,
+          "duration": 447
+        },
+        {
+          "start": 108863.80000001192,
+          "duration": 453
+        },
+        {
+          "start": 109318.69999998808,
+          "duration": 476
+        },
+        {
+          "start": 109796.59999996424,
+          "duration": 461
+        },
+        {
+          "start": 110257.59999996424,
+          "duration": 474
+        },
+        {
+          "start": 110732,
+          "duration": 486
+        },
+        {
+          "start": 111218.69999998808,
+          "duration": 448
+        },
+        {
+          "start": 111667.19999998808,
+          "duration": 440
+        },
+        {
+          "start": 112107.39999997616,
+          "duration": 436
+        },
+        {
+          "start": 112544.30000001192,
+          "duration": 428
+        },
+        {
+          "start": 112973,
+          "duration": 521
+        }
+      ],
+      "mapBuilds": [
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 15.899999976158142
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 390.5
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        }
+      ]
+    },
+    {
+      "mode": "unite",
+      "stage": "act1autochess_m01",
+      "entryMs": 26207.30000001192,
+      "frames": 7,
+      "frameMs": {
+        "median": 616.5999999999767,
+        "p95": 616.6000000000058,
+        "max": 666.6000000000058
+      },
+      "over250ms": 7,
+      "over1000ms": 0,
+      "stats": {
+        "fps": 1.3,
+        "frameMs": 744.06,
+        "cpuMs": 54.89,
+        "renderMs": 1.23,
+        "mode": "battle",
+        "units": 14,
+        "impostor": 0,
+        "impostorAtlas": {
+          "pages": 1,
+          "slots": 13,
+          "drawn": 14,
+          "full": 0
+        },
+        "boardArt": true,
+        "board3d": {
+          "on": true,
+          "calls": 38,
+          "triangles": 90203,
+          "textures": 28,
+          "geometries": 38,
+          "frames": 246,
+          "cpuMs": 3.9,
+          "lost": false,
+          "originalStage": "act2autochess_m01",
+          "losses": 0
+        },
+        "pen": 0,
+        "prepField": null,
+        "lod": 3,
+        "culled": 0,
+        "particles": 0,
+        "projectiles": 0,
+        "numbers": 0,
+        "rings": 0,
+        "auras": 0,
+        "locks": 0,
+        "flames": 0,
+        "promotions": 0,
+        "spine": {
+          "size": 18,
+          "ready": 18,
+          "loading": 0,
+          "failed": 0,
+          "refs": 14,
+          "holds": 1,
+          "weight": 30784112,
+          "idleWeight": 9827284,
+          "active": 0,
+          "queued": 0,
+          "unloading": 0
+        },
+        "renderT": 8.764099736893177,
+        "rate": 0.3231594385622183,
+        "buffered": 10,
+        "camera": {
+          "tx": 10,
+          "ty": 11.106656224891717,
+          "tz": 0,
+          "tilt": 30,
+          "dist": 13.833312449783433,
+          "scale": 71.50072512235845,
+          "cx": 640,
+          "cy": 360
+        }
+      },
+      "longTasks": [
+        {
+          "start": 115409,
+          "duration": 432
+        },
+        {
+          "start": 115842.09999996424,
+          "duration": 420
+        },
+        {
+          "start": 116263.5,
+          "duration": 436
+        },
+        {
+          "start": 116708.19999998808,
+          "duration": 445
+        },
+        {
+          "start": 117154.19999998808,
+          "duration": 10415
+        },
+        {
+          "start": 127569.5,
+          "duration": 6103
+        },
+        {
+          "start": 133676.30000001192,
+          "duration": 676
+        },
+        {
+          "start": 134359.80000001192,
+          "duration": 686
+        },
+        {
+          "start": 135058.39999997616,
+          "duration": 645
+        },
+        {
+          "start": 135712,
+          "duration": 591
+        },
+        {
+          "start": 136304,
+          "duration": 5745
+        },
+        {
+          "start": 142049.19999998808,
+          "duration": 898
+        },
+        {
+          "start": 142950.30000001192,
+          "duration": 618
+        },
+        {
+          "start": 143571.30000001192,
+          "duration": 50
+        },
+        {
+          "start": 143622.39999997616,
+          "duration": 608
+        },
+        {
+          "start": 144233.19999998808,
+          "duration": 598
+        },
+        {
+          "start": 144880.19999998808,
+          "duration": 686
+        },
+        {
+          "start": 145594,
+          "duration": 612
+        },
+        {
+          "start": 146208.59999996424,
+          "duration": 585
+        },
+        {
+          "start": 146797.39999997616,
+          "duration": 562
+        },
+        {
+          "start": 147361.09999996424,
+          "duration": 590
+        },
+        {
+          "start": 147952.09999996424,
+          "duration": 569
+        },
+        {
+          "start": 148522.5,
+          "duration": 582
+        },
+        {
+          "start": 149118,
+          "duration": 625
+        },
+        {
+          "start": 149744.39999997616,
+          "duration": 597
+        },
+        {
+          "start": 150342.09999996424,
+          "duration": 598
+        },
+        {
+          "start": 150940.69999998808,
+          "duration": 671
+        },
+        {
+          "start": 151612.09999996424,
+          "duration": 611
+        },
+        {
+          "start": 152223.69999998808,
+          "duration": 592
+        },
+        {
+          "start": 152816.39999997616,
+          "duration": 617
+        },
+        {
+          "start": 153434.09999996424,
+          "duration": 626
+        }
+      ],
+      "mapBuilds": [
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 5072.300000011921
+        },
+        {
+          "method": "setStage",
+          "ms": 5335
+        },
+        {
+          "method": "setArea",
+          "ms": 5335
+        },
+        {
+          "method": "setStage",
+          "ms": 5002.100000023842
+        },
+        {
+          "method": "setArea",
+          "ms": 5002.100000023842
+        },
+        {
+          "method": "setStage",
+          "ms": 523.1999999880791
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 5218.200000047684
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        }
+      ]
+    },
+    {
+      "mode": "unite",
+      "stage": "act1autochess_m02",
+      "entryMs": 4267.800000011921,
+      "frames": 7,
+      "frameMs": {
+        "median": 583.3000000000175,
+        "p95": 600,
+        "max": 683.1999999999825
+      },
+      "over250ms": 7,
+      "over1000ms": 0,
+      "stats": {
+        "fps": 1.2,
+        "frameMs": 804.55,
+        "cpuMs": 23.46,
+        "renderMs": 0.74,
+        "mode": "battle",
+        "units": 15,
+        "impostor": 2,
+        "impostorAtlas": {
+          "pages": 1,
+          "slots": 14,
+          "drawn": 14,
+          "full": 0
+        },
+        "boardArt": true,
+        "board3d": {
+          "on": true,
+          "calls": 38,
+          "triangles": 90203,
+          "textures": 30,
+          "geometries": 38,
+          "frames": 268,
+          "cpuMs": 9.06,
+          "lost": false,
+          "originalStage": "act2autochess_m01",
+          "losses": 0
+        },
+        "pen": 0,
+        "prepField": null,
+        "lod": 3,
+        "culled": 0,
+        "particles": 0,
+        "projectiles": 0,
+        "numbers": 0,
+        "rings": 0,
+        "auras": 0,
+        "locks": 0,
+        "flames": 0,
+        "promotions": 0,
+        "spine": {
+          "size": 18,
+          "ready": 18,
+          "loading": 0,
+          "failed": 0,
+          "refs": 15,
+          "holds": 1,
+          "weight": 30784112,
+          "idleWeight": 8513568,
+          "active": 0,
+          "queued": 0,
+          "unloading": 0
+        },
+        "renderT": 7.460924392717582,
+        "rate": 0.4004990634617184,
+        "buffered": 12,
+        "camera": {
+          "tx": 10,
+          "ty": 11.106656224891717,
+          "tz": 0,
+          "tilt": 30,
+          "dist": 13.833312449783433,
+          "scale": 71.50072512235845,
+          "cx": 640,
+          "cy": 360
+        }
+      },
+      "longTasks": [
+        {
+          "start": 156554.30000001192,
+          "duration": 574
+        },
+        {
+          "start": 157129.80000001192,
+          "duration": 587
+        },
+        {
+          "start": 157725,
+          "duration": 608
+        },
+        {
+          "start": 158339.80000001192,
+          "duration": 556
+        },
+        {
+          "start": 158898.69999998808,
+          "duration": 543
+        },
+        {
+          "start": 159444.89999997616,
+          "duration": 606
+        },
+        {
+          "start": 160051.39999997616,
+          "duration": 770
+        },
+        {
+          "start": 160821.69999998808,
+          "duration": 436
+        },
+        {
+          "start": 161261.80000001192,
+          "duration": 160
+        },
+        {
+          "start": 161508.30000001192,
+          "duration": 167
+        },
+        {
+          "start": 161675.69999998808,
+          "duration": 63
+        },
+        {
+          "start": 161740,
+          "duration": 167
+        },
+        {
+          "start": 161907.80000001192,
+          "duration": 5122
+        },
+        {
+          "start": 167030,
+          "duration": 940
+        },
+        {
+          "start": 167971.09999996424,
+          "duration": 572
+        },
+        {
+          "start": 168544,
+          "duration": 578
+        },
+        {
+          "start": 169122.89999997616,
+          "duration": 594
+        },
+        {
+          "start": 169718.09999996424,
+          "duration": 678
+        },
+        {
+          "start": 170397.09999996424,
+          "duration": 597
+        },
+        {
+          "start": 170995,
+          "duration": 548
+        }
+      ],
+      "mapBuilds": [
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 407.80000001192093
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 358.10000002384186
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 5121.900000035763
+        }
+      ]
+    },
+    {
+      "mode": "unite",
+      "stage": "act1autochess_m03",
+      "entryMs": 10228,
+      "frames": 7,
+      "frameMs": {
+        "median": 566.7999999999884,
+        "p95": 599.7999999999884,
+        "max": 633.4000000000233
+      },
+      "over250ms": 7,
+      "over1000ms": 0,
+      "stats": {
+        "fps": 1.3,
+        "frameMs": 752.25,
+        "cpuMs": 16.57,
+        "renderMs": 0.74,
+        "mode": "battle",
+        "units": 15,
+        "impostor": 2,
+        "impostorAtlas": {
+          "pages": 1,
+          "slots": 14,
+          "drawn": 14,
+          "full": 0
+        },
+        "boardArt": true,
+        "board3d": {
+          "on": true,
+          "calls": 38,
+          "triangles": 90203,
+          "textures": 30,
+          "geometries": 38,
+          "frames": 291,
+          "cpuMs": 5.83,
+          "lost": false,
+          "originalStage": "act2autochess_m01",
+          "losses": 0
+        },
+        "pen": 0,
+        "prepField": null,
+        "lod": 3,
+        "culled": 0,
+        "particles": 0,
+        "projectiles": 0,
+        "numbers": 1,
+        "rings": 0,
+        "auras": 0,
+        "locks": 0,
+        "flames": 0,
+        "promotions": 0,
+        "spine": {
+          "size": 18,
+          "ready": 18,
+          "loading": 0,
+          "failed": 0,
+          "refs": 15,
+          "holds": 1,
+          "weight": 30784112,
+          "idleWeight": 8513568,
+          "active": 0,
+          "queued": 0,
+          "unloading": 0
+        },
+        "renderT": 7.261406840350737,
+        "rate": 0.3873611632926881,
+        "buffered": 11,
+        "camera": {
+          "tx": 10,
+          "ty": 11.106656224891717,
+          "tz": 0,
+          "tilt": 30,
+          "dist": 13.833312449783433,
+          "scale": 71.50072512235845,
+          "cx": 640,
+          "cy": 360
+        }
+      },
+      "longTasks": [
+        {
+          "start": 173923.30000001192,
+          "duration": 642
+        },
+        {
+          "start": 174566.69999998808,
+          "duration": 588
+        },
+        {
+          "start": 175156.69999998808,
+          "duration": 564
+        },
+        {
+          "start": 175727.19999998808,
+          "duration": 573
+        },
+        {
+          "start": 176305.69999998808,
+          "duration": 520
+        },
+        {
+          "start": 176827.09999996424,
+          "duration": 523
+        },
+        {
+          "start": 177351.09999996424,
+          "duration": 582
+        },
+        {
+          "start": 177935,
+          "duration": 570
+        },
+        {
+          "start": 178509.30000001192,
+          "duration": 543
+        },
+        {
+          "start": 179052.59999996424,
+          "duration": 5741
+        },
+        {
+          "start": 184794.5,
+          "duration": 917
+        },
+        {
+          "start": 185717.89999997616,
+          "duration": 581
+        },
+        {
+          "start": 186346.69999998808,
+          "duration": 585
+        },
+        {
+          "start": 186933.09999996424,
+          "duration": 570
+        },
+        {
+          "start": 187505.59999996424,
+          "duration": 550
+        },
+        {
+          "start": 188056.09999996424,
+          "duration": 561
+        },
+        {
+          "start": 188617.30000001192,
+          "duration": 594
+        },
+        {
+          "start": 189212.5,
+          "duration": 584
+        },
+        {
+          "start": 189797.59999996424,
+          "duration": 570
+        },
+        {
+          "start": 190368.5,
+          "duration": 640
+        }
+      ],
+      "mapBuilds": [
+        {
+          "method": "setStage",
+          "ms": 0.09999996423721313
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0.09999996423721313
+        },
+        {
+          "method": "setStage",
+          "ms": 432.19999998807907
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 5303.400000035763
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        }
+      ]
+    },
+    {
+      "mode": "unite",
+      "stage": "act1autochess_m04",
+      "entryMs": 10359.900000035763,
+      "frames": 7,
+      "frameMs": {
+        "median": 583.2000000000116,
+        "p95": 616.6000000000058,
+        "max": 650
+      },
+      "over250ms": 7,
+      "over1000ms": 0,
+      "stats": {
+        "fps": 1.3,
+        "frameMs": 761.19,
+        "cpuMs": 15.83,
+        "renderMs": 2.06,
+        "mode": "battle",
+        "units": 15,
+        "impostor": 2,
+        "impostorAtlas": {
+          "pages": 1,
+          "slots": 14,
+          "drawn": 14,
+          "full": 0
+        },
+        "boardArt": true,
+        "board3d": {
+          "on": true,
+          "calls": 38,
+          "triangles": 90203,
+          "textures": 30,
+          "geometries": 38,
+          "frames": 314,
+          "cpuMs": 5.86,
+          "lost": false,
+          "originalStage": "act2autochess_m01",
+          "losses": 0
+        },
+        "pen": 0,
+        "prepField": null,
+        "lod": 3,
+        "culled": 0,
+        "particles": 0,
+        "projectiles": 0,
+        "numbers": 1,
+        "rings": 0,
+        "auras": 0,
+        "locks": 0,
+        "flames": 0,
+        "promotions": 0,
+        "spine": {
+          "size": 18,
+          "ready": 18,
+          "loading": 0,
+          "failed": 0,
+          "refs": 15,
+          "holds": 1,
+          "weight": 30784112,
+          "idleWeight": 8513568,
+          "active": 0,
+          "queued": 0,
+          "unloading": 0
+        },
+        "renderT": 7.261558969739384,
+        "rate": 0.38601287698274955,
+        "buffered": 11,
+        "camera": {
+          "tx": 10,
+          "ty": 11.106656224891717,
+          "tz": 0,
+          "tilt": 30,
+          "dist": 13.833312449783433,
+          "scale": 71.50072512235845,
+          "cx": 640,
+          "cy": 360
+        }
+      },
+      "longTasks": [
+        {
+          "start": 193457.69999998808,
+          "duration": 711
+        },
+        {
+          "start": 194170.5,
+          "duration": 599
+        },
+        {
+          "start": 194771.09999996424,
+          "duration": 671
+        },
+        {
+          "start": 195450.5,
+          "duration": 600
+        },
+        {
+          "start": 196055.59999996424,
+          "duration": 561
+        },
+        {
+          "start": 196618.39999997616,
+          "duration": 590
+        },
+        {
+          "start": 197209.69999998808,
+          "duration": 556
+        },
+        {
+          "start": 197767.39999997616,
+          "duration": 580
+        },
+        {
+          "start": 198350.39999997616,
+          "duration": 618
+        },
+        {
+          "start": 199004.09999996424,
+          "duration": 5525
+        },
+        {
+          "start": 204530,
+          "duration": 963
+        },
+        {
+          "start": 205495.39999997616,
+          "duration": 596
+        },
+        {
+          "start": 206131.09999996424,
+          "duration": 573
+        },
+        {
+          "start": 206704.89999997616,
+          "duration": 607
+        },
+        {
+          "start": 207313.80000001192,
+          "duration": 601
+        },
+        {
+          "start": 207916,
+          "duration": 577
+        },
+        {
+          "start": 208493.39999997616,
+          "duration": 548
+        },
+        {
+          "start": 209042,
+          "duration": 650
+        },
+        {
+          "start": 209693.09999996424,
+          "duration": 568
+        },
+        {
+          "start": 210262.5,
+          "duration": 629
+        },
+        {
+          "start": 210892.5,
+          "duration": 554
+        }
+      ],
+      "mapBuilds": [
+        {
+          "method": "setStage",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 416.10000002384186
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 5105.900000035763
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        }
+      ]
+    },
+    {
+      "mode": "unite",
+      "stage": "act2autochess_m01",
+      "entryMs": 4341.100000023842,
+      "frames": 7,
+      "frameMs": {
+        "median": 616.7000000000116,
+        "p95": 649.8999999999942,
+        "max": 650
+      },
+      "over250ms": 7,
+      "over1000ms": 0,
+      "stats": {
+        "fps": 1.6,
+        "frameMs": 623.89,
+        "cpuMs": 10.92,
+        "renderMs": 1.36,
+        "mode": "battle",
+        "units": 15,
+        "impostor": 2,
+        "impostorAtlas": {
+          "pages": 1,
+          "slots": 14,
+          "drawn": 14,
+          "full": 0
+        },
+        "boardArt": true,
+        "board3d": {
+          "on": true,
+          "calls": 38,
+          "triangles": 90203,
+          "textures": 30,
+          "geometries": 38,
+          "frames": 336,
+          "cpuMs": 1.23,
+          "lost": false,
+          "originalStage": "act2autochess_m01",
+          "losses": 0
+        },
+        "pen": 0,
+        "prepField": null,
+        "lod": 3,
+        "culled": 0,
+        "particles": 0,
+        "projectiles": 0,
+        "numbers": 1,
+        "rings": 0,
+        "auras": 0,
+        "locks": 0,
+        "flames": 0,
+        "promotions": 0,
+        "spine": {
+          "size": 18,
+          "ready": 18,
+          "loading": 0,
+          "failed": 0,
+          "refs": 15,
+          "holds": 1,
+          "weight": 30784112,
+          "idleWeight": 8513568,
+          "active": 0,
+          "queued": 0,
+          "unloading": 0
+        },
+        "renderT": 7.26220562731419,
+        "rate": 0.3801924261604708,
+        "buffered": 11,
+        "camera": {
+          "tx": 10,
+          "ty": 11.106656224891717,
+          "tz": 0,
+          "tilt": 30,
+          "dist": 13.833312449783433,
+          "scale": 71.50072512235845,
+          "cx": 640,
+          "cy": 360
+        }
+      },
+      "longTasks": [
+        {
+          "start": 213931.09999996424,
+          "duration": 625
+        },
+        {
+          "start": 214557.30000001192,
+          "duration": 600
+        },
+        {
+          "start": 215163.89999997616,
+          "duration": 599
+        },
+        {
+          "start": 215767.59999996424,
+          "duration": 550
+        },
+        {
+          "start": 216319.19999998808,
+          "duration": 623
+        },
+        {
+          "start": 216944.39999997616,
+          "duration": 681
+        },
+        {
+          "start": 217629.19999998808,
+          "duration": 638
+        },
+        {
+          "start": 218271.19999998808,
+          "duration": 550
+        },
+        {
+          "start": 218821.59999996424,
+          "duration": 623
+        },
+        {
+          "start": 219445.5,
+          "duration": 573
+        },
+        {
+          "start": 220019.89999997616,
+          "duration": 574
+        },
+        {
+          "start": 220595.39999997616,
+          "duration": 552
+        },
+        {
+          "start": 221148.69999998808,
+          "duration": 600
+        },
+        {
+          "start": 221749.39999997616,
+          "duration": 653
+        },
+        {
+          "start": 222402.89999997616,
+          "duration": 621
+        },
+        {
+          "start": 223025.69999998808,
+          "duration": 635
+        },
+        {
+          "start": 223661.89999997616,
+          "duration": 582
+        },
+        {
+          "start": 224245.89999997616,
+          "duration": 616
+        }
+      ],
+      "mapBuilds": [
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        }
+      ]
+    },
+    {
+      "mode": "unite",
+      "stage": "act2autochess_m02",
+      "entryMs": 4270.800000011921,
+      "frames": 7,
+      "frameMs": {
+        "median": 583.3999999999942,
+        "p95": 633.2000000000116,
+        "max": 666.5999999999767
+      },
+      "over250ms": 7,
+      "over1000ms": 0,
+      "stats": {
+        "fps": 1.3,
+        "frameMs": 787.44,
+        "cpuMs": 17.33,
+        "renderMs": 0.76,
+        "mode": "battle",
+        "units": 15,
+        "impostor": 2,
+        "impostorAtlas": {
+          "pages": 1,
+          "slots": 14,
+          "drawn": 14,
+          "full": 0
+        },
+        "boardArt": true,
+        "board3d": {
+          "on": true,
+          "calls": 38,
+          "triangles": 90203,
+          "textures": 30,
+          "geometries": 38,
+          "frames": 358,
+          "cpuMs": 6.78,
+          "lost": false,
+          "originalStage": "act2autochess_m01",
+          "losses": 0
+        },
+        "pen": 0,
+        "prepField": null,
+        "lod": 3,
+        "culled": 0,
+        "particles": 0,
+        "projectiles": 0,
+        "numbers": 0,
+        "rings": 0,
+        "auras": 0,
+        "locks": 0,
+        "flames": 0,
+        "promotions": 0,
+        "spine": {
+          "size": 18,
+          "ready": 18,
+          "loading": 0,
+          "failed": 0,
+          "refs": 15,
+          "holds": 1,
+          "weight": 30784112,
+          "idleWeight": 8513568,
+          "active": 0,
+          "queued": 0,
+          "unloading": 0
+        },
+        "renderT": 7.4602234597858645,
+        "rate": 0.38848545737164275,
+        "buffered": 11,
+        "camera": {
+          "tx": 10,
+          "ty": 11.106656224891717,
+          "tz": 0,
+          "tilt": 30,
+          "dist": 13.833312449783433,
+          "scale": 71.50072512235845,
+          "cx": 640,
+          "cy": 360
+        }
+      },
+      "longTasks": [
+        {
+          "start": 227405,
+          "duration": 588
+        },
+        {
+          "start": 227995,
+          "duration": 552
+        },
+        {
+          "start": 228554,
+          "duration": 585
+        },
+        {
+          "start": 229143.39999997616,
+          "duration": 564
+        },
+        {
+          "start": 229709.5,
+          "duration": 534
+        },
+        {
+          "start": 230246.59999996424,
+          "duration": 610
+        },
+        {
+          "start": 230857.59999996424,
+          "duration": 817
+        },
+        {
+          "start": 231675.59999996424,
+          "duration": 176
+        },
+        {
+          "start": 231854,
+          "duration": 158
+        },
+        {
+          "start": 232106.19999998808,
+          "duration": 143
+        },
+        {
+          "start": 232250.19999998808,
+          "duration": 64
+        },
+        {
+          "start": 232328.89999997616,
+          "duration": 134
+        },
+        {
+          "start": 232463.19999998808,
+          "duration": 5176
+        },
+        {
+          "start": 237639.19999998808,
+          "duration": 970
+        },
+        {
+          "start": 238614.19999998808,
+          "duration": 536
+        },
+        {
+          "start": 239151.09999996424,
+          "duration": 666
+        },
+        {
+          "start": 239818.19999998808,
+          "duration": 576
+        },
+        {
+          "start": 240395.80000001192,
+          "duration": 568
+        },
+        {
+          "start": 240964.59999996424,
+          "duration": 571
+        },
+        {
+          "start": 241536.09999996424,
+          "duration": 624
+        }
+      ],
+      "mapBuilds": [
+        {
+          "method": "setStage",
+          "ms": 0.09999996423721313
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0.09999996423721313
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 453
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 361
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0.09999996423721313
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 5175.599999964237
+        }
+      ]
+    },
+    {
+      "mode": "unite",
+      "stage": "act2autochess_m03",
+      "entryMs": 10344.700000047684,
+      "frames": 7,
+      "frameMs": {
+        "median": 650,
+        "p95": 650,
+        "max": 666.6000000000349
+      },
+      "over250ms": 7,
+      "over1000ms": 0,
+      "stats": {
+        "fps": 1.3,
+        "frameMs": 788.93,
+        "cpuMs": 13.54,
+        "renderMs": 2.36,
+        "mode": "battle",
+        "units": 15,
+        "impostor": 2,
+        "impostorAtlas": {
+          "pages": 1,
+          "slots": 14,
+          "drawn": 14,
+          "full": 0
+        },
+        "boardArt": true,
+        "board3d": {
+          "on": true,
+          "calls": 38,
+          "triangles": 90203,
+          "textures": 30,
+          "geometries": 38,
+          "frames": 380,
+          "cpuMs": 5.79,
+          "lost": false,
+          "originalStage": "act2autochess_m01",
+          "losses": 0
+        },
+        "pen": 0,
+        "prepField": null,
+        "lod": 3,
+        "culled": 0,
+        "particles": 0,
+        "projectiles": 0,
+        "numbers": 1,
+        "rings": 0,
+        "auras": 0,
+        "locks": 0,
+        "flames": 0,
+        "promotions": 0,
+        "spine": {
+          "size": 18,
+          "ready": 18,
+          "loading": 0,
+          "failed": 0,
+          "refs": 15,
+          "holds": 1,
+          "weight": 30784112,
+          "idleWeight": 8513568,
+          "active": 0,
+          "queued": 0,
+          "unloading": 0
+        },
+        "renderT": 7.2628538414808546,
+        "rate": 0.35863806562214445,
+        "buffered": 10,
+        "camera": {
+          "tx": 10,
+          "ty": 11.106656224891717,
+          "tz": 0,
+          "tilt": 30,
+          "dist": 13.833312449783433,
+          "scale": 71.50072512235845,
+          "cx": 640,
+          "cy": 360
+        }
+      },
+      "longTasks": [
+        {
+          "start": 244712.19999998808,
+          "duration": 695
+        },
+        {
+          "start": 245410.19999998808,
+          "duration": 583
+        },
+        {
+          "start": 245995.09999996424,
+          "duration": 654
+        },
+        {
+          "start": 246656.69999998808,
+          "duration": 699
+        },
+        {
+          "start": 247362.30000001192,
+          "duration": 583
+        },
+        {
+          "start": 247946.59999996424,
+          "duration": 550
+        },
+        {
+          "start": 248498.80000001192,
+          "duration": 648
+        },
+        {
+          "start": 249150.39999997616,
+          "duration": 589
+        },
+        {
+          "start": 249740.5,
+          "duration": 6013
+        },
+        {
+          "start": 255754.59999996424,
+          "duration": 936
+        },
+        {
+          "start": 256693.69999998808,
+          "duration": 561
+        },
+        {
+          "start": 257304.5,
+          "duration": 593
+        },
+        {
+          "start": 257898.89999997616,
+          "duration": 564
+        },
+        {
+          "start": 258465.59999996424,
+          "duration": 649
+        },
+        {
+          "start": 259115,
+          "duration": 589
+        },
+        {
+          "start": 259705,
+          "duration": 647
+        },
+        {
+          "start": 260353.09999996424,
+          "duration": 610
+        },
+        {
+          "start": 260964.09999996424,
+          "duration": 593
+        },
+        {
+          "start": 261558,
+          "duration": 658
+        }
+      ],
+      "mapBuilds": [
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 576.0999999642372
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 5434.199999988079
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        }
+      ]
+    },
+    {
+      "mode": "unite",
+      "stage": "act2autochess_m04",
+      "entryMs": 10867.600000023842,
+      "frames": 7,
+      "frameMs": {
+        "median": 616.6000000000349,
+        "p95": 650,
+        "max": 683.2999999999884
+      },
+      "over250ms": 7,
+      "over1000ms": 0,
+      "stats": {
+        "fps": 1.2,
+        "frameMs": 802.3,
+        "cpuMs": 15.88,
+        "renderMs": 1.03,
+        "mode": "battle",
+        "units": 15,
+        "impostor": 2,
+        "impostorAtlas": {
+          "pages": 1,
+          "slots": 14,
+          "drawn": 14,
+          "full": 0
+        },
+        "boardArt": true,
+        "board3d": {
+          "on": true,
+          "calls": 38,
+          "triangles": 90203,
+          "textures": 30,
+          "geometries": 38,
+          "frames": 403,
+          "cpuMs": 6.41,
+          "lost": false,
+          "originalStage": "act2autochess_m01",
+          "losses": 0
+        },
+        "pen": 0,
+        "prepField": null,
+        "lod": 3,
+        "culled": 0,
+        "particles": 0,
+        "projectiles": 0,
+        "numbers": 1,
+        "rings": 0,
+        "auras": 0,
+        "locks": 0,
+        "flames": 0,
+        "promotions": 0,
+        "spine": {
+          "size": 18,
+          "ready": 18,
+          "loading": 0,
+          "failed": 0,
+          "refs": 15,
+          "holds": 1,
+          "weight": 30784112,
+          "idleWeight": 8513568,
+          "active": 0,
+          "queued": 0,
+          "unloading": 0
+        },
+        "renderT": 7.262362850177959,
+        "rate": 0.3608793148728844,
+        "buffered": 11,
+        "camera": {
+          "tx": 10,
+          "ty": 11.106656224891717,
+          "tz": 0,
+          "tilt": 30,
+          "dist": 13.833312449783433,
+          "scale": 71.50072512235845,
+          "cx": 640,
+          "cy": 360
+        }
+      },
+      "longTasks": [
+        {
+          "start": 265193.1999999881,
+          "duration": 799
+        },
+        {
+          "start": 265995.5,
+          "duration": 668
+        },
+        {
+          "start": 266664.5,
+          "duration": 692
+        },
+        {
+          "start": 267363.3000000119,
+          "duration": 657
+        },
+        {
+          "start": 268024.5,
+          "duration": 602
+        },
+        {
+          "start": 268628.3000000119,
+          "duration": 618
+        },
+        {
+          "start": 269247.5,
+          "duration": 581
+        },
+        {
+          "start": 269829.6999999881,
+          "duration": 581
+        },
+        {
+          "start": 270413.8000000119,
+          "duration": 597
+        },
+        {
+          "start": 271011.09999996424,
+          "duration": 5850
+        },
+        {
+          "start": 276861.3000000119,
+          "duration": 1098
+        },
+        {
+          "start": 277962.59999996424,
+          "duration": 647
+        },
+        {
+          "start": 278652.09999996424,
+          "duration": 596
+        },
+        {
+          "start": 279251.89999997616,
+          "duration": 644
+        },
+        {
+          "start": 279897.59999996424,
+          "duration": 617
+        },
+        {
+          "start": 280515.09999996424,
+          "duration": 601
+        },
+        {
+          "start": 281116.8000000119,
+          "duration": 587
+        },
+        {
+          "start": 281704.89999997616,
+          "duration": 561
+        },
+        {
+          "start": 282266.8000000119,
+          "duration": 633
+        },
+        {
+          "start": 282900.89999997616,
+          "duration": 645
+        },
+        {
+          "start": 283547,
+          "duration": 678
+        }
+      ],
+      "mapBuilds": [
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 555.7000000476837
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 5288.5
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        }
+      ]
+    },
+    {
+      "mode": "boss",
+      "stage": "act1autochess_m01",
+      "entryMs": 18003.69999998808,
+      "frames": 7,
+      "frameMs": {
+        "median": 583.3999999999651,
+        "p95": 616.7000000000116,
+        "max": 650
+      },
+      "over250ms": 7,
+      "over1000ms": 0,
+      "stats": {
+        "fps": 1.5,
+        "frameMs": 673.36,
+        "cpuMs": 53.41,
+        "renderMs": 1.38,
+        "mode": "battle",
+        "units": 18,
+        "impostor": 3,
+        "impostorAtlas": {
+          "pages": 1,
+          "slots": 12,
+          "drawn": 12,
+          "full": 0
+        },
+        "boardArt": true,
+        "board3d": {
+          "on": true,
+          "calls": 53,
+          "triangles": 35102,
+          "textures": 48,
+          "geometries": 54,
+          "frames": 439,
+          "cpuMs": 7.46,
+          "lost": false,
+          "originalStage": "act2autochess_m02",
+          "losses": 0
+        },
+        "pen": 0,
+        "prepField": null,
+        "lod": 3,
+        "culled": 0,
+        "particles": 0,
+        "projectiles": 0,
+        "numbers": 0,
+        "rings": 0,
+        "auras": 0,
+        "locks": 0,
+        "flames": 0,
+        "promotions": 0,
+        "spine": {
+          "size": 33,
+          "ready": 33,
+          "loading": 0,
+          "failed": 0,
+          "refs": 18,
+          "holds": 1,
+          "weight": 94397436,
+          "idleWeight": 24808868,
+          "active": 0,
+          "queued": 0,
+          "unloading": 0
+        },
+        "renderT": 9.762010630299178,
+        "rate": 0.39695402825701215,
+        "buffered": 11,
+        "camera": {
+          "tx": 10,
+          "ty": 3.1566562248917167,
+          "tz": 0,
+          "tilt": 30,
+          "dist": 13.833312449783433,
+          "scale": 71.50072512235845,
+          "cx": 640,
+          "cy": 360
+        }
+      },
+      "longTasks": [
+        {
+          "start": 286955.6999999881,
+          "duration": 652
+        },
+        {
+          "start": 287609.3000000119,
+          "duration": 610
+        },
+        {
+          "start": 288226.89999997616,
+          "duration": 594
+        },
+        {
+          "start": 288821.5,
+          "duration": 1290
+        },
+        {
+          "start": 290112.5,
+          "duration": 114
+        },
+        {
+          "start": 290229.8000000119,
+          "duration": 129
+        },
+        {
+          "start": 290410.89999997616,
+          "duration": 141
+        },
+        {
+          "start": 290562.39999997616,
+          "duration": 7118
+        },
+        {
+          "start": 297680.39999997616,
+          "duration": 3866
+        },
+        {
+          "start": 301553.5,
+          "duration": 559
+        },
+        {
+          "start": 302115.89999997616,
+          "duration": 2843
+        },
+        {
+          "start": 304959.1999999881,
+          "duration": 1418
+        },
+        {
+          "start": 306384.8000000119,
+          "duration": 577
+        },
+        {
+          "start": 307002.1999999881,
+          "duration": 521
+        },
+        {
+          "start": 307524.89999997616,
+          "duration": 525
+        },
+        {
+          "start": 308051.39999997616,
+          "duration": 606
+        },
+        {
+          "start": 308708.6999999881,
+          "duration": 600
+        },
+        {
+          "start": 309320.89999997616,
+          "duration": 581
+        },
+        {
+          "start": 309907.8000000119,
+          "duration": 560
+        },
+        {
+          "start": 310472.39999997616,
+          "duration": 541
+        },
+        {
+          "start": 311015.6999999881,
+          "duration": 533
+        },
+        {
+          "start": 311550.5,
+          "duration": 583
+        },
+        {
+          "start": 312135.8000000119,
+          "duration": 600
+        },
+        {
+          "start": 312839.3000000119,
+          "duration": 681
+        },
+        {
+          "start": 313528.5,
+          "duration": 631
+        },
+        {
+          "start": 314164.1999999881,
+          "duration": 758
+        },
+        {
+          "start": 314925.1999999881,
+          "duration": 825
+        },
+        {
+          "start": 324132.5,
+          "duration": 674
+        },
+        {
+          "start": 324808,
+          "duration": 590
+        },
+        {
+          "start": 325399.3000000119,
+          "duration": 647
+        },
+        {
+          "start": 326047.39999997616,
+          "duration": 611
+        },
+        {
+          "start": 326664.89999997616,
+          "duration": 584
+        },
+        {
+          "start": 327249.59999996424,
+          "duration": 616
+        },
+        {
+          "start": 327866.39999997616,
+          "duration": 568
+        },
+        {
+          "start": 328435.3000000119,
+          "duration": 572
+        }
+      ],
+      "mapBuilds": [
+        {
+          "method": "setStage",
+          "ms": 478.0999999642372
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 3.5
+        },
+        {
+          "method": "setStage",
+          "ms": 388.7999999523163
+        },
+        {
+          "method": "setStage",
+          "ms": 412.4000000357628
+        },
+        {
+          "method": "setArea",
+          "ms": 412.4000000357628
+        },
+        {
+          "method": "setStage",
+          "ms": 2378.400000035763
+        },
+        {
+          "method": "setStage",
+          "ms": 2424.599999964237
+        },
+        {
+          "method": "setStage",
+          "ms": 2315
+        },
+        {
+          "method": "setStage",
+          "ms": 2345.100000023842
+        },
+        {
+          "method": "setArea",
+          "ms": 2345.100000023842
+        },
+        {
+          "method": "setStage",
+          "ms": 453.69999998807907
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 2387
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        }
+      ]
+    },
+    {
+      "mode": "boss",
+      "stage": "act1autochess_m02",
+      "entryMs": 7602.400000035763,
+      "frames": 6,
+      "frameMs": {
+        "median": 699.9000000000233,
+        "p95": 716.7000000000116,
+        "max": 733.4000000000233
+      },
+      "over250ms": 6,
+      "over1000ms": 0,
+      "stats": {
+        "fps": 1.3,
+        "frameMs": 791.07,
+        "cpuMs": 40.46,
+        "renderMs": 0.88,
+        "mode": "battle",
+        "units": 18,
+        "impostor": 3,
+        "impostorAtlas": {
+          "pages": 1,
+          "slots": 12,
+          "drawn": 12,
+          "full": 0
+        },
+        "boardArt": true,
+        "board3d": {
+          "on": true,
+          "calls": 53,
+          "triangles": 35102,
+          "textures": 48,
+          "geometries": 54,
+          "frames": 461,
+          "cpuMs": 13.12,
+          "lost": false,
+          "originalStage": "act2autochess_m02",
+          "losses": 0
+        },
+        "pen": 0,
+        "prepField": null,
+        "lod": 3,
+        "culled": 0,
+        "particles": 0,
+        "projectiles": 0,
+        "numbers": 0,
+        "rings": 0,
+        "auras": 0,
+        "locks": 0,
+        "flames": 0,
+        "promotions": 0,
+        "spine": {
+          "size": 36,
+          "ready": 36,
+          "loading": 0,
+          "failed": 0,
+          "refs": 18,
+          "holds": 1,
+          "weight": 95901460,
+          "idleWeight": 26312892,
+          "active": 0,
+          "queued": 0,
+          "unloading": 0
+        },
+        "renderT": 7.067033161288026,
+        "rate": 0.32681509126659863,
+        "buffered": 10,
+        "camera": {
+          "tx": 10,
+          "ty": 3.1566562248917167,
+          "tz": 0,
+          "tilt": 30,
+          "dist": 13.833312449783433,
+          "scale": 71.50072512235845,
+          "cx": 640,
+          "cy": 360
+        }
+      },
+      "longTasks": [
+        {
+          "start": 331442.59999996424,
+          "duration": 573
+        },
+        {
+          "start": 332017.6999999881,
+          "duration": 577
+        },
+        {
+          "start": 332603.39999997616,
+          "duration": 566
+        },
+        {
+          "start": 333194.39999997616,
+          "duration": 544
+        },
+        {
+          "start": 333740.3000000119,
+          "duration": 564
+        },
+        {
+          "start": 334313.8000000119,
+          "duration": 611
+        },
+        {
+          "start": 334931.6999999881,
+          "duration": 571
+        },
+        {
+          "start": 335506.3000000119,
+          "duration": 548
+        },
+        {
+          "start": 336054.5,
+          "duration": 2990
+        },
+        {
+          "start": 339044.8000000119,
+          "duration": 1349
+        },
+        {
+          "start": 340396.39999997616,
+          "duration": 628
+        },
+        {
+          "start": 341069.39999997616,
+          "duration": 573
+        },
+        {
+          "start": 341643.59999996424,
+          "duration": 711
+        },
+        {
+          "start": 342355.5,
+          "duration": 696
+        },
+        {
+          "start": 343051.8000000119,
+          "duration": 707
+        },
+        {
+          "start": 343759.09999996424,
+          "duration": 666
+        },
+        {
+          "start": 344426.09999996424,
+          "duration": 695
+        },
+        {
+          "start": 345122.1999999881,
+          "duration": 728
+        }
+      ],
+      "mapBuilds": [
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 417.69999998807907
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 2565.599999964237
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        }
+      ]
+    },
+    {
+      "mode": "boss",
+      "stage": "act1autochess_m03",
+      "entryMs": 4962.100000023842,
+      "frames": 7,
+      "frameMs": {
+        "median": 583.2999999999884,
+        "p95": 600,
+        "max": 616.5999999999767
+      },
+      "over250ms": 7,
+      "over1000ms": 0,
+      "stats": {
+        "fps": 1.4,
+        "frameMs": 725.82,
+        "cpuMs": 35.73,
+        "renderMs": 0.68,
+        "mode": "battle",
+        "units": 18,
+        "impostor": 0,
+        "impostorAtlas": {
+          "pages": 1,
+          "slots": 12,
+          "drawn": 12,
+          "full": 0
+        },
+        "boardArt": true,
+        "board3d": {
+          "on": true,
+          "calls": 53,
+          "triangles": 35102,
+          "textures": 48,
+          "geometries": 54,
+          "frames": 483,
+          "cpuMs": 13.9,
+          "lost": false,
+          "originalStage": "act2autochess_m02",
+          "losses": 0
+        },
+        "pen": 0,
+        "prepField": null,
+        "lod": 3,
+        "culled": 0,
+        "particles": 0,
+        "projectiles": 0,
+        "numbers": 0,
+        "rings": 0,
+        "auras": 0,
+        "locks": 0,
+        "flames": 0,
+        "promotions": 0,
+        "spine": {
+          "size": 36,
+          "ready": 36,
+          "loading": 0,
+          "failed": 0,
+          "refs": 18,
+          "holds": 1,
+          "weight": 95901460,
+          "idleWeight": 26312892,
+          "active": 0,
+          "queued": 0,
+          "unloading": 0
+        },
+        "renderT": 7.258856786267228,
+        "rate": 0.39657508458496205,
+        "buffered": 11,
+        "camera": {
+          "tx": 10,
+          "ty": 3.1566562248917167,
+          "tz": 0,
+          "tilt": 30,
+          "dist": 13.833312449783433,
+          "scale": 71.50072512235845,
+          "cx": 640,
+          "cy": 360
+        }
+      },
+      "longTasks": [
+        {
+          "start": 348453.8000000119,
+          "duration": 659
+        },
+        {
+          "start": 349113.8000000119,
+          "duration": 601
+        },
+        {
+          "start": 349718.1999999881,
+          "duration": 548
+        },
+        {
+          "start": 350293.8000000119,
+          "duration": 606
+        },
+        {
+          "start": 350925.6999999881,
+          "duration": 520
+        },
+        {
+          "start": 351448.3000000119,
+          "duration": 544
+        },
+        {
+          "start": 351995.8000000119,
+          "duration": 628
+        },
+        {
+          "start": 352626.8000000119,
+          "duration": 588
+        },
+        {
+          "start": 353215.8000000119,
+          "duration": 859
+        },
+        {
+          "start": 354075.6999999881,
+          "duration": 139
+        },
+        {
+          "start": 354296.6999999881,
+          "duration": 196
+        },
+        {
+          "start": 354494.09999996424,
+          "duration": 2354
+        },
+        {
+          "start": 356848.39999997616,
+          "duration": 1236
+        },
+        {
+          "start": 358085.5,
+          "duration": 558
+        },
+        {
+          "start": 358645,
+          "duration": 584
+        },
+        {
+          "start": 359229.6999999881,
+          "duration": 573
+        },
+        {
+          "start": 359803.59999996424,
+          "duration": 595
+        },
+        {
+          "start": 360401.3000000119,
+          "duration": 553
+        },
+        {
+          "start": 360955.5,
+          "duration": 576
+        },
+        {
+          "start": 361533.1999999881,
+          "duration": 578
+        },
+        {
+          "start": 362111.5,
+          "duration": 619
+        }
+      ],
+      "mapBuilds": [
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "setStage",
+          "ms": 443
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 409.69999998807907
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 2354.199999988079
+        }
+      ]
+    },
+    {
+      "mode": "boss",
+      "stage": "act1autochess_m04",
+      "entryMs": 6893.5,
+      "frames": 7,
+      "frameMs": {
+        "median": 599.9000000000233,
+        "p95": 616.6000000000349,
+        "max": 616.6999999999534
+      },
+      "over250ms": 7,
+      "over1000ms": 0,
+      "stats": {
+        "fps": 1.4,
+        "frameMs": 729.94,
+        "cpuMs": 33.9,
+        "renderMs": 0.71,
+        "mode": "battle",
+        "units": 18,
+        "impostor": 3,
+        "impostorAtlas": {
+          "pages": 1,
+          "slots": 12,
+          "drawn": 12,
+          "full": 0
+        },
+        "boardArt": true,
+        "board3d": {
+          "on": true,
+          "calls": 53,
+          "triangles": 35102,
+          "textures": 48,
+          "geometries": 54,
+          "frames": 505,
+          "cpuMs": 12.23,
+          "lost": false,
+          "originalStage": "act2autochess_m02",
+          "losses": 0
+        },
+        "pen": 0,
+        "prepField": null,
+        "lod": 3,
+        "culled": 0,
+        "particles": 0,
+        "projectiles": 0,
+        "numbers": 0,
+        "rings": 0,
+        "auras": 0,
+        "locks": 0,
+        "flames": 0,
+        "promotions": 0,
+        "spine": {
+          "size": 36,
+          "ready": 36,
+          "loading": 0,
+          "failed": 0,
+          "refs": 18,
+          "holds": 1,
+          "weight": 95901460,
+          "idleWeight": 26312892,
+          "active": 0,
+          "queued": 0,
+          "unloading": 0
+        },
+        "renderT": 7.260496108293167,
+        "rate": 0.37990979996968344,
+        "buffered": 11,
+        "camera": {
+          "tx": 10,
+          "ty": 3.1566562248917167,
+          "tz": 0,
+          "tilt": 30,
+          "dist": 13.833312449783433,
+          "scale": 71.50072512235845,
+          "cx": 640,
+          "cy": 360
+        }
+      },
+      "longTasks": [
+        {
+          "start": 364717.8000000119,
+          "duration": 712
+        },
+        {
+          "start": 365431.09999996424,
+          "duration": 609
+        },
+        {
+          "start": 366041.39999997616,
+          "duration": 618
+        },
+        {
+          "start": 366667,
+          "duration": 626
+        },
+        {
+          "start": 367300.1999999881,
+          "duration": 522
+        },
+        {
+          "start": 367823.1999999881,
+          "duration": 533
+        },
+        {
+          "start": 368358,
+          "duration": 589
+        },
+        {
+          "start": 368950.59999996424,
+          "duration": 608
+        },
+        {
+          "start": 369559.3000000119,
+          "duration": 2764
+        },
+        {
+          "start": 372324.39999997616,
+          "duration": 1307
+        },
+        {
+          "start": 373632.89999997616,
+          "duration": 673
+        },
+        {
+          "start": 374343,
+          "duration": 624
+        },
+        {
+          "start": 374969.89999997616,
+          "duration": 635
+        },
+        {
+          "start": 375606.09999996424,
+          "duration": 614
+        },
+        {
+          "start": 376220.59999996424,
+          "duration": 610
+        },
+        {
+          "start": 376830.89999997616,
+          "duration": 570
+        },
+        {
+          "start": 377402.39999997616,
+          "duration": 589
+        },
+        {
+          "start": 377992.09999996424,
+          "duration": 552
+        },
+        {
+          "start": 378544.6999999881,
+          "duration": 619
+        },
+        {
+          "start": 379164.3000000119,
+          "duration": 602
+        }
+      ],
+      "mapBuilds": [
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "setStage",
+          "ms": 376.60000002384186
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 2382.099999964237
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        }
+      ]
+    },
+    {
+      "mode": "boss",
+      "stage": "act2autochess_m01",
+      "entryMs": 7451.300000011921,
+      "frames": 7,
+      "frameMs": {
+        "median": 600,
+        "p95": 700,
+        "max": 750
+      },
+      "over250ms": 7,
+      "over1000ms": 0,
+      "stats": {
+        "fps": 1.4,
+        "frameMs": 739.84,
+        "cpuMs": 35.49,
+        "renderMs": 1.04,
+        "mode": "battle",
+        "units": 18,
+        "impostor": 3,
+        "impostorAtlas": {
+          "pages": 1,
+          "slots": 12,
+          "drawn": 12,
+          "full": 0
+        },
+        "boardArt": true,
+        "board3d": {
+          "on": true,
+          "calls": 53,
+          "triangles": 35102,
+          "textures": 48,
+          "geometries": 54,
+          "frames": 528,
+          "cpuMs": 11.79,
+          "lost": false,
+          "originalStage": "act2autochess_m02",
+          "losses": 0
+        },
+        "pen": 0,
+        "prepField": null,
+        "lod": 3,
+        "culled": 0,
+        "particles": 0,
+        "projectiles": 0,
+        "numbers": 0,
+        "rings": 0,
+        "auras": 0,
+        "locks": 0,
+        "flames": 0,
+        "promotions": 0,
+        "spine": {
+          "size": 36,
+          "ready": 36,
+          "loading": 0,
+          "failed": 0,
+          "refs": 18,
+          "holds": 1,
+          "weight": 95901460,
+          "idleWeight": 26312892,
+          "active": 0,
+          "queued": 0,
+          "unloading": 0
+        },
+        "renderT": 7.262589367580801,
+        "rate": 0.3792919983515587,
+        "buffered": 11,
+        "camera": {
+          "tx": 10,
+          "ty": 3.1566562248917167,
+          "tz": 0,
+          "tilt": 30,
+          "dist": 13.833312449783433,
+          "scale": 71.50072512235845,
+          "cx": 640,
+          "cy": 360
+        }
+      },
+      "longTasks": [
+        {
+          "start": 381595.09999996424,
+          "duration": 646
+        },
+        {
+          "start": 382242.59999996424,
+          "duration": 587
+        },
+        {
+          "start": 382831.09999996424,
+          "duration": 637
+        },
+        {
+          "start": 383496.09999996424,
+          "duration": 597
+        },
+        {
+          "start": 384099,
+          "duration": 553
+        },
+        {
+          "start": 384653.5,
+          "duration": 576
+        },
+        {
+          "start": 385232.6999999881,
+          "duration": 563
+        },
+        {
+          "start": 385798.1999999881,
+          "duration": 613
+        },
+        {
+          "start": 386418.1999999881,
+          "duration": 586
+        },
+        {
+          "start": 387005.39999997616,
+          "duration": 2688
+        },
+        {
+          "start": 389693.59999996424,
+          "duration": 1237
+        },
+        {
+          "start": 390937.09999996424,
+          "duration": 574
+        },
+        {
+          "start": 391511.3000000119,
+          "duration": 53
+        },
+        {
+          "start": 391568.59999996424,
+          "duration": 628
+        },
+        {
+          "start": 392197.89999997616,
+          "duration": 86
+        },
+        {
+          "start": 392302.39999997616,
+          "duration": 607
+        },
+        {
+          "start": 392911.6999999881,
+          "duration": 634
+        },
+        {
+          "start": 393548.09999996424,
+          "duration": 749
+        },
+        {
+          "start": 394297.8000000119,
+          "duration": 703
+        },
+        {
+          "start": 395001.59999996424,
+          "duration": 561
+        },
+        {
+          "start": 395563,
+          "duration": 605
+        },
+        {
+          "start": 396168.3000000119,
+          "duration": 594
+        }
+      ],
+      "mapBuilds": [
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 355.5
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 2326.899999976158
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        }
+      ]
+    },
+    {
+      "mode": "boss",
+      "stage": "act2autochess_m02",
+      "entryMs": 4511.699999988079,
+      "frames": 7,
+      "frameMs": {
+        "median": 599.8999999999651,
+        "p95": 616.6000000000349,
+        "max": 666.7000000000116
+      },
+      "over250ms": 7,
+      "over1000ms": 0,
+      "stats": {
+        "fps": 1.7,
+        "frameMs": 603.51,
+        "cpuMs": 23.82,
+        "renderMs": 1.18,
+        "mode": "battle",
+        "units": 18,
+        "impostor": 3,
+        "impostorAtlas": {
+          "pages": 1,
+          "slots": 12,
+          "drawn": 12,
+          "full": 0
+        },
+        "boardArt": true,
+        "board3d": {
+          "on": true,
+          "calls": 53,
+          "triangles": 35102,
+          "textures": 48,
+          "geometries": 54,
+          "frames": 551,
+          "cpuMs": 1.9,
+          "lost": false,
+          "originalStage": "act2autochess_m02",
+          "losses": 0
+        },
+        "pen": 0,
+        "prepField": null,
+        "lod": 3,
+        "culled": 0,
+        "particles": 0,
+        "projectiles": 0,
+        "numbers": 0,
+        "rings": 0,
+        "auras": 0,
+        "locks": 0,
+        "flames": 0,
+        "promotions": 0,
+        "spine": {
+          "size": 36,
+          "ready": 36,
+          "loading": 0,
+          "failed": 0,
+          "refs": 18,
+          "holds": 1,
+          "weight": 95901460,
+          "idleWeight": 26312892,
+          "active": 0,
+          "queued": 0,
+          "unloading": 0
+        },
+        "renderT": 7.260672685448932,
+        "rate": 0.40360965472970123,
+        "buffered": 12,
+        "camera": {
+          "tx": 10,
+          "ty": 3.1566562248917167,
+          "tz": 0,
+          "tilt": 30,
+          "dist": 13.833312449783433,
+          "scale": 71.50072512235845,
+          "cx": 640,
+          "cy": 360
+        }
+      },
+      "longTasks": [
+        {
+          "start": 399066.5,
+          "duration": 643
+        },
+        {
+          "start": 399711.39999997616,
+          "duration": 554
+        },
+        {
+          "start": 400267,
+          "duration": 578
+        },
+        {
+          "start": 400853.3000000119,
+          "duration": 567
+        },
+        {
+          "start": 401430.3000000119,
+          "duration": 494
+        },
+        {
+          "start": 401925.1999999881,
+          "duration": 523
+        },
+        {
+          "start": 402448.89999997616,
+          "duration": 555
+        },
+        {
+          "start": 403006,
+          "duration": 607
+        },
+        {
+          "start": 403616.6999999881,
+          "duration": 601
+        },
+        {
+          "start": 404222.8000000119,
+          "duration": 585
+        },
+        {
+          "start": 404808.6999999881,
+          "duration": 610
+        },
+        {
+          "start": 405419.6999999881,
+          "duration": 625
+        },
+        {
+          "start": 406045.3000000119,
+          "duration": 618
+        },
+        {
+          "start": 406664.5,
+          "duration": 671
+        },
+        {
+          "start": 407336,
+          "duration": 582
+        },
+        {
+          "start": 407918.59999996424,
+          "duration": 597
+        },
+        {
+          "start": 408516.39999997616,
+          "duration": 607
+        },
+        {
+          "start": 409125.1999999881,
+          "duration": 607
+        },
+        {
+          "start": 409732.89999997616,
+          "duration": 533
+        },
+        {
+          "start": 410267,
+          "duration": 574
+        }
+      ],
+      "mapBuilds": [
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        }
+      ]
+    },
+    {
+      "mode": "boss",
+      "stage": "act2autochess_m03",
+      "entryMs": 4904.5,
+      "frames": 7,
+      "frameMs": {
+        "median": 616.7000000000116,
+        "p95": 666.7000000000116,
+        "max": 699.9000000000233
+      },
+      "over250ms": 7,
+      "over1000ms": 0,
+      "stats": {
+        "fps": 1.4,
+        "frameMs": 710.84,
+        "cpuMs": 35.15,
+        "renderMs": 1.07,
+        "mode": "battle",
+        "units": 18,
+        "impostor": 0,
+        "impostorAtlas": {
+          "pages": 1,
+          "slots": 12,
+          "drawn": 12,
+          "full": 0
+        },
+        "boardArt": true,
+        "board3d": {
+          "on": true,
+          "calls": 53,
+          "triangles": 35102,
+          "textures": 48,
+          "geometries": 54,
+          "frames": 574,
+          "cpuMs": 13.66,
+          "lost": false,
+          "originalStage": "act2autochess_m02",
+          "losses": 0
+        },
+        "pen": 0,
+        "prepField": null,
+        "lod": 3,
+        "culled": 0,
+        "particles": 0,
+        "projectiles": 0,
+        "numbers": 0,
+        "rings": 0,
+        "auras": 0,
+        "locks": 0,
+        "flames": 0,
+        "promotions": 0,
+        "spine": {
+          "size": 36,
+          "ready": 36,
+          "loading": 0,
+          "failed": 0,
+          "refs": 18,
+          "holds": 1,
+          "weight": 95901460,
+          "idleWeight": 26312892,
+          "active": 0,
+          "queued": 0,
+          "unloading": 0
+        },
+        "renderT": 7.459901562139848,
+        "rate": 0.38365239830808656,
+        "buffered": 11,
+        "camera": {
+          "tx": 10,
+          "ty": 3.1566562248917167,
+          "tz": 0,
+          "tilt": 30,
+          "dist": 13.833312449783433,
+          "scale": 71.50072512235845,
+          "cx": 640,
+          "cy": 360
+        }
+      },
+      "longTasks": [
+        {
+          "start": 413212.1999999881,
+          "duration": 623
+        },
+        {
+          "start": 413836.8000000119,
+          "duration": 579
+        },
+        {
+          "start": 414424.6999999881,
+          "duration": 597
+        },
+        {
+          "start": 415026.3000000119,
+          "duration": 527
+        },
+        {
+          "start": 415554.59999996424,
+          "duration": 549
+        },
+        {
+          "start": 416105.1999999881,
+          "duration": 560
+        },
+        {
+          "start": 416668.1999999881,
+          "duration": 565
+        },
+        {
+          "start": 417234,
+          "duration": 882
+        },
+        {
+          "start": 418116.5,
+          "duration": 130
+        },
+        {
+          "start": 418248.3000000119,
+          "duration": 167
+        },
+        {
+          "start": 418415.89999997616,
+          "duration": 52
+        },
+        {
+          "start": 418510.09999996424,
+          "duration": 141
+        },
+        {
+          "start": 418651.89999997616,
+          "duration": 2403
+        },
+        {
+          "start": 421055.8000000119,
+          "duration": 1348
+        },
+        {
+          "start": 422408.3000000119,
+          "duration": 598
+        },
+        {
+          "start": 423007.8000000119,
+          "duration": 701
+        },
+        {
+          "start": 423709.39999997616,
+          "duration": 660
+        },
+        {
+          "start": 424370.89999997616,
+          "duration": 633
+        },
+        {
+          "start": 425004.59999996424,
+          "duration": 588
+        },
+        {
+          "start": 425592.89999997616,
+          "duration": 544
+        },
+        {
+          "start": 426137.3000000119,
+          "duration": 623
+        }
+      ],
+      "mapBuilds": [
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 490.60000002384186
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 386
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 2403.900000035763
+        }
+      ]
+    },
+    {
+      "mode": "boss",
+      "stage": "act2autochess_m04",
+      "entryMs": 7766.400000035763,
+      "frames": 7,
+      "frameMs": {
+        "median": 633.2999999999884,
+        "p95": 666.5999999999767,
+        "max": 666.7000000000116
+      },
+      "over250ms": 7,
+      "over1000ms": 0,
+      "stats": {
+        "fps": 1.3,
+        "frameMs": 763.98,
+        "cpuMs": 38.75,
+        "renderMs": 0.97,
+        "mode": "battle",
+        "units": 18,
+        "impostor": 3,
+        "impostorAtlas": {
+          "pages": 1,
+          "slots": 12,
+          "drawn": 12,
+          "full": 0
+        },
+        "boardArt": true,
+        "board3d": {
+          "on": true,
+          "calls": 53,
+          "triangles": 35102,
+          "textures": 48,
+          "geometries": 54,
+          "frames": 596,
+          "cpuMs": 12.99,
+          "lost": false,
+          "originalStage": "act2autochess_m02",
+          "losses": 0
+        },
+        "pen": 0,
+        "prepField": null,
+        "lod": 3,
+        "culled": 0,
+        "particles": 0,
+        "projectiles": 0,
+        "numbers": 0,
+        "rings": 0,
+        "auras": 0,
+        "locks": 0,
+        "flames": 0,
+        "promotions": 0,
+        "spine": {
+          "size": 36,
+          "ready": 36,
+          "loading": 0,
+          "failed": 0,
+          "refs": 18,
+          "holds": 1,
+          "weight": 95901460,
+          "idleWeight": 26312892,
+          "active": 0,
+          "queued": 0,
+          "unloading": 0
+        },
+        "renderT": 7.264432906357467,
+        "rate": 0.35407130590949987,
+        "buffered": 10,
+        "camera": {
+          "tx": 10,
+          "ty": 3.1566562248917167,
+          "tz": 0,
+          "tilt": 30,
+          "dist": 13.833312449783433,
+          "scale": 71.50072512235845,
+          "cx": 640,
+          "cy": 360
+        }
+      },
+      "longTasks": [
+        {
+          "start": 429638,
+          "duration": 919
+        },
+        {
+          "start": 430559.8000000119,
+          "duration": 846
+        },
+        {
+          "start": 431410,
+          "duration": 714
+        },
+        {
+          "start": 432132.1999999881,
+          "duration": 631
+        },
+        {
+          "start": 432769.8000000119,
+          "duration": 550
+        },
+        {
+          "start": 433321.6999999881,
+          "duration": 612
+        },
+        {
+          "start": 433936,
+          "duration": 699
+        },
+        {
+          "start": 434640.89999997616,
+          "duration": 767
+        },
+        {
+          "start": 435409,
+          "duration": 2916
+        },
+        {
+          "start": 438325.3000000119,
+          "duration": 1281
+        },
+        {
+          "start": 439608.8000000119,
+          "duration": 591
+        },
+        {
+          "start": 440238.09999996424,
+          "duration": 589
+        },
+        {
+          "start": 440827.6999999881,
+          "duration": 595
+        },
+        {
+          "start": 441424.09999996424,
+          "duration": 539
+        },
+        {
+          "start": 441964.09999996424,
+          "duration": 561
+        },
+        {
+          "start": 442525.6999999881,
+          "duration": 589
+        },
+        {
+          "start": 443115.1999999881,
+          "duration": 640
+        },
+        {
+          "start": 443756.1999999881,
+          "duration": 663
+        },
+        {
+          "start": 444419.5,
+          "duration": 677
+        },
+        {
+          "start": 445096.89999997616,
+          "duration": 628
+        }
+      ],
+      "mapBuilds": [
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0
+        },
+        {
+          "method": "setArea",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 502.5999999642372
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 2407.7999999523163
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setBattleRect",
+          "ms": 0
+        },
+        {
+          "method": "setStage",
+          "ms": 0.10000002384185791
+        },
+        {
+          "method": "setArea",
+          "ms": 0
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "failed": [],
+  "environment": "Headless Chromium software GPU; performance is not a player-device benchmark",
+  "limitations": [
+    "Stage override was superseded by recording metadata; this exploratory run does not validate all eight maps.",
+    "Software GPU frame rates cannot be used as a player-device performance measurement."
+  ]
+}

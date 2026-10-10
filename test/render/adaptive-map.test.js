@@ -4,7 +4,8 @@ import {adaptiveElapsed,adaptiveMapScale} from '../../public/js/render/adaptiveM
 test('severe ongoing lag contributes to adaptation, while hidden/resumed tabs do not',()=>{
  assert.equal(adaptiveElapsed(.4),.1,'2.5fps must not bypass adaptive quality');
  assert.equal(adaptiveElapsed(.8),.1);
- assert.equal(adaptiveElapsed(1.5),0,'one long resume gap cannot force low quality');
+ assert.equal(adaptiveElapsed(1.5),.1,'visible 1fps lag must still adapt');
+ assert.equal(adaptiveElapsed(1.5,false,true),0,'a resumed tab is handled separately');
  assert.equal(adaptiveElapsed(.4,true),0);
  for(const dt of [NaN,Infinity,-1,0])assert.equal(adaptiveElapsed(dt),0);
 });

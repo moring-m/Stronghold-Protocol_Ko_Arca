@@ -41,8 +41,18 @@ function models(value){if(!value||typeof value!=='object')return;
  Object.values(value).forEach(models);
 }models(manifest);
 const list=[...files.values()].sort((a,b)=>a.path.localeCompare(b.path));
+// Base-manifest totals omit later voices, skins and recruit assets. Use the
+// verified browser payload sizes only when the source list still matches.
+const measured=await read('content/production/resource-sizes.json').catch(()=>({files:{}}));
+for(const f of list)if(!f.local){
+ const size=measured.files[f.path];
+ const sourcesHash=createHash('sha256').update(JSON.stringify(f.sources)).digest('hex').slice(0,20);
+ if(size?.sourcesHash===sourcesHash)f.bytes=size.bytes;
+}
 const version=createHash('sha256').update(JSON.stringify(list)).digest('hex').slice(0,20);
-const index={...base,version,files:list,estimatedBytes:(base.estimatedBytes||0)+list.filter(f=>f.local).reduce((n,f)=>n+f.bytes,0)};
+const estimatedBytes=list.reduce((n,f)=>n+(f.bytes ?? 256*1024),0);
+// CacheStorage accounting includes response overhead and can exceed payload size.
+const index={...base,version,files:list,estimatedBytes,estimatedStorageBytes:Math.ceil(estimatedBytes*2.2)};
 if(!catalogOnly){
 const names=execFileSync('git',['ls-files','--cached','--others','--exclude-standard','-z'],{cwd:root}).toString().split('\0').filter(Boolean);
 for(const name of names){

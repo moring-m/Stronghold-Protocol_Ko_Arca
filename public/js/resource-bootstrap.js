@@ -76,7 +76,7 @@ async function boot() {
         button.disabled = true;
         try {
           const estimate = await navigator.storage?.estimate();
-          if (estimate?.quota && estimate.quota - estimate.usage < resources.estimatedBytes * 1.15) throw new Error('브라우저 저장 공간이 부족합니다. 공간을 확보한 뒤 다시 시도해 주세요.');
+          if (estimate?.quota && estimate.quota - estimate.usage < (resources.estimatedStorageBytes || resources.estimatedBytes * 1.15)) throw new Error('브라우저 저장 공간이 부족합니다. 공간을 확보한 뒤 다시 시도해 주세요.');
           await navigator.storage?.persist?.();
           try { localStorage.setItem('sp.resources.downloadConsent', '1'); } catch {}
           resolve();

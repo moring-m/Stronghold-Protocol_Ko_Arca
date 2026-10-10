@@ -42,6 +42,7 @@ async function downloadOne(file, cache, resources) {
   const previous=await caches.match(file.path);
   if(previous)return; // Reuse previous assets without duplicating gigabytes on every patch.
   let lastError;
+  const sourceErrors = [];
   for (const source of file.sources) {
     const url = new URL(source, self.location.origin);
     const local = file.local && source === file.path && url.origin === self.location.origin && /^\/assets\//.test(url.pathname);
@@ -71,9 +72,15 @@ async function downloadOne(file, cache, resources) {
       }
       await cache.put(file.path, new Response(payload, { headers: { 'Content-Type': contentType(file.path) } }));
       return;
-    } catch (error) { lastError = error; }
+    } catch (error) {
+      if (error.name === 'QuotaExceededError') {
+        throw new Error(`${file.path}: 브라우저 저장 공간이 부족합니다. 공간을 확보한 뒤 다시 시도해 주세요.`, {cause:error});
+      }
+      lastError = error;
+      sourceErrors.push(`${url.hostname}: ${error.name === 'TimeoutError' || error.name === 'AbortError' ? '요청 시간 초과·중단' : error.message}`);
+    }
   }
-  throw new Error(`${file.path}: ${lastError?.message || '다운로드 실패'}`);
+  throw new Error(`${file.path}: ${sourceErrors.join(' / ') || lastError?.message || '다운로드 실패'}`);
 }
 
 // Keep each message event short: browsers may terminate a worker kept alive by one
@@ -97,7 +104,7 @@ async function prepare(background = false, resume = {}) {
   const launch = path => {
     const file = byPath.get(path);
     const job = file ? download(file, cache, resources) : Promise.reject(new Error('목록에서 사라진 파일: ' + path));
-    active.set(path, job.then(() => ({path}), error => ({path, error: error.message})));
+    active.set(path, job.then(() => ({path}), error => ({path, error: error.message, storageFull:error.cause?.name === 'QuotaExceededError'})));
   };
   // Detached slow requests remain part of the resume token. A subsequent message
   // rejoins their download promises, or reuses the cache after a worker restart.
@@ -112,6 +119,7 @@ async function prepare(background = false, resume = {}) {
         const result = await Promise.race([...active.values(), deadline]);
         if (!result) return continuation();
         active.delete(result.path); processed++;
+        if (result.storageFull) throw new Error(result.error);
         if (result.error) failed.push({path:result.path, message:result.error});
         if (!retryFiles) done++;
         send({type:'progress', done, total:resources.files.length, phase:attempt ? 'retry' : 'download', attempt, path:result.error ? null : result.path});

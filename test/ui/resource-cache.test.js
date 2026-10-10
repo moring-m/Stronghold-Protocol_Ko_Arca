@@ -89,7 +89,7 @@ test('sliced retries report each missing file and never mark an incomplete cache
   if(url==='/vendor/browser-resources.json')return new Response(JSON.stringify({version:'failed',files,fontCss:''}));requests++;return new Response('',{status:404});
  }});
  let pending;const replies=[];handlers.message({data:{type:'preparePatch'},ports:[{postMessage:m=>replies.push(m)}],waitUntil:p=>pending=p});await pending;
- assert.equal(requests,3);assert.equal(replies.at(-1).type,'error');assert.match(replies.at(-1).message,/missing.bin: HTTP 404/);
+ assert.equal(requests,3);assert.equal(replies.at(-1).type,'error');assert.match(replies.at(-1).message,/missing.bin: cdn\.jsdelivr\.net: HTTP 404/);
  assert.equal(saved.has('/__resources_ready__'),false);assert.ok(replies.filter(m=>m.type==='progress').every(m=>m.done===1));
 });
 
@@ -138,4 +138,30 @@ test('one stalled file does not block later parallel downloads across slice boun
  releaseSlow();
  do {reply=await request(resume);resume=reply.resume;} while(reply.type==='continue');
  assert.equal(reply.type,'ready');assert.ok(saved.has('/__resources_ready__'));
+});
+
+test('storage exhaustion stops retries and reports quota rather than a mirror error',async()=>{
+ const handlers={},saved=new Map();let calls=0;
+ const file={path:'/assets/quota.bin',sources:['https://cdn.jsdelivr.net/file.bin','https://raw.githubusercontent.com/file.bin']};
+ const index={version:'quota',files:[file],fontCss:''};
+ const cache={match:async key=>saved.get(key)?.clone(),put:async(key,r)=>{if(key===file.path){const e=new Error('quota');e.name='QuotaExceededError';throw e;}saved.set(key,r.clone());},delete:async key=>saved.delete(key)};
+ runInNewContext(readFileSync(new URL('../../public/resource-worker.js',import.meta.url),'utf8').replace(/^import[^\n]+\n/,''),{
+  URL,Response,TextDecoder,DataView,AbortSignal,setTimeout,clearTimeout,caches:{open:async()=>cache,match:cache.match},self:{location:{origin:'https://example.test'},addEventListener:(k,fn)=>handlers[k]=fn},fetch:async url=>{if(url==='/vendor/browser-resources.json')return new Response(JSON.stringify(index));calls++;return new Response('valid');}
+ });
+ let job;const messages=[];handlers.message({data:{type:'preparePatch'},ports:[{postMessage:m=>messages.push(m)}],waitUntil:p=>job=p});await job;
+ assert.equal(calls,1,'storage failure cannot be fixed by alternate mirrors or repeated attempts');
+ assert.match(messages.find(m=>m.type==='error')?.message,/브라우저 저장 공간이 부족/);
+ assert.equal(messages.some(m=>m.type==='ready'),false);
+});
+
+test('all failed sources retain their HTTP and timeout causes',async()=>{
+ const handlers={},saved=new Map();
+ const file={path:'/assets/broken.bin',sources:['https://cdn.jsdelivr.net/file.bin','https://raw.githubusercontent.com/file.bin']};const index={version:'errors',files:[file],fontCss:''};
+ const cache={match:async key=>saved.get(key)?.clone(),put:async(key,r)=>saved.set(key,r.clone()),delete:async key=>saved.delete(key)};
+ runInNewContext(readFileSync(new URL('../../public/resource-worker.js',import.meta.url),'utf8').replace(/^import[^\n]+\n/,''),{
+  URL,Response,TextDecoder,DataView,AbortSignal,setTimeout,clearTimeout,caches:{open:async()=>cache,match:cache.match},self:{location:{origin:'https://example.test'},addEventListener:(k,fn)=>handlers[k]=fn},fetch:async url=>{if(url==='/vendor/browser-resources.json')return new Response(JSON.stringify(index));if(url===file.sources[0])return new Response('',{status:404});const e=new Error('timeout');e.name='TimeoutError';throw e;}
+ });
+ let job;const messages=[];handlers.message({data:{type:'preparePatch'},ports:[{postMessage:m=>messages.push(m)}],waitUntil:p=>job=p});await job;
+ const message=messages.find(m=>m.type==='error')?.message;
+ assert.match(message,/cdn.jsdelivr.net: HTTP 404/);assert.match(message,/raw.githubusercontent.com: 요청 시간 초과·중단/);
 });

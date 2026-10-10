@@ -1,0 +1,17 @@
+{
+  "shop": [
+    {
+      "src": "/assets/char/portrait/char_306_leizi_1.png",
+      "ok": true
+    },
+    {
+      "src": "/assets/char/portrait/char_1026_gvial2_1.png",
+      "ok": true
+    },
+    {
+      "src": "/assets/char/portrait/char_4100_caper_1.png",
+      "ok": true
+    }
+  ],
+  "errors": []
+}

@@ -144,8 +144,12 @@ const ITEM_HANDLERS = {
   use_equip_reward_char_chess: {
     onEquip(ctx, ev) {
       const base = ctx.gd.baseIdOf(ev.target.id);
-      const owned = [...ctx.board(), ...ctx.hand(), ...ctx.temp()].filter((p) => p && p.kind === 'chess' && !p.golden && ctx.gd.baseIdOf(p.id) === base).length;
-      if (owned >= 2) { if (ctx.grantChess(base)) return; }
+      const owned = [...ctx.board(), ...ctx.hand(), ...ctx.temp()].filter((p) => p && p.kind === 'chess' && !ctx.gd.isGolden(p.id) && ctx.gd.baseIdOf(p.id) === base).length;
+      if (owned >= 2) {
+        // This is a copy of an owned operator, so shared stock cannot change it into a same-bond reward.
+        if (!ctx.grantChess(base, { requirePool: false })) toastNothing(ctx, ev);
+        return;
+      }
       const id = rollSameBond(ctx, ctx.pieceBonds(ev.target.uid), 6);
       if (!id || !ctx.grantChess(id)) toastNothing(ctx, ev);
     },

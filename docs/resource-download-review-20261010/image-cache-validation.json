@@ -1,0 +1,21 @@
+{
+  "version": "50f77ccfc0380403b03c",
+  "files": 16276,
+  "cacheEntries": 16289,
+  "ready": true,
+  "missing": [],
+  "images": {
+    "total": 1386,
+    "loaded": 1386,
+    "failed": []
+  },
+  "storage": {
+    "quota": 13067652238,
+    "usage": 2330233998,
+    "usageDetails": {
+      "caches": 2330217984,
+      "serviceWorkerRegistrations": 16014
+    }
+  },
+  "errors": []
+}
