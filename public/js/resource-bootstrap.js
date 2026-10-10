@@ -1,15 +1,35 @@
 // Start after the download notice; optional resources cache in the background.
-async function message(type, onProgress) {
+async function messageOnce(type, onProgress, resume) {
   const channel = new MessageChannel();
   return new Promise((resolve, reject) => {
-    channel.port1.onmessage = ({ data }) => {
+    let timer;
+    const finish = (error, data) => { clearTimeout(timer); channel.port1.close(); error ? reject(error) : resolve(data); };
+    const arm = () => { clearTimeout(timer); timer = setTimeout(() => finish(new Error('리소스 작업의 응답이 중단되었습니다. 받은 파일은 유지됩니다.')), 60000); };
+    arm();
+    channel.port1.onmessage = ({data}) => {
+      arm();
+      if (data.type === 'activity') return;
       if (data.type === 'progress') { onProgress?.(data); return; }
-      channel.port1.close();
-      if (data.type === 'error') reject(new Error(data.message));
-      else resolve(data);
+      finish(data.type === 'error' ? new Error(data.message) : null, data);
     };
-    navigator.serviceWorker.controller.postMessage({ type }, [channel.port2]);
+    try { navigator.serviceWorker.controller.postMessage({type, resume}, [channel.port2]); }
+    catch (error) { finish(error); }
   });
+}
+async function message(type, onProgress) {
+  let resume, interruptions = 0;
+  while (true) {
+    let result;
+    try { result = await messageOnce(type, onProgress, resume); interruptions = 0; }
+    catch (error) {
+      if (!error.message.includes('응답이 중단') || ++interruptions > 2) throw error;
+      // Reconnect to a restarted worker; completed files are reused from Cache Storage.
+      continue;
+    }
+    if (result.type !== 'continue') return result;
+    resume = result.resume;
+    await new Promise(resolve => setTimeout(resolve, 0));
+  }
 }
 
 async function boot() {
@@ -71,34 +91,52 @@ async function boot() {
   if (!cacheStatus.ready || cacheStatus.patch) {
     const notice = document.createElement('div');
     notice.setAttribute('role', 'status');
-    notice.style.cssText = 'position:fixed;right:16px;bottom:16px;z-index:10000;max-width:min(360px,calc(100vw - 32px));padding:12px 16px;background:#101b18ee;color:#dce9e4;border:1px solid #4bbda1;font:14px/1.5 sans-serif;box-shadow:0 2px 12px #0006';
-    notice.textContent = '누락된 리소스를 백그라운드에서 다운로드합니다. 기존 캐시는 재사용합니다.';
-    document.body.append(notice);
-    const download = () => message('preparePatch', progress => {
-      notice.textContent = `리소스 확인·다운로드 ${progress.done}/${progress.total} · 게임을 이용할 수 있습니다.`;
-    }).then(() => {
-      notice.textContent = '리소스 다운로드 완료';
-      setTimeout(() => notice.remove(), 4000);
-    }).catch(error => {
-      notice.textContent = '일부 리소스를 다운로드하지 못했습니다. 받은 파일은 유지됩니다. ';
-      const details = document.createElement('details');
-      const summary = document.createElement('summary'); summary.textContent = '실패 원인';
-      const reason = document.createElement('pre'); reason.textContent = error.message;
-      reason.style.cssText = 'white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.5 sans-serif';
-      details.append(summary, reason); notice.append(details);
-      const retry = document.createElement('button');
-      retry.type = 'button'; retry.textContent = '다시 시도';
-      retry.onclick = () => { retry.disabled = true; download(); };
-      const skip = document.createElement('button');
-      skip.type = 'button'; skip.textContent = '실패한 파일 건너뛰기';
-      skip.style.marginLeft = '8px';
-      // preparePatch already attempted every file before reporting failures.
-      // Dismiss this batch without marking missing resources as cached/ready;
-      // they can still download on demand or on the next visit.
-      skip.onclick = () => notice.remove();
-      notice.append(retry, skip);
-      console.warn('Background resource download:', error.message);
-    });
+    notice.style.cssText = 'position:fixed;right:16px;bottom:16px;z-index:10000;width:min(360px,calc(100vw - 32px));box-sizing:border-box;padding:12px 16px;background:#101b18ee;color:#dce9e4;border:1px solid #4bbda1;font:14px/1.5 sans-serif;box-shadow:0 2px 12px #0006';
+    notice.className = 'resource-download';
+    const header = document.createElement('div'); header.style.cssText = 'display:flex;align-items:center;gap:8px';
+    const count = document.createElement('span'); count.style.cssText = 'flex:1;font-variant-numeric:tabular-nums';
+    count.textContent = `0/${resources.files.length}`;
+    const toggle = document.createElement('button'); toggle.type = 'button'; toggle.textContent = '접기';
+    toggle.setAttribute('aria-expanded', 'true'); toggle.setAttribute('aria-label', '리소스 다운로드 창 접기');
+    toggle.style.cssText = 'cursor:pointer;padding:2px 6px;font:12px sans-serif';
+    const bar = document.createElement('progress'); bar.max = resources.files.length; bar.value = 0;
+    bar.setAttribute('aria-label', '리소스 다운로드 진행률'); bar.style.cssText = 'display:block;width:100%;height:6px;margin-top:6px;accent-color:#4bbda1';
+    const detail = document.createElement('div'); detail.style.marginTop = '8px';
+    let folded = false;
+    toggle.onclick = () => {
+      folded = !folded; detail.hidden = folded;
+      notice.style.width = folded ? 'min(220px,calc(100vw - 32px))' : 'min(360px,calc(100vw - 32px))';
+      notice.style.padding = folded ? '6px 10px' : '12px 16px';
+      toggle.textContent = folded ? '펼치기' : '접기';
+      toggle.setAttribute('aria-expanded', String(!folded));
+      toggle.setAttribute('aria-label', folded ? '리소스 다운로드 창 펼치기' : '리소스 다운로드 창 접기');
+    };
+    header.append(count, toggle); notice.append(header, bar, detail); document.body.append(notice);
+    const download = () => {
+      detail.textContent = '누락된 리소스를 백그라운드에서 다운로드합니다. 기존 캐시는 재사용합니다.';
+      return message('preparePatch', progress => {
+        count.textContent = `${progress.done}/${progress.total}`; bar.max = progress.total; bar.value = progress.done;
+        detail.textContent = progress.phase === 'retry' ? '실패한 파일을 다시 시도합니다. 받은 파일은 유지됩니다.' : '리소스 확인·다운로드 중 · 게임을 이용할 수 있습니다.';
+      }).then(() => {
+        count.textContent = `${bar.max}/${bar.max}`; bar.value = bar.max;
+        detail.textContent = '리소스 다운로드 완료';
+        setTimeout(() => notice.remove(), 4000);
+      }).catch(error => {
+        // Errors need the retry/skip controls even when the user minimized progress.
+        if (folded) toggle.click();
+        detail.textContent = '일부 리소스를 다운로드하지 못했습니다. 받은 파일은 유지됩니다. ';
+        const details = document.createElement('details');
+        const summary = document.createElement('summary'); summary.textContent = '실패 원인';
+        const reason = document.createElement('pre'); reason.textContent = error.message;
+        reason.style.cssText = 'white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.5 sans-serif';
+        details.append(summary, reason); detail.append(details);
+        const retry = document.createElement('button'); retry.type = 'button'; retry.textContent = '다시 시도';
+        retry.onclick = () => { retry.disabled = true; download(); };
+        const skip = document.createElement('button'); skip.type = 'button'; skip.textContent = '실패한 파일 건너뛰기'; skip.style.marginLeft = '8px';
+        skip.onclick = () => notice.remove(); detail.append(retry, skip);
+        console.warn('Background resource download:', error.message);
+      });
+    };
     download();
   }
 }

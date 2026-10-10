@@ -47,6 +47,7 @@ async function downloadOne(file, cache, resources) {
     const local = file.local && source === file.path && url.origin === self.location.origin && /^\/assets\//.test(url.pathname);
     if (!local && (url.protocol !== 'https:' || !['cdn.jsdelivr.net', 'raw.githubusercontent.com'].includes(url.hostname))) throw new Error('허용되지 않은 리소스 출처');
     try {
+      send({type:'activity', path:file.path});
       const response = await fetch(source, { mode: 'cors', credentials: 'omit', signal: AbortSignal.timeout(30000) });
       if (!response.ok || response.type === 'opaque') throw new Error(`HTTP ${response.status}`);
       if ((response.headers.get('content-type') || '').includes('text/html')) throw new Error('리소스 대신 HTML 응답');
@@ -75,49 +76,58 @@ async function downloadOne(file, cache, resources) {
   throw new Error(`${file.path}: ${lastError?.message || '다운로드 실패'}`);
 }
 
-async function prepare(background = false) {
+// Keep each message event short: browsers may terminate a worker kept alive by one
+// multi-minute waitUntil. The page requests the next slice and can resume after restart.
+async function prepare(background = false, resume = {}) {
   const resources = await index();
   const cache = await caches.open(PREFIX + resources.version);
-  if(!background)await cache.delete('/__resources_ready__');
+  const valid = resume.version === resources.version;
+  let cursor = valid ? Math.max(0, Math.min(resources.files.length, resume.cursor || 0)) : 0;
+  let attempt = valid ? resume.attempt || 0 : 0;
+  let failed = valid ? resume.failed || [] : [];
+  let retryFiles = valid ? resume.retryFiles || null : null;
+  let done = valid ? resume.done || 0 : 0;
+  if (!background && !valid) await cache.delete('/__resources_ready__');
   await cache.put('/fonts/fonts.css', new Response(resources.fontCss, {headers:{'Content-Type':'text/css'}}));
-  let failures = [];
-  let queue = resources.files;
-  let next = 0, done = 0;
-  const run = async () => {
-    while (next < queue.length) {
-      const file = queue[next++];
-      try { await download(file, cache, resources); } catch (error) { failures.push({file, message:error.message}); }
-      send({ type: 'progress', done: Math.min(++done, resources.files.length), total: resources.files.length });
-    }
+  const started = Date.now(), byPath = new Map(resources.files.map(file => [file.path, file]));
+  const active = new Map();
+  const limit = background ? 4 : 6;
+  let processed = 0, timer;
+  const deadline = new Promise(resolve => { timer = setTimeout(() => resolve(null), 5000); });
+  const launch = path => {
+    const file = byPath.get(path);
+    const job = file ? download(file, cache, resources) : Promise.reject(new Error('목록에서 사라진 파일: ' + path));
+    active.set(path, job.then(() => ({path}), error => ({path, error: error.message})));
   };
-  await Promise.all(Array.from({ length: background ? 2 : 6 }, run));
-  // Retry only failed files: a brief mirror/network interruption must not restart the whole manifest.
-  for (let retry = 0; failures.length && retry < 2; retry++) {
-    queue = failures.map(item => item.file); failures = []; next = 0;
-    await Promise.all(Array.from({length: background ? 2 : 6}, run));
-  }
-  if (failures.length) throw new Error(`${failures.length}개 파일을 받지 못했습니다.\n${failures.slice(0, 3).map(item => item.message).join('\n')}`);
-  // Match the repository pipeline's atlas normalization, using actual cached PNG dimensions.
-  for (const file of resources.files.filter(f => f.atlas)) {
-    const sizes = new Map();
-    for (const path of file.atlas.textures) {
-      const png = await (await cache.match(path) || await caches.match(path)).arrayBuffer();
-      const view = new DataView(png);
-      sizes.set(path.split('/').at(-1), { width: view.getUint32(16), height: view.getUint32(20) });
+  // Detached slow requests remain part of the resume token. A subsequent message
+  // rejoins their download promises, or reuses the cache after a worker restart.
+  for (const path of valid ? resume.pending || [] : []) if (byPath.has(path)) launch(path);
+  const continuation = () => ({type:'continue', done, total:resources.files.length,
+    resume:{version:resources.version, cursor, attempt, failed, retryFiles, done, pending:[...active.keys()]}});
+  try {
+    while (true) {
+      const queue = retryFiles || resources.files.map(file => file.path);
+      while (active.size < limit && cursor < queue.length && processed < 64 && Date.now() - started < 5000) launch(queue[cursor++]);
+      if (active.size) {
+        const result = await Promise.race([...active.values(), deadline]);
+        if (!result) return continuation();
+        active.delete(result.path); processed++;
+        if (result.error) failed.push({path:result.path, message:result.error});
+        if (!retryFiles) done++;
+        send({type:'progress', done, total:resources.files.length, phase:attempt ? 'retry' : 'download', attempt});
+        if (processed >= 64 || Date.now() - started >= 5000) return continuation();
+        continue;
+      }
+      if (cursor < queue.length) return continuation();
+      if (!failed.length) break;
+      if (attempt >= 2) throw new Error(`${failed.length}개 파일을 받지 못했습니다.\n${failed.slice(0,3).map(item=>item.message).join('\n')}`);
+      retryFiles = failed.map(item=>item.path); failed = []; cursor = 0; attempt++;
     }
-    const text = await (await cache.match(file.path) || await caches.match(file.path)).text();
-    const normalized = normalizeAtlas(text, {
-      pma: file.atlas.pma,
-      renamePage: name => name.replace(/[^A-Za-z0-9._-]/g, '_'),
-      pageSize: name => sizes.get(name.replace(/[^A-Za-z0-9._-]/g, '_')),
-    });
-    if (normalized.missingSize.length) throw new Error(`텍스처 크기 확인 실패: ${file.path}`);
-    await cache.put(file.path, new Response(normalized.text, { headers: { 'Content-Type': 'text/plain' } }));
-  }
-  await cache.put('/fonts/fonts.css', new Response(resources.fontCss, { headers: { 'Content-Type': 'text/css' } }));
+  } finally { clearTimeout(timer); }
+  // downloadOne already normalizes each atlas before storing it. Rewriting every
+  // cached atlas here used to leave the counter at 100% with no progress for minutes.
   await cache.put('/__resources_ready__', new Response(resources.version));
-  // Keep previous versions for already-open tabs; browser quota management may evict them.
-  return { type: 'ready', version: resources.version };
+  return {type:'ready', version:resources.version};
 }
 
 self.addEventListener('install', event => event.waitUntil(self.skipWaiting()));
@@ -138,7 +148,7 @@ self.addEventListener('message', event => {
       } else if (event.data.type === 'prepare' || event.data.type === 'preparePatch') {
         listeners.add(port);
         try {
-          preparing ||= prepare(event.data.type === 'preparePatch').finally(() => { preparing = undefined; });
+          preparing ||= prepare(event.data.type === 'preparePatch', event.data.resume).finally(() => { preparing = undefined; });
           port.postMessage(await preparing);
         } finally { listeners.delete(port); }
       }
