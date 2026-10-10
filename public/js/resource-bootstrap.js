@@ -115,10 +115,12 @@ async function boot() {
     const download = () => {
       detail.textContent = '누락된 리소스를 백그라운드에서 다운로드합니다. 기존 캐시는 재사용합니다.';
       return message('preparePatch', progress => {
+        if (progress.path) window.dispatchEvent(new CustomEvent('resource-ready', {detail:{path:progress.path}}));
         count.textContent = `${progress.done}/${progress.total}`; bar.max = progress.total; bar.value = progress.done;
         detail.textContent = progress.phase === 'retry' ? '실패한 파일을 다시 시도합니다. 받은 파일은 유지됩니다.' : '리소스 확인·다운로드 중 · 게임을 이용할 수 있습니다.';
       }).then(() => {
         count.textContent = `${bar.max}/${bar.max}`; bar.value = bar.max;
+        window.dispatchEvent(new CustomEvent('resource-ready', {detail:{all:true}}));
         detail.textContent = '리소스 다운로드 완료';
         setTimeout(() => notice.remove(), 4000);
       }).catch(error => {

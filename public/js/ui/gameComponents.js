@@ -2,7 +2,7 @@
 // unit thumbnails, LP tower, coin badge, official UI sprites. Styles: css/screens/game*.css.
 
 import { FactionBadge } from './chatFaction.js';
-import { useState, useMemo } from '../../vendor/hooks.module.js';
+import { useState, useMemo, useEffect } from '../../vendor/hooks.module.js';
 import { html, Icon, TierChip, Tooltip } from './components.js';
 import { data, matchData, useData, localAsset } from '../data.js';
 import { parseRichText, rtClassName } from './richText.js';
@@ -55,6 +55,12 @@ export function makeLookups(ready = true) {
  */
 export function Img({ src, class: cls, alt = '', fallback = null, style }) {
   const [bad, setBad] = useState(null);
+  useEffect(() => {
+    if (!bad || typeof window === 'undefined') return;
+    const retry = event => { if (event.detail?.all || event.detail?.path === bad) setBad(null); };
+    window.addEventListener('resource-ready', retry);
+    return () => window.removeEventListener('resource-ready', retry);
+  }, [bad]);
   if (!src || bad === src) return fallback;
   return html`<img class=${cls} src=${src} alt=${alt} draggable=${false} loading="lazy" style=${style} onError=${() => setBad(src)} />`;
 }

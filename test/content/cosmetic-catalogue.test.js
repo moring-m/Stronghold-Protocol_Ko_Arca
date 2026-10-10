@@ -12,11 +12,10 @@ test('every listed production skin has a renderable model and indexed resources'
  }
  assert.ok(checked>400,'existing ordinary and elite skin selections are preserved');
 });
-test('production voices retain Korean, Japanese and original-language fallback together',()=>{
+test('production voices retain Korean and Japanese without Chinese or invalid source directories',()=>{
  const a=read('assets').audio;
- assert.ok(Object.keys(a.voice.kr).length>100);assert.ok(Object.keys(a.voice.jp).length>100);
- const original=a.voice.cn;assert.ok(original&&Object.keys(original).length>100);
+ assert.ok(Object.keys(a.voice.kr).length>100);assert.ok(Object.keys(a.voice.jp).length>100);assert.equal(a.voice.cn,undefined);
  for(const lang of ['kr','jp']){const cid=Object.keys(a.voice[lang])[0],slot=Object.keys(a.voice[lang][cid]).find(k=>a.voice[lang][cid][k]?.length);assert.ok(voiceLine(a,cid,slot,lang,()=>0));}
- const clem=Object.keys(original).find(id=>id.includes('clemnt'));assert.ok(clem);
- const slot=Object.keys(original[clem]).find(k=>original[clem][k]?.length);assert.ok(voiceLine(a,clem,slot,'kr',()=>0),'unavailable KR falls back to Clementia original bank');
+ const resources=JSON.parse(readFileSync(new URL('../../content/production/resources.json',import.meta.url)));
+ for(const f of resources.files){assert.ok(!/^\/assets\/audio\/voice\/(cn|voice_cn)\//.test(f.path),f.path);for(const url of f.sources)assert.ok(!/sound_beta_2\/(cn|jp)\//.test(url),url);}
 });

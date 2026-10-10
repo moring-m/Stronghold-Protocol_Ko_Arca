@@ -1,5 +1,5 @@
 // Browser-local dub preferences. Every variant of an operator shares its charId; absent entries follow the global dub.
-export const VOICE_LANGS = Object.freeze(['kr', 'jp', 'cn']);
+export const VOICE_LANGS = Object.freeze(['kr', 'jp']);
 export function sanitizeVoiceOverrides(raw) {
   const out = {};
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return out;

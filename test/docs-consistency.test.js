@@ -851,10 +851,10 @@ test('the deliberate trigger deviation (DESIGN §21.29): six 重装 skills DEFAU
 test('干员战斗语音 (DESIGN §21.30): the manifest data, the official priorities, and the 休整期 stays silent', async () => {
   const { VOICE_PRIORITY, VOICE_COOLDOWN_MS, resultVoiceSlot } = await import('../public/js/audio.js');
   const manifest = JSON.parse(readFileSync(join(ROOT, 'data/assets.json'), 'utf8'));
-  const voice = manifest.audio?.voice ?? {};
+  const voice = manifest.audio?.voice?.jp ?? manifest.audio?.voiceJp ?? {};
   const charIds = Object.keys(voice);
   assert.ok(charIds.length >= 100, `${charIds.length} operators carry official battle voice`);
-  assert.equal(manifest.stats.voiceChars, charIds.length, 'stats.voiceChars counts them');
+  assert.equal(manifest.stats.voiceChars, new Set([...charIds, ...Object.keys(manifest.audio?.voice?.kr || {})]).size, 'stats.voiceChars counts the KR/JP union');
   // one operator carries every slot a battle can play — and none of the prep-only ones (plan.mjs VOICE_BATTLE_SLOTS):
   // 干员报到 / 编入队伍 / 任命队长 are never requested by the client, so planning them only made every `npm run assets`
   // download 360 files (19.3 MB, one per operator and slot) nobody hears. `--voice-all` brings the complete set back.
@@ -873,7 +873,7 @@ test('干员战斗语音 (DESIGN §21.30): the manifest data, the official prior
   }
   // a battle slot usually carries several lines (选中干员 / 部署 have two), so the battle set alone stays well above 10 each
   assert.ok(lines.length >= charIds.length * 10, `${lines.length} voice lines for ${charIds.length} operators`);
-  for (const u of lines) assert.match(u, /^\/assets\/audio\/voice\/cn\/char_[^/]+\/cn_\d+\.mp3$/);
+  for (const u of lines) assert.match(u, /^\/assets\/audio\/voice\/(?:jp|voice)\/char_[^/]+\/cn_\d+\.mp3$/);
   // the official scheduling numbers (audio_data.json battleVoice.voiceTypeOptions)
   assert.equal(VOICE_PRIORITY.start, 100);
   assert.equal(VOICE_PRIORITY.faceEnemy, 90);

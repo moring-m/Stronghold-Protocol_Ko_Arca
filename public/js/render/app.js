@@ -1,3 +1,4 @@
+import {adaptiveElapsed, adaptiveMapScale} from './adaptiveMap.js';
 import { rangeTileInside } from './rangeClip.js';
 import { t } from '../../../shared/i18n.js';
 import { DAMAGE_NUMBER_MODES } from '../../../shared/damageDisplay.js';
@@ -467,7 +468,8 @@ export async function createFieldView(host, options = {}) {
 
   const size = () => ({ width: Math.max(1, host.clientWidth || 1), height: Math.max(1, host.clientHeight || 1) });
   const dpr = () => Math.min(4, Math.min(globalThis.devicePixelRatio || 1, QUALITY_RES[settings.quality] || 2) * (settings.renderScale || 1));
-  const boardDpr = () => Math.min(4, Math.min(globalThis.devicePixelRatio || 1, settings.mapQuality === 'medium' ? 1 : BOARD_RES[settings.quality] || 2) * (settings.renderScale || 1));
+  let loadLevel = 0;
+  const boardDpr = () => Math.min(4, Math.min(globalThis.devicePixelRatio || 1, settings.mapQuality === 'medium' ? 1 : BOARD_RES[settings.quality] || 2) * (settings.renderScale || 1) * adaptiveMapScale(loadLevel, settings.adaptiveQuality !== false));
   const s0 = size();
   // Construction is synchronous until the complete view can own cancellation. If setup throws,
   // dispose only the resources acquired by this attempt, never another view's host contents.
@@ -1938,16 +1940,24 @@ export async function createFieldView(host, options = {}) {
   let culledCount = 0;
   // Adaptive load level 0–3: a device that cannot hold the frame rate with the current work switches crowds to
   // impostors earlier and animates small / far units at a lower rate (units.js); it steps back after a calm spell.
-  let loadLevel = 0, slowFor = 0, fastFor = 0;
+  let slowFor = 0, fastFor = 0;
   function adaptLoad(dtRaw) {
-    if (settings.adaptiveQuality === false) { loadLevel=0; return; }
-    if (!(dtRaw > 0) || dtRaw > 0.25 || globalThis.document?.hidden) return;
-    const busy = views.size + penViews.size > 8;
-    const budget=1000/(settings.frameLimit || 60);
-    if (frameMs > budget*1.17 && busy) { slowFor += dtRaw; fastFor = 0; }
-    else if (frameMs < budget*1.06) { fastFor += dtRaw; slowFor = 0; }
-    if (slowFor > 1 && loadLevel < 3) { loadLevel++; slowFor = 0; fastFor = 0; impInterval = pickImpostorInterval(); }
-    else if (loadLevel > 0 && (fastFor > 6 * loadLevel || !busy && fastFor > 2)) { loadLevel--; fastFor = 0; impInterval = pickImpostorInterval(); }
+    const previous = loadLevel;
+    if (settings.adaptiveQuality === false) { loadLevel=0; slowFor=0; fastFor=0; }
+    else {
+      const elapsed = adaptiveElapsed(dtRaw, globalThis.document?.hidden);
+      if (!elapsed) return;
+      const busy = !!board3d || views.size + penViews.size > 8;
+      const budget=1000/(settings.frameLimit || 60);
+      if (frameMs > budget*1.17 && busy) { slowFor += elapsed; fastFor = 0; }
+      else if (frameMs < budget*1.06) { fastFor += elapsed; slowFor = 0; }
+      if (slowFor > 1 && loadLevel < 3) { loadLevel++; slowFor=0; fastFor=0; }
+      else if (loadLevel > 0 && (fastFor > 6 * loadLevel || !busy && fastFor > 2)) { loadLevel--; fastFor=0; }
+    }
+    if (previous !== loadLevel) {
+      impInterval = pickImpostorInterval();
+      const sz = size();board3d?.resize(sz.width, sz.height, boardDpr());
+    }
   }
   // Crowded fields render skeletons through staggered RenderTexture impostors (units.js): the interval grows with
   // the number of Spine units so the per-frame vertex work stays roughly constant (hysteresis: re-evaluated
@@ -1984,7 +1994,7 @@ export async function createFieldView(host, options = {}) {
     const dtRaw = (now - lastNow) / 1000;
     lastNow = now;
     const dt = Math.min(0.1, Math.max(0, dtRaw));
-    if (dtRaw < 0.25) frameMs = frameMs * 0.9 + dtRaw * 1000 * 0.1;
+    if (dtRaw > 0 && dtRaw < 1 && !globalThis.document?.hidden) frameMs = frameMs * 0.9 + dtRaw * 1000 * 0.1;
     fps = 1000 / Math.max(1, frameMs);
     adaptLoad(dtRaw);
     vp.width = Math.max(1, host.clientWidth || 1); vp.height = Math.max(1, host.clientHeight || 1);
@@ -2206,7 +2216,7 @@ export async function createFieldView(host, options = {}) {
       Object.assign(settings,s);
       app.ticker.maxFPS = settings.frameLimit || 60;
       board3d?.setQuality?.(settings.shadows === false ? 'low' : 'high');
-      if (previousMap !== settings.mapQuality) {
+      if (previousMap !== (settings.mapQuality || 'high')) {
         if (settings.mapQuality === 'minimal') {
           recover.off=true; clearTimeout(recover.timer); disable3d(); tiles.setArt(null); tiles.project(cam,true);
         } else {

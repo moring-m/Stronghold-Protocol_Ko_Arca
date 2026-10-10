@@ -17,6 +17,8 @@ const files=new Map(base.files.map(f=>[f.path,f]));
 for(const path of ['.cache/ursus-voice-resources.json','.cache/skin-resources.json','.cache/skill-sound-resources.json','.cache/ursus-band-resources.json','.cache/upstream-recruit-resources.json']){
  for(const f of (await read(path)).files)files.set(f.path,f);
 }
+// Chinese dub is intentionally disabled; do not retain orphaned download entries.
+for(const path of files.keys())if(/^\/assets\/audio\/voice\/(cn|voice_cn)\//.test(path))files.delete(path);
 const paths=new Set();
 function walk(value){if(typeof value==='string'&&value.startsWith('/assets/'))paths.add(value);else if(value&&typeof value==='object')Object.values(value).forEach(walk);}
 walk(manifest);const local=await read('.cache/ursus-data/local-assets.json');walk(local);

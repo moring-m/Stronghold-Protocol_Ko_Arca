@@ -114,7 +114,7 @@ async function prepare(background = false, resume = {}) {
         active.delete(result.path); processed++;
         if (result.error) failed.push({path:result.path, message:result.error});
         if (!retryFiles) done++;
-        send({type:'progress', done, total:resources.files.length, phase:attempt ? 'retry' : 'download', attempt});
+        send({type:'progress', done, total:resources.files.length, phase:attempt ? 'retry' : 'download', attempt, path:result.error ? null : result.path});
         if (processed >= 64 || Date.now() - started >= 5000) return continuation();
         continue;
       }

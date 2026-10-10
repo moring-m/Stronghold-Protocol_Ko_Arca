@@ -114,8 +114,8 @@ export async function buildUrsus(){
  // Cosmetic catalogues are prepared independently; rebuilding gameplay must retain their model and voice mappings.
  for(const [id,entry]of Object.entries(previousAssets.chars||{}))if(id.startsWith('skin_'))assets.chars[id]??=entry;
  assets.audio??={};
- const oldVoice=previousAssets.audio?.voice,baseVoice=assets.audio.voice||{};
- if(oldVoice?.kr||oldVoice?.jp)assets.audio.voice={cn:baseVoice.cn||baseVoice,kr:oldVoice.kr||{},jp:oldVoice.jp||{}};
+ const oldVoice=previousAssets.audio?.voice;
+ if(oldVoice?.kr||oldVoice?.jp)assets.audio.voice={kr:oldVoice.kr||{},jp:oldVoice.jp||assets.audio.voiceJp||{}};
  for(const key of ['voiceAvailability','voiceConditions'])if(previousAssets.audio?.[key])assets.audio[key]=previousAssets.audio[key];
  for(const [key,value]of Object.entries({chess,bonds,garrisons,tokens,assets,items,bands}))await writeFile(join(URSUS_DIR,`${key}.json`),JSON.stringify(value));
  await buildUrsusChoices(URSUS_DIR);

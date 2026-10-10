@@ -266,31 +266,22 @@ export const VOICE_COOLDOWN_MS = Object.freeze({
 export const VOICE_TAP_SLOTS = Object.freeze(['select']);
 
 /**
- * The line an operator says for a slot, in the chosen dub (settings 语音语言, ui/gameLogic/settings.js VOICE_LANGS):
- * { url, fallback }, or null for an operator no dub voices (the 预备干员 / 原型干员 stand-ins, 盟约·辅助干员, summons)
- * or a slot it lacks. 'cn' draws from `audio.voice`; 'jp' from
- * `audio.voiceJp`, the same slots and file names in the Japanese dub, and falls back to the Chinese line twice over: per
- * slot when the JP tree lacks it (a file the fetch could not get is left out of the manifest), and per line at play time
- * — `fallback` is the Chinese file of the same name, played when the host does not have the JP one (a full zip built
- * without the JP dub, before setup downloaded it). A slot with several lines draws one (`random` ∈ [0, 1)).
- * @param {any} audio the manifest's `audio`
- * @param {string} charId
- * @param {string} slot
- * @param {'cn'|'jp'|string} [lang]
- * @param {() => number} [random]
- * @returns {{ url: string, fallback: string|null } | null}
+ * Pick Korean/Japanese operator dialogue. Missing Korean slots fall back to
+ * Japanese; Chinese preferences and legacy Chinese banks are never played.
+ * @returns {{url:string, fallback:string|null}|null}
  */
-export function voiceLine(audio, charId, slot, lang = 'cn', random = Math.random) {
-  const lines = (line) => (Array.isArray(line) ? line : [line]).filter((u) => typeof u === 'string' && u);
-  const draw = (list) => (list.length ? list[Math.min(list.length - 1, Math.floor(random() * list.length))] : null);
-  const base=audio?.voice || {};
-  const cn=lines((base.cn || base)?.[charId]?.[slot]);
-  const selected=lang==='cn'?null:draw(lines((base[lang] || (lang==='jp'?audio?.voiceJp:null))?.[charId]?.[slot]));
-  if(selected){
-    const file=u=>u.slice(u.lastIndexOf('/')+1);
-    return {url:selected,fallback:cn.find(u=>file(u)===file(selected))??draw(cn)??(lang==='kr'?selected.replace('/voice_kr/','/voice/'):null)};
+export function voiceLine(audio, charId, slot, lang = 'kr', random = Math.random) {
+  const lines = line => (Array.isArray(line) ? line : [line]).filter(u => typeof u === 'string' && u && !/\/voice\/(cn|voice_cn)\//.test(u));
+  const draw = list => list.length ? list[Math.min(list.length - 1, Math.floor(random() * list.length))] : null;
+  const base = audio?.voice || {};
+  const jp = lines((base.jp || audio?.voiceJp)?.[charId]?.[slot]);
+  const selected = draw(lang === 'jp' ? jp : lines(base.kr?.[charId]?.[slot]));
+  if (selected) {
+    const file = u => u.slice(u.lastIndexOf('/') + 1);
+    const fallback = lang === 'jp' ? null : jp.find(u => file(u) === file(selected)) ?? draw(jp);
+    return {url:selected, fallback:fallback === selected ? null : fallback};
   }
-  const url=draw(cn);return url?{url,fallback:null}:null;
+  const url = draw(jp);return url ? {url, fallback:null} : null;
 }
 
 /**
@@ -669,7 +660,7 @@ export class AudioManager {
       sfx: n(v?.sfx, this.volumes.sfx),
       voice: n(v?.voice, this.volumes.voice),
       chatVolume: n(v?.chatVolume, this.volumes.chatVolume),
-      voiceLanguage: ['jp','kr','cn'].includes(v?.voiceLanguage) ? v.voiceLanguage : this.volumes.voiceLanguage,
+      voiceLanguage: ['jp','kr'].includes(v?.voiceLanguage) ? v.voiceLanguage : this.volumes.voiceLanguage,
       muted: typeof v?.muted === 'boolean' ? v.muted : this.volumes.muted,
     };
     if (previousLanguage !== this.volumes.voiceLanguage || v?.muted || v?.voice === 0) this._stopVoice();
@@ -686,7 +677,7 @@ export class AudioManager {
    * @param {string} lang
    */
   setVoiceLang(lang, overrides = this.voiceOverrides) {
-    this.voiceLang = ['kr','jp','cn'].includes(lang)?lang:'kr';
+    this.voiceLang = ['kr','jp'].includes(lang)?lang:'kr';
     this.voiceOverrides = sanitizeVoiceOverrides(overrides);
   }
 
@@ -1206,7 +1197,7 @@ export class AudioManager {
             // 作战中N: the equipped skill's own slot (0-based; 作战中4 is the fallback of a 4th slot)
             if (unitSoundClass(u) === 'char') {
               const banks=this.getManifest()?.audio?.voice;
-              const bank=(banks?.[this.volumes.voiceLanguage] || banks)?.[u.def];
+              const bank=banks?.[this.volumes.voiceLanguage]?.[u.def] || banks?.jp?.[u.def] || this.getManifest()?.audio?.voiceJp?.[u.def];
               const slots=['skill1','skill2','skill3','skill4'].filter(k=>bank?.[k]?.length);
               const n=Number(slots[Math.floor(Math.random()*slots.length)]?.slice(-1)) || 1;
               const condition=this.getManifest()?.audio?.voiceConditions?.[u.def]?.[u.skillIndex];

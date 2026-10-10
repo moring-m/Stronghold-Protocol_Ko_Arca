@@ -24,7 +24,7 @@ import { DAMAGE_NUMBER_MODES, damageNumberMode } from '../../../shared/damageDis
 
 import { sanitizeVoiceOverrides } from '../voicePrefs.js';
 export const TEXT_SIZES=Object.freeze(['sm','md','lg','xl']);
-export const VOICE_LANGS=Object.freeze(['kr','jp','cn']);
+export const VOICE_LANGS=Object.freeze(['kr','jp']);
 import { GEO, PHASE, UF } from '../../../shared/constants.js';
 import { chatNotificationSound, defaultChatCooldown } from '../chatNotificationSounds.js';
 

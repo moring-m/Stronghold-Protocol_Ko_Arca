@@ -15,14 +15,17 @@ test('per-character override survives persistence; deletion restores the current
   manager.setVoiceLang(settings.voiceLanguage, settings.voiceOverrides);
   assert.equal(voiceLangFor(a, manager.voiceLang, manager.voiceOverrides), 'jp');
   manager.setVoiceLang('jp');
-  assert.equal(voiceLangFor(b, manager.voiceLang, manager.voiceOverrides), 'cn');
+  assert.equal(voiceLangFor(b, manager.voiceLang, manager.voiceOverrides), 'jp');
   delete settings.voiceOverrides[b];
   manager.setVoiceLang('jp', settings.voiceOverrides);
   assert.equal(voiceLangFor(b, manager.voiceLang, manager.voiceOverrides), 'jp');
-  assert.equal(voiceLangFor('unknown', 'cn', manager.voiceOverrides), 'cn');
+  assert.equal(voiceLangFor('unknown', 'cn', manager.voiceOverrides), 'kr');
 });
-test('the per-operator JP preference retains the existing per-slot Chinese fallback', () => {
-  const tree = { voice: { [a]: { select: '/cn.mp3' } }, voiceJp: { [a]: { skill1: '/jp.mp3' } } };
-  assert.equal(voiceLine(tree, a, 'select', voiceLangFor(a, 'cn', { [a]: 'jp' })).url, '/cn.mp3');
-  assert.equal(voiceLine(tree, a, 'skill1', voiceLangFor(a, 'cn', { [a]: 'jp' })).url, '/jp.mp3');
+test('Chinese preferences migrate away and Korean missing slots fall back only to Japanese', () => {
+  const tree = {voice:{cn:{[a]:{select:'/assets/audio/voice/cn/char_263_skadi/cn_001.mp3'}},kr:{[a]:{skill1:'/assets/audio/voice/voice_kr/char_263_skadi/cn_023.mp3'}},jp:{[a]:{select:'/assets/audio/voice/voice/char_263_skadi/cn_001.mp3',skill1:'/assets/audio/voice/voice/char_263_skadi/cn_023.mp3'}}}};
+  assert.equal(voiceLine(tree,a,'select','kr').url,'/assets/audio/voice/voice/char_263_skadi/cn_001.mp3');
+  assert.equal(voiceLine(tree,a,'skill1','kr').fallback,'/assets/audio/voice/voice/char_263_skadi/cn_023.mp3');
+  assert.equal(voiceLine({voice:{cn:tree.voice.cn}},a,'select','kr'),null);
+  assert.equal(sanitizeSettings({voiceLanguage:'cn',voiceOverrides:{[a]:'cn'}}).voiceLanguage,'kr');
+  assert.deepEqual(sanitizeVoiceOverrides({[a]:'cn'}),{});
 });

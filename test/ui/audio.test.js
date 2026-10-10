@@ -242,10 +242,10 @@ describe('operator battle voice', () => {
     const urls = [];
     globalThis.fetch = async (u) => { urls.push(u); return { ok: true, arrayBuffer: async () => new ArrayBuffer(8) }; };
     try {
-      const vm = { audio: { sfx: { ui: {}, battle: {}, units: {} }, voice: {
+      const vm = { audio: { sfx: { ui: {}, battle: {}, units: {} }, voice: { jp: {
         char_a: { start: '/v/a_start.mp3', place: ['/v/a_p1.mp3', '/v/a_p2.mp3'], skill3: '/v/a_s3.mp3', faceEnemy: '/v/a_face.mp3' },
         char_b: { place: '/v/b_p1.mp3', skill1: '/v/b_s1.mp3' },
-      } } };
+      } } } };
       const a = new AudioManager({ win: fw.win, getManifest: () => vm, random: () => 0 });
       a.voiceGate = new VoiceGate({ gapMs: 0, preemptMargin: 1 });   // the gap itself is covered above
       a.install();
@@ -310,9 +310,9 @@ describe('operator battle voice', () => {
     };
     const tick = () => new Promise((r) => setTimeout(r, 10));
     try {
-      const vm = { audio: { sfx: { ui: {}, battle: {}, units: {} }, voice: {
+      const vm = { audio: { sfx: { ui: {}, battle: {}, units: {} }, voice: { jp: {
         char_a: { place: '/v/a_p1.mp3', start: '/v/a_start.mp3', faceEnemy: '/v/a_face.mp3', select: '/v/a_sel.mp3' },
-      } } };
+      } } } };
       const a = new AudioManager({ win: fw.win, getManifest: () => vm });
       a.voiceGate = new VoiceGate({ gapMs: 0, preemptMargin: 1 });   // the gap itself is covered above
       a.install();
