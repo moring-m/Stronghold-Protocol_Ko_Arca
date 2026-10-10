@@ -1,3 +1,6 @@
+import { MatchSetupVote } from './match/setupVote.js';
+import { onHumanEmote, onSettle, resetRoundCounters, onPickCard, onStartUnite } from './botEmotes.js';
+import {recordCombatField} from './combatHistory.js';
 
 import { msg } from '../../shared/i18n.js';
 import { bountyCard } from './choices.js';
@@ -233,7 +236,7 @@ export const DELAYS = Object.freeze({
  * official data only gives the whole BAND_CHECK step (autoChessData.enterStepList: 50 s, hint 15 s); the turn clock is
  * the remake's. It is also the step's only countdown (m.public.deadline = draft.turnDeadline). × timerScale.
  */
-export const BAND_TURN_SECONDS = 30;
+export const BAND_TURN_SECONDS = 50;
 
 const dsCache = new WeakMap();
 function dataSourceFor(data) {
@@ -377,6 +380,11 @@ export class Match {
     /** @type {Set<any>} */
     this._timers = new Set();
     this._phaseTimer = null;
+    this._infoAdvanceTimer = null;
+    this.setupRevision = 0;
+    this.setupVote = null;
+    this._setupVoteSeq = 0;
+    this._lastSetupVoteAt = -Infinity;
     this._turnTimer = null;
     this._pubDirty = false;
     this._pubTimer = null;
@@ -490,6 +498,7 @@ export class Match {
     if (!ps || ps.isBot || this.disposed) return;
     this.guard(() => {
       ps.connected = false;
+      this.cancelSetupVote();
       // a paused solo battle resumes (the server takes the field over; nobody is left to resume it)
       this._resume();
       if (this.clientCombat) this._authorityLost(ps, 'disconnect');
@@ -580,6 +589,7 @@ export class Match {
     if (!ps || ps.isBot || ps.left || this.disposed) return;
     this.guard(() => {
       ps.left = true;
+      this.cancelSetupVote();
       ps.connected = false;
       ps.autoplay = false;
       this.watchers.delete(playerId);
@@ -920,6 +930,8 @@ export class Match {
       customFactions: this.customFactions,
       customExtensions: structuredClone(this.customExtensions),
       stageId: this.stageId,
+      setupRevision:this.setupRevision,
+      rerollVote:this.setupVote?{id:this.setupVote.id,proposerId:this.setupVote.proposerId,voters:this.setupVote.voters.slice(),agreed:[...this.setupVote.agreed]}:null,
       factions: this.factions.slice(),
       disabledBonds: [...new Set([...this.disabledBonds, ...this.staticInactiveBonds])].sort(),
       drawnDisabledBonds: this.disabledBonds.slice(),
@@ -1146,8 +1158,11 @@ export class Match {
     switch (msg.t) {
       case 'g.infoReady':
         if (this.phase !== PHASE.INFO_CHECK) return fail(ERR.WRONG_PHASE);
+        if (this.setupVote) return fail(ERR.WRONG_PHASE);
+        if ((msg.setupRevision ?? 0)!==this.setupRevision) return fail(ERR.BAD_TARGET);
         if (!ps.infoReady) { ps.infoReady = true; this.markPublic(); this.maybeEndInfo(); }
         return OK;
+      case 'g.rerollVote':return this.voteSetupReroll(ps,msg.voteId,msg.agree);
       case 'g.band': return this.pickBand(ps, msg.bandId);
       case 'g.bandSkip': return this.skipBand(ps);
       // the strategy highlighted in the draft screen (what a timed-out turn takes, timeoutBand)
@@ -1246,6 +1261,7 @@ export class Match {
     if (now - ps.lastEmoteAt < EMOTE_COOLDOWN_MS) return fail(ERR.RATE);
     ps.lastEmoteAt = now;
     this.broadcast({ t: 'm.emote', playerId: ps.playerId, id });
+    onHumanEmote(this,ps.playerId,id);
     return OK;
   }
 
@@ -1472,10 +1488,10 @@ export class Match {
   }
 
   maybeEndInfo() {
-    if (this.phase !== PHASE.INFO_CHECK) return;
+    if (this.phase !== PHASE.INFO_CHECK || this.setupVote || this._infoAdvanceTimer) return;
     if (this.order.every((p) => p.isBot || p.left || p.infoReady)) {
       this.setDeadline(0);
-      this.later(0, () => { if (this.phase === PHASE.INFO_CHECK) this.enterBandDraft(); });
+      this._infoAdvanceTimer=this.later(0,()=>{this._infoAdvanceTimer=null;if(this.phase===PHASE.INFO_CHECK && !this.setupVote)this.enterBandDraft();});
     }
   }
 
@@ -1832,6 +1848,7 @@ export class Match {
     if (!card) return;
     s.picks[ps.playerId] = idx;
     s.taken[idx] = ps.playerId;
+    onPickCard(this,ps,card);
     try { applyCard(this, ps, card); } catch (e) { this.reportError(`applyCard ${card.id}`, e); }
     this.markPrivate(ps);
     this.markPublic();
@@ -2155,6 +2172,7 @@ export class Match {
 
   /** Aggregate a finished field's content/engine errors (battle.errors: unique records) for diagnostics. */
   _collectSimErrors(f, res) {
+    recordCombatField(this,f,res);
     this.simErrors += Number(res && res.errors) || 0;
     const list = f && f.battle && Array.isArray(f.battle.errors) ? f.battle.errors : [];
     for (const e of list) {
@@ -2208,6 +2226,7 @@ export class Match {
   }
 
   startUnite(plan) {
+    onStartUnite(this,plan);
     if (this.clientCombat) { this._startUniteClient(plan); return; }
     this.phase = PHASE.UNITE;
     this.unitePlan = plan;
@@ -3094,7 +3113,7 @@ export class Match {
     for (const f of this.fields) {
       if (!f.cc || f.done) continue;
       if (f.mode === 'server' && f.battle) {
-        try { f.battle.forceEnd('forced'); } catch (e) { this.reportError('boss forceEnd', e); }
+        try { f.battle.forceEnd(reason); } catch (e) { this.reportError('boss forceEnd', e); }
         let res = null;
         try { res = f.battle.result(); } catch (e) { this.reportError('boss result', e); }
         f.result = res && res.perPlayer ? res : syntheticResult(f.players, { bossBy: f.bossBy });
@@ -3221,6 +3240,7 @@ export class Match {
     this.fields = [];
     this.watchers.clear();
     this.markPublic();
+    onSettle(this);
     this.setDeadline(DELAYS.SETTLE / 1000, () => this.afterSettle(), { silent: this.soloUntimed });
   }
 
@@ -3236,6 +3256,7 @@ export class Match {
 
   afterSettle() {
     if (!this.alivePlayers().length) { this.finish({ victory: false, reason: 'eliminated' }); return; }
+    resetRoundCounters(this);
     this.startRound(this.round + 1);
   }
 
@@ -3579,3 +3600,5 @@ export class Match {
   }
 
 }
+
+for(const key of Reflect.ownKeys(MatchSetupVote.prototype)){if(key!=='constructor')Object.defineProperty(Match.prototype,key,Object.getOwnPropertyDescriptor(MatchSetupVote.prototype,key));}

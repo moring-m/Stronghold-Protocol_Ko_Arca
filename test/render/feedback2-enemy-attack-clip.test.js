@@ -177,3 +177,25 @@ test('movement pace follows speed modifiers without retiming attack or idle',()=
  a.mode='base';a.setBase('idle');a.update(.01);assert.equal(track(a).timeScale,1);
  a.setBase('move');a.moveRate=0;a.update(.01);assert.equal(track(a).timeScale,0);a.destroy();
 });
+
+test('Big Bob uses the authored heavy swing and strikes at its longer OnAttack marker',()=>{
+ const a=actor('enemy_1001_bigbo',true);assert.equal(a.roles.attack.loop,'Attack2');
+ a.windUp(6,.733);assert.equal(a.current,'Attack2');run(a,.733);a.attack(6);assert.equal(track(a).timeScale,1);
+ run(a,1.2);assert.equal(a.current,a.roles.move.loop);
+});
+test('an ability gesture completes once and restores the permanent empty-barrel form',()=>{
+ const a=actor('enemy_10044_wintun',true);
+ a.setForm({idle:'B_Idle',move:{begin:null,loop:'B_Move',end:null},die:'B_Die',attack:{begin:null,loop:'B_Attack',end:null}});
+ a.setBase('move');a.playAbility('Attack',1.467);assert.equal(a.current,'Attack');run(a,1.5);assert.equal(a.current,'B_Move');
+ a.attack(3);assert.equal(a.current,'B_Attack');
+ assert.equal(a.playAbility('not_an_animation',1),false);
+});
+test('Liskarm S1 retains ordinary attacks, while S2 uses its skill attack clip',()=>{
+ const sp=assets.chars.char_107_liskam.spine.front;const a=new SpineActor(dataOf(sp),sp);
+ a.setSkillIndex(0);assert.equal(a.roles.skill.loop,sp.anims.attack.loop);assert.equal(a.roles.skill.via,'attack');
+ a.setSkillIndex(1);assert.equal(a.roles.skill.loop,'Skill');
+});
+test('an ability gesture does not release an existing freeze',()=>{
+ const a=actor('enemy_10087_hlchgr',true);a.frozen=true;assert.equal(a.playAbility('Skill',1),true);const time=track(a).trackTime;run(a,.5);assert.equal(a.frozen,true);assert.equal(track(a).trackTime,time);
+ a.frozen=false;run(a,1.1);assert.equal(a.current,a.roles.move.loop||a.roles.move);
+});

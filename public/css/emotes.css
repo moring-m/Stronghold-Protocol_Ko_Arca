@@ -155,5 +155,5 @@ img.eart.eart--original { background:transparent; }
 .ebubble__icon { left:.299rem; top:.138rem; }
 
 .ewheel__tabs { position:absolute; top:.17rem; left:.205rem; width:2.71rem; display:flex; gap:.06rem; }
-.ewheel__tabs button { flex:1; height:.34rem; border:1px solid #49605a; background:#15211e; color:#acbdb7; font-size:.13rem; cursor:pointer; }
+.ewheel__tabs button { flex:1; height:.34rem; border:1px solid #49605a; background:#15211e; color:#acbdb7; font-size: .13rem; cursor:pointer; }
 .ewheel__tabs button[aria-selected="true"] { color:#071d16; background:#56d8b4; border-color:#56d8b4; }

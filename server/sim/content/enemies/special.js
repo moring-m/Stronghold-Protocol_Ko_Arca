@@ -6,7 +6,7 @@ import { canTargetAlly, areaSelectable } from '../../targeting.js';
 import { periodicDamage } from '../../damage.js';
 import {
   BOOM_RADIUS, nthOf, stOf, T, elem, hurt, targetsNear, allTargets, areaAllies, areaAlliesInTiles, byPriority,
-  stayRoute, spawnChildren, expose, auraBuff, watchDeaths, onTerrain,
+  stayRoute, spawnChildren, setForm, expose, auraBuff, watchDeaths, onTerrain,
 } from './helpers.js';
 import {
   unblockable, runWhenHit, blockWeight, taunt, maxTargets, ep, nthAttackPower, lowHpBuff, deathBoom, setFloat, float,
@@ -344,6 +344,7 @@ export const SPECIAL_KITS = Object.freeze({
         if (a.done) return;
         a.done = true;
         b.removeBuff(e, 'ab:barrel');
+        setForm(b,e,'emptied');
         const x = e.x, y = e.y, life = s.fixed_duration ?? 0;
         b.fx('zone', { x, y, r: BARREL_RADIUS, dur: life, kind: 'barrel' });
         let left = life;
@@ -362,6 +363,10 @@ export const SPECIAL_KITS = Object.freeze({
       a.n = (a.n ?? 0) + 1;
       if (a.n > 5) return;
       const s = ab.sk.ForeverEnhance ? ab.sk.ForeverEnhance.bb : {};
+      const anim=e.def.raw?.abilityAnimations?.ForeverEnhance;
+      e.mem.abilityAnimUntil=b.time+(anim?.duration || 1);
+      e.skillAnimUntil=e.mem.abilityAnimUntil;
+      b.fx('enemySkill',{id:e.id,x:e.x,y:e.y,clip:anim?.clip || 'Skill',dur:anim?.duration || 1});
       b.addBuff(e, { key: 'ab:enhance', refresh: 'stack', stacks: 1, maxStacks: 5, persist: true, mods: { moveFlat: (s.move_speed_add ?? 0) * e.base.moveSpeed, atkPct: s.atk_add ?? 0 } });
     },
   }],

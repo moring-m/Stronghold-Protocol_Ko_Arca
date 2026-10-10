@@ -457,6 +457,11 @@ flag `float` (近地悬浮, PRTS 术语释义 "算作空中单位") or `levitate
 (a hovering enemy keeps walking the ground path). `deploySeq` counts deployments (and identifies one: `seq === u.deploySeq`);
 `aggroSeq` is the aggro order (= deploySeq, except the summons of the initial deployment, §1).
 
+克莱门莎 S2's kit stores its cabin in `unit.mem.clemntCabin`. Before boarding each tick, it removes passengers
+that died, became hidden / uncarryable or cannot path to the next cabin position, removes their carry buff and
+returns their current `weight` (including modifiers). The same tick's count and weight limits use that cleaned
+list and budget (DESIGN §28.27); this is local to the kit, not a change to general displacement.
+
 **Hit areas (`body.js`, user playtest #5 item 10).** A regular enemy is a point: in a grid range when the tile of its
 position (`round(y)`, `round(x)`) is a range tile, in a radius when its position is (DESIGN §3). A huge enemy (巨型单位:
 `enemy.hitArea` from data/enemies.json `hitArea` — 假想敌：胄 / 管 / 盐风主教昆图斯 / 阿利斯泰尔 / “萨米的意志”, PRTS
@@ -729,7 +734,7 @@ registration order. `battle.off(handle)` / `battle.off(name, fn)` / `battle.offO
 | `heal` | `{ source, target, amount, opts }` | mutable `amount` |
 | `fatal` | `{ unit, source, credit, dmg, amount, prevented }` | HP would reach 0 — set `prevented` (substitutes, kit savers, 不死 / 复活 items, 埃芒加德; 不屈 is a `death` hook). Fired by every HP loss of a unit without a boss pool — hits of any type, element bursts, 无来源 damage, `loseHp` 流失. Order: kits' own savers (10 … −60) → items' 不死 (坚固维式重锤 — once per deployment: `items/battle.js deploymentOf`, a key every deploy changes and an in-place 复活 changes too; one battle-level hook holds the running windows (`holdsUndying`), so a window outlasts a lend, DESIGN §21.21 — the lock `PRIO_REVIVE` −100 after the substitutes (−100, registered first), the running windows `PRIO_UNDYING_HELD` −99 before them: a 傀儡师 holding 不死 does not switch, PRTS 分支特性信息 傀儡师 "未持有不死的情况下", DESIGN §22.11) → items' 复活 (M3茧甲, `PRIO_RESPAWN` −101: PRTS "复活" acts on a knock-out, which a 不死 prevents) → 埃芒加德 (−110); both 复活 revive in place and call `revivedInPlace` (a new deployment for the lock) |
 | `dollSwitch` | `{ unit, reason, done }` | content switches a 傀儡师 to its <替身> now (归溟幽灵鲨 S2 "技能结束后立刻切换为<替身>": no lethal HP loss); its trait does it unless it already is one or is not on the field, and sets `done` |
-| `dollSwap` | `{ unit, form }` | a 傀儡师 starts a switch — to its <替身> (`form` `'doll'`) or back to its <本体> (`null`); not when it is knocked out as the 替身 (不屈 rolls on it: "切换<替身>与<本体>时") |
+| `dollSwap` | `{ unit, form }` | a 傀儡师 starts a switch — to its <替身> (`form` `'doll'`) or back to its <本体> (`null`); not when it is knocked out as the 替身 (不屈 rolls on it: "切换<替身>与<本体>时"). 远牙's granted `garrison_108_a/b` gains on it too (player-confirmed, DESIGN §28.5), sharing its deployment cap and active-bond checks. |
 | `kill` | `{ killer, victim }` | victim HP reached 0 (a handler may revive by restoring HP) |
 | `death` | `{ unit, reason:'killed'|'leak'|'retreat'|'merchant'|'expired'|'forcedExit', killer }` | unit removed (`'forcedExit'`: an operator entering 联防 knocked out, §1.1) |
 | `skillStart` / `skillEnd` | `{ unit, skill, reason }` | mutate `skill.ammoLeft` / `skill.timeLeft` in skillStart (bullets added there raise `skill.ammoMax`, the ammo bar's full mark) |
@@ -789,6 +794,14 @@ or guard with a per-unit flag while dealing it. When the guard trips, the logged
 | `effectiveProfile(unit)`, `reduceElement(unit, amount, el?)` | |
 | `battle.grid` | `tile(r,c)` → `{glyph, key, height:'LOW'|'HIGH', build, pass:'ALL'|'FLY'|'NONE', terrain, special}`, `inRect`, `canStand(r,c,{ranged})` (every automatic placement: the 突袭 landing tile, tactical points, summon tiles — `build` is the effective deploy type, so never the 深水区 `tile_deepsea` (PRTS 深水区 地形信息 "拒绝部署（待补充）"; the 特制水上平台 of the inactive act1 m05 is not modelled, its tiles stay NONE here [ASSUMED]); no melee unit on a hard-blocked 射击台 / mound tile), `groundPassable`, `isLow`, `findPath(sr,sc,er,ec)`, `specialTiles('start'|'end'|…)`; `battle.rect`, `battle.stage` (normalised stage incl. `special` terrain params) |
 | `battle.data` | DataSource: `getChess(id, loadout?)`, `getEnemy(key)`, `getToken(id, ownerChessId, ownerLoadout?)`, `getStage(id)`, `getWave(id)` (normalised defs; raw record in `def.raw`; the per-battle loadout view, §12) |
+
+`keepFacing` is presentation metadata emitted by `push` and `pull` by default: `displace` includes it in the fx so the
+client retains the enemy's pre-hit facing through its slide. Directional Wild Mane S2 (#418) and radial Mostima S3 have
+official footage directly showing unchanged facing. Mint S2 uses `push({ inward: true })`, while hook pulls such as
+Gladiia S1/S2 use `pullToFront` → `pull`; the supplied drag clips directly show unchanged facing before and after the
+shown pulls. Applying that observation to pulls against prior facing and other sources is [ASSUMED]. Either method can
+pass `keepFacing: false` for a documented exception. Raw `displace` calls still face their travel direction. No facing
+flag alters movement or 失衡.
 
 ---
 
@@ -925,8 +938,8 @@ Element conventions of the kits (user playtest #5 #3; official term dictionary: 
   duration,              // s (duration kind; optional cap for ammo)
   ammo,                  // attacks (ammo kind)
   spCost, initSp, charges, spType: 'time'|'attack'|'hurt'|'none',   // optional overrides of the data values
-  trigger: 'DEFAULT' | { rule, grid, allies?, hpAtMost? },     // optional override (allies / hpAtMost: an injured ally condition, §7.1)
-  heal: bool,            // heal-type skill for the DEFAULT trigger (default: unit is a healer)
+  trigger: 'DEFAULT' | { rule, grid, allies?, hpAtMost?, enemies? },     // optional override (allies / hpAtMost: an injured ally condition, §7.1)
+  heal: bool,            // heal-type skill for the DEFAULT trigger (default: unit is a healer); trigger.enemies also permits enemies
   mods: { …mod keys },   // buff while active (instant: only during the pending attack)
   flags: { …flags },
   targeting: { maxTargets, rangeGrid, rangeExtend, priority, allInRange, canHitFly,
@@ -1302,3 +1315,8 @@ modelled — only its distance, `push` / `pull`); pushes PRTS does not classify 
 platforms/mounds are ground obstacles that elevate operators; the generic kit maps 凋亡 to `apoptosis` (侵蚀 has no element key
 yet — enemy content must pick one); 抵抗 covers the control statuses of `RESIST_STATUSES` (the official term lists 晕眩/寒冷/
 冻结/恐惧/诱导…, the rest follow the operator kits that grant it) and caps at 0.95; tactical points prefer enemy path tiles.
+
+
+“余音” owns a same-call pulse queue (DESIGN §28.24): reflected hits enqueue their earned pulses instead of recursively
+entering another pulse. This retains the lethal-hit pulse and prevents valid high hit-count chains from tripping the
+general hook guard. The queue is emptied in `finally`; it introduces no timer or simulation RNG.

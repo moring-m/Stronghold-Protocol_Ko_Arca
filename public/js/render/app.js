@@ -121,7 +121,7 @@ import { TileField } from './tiles.js';
 import { UnitView, ItemView, DeviceView, FORMS, syncView } from './units.js';
 import { FxSystem, ensureDamageFonts } from './fx.js';
 import { createDragController, pieceTile, dragStandTile } from './drag.js';
-import { backdropTextures, shadowTexture, refreshTierChips, silhouetteTexture } from './textures.js';
+import { backdropTextures, shadowTexture, refreshTierChips, refreshDownLabels, silhouetteTexture } from './textures.js';
 import { TILE_H, TIER_COLORS, COLORS } from './style.js';
 import { createAssets, assets as defaultAssets } from '../assets.js';
 import { loadBoardArt } from './boardArt.js';
@@ -129,7 +129,7 @@ import { ImpostorAtlas } from './impostor.js';
 import { loadThree, loadBoardPack, webgl2Available, boardArtListed } from './board3d/load.js';
 import { BoardScene } from './board3d/scene.js';
 import { AREAS, areaFor, unionAreas } from './board3d/layout.js';
-import { layoutPen, penSignature, bossPenStage, BOSS_PEN_RECT, parsePenRect } from './pen.js';
+import { layoutPen, penSignature, bossPenStage, cooperativeBossStage, BOSS_PEN_RECT, parsePenRect } from './pen.js';
 import { IDENTITY, bossPrepField, tilesToDisp, leaderStand } from './prepfield.js';
 import { pickOnTile, pickBattle, hitRectAt, hitTiles } from './pick.js';
 import { promotionsOf } from './promote.js';
@@ -228,10 +228,7 @@ const BOSS_PREP_AREA = Object.freeze([
   Object.freeze({r0:BOSS_PEN_RECT.r0-1,r1:BOSS_PEN_RECT.r0-1,c0:6,c1:14}),
   Object.freeze({...BOSS_PEN_RECT,c0:6,c1:14}),
 ]);
-const AREA_NO_PEN = Object.freeze({
-  normal: Object.freeze(AREAS.normal.filter((a) => a.r1 <= 13)),
-  unite: Object.freeze(AREAS.unite.filter((a) => a.r1 <= 13)),
-});
+const COOPERATIVE_BOSS_AREA = Object.freeze(BOSS_PREP_AREA.map(a=>Object.freeze({...a,r0:a.r0+7,r1:a.r1+7})));
 
 /**
  * 3D area built for a view kind (viewKind): prep / normal / pen retain the same field + preview geometry.
@@ -243,12 +240,13 @@ export function boardArea(vk) {
   if (['bossPrep','boss','hidden'].includes(vk)) return BOSS_PREP_AREA;
   if (vk === 'pen') return AREAS.normal;
   if (vk === 'prep' || vk === 'normal') return AREAS.normal;
-  if (vk === 'unite') return AREA_NO_PEN.unite.length ? AREA_NO_PEN.unite : AREAS.unite;
+  if (vk === 'unite') return COOPERATIVE_BOSS_AREA;
   return areaFor(vk);
 }
 
 /** Boss intel builds only its field and the separate preview floor, never the normal battlefield. */
 export function boardAreaForView(vk, previousKind) {
+  if (vk === 'pen' && previousKind === 'unite') return boardArea('unite');
   if (vk === 'pen' && ['bossPrep','boss','hidden'].includes(previousKind)) return BOSS_PREP_AREA;
   return boardArea(vk);
 }
@@ -259,6 +257,7 @@ export function boardAreaForView(vk, previousKind) {
  */
 export function bandFor(kind) {
   if (['bossPrep','boss','hidden'].includes(kind)) return [0,12];
+  if (kind === 'unite') return [7,18];
   return ['pen','prep','normal'].includes(kind) ? [6, 18] : [6, 13];
 }
 
@@ -745,8 +744,8 @@ export async function createFieldView(host, options = {}) {
   }
   loadShadow();
   ensureDamageFonts();
-  // web fonts may land after the first chips were drawn
-  if (document.fonts?.ready) document.fonts.ready.then(() => { if (!destroyed) refreshTierChips(); }).catch(() => {});
+  // web fonts may land after the first chips / redeploy-ring labels were drawn
+  if (document.fonts?.ready) document.fonts.ready.then(() => { if (!destroyed) { refreshTierChips(); refreshDownLabels(); } }).catch(() => {});
 
   // ---- camera ---------------------------------------------------------------------------------------------
 
@@ -920,7 +919,10 @@ export async function createFieldView(host, options = {}) {
     const previous=camBeforePen && viewKind(camBeforePen.kind,camBeforePen.opts);
     return ['bossPrep','boss','hidden'].includes(k) || k==='pen' && ['bossPrep','boss','hidden'].includes(previous);
   }
-  function visualStage() { return bossPreview() ? bossPenStage(stageRec) : stageRec; }
+  function visualStage() {
+    const k=viewKind(camKind,camOpts), previous=camBeforePen && viewKind(camBeforePen.kind,camBeforePen.opts);
+    return bossPreview() ? bossPenStage(stageRec) : k==='unite' || k==='pen' && previous==='unite' ? cooperativeBossStage(stageRec) : stageRec;
+  }
   function applyVisualStage() {
     const visual=visualStage();
     if (!visual) return;
@@ -1787,7 +1789,9 @@ export async function createFieldView(host, options = {}) {
         if (e[1] === 'displace') {
           const d = e[4] && typeof e[4] === 'object' ? e[4] : null;
           const v = d && d.id != null ? views.get(d.id) : null;
-          if (v && v.slideTo) v.slideTo(Number(e[2]), Number(e[3]), Number(d.dur) > 0 ? { dur: Number(d.dur) } : {});
+          if (v && v.slideTo) v.slideTo(Number(e[2]), Number(e[3]), {
+            ...(Number(d.dur) > 0 ? { dur: Number(d.dur) } : {}), keepFacing: d.keepFacing === true,
+          });
         }
         // an enemy's mode change — the `form` of a sim setForm fx (shared/protocol.js fxForm: 掠海漂移体 → 爬行模式, user
         // playtest #5 item 1; 转译基底's forms, a 逐火 ember and its revival, the leaders' 重生, 守墓石像 — user report after
@@ -1850,7 +1854,9 @@ export async function createFieldView(host, options = {}) {
     const extra = e[4] && typeof e[4] === 'object' ? e[4] : null;
     const v = extra && extra.id != null ? views.get(extra.id) : null;
     // `dur`: the push / pull's 失衡 time in game seconds (battle/displacement.js) — the slide's length
-    if (v && v.slideTo) v.slideTo(Number(e[2]), Number(e[3]), Number(extra.dur) > 0 ? { at: slideAt, dur: Number(extra.dur) } : { at: slideAt });
+    if (v && v.slideTo) v.slideTo(Number(e[2]), Number(e[3]), {
+      at: slideAt, ...(Number(extra.dur) > 0 ? { dur: Number(extra.dur) } : {}), keepFacing: extra.keepFacing === true,
+    });
   }
   let renderT0Battle = null;   // game time of the first rendered battle frame (spawn puffs skip the initial wave)
   let downSeq = 0;             // syncBattle pass counter: a view still marked down after a pass left the `down` list

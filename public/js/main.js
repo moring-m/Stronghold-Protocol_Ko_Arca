@@ -1,3 +1,4 @@
+import './ui/compat.js';
 import { StatsHost } from './screens/stats.js';
 import { recordResult, installStatsRecorder } from './ui/stats.js';
 
@@ -31,7 +32,7 @@ import { recordError } from './diag.js';
 // warmed in the background as soon as the player is in a room (warmGameData), before the match needs them.
 
 // Polyfills first (older Safari / Firefox ESR): every module evaluated after this one sees them.
-import './ui/compat.js';
+
 import { installButtonFocusRelease } from './ui/buttonFocus.js';
 // 한글 패치: 첫 렌더 전에 한국어 사전을 불러오고 DOM 번역기를 건다 (top-level await).
 import './i18n/i18n.js';
@@ -136,6 +137,7 @@ function maybeFinishRestore() {
  * follow the store themselves).
  */
 function backToLobby() {
+  identity.rememberMatch(null);
   clearTimeout(restoreTimer);
   const s = store.get();
   if (s.room || s.match.public) closeAllDialogs();
@@ -145,9 +147,11 @@ function backToLobby() {
 
 function onWelcome(msg) {
   identity.saveToken(msg.token);
+  identity.rememberMatch(null);
   const prev = store.get();
   const prevId = prev.me.playerId;
   const name = typeof msg.name === 'string' && msg.name ? msg.name : prev.me.name;
+  identity.saveName(name);
   store.set({ me: { playerId: msg.playerId ?? null, name, token: typeof msg.token === 'string' ? msg.token : null } });
   welcomeAt = Date.now();
 
@@ -189,6 +193,8 @@ function onRoomState(msg) {
   if (room.inMatch && !(prevRoom && prevRoom.inMatch && prevRoom.code === room.code)) store.set({ match: emptyMatch() });
   if (prevRoom?.code !== room.code) store.set({chat: [], chatFaction: null, chatFactions: {}});
   store.set({ room });
+  identity.rememberMatch(room.inMatch && seats.some((seat) => seat?.playerId === myId)
+    ? { name: store.get().me.name, code: room.code || '' } : null);
   if (room.mode === 'coop' && typeof room.code === 'string') rememberRoom(room.code);
   maybeFinishRestore();
 }
@@ -211,8 +217,11 @@ function wireNet() {
   });
   net.on('clock', (c) => store.set({ clock: { offset: c.offset, rtt: c.rtt, synced: c.synced } }));
   net.on('welcome', onWelcome);
-  net.on('helloError', (err) => toastError(err));
-  net.on('replaced', () => toast('该身份已在其他页面登录，本页已断开', 'warn', { ttl: 6000 }));
+  net.on('helloError', (err) => {
+    if (err.code === 'SESSION_IN_USE') identity.rejectToken();
+    toastError(err);
+  });
+  net.on('replaced', () => toast(t('该身份已在其他页面登录，本页已断开'), 'warn', { ttl: 6000 }));
   net.on('unhandledError', (err) => toastError(err));
   net.on('room.state', onRoomState);
   net.on('room.closed', (msg) => {
@@ -228,6 +237,12 @@ function wireNet() {
     // 本机统计 (PR #323): every arrival, including the lobby's result replay after a reconnect / reload —
     // replays dedupe by content id inside recordResult (spectator seats' copies build no record at all)
     recordResult(res, { myId: store.get().me.playerId, roomMode: store.get().room?.mode ?? null, now: Date.now() });
+  });
+  net.on('room.commended',msg=>{
+    const result=store.get().match.result;
+    if(result?.matchNo!==msg.matchNo)return;
+    store.patch('match',{result:{...result,commendationsGiven:msg.given,
+      players:(result.players||[]).map(p=>({...p,commendations:msg.counts?.[p.playerId]||0}))}});
   });
   net.on('m.toast', (msg) => {
     const kind = ['info', 'success', 'warn', 'error'].includes(msg.kind) ? msg.kind : 'info';

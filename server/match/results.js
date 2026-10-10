@@ -114,6 +114,7 @@ export function buildResult(m, outcome) {
       bandId: ps.bandId,
       lineup,
       bonds: bondList(gd, ps.bonds).filter((b) => b.active || b.layers > 0),
+      combatRounds: ps.combatRounds || [],
       stats: {
         dmgDealt: Math.round(ps.stats.dmgDealt), kills: ps.stats.kills, leaks: ps.stats.leaks, gold: ps.stats.gold,
         refreshes: ps.stats.refreshes, merges: ps.stats.merges, itemsEquipped: ps.stats.itemsEquipped,

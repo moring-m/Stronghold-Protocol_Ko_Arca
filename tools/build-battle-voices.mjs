@@ -33,7 +33,8 @@ for(const lang of ['kr','jp'])for(const id of ids){
  })]));
  if(lang==='kr')audit.push({charId:id,metadataKR:!!available?.KR,krLines:resolved.filter(x=>x.actual==='kr').length,jpFallback:resolved.filter(x=>x.actual==='jp')});
 }
-manifest.audio.voice=voice;
+const existingVoice=manifest.audio.voice||{};
+manifest.audio.voice={cn:existingVoice.cn || (existingVoice.kr||existingVoice.jp?{}:existingVoice),...voice};
 manifest.audio.voiceAvailability=Object.fromEntries(audit.map(x=>[x.charId,{krLines:x.krLines,jpFallback:x.jpFallback.length}]));
 manifest.audio.voiceConditions=Object.fromEntries([...ids].map(id=>[id,Object.fromEntries(Object.values(records).filter(c=>c.charId===id).flatMap(c=>(c.skills||[c.skill]).filter(Boolean).map(sk=>[sk.index,{passive:sk.skillType!=='MANUAL',spCost:sk.spCost}])))]));
 await writeFile('.cache/ursus-data/assets.json',JSON.stringify(manifest));

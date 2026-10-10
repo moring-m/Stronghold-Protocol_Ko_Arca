@@ -36,7 +36,13 @@ export function drawDisabledBonds(gd, rng, policy = {}) {
   const protectedIds = new Set(policy.protectedBonds||[]);
   const quota = Math.min(Math.max(nCore + extraCore,forced.length),Math.max(0,core.length-5));
   const randomCore = core.filter(id=>!forced.includes(id)&&!protectedIds.has(id));
-  const drawn = [...forced, ...sample(randomCore,Math.max(0,quota-forced.length),rng), ...sample(addon, Math.min(nAddon,Math.max(0,addon.length-3)), rng)].sort();
+  const drawn = [...forced, ...sample(randomCore,Math.max(0,quota-forced.length),rng)].sort();
+  const forcedAux=addon.filter(id=>(policy.forcedAuxBonds||[]).includes(id));
+  const protectedAux=new Set(policy.protectedAuxBonds||[]);
+  // Forced auxiliary bans can exceed the random quota; protected entries never enter it.
+  const auxQuota=Math.min(Math.max(nAddon,forcedAux.length),addon.length);
+  const auxDraw=[...forcedAux,...sample(addon.filter(id=>!forcedAux.includes(id)&&!protectedAux.has(id)),Math.max(0,auxQuota-forcedAux.length),rng)];
+  drawn.push(...auxDraw);drawn.sort();
   const off = new Set([...drawn, ...staticOff]);
   const banned = [];
   for (const id of gd.visibleChess) {

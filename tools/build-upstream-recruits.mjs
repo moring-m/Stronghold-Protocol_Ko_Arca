@@ -49,6 +49,7 @@ export async function buildUpstreamRecruits(root,dir){
  assets.audio??={};assets.audio.units??={};for(const [id,value]of Object.entries(srcAssets.audio?.units||{}))assets.audio.units[id]??=value;
  const ursusChars=new Set(Object.values(chess).filter(c=>!c.optionalRecruit&&c.bonds?.includes('ursusShip')).map(c=>c.charId));
  for(const rec of Object.values(chess))if(rec.optionalRecruit&&(ursusChars.has(rec.charId)||rec.bonds?.includes('ursusShip')))Object.assign(rec,{visible:false,isHidden:true,shopExcluded:true});
+ assets.stats??={};assets.stats.voiceChars=Object.keys(assets.audio?.voice?.cn||assets.audio?.voice||{}).length;
  for(const [k,v]of Object.entries({chess,tokens,assets,bonds}))await writeFile(`${dir}/${k}.json`,JSON.stringify(v));
  await buildRecruitResources(root);
  console.log(`Upstream recruit roster: ${ids.length} operators, preserved Sakiko`);

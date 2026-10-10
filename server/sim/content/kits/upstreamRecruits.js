@@ -2,6 +2,7 @@ export const STANDIN_KIT_FILES = Object.freeze(['standin-acguad.js', 'standin-sh
 
 
 export const OPERATOR_KIT_FILES = Object.freeze([
+  'op-clemnt.js',
   'op-siege.js',
   'op-chen.js',
   'op-irene.js',

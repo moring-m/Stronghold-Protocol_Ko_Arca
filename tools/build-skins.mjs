@@ -9,6 +9,7 @@ import {spineAttackTiming} from '../shared/attackTiming.js';
 export async function buildSkins(root,dir){
  const read=async p=>JSON.parse(await readFile(p,'utf8'));
  const zh=await read(join(root,'.cache/skins/zh.json')),ko=await read(join(root,'.cache/skins/ko.json'));
+ const names=(await read(join(root,'content/i18n/skin-names-ko.json')).catch(()=>({}))).entries || {};
  const chess=await read(join(dir,'chess.json')),assets=await read(join(dir,'assets.json'));const chars=new Set(Object.values(chess).filter(c=>c.globalReleased!==false).map(c=>c.charId));
  const candidates=Object.values(zh.charSkins).filter(s=>chars.has(s.charId)&&s.displaySkin?.skinName);
  const files=[],catalog=new Map();let done=0,missing=0;
@@ -28,7 +29,7 @@ export async function buildSkins(root,dir){
    const avatar=`/assets/custom/skins/${id}/avatar.png`,portrait=`/assets/custom/skins/${id}/portrait.png`;
    files.push({path:avatar,sources:[RAW.yuanyan+'avatar/'+encodeURIComponent(s.avatarId)+'.png']},{path:portrait,sources:[RAW.yuanyan+'portrait/'+encodeURIComponent(s.portraitId)+'.png']});
    assets.chars[id]={avatar,portrait,spine:{front,back}};
-   const entry={id,name:ko.charSkins[s.skinId]?.displaySkin?.skinName||s.displaySkin.skinName,assets:{spine:id,avatar:id,portrait:id},attackTiming:{front:spineAttackTiming(front),back:spineAttackTiming(back)}};
+   const entry={id,name:ko.charSkins[s.skinId]?.displaySkin?.skinName||names[s.displaySkin.skinName]||s.displaySkin.skinName,assets:{spine:id,avatar:id,portrait:id},attackTiming:{front:spineAttackTiming(front),back:spineAttackTiming(back)}};
    if(!catalog.has(s.charId))catalog.set(s.charId,[]);catalog.get(s.charId).push(entry);
   }catch{missing++;}done++;if(done%20===0)console.log(`Skins ${done}, unavailable ${missing}`);}}
  await Promise.all(Array.from({length:8},worker));

@@ -760,7 +760,7 @@ test('锏: S3 = 10 slashes (180 % ×1.6 talent) on ≤5 enemies + a 300 % finish
   assert.equal(slashes.length, 11 * 2, '10 slashes + finisher on 2 enemies');
   assert.ok(near(slashes[0].amount, u.s.atk * bb.d_atk_scale * t0.atk_scale, 1e-3));
   assert.ok(near(slashes.at(-1).amount, u.s.atk * bb.e_atk_scale_end * t0.atk_scale, 1e-3));
-  assert.ok(near(h.b.time - t, 10 * bb.d_hit_interval, 0.05));
+  assert.ok(near(h.b.time - t, 9 * bb.d_hit_interval, 0.05));
   const far = enemyAt(h, 'enemy_dummy2');
   assert.ok(far.x < 7 - 0.4, 'pulled toward her');
   assert.ok(h.hooksOf('statusApplied').some((c) => c.status === 'tremble'), '战栗');
@@ -1230,4 +1230,15 @@ test('Skadi seaborn returns after being killed, not only natural expiry',()=>{
  assert.ok(tok.alive&&tok.deployed);assert.equal(h.b.allyUnits.filter(x=>x.defId===tok.defId&&x.alive).length,1);
  h.run(25.5);assert.equal(tok.alive,false);h.run(31);assert.ok(tok.alive);
  checkInvariants(h.b);
+});
+
+test('Degenbrecher S3 releases immunity in the finisher frame, preserving all ten slashes and cleanup on interruption',()=>{
+ const h=battle({units:[{chessId:'chess_char_6_19_a',row:10,col:5,carryState:{sp:34}}],enemies:[{key:'enemy_dummy',pos:[10,6]}]});
+ const u=h.unit('chess_char_6_19_a');assert.ok(h.runUntil(()=>u.skill.active,10));
+ const start=h.b.time;assert.equal(u.s.flags.invulnerable,true);
+ assert.ok(h.runUntil(()=>h.eventsOf('fx').some(x=>x[1]==='finale'),5));
+ assert.ok(h.b.time-start<=9*u.def.skill.bb.d_hit_interval+.04);assert.ok(!u.s.flags.invulnerable);assert.equal(u.mem.dgb,null);
+ assert.equal(h.dmg.filter(d=>d.src===u.id&&d.tags.includes('slash')).length,11);
+ const hp=u.hp;h.b.dealDamage(null,u,{amount:50,type:'true'});assert.ok(u.hp<hp);
+ assert.ok(u.skill.activate('test',{free:true}));assert.equal(u.s.flags.invulnerable,true);u.skill.stop();assert.ok(!u.s.flags.invulnerable);assert.equal(u.mem.dgb,null);assert.equal(h.b.errorCount,0);
 });

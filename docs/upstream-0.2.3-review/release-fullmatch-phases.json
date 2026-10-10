@@ -1,0 +1,432 @@
+{
+  "phases": [
+    {
+      "phase": "INFO_CHECK",
+      "round": 0,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "BAND_DRAFT",
+      "round": 0,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "BATTLE_CHECK",
+      "round": 0,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "ROUND_START",
+      "round": 1,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "PREP",
+      "round": 1,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "COMBAT",
+      "round": 1,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "UNITE",
+      "round": 1,
+      "unite": true,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "SETTLE",
+      "round": 1,
+      "unite": true,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "ROUND_START",
+      "round": 2,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "PREP",
+      "round": 2,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "COMBAT",
+      "round": 2,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "SETTLE",
+      "round": 2,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "ROUND_START",
+      "round": 3,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "SP_DRAFT",
+      "round": 3,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "PREP",
+      "round": 3,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "COMBAT",
+      "round": 3,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "SETTLE",
+      "round": 3,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "ROUND_START",
+      "round": 4,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "PREP",
+      "round": 4,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "COMBAT",
+      "round": 4,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "SETTLE",
+      "round": 4,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "ROUND_START",
+      "round": 5,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "PREP",
+      "round": 5,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "COMBAT",
+      "round": 5,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "UNITE",
+      "round": 5,
+      "unite": true,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "SETTLE",
+      "round": 5,
+      "unite": true,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "ROUND_START",
+      "round": 6,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "SP_DRAFT",
+      "round": 6,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "PREP",
+      "round": 6,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "COMBAT",
+      "round": 6,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "SETTLE",
+      "round": 6,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "ROUND_START",
+      "round": 7,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "PREP",
+      "round": 7,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "COMBAT",
+      "round": 7,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "UNITE",
+      "round": 7,
+      "unite": true,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "SETTLE",
+      "round": 7,
+      "unite": true,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "ROUND_START",
+      "round": 8,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "PREP",
+      "round": 8,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "COMBAT",
+      "round": 8,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "UNITE",
+      "round": 8,
+      "unite": true,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "SETTLE",
+      "round": 8,
+      "unite": true,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "ROUND_START",
+      "round": 9,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "SP_DRAFT",
+      "round": 9,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "PREP",
+      "round": 9,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "COMBAT",
+      "round": 9,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "UNITE",
+      "round": 9,
+      "unite": true,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "SETTLE",
+      "round": 9,
+      "unite": true,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "ROUND_START",
+      "round": 10,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "PREP",
+      "round": 10,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "COMBAT",
+      "round": 10,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "UNITE",
+      "round": 10,
+      "unite": true,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "SETTLE",
+      "round": 10,
+      "unite": true,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "ROUND_START",
+      "round": 11,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "PREP",
+      "round": 11,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "COMBAT",
+      "round": 11,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "UNITE",
+      "round": 11,
+      "unite": true,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "SETTLE",
+      "round": 11,
+      "unite": true,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "ROUND_START",
+      "round": 12,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "PREP",
+      "round": 12,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "COMBAT",
+      "round": 12,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "UNITE",
+      "round": 12,
+      "unite": true,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "SETTLE",
+      "round": 12,
+      "unite": true,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "ROUND_START",
+      "round": 13,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "PREP",
+      "round": 13,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "COMBAT",
+      "round": 13,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "SETTLE",
+      "round": 13,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "ROUND_START",
+      "round": 14,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "PREP",
+      "round": 14,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "FINAL_ASSAULT",
+      "round": 14,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    },
+    {
+      "phase": "RESULT",
+      "round": 14,
+      "unite": false,
+      "stage": "act1autochess_m04"
+    }
+  ],
+  "errors": [],
+  "warnings": [],
+  "verify": {
+    "checked": 0,
+    "mismatches": 0,
+    "rejected": 0,
+    "takeovers": 0
+  }
+}

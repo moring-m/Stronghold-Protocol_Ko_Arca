@@ -43,3 +43,19 @@ test('UI changes between policies never leave contradictory selections or mutate
  assert.deepEqual(setBondBanPolicy(protectedValue,cores[0],'random').protectedBonds,[]);
  assert.deepEqual(before.disabledBonds,[cores[0]]);
 });
+
+test('auxiliary bans support forced/protected policies independently, including an explicit ban of every auxiliary bond',()=>{
+ const aux=gd.bondIds.filter(id=>!gd.bond(id)?.isCore&&gd.bond(id)?.weight>0&&!gd.modeInactiveBonds.has(id));
+ assert.ok(aux.length>3);
+ const selection=normalizeCustomExtensions({bonds:[],stages:[],forcedAuxBonds:[aux[0]],protectedAuxBonds:[aux[1]]},DATA);
+ for(let seed=1;seed<40;seed++){
+  const out=drawDisabledBonds(gd,createRng(seed),selection);assert.ok(out.drawn.includes(aux[0]));assert.ok(!out.drawn.includes(aux[1]));
+  assert.ok(aux.filter(id=>!out.drawn.includes(id)).length>=3);
+ }
+ const h=makeMatch({customExtensions:selection});assert.ok(h.m.disabledBonds.includes(aux[0]));assert.ok(!h.m.disabledBonds.includes(aux[1]));h.m.dispose();
+ assert.deepEqual(validateExtensionMinimums(DATA,{bonds:[],stages:[],forcedAuxBonds:aux},{mode:'coop',difficulty:'NORMAL'}),[]);
+ assert.deepEqual(drawDisabledBonds(gd,createRng(4),{forcedAuxBonds:aux}).drawn.filter(id=>aux.includes(id)).sort(),[...aux].sort());
+ assert.ok(validateExtensionMinimums(DATA,{...selection,protectedAuxBonds:[aux[0]]},{mode:'coop',difficulty:'NORMAL'}).some(s=>s.includes('함께')));
+ const ui=setBondBanPolicy(selection,aux[0],'protected',true);assert.deepEqual(ui.forcedAuxBonds,[]);assert.ok(ui.protectedAuxBonds.includes(aux[0]));
+ assert.ok(customExtensionCatalog(DATA).forcedAuxBonds.every(e=>!DATA.bonds[e.id].isCore));
+});

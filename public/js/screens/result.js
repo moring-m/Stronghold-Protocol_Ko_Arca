@@ -1,3 +1,6 @@
+import {CombatReport} from '../ui/combatReport.js';
+import {net} from '../net.js';
+import {toastError} from '../ui/toasts.js';
 import { ChatPanel } from '../ui/chat.js';
 
 import { t } from '../../../shared/i18n.js';
@@ -14,7 +17,7 @@ import { t } from '../../../shared/i18n.js';
 //                 stats: { dmgDealt, kills, leaks, gold /* funds SPENT */, refreshes, merges, bossDamage?, itemsEquipped?,
 //                          activatedLayers?, lpLost?, perfectRounds? } }] }
 
-import { useEffect } from '../../vendor/hooks.module.js';
+import { useEffect, useState } from '../../vendor/hooks.module.js';
 import { html, Button, Icon, MicroLabel, DifficultyTag } from '../ui/components.js';
 import { useGameData, Img, UnitThumb, BandIcon, PlayerAvatar, BondGlyph, LpTower, Sprite } from '../ui/gameComponents.js';
 import { normalizeResult, fmtNum } from '../ui/gameLogic.js';
@@ -32,8 +35,10 @@ const STAT_ROWS = [
   ['refreshes', '刷新次数'], ['leaks', '未击倒'], ['lpLost', '损失生命'],
 ];
 
-function PlayerCard({ p, myId, titles, best, solo = false }) {
+function PlayerCard({ p, myId, titles, best, solo = false, recommend=null, recommended=false }) {
   const gd = useGameData();
+  const [sending,setSending]=useState(false);
+  const send=async()=>{setSending(true);try{await recommend(p.playerId);}catch(err){toastError(err);}finally{setSending(false);}};
   const titleRec = p.title ? titles.find((t) => t.id === p.title.id) || null : null;
   const titleName = p.title?.name || titleRec?.name || null;
   const stats = STAT_ROWS.filter(([k]) => Number.isFinite(p.stats[k])).slice(0, 7);
@@ -63,6 +68,7 @@ function PlayerCard({ p, myId, titles, best, solo = false }) {
         <span><${MicroLabel} tone="gold">评语</${MicroLabel}><b>${titleName}</b></span>
       </div>` : html`<span class="rcard__title rcard__title--none" aria-hidden="true"></span>`}
     </header>
+    <div class="rcard__commend"><span>👍 ${p.commendations||0}</span>${recommend && p.playerId!==myId && !p.isBot ? html`<button type="button" disabled=${recommended||sending} onClick=${send}>${recommended?'추천 완료':'👍 팀원 추천'}</button>`:null}</div>
     <div class="rcard__stats">
       ${stats.map(([k, label]) => html`<div key=${k} class=${cx('rstat', best[k] === p.playerId && 'is-best')}><span>${label}</span><b class="num">${fmtNum(p.stats[k])}</b></div>`)}
       ${Number.isFinite(p.lp) ? html`<div class="rstat" title=${p.lpShared && !solo ? '最终攻势起全队共享目标生命值' : ''}><span>${p.lpShared && !solo ? '同盟剩余生命' : '剩余生命'}</span><${LpTower} value=${p.lp} size="sm" /></div>` : null}
@@ -87,6 +93,7 @@ export function ResultScreen() {
  */
 export function ResultView({ res, pub = null, myId = null, backLabel, onBack, quiet = false }) {
   const gd = useGameData();
+  const [page,setPage]=useState('result');
   const r = normalizeResult(res, pub);
   const titles = Array.isArray(gd.config?.titles) ? gd.config.titles : [];
   const best = {};
@@ -105,7 +112,8 @@ export function ResultView({ res, pub = null, myId = null, backLabel, onBack, qu
   return html`<div class=${cx('screen', 'result', r.victory ? 'is-win' : 'is-lose')}>
     <div class="result__bg" aria-hidden="true" style=${bg ? `--result-bg:url("${bg}")` : undefined}></div>
     <div class="result__grid" aria-hidden="true"></div>
-    <main class="result__main">
+    <nav class="result__pages" aria-label="결과 페이지"><button type="button" aria-pressed=${page==='result'} onClick=${()=>setPage('result')}>‹ 결과 요약</button><button type="button" aria-pressed=${page==='combat'} onClick=${()=>setPage('combat')}>상세 전투 통계 ›</button></nav>
+    ${page==='combat'?html`<main class="result__combat"><${CombatReport} players=${r.players} myId=${myId}/><${Button} variant="secondary" icon="chevronLeft" onClick=${onBack}>${backLabel}<//></main>`:html`<main class="result__main">
       <section class="result__hero">
         <div class="result__logo"><${Sprite} k="entry/season_logo_settle" class="result__logoimg" fallback=${html`<${MicroLabel} tone="mint">STRONGHOLD PROTOCOL</${MicroLabel}>`} /></div>
         ${r.difficulty ? html`<${DifficultyTag} difficulty=${r.difficulty} size="lg" />` : null}
@@ -131,10 +139,10 @@ export function ResultView({ res, pub = null, myId = null, backLabel, onBack, qu
       </section>
       <section class="result__players">
         <h2 class="brief-h"><span>同盟成员</span><${MicroLabel}>ALLIANCE REPORT</${MicroLabel}></h2>
-        ${r.players.length ? r.players.map((p) => html`<${PlayerCard} key=${p.playerId} p=${p} myId=${myId} titles=${titles} best=${best} solo=${r.players.length < 2} />`)
+        ${r.players.length ? r.players.map((p) => html`<${PlayerCard} key=${p.playerId} p=${p} myId=${myId} titles=${titles} best=${best} solo=${r.players.length < 2} recommend=${!quiet&&r.matchNo&&r.players.some(p=>p.playerId===myId&&!p.isBot)?id=>net.request('room.commend',{playerId:id,matchNo:r.matchNo}):null} recommended=${(r.commendationsGiven[myId]||[]).includes(p.playerId)} />`)
           : html`<p class="t-dim">暂无结算数据</p>`}
       </section>
-    </main>
+    </main>`}
   </div>`;
 }
 

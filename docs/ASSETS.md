@@ -2,8 +2,57 @@
 
 Owner: `tools/fetch-assets.mjs` and `tools/assets/*`. Research background: `docs/research/07-assets.md`.
 
-All art, Spine models and audio are **downloaded at install time**. They are never committed; `public/assets/` is git-ignored.
-Everything the client needs is listed in **`data/assets.json`**. The client should only request URLs that appear in that manifest.
+All official game art, Spine models and audio are **downloaded at install time**. They are never committed; `public/assets/` is git-ignored.
+All downloaded game assets the client needs are listed in **`data/assets.json`**. Game-art requests must use that manifest.
+The original project icons below are shipped static files, not downloaded game assets.
+
+## Original project application icons (#413)
+
+By the maintainer's revised decision of 2026-10-10, **沿用 0.2.x 的薄荷绿城堡并精修**.
+`public/icons/app.svg` retains the existing mint rook's three battlements, inset tower and splayed base.
+The selected refinement (B) narrows the tower, balances the battlements, reduces the base thickness and adds breathing
+room. On the 512 px canvas the mark spans x=128–384 and y=88–424; the tower is 176 px wide and the base is 32 px thick.
+The original colours remain mint `#4ed8af` and dark `#0c0f0e`, with no text, gradients, gloss or texture.
+
+**Provenance / originality statement (2026-10-10):** this is a proportion refinement of this project's existing
+`public/icons/app.svg` from before `ba5b998a`, expressed as basic rectangles and polygons.
+No official logo, artwork, icon or font was used, downloaded, embedded, traced or redrawn for this refinement.
+The vector and exports are project-owned work under the repository's GPL-3.0-or-later licence, separate from the
+Hypergryph / Yostar game assets below. The castle mark does not assert official branding.
+
+Rebuild offline with Python 3 and Pillow (the same image library used by local-extract):
+
+```bash
+python3 tools/export-app-icons.py
+# Optional review export without replacing shipped files:
+python3 tools/export-app-icons.py --out /tmp/stronghold-icons
+```
+
+The script reads only the master SVG's flat rectangle / polygon geometry, renders at 8× and downsamples; unsupported
+SVG elements fail rather than silently disappearing. It needs no game art, fonts, browser or network.
+ICO frames use the same native-size renders as the PNG favicons, with explicit 24-bit DIBs and opaque 1-bit masks
+whose rows are padded to 4 bytes. This avoids malformed transparency masks in Pillow's RGB ICO export.
+
+| Files in `public/icons/` | Use |
+|---|---|
+| `app-192.png`, `app-512.png` | Manifest `purpose: any`, 192 / 512 px |
+| `app-maskable-192.png`, `app-maskable-512.png` | Manifest `purpose: maskable`, opaque full-bleed background |
+| `favicon-16.png`, `favicon-32.png`, `favicon-48.png`, `favicon.ico` | Tab / legacy favicon; ICO contains 16 / 32 / 48 px frames |
+| `apple-touch-icon.png` | 180 px home-screen icon |
+| `app.svg` | Scalable favicon and editable source |
+
+The maskable mark is scaled to 87.5% around the canvas centre. Its outermost vertex is about 36.1% of the canvas
+width from that centre; even antialiased edge pixels stay inside the **40%-radius safe circle** specified by
+[Web Application Manifest §2.3](https://www.w3.org/TR/appmanifest/#icon-masks).
+The background remains opaque to every edge; launcher masks may remove the background outside the safe zone.
+Normal icons and favicons retain the larger mark for readability. `public/index.html` links the SVG / ICO / PNG
+favicons and Apple icon; `public/manifest.json` lists all four install icons. All these static files must be tracked
+and included by the full and lite package allowlist; no changes to `data/assets.json` are needed.
+
+`test/ui/pwa-install-023.test.js` checks decoded pixels, mask safety and references; `test/package.test.js` checks
+packaging inclusion. The local handoff `claude-review-023/icon-v2/` holds the original and A/B/C SVGs, light/dark
+256 px and 16/32/48/96 px comparisons, and phone-layout / mask previews with their render script.
+These are offline review renders, not evidence of browser or native OS installation.
 
 ## Running
 
@@ -37,6 +86,23 @@ smaller manifest is intended, for example after a mapping change. Build fields (
 plan legitimately narrows — like the 干员战斗语音 default, which no longer plans the three prep-only slots (360 entries,
 DESIGN §21.30) — reports exactly those entries and needs `--allow-shrink` once; the list it prints is the check.
 
+**A dropped leaf is reported, never silent.** `resolveTemplate` leaves out every entry none of whose alternative files
+is on disk — for a leaf that is an entry the client loses outright: a unit whose `attack` sound was never downloaded has
+no `audio.sfx.units[charId].attack` at all, so the sound is simply missing (nothing falls back; there is no URL to
+retry). That is a different thing from an entry whose *fallback* was used. The run therefore prints a summary naming at most eight such leaves
+and records the complete list as `droppedLeaves` (a subset of `misses`, which also lists the
+unresolved Spine models):
+
+```
+[assets] 1 leaf dropped: no alternative on disk (audio.sfx.units.some_char.attack)
+```
+
+A run with nothing dropped prints `[assets] no leaf dropped: every planned leaf has a file on disk`. This is only
+observability: which files are planned, downloaded and written does not change. `--strict` (or `SP_ASSETS_STRICT=1`)
+turns those drops into a failure (exit 1, the leaves named) so a CI or packaging run cannot ship a manifest with such
+holes — the committed manifest's shrink guard cannot see them once the entry is already gone. The manifest may
+already have been written before this check returns failure; strict mode does not roll it back.
+
 The script is **idempotent**. A file on disk is kept, not re-downloaded, when any one of these holds:
 - its size matches the ledger entry from a previous download (`.cache/assets-ledger.json`);
 - its size matches the byte count recorded in research;
@@ -58,10 +124,12 @@ Outputs:
 - `data/assets.json`: the manifest (committed).
 - `public/assets/**`: art and audio (git-ignored).
 - `public/fonts/*`: fonts and `fonts.css`.
-- `.cache/assets-report.json`: misses, fallbacks and notes from the last run.
+- `.cache/assets-report.json`: misses, fallbacks, `droppedLeaves` (the leaves left out of the manifest for having no file
+  on disk) and notes from the last run.
 - `.cache/spine-info.json`: skeleton parse cache.
 
-The run exits with code 1 if any pool operator is missing its avatar, its portrait or its Front Spine.
+The run exits with code 1 if any pool operator is missing its avatar, its portrait or its Front Spine, and — with
+`--strict` / `SP_ASSETS_STRICT=1` — if any leaf was dropped for having no file on disk.
 
 Upstream indexes are cached under `.cache/`. They are downloaded when missing:
 - `.cache/gamedata/excel/audio_data.json`, from `Kengxxiao/ArknightsGameData` (zh_CN).
@@ -183,7 +251,8 @@ All paths are URL paths relative to the site root, for example `/assets/char/ava
                 disconnect, settlementSucceed, settlementFail, settlementTeam, settlementBossSign,
                 goodEvaluation, load, start, matchSucceed, matchFail, matchCancel, joinRoom },
       battle: { deploy, tokenDeploy, charDie, enemyDie, enemyDieHeavy, enemyHit, heal, leak, win, lose, killCoin },
-      units:  { [charId|tokenId|enemyId]: { attack?, hit?, skill?, skills?: {[skillIndex]: url}, die?, born?,
+      units:  { [charId|tokenId|enemyId]: { attack?, hit?, skill?, skills?: {[skillIndex]: url}, attacks?: {[skillIndex]: url}, hits?: {[skillIndex]: url}, die?, born?,
+                attackMix?: {[skillIndex]: {p?, vol?}}, hitMix?: {[skillIndex]: {p?, vol?}},
                 mix?: { [attack|hit|die|born]: { p?, vol? } } } }
     }
   },
@@ -374,3 +443,12 @@ The project's code is GPL-3.0-or-later (`LICENSE`); none of the items below is c
   - **Novecento Wide:** © Jan Tonellato / Synthview. Free licence.
   - Both are mirrored from TimWangZi/The-font-of-Arknights.
   - Noto Sans SC and Noto Serif SC (SIL OFL) are loaded from Google Fonts, not self-hosted.
+
+### Skill attack banks (0.2.3, PR #410)
+
+`pickModeAttacks` / `pickModeHits` select a uniform d/h/s bank from the official audio table (attack/combat abilities
+only). A skill's activation sound supplies its mode letter; without one, d/h/s = slots 1/2/3 is [ASSUMED]. Competing
+banks prefer START over ON, then plain/numeric order; this is a deterministic approximation, not proof of every
+operator's runtime ability graph. Mixed-letter banks are skipped. Preserve `mixOf` for each selected bank separately;
+`attacks`/`hits` and `attackMix`/`hitMix` use matching skill keys. Regenerate the current manifest instead of importing
+an older PR's full JSON, preserving JP voices and current operators. See DESIGN §28.17.

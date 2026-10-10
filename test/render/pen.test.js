@@ -177,9 +177,9 @@ test('boss preview relocates the pen without mutating simulation rows or duplica
   assert.equal(bossPenStage(stage),visual);
   const source=parsePenRect(stage.config?.enemy_place_rect)||{r0:14,r1:18,c0:7,c1:13};
   assert.equal(visual.rows[7].slice(0,6),'######','rear lateral spaces stay scenery');
-  assert.equal(visual.rows[7].slice(6,15),stage.rows[source.r0-1].slice(6,15),'central pen border remains');
-  assert.equal(parsePenRect(visual.config.enemy_place_rect).r0,8);
-  for(let r=8;r<=12;r++){
+  assert.equal(visual.rows[6].slice(6,15),stage.rows[source.r0-1].slice(6,15),'central pen border remains');
+  assert.equal(parsePenRect(visual.config.enemy_place_rect).r0,7);
+  for(let r=7;r<=11;r++){
    assert.equal(visual.rows[r].slice(0,source.c0-1),'#'.repeat(source.c0-1));
    assert.equal(visual.rows[r].slice(source.c1+2),'#'.repeat(visual.rows[r].length-source.c1-2));
   }

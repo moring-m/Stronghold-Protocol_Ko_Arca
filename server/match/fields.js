@@ -1,3 +1,4 @@
+import {combatMetrics} from '../../shared/combatStats.js';
 // server/match/fields.js — runs the battles of one combat phase (DESIGN §4, §11, §14).
 //
 // Server-run combat (legacy streaming mode, SP_COMBAT=server; and the Final Assault when no field has a connected human):
@@ -557,7 +558,7 @@ const recJson = (rec) => { try { return rec ? JSON.stringify(rec) : ''; } catch 
 /**
  * Bonds an IN_BATTLE layer gain of this player can name: its bond snapshot (every bond its lineup counts), plus bonds
  * its band, its effects (机变 cards, 驻守 …), its units and their items mention (content grants layers to those —
- * e.g. 克莱门莎's <阿戈尔>, requireActive: false). Anything else is a forged gain.
+ * including referenced bonds outside the lineup snapshot). Anything else is a forged gain.
  */
 function layerBondsOf(p, gd) {
   const out = new Set(Object.keys(p.bonds && typeof p.bonds === 'object' ? p.bonds : {}));
@@ -869,6 +870,7 @@ export function validateClientResult(spec, raw, { gd = null } = {}) {
         if (gd && !rec) continue;
         unitStats.push({
           uid: Number.isInteger(u.uid) ? u.uid : null, defId, name: rec && typeof rec.name === 'string' ? rec.name : defId, kind: u.kind === 'token' ? 'token' : 'op',
+          ...combatMetrics(u),
           dmg: Math.max(0, Number(u.dmg) || 0), kills: Math.max(0, Math.trunc(Number(u.kills) || 0)), heal: Math.max(0, Number(u.heal) || 0),
           taken: Math.max(0, Number(u.taken) || 0), attacks: Math.max(0, Math.trunc(Number(u.attacks) || 0)),
         });

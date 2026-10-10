@@ -812,7 +812,7 @@ const nthAttackStatus = (n, key, dur, sil = true) => ({
   attack(c, b, e, a) {
     a.n++;
     if (a.n % n) return;
-    for (const t of c.targets) if (t.alive && dur > 0) b.applyStatus(t, key, { duration: dur, source: e });
+    for (const t of c.targets) if (t.alive && dur > 0 && (!c.targetDeployments || c.targetDeployments.get(t)===t.deploySeq)) b.applyStatus(t, key, { duration: dur, source: e });
   },
 });
 /** Every Nth attack deals ×scale (+ optional element). */
@@ -3072,6 +3072,7 @@ const LEGACY_KITS = Object.freeze({
         if (a.done) return;
         a.done = true;
         b.removeBuff(e, 'ab:barrel');
+        setForm(b,e,'emptied');
         const x = e.x, y = e.y, life = s.fixed_duration ?? 0;
         b.fx('zone', { x, y, r: BARREL_RADIUS, dur: life, kind: 'barrel' });
         let left = life;
@@ -3090,6 +3091,10 @@ const LEGACY_KITS = Object.freeze({
       a.n = (a.n ?? 0) + 1;
       if (a.n > 5) return;
       const s = ab.sk.ForeverEnhance ? ab.sk.ForeverEnhance.bb : {};
+      const anim=e.def.raw?.abilityAnimations?.ForeverEnhance;
+      e.mem.abilityAnimUntil=b.time+(anim?.duration || 1);
+      e.skillAnimUntil=e.mem.abilityAnimUntil;
+      b.fx('enemySkill',{id:e.id,x:e.x,y:e.y,clip:anim?.clip || 'Skill',dur:anim?.duration || 1});
       b.addBuff(e, { key: 'ab:enhance', refresh: 'stack', stacks: 1, maxStacks: 5, persist: true, mods: { moveFlat: (s.move_speed_add ?? 0) * e.base.moveSpeed, atkPct: s.atk_add ?? 0 } });
     },
   }],
@@ -3529,6 +3534,7 @@ const SPECIAL_KITS = Object.freeze({
         if (a.done) return;
         a.done = true;
         b.removeBuff(e, 'ab:barrel');
+        setForm(b,e,'emptied');
         const x = e.x, y = e.y, life = s.fixed_duration ?? 0;
         b.fx('zone', { x, y, r: BARREL_RADIUS, dur: life, kind: 'barrel' });
         let left = life;
@@ -3547,6 +3553,10 @@ const SPECIAL_KITS = Object.freeze({
       a.n = (a.n ?? 0) + 1;
       if (a.n > 5) return;
       const s = ab.sk.ForeverEnhance ? ab.sk.ForeverEnhance.bb : {};
+      const anim=e.def.raw?.abilityAnimations?.ForeverEnhance;
+      e.mem.abilityAnimUntil=b.time+(anim?.duration || 1);
+      e.skillAnimUntil=e.mem.abilityAnimUntil;
+      b.fx('enemySkill',{id:e.id,x:e.x,y:e.y,clip:anim?.clip || 'Skill',dur:anim?.duration || 1});
       b.addBuff(e, { key: 'ab:enhance', refresh: 'stack', stacks: 1, maxStacks: 5, persist: true, mods: { moveFlat: (s.move_speed_add ?? 0) * e.base.moveSpeed, atkPct: s.atk_add ?? 0 } });
     },
   }],

@@ -1,0 +1,2330 @@
+[
+  {
+    "id": "act1autochess_m01",
+    "kind": "unite",
+    "side": "R",
+    "errors": [],
+    "stats": {
+      "calls": 35,
+      "triangles": 32916,
+      "textures": 30,
+      "geometries": 36,
+      "frames": 10,
+      "cpuMs": 76.28,
+      "lost": false,
+      "originalStage": "act1autochess_m01"
+    },
+    "structure": [
+      {
+        "key": "original:MT_AutochessSand_common@lightmap0@platform",
+        "hash": 649825078,
+        "vertices": 78,
+        "triangles": 26,
+        "offset": 7
+      },
+      {
+        "key": "preview:MT_AutochessSand_common@lightmap0@platform",
+        "hash": 2782688427,
+        "vertices": 792,
+        "triangles": 264,
+        "offset": 7
+      },
+      {
+        "key": "original:MT_AutochessSand@lightmap0@platform",
+        "hash": 889027972,
+        "vertices": 22968,
+        "triangles": 7656,
+        "offset": 7
+      },
+      {
+        "key": "preview:MT_AutochessSand@lightmap0@platform",
+        "hash": 2992398105,
+        "vertices": 1620,
+        "triangles": 540,
+        "offset": 7
+      },
+      {
+        "key": "cooperative:MT_AutochessSand@lightmap0@scenery",
+        "hash": 3279886047,
+        "vertices": 7524,
+        "triangles": 2508,
+        "offset": 7
+      },
+      {
+        "key": "original:MT_AutochessSand@lightmap0@scenery",
+        "hash": 3266397052,
+        "vertices": 27363,
+        "triangles": 9121,
+        "offset": 7
+      },
+      {
+        "key": "original:MT_AutochessSand@lightmap1@platform",
+        "hash": 1440680063,
+        "vertices": 7233,
+        "triangles": 2411,
+        "offset": 7
+      },
+      {
+        "key": "preview:MT_AutochessSand@lightmap1@platform",
+        "hash": 3674503821,
+        "vertices": 270,
+        "triangles": 90,
+        "offset": 7
+      },
+      {
+        "key": "cooperative:MT_AutochessSand@lightmap1@scenery",
+        "hash": 706115546,
+        "vertices": 390,
+        "triangles": 130,
+        "offset": 7
+      },
+      {
+        "key": "original:MT_AutochessSand@lightmap1@scenery",
+        "hash": 3482359782,
+        "vertices": 2154,
+        "triangles": 718,
+        "offset": 7
+      },
+      {
+        "key": "cooperative:MT_AutochessSand_grass@lightmap0@scenery",
+        "empty": true
+      },
+      {
+        "key": "original:MT_AutochessSand_grass@lightmap0@scenery",
+        "hash": 1526462212,
+        "vertices": 3081,
+        "triangles": 1027,
+        "offset": 7
+      },
+      {
+        "key": "cooperative:MT_AutochessSand_water@scenery",
+        "empty": true
+      },
+      {
+        "key": "original:MT_AutochessSand_water@scenery",
+        "hash": 3150981119,
+        "vertices": 183,
+        "triangles": 61,
+        "offset": 7
+      },
+      {
+        "key": "cooperative:MT_AutochessSand_sand@lightmap0@scenery",
+        "empty": true
+      },
+      {
+        "key": "original:MT_AutochessSand_sand@lightmap0@scenery",
+        "hash": 2268709245,
+        "vertices": 1275,
+        "triangles": 425,
+        "offset": 7
+      },
+      {
+        "key": "cooperative:MT_AutochessSand_shuidi@lightmap1@scenery",
+        "hash": 623191060,
+        "vertices": 42,
+        "triangles": 14,
+        "offset": 7
+      },
+      {
+        "key": "original:MT_AutochessSand_shuidi@lightmap1@scenery",
+        "hash": 2703119715,
+        "vertices": 945,
+        "triangles": 315,
+        "offset": 7
+      },
+      {
+        "key": "cooperative:MT_AutochessSand_sand2@lightmap0@scenery",
+        "hash": 1222059281,
+        "vertices": 561,
+        "triangles": 187,
+        "offset": 7
+      },
+      {
+        "key": "original:MT_AutochessSand_sand2@lightmap0@scenery",
+        "hash": 1679361579,
+        "vertices": 2376,
+        "triangles": 792,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:0",
+        "hash": 968534371,
+        "vertices": 2898,
+        "triangles": 966,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:1",
+        "hash": 4041578742,
+        "vertices": 825,
+        "triangles": 275,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:2",
+        "hash": 940477308,
+        "vertices": 5458,
+        "triangles": 2467,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:3",
+        "hash": 1530268070,
+        "vertices": 213,
+        "triangles": 71,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:4",
+        "hash": 2985395610,
+        "vertices": 153,
+        "triangles": 51,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:5",
+        "hash": 2685125331,
+        "vertices": 270,
+        "triangles": 90,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:6",
+        "hash": 3619410114,
+        "vertices": 462,
+        "triangles": 357,
+        "offset": 7
+      }
+    ]
+  },
+  {
+    "id": "act1autochess_m01",
+    "kind": "unite",
+    "side": "L",
+    "errors": [],
+    "stats": {
+      "calls": 36,
+      "triangles": 32698,
+      "textures": 30,
+      "geometries": 38,
+      "frames": 16,
+      "cpuMs": 41.06,
+      "lost": false,
+      "originalStage": "act1autochess_m01"
+    },
+    "structure": [
+      {
+        "key": "original:MT_AutochessSand_common@lightmap0@platform",
+        "hash": 649825078,
+        "vertices": 78,
+        "triangles": 26,
+        "offset": 7
+      },
+      {
+        "key": "preview:MT_AutochessSand_common@lightmap0@platform",
+        "hash": 2782688427,
+        "vertices": 792,
+        "triangles": 264,
+        "offset": 7
+      },
+      {
+        "key": "original:MT_AutochessSand@lightmap0@platform",
+        "hash": 889027972,
+        "vertices": 22968,
+        "triangles": 7656,
+        "offset": 7
+      },
+      {
+        "key": "preview:MT_AutochessSand@lightmap0@platform",
+        "hash": 2992398105,
+        "vertices": 1620,
+        "triangles": 540,
+        "offset": 7
+      },
+      {
+        "key": "cooperative:MT_AutochessSand@lightmap0@scenery",
+        "hash": 3279886047,
+        "vertices": 7524,
+        "triangles": 2508,
+        "offset": 7
+      },
+      {
+        "key": "original:MT_AutochessSand@lightmap0@scenery",
+        "hash": 3266397052,
+        "vertices": 27363,
+        "triangles": 9121,
+        "offset": 7
+      },
+      {
+        "key": "original:MT_AutochessSand@lightmap1@platform",
+        "hash": 1440680063,
+        "vertices": 7233,
+        "triangles": 2411,
+        "offset": 7
+      },
+      {
+        "key": "preview:MT_AutochessSand@lightmap1@platform",
+        "hash": 3674503821,
+        "vertices": 270,
+        "triangles": 90,
+        "offset": 7
+      },
+      {
+        "key": "cooperative:MT_AutochessSand@lightmap1@scenery",
+        "hash": 706115546,
+        "vertices": 390,
+        "triangles": 130,
+        "offset": 7
+      },
+      {
+        "key": "original:MT_AutochessSand@lightmap1@scenery",
+        "hash": 3482359782,
+        "vertices": 2154,
+        "triangles": 718,
+        "offset": 7
+      },
+      {
+        "key": "cooperative:MT_AutochessSand_grass@lightmap0@scenery",
+        "empty": true
+      },
+      {
+        "key": "original:MT_AutochessSand_grass@lightmap0@scenery",
+        "hash": 1526462212,
+        "vertices": 3081,
+        "triangles": 1027,
+        "offset": 7
+      },
+      {
+        "key": "cooperative:MT_AutochessSand_water@scenery",
+        "empty": true
+      },
+      {
+        "key": "original:MT_AutochessSand_water@scenery",
+        "hash": 3150981119,
+        "vertices": 183,
+        "triangles": 61,
+        "offset": 7
+      },
+      {
+        "key": "cooperative:MT_AutochessSand_sand@lightmap0@scenery",
+        "empty": true
+      },
+      {
+        "key": "original:MT_AutochessSand_sand@lightmap0@scenery",
+        "hash": 2268709245,
+        "vertices": 1275,
+        "triangles": 425,
+        "offset": 7
+      },
+      {
+        "key": "cooperative:MT_AutochessSand_shuidi@lightmap1@scenery",
+        "hash": 623191060,
+        "vertices": 42,
+        "triangles": 14,
+        "offset": 7
+      },
+      {
+        "key": "original:MT_AutochessSand_shuidi@lightmap1@scenery",
+        "hash": 2703119715,
+        "vertices": 945,
+        "triangles": 315,
+        "offset": 7
+      },
+      {
+        "key": "cooperative:MT_AutochessSand_sand2@lightmap0@scenery",
+        "hash": 1222059281,
+        "vertices": 561,
+        "triangles": 187,
+        "offset": 7
+      },
+      {
+        "key": "original:MT_AutochessSand_sand2@lightmap0@scenery",
+        "hash": 1679361579,
+        "vertices": 2376,
+        "triangles": 792,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:0",
+        "hash": 968534371,
+        "vertices": 2898,
+        "triangles": 966,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:1",
+        "hash": 4041578742,
+        "vertices": 825,
+        "triangles": 275,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:2",
+        "hash": 940477308,
+        "vertices": 5458,
+        "triangles": 2467,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:3",
+        "hash": 1530268070,
+        "vertices": 213,
+        "triangles": 71,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:4",
+        "hash": 2985395610,
+        "vertices": 153,
+        "triangles": 51,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:5",
+        "hash": 2685125331,
+        "vertices": 270,
+        "triangles": 90,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:6",
+        "hash": 3619410114,
+        "vertices": 462,
+        "triangles": 357,
+        "offset": 7
+      }
+    ]
+  },
+  {
+    "id": "act1autochess_m01",
+    "kind": "unite",
+    "side": "all",
+    "errors": [],
+    "stats": {
+      "calls": 37,
+      "triangles": 32816,
+      "textures": 30,
+      "geometries": 38,
+      "frames": 22,
+      "cpuMs": 22.46,
+      "lost": false,
+      "originalStage": "act1autochess_m01"
+    },
+    "structure": [
+      {
+        "key": "original:MT_AutochessSand_common@lightmap0@platform",
+        "hash": 649825078,
+        "vertices": 78,
+        "triangles": 26,
+        "offset": 7
+      },
+      {
+        "key": "preview:MT_AutochessSand_common@lightmap0@platform",
+        "hash": 2782688427,
+        "vertices": 792,
+        "triangles": 264,
+        "offset": 7
+      },
+      {
+        "key": "original:MT_AutochessSand@lightmap0@platform",
+        "hash": 889027972,
+        "vertices": 22968,
+        "triangles": 7656,
+        "offset": 7
+      },
+      {
+        "key": "preview:MT_AutochessSand@lightmap0@platform",
+        "hash": 2992398105,
+        "vertices": 1620,
+        "triangles": 540,
+        "offset": 7
+      },
+      {
+        "key": "cooperative:MT_AutochessSand@lightmap0@scenery",
+        "hash": 3279886047,
+        "vertices": 7524,
+        "triangles": 2508,
+        "offset": 7
+      },
+      {
+        "key": "original:MT_AutochessSand@lightmap0@scenery",
+        "hash": 3266397052,
+        "vertices": 27363,
+        "triangles": 9121,
+        "offset": 7
+      },
+      {
+        "key": "original:MT_AutochessSand@lightmap1@platform",
+        "hash": 1440680063,
+        "vertices": 7233,
+        "triangles": 2411,
+        "offset": 7
+      },
+      {
+        "key": "preview:MT_AutochessSand@lightmap1@platform",
+        "hash": 3674503821,
+        "vertices": 270,
+        "triangles": 90,
+        "offset": 7
+      },
+      {
+        "key": "cooperative:MT_AutochessSand@lightmap1@scenery",
+        "hash": 706115546,
+        "vertices": 390,
+        "triangles": 130,
+        "offset": 7
+      },
+      {
+        "key": "original:MT_AutochessSand@lightmap1@scenery",
+        "hash": 3482359782,
+        "vertices": 2154,
+        "triangles": 718,
+        "offset": 7
+      },
+      {
+        "key": "cooperative:MT_AutochessSand_grass@lightmap0@scenery",
+        "empty": true
+      },
+      {
+        "key": "original:MT_AutochessSand_grass@lightmap0@scenery",
+        "hash": 1526462212,
+        "vertices": 3081,
+        "triangles": 1027,
+        "offset": 7
+      },
+      {
+        "key": "cooperative:MT_AutochessSand_water@scenery",
+        "empty": true
+      },
+      {
+        "key": "original:MT_AutochessSand_water@scenery",
+        "hash": 3150981119,
+        "vertices": 183,
+        "triangles": 61,
+        "offset": 7
+      },
+      {
+        "key": "cooperative:MT_AutochessSand_sand@lightmap0@scenery",
+        "empty": true
+      },
+      {
+        "key": "original:MT_AutochessSand_sand@lightmap0@scenery",
+        "hash": 2268709245,
+        "vertices": 1275,
+        "triangles": 425,
+        "offset": 7
+      },
+      {
+        "key": "cooperative:MT_AutochessSand_shuidi@lightmap1@scenery",
+        "hash": 623191060,
+        "vertices": 42,
+        "triangles": 14,
+        "offset": 7
+      },
+      {
+        "key": "original:MT_AutochessSand_shuidi@lightmap1@scenery",
+        "hash": 2703119715,
+        "vertices": 945,
+        "triangles": 315,
+        "offset": 7
+      },
+      {
+        "key": "cooperative:MT_AutochessSand_sand2@lightmap0@scenery",
+        "hash": 1222059281,
+        "vertices": 561,
+        "triangles": 187,
+        "offset": 7
+      },
+      {
+        "key": "original:MT_AutochessSand_sand2@lightmap0@scenery",
+        "hash": 1679361579,
+        "vertices": 2376,
+        "triangles": 792,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:0",
+        "hash": 968534371,
+        "vertices": 2898,
+        "triangles": 966,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:1",
+        "hash": 4041578742,
+        "vertices": 825,
+        "triangles": 275,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:2",
+        "hash": 940477308,
+        "vertices": 5458,
+        "triangles": 2467,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:3",
+        "hash": 1530268070,
+        "vertices": 213,
+        "triangles": 71,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:4",
+        "hash": 2985395610,
+        "vertices": 153,
+        "triangles": 51,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:5",
+        "hash": 2685125331,
+        "vertices": 270,
+        "triangles": 90,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:6",
+        "hash": 3619410114,
+        "vertices": 462,
+        "triangles": 357,
+        "offset": 7
+      }
+    ]
+  },
+  {
+    "id": "act1autochess_m01",
+    "kind": "boss",
+    "side": "R",
+    "errors": [],
+    "stats": {
+      "calls": 28,
+      "triangles": 25062,
+      "textures": 30,
+      "geometries": 29,
+      "frames": 28,
+      "cpuMs": 33.88,
+      "lost": false,
+      "originalStage": "act1autochess_m01"
+    },
+    "structure": [
+      {
+        "key": "original:MT_AutochessSand_common@lightmap0@platform",
+        "hash": 3211798746,
+        "vertices": 216,
+        "triangles": 72,
+        "offset": 0
+      },
+      {
+        "key": "preview:MT_AutochessSand_common@lightmap0@platform",
+        "hash": 2782688427,
+        "vertices": 792,
+        "triangles": 264,
+        "offset": 0
+      },
+      {
+        "key": "original:MT_AutochessSand@lightmap0@platform",
+        "hash": 1250143201,
+        "vertices": 17439,
+        "triangles": 5813,
+        "offset": 0
+      },
+      {
+        "key": "preview:MT_AutochessSand@lightmap0@platform",
+        "hash": 2992398105,
+        "vertices": 1620,
+        "triangles": 540,
+        "offset": 0
+      },
+      {
+        "key": "cooperative:MT_AutochessSand@lightmap0@scenery",
+        "hash": 3279886047,
+        "vertices": 7524,
+        "triangles": 2508,
+        "offset": 0
+      },
+      {
+        "key": "original:MT_AutochessSand@lightmap0@scenery",
+        "hash": 1269056866,
+        "vertices": 21867,
+        "triangles": 7289,
+        "offset": 0
+      },
+      {
+        "key": "original:MT_AutochessSand@lightmap1@platform",
+        "hash": 1896538372,
+        "vertices": 5247,
+        "triangles": 1749,
+        "offset": 0
+      },
+      {
+        "key": "preview:MT_AutochessSand@lightmap1@platform",
+        "hash": 3674503821,
+        "vertices": 270,
+        "triangles": 90,
+        "offset": 0
+      },
+      {
+        "key": "cooperative:MT_AutochessSand@lightmap1@scenery",
+        "hash": 706115546,
+        "vertices": 390,
+        "triangles": 130,
+        "offset": 0
+      },
+      {
+        "key": "original:MT_AutochessSand@lightmap1@scenery",
+        "hash": 900899540,
+        "vertices": 1641,
+        "triangles": 547,
+        "offset": 0
+      },
+      {
+        "key": "cooperative:MT_AutochessSand_grass@lightmap0@scenery",
+        "empty": true
+      },
+      {
+        "key": "original:MT_AutochessSand_grass@lightmap0@scenery",
+        "hash": 3178450753,
+        "vertices": 3021,
+        "triangles": 1007,
+        "offset": 0
+      },
+      {
+        "key": "cooperative:MT_AutochessSand_water@scenery",
+        "empty": true
+      },
+      {
+        "key": "original:MT_AutochessSand_water@scenery",
+        "hash": 3981685928,
+        "vertices": 9,
+        "triangles": 3,
+        "offset": 0
+      },
+      {
+        "key": "cooperative:MT_AutochessSand_sand@lightmap0@scenery",
+        "empty": true
+      },
+      {
+        "key": "original:MT_AutochessSand_sand@lightmap0@scenery",
+        "hash": 2776336284,
+        "vertices": 975,
+        "triangles": 325,
+        "offset": 0
+      },
+      {
+        "key": "cooperative:MT_AutochessSand_shuidi@lightmap1@scenery",
+        "hash": 623191060,
+        "vertices": 42,
+        "triangles": 14,
+        "offset": 0
+      },
+      {
+        "key": "original:MT_AutochessSand_shuidi@lightmap1@scenery",
+        "hash": 2379737417,
+        "vertices": 240,
+        "triangles": 80,
+        "offset": 0
+      },
+      {
+        "key": "cooperative:MT_AutochessSand_sand2@lightmap0@scenery",
+        "hash": 1222059281,
+        "vertices": 561,
+        "triangles": 187,
+        "offset": 0
+      },
+      {
+        "key": "original:MT_AutochessSand_sand2@lightmap0@scenery",
+        "hash": 2094305332,
+        "vertices": 714,
+        "triangles": 238,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:0",
+        "hash": 968534371,
+        "vertices": 2898,
+        "triangles": 966,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:1",
+        "hash": 4041578742,
+        "vertices": 825,
+        "triangles": 275,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:2",
+        "hash": 940477308,
+        "vertices": 5458,
+        "triangles": 2467,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:3",
+        "hash": 1530268070,
+        "vertices": 213,
+        "triangles": 71,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:4",
+        "hash": 2985395610,
+        "vertices": 153,
+        "triangles": 51,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:5",
+        "hash": 2685125331,
+        "vertices": 270,
+        "triangles": 90,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:6",
+        "hash": 3619410114,
+        "vertices": 462,
+        "triangles": 357,
+        "offset": 0
+      }
+    ]
+  },
+  {
+    "id": "act1autochess_m01",
+    "kind": "boss",
+    "side": "L",
+    "errors": [],
+    "stats": {
+      "calls": 28,
+      "triangles": 25012,
+      "textures": 30,
+      "geometries": 29,
+      "frames": 34,
+      "cpuMs": 18.45,
+      "lost": false,
+      "originalStage": "act1autochess_m01"
+    },
+    "structure": [
+      {
+        "key": "original:MT_AutochessSand_common@lightmap0@platform",
+        "hash": 3211798746,
+        "vertices": 216,
+        "triangles": 72,
+        "offset": 0
+      },
+      {
+        "key": "preview:MT_AutochessSand_common@lightmap0@platform",
+        "hash": 2782688427,
+        "vertices": 792,
+        "triangles": 264,
+        "offset": 0
+      },
+      {
+        "key": "original:MT_AutochessSand@lightmap0@platform",
+        "hash": 1250143201,
+        "vertices": 17439,
+        "triangles": 5813,
+        "offset": 0
+      },
+      {
+        "key": "preview:MT_AutochessSand@lightmap0@platform",
+        "hash": 2992398105,
+        "vertices": 1620,
+        "triangles": 540,
+        "offset": 0
+      },
+      {
+        "key": "cooperative:MT_AutochessSand@lightmap0@scenery",
+        "hash": 3279886047,
+        "vertices": 7524,
+        "triangles": 2508,
+        "offset": 0
+      },
+      {
+        "key": "original:MT_AutochessSand@lightmap0@scenery",
+        "hash": 1269056866,
+        "vertices": 21867,
+        "triangles": 7289,
+        "offset": 0
+      },
+      {
+        "key": "original:MT_AutochessSand@lightmap1@platform",
+        "hash": 1896538372,
+        "vertices": 5247,
+        "triangles": 1749,
+        "offset": 0
+      },
+      {
+        "key": "preview:MT_AutochessSand@lightmap1@platform",
+        "hash": 3674503821,
+        "vertices": 270,
+        "triangles": 90,
+        "offset": 0
+      },
+      {
+        "key": "cooperative:MT_AutochessSand@lightmap1@scenery",
+        "hash": 706115546,
+        "vertices": 390,
+        "triangles": 130,
+        "offset": 0
+      },
+      {
+        "key": "original:MT_AutochessSand@lightmap1@scenery",
+        "hash": 900899540,
+        "vertices": 1641,
+        "triangles": 547,
+        "offset": 0
+      },
+      {
+        "key": "cooperative:MT_AutochessSand_grass@lightmap0@scenery",
+        "empty": true
+      },
+      {
+        "key": "original:MT_AutochessSand_grass@lightmap0@scenery",
+        "hash": 3178450753,
+        "vertices": 3021,
+        "triangles": 1007,
+        "offset": 0
+      },
+      {
+        "key": "cooperative:MT_AutochessSand_water@scenery",
+        "empty": true
+      },
+      {
+        "key": "original:MT_AutochessSand_water@scenery",
+        "hash": 3981685928,
+        "vertices": 9,
+        "triangles": 3,
+        "offset": 0
+      },
+      {
+        "key": "cooperative:MT_AutochessSand_sand@lightmap0@scenery",
+        "empty": true
+      },
+      {
+        "key": "original:MT_AutochessSand_sand@lightmap0@scenery",
+        "hash": 2776336284,
+        "vertices": 975,
+        "triangles": 325,
+        "offset": 0
+      },
+      {
+        "key": "cooperative:MT_AutochessSand_shuidi@lightmap1@scenery",
+        "hash": 623191060,
+        "vertices": 42,
+        "triangles": 14,
+        "offset": 0
+      },
+      {
+        "key": "original:MT_AutochessSand_shuidi@lightmap1@scenery",
+        "hash": 2379737417,
+        "vertices": 240,
+        "triangles": 80,
+        "offset": 0
+      },
+      {
+        "key": "cooperative:MT_AutochessSand_sand2@lightmap0@scenery",
+        "hash": 1222059281,
+        "vertices": 561,
+        "triangles": 187,
+        "offset": 0
+      },
+      {
+        "key": "original:MT_AutochessSand_sand2@lightmap0@scenery",
+        "hash": 2094305332,
+        "vertices": 714,
+        "triangles": 238,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:0",
+        "hash": 968534371,
+        "vertices": 2898,
+        "triangles": 966,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:1",
+        "hash": 4041578742,
+        "vertices": 825,
+        "triangles": 275,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:2",
+        "hash": 940477308,
+        "vertices": 5458,
+        "triangles": 2467,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:3",
+        "hash": 1530268070,
+        "vertices": 213,
+        "triangles": 71,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:4",
+        "hash": 2985395610,
+        "vertices": 153,
+        "triangles": 51,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:5",
+        "hash": 2685125331,
+        "vertices": 270,
+        "triangles": 90,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:6",
+        "hash": 3619410114,
+        "vertices": 462,
+        "triangles": 357,
+        "offset": 0
+      }
+    ]
+  },
+  {
+    "id": "act1autochess_m01",
+    "kind": "boss",
+    "side": "all",
+    "errors": [],
+    "stats": {
+      "calls": 28,
+      "triangles": 25012,
+      "textures": 30,
+      "geometries": 29,
+      "frames": 40,
+      "cpuMs": 10.31,
+      "lost": false,
+      "originalStage": "act1autochess_m01"
+    },
+    "structure": [
+      {
+        "key": "original:MT_AutochessSand_common@lightmap0@platform",
+        "hash": 3211798746,
+        "vertices": 216,
+        "triangles": 72,
+        "offset": 0
+      },
+      {
+        "key": "preview:MT_AutochessSand_common@lightmap0@platform",
+        "hash": 2782688427,
+        "vertices": 792,
+        "triangles": 264,
+        "offset": 0
+      },
+      {
+        "key": "original:MT_AutochessSand@lightmap0@platform",
+        "hash": 1250143201,
+        "vertices": 17439,
+        "triangles": 5813,
+        "offset": 0
+      },
+      {
+        "key": "preview:MT_AutochessSand@lightmap0@platform",
+        "hash": 2992398105,
+        "vertices": 1620,
+        "triangles": 540,
+        "offset": 0
+      },
+      {
+        "key": "cooperative:MT_AutochessSand@lightmap0@scenery",
+        "hash": 3279886047,
+        "vertices": 7524,
+        "triangles": 2508,
+        "offset": 0
+      },
+      {
+        "key": "original:MT_AutochessSand@lightmap0@scenery",
+        "hash": 1269056866,
+        "vertices": 21867,
+        "triangles": 7289,
+        "offset": 0
+      },
+      {
+        "key": "original:MT_AutochessSand@lightmap1@platform",
+        "hash": 1896538372,
+        "vertices": 5247,
+        "triangles": 1749,
+        "offset": 0
+      },
+      {
+        "key": "preview:MT_AutochessSand@lightmap1@platform",
+        "hash": 3674503821,
+        "vertices": 270,
+        "triangles": 90,
+        "offset": 0
+      },
+      {
+        "key": "cooperative:MT_AutochessSand@lightmap1@scenery",
+        "hash": 706115546,
+        "vertices": 390,
+        "triangles": 130,
+        "offset": 0
+      },
+      {
+        "key": "original:MT_AutochessSand@lightmap1@scenery",
+        "hash": 900899540,
+        "vertices": 1641,
+        "triangles": 547,
+        "offset": 0
+      },
+      {
+        "key": "cooperative:MT_AutochessSand_grass@lightmap0@scenery",
+        "empty": true
+      },
+      {
+        "key": "original:MT_AutochessSand_grass@lightmap0@scenery",
+        "hash": 3178450753,
+        "vertices": 3021,
+        "triangles": 1007,
+        "offset": 0
+      },
+      {
+        "key": "cooperative:MT_AutochessSand_water@scenery",
+        "empty": true
+      },
+      {
+        "key": "original:MT_AutochessSand_water@scenery",
+        "hash": 3981685928,
+        "vertices": 9,
+        "triangles": 3,
+        "offset": 0
+      },
+      {
+        "key": "cooperative:MT_AutochessSand_sand@lightmap0@scenery",
+        "empty": true
+      },
+      {
+        "key": "original:MT_AutochessSand_sand@lightmap0@scenery",
+        "hash": 2776336284,
+        "vertices": 975,
+        "triangles": 325,
+        "offset": 0
+      },
+      {
+        "key": "cooperative:MT_AutochessSand_shuidi@lightmap1@scenery",
+        "hash": 623191060,
+        "vertices": 42,
+        "triangles": 14,
+        "offset": 0
+      },
+      {
+        "key": "original:MT_AutochessSand_shuidi@lightmap1@scenery",
+        "hash": 2379737417,
+        "vertices": 240,
+        "triangles": 80,
+        "offset": 0
+      },
+      {
+        "key": "cooperative:MT_AutochessSand_sand2@lightmap0@scenery",
+        "hash": 1222059281,
+        "vertices": 561,
+        "triangles": 187,
+        "offset": 0
+      },
+      {
+        "key": "original:MT_AutochessSand_sand2@lightmap0@scenery",
+        "hash": 2094305332,
+        "vertices": 714,
+        "triangles": 238,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:0",
+        "hash": 968534371,
+        "vertices": 2898,
+        "triangles": 966,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:1",
+        "hash": 4041578742,
+        "vertices": 825,
+        "triangles": 275,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:2",
+        "hash": 940477308,
+        "vertices": 5458,
+        "triangles": 2467,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:3",
+        "hash": 1530268070,
+        "vertices": 213,
+        "triangles": 71,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:4",
+        "hash": 2985395610,
+        "vertices": 153,
+        "triangles": 51,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:5",
+        "hash": 2685125331,
+        "vertices": 270,
+        "triangles": 90,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:6",
+        "hash": 3619410114,
+        "vertices": 462,
+        "triangles": 357,
+        "offset": 0
+      }
+    ]
+  },
+  {
+    "id": "act2autochess_m01",
+    "kind": "unite",
+    "side": "R",
+    "errors": [],
+    "stats": {
+      "calls": 35,
+      "triangles": 90326,
+      "textures": 46,
+      "geometries": 36,
+      "frames": 56,
+      "cpuMs": 30.95,
+      "lost": false,
+      "originalStage": "act2autochess_m01"
+    },
+    "structure": [
+      {
+        "key": "original:MT_Syracuse_metro@lightmap1@platform",
+        "hash": 2351076813,
+        "vertices": 22737,
+        "triangles": 7579,
+        "offset": 7
+      },
+      {
+        "key": "preview:MT_Syracuse_metro@lightmap1@platform",
+        "hash": 3432787655,
+        "vertices": 66,
+        "triangles": 22,
+        "offset": 7
+      },
+      {
+        "key": "cooperative:MT_Syracuse_metro@lightmap1@scenery",
+        "hash": 4152025846,
+        "vertices": 37518,
+        "triangles": 12506,
+        "offset": 7
+      },
+      {
+        "key": "original:MT_Syracuse_metro@lightmap1@scenery",
+        "hash": 133521320,
+        "vertices": 38199,
+        "triangles": 12733,
+        "offset": 7
+      },
+      {
+        "key": "original:MT_Syracuse_metro@lightmap0@platform",
+        "hash": 2673588279,
+        "vertices": 18858,
+        "triangles": 6286,
+        "offset": 7
+      },
+      {
+        "key": "preview:MT_Syracuse_metro@lightmap0@platform",
+        "hash": 2990068064,
+        "vertices": 2328,
+        "triangles": 776,
+        "offset": 7
+      },
+      {
+        "key": "cooperative:MT_Syracuse_metro@lightmap0@scenery",
+        "hash": 3601874296,
+        "vertices": 44097,
+        "triangles": 14699,
+        "offset": 7
+      },
+      {
+        "key": "original:MT_Syracuse_metro@lightmap0@scenery",
+        "hash": 64656767,
+        "vertices": 62211,
+        "triangles": 20737,
+        "offset": 7
+      },
+      {
+        "key": "original:MT_Syracuse_metro_common@lightmap1@platform",
+        "hash": 1328599177,
+        "vertices": 18,
+        "triangles": 6,
+        "offset": 7
+      },
+      {
+        "key": "preview:MT_Syracuse_metro_common@lightmap1@platform",
+        "empty": true
+      },
+      {
+        "key": "original:MT_Syracuse_metro_common@lightmap0@platform",
+        "hash": 1932344084,
+        "vertices": 27,
+        "triangles": 9,
+        "offset": 7
+      },
+      {
+        "key": "preview:MT_Syracuse_metro_common@lightmap0@platform",
+        "hash": 2882933313,
+        "vertices": 198,
+        "triangles": 66,
+        "offset": 7
+      },
+      {
+        "key": "cooperative:MT_Syracuse_metro_floor@lightmap1@scenery",
+        "hash": 3152279324,
+        "vertices": 75,
+        "triangles": 25,
+        "offset": 7
+      },
+      {
+        "key": "original:MT_Syracuse_metro_floor@lightmap1@scenery",
+        "hash": 4257496193,
+        "vertices": 663,
+        "triangles": 221,
+        "offset": 7
+      },
+      {
+        "key": "cooperative:MT_Syracuse_metro_floor@lightmap0@scenery",
+        "hash": 3697085613,
+        "vertices": 66,
+        "triangles": 22,
+        "offset": 7
+      },
+      {
+        "key": "original:MT_Syracuse_metro_floor@lightmap0@scenery",
+        "hash": 3159703307,
+        "vertices": 1272,
+        "triangles": 424,
+        "offset": 7
+      },
+      {
+        "key": "cooperative:MT_Syracuse_metro_grass@lightmap0@scenery",
+        "hash": 2364684869,
+        "vertices": 780,
+        "triangles": 260,
+        "offset": 7
+      },
+      {
+        "key": "original:MT_Syracuse_metro_grass@lightmap0@scenery",
+        "hash": 1247350558,
+        "vertices": 1770,
+        "triangles": 590,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:0",
+        "hash": 1058987465,
+        "vertices": 4575,
+        "triangles": 1525,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:1",
+        "hash": 3112590925,
+        "vertices": 3351,
+        "triangles": 1117,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:2",
+        "hash": 524658565,
+        "vertices": 11890,
+        "triangles": 5991,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:3",
+        "hash": 568721104,
+        "vertices": 168,
+        "triangles": 56,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:4",
+        "hash": 341464545,
+        "vertices": 606,
+        "triangles": 202,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:5",
+        "hash": 3647796982,
+        "vertices": 428,
+        "triangles": 218,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:6",
+        "hash": 1311053567,
+        "vertices": 530,
+        "triangles": 182,
+        "offset": 7
+      }
+    ]
+  },
+  {
+    "id": "act2autochess_m01",
+    "kind": "unite",
+    "side": "L",
+    "errors": [],
+    "stats": {
+      "calls": 37,
+      "triangles": 90336,
+      "textures": 46,
+      "geometries": 38,
+      "frames": 62,
+      "cpuMs": 16.88,
+      "lost": false,
+      "originalStage": "act2autochess_m01"
+    },
+    "structure": [
+      {
+        "key": "original:MT_Syracuse_metro@lightmap1@platform",
+        "hash": 2351076813,
+        "vertices": 22737,
+        "triangles": 7579,
+        "offset": 7
+      },
+      {
+        "key": "preview:MT_Syracuse_metro@lightmap1@platform",
+        "hash": 3432787655,
+        "vertices": 66,
+        "triangles": 22,
+        "offset": 7
+      },
+      {
+        "key": "cooperative:MT_Syracuse_metro@lightmap1@scenery",
+        "hash": 4152025846,
+        "vertices": 37518,
+        "triangles": 12506,
+        "offset": 7
+      },
+      {
+        "key": "original:MT_Syracuse_metro@lightmap1@scenery",
+        "hash": 133521320,
+        "vertices": 38199,
+        "triangles": 12733,
+        "offset": 7
+      },
+      {
+        "key": "original:MT_Syracuse_metro@lightmap0@platform",
+        "hash": 2673588279,
+        "vertices": 18858,
+        "triangles": 6286,
+        "offset": 7
+      },
+      {
+        "key": "preview:MT_Syracuse_metro@lightmap0@platform",
+        "hash": 2990068064,
+        "vertices": 2328,
+        "triangles": 776,
+        "offset": 7
+      },
+      {
+        "key": "cooperative:MT_Syracuse_metro@lightmap0@scenery",
+        "hash": 3601874296,
+        "vertices": 44097,
+        "triangles": 14699,
+        "offset": 7
+      },
+      {
+        "key": "original:MT_Syracuse_metro@lightmap0@scenery",
+        "hash": 64656767,
+        "vertices": 62211,
+        "triangles": 20737,
+        "offset": 7
+      },
+      {
+        "key": "original:MT_Syracuse_metro_common@lightmap1@platform",
+        "hash": 1328599177,
+        "vertices": 18,
+        "triangles": 6,
+        "offset": 7
+      },
+      {
+        "key": "preview:MT_Syracuse_metro_common@lightmap1@platform",
+        "empty": true
+      },
+      {
+        "key": "original:MT_Syracuse_metro_common@lightmap0@platform",
+        "hash": 1932344084,
+        "vertices": 27,
+        "triangles": 9,
+        "offset": 7
+      },
+      {
+        "key": "preview:MT_Syracuse_metro_common@lightmap0@platform",
+        "hash": 2882933313,
+        "vertices": 198,
+        "triangles": 66,
+        "offset": 7
+      },
+      {
+        "key": "cooperative:MT_Syracuse_metro_floor@lightmap1@scenery",
+        "hash": 3152279324,
+        "vertices": 75,
+        "triangles": 25,
+        "offset": 7
+      },
+      {
+        "key": "original:MT_Syracuse_metro_floor@lightmap1@scenery",
+        "hash": 4257496193,
+        "vertices": 663,
+        "triangles": 221,
+        "offset": 7
+      },
+      {
+        "key": "cooperative:MT_Syracuse_metro_floor@lightmap0@scenery",
+        "hash": 3697085613,
+        "vertices": 66,
+        "triangles": 22,
+        "offset": 7
+      },
+      {
+        "key": "original:MT_Syracuse_metro_floor@lightmap0@scenery",
+        "hash": 3159703307,
+        "vertices": 1272,
+        "triangles": 424,
+        "offset": 7
+      },
+      {
+        "key": "cooperative:MT_Syracuse_metro_grass@lightmap0@scenery",
+        "hash": 2364684869,
+        "vertices": 780,
+        "triangles": 260,
+        "offset": 7
+      },
+      {
+        "key": "original:MT_Syracuse_metro_grass@lightmap0@scenery",
+        "hash": 1247350558,
+        "vertices": 1770,
+        "triangles": 590,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:0",
+        "hash": 1058987465,
+        "vertices": 4575,
+        "triangles": 1525,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:1",
+        "hash": 3112590925,
+        "vertices": 3351,
+        "triangles": 1117,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:2",
+        "hash": 524658565,
+        "vertices": 11890,
+        "triangles": 5991,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:3",
+        "hash": 568721104,
+        "vertices": 168,
+        "triangles": 56,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:4",
+        "hash": 341464545,
+        "vertices": 606,
+        "triangles": 202,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:5",
+        "hash": 3647796982,
+        "vertices": 428,
+        "triangles": 218,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:6",
+        "hash": 1311053567,
+        "vertices": 530,
+        "triangles": 182,
+        "offset": 7
+      }
+    ]
+  },
+  {
+    "id": "act2autochess_m01",
+    "kind": "unite",
+    "side": "all",
+    "errors": [],
+    "stats": {
+      "calls": 38,
+      "triangles": 90518,
+      "textures": 46,
+      "geometries": 38,
+      "frames": 68,
+      "cpuMs": 9.4,
+      "lost": false,
+      "originalStage": "act2autochess_m01"
+    },
+    "structure": [
+      {
+        "key": "original:MT_Syracuse_metro@lightmap1@platform",
+        "hash": 2351076813,
+        "vertices": 22737,
+        "triangles": 7579,
+        "offset": 7
+      },
+      {
+        "key": "preview:MT_Syracuse_metro@lightmap1@platform",
+        "hash": 3432787655,
+        "vertices": 66,
+        "triangles": 22,
+        "offset": 7
+      },
+      {
+        "key": "cooperative:MT_Syracuse_metro@lightmap1@scenery",
+        "hash": 4152025846,
+        "vertices": 37518,
+        "triangles": 12506,
+        "offset": 7
+      },
+      {
+        "key": "original:MT_Syracuse_metro@lightmap1@scenery",
+        "hash": 133521320,
+        "vertices": 38199,
+        "triangles": 12733,
+        "offset": 7
+      },
+      {
+        "key": "original:MT_Syracuse_metro@lightmap0@platform",
+        "hash": 2673588279,
+        "vertices": 18858,
+        "triangles": 6286,
+        "offset": 7
+      },
+      {
+        "key": "preview:MT_Syracuse_metro@lightmap0@platform",
+        "hash": 2990068064,
+        "vertices": 2328,
+        "triangles": 776,
+        "offset": 7
+      },
+      {
+        "key": "cooperative:MT_Syracuse_metro@lightmap0@scenery",
+        "hash": 3601874296,
+        "vertices": 44097,
+        "triangles": 14699,
+        "offset": 7
+      },
+      {
+        "key": "original:MT_Syracuse_metro@lightmap0@scenery",
+        "hash": 64656767,
+        "vertices": 62211,
+        "triangles": 20737,
+        "offset": 7
+      },
+      {
+        "key": "original:MT_Syracuse_metro_common@lightmap1@platform",
+        "hash": 1328599177,
+        "vertices": 18,
+        "triangles": 6,
+        "offset": 7
+      },
+      {
+        "key": "preview:MT_Syracuse_metro_common@lightmap1@platform",
+        "empty": true
+      },
+      {
+        "key": "original:MT_Syracuse_metro_common@lightmap0@platform",
+        "hash": 1932344084,
+        "vertices": 27,
+        "triangles": 9,
+        "offset": 7
+      },
+      {
+        "key": "preview:MT_Syracuse_metro_common@lightmap0@platform",
+        "hash": 2882933313,
+        "vertices": 198,
+        "triangles": 66,
+        "offset": 7
+      },
+      {
+        "key": "cooperative:MT_Syracuse_metro_floor@lightmap1@scenery",
+        "hash": 3152279324,
+        "vertices": 75,
+        "triangles": 25,
+        "offset": 7
+      },
+      {
+        "key": "original:MT_Syracuse_metro_floor@lightmap1@scenery",
+        "hash": 4257496193,
+        "vertices": 663,
+        "triangles": 221,
+        "offset": 7
+      },
+      {
+        "key": "cooperative:MT_Syracuse_metro_floor@lightmap0@scenery",
+        "hash": 3697085613,
+        "vertices": 66,
+        "triangles": 22,
+        "offset": 7
+      },
+      {
+        "key": "original:MT_Syracuse_metro_floor@lightmap0@scenery",
+        "hash": 3159703307,
+        "vertices": 1272,
+        "triangles": 424,
+        "offset": 7
+      },
+      {
+        "key": "cooperative:MT_Syracuse_metro_grass@lightmap0@scenery",
+        "hash": 2364684869,
+        "vertices": 780,
+        "triangles": 260,
+        "offset": 7
+      },
+      {
+        "key": "original:MT_Syracuse_metro_grass@lightmap0@scenery",
+        "hash": 1247350558,
+        "vertices": 1770,
+        "triangles": 590,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:0",
+        "hash": 1058987465,
+        "vertices": 4575,
+        "triangles": 1525,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:1",
+        "hash": 3112590925,
+        "vertices": 3351,
+        "triangles": 1117,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:2",
+        "hash": 524658565,
+        "vertices": 11890,
+        "triangles": 5991,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:3",
+        "hash": 568721104,
+        "vertices": 168,
+        "triangles": 56,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:4",
+        "hash": 341464545,
+        "vertices": 606,
+        "triangles": 202,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:5",
+        "hash": 3647796982,
+        "vertices": 428,
+        "triangles": 218,
+        "offset": 7
+      },
+      {
+        "key": "opposite-border:6",
+        "hash": 1311053567,
+        "vertices": 530,
+        "triangles": 182,
+        "offset": 7
+      }
+    ]
+  },
+  {
+    "id": "act2autochess_m01",
+    "kind": "boss",
+    "side": "R",
+    "errors": [],
+    "stats": {
+      "calls": 30,
+      "triangles": 76286,
+      "textures": 46,
+      "geometries": 30,
+      "frames": 74,
+      "cpuMs": 15.43,
+      "lost": false,
+      "originalStage": "act2autochess_m01"
+    },
+    "structure": [
+      {
+        "key": "original:MT_Syracuse_metro@lightmap1@platform",
+        "hash": 3708798411,
+        "vertices": 14583,
+        "triangles": 4861,
+        "offset": 0
+      },
+      {
+        "key": "preview:MT_Syracuse_metro@lightmap1@platform",
+        "hash": 3432787655,
+        "vertices": 66,
+        "triangles": 22,
+        "offset": 0
+      },
+      {
+        "key": "cooperative:MT_Syracuse_metro@lightmap1@scenery",
+        "hash": 4152025846,
+        "vertices": 37518,
+        "triangles": 12506,
+        "offset": 0
+      },
+      {
+        "key": "original:MT_Syracuse_metro@lightmap1@scenery",
+        "hash": 2673973058,
+        "vertices": 31812,
+        "triangles": 10604,
+        "offset": 0
+      },
+      {
+        "key": "original:MT_Syracuse_metro@lightmap0@platform",
+        "hash": 2676132966,
+        "vertices": 11883,
+        "triangles": 3961,
+        "offset": 0
+      },
+      {
+        "key": "preview:MT_Syracuse_metro@lightmap0@platform",
+        "hash": 2990068064,
+        "vertices": 2328,
+        "triangles": 776,
+        "offset": 0
+      },
+      {
+        "key": "cooperative:MT_Syracuse_metro@lightmap0@scenery",
+        "hash": 3601874296,
+        "vertices": 44097,
+        "triangles": 14699,
+        "offset": 0
+      },
+      {
+        "key": "original:MT_Syracuse_metro@lightmap0@scenery",
+        "hash": 2520740726,
+        "vertices": 53634,
+        "triangles": 17878,
+        "offset": 0
+      },
+      {
+        "key": "original:MT_Syracuse_metro_common@lightmap1@platform",
+        "hash": 862572561,
+        "vertices": 54,
+        "triangles": 18,
+        "offset": 0
+      },
+      {
+        "key": "preview:MT_Syracuse_metro_common@lightmap1@platform",
+        "empty": true
+      },
+      {
+        "key": "original:MT_Syracuse_metro_common@lightmap0@platform",
+        "hash": 4242575837,
+        "vertices": 24,
+        "triangles": 8,
+        "offset": 0
+      },
+      {
+        "key": "preview:MT_Syracuse_metro_common@lightmap0@platform",
+        "hash": 2882933313,
+        "vertices": 198,
+        "triangles": 66,
+        "offset": 0
+      },
+      {
+        "key": "cooperative:MT_Syracuse_metro_floor@lightmap1@scenery",
+        "hash": 3152279324,
+        "vertices": 75,
+        "triangles": 25,
+        "offset": 0
+      },
+      {
+        "key": "original:MT_Syracuse_metro_floor@lightmap1@scenery",
+        "hash": 1721815429,
+        "vertices": 51,
+        "triangles": 17,
+        "offset": 0
+      },
+      {
+        "key": "cooperative:MT_Syracuse_metro_floor@lightmap0@scenery",
+        "hash": 3697085613,
+        "vertices": 66,
+        "triangles": 22,
+        "offset": 0
+      },
+      {
+        "key": "original:MT_Syracuse_metro_floor@lightmap0@scenery",
+        "hash": 1053868743,
+        "vertices": 360,
+        "triangles": 120,
+        "offset": 0
+      },
+      {
+        "key": "cooperative:MT_Syracuse_metro_grass@lightmap0@scenery",
+        "hash": 2364684869,
+        "vertices": 780,
+        "triangles": 260,
+        "offset": 0
+      },
+      {
+        "key": "original:MT_Syracuse_metro_grass@lightmap0@scenery",
+        "hash": 3487483020,
+        "vertices": 1332,
+        "triangles": 444,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:0",
+        "hash": 1058987465,
+        "vertices": 4575,
+        "triangles": 1525,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:1",
+        "hash": 3112590925,
+        "vertices": 3351,
+        "triangles": 1117,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:2",
+        "hash": 524658565,
+        "vertices": 11890,
+        "triangles": 5991,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:3",
+        "hash": 568721104,
+        "vertices": 168,
+        "triangles": 56,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:4",
+        "hash": 341464545,
+        "vertices": 606,
+        "triangles": 202,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:5",
+        "hash": 3647796982,
+        "vertices": 428,
+        "triangles": 218,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:6",
+        "hash": 1311053567,
+        "vertices": 530,
+        "triangles": 182,
+        "offset": 0
+      }
+    ]
+  },
+  {
+    "id": "act2autochess_m01",
+    "kind": "boss",
+    "side": "L",
+    "errors": [],
+    "stats": {
+      "calls": 29,
+      "triangles": 76104,
+      "textures": 46,
+      "geometries": 30,
+      "frames": 80,
+      "cpuMs": 8.55,
+      "lost": false,
+      "originalStage": "act2autochess_m01"
+    },
+    "structure": [
+      {
+        "key": "original:MT_Syracuse_metro@lightmap1@platform",
+        "hash": 3708798411,
+        "vertices": 14583,
+        "triangles": 4861,
+        "offset": 0
+      },
+      {
+        "key": "preview:MT_Syracuse_metro@lightmap1@platform",
+        "hash": 3432787655,
+        "vertices": 66,
+        "triangles": 22,
+        "offset": 0
+      },
+      {
+        "key": "cooperative:MT_Syracuse_metro@lightmap1@scenery",
+        "hash": 4152025846,
+        "vertices": 37518,
+        "triangles": 12506,
+        "offset": 0
+      },
+      {
+        "key": "original:MT_Syracuse_metro@lightmap1@scenery",
+        "hash": 2673973058,
+        "vertices": 31812,
+        "triangles": 10604,
+        "offset": 0
+      },
+      {
+        "key": "original:MT_Syracuse_metro@lightmap0@platform",
+        "hash": 2676132966,
+        "vertices": 11883,
+        "triangles": 3961,
+        "offset": 0
+      },
+      {
+        "key": "preview:MT_Syracuse_metro@lightmap0@platform",
+        "hash": 2990068064,
+        "vertices": 2328,
+        "triangles": 776,
+        "offset": 0
+      },
+      {
+        "key": "cooperative:MT_Syracuse_metro@lightmap0@scenery",
+        "hash": 3601874296,
+        "vertices": 44097,
+        "triangles": 14699,
+        "offset": 0
+      },
+      {
+        "key": "original:MT_Syracuse_metro@lightmap0@scenery",
+        "hash": 2520740726,
+        "vertices": 53634,
+        "triangles": 17878,
+        "offset": 0
+      },
+      {
+        "key": "original:MT_Syracuse_metro_common@lightmap1@platform",
+        "hash": 862572561,
+        "vertices": 54,
+        "triangles": 18,
+        "offset": 0
+      },
+      {
+        "key": "preview:MT_Syracuse_metro_common@lightmap1@platform",
+        "empty": true
+      },
+      {
+        "key": "original:MT_Syracuse_metro_common@lightmap0@platform",
+        "hash": 4242575837,
+        "vertices": 24,
+        "triangles": 8,
+        "offset": 0
+      },
+      {
+        "key": "preview:MT_Syracuse_metro_common@lightmap0@platform",
+        "hash": 2882933313,
+        "vertices": 198,
+        "triangles": 66,
+        "offset": 0
+      },
+      {
+        "key": "cooperative:MT_Syracuse_metro_floor@lightmap1@scenery",
+        "hash": 3152279324,
+        "vertices": 75,
+        "triangles": 25,
+        "offset": 0
+      },
+      {
+        "key": "original:MT_Syracuse_metro_floor@lightmap1@scenery",
+        "hash": 1721815429,
+        "vertices": 51,
+        "triangles": 17,
+        "offset": 0
+      },
+      {
+        "key": "cooperative:MT_Syracuse_metro_floor@lightmap0@scenery",
+        "hash": 3697085613,
+        "vertices": 66,
+        "triangles": 22,
+        "offset": 0
+      },
+      {
+        "key": "original:MT_Syracuse_metro_floor@lightmap0@scenery",
+        "hash": 1053868743,
+        "vertices": 360,
+        "triangles": 120,
+        "offset": 0
+      },
+      {
+        "key": "cooperative:MT_Syracuse_metro_grass@lightmap0@scenery",
+        "hash": 2364684869,
+        "vertices": 780,
+        "triangles": 260,
+        "offset": 0
+      },
+      {
+        "key": "original:MT_Syracuse_metro_grass@lightmap0@scenery",
+        "hash": 3487483020,
+        "vertices": 1332,
+        "triangles": 444,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:0",
+        "hash": 1058987465,
+        "vertices": 4575,
+        "triangles": 1525,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:1",
+        "hash": 3112590925,
+        "vertices": 3351,
+        "triangles": 1117,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:2",
+        "hash": 524658565,
+        "vertices": 11890,
+        "triangles": 5991,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:3",
+        "hash": 568721104,
+        "vertices": 168,
+        "triangles": 56,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:4",
+        "hash": 341464545,
+        "vertices": 606,
+        "triangles": 202,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:5",
+        "hash": 3647796982,
+        "vertices": 428,
+        "triangles": 218,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:6",
+        "hash": 1311053567,
+        "vertices": 530,
+        "triangles": 182,
+        "offset": 0
+      }
+    ]
+  },
+  {
+    "id": "act2autochess_m01",
+    "kind": "boss",
+    "side": "all",
+    "errors": [],
+    "stats": {
+      "calls": 30,
+      "triangles": 76286,
+      "textures": 46,
+      "geometries": 30,
+      "frames": 86,
+      "cpuMs": 4.92,
+      "lost": false,
+      "originalStage": "act2autochess_m01"
+    },
+    "structure": [
+      {
+        "key": "original:MT_Syracuse_metro@lightmap1@platform",
+        "hash": 3708798411,
+        "vertices": 14583,
+        "triangles": 4861,
+        "offset": 0
+      },
+      {
+        "key": "preview:MT_Syracuse_metro@lightmap1@platform",
+        "hash": 3432787655,
+        "vertices": 66,
+        "triangles": 22,
+        "offset": 0
+      },
+      {
+        "key": "cooperative:MT_Syracuse_metro@lightmap1@scenery",
+        "hash": 4152025846,
+        "vertices": 37518,
+        "triangles": 12506,
+        "offset": 0
+      },
+      {
+        "key": "original:MT_Syracuse_metro@lightmap1@scenery",
+        "hash": 2673973058,
+        "vertices": 31812,
+        "triangles": 10604,
+        "offset": 0
+      },
+      {
+        "key": "original:MT_Syracuse_metro@lightmap0@platform",
+        "hash": 2676132966,
+        "vertices": 11883,
+        "triangles": 3961,
+        "offset": 0
+      },
+      {
+        "key": "preview:MT_Syracuse_metro@lightmap0@platform",
+        "hash": 2990068064,
+        "vertices": 2328,
+        "triangles": 776,
+        "offset": 0
+      },
+      {
+        "key": "cooperative:MT_Syracuse_metro@lightmap0@scenery",
+        "hash": 3601874296,
+        "vertices": 44097,
+        "triangles": 14699,
+        "offset": 0
+      },
+      {
+        "key": "original:MT_Syracuse_metro@lightmap0@scenery",
+        "hash": 2520740726,
+        "vertices": 53634,
+        "triangles": 17878,
+        "offset": 0
+      },
+      {
+        "key": "original:MT_Syracuse_metro_common@lightmap1@platform",
+        "hash": 862572561,
+        "vertices": 54,
+        "triangles": 18,
+        "offset": 0
+      },
+      {
+        "key": "preview:MT_Syracuse_metro_common@lightmap1@platform",
+        "empty": true
+      },
+      {
+        "key": "original:MT_Syracuse_metro_common@lightmap0@platform",
+        "hash": 4242575837,
+        "vertices": 24,
+        "triangles": 8,
+        "offset": 0
+      },
+      {
+        "key": "preview:MT_Syracuse_metro_common@lightmap0@platform",
+        "hash": 2882933313,
+        "vertices": 198,
+        "triangles": 66,
+        "offset": 0
+      },
+      {
+        "key": "cooperative:MT_Syracuse_metro_floor@lightmap1@scenery",
+        "hash": 3152279324,
+        "vertices": 75,
+        "triangles": 25,
+        "offset": 0
+      },
+      {
+        "key": "original:MT_Syracuse_metro_floor@lightmap1@scenery",
+        "hash": 1721815429,
+        "vertices": 51,
+        "triangles": 17,
+        "offset": 0
+      },
+      {
+        "key": "cooperative:MT_Syracuse_metro_floor@lightmap0@scenery",
+        "hash": 3697085613,
+        "vertices": 66,
+        "triangles": 22,
+        "offset": 0
+      },
+      {
+        "key": "original:MT_Syracuse_metro_floor@lightmap0@scenery",
+        "hash": 1053868743,
+        "vertices": 360,
+        "triangles": 120,
+        "offset": 0
+      },
+      {
+        "key": "cooperative:MT_Syracuse_metro_grass@lightmap0@scenery",
+        "hash": 2364684869,
+        "vertices": 780,
+        "triangles": 260,
+        "offset": 0
+      },
+      {
+        "key": "original:MT_Syracuse_metro_grass@lightmap0@scenery",
+        "hash": 3487483020,
+        "vertices": 1332,
+        "triangles": 444,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:0",
+        "hash": 1058987465,
+        "vertices": 4575,
+        "triangles": 1525,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:1",
+        "hash": 3112590925,
+        "vertices": 3351,
+        "triangles": 1117,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:2",
+        "hash": 524658565,
+        "vertices": 11890,
+        "triangles": 5991,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:3",
+        "hash": 568721104,
+        "vertices": 168,
+        "triangles": 56,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:4",
+        "hash": 341464545,
+        "vertices": 606,
+        "triangles": 202,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:5",
+        "hash": 3647796982,
+        "vertices": 428,
+        "triangles": 218,
+        "offset": 0
+      },
+      {
+        "key": "opposite-border:6",
+        "hash": 1311053567,
+        "vertices": 530,
+        "triangles": 182,
+        "offset": 0
+      }
+    ]
+  }
+]

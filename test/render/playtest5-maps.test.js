@@ -70,7 +70,7 @@ describe('#6 act2 m01 blowers in every view', () => {
   test('联防 builds both halves\' row-13 blowers; the Final Assault builds the four row-6 blowers', () => {
     // (the partner's row-6 machines (6,11) / (6,15) stand off the island: row 7–8 are '#' right of col 9 in 联防)
     assert.deepEqual(blowersIn3d(M01,'bossPrep'),['6,11','6,15','6,5','6,9']);
-    assert.deepEqual(blowersIn3d(M01, 'unite'), ['13,13', '13,17', '13,5', '13,9', '6,5', '6,9']);
+    assert.deepEqual(blowersIn3d(M01, 'unite'), ['13,13', '13,17', '13,5', '13,9']);
     for (const vk of ['boss',viewKind('hidden')]) {
       assert.deepEqual(blowersIn3d(M01, vk), ['6,11', '6,15', '6,5', '6,9'], vk);
     }
@@ -145,7 +145,7 @@ test('boss intel attaches only the central preview pen behind the unchanged aren
  const {boardAreaForView}=await import('../../public/js/render/app.js');
  const {bossPenStage}=await import('../../public/js/render/pen.js');
  const area=boardAreaForView('pen','bossPrep');
- assert.ok(area.some(a=>a.r0===7&&a.r1===7&&a.c0===6&&a.c1===14),'border belongs only to central preview');
+ assert.ok(area.some(a=>a.r0===6&&a.r1===6&&a.c0===6&&a.c1===14),'border belongs only to central preview');
  assert.ok(area.some(a=>8>=a.r0&&8<=a.r1&&10>=a.c0&&10<=a.c1));
  assert.ok(!area.some(a=>8>=a.r0&&8<=a.r1&&2>=a.c0&&2<=a.c1));
  assert.ok(!area.some(a=>15>=a.r0&&15<=a.r1));

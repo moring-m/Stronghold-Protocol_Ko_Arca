@@ -14,6 +14,7 @@ const json=async p=>JSON.parse(await readFile(p,'utf8'));
 export async function buildUrsus(){
  await mkdir(URSUS_DIR,{recursive:true});
  const previousChess=await json(join(URSUS_DIR,'chess.json')).catch(()=>({}));
+ const previousAssets=await json(join(URSUS_DIR,'assets.json')).catch(()=>json(join(ROOT,'content/production/data/assets.json')).catch(()=>({})));
  for(const f of await readdir(join(ROOT,'data'))) if(f.endsWith('.json')) await copyFile(join(ROOT,'data',f),join(URSUS_DIR,f));
  const ops=await json(join(ROOT,'content/custom/ursus/operators.json'));
  const ctx=await loadContext({operatorsOnly:true});
@@ -110,6 +111,12 @@ export async function buildUrsus(){
  assets.bands[bandId]='/assets/custom/ursus/band/kaschey-portrait-v3.png';
  await writeFile(join(ROOT,'.cache/ursus-band-resources.json'),JSON.stringify({files:[{path:assets.bands[bandId],local:true,sources:[]}]}));
  for(const [id,rec]of Object.entries(chess))if(previousChess[id]?.charId===rec.charId&&previousChess[id]?.skins)rec.skins=previousChess[id].skins;
+ // Cosmetic catalogues are prepared independently; rebuilding gameplay must retain their model and voice mappings.
+ for(const [id,entry]of Object.entries(previousAssets.chars||{}))if(id.startsWith('skin_'))assets.chars[id]??=entry;
+ assets.audio??={};
+ const oldVoice=previousAssets.audio?.voice,baseVoice=assets.audio.voice||{};
+ if(oldVoice?.kr||oldVoice?.jp)assets.audio.voice={cn:baseVoice.cn||baseVoice,kr:oldVoice.kr||{},jp:oldVoice.jp||{}};
+ for(const key of ['voiceAvailability','voiceConditions'])if(previousAssets.audio?.[key])assets.audio[key]=previousAssets.audio[key];
  for(const [key,value]of Object.entries({chess,bonds,garrisons,tokens,assets,items,bands}))await writeFile(join(URSUS_DIR,`${key}.json`),JSON.stringify(value));
  await buildUrsusChoices(URSUS_DIR);
  await buildRecruits(ROOT,URSUS_DIR);

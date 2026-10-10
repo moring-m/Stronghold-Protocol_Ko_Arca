@@ -293,6 +293,7 @@ export function dealDamage(battle, source, target, dmgIn) {
   if (final > 0 && leaderHitCancelled(battle, target, final)) return 0;
   const beforeShield = final;
   final = absorbShields(battle, target, final, type);
+  target.stats.shieldAbsorbed=(target.stats.shieldAbsorbed||0)+Math.max(0,beforeShield-final);
   dmg.displayCritical = criticalDamage(beforeShield, dmg.expectedDamage, dmg.forceCritical);
   if (beforeShield > 0 && final === 0 && dmg.displayCritical) {
     const barrier = ts.shield > 0;
@@ -314,6 +315,7 @@ export function dealDamage(battle, source, target, dmgIn) {
 export function applyHpLoss(battle, source, target, amount, dmg) {
   if (!target.alive) return 0;
   let dealt = 0;
+  const type=dmg?.type||'true';
   const hs = dmg && dmg.sourceless ? null : source; // the source hooks see (无来源: none; `credit` keeps it)
   if (target.bossPool) {
     const pool = target.bossPool;
@@ -343,9 +345,13 @@ export function applyHpLoss(battle, source, target, amount, dmg) {
   // 史尔特尔 S3 …), friendly damage; `taken` and the kill credit do
   if (source && source.side !== target.side) {
     source.stats.dmg += dealt;
+    const key=type==='phys'?'physicalDamage':type==='arts'?'artsDamage':type==='elemental'?'elementalDamage':'trueDamage';
+    source.stats[key]=(source.stats[key]||0)+dealt;
     if (source.side === 'ally' && source.ownerId != null) { const pp = battle._pp(source.ownerId); if (pp) pp.damageDealt += dealt; }
   }
   target.stats.taken += dealt;
+  const takenKey=type==='phys'?'takenPhysical':type==='arts'?'takenArts':type==='elemental'?'takenElemental':'takenTrue';
+  target.stats[takenKey]=(target.stats[takenKey]||0)+dealt;
   target.lastHitAt = battle.time;
   if (dmg && !dmg.silent && amount >= 0.5) {
     const shown = dmg.type === 'element' ? dmg.element : dmg.type === 'elemental' ? (dmg.element || 'true') : dmg.type;

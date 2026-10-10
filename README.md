@@ -4,9 +4,9 @@
 
 《명일방주》의 시즌 오토체스 타워 디펜스 모드 「위수 프로토콜: 맹약」을 **비공식 팬 메이크로 재현한 작품**입니다. 브라우저에서 바로 플레이할 수 있으며, 싱글 플레이 또는 1–4인 온라인 협동을 지원합니다.
 
-![version](https://img.shields.io/badge/version-0.2.2a-2ea44f)
+![version](https://img.shields.io/badge/version-0.2.3a-2ea44f)
 
-현재 커스텀판: **0.2.2a**. [실제 플레이 변경 비교](docs/release-0.2.2a/COMPARISON.md).
+현재 버전: **0.2.3a**. [원본 변경별 반영·비교·캡처](docs/upstream-0.2.3-review/README.md).
 ![license](https://img.shields.io/badge/code%20license-GPL--3.0--or--later-blue)
 ![node](https://img.shields.io/badge/node-22%20%7C%2024-339933)
 

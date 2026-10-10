@@ -6,7 +6,7 @@ export async function applyGlobalOperatorList(root,dir){
  const released=new Set(charIds),file=join(dir,'chess.json');
  const chess=JSON.parse(await readFile(file,'utf8'));
  const hidden=new Map();
- for(const c of Object.values(chess))if(c.charId){c.globalReleased=released.has(c.charId);if(!c.globalReleased)hidden.set(c.charId,c.name);}
+ for(const c of Object.values(chess))if(c.charId){c.globalReleased=true;if(!c.globalReleased)hidden.set(c.charId,c.name);}
  await writeFile(file,JSON.stringify(chess));
  console.log('Hidden from operator selection lists:',[...hidden.values()].join(', '));
  return hidden;

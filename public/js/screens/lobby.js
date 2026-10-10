@@ -1,3 +1,4 @@
+import { PwaInstallButton } from '../ui/device.js';
 import { openStats } from './stats.js';
 
 import { t } from '../../../shared/i18n.js';
@@ -12,6 +13,7 @@ import { t } from '../../../shared/i18n.js';
 // hidden core on 险境+), per research 00-INDEX §2. Battlefield pool (`modes[].stages`): 标准 always
 // plays 战场#01, 险境 draws one of 8, 绝境 / 终极 one of 7 (m01 excluded).
 
+import { ResumeMatchButton } from '../ui/resumeMatch.js';
 import { useEffect, useRef, useState } from '../../vendor/hooks.module.js';
 import { DIFFICULTIES, DIFFICULTY_NAMES, DIFFICULTY_COLORS, ROOM_CODE_LEN, MAX_SEATS, MAX_SPECTATORS, MAX_SPECTATOR_SEATS, ERR, modeIdFor } from '../../../shared/constants.js';
 import { html, Button, Icon, MicroLabel, Panel, TextField, PingPill, AvatarFrame, Tooltip, Spinner, Modal, DifficultyIcon, doctorNo } from '../ui/components.js';
@@ -332,6 +334,7 @@ export function LobbyScreen() {
         <h1 class="topbar__title">选择模拟协议</h1>
       </div>
       <div class="topbar__right">
+        <${ResumeMatchButton} /><${PwaInstallButton} class="lobby-pwa" />
         <${SettingsButton} />
         <${GuideButton} class="lobby-guide" variant="secondary" />
         <${LoadoutButton} from="lobby" size="sm" class="lobby-loadout" />

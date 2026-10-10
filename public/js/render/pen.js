@@ -29,7 +29,7 @@ export const PEN_RECT = Object.freeze({ r0: 14, r1: 18, c0: 7, c1: 13 });
 export const MAX_PREVIEW = 50;
 export const PER_TILE = 3;
 
-export const BOSS_PEN_RECT = Object.freeze({r0:8,r1:12,c0:7,c1:13});
+export const BOSS_PEN_RECT = Object.freeze({r0:7,r1:11,c0:7,c1:13});
 const bossStages = new WeakMap();
 
 /** Display-only stage: attach the original preview pen behind the boss arena.
@@ -56,6 +56,36 @@ export function bossPenStage(stage) {
     config:{...stage.config,enemy_place_rect:`((${rect.r0},${rect.c0}),(${rect.r1},${rect.c1}))`},
     previewLayout:{source,rect,offset}};
   bossStages.set(stage,visual);
+  return visual;
+}
+
+// Cooperative combat stays on its simulation rows; only the displayed map uses
+// the boss structure translated by seven rows, including its central preview pen.
+const cooperativeStages = new WeakMap();
+export function cooperativeBossStage(stage) {
+  if (!stage?.rows) return stage;
+  if (cooperativeStages.has(stage)) return cooperativeStages.get(stage);
+  const boss=bossPenStage(stage), worldOffset=7;
+  const rows=stage.rows.map((line,r)=>r>=worldOffset ? boss.rows[r-worldOffset] : '#'.repeat(line.length));
+  // Keep the shared envelope, but use the cooperative routes and gates where
+  // the boss arena has its central seat/connector or a different entrance.
+  const patches=[];
+  const structuralRows=[...boss.rows];
+  for(let r=8;r<=12;r++) {
+    const line=rows[r].split(''), canonical=structuralRows[r-worldOffset].split('');
+    for(let c=0;c<line.length;c++) {
+      const actual=stage.rows[r][c], displayed=line[c];
+      if(actual===displayed || !(r>=9 && c>=9 && c<=11 || /[SEIO]/.test(actual+displayed)))continue;
+      line[c]=actual;canonical[c]=actual;
+      patches.push({r0:r-worldOffset,r1:r-worldOffset,c0:c,c1:c});
+    }
+    rows[r]=line.join('');structuralRows[r-worldOffset]=canonical.join('');
+  }
+  const structuralSource={...boss,rows:structuralRows};
+  const rect={...boss.previewLayout.rect,r0:boss.previewLayout.rect.r0+worldOffset,r1:boss.previewLayout.rect.r1+worldOffset};
+  const visual={...stage,rows,config:{...stage.config,enemy_place_rect:`((${rect.r0},${rect.c0}),(${rect.r1},${rect.c1}))`},
+    previewLayout:{...boss.previewLayout,worldOffset,cooperativePatches:patches}, structuralSource};
+  cooperativeStages.set(stage,visual);
   return visual;
 }
 

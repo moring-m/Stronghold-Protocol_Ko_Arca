@@ -1,3 +1,4 @@
+import {combatMetrics} from '../../shared/combatStats.js';
 // server/sim/units.js — Unit model (operators, tokens, enemies, devices) and stat aggregation (DESIGN §5.2).
 //
 // Aggregation (recomputed lazily whenever buffs change — `unit.markDirty()`):
@@ -95,7 +96,7 @@ export class Unit {
     // every deployment clears it (battle/deploy.js _deploy)
     this.downAtHome = false;
     this.trait = {};            // profession runtime state
-    this.stats = { dmg: 0, kills: 0, heal: 0, taken: 0, attacks: 0 };
+    this.stats = combatMetrics();
     this.hidden = false;        // enemies inside a DISAPPEAR segment
     this.moving = false;        // enemies: walked this tick (drawn on the move clip; ai.js updateEnemy)
     this.form = null;           // the model's current form (content/enemies/helpers.js setForm, a 傀儡师's 替身 'doll' → snapshot.js unitInfo)

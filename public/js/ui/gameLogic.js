@@ -22,6 +22,9 @@ import { DAMAGE_NUMBER_MODES, damageNumberMode } from '../../../shared/damageDis
 //   A board piece dropped on its own tile is legal ('orient'): the direction wheel re-orients it in place
 //   (research 09 §1.2); board drops of units go through the wheel before g.move {uid, to, dir} (ui/facing.js).
 
+import { sanitizeVoiceOverrides } from '../voicePrefs.js';
+export const TEXT_SIZES=Object.freeze(['sm','md','lg','xl']);
+export const VOICE_LANGS=Object.freeze(['kr','jp','cn']);
 import { GEO, PHASE, UF } from '../../../shared/constants.js';
 import { chatNotificationSound, defaultChatCooldown } from '../chatNotificationSounds.js';
 
@@ -1724,7 +1727,7 @@ export function shortcutBlocked(act, { modal = false, drawer = false } = {}) {
 
 // ---- settings ------------------------------------------------------------------------------------------------------
 
-export const DEFAULT_SETTINGS = Object.freeze({ bgm: 0.6, sfx: 0.8, voice: 0.6, voiceLanguage: 'kr', chatVolume: 0.5, chatSound: 'emote', chatSoundCustomized: false, chatFactionNotifications: false, chatCooldown: defaultChatCooldown('emote'), muted: false, damageNumbers: true, damageNumberMode: 'basic', quality: 'high', mapQuality: 'high', renderScale: 1, effectsQuality: 'high', shadows: true, skillRanges: true, unitRanges: true, animationQuality: 'high', frameLimit: 60, adaptiveQuality: true });
+export const DEFAULT_SETTINGS = Object.freeze({ bgm: 0.6, sfx: 0.8, voice: 0.6, voiceLanguage: 'kr', voiceOverrides: Object.freeze({}), textSize: 'sm', chatVolume: 0.5, chatSound: 'emote', chatSoundCustomized: false, chatFactionNotifications: false, chatCooldown: defaultChatCooldown('emote'), muted: false, damageNumbers: true, damageNumberMode: 'basic', quality: 'high', mapQuality: 'high', renderScale: 1, effectsQuality: 'high', shadows: true, skillRanges: true, unitRanges: true, animationQuality: 'high', frameLimit: 60, adaptiveQuality: true });
 const QUALITIES = ['high', 'medium', 'low'];
 
 /**
@@ -1740,12 +1743,14 @@ export function sanitizeSettings(raw) {
     bgm: vol(r.bgm, DEFAULT_SETTINGS.bgm),
     sfx: vol(r.sfx, DEFAULT_SETTINGS.sfx),
     voice: vol(r.voice, DEFAULT_SETTINGS.voice),
+    voiceOverrides: sanitizeVoiceOverrides(r.voiceOverrides),
+    textSize: TEXT_SIZES.includes(r.textSize)?r.textSize:'sm',
     chatVolume: vol(r.chatVolume, DEFAULT_SETTINGS.chatVolume),
     chatSound,
     chatSoundCustomized: r.chatSoundCustomized === true,
     chatFactionNotifications: typeof r.chatFactionNotifications === 'boolean' ? r.chatFactionNotifications : DEFAULT_SETTINGS.chatFactionNotifications,
     chatCooldown: Number.isFinite(r.chatCooldown) ? clamp(Math.round(r.chatCooldown), 1, 5) : defaultChatCooldown(chatSound),
-    voiceLanguage: r.voiceLanguage === 'jp' ? 'jp' : 'kr',
+    voiceLanguage: VOICE_LANGS.includes(r.voiceLanguage)?r.voiceLanguage:'kr',
     muted: typeof r.muted === 'boolean' ? r.muted : DEFAULT_SETTINGS.muted,
     damageNumbers: damageNumberMode(r) !== 'none',
     damageNumberMode: DAMAGE_NUMBER_MODES.includes(r.damageNumberMode) || typeof r.damageNumbers === 'boolean' ? damageNumberMode(r) : DEFAULT_SETTINGS.damageNumberMode,
@@ -1803,6 +1808,8 @@ export function normalizeResult(res, pub) {
       title,
       lineup: (Array.isArray(p.lineup) ? p.lineup : Array.isArray(p.board) ? p.board : []).filter(isObj).slice(0, 12),
       bonds: (Array.isArray(p.bonds) ? p.bonds : Array.isArray(pp.bonds) ? pp.bonds : []).filter(isObj),
+      combatRounds: Array.isArray(p.combatRounds)?p.combatRounds:[],
+      commendations: Number(p.commendations)||0,
       stats: isObj(p.stats) ? p.stats : {},
       trophies: Number.isFinite(p.trophies) ? p.trophies : 0,
       reward: Number.isFinite(p.reward) ? p.reward : 0,
@@ -1821,6 +1828,8 @@ export function normalizeResult(res, pub) {
     modeId: r.modeId || pub?.modeId || null,
     bossId: r.bossId ?? pub?.bossId ?? null,
     hiddenBossId: r.hiddenBossId ?? pub?.hiddenBossId ?? null,
+    matchNo:r.matchNo??null,
+    commendationsGiven:r.commendationsGiven||{},
     durationMs: Number.isFinite(r.durationMs) ? r.durationMs : null,
     players,
   };

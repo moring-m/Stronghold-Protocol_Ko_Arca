@@ -11,6 +11,7 @@ import { useGameData, Img, RichText } from '../ui/gameComponents.js';
 import { StepHeader, ExitModal } from '../ui/matchChrome.js';
 import { MatchInfo, matchInfoModel } from '../ui/matchInfo.js';
 import { LoadoutButton } from './loadout.js';
+import { SetupReroll } from '../ui/setupReroll.js';
 import { actions } from '../ui/gameActions.js';
 import { factionTypes, sortedPlayers, phaseTotalSeconds } from '../ui/gameLogic.js';
 import { enemyIconUrl, factionIconUrl } from '../ui/assetUrls.js';
@@ -47,7 +48,7 @@ export function BriefingScreen() {
   const ready = async () => {
     if (busy || me?.ready) return;
     setBusy(true);
-    await actions.infoReady();
+    await actions.infoReady(pub.setupRevision ?? 0);
     setBusy(false);
   };
 
@@ -88,18 +89,16 @@ export function BriefingScreen() {
         <${MatchInfo} model=${info} />
       </section>
     </main>
+    <${SetupReroll} pub=${pub} />
     <footer class="brief__foot">
       <span>리롤 ${room?.rerollLimit === -1 ? '무제한' : `${Math.max(0, (room?.rerollLimit ?? 0) - (room?.rerollsUsed ?? 0))}회 남음`}</span>
-      ${room?.hostId === myId && me ? html`<${Button} disabled=${busy || (room.rerollLimit !== -1 && (room.rerollsUsed ?? 0) >= (room.rerollLimit ?? 0))}
-        onClick=${async () => { if (busy) return; setBusy(true); try { await actions.reroll(room.matchNo); } finally { setBusy(false); } }}
-        title="방을 유지하고 보스·맵·적 세력·금지 목록을 다시 추첨합니다">리롤<//>` : null}
       <${LoadoutButton} from="briefing" size="lg" class="brief-loadout" />
       <div class="brief-ready">
         <span class="brief-ready__txt">已就绪 <b class="num">${readyN}</b><span class="num">/${players.length}</span></span>
         <span class="brief-ready__pips">${players.map((p) => html`<i key=${p.playerId} class=${cx(p.ready && 'on', p.playerId === myId && 'me')} title=${p.name}><${Icon} name="user" /></i>`)}</span>
       </div>
       <${Button} variant="primary" size="xl" icon=${me?.ready ? 'check' : me ? 'play' : 'eye'} active=${!!me?.ready} loading=${busy}
-        disabled=${!!me?.ready || !me} onClick=${ready}>${me?.ready ? '已就绪' : me ? '准备就绪' : '观战中'}<//>
+        disabled=${!!me?.ready || !me || !!pub.rerollVote} onClick=${ready}>${me?.ready ? '已就绪' : me ? '准备就绪' : '观战中'}<//>
     </footer>
     <${ChatPanel} />
     <${ExitModal} open=${exit} onClose=${() => setExit(false)} solo=${solo} />

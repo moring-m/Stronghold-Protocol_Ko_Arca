@@ -10,7 +10,7 @@ import { GIcon } from './gameComponents.js';
 import { useLayoutEffect, useState } from '../../vendor/hooks.module.js';
 import { html, Modal, Button, Icon, MicroLabel } from './components.js';
 import { createStore, useStore, loadPref, savePref } from '../store.js';
-import { sanitizeSettings, migrateSavedSettings } from './gameLogic.js';
+import { sanitizeSettings, migrateSavedSettings, TEXT_SIZES } from './gameLogic.js';
 import { audio } from '../audio.js';
 import { CHAT_NOTIFICATION_SOUNDS, defaultChatCooldown } from '../chatNotificationSounds.js';
 import { openGuide } from './guide.js';
@@ -19,14 +19,29 @@ import { detectFeatures } from './device.js';
 /** Settings store: { bgm, sfx, voice, muted, damageNumbers, quality }. */
 export const settingsStore = createStore(migrateSavedSettings(loadPref('settings', null)));
 
+/**
+ * 设置 →「文字大小」: put the step on <html data-text> — css/theme.css turns it into the text root `--t`
+ * (`:root[data-text="md"] { --t: … }`), which every readable font-size reads; no layout value does. The attribute
+ * (not an inline style) keeps the default in the stylesheet: without it — no JavaScript, an old saved profile, a
+ * value a future version dropped — the page is the design's own sizes. Values outside TEXT_SIZES fall back to 小.
+ * @param {'sm'|'md'|'lg'|'xl'} v
+ */
+export function applyTextSize(v) {
+  const el = globalThis.document?.documentElement;
+  if (el) el.dataset.text = TEXT_SIZES.includes(v) ? v : 'sm';
+}
+
 settingsStore.subscribe((s) => {
   savePref('settings', sanitizeSettings(s));
   audio.setVolumes(s);
-  audio.setVoiceLang(s.voiceLang);
+  audio.setVoiceLang(s.voiceLanguage, s.voiceOverrides);
+  applyTextSize(s.textSize);
 });
 savePref('settings', settingsStore.get());
 audio.setVolumes(settingsStore.get());
-audio.setVoiceLang(settingsStore.get().voiceLang);
+audio.setVoiceLang(settingsStore.get().voiceLanguage, settingsStore.get().voiceOverrides);
+// before the first render (main.js boot renders after its imports ran): the stored step is on screen without a flash
+applyTextSize(settingsStore.get().textSize);
 
 /** @param {Partial<ReturnType<typeof sanitizeSettings>>} patch */
 export function updateSettings(patch) {
@@ -59,8 +74,8 @@ function Toggle({ label, micro, value, onChange, id }) {
   </div>`;
 }
 
-function Choice({label,value,options,onChange}) {
-  return html`<div class="set-row" data-i18n-skip><label class="set-row__label">${label}</label><select aria-label=${label} value=${value} onChange=${e=>onChange(e.currentTarget.value)}>${options.map(([id,text])=>html`<option value=${id}>${text}</option>`)}</select></div>`;
+function Choice({label,value,options,onChange,testId}) {
+  return html`<div class="set-row" data-i18n-skip><label class="set-row__label">${label}</label><select aria-label=${label} data-testid=${testId} value=${value} onChange=${e=>onChange(e.currentTarget.value)}>${options.map(([id,text])=>html`<option value=${id}>${text}</option>`)}</select></div>`;
 }
 
 /**
@@ -74,7 +89,7 @@ export function SettingsModal({ open, onClose }) {
   useLayoutEffect(() => { setCandidateSound(s.chatSound); if (!open) audio.stopChatNotification(); }, [open, s.chatSound]);
   const [tested, setTested] = useState(false);
   const [touchUi] = useState(() => detectFeatures().coarse && !detectFeatures().fine);
-  return html`<${Modal} open=${open} onClose=${onClose} title="设置" micro="SETTINGS" width="7.4rem"
+  return html`<${Modal} open=${open} onClose=${onClose} title="设置" micro="SETTINGS" class="settings-modal" width="7.4rem"
     actions=${html`<${RestartVoteControls} voteVisible=${false} onRequested=${onClose} label="리방 투표" /><${Button} variant="secondary" icon="book" class="set-guide" onClick=${() => openGuide(0)}>玩法说明<//>
       <${Button} variant="primary" icon="check" onClick=${onClose}>完成<//>`}>
     <nav class="set-categories" aria-label="설정 종류" data-i18n-skip>
@@ -129,6 +144,7 @@ export function SettingsModal({ open, onClose }) {
         </div>
       </div>
       <p class="set-hint" data-i18n-skip>합산: 연속 피해를 묶어 표시 · 모두: 타격마다 표시 · 기본: 명일방주의 붉은 대미지 표시 판정(예상 피해의 1.5배 이상)을 적용합니다.</p>
+      <${Choice} testId="text-size" label="글자 크기" value=${s.textSize} options=${[['sm','작게'],['md','보통'],['lg','크게'],['xl','아주 크게']]} onChange=${v=>updateSettings({textSize:v})} />
     </section><section hidden=${category!=='controls'} class="set-category" data-category="controls">
       ${touchUi
         ? html`<p class="set-hint">触屏操作：点击单位选中（撤退 / 出售）· 长按单位或卡牌查看详情 · 拖动部署后滑动选择朝向</p>`
@@ -141,5 +157,5 @@ export function SettingsModal({ open, onClose }) {
 /** The same settings entry for title, lobby and waiting room. */
 export function SettingsButton({class: cls = ''}) {
   const [open, setOpen] = useState(false);
-  return html`<span class=${`settings-entry ${cls}`}><${Button} variant="secondary" size="sm" square=${true} aria-label="设置" title="设置" onClick=${() => setOpen(true)}><${GIcon} name="gear" /><//><${SettingsModal} open=${open} onClose=${() => setOpen(false)} /></span>`;
+  return html`<span class=${`settings-entry ${cls}`}><${Button} variant="secondary" size="sm" square=${true} data-testid="settings-btn" aria-label="设置" title="设置" onClick=${() => setOpen(true)}><${GIcon} name="gear" /><//><${SettingsModal} open=${open} onClose=${() => setOpen(false)} /></span>`;
 }

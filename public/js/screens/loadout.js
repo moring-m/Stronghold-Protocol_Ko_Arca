@@ -1,3 +1,4 @@
+import { OperatorVoice } from '../ui/operatorVoice.js';
 import {RecruitPresetButton,RecruitPresetsHost} from '../ui/recruitPresets.js';
 
 
@@ -318,6 +319,7 @@ function Detail({ m, chess, golden, entries, ops, onChange, onReset, locked }) {
       <${Button} variant="ghost" size="sm" icon="refresh" class="lo-dhead__reset" disabled=${!choice.changed && !choice.skin} onClick=${onReset}>恢复默认<//>
     </div>
     <div class="lo-detail__body" ref=${bodyRef}>
+      <${OperatorVoice} charId=${chess.charId} />
       ${!chess.recruitPrototype && !chess.recruitReserve ? html`<${CultivationSection} charId=${chess.charId} ops=${ops} onSet=${(id,patch)=>setOpsMap(setOps(loadoutStore.get().ops,id,patch))} />` : null}
       <section class="lo-sec lo-sec--garrison"><header class="lo-sec__head"><h3>특질<${MicroLabel}>GARRISON<//></h3>
         <div class="lo-seg" role="tablist" aria-label="특질 단계">

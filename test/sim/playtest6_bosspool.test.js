@@ -151,3 +151,38 @@ for (const bossId of BOSSES) {
     assert.deepEqual(b.enemies.filter((e) => e.alive && e.isBoss).map((e) => e.defId), []);
   });
 }
+
+// A server-confirmed kill must draw DIE even when this client's last pool snapshot retained HP.
+for (const bossId of BOSSES) {
+  test(`${bossId}: confirmed clear emits each surviving leader's death once despite stale HP`, () => {
+    const {b,leaders}=bossBattle(bossId,null);
+    assert.ok(b.sharedBoss.hp>0);
+    const ids=new Set(leaders.map(e=>e.id));
+    const deaths=[];
+    b.on('death',({unit})=>{if(ids.has(unit.id))deaths.push(unit.id);});
+    b.forceEnd('cleared');
+    assert.equal(b.reason,'cleared');
+    assert.equal(b.snapshot().boss.hp,0);
+    assert.ok(leaders.every(e=>!e.alive));
+    assert.deepEqual(new Set(deaths),ids);
+    b.forceEnd('cleared');
+    assert.equal(deaths.length,ids.size,'repeated completion never repeats DIE');
+  });
+}
+test('timeout and forced boss endings preserve surviving bosses',()=>{
+  for(const reason of ['timeout','forced']){
+    const {b,leaders}=bossBattle('boss_1',null);
+    b.forceEnd(reason);
+    assert.equal(b.reason,reason);
+    assert.ok(leaders.every(e=>e.alive));
+    assert.ok(b.sharedBoss.hp>0);
+  }
+});
+
+test('late confirmed defeat animates an already stopped field without resending its result',()=>{
+ const {b,leaders}=bossBattle('boss_1',null);b.forceEnd('timeout');
+ const original=b.result(),deaths=[];b.on('death',({unit})=>deaths.push(unit.id));
+ b.confirmBossDefeat();assert.ok(leaders.every(e=>!e.alive));
+ assert.equal(b.result(),original);assert.equal(b.reason,'timeout');
+ const count=deaths.length;b.confirmBossDefeat();assert.equal(deaths.length,count);
+});

@@ -1,3 +1,4 @@
+import {combatRound} from '../../../shared/combatStats.js';
 // Local match statistics: every match the local player took part in is appended as one record to localStorage
 // (`sp.pref.stats`). Per-browser only — the server keeps matches in memory and has no identity, so there is nowhere
 // else for cross-match numbers to live; nothing here is ever sent anywhere. The stats page labels itself 本机数据 and
@@ -161,6 +162,7 @@ function normalizePlayerRow(raw, quit = false) {
     reward: int(p.reward, 0),
     lineup,
     bonds,
+    combatRounds:(Array.isArray(p.combatRounds)?p.combatRounds:[]).slice(0,40).map(combatRound),
     stats: normalizeStatBlock(p.stats),
   };
 }

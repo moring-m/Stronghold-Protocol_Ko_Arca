@@ -1,3 +1,4 @@
+import { borderCells, combatBorderAreas, oppositeBorderRuns, completeOppositeRuns, vacantBorderCells, reflectOppositeBorder, disjointAreas, uncoveredTileCells, uniqueCopiedFaces } from './surroundings.js';
 import { applyNativeStageBlend } from './materials.js';
 // render/board3d/scene.js — the official 卫戍协议 board as a real three.js scene (DESIGN §15), rendered on its own
 // canvas UNDER the Pixi canvas (units, FX, highlights, HP bars stay in Pixi). One camera model drives both layers:
@@ -24,7 +25,7 @@ import { buildBoard, buildDeviceSlabs, objToBoard, boxProjectUV, ROWS, COLS, DEV
 import { surfaceUV } from './atlas.js';
 import {
   focusUniforms, addFocus, makeTexture, boardMaterial, glassMaterial, decalMaterial, pipeMaterial, unlitMaterial, gateMaterial, glowMaterial,
-  waterMaterial, mireMaterial, infectionMaterial, smogMaterial, dashTexture, environmentMap, nativePhysicalLighting, addShadowContrast,
+  waterMaterial, mireMaterial, infectionMaterial, infectionGlowMaterial, smogMaterial, dashTexture, environmentMap, nativePhysicalLighting, addShadowContrast,
 } from './materials.js';
 import { syncThreeCamera } from '../projection.js';
 
@@ -96,14 +97,26 @@ export function geometryForArea(src, areas, {support=false}={}) {
 
 // Water surfaces may be one connected mesh across both fields. Clip their
 // triangles, preserving UVs, rather than treating the whole sheet as decoration.
+// Complement in tile coordinates, so native replacement faces never overlap.
+export function outsideTileAreas(holes) {
+  let parts=[{r0:-100,r1:100,c0:-100,c1:100}];
+  for(const h of holes)parts=parts.flatMap(a=>{
+    const r0=Math.max(a.r0,h.r0),r1=Math.min(a.r1,h.r1),c0=Math.max(a.c0,h.c0),c1=Math.min(a.c1,h.c1);
+    if(r0>r1 || c0>c1)return [a];
+    return [{...a,r1:r0-1},{...a,r0:r1+1},{r0,r1,c0:a.c0,c1:c0-1},{r0,r1,c0:c1+1,c1:a.c1}].filter(b=>b.r0<=b.r1&&b.c0<=b.c1);
+  });
+  return parts;
+}
+
 export function surfaceForArea(src, areas) {
+  areas=disjointAreas(areas);
   const attrs = Object.entries({position:3,normal:3,uv:2,uv1:2,color:3}).filter(([key,size])=>src[key]?.length === src.position.length/3*size);
   const output = Object.fromEntries(attrs.map(([key])=>[key,[]]));
   const index=[];
   const vertex=id=>Object.fromEntries(attrs.map(([key,size])=>[key,Array.from(src[key].slice(id*size,(id+1)*size))]));
   const mix=(a,b,t)=>Object.fromEntries(attrs.map(([key])=>[key,a[key].map((v,i)=>v+(b[key][i]-v)*t)]));
   for(let i=0;i<src.index.length;i+=3) {
-    const triangle=src.index.slice(i,i+3).map(vertex);
+    const triangle=Array.from(src.index.slice(i,i+3),vertex);
     for(const area of areas) {
       let poly=triangle;
       for(const [axis,limit,sign] of [[0,area.c0-.5,1],[0,area.c1+.5,-1],[1,area.r0-.5,1],[1,area.r1+.5,-1]]) {
@@ -150,14 +163,14 @@ export function sceneryForArea(src, areas, {interiorOnly=false, surroundOnly=fal
   const bounds = new Map();
   for (const id of src.index) {
     const root=find(id), x=src.position[id*3], y=src.position[id*3+1];
-    const b=bounds.get(root) || {x0:Infinity,x1:-Infinity,y0:Infinity,y1:-Infinity};
-    b.x0=Math.min(b.x0,x);b.x1=Math.max(b.x1,x);b.y0=Math.min(b.y0,y);b.y1=Math.max(b.y1,y);bounds.set(root,b);
+    const b=bounds.get(root) || {x0:Infinity,x1:-Infinity,y0:Infinity,y1:-Infinity,z1:-Infinity};
+    b.x0=Math.min(b.x0,x);b.x1=Math.max(b.x1,x);b.y0=Math.min(b.y0,y);b.y1=Math.max(b.y1,y);b.z1=Math.max(b.z1,src.position[id*3+2]);bounds.set(root,b);
   }
   const keep = new Set();
   for (const [root,b] of bounds) {
     const landscape = b.x0 < -.5 || b.x1 > 20.5 || b.y0 < -.5 || b.y1 > 18.5;
     if (decorationOnly) {
-      if (!landscape && b.x1-b.x0 < 3.5 && b.y1-b.y0 < 2.5 && areas.some(a=>b.x0>=a.c0-.5 && b.x1<=a.c1+.5 && b.y0>=a.r0-.5 && b.y1<=a.r1+.5)) keep.add(root);
+      if (!landscape && b.z1 <= 2.5 && b.x1-b.x0 < 3.5 && b.y1-b.y0 < 2.5 && areas.some(a=>b.x0>=a.c0-.55 && b.x1<=a.c1+.55 && b.y0>=a.r0-.55 && b.y1<=a.r1+.55)) keep.add(root);
       continue;
     }
     if (interiorOnly && landscape && b.y1 > 6.5) continue;
@@ -169,7 +182,7 @@ export function sceneryForArea(src, areas, {interiorOnly=false, surroundOnly=fal
   }
   const index=[];
   for(let i=0;i<src.index.length;i+=3) if(keep.has(find(src.index[i]))) index.push(src.index[i],src.index[i+1],src.index[i+2]);
-  return {...src,index};
+  return {...src,index,footprints:decorationOnly ? [...keep].map(root=>bounds.get(root)).filter(b=>b.z1>=-.04) : undefined};
 }
 
 /** Translate the complete cooperative background without changing UVs or lighting. */
@@ -183,17 +196,19 @@ const mergeInto = (list) => {
   for (const g of list) { nv += g.position.length / 3; ni += g.index.length; }
   const position = new Float32Array(nv * 3), normal = new Float32Array(nv * 3), uv = new Float32Array(nv * 2), color = new Float32Array(nv * 3);
   const index = nv > 65535 ? new Uint32Array(ni) : new Uint16Array(ni);
+  const uv1=list.some(g=>g.uv1?.length)?new Float32Array(nv*2):null;
   let vo = 0, io = 0;
   for (const g of list) {
     const n = g.position.length / 3;
     position.set(g.position, vo * 3);
     if (g.normal) normal.set(g.normal, vo * 3);
     if (g.uv) uv.set(g.uv, vo * 2);
+    if (uv1 && g.uv1) uv1.set(g.uv1,vo*2);
     if (g.color) color.set(g.color, vo * 3); else color.fill(1, vo * 3, (vo + n) * 3);
     for (let i = 0; i < g.index.length; i++) index[io + i] = g.index[i] + vo;
     vo += n; io += g.index.length;
   }
-  return { position, normal, uv, color, index };
+  return { position, normal, uv, color, index, ...(uv1?{uv1}:{}) };
 };
 
 /** Apply a 4×4-free transform (scale s, rotate about z by `rot` quarter turns, translate) to board-space data. */
@@ -292,6 +307,7 @@ export class BoardScene {
       water: waterMaterial(T, this.tex, this.focus),
       mire: mireMaterial(T, this.tex, this.focus),
       infection: infectionMaterial(T, this.tex, this.focus),
+      infectionGlow: infectionGlowMaterial(T, this.tex, this.focus),
       smog: smogMaterial(T, this.tex, this.focus),
       shadowCatcher: new T.ShadowMaterial({ opacity: 0.60, color: 0x000000 }),
     };
@@ -454,7 +470,7 @@ export class BoardScene {
   /** Rebuild everything for a stage (no-op when the same stage object/grid is set again). */
   setStage(stage) {
     if (this.destroyed) return;
-    const key = stage ? `${stage.id || ''}|${(stage.rows || []).join('/')}|${JSON.stringify((stage.devices || []).map((d) => [d.key, d.pos, d.active, d.dir]))}` : '';
+    const key = stage ? `${stage.id || ''}|${(stage.rows || []).join('/')}|${JSON.stringify((stage.devices || []).map((d) => [d.key, d.pos, d.active, d.dir]))}|${stage.previewLayout ? stage.previewLayout.worldOffset || 0 : 'native'}` : '';
     if (key === this.stageKey) return;
     this.stageKey = key;
     this.stage = stage || null;
@@ -468,9 +484,12 @@ export class BoardScene {
         }
       });
     }
+    const worldOffset=stage.previewLayout?.worldOffset || 0;
+    const structuralStage=stage.structuralSource || stage;
     const board = buildBoard(stage, { uv: this.pack?.uv || null, area: this.area });
     this.board = board;
     const M = this.meshes = {};
+    const borderSurfaces=[], borderSources=[], nativeParts=[];
     const candidate = this.mapQuality === 'low' ? null : this.pack?.original?.scenes?.[stage.id];
     // Missing/invalid material metadata must retain the working reconstructed board.
     const original = candidate && Object.entries(candidate.buckets).every(([k,g]) => this.originalMaterials[g.material || k]) ? candidate : null;
@@ -533,48 +552,140 @@ export class BoardScene {
           ? [...this.area, {r0:14,r1:18,c0:0,c1:5}] : this.area;
         const nativeArea = stage.previewLayout ? AREAS.boss : this.area;
         let visibleGeometry;
-        if (stage.previewLayout && !geometry.platform) {
+        if (structuralStage.previewLayout && !geometry.platform) {
           // Reuse the cooperative environment as one layout, translated into
           // boss world space. Combat tiles and simulation coordinates stay put.
           const environmentArea=stage.id==='act2autochess_m01'
             ? [...AREAS.unite,{r0:14,r1:18,c0:0,c1:5}] : AREAS.unite;
-          if (!waterSurface) {
-            // Reuse the opposite border's complete props, preserving their UVs,
-            // material and baked lighting instead of duplicating playable tiles.
-            const decor=sceneryForArea(geometry,[{c0:3,c1:5,r0:12,r1:13}],{decorationOnly:true});
-            for (const shift of [4,7,10]) {
-              const moved={...decor,position:Array.from(decor.position,(v,i)=>i%3===0?v+shift:i%3===1?v-stage.previewLayout.offset:v)};
-              M[`preview-decor:${material}:${shift}`]=this._mesh(moved,runtimeMaterial,{cast:!runtimeMaterial.isShaderMaterial});
-            }
-          }
           const environment=waterSurface ? surfaceForArea(geometry,environmentArea) : sceneryForArea(geometry,environmentArea,{surroundOnly:true});
-          M[`cooperative:${material}`]=this._mesh(translateEnvironment(environment,stage.previewLayout.offset),runtimeMaterial,{cast:!runtimeMaterial.isShaderMaterial});
-          visibleGeometry=waterSurface ? {...geometry,index:[]} : sceneryForArea(geometry,AREAS.boss,{interiorOnly:true});
+          // Native boss geometry owns the boundary through row 6.5.
+          // The rear environment starts after it, never drawing a second copy
+          // of the same boundary blocks on top of the native boss rim.
+          const rear=surfaceForArea(environment,[{c0:-100,c1:100,r0:14,r1:100}]);
+          const movedRear=translateEnvironment(rear,structuralStage.previewLayout.offset);
+          M[`cooperative:${material}`]=this._mesh(movedRear,runtimeMaterial,{cast:!runtimeMaterial.isShaderMaterial});
+          if(!waterSurface){borderSurfaces.push(sceneryForArea(movedRear,[{r0:6,r1:7,c0:-1,c1:21}],{decorationOnly:true}));borderSources.push({geometry:movedRear,ornamentGeometry:translateEnvironment(environment,structuralStage.previewLayout.offset),sourceArea:{r0:7,r1:100,c0:-100,c1:100},material:runtimeMaterial,platform:false});}
+          visibleGeometry=waterSurface ? {...geometry,index:[]} : surfaceForArea(sceneryForArea(geometry,AREAS.boss),[{r0:-100,r1:6,c0:-100,c1:100}]);
         } else {
-          visibleGeometry=waterSurface ? surfaceForArea(geometry,nativeArea) : geometry.platform ? geometryForArea(geometry,nativeArea,{support:true}) : sceneryForArea(geometry,scenicArea);
+          visibleGeometry=waterSurface ? surfaceForArea(geometry,nativeArea) : geometry.platform ? surfaceForArea(geometry,nativeArea) : sceneryForArea(geometry,scenicArea);
         }
+        const patches=stage.previewLayout?.cooperativePatches;
+        if(patches?.length) {
+          visibleGeometry=surfaceForArea(visibleGeometry,outsideTileAreas(patches));
+          const sourceAreas=patches.map(a=>({...a,r0:a.r0+worldOffset,r1:a.r1+worldOffset}));
+          const replacement=translateEnvironment(surfaceForArea(geometry,sourceAreas),worldOffset);
+          M[`cooperative-functional:${material}`]=this._mesh(replacement,runtimeMaterial,{cast:!runtimeMaterial.isShaderMaterial});
+        }
+        nativeParts.push({key:`original:${material}`,geometry:visibleGeometry,source:geometry,material:runtimeMaterial});
         M[`original:${material}`] = this._mesh(visibleGeometry, runtimeMaterial, { cast: !runtimeMaterial.isShaderMaterial });
+        if(!waterSurface){borderSurfaces.push(geometry.platform ? {...visibleGeometry,footprints:[]} : sceneryForArea(visibleGeometry,[{r0:6,r1:7,c0:-1,c1:21}],{decorationOnly:true}));borderSources.push({geometry:stage.previewLayout ? surfaceForArea(geometry,[{r0:-100,r1:6,c0:-100,c1:100}]) : visibleGeometry,ornamentGeometry:geometry,sourceArea:stage.previewLayout ? {r0:-100,r1:6,c0:-100,c1:100} : null,material:runtimeMaterial,platform:!!geometry.platform});}
         if (stage.previewLayout && geometry.platform) {
-          const {source,offset}=stage.previewLayout;
-          const x0=source.c0-1.5,x1=source.c1+1.5,y0=source.r0-offset-1.5,y1=y0+1;
-          const trim={position:[x0,y0,-.4,x1,y0,-.4,x1,y1,-.4,x0,y1,-.4,x0,y0,.06,x1,y0,.06,x1,y1,.06,x0,y1,.06],index:[4,5,6,4,6,7,0,2,1,0,3,2,0,1,5,0,5,4,1,2,6,1,6,5,2,3,7,2,7,6,3,0,4,3,4,7]};
-          // This is scenery: omit the playable tile texture and lower its surface.
-          const trimMaterial=new this.THREE.MeshStandardMaterial({color:stage.id==='act2autochess_m01'||stage.id==='act2autochess_m03'?0x778880:0xc5a77a,roughness:1,metalness:0});
-          this.lightmapMaterials.push(trimMaterial);
-          const trimMoved=trim;
-          if (!M['preview-trim']) M['preview-trim']=this._mesh(trimMoved,trimMaterial,{cast:true});
-          const floor=geometryForArea(geometry,[{...source,c0:source.c0-1,c1:source.c1+1}],{support:true});
+          const {source,offset}=structuralStage.previewLayout;
+          const floor=surfaceForArea(geometry,[{...source,c0:source.c0-1,c1:source.c1+1}]);
           const moved={...floor,position:floor.position.map((v,i)=>i%3===1?v-offset:v)};
           M[`preview:${material}`]=this._mesh(moved,runtimeMaterial,{cast:!runtimeMaterial.isShaderMaterial});
+          borderSurfaces.push({...moved,footprints:[]});
         }
       }
     } else {
-      M.board = this._mesh(board.buckets.board, this.mat.board);
-      M.glass = this._mesh(board.buckets.glass, this.mat.glass);
-      M.decal = this._mesh(board.buckets.decal, this.mat.decal, { cast: false });
-      M.pipe = this._mesh(board.buckets.pipe, this.mat.pipe);
+      const fallback=stage.previewLayout ? buildBoard(structuralStage,{uv:this.pack?.uv || null,area:[...AREAS.boss,{r0:7,r1:11,c0:6,c1:14}]}) : board;
+      const areas=stage.previewLayout ? [{r0:0,r1:5,c0:0,c1:20}] : combatBorderAreas(stage,this.area);
+      const cells=stage.previewLayout ? vacantBorderCells(borderCells(structuralStage,areas),[fallback.buckets.board]) : [];
+      const buckets=Object.fromEntries(['board','glass','decal','pipe'].map(key=>[key,[fallback.buckets[key]]]));
+      oppositeBorderRuns(cells,areas,{mirror:true}).forEach(({source,axis})=>{
+        for(const key of Object.keys(buckets)){
+          const geometry=fallback.buckets[key];
+          if(!geometry?.position?.length||!geometry?.index?.length)continue;
+          const tile=surfaceForArea(geometry,[source]);
+          if(tile.index.length)buckets[key].push(reflectOppositeBorder(tile,axis));
+        }
+      });
+      for(const[key,list]of Object.entries(buckets))M[key]=this._mesh(mergeInto(list),this.mat[key],{cast:key!=='decal'});
+    }
+    if (original && !['act2autochess_m01','act2autochess_m03'].includes(stage.id) && this.area.some(a=>a.c1>=20)) {
+      // The sand island has a water notch outside its right rim. Extend the
+      // opposite authored hill strip only into uncovered cells; keep the sea
+      // beyond the rim and the existing stairs/props intact in both modes.
+      const rowOffset=stage.previewLayout ? 0 : 7;
+      const candidates=[];
+      for(let r=3+rowOffset;r<=6+rowOffset;r++)candidates.push([r,19]);
+      const solid=nativeParts.filter(p=>!p.material.isShaderMaterial).map(({geometry:g})=>({...g,footprints:[],index:Array.from(g.index).filter((_,i,a)=>{
+        const base=i-i%3;return a.slice(base,base+3).every(id=>g.normal?.[id*3+2]>.7);
+      })}));
+      const gaps=uncoveredTileCells(candidates,solid);
+      const holes=gaps.map(([r,c])=>({r0:r,r1:r,c0:c,c1:c}));
+      if(holes.length)for(const {key,geometry,source,material}of nativeParts) {
+        if(material.isShaderMaterial)continue;
+        const retained=surfaceForArea(geometry,outsideTileAreas(holes));
+        this.root.remove(M[key]);M[key]?.geometry.dispose();
+        M[key]=this._mesh(retained,material,{cast:true});
+        const low={...source,index:Array.from(source.index).filter((_,i,a)=>{
+          const base=i-i%3;return a.slice(base,base+3).every(id=>source.position[id*3+2]<=.85);
+        })};
+        const copied=holes.map(a=>{
+          // The matching last hill has an open corner. Use the nearest complete
+          // authored hill tile instead of importing that same notch again.
+          const relativeRow=a.r0-rowOffset;
+          const shift=relativeRow===4 || relativeRow===6 ? relativeRow-5 : 0;
+          const sourceArea={...a,r0:a.r0-shift,r1:a.r1-shift,c0:21-a.c1,c1:21-a.c0};
+          return reflectOppositeBorder(translateEnvironment(surfaceForArea(low,[sourceArea]),-shift),21);
+        });
+        const copy=mergeInto(copied);
+        M[`sand-rim:${key}`]=this._mesh(copy,material,{cast:true});
+        borderSurfaces.push({...copy,platform:true,footprints:[]});
+      }
     }
     if (original) {
+      const areas=structuralStage.previewLayout ? [{r0:0,r1:5,c0:0,c1:20}] : combatBorderAreas(stage,this.area);
+      const raised=borderSurfaces.map(g=>g.platform ? g : ({...g,index:Array.from(g.index).filter((_,i,a)=>{const base=i-i%3;return Math.max(...a.slice(base,base+3).map(id=>g.position[id*3+2]))>.08 && a.slice(base,base+3).every(id=>g.normal?.[id*3+2]>.85);})}));
+      const cells=stage.previewLayout ? vacantBorderCells(borderCells(structuralStage,areas),raised) : [];
+      const sourceRaised=borderSources.filter(s=>!s.platform).map(({geometry,ornamentGeometry,sourceArea})=>{const g=sceneryForArea(ornamentGeometry || geometry,[sourceArea || {r0:-100,r1:100,c0:-100,c1:100}],{decorationOnly:true});return {...g,index:Array.from(g.index).filter((_,i,a)=>{const base=i-i%3;return Math.max(...a.slice(base,base+3).map(id=>g.position[id*3+2]))>.08 && a.slice(base,base+3).every(id=>g.normal?.[id*3+2]>.85);})};});
+      const runs=completeOppositeRuns(oppositeBorderRuns(cells,areas,{mirror:true}),sourceRaised),copies=new Map();
+      const addCopy=(geometry,axis,material)=>{
+        if(!geometry.index.length)return;
+        if(!copies.has(material))copies.set(material,[]);
+        copies.get(material).push(reflectOppositeBorder(geometry,axis));
+      };
+      runs.forEach(({source,axis},i)=>{
+        const footprints=sourceRaised.flatMap(g=>g.footprints || []).filter(b=>b.x0>=source.c0-.55 && b.x1<=source.c1+.55 && b.y0>=source.r0-.55 && b.y1<=source.r1+.55);
+        const supportAreas=footprints.length ? [{...source,r0:source.r0-.03,r1:source.r1+.03,c0:source.c0-.03,c1:source.c1+.03}] : [];
+        borderSources.forEach(({geometry,ornamentGeometry,sourceArea,material,platform},j)=>{
+          const region=sourceArea ? {r0:Math.max(source.r0,sourceArea.r0),r1:Math.min(source.r1,sourceArea.r1),c0:Math.max(source.c0,sourceArea.c0),c1:Math.min(source.c1,sourceArea.c1)} : source;
+          if(region.r0>region.r1 || region.c0>region.c1)return;
+          // The native water already spans the background; copying it would
+          // draw another transparent surface at exactly the same depth.
+          if(material.isShaderMaterial)return;
+          if(platform){
+            if(!footprints.length && region.r0<=5 && region.c0>=0 && region.c1<=20)return;
+            const tile=compactGeometry(surfaceForArea(geometry,[region]));
+            addCopy(tile,axis,material);
+          }else{
+            const supportSource=ornamentGeometry || geometry;
+            const ornament=sceneryForArea(supportSource,[region],{decorationOnly:true});
+            addCopy(compactGeometry(ornament),axis,material);
+            // Copy the authored floor only underneath complete native props.
+            // This retains soil inside a planter without importing loose
+            // landscape/pen fragments into otherwise empty background cells.
+            if(supportAreas.length) {
+              const used=new Set();
+              for(let n=0;n<ornament.index.length;n+=3)used.add(Array.from(ornament.index.slice(n,n+3)).join(','));
+              const index=[];
+              for(let n=0;n<supportSource.index.length;n+=3) {
+                const tri=Array.from(supportSource.index.slice(n,n+3));
+                if(!used.has(tri.join(',')) && tri.every(id=>supportSource.position[id*3+2]<=.85))index.push(...tri);
+              }
+              const base=surfaceForArea({...supportSource,index},supportAreas);
+              addCopy(compactGeometry(base),axis,material);
+            }
+          }
+        });
+      });
+      const occupied=new Set();
+      for(const mesh of Object.values(M))if(mesh && !mesh.material?.isShaderMaterial && mesh.geometry?.index) {
+        uniqueCopiedFaces({position:mesh.geometry.attributes.position.array,index:mesh.geometry.index.array},occupied);
+      }
+      let copyIndex=0;
+      for(const[material,list]of copies)M[`opposite-border:${copyIndex++}`]=this._mesh(uniqueCopiedFaces(mergeInto(list),occupied),material,{cast:!material.isShaderMaterial});
       // Original scenes already contain their theme-specific preview floor.
       // Procedural glass belongs only to the fallback board (above); adding it
       // here covers the native sand/city floor and its baked lighting.
@@ -582,6 +693,11 @@ export class BoardScene {
       M.deviceSlabs = this._mesh(slabs.board, this.mat.board);
       M.deviceDecals = this._mesh(slabs.decal, this.mat.decal, { cast: false });
 
+    }
+    // Apply the same translation to every native structural mesh, including
+    // copied supports and the preview pen. Devices retain gameplay positions.
+    if(worldOffset)for(const mesh of Object.values(M)) {
+      if(mesh?.position && mesh!==M.deviceSlabs && mesh!==M.deviceDecals){ mesh.position.y+=worldOffset; mesh.updateMatrix(); }
     }
     this._buildDevices(board);
     this._buildGates(board);
@@ -700,6 +816,7 @@ export class BoardScene {
       const nrm = new Float32Array(pos.length); for (let i = 2; i < nrm.length; i += 3) nrm[i] = 1;
       return { position: new Float32Array(pos), normal: nrm, uv: new Float32Array(uv), color: null, index: new Uint16Array(idx) };
     };
+    if (board.terrain.infection.length) this.meshes.infectionGlow = this._mesh(quads(board.terrain.infection, 0.025, 0.025), this.mat.infectionGlow, {cast:false,receive:false,order:3});
     // Native stage meshes already contain these environmental tile surfaces.
     if (this.originalStage) return;
     const T = board.terrain;
@@ -868,7 +985,7 @@ export class BoardScene {
     let flash = 0;
     for (let i = this.flashes.length - 1; i >= 0; i--) { const f = this.flashes[i]; f.t += dt; if (f.t > 1.2) this.flashes.splice(i, 1); else flash = Math.max(flash, 1 - f.t / 1.2); }
     for (const m of [this.mat.gateEndAdd, this.mat.gateEndAb]) if (m) m.uniforms.uFlash.value.setRGB(flash, flash * 0.12, flash * 0.1);
-    for (const k of ['water', 'mire', 'infection', 'smog']) this.mat[k].uniforms.uTime.value = t;
+    for (const k of ['water', 'mire', 'infection', 'infectionGlow', 'smog']) this.mat[k].uniforms.uTime.value = t;
     for (const m of Object.values(this.originalMaterials)) if (m.uniforms?.uTime) m.uniforms.uTime.value = t;
     this.renderer.render(this.scene, this.camera);
     this.frames++;

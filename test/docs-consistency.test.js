@@ -305,11 +305,11 @@ test('user playtest #4 (DESIGN §18): picking by tile, timers, 机变 two taps, 
   assert.match(META, /solo \/ single human untimed/);
   assert.match(PLAYING, /只有你一名玩家/);
   // #4 one countdown: BAND_TURN_SECONDS per turn (code = data = docs)
-  assert.equal(BAND_TURN_SECONDS, 30);
+  assert.equal(BAND_TURN_SECONDS, 50);
   assert.equal(DATA.config.timers.bandTurn, BAND_TURN_SECONDS);
-  assert.match(DESIGN, /`BAND_TURN_SECONDS` 30 s per turn = m\.public\.deadline/);
-  assert.match(META, /`Match\.BAND_TURN_SECONDS` 30/);
-  assert.match(PLAYING, /\*\*每人 30 秒\*\*/);
+  assert.match(DESIGN, /`BAND_TURN_SECONDS` 50 s per turn = m\.public\.deadline/);
+  assert.match(META, /`Match\.BAND_TURN_SECONDS` 50/);
+  assert.match(PLAYING, /\*\*每人 50 秒\*\*/);
   assert.ok(!/12 s\/turn/.test(DESIGN) && !/`bandTurn` 12/.test(META) && !/每人 12 秒/.test(PLAYING), 'the old 12 s turn is gone');
   assert.match(META, /`ev\.preview` true/, 'META: onBattleStart handlers must not change the match for the stats preview');
   // #2 机变 two taps
@@ -702,7 +702,8 @@ test('batch 6 after 0.1.0 (DESIGN §21.21–§21.25): the hammer per deployment,
   const sec = (n) => DESIGN.slice(DESIGN.indexOf(`## ${n}.`), DESIGN.indexOf(`## ${n + 1}.`) > 0 ? DESIGN.indexOf(`## ${n + 1}.`) : undefined);
   // F1: 不死 before 复活, once per deployment (§5.4 = SIM = items/battle.js)
   const { PRIO_REVIVE, PRIO_RESPAWN } = await import('../server/sim/content/items/battle.js');
-  assert.equal(PRIO_RESPAWN, PRIO_REVIVE - 1);
+  assert.equal(PRIO_REVIVE, -100);
+  assert.equal(PRIO_RESPAWN, 13, 'v0.2.3 knock-out revival runs after fatal prevention');
   assert.match(sec(5), /\| `fatal` \|[^\n]*坚固维式重锤, once per deployment\) `PRIO_REVIVE` −100 → items' 复活 \(M3茧甲\) `PRIO_RESPAWN` −101 → 埃芒加德 −110/);
   assert.match(SIM, /坚固维式重锤 — once per deployment/);
   assert.match(PLAYING, /\*\*每次部署一次\*\*/);
@@ -751,7 +752,7 @@ test('batch 6 QA residuals (DESIGN §21.21–§21.25): the lock per deployment f
   const items = doc('server/sim/content/items/battle.js');
   assert.match(items, /function deploymentOf\(u\)/);
   assert.ok(!/S\.on\('deploy', \(c\) => \{\s*if \(c\.unit !== u \|\| c\.initial\) return;\s*hs\.undyingUsed/.test(items), 'no per-grant re-arm hook');
-  assert.match(doc('server/sim/content/bands/battle.js'), /revivedInPlace\(u\)/);
+  assert.match(doc('server/sim/content/bands/battle.js'), /reviveNow\(battle, c, 'band'\)/);
   assert.match(doc('server/sim/content/kits/tier4.js'), /if \(holdsUndying\(battle, unit\)\) return;/);
   assert.match(sub(21), /\*\*QA after the integration, fixed\*\*: \(1\) the lock lived in the hooks of the carrier's hammer grants/);
   assert.match(sub(21), /both in-place revives now call `revivedInPlace`/);
@@ -838,7 +839,7 @@ test('the deliberate trigger deviation (DESIGN §21.29): six 重装 skills DEFAU
   assert.match(r03, /\*\*Deliberate deviation\*\* \(the owner, 2026-10-03/);
   // PR #12's kit lines stay; their comments give this reason, not the community summary
   const t1 = doc('server/sim/content/kits/tier1.js');
-  assert.equal((t1.match(/trigger: 'DEFAULT',/g) || []).length, 2, "PR #12's two kit lines");
+  for (const [id, rule] of [['chess_char_1_04_a', 'ACTIVE_RANGE'], ['chess_char_1_20_a', 'DEFAULT']]) assert.equal(DATA.chess[id].skills[1].trigger.rule, rule, `${id}: preserve the local trigger through per-skill kit refactors`);
   assert.ok(!/offensive skills activate when an enemy is in their skill range/.test(t1));
   assert.ok(!/documented for skillIndex 0/.test(t1));
   assert.match(DATA_MD, /a deliberate deviation, `tools\/build-data\.mjs TRIGGER_DEVIATIONS`, DESIGN §21\.29/);

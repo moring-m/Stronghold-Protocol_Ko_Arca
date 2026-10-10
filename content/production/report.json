@@ -1,10 +1,10 @@
 {
-  "builtAt": "2026-10-09T08:14:27.138Z",
-  "sourceRevision": "04b850d5304573266f8c81e7fcc1b48a17ae6af1",
+  "builtAt": "2026-10-10T07:57:34.528Z",
+  "sourceRevision": "beb8fe12bc7d0d872443e47687dde2b417cb7b8c",
   "workingTree": true,
-  "resourceVersion": "a8f93e0d4f087e5f924d",
-  "resources": 12980,
+  "resourceVersion": "cbd4532ec9afd1e7a309",
+  "resources": 18964,
   "localResources": 440,
-  "requiredAssetPaths": 12871,
+  "requiredAssetPaths": 15171,
   "customBand": "/assets/custom/ursus/band/kaschey-portrait-v3.png"
 }

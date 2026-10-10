@@ -11,7 +11,7 @@ import path from 'node:path';
 import { randomBytes } from 'node:crypto';
 import { setTimeout as delay } from 'node:timers/promises';
 
-import { startServer, parseRange, acceptsGzip, parseTrustProxy } from '../server/index.js';
+import { startServer, parseRange, acceptsGzip, parseTrustProxy, WS_MAX_PAYLOAD } from '../server/index.js';
 import { loadData, lookup, getChess, getBond, getBand, getMode, getConfig, INDEXED_FILES } from '../server/data.js';
 import * as dataModule from '../server/data.js';
 import { CODE_ALPHABET, BOT_NAMES } from '../server/lobby.js';
@@ -500,10 +500,10 @@ describe('websocket lobby', () => {
     await createRoom(c);
   });
 
-  test('oversized frame (> 64 KB) closes only that socket', async () => {
+  test('oversized frame (> configured battle-report limit) closes only that socket', async () => {
     const c = await pool.player('Big');
     const bystander = await pool.player('Bystander');
-    c.sendRaw(JSON.stringify({ t: 'ping', c: 1, pad: 'x'.repeat(70 * 1024) }));
+    c.sendRaw(JSON.stringify({ t: 'ping', c: 1, pad: 'x'.repeat(WS_MAX_PAYLOAD + 1024) }));
     const info = await c.closed;
     assert.equal(info.code, 1009);
     const pong = await bystander.request({ t: 'ping', c: 2 });

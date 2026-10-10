@@ -1,3 +1,4 @@
+import {COMBAT_METRICS} from './combatStats.js';
 import {isDiyModule} from './diy.js';
 // Normative message catalogue (DESIGN §8). Used by server (validation) and client (building requests).
 import { extensionSelectionShape } from './customExtensions.js';
@@ -43,7 +44,7 @@ const isLeak = (l) => isPlain(l) && isId(l.enemyKey)
 const isUnitEnd = (u) => isPlain(u) && nullable(isUid)(u.uid) && isNum(u.hpPct, 0, 1) && isNum(u.sp, 0, 1e5) && isBool(u.alive)
   && optional(isBool)(u.skillActive) && nullable(isId)(u.defId);
 const isUnitStat = (u) => isPlain(u) && nullable(isUid)(u.uid) && nullable(isId)(u.defId) && optional((v) => isStr(v, 16))(u.kind)
-  && isStat(u.dmg) && isStat(u.kills) && isStat(u.heal) && isStat(u.taken) && isStat(u.attacks);
+  && COMBAT_METRICS.every(k=>isStat(u[k]));
 const isPerPlayer = (p) => isPlain(p) && isInt(p.killed, 0, 1e5) && isInt(p.total, 0, 1e5)
   // `resolved` = the HUD capsule's numerator of this player's own field (the round's own scheduled enemies knocked out
   // or leaked: server/sim/battle/deploy.js killedInTotal / leakedInTotal, Battle.resolved). `killed` counts every counted
@@ -390,11 +391,13 @@ const target = (v) => {
 /** @type {Record<string, Record<string, (v:any)=>boolean> & { $optional?: string[] }>} */
 export const C2S = {
   // session & lobby
-  hello: { name: (v) => isStr(v, NAME_MAX_LEN) && v.trim().length > 0, token: (v) => v == null || isStr(v, 64), version: (v) => v == null || isInt(v, 0, 1e6), $optional: ['token', 'version'] },
+  hello: { name: (v) => isStr(v, NAME_MAX_LEN) && v.trim().length > 0, token: (v) => v == null || isStr(v, 64), version: (v) => v == null || isInt(v, 0, 1e6),
+    noReplace: isBool, claimAt: (v) => isNum(v, 0, Number.MAX_SAFE_INTEGER), $optional: ['token', 'version', 'noReplace', 'claimAt'] },
   ping: { c: (v) => typeof v === 'number' && Number.isFinite(v) },
   'room.create': { mode: (v) => v === 'solo' || v === 'coop', difficulty: (v) => DIFFICULTIES.includes(v), spectators: isSpectatorCap, customExtensions: extensionSelectionShape, $optional: ['spectators','customExtensions'] },
   'room.join': { code: (v) => isStr(v, ROOM_CODE_LEN + 2) && /^[A-Za-z0-9]+$/.test(v) },
   'room.leave': {},
+  'room.commend': {playerId:isId,matchNo:(v)=>isInt(v,1,2**31)},
   'room.ready': { ready: isBool },
   'room.setCustomFactions': { enabled: isBool },
   'room.setCustomExtensions': { selection: extensionSelectionShape },
@@ -412,6 +415,8 @@ export const C2S = {
   'room.requestRestart': { matchNo: (v) => isInt(v, 1) },
   'room.answerRestart': { matchNo: (v) => isInt(v, 1), voteId: (v) => isInt(v, 1), agree: (v) => typeof v === 'boolean' },
   'room.start': {},
+  'room.rerollSetup': { setupRevision: (v) => isInt(v, 0, 2 ** 31) },
+  'room.cancelReroll': { voteId: (v) => isInt(v, 1, 2 ** 31) },
   // operator loadout (DESIGN §16): stored per session/seat; accepted until the match leaves INFO_CHECK — `ops` (0.2.2):
   // the per-operator 潜能 / 练度 (absent = none set: every operator at 潜能 6, 精英2 Lv.60)
   'room.loadout': { entries: isLoadoutEntries, ops: isLoadoutOps, $optional: ['ops'] },
@@ -428,7 +433,8 @@ export const C2S = {
   'room.removeSpectator': { playerId: isId },
 
   // match
-  'g.infoReady': { matchNo: optional((v) => isInt(v, 1)) },
+  'g.infoReady': { matchNo: optional((v) => isInt(v, 1)), setupRevision: optional((v)=>isInt(v,0,2**31)) },
+  'g.rerollVote': {voteId:(v)=>isInt(v,1,2**31),agree:isBool},
   'g.band': { bandId: isId },
   'g.bandSkip': {},
   // the strategy highlighted in the draft screen (user playtest #4 item 4): a turn that runs out takes it while it is
@@ -488,7 +494,7 @@ export const S2C = [
   'room.state', 'room.closed',
   'm.public', 'm.private', 'm.field', 'm.toast', 'm.ticker', 'm.emote', 'm.result', 'm.chat', 'm.chatHistory',
   // m.unitStats { seq, round, units: [unitStatsEntry] } — the answer to g.unitStats (the requester only)
-  'm.unitStats',
+  'm.unitStats', 'room.commended',
   // client-side combat (DESIGN §14): b.start { battleId, fieldId, kind, spec, authoritative, startAt, serverNow, elapsed,
   // speed, watch? } · b.pool { hp, max, teamLp, acked: { [fieldId]: cumulative boss damage counted } } ·
   // b.end { battleId, fieldId, reason }

@@ -158,7 +158,7 @@
 .lo-card__art { position: relative; display: block; aspect-ratio: 1; overflow: hidden; background: #1b201e; }
 .lo-card__art img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .lo-card__art::after { content: ''; position: absolute; inset: 55% 0 0; background: linear-gradient(180deg, transparent, rgba(8, 10, 9, .85)); }
-.lo-card__glyph { display: grid; place-items: center; width: 100%; height: 100%; font-size: .44rem; font-weight: 900; color: var(--text-dim); }
+.lo-card__glyph { display: grid; place-items: center; width: 100%; height: 100%; font-size: calc(.44 * var(--t)); font-weight: 900; color: var(--text-dim); }
 .lo-card__tier { position: absolute; left: .03rem; top: .03rem; z-index: 1; }
 .lo-card__flag {
   position: absolute; right: 0; top: 0; z-index: 1; width: .22rem; height: .22rem;

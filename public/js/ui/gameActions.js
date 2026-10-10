@@ -60,7 +60,10 @@ export async function act(t, fields = {}, opts = {}) {
 
 export const actions = {
   reroll: (matchNo) => act('room.reroll', { matchNo }, { sfx: 'confirm' }),
-  infoReady: () => act('g.infoReady', { matchNo: store.get().room?.matchNo }),
+  infoReady: (setupRevision = 0) => act('g.infoReady', { matchNo: store.get().room?.matchNo, setupRevision }),
+  rerollSetup: (setupRevision)=>act('room.rerollSetup',{setupRevision},{sfx:'confirm'}),
+  rerollVote: (voteId,agree)=>act('g.rerollVote',{voteId,agree}),
+  cancelReroll: (voteId)=>act('room.cancelReroll',{voteId}),
   band: (bandId) => act('g.band', { bandId }),
   bandSkip: () => act('g.bandSkip'),
   buy: (slot) => act('g.buy', { slot }),

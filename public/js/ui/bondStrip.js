@@ -154,23 +154,56 @@ export function BondPopup({ bondId, entry, priv, banned = [], onClose, onMember,
   </div>`;
 }
 
-/** Keep the strip on one line, fitting its natural size to the available HUD width. */
+/** Up to 12 bonds fit entirely; longer lists expose 11.5 cells at a time. */
+export function bondWindowSize(count,naturalWidth,pitch,firstLeft,available,cellWidth=pitch) {
+  const overflow=count>12;
+  const width=overflow?Math.min(naturalWidth,firstLeft+11*pitch+.5*cellWidth):naturalWidth;
+  const scale=Math.min(1,available/Math.max(1,width));
+  return {overflow,scale,width:width*scale,contentWidth:naturalWidth*scale,fadeWidth:cellWidth*.5*scale};
+}
 export function FitBondStrip({ folded = false, children }) {
-  const host = useRef(null), content = useRef(null);
-  useEffect(() => {
-    const outer=host.current,inner=content.current;
-    if(!outer||!inner)return;
+  const host=useRef(null),content=useRef(null),windowRef=useRef(null),drag=useRef(null);
+  const edges=()=>{
+    const w=windowRef.current;if(!w)return;
+    w.dataset.left=String(w.scrollLeft>1);
+    w.dataset.right=String(w.scrollLeft<w.scrollWidth-w.clientWidth-1);
+  };
+  useEffect(()=>{
+    const outer=host.current,inner=content.current,w=windowRef.current;
+    if(!outer||!inner||!w)return;
     const fit=()=>{
-      const scale=Math.min(1,outer.clientWidth/Math.max(1,inner.offsetWidth));
-      outer.style.setProperty('--bond-fit-scale',scale);
-      outer.style.setProperty('--bond-fit-height',`${inner.offsetHeight*scale}px`);
+      const slots=[...inner.querySelectorAll('.bslot')];
+      const first=slots[0],pitch=slots.length>1?slots[1].offsetLeft-first.offsetLeft:first?.offsetWidth||1;
+      const spec=bondWindowSize(slots.length,inner.offsetWidth,pitch,first?.offsetLeft||0,outer.clientWidth,first?.offsetWidth||pitch);
+      outer.classList.toggle('is-scrollable',spec.overflow);
+      outer.style.setProperty('--bond-fit-scale',spec.scale);
+      outer.style.setProperty('--bond-fit-height',`${inner.offsetHeight*spec.scale}px`);
+      outer.style.setProperty('--bond-window-width',`${spec.width}px`);
+      outer.style.setProperty('--bond-content-width',`${spec.contentWidth}px`);
+      outer.style.setProperty('--bond-fade-width',`${spec.fadeWidth}px`);
+      if(!spec.overflow)w.scrollLeft=0;
+      edges();
     };
-    fit();
-    const observer=new ResizeObserver(fit);
-    observer.observe(outer);observer.observe(inner);
-    return ()=>observer.disconnect();
+    fit();const observer=new ResizeObserver(fit);observer.observe(outer);observer.observe(inner);
+    return()=>observer.disconnect();
   },[children]);
+  const down=e=>{
+    if(folded||!host.current?.classList.contains('is-scrollable')||e.button!==0)return;
+    drag.current={id:e.pointerId,x:e.clientX,left:windowRef.current.scrollLeft,moved:false};
+  };
+  const move=e=>{
+    const d=drag.current,w=windowRef.current;if(!d||d.id!==e.pointerId)return;
+    const dx=e.clientX-d.x;
+    if(!d.moved&&Math.abs(dx)>5){d.moved=true;w.setPointerCapture(e.pointerId);w.classList.add('is-dragging');}
+    if(d.moved){e.preventDefault();w.scrollLeft=d.left-dx;edges();}
+  };
+  const up=e=>{const w=windowRef.current;if(w?.hasPointerCapture(e.pointerId))w.releasePointerCapture(e.pointerId);w?.classList.remove('is-dragging');if(drag.current)drag.current.id=null;};
   return html`<div id="match-bond-strip" ref=${host} class=${cx('gm__bond-list',folded&&'is-folded')} aria-label="맹약 목록">
-    <div ref=${content} class="gm__bond-fit">${children}</div>
+    <div ref=${windowRef} class="gm__bond-window" tabindex=${folded?-1:0} role="region" aria-label="맹약 목록 · 드래그 또는 방향키로 이동"
+      onPointerDown=${down} onPointerMove=${move} onPointerUp=${up} onPointerCancel=${up} onScroll=${edges}
+      onClickCapture=${e=>{if(drag.current?.moved){e.preventDefault();e.stopPropagation();drag.current=null;}}}
+      onKeyDown=${e=>{const w=windowRef.current;if(!host.current?.classList.contains('is-scrollable'))return;if(['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){e.preventDefault();w.scrollLeft=e.key==='Home'?0:e.key==='End'?w.scrollWidth:w.scrollLeft+(e.key==='ArrowRight'?1:-1)*w.clientWidth/11.5;edges();}}}>
+      <div class="gm__bond-track"><div ref=${content} class="gm__bond-fit">${children}</div></div>
+    </div>
   </div>`;
 }

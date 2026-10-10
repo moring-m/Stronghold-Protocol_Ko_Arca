@@ -3164,14 +3164,14 @@ function blkkgt(bb, chess, def) {
     },
     skill: {
       kind: 'duration',
-      duration: slashes * iv,
+      duration: (slashes - 1) * iv,
       ...(skillGrid ? { targeting: { rangeGrid: skillGrid } } : {}),
       attack: { noAttack: true },
       // PRTS 备注 "※多段斩击期间，自身获得无敌，晕眩免疫，冻结免疫": invulnerable while the slashes run (removed in onEnd,
       // before the finisher); stun / freeze refused by her `beforeStatus` hook (install) while `mem.dgb` is set
       onStart({ battle, unit }) {
         unit.mem.dgb = { n: 1, acc: 0, pacc: 0 };
-        battle.addBuff(unit, { key: 'blkkgt:slashes', duration: slashes * iv + 1, flags: { invulnerable: true }, visible: true, source: unit });
+        battle.addBuff(unit, { key: 'blkkgt:slashes', duration: (slashes - 1) * iv + .05, flags: { invulnerable: true }, visible: true, source: unit });
         slash(battle, unit, num(bb.d_atk_scale, 1));
       },
       onTick({ battle, unit, dt }) {

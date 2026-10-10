@@ -103,8 +103,9 @@ export class SkillRuntime {
     if (this.rule.startsWith('CUSTOM_RANGE')) this.rule = 'CUSTOM_RANGE';
     this.triggerGrid = trig.grid ?? trig.rangeGrid ?? d.trigger?.grid ?? (this.rule === 'SKILL_RANGE' ? (s.targeting?.rangeGrid ?? d.rangeGrid) : null);
     // kit options: an injured, healable ally of the trigger grid with an HP ratio of at most `hpAtMost` (SKILL_RANGE:
-    // instead of an enemy; DEFAULT: in addition to the basic rule)
+    // instead of an enemy; DEFAULT: a heal target at the normal attack cadence)
     this.triggerAllies = !!trig.allies;
+    this.triggerEnemies = !!trig.enemies; // mixed attack/heal skills may also open for a selectable enemy
     this.triggerHpAtMost = Number.isFinite(+trig.hpAtMost) && +trig.hpAtMost > 0 ? +trig.hpAtMost : 1;
     this.healSkill = s.heal ?? (unit.profile && unit.profile.dmgType === 'heal' && !!unit.profile.heal);
     // the official skill strategies automate the manual 开启: only MANUAL skills wait for the operation cooldown
@@ -126,6 +127,7 @@ export class SkillRuntime {
     this._trigKeys = null;
     this._trigSet = null;
     this.triggerRanges = [];      // content trigger ranges (addTriggerRange)
+    this.attackTriggerRanges = new Set(); // special targeting checked only at the next attack
     this.noSkill = !spec;         // unit without any skill spec
   }
 
@@ -148,23 +150,26 @@ export class SkillRuntime {
    * keys, or `{ keys, profile }` — tile keys with the enemy profile the effect selects by (`canHitFly` false: ground
    * enemies only — the owner's larger-range rule through a summon's area, kits/shared/summoner.js summonTriggerArea;
    * 0.2.0 WV, additive). A targetable enemy (flyers included unless the entry's profile says otherwise) on those tiles
-   * satisfies the DEFAULT rule (and unknown DEFAULT-like rules); it is checked every tick, since the unit itself may
-   * have nothing to attack. Returns an unregister fn.
+   * satisfies the DEFAULT rule (and unknown DEFAULT-like rules). Summon effect areas are checked every tick;
+   * { attackOnly: true } is for special targeting that must wait for the next attack (蕾缪安, 死芒).
+   * Returns an unregister fn.
    */
 
 
 
-  addTriggerRange(fn) {
+  addTriggerRange(fn, { attackOnly = false } = {}) {
     if (typeof fn !== 'function') return () => {};
     this.triggerRanges.push(fn);
-    return () => { const i = this.triggerRanges.indexOf(fn); if (i >= 0) this.triggerRanges.splice(i, 1); };
+    if (attackOnly) this.attackTriggerRanges.add(fn);
+    return () => { this.attackTriggerRanges.delete(fn); const i = this.triggerRanges.indexOf(fn); if (i >= 0) this.triggerRanges.splice(i, 1); };
   }
 
   /** An enemy inside one of the content trigger ranges. */
-  _extraTriggerSatisfied() {
+  _extraTriggerSatisfied(allowAttackOnly = true) {
     const b = this.battle;
     const u = this.unit;
     for (const fn of this.triggerRanges) {
+      if (!allowAttackOnly && this.attackTriggerRanges.has(fn)) continue;
       const list = b._safe(() => fn(b, u), 'skill.triggerRange', u);
       if (!list || typeof list[Symbol.iterator] !== 'function') continue;
       for (const x of list) {
@@ -327,11 +332,11 @@ export class SkillRuntime {
   }
 
   /** Add SP (fires the `spGain` hook). Ordinary recovery pauses during an active skill; explicit item effects may bypass that pause. */
-  gainSp(amount, reason = 'time', silent = false, { duringSkill = false } = {}) {
+  gainSp(amount, reason = 'time', silent = false, { duringSkill = false, ignoreLock = false } = {}) {
     if (this.noSkill || this.kind === 'passive' || !(amount > 0)) return 0;
-    if (this.active && this.isTimed && reason !== 'init' && !duringSkill) return 0;
+    if (this.active && this.isTimed && reason !== 'init' && !duringSkill && !ignoreLock) return 0;
     // 阻回 (the operators' 凋亡 burst, damage.js): "停止并阻止任意形式的技力回复" — no SP of any kind (time, attack, hurt, gifts)
-    if (reason !== 'init' && this.unit.s.flags.noSp) return 0;
+    if (reason !== 'init' && !ignoreLock && this.unit.s.flags.noSp) return 0;
     let cost = this.spCost;
     if (this.charges >= this.maxCharges && this.sp >= cost) return 0;
     let amt = amount;
@@ -414,7 +419,7 @@ export class SkillRuntime {
       const prof = u.profile;
       if (prof && (prof.noAttack || (prof.noAttackUnlessSkill && !this.active) || (this._prospectiveRangeKeys() || typeof this.spec.hasTargets === 'function' || this.spec.triggerProfile || this.spec.targeting?.canHitFly))) {
         if (this._defaultCondition()) this.activate('DEFAULT');
-      } else if (this.triggerRanges.length && !this.healSkill && this._extraTriggerSatisfied()) this.activate('DEFAULT');
+      } else if (this.triggerRanges.length && !this.healSkill && this._extraTriggerSatisfied(false)) this.activate('DEFAULT');
     }
   }
 
@@ -510,7 +515,7 @@ export class SkillRuntime {
     const prospective = this.spec.attack?.canAttack || (candidateRange && candidateRange.length > 100) ? null : candidateRange;
     const keys = range || (prospective ? [...new Set([...(baseKeys || []), ...prospective])] : baseKeys);
     if (keys) {
-      if (this.healSkill) return b.injuredAlliesInKeys(keys, u).length > 0;
+      if (this.healSkill) return b.injuredAlliesInKeys(keys, u).length > 0 || (this.triggerEnemies && b.enemiesInKeys(keys, u, TRIGGER_PROFILE).length > 0);
       const air = this.spec.targeting?.canHitFly;
       const profile = { ...u.profile, ...(air == null ? {} : { canHitFly: air, ...(air ? {groundOnly:false} : {}) }), ...this.spec.triggerProfile };
       if (b.enemiesInKeys(keys, u, profile).length > 0 || this._allyTargetIn(keys)) return true;
@@ -527,8 +532,8 @@ export class SkillRuntime {
     if (this.active && this.isTimed) return false;
     if (this.rule === 'TAKE_DAMAGE' || this.rule === 'NEVER' || TICK_RULES.has(this.rule)) return false;
     if (this.pending || this._opCooling()) return false;
-    if (!this._defaultCondition()) return false;
-    if (this.triggerAllies && !this._allyTriggerSatisfied()) return false;
+    // Guardian charged heals supply their own attack target; no enemy is required (#406).
+    if (this.triggerAllies ? !this._allyTriggerSatisfied() : !this._defaultCondition()) return false;
     this._beforeAttack = true;   // the attack follows this cast in the same check (ai.js updateAlly): attacks pace it
     try { return this.activate('DEFAULT'); } finally { this._beforeAttack = false; }
   }
@@ -556,6 +561,7 @@ export class SkillRuntime {
       if (this.maxCharges === 1 || wasFull) this.sp = 0;
     }
     this.activations++;
+    u.stats.skillUses=(u.stats.skillUses||0)+1;
     this.lastStart = this.battle.time;
     const b = this.battle;
     if (this.manual) this.opReadyAt = b.time + AUTO_OP_COOLDOWN;

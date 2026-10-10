@@ -357,10 +357,12 @@ describe('audio banks and plan id sets', () => {
     const r = resolveTemplate(tpl, { root: ROOT, spine: new Map([['k', { skel: '/assets/s.skel', atlas: '/assets/s.atlas', textures: [] }]]) });
     assert.deepEqual(Object.keys(r.value).sort(), ['keep', 'm']);
     assert.deepEqual(r.misses.sort(), ['a', 'b.c']);
+    assert.deepEqual(r.droppedLeaves, ['a', 'b.c'], 'a leaf no alternative of which is on disk is a dropped leaf');
     assert.equal(collectLeaves(tpl).length, 2);
     const ok = resolveTemplate({ p: { alts: [{ rel: 'nope.png', urls: ['x'] }, { rel: 'package.json', urls: ['y'] }] } }, { root: ROOT, spine: new Map() });
     assert.equal(ok.value.p, '/assets/package.json');
     assert.equal(ok.fallbacks.length, 1);
+    assert.deepEqual(ok.droppedLeaves, [], 'a fallback on disk is not a drop');
   });
 });
 

@@ -138,7 +138,14 @@ export function updateAlly(b, u, dt) {
   if (u.atkCd > 1e-9) return;
   if (prof.canAttack && !prof.canAttack(b, u)) { if (prof.storeEnergy) { u.trait.hadTarget = false; storeEnergy(b,u,prof); } return; }
   let targets = acquireTargets(b, u, prof);
-  if (!targets.length && !prof.allowEmptyAttack) { u.trait.hadTarget = false; storeEnergy(b,u,prof); return; }
+  // A DEFAULT charged heal can replace this attack with an eligible ally even when no enemy exists.
+  // Run after cooldown/control checks so silence, disarm and the exact attack cadence still apply (#406).
+  if (!targets.length && sk?.triggerAllies && sk.onAboutToAttack()) {
+    prof = effectiveProfile(u);
+    if (prof.noAttack || !u.alive) return;
+    targets = acquireTargets(b, u, prof);
+  }
+  if (!targets.length && !prof.allowEmptyAttack) { u.trait.hadTarget = false; storeEnergy(b, u, prof); return; }
   u.trait.hadTarget = true;
   if (sk && sk.onAboutToAttack()) {
     if (u.atkCd > 1e-9 || b.time < (u.mem.skillCastUntil || 0)) return; // an independent cast owns its full animation
@@ -644,7 +651,7 @@ export function updateEnemy(b, e, dt) {
   // and DISAPPEAR / APPEAR legs still happen (advanceRoute); drawn idle (the client plays the clip, then Move again);
   // a 恐惧 runs at once (it cannot attack). 失衡 holds the walking too — under 恐惧 / 诱导 as well (失衡免疫 says 「失衡期间
   // 无法自主移动」; no source exempts a fear)
-  const standing = winding || unbalanced || (b.time < e.atkStandUntil && !e.s.flags.fear);
+  const standing = (winding && !(e.profile?.attackMoves ?? e.def?.attackMoves)) || unbalanced || (b.time < e.atkStandUntil && !e.s.flags.fear);
   if (e.s.flags.noMove) { e.moving = false; return; }   // standing (a 重生, a form change): drawn idle, not walking
   // 恐惧 (ba.fear "无法被阻挡并四散逃跑"; PRTS 诱发移动: 恐惧 outranks 诱导): runs to random tiles of the fan away from
   // its source — a self-inflicted fear flutters inside its own tile (fear.js); the route re-plans once it ends
@@ -969,6 +976,8 @@ function enemyAttack(b, e) {
   // — the 'atk' event (kind `e.profile.shot`, drawn by the content's own fx), cooldown, pause, the 'attack' hook — and
   // the content's 'attack' handler deals its damage
   const deferred = !!(e.profile && e.profile.deferHit);
+  // A lethal strike may immediately redeploy its target. Post-attack effects still belong to the struck deployment.
+  const targetDeployments = new Map(targets.map((t) => [t, t.deploySeq]));
   for (const t of targets) {
     b._ev(['atk', e.id, t.id, deferred ? (e.profile.shot || 'none') : rangedShot ? 'enemy' : 'none']);
     if (deferred) continue;
@@ -980,7 +989,7 @@ function enemyAttack(b, e) {
       b.addProjectile({ from: e, target: t, speed: PROJECTILE_SPEEDS.enemy, visual: 'enemy', source: e, onHit: (c) => hit(c.target, true) });
     } else hit(t);
   }
-  if (b._hooks.attack) b.emit('attack', { attacker: e, targets, isSkill: false });
+  if (b._hooks.attack) b.emit('attack', { attacker: e, targets, targetDeployments, isSkill: false });
   if (!wound) e.atkCd = e.s.interval;
   // stands for the rest of its attack clip (attackStand; the wind-up was stood before the strike)
   if (!(e.profile?.attackMoves ?? def.attackMoves)) e.atkStandUntil = b.time + attackStand(e, STAND).rest;

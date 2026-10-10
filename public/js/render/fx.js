@@ -1741,7 +1741,7 @@ export class FxSystem {
     }
     if(kind==='enemySkill'){
       const view=this.ctx.view?.(extra?.id);
-      if(view?.actor && typeof extra.clip==='string' && view.actor.has(extra.clip))view.actor.setForm(view._formSpec?.()?.roles || null,extra.clip);
+      if(view?.actor && typeof extra.clip==='string' && view.actor.has(extra.clip))view.actor.playAbility(extra.clip,extra.dur);
       return;
     }
     const ex = extra && typeof extra === 'object' ? extra : {};

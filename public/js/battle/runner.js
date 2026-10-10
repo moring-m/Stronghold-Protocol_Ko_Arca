@@ -749,6 +749,10 @@ export function createBattleRunner(deps) {
     for (const e of [...entries.values(), ...pending.values()]) {
       const pool = e.battle ? e.battle.sharedBoss : null;
       if (pool && typeof pool.sync === 'function') pool.sync(msg.hp, msg.acked ? msg.acked[e.fieldId] : undefined);
+      if (pool && Number.isFinite(msg.hp) && msg.hp <= 0) {
+        e.battle.confirmBossDefeat?.();
+        if (e === cur) emitFrame(e, false);
+      }
     }
     emit('pool', msg);
   }
@@ -762,13 +766,16 @@ export function createBattleRunner(deps) {
       schedule();
       return;
     }
-    // the first end counts; a battle still loading ends as soon as it is built (prepare)
-    if (!e.endReason) e.endReason = msg.reason === 'timeout' ? 'timeout' : 'forced';
+    // A confirmed boss clear also reconciles a field that stopped before its final HP acknowledgement.
+    const bossCleared=msg.reason === 'cleared' && (e.kind === 'boss' || e.kind === 'hidden');
+    if (bossCleared) e.endReason='cleared';
+    else if (!e.endReason) e.endReason=msg.reason === 'timeout'?'timeout':'forced';
     if (e.battle) endBattle(e);
   }
 
   /** End an entry's battle with its b.end reason; an authority reports it at once. */
   function endBattle(e) {
+    if(e.endReason==='cleared')e.battle.confirmBossDefeat?.();
     if (!e.battle.finished) {
       try { e.battle.forceEnd(e.endReason); } catch { /* ignore */ }
     }

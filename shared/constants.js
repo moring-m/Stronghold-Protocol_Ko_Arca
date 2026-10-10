@@ -3,8 +3,8 @@
 
 export const PROTOCOL_VERSION = 1;
 /** Upstream package version stays valid SemVer; the lowercase suffix identifies site updates. */
-export const BASE_VERSION = '0.2.2';
-export const APP_VERSION = `${BASE_VERSION}c`;
+export const BASE_VERSION = '0.2.3';
+export const APP_VERSION = `${BASE_VERSION}a`;
 export const DEV_BUILD = /-dev$/.test(APP_VERSION);
 
 export const MAX_SEATS = 4;
@@ -131,6 +131,7 @@ export const ANIM = Object.freeze({ IDLE: 0, MOVE: 1, ATTACK: 2, SKILL: 3, DIE: 
 
 export const ERR = Object.freeze({
   BAD_MSG: 'BAD_MSG',             // malformed / unknown message
+  SESSION_IN_USE: 'SESSION_IN_USE', // a local recovery candidate cannot replace the connected holder
   RATE: 'RATE',                   // rate limited
   NOT_IN_ROOM: 'NOT_IN_ROOM',
   ROOM_NOT_FOUND: 'ROOM_NOT_FOUND',
@@ -155,6 +156,7 @@ export const ERR = Object.freeze({
 });
 
 export const ERR_TEXT = {
+  SESSION_IN_USE: '이 게임이 다른 창에서 사용 중이거나 안전하게 복구할 수 없습니다. 기존 창을 닫고 다시 시도하세요.',
   BAD_MSG: '无效的请求', RATE: '操作过于频繁', NOT_IN_ROOM: '你不在房间中', ROOM_NOT_FOUND: '未找到该同盟密钥对应的房间',
   ROOM_FULL: '房间已满', ROOM_STARTED: '模拟已开始', NOT_HOST: '只有房主可以操作', NOT_READY: '仍有玩家未就绪',
   WRONG_PHASE: '当前阶段无法进行该操作', NO_FUNDS: '资金不足', HAND_FULL: '整备区已满', BOARD_FULL: '已达到部署上限',

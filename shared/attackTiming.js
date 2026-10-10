@@ -12,7 +12,7 @@ export function skillIsContinuous(sp, role) {
 }
 // Explicit skill semantics; durations/names alone are not sufficient to classify a clip.
 export const NORMAL_ATTACK_BUFF_SKILLS = [
- ['char_494_vendla',[0,1]], ['char_1020_reed2',[1]],
+ ['char_107_liskam',[0]], ['char_494_vendla',[0,1]], ['char_1020_reed2',[1]],
  ['char_183_skgoat',[0]], ['char_381_bubble',[0]], ['char_150_snakek',[0]],
  ['char_136_hsguma',[0,1]], ['char_128_plosis',[0]], ['char_213_mostma',[0]],
  ['char_197_poca',[0,1]], ['char_1023_ghost2',[0]],
@@ -55,8 +55,15 @@ const clipTiming = (sp, role) => {
   const hit = markers?.[0];
   return { dur, hit: Number.isFinite(hit) ? Math.min(dur, Math.max(0, hit)) : dur / 2 };
 };
+// Big Bob's authored Attack2 carries the longer heavy-swing duration and OnAttack marker.
+export function selectedAnimationRoles(sp) {
+  const roles=sp?.anims||{};
+  return (sp?.skel||'').includes('enemy_1001_bigbo') && sp.animations?.Attack2>0
+    ? {...roles,attack:{...roles.attack,begin:null,loop:'Attack2',end:null}} : roles;
+}
 export function spineAttackTiming(sp) {
   if (!sp?.anims) return null;
+  sp={...sp,anims:selectedAnimationRoles(sp)};
   const skills = {};
   for (const [i, role] of Object.entries(sp.anims.skills || {})) {
     const selected = selectedSkillClip(sp, Number(i)) || role;

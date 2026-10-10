@@ -1,0 +1,1743 @@
+{
+  "reports": [
+    {
+      "id": "act1autochess_m01",
+      "kind": "boss",
+      "mesh": {
+        "triangles": 12719,
+        "nonFinite": 0,
+        "duplicateFaces": 0,
+        "examples": [],
+        "stats": {
+          "calls": 55,
+          "triangles": 60061,
+          "textures": 30,
+          "geometries": 33,
+          "frames": 8,
+          "cpuMs": 154.14,
+          "lost": false,
+          "originalStage": "act1autochess_m01"
+        }
+      },
+      "cameras": [
+        {
+          "side": "L",
+          "params": {
+            "tx": 6,
+            "ty": 3.5488418350022553,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "R",
+          "params": {
+            "tx": 14,
+            "ty": 3.5488418350022553,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "all",
+          "params": {
+            "tx": 10,
+            "ty": 3.2288498094687004,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 14.911032952270734,
+            "scale": 82.91610934749492,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 82.91610934749491,
+            "depth": 14.911032952270736
+          }
+        }
+      ]
+    },
+    {
+      "id": "act1autochess_m01",
+      "kind": "unite",
+      "mesh": {
+        "triangles": 14482,
+        "nonFinite": 0,
+        "duplicateFaces": 0,
+        "examples": [],
+        "stats": {
+          "calls": 71,
+          "triangles": 83001,
+          "textures": 30,
+          "geometries": 42,
+          "frames": 20,
+          "cpuMs": 93.64,
+          "lost": false,
+          "originalStage": "act1autochess_m01"
+        }
+      },
+      "cameras": [
+        {
+          "side": "L",
+          "params": {
+            "tx": 6,
+            "ty": 10.998841835002256,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "R",
+          "params": {
+            "tx": 14,
+            "ty": 10.998841835002256,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "all",
+          "params": {
+            "tx": 10,
+            "ty": 11.178849809468701,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 14.911032952270734,
+            "scale": 82.91610934749492,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 82.91610934749491,
+            "depth": 14.911032952270736
+          }
+        }
+      ]
+    },
+    {
+      "id": "act1autochess_m02",
+      "kind": "boss",
+      "mesh": {
+        "triangles": 12482,
+        "nonFinite": 0,
+        "duplicateFaces": 0,
+        "examples": [],
+        "stats": {
+          "calls": 59,
+          "triangles": 57803,
+          "textures": 32,
+          "geometries": 36,
+          "frames": 36,
+          "cpuMs": 82.49,
+          "lost": false,
+          "originalStage": "act1autochess_m02"
+        }
+      },
+      "cameras": [
+        {
+          "side": "L",
+          "params": {
+            "tx": 6,
+            "ty": 3.5488418350022553,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "R",
+          "params": {
+            "tx": 14,
+            "ty": 3.5488418350022553,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "all",
+          "params": {
+            "tx": 10,
+            "ty": 3.2288498094687004,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 14.911032952270734,
+            "scale": 82.91610934749492,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 82.91610934749491,
+            "depth": 14.911032952270736
+          }
+        }
+      ]
+    },
+    {
+      "id": "act1autochess_m02",
+      "kind": "unite",
+      "mesh": {
+        "triangles": 14183,
+        "nonFinite": 0,
+        "duplicateFaces": 0,
+        "examples": [],
+        "stats": {
+          "calls": 76,
+          "triangles": 80365,
+          "textures": 32,
+          "geometries": 45,
+          "frames": 44,
+          "cpuMs": 83.11,
+          "lost": false,
+          "originalStage": "act1autochess_m02"
+        }
+      },
+      "cameras": [
+        {
+          "side": "L",
+          "params": {
+            "tx": 6,
+            "ty": 10.998841835002256,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "R",
+          "params": {
+            "tx": 14,
+            "ty": 10.998841835002256,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "all",
+          "params": {
+            "tx": 10,
+            "ty": 11.178849809468701,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 14.911032952270734,
+            "scale": 82.91610934749492,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 82.91610934749491,
+            "depth": 14.911032952270736
+          }
+        }
+      ]
+    },
+    {
+      "id": "act1autochess_m03",
+      "kind": "boss",
+      "mesh": {
+        "triangles": 13063,
+        "nonFinite": 0,
+        "duplicateFaces": 0,
+        "examples": [],
+        "stats": {
+          "calls": 45,
+          "triangles": 64264,
+          "textures": 32,
+          "geometries": 28,
+          "frames": 57,
+          "cpuMs": 105.54,
+          "lost": false,
+          "originalStage": "act1autochess_m03"
+        }
+      },
+      "cameras": [
+        {
+          "side": "L",
+          "params": {
+            "tx": 6,
+            "ty": 3.5488418350022553,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "R",
+          "params": {
+            "tx": 14,
+            "ty": 3.5488418350022553,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "all",
+          "params": {
+            "tx": 10,
+            "ty": 3.2288498094687004,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 14.911032952270734,
+            "scale": 82.91610934749492,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 82.91610934749491,
+            "depth": 14.911032952270736
+          }
+        }
+      ]
+    },
+    {
+      "id": "act1autochess_m03",
+      "kind": "unite",
+      "mesh": {
+        "triangles": 14885,
+        "nonFinite": 0,
+        "duplicateFaces": 0,
+        "examples": [],
+        "stats": {
+          "calls": 57,
+          "triangles": 87655,
+          "textures": 32,
+          "geometries": 35,
+          "frames": 65,
+          "cpuMs": 72.86,
+          "lost": false,
+          "originalStage": "act1autochess_m03"
+        }
+      },
+      "cameras": [
+        {
+          "side": "L",
+          "params": {
+            "tx": 6,
+            "ty": 10.998841835002256,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "R",
+          "params": {
+            "tx": 14,
+            "ty": 10.998841835002256,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "all",
+          "params": {
+            "tx": 10,
+            "ty": 11.178849809468701,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 14.911032952270734,
+            "scale": 82.91610934749492,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 82.91610934749491,
+            "depth": 14.911032952270736
+          }
+        }
+      ]
+    },
+    {
+      "id": "act1autochess_m04",
+      "kind": "boss",
+      "mesh": {
+        "triangles": 13098,
+        "nonFinite": 0,
+        "duplicateFaces": 0,
+        "examples": [],
+        "stats": {
+          "calls": 44,
+          "triangles": 59664,
+          "textures": 32,
+          "geometries": 28,
+          "frames": 78,
+          "cpuMs": 71.62,
+          "lost": false,
+          "originalStage": "act1autochess_m04"
+        }
+      },
+      "cameras": [
+        {
+          "side": "L",
+          "params": {
+            "tx": 6,
+            "ty": 3.5488418350022553,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "R",
+          "params": {
+            "tx": 14,
+            "ty": 3.5488418350022553,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "all",
+          "params": {
+            "tx": 10,
+            "ty": 3.2288498094687004,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 14.911032952270734,
+            "scale": 82.91610934749492,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 82.91610934749491,
+            "depth": 14.911032952270736
+          }
+        }
+      ]
+    },
+    {
+      "id": "act1autochess_m04",
+      "kind": "unite",
+      "mesh": {
+        "triangles": 15150,
+        "nonFinite": 0,
+        "duplicateFaces": 0,
+        "examples": [],
+        "stats": {
+          "calls": 57,
+          "triangles": 83918,
+          "textures": 32,
+          "geometries": 35,
+          "frames": 86,
+          "cpuMs": 57.42,
+          "lost": false,
+          "originalStage": "act1autochess_m04"
+        }
+      },
+      "cameras": [
+        {
+          "side": "L",
+          "params": {
+            "tx": 6,
+            "ty": 10.998841835002256,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "R",
+          "params": {
+            "tx": 14,
+            "ty": 10.998841835002256,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "all",
+          "params": {
+            "tx": 10,
+            "ty": 11.178849809468701,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 14.911032952270734,
+            "scale": 82.91610934749492,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 82.91610934749491,
+            "depth": 14.911032952270736
+          }
+        }
+      ]
+    },
+    {
+      "id": "act1autochess_m05",
+      "kind": "boss",
+      "mesh": {
+        "triangles": 14833,
+        "nonFinite": 0,
+        "duplicateFaces": 0,
+        "examples": [],
+        "stats": {
+          "calls": 46,
+          "triangles": 65907,
+          "textures": 34,
+          "geometries": 29,
+          "frames": 99,
+          "cpuMs": 76.38,
+          "lost": false,
+          "originalStage": "act1autochess_m05"
+        }
+      },
+      "cameras": [
+        {
+          "side": "L",
+          "params": {
+            "tx": 6,
+            "ty": 3.5488418350022553,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "R",
+          "params": {
+            "tx": 14,
+            "ty": 3.5488418350022553,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "all",
+          "params": {
+            "tx": 10,
+            "ty": 3.2288498094687004,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 14.911032952270734,
+            "scale": 82.91610934749492,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 82.91610934749491,
+            "depth": 14.911032952270736
+          }
+        }
+      ]
+    },
+    {
+      "id": "act1autochess_m05",
+      "kind": "unite",
+      "mesh": {
+        "triangles": 16608,
+        "nonFinite": 0,
+        "duplicateFaces": 0,
+        "examples": [],
+        "stats": {
+          "calls": 60,
+          "triangles": 91633,
+          "textures": 34,
+          "geometries": 37,
+          "frames": 106,
+          "cpuMs": 69.87,
+          "lost": false,
+          "originalStage": "act1autochess_m05"
+        }
+      },
+      "cameras": [
+        {
+          "side": "L",
+          "params": {
+            "tx": 6,
+            "ty": 10.998841835002256,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "R",
+          "params": {
+            "tx": 14,
+            "ty": 10.998841835002256,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "all",
+          "params": {
+            "tx": 10,
+            "ty": 11.178849809468701,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 14.911032952270734,
+            "scale": 82.91610934749492,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 82.91610934749491,
+            "depth": 14.911032952270736
+          }
+        }
+      ]
+    },
+    {
+      "id": "act1autochess_m06",
+      "kind": "boss",
+      "mesh": {
+        "triangles": 14248,
+        "nonFinite": 0,
+        "duplicateFaces": 0,
+        "examples": [],
+        "stats": {
+          "calls": 48,
+          "triangles": 71840,
+          "textures": 34,
+          "geometries": 30,
+          "frames": 119,
+          "cpuMs": 83.2,
+          "lost": false,
+          "originalStage": "act1autochess_m06"
+        }
+      },
+      "cameras": [
+        {
+          "side": "L",
+          "params": {
+            "tx": 6,
+            "ty": 3.5488418350022553,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "R",
+          "params": {
+            "tx": 14,
+            "ty": 3.5488418350022553,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "all",
+          "params": {
+            "tx": 10,
+            "ty": 3.2288498094687004,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 14.911032952270734,
+            "scale": 82.91610934749492,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 82.91610934749491,
+            "depth": 14.911032952270736
+          }
+        }
+      ]
+    },
+    {
+      "id": "act1autochess_m06",
+      "kind": "unite",
+      "mesh": {
+        "triangles": 15845,
+        "nonFinite": 0,
+        "duplicateFaces": 0,
+        "examples": [],
+        "stats": {
+          "calls": 64,
+          "triangles": 93104,
+          "textures": 34,
+          "geometries": 39,
+          "frames": 127,
+          "cpuMs": 67.57,
+          "lost": false,
+          "originalStage": "act1autochess_m06"
+        }
+      },
+      "cameras": [
+        {
+          "side": "L",
+          "params": {
+            "tx": 6,
+            "ty": 10.998841835002256,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "R",
+          "params": {
+            "tx": 14,
+            "ty": 10.998841835002256,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "all",
+          "params": {
+            "tx": 10,
+            "ty": 11.178849809468701,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 14.911032952270734,
+            "scale": 82.91610934749492,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 82.91610934749491,
+            "depth": 14.911032952270736
+          }
+        }
+      ]
+    },
+    {
+      "id": "act1autochess_m07",
+      "kind": "boss",
+      "mesh": {
+        "triangles": 12974,
+        "nonFinite": 0,
+        "duplicateFaces": 0,
+        "examples": [],
+        "stats": {
+          "calls": 45,
+          "triangles": 59693,
+          "textures": 34,
+          "geometries": 28,
+          "frames": 140,
+          "cpuMs": 68.32,
+          "lost": false,
+          "originalStage": "act1autochess_m07"
+        }
+      },
+      "cameras": [
+        {
+          "side": "L",
+          "params": {
+            "tx": 6,
+            "ty": 3.5488418350022553,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "R",
+          "params": {
+            "tx": 14,
+            "ty": 3.5488418350022553,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "all",
+          "params": {
+            "tx": 10,
+            "ty": 3.2288498094687004,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 14.911032952270734,
+            "scale": 82.91610934749492,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 82.91610934749491,
+            "depth": 14.911032952270736
+          }
+        }
+      ]
+    },
+    {
+      "id": "act1autochess_m07",
+      "kind": "unite",
+      "mesh": {
+        "triangles": 14908,
+        "nonFinite": 0,
+        "duplicateFaces": 0,
+        "examples": [],
+        "stats": {
+          "calls": 58,
+          "triangles": 82431,
+          "textures": 34,
+          "geometries": 35,
+          "frames": 148,
+          "cpuMs": 54.42,
+          "lost": false,
+          "originalStage": "act1autochess_m07"
+        }
+      },
+      "cameras": [
+        {
+          "side": "L",
+          "params": {
+            "tx": 6,
+            "ty": 10.998841835002256,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "R",
+          "params": {
+            "tx": 14,
+            "ty": 10.998841835002256,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "all",
+          "params": {
+            "tx": 10,
+            "ty": 11.178849809468701,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 14.911032952270734,
+            "scale": 82.91610934749492,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 82.91610934749491,
+            "depth": 14.911032952270736
+          }
+        }
+      ]
+    },
+    {
+      "id": "act2autochess_m01",
+      "kind": "boss",
+      "mesh": {
+        "triangles": 33073,
+        "nonFinite": 0,
+        "duplicateFaces": 0,
+        "examples": [],
+        "stats": {
+          "calls": 54,
+          "triangles": 151556,
+          "textures": 49,
+          "geometries": 30,
+          "frames": 161,
+          "cpuMs": 70.87,
+          "lost": false,
+          "originalStage": "act2autochess_m01"
+        }
+      },
+      "cameras": [
+        {
+          "side": "L",
+          "params": {
+            "tx": 6,
+            "ty": 3.5488418350022553,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "R",
+          "params": {
+            "tx": 14,
+            "ty": 3.5488418350022553,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "all",
+          "params": {
+            "tx": 10,
+            "ty": 3.2288498094687004,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 14.911032952270734,
+            "scale": 82.91610934749492,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 82.91610934749491,
+            "depth": 14.911032952270736
+          }
+        }
+      ]
+    },
+    {
+      "id": "act2autochess_m01",
+      "kind": "unite",
+      "mesh": {
+        "triangles": 39397,
+        "nonFinite": 0,
+        "duplicateFaces": 0,
+        "examples": [],
+        "stats": {
+          "calls": 70,
+          "triangles": 179870,
+          "textures": 49,
+          "geometries": 38,
+          "frames": 172,
+          "cpuMs": 45.72,
+          "lost": false,
+          "originalStage": "act2autochess_m01"
+        }
+      },
+      "cameras": [
+        {
+          "side": "L",
+          "params": {
+            "tx": 6,
+            "ty": 10.998841835002256,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "R",
+          "params": {
+            "tx": 14,
+            "ty": 10.998841835002256,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "all",
+          "params": {
+            "tx": 10,
+            "ty": 11.178849809468701,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 14.911032952270734,
+            "scale": 82.91610934749492,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 82.91610934749491,
+            "depth": 14.911032952270736
+          }
+        }
+      ]
+    },
+    {
+      "id": "act2autochess_m02",
+      "kind": "boss",
+      "mesh": {
+        "triangles": 14056,
+        "nonFinite": 0,
+        "duplicateFaces": 0,
+        "examples": [],
+        "stats": {
+          "calls": 92,
+          "triangles": 69123,
+          "textures": 52,
+          "geometries": 54,
+          "frames": 188,
+          "cpuMs": 67.08,
+          "lost": false,
+          "originalStage": "act2autochess_m02"
+        }
+      },
+      "cameras": [
+        {
+          "side": "L",
+          "params": {
+            "tx": 6,
+            "ty": 3.5488418350022553,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "R",
+          "params": {
+            "tx": 14,
+            "ty": 3.5488418350022553,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "all",
+          "params": {
+            "tx": 10,
+            "ty": 3.2288498094687004,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 14.911032952270734,
+            "scale": 82.91610934749492,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 82.91610934749491,
+            "depth": 14.911032952270736
+          }
+        }
+      ]
+    },
+    {
+      "id": "act2autochess_m02",
+      "kind": "unite",
+      "mesh": {
+        "triangles": 15930,
+        "nonFinite": 0,
+        "duplicateFaces": 0,
+        "examples": [],
+        "stats": {
+          "calls": 118,
+          "triangles": 94909,
+          "textures": 52,
+          "geometries": 68,
+          "frames": 196,
+          "cpuMs": 58.75,
+          "lost": false,
+          "originalStage": "act2autochess_m02"
+        }
+      },
+      "cameras": [
+        {
+          "side": "L",
+          "params": {
+            "tx": 6,
+            "ty": 10.998841835002256,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "R",
+          "params": {
+            "tx": 14,
+            "ty": 10.998841835002256,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "all",
+          "params": {
+            "tx": 10,
+            "ty": 11.178849809468701,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 14.911032952270734,
+            "scale": 82.91610934749492,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 82.91610934749491,
+            "depth": 14.911032952270736
+          }
+        }
+      ]
+    },
+    {
+      "id": "act2autochess_m03",
+      "kind": "boss",
+      "mesh": {
+        "triangles": 22787,
+        "nonFinite": 0,
+        "duplicateFaces": 0,
+        "examples": [],
+        "stats": {
+          "calls": 57,
+          "triangles": 80416,
+          "textures": 60,
+          "geometries": 33,
+          "frames": 209,
+          "cpuMs": 43.56,
+          "lost": false,
+          "originalStage": "act2autochess_m03"
+        }
+      },
+      "cameras": [
+        {
+          "side": "L",
+          "params": {
+            "tx": 6,
+            "ty": 3.5488418350022553,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "R",
+          "params": {
+            "tx": 14,
+            "ty": 3.5488418350022553,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "all",
+          "params": {
+            "tx": 10,
+            "ty": 3.2288498094687004,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 14.911032952270734,
+            "scale": 82.91610934749492,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 82.91610934749491,
+            "depth": 14.911032952270736
+          }
+        }
+      ]
+    },
+    {
+      "id": "act2autochess_m03",
+      "kind": "unite",
+      "mesh": {
+        "triangles": 25141,
+        "nonFinite": 0,
+        "duplicateFaces": 0,
+        "examples": [],
+        "stats": {
+          "calls": 71,
+          "triangles": 99060,
+          "textures": 60,
+          "geometries": 40,
+          "frames": 217,
+          "cpuMs": 29.14,
+          "lost": false,
+          "originalStage": "act2autochess_m03"
+        }
+      },
+      "cameras": [
+        {
+          "side": "L",
+          "params": {
+            "tx": 6,
+            "ty": 10.998841835002256,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "R",
+          "params": {
+            "tx": 14,
+            "ty": 10.998841835002256,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "all",
+          "params": {
+            "tx": 10,
+            "ty": 11.178849809468701,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 14.911032952270734,
+            "scale": 82.91610934749492,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 82.91610934749491,
+            "depth": 14.911032952270736
+          }
+        }
+      ]
+    },
+    {
+      "id": "act2autochess_m04",
+      "kind": "boss",
+      "mesh": {
+        "triangles": 12817,
+        "nonFinite": 0,
+        "duplicateFaces": 0,
+        "examples": [],
+        "stats": {
+          "calls": 65,
+          "triangles": 60753,
+          "textures": 60,
+          "geometries": 39,
+          "frames": 230,
+          "cpuMs": 64.22,
+          "lost": false,
+          "originalStage": "act2autochess_m04"
+        }
+      },
+      "cameras": [
+        {
+          "side": "L",
+          "params": {
+            "tx": 6,
+            "ty": 3.5488418350022553,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "R",
+          "params": {
+            "tx": 14,
+            "ty": 3.5488418350022553,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "all",
+          "params": {
+            "tx": 10,
+            "ty": 3.2288498094687004,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 14.911032952270734,
+            "scale": 82.91610934749492,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 82.91610934749491,
+            "depth": 14.911032952270736
+          }
+        }
+      ]
+    },
+    {
+      "id": "act2autochess_m04",
+      "kind": "unite",
+      "mesh": {
+        "triangles": 14493,
+        "nonFinite": 0,
+        "duplicateFaces": 0,
+        "examples": [],
+        "stats": {
+          "calls": 83,
+          "triangles": 85888,
+          "textures": 60,
+          "geometries": 49,
+          "frames": 238,
+          "cpuMs": 54.54,
+          "lost": false,
+          "originalStage": "act2autochess_m04"
+        }
+      },
+      "cameras": [
+        {
+          "side": "L",
+          "params": {
+            "tx": 6,
+            "ty": 10.998841835002256,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "R",
+          "params": {
+            "tx": 14,
+            "ty": 10.998841835002256,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 10.731017003337843,
+            "scale": 115.21413472460378,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 115.21413472460378,
+            "depth": 10.731017003337843
+          }
+        },
+        {
+          "side": "all",
+          "params": {
+            "tx": 10,
+            "ty": 11.178849809468701,
+            "tz": 0,
+            "tilt": 30,
+            "dist": 14.911032952270734,
+            "scale": 82.91610934749492,
+            "cx": 720,
+            "cy": 450
+          },
+          "center": {
+            "x": 720,
+            "y": 450,
+            "s": 82.91610934749491,
+            "depth": 14.911032952270736
+          }
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

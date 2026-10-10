@@ -1,3 +1,4 @@
+import {combatMetrics} from '../../shared/combatStats.js';
 import { PUSH_UNBALANCE, PULL_UNBALANCE, PULL_UNBALANCE_WEAK, UNBALANCE_MIN } from './constants.js';
 import { hypot } from './detmath.js';
 function pushUnbalance(level) {
@@ -601,11 +602,13 @@ export class Battle {
     if (!this.started) this.start();
     if (this.finished) return;
     if (reason === 'timeout') this._timeout();
-    else this._finish('forced');
+    else this._finish(reason === 'cleared' && this.sharedBoss ? 'cleared' : 'forced');
   }
 
   _finish(reason) {
     if (this.finished) return;
+    // The server confirmed the shared boss died; local HP may still lag its acknowledgement.
+    if (reason === 'cleared' || this.sharedBoss?.hp <= 0) this.confirmBossDefeat();
     this.finished = true;
     this.reason = reason;
     this._endReq = null;
@@ -648,7 +651,7 @@ export class Battle {
       }));
       pp.unitStats = ps.units.map((u) => ({
         id: u.id, uid: u.uid, defId: u.defId, name: u.name, kind: u.kind,
-        dmg: Math.round(u.stats.dmg), kills: u.stats.kills, heal: Math.round(u.stats.heal), taken: Math.round(u.stats.taken), attacks: u.stats.attacks,
+        ...combatMetrics(u.stats),
       }));
       perPlayer[ps.playerId] = pp;
     }
@@ -981,6 +984,7 @@ export class Battle {
     // "倒地干员所在地块视为可部署，但所有我方单位在此处的部署行为将被阻止" (PRTS 卫戍协议/帮助 §作战阶段 单位部署)
     if (this.downOn(R0, C0, u)) { this.log(`a knocked-out operator lies on ${R0},${C0}; ${u} not deployed`); return false; }
     const first = u.deploySeq === 0;
+    if(!first)u.stats.redeploys=(u.stats.redeploys||0)+1;
     u.alive = true;
     u.deployed = true;
     u.removed = false;
@@ -1054,6 +1058,7 @@ export class Battle {
     this._cutAttackStand(unit);
     unit.alive = false;
     unit.removeReason = reason;
+    if(reason==='killed')unit.stats.deaths=(unit.stats.deaths||0)+1;
     unit.deployed = false;
     unit.deathAt = this.time;
     // while the removal bookkeeping runs, a skill onEnd handler must not redeploy the unit (it would come back
@@ -1429,6 +1434,7 @@ export class Battle {
     for (let i = 0, n = units.length; i < n; i++) { // units created by onTick handlers start ticking next tick
       const u = units[i];
       if (!u.alive || u.removed) continue;
+      if(u.deployed&&!u.hidden)u.stats.activeTime=(u.stats.activeTime||0)+dt;
       if (u.buffs.length) {
         const arr = u.buffs.slice();
         for (const b of arr) {
@@ -2134,9 +2140,12 @@ export class Battle {
    * 而改变推动的方向或削减力度" — the < 0.25 tile rule still applies). `inward` = a radial push towards `from` (薄绿 S2's "拖拽", PRTS 备注 "实际为
    * 反方向（指向薄绿方向）的推开"), never nearer than PULL_STOP_RADIUS to its centre [ASSUMED: "至面前"]. `effect` = a 特效
    * push (PRTS 推与拉: one frame less of travel than a 弹道 push — constants.js PUSH_TILES_EFFECT / PUSH_EFFECT_SKILLS).
+   * The displace fx keeps the enemy's pre-hit facing by default: official footage shows this for a directional push
+   * (野鬃 S2, #418) and a radial push (莫斯提马 S3). [ASSUMED] for other push sources; an explicitly different
+   * client action can pass `keepFacing: false`. Pulls use the same display rule; raw displacements remain unmarked.
    * Returns the tiles moved.
    */
-  push(e, force, { from = null, dir = null, fixed = false, fixedAngle = false, inward = false, effect = false } = {}) {
+  push(e, force, { from = null, dir = null, fixed = false, fixedAngle = false, inward = false, effect = false, keepFacing = true } = {}) {
     if (!this._displaceable(e)) { this._staticForce(e, force, false); return 0; }
     let level = this.forceLevel(e, force);
     const fx0 = fin(from?.x, e.x), fy0 = fin(from?.y, e.y);
@@ -2158,7 +2167,7 @@ export class Battle {
     // 失衡 for the row's 位移时间 — also when the 特效 column or a wall shortens the slide [ASSUMED for the wall]; a slide a
     // wall stops at the first step gets the 0.1 s floor, like a body that cannot move [ASSUMED: 碰撞、停止 is 待补充]
     const hold = pushUnbalance(level);
-    const moved = this.displace(e, { x: ux, y: uy }, dist, { dur: hold });
+    const moved = this.displace(e, { x: ux, y: uy }, dist, { dur: hold, keepFacing });
     if (hold > 0) this._unbalance(e, moved > 0 ? hold : UNBALANCE_MIN);
     return moved;
   }
@@ -2167,9 +2176,13 @@ export class Battle {
    * Pull enemy `e` with 力度 `force` towards the point `to` (PRTS 推与拉 §拉力 / §捕网): 受力等级 ≥ 0 — all the way, until it
    * is within `stop` tiles of `center` (急停; `center` defaults to `to`, `stop` to PULL_STOP_RADIUS) or reaches `to`;
    * −1 — PULL_WEAK_SHARE of its starting distance to `to`; −2 — PULL_CRAWL tiles; ≤ −3 — nothing. `pullToFront` aims at
-   * the official 拉力起点 in front of an operator. Returns the tiles moved.
+   * the official 拉力起点 in front of an operator. The displace fx keeps the pre-hit facing by default, as for pushes.
+   * The supplied 歌蕾蒂娅 S1/S2 clip directly shows the target keeping its facing before and after a hook pull.
+   * [ASSUMED] for other pull directions/sources: the clip does not isolate travel against the prior facing.
+   * PRTS distinguishes 薄绿's inward push from a hook pull, not their model facing.
+   * Pass `keepFacing: false` for a documented exception. Returns the tiles moved.
    */
-  pull(e, force, { to, center = null, stop = PULL_STOP_RADIUS } = {}) {
+  pull(e, force, { to, center = null, stop = PULL_STOP_RADIUS, keepFacing = true } = {}) {
     if (!to) return 0;
     // an enemy the puller itself blocks already stands in front of it (at contact) [ASSUMED: no pull, no unblocking]
     if (e && center && center.side === 'ally' && e.blockedBy === center) return 0;
@@ -2192,7 +2205,7 @@ export class Battle {
       if (disc >= 0) { const t = -wu - Math.sqrt(disc); if (t >= 0) full = Math.min(full, t); }
     }
     const dist = level >= 0 ? full : level === -1 ? Math.min(full, PULL_WEAK_SHARE * d0) : Math.min(full, PULL_CRAWL);
-    const moved = dist > 1e-6 ? this.displace(e, { x: ux, y: uy }, dist, { dur: hold }) : 0;
+    const moved = dist > 1e-6 ? this.displace(e, { x: ux, y: uy }, dist, { dur: hold, keepFacing }) : 0;
     this._unbalance(e, hold);
     return moved;
   }
@@ -2228,7 +2241,7 @@ export class Battle {
    * ⇒ no movement (_displaceable). The tiles it may cross follow its movement (`motion`): a hovering enemy walks the
    * ground, so it stays on ground-passable tiles.
    */
-  displace(e, dir, distance, { dur = 0 } = {}) {
+  displace(e, dir, distance, { dur = 0, keepFacing = false } = {}) {
     if (!this._displaceable(e) || !dir) return 0;
     const dxv = fin(dir.x, 0), dyv = fin(dir.y, 0);
     const len = hypot(dxv, dyv);
@@ -2254,7 +2267,7 @@ export class Battle {
       e.atkStandUntil = -Infinity;
       if (e.route) e.route.pts = null;
       // `dur` (game s): the 失衡 the push / pull gives — the client's slide takes that long (render/units.js slideTo)
-      this.fx('displace', dur > 0 ? { x: e.x, y: e.y, id: e.id, dur } : { x: e.x, y: e.y, id: e.id });
+      this.fx('displace',{x:e.x,y:e.y,id:e.id,...(dur>0?{dur}:{}),...(keepFacing?{keepFacing:true}:{})});
       if(e.mem.attackWindup){delete e.mem.attackWindup;this._ev(['atkCancel',e.id]);}
       e.moving=false;
     }
@@ -2471,6 +2484,13 @@ export class Battle {
     // a broken pool (NaN hp) must not leak NaN into the unit: show it full until the pool is sane again
     const ratio = pool.maxHp > 0 ? (Number.isFinite(pool.hp) ? Math.max(0, pool.hp) / pool.maxHp : 1) : 0;
     e.hp = e.s.maxHp * Math.min(1, ratio);
+  }
+
+  /** Reconcile an authoritative boss defeat, even if this field already stopped ticking. */
+  confirmBossDefeat() {
+    if (!this.sharedBoss) return;
+    this.sharedBoss.hp = 0;
+    this._bossSync();
   }
 
   _bossSync() {

@@ -1,3 +1,4 @@
+import {cultivatedStats} from '../../shared/potential.js';
 // The browser battle runner (public/js/battle/runner.js) under Node with a fake socket, a manual clock and manual
 // animation frames: pacing (60 ticks per real second at 2×, ≤ 8 per frame), the b.snap / b.ev feed and the field meta,
 // b.progress / b.result when authoritative (valid protocol frames, the same result as the server's simulation),
@@ -432,8 +433,8 @@ test('live unit stats (user playtest #4 item 7): unitStats(id) reads the battle 
   assert.equal(got.interval, Math.round(s.interval * 100) / 100);
   assert.equal(got.blockCnt, s.blockCnt);
   assert.equal(got.hp, Math.round(ally.hp));
-  assert.equal(got.base.atk, Math.round(ally.base.atk));
-  assert.equal(got.base.maxHp, Math.round(ally.base.maxHp));
+  assert.equal(got.base.atk, Math.round(cultivatedStats(ally.base,ally.cultMul).atk));
+  assert.equal(got.base.maxHp, Math.round(cultivatedStats(ally.base,ally.cultMul).maxHp));
   assert.equal(r.runner.unitStats(ally.id, start.fieldId)?.id, ally.id, 'on the named field');
   assert.equal(r.runner.unitStats(ally.id, 'n:someone_else'), null, 'another field: nothing');
   assert.equal(r.runner.unitStats(999999), null, 'unknown unit');
@@ -466,4 +467,16 @@ test('live unit stats (user playtest #4 item 7): unitStats(id) reads the battle 
   assert.equal(r.runner.unitStats(ally.id), null, 'nothing on screen after the battles were dropped');
   assert.equal(r.runner.unitIdOf(ally.uid, ally.ownerId), null);
   r.runner.dispose();
+});
+
+test('server confirmed boss kill retains cleared; normal/forced endings never invent a boss kill',async()=>{
+  for(const [kind,reason,expected] of [['boss','cleared','cleared'],['hidden','cleared','cleared'],['normal','cleared','forced'],['boss','forced','forced']]){
+    const start=realStart(7303),r=rig();
+    r.net.emit('b.start',start);await r.settle();
+    const e=r.runner._entries.get(start.battleId);e.kind=kind;
+    const end=e.battle.forceEnd.bind(e.battle),calls=[];
+    e.battle.forceEnd=(why)=>{calls.push(why);return end(why);};
+    r.net.emit('b.end',{battleId:start.battleId,reason});await r.settle();
+    assert.deepEqual(calls,[expected]);r.runner.dispose();
+  }
 });

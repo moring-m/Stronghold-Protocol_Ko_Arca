@@ -94,7 +94,7 @@ test('a 「不停止移动」 attacker (attackMoves) keeps walking through its a
   const rec = (attackMoves) => ({ ...enemyRec({ key: 'enemy_mover', hp: 1e9, atk: 1, range: 2.5, bat: 2, speed: 1 }), attackAnim: { clip: 'Attack', dur: 1.5, hit: 0.5 }, ...(attackMoves ? { attackMoves: true } : {}) });
   const run = (attackMoves) => {
     const h = makeBattle({
-      defs: { chess: { t_a: chessRec({ id: 't_a', stats: { maxHp: 1e9, atk: 0 } }) }, enemies: { enemy_mover: rec(attackMoves) } },
+      defs: { chess: { t_a: chessRec({ id: 't_a', stats: { maxHp: 1e9, atk: 0, blockCnt: 0 } }) }, enemies: { enemy_mover: rec(attackMoves) } },
       units: [{ chessId: 't_a', row: 10, col: 6 }], enemies: [{ key: 'enemy_mover', time: 0, route: 0 }], content: 'none', autoFinish: false, timeLimit: 60, hooks: ['attack'],
     });
     return trace(h, 12);
@@ -116,7 +116,7 @@ test('no attack clip known: ATTACK_PAUSE after the strike and no wind-up stand; 
   });
   h.step();
   const e = h.enemy('enemy_slow');
-  assert.ok(e.lastAttackAt >= 0, 'attacked at once');
+  assert.ok(h.runUntil(()=>e.lastAttackAt >= 0,5), 'attacks after deployment and authored wind-up');
   assert.ok(Math.abs(e.atkStandUntil - (h.b.time - TICK + 2.5)) < 1e-6, 'stands the 2.5 s after the strike');
   h.run(0.5);
   const x0 = e.x;
@@ -156,8 +156,8 @@ test('a ranged enemy with a target in range on a WAIT checkpoint leaves when the
   assert.equal(free.attacks, 0);
   assert.ok(sniper.attacks >= 2 && quick.attacks >= 5);
   assert.ok(Math.abs(sniper.waited - free.waited) < 1e-9 && Math.abs(quick.waited - free.waited) < 1e-9, `the wait ends at ${free.waited.toFixed(2)} s for all three`);
-  // it walks on once the attack clip running at the end of the wait is over (the attack at 2.7 s: until 3.2 s)
-  assert.ok(sniper.moved > free.moved && sniper.moved <= 3.2 + 2 * TICK, `leaves at ${sniper.moved?.toFixed(2)} s (no target: ${free.moved.toFixed(2)} s)`);
+  // Deployment and the authored wind-up shift the attack; walking resumes within one full clip after WAIT.
+  assert.ok(sniper.moved > free.moved && sniper.moved <= free.waited + 1 + 2 * TICK, `leaves at ${sniper.moved?.toFixed(2)} s (no target: ${free.moved.toFixed(2)} s)`);
   assert.equal(quick.moved, null, 'an enemy attacking quicker than its clip stands while the target stays in range');
 });
 

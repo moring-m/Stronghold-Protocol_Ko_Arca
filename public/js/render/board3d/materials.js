@@ -319,6 +319,23 @@ export function infectionMaterial(THREE, tex, focus) {
   });
 }
 
+/** Additive illumination only: preserves the native rage tile's texture. */
+export function infectionGlowMaterial(THREE, tex, focus) {
+  return new THREE.ShaderMaterial({
+    uniforms:{uTime:{value:0},...focus},vertexShader:TERRAIN_VERT,
+    fragmentShader:[
+      'uniform float uTime;',FOCUS_GLSL,'varying vec2 vUv; varying vec3 vWorld;',
+      'void main(){',
+      'float edge=min(min(vUv.x,1.0-vUv.x),min(vUv.y,1.0-vUv.y));',
+      'float border=(1.0-smoothstep(0.0,0.10,edge))*smoothstep(0.0,0.018,edge);',
+      'float pulse=0.65+0.35*sin(uTime*2.5+vWorld.x+vWorld.y);',
+      'float a=(0.09+border*0.38)*pulse*focusMask(vWorld.xy);',
+      'gl_FragColor=vec4(1.0,0.24,0.035,a);',
+      '#include <colorspace_fragment>', '}'
+    ].join('\n'),transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
+  });
+}
+
 /** Smog: drifting exhaust haze (vertical billboards over the grilles). */
 export function smogMaterial(THREE, tex, focus) {
   const uniforms = { uTime: { value: 0 }, uNoise: { value: tex.noise || null }, ...focus };

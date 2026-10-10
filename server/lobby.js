@@ -369,6 +369,7 @@ export class Lobby {
       case 'room.join': return this.join(session, msg);
       case 'room.leave': return this.leave(session);
       case 'room.ready': return this.ready(session, msg);
+      case 'room.commend': return this.commend(session,msg);
       case 'room.setCustomFactions': return this.setCustomFactions(session, msg);
       case 'room.setCustomExtensions': return this.setCustomExtensions(session, msg);
       case 'room.setDifficulty': return this.setDifficulty(session, msg);
@@ -380,6 +381,8 @@ export class Lobby {
       case 'room.reroll': return this.reroll(session, msg);
       case 'room.requestRestart': case 'room.answerRestart': return handleRestart(this, session, msg);
       case 'room.start': return this.start(session);
+      case 'room.rerollSetup': return this.rerollSetup(session, msg);
+      case 'room.cancelReroll': return this.rerollSetup(session, msg, true);
       case 'room.loadout': return this.loadout(session, msg);
       case 'room.spectate': return this.spectate(session, msg);
       case 'room.removeSpectator': return this.removeSpectator(session, msg);
@@ -705,10 +708,7 @@ export class Lobby {
     if (!room.match || room.match.phase !== 'INFO_CHECK') return fail(ERR.WRONG_PHASE);
     if (matchNo !== room.matchCount) return fail(ERR.BAD_TARGET, 'stale reroll request');
     if (room.rerollLimit !== -1 && room.rerollsUsed >= room.rerollLimit) return fail(ERR.BAD_MSG, '리롤 횟수를 모두 사용했습니다.');
-    room.rerollsUsed++;
-    const result = this.startMatch(room, room.matchKey, room.matchCtx);
-    if (result.error) { room.rerollsUsed--; this.broadcastState(room); }
-    return result;
+    return this.rerollSetup(session,{setupRevision:room.match.setupRevision});
   }
 
   start(session) {
@@ -733,6 +733,18 @@ export class Lobby {
     }
     room.rerollsUsed = 0;
     return this.startMatch(room, key);
+  }
+
+  /** Host authorization stays in the lobby; the match owns the vote and setup. */
+  rerollSetup(session, msg, cancel = false) {
+    const room = this.roomOf(session);
+    if (!room) return fail(ERR.NOT_IN_ROOM);
+    if (room.spectatorOf(session.playerId)) return fail(ERR.SPECTATOR);
+    if (room.hostId !== session.playerId) return fail(ERR.NOT_HOST);
+    if(!cancel&&room.rerollLimit!==-1&&room.rerollsUsed>=room.rerollLimit)return fail(ERR.BAD_MSG,'리롤 횟수를 모두 사용했습니다.');
+    const method = cancel ? 'cancelSetupReroll' : 'requestSetupReroll';
+    if (!room.match || typeof room.match[method] !== 'function') return fail(ERR.WRONG_PHASE);
+    return this.callMatch(room, method, session.playerId, cancel ? msg.voteId : msg.setupRevision) || fail(ERR.INTERNAL);
   }
 
   /**
@@ -815,6 +827,7 @@ export class Lobby {
         broadcast: (msg) => { if (ctx.live) this.matchBroadcast(room, ctx, msg); },
         onEnd: (summary) => this.onMatchEnd(room, ctx, summary),
       });
+      match.onSetupRerolled=()=>{room.rerollsUsed++;this.broadcastState(room);};
       ctx.match = match;
       if (replacedCtx) this.disposeMatchCtx(replacedCtx);
       room.match = match;
@@ -845,6 +858,9 @@ export class Lobby {
     room.matchCtx = null;
     room.matchKey = null;
     room.replay = this.buildReplay(room, ctx);
+    const resultFrame=ctx.sharedResult || ctx.results.values().next().value;
+    const participants=resultFrame ? (JSON.parse(resultFrame).players||[]).filter(p=>!p.isBot).map(p=>p.playerId) : [];
+    room.resultFeedback={matchNo:room.matchCount,participants:new Set(participants),counts:{},given:{}};
     setImmediate(() => this.disposeMatchCtx(ctx));
     this.log.info(`[lobby] ${room.code} match #${room.matchCount} ended`);
     for (let i = 0; i < room.seats.length; i++) {
@@ -866,6 +882,7 @@ export class Lobby {
     // runResync restores the room history; the match-local fallback must not clear it.
     if (msg?.t === 'm.chatHistory') return true;
     if (msg && msg.t === 'm.result') {
+      msg={...msg,matchNo:room.matchCount};
       const data = encode(msg);
       if (data != null) ctx.results.set(playerId, data);
     }
@@ -874,6 +891,7 @@ export class Lobby {
 
   /** Match broadcast; the latest m.public and a broadcast m.result are also kept for the replay. */
   matchBroadcast(room, ctx, msg) {
+    if(msg?.t==='m.result')msg={...msg,matchNo:room.matchCount};
     const data = this.broadcastRoom(room, msg);
     if (data == null) return;
     if (msg.t === 'm.public') ctx.lastPublic = data;
@@ -894,6 +912,24 @@ export class Lobby {
     }
     if (frames.size === 0) return null;
     return { publicFrame: ctx.lastPublic, frames, pending: new Set(frames.keys()) };
+  }
+
+  /** One recommendation per teammate, only from a human who played this completed match. */
+  commend(session,msg) {
+    const room=this.roomOf(session),f=room?.resultFeedback;
+    if(!f || room.match || f.matchNo!==msg.matchNo)return fail(ERR.WRONG_PHASE);
+    if(!f.participants.has(session.playerId)||!f.participants.has(msg.playerId)||session.playerId===msg.playerId)return fail(ERR.BAD_TARGET);
+    const given=f.given[session.playerId]??=[];
+    if(given.includes(msg.playerId))return OK;
+    given.push(msg.playerId);f.counts[msg.playerId]=(f.counts[msg.playerId]||0)+1;
+    if(room.replay)for(const [pid,frame] of room.replay.frames){
+      const result=JSON.parse(frame);
+      result.players=(result.players||[]).map(p=>({...p,commendations:f.counts[p.playerId]||0}));
+      result.commendationsGiven=f.given;
+      room.replay.frames.set(pid,encode(result));
+    }
+    this.broadcastRoom(room,{t:'room.commended',matchNo:f.matchNo,counts:f.counts,given:f.given});
+    return OK;
   }
 
   /** The replay frames still owed to a player (null when they moved on). @returns {string[] | null} */

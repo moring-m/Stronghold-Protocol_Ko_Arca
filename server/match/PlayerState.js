@@ -1,3 +1,4 @@
+import {onMerge} from './botEmotes.js';
 
 import { checkLoadoutOps, cultivationCharIds } from '../../shared/protocol.js';
 import { cultivationOf } from '../../shared/potential.js';
@@ -326,6 +327,11 @@ export class PlayerState {
       this.ops = Object.freeze(o);
     }
     return true;
+  }
+
+  buildRecruitStock(pool,banned){
+    const candidate=Object.create(this);candidate.m=Object.assign(Object.create(this.m),{pool,bannedChess:banned});
+    return new RecruitPool(pool,candidate).sync();
   }
 
   get pool(){
@@ -683,6 +689,7 @@ export class PlayerState {
     this.pushRewardOffer('merge');
     const rec = this.gd.chess(goldenId);
     this.m.tickerFor('GOLDEN_CHAR', [this.name, rec ? rec.name : goldenId], { playerId: this.playerId });
+    onMerge(this.m,this,{kind:'chess'});
     this.m.dispatch(this, 'onMerge', { kind: 'chess', piece: elite, baseId, consumed: consumed.map((l) => l.piece.uid), area: where });
     return elite;
   }

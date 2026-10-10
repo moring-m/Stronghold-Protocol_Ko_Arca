@@ -722,368 +722,6 @@
       "jpFallback": []
     },
     {
-      "charId": "char_4224_turdus",
-      "metadataKR": false,
-      "krLines": 0,
-      "jpFallback": [
-        {
-          "slot": "start",
-          "asset": "char_4224_turdus/CN_019",
-          "actual": "jp"
-        },
-        {
-          "slot": "faceEnemy",
-          "asset": "char_4224_turdus/CN_020",
-          "actual": "jp"
-        },
-        {
-          "slot": "select",
-          "asset": "char_4224_turdus/CN_021",
-          "actual": "jp"
-        },
-        {
-          "slot": "select",
-          "asset": "char_4224_turdus/CN_022",
-          "actual": "jp"
-        },
-        {
-          "slot": "place",
-          "asset": "char_4224_turdus/CN_023",
-          "actual": "jp"
-        },
-        {
-          "slot": "place",
-          "asset": "char_4224_turdus/CN_024",
-          "actual": "jp"
-        },
-        {
-          "slot": "skill1",
-          "asset": "char_4224_turdus/CN_025",
-          "actual": "jp"
-        },
-        {
-          "slot": "skill2",
-          "asset": "char_4224_turdus/CN_026",
-          "actual": "jp"
-        },
-        {
-          "slot": "skill3",
-          "asset": "char_4224_turdus/CN_027",
-          "actual": "jp"
-        },
-        {
-          "slot": "skill4",
-          "asset": "char_4224_turdus/CN_028",
-          "actual": "jp"
-        },
-        {
-          "slot": "resultFour",
-          "asset": "char_4224_turdus/CN_029",
-          "actual": "jp"
-        },
-        {
-          "slot": "resultThree",
-          "asset": "char_4224_turdus/CN_030",
-          "actual": "jp"
-        },
-        {
-          "slot": "resultTwo",
-          "asset": "char_4224_turdus/CN_031",
-          "actual": "jp"
-        },
-        {
-          "slot": "resultLose",
-          "asset": "char_4224_turdus/CN_032",
-          "actual": "jp"
-        }
-      ]
-    },
-    {
-      "charId": "char_188_helage",
-      "metadataKR": true,
-      "krLines": 14,
-      "jpFallback": []
-    },
-    {
-      "charId": "char_1051_headb2",
-      "metadataKR": false,
-      "krLines": 0,
-      "jpFallback": [
-        {
-          "slot": "start",
-          "asset": "char_1051_headb2/CN_019",
-          "actual": "jp"
-        },
-        {
-          "slot": "faceEnemy",
-          "asset": "char_1051_headb2/CN_020",
-          "actual": "jp"
-        },
-        {
-          "slot": "select",
-          "asset": "char_1051_headb2/CN_021",
-          "actual": "jp"
-        },
-        {
-          "slot": "select",
-          "asset": "char_1051_headb2/CN_022",
-          "actual": "jp"
-        },
-        {
-          "slot": "place",
-          "asset": "char_1051_headb2/CN_023",
-          "actual": "jp"
-        },
-        {
-          "slot": "place",
-          "asset": "char_1051_headb2/CN_024",
-          "actual": "jp"
-        },
-        {
-          "slot": "skill1",
-          "asset": "char_1051_headb2/CN_025",
-          "actual": "jp"
-        },
-        {
-          "slot": "skill2",
-          "asset": "char_1051_headb2/CN_026",
-          "actual": "jp"
-        },
-        {
-          "slot": "skill3",
-          "asset": "char_1051_headb2/CN_027",
-          "actual": "jp"
-        },
-        {
-          "slot": "skill4",
-          "asset": "char_1051_headb2/CN_028",
-          "actual": "jp"
-        },
-        {
-          "slot": "resultFour",
-          "asset": "char_1051_headb2/CN_029",
-          "actual": "jp"
-        },
-        {
-          "slot": "resultThree",
-          "asset": "char_1051_headb2/CN_030",
-          "actual": "jp"
-        },
-        {
-          "slot": "resultTwo",
-          "asset": "char_1051_headb2/CN_031",
-          "actual": "jp"
-        },
-        {
-          "slot": "resultLose",
-          "asset": "char_1051_headb2/CN_032",
-          "actual": "jp"
-        }
-      ]
-    },
-    {
-      "charId": "char_195_glassb",
-      "metadataKR": true,
-      "krLines": 14,
-      "jpFallback": []
-    },
-    {
-      "charId": "char_197_poca",
-      "metadataKR": true,
-      "krLines": 14,
-      "jpFallback": []
-    },
-    {
-      "charId": "char_194_leto",
-      "metadataKR": true,
-      "krLines": 14,
-      "jpFallback": []
-    },
-    {
-      "charId": "char_137_brownb",
-      "metadataKR": true,
-      "krLines": 14,
-      "jpFallback": []
-    },
-    {
-      "charId": "char_4223_botany",
-      "metadataKR": false,
-      "krLines": 0,
-      "jpFallback": [
-        {
-          "slot": "start",
-          "asset": "char_4223_botany/CN_019",
-          "actual": "jp"
-        },
-        {
-          "slot": "faceEnemy",
-          "asset": "char_4223_botany/CN_020",
-          "actual": "jp"
-        },
-        {
-          "slot": "select",
-          "asset": "char_4223_botany/CN_021",
-          "actual": "jp"
-        },
-        {
-          "slot": "select",
-          "asset": "char_4223_botany/CN_022",
-          "actual": "jp"
-        },
-        {
-          "slot": "place",
-          "asset": "char_4223_botany/CN_023",
-          "actual": "jp"
-        },
-        {
-          "slot": "place",
-          "asset": "char_4223_botany/CN_024",
-          "actual": "jp"
-        },
-        {
-          "slot": "skill1",
-          "asset": "char_4223_botany/CN_025",
-          "actual": "jp"
-        },
-        {
-          "slot": "skill2",
-          "asset": "char_4223_botany/CN_026",
-          "actual": "jp"
-        },
-        {
-          "slot": "skill3",
-          "asset": "char_4223_botany/CN_027",
-          "actual": "jp"
-        },
-        {
-          "slot": "skill4",
-          "asset": "char_4223_botany/CN_028",
-          "actual": "jp"
-        },
-        {
-          "slot": "resultFour",
-          "asset": "char_4223_botany/CN_029",
-          "actual": "jp"
-        },
-        {
-          "slot": "resultThree",
-          "asset": "char_4223_botany/CN_030",
-          "actual": "jp"
-        },
-        {
-          "slot": "resultTwo",
-          "asset": "char_4223_botany/CN_031",
-          "actual": "jp"
-        },
-        {
-          "slot": "resultLose",
-          "asset": "char_4223_botany/CN_032",
-          "actual": "jp"
-        }
-      ]
-    },
-    {
-      "charId": "char_4182_oblvns",
-      "metadataKR": false,
-      "krLines": 0,
-      "jpFallback": [
-        {
-          "slot": "start",
-          "asset": "char_4182_oblvns/CN_019",
-          "actual": "jp"
-        },
-        {
-          "slot": "faceEnemy",
-          "asset": "char_4182_oblvns/CN_020",
-          "actual": "jp"
-        },
-        {
-          "slot": "select",
-          "asset": "char_4182_oblvns/CN_021",
-          "actual": "jp"
-        },
-        {
-          "slot": "select",
-          "asset": "char_4182_oblvns/CN_022",
-          "actual": "jp"
-        },
-        {
-          "slot": "place",
-          "asset": "char_4182_oblvns/CN_023",
-          "actual": "jp"
-        },
-        {
-          "slot": "place",
-          "asset": "char_4182_oblvns/CN_024",
-          "actual": "jp"
-        },
-        {
-          "slot": "skill1",
-          "asset": "char_4182_oblvns/CN_025",
-          "actual": "jp"
-        },
-        {
-          "slot": "skill2",
-          "asset": "char_4182_oblvns/CN_026",
-          "actual": "jp"
-        },
-        {
-          "slot": "skill3",
-          "asset": "char_4182_oblvns/CN_027",
-          "actual": "jp"
-        },
-        {
-          "slot": "skill4",
-          "asset": "char_4182_oblvns/CN_028",
-          "actual": "jp"
-        },
-        {
-          "slot": "resultFour",
-          "asset": "char_4182_oblvns/CN_029",
-          "actual": "jp"
-        },
-        {
-          "slot": "resultThree",
-          "asset": "char_4182_oblvns/CN_030",
-          "actual": "jp"
-        },
-        {
-          "slot": "resultTwo",
-          "asset": "char_4182_oblvns/CN_031",
-          "actual": "jp"
-        },
-        {
-          "slot": "resultLose",
-          "asset": "char_4182_oblvns/CN_032",
-          "actual": "jp"
-        }
-      ]
-    },
-    {
-      "charId": "char_1050_chen3",
-      "metadataKR": true,
-      "krLines": 14,
-      "jpFallback": []
-    },
-    {
-      "charId": "char_1035_wisdel",
-      "metadataKR": true,
-      "krLines": 14,
-      "jpFallback": []
-    },
-    {
-      "charId": "char_4138_narant",
-      "metadataKR": true,
-      "krLines": 14,
-      "jpFallback": []
-    },
-    {
-      "charId": "char_4132_ascln",
-      "metadataKR": true,
-      "krLines": 14,
-      "jpFallback": []
-    },
-    {
       "charId": "char_003_kalts",
       "metadataKR": true,
       "krLines": 14,
@@ -1133,6 +771,18 @@
     },
     {
       "charId": "char_180_amgoat",
+      "metadataKR": true,
+      "krLines": 14,
+      "jpFallback": []
+    },
+    {
+      "charId": "char_188_helage",
+      "metadataKR": true,
+      "krLines": 14,
+      "jpFallback": []
+    },
+    {
+      "charId": "char_197_poca",
       "metadataKR": true,
       "krLines": 14,
       "jpFallback": []
@@ -1228,6 +878,83 @@
       "jpFallback": []
     },
     {
+      "charId": "char_1015_aglna2",
+      "metadataKR": false,
+      "krLines": 0,
+      "jpFallback": [
+        {
+          "slot": "start",
+          "asset": "char_1015_aglna2/CN_019",
+          "actual": "jp"
+        },
+        {
+          "slot": "faceEnemy",
+          "asset": "char_1015_aglna2/CN_020",
+          "actual": "jp"
+        },
+        {
+          "slot": "select",
+          "asset": "char_1015_aglna2/CN_021",
+          "actual": "jp"
+        },
+        {
+          "slot": "select",
+          "asset": "char_1015_aglna2/CN_022",
+          "actual": "jp"
+        },
+        {
+          "slot": "place",
+          "asset": "char_1015_aglna2/CN_023",
+          "actual": "jp"
+        },
+        {
+          "slot": "place",
+          "asset": "char_1015_aglna2/CN_024",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill1",
+          "asset": "char_1015_aglna2/CN_025",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill2",
+          "asset": "char_1015_aglna2/CN_026",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill3",
+          "asset": "char_1015_aglna2/CN_027",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill4",
+          "asset": "char_1015_aglna2/CN_028",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultFour",
+          "asset": "char_1015_aglna2/CN_029",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultThree",
+          "asset": "char_1015_aglna2/CN_030",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultTwo",
+          "asset": "char_1015_aglna2/CN_031",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultLose",
+          "asset": "char_1015_aglna2/CN_032",
+          "actual": "jp"
+        }
+      ]
+    },
+    {
       "charId": "char_1031_slent2",
       "metadataKR": true,
       "krLines": 14,
@@ -1235,6 +962,12 @@
     },
     {
       "charId": "char_1034_jesca2",
+      "metadataKR": true,
+      "krLines": 14,
+      "jpFallback": []
+    },
+    {
+      "charId": "char_1035_wisdel",
       "metadataKR": true,
       "krLines": 14,
       "jpFallback": []
@@ -1256,6 +989,166 @@
       "metadataKR": true,
       "krLines": 14,
       "jpFallback": []
+    },
+    {
+      "charId": "char_1050_chen3",
+      "metadataKR": true,
+      "krLines": 14,
+      "jpFallback": []
+    },
+    {
+      "charId": "char_1051_headb2",
+      "metadataKR": false,
+      "krLines": 0,
+      "jpFallback": [
+        {
+          "slot": "start",
+          "asset": "char_1051_headb2/CN_019",
+          "actual": "jp"
+        },
+        {
+          "slot": "faceEnemy",
+          "asset": "char_1051_headb2/CN_020",
+          "actual": "jp"
+        },
+        {
+          "slot": "select",
+          "asset": "char_1051_headb2/CN_021",
+          "actual": "jp"
+        },
+        {
+          "slot": "select",
+          "asset": "char_1051_headb2/CN_022",
+          "actual": "jp"
+        },
+        {
+          "slot": "place",
+          "asset": "char_1051_headb2/CN_023",
+          "actual": "jp"
+        },
+        {
+          "slot": "place",
+          "asset": "char_1051_headb2/CN_024",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill1",
+          "asset": "char_1051_headb2/CN_025",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill2",
+          "asset": "char_1051_headb2/CN_026",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill3",
+          "asset": "char_1051_headb2/CN_027",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill4",
+          "asset": "char_1051_headb2/CN_028",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultFour",
+          "asset": "char_1051_headb2/CN_029",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultThree",
+          "asset": "char_1051_headb2/CN_030",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultTwo",
+          "asset": "char_1051_headb2/CN_031",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultLose",
+          "asset": "char_1051_headb2/CN_032",
+          "actual": "jp"
+        }
+      ]
+    },
+    {
+      "charId": "char_1052_kalts2",
+      "metadataKR": false,
+      "krLines": 0,
+      "jpFallback": [
+        {
+          "slot": "start",
+          "asset": "char_1052_kalts2/CN_019",
+          "actual": "jp"
+        },
+        {
+          "slot": "faceEnemy",
+          "asset": "char_1052_kalts2/CN_020",
+          "actual": "jp"
+        },
+        {
+          "slot": "select",
+          "asset": "char_1052_kalts2/CN_021",
+          "actual": "jp"
+        },
+        {
+          "slot": "select",
+          "asset": "char_1052_kalts2/CN_022",
+          "actual": "jp"
+        },
+        {
+          "slot": "place",
+          "asset": "char_1052_kalts2/CN_023",
+          "actual": "jp"
+        },
+        {
+          "slot": "place",
+          "asset": "char_1052_kalts2/CN_024",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill1",
+          "asset": "char_1052_kalts2/CN_025",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill2",
+          "asset": "char_1052_kalts2/CN_026",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill3",
+          "asset": "char_1052_kalts2/CN_027",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill4",
+          "asset": "char_1052_kalts2/CN_028",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultFour",
+          "asset": "char_1052_kalts2/CN_029",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultThree",
+          "asset": "char_1052_kalts2/CN_030",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultTwo",
+          "asset": "char_1052_kalts2/CN_031",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultLose",
+          "asset": "char_1052_kalts2/CN_032",
+          "actual": "jp"
+        }
+      ]
     },
     {
       "charId": "char_1502_crosly",
@@ -1461,7 +1354,19 @@
       "jpFallback": []
     },
     {
+      "charId": "char_4132_ascln",
+      "metadataKR": true,
+      "krLines": 14,
+      "jpFallback": []
+    },
+    {
       "charId": "char_4133_logos",
+      "metadataKR": true,
+      "krLines": 14,
+      "jpFallback": []
+    },
+    {
+      "charId": "char_4138_narant",
       "metadataKR": true,
       "krLines": 14,
       "jpFallback": []
@@ -1495,6 +1400,717 @@
       "metadataKR": true,
       "krLines": 14,
       "jpFallback": []
+    },
+    {
+      "charId": "char_4226_veen",
+      "metadataKR": false,
+      "krLines": 0,
+      "jpFallback": [
+        {
+          "slot": "start",
+          "asset": "char_4226_veen/CN_019",
+          "actual": "jp"
+        },
+        {
+          "slot": "faceEnemy",
+          "asset": "char_4226_veen/CN_020",
+          "actual": "jp"
+        },
+        {
+          "slot": "select",
+          "asset": "char_4226_veen/CN_021",
+          "actual": "jp"
+        },
+        {
+          "slot": "select",
+          "asset": "char_4226_veen/CN_022",
+          "actual": "jp"
+        },
+        {
+          "slot": "place",
+          "asset": "char_4226_veen/CN_023",
+          "actual": "jp"
+        },
+        {
+          "slot": "place",
+          "asset": "char_4226_veen/CN_024",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill1",
+          "asset": "char_4226_veen/CN_025",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill2",
+          "asset": "char_4226_veen/CN_026",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill3",
+          "asset": "char_4226_veen/CN_027",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill4",
+          "asset": "char_4226_veen/CN_028",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultFour",
+          "asset": "char_4226_veen/CN_029",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultThree",
+          "asset": "char_4226_veen/CN_030",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultTwo",
+          "asset": "char_4226_veen/CN_031",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultLose",
+          "asset": "char_4226_veen/CN_032",
+          "actual": "jp"
+        }
+      ]
+    },
+    {
+      "charId": "char_4228_closur",
+      "metadataKR": false,
+      "krLines": 0,
+      "jpFallback": [
+        {
+          "slot": "start",
+          "asset": "char_4228_closur/CN_019",
+          "actual": "jp"
+        },
+        {
+          "slot": "faceEnemy",
+          "asset": "char_4228_closur/CN_020",
+          "actual": "jp"
+        },
+        {
+          "slot": "select",
+          "asset": "char_4228_closur/CN_021",
+          "actual": "jp"
+        },
+        {
+          "slot": "select",
+          "asset": "char_4228_closur/CN_022",
+          "actual": "jp"
+        },
+        {
+          "slot": "place",
+          "asset": "char_4228_closur/CN_023",
+          "actual": "jp"
+        },
+        {
+          "slot": "place",
+          "asset": "char_4228_closur/CN_024",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill1",
+          "asset": "char_4228_closur/CN_025",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill2",
+          "asset": "char_4228_closur/CN_026",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill3",
+          "asset": "char_4228_closur/CN_027",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill4",
+          "asset": "char_4228_closur/CN_028",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultFour",
+          "asset": "char_4228_closur/CN_029",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultThree",
+          "asset": "char_4228_closur/CN_030",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultTwo",
+          "asset": "char_4228_closur/CN_031",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultLose",
+          "asset": "char_4228_closur/CN_032",
+          "actual": "jp"
+        }
+      ]
+    },
+    {
+      "charId": "char_4229_aphris",
+      "metadataKR": false,
+      "krLines": 0,
+      "jpFallback": [
+        {
+          "slot": "start",
+          "asset": "char_4229_aphris/CN_019",
+          "actual": "jp"
+        },
+        {
+          "slot": "faceEnemy",
+          "asset": "char_4229_aphris/CN_020",
+          "actual": "jp"
+        },
+        {
+          "slot": "select",
+          "asset": "char_4229_aphris/CN_021",
+          "actual": "jp"
+        },
+        {
+          "slot": "select",
+          "asset": "char_4229_aphris/CN_022",
+          "actual": "jp"
+        },
+        {
+          "slot": "place",
+          "asset": "char_4229_aphris/CN_023",
+          "actual": "jp"
+        },
+        {
+          "slot": "place",
+          "asset": "char_4229_aphris/CN_024",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill1",
+          "asset": "char_4229_aphris/CN_025",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill2",
+          "asset": "char_4229_aphris/CN_026",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill3",
+          "asset": "char_4229_aphris/CN_027",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill4",
+          "asset": "char_4229_aphris/CN_028",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultFour",
+          "asset": "char_4229_aphris/CN_029",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultThree",
+          "asset": "char_4229_aphris/CN_030",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultTwo",
+          "asset": "char_4229_aphris/CN_031",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultLose",
+          "asset": "char_4229_aphris/CN_032",
+          "actual": "jp"
+        }
+      ]
+    },
+    {
+      "charId": "char_4230_mcnist",
+      "metadataKR": false,
+      "krLines": 0,
+      "jpFallback": [
+        {
+          "slot": "start",
+          "asset": "char_4230_mcnist/CN_019",
+          "actual": "jp"
+        },
+        {
+          "slot": "faceEnemy",
+          "asset": "char_4230_mcnist/CN_020",
+          "actual": "jp"
+        },
+        {
+          "slot": "select",
+          "asset": "char_4230_mcnist/CN_021",
+          "actual": "jp"
+        },
+        {
+          "slot": "select",
+          "asset": "char_4230_mcnist/CN_022",
+          "actual": "jp"
+        },
+        {
+          "slot": "place",
+          "asset": "char_4230_mcnist/CN_023",
+          "actual": "jp"
+        },
+        {
+          "slot": "place",
+          "asset": "char_4230_mcnist/CN_024",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill1",
+          "asset": "char_4230_mcnist/CN_025",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill2",
+          "asset": "char_4230_mcnist/CN_026",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill3",
+          "asset": "char_4230_mcnist/CN_027",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill4",
+          "asset": "char_4230_mcnist/CN_028",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultFour",
+          "asset": "char_4230_mcnist/CN_029",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultThree",
+          "asset": "char_4230_mcnist/CN_030",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultTwo",
+          "asset": "char_4230_mcnist/CN_031",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultLose",
+          "asset": "char_4230_mcnist/CN_032",
+          "actual": "jp"
+        }
+      ]
+    },
+    {
+      "charId": "char_4235_thumpy",
+      "metadataKR": false,
+      "krLines": 0,
+      "jpFallback": [
+        {
+          "slot": "start",
+          "asset": "char_4235_thumpy/CN_019",
+          "actual": "jp"
+        },
+        {
+          "slot": "faceEnemy",
+          "asset": "char_4235_thumpy/CN_020",
+          "actual": "jp"
+        },
+        {
+          "slot": "select",
+          "asset": "char_4235_thumpy/CN_021",
+          "actual": "jp"
+        },
+        {
+          "slot": "select",
+          "asset": "char_4235_thumpy/CN_022",
+          "actual": "jp"
+        },
+        {
+          "slot": "place",
+          "asset": "char_4235_thumpy/CN_023",
+          "actual": "jp"
+        },
+        {
+          "slot": "place",
+          "asset": "char_4235_thumpy/CN_024",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill1",
+          "asset": "char_4235_thumpy/CN_025",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill2",
+          "asset": "char_4235_thumpy/CN_026",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill3",
+          "asset": "char_4235_thumpy/CN_027",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill4",
+          "asset": "char_4235_thumpy/CN_028",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultFour",
+          "asset": "char_4235_thumpy/CN_029",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultThree",
+          "asset": "char_4235_thumpy/CN_030",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultTwo",
+          "asset": "char_4235_thumpy/CN_031",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultLose",
+          "asset": "char_4235_thumpy/CN_032",
+          "actual": "jp"
+        }
+      ]
+    },
+    {
+      "charId": "char_4231_clemnt",
+      "metadataKR": false,
+      "krLines": 0,
+      "jpFallback": [
+        {
+          "slot": "start",
+          "asset": "char_4231_clemnt/CN_019",
+          "actual": "jp"
+        },
+        {
+          "slot": "faceEnemy",
+          "asset": "char_4231_clemnt/CN_020",
+          "actual": "jp"
+        },
+        {
+          "slot": "select",
+          "asset": "char_4231_clemnt/CN_021",
+          "actual": "jp"
+        },
+        {
+          "slot": "select",
+          "asset": "char_4231_clemnt/CN_022",
+          "actual": "jp"
+        },
+        {
+          "slot": "place",
+          "asset": "char_4231_clemnt/CN_023",
+          "actual": "jp"
+        },
+        {
+          "slot": "place",
+          "asset": "char_4231_clemnt/CN_024",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill1",
+          "asset": "char_4231_clemnt/CN_025",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill2",
+          "asset": "char_4231_clemnt/CN_026",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill3",
+          "asset": "char_4231_clemnt/CN_027",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill4",
+          "asset": "char_4231_clemnt/CN_028",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultFour",
+          "asset": "char_4231_clemnt/CN_029",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultThree",
+          "asset": "char_4231_clemnt/CN_030",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultTwo",
+          "asset": "char_4231_clemnt/CN_031",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultLose",
+          "asset": "char_4231_clemnt/CN_032",
+          "actual": "jp"
+        }
+      ]
+    },
+    {
+      "charId": "char_4224_turdus",
+      "metadataKR": false,
+      "krLines": 0,
+      "jpFallback": [
+        {
+          "slot": "start",
+          "asset": "char_4224_turdus/CN_019",
+          "actual": "jp"
+        },
+        {
+          "slot": "faceEnemy",
+          "asset": "char_4224_turdus/CN_020",
+          "actual": "jp"
+        },
+        {
+          "slot": "select",
+          "asset": "char_4224_turdus/CN_021",
+          "actual": "jp"
+        },
+        {
+          "slot": "select",
+          "asset": "char_4224_turdus/CN_022",
+          "actual": "jp"
+        },
+        {
+          "slot": "place",
+          "asset": "char_4224_turdus/CN_023",
+          "actual": "jp"
+        },
+        {
+          "slot": "place",
+          "asset": "char_4224_turdus/CN_024",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill1",
+          "asset": "char_4224_turdus/CN_025",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill2",
+          "asset": "char_4224_turdus/CN_026",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill3",
+          "asset": "char_4224_turdus/CN_027",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill4",
+          "asset": "char_4224_turdus/CN_028",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultFour",
+          "asset": "char_4224_turdus/CN_029",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultThree",
+          "asset": "char_4224_turdus/CN_030",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultTwo",
+          "asset": "char_4224_turdus/CN_031",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultLose",
+          "asset": "char_4224_turdus/CN_032",
+          "actual": "jp"
+        }
+      ]
+    },
+    {
+      "charId": "char_195_glassb",
+      "metadataKR": true,
+      "krLines": 14,
+      "jpFallback": []
+    },
+    {
+      "charId": "char_194_leto",
+      "metadataKR": true,
+      "krLines": 14,
+      "jpFallback": []
+    },
+    {
+      "charId": "char_137_brownb",
+      "metadataKR": true,
+      "krLines": 14,
+      "jpFallback": []
+    },
+    {
+      "charId": "char_4223_botany",
+      "metadataKR": false,
+      "krLines": 0,
+      "jpFallback": [
+        {
+          "slot": "start",
+          "asset": "char_4223_botany/CN_019",
+          "actual": "jp"
+        },
+        {
+          "slot": "faceEnemy",
+          "asset": "char_4223_botany/CN_020",
+          "actual": "jp"
+        },
+        {
+          "slot": "select",
+          "asset": "char_4223_botany/CN_021",
+          "actual": "jp"
+        },
+        {
+          "slot": "select",
+          "asset": "char_4223_botany/CN_022",
+          "actual": "jp"
+        },
+        {
+          "slot": "place",
+          "asset": "char_4223_botany/CN_023",
+          "actual": "jp"
+        },
+        {
+          "slot": "place",
+          "asset": "char_4223_botany/CN_024",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill1",
+          "asset": "char_4223_botany/CN_025",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill2",
+          "asset": "char_4223_botany/CN_026",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill3",
+          "asset": "char_4223_botany/CN_027",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill4",
+          "asset": "char_4223_botany/CN_028",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultFour",
+          "asset": "char_4223_botany/CN_029",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultThree",
+          "asset": "char_4223_botany/CN_030",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultTwo",
+          "asset": "char_4223_botany/CN_031",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultLose",
+          "asset": "char_4223_botany/CN_032",
+          "actual": "jp"
+        }
+      ]
+    },
+    {
+      "charId": "char_4182_oblvns",
+      "metadataKR": false,
+      "krLines": 0,
+      "jpFallback": [
+        {
+          "slot": "start",
+          "asset": "char_4182_oblvns/CN_019",
+          "actual": "jp"
+        },
+        {
+          "slot": "faceEnemy",
+          "asset": "char_4182_oblvns/CN_020",
+          "actual": "jp"
+        },
+        {
+          "slot": "select",
+          "asset": "char_4182_oblvns/CN_021",
+          "actual": "jp"
+        },
+        {
+          "slot": "select",
+          "asset": "char_4182_oblvns/CN_022",
+          "actual": "jp"
+        },
+        {
+          "slot": "place",
+          "asset": "char_4182_oblvns/CN_023",
+          "actual": "jp"
+        },
+        {
+          "slot": "place",
+          "asset": "char_4182_oblvns/CN_024",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill1",
+          "asset": "char_4182_oblvns/CN_025",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill2",
+          "asset": "char_4182_oblvns/CN_026",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill3",
+          "asset": "char_4182_oblvns/CN_027",
+          "actual": "jp"
+        },
+        {
+          "slot": "skill4",
+          "asset": "char_4182_oblvns/CN_028",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultFour",
+          "asset": "char_4182_oblvns/CN_029",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultThree",
+          "asset": "char_4182_oblvns/CN_030",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultTwo",
+          "asset": "char_4182_oblvns/CN_031",
+          "actual": "jp"
+        },
+        {
+          "slot": "resultLose",
+          "asset": "char_4182_oblvns/CN_032",
+          "actual": "jp"
+        }
+      ]
     }
   ]
 }

@@ -1,0 +1,132 @@
+[
+  {
+    "id": "act1autochess_m01",
+    "kind": "unite",
+    "original": "act1autochess_m01",
+    "keys": [
+      "cooperative-functional:MT_AutochessSand_common@lightmap0@platform",
+      "original:MT_AutochessSand_common@lightmap0@platform",
+      "cooperative-functional:MT_AutochessSand@lightmap0@platform",
+      "original:MT_AutochessSand@lightmap0@platform",
+      "cooperative:MT_AutochessSand@lightmap0@scenery",
+      "cooperative-functional:MT_AutochessSand@lightmap0@scenery",
+      "original:MT_AutochessSand@lightmap0@scenery",
+      "cooperative-functional:MT_AutochessSand@lightmap1@platform",
+      "original:MT_AutochessSand@lightmap1@platform",
+      "cooperative:MT_AutochessSand@lightmap1@scenery",
+      "cooperative-functional:MT_AutochessSand@lightmap1@scenery",
+      "original:MT_AutochessSand@lightmap1@scenery",
+      "cooperative-functional:MT_AutochessSand_grass@lightmap0@scenery",
+      "original:MT_AutochessSand_grass@lightmap0@scenery",
+      "original:MT_AutochessSand_sand@lightmap0@scenery",
+      "cooperative:MT_AutochessSand_shuidi@lightmap1@scenery",
+      "cooperative-functional:MT_AutochessSand_shuidi@lightmap1@scenery",
+      "original:MT_AutochessSand_shuidi@lightmap1@scenery",
+      "cooperative:MT_AutochessSand_sand2@lightmap0@scenery",
+      "cooperative-functional:MT_AutochessSand_sand2@lightmap0@scenery",
+      "original:MT_AutochessSand_sand2@lightmap0@scenery",
+      "sand-rim:original:MT_AutochessSand@lightmap0@platform",
+      "sand-rim:original:MT_AutochessSand@lightmap0@scenery",
+      "sand-rim:original:MT_AutochessSand_shuidi@lightmap1@scenery",
+      "sand-rim:original:MT_AutochessSand_sand2@lightmap0@scenery",
+      "opposite-border:0",
+      "opposite-border:1",
+      "opposite-border:2",
+      "opposite-border:3",
+      "opposite-border:4",
+      "opposite-border:5",
+      "opposite-border:6"
+    ],
+    "cells": [
+      {
+        "row": 10,
+        "col": 19,
+        "samples": 441,
+        "covered": 441,
+        "missing": []
+      },
+      {
+        "row": 11,
+        "col": 19,
+        "samples": 441,
+        "covered": 441,
+        "missing": []
+      },
+      {
+        "row": 12,
+        "col": 19,
+        "samples": 441,
+        "covered": 441,
+        "missing": []
+      },
+      {
+        "row": 13,
+        "col": 19,
+        "samples": 441,
+        "covered": 441,
+        "missing": []
+      }
+    ]
+  },
+  {
+    "id": "act1autochess_m01",
+    "kind": "boss",
+    "original": "act1autochess_m01",
+    "keys": [
+      "original:MT_AutochessSand_common@lightmap0@platform",
+      "original:MT_AutochessSand@lightmap0@platform",
+      "cooperative:MT_AutochessSand@lightmap0@scenery",
+      "original:MT_AutochessSand@lightmap0@scenery",
+      "original:MT_AutochessSand@lightmap1@platform",
+      "cooperative:MT_AutochessSand@lightmap1@scenery",
+      "original:MT_AutochessSand@lightmap1@scenery",
+      "original:MT_AutochessSand_grass@lightmap0@scenery",
+      "original:MT_AutochessSand_sand@lightmap0@scenery",
+      "cooperative:MT_AutochessSand_shuidi@lightmap1@scenery",
+      "original:MT_AutochessSand_shuidi@lightmap1@scenery",
+      "cooperative:MT_AutochessSand_sand2@lightmap0@scenery",
+      "original:MT_AutochessSand_sand2@lightmap0@scenery",
+      "sand-rim:original:MT_AutochessSand@lightmap0@platform",
+      "sand-rim:original:MT_AutochessSand@lightmap0@scenery",
+      "sand-rim:original:MT_AutochessSand_shuidi@lightmap1@scenery",
+      "sand-rim:original:MT_AutochessSand_sand2@lightmap0@scenery",
+      "opposite-border:0",
+      "opposite-border:1",
+      "opposite-border:2",
+      "opposite-border:3",
+      "opposite-border:4",
+      "opposite-border:5",
+      "opposite-border:6"
+    ],
+    "cells": [
+      {
+        "row": 3,
+        "col": 19,
+        "samples": 441,
+        "covered": 441,
+        "missing": []
+      },
+      {
+        "row": 4,
+        "col": 19,
+        "samples": 441,
+        "covered": 441,
+        "missing": []
+      },
+      {
+        "row": 5,
+        "col": 19,
+        "samples": 441,
+        "covered": 441,
+        "missing": []
+      },
+      {
+        "row": 6,
+        "col": 19,
+        "samples": 441,
+        "covered": 441,
+        "missing": []
+      }
+    ]
+  }
+]

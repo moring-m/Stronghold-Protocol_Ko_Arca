@@ -28,7 +28,8 @@ import { restartForEnvProxy } from './assets/env-proxy.mjs';
 //
 // Usage: node tools/fetch-assets.mjs [--concurrency=16] [--force] [--offline]
 //                                    [--dry-run] [--refresh-index] [--prune]
-//                                    [--allow-shrink] [--local-spines] [--help]
+//                                    [--allow-shrink] [--add-only] [--strict]
+//                                    [--local-spines] [--help]
 
 import { readFile, writeFile, mkdir, rename, readdir, unlink } from 'node:fs/promises';
 import { existsSync, realpathSync } from 'node:fs';
@@ -67,21 +68,38 @@ const HELP = `Usage: node tools/fetch-assets.mjs [options]
                     (public/assets/local/** of tools/local-extract is never deleted); implies --allow-shrink
   --allow-shrink    write data/assets.json even when it loses entries the current one has
                     (without it such a run keeps the current manifest, lists the entries and exits 1)
-  --local-spines    rewrite ${LOCAL_ENEMY_SPINES_FILE} from the enemy models extracted
-                    by tools/local-extract/extract.py (public/assets/local/spine/enemy/)
+  --strict          exit 1 when a leaf was dropped for having no file on disk (the report's
+                    droppedLeaves: an entry the plan resolved and the client would lose, e.g. a
+                    sound that never plays); by default such a drop is only reported
+  --add-only        download only files missing on disk; never re-download, rewrite or delete an existing
+                    file, no font rebuild (a worktree sharing public/assets and public/fonts)
+  --local-spines    rewrite ${LOCAL_ENEMY_SPINES_FILE} from the
+                    enemy and token models extracted by tools/local-extract/extract.py
+                    (public/assets/local/spine/enemy/, public/assets/local/spine/token/)
   --help            this text
 Environment: SP_ASSET_SOURCE sets the default source; SP_GITHUB_PROXY sets the
-HTTPS mirror prefix (default https://gh-proxy.com/; empty disables the proxy).
+HTTPS mirror prefix (default https://gh-proxy.com/; empty disables the proxy);
+SP_ASSETS_STRICT=1 is the same as --strict (CI / packaging builds).
 Mirror attempts have an 8 s response header timeout; response body has a separate idle timeout. Stops for this run after 3 consecutive
 failures. Only explicitly enabled GitHub downloads use the third-party proxy.`;
 
 /**
+ * True for the usual truthy spellings of a boolean environment variable (`1`, `true`, `yes`, `on`); empty, `0`,
+ * `false`, `no` and `off` are false, and so is anything absent.
+ * @param {string|undefined} value
+ * @returns {boolean}
+ */
+function envFlag(value) {
+  return typeof value === 'string' && value !== '' && !/^(0|false|no|off)$/i.test(value);
+}
+
+/**
  * Parse CLI flags.
  * @param {string[]} argv
- * @returns {{concurrency:number, force:boolean, offline:boolean, dryRun:boolean, refreshIndex:boolean, prune:boolean, allowShrink:boolean, localSpines:boolean, voiceLang:string, voiceAll:boolean, help:boolean, source:string}}
+ * @returns {{concurrency:number, force:boolean, offline:boolean, dryRun:boolean, refreshIndex:boolean, prune:boolean, allowShrink:boolean, strict:boolean, addOnly:boolean, localSpines:boolean, voiceLang:string, voiceAll:boolean, help:boolean, source:string}}
  */
 export function parseArgs(argv) {
-  const o = { concurrency: 16, force: false, offline: false, dryRun: false, refreshIndex: false, prune: false, allowShrink: false, localSpines: false, voiceLang: 'cn', voiceAll: false, help: false, source: process.env.SP_ASSET_SOURCE || 'direct' };
+  const o = { concurrency: 16, force: false, offline: false, dryRun: false, refreshIndex: false, prune: false, allowShrink: false, strict: envFlag(process.env.SP_ASSETS_STRICT), addOnly: false, localSpines: false, voiceLang: 'cn', voiceAll: false, help: false, source: process.env.SP_ASSET_SOURCE || 'direct' };
   for (const a of argv) {
     const [k, v] = a.split('=');
     if (k === '--concurrency') o.concurrency = Math.max(1, Math.min(64, parseInt(v, 10) || 16));
@@ -92,6 +110,8 @@ export function parseArgs(argv) {
     else if (k === '--refresh-index') o.refreshIndex = true;
     else if (k === '--prune') o.prune = true;
     else if (k === '--allow-shrink') o.allowShrink = true;
+    else if (k === '--strict') o.strict = true;
+    else if (k === '--add-only') o.addOnly = true;
     else if (k === '--local-spines') o.localSpines = true;
     else if (k === '--voice-lang') { if (!VOICE_DIRS[v]) throw new Error(`unknown --voice-lang ${v} (cn | jp | en | kr)`); o.voiceLang = v; }
     else if (k === '--voice-all') o.voiceAll = true;
@@ -226,6 +246,64 @@ async function syncLocalEnemySpines(opts) {
   return committed;
 }
 
+/**
+ * The one summary line for the leaves the plan had resolved but whose every alternative file is missing on disk
+ * (resolveTemplate `droppedLeaves`). Each of them disappears from data/assets.json, so the client has no entry at all —
+ * for a sound, silence that no "the client uses fallbacks" wording explains. Printed on every run, empty or not: a
+ * green line is the check that nothing was dropped.
+ * @param {string[]} droppedLeaves dotted template paths
+ * @param {number} [max] how many paths the line names before "…"
+ * @returns {string}
+ */
+export function leafDropSummary(droppedLeaves, max = 8) {
+  const n = droppedLeaves.length;
+  if (!n) return '[assets] no leaf dropped: every planned leaf has a file on disk';
+  return `[assets] ${n} ${n === 1 ? 'leaf' : 'leaves'} dropped: no alternative on disk ` +
+    `(${droppedLeaves.slice(0, max).join(', ')}${n > max ? ', …' : ''})`;
+}
+
+/**
+ * The error line of a --strict / SP_ASSETS_STRICT run that dropped at least one leaf for having no alternative on
+ * disk. CI and packaging runs pass --strict so a manifest with such holes cannot ship (the entry is gone from the
+ * client's manifest; nothing retries it later, the next plain run only warns again).
+ * @param {string[]} droppedLeaves dotted template paths
+ * @param {number} [max] how many paths the line names before pointing at the report
+ * @returns {string}
+ */
+export function strictLeafDropError(droppedLeaves, max = 10) {
+  const n = droppedLeaves.length;
+  return `ERROR: ${n} ${n === 1 ? 'leaf' : 'leaves'} dropped for having no alternative on disk ` +
+    `(--strict / SP_ASSETS_STRICT=1): ${droppedLeaves.slice(0, max).join(', ')}` +
+    `${n > max ? `, … (all ${n} in ${relative(ROOT, REPORT)})` : ''}`;
+}
+
+/**
+ * Exit code of a finished run: 0 only when nothing failed — every required asset is present, no leaf was dropped
+ * while --strict / SP_ASSETS_STRICT is on, and the manifest was written (the shrink guard keeps the current one when
+ * the rebuild would lose entries).
+ * @param {{requiredMisses?:number, droppedLeaves?:number, strict?:boolean, manifestWritten?:boolean}} o
+ * @returns {number} 0 or 1
+ */
+export function runExitCode({ requiredMisses = 0, droppedLeaves = 0, strict = false, manifestWritten = true } = {}) {
+  if (requiredMisses) return 1;
+  if (strict && droppedLeaves) return 1;
+  return manifestWritten ? 0 : 1;
+}
+
+/**
+ * Files under public/assets the manifest does not reference (`--prune` deletes them). public/assets/local/** belongs to
+ * tools/local-extract (data/local-assets.json) and is never an orphan: --prune used to delete all of it. Compared without
+ * case: on Windows / macOS a listed path and a file whose name differs only in case are one file (module/WAH-Y.png on
+ * disk serves the listed module/wah-y.png), which --prune must not delete.
+ * @param {string[]} onDisk forward-slash paths relative to public/assets
+ * @param {Iterable<string>} referenced the manifest's files, same form
+ */
+export function orphanFiles(onDisk, referenced) {
+  const listed = new Set([...referenced].map((r) => r.toLowerCase()));
+  return onDisk.filter((r) => !listed.has(r.toLowerCase()) && !r.startsWith('local/'));
+}
+
+
 async function main() {
   const opts = parseArgs(process.argv.slice(2));
   if (opts.help) { log(HELP); return 0; }
@@ -325,11 +403,15 @@ async function main() {
 
   const charIds = Object.keys(assets07.operators || {});
   const required = requiredMisses(manifest, charIds);
+  // Leaves the plan had resolved and the manifest loses here (no alternative of theirs on disk): reported on their own
+  // line below and kept in the report, whether or not they shrink the committed manifest.
+  const droppedLeaves = resolved.droppedLeaves;
   const report = {
     downloadedBytes: dl.totals.bytesDownloaded,
     totals: dl.totals,
     stats: manifest.stats,
     requiredMisses: required,
+    droppedLeaves,
     misses: resolved.misses,
     downloadErrors, // leaves whose primary failed transiently (fallbacks not tried; re-run to retry)
     fallbacks: resolved.fallbacks,
@@ -356,8 +438,9 @@ async function main() {
   log(`fonts: ${Object.values(fonts.files).map((f) => f.woff2 || f.original).join(', ') || 'none'}`);
   if (resolved.fallbacks.length) { log(`fallbacks used (${resolved.fallbacks.length}):`); for (const f of resolved.fallbacks.slice(0, 20)) log(`  ${f}`); }
   if (downloadErrors.length) log(`download errors (${downloadErrors.length}, re-run to retry): ${downloadErrors.slice(0, 10).join(', ')}`);
+  log(leafDropSummary(droppedLeaves));
   if (resolved.misses.length) {
-    log(`missing (${resolved.misses.length}, omitted from manifest; client uses fallbacks):`);
+    log(`missing (${resolved.misses.length}, omitted from manifest; the client falls back only where the entry has another alternative):`);
     for (const m of resolved.misses.slice(0, 40)) log(`  ${m}`);
     if (resolved.misses.length > 40) log(`  … see ${REPORT}`);
   }
@@ -372,11 +455,12 @@ async function main() {
     if (!guard.write) log('  re-run to retry the downloads (--refresh-index for the audio/model indexes), or pass --allow-shrink (or --prune) to write the smaller manifest');
   }
   log(`manifest: ${MANIFEST}${guard.write ? '' : ' (kept)'} · report: ${REPORT} · ${((Date.now() - t0) / 1000).toFixed(0)} s`);
-  if (required.length) {
-    log(`ERROR: ${required.length} required assets missing: ${required.slice(0, 10).join(', ')}`);
-    return 1;
+  if (required.length) log(`ERROR: ${required.length} required assets missing: ${required.slice(0, 10).join(', ')}`);
+  if (opts.strict && droppedLeaves.length) {
+    log(strictLeafDropError(droppedLeaves));
+    log('  a plain run downloads them again (--refresh-index if the upstream index lost them); without --strict / SP_ASSETS_STRICT this is only a warning');
   }
-  return guard.write ? 0 : 1;
+  return runExitCode({ requiredMisses: required.length, droppedLeaves: droppedLeaves.length, strict: opts.strict, manifestWritten: guard.write });
 }
 
 // run only as a script (tests import parseArgs / shrinkGuard)

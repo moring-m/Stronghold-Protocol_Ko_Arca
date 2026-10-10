@@ -13,9 +13,9 @@ test('Pinecone S1 spends one charge, waits for Skill_1 OnAttack, and holds its f
  assert.equal(attackClipTiming({...u,def:u.def,skill:{...u.skill,active:true}}).hit,.467,'selected skill index is read from the definition');
  const count=()=>h.hooksOf('attack').filter(c=>c.attacker===u).length;const before=count(),charges=u.skill.charges,t=h.b.time;
  assert.ok(u.skill.activate());assert.equal(u.skill.charges,charges-1);assert.equal(count(),before);
- h.run(.4);assert.equal(count(),before);assert.equal(u.skill.sp,0,'SP remains paused during cast wind-up');h.run(.12);assert.equal(count(),before+1);
+ h.run(.4);assert.equal(count(),before);assert.ok(u.skill.sp>0,'multi-charge recovery continues during an instant cast');h.run(.12);assert.equal(count(),before+1);
  assert.equal(h.hooksOf('attack').at(-1).isSkill,true);assert.ok(h.b.time>=t+timing.hit);
- h.run(.7);assert.equal(count(),before+1,'no normal attack interrupts the tail');assert.equal(u.skill.sp,0,'SP remains paused during recovery');
+ h.run(.7);assert.equal(count(),before+1,'no normal attack interrupts the tail');assert.ok(u.skill.sp>0,'multi-charge recovery continues during cast recovery');
  assert.deepEqual(h.b.errors,[]);
  }
 });

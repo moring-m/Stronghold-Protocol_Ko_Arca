@@ -21,7 +21,7 @@ import { resolveUvTable } from '../../public/js/render/board3d/atlas.js';
 import { parseObj } from '../../public/js/render/board3d/obj.js';
 import { boardArtListed } from '../../public/js/render/board3d/load.js';
 import { presetCamera } from '../../public/js/render/projection.js';
-import { viewKind, switchableBox } from '../../public/js/render/app.js';
+import { boardArea, viewKind, switchableBox } from '../../public/js/render/app.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const stages = JSON.parse(readFileSync(path.join(ROOT, 'data/stages.json'), 'utf8'));
@@ -231,4 +231,33 @@ describe('asset pack gate', () => {
     assert.equal(await boardArtListed(null), false);
     assert.equal(await boardArtListed({ local: 1 }), false);
   });
+});
+
+// This exercises the actual mesh/matrix path: updating position without updating
+// its frozen matrix previously left the cooperative map at the boss coordinates.
+test('all fallback maps share boss geometry and apply the cooperative translation to their matrices',async()=>{
+  const {bossPenStage,cooperativeBossStage}=await import('../../public/js/render/pen.js');
+  const board=new BoardScene(THREE,fakePack(),{renderer:stubRenderer()});
+  try {
+    for(const stage of Object.values(stages)) {
+      board.setArea(boardArea('boss'));
+      board.setStage(bossPenStage(stage));
+      const source=Object.fromEntries(['board','glass','decal','pipe'].map(key=>[key,board.meshes[key] ? Array.from(board.meshes[key].geometry.attributes.position.array) : null]));
+      board.setArea(boardArea('unite'));
+      board.setStage(cooperativeBossStage(stage));
+      for(const[key,positions]of Object.entries(source)) {
+        const mesh=board.meshes[key];
+        if(key==='board')assert.notDeepEqual(mesh ? Array.from(mesh.geometry.attributes.position.array) : null,positions,`${stage.id}: cooperative central routes replace boss seats`);
+        if(mesh){assert.equal(mesh.position.y,7);assert.equal(mesh.matrix.elements[13],7,`${stage.id} ${key}: translated rendering matrix`);}
+      }
+    }
+  } finally {board.destroy();}
+});
+
+test('native rage tiles gain a world-space additive glow without replacing their authored texture',()=>{
+ const board=new BoardScene(THREE,fakePack(),{renderer:stubRenderer()});
+ board.setStage(stages.act1autochess_m01);board.originalStage={};board._buildTerrain({terrain:{infection:[[10,5]],water:[],mire:[],smog:[]}});
+ const glow=board.meshes.infectionGlow;assert.ok(glow);assert.equal(glow.material.blending,THREE.AdditiveBlending);assert.equal(glow.material.depthWrite,false);
+ const positions=glow.geometry.getAttribute('position');assert.ok(Math.abs(positions.getX(0)-4.525)<1e-5);assert.ok(Math.abs(positions.getY(0)-9.525)<1e-5);assert.ok(Math.abs(positions.getZ(0)-.025)<1e-5);
+ assert.equal(board.meshes.infection,undefined);board.destroy();
 });
