@@ -5,7 +5,7 @@
 //
 //   ADD_BOND            grants `give_garrison_id` to other operators before the first deployment (targets parsed from
 //                       the text: 身前一格 / 身前一格【X】/ 自身和身前一格 / 同一行最右边 / 所有【X】). A unit owns a garrison id
-//                       at most once (耀骑士临光 already carries the 144/159 it grants to itself). Granted traits use
+//                       once per granting source (its own intrinsic trait is not granted to itself twice). Granted traits use
 //                       the same data-driven caps as native traits (华法琳: 7 / 14 layers per battle).
 //   layer events        act1autochess_gar_event_useskill (skillStart) · _selfkillenemy (kill, every check_cnt) ·
 //                       _selfdead (death 'killed'; texts with 替身 also on each dollSwap body ⇄ substitute transition,
@@ -62,13 +62,14 @@ export function install(battle) {
   const add = (unit, g, grantedBy = null) => {
     let set = owned.get(unit);
     if (!set) { set = new Set(); owned.set(unit, set); }
-    if (set.has(g.garrisonId)) return null;
-    set.add(g.garrisonId);
+    const instanceKey=grantedBy?`grant:${grantedBy.unit.id}:${grantedBy.gid}:${g.garrisonId}`:`native:${g.garrisonId}`;
+    if(set.has(instanceKey)||(grantedBy?.unit===unit&&set.has(`native:${g.garrisonId}`)))return null;
+    set.add(instanceKey);
     const bb = g.bb || {};
     const cap = S.num(bb.max_add_count_per_battle, 0) > 0 ? S.num(bb.max_add_count_per_battle) : Infinity;
     const it = {
       unit, g, gid: g.garrisonId, key: g.effectKey, bb, bbStr: g.bbStr || {}, grantedBy,
-      cap, capKey: `gar:${g.garrisonId}:${unit.id}`, cnt: 0, k: -1,
+      cap, capKey: `gar:${g.garrisonId}:${unit.id}:${instanceKey}`, cnt: 0, k: -1,
     };
     all.push(it);
     return it;
@@ -241,7 +242,7 @@ const INSTALLERS = {
         if(!S.onField(it.unit)||!S.inRange(it.unit,target)||(it.cnt||0)>=S.num(it.bb.max_trigger_count,8))continue;
         const active=targetBonds(battle,it);
         let added=0;
-        for(const bond of active)added+=fireGain(battle,it,{bonds:[bond],n:bond==='visiShip'?S.num(it.bb.visi_add_count,1):amountOf(battle,it)});
+        for(const bond of active)added+=fireGain(battle,it,{bonds:[bond],n:bond==='preciShip'?S.num(it.bb.preci_add_count,2):amountOf(battle,it)});
         if(added>0)it.cnt=(it.cnt||0)+1;
       }
     });

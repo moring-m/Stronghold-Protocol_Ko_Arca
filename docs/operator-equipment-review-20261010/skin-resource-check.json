@@ -1,0 +1,482 @@
+[
+  {
+    "path": "/assets/custom/skins/skin_char_1035_wisdel_sale_14/Front/char_1035_wisdel_sale_14.atlas",
+    "bytes": 17498,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_1035_wisdel_sale_14/Back/char_1035_wisdel_sale_14.atlas",
+    "bytes": 12680,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_1035_wisdel_sale_14/Back/char_1035_wisdel_sale_14.png",
+    "bytes": 313809,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_1035_wisdel_sale_14/Front/char_1035_wisdel_sale_14.png",
+    "bytes": 358553,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_1035_wisdel_sale_14/Back/char_1035_wisdel_sale_14.skel",
+    "bytes": 1136897,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_1035_wisdel_sale_14/Front/char_1035_wisdel_sale_14.skel",
+    "bytes": 2229675,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_1035_wisdel_game_9/Front/char_1035_wisdel_game_9.atlas",
+    "bytes": 3001,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_1035_wisdel_sale_14/avatar.png",
+    "bytes": 65659,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_1035_wisdel_game_9/Front/char_1035_wisdel_game_9.skel",
+    "bytes": 88351,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_1035_wisdel_sale_14/portrait.png",
+    "bytes": 129739,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_1035_wisdel_game_9/Front/char_1035_wisdel_game_9.png",
+    "bytes": 107216,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_1035_wisdel_game_9/Back/char_1035_wisdel_game_9.skel",
+    "bytes": 60099,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_1035_wisdel_game_9/portrait.png",
+    "bytes": 43311,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_1035_wisdel_game_9/Back/char_1035_wisdel_game_9.png",
+    "bytes": 107216,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_1035_wisdel_game_9/Back/char_1035_wisdel_game_9.atlas",
+    "bytes": 3001,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_1035_wisdel_game_9/avatar.png",
+    "bytes": 32966,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4132_ascln_iteration_4/Front/char_4132_ascln_iteration_4.skel",
+    "bytes": 368931,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4132_ascln_iteration_4/Front/char_4132_ascln_iteration_4.atlas",
+    "bytes": 9863,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4132_ascln_iteration_4/Back/char_4132_ascln_iteration_4.skel",
+    "bytes": 225655,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4132_ascln_iteration_4/Back/char_4132_ascln_iteration_4.atlas",
+    "bytes": 6019,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4132_ascln_iteration_4/Front/char_4132_ascln_iteration_4.png",
+    "bytes": 309102,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4132_ascln_iteration_4/Back/char_4132_ascln_iteration_4.png",
+    "bytes": 261355,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4132_ascln_iteration_4/portrait.png",
+    "bytes": 122527,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4132_ascln_iteration_4/avatar.png",
+    "bytes": 62339,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4182_oblvns_avemujica_1/Front/char_4182_oblvns_avemujica_1.skel",
+    "bytes": 935689,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4182_oblvns_avemujica_1/Front/char_4182_oblvns_avemujica_1.atlas",
+    "bytes": 11349,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4138_narant_breaker_1/Front/char_4138_narant_breaker_1.atlas",
+    "bytes": 12298,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4138_narant_breaker_1/Front/char_4138_narant_breaker_1.skel",
+    "bytes": 911826,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4182_oblvns_avemujica_1/Front/char_4182_oblvns_avemujica_1.png",
+    "bytes": 267744,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4138_narant_breaker_1/Front/char_4138_narant_breaker_1.png",
+    "bytes": 359561,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4138_narant_breaker_1/Back/char_4138_narant_breaker_1.skel",
+    "bytes": 523233,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4138_narant_breaker_1/Back/char_4138_narant_breaker_1.atlas",
+    "bytes": 12298,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4138_narant_breaker_1/avatar.png",
+    "bytes": 71341,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4138_narant_breaker_1/Back/char_4138_narant_breaker_1.png",
+    "bytes": 359561,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4182_oblvns_avemujica_1/Back/char_4182_oblvns_avemujica_1.skel",
+    "bytes": 712199,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4138_narant_breaker_1/portrait.png",
+    "bytes": 138270,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4182_oblvns_avemujica_1/Back/char_4182_oblvns_avemujica_1.atlas",
+    "bytes": 8425,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4138_narant_littlePony_1/Front/char_4138_narant_littlePony_1.atlas",
+    "bytes": 9423,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4182_oblvns_avemujica_1/avatar.png",
+    "bytes": 68635,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4182_oblvns_avemujica_1/portrait.png",
+    "bytes": 127111,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4182_oblvns_avemujica_1/Back/char_4182_oblvns_avemujica_1.png",
+    "bytes": 228117,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4138_narant_littlePony_1/Front/char_4138_narant_littlePony_1.png",
+    "bytes": 181598,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4138_narant_littlePony_1/Front/char_4138_narant_littlePony_1.skel",
+    "bytes": 675708,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4138_narant_littlePony_1/Back/char_4138_narant_littlePony_1.atlas",
+    "bytes": 4533,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_1035_wisdel_game_9/Front/char_1035_wisdel_game_9.atlas",
+    "bytes": 3001,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4138_narant_littlePony_1/portrait.png",
+    "bytes": 137127,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4132_ascln_iteration_4/Front/char_4132_ascln_iteration_4.skel",
+    "bytes": 368931,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4138_narant_littlePony_1/avatar.png",
+    "bytes": 68811,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4132_ascln_iteration_4/Front/char_4132_ascln_iteration_4.atlas",
+    "bytes": 9863,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4138_narant_littlePony_1/Back/char_4138_narant_littlePony_1.skel",
+    "bytes": 294167,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_1035_wisdel_game_9/Front/char_1035_wisdel_game_9.skel",
+    "bytes": 88351,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_1035_wisdel_game_9/Front/char_1035_wisdel_game_9.png",
+    "bytes": 107216,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4138_narant_littlePony_1/Back/char_4138_narant_littlePony_1.png",
+    "bytes": 147777,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4132_ascln_iteration_4/Front/char_4132_ascln_iteration_4.png",
+    "bytes": 309102,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_1035_wisdel_sale_14/Front/char_1035_wisdel_sale_14.png",
+    "bytes": 358553,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4138_narant_breaker_1/Front/char_4138_narant_breaker_1.skel",
+    "bytes": 911826,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4138_narant_breaker_1/Front/char_4138_narant_breaker_1.atlas",
+    "bytes": 12298,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4138_narant_littlePony_1/Front/char_4138_narant_littlePony_1.png",
+    "bytes": 181598,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4138_narant_breaker_1/Front/char_4138_narant_breaker_1.png",
+    "bytes": 359561,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4182_oblvns_avemujica_1/Front/char_4182_oblvns_avemujica_1.skel",
+    "bytes": 935689,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4182_oblvns_avemujica_1/Front/char_4182_oblvns_avemujica_1.png",
+    "bytes": 267744,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_1035_wisdel_sale_14/Front/char_1035_wisdel_sale_14.atlas",
+    "bytes": 17498,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4138_narant_littlePony_1/Front/char_4138_narant_littlePony_1.atlas",
+    "bytes": 9423,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4138_narant_littlePony_1/Front/char_4138_narant_littlePony_1.skel",
+    "bytes": 675708,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4182_oblvns_avemujica_1/Front/char_4182_oblvns_avemujica_1.atlas",
+    "bytes": 11349,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_1035_wisdel_game_9/Back/char_1035_wisdel_game_9.atlas",
+    "bytes": 3001,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_1035_wisdel_game_9/Back/char_1035_wisdel_game_9.png",
+    "bytes": 107216,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_1035_wisdel_game_9/avatar.png",
+    "bytes": 32966,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_1035_wisdel_sale_14/Front/char_1035_wisdel_sale_14.skel",
+    "bytes": 2229675,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4132_ascln_iteration_4/Back/char_4132_ascln_iteration_4.atlas",
+    "bytes": 6019,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4132_ascln_iteration_4/portrait.png",
+    "bytes": 122527,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_1035_wisdel_sale_14/Back/char_1035_wisdel_sale_14.skel",
+    "bytes": 1136897,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_1035_wisdel_sale_14/Back/char_1035_wisdel_sale_14.atlas",
+    "bytes": 12680,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_1035_wisdel_game_9/portrait.png",
+    "bytes": 43311,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_1035_wisdel_sale_14/Back/char_1035_wisdel_sale_14.png",
+    "bytes": 313809,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_1035_wisdel_sale_14/avatar.png",
+    "bytes": 65659,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4132_ascln_iteration_4/avatar.png",
+    "bytes": 62339,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_1035_wisdel_sale_14/portrait.png",
+    "bytes": 129739,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4138_narant_littlePony_1/Back/char_4138_narant_littlePony_1.skel",
+    "bytes": 294167,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4138_narant_littlePony_1/Back/char_4138_narant_littlePony_1.png",
+    "bytes": 147777,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4138_narant_littlePony_1/Back/char_4138_narant_littlePony_1.atlas",
+    "bytes": 4533,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4138_narant_breaker_1/Back/char_4138_narant_breaker_1.skel",
+    "bytes": 523233,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4138_narant_breaker_1/Back/char_4138_narant_breaker_1.atlas",
+    "bytes": 12298,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4138_narant_littlePony_1/portrait.png",
+    "bytes": 137127,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4138_narant_littlePony_1/avatar.png",
+    "bytes": 68811,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4138_narant_breaker_1/avatar.png",
+    "bytes": 71341,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4182_oblvns_avemujica_1/Back/char_4182_oblvns_avemujica_1.skel",
+    "bytes": 712199,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4182_oblvns_avemujica_1/Back/char_4182_oblvns_avemujica_1.atlas",
+    "bytes": 8425,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_1035_wisdel_game_9/Back/char_1035_wisdel_game_9.skel",
+    "bytes": 60099,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4138_narant_breaker_1/Back/char_4138_narant_breaker_1.png",
+    "bytes": 359561,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4132_ascln_iteration_4/Back/char_4132_ascln_iteration_4.skel",
+    "bytes": 225655,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4138_narant_breaker_1/portrait.png",
+    "bytes": 138270,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4182_oblvns_avemujica_1/portrait.png",
+    "bytes": 127111,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4182_oblvns_avemujica_1/avatar.png",
+    "bytes": 68635,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4182_oblvns_avemujica_1/Back/char_4182_oblvns_avemujica_1.png",
+    "bytes": 228117,
+    "ok": true
+  },
+  {
+    "path": "/assets/custom/skins/skin_char_4132_ascln_iteration_4/Back/char_4132_ascln_iteration_4.png",
+    "bytes": 261355,
+    "ok": true
+  }
+]

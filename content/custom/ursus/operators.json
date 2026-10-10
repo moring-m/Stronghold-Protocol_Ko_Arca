@@ -42,7 +42,7 @@
     "tier": 4,
     "bonds": [
       "ursusShip",
-      "visiShip"
+      "preciShip"
     ],
     "skillIndex": 1,
     "trait": "slowedDeaths"

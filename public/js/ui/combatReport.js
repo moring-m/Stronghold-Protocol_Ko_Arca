@@ -7,6 +7,12 @@ import {combatMetrics,sumCombatMetrics} from '../../../shared/combatStats.js';
 export const COMBAT_COLUMNS=[['dmg','총 피해'],['physicalDamage','물리 피해'],['artsDamage','마법 피해'],['trueDamage','고정 피해'],['elementalDamage','원소 피해'],['heal','회복'],['taken','받은 피해'],['takenPhysical','받은 물리 피해'],['takenArts','받은 마법 피해'],['takenTrue','받은 고정 피해'],['takenElemental','받은 원소 피해'],['shieldAbsorbed','보호막 흡수'],['kills','처치'],['attacks','공격'],['skillUses','스킬 사용'],['redeploys','재배치'],['deaths','전투불능'],['activeTime','전투 시간(초)']];
 const DAMAGE_COLORS={physicalDamage:'phys',artsDamage:'arts',trueDamage:'true',elementalDamage:'element'};
 export function combatChartRows(rows,metric){return rows.map(u=>({...u,value:Number.isFinite(Number(u[metric]))?Math.max(0,Number(u[metric])):0})).sort((a,b)=>b.value-a.value);}
+export function combatDamageSegments(unit){
+ const total=Math.max(0,Number(unit.dmg)||0),segments=Object.entries(DAMAGE_COLORS).map(([key,color])=>({key,color,value:Math.max(0,Number(unit[key])||0)}));
+ const typed=segments.reduce((n,s)=>n+s.value,0),denominator=Math.max(total,typed,1);
+ if(total>typed)segments.push({key:'unclassifiedDamage',color:'unclassified',value:total-typed});
+ return segments.filter(s=>s.value>0).map(s=>({...s,width:s.value/denominator*100}));
+}
 const KIND={normal:'일반 전투',unite:'협력방어',boss:'보스전',hidden:'히든 보스전'};
 export function aggregateCombatUnits(rounds) {
   const rows=new Map();
@@ -38,8 +44,8 @@ export function CombatReport({players,myId}) {
       ${display==='chart'?html`<div class="combat-charts">
         <section class="combat-chart" aria-label="오퍼레이터별 그래프"><h3>오퍼레이터별 · ${COMBAT_COLUMNS.find(([k])=>k===metric)?.[1]}</h3>
           ${chartRows.length?chartRows.map(u=>html`<div class="combat-chart__row"><span class="combat-chart__name"><${UnitThumb} kind=${u.kind==='token'?'token':'chess'} id=${u.defId} size="sm" /><span>${name(u)}${u.uid!=null?html`<small>#${u.uid}</small>`:null}</span></span><div class="combat-chart__track" role="img" aria-label=${`${name(u)}: ${fmtNum(u.value)}`}><div class="combat-chart__bar" style=${`width:${u.value/peak*100}%`}>
-            ${metric==='dmg'?Object.entries(DAMAGE_COLORS).map(([key,color])=>html`<i class=${`is-${color}`} style=${`width:${u.value?u[key]/u.value*100:0}%`} title=${`${COMBAT_COLUMNS.find(([k])=>k===key)[1]} ${fmtNum(u[key])}`}></i>`):html`<i style="width:100%"></i>`}</div></div><b class="num">${fmtNum(u.value)}</b></div>`):html`<p class="t-dim">표시할 기록이 없습니다.</p>`}
-          ${metric==='dmg'?html`<div class="combat-chart__legend">${Object.entries(DAMAGE_COLORS).map(([key,color])=>html`<span><i class=${`is-${color}`}></i>${COMBAT_COLUMNS.find(([k])=>k===key)[1]}</span>`)}</div>`:null}
+            ${metric==='dmg'?combatDamageSegments(u).map(({key,color,value,width})=>html`<i class=${`is-${color}`} style=${`width:${width}%`} title=${`${COMBAT_COLUMNS.find(([k])=>k===key)?.[1]||'유형 미기록 피해'} ${fmtNum(value)}`}></i>`):html`<i style="width:100%"></i>`}</div></div><b class="num">${fmtNum(u.value)}</b></div>`):html`<p class="t-dim">표시할 기록이 없습니다.</p>`}
+          ${metric==='dmg'?html`<div class="combat-chart__legend">${Object.entries(DAMAGE_COLORS).map(([key,color])=>html`<span><i class=${`is-${color}`}></i>${COMBAT_COLUMNS.find(([k])=>k===key)[1]}</span>`)}<span><i class="is-unclassified"></i>유형 미기록 피해</span></div>`:null}
         </section>
         <section class="combat-chart" aria-label="라운드별 그래프"><h3>라운드별 · ${COMBAT_COLUMNS.find(([k])=>k===metric)?.[1]}</h3>${selected.filter(r=>r.available!==false).map(r=>{const value=r.totals?.[metric]??sumCombatMetrics(r.units||[])[metric];return html`<div class="combat-chart__row"><span class="combat-chart__name">${r.round}라운드<small>${KIND[r.kind]||r.kind}</small></span><div class="combat-chart__track" role="img" aria-label=${`${r.round}라운드: ${fmtNum(value)}`}><div class="combat-chart__bar" style=${`width:${value/roundPeak*100}%`}><i style="width:100%"></i></div></div><b class="num">${fmtNum(value)}</b></div>`;})}</section>
       </div>`:null}

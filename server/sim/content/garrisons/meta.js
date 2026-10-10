@@ -238,7 +238,7 @@ H.SERVER_GAIN_RANDOM_EQUIP_CHESS_IN_POOL = {
     if (rounds.length && !rounds.includes(ctx.round)) return;
     for (let i = 0; i < Math.min(10, num(bb.count, 1)); i++) {
       const r = ctx.rollPool(bbStr.pool);
-      const id = r && r.kind === 'item' ? r.id : ctx.rollItem({ maxTier: ctx.shopLevel() });
+      const id = r && r.kind === 'item' ? r.id : null;
       if (id) ctx.grantItem(id);
     }
   },

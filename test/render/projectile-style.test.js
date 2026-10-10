@@ -13,3 +13,7 @@ import {meleeStyle} from '../../public/js/render/projectileStyle.js';
 test('melee weapon families distinguish thrusts, blunt hits, claws, blades and arts',()=>{
  assert.equal(meleeStyle({subProf:'charger'}),'thrust');assert.equal(meleeStyle({subProf:'fighter'}),'impact');assert.equal(meleeStyle({name:'猎犬'}),'claw');assert.equal(meleeStyle({subProf:'sword'}),'blade');assert.equal(meleeStyle({},'arts'),'arts');
 });
+
+test('healing projectiles use one quarter of their original visual size with unchanged travel speed',()=>{
+ const p=projectileStyle('orb');assert.equal(p.head,.48*.25);assert.equal(p.width,.3*.25);assert.equal(p.len,.55*.25);assert.equal(p.speed,10);assert.equal(p.hit,'heal');
+});

@@ -730,7 +730,7 @@ export class FxSystem {
     if (seg > 0.5) pr.ang = Math.atan2(py - q.y, px - q.x);
     const thin = look === 'tracer' || look === 'dart';
     const flown = k > kb ? seg * (k / (k - kb)) : 0;
-    const L = Math.min(s*1.65, seg, flown) * (1 - fk);
+    const L = Math.min(s*1.65*(spec.hit==='heal'?.25:1), seg, flown) * (1 - fk);
     const tr = pr.trail;
     tr.position.set(px, py);
     tr.rotation = pr.ang;

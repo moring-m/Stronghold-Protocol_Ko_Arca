@@ -12,10 +12,11 @@ for(const[id,stage]of Object.entries(stages))test(`${id}: cooperative structure 
  assert.notEqual(coop.structuralSource,boss);
  assert.equal(coop.previewLayout.worldOffset,7);
  for(let r=0;r<=11;r++)for(let c=0;c<boss.rows[r].length;c++) {
-   const patched=coop.previewLayout.cooperativePatches.some(a=>a.r0===r&&a.c0===c);
+   const patched=coop.previewLayout.cooperativePatches.some(a=>r>=a.r0&&r<=a.r1&&c>=a.c0&&c<=a.c1);
    assert.equal(coop.rows[r+7][c],patched?stage.rows[r+7][c]:boss.rows[r][c]);
  }
  for(let r=9;r<=12;r++)assert.equal(coop.rows[r].slice(9,12),stage.rows[r].slice(9,12));
+ for(let r=8;r<=12;r++)assert.equal(coop.rows[r].slice(12,19),stage.rows[r].slice(12,19),'right cooperative field uses its ordinary orientation');
  assert.equal(coop.rows[9][18],stage.rows[9][18]);
  assert.equal(coop.rows[12][18],stage.rows[12][18]);
  assert.deepEqual(coop.devices,stage.devices,'functional devices retain simulation coordinates');

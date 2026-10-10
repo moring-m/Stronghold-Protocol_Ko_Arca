@@ -1338,6 +1338,7 @@ function equipCheck(ctx, itemPiece, targetPiece) {
   const item = ctx.getItem(itemPiece.id);
   if (item?.itemType === 'MAGIC') return { ok: false, code: 'BAD_TARGET', reason: '该道具需要放置在战场上使用' };
   if (!isObj(targetPiece) || targetPiece.kind !== 'chess') return { ok: false, code: 'BAD_TARGET', reason: '装备只能配发给干员' };
+  if(ctx.getChess(targetPiece.id)?.optionalRecruit&&item?.buffs?.some(b=>b.key==='use_equip_recruit_new_char_and_give_char_to_player_most_bond'))return {ok:false,code:'BAD_TARGET',reason:'선발 오퍼레이터에게는 비콘을 사용할 수 없습니다.'};
   return { ok: true, action: 'equip' };
 }
 

@@ -33,7 +33,7 @@ function battle({ units, bonds = {}, enemies = [], edefs = {}, kind, seed = 3, p
   const h = makeBattle({
     kind, seed, bonds, players,
     defs: { chess, enemies: { e_dummy: dummy(), ...edefs } },
-    units: units.map((u) => ({ chessId: u.id, row: u.row, col: u.col })),
+    units: units.map((u) => ({ chessId: u.id, row: u.row, col: u.col, dir:u.dir })),
     enemies, autoFinish: false, timeLimit: 400,
   });
   h.step(1);
@@ -694,4 +694,12 @@ test('coverage: every IN_BATTLE garrison id of a visible chess (and every id the
   const missing = [...VISIBLE_IDS].filter((g) => !COVER.has(g)).sort();
   assert.deepEqual(missing, []);
   assert.ok(VISIBLE_IDS.size >= 100, `${VISIBLE_IDS.size} ids`);
+});
+
+test('two Warfarin or Kroos grant sources stack independently on one target with separate caps',()=>{
+ for(const [gid,bond,cap] of [['garrison_72_a','yanShip',7],['garrison_73_a','preciShip',10]]){
+  const h=battle({units:[{id:'left',g:[gid],row:10,col:4,dir:'RIGHT'},{id:'right',g:[gid],row:10,col:6,dir:'LEFT'},{id:'target',row:10,col:5,bonds:[bond]}],bonds:{[bond]:B(0)}});
+  skill(h,h.unit('target'));assert.equal(gains(h)[bond],2);
+  for(let i=0;i<30;i++)skill(h,h.unit('target'));assert.equal(gains(h)[bond],2*cap);assert.equal(h.b.errorCount,0);
+ }
 });

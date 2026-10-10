@@ -24,9 +24,9 @@ test('production Ursus balance matches the release and custom operator definitio
  const bonds=read('data/bonds.json'),chess=read('data/chess.json'),garrisons=read('data/garrisons.json');
  assert.equal(bonds.ursusShip.bb.base_bonus,.2);
  assert.equal(bonds.ursusShip.bb.atk_per_stack,.01);
- assert.equal(bonds.ursusShip.bb.hp_per_stack,.01);
- assert.equal(bonds.ursusShip.bb.donation_ratio,.05);
- assert.equal(bonds.ursusShip.bb.donation_per_stack,.00025);
+ assert.equal(bonds.ursusShip.bb.hp_per_stack,.005);
+ assert.equal(bonds.ursusShip.bb.donation_ratio,.1);
+ assert.equal(bonds.ursusShip.bb.donation_per_stack,.00015);
  const definitions=JSON.parse(readFileSync(new URL('../content/custom/ursus/operators.json',import.meta.url)));
  for(const op of definitions)for(const suffix of ['a','b']){
   const rec=chess[`chess_custom_ursus_${op.key}_${suffix}`];
@@ -62,4 +62,13 @@ test('Beehunter replaces Absinthe with complete resources and two independent tr
   assert.ok(chess[`chess_custom_ursus_helage_${suffix}`].bonds.includes('indomShip'));
  }
  for(const lang of ['kr','jp'])assert.ok(assets.audio.voice[lang].char_137_brownb.place.length);
+});
+
+test('original five recruits retain every available named costume in every tier and promotion',()=>{
+ const chess=read('data/chess.json'),assets=read('data/assets.json'),files=new Set(read('resources.json').files.map(f=>f.path));
+ for(const [charId,count] of [['char_4182_oblvns',1],['char_1050_chen3',0],['char_1035_wisdel',2],['char_4138_narant',2],['char_4132_ascln',1]]){
+  const forms=Object.values(chess).filter(c=>c.optionalRecruit&&c.charId===charId);assert.ok(forms.length>=2,charId);
+  for(const c of forms){assert.equal(c.skins?.length??0,count,c.chessId);for(const skin of c.skins){assert.ok(!/[\u3400-\u9fff]/u.test(skin.name),skin.name);const a=assets.chars[skin.assets.spine];assert.ok(a);for(const path of [a.avatar,a.portrait,a.spine.front.skel,a.spine.front.atlas,...a.spine.front.textures])assert.ok(files.has(path),path);assert.ok(skin.attackTiming.front.attack.hit>=0);}}
+ }
+ for(const suffix of ['a','b'])assert.equal(read('data/items.json')['chess_item_custom_ursus_favor_'+suffix].price,4);
 });

@@ -1,3 +1,4 @@
+import {combatMetrics} from '../../shared/combatStats.js';
 import { customFactionData } from '../../shared/customFactions.js';
 import { applyCustomExtensions, normalizeCustomExtensions } from '../../shared/customExtensions.js';
 // server/sim/spec.js — BattleSpec: the JSON description of one battle, built by the server and simulated identically
@@ -410,8 +411,7 @@ export function compactResult(res) {
       })),
       unitStats: cap(p.unitStats, 160).filter(Boolean).map((u) => ({
         uid: uidOr(u.uid), defId: keyOr(u.defId), kind: typeof u.kind === 'string' && u.kind.length <= 16 ? u.kind : 'op',
-        dmg: Math.max(0, Math.round(fnum(u.dmg))), kills: Math.max(0, Math.trunc(fnum(u.kills))), heal: Math.max(0, Math.round(fnum(u.heal))),
-        taken: Math.max(0, Math.round(fnum(u.taken))), attacks: Math.max(0, Math.trunc(fnum(u.attacks))),
+        ...combatMetrics(u),
       })),
     };
     // the HUD capsule's numerator (or absent for a result that has none: the teammate UI falls back to `killed`)

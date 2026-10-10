@@ -649,7 +649,7 @@ test('pools: 凯瑟琳 127 odd rounds, 佩佩 94, 洛洛 91, 焰尾 149, 歌蕾�
       s.roundStart();
       s.m.round = 1;
       assert.equal(handItems(s.ps).length, g.bb.count, `${gid}: round 2 nothing`);
-      for (const id of handItems(s.ps)) assert.ok(DATA.items[id].tier <= s.ps.shop.level, id);
+      for (const id of handItems(s.ps)) { const pool=DATA.choices.pools[g.bbStr.pool];assert.ok(DATA.items[id].tier <= (pool.tiers?.length?Math.max(...pool.tiers):s.ps.shop.level), id);assert.ok(!pool.excluded?.includes(id),id); }
     }
     cover(gid);
   }

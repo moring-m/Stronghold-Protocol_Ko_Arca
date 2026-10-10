@@ -1,0 +1,177 @@
+{
+  "environment": "Chromium 480x320, software GPU; timings describe local CPU scene work, not player-device FPS",
+  "before": [
+    {
+      "scene": "unite-m01",
+      "elapsedMsIncluding900msObservationAndSceneLoading": 20045.899999976158,
+      "layoutWorkMs": [
+        544.6999999880791,
+        5271.5,
+        5548.699999988079,
+        5745.300000011921
+      ],
+      "board": {
+        "on": true,
+        "calls": 38,
+        "triangles": 90203,
+        "textures": 28,
+        "geometries": 38,
+        "frames": 11,
+        "cpuMs": 56.37,
+        "lost": false,
+        "originalStage": "act2autochess_m01",
+        "losses": 0
+      }
+    },
+    {
+      "scene": "normal-m01",
+      "elapsedMsIncluding900msObservationAndSceneLoading": 3858.399999976158,
+      "layoutWorkMs": [
+        447.30000001192093,
+        442.60000002384186,
+        402.10000002384186
+      ],
+      "board": {
+        "on": true,
+        "calls": 14,
+        "triangles": 61626,
+        "textures": 28,
+        "geometries": 14,
+        "frames": 18,
+        "cpuMs": 53,
+        "lost": false,
+        "originalStage": "act2autochess_m01",
+        "losses": 0
+      }
+    },
+    {
+      "scene": "unite-m01",
+      "elapsedMsIncluding900msObservationAndSceneLoading": 17884.30000001192,
+      "layoutWorkMs": [
+        5120.5,
+        5325,
+        5647.599999964237
+      ],
+      "board": {
+        "on": true,
+        "calls": 38,
+        "triangles": 90203,
+        "textures": 28,
+        "geometries": 38,
+        "frames": 24,
+        "cpuMs": 41.47,
+        "lost": false,
+        "originalStage": "act2autochess_m01",
+        "losses": 0
+      }
+    },
+    {
+      "scene": "normal-m01",
+      "elapsedMsIncluding900msObservationAndSceneLoading": 3512,
+      "layoutWorkMs": [
+        443.60000002384186,
+        447.30000001192093,
+        382.5999999642372
+      ],
+      "board": {
+        "on": true,
+        "calls": 14,
+        "triangles": 61626,
+        "textures": 28,
+        "geometries": 14,
+        "frames": 31,
+        "cpuMs": 45.52,
+        "lost": false,
+        "originalStage": "act2autochess_m01",
+        "losses": 0
+      }
+    }
+  ],
+  "after": [
+    {
+      "scene": "unite-m01",
+      "elapsedMsIncluding900msObservationAndSceneLoading": 6006.899999976158,
+      "layoutWorkMs": [
+        381,
+        2159.5
+      ],
+      "board": {
+        "on": true,
+        "calls": 37,
+        "triangles": 91313,
+        "textures": 30,
+        "geometries": 61,
+        "frames": 12,
+        "cpuMs": 38.58,
+        "lost": false,
+        "originalStage": "act2autochess_m01",
+        "cachedLayouts": 2,
+        "layoutCacheHits": 0,
+        "losses": 0
+      }
+    },
+    {
+      "scene": "normal-m01",
+      "elapsedMsIncluding900msObservationAndSceneLoading": 2830.300000011921,
+      "layoutWorkMs": [
+        0.30000001192092896
+      ],
+      "board": {
+        "on": true,
+        "calls": 14,
+        "triangles": 61626,
+        "textures": 30,
+        "geometries": 61,
+        "frames": 24,
+        "cpuMs": 12.08,
+        "lost": false,
+        "originalStage": "act2autochess_m01",
+        "cachedLayouts": 2,
+        "layoutCacheHits": 1,
+        "losses": 0
+      }
+    },
+    {
+      "scene": "unite-m01",
+      "elapsedMsIncluding900msObservationAndSceneLoading": 1965.0999999642372,
+      "layoutWorkMs": [
+        0.19999998807907104
+      ],
+      "board": {
+        "on": true,
+        "calls": 37,
+        "triangles": 91313,
+        "textures": 30,
+        "geometries": 61,
+        "frames": 32,
+        "cpuMs": 5.69,
+        "lost": false,
+        "originalStage": "act2autochess_m01",
+        "cachedLayouts": 2,
+        "layoutCacheHits": 2,
+        "losses": 0
+      }
+    },
+    {
+      "scene": "normal-m01",
+      "elapsedMsIncluding900msObservationAndSceneLoading": 1884.5,
+      "layoutWorkMs": [
+        0.19999998807907104
+      ],
+      "board": {
+        "on": true,
+        "calls": 14,
+        "triangles": 61626,
+        "textures": 30,
+        "geometries": 61,
+        "frames": 46,
+        "cpuMs": 1.9,
+        "lost": false,
+        "originalStage": "act2autochess_m01",
+        "cachedLayouts": 2,
+        "layoutCacheHits": 3,
+        "losses": 0
+      }
+    }
+  ]
+}

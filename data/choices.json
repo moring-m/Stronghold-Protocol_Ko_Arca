@@ -7177,6 +7177,29 @@
       "tier": 6,
       "rule": "shopEligible",
       "assumed": true
+    },
+    "pool_equip_cathy_garrison": {
+      "kind": "equip",
+      "rule": "shopEligible",
+      "tiers": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "excluded": [
+        "chess_item_1_03_e_a",
+        "chess_item_2_05_e_a",
+        "chess_item_2_07_e_a",
+        "chess_item_3_12_e_a",
+        "chess_item_2_03_e_a",
+        "chess_item_3_09_e_a",
+        "chess_item_3_10_e_a",
+        "chess_item_4_09_e_a"
+      ],
+      "assumed": [
+        "uniform item weights"
+      ]
     }
   }
 }

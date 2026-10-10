@@ -175,6 +175,7 @@ const ITEM_HANDLERS = {
     onEquip(ctx, ev) {
       const target = ctx.piece(ev.target.uid);
       if (!target) return;
+      if(ctx.gd.chess(target.id)?.optionalRecruit){ev.error='BAD_TARGET';ev.detail='선발 오퍼레이터에게는 비콘을 사용할 수 없습니다.';ev.keep=true;return;}
       const tier = ctx.gd.tierOf(target.id);
       const n = Math.max(1, int(paramsOf(ctx, ev.item).refresh_cnt, 2));
       const bonds = ctx.pieceBonds(target.uid);

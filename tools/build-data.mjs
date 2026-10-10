@@ -1891,6 +1891,7 @@ function buildGarrisons(ctx, chess) {
     const g = dict[id];
     if (!g) { warn(`garrison ${id} referenced but missing from garrisonDataDict`); continue; }
     const { bb, bbStr } = flattenBB(g.blackboard, `garrison ${id}`);
+    if (id === 'garrison_127_a' || id === 'garrison_127_b') bbStr.pool = 'pool_equip_cathy_garrison';
     const raw = g.garrisonDesc || g.description;
     const dp = textPair(raw);
     out[id] = {
@@ -3385,6 +3386,8 @@ function buildChoices(ctx, effects, items, chess) {
     schedule,
     pools: {
       pool_equip_normal: { kind: 'equip', rule: 'shopEligible', maxTier: 'shopLevel', assumed: true },
+      // Catherine trait: user-verified pool; tier I-IV, excluding funds and special hammers. Weights remain unknown.
+      pool_equip_cathy_garrison: { kind: 'equip', rule: 'shopEligible', tiers: [1, 2, 3, 4], excluded: ['chess_item_1_03_e_a', 'chess_item_2_05_e_a', 'chess_item_2_07_e_a', 'chess_item_3_12_e_a', 'chess_item_2_03_e_a', 'chess_item_3_09_e_a', 'chess_item_3_10_e_a', 'chess_item_4_09_e_a'], assumed: ['uniform item weights'] },
       pool_equip_shop_1: { kind: 'equip', rule: 'shopEligible', tiers: [1], assumed: true },
       pool_equip_kathe: { kind: 'equip', rule: 'shopEligible', assumed: true },
       pool_equip_narant: { kind: 'equip', rule: 'shopEligible', assumed: true },

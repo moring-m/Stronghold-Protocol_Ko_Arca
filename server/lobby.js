@@ -485,6 +485,10 @@ export class Lobby {
     if (room.mode === 'solo') return fail(ERR.ROOM_FULL, 'solo room');
     const idx = room.freeSeat();
     if (idx < 0) return fail(ERR.ROOM_FULL);
+    if(cur===room && room.spectatorOf(session.playerId)){
+      if(Date.now()<(session.roleSwitchUntil||0))return fail(ERR.BAD_TARGET,'관전·참가 전환은 2초 후 다시 할 수 있습니다.');
+      session.roleSwitchUntil=Date.now()+2000;
+    }
     if (cur) this.removeMember(cur, session.playerId);
     room.seats[idx] = this.humanSeat(idx, session);
     session.roomCode = room.code;
@@ -521,6 +525,8 @@ export class Lobby {
         if (room.mode === 'solo' || room.spectatorCap <= room.spectators.length) return fail(ERR.ROOM_FULL);
         const seat = room.seatOf(session.playerId);
         if (!seat || seat.isBot) return fail(ERR.BAD_TARGET);
+        if(Date.now()<(session.roleSwitchUntil||0))return fail(ERR.BAD_TARGET,'관전·참가 전환은 2초 후 다시 할 수 있습니다.');
+        session.roleSwitchUntil=Date.now()+2000;
         cancelVote(this, room);
         room.seats[seat.seat] = null;
         room.spectators.push({playerId:session.playerId,name:session.name,connected:session.connected});

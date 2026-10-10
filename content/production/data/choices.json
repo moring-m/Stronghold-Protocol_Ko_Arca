@@ -5062,7 +5062,7 @@
       },
       {
         "effectId": "allybuff_custom_ursus_oath",
-        "name": "이스티나의 맹세",
+        "name": "지마의 맹세",
         "desc": "자신의 우르수스, 기습, 불굴 맹약 중첩 +8. 다른 아군이 있으면 해당 아군도 획득.",
         "kind": "ally",
         "stageId": null,
@@ -7193,6 +7193,29 @@
       "tier": 6,
       "rule": "shopEligible",
       "assumed": true
+    },
+    "pool_equip_cathy_garrison": {
+      "kind": "equip",
+      "rule": "shopEligible",
+      "tiers": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "excluded": [
+        "chess_item_1_03_e_a",
+        "chess_item_2_05_e_a",
+        "chess_item_2_07_e_a",
+        "chess_item_3_12_e_a",
+        "chess_item_2_03_e_a",
+        "chess_item_3_09_e_a",
+        "chess_item_3_10_e_a",
+        "chess_item_4_09_e_a"
+      ],
+      "assumed": [
+        "uniform item weights"
+      ]
     }
   }
 }

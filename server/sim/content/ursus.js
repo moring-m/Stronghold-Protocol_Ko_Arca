@@ -98,7 +98,7 @@ export function install(battle){
   const active=()=>S.bondActive(battle,pid,'ursusShip');
   const six=()=>active()&&(S.bondState(battle,pid,'ursusShip').count>=6||S.bondTier(battle,pid,'ursusShip')>=2);
   const refresh=()=>{
-   const layers=S.bondLayers(battle,pid,'ursusShip'),bonus=active() ? .2+.01*layers : 0,hpBonus=active() ? .2+.008*layers : 0;
+   const layers=S.bondLayers(battle,pid,'ursusShip'),bonus=active() ? .2+.01*layers : 0,hpBonus=active() ? .2+.005*layers : 0;
    const members=battle.allyUnits.filter(u=>u.ownerId===pid&&u.kind==='op'&&S.unitBonds(u).includes('ursusShip'));
    // Apply the faction bonus first; donations use current total ATK of live, deployed operators only.
    // The drone is not an operator and cannot recursively contribute its own donation.
@@ -108,8 +108,9 @@ export function install(battle){
     if(old?.mods?.atkPct!==bonus||old?.mods?.hpPct!==hpBonus)S.passiveBuff(battle,u,'bond:ursus:stats',S.directMods({atk:bonus,hp:hpBonus}));
    }
    if(drone){
-    drone.mem.visualScale=.85*(1+.002*layers);
-    drone.mem.attackRangeRadius=DRONE_RANGE*(1+.001*layers);
+    const growthLayers=six()?layers:0;
+    drone.mem.visualScale=.85*(1+.002*growthLayers);
+    drone.mem.attackRangeRadius=DRONE_RANGE*(1+.001*growthLayers);
     drone.profile.visibleRangeRadius=drone.mem.attackRangeRadius;
     const atkFlat=six()?members.filter(u=>u.alive&&u.deployed&&!u.hidden).reduce((sum,u)=>sum+u.s.atk,0)*(.1+.00015*layers):0;
     const aspd=six()?50:0,old=drone.findBuff('bond:ursus:drone');

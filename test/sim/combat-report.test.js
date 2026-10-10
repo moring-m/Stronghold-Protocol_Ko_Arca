@@ -46,3 +46,27 @@ test('maximum four-player detailed reports fit within the transport limit and in
  assert.equal(validateC2S(msg),null);const bytes=Buffer.byteLength(JSON.stringify(msg));assert.ok(bytes>64*1024);assert.ok(bytes<WS_MAX_PAYLOAD);
  msg.result.perPlayer.p0.unitStats[0].physicalDamage=-1;assert.notEqual(validateC2S(msg),null);
 });
+
+import {combatDamageSegments} from '../../public/js/ui/combatReport.js';
+test('damage charts retain total damage when old records have missing damage types',()=>{
+ assert.deepEqual(combatDamageSegments({dmg:100}),[{key:'unclassifiedDamage',color:'unclassified',value:100,width:100}]);
+ const parts=combatDamageSegments({dmg:100,physicalDamage:30,artsDamage:20});
+ assert.equal(parts.reduce((n,p)=>n+p.width,0),100);assert.equal(parts.at(-1).value,50);
+ assert.deepEqual(combatDamageSegments({dmg:0}),[]);
+ const typed=combatDamageSegments({dmg:100,physicalDamage:70,artsDamage:30});assert.equal(typed.length,2);assert.equal(typed[0].width,70);
+});
+
+import {compactResult,fitResult} from '../../server/sim/spec.js';
+test('browser result compaction and frame fitting retain every damage type and additional combat metric',()=>{
+ const h=battle();h.step();const u=h.unit('report_op'),e=h.enemies()[0];
+ for(const [type,amount] of [['phys',100.25],['arts',200.25],['true',300.25],['elemental',400.25]])h.b.dealDamage(u,e,{type,amount});
+ u.stats.skillUses=3;u.stats.redeploys=2;u.stats.shieldAbsorbed=45;u.stats.activeTime=1.25;
+ const raw=h.b.result();for(const converted of [compactResult(raw),fitResult(compactResult(raw))]){
+ const result=converted.result||converted;
+ const stat=result.perPlayer.p1.unitStats.find(s=>s.defId==='report_op');
+ assert.deepEqual(combatMetrics(stat),combatMetrics(u.stats));
+ assert.equal(stat.dmg,stat.physicalDamage+stat.artsDamage+stat.trueDamage+stat.elementalDamage);
+ const m={round:1,players:new Map([['p1',{}]])};recordCombatField(m,{kind:'normal',fieldId:'one',players:['p1']},result);
+ assert.equal(m.players.get('p1').combatRounds[0].totals.artsDamage,200.25);
+ }
+});

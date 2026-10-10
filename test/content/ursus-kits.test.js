@@ -123,7 +123,7 @@ test('Every new elite operator has selectable official modules; all module loado
  }}finally{setGameData(null)}
 });
 test('Updated affiliations/tier and default/alternate skill icons follow the UI manifest contract',{skip:!ready},async()=>{
- const {skillIconUrl,skillRecordIconUrl}=await import('../../public/js/ui/assetUrls.js');const c=data.chess[id('glassb')];assert.equal(c.tier,4);assert.deepEqual(c.bonds,['ursusShip','visiShip']);assert.deepEqual(data.chess[id('helage')].bonds,['ursusShip','raidShip']);
+ const {skillIconUrl,skillRecordIconUrl}=await import('../../public/js/ui/assetUrls.js');const c=data.chess[id('glassb')];assert.equal(c.tier,4);assert.deepEqual(c.bonds,['ursusShip','preciShip']);assert.deepEqual(data.chess[id('helage')].bonds,['ursusShip','raidShip']);
  assert.equal(data.assets.bonds.ursusShip,'/assets/custom/ursus/icon-full.png');
  for(const c of Object.values(data.chess).filter(c=>c.chessId.startsWith('chess_custom_ursus_'))){assert.match(skillIconUrl(data.assets,c),/\/custom\/ursus\/skill\//);for(const sk of c.skills)assert.match(skillRecordIconUrl(data.assets,sk),/\/custom\/ursus\/skill\//)}
 });
@@ -176,21 +176,21 @@ test('Ukusik preparation grants +4 / +8 to each active bond',{skip:!ready},()=>{
 for(const elite of [false,true])test(`Istina ${elite?'elite':'normal'}: only sluggish deaths inside range grant +2 / +4 to active bonds, at most eight triggers`,{skip:!ready},(t)=>{
  setGameData(data);t.after(()=>setGameData(null));
  const state=()=>({count:3,active:true,tier:1,layers:0});
- const h=combat('glassb',0,elite,{flags:{layerGainsEnabled:true},bonds:{ursusShip:state(),visiShip:state()},enemies:[]});const u=h.unit(id('glassb',elite));
- const layers=()=>['ursusShip','visiShip'].map(k=>h.b.getPlayer('p1').bonds[k].layers);
+ const h=combat('glassb',0,elite,{flags:{layerGainsEnabled:true},bonds:{ursusShip:state(),preciShip:state()},enemies:[]});const u=h.unit(id('glassb',elite));
+ const layers=()=>['ursusShip','preciShip'].map(k=>h.b.getPlayer('p1').bonds[k].layers);
  const death=(status,pos=[10,4],killer=null)=>{const e=h.spawn('dummy',{pos,route:{motion:'WALK',start:pos,end:[10,2],checkpoints:[]}});if(status)h.b.applyStatus(e,status,{duration:5,source:u,value:.5});h.b.kill(e,killer);};
- assert.match(data.garrisons[u.def.raw.garrisonIds[0]].desc,new RegExp(`정지.*\\[우르수스\\]/\\[예견\\].*\\+${elite?4:2}.*전투당 최대 8회 발동`));
+ assert.match(data.garrisons[u.def.raw.garrisonIds[0]].desc,new RegExp(`정지.*\\[우르수스\\]/\\[정밀\\].*\\+${elite?4:2}.*전투당 최대 8회 발동`));
  death('slow');death('stun');death('freeze');death(null);death('sluggish',[12,9]);assert.deepEqual(layers(),[0,0]);
- death('sluggish');assert.deepEqual(layers(),elite?[4,2]:[2,1],'another source or no credited killer still qualifies');
- for(let i=0;i<13;i++)death('sluggish');assert.deepEqual(layers(),elite?[32,16]:[16,8],'one death is one trigger even when both bonds gain');
+ death('sluggish');assert.deepEqual(layers(),elite?[4,4]:[2,2],'another source or no credited killer still qualifies');
+ for(let i=0;i<13;i++)death('sluggish');assert.deepEqual(layers(),elite?[32,32]:[16,16],'one death is one trigger even when both bonds gain');
 });
 
 test('Istina never grants inactive bonds and shares one eight-trigger budget across later activation',{skip:!ready},(t)=>{
  setGameData(data);t.after(()=>setGameData(null));
- const h=combat('glassb',0,false,{flags:{layerGainsEnabled:true},bonds:{ursusShip:{count:3,active:true,tier:1,layers:0},visiShip:{count:0,active:false,tier:0,layers:0}},enemies:[]});const u=h.unit(id('glassb'));
+ const h=combat('glassb',0,false,{flags:{layerGainsEnabled:true},bonds:{ursusShip:{count:3,active:true,tier:1,layers:0},preciShip:{count:0,active:false,tier:0,layers:0}},enemies:[]});const u=h.unit(id('glassb'));
  const death=()=>{const e=h.spawn('dummy',{pos:[10,4],route:{motion:'WALK',start:[10,4],end:[10,2],checkpoints:[]}});h.b.applyStatus(e,'sluggish',{duration:5,source:u});h.b.kill(e);};
- for(let i=0;i<4;i++)death();const bonds=h.b.getPlayer('p1').bonds;assert.equal(bonds.ursusShip.layers,8);assert.equal(bonds.visiShip.layers,0);
- Object.assign(bonds.visiShip,{count:3,active:true,tier:1});for(let i=0;i<9;i++)death();assert.equal(bonds.ursusShip.layers,16);assert.equal(bonds.visiShip.layers,4);
+ for(let i=0;i<4;i++)death();const bonds=h.b.getPlayer('p1').bonds;assert.equal(bonds.ursusShip.layers,8);assert.equal(bonds.preciShip.layers,0);
+ Object.assign(bonds.preciShip,{count:3,active:true,tier:1});for(let i=0;i<9;i++)death();assert.equal(bonds.ursusShip.layers,16);assert.equal(bonds.preciShip.layers,8);
 });
 
 test('Ursus default skills match the requested roster for normal and elite records',{skip:!ready},async()=>{

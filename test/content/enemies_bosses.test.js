@@ -3058,13 +3058,34 @@ for(const key of ['enemy_1329_cbshld','enemy_1329_cbshld_2'])test(`${key}: first
  assert.ok(!e.findBuff('ab:mirrorCrack1'));assert.ok(e.findBuff('ab:mirrorCrack2'));
 });
 
-test('catapult follow-up stones use the data hit interval, and already launched stones survive the shooter death',()=>{
+test('catapult completes a committed wind-up after losing its target',()=>{
  const h=arena({units:[{chessId:'t_wall',row:10,col:4}],captureNoisy:true});h.step();const e=put(h,'enemy_10162_mnctpt',[10,7]);
+ h.runUntil(()=>!!e.mem.attackWindup,10);const until=e.mem.attackWindup.until,u=h.unit('t_wall');
+ u.x=18;u.y=15;h.run(Math.max(0,until-h.b.time)+.1);assert.equal(e.stats.attacks,1);assert.equal(h.eventsOf('atkCancel').filter(ev=>ev[1]===e.id).length,0);assert.equal(h.b.errorCount,0);
+});
+
+test('catapult splash ignores camouflage and disarm cancels only stones not yet launched',()=>{
+ const h=arena({units:[{chessId:'t_wall',row:10,col:4},{chessId:'t_wall2',row:11,col:4}],captureNoisy:true});h.step();
+ const visible=h.unit('t_wall'),camouflaged=h.unit('t_wall2');h.b.addBuff(camouflaged,{key:'camo',flags:{camouflage:true},duration:100});const e=put(h,'enemy_10162_mnctpt',[10,7]);
+ h.runUntil(()=>visible.stats.taken>0,10);approx(camouflaged.stats.taken,e.s.atk);h.b.applyStatus(e,'disarm',{duration:10});h.run(1);approx(visible.stats.taken,2*e.s.atk);approx(camouflaged.stats.taken,2*e.s.atk);assert.equal(h.b.errorCount,0);
+});
+
+test('catapult stones land 0.3 seconds apart, and launched stones survive shooter death',()=>{
+ const h=arena({units:[{chessId:'t_wall',row:10,col:3}],captureNoisy:true});h.step();const e=put(h,'enemy_10162_mnctpt',[10,7]);
  h.runUntil(()=>h.unit('t_wall').stats.taken>0,10);const u=h.unit('t_wall'),atk=e.s.atk;
- approx(u.stats.taken,atk,1e-6,'first stone only');h.b.kill(e,null);
+ approx(u.stats.taken,atk,1e-6,'first stone only');
  h.run(.2);approx(u.stats.taken,atk);
  h.run(.15);approx(u.stats.taken,2*atk);
- h.run(.3);approx(u.stats.taken,3*atk);
+ h.b.kill(e,null);h.run(.3);approx(u.stats.taken,3*atk);
+});
+
+test('catapult normal splash reaches 1.5 tiles and moving away avoids a launched stone',()=>{
+ const h=arena({units:[{chessId:'t_wall',row:10,col:4},{chessId:'t_wall',row:11,col:4}],captureNoisy:true});h.step();const e=put(h,'enemy_10162_mnctpt',[10,7]);
+ h.runUntil(()=>e.stats.attacks>0,10);
+ const targets=h.b.allyUnits;for(const u of targets){u.x-=5;u.y-=5;}
+ h.run(2);for(const u of targets)approx(u.stats.taken,0);
+ const h2=arena({units:[{chessId:'t_wall',row:10,col:4},{chessId:'t_wall',row:11,col:4}],captureNoisy:true});h2.step();put(h2,'enemy_10162_mnctpt',[10,7]);
+ h2.runUntil(()=>h2.b.allyUnits.some(u=>u.stats.taken>0),10);for(const u of h2.b.allyUnits)assert.ok(u.stats.taken>0,'adjacent ally hit by normal splash');
 });
 
 test('Sarkaz lancer additional damage uses effective movement speed, including Sluggish',()=>{

@@ -5,7 +5,7 @@ export async function buildUrsusChoices(dir){
  const read=async name=>JSON.parse(await readFile(join(dir,name+'.json'),'utf8'));
  const choices=await read('choices'),effects=await read('effects');
  const definitions=[
-  {id:'allybuff_custom_ursus_oath',template:'allybuff_select_2_1',name:'이스티나의 맹세',desc:'자신의 우르수스, 기습, 불굴 맹약 중첩 +8. 다른 아군이 있으면 해당 아군도 획득.',team:true,params:{count:8,bond_list:'ursusShip,raidShip,indomShip'}},
+  {id:'allybuff_custom_ursus_oath',template:'allybuff_select_2_1',name:'지마의 맹세',desc:'자신의 우르수스, 기습, 불굴 맹약 중첩 +8. 다른 아군이 있으면 해당 아군도 획득.',team:true,params:{count:8,bond_list:'ursusShip,raidShip,indomShip'}},
   {id:'allybuff_custom_ursus_support',template:'allybuff_select_7_1',name:'우르수스 지원',desc:'우르수스 맹약의 무작위 오퍼레이터 1명 획득.',team:false,params:{count:1,bond:'ursusShip'}}
  ];
  for(const d of definitions){

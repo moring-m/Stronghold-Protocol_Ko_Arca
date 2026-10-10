@@ -22,8 +22,8 @@ test('old favorites migrate without a link; selecting a faction applies its pres
 test('recruit preset replaces recruit settings only; absent picks clear and unavailable picks drop',()=>{
  const records={standard:{},old:{optionalRecruit:true},next:{optionalRecruit:true,visible:true},unreleased:{optionalRecruit:true,visible:true,globalReleased:false}};
  const out=replaceRecruitEntries({standard:{skill:1},old:{selected:true,skin:'old'}},{next:{selected:true,skill:2,skin:'new'},standard:{selected:true},unreleased:{selected:true}},id=>records[id]);
- assert.deepEqual(out,{standard:{skill:1},next:{selected:true,skill:2,skin:'new'}});
- assert.deepEqual(replaceRecruitEntries(out,{},id=>records[id]),{standard:{skill:1}});
+ assert.deepEqual(out,{standard:{skill:1},old:{skin:'old'},next:{selected:true,skill:2,skin:'new'}});
+ assert.deepEqual(replaceRecruitEntries(out,{},id=>records[id]),{standard:{skill:1},old:{skin:'old'},next:{skill:2,skin:'new'}});
 });
 test('recruit presets lock after strategy selection including final result and unknown match phases',()=>{
  assert.ok(canApplyRecruitPreset({}));
@@ -45,4 +45,10 @@ test('an obsolete nonempty preset cannot silently clear the current loadout',()=
  const result=applyRecruitPreset('stale',{});assert.equal(result.ok,false);
  assert.deepEqual(loadoutStore.get().entries,{existing:{selected:true}});assert.equal(recruitPresetStore.get().active,'a');
  }finally{recruitPresetStore.set(r);loadoutStore.set(l);}
+});
+
+test('recruit preset activation respects current operator skills including returning to default',()=>{
+ const get=id=>({optionalRecruit:true,visible:true});
+ assert.deepEqual(replaceRecruitEntries({op:{skill:1}},{op:{selected:true}},get),{op:{skill:1,selected:true}});
+ assert.deepEqual(replaceRecruitEntries({op:{selected:true}},{op:{selected:true,skill:2}},get),{op:{selected:true}});
 });

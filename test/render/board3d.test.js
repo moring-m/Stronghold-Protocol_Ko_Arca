@@ -658,3 +658,15 @@ test('native field support retains nearby underground faces but excludes inactiv
  const src={position:[3,12,0,4,12,0,3,13,1, -2,12,0,5,12,0,-2,15,1, 8,12,0,9,12,0,8,13,1],index:[0,1,2,3,4,5,6,7,8]};
  assert.deepEqual(sceneryForArea(src,[{c0:3,c1:5,r0:12,r1:13}],{decorationOnly:true}).index,[0,1,2]);
  });
+
+test('scenery component reuse separates translated positions and filtered index buffers',()=>{
+ const src={position:[0,0,0,1,0,0,0,1,0,8,0,0,9,0,0,8,1,0],index:[0,1,2,3,4,5]};
+ const left=[{r0:0,r1:1,c0:0,c1:1}],right=[{r0:0,r1:1,c0:8,c1:9}];
+ assert.deepEqual(sceneryForArea(src,left).index,[0,1,2]);
+ assert.deepEqual(sceneryForArea(src,right).index,[3,4,5],'a cached component analysis still selects each requested region independently');
+ const moved={...src,position:src.position.map((v,i)=>i%3===0?v+2:v)};
+ assert.deepEqual(sceneryForArea(moved,left).index,[],'same indices with translated positions must not use the old bounds');
+ const filtered={...src,index:[3,4,5]};
+ assert.deepEqual(sceneryForArea(filtered,left).index,[],'same positions with different topology must not use old components');
+ assert.deepEqual(sceneryForArea(src,left).index,[0,1,2],'derived geometry cannot invalidate the original selection');
+});

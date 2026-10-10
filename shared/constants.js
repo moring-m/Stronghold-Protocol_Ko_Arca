@@ -4,7 +4,7 @@
 export const PROTOCOL_VERSION = 1;
 /** Upstream package version stays valid SemVer; the lowercase suffix identifies site updates. */
 export const BASE_VERSION = '0.2.3';
-export const APP_VERSION = `${BASE_VERSION}a`;
+export const APP_VERSION = `${BASE_VERSION}c`;
 export const DEV_BUILD = /-dev$/.test(APP_VERSION);
 
 export const MAX_SEATS = 4;

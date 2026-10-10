@@ -1,7 +1,7 @@
 // server/sim/content/enemies/special.js — SPECIAL 特异 kits (prisoners, 穿刺手, 暴虐兵长, 镜卫, chimeras, 圣杯, the act-2 specials
 // …) and their part of KITS (split from content/enemies.js).
 
-import { ALLY_COLLIDER_RADIUS } from '../../constants.js';
+import { ALLY_COLLIDER_RADIUS, PROJECTILE_SPEEDS } from '../../constants.js';
 import { canTargetAlly, areaSelectable } from '../../targeting.js';
 import { periodicDamage } from '../../damage.js';
 import {
@@ -415,13 +415,25 @@ export const SPECIAL_KITS = Object.freeze({
     // PRTS 天赋 「索敌不受阻挡影响，且不会因丢失目标而结束攻击」: its target selection ignores its block — a 隐匿 blocker (an
     // operator on the 排气格栅) is no target, so with nobody else in range it does not attack (the official game, community
     // report of 2026-10-06, item 24); it picks by 仇恨值, not its blocker first
-    spawn(b, e) { e.profile.blockFree = true; },
-    dealt(c, b, e) {
-      const n = T(ab, 'Attack.attack@times') ?? 1, r = T(ab, 'Attack.attack@projectile_range') ?? 0;
-      const t = c.target;
-      for (let i = 1; i < n; i++) hurt(b, e, t, e.s.atk, 'phys');
-      // the stone's splash ("碰撞无视迷彩"): an area selection — no unblocking 隐匿 ally
-      if (r > 0) for (const u of areaAllies(b, e, t.x, t.y, r)) if (u !== t) for (let i = 0; i < n; i++) hurt(b, e, u, e.s.atk, 'phys');
+    spawn(b, e) { Object.assign(e.profile,{blockFree:true,deferHit:true,continueAttackOnTargetLoss:true}); },
+    attack(c, b, e) {
+      const n = T(ab, 'Attack.attack@times') ?? 3, interval=T(ab,'Attack.attack@hit_interval') ?? .3;
+      const t = c.targets[0];if(!t)return;
+      const aim={x:t.x,y:t.y},damage=e.s.atk;
+      for(let i=0;i<n;i++)b.after(i*interval,()=>{
+        if(!e.alive||!e.deployed||e.s.flags.stun||e.s.flags.freeze||e.s.flags.sleep||e.s.flags.disarm||e.hidden)return;
+        const acting=!!e.s.flags.inDrama;
+        const bound=acting?(T(ab,'Attack.attack@offset_bound')??3):0;
+        const to={x:aim.x+(bound?(b.rng()*2-1)*bound:0),y:aim.y+(bound?(b.rng()*2-1)*bound:0)};
+        const r=acting?(T(ab,'Attack.attack@projectile_range')??.5):1.5;
+        b.fx('bombardShell',{x:to.x,y:to.y,id:e.id,r,t:hypot(to.x-e.x,to.y-e.y)/PROJECTILE_SPEEDS.lob});
+        b.addProjectile({from:e,to,speed:PROJECTILE_SPEEDS.lob,source:e,visual:'lob',onHit:({x,y})=>{
+          b.fx('explode',{x,y,r,kind:'catapult'});
+          // The main target is not forced to take damage. Every unit must still
+          // intersect the landing area; camouflage does not avoid the splash.
+          for(const u of areaAllies(b,e,x,y,r))b.dealDamage(e,u,{amount:damage,type:'phys',isAttack:true,isProjectile:true,isSplash:true});
+        }});
+      });
     },
   }],
 });

@@ -1499,10 +1499,10 @@ function MatchScreen() {
       ${combat && alive && !spectator && !myDone && endField ? html`<button type="button" class="gm__end-battle" data-i18n-skip disabled=${endField.endVotes?.includes(myId)} onClick=${async()=>{
         const f=pub.fields?.find(f=>f.live && f.players?.includes(myId)); if(!f)return;
         const shared=f.kind==='boss'||f.kind==='hidden'||f.players.length>1;
-        if(await confirmDialog({title:'현재 전투 종료',text:shared?'모든 참가자가 종료를 요청하면 전투를 끝냅니다. 남은 적은 미처치로 정산되며, 보스전은 패배합니다.':'지금 전투를 끝내고 다음 단계로 넘어갑니다. 남은 적은 미처치로 정산됩니다.',okText:'전투 종료',danger:true})) {
-          try {await net.request('g.endBattle',{fieldId:f.fieldId}); if(shared)toast('전투 종료를 요청했습니다. 동료의 요청을 기다립니다.','info');}catch(e){toast(e.message,'error');}
+        if(await confirmDialog({title:'현재 전투 포기',text:shared?'모든 참가자가 포기를 요청하면 전투를 끝냅니다. 남은 적은 미처치로 정산되며, 보스전은 패배합니다.':'지금 전투를 끝내고 다음 단계로 넘어갑니다. 남은 적은 미처치로 정산됩니다.',okText:'전투 포기',danger:true})) {
+          try {await net.request('g.endBattle',{fieldId:f.fieldId}); if(shared)toast('전투 포기를 요청했습니다. 동료의 요청을 기다립니다.','info');}catch(e){toast(e.message,'error');}
         }
-      }}><${Icon} name="close" />${endField.endVotes?.includes(myId)?'종료 요청됨':'전투 종료'}</button>` : null}
+      }}><span class="readybtn__box"><${Icon} name="close" /></span><span class="readybtn__label">${endField.endVotes?.includes(myId)?'포기 요청됨':'전투 포기'}</span></button>` : null}
       <${Ticker} />
 
       <div class="gm__corner">

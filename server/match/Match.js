@@ -1898,6 +1898,7 @@ export class Match {
       let list;
       if (Array.isArray(p.tiers) && p.tiers.length) list = p.tiers.flatMap((t) => this.gd.shopItemsByTier[t] || []);
       else list = tierList(1, p.maxTier === 'shopLevel' ? Math.max(1, Math.min(6, shopLevel)) : 6);
+      if (Array.isArray(p.excluded)) list = list.filter(id => !p.excluded.includes(id));
       return list.length ? list[Math.floor(rng() * list.length)] : null;
     }
     const list = Number.isInteger(tier) ? tierList(tier, tier) : tierList(1, Math.max(1, Math.min(6, maxTier)));

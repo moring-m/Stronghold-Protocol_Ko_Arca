@@ -658,6 +658,7 @@ export async function createFieldView(host, options = {}) {
       host.insertBefore(c3, canvas);
       board3dCanvas = c3;
       const b = new BoardScene(THREE, pack, {
+        layoutCacheSize: 4,
         canvas: c3, antialias: settings.quality !== 'low' && (globalThis.devicePixelRatio || 1) < 2, shadows: settings.shadows !== false,
       });
       const sz = size();
@@ -821,7 +822,14 @@ export async function createFieldView(host, options = {}) {
     camOpts = { ...o };
     // the field actually shown (a 'prep' camera on the boss rows is the Final Assault prep: boss field built / drawn)
     const vk = viewKind(camKind, camOpts);
-    applyVisualStage();
+    camMs = Number.isFinite(o.ms) && o.ms >= 0 ? o.ms : (vk === 'pen' || prevView === 'pen' ? PEN_CAMERA_MS : CAMERA_MS);
+    const instant = o.instant || camMs === 0 || mode === 'idle' && !camTo;
+    const nextArea = viewBoardArea(vk);
+    // Different layouts cannot preserve the old field in the new grid. Build
+    // the final layout directly instead of creating and discarding a union.
+    const layoutChanged = board3d?.stage && board3d.stage !== visualStage();
+    const flightArea = instant || layoutChanged ? nextArea : unionAreas(viewBoardArea(prevView), nextArea);
+    applyVisualStage(flightArea);
     if (vk === 'prep') setPrepField(IDENTITY);
     else if (vk === 'bossPrep') setPrepField(bossPrepField(camOpts.side === 'R' ? 'R' : 'L'));
     const target = targetCamera(camKind, camOpts);
@@ -830,9 +838,7 @@ export async function createFieldView(host, options = {}) {
     const focus = camRect();
     tiles.setArea(viewBoardArea(vk));
     board3d?.setFocus(focus);
-    camMs = Number.isFinite(o.ms) && o.ms >= 0 ? o.ms : (vk === 'pen' || prevView === 'pen' ? PEN_CAMERA_MS : CAMERA_MS);
-    if (o.instant || camMs === 0 || mode === 'idle' && !camTo) {
-      board3d?.setArea(viewBoardArea(vk));
+    if (instant) {
       cam = target; camFrom = camTo = null;
       tiles.setView(band, focus, field);
       setPenHidden(!penShown(vk));
@@ -844,7 +850,6 @@ export async function createFieldView(host, options = {}) {
       camT0 = performance.now();
       // keep both fields drawn (and lit) while the camera flies between them
       tiles.setView([Math.min(prevBand[0], band[0]), Math.max(prevBand[1], band[1])], focus, [Math.min(prevField[0], field[0]), Math.max(prevField[1], field[1])]);
-      board3d?.setArea(unionAreas(viewBoardArea(prevView), viewBoardArea(vk)));
       setPenHidden(!penShown(vk, prevView));
       setLeaderHidden(!leaderShown(vk, prevView));
       pendingView = { band, focus, field, area: viewBoardArea(vk), pen: penShown(vk), leader: leaderShown(vk) };
@@ -925,11 +930,11 @@ export async function createFieldView(host, options = {}) {
     const k=viewKind(camKind,camOpts), previous=camBeforePen && viewKind(camBeforePen.kind,camBeforePen.opts);
     return bossPreview() ? bossPenStage(stageRec) : k==='unite' || k==='pen' && previous==='unite' ? cooperativeBossStage(stageRec) : stageRec;
   }
-  function applyVisualStage() {
+  function applyVisualStage(area) {
     const visual=visualStage();
     if (!visual) return;
     tiles.setStage(visual);
-    board3d?.setStage(visual);
+    board3d?.setStage(visual, area);
     if (penList) { const list=penList; clearPen(); setPenList(list); }
   }
 

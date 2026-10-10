@@ -621,7 +621,12 @@ describe('websocket lobby', () => {
     await host.waitFor('room.state', (s) => s.spectators.length === 1);
     await expectOk(s1, { t: 'room.spectate', code: st.code }); // idempotent
     await expectOk(guest, { t: 'room.spectate', code: st.code });
-    await expectOk(guest, { t: 'room.join', code: st.code }); // reversible in-place switch
+    await expectError(guest, { t: 'room.join', code: st.code }, ERR.BAD_TARGET);
+    const switchingSession=srv.registry.byId(guest.id);
+    assert.ok(switchingSession.roleSwitchUntil>Date.now());
+    switchingSession.roleSwitchUntil=Date.now()-1;
+    await expectOk(guest, { t: 'room.join', code: st.code }); // reversible after cooldown
+    await expectError(guest, { t: 'room.spectate', code: st.code }, ERR.BAD_TARGET);
     // a spectator may not act
     await expectError(s1, { t: 'room.ready', ready: true }, ERR.SPECTATOR);
     for (const msg of [{ t: 'room.start' }, { t: 'room.addBot' }, { t: 'room.setDifficulty', difficulty: 'HARD' }, { t: 'room.removeSpectator', playerId: s1.id }]) {

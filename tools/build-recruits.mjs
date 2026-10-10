@@ -2,7 +2,7 @@
 import {readFile,writeFile} from 'node:fs/promises';
 import {loadContext,buildChess,buildTokens} from './build-data.mjs';
 import {loadKorean,localizeOperator,localizeToken} from './ursus-korean.mjs';
-export async function buildRecruits(root,dir){
+export async function buildRecruits(root,dir,{previousChess=null}={}){
  const read=async p=>JSON.parse(await readFile(p,'utf8'));
  const ops=await read(`${root}/content/custom/ursus/recruits.json`),ctx=await loadContext({operatorsOnly:true}),a=ctx.act;
  for(const [i,o] of ops.entries())for(const tier of [5,6]){
@@ -19,7 +19,7 @@ export async function buildRecruits(root,dir){
  const result=buildChess(ctx),generated=result.chess,chess=await read(`${dir}/chess.json`),bonds=await read(`${dir}/bonds.json`),kr=await loadKorean(root);
  for(const o of ops)for(const tier of [5,6])for(const suffix of ['a','b']){
   const id=`chess_custom_recruit_${o.key}_${tier}_${suffix}`,r=generated[id];if(!r?.skills?.length)throw Error(`Missing recruit ${id}`);
-  localizeOperator(r,kr,a.charChessDataDict[id].status);r.name=o.name;r.optionalRecruit=true;r.garrisonIds=[];r.assets.avatar=`${o.charId}${suffix==='b'?'_2':''}`;chess[id]=r;
+  localizeOperator(r,kr,a.charChessDataDict[id].status);r.name=o.name;r.optionalRecruit=true;r.garrisonIds=[];r.assets.avatar=`${o.charId}${suffix==='b'?'_2':''}`;const old=chess[id]?.skins?.length?chess[id]:Object.values(previousChess||chess).find(c=>c.charId===o.charId&&c.skins?.length);if(old?.skins)r.skins=old.skins;else if(previousChess?.[id]?.charId===o.charId&&previousChess[id].skins)r.skins=previousChess[id].skins;chess[id]=r;
   if(suffix==='a')for(const bond of o.bonds)for(const k of ['members','visibleMembers'])if(bonds[bond]?.[k]&&!bonds[bond][k].includes(id))bonds[bond][k].push(id);
  }
  const tokens=await read(`${dir}/tokens.json`),generatedTokens=buildTokens(ctx,generated,result.tokenOwners,await read(`${dir}/enemies.json`));

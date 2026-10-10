@@ -143,7 +143,7 @@ export const HIT_TINT = Object.freeze({ phys: 0xffd9a0, arts: 0xc77dff, true: 0x
 export const PROJ = Object.freeze({
   arrow: { look: 'tracer', speed: 14, tint: 0xfff6dc, glow: 0xffc45a, len: 1.05, width: 0.2, head: 0.36, muzzle: 0xffd27a, hit: 'spark' },
   bolt: { look: 'orb', speed: 11, tint: 0xf4e2ff, glow: 0xb36bff, len: 0.6, width: 0.34, head: 0.52, trail: 0xa35cff, muzzle: 0xc77dff, hit: 'arts' },
-  orb: { look: 'orb', speed: 10, tint: 0xeafff0, glow: 0x3fe07a, len: 0.55, width: 0.3, head: 0.48, trail: 0x62f08a, muzzle: 0x62f08a, hit: 'heal' },
+  orb: { look: 'orb', speed: 10, tint: 0xeafff0, glow: 0x3fe07a, len: 0.1375, width: 0.075, head: 0.12, trail: 0x62f08a, muzzle: 0x62f08a, hit: 'heal' },
   bomb: { look: 'shell', speed: 8, tint: 0xffeed0, glow: 0xff8a3d, len: 0.85, width: 0.3, head: 0.56, trail: 0xff9c4a, arc: 1.1, smoke: 0x2e2824, muzzle: 0xffb35c, hit: 'boom' },
   lob: { look: 'shell', speed: 8, tint: 0xfff4dc, glow: 0xffb04a, len: 0.7, width: 0.26, head: 0.5, trail: 0xffc27a, arc: 1.4, smoke: 0x3a322c, muzzle: 0xffc27a, hit: 'splash' },
   drone: { look: 'dart', speed: 16, tint: 0xe4fbff, glow: 0x57c9ff, len: 0.7, width: 0.16, head: 0.3, trail: 0x57c9ff, hit: 'zap' },

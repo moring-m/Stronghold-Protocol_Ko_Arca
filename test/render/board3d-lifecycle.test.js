@@ -261,3 +261,74 @@ test('native rage tiles gain a world-space additive glow without replacing their
  const positions=glow.geometry.getAttribute('position');assert.ok(Math.abs(positions.getX(0)-4.525)<1e-5);assert.ok(Math.abs(positions.getY(0)-9.525)<1e-5);assert.ok(Math.abs(positions.getZ(0)-.025)<1e-5);
  assert.equal(board.meshes.infection,undefined);board.destroy();
 });
+
+test('a simultaneous cooperative stage and area change rebuilds once, retaining battle device handles',async()=>{
+ const {cooperativeBossStage}=await import('../../public/js/render/pen.js');
+ const board=new BoardScene(THREE,fakePack(),{renderer:stubRenderer()});
+ try{
+  board.setStage(stages.act1autochess_m01);
+  const device=board.createDevice(),mesh=board.dynamic.children.at(-1);
+  const clear=board._clear.bind(board);let builds=0;board._clear=()=>{builds++;clear();};
+  const stage=cooperativeBossStage(stages.act1autochess_m01);
+  board.setStage(stage,boardArea('unite'));
+  assert.equal(builds,1,'do not build the new stage with the old area first');
+  assert.equal(board.stage,stage);assert.deepEqual(board.area,boardArea('unite'));
+  assert.ok(inScene(board,mesh));assert.equal(device.destroyed,false);
+  board.setStage(stage,boardArea('unite'));assert.equal(builds,1,'identical stage and area reuse the board');
+  board.setStage(stages.act1autochess_m01,boardArea('prep'));assert.equal(builds,2,'return to prep also builds once');
+  assert.ok(inScene(board,mesh));device.destroy();
+ }finally{board.destroy();}
+});
+
+test('cached layouts reuse static geometry, refresh crates and free evicted layouts and teardown resources',()=>{
+ const live=new Set();
+ class Geometry extends THREE.BufferGeometry{constructor(){super();live.add(this);this.addEventListener('dispose',()=>live.delete(this));}}
+ const board=new BoardScene({...THREE,BufferGeometry:Geometry},fakePack(),{renderer:stubRenderer(),layoutCacheSize:2});
+ try{
+  const source=stages.act1autochess_m01;
+  board.setStage(source,AREAS.normal);const original=board.meshes.board.geometry,crates=board.staticCrates;
+  board.setStage(stages.act2autochess_m03,AREAS.boss);
+  assert.ok(live.has(original),'inactive layout retains its GPU geometry');
+  board.setBattleRect({r0:0,r1:18,c0:0,c1:20});
+  board.setStage(source,AREAS.normal);
+  assert.equal(board.meshes.board.geometry,original,'returning to an unchanged layout does not recreate static geometry');
+  assert.equal(board.layoutCacheHits,1);assert.equal(board.staticCrates,crates);
+  assert.equal(board.meshes.crates,null,'cached layout respects current battle rectangle');
+  board.setBattleRect(null);assert.ok(board.meshes.crates,'prep restores its own stage crates');
+  const device=board.createDevice(),mesh=board.dynamic.children.at(-1);
+  board.setStage(stages.act2autochess_m04,AREAS.unite);
+  board.setStage(stages.act1autochess_m03,AREAS.normal);
+  assert.ok(!live.has(original),'least recently used layout is disposed on eviction');
+  assert.ok(board.layoutCache.size<=1,'active plus retained layouts stay bounded');assert.ok(inScene(board,mesh));device.destroy();
+ }finally{board.destroy();}
+ assert.equal(live.size,0,'teardown also frees all cached geometry');
+});
+
+test('all native cooperative right fields use ordinary source coordinates and texture UVs',async()=>{
+ const {gunzipSync}=await import('node:zlib');
+ const {cooperativeBossStage}=await import('../../public/js/render/pen.js');
+ const vertexKey=(p,uv,id)=>[p[id*3],p[id*3+1],p[id*3+2],uv[id*2],uv[id*2+1]].map(v=>Math.round(v*10000)).join(',');
+ for(const stage of Object.values(stages)){
+  const native=JSON.parse(gunzipSync(readFileSync(path.join(ROOT,`public/assets/local/map/original/${stage.id}-v16.json.gz`))));
+  const pack=fakePack();pack.original={scenes:{[stage.id]:native},materials:{},images:{}};
+  const board=new BoardScene(THREE,pack,{renderer:stubRenderer()});
+  try{
+   for(const[key,g]of Object.entries(native.buckets))board.originalMaterials[g.material||key] ||= new THREE.MeshStandardMaterial();
+   board.setStage(cooperativeBossStage(stage),boardArea('unite'));
+   let checked=0;
+   for(const[key,g]of Object.entries(native.buckets)){
+    if(!g.platform || !g.uv?.length)continue;
+    // Clipping introduces new edge vertices and can retriangulate faces. Check
+    // authored vertices inside the right footprint, with Float32 tolerance.
+    const expected={...g,index:Array.from(g.index).filter(id=>g.position[id*3]>=11.5 && g.position[id*3]<=18.5 && g.position[id*3+1]>=7.5 && g.position[id*3+1]<=12.5)};if(!expected.index.length)continue;
+    const mesh=board.meshes[`cooperative-functional:${key}`];assert.ok(mesh,`${stage.id}: native right field replacement`);
+    const a=mesh.geometry.attributes;
+    const positions=Array.from(a.position.array,(v,i)=>v+(i%3===1?mesh.position.y:0));
+    const actual=new Set(Array.from(mesh.geometry.index.array,id=>vertexKey(positions,a.uv.array,id)));
+    for(const id of expected.index)assert.ok(actual.has(vertexKey(expected.position,expected.uv,id)) || Array.from(mesh.geometry.index.array).some(j=>Math.abs(positions[j*3]-expected.position[id*3])<.00002 && Math.abs(positions[j*3+1]-expected.position[id*3+1])<.00002 && Math.abs(positions[j*3+2]-expected.position[id*3+2])<.00002 && Math.abs(a.uv.array[j*2]-expected.uv[id*2])<.00002 && Math.abs(a.uv.array[j*2+1]-expected.uv[id*2+1])<.00002),`${stage.id}: right field position and UV match ordinary native geometry (${vertexKey(expected.position,expected.uv,id)})`);
+    checked++;
+   }
+   assert.ok(checked>0,`${stage.id}: actual native floor tested`);
+  }finally{board.destroy();}
+ }
+});

@@ -69,15 +69,20 @@ export function cooperativeBossStage(stage) {
   const rows=stage.rows.map((line,r)=>r>=worldOffset ? boss.rows[r-worldOffset] : '#'.repeat(line.length));
   // Keep the shared envelope, but use the cooperative routes and gates where
   // the boss arena has its central seat/connector or a different entrance.
-  const patches=[];
+  // Boss seats mirror the right field. Cooperative operators and routes use
+  // the ordinary right field, including its raised row and native tile art.
+  // Replace the complete footprint even where the tile glyph is identical.
+  const rightField={r0:1,r1:5,c0:12,c1:18};
+  const patches=[rightField];
   const structuralRows=[...boss.rows];
   for(let r=8;r<=12;r++) {
     const line=rows[r].split(''), canonical=structuralRows[r-worldOffset].split('');
     for(let c=0;c<line.length;c++) {
       const actual=stage.rows[r][c], displayed=line[c];
-      if(actual===displayed || !(r>=9 && c>=9 && c<=11 || /[SEIO]/.test(actual+displayed)))continue;
+      const right=c>=rightField.c0 && c<=rightField.c1;
+      if(!right && (actual===displayed || !(r>=9 && c>=9 && c<=11 || /[SEIO]/.test(actual+displayed))))continue;
       line[c]=actual;canonical[c]=actual;
-      patches.push({r0:r-worldOffset,r1:r-worldOffset,c0:c,c1:c});
+      if(!right)patches.push({r0:r-worldOffset,r1:r-worldOffset,c0:c,c1:c});
     }
     rows[r]=line.join('');structuralRows[r-worldOffset]=canonical.join('');
   }

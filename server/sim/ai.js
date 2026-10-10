@@ -923,11 +923,11 @@ function enemyAttack(b, e) {
   }
   if (own && targets.length) targets = targets.filter((a) => own(a));
   if (targets.length > 1) sortAllyTargets(e, targets);
-  if (!targets.length) { cancelWindup(b, e); return false; }
+  if (!targets.length && !(e.mem.attackWindup && e.profile?.continueAttackOnTargetLoss)) { cancelWindup(b, e); return false; }
   let wound = false;
   const pending = e.mem.attackWindup;
   if (pending) {
-    targets = pending.targets.filter(t => targets.includes(t));
+    targets = e.profile?.continueAttackOnTargetLoss ? pending.targets : pending.targets.filter(t => targets.includes(t));
     if (!targets.length) { cancelWindup(b, e); return false; }
     if (b.time + 1e-9 < pending.until) return true;
     delete e.mem.attackWindup; wound = true;
@@ -964,7 +964,7 @@ function enemyAttack(b, e) {
   if (b._hooks.beforeAttack) {
     const ctx = { attacker: e, targets, isSkill: false, profile: e.profile };
     b.emit('beforeAttack', ctx);
-    targets = (ctx.targets || []).filter((t) => t && t.alive);
+    targets = (ctx.targets || []).filter((t) => t && (t.alive || e.profile?.continueAttackOnTargetLoss && e.profile?.deferHit));
     if (!targets.length || !e.alive) return false;
   }
   e.lastAttackAt = b.time;

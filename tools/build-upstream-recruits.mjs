@@ -34,7 +34,7 @@ export async function buildUpstreamRecruits(root,dir){
    rec.mechanicText=mechanicText(rec);
    rec.skills=rec.skills.map(s=>({...s,locked:prototype}));localizeOperator(rec,kr,{...slot.status,evolvePhase:`PHASE_${slot.status.phase}`,charLevel:slot.status.level});
    if(keys.has(cid))rec.name=legacy.find(o=>o.charId===cid).name;
-   const old=chess[id];if(old?.skins)rec.skins=old.skins;
+   const old=chess[id]?.skins?.length?chess[id]:Object.values(chess).find(c=>c.charId===cid&&c.skins?.length);if(old?.skins)rec.skins=old.skins;
    chess[id]=rec;
    for(const tid of form.tokens||[]){const t=backups.tokens[tid];if(!t)continue;const v=t.variants?.[`${cid}@${statusKey(slot.status)}`];if(!v)continue;
     const target=tokens[tid]??structuredClone(t);target.variants??={};target.variants[id]=structuredClone(v);target.owners??=[];if(!target.owners.includes(id))target.owners.push(id);tokens[tid]=target;

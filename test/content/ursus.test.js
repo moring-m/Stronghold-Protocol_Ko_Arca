@@ -10,8 +10,8 @@ function setup(n,layers=0){
 }
 test('Ursus 2: no drone or speed buff',()=>{const h=setup(2);h.step(1);assert.equal(h.b.allyUnits.filter(u=>u.defId===DRONE_ID).length,0);close(h.unit('u0_a').s.aspd,100)});
 for(const n of [3,5,6])test(`Ursus ${n}: one drone, layer scaling, selective +50 ASPD`,()=>{
- const h=setup(n,10);h.step(1);const d=h.b.allyUnits.find(u=>u.defId===DRONE_ID);assert.ok(d);close(d.s.atk,n===6?1814.605:1300);close(d.s.maxHp,16640);close(d.hp,d.s.maxHp);close(d.s.aspd,n===6?150:100);close(h.unit('u0_a').s.aspd,100);close(h.unit('u0_a').s.atk,650);close(h.unit('u0_a').s.maxHp,2560);close(h.unit('u6_a').s.aspd,100);
- h.b.addLayers('p1','ursusShip',20,'test');h.step(2);close(d.s.atk,n===6?2205.375:1500);close(d.s.maxHp,18720);close(d.s.aspd,n===6?150:100);assert.equal(h.b.allyUnits.filter(u=>u.defId===DRONE_ID).length,1);checkInvariants(h.b);
+ const h=setup(n,10);h.step(1);const d=h.b.allyUnits.find(u=>u.defId===DRONE_ID);assert.ok(d);close(d.s.atk,n===6?1814.605:1300);close(d.s.maxHp,16250);close(d.hp,d.s.maxHp);close(d.s.aspd,n===6?150:100);close(h.unit('u0_a').s.aspd,100);close(h.unit('u0_a').s.atk,650);close(h.unit('u0_a').s.maxHp,2500);close(h.unit('u6_a').s.aspd,100);
+ h.b.addLayers('p1','ursusShip',20,'test');h.step(2);close(d.s.atk,n===6?2205.375:1500);close(d.s.maxHp,17550);close(d.s.aspd,n===6?150:100);assert.equal(h.b.allyUnits.filter(u=>u.defId===DRONE_ID).length,1);checkInvariants(h.b);
 });
 test('Default official data has no experimental faction, operators, or drone',()=>{
  for(const [file,key]of [['bonds','ursusShip'],['tokens',DRONE_ID],['chess','chess_custom_ursus_helage_a']])assert.equal(JSON.parse(readFileSync(new URL(`../../data/${file}.json`,import.meta.url)))[key],undefined);
@@ -149,7 +149,7 @@ test('six Ursus adds donated total ATK before the three-member percentage, track
  h.b.kill(u,null);h.step();assert.ok(d.s.atk<buffed);close(d.s.atk,expected());
 });
 test('hidden drone visual scale grows from 85 percent by 0.2 percent of that base per layer and is serialized',()=>{
- const h=setup(3,100);h.step();const d=h.b.allyUnits.find(u=>u.defId===DRONE_ID);close(d.mem.visualScale,.85*1.2);assert.deepEqual(h.b.snapshot().modelScales,[[d.id,.85*1.2]]);
+ const h=setup(6,100);h.step();const d=h.b.allyUnits.find(u=>u.defId===DRONE_ID);close(d.mem.visualScale,.85*1.2);assert.deepEqual(h.b.snapshot().modelScales,[[d.id,.85*1.2]]);
  h.b.addLayers('p1','ursusShip',100,'test');h.step(2);close(d.mem.visualScale,.85*1.4);checkInvariants(h.b);
 });
 
@@ -170,7 +170,22 @@ for (const layers of [0,499,500,501]) test(`Ursus donation rebalance at ${layers
  const total=h.b.allyUnits.filter(u=>u.kind==='op'&&u.def.bonds.includes('ursusShip')).reduce((n,u)=>n+u.s.atk,0);
  const ratio=.1+.00015*layers,old=.05+.00025*layers;
  close(d.s.atk,(1000+total*ratio)*(1.2+.01*layers));
- close(d.s.maxHp,13000*(1.2+.008*layers));
- close(h.unit('u0_a').s.maxHp,2000*(1.2+.008*layers));
+ close(d.s.maxHp,13000*(1.2+.005*layers));
+ close(h.unit('u0_a').s.maxHp,2000*(1.2+.005*layers));
  if(layers<500)assert.ok(ratio>old);else if(layers===500)close(ratio,old);else assert.ok(ratio<old);
+});
+
+test('three and five Ursus keep base drone size and range even with large layer counts',()=>{
+ for(const count of [3,5]){
+  const h=setup(count,1000);h.step();const d=h.b.allyUnits.find(u=>u.defId===DRONE_ID);
+  close(d.mem.visualScale,.85);close(d.mem.attackRangeRadius,2);close(d.profile.visibleRangeRadius,2);
+  h.b.addLayers('p1','ursusShip',1000,'test');h.step(2);close(d.mem.visualScale,.85);close(d.mem.attackRangeRadius,2);
+ }
+});
+
+test('live six-Ursus eligibility updates drone size and range in both directions',()=>{
+ const h=setup(6,100);h.step();const d=h.b.allyUnits.find(u=>u.defId===DRONE_ID),state=h.b.players[0].bonds.ursusShip;
+ close(d.mem.visualScale,.85*1.2);close(d.mem.attackRangeRadius,2.2);
+ state.count=5;state.tier=1;h.step(2);close(d.mem.visualScale,.85);close(d.mem.attackRangeRadius,2);assert.deepEqual(h.b.snapshot().modelScales,[[d.id,.85]]);assert.deepEqual(h.b.snapshot().attackRanges,[[d.id,2]]);
+ state.count=6;state.tier=2;h.step(2);close(d.mem.visualScale,.85*1.2);close(d.mem.attackRangeRadius,2.2);checkInvariants(h.b);
 });

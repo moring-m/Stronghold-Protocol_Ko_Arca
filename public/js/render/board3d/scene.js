@@ -116,8 +116,15 @@ export function surfaceForArea(src, areas) {
   const vertex=id=>Object.fromEntries(attrs.map(([key,size])=>[key,Array.from(src[key].slice(id*size,(id+1)*size))]));
   const mix=(a,b,t)=>Object.fromEntries(attrs.map(([key])=>[key,a[key].map((v,i)=>v+(b[key][i]-v)*t)]));
   for(let i=0;i<src.index.length;i+=3) {
-    const triangle=Array.from(src.index.slice(i,i+3),vertex);
+    const ids=src.index.slice(i,i+3),p=src.position;
+    const x0=Math.min(p[ids[0]*3],p[ids[1]*3],p[ids[2]*3]),x1=Math.max(p[ids[0]*3],p[ids[1]*3],p[ids[2]*3]);
+    const y0=Math.min(p[ids[0]*3+1],p[ids[1]*3+1],p[ids[2]*3+1]),y1=Math.max(p[ids[0]*3+1],p[ids[1]*3+1],p[ids[2]*3+1]);
+    let triangle;
     for(const area of areas) {
+      // Most authored scenery lies outside a requested border strip. Reject
+      // those triangles before allocating/interpolating all vertex attributes.
+      if(x1<area.c0-.5 || x0>area.c1+.5 || y1<area.r0-.5 || y0>area.r1+.5)continue;
+      triangle ||= Array.from(ids,vertex);
       let poly=triangle;
       for(const [axis,limit,sign] of [[0,area.c0-.5,1],[0,area.c1+.5,-1],[1,area.r0-.5,1],[1,area.r1+.5,-1]]) {
         const next=[];
@@ -142,14 +149,18 @@ export function surfaceForArea(src, areas) {
   return {...src,...output,index};
 }
 
-/** Keep decorative mesh components whole. Only hide components wholly inside an
- * inactive board region; landscape and components crossing its boundary stay intact. */
-export function sceneryForArea(src, areas, {interiorOnly=false, surroundOnly=false, decorationOnly=false}={}) {
+// Authored geometry buffers are immutable. Border selection repeatedly asks for
+// different cells of the same mesh; weld its seams and find components once.
+// Weak keys let obsolete stages and their derived buffers be collected.
+const sceneryComponents = new WeakMap();
+function componentsForScenery(src) {
+  let positions=sceneryComponents.get(src.index);
+  if(!positions)sceneryComponents.set(src.index,positions=new WeakMap());
+  const cached=positions.get(src.position);
+  if(cached)return cached;
   const count = src.position.length / 3;
   const parent = Int32Array.from({length:count}, (_, i) => i);
   const find = i => { while (parent[i] !== i) { parent[i] = parent[parent[i]]; i = parent[i]; } return i; };
-  // UV/material seams duplicate vertices at identical positions. Join those
-  // copies so separate faces of one decorative object cannot be clipped apart.
   const welded = new Map();
   for (const id of src.index) {
     const key = `${src.position[id*3]},${src.position[id*3+1]},${src.position[id*3+2]}`;
@@ -166,6 +177,15 @@ export function sceneryForArea(src, areas, {interiorOnly=false, surroundOnly=fal
     const b=bounds.get(root) || {x0:Infinity,x1:-Infinity,y0:Infinity,y1:-Infinity,z1:-Infinity};
     b.x0=Math.min(b.x0,x);b.x1=Math.max(b.x1,x);b.y0=Math.min(b.y0,y);b.y1=Math.max(b.y1,y);b.z1=Math.max(b.z1,src.position[id*3+2]);bounds.set(root,b);
   }
+  const result={find,bounds};positions.set(src.position,result);return result;
+}
+
+/** Keep decorative mesh components whole. Only hide components wholly inside an
+ * inactive board region; landscape and components crossing its boundary stay intact. */
+export function sceneryForArea(src, areas, {interiorOnly=false, surroundOnly=false, decorationOnly=false}={}) {
+  const {find,bounds}=componentsForScenery(src);
+  // UV/material seams duplicate vertices at identical positions. Join those
+  // copies so separate faces of one decorative object cannot be clipped apart.
   const keep = new Set();
   for (const [root,b] of bounds) {
     const landscape = b.x0 < -.5 || b.x1 > 20.5 || b.y0 < -.5 || b.y1 > 18.5;
@@ -247,6 +267,9 @@ export class BoardScene {
    * @param {{ canvas?: HTMLCanvasElement, quality?: string, antialias?: boolean, renderer?: any }} [opts]
    */
   constructor(THREE, pack, opts = {}) {
+    this.layoutCacheSize = Math.max(0, Math.min(4, opts.layoutCacheSize || 0));
+    this.layoutCache = new Map();
+    this.layoutCacheHits = 0;
     this.THREE = THREE;
     this.pack = pack;
     this.opts = opts;
@@ -442,6 +465,27 @@ export class BoardScene {
     this.meshes = {};
   }
 
+  _disposeLayout(layout) {
+    for(const m of layout.lightmapMaterials)m.dispose();
+    for(const t of Object.values(layout.lightmapTextures))t.dispose();
+    for(const child of layout.children)child.traverse?.(o=>o.geometry?.dispose());
+  }
+
+  _stashLayout() {
+    if(!this.layoutCacheSize || !this.activeLayoutKey || !this.root.children.length)return;
+    const layout={children:[...this.root.children],meshes:this.meshes,board:this.board,staticCrates:this.staticCrates,
+      lightmapMaterials:this.lightmapMaterials,lightmapTextures:this.lightmapTextures,
+      originalStage:this.originalStage,stageLightDir:this.stageLightDir,
+      keyIntensity:this.key.intensity,keyColor:this.key.color.clone(),hemiIntensity:this.hemi.intensity};
+    for(const child of layout.children)this.root.remove(child);
+    this.lightmapMaterials=[];this.lightmapTextures={};this.meshes={};
+    this.layoutCache.set(this.activeLayoutKey,layout);
+    while(this.layoutCache.size>this.layoutCacheSize-1){
+      const [key,old]=this.layoutCache.entries().next().value;
+      this.layoutCache.delete(key);this._disposeLayout(old);
+    }
+  }
+
   /** The crate mesh in board space (s_common_box_01 when loaded, else a unit chamfer-free box), UVs on D. */
   crateGeometry() {
     if (this._crateGeom) return this._crateGeom;
@@ -457,25 +501,40 @@ export class BoardScene {
   }
 
   /** Built areas (inclusive tile rects): rebuilds when they change. */
-  setArea(rects) {
+  setArea(rects, { rebuild = true } = {}) {
     const list = Array.isArray(rects) && rects.length ? rects : AREAS.normal;
     const k = areaKey(list);
     if (k === this.areaKey) return false;
     this.area = list;
     this.areaKey = k;
-    if (this.stage) { this.stageKey = null; this.setStage(this.stage); }
+    this.stageKey = null;
+    if (rebuild && this.stage) this.setStage(this.stage);
     return true;
   }
 
   /** Rebuild everything for a stage (no-op when the same stage object/grid is set again). */
-  setStage(stage) {
+  setStage(stage, area) {
     if (this.destroyed) return;
+    if (area) this.setArea(area, { rebuild: false });
     const key = stage ? `${stage.id || ''}|${(stage.rows || []).join('/')}|${JSON.stringify((stage.devices || []).map((d) => [d.key, d.pos, d.active, d.dir]))}|${stage.previewLayout ? stage.previewLayout.worldOffset || 0 : 'native'}` : '';
     if (key === this.stageKey) return;
+    const layoutKey=stage ? `${key}|${this.areaKey}|${this.mapQuality}|${!!this.pack?.original?.scenes?.[stage.id]}` : null;
+    const cached=this.layoutCache.get(layoutKey);
+    if(cached)this.layoutCache.delete(layoutKey);
+    this._stashLayout();
     this.stageKey = key;
     this.stage = stage || null;
     this._clear();
+    this.activeLayoutKey=layoutKey;
     if (!stage) return;
+    if(cached){
+      for(const child of cached.children)this.root.add(child);
+      for(const prop of ['meshes','board','staticCrates','lightmapMaterials','lightmapTextures','originalStage','stageLightDir'])this[prop]=cached[prop];
+      this.key.intensity=cached.keyIntensity;this.key.color.copy(cached.keyColor);this.hemi.intensity=cached.hemiIntensity;
+      this._fitShadow(this.board);this._rebuildCrates();
+      this.renderer.shadowMap.needsUpdate=true;this.layoutCacheHits++;
+      return;
+    }
     if (this.mapQuality !== 'low' && this.pack?.original?.loadStage && !this.pack.original.scenes[stage.id]) {
       this.pack.original.loadStage(stage.id).then((scene) => {
         if (scene && !this.destroyed && this.stage?.id === stage.id) {
@@ -995,7 +1054,7 @@ export class BoardScene {
 
   stats() {
     const info = this.renderer.info;
-    return { calls: info?.render?.calls ?? 0, triangles: info?.render?.triangles ?? 0, textures: info?.memory?.textures ?? 0, geometries: info?.memory?.geometries ?? 0, frames: this.frames, cpuMs: Math.round(this.lastMs * 100) / 100, lost: this.lost, originalStage: this.originalStage || null };
+    return { calls: info?.render?.calls ?? 0, triangles: info?.render?.triangles ?? 0, textures: info?.memory?.textures ?? 0, geometries: info?.memory?.geometries ?? 0, frames: this.frames, cpuMs: Math.round(this.lastMs * 100) / 100, lost: this.lost, originalStage: this.originalStage || null, cachedLayouts:this.layoutCache.size,layoutCacheHits:this.layoutCacheHits };
   }
 
   destroy() {
@@ -1003,6 +1062,8 @@ export class BoardScene {
     this.destroyed = true;
     for (const d of [...this.devices]) d.destroy();
     this._clear();
+    for(const layout of this.layoutCache.values())this._disposeLayout(layout);
+    this.layoutCache.clear();
     this.mat.edge?.map?.dispose?.(); // canvas dash texture (not in this.tex)
     for (const m of Object.values(this.mat)) m?.dispose?.();
     for (const t of Object.values(this.tex)) t?.dispose?.();
