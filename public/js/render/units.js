@@ -812,17 +812,6 @@ export class UnitView {
     this.countText.visible = true;
   }
 
-  /** Local custom-faction debug readout; one label per target, never per stack. */
-  setNoteStacks(n) {
-    this.noteStacks = Math.max(0, Math.floor(Number(n) || 0));
-    if (!this.noteStacks) { if(this.noteText)this.noteText.visible=false; return; }
-    if (!this.noteText) {
-      this.noteText = new this.P.Text('', {fontFamily:'Bender, sans-serif',fontSize:16,fontWeight:'700',fill:'#b7f4df',stroke:'#08120f',strokeThickness:4});
-      this.noteText.anchor.set(.5);this.hud.addChild(this.noteText);
-    }
-    this.noteText.text = `속세의 음 ×${this.noteStacks}`;
-  }
-
   /** Equipped item pips (prep): list of item icon URLs. */
   setItems(urls) {
     const P = this.P;
@@ -1713,11 +1702,6 @@ export class UnitView {
       ic.visible = true;
       ic.width = ic.height = isz;
       ic.position.set(x - ((icons.length - 1) * (isz + 2)) / 2 + i * (isz + 2), iy);
-    }
-    if(this.noteText){
-      this.noteText.visible=this.alive&&!prep&&this.noteStacks>0;
-      this.noteText.scale.set(clamp(s/90,.65,1));
-      this.noteText.position.set(x,iy-isz/2-this.noteText.height/2-3);
     }
     // 狼影 pips under the bars (b.snap `wolves`), then the element gauge row under them (b.snap `elem`); redeploy ring above a
     // knocked-down operator (b.snap `down`)
