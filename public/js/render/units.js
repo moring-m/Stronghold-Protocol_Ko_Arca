@@ -812,6 +812,14 @@ export class UnitView {
     this.countText.visible = true;
   }
 
+  /** Compact note count directly above the target HP bar. */
+  setNoteStacks(n) {
+    this.noteStacks=Math.max(0,Math.floor(Number(n)||0));
+    if(!this.noteStacks){if(this.noteText)this.noteText.visible=false;return;}
+    if(!this.noteText){this.noteText=new this.P.Text('',{fontFamily:'Bender, sans-serif',fontSize:12,fontWeight:'700',fill:'#b7a5ed',stroke:'#08120f',strokeThickness:3});this.noteText.anchor.set(.5,1);this.hud.addChild(this.noteText);}
+    this.noteText.text=`속세의 음 ${this.noteStacks}`;
+  }
+
   /** Equipped item pips (prep): list of item icon URLs. */
   setItems(urls) {
     const P = this.P;
@@ -1613,7 +1621,7 @@ export class UnitView {
     if(this.info.energyMax && !this.energyText)this.setEnergy(this.info.energy || 0);
 
     const damaged = this.hp < this.maxHp - 0.5;
-    const showHp = showBars && (!this.isEnemy || damaged || this.isBoss || this.shieldHp > 0) && !NO_HP_BAR.has(this.info.defId);
+    const showHp = showBars && (!this.isEnemy || damaged || this.isBoss || this.shieldHp > 0 || this.noteStacks > 0) && !NO_HP_BAR.has(this.info.defId);
     const bw = clamp(s * (this.isBoss ? UNIT.bossBarWidth : UNIT.barWidth), 24, this.isBoss ? 260 : 96);
     const bh = clamp(s * (this.isBoss ? 0.09 : 0.065), 3, this.isBoss ? 9 : 6);
     // a knocked-down operator's HUD is its redeploy ring alone, drawn at full strength over the greyed model
@@ -1622,6 +1630,7 @@ export class UnitView {
     this.shake = Math.max(0, this.shake - dt);
     const x0 = x - bw / 2 + sx;
     let cy = y - 4;
+    if(this.noteText){this.noteText.visible=showBars&&this.noteStacks>0;this.noteText.scale.set(clamp(s/90,.65,1));this.noteText.position.set(x+sx,cy-3);}
     // HP
     this.hpBg.visible = this.hpFill.visible = this.hpGhost.visible = showHp;
     if (showHp) {

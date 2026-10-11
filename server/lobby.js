@@ -602,6 +602,7 @@ export class Lobby {
     this.dropReplay(room, session.playerId);
     room.customExtensions = selected;
     room.customFactions = selected.bonds.includes('ursus') && !(selected.disabledBonds||[]).includes('ursusShip');
+    if (!room.customExtensions.bonds.includes('leithanien')) for (const member of room.chatMembers.values()) if (member.faction === '라이타니엔') member.faction = null;
     if (!room.customFactions) for (const member of room.chatMembers.values()) if (member.faction === '우르수스') member.faction = null;
     for (const s of room.seats) if (s && !s.isBot && s.playerId !== room.hostId) s.ready = false;
     this.broadcastState(room);
@@ -1022,6 +1023,7 @@ export class Lobby {
     const seat = room?.seatOf(session.playerId) || spectator;
     if (!seat || seat.isBot || seat.left) return fail(ERR.NOT_IN_ROOM);
     const selecting = msg.t === 'g.chatFaction';
+    if (selecting && msg.faction === '라이타니엔' && !room.customExtensions.bonds.includes('leithanien')) return fail(ERR.BAD_MSG);
     if (selecting && msg.faction === '우르수스' && !room.customFactions) return fail(ERR.BAD_MSG);
     const text = selecting ? (msg.faction === null ? '진영 선택 취소' : chatFaction(msg.faction) ? `진영 선택: ${msg.faction}` : '') : normalizeChatText(msg.text);
     if (!text) return fail(ERR.BAD_MSG);

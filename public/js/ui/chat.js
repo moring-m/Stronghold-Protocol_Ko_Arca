@@ -18,6 +18,7 @@ export function ChatPanel({room = false, docked = false}) {
   const m = data.get('assets');
   const messages = useStore((s) => s.chat);
   const online = useStore((s) => s.connection.status === 'online');
+  const leithanien = useStore(s => (s.room?.inMatch ? s.match.public?.customExtensions : s.room?.customExtensions)?.bonds?.includes('leithanien') === true);
   const customFactions = useStore(s => !!(s.room?.inMatch ? s.match.public?.customFactions : s.room?.customFactions));
   const faction = useStore((s) => s.chatFaction);
   const [expanded, setOpen] = useState(false);
@@ -136,7 +137,7 @@ export function ChatPanel({room = false, docked = false}) {
         <button type="button" class="game-chat__settings" aria-label="채팅 설정 열기" title="채팅 설정" onClick=${() => setSettingsOpen(true)}>⚙</button>
         <button type="button" class="game-chat__close" aria-label="채팅 닫기" onClick=${() => setOpen(false)}>×</button></header>
       ${choosingFaction ? html`<div id="game-chat-factions" class="game-chat__factions" role="group" aria-label="채팅 진영 선택">
-        ${CHAT_FACTIONS.filter(f => f.name !== '우르수스' || customFactions).map((f) => html`<button key=${f.name} type="button" style=${{ '--faction-color': f.color }}
+        ${CHAT_FACTIONS.filter(f => (f.name !== '우르수스' || customFactions) && (f.name !== '라이타니엔' || leithanien)).map((f) => html`<button key=${f.name} type="button" style=${{ '--faction-color': f.color }}
           aria-pressed=${faction === f.name} disabled=${sending} onClick=${() => selectFaction(f.name)}><img src=${bondIconUrl(m,f.bondId)} class="game-chat__faction-icon" />${f.name}</button>`)}
         ${faction ? html`<button type="button" class="game-chat__faction-clear" disabled=${sending || !online} onClick=${() => selectFaction(null)}>진영 선택 취소</button>` : null}
       </div>` : null}

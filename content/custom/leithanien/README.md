@@ -20,8 +20,8 @@ NODE_USE_ENV_PROXY=1 node scripts/start-leithanien-local.mjs
 node --test test/content/leithanien.test.js test/match/leithanien.test.js
 ```
 
-대상 위에 `속세의 음 ×중첩 수`를 표시하는 디버그 기능을 포함합니다. 표시값은 현재 남아 있는 중첩의 합계이며, 각 중첩이 만료되면 감소합니다.
+대상 체력바 바로 위에 속세의 음 중첩 수를 작은 글씨로 표시합니다. 표시값은 현재 남아 있는 중첩의 합계이며, 각 중첩이 만료되면 감소합니다.
 
-중첩당 속세의 음 피해 증가량은 +0.25%이며, 6시너지에서 지속시간은 기본 10초에 30중첩당 1초가 추가됩니다. 중첩 성장 추정은 [BALANCE.md](BALANCE.md)를 참고하세요.
+속세의 음 매초 피해는 시전자 공격력의 5% + 맹약 중첩당 0.015%이며 오퍼레이터별 재발동 대기 시간은 0.2초입니다. 6시너지에서 지속시간은 기본 10초에 30중첩당 1초가 추가됩니다. 중첩 성장 추정은 [BALANCE.md](BALANCE.md)를 참고하세요.
 
 위치킹 NPC 원화: PRTS `文件:Avg avg npc 1116 1-1$1.png` (https://prts.wiki/w/文件:Avg_avg_npc_1116_1-1$1.png). 위키 이미지 다운로드가 실패하여 같은 공식 원화의 ArknightsAssets2 사본을 사용했습니다. 전략 아이콘은 이 NPC 얼굴을 기준으로 카셰이 아이콘의 민트 필터·스캔라인·텍스트 스타일을 적용했습니다.

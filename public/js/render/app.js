@@ -1703,6 +1703,7 @@ export async function createFieldView(host, options = {}) {
     if (destroyed || mode !== 'battle') return false;
     if (battleMeta?.fieldId && snap && snap.fieldId && snap.fieldId !== battleMeta.fieldId) return false;
     for (const [id,n] of Object.entries(snap?.energy || {})) views.get(Number(id))?.setEnergy?.(n);
+    for(const [id,v] of views)if(v.isEnemy)v.setNoteStacks?.(snap?.noteStacks?.[id]||0);
     return interp.push(snap, performance.now() / 1000);
   }
 

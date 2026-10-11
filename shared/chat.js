@@ -10,6 +10,7 @@ export const CHAT_FACTIONS = Object.freeze([
   { name: '에기르', bondId: 'egirShip', color: '#009fb2' },
   { name: '시라쿠사', bondId: 'siracusaShip', color: '#4776df' },
   { name: '카시미어', bondId: 'kazimierzShip', color: '#d8b400' },
+  { name: '라이타니엔', bondId: 'leithanienShip', color: '#b7a5ed' },
   { name: '우르수스', bondId: 'ursusShip', color: '#d94c45' },
 ].map(Object.freeze));
 export const chatFaction = (name) => CHAT_FACTIONS.find((f) => f.name === name) || null;

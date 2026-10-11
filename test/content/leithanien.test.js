@@ -19,11 +19,11 @@ function setup(count=3,layers=0,multiple=false){
 }
 test('independent notes last five seconds, merge equal-frame stacks, do not recursively apply',()=>{
  const h=setup();h.b.dealDamage(h.u,h.e,{amount:1,type:'arts'});h.b.dealDamage(h.u,h.e,{amount:1,type:'arts'});
- assert.equal(h.b.leithanien.applications,2);assert.equal(h.b.leithanien.heap.length,1);assert.equal(h.b.snapshot().noteStacks[h.e.id],2);
+ assert.equal(h.b.leithanien.applications,1);assert.equal(h.b.leithanien.heap.length,1);assert.equal(h.b.snapshot().noteStacks[h.e.id],1);
  h.run(1.1);assert.equal(h.b.leithanien.damageBatches,1);
- const d=h.hooksOf('damaged').filter(c=>c.dmg.tags.includes('leithanien:note'));assert.equal(d[0].amount,24);assert.equal(d[0].source,h.u);assert.equal(h.u.stats.artsDamage,26);assert.equal(h.u.stats.physicalDamage||0,0);
+ const d=h.hooksOf('damaged').filter(c=>c.dmg.tags.includes('leithanien:note'));assert.equal(d[0].amount,5);assert.equal(d[0].source,h.u);assert.equal(h.u.stats.artsDamage,7);assert.equal(h.u.stats.physicalDamage||0,0);
  h.b.dealDamage(h.u,h.e,{amount:1,type:'arts'});h.run(4);
- assert.equal(h.b.leithanien.liveStacks,1);h.run(1.1);assert.equal(h.b.leithanien.liveStacks,0);assert.equal(h.b.leithanien.applications,3);assert.equal(h.b.snapshot().noteStacks[h.e.id],undefined);assert.equal(h.b.errorCount,0);
+ assert.equal(h.b.leithanien.liveStacks,1);h.run(1.1);assert.equal(h.b.leithanien.liveStacks,0);assert.equal(h.b.leithanien.applications,2);assert.equal(h.b.snapshot().noteStacks[h.e.id],undefined);assert.equal(h.b.errorCount,0);
 });
 test('six synergy extends each duration by ten seconds + one per thirty layers and weakens enemy damage',()=>{
  const h=setup(6,30);h.b.dealDamage(h.u,h.e,{amount:1,type:'arts'});
@@ -31,7 +31,7 @@ test('six synergy extends each duration by ten seconds + one per thirty layers a
  const below=setup(6,29);below.b.dealDamage(below.u,below.e,{amount:1,type:'arts'});assert.equal(below.b.leithanien.heap[0].end-below.b.time,10);
  const hp=h.u.hp;h.b.dealDamage(h.e,h.u,{amount:100,type:'true'});assert.equal(hp-h.u.hp,75);const hpDot=h.u.hp;h.b.dealDamage(h.e,h.u,{amount:100,type:'true',sourceless:true});assert.equal(hpDot-h.u.hp,75);
  h.run(11.1);const hp2=h.u.hp;h.b.dealDamage(h.e,h.u,{amount:100,type:'true'});assert.equal(hp2-h.u.hp,100);
- assert.ok(Math.abs(h.hooksOf('damaged').find(c=>c.dmg.tags.includes('leithanien:note')).amount-12.75)<1e-6);assert.equal(h.b.errorCount,0);
+ assert.ok(Math.abs(h.hooksOf('damaged').find(c=>c.dmg.tags.includes('leithanien:note')).amount-5.45)<1e-6);assert.equal(h.b.errorCount,0);
 });
 test('faction content is opt-in and each custom core adds exactly one ban',()=>{
  const base=applyCustomExtensions(data,{bonds:[],stages:[]});assert.ok(!base.bonds.leithanienShip);assert.ok(!base.items.chess_item_custom_leithanien_bell_a);assert.ok(!base.bands.band_custom_leithanien_witchking);assert.ok(!base.choices.cards.tactic.some(c=>c.effectId==='allybuff_custom_leithanien_oath'));
@@ -52,16 +52,16 @@ test('Viviana gain and other battle traits respect per-battle limits; equipment 
  const h=makeBattle({data:raw,autoFinish:false,units:[{chessId:vivi,row:10,col:3,items:['chess_item_custom_leithanien_score_a','chess_item_custom_leithanien_bell_a']},{chessId:less,row:10,col:4},{chessId:diam,row:10,col:5}],enemies:[{key:'dummy',route:{motion:'WALK',start:[10,9],end:[10,8],checkpoints:[]}}],bonds:{leithanienShip:{active:true,count:6,tier:2,layers:0},skillfulShip:{active:true,count:3,tier:1,layers:0},arcaneShip:{active:true,count:3,tier:1,layers:0},raidShip:{active:true,count:3,tier:1,layers:0}},flags:{layerGainsEnabled:true},captureNoisy:true});h.run(.1);
  const v=h.unit(vivi),l=h.unit(less),d=h.unit(diam),e=h.enemy();const p=h.b.getPlayer(v.ownerId);assert.equal(p.bonds.leithanienShip.layers,4);
  for(let i=0;i<20;i++)h.b.emit('deploy',{unit:l,initial:false});assert.equal(p.bonds.leithanienShip.layers,32);
- for(let i=0;i<60;i++)h.b.dealDamage(v,e,{amount:1,type:'arts'});assert.equal(p.bonds.leithanienShip.layers,52);assert.equal(p.bonds.skillfulShip.layers,20);
- const arcaneBefore=p.bonds.arcaneShip.layers,nimbleBefore=p.bonds.skillfulShip.layers;e.x=6;e.y=10;for(let i=0;i<9;i++)h.b.emit('damaged',{target:e,type:'element',dmg:{element:'necrosis'},amount:1});assert.equal(p.bonds.arcaneShip.layers-arcaneBefore,7);assert.equal(p.bonds.skillfulShip.layers,nimbleBefore);
+ for(let i=0;i<60;i++){h.b.dealDamage(v,e,{amount:1,type:'arts'});h.b.time+=.2;}assert.equal(p.bonds.leithanienShip.layers,52);assert.equal(p.bonds.skillfulShip.layers,20);
+ const arcaneBefore=p.bonds.arcaneShip.layers,nimbleBefore=p.bonds.skillfulShip.layers;e.x=6;e.y=10;for(let i=0;i<9;i++)h.b.emit('damaged',{target:e,type:'element',dmg:{element:'necrosis'},amount:1});assert.equal(p.bonds.arcaneShip.layers-arcaneBefore,6);assert.equal(p.bonds.skillfulShip.layers,nimbleBefore);
  const before=h.b.leithanien.applications;h.b.emit('skillStart',{unit:l});assert.equal(h.b.leithanien.applications,before+1);
  assert.equal(v.findBuff('leithanien:score:arts').mods.artsDealtMul,1.4);assert.equal(v.s.aspd>=120,true);assert.equal(h.b.errorCount,0,JSON.stringify(h.b.errors));
 });
 
-test('three thousand simultaneous stacks use one cohort and five damage batches',()=>{
+test('three thousand simultaneous hits are throttled to one note and five damage batches',()=>{
  const h=setup();
  for(let i=0;i<3000;i++)h.b.dealDamage(h.u,h.e,{amount:1,type:'arts'});
- assert.equal(h.b.leithanien.heap.length,1);assert.equal(h.b.leithanien.liveStacks,3000);
+ assert.equal(h.b.leithanien.heap.length,1);assert.equal(h.b.leithanien.liveStacks,1);
  h.run(5.1);assert.equal(h.b.leithanien.damageBatches,5);assert.equal(h.b.leithanien.liveStacks,0);assert.equal(h.b.errorCount,0);
 });
 test('newly supported operators also cast their alternative skills without content errors',()=>{
@@ -92,23 +92,23 @@ test('battle entry preserves enabled Leithanien operators through DataSource and
 test('notes from multiple casters are recorded in each operator arts damage statistics',()=>{
  const h=setup(3,0,true),second=h.unit('test2');
  h.b.dealDamage(h.u,h.e,{amount:1,type:'phys'});h.b.dealDamage(second,h.e,{amount:1,type:'phys'});h.run(1.1);
- assert.equal(h.u.stats.artsDamage,12);assert.equal(second.stats.artsDamage,24);
+ assert.equal(h.u.stats.artsDamage,5);assert.equal(second.stats.artsDamage,10);
  assert.equal(h.u.stats.physicalDamage,1);assert.equal(second.stats.physicalDamage,1);
  assert.equal(h.b.snapshot().noteStacks[h.e.id],2);assert.equal(h.b.errorCount,0);
 });
 
-test('Leithanien description displays the current 0.25-percent damage scaling',()=>{
+test('Leithanien description displays the current attack coefficient scaling',()=>{
  const bond=data.bonds.leithanienShip;
- assert.ok(richTextPlain(formatBondEffect(bond,1)).includes('+20.25%'));
- assert.ok(richTextPlain(formatBondEffect(bond,568)).includes('+162.00%'));
- assert.ok(richTextPlain(formatBondEffect(bond,999)).includes('+269.75%'));
+ assert.ok(richTextPlain(formatBondEffect(bond,600)).includes('14.00%'));
+ assert.ok(richTextPlain(formatBondEffect(bond,568)).includes('13.52%'));
+ assert.ok(richTextPlain(formatBondEffect(bond,400)).includes('11.00%'));
  assert.ok(bond.desc.includes('30회 중첩할 때마다 +1초'));
  assert.ok(!bond.desc.includes('[3]'));
 });
 
  test('notes suppress floating damage numbers while retaining caster statistics',()=>{
  const h=setup(6,30);h.b.dealDamage(h.u,h.e,{amount:1,type:'arts'});const before=h.eventsOf('dmg').length;h.run(1.1);
- assert.equal(h.eventsOf('dmg').length,before);assert.ok(Math.abs(h.u.stats.artsDamage-13.75)<1e-6);
+ assert.equal(h.eventsOf('dmg').length,before);assert.ok(Math.abs(h.u.stats.artsDamage-6.45)<1e-6);
  const bond=data.bonds.leithanienShip;assert.ok(richTextPlain(formatBondEffect(bond,90,6)).includes('13초간'));assert.ok(bond.descRaw.includes('<@ba.vup>속세의 음</>'));
  });
 test('Ebenholz uses one/two percent attack per three Leithanien layers',()=>{
@@ -121,7 +121,7 @@ test('Ebenholz uses one/two percent attack per three Leithanien layers',()=>{
 test('final operator tiers and Diamante affiliations match the selected changes',()=>{
  for(const suffix of ['a','b']){
   assert.equal(data.chess['chess_custom_leithanien_viviana_'+suffix].tier,6);
-  assert.equal(data.chess['chess_custom_leithanien_ebenholz_'+suffix].tier,5);
+  assert.equal(data.chess['chess_custom_leithanien_ebenholz_'+suffix].tier,6);
   const d=data.chess['chess_custom_leithanien_diamante_'+suffix];assert.deepEqual(d.bonds,['leithanienShip','arcaneShip']);
   assert.ok(data.garrisons[d.garrisonIds[0]].desc.includes('[아케인]'));
  }
@@ -138,4 +138,15 @@ test('current Leithanien effect shows floored duration bonuses without per-layer
  }
  assert.ok(richTextPlain(formatBondEffect(bond,400,3)).includes('목표에게 5초간'));
  assert.ok(bond.desc.includes('30회 중첩할 때마다 +1초'));
+});
+
+test('note application cooldown is per caster and expires at 0.2 game seconds',()=>{
+ const h=setup(3,600,true),second=h.unit('test2');
+ const hit=u=>h.b.dealDamage(u,h.e,{amount:1,type:'phys'});
+ hit(h.u);hit(h.u);hit(second);assert.equal(h.b.leithanien.applications,2);
+ h.b.time+=.199;hit(h.u);assert.equal(h.b.leithanien.applications,2);
+ h.b.time+=.001;hit(h.u);assert.equal(h.b.leithanien.applications,3);
+ h.run(1.1);
+ const notes=h.hooksOf('damaged').filter(c=>c.dmg.tags.includes('leithanien:note'));
+ assert.ok(notes.some(c=>c.source===second&&Math.abs(c.amount-28)<1e-6));
 });
