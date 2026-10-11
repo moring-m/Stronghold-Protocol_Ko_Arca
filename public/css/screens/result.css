@@ -158,3 +158,5 @@
 .result__pages button{border:0;border-bottom:2px solid transparent;background:transparent;color:var(--text-lo);font:inherit;font-size:.21rem;font-weight:700;letter-spacing:.06em;padding:.12rem .2rem;white-space:nowrap}
 .result__pages button[aria-pressed="true"]{border:0;border-bottom:2px solid var(--mint-400);color:var(--text-hi);background:transparent}
 .result__pages button:hover{color:var(--mint-400)}
+
+.result__custom{margin:.15rem 0;font-size:.12rem;max-width:3rem}.result__custom summary{color:var(--mint);cursor:pointer}.result__custom p{margin:.05rem 0 .12rem;overflow-wrap:anywhere}

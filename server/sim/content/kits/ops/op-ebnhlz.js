@@ -65,6 +65,7 @@
 
 import { num, talentBb, moduleBb, traitBb, skillRec, batMod, up, toggleBuff } from '../shared/tier1.js';
 import { canTargetEnemy, sortEnemyTargets } from '../../../targeting.js';
+import { bodyOnTile } from '../../../body.js';
 import { hasHp } from '../../../damage.js';
 import { COLS } from '../../../constants.js';
 import { hypot } from '../../../detmath.js';
@@ -143,14 +144,24 @@ function remnantKit(owner) {
       }, { owner: t });
       battle.on('tick', () => {
         if (!t.alive || t.mem.flashback) return;
-        if (!battle.foesInRadius(t.x, t.y, REMNANT_RADIUS, true).some((e) => !e.isFlying && canTargetEnemy(t, e, GROUND))) return;
+        const nearby = () => {
+          const out = battle.foesInRadius(t.x, t.y, REMNANT_RADIUS, true).filter(e => !e.isFlying && canTargetEnemy(t,e,GROUND));
+          for (const e of battle.enemies) {
+            if (!e.alive || !e.deployed || e.isFlying || !(e.isBoss || e.def?.rank === 'BOSS') || !canTargetEnemy(t,e,GROUND) || out.includes(e)) continue;
+            let adjacent = false;
+            for (let dr=-1;dr<=1;dr++) for (let dc=-1;dc<=1;dc++) if ((dr || dc) && bodyOnTile(e,Math.round(t.y)+dr,Math.round(t.x)+dc)) adjacent=true;
+            if (adjacent) out.push(e);
+          }
+          return out;
+        };
+        if (!nearby().length) return;
         t.mem.flashback = true;
         const seq = t.deploySeq;
         battle.fx('aoe', { x: t.x, y: t.y, radius: REMNANT_RADIUS, id: t.id, dmgType: 'arts', skill: 'ebnhlz:flashback', t: REMNANT_DELAY });
         battle.after(REMNANT_DELAY, () => {
           if (!t.alive || t.deploySeq !== seq) return;
           const atk = owner && owner.s ? owner.s.atk : t.s.atk;
-          for (const e of battle.foesInRadius(t.x, t.y, REMNANT_RADIUS, true)) {
+          for (const e of nearby()) {
             if (e.isFlying || !canTargetEnemy(t, e, GROUND)) continue;
             battle.dealDamage(t, e, { amount: atk * scale, type: 'arts', isSkill: true, tags: ['summon', 'ebnhlz:flashback'] });
             if (e.alive && battle.push(e, force, { from: t, inward: true }) > 0) battle.fx('pull', { x: e.x, y: e.y, id: e.id, src: t.id });

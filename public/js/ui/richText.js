@@ -166,7 +166,7 @@ export function fillPlaceholders(src, values, formats = []) {
  * @param {number} [layers]
  * @returns {string} rich text (markup kept)
  */
-export function formatBondEffect(bond, layers = 0) {
+export function formatBondEffect(bond, layers = 0, count = 0) {
   if (!bond || typeof bond !== 'object') return '';
   const src = bond.effectDescRaw || bond.effectDesc || '';
   const params = Array.isArray(bond.effectDescParams) ? bond.effectDescParams : [];
@@ -184,5 +184,6 @@ export function formatBondEffect(bond, layers = 0) {
     values[p.index] = chance ? Math.max(0, Math.min(1, base + per * L)) : base + per * L;
     formats[p.index] = p.format || '0';
   }
-  return fillPlaceholders(src, values, formats);
+  const text=fillPlaceholders(src, values, formats);
+  return bond.bondId==='leithanienShip'||bond.id==='leithanienShip'?text.replace('5초',`${count>=6?10+Math.floor(L/30):5}초`).replaceAll('{leithDurationBonus}',String(5+Math.floor(L/30))).replaceAll('{leithDurationStacks}',String(Math.floor(L/30))):text;
 }

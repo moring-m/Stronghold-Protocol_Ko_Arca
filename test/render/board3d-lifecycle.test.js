@@ -368,3 +368,20 @@ test('rising rage glow appears only with a native map and follows each rendered 
   assert.ok(Math.abs(board.meshes.infectionRise.geometry.attributes.position.getZ(0)-.43)<1e-5);
  }finally{board.destroy();}
 });
+
+test('native rage map emits glow for both infection tiles',async()=>{
+ const {gunzipSync}=await import('node:zlib');const stage=stages.act1autochess_m04;
+ const native=JSON.parse(gunzipSync(readFileSync(path.join(ROOT,`public/assets/local/map/original/${stage.id}-v16.json.gz`))));
+ const pack=fakePack();pack.original={scenes:{[stage.id]:native},materials:{},images:{}};
+ const board=new BoardScene(THREE,pack,{renderer:stubRenderer()});
+ try{for(const[key,g]of Object.entries(native.buckets))board.originalMaterials[g.material||key] ||= new THREE.MeshStandardMaterial();board.setStage(stage,AREAS.normal);
+ const tiles=board.board.terrain.infection;
+ assert.equal(tiles.length,2);assert.equal(board.meshes.infectionRise.geometry.attributes.position.count,32);
+ const pos=board.meshes.infectionRise.geometry.attributes.position;
+ for(let tile=0;tile<2;tile++){
+   const z=board._nativeTileHeight(board.board,...tiles[tile]);
+   assert.ok(Math.abs(pos.getZ(tile*16)-(z+.03))<1e-5);
+   assert.ok(pos.getZ(tile*16+2)-pos.getZ(tile*16)>.59,'glow extends above foreground rim on both tiles');
+ }
+ }finally{board.destroy();}
+});

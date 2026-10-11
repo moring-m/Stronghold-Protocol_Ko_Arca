@@ -486,7 +486,9 @@
 .preset-name-row .preset-faction-icon { width:max(.24rem,20px); height:max(.24rem,20px); flex:none; object-fit:contain; }
 
 /* Optional leftmost equipment slot, preserving server purchase indexes. */
-.shopbar--item-left .shopbar__item { order: -1; }
+.shopbar--item-left .shopbar__item { order:1; padding-left:0; border-left:0; padding-right:.08rem; border-right:1px dashed var(--line-2); }
+.shopbar--item-left .shopbar__cards, .shopbar--item-left .shopbar__reward { order:2; }
+.shopbar--item-left .funds { order:3; }
 .shopbar__tools { grid-template-columns: auto auto auto; }
 .funds__collapse kbd, .shopbar-tab__btn kbd { font-size: .13rem; margin-left: .05rem; }
 .extension-group-heading { grid-column: 1 / -1; margin: .16rem 0 .04rem; padding-bottom: .06rem; border-bottom: 1px solid var(--line); color: var(--mint-400); font-size: max(.18rem,13px); }
@@ -499,3 +501,5 @@
   box-shadow:none;
   cursor:default;
 }
+
+.custom-ext .extension-rule-value{cursor:default;display:grid;grid-template-columns:minmax(0,1fr) 72px auto;gap:8px!important}.custom-ext .extension-rule-value > input[type="number"]{width:72px;height:36px;padding:0 6px;margin:0;background:#0b1511;border:1px solid #49665c;color:#e1eee8;font:inherit;text-align:right;box-sizing:border-box;min-width:0}.custom-ext .extension-rule-value > span:last-child{white-space:nowrap}.custom-ext .extension-rule-value > input[type="number"]:focus{outline:1px solid #5ee6c2}

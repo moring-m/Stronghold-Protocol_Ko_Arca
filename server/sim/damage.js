@@ -83,6 +83,7 @@ export function makeDamageInfo(d = {}) {
     resIgnoreFlat: d.resIgnoreFlat ?? 0,
     resIgnorePct: d.resIgnorePct ?? 0,
     mul: d.mul ?? 1,
+    silent: !!d.silent,
     canDodge: d.canDodge ?? (type === 'phys' || type === 'arts'),
     isSkill: !!d.isSkill,
     isSplash: !!d.isSplash,
@@ -286,14 +287,14 @@ export function dealDamage(battle, source, target, dmgIn) {
   // gets the stats and the kill (PRTS 伤害分类 无来源 ③)
   const hs = dmg.sourceless ? null : source;
   let ts = target.s;
-  if (ts.flags.invulnerable) { battle._ev(['dmg',target.id,0,dmg.type,{critical:true,expected:0,value:0}]); return 0; }
+  if (ts.flags.invulnerable) { if(!dmg.silent)battle._ev(['dmg',target.id,0,dmg.type,{critical:true,expected:0,value:0}]); return 0; }
   if (sleepBlocks(target, hs, dmg) || liftoffEvades(target, hs, dmg)) return 0;
   if (battle._hooks.hit) {
     battle.emit('hit', { source: hs, target, dmg, credit: source });
     if (dmg.cancel || !target.alive || !target.deployed) return 0;
     if (dmg.type === 'element') return applyElement(battle, source, target, dmg);
     ts = target.s; // handlers may have changed the target's buffs (fragile, invulnerable, dodge…): never use stale stats
-    if (ts.flags.invulnerable) { battle._ev(['dmg',target.id,0,dmg.type,{critical:true,expected:0,value:0}]); return 0; }
+    if (ts.flags.invulnerable) { if(!dmg.silent)battle._ev(['dmg',target.id,0,dmg.type,{critical:true,expected:0,value:0}]); return 0; }
     if (sleepBlocks(target, hs, dmg)) return 0;
   }
   const type = dmg.type;
@@ -337,7 +338,7 @@ export function dealDamage(battle, source, target, dmgIn) {
   final = absorbShields(battle, target, final, type);
   target.stats.shieldAbsorbed=(target.stats.shieldAbsorbed||0)+Math.max(0,beforeShield-final);
   dmg.displayCritical = criticalDamage(beforeShield, dmg.expectedDamage, dmg.forceCritical);
-  if (beforeShield > 0 && final === 0 && dmg.displayCritical) {
+  if (!dmg.silent && beforeShield > 0 && final === 0 && dmg.displayCritical) {
     const barrier = ts.shield > 0;
     battle._ev(['dmg', target.id, roundedDamageNumber(beforeShield), type,
       {critical: true, expected: dmg.expectedDamage, blocked: barrier ? 'barrier' : 'shield',sourceId:source?.id ?? null,isAttack:!!dmg.isAttack,isSkill:!!dmg.isSkill}]);

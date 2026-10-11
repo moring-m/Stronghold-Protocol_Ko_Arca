@@ -404,10 +404,25 @@ export function attachAudit(m, { invariants = true, limit = 200 } = {}) {
       expectUnite = null;
     });
     const before = new Map(m.alivePlayers().map((ps) => [ps, ps.lp]));
+    const sharedHp=!!gd.config.customRules?.sharedHp,teamBefore=m.teamLp;
+    const lostBefore=new Map([...before.keys()].map(ps=>[ps,ps.stats.lpLost]));
     const res = orig(plan, uniteResult);
     check('settle', () => {
       const cap = gd.lpCapPerRound;
       const uniteRan = !!(plan && uniteResult && !uniteResult.synthetic);
+      if(sharedHp){
+        let billed=0;
+        for(const ps of before.keys()){
+          const n=ps.stats.lpLost-lostBefore.get(ps),counted=(m.lastResults.get(ps.playerId)?.leaked||[]).filter(l=>l&&l.counted!==false).length;
+          const max=uniteRan&&plan.leakers.includes(ps)?cap:Math.min(cap,counted);
+          if(n<0||n>max||(!uniteRan&&n!==max))fail(`${ps.playerId}: invalid shared HP contribution ${n}`);
+          billed+=n;
+          if(ps.alive !== (m.teamLp>0))fail(`${ps.playerId}: alive differs from shared HP ${m.teamLp}`);
+        }
+        if(m.teamLp!==Math.max(0,teamBefore-billed))fail('shared HP settlement differs from billed losses');
+        if(m.alivePlayers().reduce((n,p)=>n+p.lp,0)!==m.teamLp)fail('shared HP shares differ from pool');
+        return;
+      }
       for (const [ps, lp0] of before) {
         const r = m.lastResults.get(ps.playerId) || { leaked: [] };
         const counted = (r.leaked || []).filter((l) => l && l.counted !== false).length;

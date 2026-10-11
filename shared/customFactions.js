@@ -9,3 +9,14 @@ export function customFactionData(raw, enabled) {
   const choices=raw.choices?{...raw.choices,cards:{...raw.choices.cards,tactic:(raw.choices.cards?.tactic||[]).filter(c=>!custom(c.effectId))}}:raw.choices;
   return {...raw,chess,bonds,items,bands,choices};
 }
+
+export function filterCustomFaction(raw, key, bondId, enabled) {
+ if(enabled)return raw;
+ const custom=id=>id.includes('custom_'+key);
+ const chess=Object.fromEntries(Object.entries(raw.chess||{}).filter(([id])=>!custom(id)).map(([id,c])=>[id,{...c,bonds:(c.bonds||[]).filter(b=>b!==bondId)}]));
+ const bonds=Object.fromEntries(Object.entries(raw.bonds||{}).filter(([id])=>id!==bondId).map(([id,b])=>[id,{...b,members:b.members?.filter(x=>!custom(x)),visibleMembers:b.visibleMembers?.filter(x=>!custom(x))}]));
+ const items=Object.fromEntries(Object.entries(raw.items||{}).filter(([id])=>!custom(id)));
+ const bands=Object.fromEntries(Object.entries(raw.bands||{}).filter(([id])=>!custom(id)));
+ const choices=raw.choices?{...raw.choices,cards:{...raw.choices.cards,tactic:(raw.choices.cards?.tactic||[]).filter(c=>!custom(c.effectId))}}:raw.choices;
+ return {...raw,chess,bonds,items,bands,choices};
+}

@@ -124,6 +124,7 @@ export function TeamPanel({ pub, myId, watching, bubbles, onWatch, compact = fal
   const phaseKey = `${pub?.phase}:${pub?.round}`;
   useEffect(() => { setOpenPid(null); }, [phaseKey, watching, observe?.observing]);
   const players = sortedPlayers(pub);
+  const shared=pub?.customExtensions?.rules?.includes('sharedHp');
   if (!players.length) return null;
   // the shared-field phases (最终攻势 / 隐秘核心 / 联防): mark the rows fighting next to the viewer (user playtest #5)
   const mates = new Set(sameFieldmates(pub, myId));
@@ -162,7 +163,7 @@ export function TeamPanel({ pub, myId, watching, bubbles, onWatch, compact = fal
       const open = !!observe && openPid === p.playerId && !self;
       const back = !!observe && self && observe.observing;
       const title = observe ? (self ? (observe.observing ? '返回战场' : '你自己') : `查看 ${p.name} 的战场`) : (self ? '查看自己的阵地' : `查看 ${p.name} 的阵地`);
-      const lp = rowLp(p, pub, self ? selfLive : null, { uniteLocal, normalLeaks, cap });
+      const lp = rowLp(shared?{...p,lp:pub.teamLp}:p, pub, self ? (shared&&selfLive?{...selfLive,lp:pub.teamLp}:selfLive) : null, { uniteLocal, normalLeaks, cap });
       const same = !self && mates.has(p.playerId);
       // the shared-field frame (最终攻势 / 隐秘核心 / 联防 + the boss-round prep pairing, user playtest #5): the official
       // co-op style — a gold frame on the avatar, the tooltip says why; it beats the old text chip nobody noticed
@@ -179,8 +180,8 @@ export function TeamPanel({ pub, myId, watching, bubbles, onWatch, compact = fal
         <div class="team__info">
           <span class="team__name">${p.name || '博士'}</span>
           <div class="team__line">
-            <${LpTower} value=${lp.lp} size="sm" tone=${Number.isFinite(lp.lp) && lp.lp - lp.pending <= 5 ? 'danger' : null} pending=${lp.pending}
-              tip=${rowLpTip(lp, cap)} />
+            ${shared?html`<span class="team__shared-loss num" title="감소 예정 HP">−${lp.pending||0}</span>`:html`<${LpTower} value=${lp.lp} size="sm" tone=${Number.isFinite(lp.lp) && lp.lp - lp.pending <= 5 ? 'danger' : null} pending=${lp.pending}
+              tip=${rowLpTip(lp, cap)} />`}
             ${lp.left != null ? html`<${MissTag} n=${lp.left} name=${self ? null : p.name || '博士'} />` : null}
             <${Tooltip} text=${offline ? '连接已断开' : meta.text} placement="right">
               <span class=${cx('team__status', `is-${meta.tone}`, offline && 'is-offline', (offline || STATUS_SPRITE[status]) && localAsset('ui/battle', offline ? 'icon_lost_connect' : STATUS_SPRITE[status]) && 'has-sprite')} aria-label=${meta.text}>

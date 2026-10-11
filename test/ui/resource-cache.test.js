@@ -165,3 +165,24 @@ test('all failed sources retain their HTTP and timeout causes',async()=>{
  const message=messages.find(m=>m.type==='error')?.message;
  assert.match(message,/cdn.jsdelivr.net: HTTP 404/);assert.match(message,/raw.githubusercontent.com: 요청 시간 초과·중단/);
 });
+
+test('resource redownload deletes resource caches only and prevents pending old downloads from writing back',async()=>{
+ const handlers={},stores=new Map([['stronghold-resources-old',new Map()],['user-history',new Map([['history','keep']])]]);
+ let release;const slow=new Promise(r=>release=r);
+ const file={path:'/assets/reset-test.bin',sources:['https://raw.githubusercontent.com/example/main/reset.bin']};
+ const index={version:'old',files:[file],fontCss:''};
+ const caches={keys:async()=>[...stores.keys()],delete:async key=>stores.delete(key),open:async name=>{
+   if(!stores.has(name))stores.set(name,new Map());const saved=stores.get(name);
+   return {match:async key=>saved.get(key)?.clone(),put:async(key,r)=>saved.set(key,r.clone()),keys:async()=>[...saved.keys()].map(key=>({url:'https://example.test'+key}))};
+ },match:async()=>undefined};
+ runInNewContext(readFileSync(new URL('../../public/resource-worker.js',import.meta.url),'utf8').replace(/^import[^\n]+\n/,''),{
+  URL,Response,TextDecoder,DataView,AbortSignal,setTimeout,clearTimeout,caches,
+  self:{location:{origin:'https://example.test'},addEventListener:(k,fn)=>handlers[k]=fn},
+  fetch:async url=>{if(url==='/vendor/browser-resources.json')return Response.json(index);await slow;return new Response('asset');}
+ });
+ const send=(type,replies)=>{let pending;handlers.message({data:{type},ports:[{postMessage:m=>replies.push(m)}],waitUntil:p=>pending=p});return pending;};
+ const old=send('preparePatch',[]);await new Promise(r=>setTimeout(r,10));
+ const replies=[];await send('resetResources',replies);assert.equal(replies[0].type,'reset');
+ release();await old;
+ assert.deepEqual([...stores.keys()],['user-history']);assert.equal(stores.get('user-history').get('history'),'keep');
+});

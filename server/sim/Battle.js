@@ -900,12 +900,14 @@ export class Battle {
     const mm = (v, pos = false) => { const n = fin(v, 1); return n < 0 || (pos && n <= 0) ? 1 : n; };
     const m0 = opts.mods || {};
     const m = { hpMul: mm(m0.hpMul, true), atkMul: mm(m0.atkMul), defMul: mm(m0.defMul), resMul: mm(m0.resMul), speedMul: mm(m0.speedMul) };
+    const rules=this.data.raw?.config?.customRules||{};
+    const percent=id=>(rules[id]??100)/100;
     const e = new Unit({
       id: ++this._idSeq, side: 'enemy', kind: 'enemy', def, defId: def.key ?? enemyKey, name: def.name,
       x: start[1], y: start[0], motion: def.motion,
       base: {
-        maxHp: def.maxHp * (m.hpMul ?? 1), atk: def.atk * (m.atkMul ?? 1), def: def.def * (m.defMul ?? 1), res: def.res * (m.resMul ?? 1),
-        aspd: def.aspd, bat: def.bat, blockCnt: 0, moveSpeed: def.moveSpeed * (m.speedMul ?? 1), spRecovery: 0,
+        maxHp: def.maxHp * (m.hpMul ?? 1) * percent('enemyHp'), atk: def.atk * (m.atkMul ?? 1) * percent('enemyAtk'), def: def.def * (m.defMul ?? 1) * percent('enemyDef'), res: def.res * (m.resMul ?? 1) * percent('enemyRes'),
+        aspd: def.aspd * percent('enemyAspd'), bat: def.bat, blockCnt: 0, moveSpeed: def.moveSpeed * (m.speedMul ?? 1) * percent('enemySpeed'), spRecovery: 0,
         tauntLevel: def.tauntLevel, massLevel: def.massLevel, hpRecoveryPerSec: def.hpRecoveryPerSec, rangeRadius: def.rangeRadius,
       },
     });
@@ -2424,11 +2426,11 @@ export class Battle {
     if (!pp) return 0;
     const ps = this.getPlayer(playerId);
     const live = ps && ps.bonds[bondId] ? (ps.bonds[bondId].layers ?? 0) : (pp.layerGains[bondId] ?? 0);
-    if (!(layerGainRoom(live, Infinity) > 0)) return 0;
+    if (!(layerGainRoom(live, Infinity, this.data.raw?.config?.customRules?.unlimitedLayers?Infinity:undefined) > 0)) return 0;
     const source = opts.source ?? null;
     const ctx = { playerId, bondId, n, reason, source, tile: Array.isArray(opts.tile) ? opts.tile : this._sourceTile(source) };
     if (this._hooks.layerGain) { this.emit('layerGain', ctx); if (!(ctx.n > 0) || !Number.isFinite(ctx.n)) return 0; }
-    const add = layerGainRoom(live, ctx.n);
+    const add = layerGainRoom(live, ctx.n, this.data.raw?.config?.customRules?.unlimitedLayers?Infinity:undefined);
     if (!(add > 0)) return 0;
     pp.layerGains[bondId] = (pp.layerGains[bondId] ?? 0) + add;
     if (ps && ps.bonds[bondId]) ps.bonds[bondId].layers = (ps.bonds[bondId].layers ?? 0) + add;
@@ -2541,6 +2543,7 @@ export class Battle {
       fieldId: this.fieldId,
       t: Math.round(this.time * 1000) / 1000,
       units: snapshotUnits(this.units, this.time),
+      noteStacks: Object.fromEntries(this.enemies.filter(u=>u.alive&&u.deployed&&!u.hidden&&u.mem.leithanienStacks>0).map(u=>[u.id,u.mem.leithanienStacks])),
       energy: Object.fromEntries(this.allyUnits.filter(u=>u.alive&&u.deployed&&u.profile?.storeEnergy).map(u=>[u.id,storedEnergy(u)])),
       dp: this.players.length ? Math.floor(this.players[0].dp) : 0,
       killed: this.killed,

@@ -299,3 +299,9 @@ export function inPen(row, col, rect = PEN_RECT) {
   return row >= rect.r0 && row <= rect.r1 && col >= rect.c0 && col <= rect.c1;
 }
 
+
+/** Initial preview visibility follows the same permanent invisibility archetype as combat. */
+export function previewStealth(rec) {
+  // acType/acTypes describe draft factions, not the enemy's actual stealth ability.
+  return (rec?.abilities || []).some(a => /^(隐匿|은신|invisible|stealth)(?:\s*$|[，,（(。:：])/i.test(String(a.text||a.textRaw||'').replace(/<[^>]*>/g,'').trim()));
+}

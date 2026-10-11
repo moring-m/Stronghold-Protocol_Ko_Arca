@@ -571,6 +571,10 @@ export function freezeDef(d) {
 export class DataSource {
   constructor(raw = {}, fallback = null) {
     this.raw = {
+      // Extension selection is revalidated at battle entry, after conversion to DataSource.
+      // Keep the catalogues that distinguish opt-in factions and exclusion rules.
+      bonds: raw.bonds ?? {}, items: raw.items ?? {}, bands: raw.bands ?? {},
+      bosses: raw.bosses ?? {}, config: raw.config ?? {},
       chess: asMap(unwrap(raw.chess, 'chess'), 'chessId') ?? {},
       enemies: asMap(unwrap(raw.enemies, 'enemies'), 'key') ?? {},
       tokens: asMap(unwrap(raw.tokens, 'tokens'), 'tokenId') ?? {},

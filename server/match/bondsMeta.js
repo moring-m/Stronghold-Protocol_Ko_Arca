@@ -114,11 +114,13 @@ export function computeBonds(gd, ps) {
   // first pass: raw counts
   const raw = {};
   for (const id of gd.bondIds) {
-    if (gd.modeInactiveBonds.has(id)) continue;
+    if (gd.modeInactiveBonds.has(id) && !(id===HARMONY_BOND && gd.config.customRules?.defaultHarmony)) continue;
     raw[id] = rawCount(gd, id, mem, ps);
   }
   // 调和: +1 to core bonds with ≥ 1 real board member while it is active
   const harmony = gd.bond(HARMONY_BOND);
+  const defaultHarmony=!!gd.config.customRules?.defaultHarmony;
+  if(defaultHarmony && harmony) raw[HARMONY_BOND]=Math.max(raw[HARMONY_BOND]||0,thresholdsOf(harmony)[0]||1);
   const harmonyActive = harmony && raw[HARMONY_BOND] != null && tierFor(harmony, raw[HARMONY_BOND]) >= 1;
   for (const id of Object.keys(raw)) {
     const bond = gd.bond(id);
@@ -234,13 +236,13 @@ export function bondList(gd, bonds, { full = false, off = null } = {}) {
  * @param {ReturnType<typeof computeBonds>} bonds
  * @param {Record<string, number>|null|undefined} gains
  */
-export function bondsWithGains(bonds, gains) {
+export function bondsWithGains(bonds, gains, limit) {
   if (!gains || typeof gains !== 'object') return bonds;
   let out = null;
   for (const [id, n] of Object.entries(gains)) {
     const b = bonds && bonds[id];
     if (!b) continue;
-    const add = layerGainRoom(b.layers, Math.floor(Number(n) || 0));
+    const add = layerGainRoom(b.layers, Math.floor(Number(n) || 0), limit);
     if (!(add > 0)) continue;
     if (!out) out = { ...bonds };
     out[id] = { ...b, layers: (b.layers || 0) + add };

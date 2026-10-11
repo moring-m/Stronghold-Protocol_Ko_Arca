@@ -1,3 +1,4 @@
+import {recordCustomExtensions} from '../../../shared/customExtensions.js';
 import {combatRound} from '../../../shared/combatStats.js';
 // Local match statistics: every match the local player took part in is appended as one record to localStorage
 // (`sp.pref.stats`). Per-browser only — the server keeps matches in memory and has no identity, so there is nowhere
@@ -38,7 +39,7 @@ import {combatRound} from '../../../shared/combatStats.js';
 import { PHASE } from '../../../shared/constants.js';
 
 /** Current record-envelope version (bump + add a MIGRATIONS step when the record shape changes). */
-export const STATS_VERSION = 1;
+export const STATS_VERSION = 2;
 /** localStorage key under the app's `sp.pref.` prefix (store.js loadPref). */
 export const STATS_PREF_KEY = 'stats';
 /** Oldest records are dropped beyond this many matches. */
@@ -200,6 +201,7 @@ export function normalizeRecord(raw) {
     seed: num(r.seed),
     durationMs: num(r.durationMs),
     teamLp: num(r.teamLp),
+    customExtensions:recordCustomExtensions(r.customExtensions),
     roomMode: r.roomMode === 'solo' || r.roomMode === 'coop' || r.roomMode === 'laboratory' ? r.roomMode : null,
     selfId: str(r.selfId),
     players,
@@ -212,11 +214,11 @@ export function normalizeRecord(raw) {
 
 /**
  * The MIGRATIONS chain: `MIGRATIONS[v]` upgrades a v-envelope to v+1, for v = STATS_VERSION and down.
- * Empty at v1 — the steps exist so the next format change lands as one function here and every stored /
+ * v1 → v2 adds optional match custom settings; existing records remain without a snapshot. Every stored /
  * imported envelope walks the whole chain.
  * @type {Record<number, (stats: any) => any>}
  */
-export const MIGRATIONS = {};
+export const MIGRATIONS = {1:stats=>({...stats,v:2})};
 
 /** Newest first (the stored order): by time, then id. */
 const newestFirst = (a, b) => (b.t - a.t) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
@@ -284,7 +286,7 @@ export function loadStats() {
 // ---- compaction + the storage budget ---------------------------------------------------------------------------
 
 const COMPACT_FRAME = ['id', 'v', 't', 'end', 'victory', 'roundsPassed', 'lastRound', 'hiddenReached', 'hiddenCleared', 'reason', 'modeId',
-  'difficulty', 'roomMode', 'durationMs', 'selfId'];
+  'difficulty', 'roomMode', 'durationMs', 'selfId', 'customExtensions'];
 
 /**
  * The compact form of a record: the frame and the player's OWN row without lineup, bonds and name — everything the
@@ -393,6 +395,7 @@ export function buildRecord(res, ctx = {}) {
     seed: num(r.seed),
     durationMs: num(r.durationMs),
     teamLp: num(r.teamLp),
+    customExtensions:r.customExtensions,
     roomMode: ctx.laboratory ? 'laboratory' : roomModeOf(str(r.modeId), ctx.roomMode),
     selfId: myId,
     players: r.players,
@@ -490,6 +493,7 @@ export function buildQuitRecord(state, ctx = {}) {
     seed: null,
     durationMs: live.sawStart ? Math.max(0, now - live.startedAt) : null,
     teamLp: num(pub.teamLp),
+    customExtensions:pub.customExtensions,
     roomMode: roomModeOf(str(pub.modeId), state.room?.mode),
     selfId: myId,
     players: [{
@@ -513,6 +517,7 @@ export function recordToResult(rec) {
   if (!r || r.end === 'quit' || r.compact) return null;
   const res = {
     laboratory: r.roomMode === 'laboratory',
+    customExtensions:r.customExtensions,
     victory: r.victory,
     roundsPassed: r.roundsPassed,
     hiddenReached: r.hiddenReached,

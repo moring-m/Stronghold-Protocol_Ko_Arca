@@ -344,7 +344,7 @@ export function infectionRiseMaterial(THREE, focus) {
  'float side=smoothstep(0.0,0.015,vUv.x)*(1.0-smoothstep(0.985,1.0,vUv.x));',
  'float rise=fract(vUv.y-uTime*0.65+vWorld.x*0.17+vWorld.y*0.11);',
  'float wisps=pow(max(0.0,sin(vUv.x*25.0+sin(vUv.y*5.0-uTime*2.0)*0.65)),5.0);',
- 'float fade=exp(-vUv.y*4.5)*(1.0-smoothstep(0.65,1.0,vUv.y));',
+ 'float fade=exp(-vUv.y*1.4)*(1.0-smoothstep(0.55,1.0,vUv.y));',
  'float a=side*fade*(0.48+0.35*wisps*pow(1.0-rise,1.5))*focusMask(vWorld.xy);',
  'gl_FragColor=vec4(1.0,0.035,0.018,a);','#include <colorspace_fragment>','}'
  ].join('\n'),transparent:true,depthWrite:false,side:THREE.DoubleSide,blending:THREE.NormalBlending});

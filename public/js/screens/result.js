@@ -1,3 +1,4 @@
+import {EXTENSION_CATEGORIES,RULE_VALUES,customExtensionCatalog,recordCustomExtensions} from '../../../shared/customExtensions.js';
 import { isLaboratory, stopLaboratory } from '../laboratory.js';
 import {CombatReport} from '../ui/combatReport.js';
 import {net} from '../net.js';
@@ -137,6 +138,7 @@ export function ResultView({ res, pub = null, myId = null, backLabel, onBack, qu
             <${Img} src=${enemyIconUrl(gd.m, hidden.enemyKey)} /><span class="medal__check">${r.hiddenCleared ? html`<${Icon} name="check" />` : html`<${Icon} name="close" />`}</span>
             <span class="medal__label">隐秘核心</span></div>` : null}
         </div>
+        ${recordCustomExtensions(res?.customExtensions||pub?.customExtensions)?html`<details class="result__custom"><summary>커스텀 설정</summary>${Object.entries(recordCustomExtensions(res?.customExtensions||pub?.customExtensions)).map(([category,values])=>html`<div><b>${category==='ruleValues'?'규칙 수치':EXTENSION_CATEGORIES.find(c=>c.id===category)?.name||category}</b><p>${category==='ruleValues'?Object.entries(values).map(([id,n])=>{const r=RULE_VALUES.find(r=>r.id===id);return `${r?.name||id} ${n}${r?.unit||''}`;}).join(' · '):values.map(id=>customExtensionCatalog({bonds:gd.bond('leithanienShip')?{leithanienShip:gd.bond('leithanienShip')}: {}})[category]?.find(e=>e.id===id)?.name||(['bonds'].includes(category)?id:category.includes('Bands')?gd.band(id)?.name:category.includes('Bosses')?gd.boss(id)?.name:category.includes('Stages')||category==='stages'?gd.stage(id)?.name:gd.bond(id)?.name)||id).join(' · ')}</p></div>`)}</details>`:null}
         ${mins ? html`<p class="result__time t-lo">本局耗时 <b class="num">${mins}</b> 分钟</p>` : null}
         </div>
         ${chat ? html`<${ChatPanel} docked=${true} />` : null}
