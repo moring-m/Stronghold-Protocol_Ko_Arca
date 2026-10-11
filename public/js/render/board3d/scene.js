@@ -657,14 +657,18 @@ export class BoardScene {
           runtimeMaterial.customProgramCacheKey = () => nativeGamma ? 'sp-focus-native-gamma-rgbm5' : 'sp-focus-unity-rgbm5';
           this.lightmapMaterials.push(runtimeMaterial);
         }
-        const waterSurface = /Dosshore_UI/i.test(sourceName);
+        const waterSurface = /Dosshore_UI/i.test(sourceName) || !!runtimeMaterial.uniforms?.uDeep;
         // City scenery beside the preview pen is environment, not a second field.
         // Retain it only for normal/cooperative framing; never add platform tiles.
         const scenicArea = stage.id === 'act2autochess_m01' && this.area.some(a=>a.r1 >= 13)
           ? [...this.area, {r0:14,r1:18,c0:0,c1:5}] : this.area;
         const nativeArea = stage.previewLayout ? AREAS.boss : this.area;
         let visibleGeometry;
-        if (structuralStage.previewLayout && !geometry.platform) {
+        if (waterSurface) {
+          // A native water plane is continuous background, not a tile or hill.
+          // Keep one authored plane; splitting/moving it produces rectangular seams.
+          visibleGeometry=geometry;
+        } else if (structuralStage.previewLayout && !geometry.platform) {
           // Reuse the cooperative environment as one layout, translated into
           // boss world space. Combat tiles and simulation coordinates stay put.
           const environmentArea=stage.id==='act2autochess_m01'

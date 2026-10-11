@@ -612,11 +612,7 @@ export class UnitView {
     let want = pic.state === 'img' ? 'img' : 'placeholder';
     if (pic.state === 'wait' && nowMs() - pic.t0 < PIC_WAIT_MS) want = null;
     if (!want || pic.shown === want) return;
-    // Catherine's support devices use their original transparent device art, without an operator portrait frame.
-    const supportDevice=/^token_1004[12]_cathy_/.test(this.info.defId||'');
-    this.fallback.texture = supportDevice && want === 'img'
-      ? this.P.Texture.from(pic.img)
-      : diamondTexture(pic.key, want === 'img' ? pic.img : null, pic.color, { enemy: this.isEnemy, golden: this.golden, ice: ICE_TOKENS.has(this.info.defId) });
+    this.fallback.texture = diamondTexture(pic.key, want === 'img' ? pic.img : null, pic.color, { enemy: this.isEnemy, golden: this.golden, ice: ICE_TOKENS.has(this.info.defId) });
     pic.shown = want;
   }
 
@@ -1535,7 +1531,7 @@ export class UnitView {
     if (!spineShown || this.swapT < 1) {
       const size = s * UNIT.diamond * (this.isBoss ? 1.5 : 1);
       const bob = this.alive && this.isEnemy ? Math.sin(t * 2.4 + this.bob) * s * 0.03 : 0;
-      this.fallback.scale.set(size / Math.max(this.fallback.texture.width,this.fallback.texture.height,1));
+      this.fallback.scale.set(size / 160);
       this.fallback.position.set(0, -s * 0.08 + bob);
       this.fallback.tint = this.down ? DOWN_LOOK.tint : this.flash > 0 ? mixTint(0xffffff, 0xff8a80, this.flash) : (this.flags & UF.FROZEN ? 0x9fd4ff : 0xffffff);
       if (!this.alive) this.fallback.alpha = Math.max(0, this.fallback.alpha);
