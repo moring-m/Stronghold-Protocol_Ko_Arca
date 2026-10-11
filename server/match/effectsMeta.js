@@ -541,7 +541,7 @@ export function makeCtx(m, ps, source, hook, ev = null) {
       const base = gd.baseIdOf(id);
       // "some effects fail when the cap is hit" (research 06 §7): by default a chess of the pool needs a free copy
       if (opts.requirePool !== false && m.pool.has(base) && m.pool.left(base) < 1) return null;
-      const p = ps.acquireChess(id, { source: opts.source || source.key || 'effect', toTemp: !!opts.toTemp, fromPool: opts.fromPool !== false });
+      const p = ps.acquireChess(id, { source: opts.source || source.key || 'effect', toTemp: !!opts.toTemp, fromPool: opts.fromPool ?? (opts.requirePool !== false) });
       // 「歌蕾蒂娅：获得斯卡蒂」 — every silent grantChess (a 特质, 余 SERVER_MOST_BOND, a band, an item, a choice).
       // opts.toast === false skips it. A caller that already says the same thing should pass that.
       if (p && opts.toast !== false) {
@@ -560,7 +560,7 @@ export function makeCtx(m, ps, source, hook, ev = null) {
         source: opts.source || source.key || 'effect',
         toTemp: !!opts.toTemp,
         deferMerge: ps._deferItemMerge > 0,
-        fromPool: opts.fromPool !== false,
+        fromPool: opts.fromPool ?? (opts.requirePool !== false),
       });
       return p ? view(p) : null;
     },

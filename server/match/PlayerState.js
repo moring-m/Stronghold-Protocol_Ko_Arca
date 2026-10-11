@@ -601,7 +601,7 @@ export class PlayerState {
     const base = this.gd.baseIdOf(chessId);
     const need = rec.isGolden ? this.gd.goldenCopies : 1;
     const taken = fromPool ? this.pool.take(base, need, { overdraw: true }) : 0;
-    const piece = this.newPiece('chess', chessId, { poolCopies: taken });
+    const piece = this.newPiece('chess', chessId, { poolCopies: taken, poolExempt: !fromPool });
     this.round.gainedChess++;
     let owned = piece;
     if (!rec.isGolden && this.completesChessMerge(chessId)) {
@@ -656,7 +656,7 @@ export class PlayerState {
       for (const it of l.piece.items || []) items.push(it);
       l.piece.items = [];
     }
-    copies += this.pool.take(baseId, Math.max(0, this.gd.goldenCopies - copies), { overdraw: true });
+    if (!consumed.some(l => l.piece.poolExempt)) copies += this.pool.take(baseId, Math.max(0, this.gd.goldenCopies - copies), { overdraw: true });
     const elite = this.newPiece('chess', goldenId, { poolCopies: copies });
     // Preserve other round state; 拉普兰德's elite refresh trait uses a different key from her normal trait.
     for (const l of consumed) {
@@ -702,7 +702,7 @@ export class PlayerState {
     const goldenId = this.gd.goldenIdOf(piece.id);
     if (!goldenId) return false;
     const base = this.gd.baseIdOf(piece.id);
-    const extra = Math.max(0, this.gd.goldenCopies - (piece.poolCopies || 0));
+    const extra = piece.poolExempt ? 0 : Math.max(0, this.gd.goldenCopies - (piece.poolCopies || 0));
     piece.poolCopies = (piece.poolCopies || 0) + this.pool.take(base, extra, { overdraw: true });
     piece.id = goldenId;
     this.recompute();
@@ -757,7 +757,9 @@ export class PlayerState {
     if (!rec || rec.isGolden) return false;
     const gid = rec.upgradeChessId || rec.goldenId;
     if (!gid || !this.gd.item(gid)) return false;
-    if (this.m.itemPool.left(piece.id) < 1) return false;
+    const exempt = piece.stockCopies === 0;
+    if (!exempt && this.m.itemPool.left(piece.id) < 1) return false;
+    if (piece.stockCopies != null && !exempt) piece.stockCopies++;
     piece.id = gid;
     this.recompute();
     return true;
@@ -845,7 +847,7 @@ export class PlayerState {
       this.m.toast(this, 'warn', '장비 재고가 부족하여 장비를 획득하지 못했습니다');
       return null;
     }
-    let piece = this.newPiece('item', itemId);
+    let piece = this.newPiece('item', itemId, { stockCopies: fromPool ? this.m.itemPool.need(itemId) : 0 });
     // A prep-end grant may sit beside an identical copy until the next prep. The invariant counts only copies
     // without this mark, so the fight that is about to start is not reported as a missed merge.
     if (deferMerge) piece.deferMerge = true;
@@ -871,7 +873,8 @@ export class PlayerState {
     // remember where equipped twins sat: with a full hand AND a full temp the golden item takes the first one's slot
     const slotOf = consumed.filter((l) => l.area === 'equipped').map((l) => ({ holder: l.holder, idx: l.holder.items.indexOf(l.piece) }));
     for (const l of consumed) if (l.area !== 'new') this._detach(l);
-    const golden = this.newPiece('item', rec.upgradeChessId || rec.goldenId);
+    const stockCopies = consumed.reduce((n, l) => n + (l.piece.stockCopies ?? this.m.itemPool.need(l.piece.id)), 0);
+    const golden = this.newPiece('item', rec.upgradeChessId || rec.goldenId, { stockCopies });
     if (!this.stow(golden, { allowTemp: true })) {
       const at = slotOf[0];
       if (!at || !this.find(at.holder.uid)) {

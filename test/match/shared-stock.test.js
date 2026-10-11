@@ -129,7 +129,7 @@ test('Mimic can exceed the pool; excess copies keep stock empty until enough own
   const mimic = p.acquireItem('chess_item_5_05_e_a'); assert.ok(mimic);
   assert.ok(p.equip(mimic.uid, target.uid).ok);
   assert.equal(p.allChess().filter(c => m.gd.baseIdOf(c.id) === id).length, 2);
-  assert.equal(m.pool.entries.get(id).left, -1);
+  assert.equal(m.pool.entries.get(id).left, 0, 'free copies do not consume stock');
   assert.equal(m.pool.left(id), 0); checkInvariants(m);
   const elite = p.allChess().find(c => m.gd.baseIdOf(c.id) === id);
   assert.ok(p.sell(elite.uid).ok); assert.equal(m.pool.left(id), 2); checkInvariants(m); m.dispose();
