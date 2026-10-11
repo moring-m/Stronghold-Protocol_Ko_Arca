@@ -1,6 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {LaboratoryMatch} from '../../server/match/LaboratoryMatch.js';
+import {GameData} from '../../server/match/gamedata.js';
 import {Match} from '../../server/match/Match.js';
 import {VirtualScheduler} from '../../server/match/scheduler.js';
 import {getData} from '../../server/data.js';
@@ -85,4 +86,20 @@ test('laboratory suppresses economic/acquisition hooks and reward offers but kee
  assert.equal(ps.layers.victoriaShip,24);
  assert.equal(invoked.includes('onGain'),false);
  assert.equal(invoked.includes('onMerge'),false);
+});
+
+for(const difficulty of ['FUNNY','NORMAL','HARD','ABYSS'])for(const players of [1,2,3,4])test(`laboratory ${difficulty} scales to ${players} living participants with one actual player`,t=>{
+ const modeId=`mode_${players>1?'multi':'single'}_${difficulty.toLowerCase()}`;
+ const reference=new GameData(raw,modeId);
+ const sched=new VirtualScheduler();
+ const m=new LaboratoryMatch({laboratory:{stageId:'act1autochess_m02',bossId:'boss_1',bandId:'band_pith',kind:'boss',players},difficulty,data:raw,seed:17,scheduler:sched,seats:[{seat:0,playerId:'local',name:'박사'}],send:()=>true,broadcast:()=>{},onEnd:()=>{}});t.after(()=>m.dispose());m.start();sched.advance(3000);
+ assert.equal(m.players.size,1);assert.equal(m.mode,'solo');
+ assert.equal(m.round,reference.bossRound);
+ assert.deepEqual(m.gd.enemyScale(m.round),reference.enemyScale(reference.bossRound));
+ assert.equal(m.gd.bossPoolHp('boss_1',1),reference.bossPoolHp('boss_1',players));
+ assert.deepEqual(m.handle('local',{t:'g.ready',ready:true}),{ok:true});
+ sched.advance(3000);
+ assert.equal(m.bossPool.maxHp,reference.bossPoolHp('boss_1',players));
+ assert.equal(m.bossWaves[0].wave.templateId.replace(/_s$/,''),raw.bosses.boss_1.templates[modeId].template.replace(/_s$/,''));
+ assert.equal(m.fields[0].players.length,1);
 });

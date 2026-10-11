@@ -136,21 +136,21 @@ describe('2: the own LP drops live while the battle runs', () => {
     assert.equal(pendingTip(30, 0), null);
   });
 
-  test('team panel rows: show settled HP without previewing leak deductions', () => {
+  test('team panel rows: keep settled HP and restore separate pending-loss indicators', () => {
     const pub = { phase: PHASE.COMBAT };
-    assert.deepEqual(rowLp({ lp: 30, pendingLp: 3 }, pub), { lp: 30, pending: 0, unite: false, left: null });
-    assert.deepEqual(rowLp({ lp: 2, pendingLp: 3 }, pub), { lp: 2, pending: 0, unite: false, left: null }, 'clamped at the LP left');
+    assert.deepEqual(rowLp({ lp: 30, pendingLp: 3 }, pub), { lp: 30, pending: 3, unite: false, left: null });
+    assert.deepEqual(rowLp({ lp: 2, pendingLp: 3 }, pub), { lp: 2, pending: 2, unite: false, left: null }, 'clamped at the LP left');
     assert.deepEqual(rowLp({ lp: 30 }, pub), { lp: 30, pending: 0, unite: false, left: null });
-    assert.deepEqual(rowLp({ lp: 30, pendingLp: 4 }, { phase: PHASE.UNITE }), { lp: 30, pending: 0, unite: false, left: null });
+    assert.deepEqual(rowLp({ lp: 30, pendingLp: 4 }, { phase: PHASE.UNITE }), { lp: 30, pending: 4, unite: true, left: null });
     assert.deepEqual(rowLp({ lp: 30, pendingLp: 4 }, { phase: PHASE.SETTLE }), { lp: 30, pending: 0, unite: false, left: null });
     assert.deepEqual(rowLp({ lp: 30, pendingLp: 4, alive: false }, pub), { lp: 30, pending: 0, unite: false, left: null });
     // the own row: the top bar's numbers (m.private lp — m.public may lag behind it by a throttle interval)
-    assert.deepEqual(rowLp({ lp: 30, pendingLp: 1 }, pub, { lp: 30, pending: 5, unite: false }), { lp: 30, pending: 0, unite: false, left: null });
+    assert.deepEqual(rowLp({ lp: 30, pendingLp: 1 }, pub, { lp: 30, pending: 5, unite: false }), { lp: 30, pending: 5, unite: false, left: null });
     assert.deepEqual(rowLp({ lp: 30 }, pub, { lp: 25, pending: 0, unite: false }), { lp: 25, pending: 0, unite: false, left: null }, 'settled m.private first');
     assert.deepEqual(rowLp({ lp: 30 }, { phase: PHASE.FINAL_ASSAULT }, { lp: 99, pending: 5 }), { lp: 30, pending: 0, unite: false, left: null }, 'boss rounds: the row keeps its own share');
   });
 
-  test('LP tower: lp − pending in red with a −N tick keyed by the pending value (it pops again on every leak), the 联防中 tag', () => {
+  test('LP tower retains settled HP and separately displays pending loss, including cooperative leaks', () => {
     const plain = LpTower({ value: 24, size: 'lg' });
     assert.ok(!hasClass(plain, 'is-pending'));
     assert.equal(textOf(plain), '24');
@@ -160,10 +160,10 @@ describe('2: the own LP drops live while the battle runs', () => {
     assert.equal(pend.key, 3, 'keyed: a new count re-mounts the tick (its pop animation plays again)');
     assert.equal(textOf(pend), '−3');
     const val = [...walk(v)].find((n) => hasClass(n, 'lp__val'));
-    assert.equal(textOf(val), '21');
+    assert.equal(textOf(val), '24');
     assert.equal(v.props.title, 'x');
     const unite = LpTower({ value: 5, pending: 9, note: '联防中' });
-    assert.equal(textOf([...walk(unite)].find((n) => hasClass(n, 'lp__val'))), '0', 'clamped');
+    assert.equal(textOf([...walk(unite)].find((n) => hasClass(n, 'lp__val'))), '5', 'settled HP stays unchanged');
     assert.equal(textOf([...walk(unite)].find((n) => hasClass(n, 'lp__pend'))), '−5');
     assert.equal(textOf([...walk(unite)].find((n) => hasClass(n, 'lp__note'))), '联防中');
     assert.equal(textOf(LpTower({ value: null, pending: 3 })), '--');
@@ -258,7 +258,7 @@ describe('3: the temp overflow row (临时整备区)', () => {
   test('while the ready button shows its reason the effects column moves down a line (on phones the ready count ran into it)', () => {
     const game = read('public/js/screens/game.js');
     // the same condition as ReadyToggle's reason: PREP, alive, not ready, pieces in the row
-    assert.match(game, /const readyWhy = phase === PHASE\.PREP && alive && !priv\?\.ready && temp\.count > 0;/);
+    assert.match(game, /const readyWhy = phase === PHASE\.PREP && alive && !priv\?\.ready && \(hasPersonalChoice \|\| temp\.count > 0\);/);
     assert.match(game, /readyWhy && 'has-readywhy'/);
     const css = read('public/css/screens/game.css');
     assert.match(css, /\.gm__effects \{ position: absolute; right: \.3rem; top: 2\.4rem; \}/);
@@ -464,7 +464,9 @@ describe('9: busy indicators and data loading', () => {
     for (const f of files) for (const m of read(f).matchAll(/data\.(?:get|lookup|list|load|status)\('([A-Za-z-]+)'/g)) used.add(m[1]);
     for (const m of read('public/js/ui/gameComponents.js').matchAll(/useData\('([A-Za-z-]+)'/g)) used.add(m[1]);
     assert.ok(used.size >= 10, [...used].join(','));
-    const missing = [...used].filter((n) => !GAME_FILES.includes(n));
+    // Laboratory warms its additional unit backups before creating the local match.
+    assert.match(read('public/js/laboratory.js'), /\[\.\.\.GAME_FILES, 'waves', 'backups'\]\.map\(k => data\.load\(k\)\)/);
+    const missing = [...used].filter((n) => !GAME_FILES.includes(n) && n !== 'backups');
     assert.deepEqual(missing, [], 'read by the match UI but not awaited by the match screen');
     const main = read('public/js/main.js');
     assert.match(main, /if \(s\.room && !prev\.room\) warmGameData\(\);/);

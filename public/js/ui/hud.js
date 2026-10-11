@@ -362,7 +362,7 @@ export function currentPlayerLp(pub, priv, playerId) {
   return Number.isFinite(p?.lp) ? p.lp : null;
 }
 
-export function TopBar({ pub, priv, conn, hud, total, drawer, onExit, onDrawer, onReady, readyBusy, readyCount, playerCount, pen = false, penAvail = false, onPen = () => {},
+export function TopBar({ battleEnd = null, pub, priv, conn, hud, total, drawer, onExit, onDrawer, onReady, readyBusy, readyCount, playerCount, pen = false, penAvail = false, onPen = () => {},
   config = null, frozenAt = null, pause = null, live = null, spectator = false,
   spectators = null, myId = null, isHost = false, onRemoveSpectator = null, watchedPlayerId = null, liveTeamLp = null }) {
   const phase = pub?.phase;
@@ -371,7 +371,7 @@ export function TopBar({ pub, priv, conn, hud, total, drawer, onExit, onDrawer, 
   const lp = boss && Number.isFinite(liveTeamLp ?? pub?.teamLp) ? (liveTeamLp ?? pub.teamLp) : currentPlayerLp(pub, priv, playerId);
   const watched = spectator ? pub?.players?.find(p => p.playerId === playerId) : null;
   // normal rounds: the leaks of the own battle so far (boss rounds: the team LP above already moves live)
-  const pending = 0; // Show settled HP; leaks are deducted by the server after combat.
+  const pending = !boss && Number.isFinite(lp) ? Math.min(lp, Math.max(0, Number(spectator ? watched?.pendingLp : live?.pending) || 0)) : 0;
   const hidden = phase === PHASE.HIDDEN_CORE || (Number.isFinite(pub?.lastRound) && pub.round > pub.lastRound);
   const roundText = hidden ? '??' : pub?.round > 0 ? String(pub.round) : '--';
   // a spectator seat (no m.private, community report #26) never readies
@@ -424,6 +424,7 @@ export function TopBar({ pub, priv, conn, hud, total, drawer, onExit, onDrawer, 
         ${pause && (pause.show || pause.paused) ? html`<${PauseButton} paused=${!!pause.paused} busy=${pause.busy} onToggle=${pause.onToggle} />` : null}
       </div>
       <${OvertimeWarning} ot=${ot} />
+      ${battleEnd}
       ${showReady ? html`<${BoundReadyToggle} priv=${priv} onToggle=${onReady} busy=${readyBusy} readyCount=${readyCount} total=${playerCount} />` : null}
     </div>
   </header>`;

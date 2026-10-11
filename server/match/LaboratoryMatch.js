@@ -1,5 +1,6 @@
 // Local-only single-round mode. This class is never constructed by the lobby.
 import {laboratoryEquipment} from '../../shared/search.js';
+import {GameData} from './gamedata.js';
 import { Match } from './Match.js';
 import { SharedPool } from './pool.js';
 import { PHASE, ERR, BOND_LAYER_CAP } from '../../shared/constants.js';
@@ -12,12 +13,21 @@ export class LaboratoryMatch extends Match {
       || !['boss', 'hidden'].includes(setup.kind) || !!this.gd.boss(setup.bossId).hidden !== (setup.kind === 'hidden')) {
       throw new TypeError('실험실 시작 설정이 올바르지 않습니다.');
     }
-    this.laboratory = { ...setup };
+    const playerCount=setup.players??1;
+    if(!Number.isInteger(playerCount)||playerCount<1||playerCount>4)throw new TypeError('실험실 인원 기준이 올바르지 않습니다.');
+    this.laboratory = { ...setup, players:playerCount };
+    const referenceModeId=playerCount>1?this.modeId.replace('_single_','_multi_'):this.modeId;
+    if(playerCount>1){
+      const reference=new GameData(this.data,referenceModeId);
+      this.gd.mode={...reference.mode};
+      this.gd.enemyScale=round=>reference.enemyScale(round);
+      this.gd.bossPoolShare=()=>reference.bossPoolShare(playerCount);
+    }
     // Training also permits hidden leaders at Standard difficulty and leaders outside the random pool.
     this.gd.mode = { ...this.gd.mode, hiddenRound: this.gd.hiddenRound || this.gd.bossRound + 1 };
     const targetRound = setup.kind === 'hidden' ? this.gd.hiddenRound : this.gd.bossRound;
     const boss = this.gd.boss(setup.bossId);
-    const template = boss.templates?.[this.modeId]?.template || boss.templates?.mode_single_normal?.template;
+    const template = boss.templates?.[referenceModeId]?.template || boss.templates?.mode_single_normal?.template;
     if (!template || !this.gd.wave(template)) throw new TypeError('선택한 보스의 전투 데이터가 없습니다.');
     const originalRoundCfg = this.gd.roundCfg.bind(this.gd);
     this.gd.roundCfg = r => r === targetRound ? { ...(originalRoundCfg(r) || {}), bossTemplates: { [setup.bossId]: template } } : originalRoundCfg(r);

@@ -887,3 +887,28 @@ test('Yu most-member trait rewards every eligible faction, not only Yan',()=>{
   s.h.m.dispose();
  }
 });
+
+test('equipment-grant traits overflow into the temporary bench when the normal bench is full', () => {
+  for (const event of ['SERVER_GAIN', 'SERVER_PREP_START', 'SERVER_PREP_FIN']) {
+    for (const key of ['SERVER_GAIN_EQUIP', 'SERVER_GAIN_RANDOM_EQUIP_CHESS_IN_POOL', 'SERVER_POOL_EQUIP']) {
+      for (const {gid, g, owners} of idsOf(event, key)) {
+        for (const owner of owners) {
+          const {m, ps} = setup();
+          try {
+            m.round = 3;
+            const filler = plain()[0];
+            ps.hand = ps.hand.map(() => ps.newPiece('chess', filler));
+            ps.temp.fill(null);
+            if (event === 'SERVER_GAIN') ps.acquireChess(owner, {fromPool:false, source:'test'});
+            else {
+              ps.board.set('10,4', ps.newPiece('chess', owner));
+              ps.recompute();
+              m.dispatch(ps, event === 'SERVER_PREP_START' ? 'onRoundStart' : 'onPrepEnd', {round:3});
+            }
+            assert.ok(ps.temp.some(p => p?.kind === 'item'), `${gid} ${owner} must grant equipment to temp`);
+          } finally { m.dispose(); }
+        }
+      }
+    }
+  }
+});

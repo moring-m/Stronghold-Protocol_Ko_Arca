@@ -203,7 +203,7 @@ export function LpTower({ value, size = 'md', class: cls, tone, pending = 0, not
   return html`<span class=${cx('lp', `lp--${size}`, tone && `lp--${tone}`, p > 0 && 'is-pending', cls)} title=${tip || '目标生命值'}
       data-pending=${p > 0 ? p : null}>
     <${Sprite} k="hudPanel/icon_hp" class="lp__icon" fallback=${html`<${Icon} name="rook" class="lp__icon" />`} />
-    <b class="num lp__val">${ok ? Math.max(0, value - p) : '--'}</b>
+    <b class="num lp__val">${ok ? Math.max(0, value) : '--'}</b>
     ${p > 0 ? html`<span key=${p} class="lp__pend num" aria-label=${`结算时扣除 ${p}`}>−${p}</span>` : null}
     ${note ? html`<span class="lp__note">${note}</span>` : null}
   </span>`;

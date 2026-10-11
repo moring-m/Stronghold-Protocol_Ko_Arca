@@ -13,11 +13,11 @@ test('saved shortcuts and shop side survive sanitization; rebinding swaps duplic
  assert.equal(shortcutFor({key:'r',target:{tagName:'INPUT'}},settings.keys),null);
  assert.equal(facingSwallows({key:'r',code:'KeyR'},settings.keys),true);
 });
-test('normal and cooperative leaks never preview an HP deduction; settled HP still updates',()=>{
+test('normal and cooperative leaks retain pending indicators and settled HP',()=>{
  for(const phase of ['COMBAT','UNITE']){
   const pub={phase,unite:{leakers:['p1']}};
   const p={playerId:'p1',lp:30,pendingLp:10,uniteLeft:12};
-  assert.deepEqual(rowLp(p,pub,{lp:30,pending:10,unite:true,left:12}),{lp:30,pending:0,unite:false,left:null});
+  assert.deepEqual(rowLp(p,pub,{lp:30,pending:10,unite:true,left:12}),{lp:30,pending:10,unite:true,left:phase==='UNITE'?12:null});
   assert.equal(rowLp(p,pub,{lp:20,pending:0}).lp,20);
  }
 });

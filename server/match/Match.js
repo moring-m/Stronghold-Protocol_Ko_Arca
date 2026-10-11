@@ -1823,7 +1823,7 @@ export class Match {
       s.idx++;
     }
     const available = s.cards.filter(c => this.spCardAvailable(c)).map(c => c.idx);
-    if (s.idx >= s.order.length || !available.length) { this.setDeadline(0); this.later(1000, () => this.finishSpDraft()); return; }
+    if (s.idx >= s.order.length || !available.length) { this.setDeadline(0); this.later(3000, () => this.finishSpDraft()); return; }
     const token = ++this._turnToken;
     if (!s.untimed) {
       const first = s.idx === 0;

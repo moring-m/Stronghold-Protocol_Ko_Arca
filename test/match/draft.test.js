@@ -161,6 +161,8 @@ test('机变 (co-op): 6 shared cards, random order, 30 s first / 16 s others, ti
   h2.sched.advance(16001);
   assert.ok(m2.sp.picks[b] != null && m2.sp.picks[b] !== 2);
   assert.deepEqual(m2.handle(c, { t: 'g.choice', idx: m2.sp.cards.map((x) => x.idx).find((i) => m2.sp.taken[i] == null) }), { ok: true });
+  h2.sched.advance(2999);
+  assert.equal(m2.phase, PHASE.SP_DRAFT, 'selection remains visible for three seconds');
   h2.sched.advance(1);
   assert.equal(m2.phase, PHASE.PREP, '机变 → prep');
   checkInvariants(m2);
@@ -185,6 +187,8 @@ test('机变 (solo): 3 cards, untimed; supply/shop cards give the item, bounty c
   assert.deepEqual(m.handle('p_0', { t: 'g.choice', idx: 1 }), { ok: true });
   const ps = h.ps('p_0');
   assert.ok([...ps.hand, ...ps.temp].some((p) => p && (p.id === card.id || p.id === DATA.items[card.id].goldenId)), 'item granted');
+  h.sched.advance(2999);
+  assert.equal(m.phase, PHASE.SP_DRAFT);
   h.sched.advance(1);
   assert.equal(m.phase, PHASE.PREP);
   // a bounty card applied through the default

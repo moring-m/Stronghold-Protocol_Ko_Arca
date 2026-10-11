@@ -784,3 +784,11 @@
 .lab-empty{grid-column:1/-1;align-self:center;justify-self:center;margin:0;white-space:nowrap;text-align:center;font-size:.18rem}
 .lab-menu-tabs.shopbar__tools{position:relative;margin-top:.35rem}
 .lab-menu-tabs .shopbar__remain{position:absolute;right:0;bottom:calc(100% + .06rem);white-space:nowrap}
+
+.gtop__right .gm__end-battle{position:static;height:.46rem;min-width:2rem;padding:0 .12rem;gap:.08rem;font-size:.17rem;white-space:nowrap;align-self:flex-end}
+.gtop__right .gm__end-battle .readybtn__box{width:.28rem;height:.28rem}.gtop__right .gm__end-battle .icon{width:.18rem;height:.18rem}
+
+/* Keep settings tabs outside the scrolling content, including its top padding. */
+.settings-modal .modal__body { display:flex; flex-direction:column; min-height:0; overflow:hidden; }
+.settings-modal .set-categories { position:static; flex-shrink:0; }
+.settings-modal .set-list { min-height:0; overflow-y:auto; overscroll-behavior:contain; }
