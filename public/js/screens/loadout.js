@@ -294,7 +294,7 @@ function Detail({ m, chess, golden, entries, ops, onChange, onReset, locked }) {
       <div class="lo-dhead__info">
         <div class="lo-dhead__chips"><${TierChip} tier=${chess.tier} size="md" />
           ${choice.changed ? html`<span class="lo-badge lo-badge--changed">已调整</span>` : html`<span class="lo-badge lo-badge--plain">默认配置</span>`}</div>
-        ${(chess.bonds || []).includes('ursusShip') ? html`<span class="lo-badge">커스텀 진영 · 우르수스</span>` : null}
+        ${[['ursusShip','우르수스'],['leithanienShip','라이타니엔']].filter(([id])=>(chess.bonds||[]).includes(id)).map(([id,name])=>html`<span key=${id} class="lo-badge">커스텀 진영 · ${name}</span>`)}
         <h2 class="lo-dhead__name">${chess.name}</h2>
         <span class="lo-dhead__en">${chess.appellation || ''}</span>
         <span class="lo-dhead__class">
@@ -422,7 +422,8 @@ function LoadoutScreen({ st }) {
   }, [ready, roster]);
   const [tab, setTab] = useState('standard');
   const [listView,setListView]=useState(()=>loadPref('loadout.listView',false)===true);
-  const candidates = roster.filter(c => c.optionalRecruit && c.tier === 5);
+  const leithanienChars = new Set(roster.filter(c=>c.chessId?.startsWith('chess_custom_leithanien_')).map(c=>c.charId));
+  const candidates = roster.filter(c => c.optionalRecruit && c.tier === 5 && !leithanienChars.has(c.charId));
   const selectedAt = (c,t) => !!st.entries[c.chessId.replace(/_[56]_a$/, `_${t}_a`)]?.selected;
   const displayTier = c => c.recruitPrototype && [5,6].find(t=>st.sel===c.chessId.replace(/_[56]_a$/, `_${t}_a`)) || selectedTier(c) || 5;
   const selectedTier = c => [5, 6].find(t => st.entries[c.chessId.replace(/_[56]_a$/, `_${t}_a`)]?.selected) || 0;

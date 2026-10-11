@@ -36,7 +36,7 @@ export async function startLaboratory(setup) {
   const name = previous.me.name || '박사';
   const lo = loadoutStore.get();
   const catalog = customExtensionCatalog(raw);
-  const customExtensions = normalizeCustomExtensions(setup.customExtensions===undefined?{bonds:catalog.bonds.map(x=>x.id),stages:catalog.stages.map(x=>x.id)}:{bonds:setup.customExtensions.bonds||[],stages:setup.customExtensions.stages||[]},raw);
+  const customExtensions = normalizeCustomExtensions(setup.customExtensions===undefined?{bonds:catalog.bonds.map(x=>x.id),stages:catalog.stages.map(x=>x.id)}:{bonds:setup.customExtensions.bonds||[],stages:setup.customExtensions.stages||[],rules:setup.customExtensions.rules||[],ruleValues:setup.customExtensions.ruleValues},raw);
   const configured=applyCustomExtensions(raw,customExtensions);
   setSimData(configured);
   support.setGameData(configured);
@@ -50,7 +50,11 @@ export async function startLaboratory(setup) {
   const request = async (t, fields = {}) => {
     if (t === 'room.leave') { stopLaboratory(); return { t: 'ok' }; }
     if (t === 'g.leave') { match.finish({ victory: false, reason: 'abandoned' }); return { t: 'ok' }; }
-    if (t === 'room.loadout') return { t: 'ok' }; // preferences are already stored locally
+    if (t === 'room.loadout') {
+      const res = match.setLoadout(playerId, fields.entries, fields.ops);
+      if (res?.error) throw new NetError(res.error, res.detail, res.detail);
+      return { t: 'ok' };
+    }
     const msg = { ...fields, t };
     if (!t.startsWith('g.lab') && validateC2S(msg)) throw new NetError('BAD_MSG');
     const res = match.handle(playerId, msg);

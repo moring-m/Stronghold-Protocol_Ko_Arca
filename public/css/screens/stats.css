@@ -191,3 +191,5 @@
 }
 .sp-coarse .st-tab, .sp-coarse .st-table tr.is-clickable td { min-height: 30px; }
 @media (prefers-reduced-motion: reduce) { .st { animation: none; } }
+
+.st-custom{display:inline-block;margin-left:.08rem;font-size:.11rem}.st-custom summary{color:var(--mint);cursor:pointer}.st-custom>div{position:relative;min-width:2.5rem;z-index:10;background:#101c19;border:1px solid #41695c;padding:.15rem;max-width:5rem;white-space:normal}.st-custom p{margin:.06rem 0}

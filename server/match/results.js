@@ -128,6 +128,7 @@ export function buildResult(m, outcome) {
   });
   return {
     t: 'm.result',
+    customExtensions: structuredClone(m.customExtensions),
     victory,
     roundsPassed: teamRounds,
     hiddenReached,

@@ -1,3 +1,4 @@
+import {ResourceRedownloadButton} from '../ui/resourceRedownload.js';
 import { openStats } from './stats.js';
 
 
@@ -221,7 +222,7 @@ export function TitleScreen() {
   // touch screens: no autofocus (it would pop the on-screen keyboard over a landscape phone's whole view)
   const touchUi = useMemo(() => detectFeatures().coarse, []);
   return html`<div class="screen title-screen">
-    <div class="title-tools"><${Button} variant="secondary" size="sm" onClick=${openStats}>통계<//><${PatchNotesButton} /><${SettingsButton} /></div>
+    <div class="title-tools"><${ResourceRedownloadButton} /><${Button} variant="secondary" size="sm" onClick=${openStats}>통계<//><${PatchNotesButton} /><${SettingsButton} /></div>
     <div class=${`title-bg${bgLoaded ? ' has-art' : ''}${ridgesLoaded ? ' has-ridges' : ''}`} aria-hidden="true">
       ${backdrop ? html`<img class="title-bg__art" src=${backdrop} alt="" draggable=${false}
         onLoad=${() => setBgLoadedUrl(backdrop)} />` : null}

@@ -944,7 +944,7 @@ export class PlayerState {
     if (!this.gd.bond(bondId) || !Number.isFinite(n) || n <= 0) return 0;
     if (requireActive && !(this.bonds[bondId] && this.bonds[bondId].active)) return 0;
     const before = this.layers[bondId] || 0;
-    const add = layerGainRoom(before, Math.floor(n));
+    const add = layerGainRoom(before, Math.floor(n), this.gd.config.customRules?.unlimitedLayers?Infinity:undefined);
     if (add <= 0) return 0;
     this.layers[bondId] = before + add;
     this.recompute();
@@ -1722,7 +1722,7 @@ export class PlayerState {
    * in-battle gains of this round's finished normal battle (bondsMeta.bondsWithGains). The 联防 field fights with them too
    * (battleInput `reached`); no other rule reads them.
    */
-  bondsView() { return bondsWithGains(this.bonds, this.pendingLayerGains); }
+  bondsView() { return bondsWithGains(this.bonds, this.pendingLayerGains, this.gd.config.customRules?.unlimitedLayers?Infinity:undefined); }
 
   // =================================================================================================
   // battle input

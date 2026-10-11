@@ -1,3 +1,4 @@
+import {ResourceRedownloadButton} from '../ui/resourceRedownload.js';
 import { PwaInstallButton } from '../ui/device.js';
 import { openStats } from './stats.js';
 
@@ -350,7 +351,7 @@ export function LobbyScreen() {
       </div>
       <div class="topbar__right">
         <${ResumeMatchButton} /><${PwaInstallButton} class="lobby-pwa" />
-        <${SettingsButton} />
+        <${ResourceRedownloadButton} /><${SettingsButton} />
         <${GuideButton} class="lobby-guide" variant="secondary" />
         <${LoadoutButton} from="lobby" size="sm" class="lobby-loadout" />
         <div class="me-chip">

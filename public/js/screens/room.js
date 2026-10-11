@@ -1,3 +1,4 @@
+import {extensionSelectionCount} from '../../../shared/customExtensions.js';
 import { t } from '../../../shared/i18n.js';
 import { openStats } from './stats.js';
 import { ChatPanel } from '../ui/chat.js';
@@ -420,7 +421,7 @@ export function RoomScreen() {
       <div class="room-bar__right">
         <div class="room-bar__settings">
           <${LoadoutButton} from="room" size="lg" class="room-loadout" />
-          <${Button} variant="secondary" size="lg" icon="settings" class="room-custom-extensions" disabled=${!!busy || !online} onClick=${()=>setExtensionsOpen(true)}>커스텀 설정 <span class="lo-entry__n num">${Object.values(room.customExtensions || {bonds:room.customFactions?['ursus']:[]}).reduce((n,ids)=>n+(Array.isArray(ids)?ids.length:0),0)}</span><//>
+          <${Button} variant="secondary" size="lg" icon="settings" class="room-custom-extensions" disabled=${!!busy || !online} onClick=${()=>setExtensionsOpen(true)}>커스텀 설정 <span class="lo-entry__n num">${extensionSelectionCount(room.customExtensions || {bonds:room.customFactions?['ursus']:[]})}</span><//>
         </div>
         ${facts.isHost
           ? html`<${Tooltip} text=${facts.canStart ? null : '仍有博士未准备就绪'}>

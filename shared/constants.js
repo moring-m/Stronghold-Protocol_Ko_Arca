@@ -4,7 +4,7 @@
 export const PROTOCOL_VERSION = 1;
 /** Upstream package version stays valid SemVer; the lowercase suffix identifies site updates. */
 export const BASE_VERSION = '0.2.4';
-export const APP_VERSION = `${BASE_VERSION}b`;
+export const APP_VERSION = `${BASE_VERSION}c`;
 export const DEV_BUILD = /-dev$/.test(APP_VERSION);
 
 export const MAX_SEATS = 4;
@@ -103,9 +103,9 @@ export const BOND_LAYER_CAP = 999;
  * negative (a count already at or over the cap gains 0 and is never lowered); 0 for a non-positive / non-finite `n`
  * except +Infinity (= "the room left").
  */
-export function layerGainRoom(before, n) {
+export function layerGainRoom(before, n, limit = BOND_LAYER_CAP) {
   if (!(n > 0)) return 0;
-  const cap = BOND_LAYER_CAP > 0 ? BOND_LAYER_CAP : Infinity;
+  const cap = limit > 0 ? limit : Infinity;
   const b = Number.isFinite(before) && before > 0 ? before : 0;
   return Math.max(0, Math.min(n, cap - b));
 }

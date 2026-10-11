@@ -38,11 +38,12 @@ async function safeImport(path) {
 const TIERS = await Promise.all([
   ...[1, 2, 3, 4, 5, 6].map((t) => safeImport(`./kits/tier${t}.js`)),
   safeImport('./kits/ursus.js'),
+  safeImport('./kits/leithanien.js'),
   safeImport('./kits/recruits.js'),
   safeImport('./kits/upstreamRecruits.js'),
   safeImport('./kits/upstream022.js'),
 ]);
-const DOMAIN_NAMES = ['tokens', 'devices', 'enemies', 'bosses', 'bonds', 'garrisons', 'items', 'bands', 'choices', 'ursus'];
+const DOMAIN_NAMES = ['tokens', 'devices', 'enemies', 'bosses', 'bonds', 'garrisons', 'items', 'bands', 'choices', 'ursus', 'leithanien'];
 const DOMAINS = await Promise.all(DOMAIN_NAMES.map((n) => safeImport(`./${n}.js`)));
 const tokens = DOMAINS[0];
 const recruitTokens = await safeImport('./recruitTokens.js');
@@ -72,7 +73,7 @@ export function setupUnitKit(battle, unit, mode = 'full') {
   if (mode === 'full' || injected) {
     // DESIGN §5.6's example keys kits by the suffix-less id (`chess_char_1_01`), data/SIM.md by baseId (`…_a`): accept both
     const bare = String(def.baseId ?? def.id ?? '').replace(/_[ab]$/, '');
-    const pick = (reg) => reg?.[def.baseId] ?? reg?.[def.id] ?? reg?.[bare] ?? ((raw.optionalRecruit || raw.isDiy) ? reg?.[raw.charId] : undefined);
+    const pick = (reg) => reg?.[def.baseId] ?? reg?.[def.id] ?? reg?.[bare] ?? ((raw.optionalRecruit || raw.isDiy || raw.customKit) ? reg?.[raw.charId] : undefined);
     const f = pick(injected) ?? (mode === 'full' ? pick(KITS) : undefined);
     if (typeof f === 'function') {
       try {

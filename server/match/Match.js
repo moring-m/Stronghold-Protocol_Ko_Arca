@@ -1002,7 +1002,7 @@ export class Match {
       const s = this.sp;
       v.sp = {
         family: s.family, name: s.name, desc: s.desc, eventId: s.eventId, cards: s.cards.map(c => ({ ...cardView(c), soldOut: c.kind === 'item' && !this.itemPool.canGain(c.id) })), order: s.order.slice(),
-        turn: this.spTurn(), picks: { ...s.picks }, taken: { ...s.taken }, untimed: !!s.untimed,
+        turn: this.spTurn(), picks: { ...s.picks }, taken: { ...s.taken }, untimed: !!s.untimed, settling: !!s.settling,
       };
     }
     if (this.phase === PHASE.UNITE && this.unitePlan) v.unite = { helpers: this.unitePlan.helpers.map((p) => p.playerId), leakers: this.unitePlan.leakers.map((p) => p.playerId) };
@@ -1606,6 +1606,7 @@ export class Match {
    * assignments — a turn that runs out and a departing seat — obey the same rule: see timeoutBand / defaultBand.
    */
   bandTaken(bandId, playerId) {
+    if (this.customExtensions.rules?.includes('duplicateBands')) return false;
     const picks = this.draft?.picks || {};
     for (const [pid, id] of Object.entries(picks)) if (pid !== playerId && id === bandId) return true;
     return false;
@@ -1727,6 +1728,11 @@ export class Match {
   }
 
   startRound(r) {
+    if(this.gd.config.customRules?.sharedHp && this.teamLp==null){
+      const players=this.alivePlayers();this.teamLp=players.reduce((n,p)=>n+Math.max(0,p.lp),0);
+      for(const ps of players)ps.lpAtFinal=Math.max(0,ps.lp);
+      this._syncTeamLp();
+    }
     this.phase = PHASE.ROUND_START;
     this.round = r;
     this.fields = [];
@@ -1823,7 +1829,7 @@ export class Match {
       s.idx++;
     }
     const available = s.cards.filter(c => this.spCardAvailable(c)).map(c => c.idx);
-    if (s.idx >= s.order.length || !available.length) { this.setDeadline(0); this.later(3000, () => this.finishSpDraft()); return; }
+    if (s.idx >= s.order.length || !available.length) { s.settling = true; this.setDeadline(3, () => this.finishSpDraft()); this.markPublic(); return; }
     const token = ++this._turnToken;
     if (!s.untimed) {
       const first = s.idx === 0;
@@ -3224,7 +3230,8 @@ export class Match {
       const r = this.lastResults.get(ps.playerId) || { leaked: [], perfect: true, coins: 0, layerGains: {}, killed: 0, damageDealt: 0 };
       const counted = (r.leaked || []).filter((l) => l && l.counted !== false).length;
       const loss = uniteRan && plan.leakers.includes(ps) ? Math.min(cap, survivors.get(ps.playerId) || 0) : Math.min(cap, counted);
-      ps.lp -= loss;
+      if(this.gd.config.customRules?.sharedHp)this.teamLp=Math.max(0,this.teamLp-loss);
+      else ps.lp -= loss;
       ps.stats.lpLost += loss;
       ps.stats.leaks += counted;
       ps.stats.kills += Number(r.killed) || 0;
@@ -3249,7 +3256,7 @@ export class Match {
       for (const [bondId, n] of Object.entries(r.layerGains || {})) {
         if (!this.gd.bond(bondId) || !(n > 0)) continue;
         const before = ps.layers[bondId] || 0;
-        const add = layerGainRoom(before, Math.floor(n));
+        const add = layerGainRoom(before, Math.floor(n), this.gd.config.customRules?.unlimitedLayers?Infinity:undefined);
         if (!(add > 0)) continue;
         ps.layers[bondId] = before + add;
         this.dispatch(ps, 'onLayers', { bondId, from: before, to: ps.layers[bondId], reason: 'battle' });
@@ -3258,8 +3265,9 @@ export class Match {
       this.dispatch(ps, 'onBattleResult', { result: r, lpLoss: loss, perfect: counted === 0 && r.perfect !== false, unite: uniteResult || null });
       ps.recompute();
     }
+    if(this.gd.config.customRules?.sharedHp)this._syncTeamLp();
     for (const ps of alive) {
-      if (ps.lp <= 0) {
+      if (this.gd.config.customRules?.sharedHp ? this.teamLp<=0 : ps.lp<=0) {
         ps.lp = 0;
         ps.eliminate(this.round);
         this.toast(ps, 'error', '你的目标生命值耗尽，已被淘汰');
@@ -3297,7 +3305,7 @@ export class Match {
     if (!alive.length) { this.finish({ victory: false, reason: 'eliminated' }); return; }
     this.phase = hidden ? PHASE.HIDDEN_CORE : PHASE.FINAL_ASSAULT;
     this.lastResults = new Map();
-    if (!hidden) {
+    if (!hidden && !this.gd.config.customRules?.sharedHp) {
       this.teamLp = alive.reduce((s, p) => s + Math.max(0, p.lp), 0);
       for (const ps of alive) ps.lpAtFinal = Math.max(0, ps.lp);
     }

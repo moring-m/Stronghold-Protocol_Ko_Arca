@@ -6,4 +6,4 @@ export function matchesKoreanSearch(text,query){
  const initials=[...name].map(c=>{const n=c.codePointAt(0)-0xAC00;return n>=0&&n<11172?INITIALS[Math.floor(n/588)]:c;}).join('');
  return initials.replace(/\s/g,'').includes(q.replace(/\s/g,''));
 }
-export function laboratoryEquipment(rec){return rec?.itemType==='EQUIP'&&!['ECONOMY','RECRUIT'].includes(rec.category);}
+export function laboratoryEquipment(rec){return rec?.itemType==='EQUIP'&&(rec.trapId==='trap_1070_acarm070'||!['ECONOMY','RECRUIT'].includes(rec.category));}

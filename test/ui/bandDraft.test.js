@@ -302,3 +302,11 @@ test('confirmed strategy overrides a stale preview after timeout or server assig
  const bands=[{bandId:'band_bldsk'},{bandId:'band_lisa'}];
  assert.equal(draftSelection('band_lisa',{bands,taken:new Map(),myPick:'band_bldsk',myTurn:false}),'band_bldsk');
 });
+
+ test('custom rule permits teammates to select the same strategy',()=>{
+ const h=draftOf({humans:3,seed:5,customExtensions:{bonds:[],stages:[],rules:['duplicateBands']}});
+ const [first,second]=h.m.draft.order;
+ assert.deepEqual(h.m.handle(first,{t:'g.band',bandId:'band_sarkazb'}),{ok:true});
+ assert.equal(h.m.bandTaken('band_sarkazb',second),false);
+ assert.deepEqual(h.m.handle(second,{t:'g.band',bandId:'band_sarkazb'}),{ok:true});
+ });

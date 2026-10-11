@@ -850,6 +850,19 @@ export function createBattleRunner(deps) {
       const time = e.battle && Number.isFinite(e.battle.time) ? e.battle.time : null;
       return { battleId: e.battleId, fieldId: e.fieldId, kind: e.kind, spec: e.spec, time };
     },
+    damageSample() {
+      const e = cur;
+      if (!e?.battle) return null;
+      const b = e.battle, rows = new Map();
+      for (const u of b.allyUnits) {
+        const owner = u.kind === 'op' ? u : u.ownerUnit;
+        if (!owner || owner.kind !== 'op') continue;
+        let row = rows.get(owner.id);
+        if (!row) { row = {id:owner.id,defId:owner.defId,name:owner.def?.name||owner.defId,values:[0,0,0,0]};rows.set(owner.id,row); }
+        ['physicalDamage','artsDamage','trueDamage','elementalDamage'].forEach((key,i)=>{row.values[i]+=Math.max(0,Number(u.stats?.[key])||0);});
+      }
+      return {battleId:e.battleId,time:b.time,rows:[...rows.values()]};
+    },
     stats() {
       return { ...stats, avgTickMs: stats.ticks ? stats.stepMs / stats.ticks : 0, entries: entries.size, loadingSim: !!simP };
     },

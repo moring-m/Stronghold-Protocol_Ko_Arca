@@ -3,6 +3,7 @@ import { normalizeAtlas } from './vendor/resource-atlas.mjs';
 const PREFIX = 'stronghold-resources-';
 let indexPromise;
 let preparing;
+let generation=0;
 const downloads = new Map();
 const listeners = new Set();
 const contentType = path => path.endsWith('.png') ? 'image/png' : path.endsWith('.atlas') ? 'text/plain' :
@@ -32,12 +33,13 @@ async function complete(cache, resources) {
 function download(file, cache, resources) {
   const key = resources.version + ':' + file.path;
   if (downloads.has(key)) return downloads.get(key);
-  const job = downloadOne(file, cache, resources).finally(() => downloads.delete(key));
+  const job = downloadOne(file, cache, resources).finally(() => {if(downloads.get(key)===job)downloads.delete(key);});
   downloads.set(key, job);
   return job;
 }
 
 async function downloadOne(file, cache, resources) {
+  const startedGeneration=generation;
   if (await cache.match(file.path)) return;
   const previous=await caches.match(file.path);
   if(previous)return; // Reuse previous assets without duplicating gigabytes on every patch.
@@ -53,6 +55,7 @@ async function downloadOne(file, cache, resources) {
       if (!response.ok || response.type === 'opaque') throw new Error(`HTTP ${response.status}`);
       if ((response.headers.get('content-type') || '').includes('text/html')) throw new Error('리소스 대신 HTML 응답');
       const body = await response.arrayBuffer();
+      if(startedGeneration!==generation)throw new Error('리소스 재다운로드로 작업이 초기화되었습니다.');
       if (!body.byteLength) throw new Error('빈 파일');
       if (file.path.endsWith('.png') && new DataView(body).getUint32(0) !== 0x89504e47) throw new Error('잘못된 PNG');
       let payload = body;
@@ -70,9 +73,11 @@ async function downloadOne(file, cache, resources) {
         if (normalized.missingSize.length) throw new Error('Missing atlas texture dimensions');
         payload = normalized.text;
       }
+      if(startedGeneration!==generation)throw new Error('리소스 재다운로드로 작업이 초기화되었습니다.');
       await cache.put(file.path, new Response(payload, { headers: { 'Content-Type': contentType(file.path) } }));
       return;
     } catch (error) {
+      if(startedGeneration!==generation)throw error;
       if (error.name === 'QuotaExceededError') {
         throw new Error(`${file.path}: 브라우저 저장 공간이 부족합니다. 공간을 확보한 뒤 다시 시도해 주세요.`, {cause:error});
       }
@@ -86,7 +91,9 @@ async function downloadOne(file, cache, resources) {
 // Keep each message event short: browsers may terminate a worker kept alive by one
 // multi-minute waitUntil. The page requests the next slice and can resume after restart.
 async function prepare(background = false, resume = {}) {
+  const startedGeneration=generation;
   const resources = await index();
+  if(startedGeneration!==generation)throw new Error('리소스 재다운로드로 작업이 초기화되었습니다.');
   const cache = await caches.open(PREFIX + resources.version);
   const valid = resume.version === resources.version;
   let cursor = valid ? Math.max(0, Math.min(resources.files.length, resume.cursor || 0)) : 0;
@@ -113,6 +120,7 @@ async function prepare(background = false, resume = {}) {
     resume:{version:resources.version, cursor, attempt, failed, retryFiles, done, pending:[...active.keys()]}});
   try {
     while (true) {
+      if(startedGeneration!==generation)throw new Error('리소스 재다운로드로 작업이 초기화되었습니다.');
       const queue = retryFiles || resources.files.map(file => file.path);
       while (active.size < limit && cursor < queue.length && processed < 64 && Date.now() - started < 5000) launch(queue[cursor++]);
       if (active.size) {
@@ -134,6 +142,7 @@ async function prepare(background = false, resume = {}) {
   } finally { clearTimeout(timer); }
   // downloadOne already normalizes each atlas before storing it. Rewriting every
   // cached atlas here used to leave the counter at 100% with no progress for minutes.
+  if(startedGeneration!==generation)throw new Error('리소스 재다운로드로 작업이 초기화되었습니다.');
   await cache.put('/__resources_ready__', new Response(resources.version));
   return {type:'ready', version:resources.version};
 }
@@ -145,7 +154,11 @@ self.addEventListener('message', event => {
   if (!port) return;
   event.waitUntil((async () => {
     try {
-      if (event.data.type === 'status') {
+      if(event.data.type==='resetResources'){
+        generation++;downloads.clear();preparing=undefined;indexPromise=undefined;
+        for(const name of await caches.keys())if(name.startsWith(PREFIX)||name.startsWith('stronghold-ursus-preview-assets-'))await caches.delete(name);
+        port.postMessage({type:'reset'});
+      } else if (event.data.type === 'status') {
         indexPromise = undefined;
         const resources = await index();
         const cache = await caches.open(PREFIX + resources.version);
@@ -156,7 +169,7 @@ self.addEventListener('message', event => {
       } else if (event.data.type === 'prepare' || event.data.type === 'preparePatch') {
         listeners.add(port);
         try {
-          preparing ||= prepare(event.data.type === 'preparePatch', event.data.resume).finally(() => { preparing = undefined; });
+          if(!preparing){const job=prepare(event.data.type === 'preparePatch', event.data.resume).finally(()=>{if(preparing===job)preparing=undefined;});preparing=job;}
           port.postMessage(await preparing);
         } finally { listeners.delete(port); }
       }

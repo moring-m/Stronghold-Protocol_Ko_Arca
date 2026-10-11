@@ -163,7 +163,8 @@ export function ChoiceView({ pub, sp, myId, solo, personal = false, busyIdx = nu
   const turnName = players.get(sp.turnPid)?.name || '队友';
   const special = /_s$/.test(String(sp.family || ''));
   const order = personal || solo ? [] : sp.order;
-  const timed = personal ? pub?.deadline > 0 : !solo && !sp.untimed;
+  const settling = !personal && !!pub?.sp?.settling;
+  const timed = settling || (personal ? pub?.deadline > 0 : !solo && !sp.untimed);
   const armedCardRec = armed != null ? sp.cards.find((c) => c && c.idx === armed) : null;
   const armedName = armedCardRec ? resolveSpCard(armedCardRec, sp.family).name : null;
   // a press anywhere but a card or the confirm button drops the selection
@@ -180,7 +181,7 @@ export function ChoiceView({ pub, sp, myId, solo, personal = false, busyIdx = nu
         <div class="spov__titles">
           <${MicroLabel} tone="mint">CONTINGENCY // 机变阶段</${MicroLabel}>
           <h2 class=${cx('spov__title', special && 'is-special')}>${sp.name || fam?.name || '机变'}<span class="spov__bar">|</span><span class="spov__desc"><${RichText} text=${sp.desc || fam?.desc || '选择一项'} /></span></h2>
-          <p class="spov__sub">${timed ? '倒计时结束后仍未选定将自动分配' : '选择一项（无时间限制）'}${mine == null && myTurn ? ' · 点击卡牌选中，再次点击确认' : ''}</p>
+          <p class="spov__sub">${settling ? html`<span data-i18n-skip>선택 완료 · 잠시 후 다음 단계로 넘어갑니다.</span>` : timed ? '倒计时结束后仍未选定将自动分配' : '选择一项（无时间限制）'}${mine == null && myTurn ? ' · 点击卡牌选中，再次点击确认' : ''}</p>
         </div>
         <div class="spov__turn">
           ${mine != null ? html`<span class="spov__turntxt is-done"><${Icon} name="check" />已完成选择</span>`
@@ -188,7 +189,7 @@ export function ChoiceView({ pub, sp, myId, solo, personal = false, busyIdx = nu
             : html`<span class="spov__turntxt">${turnName} 正在决策…<${Icon} name="hourglass" /></span>`}
           ${armed != null ? html`<${Button} variant="primary" size="lg" icon="check" class="spov__confirm" data-testid="sp-confirm"
               title=${armedName ? `确认选择「${armedName}」（再次点击卡牌亦可）` : '确认选择'} onClick=${onConfirm}>确认选择<//>` : null}
-          ${timed ? html`<${Countdown} deadline=${pub?.deadline} total=${total ?? undefined} size="sm" />` : null}
+          ${timed ? html`<${Countdown} deadline=${pub?.deadline} total=${settling ? 3 : total ?? undefined} size="sm" />` : null}
         </div>
       </header>
       ${order.length ? html`<div class="spov__order" aria-label="决策顺序">

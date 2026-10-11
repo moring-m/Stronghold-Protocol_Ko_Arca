@@ -496,7 +496,7 @@ export class UnitView {
     this.coins = null;            // [balance, cap] of 琳琅诗怀雅's skill purse, including zero
     this.coinHud = null;
     this.neg = 0;                 // the share of its cap a negative-HP pool holds, 0 = none (sync; b.snap `neg`, 斩业星熊's 我执)
-    this.flags = 0; this.anim = ANIM.IDLE;
+    this.flags = info.preview && info.previewStealth ? UF.STEALTH : 0; this.anim = ANIM.IDLE;
     this.statuses = new Set();
     this.alive = true;
     this.dying = 0;               // seconds left of the death fade (0 = not dying)
@@ -810,6 +810,17 @@ export class UnitView {
     }
     this.countText.text = `×${n}`;
     this.countText.visible = true;
+  }
+
+  /** Local custom-faction debug readout; one label per target, never per stack. */
+  setNoteStacks(n) {
+    this.noteStacks = Math.max(0, Math.floor(Number(n) || 0));
+    if (!this.noteStacks) { if(this.noteText)this.noteText.visible=false; return; }
+    if (!this.noteText) {
+      this.noteText = new this.P.Text('', {fontFamily:'Bender, sans-serif',fontSize:16,fontWeight:'700',fill:'#b7f4df',stroke:'#08120f',strokeThickness:4});
+      this.noteText.anchor.set(.5);this.hud.addChild(this.noteText);
+    }
+    this.noteText.text = `속세의 음 ×${this.noteStacks}`;
   }
 
   /** Equipped item pips (prep): list of item icon URLs. */
@@ -1342,7 +1353,8 @@ export class UnitView {
     if (this.dimmed) alpha *= 0.35;
     this.alpha = alpha;
 
-    const mistOn = this.alive && !this.down && !!(this.flags & UF.STEALTH);
+    const previewAuthoredStealth = this.info.preview && (this.actor?.authoredVisualStates?.has('stealth') || STEALTH_FORMS[this.info.spine || this.info.defId]);
+    const mistOn = this.alive && !this.down && !!(this.flags & UF.STEALTH) && !previewAuthoredStealth;
     const mistTexture = mistOn ? stealthMistTexture(this.ctx.assets) : null;
     if (mistTexture && !this.stealthMist) {
       this.stealthMist = Array.from({length:4}, () => {
@@ -1490,7 +1502,7 @@ export class UnitView {
       else if (this.alive && (this.flags & UF.FROZEN)) tint = 0x9fd4ff;
       else if (this.flags & UF.COLD) tint = 0xcfe6ff;
       if (submerged) tint = mixTint(tint, 0x275d69, .3);
-      if (this.flags & UF.STEALTH) tint = mixTint(tint,0x26333f,.6);
+      if ((this.flags & UF.STEALTH) && !previewAuthoredStealth) tint = mixTint(tint,0x26333f,.6);
       if (flashK > 0) tint = mixTint(tint, 0xff8a80, flashK * 0.8);
       this.actor.moveRate = this.moveAnimRate ?? 1;
       let animDt = dt * (this.ctx.animRate?.() || 1);
@@ -1701,6 +1713,11 @@ export class UnitView {
       ic.visible = true;
       ic.width = ic.height = isz;
       ic.position.set(x - ((icons.length - 1) * (isz + 2)) / 2 + i * (isz + 2), iy);
+    }
+    if(this.noteText){
+      this.noteText.visible=this.alive&&!prep&&this.noteStacks>0;
+      this.noteText.scale.set(clamp(s/90,.65,1));
+      this.noteText.position.set(x,iy-isz/2-this.noteText.height/2-3);
     }
     // 狼影 pips under the bars (b.snap `wolves`), then the element gauge row under them (b.snap `elem`); redeploy ring above a
     // knocked-down operator (b.snap `down`)

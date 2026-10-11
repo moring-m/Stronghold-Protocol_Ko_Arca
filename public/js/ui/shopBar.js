@@ -80,13 +80,13 @@ function ArmedTag({ reason, free }) {
  * @param {{ slot:any, idx:number, priv:any, frozen?:boolean, reason?:string|null, free?:boolean, armed?:boolean,
  *   onTap?:(idx:number)=>void, onBuy:Function, onDetail:Function }} props
  */
-export function ChessCard({ slot, idx, priv, frozen = false, reason = null, free = false, hidePrice = false, armed = false, onTap = null, onBuy, onDetail, offBonds = null }) {
+export function ChessCard({ slot, idx, priv, frozen = false, reason = null, free = false, hidePrice = false, showFavorite = true, armed = false, onTap = null, onBuy, onDetail, offBonds = null }) {
   useStore(x=>x,Object.is,favoritesStore);
   const c = data.lookup('chess', slot.id);
   const m = data.get('assets');
   const tier = c?.tier ?? 1;
   const recruit = !!c?.optionalRecruit;
-  const favorite = !recruit && isFavorite('chess',slot.id);
+  const favorite = showFavorite && !recruit && isFavorite('chess',slot.id);
   const prog = mergeProgress(priv, slot.id, (id) => data.lookup('chess', id));
   const hint = mergeHint(priv, slot.id);
   const willMerge = !!hint;

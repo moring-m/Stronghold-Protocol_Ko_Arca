@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { layoutPen, penZones, thinPreview, penEntries, penSignature, parsePenRect, MAX_PREVIEW, PER_TILE, inPen } from '../../public/js/render/pen.js';
+import { previewStealth, layoutPen, penZones, thinPreview, penEntries, penSignature, parsePenRect, MAX_PREVIEW, PER_TILE, inPen } from '../../public/js/render/pen.js';
 import { bossPrepField, IDENTITY, mirrorDir, tilesToDisp } from '../../public/js/render/prepfield.js';
 import { bossFieldPlacement } from '../../server/match/finalAssault.js';
 
@@ -190,4 +190,18 @@ test('boss preview relocates the pen without mutating simulation rows or duplica
    assert.ok(Math.abs(after.figures[i].y-(before.figures[i].y-visual.previewLayout.offset))<1e-8);
   }
  }
+});
+
+test('enemy preview identifies permanent invisibility without marking ordinary enemies',()=>{
+ assert.equal(previewStealth({acTypes:['INVISIBLE'],abilities:[{text:'은신'}]}),true);
+ assert.equal(previewStealth({acType:'INVISIBLE',abilities:[{textRaw:'<$ba.invisible>隐匿</>'}]}),true);
+ assert.equal(previewStealth({acTypes:['NORMAL']}),false);
+ assert.equal(previewStealth(null),false);
+ assert.equal(previewStealth({acType:'INVISIBLE',acTypes:['INVISIBLE','SPECIAL'],abilities:[]}),false);
+ assert.equal(previewStealth({acType:'NORMAL',acTypes:['NORMAL','INVISIBLE']}),false);
+});
+
+test('conditional stealth and stealth granted to other enemies are absent from preview',()=>{
+ for(const text of ['免疫水蚀，在水中攻击力提升并获得隐匿','每隔一段时间使周围其他敌方单位暂时隐匿','被击倒时暂时变为隐匿','물속에서 은신 획득'])assert.equal(previewStealth({abilities:[{text}]}),false);
+ assert.equal(previewStealth({abilities:[{text:'隐匿，平时不攻击，失去隐匿时反击'}]}),true);
 });

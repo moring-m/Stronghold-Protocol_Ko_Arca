@@ -1,3 +1,4 @@
+import {EXTENSION_CATEGORIES,RULE_VALUES,customExtensionCatalog} from '../../../shared/customExtensions.js';
 // The local stats viewer (统计数据): this browser's record of the matches the player took part in — see ui/stats.js for
 // what is recorded, what counts and how the storage is bounded. A full-screen overlay opened imperatively from the
 // title screen / lobby / room (`openStats()`); <StatsHost/> is mounted once by main.js. Ported from PR #323 by
@@ -215,7 +216,7 @@ function HistoryRow({ rec, gd, onOpen }) {
     <td>${difficultyName(rec.difficulty)}</td>
     <td>${rec.roomMode === 'laboratory' ? '실험실' : rec.roomMode === 'solo' ? t('单人') : rec.roomMode === 'coop' ? t('同盟') : '—'}</td>
     <td><span class="st-band">${band ? html`<${BandIcon} bandId=${band.bandId} size="xs" />${band.name}` : self?.bandId || '—'}</span></td>
-    <td class="st-res">${quit ? html`<span class="t-quit">${t('中途退出')}</span>` : html`<span class=${won ? 't-win' : 't-lose'}>${won ? t('胜') : t('负')}</span>`}
+    <td class="st-res">${rec.customExtensions?html`<details class="st-custom" onClick=${e=>e.stopPropagation()} onKeyDown=${e=>e.stopPropagation()}><summary>커스텀</summary><div>${Object.entries(rec.customExtensions).map(([key,values])=>html`<p><b>${EXTENSION_CATEGORIES.find(c=>c.id===key)?.name||'규칙 수치'}</b> ${Array.isArray(values)?values.map(id=>customExtensionCatalog({bonds:gd.bond('leithanienShip')?{leithanienShip:gd.bond('leithanienShip')}: {}})[key]?.find(e=>e.id===id)?.name||(key.includes('Bands')?gd.band(id)?.name:key.includes('Bosses')?gd.boss(id)?.name:key.includes('Stages')||key==='stages'?gd.stage(id)?.name:gd.bond(id)?.name)||id).join(' · '):Object.entries(values).map(([id,n])=>{const r=RULE_VALUES.find(r=>r.id===id);return `${r?.name||id} ${n}${r?.unit||''}`;}).join(' · ')}</p>`)}</div></details>`:null}${quit ? html`<span class="t-quit">${t('中途退出')}</span>` : html`<span class=${won ? 't-win' : 't-lose'}>${won ? t('胜') : t('负')}</span>`}
       ${!counted ? html`<em class="st-chip">${t('不计入统计')}</em>` : null}</td>
     <td class="num">${known ? fmtNum(rounds) : '—'}</td>
     <td class="st-go" aria-hidden="true">${view ? html`<${Icon} name="chevronRight" />` : null}</td>
@@ -247,7 +248,7 @@ function Replay({ rec, onBack }) {
 
 /** The overlay, rendered while open (its data hooks run only then). */
 function StatsScreen({ tab }) {
-  const ready = useData('config', 'bands', 'assets');
+  const ready = useData('config', 'bands', 'assets', 'bonds', 'stages', 'bosses');
   const gd = useMemo(() => makeLookups(ready), [ready]);
   const [stats, setStats] = useState(() => loadStats());
   const [replay, setReplay] = useState(null);

@@ -965,7 +965,7 @@ export class BoardScene {
       // Four upright curtains follow the tile outline; no crossed billboards
       // through the middle of the tile (which obscure the original artwork).
       for(const [r,c] of board.terrain.infection)for(const [ax,ay,bx,by] of [[-1,-1,1,-1],[1,-1,1,1],[1,1,-1,1],[-1,1,-1,-1]]){
-        const b=position.length/3,w=.475,z=infectionHeights.get(`${r},${c}`)+.03,h=.45;
+        const b=position.length/3,w=.475,z=infectionHeights.get(`${r},${c}`)+.03,h=.60;
         position.push(c+ax*w,r+ay*w,z,c+bx*w,r+by*w,z,c+bx*w,r+by*w,z+h,c+ax*w,r+ay*w,z+h);
         uv.push(0,0,1,0,1,1,0,1);index.push(b,b+1,b+2,b,b+2,b+3);
       }

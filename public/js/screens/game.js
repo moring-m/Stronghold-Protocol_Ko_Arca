@@ -117,6 +117,7 @@ import { ResultScreen } from './result.js';
 import { net } from '../net.js';
 import { store, useStore, shallowEqual, serverNow, emptyMatch, isSpectating } from '../store.js';
 import { battleRunner } from '../battle/runner.js';
+import { LaboratoryDamage } from '../ui/laboratoryDamage.js';
 import { isClientCombat, observeTarget, teammateProgress, cameraLayers, layerCamera, sidesOf, resumedWatch } from '../battle/observe.js';
 import { screenStrip, playerBonds, playerLayer, detailBondOwner, toggleBond, popupView } from '../ui/watchBonds.js';
 import { data, localAsset, getMode } from '../data.js';
@@ -298,7 +299,7 @@ function MatchScreen() {
   const leaker = phase === PHASE.UNITE && Array.isArray(pub?.unite?.leakers) && pub.unite.leakers.includes(myId);
   const localLeft = leaker && uniteLocal ? (uniteLocal[myId] ?? 0) : undefined;
   const liveLpNow = liveLp(lpBaseRef.current, {
-    phase, round: pub?.round, lp: priv?.lp, statsLeaks: priv?.stats?.leaks, alive,
+    phase, round: pub?.round, lp: pub?.customExtensions?.rules?.includes('sharedHp')?pub.teamLp:priv?.lp, statsLeaks: priv?.stats?.leaks, alive,
     leaks: ownLeaks(localLeaks, meP?.pendingLp), cap: gd.config?.lpCapPerRound,
     uniteLeft: leaker ? uniteRemaining(localLeft, meP?.uniteLeft) : null,
   });
@@ -493,8 +494,23 @@ function MatchScreen() {
     view.enterBattle({ ...field, units });
     const earlySnap = snapBufRef.current.get(field.fieldId);
     snapBufRef.current.delete(field.fieldId);
-    // Local feed configuration belongs to entry; framing also responds to phase updates.
+    // a scouted prep board frames like the own prep with the shop folded (the bench row included, app.js camRect);
+    // 'prep' expands the rect's top to the hand row
+    const kind = field.prep ? 'prep' : (field.kind === 'hidden' ? 'boss' : field.kind || 'normal');
+    const pf = (Array.isArray(pub?.fields) ? pub.fields : []).find((f) => f && f.fieldId === field.fieldId);
+    const members = Array.isArray(pf?.players) ? pf.players : Array.isArray(field.players) ? field.players : [];
+    const sides = field.sides && typeof field.sides === 'object' ? field.sides : null;
+    const side = sides && sides[myId] ? sides[myId] : members.length > 1 && members.indexOf(myId) === 1 ? 'R' : 'L';
+    // local simulation (client-side combat) feeds a frame per animation frame: no network jitter buffer
     view.raw?.setLocalFeed?.({ on: !!field.local, speed: field.speed });
+    const observerHalf = (spectator || watchingOther) && (kind === 'boss' || (kind === 'unite' && members.length === 1));
+    const observedId = watchWho?.playerId || members[0];
+    const observedSide = sides?.[observedId] || (members.indexOf(observedId) === 1 ? 'R' : 'L');
+    const lone = (kind === 'boss' || kind === 'unite') && members.length === 1;
+    setLayer(observerHalf ? observedSide : lone ? side : 'ALL');
+    // a lone player's boss field (solo modes, the odd player of a co-op Final Assault: the `_s` templates route every
+    // enemy to the left objective) is framed on its own half like the ‹ › half view; pairs start on 全景
+    setCam(kind, field.prep ? { rect: field.rect, side: field.prepSide || side, shop: false } : observerHalf ? {rect:field.rect,side:observedSide,half:true} : lone ? { rect: field.rect, side, half: true } : { rect: field.rect, side });
     audio.setFieldUnits(field.units);
     if (early && early.length) {
       // replay state-bearing events only (a burst of stale hit sparks / damage numbers would look wrong)
@@ -518,29 +534,6 @@ function MatchScreen() {
       setHud(hudRef.current);
     }
   }, [view, showPrep, priv, editable, field, combat, mode, watchingOther, watching, holdSeq]);
-
-  // A combat frame can arrive before the public phase. Reframe that same frame when
-  // combat becomes active, using the same options as a manual observation switch.
-  useEffect(() => {
-    if (!view || !field?.fieldId || field === staleFieldRef.current || showPrep) return;
-    if (watchingOther && !combat && field.fieldId !== watching) return;
-    // a scouted prep board frames like the own prep with the shop folded (the bench row included, app.js camRect);
-    // 'prep' expands the rect's top to the hand row
-    const kind = field.prep ? 'prep' : (field.kind === 'hidden' ? 'boss' : field.kind || 'normal');
-    const pf = (Array.isArray(pub?.fields) ? pub.fields : []).find((f) => f && f.fieldId === field.fieldId);
-    const members = Array.isArray(pf?.players) ? pf.players : Array.isArray(field.players) ? field.players : [];
-    const sides = field.sides && typeof field.sides === 'object' ? field.sides : null;
-    const side = sides && sides[myId] ? sides[myId] : members.length > 1 && members.indexOf(myId) === 1 ? 'R' : 'L';
-    const observerHalf = (spectator || watchingOther) && (kind === 'boss' || kind === 'unite');
-    const preferred = watchWho?.playerId || spectatorChoice.current;
-    const observedId = members.includes(preferred) ? preferred : members[0];
-    const observedSide = sides?.[observedId] || (members.indexOf(observedId) === 1 ? 'R' : 'L');
-    const lone = (kind === 'boss' || kind === 'unite') && members.length === 1;
-    setLayer(observerHalf ? observedSide : lone ? side : 'ALL');
-    // a lone player's boss field (solo modes, the odd player of a co-op Final Assault: the `_s` templates route every
-    // enemy to the left objective) is framed on its own half like the ‹ › half view; pairs start on 全景
-    setCam(kind, field.prep ? { rect: field.rect, side: field.prepSide || side, shop: false } : observerHalf ? {rect:field.rect,side:observedSide,half:true} : lone ? { rect: field.rect, side, half: true } : { rect: field.rect, side });
-  }, [view, field, combat, showPrep, watchingOther, spectator, watchWho?.playerId]);
 
   useEffect(() => {
     if (!view) return;
@@ -658,6 +651,7 @@ function MatchScreen() {
     const A = whoAppliedRef.current;
     if (A.who === who && A.field === field) return;
     whoAppliedRef.current = { who, field };
+    if (field.kind === 'unite' && field.players?.length === 2 && A.field !== field) return;
     const k = playerLayer(field, pub, myId, who.playerId);
     if (!k) return;
     setLayer(k);
@@ -1478,7 +1472,8 @@ function MatchScreen() {
       ready=${phase === PHASE.PREP && !!priv?.ready} />` : null}
 
     <div class="gm__hud" ref=${hudElRef}>
-      <${TopBar} battleEnd=${combat && alive && !spectator && !myDone && endField ? html`<button type="button" class="gm__end-battle" data-i18n-skip disabled=${endField.endVotes?.includes(myId)} onClick=${async()=>{
+      ${pub?.laboratory && combat ? html`<${LaboratoryDamage} runner=${battleRunner} fieldId=${field?.fieldId}/>` : null}
+      <${TopBar} battleEnd=${combat && alive && !spectator && !myDone && endField && !['boss','hidden'].includes(endField.kind) ? html`<button type="button" class="gm__end-battle" data-i18n-skip disabled=${endField.endVotes?.includes(myId)} onClick=${async()=>{
         const f=pub.fields?.find(f=>f.live && f.players?.includes(myId)); if(!f)return;
         const shared=f.kind==='boss'||f.kind==='hidden'||f.players.length>1;
         if(await confirmDialog({title:'현재 전투 포기',text:shared?'모든 참가자가 포기를 요청하면 전투를 끝냅니다. 남은 적은 미처치로 정산되며, 보스전은 패배합니다.':'지금 전투를 끝내고 다음 단계로 넘어갑니다. 남은 적은 미처치로 정산됩니다.',okText:'전투 포기',danger:true})) {

@@ -68,6 +68,18 @@ export class LaboratoryMatch extends Match {
     return super.dispatch(ps, hook, ev, opts);
   }
 
+  setLoadout(playerId, entries, ops = undefined) {
+    if (this.phase !== PHASE.PREP) return super.setLoadout(playerId, entries, ops);
+    const ps = this.players.get(playerId);
+    if (!ps || this.disposed || this.ended || ps.ready) return { error: ERR.WRONG_PHASE };
+    if (!ps.setLoadout(entries, ops)) return { error: ERR.BAD_TARGET };
+    ps.recompute();
+    this.markPrivate(ps);
+    this.markPublic();
+    this.flush(true);
+    return { ok: true };
+  }
+
   publicView() { return { ...super.publicView(), laboratory: this.laboratory }; }
 
   handle(playerId, msg) {
@@ -77,7 +89,7 @@ export class LaboratoryMatch extends Match {
     if (!ps || this.disposed || this.ended || this.phase !== PHASE.PREP || ps.ready) return { error: ERR.WRONG_PHASE };
     let result;
     if (msg.t === 'g.labStack') {
-      if (!this.gd.bond(msg.bondId) || this.gd.bond(msg.bondId).noStack || !Number.isInteger(msg.layers) || msg.layers < 0 || msg.layers > BOND_LAYER_CAP) return { error: ERR.BAD_TARGET };
+      if (!this.gd.bond(msg.bondId) || this.gd.bond(msg.bondId).noStack || !Number.isInteger(msg.layers) || msg.layers < 0 || msg.layers > (this.gd.config.customRules?.unlimitedLayers?Number.MAX_SAFE_INTEGER:BOND_LAYER_CAP)) return { error: ERR.BAD_TARGET };
       ps.layers[msg.bondId] = msg.layers;
       ps.recompute();
       result = { ok: true };

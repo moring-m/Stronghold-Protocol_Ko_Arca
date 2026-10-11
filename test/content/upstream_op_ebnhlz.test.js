@@ -459,3 +459,12 @@ test('S3 寂静之声 (MANUAL, data DEFAULT): 30 s, ASPD +50 / +60, ATK +43 % / 
     done(h);
   }
 });
+
+test('S2 remnant triggers on a boss in any of the eight adjacent tiles',()=>{
+ const {h,u}=field({tier:6,elite:true,skill:1});
+ u.skill.gainSp(999);assert.ok(h.runUntil(()=>u.skill.activations===1,5));
+ const rem=h.b.allyUnits.find(t=>t.kind==='token'&&t.defId===REMNANT&&t.alive);
+ assert.ok(rem);const boss=h.spawn('enemy_dummy',{pos:[rem.y+1,rem.x+1]});boss.isBoss=true;
+ assert.ok(h.runUntil(()=>h.hooksOf('damaged').some(c=>c.source===rem&&c.target===boss),2));
+ assert.equal(rem.alive,false);done(h);
+});

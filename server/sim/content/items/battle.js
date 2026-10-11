@@ -439,7 +439,7 @@ const BY_BUFF = {
 /** Item-key behaviours. */
 const BY_ITEM = {
   chess_item_custom_ursus_favor(battle, u, rec, scope) {
-    onAttackEnemies(scope,u,t=>{ if(isMember(battle,u,'ursusShip')) battle.dealDamage(u,t,{amount:u.s.maxHp*.05,type:'true',tags:procTags('ursus_favor')}); });
+    onAttackEnemies(scope,u,t=>{ if(isMember(battle,u,'ursusShip')) battle.dealDamage(u,t,{amount:u.s.maxHp*.10,type:'true',tags:procTags('ursus_favor')}); });
     scope.on('attack', c => {
       if (c.attacker !== u || !isMember(battle,u,'ursusShip')) return;
       // Scope already invokes this hook once for each equipment strike.

@@ -2,7 +2,7 @@ import {loadPref,savePref} from '../store.js';
 import {EXTENSION_CATEGORIES,extensionSelectionShape} from '../../../shared/customExtensions.js';
 const KEY='customExtensionPresets';
 export function copyExtensionSelection(selection={}) {
-  return Object.fromEntries(EXTENSION_CATEGORIES.map(({id})=>[id,[...new Set(selection[id]||[])]]));
+  return {...(selection.ruleValues?{ruleValues:{...selection.ruleValues}}:{}),...Object.fromEntries(EXTENSION_CATEGORIES.map(({id})=>[id,[...new Set(selection[id]||[])]]))};
 }
 export function normalizeExtensionPresets(raw) {
   const seen=new Set();
@@ -13,5 +13,5 @@ export function saveExtensionPresets(presets){const saved=normalizeExtensionPres
 /** Drop stale IDs against the current catalog without changing the saved preset. */
 export function resolveExtensionPreset(preset,catalog) {
  const selection=copyExtensionSelection(preset?.selection);
- return Object.fromEntries(EXTENSION_CATEGORIES.map(({id})=>{const allowed=new Set((catalog[id]||[]).map(e=>e.id));return [id,selection[id].filter(key=>allowed.has(key))];}));
+ return {...(selection.ruleValues?{ruleValues:{...selection.ruleValues}}:{}),...Object.fromEntries(EXTENSION_CATEGORIES.map(({id})=>{const allowed=new Set((catalog[id]||[]).map(e=>e.id));return [id,selection[id].filter(key=>allowed.has(key))];}))};
 }

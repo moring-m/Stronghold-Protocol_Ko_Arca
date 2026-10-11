@@ -10,8 +10,9 @@ const out=resolve((process.argv[2] && !process.argv[2].startsWith('--') ? proces
 if(out===root)throw Error('Export directory must be separate from the source checkout.');
 if(!catalogOnly) await mkdir(out,{recursive:true});
 const read=async p=>JSON.parse(await readFile(join(root,p),'utf8'));
-const overlay=join(root,'.cache/ursus-data');
-const manifest=await read('.cache/ursus-data/assets.json');
+const dataArg=process.argv.find(a=>a.startsWith('--data-dir='));
+const overlay=dataArg?resolve(root,dataArg.slice('--data-dir='.length)):join(root,'.cache/ursus-data');
+const manifest=JSON.parse(await readFile(join(overlay,'assets.json'),'utf8'));
 const base=await read('public/vendor/browser-resources.json');
 const files=new Map(base.files.map(f=>[f.path,f]));
 for(const path of ['.cache/ursus-voice-resources.json','.cache/skin-resources.json','.cache/skill-sound-resources.json','.cache/ursus-band-resources.json','.cache/upstream-recruit-resources.json']){
@@ -21,7 +22,7 @@ for(const path of ['.cache/ursus-voice-resources.json','.cache/skin-resources.js
 for(const path of files.keys())if(/^\/assets\/audio\/voice\/(cn|voice_cn)\//.test(path))files.delete(path);
 const paths=new Set();
 function walk(value){if(typeof value==='string'&&value.startsWith('/assets/'))paths.add(value);else if(value&&typeof value==='object')Object.values(value).forEach(walk);}
-walk(manifest);const local=await read('.cache/ursus-data/local-assets.json');walk(local);
+walk(manifest);const local=JSON.parse(await readFile(join(overlay,'local-assets.json'),'utf8'));walk(local);
 // Additional custom operators and locally extracted board/VFX art are served by the application.
 // They need an index entry even though they are not in the original upstream resource plan.
 for(const path of paths)if(!files.has(path)){

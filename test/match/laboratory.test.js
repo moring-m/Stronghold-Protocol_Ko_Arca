@@ -4,10 +4,10 @@ import {LaboratoryMatch} from '../../server/match/LaboratoryMatch.js';
 import {GameData} from '../../server/match/gamedata.js';
 import {Match} from '../../server/match/Match.js';
 import {VirtualScheduler} from '../../server/match/scheduler.js';
-import {getData} from '../../server/data.js';
+import {loadData} from '../../server/data.js';
 import {PHASE,ERR,BOND_LAYER_CAP} from '../../shared/constants.js';
 import {legalTileFor} from './harness.js';
-const raw=getData({dataDir:'content/production/data'});
+const raw=loadData(new URL('../../content/production/data/',import.meta.url).pathname);
 function create(t,kind='boss',difficulty='NORMAL',bandId='band_pith'){
  const sched=new VirtualScheduler(),sent=[];
  const boss=Object.values(raw.bosses).find(b=>!!b.hidden===(kind==='hidden'));
@@ -102,4 +102,26 @@ for(const difficulty of ['FUNNY','NORMAL','HARD','ABYSS'])for(const players of [
  assert.equal(m.bossPool.maxHp,reference.bossPoolHp('boss_1',players));
  assert.equal(m.bossWaves[0].wave.templateId.replace(/_s$/,''),raw.bosses.boss_1.templates[modeId].template.replace(/_s$/,''));
  assert.equal(m.fields[0].players.length,1);
+});
+
+ test('laboratory loadout skin edits reach deployed battle input during preparation',t=>{
+  const {m,ps}=create(t);
+  const c=Object.values(raw.chess).find(c=>c.visible&&!c.isGolden&&!c.optionalRecruit&&c.skins?.length);
+  assert.ok(c);
+  assert.deepEqual(m.setLoadout('local',{[c.chessId]:{skin:c.skins[0].id}}),{ok:true});
+  assert.equal(ps.privateView().loadout[c.chessId].skin,c.skins[0].id);
+  m.handle('local',{t:'g.labGain',kind:'chess',id:c.chessId});
+  const piece=ps.hand.find(p=>p?.id===c.chessId),tile=legalTileFor(m,ps,c.chessId);
+  assert.deepEqual(m.handle('local',{t:'g.move',uid:piece.uid,to:{area:'board',row:tile[0],col:tile[1]}}),{ok:true});
+  assert.equal(ps.battleInput({side:'L',colOffset:0}).units.find(u=>u.chessId===c.chessId).skinId,c.skins[0].id);
+ });
+
+test('laboratory grants personnel file and applying it raises the deployment limit to nine',t=>{
+ const {m,ps}=create(t);const chess=Object.values(raw.chess).find(c=>c.visible&&!c.isGolden&&!c.isHidden&&!c.isDiy);
+ assert.deepEqual(m.handle('local',{t:'g.labGain',kind:'chess',id:chess.chessId}),{ok:true});
+ const piece=ps.hand.find(p=>p?.id===chess.chessId);
+ assert.deepEqual(m.handle('local',{t:'g.labGain',kind:'item',id:'chess_item_6_08_e_a'}),{ok:true});
+ const item=ps.hand.find(p=>p?.id==='chess_item_6_08_e_a');assert.ok(item);
+ assert.deepEqual(m.handle('local',{t:'g.equip',itemUid:item.uid,targetUid:piece.uid}),{ok:true});
+ assert.equal(ps.deployCap,9);
 });

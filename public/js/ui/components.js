@@ -839,8 +839,9 @@ export function TextField({ label, micro, value, onInput, onEnter, placeholder, 
     if (autoFocus) setTimeout(() => ref.current?.focus(), 60);
   }, []);
   const handle = (e) => {
+    if (composing.current || e.isComposing) return;
     let v = e.currentTarget.value;
-    if ((ascii || !composing.current) && transform) {
+    if (transform) {
       const t = transform(v);
       if (t !== v) { v = t; e.currentTarget.value = t; }
     }
@@ -857,15 +858,6 @@ export function TextField({ label, micro, value, onInput, onEnter, placeholder, 
         oncompositionstart=${() => { composing.current = true; }}
         oncompositionend=${(e) => { composing.current = false; handle(e); }}
         onKeyDown=${(e) => {
-          if (ascii && !e.ctrlKey && !e.metaKey && !e.altKey && /^(Key[A-Z]|Digit[0-9]|Numpad[0-9])$/.test(e.code || '')) {
-            e.preventDefault();
-            const el=e.currentTarget, key=e.code.replace(/^(Key|Digit|Numpad)/,'');
-            const start=el.selectionStart ?? el.value.length, end=el.selectionEnd ?? start;
-            let next=el.value.slice(0,start)+key+el.value.slice(end);
-            if (transform) next=transform(next);
-            el.value=next;el.setSelectionRange(Math.min(start+1,next.length),Math.min(start+1,next.length));
-            onInput?.(next);return;
-          }
           if (e.key === 'Enter' && !e.isComposing && !composing.current) onEnter?.(e);
         }} />
     </span>

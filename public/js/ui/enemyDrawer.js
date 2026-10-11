@@ -80,6 +80,7 @@ function InfoTab({ pub, priv, onChess, bandId = null, bandOwner = null }) {
       <div><${MicroLabel} tone="mint">STRATEGY // ${label}</${MicroLabel}><b>${band.name} <small class="t-lo">${band.effectName}</small></b>
         <${RichText} text=${band.descRaw || band.desc} class="iband__desc" /></div>
     </div>`)}
+    <h4 class="ihead">등장하는 특훈 적</h4><${FactionChips} types=${factionTypes(pub?.factions)} />
     ${stage ? html`<p class="istage"><${Icon} name="rook" />战场：<b>${stage.name || stage.id}</b></p>` : null}
     <h4 class="ihead">本局禁用干员情况 <small class="num">${banned.length}</small></h4>
     <div class="ibonds">

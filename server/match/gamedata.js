@@ -121,7 +121,7 @@ export class GameData {
     let base = boss && boss.bloodPoint && Number.isFinite(boss.bloodPoint[diff]) ? boss.bloodPoint[diff] : null;
     if (base == null && boss && boss.bloodPoint) base = Object.values(boss.bloodPoint).find((v) => Number.isFinite(v)) ?? null;
     if (base == null) base = 500000;
-    return Math.max(1, Math.round(base * this.bossPoolShare(aliveCount)));
+    return Math.max(1, Math.round(base * this.bossPoolShare(aliveCount) * (this.config.customRules?.enemyHp??100)/100));
   }
 
   /** Solo uses the full base HP. Co-op uses base × alive participants (1–4)
@@ -227,7 +227,7 @@ export class GameData {
   get refreshPrice() { return Math.max(0, numOr(this.economy.refreshPrice, DEFAULTS.refreshPrice)); }
   get benchSize() { return posIntOr(this.economy.benchSize, DEFAULTS.benchSize); }
   get tempSize() { return posIntOr(this.economy.tempSize, DEFAULTS.tempSize); }
-  get deployCap() { return posIntOr(this.economy.deployCap, DEFAULTS.deployCap); }
+  get deployCap() { return posIntOr(this.config.customRules?.deployCap ?? this.economy.deployCap, DEFAULTS.deployCap); }
   get equipPerChess() { return posIntOr(this.economy.equipPerChess, DEFAULTS.equipPerChess); }
   get maxArtsPerRound() { return posIntOr(this.economy.maxArtsPerRound, DEFAULTS.maxArtsPerRound); }
   get goldenCopies() { return posIntOr(this.economy.goldenCopies, DEFAULTS.goldenCopies); }
@@ -260,6 +260,7 @@ export class GameData {
 
   /** Normal equipment copies in the shared pool; effect-only items have no shop stock limit. */
   itemPoolCopies(id) {
+    if(this.config.customRules?.unlimitedStock)return null;
     const base = this.baseIdOf(id), rec = this.item(base);
     if (!rec || !isShopItem(rec)) return null;
     const count = this.economy.itemPoolCopiesOverrides?.[base] ?? this.economy.itemPoolCopies?.[rec.tier];

@@ -127,7 +127,7 @@ export function BondPopup({ bondId, entry, priv, banned = [], onClose, onMember,
     </div>
     ${hasNow ? html`<section class="bpop__sec bpop__sec--now">
       <h4>当前效果 ${b.noStack ? null : html`<small class="num">（${layers} 层）</small>`}</h4>
-      <${RichText} as="p" text=${formatBondEffect(b, layers)} class="bpop__desc" />
+      <${RichText} as="p" text=${formatBondEffect(b, layers, count)} class="bpop__desc" />
     </section>` : null}
     <section class="bpop__sec">
       <h4>盟约效果</h4>

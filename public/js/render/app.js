@@ -130,7 +130,7 @@ import { ImpostorAtlas } from './impostor.js';
 import { loadThree, loadBoardPack, webgl2Available, boardArtListed } from './board3d/load.js';
 import { BoardScene } from './board3d/scene.js';
 import { AREAS, areaFor, unionAreas } from './board3d/layout.js';
-import { layoutPen, penSignature, bossPenStage, cooperativeBossStage, BOSS_PEN_RECT, parsePenRect } from './pen.js';
+import { previewStealth, layoutPen, penSignature, bossPenStage, cooperativeBossStage, BOSS_PEN_RECT, parsePenRect } from './pen.js';
 import { IDENTITY, bossPrepField, tilesToDisp, leaderStand } from './prepfield.js';
 import { pickOnTile, pickBattle, hitRectAt, hitTiles } from './pick.js';
 import { promotionsOf } from './promote.js';
@@ -1229,7 +1229,7 @@ export async function createFieldView(host, options = {}) {
       const rec = data.enemy(f.enemyKey);
       const rank = rec?.rank;
       const info = {
-        id: 'e:' + f.key, kind: 'enemy', side: 'enemy', defId: f.enemyKey, enemyKey: f.enemyKey, preview: true, name: rec?.name || f.enemyKey,
+        id: 'e:' + f.key, kind: 'enemy', side: 'enemy', defId: f.enemyKey, enemyKey: f.enemyKey, preview: true, previewStealth: previewStealth(rec), name: rec?.name || f.enemyKey,
         tier: f.boss || rank === 'BOSS' ? 3 : f.elite || rank === 'ELITE' ? 2 : 1, golden: false,
         spine: rec?.spine || f.enemyKey, avatar: rec?.iconId || rec?.avatar || f.enemyKey,
         x: f.x, y: f.y, facing: -1, maxHp: 1, boss: !!f.boss, onBattlefield:!!f.onBattlefield, hitArea:f.onBattlefield?rec?.hitArea:null, motion: f.fly ? 'FLY' : undefined,
@@ -1702,6 +1702,7 @@ export async function createFieldView(host, options = {}) {
   function pushSnapshot(snap) {
     if (destroyed || mode !== 'battle') return false;
     if (battleMeta?.fieldId && snap && snap.fieldId && snap.fieldId !== battleMeta.fieldId) return false;
+    for (const [id,v] of views) if(v.isEnemy)v.setNoteStacks?.(snap?.noteStacks?.[id] || 0);
     for (const [id,n] of Object.entries(snap?.energy || {})) views.get(Number(id))?.setEnergy?.(n);
     return interp.push(snap, performance.now() / 1000);
   }

@@ -32,7 +32,7 @@ export function drawDisabledBonds(gd, rng, policy = {}) {
   });
   const core = eligible.filter((b) => gd.bond(b).isCore);
   const addon = eligible.filter((b) => !gd.bond(b).isCore);
-  const extraCore = core.includes('ursusShip') ? 1 : 0;
+  const extraCore = ['ursusShip','leithanienShip'].filter(id=>core.includes(id)).length;
   const forced = core.filter(id=>(policy.forcedBonds||[]).includes(id));
   const protectedIds = new Set(policy.protectedBonds||[]);
   const quota = Math.min(Math.max(nCore + extraCore,forced.length),Math.max(0,core.length-5));
@@ -70,13 +70,14 @@ export class SharedPool {
    */
   constructor(gd, { banned = [] } = {}) {
     this.gd = gd;
+    this.unlimited=!!gd.config.customRules?.unlimitedStock;
     const ban = new Set(banned);
     /** @type {Map<string, { cap: number, left: number, tier: number }>} */
     this.entries = new Map();
     for (const id of gd.visibleChess) {
       if (ban.has(id) || gd.chess(id)?.optionalRecruit) continue;
       const cap = gd.poolCopies(id);
-      if (cap <= 0) continue;
+      if (cap <= 0 && !this.unlimited) continue;
       this.entries.set(id, { cap, left: cap, tier: gd.tierOf(id) });
     }
     this.banned = [...ban].sort();
@@ -85,12 +86,12 @@ export class SharedPool {
   /** Whether a base chess is part of this match's pool (visible, not banned). */
   has(baseId) { return this.entries.has(baseId); }
   cap(baseId) { return this.entries.get(baseId)?.cap ?? 0; }
-  left(baseId) { return Math.max(0, this.entries.get(baseId)?.left ?? 0); }
+  left(baseId) { if(this.unlimited&&this.has(baseId))return Infinity;return Math.max(0, this.entries.get(baseId)?.left ?? 0); }
 
   /** Take up to n copies; returns the number actually taken (0 when not in the pool / empty). */
   take(baseId, n = 1, { overdraw = false } = {}) {
     const e = this.entries.get(baseId);
-    if (!e || !(n > 0)) return 0;
+    if (this.unlimited || !e || !(n > 0)) return 0;
     const k = overdraw ? Math.floor(n) : Math.min(Math.max(0, e.left), Math.floor(n));
     e.left -= k;
     return k;
@@ -99,7 +100,7 @@ export class SharedPool {
   /** Return n copies (clamped at the cap). Returns the number actually returned. */
   give(baseId, n = 1) {
     const e = this.entries.get(baseId);
-    if (!e || !(n > 0)) return 0;
+    if (this.unlimited || !e || !(n > 0)) return 0;
     const k = Math.min(e.cap - e.left, Math.floor(n));
     e.left += k;
     return k;
@@ -109,11 +110,11 @@ export class SharedPool {
   _eligible({ maxTier = 6, tier = null, filter = null, ignoreCounts = false } = {}) {
     const out = [];
     for (const [id, e] of this.entries) {
-      if (!ignoreCounts && e.left <= 0) continue;
+      if (!this.unlimited && !ignoreCounts && e.left <= 0) continue;
       if (tier != null ? e.tier !== tier : e.tier > maxTier) continue;
       if (!filter && this.gd.chess(id)?.optionalRecruit) continue;
       if (filter && !filter(id, e)) continue;
-      out.push([id, ignoreCounts ? 1 : e.left]);
+      out.push([id, ignoreCounts ? 1 : this.unlimited ? Math.max(1,e.cap) : e.left]);
     }
     return out;
   }
@@ -208,7 +209,8 @@ export class RecruitPool extends SharedPool {
  * experiment BV1eLXXBqEgF, 1:30 and 2:30. [ASSUMED] An item that is consumed/destroyed or removed by elimination no
  * longer occupies stock, consistently with the video's ownership model; this is not a per-match purchase limit. */
 export class SharedItemPool {
-  constructor(gd, players) { this.gd = gd; this.players = players; }
+  constructor(gd, players) { this.gd = gd;
+    this.unlimited=!!gd.config.customRules?.unlimitedStock; this.players = players; }
   cap(id) { return this.gd.itemPoolCopies(id); }
   need(id) { return this.gd.isGolden(id) ? 2 : 1; }
   held(id) {
