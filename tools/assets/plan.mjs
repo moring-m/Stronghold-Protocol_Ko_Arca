@@ -450,6 +450,7 @@ export function buildPlan({ assets07, ops03, enemies05, maps05, audio, modelsDat
       if (model) entry.spineVariant = v;
     }
     entry.spine = model;
+    if (id === 'token_10031_swire2_gdtrap') entry.spineLocal = literal({"group":"spine/token/token_10031_swire2_gdtrap","skel":"token_10031_swire2_gdtrap.skel","atlas":"token_10031_swire2_gdtrap.atlas","textures":["token_10031_swire2_gdtrap.png"],"pma":true,"anims":{"idle":"Idle","deploy":"Start","attack":{"begin":null,"loop":"Attack","end":null},"attackDown":null,"skill":{"begin":null,"loop":"Attack","end":null,"via":"attack","index":0,"idle":null},"die":"Die","move":null,"stun":null},"animations":{"Attack":0.2,"Default":0,"Die":0.467,"Idle":2,"Start":0.667},"events":["OnAttack","OnStart"],"hits":{"Attack":[0.2]},"bounds":{"x":-75.631,"y":-8.563,"width":152,"height":225.923}});
     tokens[id] = entry;
     const { roles: u, mix } = unitSounds(audio, pickUnitSfx(audio.unitBanks.get(id)));
     if (mix) u.mix = mix;

@@ -1,7 +1,7 @@
 
 
 
-import { deviceInfo, deviceTipAt, noteDeviceUnits, readyShopFold } from '../ui/gameLogic.js';
+import { deviceInfo, deviceTipAt, noteDeviceUnits, deviceUnitsForEntry, readyShopFold } from '../ui/gameLogic.js';
 
 
 import { audioEarly } from './game/early.js';
@@ -91,7 +91,7 @@ import { Ticker } from '../ui/ticker.js';
 import { EmoteWheel } from '../ui/emotes.js';
 import { EffectsList } from '../ui/effectsList.js';
 import { CombatHud } from '../ui/combatHud.js';
-import { SettingsModal } from '../ui/settings.js';
+import { settingsStore, SettingsModal } from '../ui/settings.js';
 import { ExitModal, AwayOverlay, awayStore } from '../ui/matchChrome.js';
 import { openGuide } from '../ui/guide.js';
 import { actions } from '../ui/gameActions.js';
@@ -412,7 +412,7 @@ function MatchScreen() {
   // prep rendering (own board) vs battle rendering (m.field). The field object present when prep starts is stale
   // (last round's battle): combat only enters an m.field pushed after that (a new object), and every new m.field
   // push (watch switch, reconnect) re-enters the battle view.
-  const showPrep = (mode === 'prep' || mode === 'boot') && !watchingOther;
+  const showPrep = (mode === 'prep' || mode === 'boot') && !watchingOther && !spectator;
 
   // own board (prep, or a battle field the player fights on) → the stage with the player's overrides; a teammate's
   // board → the plain stage (their overrides are not known here)
@@ -439,8 +439,18 @@ function MatchScreen() {
   live.current.deviceBattle = !!shownField && !shownField.prep;
   const staleFieldRef = useRef(null);
   const enteredFieldRef = useRef(null);
+  const enteredViewRef = useRef(null);
   const pressSel = useRef(null);                         // the selected piece when the current field press began
   useEffect(() => {
+    const previousFieldId = lastFieldRef.current;
+    const previousDevices = deviceUnitsRef.current;
+    if (enteredViewRef.current !== view) {
+      enteredViewRef.current = view;
+      enteredFieldRef.current = null;
+      lastFieldRef.current = null;
+      viewModeRef.current = null;
+      reentryRef.current = null;
+    }
     if (!view) return;
     if (showPrep) {
       if (field?.prep) staleFieldRef.current = field; // a prep scouting board is never a battle to enter
@@ -464,19 +474,23 @@ function MatchScreen() {
       }
       return;
     }
-    const wanted = combat || mode === 'settle' || watchingOther;
+    const wanted = combat || mode === 'settle' || watchingOther || spectator;
     if (!wanted || !field || !field.fieldId || field === staleFieldRef.current || field === enteredFieldRef.current) return;
     if (watchingOther && !combat && field.fieldId !== watching) return; // an older push while switching
     if (lastFieldRef.current && lastFieldRef.current !== field.fieldId) setDetail((d) => (inBattleCard(d) ? null : d));
     enteredFieldRef.current = field;
+    const sameField = previousFieldId != null && previousFieldId === field.fieldId;
     lastFieldRef.current = field.fieldId;
     reentryRef.current = null;
     viewModeRef.current = 'battle';
     snapUnitsRef.current = new Map();
-    view.enterBattle(field);
     const early = evBufRef.current.get(field.fieldId);
     evBufRef.current.delete(field.fieldId);
-    deviceUnitsRef.current = noteDeviceUnits(new Map(), { units: field.units, events: early });
+    deviceUnitsRef.current = deviceUnitsForEntry(previousDevices, noteDeviceUnits(new Map(), { units: field.units, events: early }), sameField);
+    const units = Array.isArray(field.units) ? [...field.units] : [];
+    const ids = new Set(units.map(u => u?.id));
+    for (const [id, info] of deviceUnitsRef.current) if (!ids.has(id)) units.push(info);
+    view.enterBattle({ ...field, units });
     const earlySnap = snapBufRef.current.get(field.fieldId);
     snapBufRef.current.delete(field.fieldId);
     // a scouted prep board frames like the own prep with the shop folded (the bench row included, app.js camRect);
@@ -491,10 +505,10 @@ function MatchScreen() {
     const observerHalf = (spectator || watchingOther) && (kind === 'boss' || kind === 'unite');
     const observedId = watchWho?.playerId || members[0];
     const observedSide = sides?.[observedId] || (members.indexOf(observedId) === 1 ? 'R' : 'L');
-    setLayer(observerHalf ? observedSide : 'ALL');
+    const lone = (kind === 'boss' || kind === 'unite') && members.length === 1;
+    setLayer(observerHalf ? observedSide : lone ? side : 'ALL');
     // a lone player's boss field (solo modes, the odd player of a co-op Final Assault: the `_s` templates route every
     // enemy to the left objective) is framed on its own half like the ‹ › half view; pairs start on 全景
-    const lone = kind === 'boss' && members.length === 1;
     setCam(kind, field.prep ? { rect: field.rect, side: field.prepSide || side, shop: false } : observerHalf ? {rect:field.rect,side:observedSide,half:true} : lone ? { rect: field.rect, side, half: true } : { rect: field.rect, side });
     audio.setFieldUnits(field.units);
     if (early && early.length) {
@@ -583,6 +597,13 @@ function MatchScreen() {
     };
     const offs = [net.on('m.field', onFieldMeta), net.on('b.snap', onSnap), net.on('b.ev', onEv)];
     if (battleRunner) offs.push(battleRunner.on('field', onFieldMeta), battleRunner.on('snap', onSnap), battleRunner.on('ev', onEv));
+    if (view && !showPrep && field?.fieldId) {
+      if (field.local) battleRunner?.reshow();
+      else if (combat || watchingOther) {
+        const who = watchWho?.fieldId === field.fieldId ? watchWho.playerId : null;
+        net.request('g.watch', { fieldId: field.fieldId, ...(who ? { playerId: who } : {}) }).catch(() => {});
+      }
+    }
     return () => { for (const off of offs) { try { off(); } catch { /* ignore */ } } clearTimeout(pending); };
   }, [view]);
 
@@ -754,7 +775,10 @@ function MatchScreen() {
   const toggleReady = useCallback(async (r) => {
     const L = live.current;
     const me = Array.isArray(L.pub?.players) ? L.pub.players.find((p) => p && p.playerId === L.myId) : null;
-    const ask = r ? readyFundsPrompt(L.priv, { keptBands: data.get('config')?.economy?.leftoverFundsKeptByBands, autoplay: !!me?.autoplay }) : null;
+    const ask = !r ? null : L.pub?.laboratory ? {
+      title: '준비 완료 확인', micro: 'BATTLE READY', okText: '전투 시작', cancelText: '계속 준비',
+      text: '현재 배치와 설정으로 전투를 시작하시겠습니까?',
+    } : readyFundsPrompt(L.priv, { keptBands: data.get('config')?.economy?.leftoverFundsKeptByBands, autoplay: !!me?.autoplay });
     if (ask) {
       if (askingReady.current) return;
       askingReady.current = true;
@@ -1245,7 +1269,8 @@ function MatchScreen() {
   // ---- keyboard ---------------------------------------------------------------------------------------------
   useEffect(() => {
     const onKey = async (e) => {
-      const act = shortcutFor(e);
+      const act = shortcutFor(e, settingsStore.get().keys);
+      if (!act) return;
       const L = live.current;
       // dialogs / the guide own the keyboard; behind the 本局信息 / 敌方情报 drawer only Esc (closing it) acts
       if (shortcutBlocked(act, { modal: !!document.querySelector('.modal, .guide'), drawer: !!L.drawer })) return;
@@ -1274,6 +1299,7 @@ function MatchScreen() {
         togglePauseRef.current(!L.paused);
         return;
       }
+      if (act === 'collapseShop' && L.pub?.phase === PHASE.PREP && L.priv && !L.pen && !L.drag && !L.facing) {e.preventDefault();setCollapsed(c=>!c);return;}
       if (L.pub?.phase !== PHASE.PREP || !L.priv) return;
       e.preventDefault(); // a focused HUD button must not also activate (Space) — see shortcutFor
       if (act === 'ready' && e.target instanceof HTMLElement && e.target.closest('button, [role="button"]')) e.target.blur();
@@ -1506,8 +1532,8 @@ function MatchScreen() {
       <${Ticker} />
 
       <div class="gm__corner">
-        <${ChatPanel} />
-        ${spectator ? null : html`<${EmoteWheel} open=${emoteOpen} onToggle=${setEmoteOpen} onSend=${(id) => actions.emote(id)} disabled=${conn.status !== 'online'} />`}
+        ${solo || pub?.laboratory ? null : html`<${ChatPanel} />`}
+        ${spectator || solo || pub?.laboratory ? null : html`<${EmoteWheel} open=${emoteOpen} onToggle=${setEmoteOpen} onSend=${(id) => actions.emote(id)} disabled=${conn.status !== 'online'} />`}
         <button type="button" class="gm__gear" aria-label="设置" title="设置" onClick=${() => setSettingsOpen(true)}><${GIcon} name="gear" /></button>
         <button type="button" class="gm__gear gm__guide" aria-label="玩法说明" title="玩法说明" onClick=${() => openGuide(0)}><${Icon} name="book" /></button>
         <${FullscreenButton} class="gm__gear gm__fs" />

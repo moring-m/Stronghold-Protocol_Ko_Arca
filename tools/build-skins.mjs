@@ -21,9 +21,9 @@ export async function buildSkins(root,dir,{charIds=null,incremental=false}={}){
   const [bytes,atlas]=await Promise.all([cached(base+file+'.skel'),cached(base+file+'.atlas')]);
   const info=atlasInfo(atlas.toString()),sk=parseSkel(bytes,new Set(info.regions));const prefix=`/assets/custom/skins/${id}/${side}`;
   const textures=info.pages.map(p=>`${prefix}/${p.replace(/[^A-Za-z0-9._-]/g,'_')}`);
-  files.push({path:prefix+'/'+file+'.skel',sources:[base+file+'.skel']},{path:prefix+'/'+file+'.atlas',sources:[base+file+'.atlas'],atlas:{textures,pma:false}});
+  files.push({path:prefix+'/'+file+'.skel',sources:[base+file+'.skel']},{path:prefix+'/'+file+'.atlas',sources:[base+file+'.atlas'],atlas:{textures,pma:info.hasPma}});
   for(const [i,p]of info.pages.entries())files.push({path:textures[i],sources:[base+p]});
-  return {skel:prefix+'/'+file+'.skel',atlas:prefix+'/'+file+'.atlas',textures,pma:false,animations:sk.durations,durations:sk.durations,hits:sk.hits,bounds:sk.bounds,anims:resolveRoles(sk.animations,{skillIndices:[0,1,2],durations:sk.durations})};
+  return {skel:prefix+'/'+file+'.skel',atlas:prefix+'/'+file+'.atlas',textures,pma:info.hasPma,animations:sk.durations,durations:sk.durations,hits:sk.hits,bounds:sk.bounds,anims:resolveRoles(sk.animations,{skillIndices:[0,1,2],durations:sk.durations})};
  }
  async function worker(){while(candidates.length){const s=candidates.shift(),id='skin_'+s.battleSkin.skinOrPrefabId.replace(/[^A-Za-z0-9_]/g,'_');if(incremental&&catalog.get(s.charId)?.some(e=>e.id===id))continue;try{
    let front;try{front=await model(s,id,'Front')}catch{front=await model(s,id,'Front','Spine')}let back=assets.chars[id]?.spine?.back||null;try{back=await model(s,id,'Back')}catch{}

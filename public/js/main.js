@@ -1,3 +1,4 @@
+import { LaboratoryScreen } from './ui/laboratory.js';
 import './ui/compat.js';
 import { StatsHost } from './screens/stats.js';
 import { recordResult, installStatsRecorder } from './ui/stats.js';
@@ -63,7 +64,7 @@ const JOIN_DELAY_MS = 350;
 const TICKER_KEEP = 20;
 const EMOTE_KEEP = 20;
 
-const SCREENS = { title: TitleScreen, lobby: LobbyScreen, room: RoomScreen, game: GameScreen };
+const SCREENS = { laboratory: LaboratoryScreen, title: TitleScreen, lobby: LobbyScreen, room: RoomScreen, game: GameScreen };
 
 /** Copy of a server message without transport fields. */
 function payload(msg) {
@@ -236,7 +237,7 @@ function wireNet() {
     store.patch('match', { result: res });
     // 本机统计 (PR #323): every arrival, including the lobby's result replay after a reconnect / reload —
     // replays dedupe by content id inside recordResult (spectator seats' copies build no record at all)
-    recordResult(res, { myId: store.get().me.playerId, roomMode: store.get().room?.mode ?? null, now: Date.now() });
+    recordResult(res, { laboratory:!!store.get().room?.laboratory, myId: store.get().me.playerId, roomMode: store.get().room?.mode ?? null, now: Date.now() });
   });
   net.on('room.commended',msg=>{
     const result=store.get().match.result;

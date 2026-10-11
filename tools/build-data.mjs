@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { MEASURED_STOCK } from '../shared/stockRules.js';
 // tools/build-data.mjs — DATA BUILD PIPELINE (task F1).
 //
 // Reads the official zh_CN client data (Kengxxiao/ArknightsGameData) plus the research JSON in
@@ -3564,7 +3565,7 @@ function buildConfig(ctx, waves, stages, bands) {
       storeCntMax: act.constData.storeCntMax,
       equipPerChess: 2, maxArtsPerRound: 2,
       poolCopies: { 1: 12, 2: 14, 3: 18, 4: 16, 5: 8, 6: 5 },
-      poolCopiesOverrides: { chess_char_6_11_a: 4 },
+      ...MEASURED_STOCK,
       goldenCopies: 3,
       mergeCount: 3,
       mergeCountOverrides: Object.fromEntries(Object.entries(act.charChessDataDict).filter(([, c]) => !c.isGolden && c.upgradeNum && c.upgradeNum !== 3).map(([id, c]) => [id, c.upgradeNum])),

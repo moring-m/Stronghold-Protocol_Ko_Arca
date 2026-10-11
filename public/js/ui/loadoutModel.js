@@ -314,6 +314,23 @@ export function setChoice(entries, base, golden, patch) {
   return out;
 }
 
+/** Selecting an active tier toggles it off; clearing keeps skill/module/skin choices. */
+export function setRecruitSelection(entries, chess, tier, getChess) {
+  const next = sanitizeEntries(entries, getChess);
+  const key = chess.chessId.replace(/_[56]_a$/, '');
+  const id = `${key}_${tier || 5}_a`;
+  const wasSelected = !!next[id]?.selected;
+  for (const t of chess.recruitPrototype && tier ? [tier] : [5, 6]) {
+    const k = `${key}_${t}_a`;
+    if (!next[k]) continue;
+    next[k] = { ...next[k] };
+    delete next[k].selected;
+    if (!Object.keys(next[k]).length) delete next[k];
+  }
+  if (tier && !wasSelected) next[id] = { ...next[id], selected: true };
+  return next;
+}
+
 /** Remove one chess's entry (恢复默认). */
 export function resetChoice(entries, baseId) {
   if (!entries || !Object.hasOwn(entries, baseId)) return entries;
@@ -483,15 +500,25 @@ export function garrisonTexts(chess,getGarrison,translate=tr) {
   const seen=new Set(),groups=new Map();
   const key=text=>text.replace(/<@[^>]+>|<\/>/g,'').replace(/[【】]/g,c=>c==='【'?'[':']')
     .replace(/맹약의\s*중첩/g,'맹약 중첩').replace(/\s+/g,'');
-  const lines=(chess?.garrisonIds||[]).flatMap(id=>{
+  const ids=chess?.garrisonIds||[];
+  const lines=ids.flatMap(id=>{
     const rec=getGarrison(id);
+    // Official numbered references link implementation records to a combined description.
+    // Keep distinct triggers (e.g. Vigil's kills), but omit grant internals and
+    // same-trigger records already explained by their owning description.
+    const grantOwner=ids.map(getGarrison).find(r=>r?.bbStr?.give_garrison_id===id &&
+      key(translate(r.descRaw||r.desc||'')).includes(key(translate(rec?.descRaw||rec?.desc||''))));
+    if(grantOwner) return [];
+    const ref=(rec?.descRaw||rec?.desc||'').match(/^【(\d+)】/);
+    const owner=ref&&ids.map(getGarrison).find(r=>r?.garrisonId?.match(/^garrison_(\d+)_/)?.[1]===ref[1]);
+    if(owner&&(owner.battleRuneKey==='give_garrison_to_front'||owner.effectKey===rec.effectKey)) return [];
     return translate(rec?.descRaw||rec?.desc||'').replace(/\\n/g,'\n').split(/\n|<br\s*\/?\s*>/i).map(line=>({line,id}));
   });
   const keys=lines.map(({line})=>key(line));
   for(const [index,{line,id}] of lines.entries()) {
     const k=keys[index];
     // A combined description may repeat a complete opening clause in another record.
-    if(k && keys.some(other=>other.startsWith(k) && /^[,，;]/.test(other.slice(k.length)))) continue;
+    if(k && keys.some(other=>other.startsWith(k) && /^[,，;（(]/.test(other.slice(k.length)))) continue;
     // Some records describe both rest boundaries; another record repeats just one boundary.
     // Compare each independent trigger, preserving any trigger that has not been shown yet.
     const prefix=line.match(/^(?:<(?:휴식 기간 진입 시|휴식 기간 종료 시)>\s*)+/)?.[0];

@@ -2,7 +2,7 @@ import {PROJ} from './style.js';
 // Visual-only weapon families: never change server projectile speed or damage timing.
 const BOW_USERS=new Set(['char_197_poca','char_126_shotst','char_332_archet','char_430_fartth','char_124_kroos','char_1021_kroos2','char_133_mm','char_158_milu','char_219_meteo','char_340_shwaz','char_118_yuki','char_145_prove','char_261_sddrag','char_366_acdrop','char_211_adnach','char_193_frostl']);
 function weaponStyle(kind,info={},isEnemy=false){
- const base=PROJ[kind];if(!base)return base;
+ const base=PROJ[kind === 'arts' ? 'bolt' : kind];if(!base)return base;
  if(!['arrow','enemy','bolt'].includes(kind))return base;
  const name=String(info.name||''),id=info.charId||info.spine||'';
  let family=kind==='bolt'?'arts':isEnemy&&info.attackType==='arts'?'arts':'bullet';

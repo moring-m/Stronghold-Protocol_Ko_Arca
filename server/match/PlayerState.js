@@ -11,6 +11,7 @@ function opsCharIds(raw) {
 }
 
 
+import { summonPlacementGrid } from '../../shared/summonPlacement.js';
 import { diyTokenOwner } from '../../shared/diy.js';
 import { atPotential } from '../../shared/potential.js';
 const posIntOr = (v, d) => (Number.isInteger(v) && v > 0 ? v : d);
@@ -599,7 +600,7 @@ export class PlayerState {
     if (!rec || !this.canRecruit(chessId)) return null;
     const base = this.gd.baseIdOf(chessId);
     const need = rec.isGolden ? this.gd.goldenCopies : 1;
-    const taken = fromPool ? this.pool.take(base, need) : 0;
+    const taken = fromPool ? this.pool.take(base, need, { overdraw: true }) : 0;
     const piece = this.newPiece('chess', chessId, { poolCopies: taken });
     this.round.gainedChess++;
     let owned = piece;
@@ -616,7 +617,7 @@ export class PlayerState {
     }
     this.recompute();
     if (!silent) this.m.dispatch(this, 'onGain', { piece: owned, kind: 'chess', source });
-    this.recompute();
+    if (!this.m.laboratory) this.recompute(); // No acquisition handlers run in the laboratory.
     return owned;
   }
 
@@ -655,6 +656,7 @@ export class PlayerState {
       for (const it of l.piece.items || []) items.push(it);
       l.piece.items = [];
     }
+    copies += this.pool.take(baseId, Math.max(0, this.gd.goldenCopies - copies), { overdraw: true });
     const elite = this.newPiece('chess', goldenId, { poolCopies: copies });
     // Preserve other round state; 拉普兰德's elite refresh trait uses a different key from her normal trait.
     for (const l of consumed) {
@@ -701,7 +703,7 @@ export class PlayerState {
     if (!goldenId) return false;
     const base = this.gd.baseIdOf(piece.id);
     const extra = Math.max(0, this.gd.goldenCopies - (piece.poolCopies || 0));
-    piece.poolCopies = (piece.poolCopies || 0) + this.pool.take(base, extra);
+    piece.poolCopies = (piece.poolCopies || 0) + this.pool.take(base, extra, { overdraw: true });
     piece.id = goldenId;
     this.recompute();
     this.m.dispatch(this, 'onMerge', { kind: 'chess', piece, baseId: base, consumed: [], source: 'promote' });
@@ -755,6 +757,7 @@ export class PlayerState {
     if (!rec || rec.isGolden) return false;
     const gid = rec.upgradeChessId || rec.goldenId;
     if (!gid || !this.gd.item(gid)) return false;
+    if (this.m.itemPool.left(piece.id) < 1) return false;
     piece.id = gid;
     this.recompute();
     return true;
@@ -767,6 +770,7 @@ export class PlayerState {
    * the user's first-hand report; the normal shop's slots may repeat). The offer reserves no copies (the pick takes one).
    */
   pushRewardOffer(source = 'merge', { tier = null, ids = null, label = null } = {}) {
+    if (this.m.laboratory) return null;
     const ro = this.gd.rewardOffer();
     const t = Number.isInteger(tier) ? tier : Math.min(this.shop.level + ro.tierOffset, ro.maxTier);
     // an offer never shows one operator twice, whoever built the list (user playtest #6 item 19)
@@ -792,7 +796,8 @@ export class PlayerState {
    * 'item' under its `label` (the effect's name; player report #6 after 0.1.0).
    */
   pushItemOffer(ids, { source = 'effect', tier = null, label = null } = {}) {
-    const list = [...new Set(Array.isArray(ids) ? ids : [])].filter((id) => this.gd.item(id)).slice(0, MAX_OFFER_SLOTS);
+    if (this.m.laboratory) return null;
+    const list = [...new Set(Array.isArray(ids) ? ids : [])].filter((id) => this.gd.item(id) && this.m.itemPool.canGain(id)).slice(0, MAX_OFFER_SLOTS);
     if (!list.length) return null;
     const offer = { tier: Number.isInteger(tier) ? tier : null, source, label: typeof label === 'string' && label ? label : null, slots: list.map((id) => ({ kind: 'item', id, price: 0, sold: false })) };
     this.offers.push(offer);
@@ -836,6 +841,10 @@ export class PlayerState {
   acquireItem(itemId, { source = 'grant', toTemp = false, silent = false, deferMerge = false } = {}) {
     const rec = this.gd.item(itemId);
     if (!rec) return null;
+    if (!this.m.itemPool.canGain(itemId)) {
+      this.m.toast(this, 'warn', '장비 재고가 부족하여 장비를 획득하지 못했습니다');
+      return null;
+    }
     let piece = this.newPiece('item', itemId);
     // A prep-end grant may sit beside an identical copy until the next prep. The invariant counts only copies
     // without this mark, so the fight that is about to start is not reported as a missed merge.
@@ -928,6 +937,7 @@ export class PlayerState {
    * under BOND_LAYER_CAP (999, shared/constants.js) — a gain at the cap adds 0 and dispatches nothing.
    */
   addLayers(bondId, n, { requireActive = false, reason = '' } = {}) {
+    if (this.m.laboratory) return 0;
     if (!this.gd.bond(bondId) || !Number.isFinite(n) || n <= 0) return 0;
     if (requireActive && !(this.bonds[bondId] && this.bonds[bondId].active)) return 0;
     const before = this.layers[bondId] || 0;
@@ -957,7 +967,7 @@ export class PlayerState {
   }
 
   _rollItemSlot() {
-    const id = this.pool.rollItem(this.m.rngShop, this.shop.level);
+    const id = this.pool.rollItem(this.m.rngShop, this.shop.level, this.m.itemPool);
     return id ? { kind: 'item', id, basePrice: this.gd.itemPrice(id), frozen: false, sold: false } : null;
   }
 
@@ -989,7 +999,7 @@ export class PlayerState {
     if (nChess <= layout.chess && nItem <= layout.item) return;
     const chess = old.slice(0, layout.chess);
     const items = old.slice(layout.chess);
-    while (chess.length < nChess) chess.push(null);
+    while (chess.length < nChess) chess.unshift(null);
     while (items.length < nItem) items.push(null);
     this.shop.slots = [...chess, ...items];
     this.shop.layout = { chess: chess.length, item: items.length };
@@ -1036,11 +1046,16 @@ export class PlayerState {
       piece = this.acquireChess(slot.id, { source: 'buy' });
     } else {
       if (!this.gd.item(slot.id)) return fail(ERR.BAD_TARGET);
+      if (!this.m.itemPool.canGain(slot.id)) return fail(ERR.SOLD_OUT);
       if (handFull) return fail(ERR.HAND_FULL);
       this.spend(price);
       slot.sold = true;
       piece = this.acquireItem(slot.id, { source: 'buy' });
     }
+    return this.completePurchase(piece, slot, price);
+  }
+
+  completePurchase(piece, slot, price) {
     this.stats.buys++;
     this.round.buys++;
     this.m.dispatch(this, 'onBuy', { piece, slot, price, kind: slot.kind });
@@ -1171,12 +1186,14 @@ export class PlayerState {
    * @returns {Set<string> | null}
    */
   summonRange(piece, owner = null) {
-    if (!piece || piece.kind !== 'token' || this.gd.token(piece.id)?.ownerRange !== true) return null;
+    if (!piece || piece.kind !== 'token') return null;
+    const fixedGrid = summonPlacementGrid(piece.id);
+    if (!fixedGrid && this.gd.token(piece.id)?.ownerRange !== true) return null;
     let at = owner;
     if (!at) for (const [key, p] of this.board) if (p.uid === piece.ownerUid && p.kind === 'chess') { at = { key, piece: p, dir: pieceDir(p) }; break; }
     const rec = at && this.gd.chess(at.piece.id);
     if (!rec) return null;
-    const grid = attackRangeGrid(loadoutRecord(rec, resolveRecordLoadout(rec, this.loadoutFor(rec)))) || rec.rangeGrid;
+    const grid = fixedGrid || attackRangeGrid(loadoutRecord(rec, resolveRecordLoadout(rec, this.loadoutFor(rec)))) || rec.rangeGrid;
     const [r, c] = parseKey(at.key);
     return ownerRangeKeys(grid, r, c, at.dir);
   }
@@ -1548,6 +1565,7 @@ export class PlayerState {
     const handFull = freeSlot(this.hand) < 0;
     if (slot.kind === 'item') {
       if (!this.gd.item(slot.id)) return fail(ERR.BAD_TARGET);
+      if (!this.m.itemPool.canGain(slot.id)) return fail(ERR.SOLD_OUT);
       if (handFull) return fail(ERR.HAND_FULL);
     } else {
       const rec = this.gd.chess(slot.id);
@@ -1807,6 +1825,7 @@ export class PlayerState {
       funds: this.funds,
       bandId: this.bandId,
       ready: this.ready,
+      prepMapChars: this.m.prepMapChars(this),
       canReady: this.alive && this.tempEmpty && !this.personalChoice && this.m.phase === PHASE.PREP,
       personalChoice: this.personalChoice ? {
         id: this.personalChoice.id,

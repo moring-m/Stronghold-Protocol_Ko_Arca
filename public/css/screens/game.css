@@ -499,6 +499,9 @@
    inside the label, so the label lays glyph and text out like the button itself */
 .settings-btn .btn__label { display: inline-flex; align-items: center; gap: .1rem; }
 .settings-btn .btn__icon { color: var(--mint-500); }
+/* square (the lobby's gear alone): the label box drops out so the gear sizes and centres against the button, like an `icon` */
+.settings-btn.btn--square .btn__label { display: contents; }
+.settings-btn.btn--square .btn__icon { width: 62%; height: 62%; } /* the gear glyph is drawn smaller in its box than the book */
 .set-list { display: flex; flex-direction: column; gap: .16rem; padding-top: .06rem; }
 .set-row { display: grid; grid-template-columns: 3.3rem 1fr auto; align-items: center; gap: .18rem; min-height: .44rem; }
 .set-row--chat-sound select { min-width: 0; width: 100%; padding: .06rem; color: var(--text-hi); background: var(--bg-1, #111817); border: 1px solid var(--line-2); font: inherit; font-size: calc(.16 * var(--t)); }
@@ -702,7 +705,7 @@
   .set-category .set-row--chat-sound { grid-template-columns:1fr; }
   .set-category .set-row--chat-sound select { grid-column:1; }
 }
-.gm__end-battle { position:absolute; right:.2rem; top:1.25rem; z-index:8; display:flex; align-items:center; height:.56rem; min-width:2.3rem; padding:0 .16rem 0 .12rem; gap:.12rem; border:2px solid #865957; background:rgba(28,17,17,.9); color:#ffd9d3; font:inherit; font-size:.22rem; font-weight:700; letter-spacing:.14em; box-shadow:0 0 .18rem #86595726; cursor:pointer; }
+.gm__end-battle { position:absolute; right:2.7rem; top:.2rem; z-index:8; display:flex; align-items:center; height:.56rem; min-width:2.3rem; padding:0 .16rem 0 .12rem; gap:.12rem; border:2px solid #865957; background:rgba(28,17,17,.9); color:#ffd9d3; font:inherit; font-size:.22rem; font-weight:700; letter-spacing:.14em; box-shadow:0 0 .18rem #86595726; cursor:pointer; }
 .gm__end-battle .readybtn__box {border-color:#865957;}
 .gm__end-battle .icon { width:.26rem; height:.26rem; }
 .gm__end-battle:hover:not(:disabled) {background:rgba(134,89,87,.14);box-shadow:0 0 .26rem #8659574d;}
@@ -734,3 +737,50 @@
 .gm__bond-window[data-left="true"][data-right="true"] {mask-image:linear-gradient(to right,transparent,#000 var(--bond-fade-width),#000 calc(100% - var(--bond-fade-width)),transparent);}
 .gm__bond-list.is-folded .gm__bond-window {pointer-events:none;}
 .gm.is-pen .gm__bond-window {pointer-events:none;}
+
+/* Laboratory uses the standard shop card height and seven slots per page. */
+.shopbar.lab-bar{right:.26rem;width:min(14.8rem,calc(100% - .52rem));align-items:stretch;box-sizing:border-box}
+.lab-menu-tabs.shopbar__tools{display:flex;flex-wrap:nowrap;align-self:flex-end;gap:.12rem}
+.lab-menu-tabs .toolbtn{display:flex;align-items:center;justify-content:center;gap:.06rem;white-space:nowrap;flex:none}
+.lab-shop-panel.shopbar__row{display:flex;flex-direction:row;gap:.08rem;box-sizing:border-box;min-width:0;width:100%}
+.lab-filters{display:flex;flex-direction:column;justify-content:center;flex:0 0 1.65rem;gap:.1rem;min-width:0;height:2rem}
+.lab-tier-filter.lo-chips{display:grid;grid-template-columns:repeat(4,1fr);gap:.03rem}
+.lab-filters .lo-chip{min-width:0;height:.34rem;padding:0 .03rem;font-size:.14rem}
+.lab-filters .lo-select{width:100%;height:.36rem}.lab-filters .lo-select select{min-width:0;width:100%;font-size:.13rem}.lab-filters .lo-select__k{display:none}
+.lab-filter-search.lo-search{width:100%;min-width:0;max-width:none;margin:0}.lab-filter-search .field__input{min-width:0}
+.lab-filter-caption{display:flex;align-items:center;gap:.06rem;font-size:.16rem;color:var(--text-md)}.lab-filter-caption .icon{width:.2rem;height:.2rem}
+.lab-catalog{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:.08rem;flex:1;min-width:0;height:2rem;overflow:hidden;align-items:stretch}
+.lab-catalog>.scard,.lab-catalog>.scard-wrap{width:100%;height:2rem;min-width:0;box-sizing:border-box}.lab-catalog>.scard-wrap>.scard{width:100%;height:2rem}
+.lab-stack__icon{position:absolute;left:.1rem;top:.12rem;display:flex;align-items:center;justify-content:center;width:.56rem;height:.56rem;border:1px solid var(--line);background:#091b18}
+.lab-stack__icon .bglyph{width:.42rem;height:.42rem}.lab-stack .scard__body{gap:.05rem}.lab-stack small{color:var(--text-lo);font-size:.12rem}
+.lab-stack__controls{display:flex;align-items:center;gap:.04rem}.lab-stack input{min-width:0;width:.6rem;flex:1;box-sizing:border-box;color:var(--text-hi);background:var(--bg-deep);border:1px solid var(--line);padding:.03rem;text-align:center;font-size:.14rem}.lab-stack .btn{padding:0 .06rem;font-size:.12rem;height:.27rem}
+.lab-pages.funds{flex:0 0 .9rem;width:.9rem;box-sizing:border-box;gap:.08rem}.lab-pages .toolbtn{width:.65rem;display:flex;justify-content:center}.lab-pages__count{font-size:.14rem}
+@media(max-width:650px){.shopbar.lab-bar{right:.12rem;width:calc(100% - .24rem)}.lab-filters{flex-basis:1.3rem}.lab-pages.funds{flex-basis:.65rem;width:.65rem}.lab-catalog{gap:.03rem}.lab-menu-tabs.shopbar__tools{gap:.04rem}}
+
+/* Clear navigation, with filters anchored above the bottom search field. */
+.lab-filters{justify-content:flex-start;gap:.1rem}
+.lab-filter-search.lo-search{margin-top:auto;flex:none}
+.lab-filters .lo-select{height:.46rem;min-height:.46rem;flex:none}
+.lab-filters .lo-select select{height:100%;font-size:.16rem;padding:.05rem .08rem}
+.lab-pages.funds{flex-basis:1.2rem;width:1.2rem;padding:.06rem .08rem}
+.lab-pages .funds__collapse{width:100%;box-sizing:border-box;white-space:nowrap;gap:.04rem;padding:.06rem .03rem;font-size:.14rem}
+.lab-pages .funds__collapse kbd{font-size:.12rem}
+.lab-pages__count{font-size:.2rem;font-weight:700;line-height:1.3}
+.lab-page-arrow{display:flex;align-items:center;justify-content:center;width:100%;height:.42rem;border:0;border-bottom:1px solid #4ed8af55;background:#4ed8af0a;color:var(--mint-400);cursor:pointer;transition:background .15s}
+.lab-page-arrow .icon{width:.23rem;height:.23rem}.lab-page-arrow:hover:not(:disabled){background:#4ed8af25}.lab-page-arrow:disabled{opacity:.28;cursor:default}
+.lab-stack__icon{left:50%;top:.16rem;transform:translateX(-50%);width:.85rem;height:.85rem;border:1px solid #4ed8af66;background:radial-gradient(circle,#4ed8af20,#091b18);clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%)}
+.lab-stack__icon .bglyph{width:.6rem;height:.6rem}
+.lab-menu-tabs.shopbar__tools{gap:0;border:1px solid var(--line-2);background:#0b1512;align-self:flex-end;pointer-events:auto}
+.lab-menu-tab{display:flex;align-items:center;justify-content:center;gap:.08rem;height:.45rem;padding:0 .18rem;white-space:nowrap;border:0;border-right:1px solid var(--line);border-bottom:3px solid transparent;background:transparent;color:var(--text-md);font:inherit;font-size:.17rem;cursor:pointer}
+.lab-menu-tab:last-child{border-right:0}.lab-menu-tab .icon{width:.2rem;height:.2rem}.lab-menu-tab.is-on{color:var(--mint-400);background:#4ed8af12;border-bottom-color:var(--mint-400)}.lab-menu-tab:hover{background:#4ed8af0c}
+@media(max-width:650px){.lab-pages.funds{flex-basis:1.1rem;width:1.1rem}.lab-menu-tab{padding:0 .1rem}}
+/* Stack editors stay still while their inputs and apply buttons are used. */
+.lab-catalog--bonds .scard.lab-stack:hover,
+.lab-catalog--bonds .scard.lab-stack:active{transform:none}
+
+/* Use the regular shop's lifted confirmation card without clipping it. */
+.lab-catalog{overflow:visible}
+
+.lab-empty{grid-column:1/-1;align-self:center;justify-self:center;margin:0;white-space:nowrap;text-align:center;font-size:.18rem}
+.lab-menu-tabs.shopbar__tools{position:relative;margin-top:.35rem}
+.lab-menu-tabs .shopbar__remain{position:absolute;right:0;bottom:calc(100% + .06rem);white-space:nowrap}

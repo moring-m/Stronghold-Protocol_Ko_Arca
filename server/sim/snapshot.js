@@ -24,6 +24,12 @@ import { enemyStealthed } from './targeting.js';
 const r2 = (v) => Math.round(v * 100) / 100;
 const r1 = (v) => Math.round(v * 10) / 10;
 
+/** Read each mystic kit's real store, including converted and elite energies. */
+export function storedEnergy(u) {
+  const n = u.profile?.energyCount ? u.profile.energyCount(u) : u.trait.stored;
+  return Math.max(0, Math.floor(Number(n) || 0));
+}
+
 /** Static per-unit info sent on spawn / in m.field. */
 export function unitInfo(u) {
   const d = u.def || {};
@@ -73,7 +79,7 @@ export function unitInfo(u) {
     // member list and the detail card's bond chips of a teammate's unit)
     items: u.side === 'ally' && u.kind === 'op' && Array.isArray(u.items) && u.items.length ? [...u.items] : undefined,
     optionalRecruit: !!d.raw?.optionalRecruit || !!d.optionalRecruit,
-    energy: u.profile?.storeEnergy ? u.trait.stored || 0 : undefined,
+    energy: u.profile?.storeEnergy ? storedEnergy(u) : undefined,
     energyMax: u.profile?.storeEnergy ? u.profile.storeMax ?? 3 : undefined,
     profession: d.profession, subProf: d.subProf, attackType: u.dmgType,
     // 补位: the replaced operator's charId when the chess fights as its stand-in (spine / avatar are the stand-in's; the
@@ -154,6 +160,8 @@ export function unitTuple(u, t) {
     if (!spMax) spMax = u.mem.skillCastDuration;
     sp = spMax * Math.max(0, Math.min(1, (u.mem.skillCastUntil - t) / u.mem.skillCastDuration));
   }
+  const doll = u.trait?.doll && u.findBuff('trait:substitute');
+  if (doll) { spMax = doll.duration; sp = Math.max(0, doll.timeLeft); }
   // hp is rounded up (a living unit never shows 0) but never above the rounded max HP
   const maxHp = Math.max(1, Math.round(u.s.maxHp));
   const hp = u.alive ? Math.min(Math.max(1, Math.ceil(u.hp)), maxHp) : 0;
@@ -174,6 +182,13 @@ export function ammoView(u) {
   if (u.side !== 'ally' || !sk || !sk.active || sk.kind !== 'ammo') return null;
   const left = Math.max(0, Math.ceil(sk.ammoLeft - 1e-9));
   return [left, Math.max(1, Math.ceil((sk.ammoMax || sk.ammo || 0) - 1e-9), left)];
+}
+
+/** 琳琅诗怀雅's skill purse: zero is a balance; no purse is null. Display only. */
+export function coinView(u) {
+  const n = u.mem?.coins, max = u.skill?.bb?.sp;
+  if (u.side !== 'ally' || !Number.isSafeInteger(n) || n < 0 || !Number.isSafeInteger(max) || max < 1) return null;
+  return [Math.min(n, max), max];
 }
 
 /**

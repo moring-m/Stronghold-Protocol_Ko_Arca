@@ -420,7 +420,7 @@ export function RoomScreen() {
       <div class="room-bar__right">
         <div class="room-bar__settings">
           <${LoadoutButton} from="room" size="lg" class="room-loadout" />
-          <${Button} variant="secondary" size="lg" icon="settings" class="room-custom-extensions" disabled=${!!busy || !online} onClick=${()=>setExtensionsOpen(true)}>커스텀 확장 설정 <span class="lo-entry__n num">${Object.values(room.customExtensions || {bonds:room.customFactions?['ursus']:[]}).reduce((n,ids)=>n+(Array.isArray(ids)?ids.length:0),0)}</span><//>
+          <${Button} variant="secondary" size="lg" icon="settings" class="room-custom-extensions" disabled=${!!busy || !online} onClick=${()=>setExtensionsOpen(true)}>커스텀 설정 <span class="lo-entry__n num">${Object.values(room.customExtensions || {bonds:room.customFactions?['ursus']:[]}).reduce((n,ids)=>n+(Array.isArray(ids)?ids.length:0),0)}</span><//>
         </div>
         ${facts.isHost
           ? html`<${Tooltip} text=${facts.canStart ? null : '仍有博士未准备就绪'}>
@@ -432,6 +432,6 @@ export function RoomScreen() {
               loading=${busy === 'ready'} disabled=${!online || !facts.mine} onClick=${toggleReady}>${myReady ? '已就绪' : '准备就绪'}<//>`}
       </div>
     </footer>
-    <${ChatPanel} room=${true} />
+    ${coop ? html`<${ChatPanel} room=${true} />` : null}
   </div>`;
 }

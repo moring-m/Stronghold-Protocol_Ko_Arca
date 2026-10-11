@@ -213,6 +213,8 @@ export default {
 
     return {
       trait: {
+        storeMax: N + E,
+        energyCount: unit => { const v = stateOf(unit); return v.n + v.e; },
         hitsFn: () => 1,   // the engine's main hit only: the stored energies are this kit's (land)
         onEachHit(battle, unit, victim, hc) { if (hc.kind === 'main' && victim && victim.side === 'enemy') land(battle, unit, victim, hc); },
         // the store (the shared profile calls it at his attack check with no valid target — professions.js installMystic:

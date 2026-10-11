@@ -155,7 +155,7 @@ export function cameraLayers(field, pub, myId) {
   const label = (pid) => (!pid ? '无人在家' : pid === myId ? '你自己' : nameOf(pub, pid));
   const left = at('L');
   const right = at('R');
-  if ((field.kind === 'boss' || field.kind === 'hidden') && (!left || !right)) return [];
+  if ((field.kind === 'boss' || field.kind === 'hidden') && (!left || !right) && !pub?.laboratory) return [];
   return [
     { key: 'L', label: label(left), self: left === myId, watch: !!left && left !== myId },
     { key: 'ALL', label: '全景', self: false, watch: false },

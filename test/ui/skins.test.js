@@ -99,3 +99,16 @@ test('Santalla combined rest triggers and Vigil shared clauses are shown once wi
  const entries={end:{desc:'<휴식 기간 종료 시> 맹약 중첩 +4'},both:{desc:'<휴식 기간 진입 시> <휴식 기간 종료 시> 맹약 중첩 +4'}};
  assert.deepEqual(garrisonTexts({garrisonIds:['end','both']},id=>entries[id]),['<휴식 기간 종료 시> 맹약 중첩 +4','<휴식 기간 진입 시> 맹약 중첩 +4']);
 });
+
+test('Executor, Radiant Nearl and Degenbrecher present combined traits once while keeping independent triggers',async()=>{
+ const {garrisonTexts}=await import('../../public/js/ui/loadoutModel.js');
+ const {readFile}=await import('node:fs/promises');
+ const read=async p=>JSON.parse(await readFile(new URL(p,import.meta.url),'utf8'));
+ const [cs,gs,ko]=await Promise.all([read('../../content/production/data/chess.json'),read('../../content/production/data/garrisons.json'),read('../../public/i18n/ko/data.json')]);
+ const text=id=>garrisonTexts(cs[id],key=>gs[key],s=>ko[s]||s).join('\n');
+ for(const suffix of ['a','b']) {
+  const exe=text('chess_char_5_01_'+suffix);assert.equal((exe.match(/탄약을/g)||[]).length,1);assert.ok(exe.includes('라테라노'));assert.ok(exe.includes('예견'));
+  const nearl=text('chess_char_6_17_'+suffix);assert.equal((nearl.match(/특질 획득/g)||[]).length,1);assert.equal((nearl.match(/재배치 시간/g)||[]).length,1);assert.ok(nearl.includes('재배치 시간'));assert.ok(nearl.includes('공격 속도'));
+  const degen=text('chess_char_6_19_'+suffix);assert.equal((degen.match(/획득 시/g)||[]).length,1);assert.equal((degen.match(/배치 시/g)||[]).length,1);assert.ok(degen.includes('맹약 활성화 불필요'));
+ }
+});

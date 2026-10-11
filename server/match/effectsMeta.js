@@ -330,6 +330,7 @@ export class EffectDispatcher {
    * SERVER_GAIN. SERVER_PRICE cannot be triggered. Returns the number of garrison handlers run.
    */
   triggerGarrisons(ps, piece, eventType, { asPiece = null, triggeredBy = null } = {}) {
+    if (this.m.laboratory && ['onGain', 'onSold', 'onRefresh'].includes(GARRISON_HOOK[eventType])) return 0;
     const gd = this.m.gd;
     const hook = eventType === 'SERVER_PRICE' ? null : GARRISON_HOOK[eventType];
     const rec = piece && piece.kind === 'chess' ? gd.chess(piece.id) : null;
@@ -351,7 +352,8 @@ export class EffectDispatcher {
         const repeat = hook === 'onGain' ? this.investRepeat(ps) : 1;
         const loc = ps.find(self.uid);
         const where = loc ? (loc.area === 'board' ? 'board' : loc.area) : 'trigger';
-        this._call(ps, key, h, hook, { kind: 'garrison', key, piece: self, garrisonId: gid, garrison: g, bb: g.bb || {}, bbStr: g.bbStr || {}, where, trigger: true, triggeredBy }, ev, repeat);
+        this._call(ps, key, h, hook, { kind: 'garrison', key, piece: self, copiedFrom: asPiece ? piece : null,
+          garrisonId: gid, garrison: g, bb: g.bb || {}, bbStr: g.bbStr || {}, where, trigger: true, triggeredBy }, ev, repeat);
         n++;
       }
     } finally {
@@ -568,7 +570,7 @@ export function makeCtx(m, ps, source, hook, ev = null) {
         if (opts.bond) { const c = gd.chess(id); if (!c || !Array.isArray(c.bonds) || !c.bonds.includes(opts.bond)) return false; }
         return typeof opts.filter === 'function' ? !!opts.filter(id) : true;
       };
-      return ps.pool.roll(m.rngMeta, { maxTier: Number.isInteger(opts.maxTier) ? opts.maxTier : 6, tier: Number.isInteger(opts.tier) ? opts.tier : null, filter: f });
+      return ps.pool.roll(m.rngMeta, { maxTier: Number.isInteger(opts.maxTier) ? opts.maxTier : 6, tier: Number.isInteger(opts.tier) ? opts.tier : null, filter: f, ignoreCounts: opts.ignoreCounts === true });
     },
     rollItem: (opts = {}) => m.rollItemId(opts),
     /**

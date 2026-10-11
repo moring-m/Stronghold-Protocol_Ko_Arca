@@ -45,7 +45,7 @@ async function main() {
   await assets.ready();
   const index = await fetch('/dev/recordings/index.json').then((r) => (r.ok ? r.json() : []), () => []);
   const view = await createFieldView($('field'), {
-    data, assets, settings: { quality: q.get('quality') || 'high', damageNumbers: true },
+    data, assets, settings: { quality: q.get('quality') || 'high', mapQuality: q.get('mapQuality') || 'high', damageNumbers: true },
     ...(q.has('aa') ? { antialias: q.get('aa') !== '0' } : {}),
   });
   demo.view = view;

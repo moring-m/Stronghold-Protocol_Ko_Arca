@@ -1,3 +1,5 @@
+import { summonPlacementGrid } from '../../../shared/summonPlacement.js';
+import { shortcutFor as configuredShortcut, sanitizeHotkeys, DEFAULT_HOTKEYS } from './gameLogic/shortcuts.js';
 import { DAMAGE_NUMBER_MODES, damageNumberMode } from '../../../shared/damageDisplay.js';
 // Pure in-match UI logic (no DOM, no Preact) — unit-tested in Node (test/ui/*.test.js).
 //
@@ -1229,14 +1231,16 @@ export function tileAllows(ctx, piece, row, col) {
  * @returns {Set<string> | null}
  */
 export function summonRange(ctx, piece, owner = null) {
-  if (!isObj(piece) || piece.kind !== 'token' || ctx?.getToken?.(piece.id)?.ownerRange !== true) return null;
+  if (!isObj(piece) || piece.kind !== 'token') return null;
+  const fixedGrid = summonPlacementGrid(piece.id);
+  if (!fixedGrid && ctx?.getToken?.(piece.id)?.ownerRange !== true) return null;
   let at = owner;
   if (!at) for (const e of ctx.boardAt.values()) if (e.piece.uid === piece.ownerUid && e.piece.kind === 'chess') { at = e; break; }
   const rec = at && ctx.getChess(at.piece.id);
   if (!rec) return null;
   let grid = null;
   try { grid = attackRangeGrid(chessLoadout(rec, ctx.priv?.loadout ?? null, ctx.getChess)?.record || rec); } catch { /* the data grid */ }
-  return new Set(rangeTiles(grid || rec.rangeGrid, at.row, at.col, pieceDir(at.piece)).map(([r, c]) => tileKey(r, c)));
+  return new Set(rangeTiles(fixedGrid || grid || rec.rangeGrid, at.row, at.col, pieceDir(at.piece)).map(([r, c]) => tileKey(r, c)));
 }
 
 /** tileAllows plus the owner-range rule of a range-bound summon (summonRange). */
@@ -1686,23 +1690,7 @@ export function rangeGridBox(grid, mirror = false) {
  * @param {{ key?: string, code?: string, ctrlKey?: boolean, metaKey?: boolean, altKey?: boolean, repeat?: boolean, target?: any }} e
  * @returns {'refresh'|'freeze'|'levelUp'|'retreat'|'sell'|'ready'|'escape'|null}
  */
-export function shortcutFor(e) {
-  if (!e || e.defaultPrevented || e.isComposing || e.keyCode === 229 || e.ctrlKey || e.metaKey || e.altKey || e.repeat) return null;
-  const t = e.target;
-  const tag = t && typeof t.tagName === 'string' ? t.tagName.toUpperCase() : '';
-  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || t?.isContentEditable) return null;
-  if (e.key === 'Escape') return 'escape';
-  if (e.repeat) return null;
-  const code = e.code || '';
-  const key = typeof e.key === 'string' ? e.key.toLowerCase() : '';
-  if (code === 'KeyR' || key === 'r') return 'refresh';
-  if (code === 'KeyF' || key === 'f') return 'freeze';
-  if (code === 'KeyD' || key === 'd') return 'levelUp';
-  if (code === 'KeyQ' || key === 'q') return 'retreat';
-  if (code === 'KeyX' || key === 'x') return 'sell';
-  if (code === 'Space' || key === ' ') return 'ready';
-  return null;
-}
+export function shortcutFor(e, keys) { return configuredShortcut(e, keys); }
 
 /**
  * Whether a press on the field closes the open detail card: a card opened from the field itself (an own piece — tap,
@@ -1728,7 +1716,7 @@ export function shortcutBlocked(act, { modal = false, drawer = false } = {}) {
 
 // ---- settings ------------------------------------------------------------------------------------------------------
 
-export const DEFAULT_SETTINGS = Object.freeze({ bgm: 0.6, sfx: 0.8, voice: 0.6, voiceLanguage: 'kr', voiceOverrides: Object.freeze({}), textSize: 'sm', chatVolume: 0.5, chatSound: 'emote', chatSoundCustomized: false, chatFactionNotifications: false, chatCooldown: defaultChatCooldown('emote'), muted: false, damageNumbers: true, damageNumberMode: 'basic', quality: 'high', mapQuality: 'high', renderScale: 1, effectsQuality: 'high', shadows: true, skillRanges: true, unitRanges: true, animationQuality: 'high', frameLimit: 60, adaptiveQuality: true });
+export const DEFAULT_SETTINGS = Object.freeze({ keys: DEFAULT_HOTKEYS, shopItemLeft: false, bgm: 0.6, sfx: 0.8, voice: 0.6, voiceLanguage: 'kr', voiceOverrides: Object.freeze({}), textSize: 'sm', chatVolume: 0.5, chatSound: 'emote', chatSoundCustomized: false, chatFactionNotifications: false, chatCooldown: defaultChatCooldown('emote'), muted: false, damageNumbers: true, damageNumberMode: 'basic', quality: 'high', mapQuality: 'high', renderScale: 1, effectsQuality: 'high', shadows: true, skillRanges: true, unitRanges: true, animationQuality: 'high', frameLimit: 60, adaptiveQuality: true });
 const QUALITIES = ['high', 'medium', 'low'];
 
 /**
@@ -1741,6 +1729,8 @@ export function sanitizeSettings(raw) {
   const vol = (v, d) => (Number.isFinite(v) ? clamp(Math.round(v * 100) / 100, 0, 1) : d);
   const chatSound = r.chatSound === 'off' || chatNotificationSound(r.chatSound) ? r.chatSound : DEFAULT_SETTINGS.chatSound;
   return {
+    keys: sanitizeHotkeys(r.keys),
+    shopItemLeft: r.shopItemLeft === true,
     bgm: vol(r.bgm, DEFAULT_SETTINGS.bgm),
     sfx: vol(r.sfx, DEFAULT_SETTINGS.sfx),
     voice: vol(r.voice, DEFAULT_SETTINGS.voice),
@@ -1957,3 +1947,5 @@ export { deviceInfo, deviceTipAt, noteDeviceUnits } from './gameLogic/terrain.js
 export { readyShopFold } from './gameLogic/shop.js';
 
 export { normalizePersonalChoice } from './gameLogic/draft.js';
+
+export { deviceUnitsForEntry } from './gameLogic/terrain.js';

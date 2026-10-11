@@ -200,7 +200,7 @@ export function normalizeRecord(raw) {
     seed: num(r.seed),
     durationMs: num(r.durationMs),
     teamLp: num(r.teamLp),
-    roomMode: r.roomMode === 'solo' || r.roomMode === 'coop' ? r.roomMode : null,
+    roomMode: r.roomMode === 'solo' || r.roomMode === 'coop' || r.roomMode === 'laboratory' ? r.roomMode : null,
     selfId: str(r.selfId),
     players,
   };
@@ -352,6 +352,7 @@ export function saveStats(stats) {
  * @returns {'solo'|'coop'|null}
  */
 export function roomModeOf(modeId, roomMode) {
+  if (roomMode === 'laboratory') return 'laboratory';
   if (roomMode === 'solo' || roomMode === 'coop') return roomMode;
   if (typeof modeId !== 'string') return null;
   if (modeId.includes('_single_')) return 'solo';
@@ -392,7 +393,7 @@ export function buildRecord(res, ctx = {}) {
     seed: num(r.seed),
     durationMs: num(r.durationMs),
     teamLp: num(r.teamLp),
-    roomMode: roomModeOf(str(r.modeId), ctx.roomMode),
+    roomMode: ctx.laboratory ? 'laboratory' : roomModeOf(str(r.modeId), ctx.roomMode),
     selfId: myId,
     players: r.players,
   });
@@ -511,6 +512,7 @@ export function recordToResult(rec) {
   const r = normalizeRecord(rec);
   if (!r || r.end === 'quit' || r.compact) return null;
   const res = {
+    laboratory: r.roomMode === 'laboratory',
     victory: r.victory,
     roundsPassed: r.roundsPassed,
     hiddenReached: r.hiddenReached,
@@ -560,6 +562,7 @@ function storeRecord(rec) {
  * @returns {any|null}
  */
 export function recordResult(res, ctx = {}) {
+  if (['abandoned', 'quit'].includes(res?.reason)) return null;
   return storeRecord(buildRecord(res, ctx));
 }
 
@@ -571,9 +574,8 @@ export function recordResult(res, ctx = {}) {
  */
 export function recordQuit(state, ctx = {}) {
   const live = ctx.live ?? liveMatch;
-  const rec = storeRecord(buildQuitRecord(state, ctx));
-  live.active = false; // one record per match
-  return rec;
+  live.active = false;
+  return null; // Abandoning a simulation never creates a history entry.
 }
 
 /**
@@ -678,7 +680,7 @@ export function roundsOf(rec) {
  * @returns {boolean}
  */
 export function countsTowardStats(rec) {
-  if (!isObj(rec)) return false;
+  if (!isObj(rec) || rec.roomMode === 'laboratory') return false;
   if (rec.end !== 'quit') return true;
   const self = selfRowOf(rec);
   if (!self) return false;

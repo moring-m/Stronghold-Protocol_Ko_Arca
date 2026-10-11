@@ -222,6 +222,7 @@ const installDollkeeper = (battle, unit) => {
   const leave = () => {
     if (!unit.trait.doll) return;
     unit.trait.doll = false;
+    if (unit.trait.dollRange) { unit.rangeGrid=unit.trait.dollRange; unit.profile.canHitFly=unit.trait.dollCanHitFly; delete unit.trait.dollCanHitFly; delete unit.trait.dollRange; battle.refreshRange(unit); }
     unit.form = null;
     if (!unit.alive || !unit.deployed) return;
     startSwitch();
@@ -243,6 +244,9 @@ const installDollkeeper = (battle, unit) => {
       flags: { noSp: true, ...(unit.profile.dollNoAttack ? { disarm: true, silence: true } : null) },
     });
     battle.releaseBlocked(unit);
+    const tokId = (unit.def.tokens || []).map(t => typeof t === 'string' ? t : t?.tokenId).find(t => /shadow|doll/.test(t || ''));
+    const grid = tokId && battle.tokenDef(tokId, unit)?.rangeGrid;
+    if (grid?.length) { unit.trait.dollRange=unit.rangeGrid; unit.trait.dollCanHitFly=unit.profile.canHitFly; unit.profile.canHitFly=true; unit.rangeGrid=grid; battle.refreshRange(unit); }
     unit.form = 'doll';
     unit.markDirty();
     unit.hp = unit.s.maxHp;
@@ -267,6 +271,7 @@ const installDollkeeper = (battle, unit) => {
     if (ctx.unit !== unit) return;
     unit.trait.doll = false;
     unit.trait.dollSwitching = false;
+    if (unit.trait.dollRange) { unit.rangeGrid=unit.trait.dollRange; unit.profile.canHitFly=unit.trait.dollCanHitFly; delete unit.trait.dollCanHitFly; delete unit.trait.dollRange; battle.refreshRange(unit); }
     // knocked out as the 替身: its death clip has played (the 'die' event came first); the redeploy is the 本体 again
     if (unit.form) { unit.form = null; battle.fx('dollEnd', at({ form: null })); }
   }, { owner: unit });
@@ -366,6 +371,13 @@ const installTactician = (battle, unit) => {
     });
   };
   battle.on('deploy', (ctx) => { if (ctx.unit === unit) spawn(); }, { owner: unit });
+  battle.on('death', (ctx) => {
+    if (ctx.unit !== unit) return;
+    for (const token of battle.allyUnits) {
+      if (token.kind === 'token' && token.ownerUnit === unit && token.alive && token.deployed) battle.retreat(token, {reason:'expired', permanent:true});
+    }
+    unit.trait.reinforcement = null;
+  }, {owner:unit});
 };
 
 const installFunnel = (battle, unit) => {

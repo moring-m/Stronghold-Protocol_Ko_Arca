@@ -41,6 +41,7 @@ const cx = (...parts) => parts.flat().filter(Boolean).join(' ');
 
 /** 24×24 glyph paths (original, simple geometric shapes). `eo` = even-odd fill rule. */
 export const ICONS = {
+  flask: { d: 'M8 2h8v2h-1v5l6 10v3H3v-3L9 9V4H8zm3 2v6l-3 5h8l-3-5V4z', eo: true },
   map: {d:"M2 5l6-3 8 3 6-3v17l-6 3-8-3-6 3zm2 1v13l3-1.5v-13zm5-1v12l6 2V7zm8 2v12l3-1V5z",eo:true},
   star: { d: "M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.9L12 17.8l-6.2 3.3L7 14.2 2 9.3l6.9-1z" },
   patchNotes: {d:'M5 2h10l4 4v16H5zm2 2v16h10V7h-4V4zm8 0v1h1zM9 9h6v2H9zm0 4h6v2H9zm0 4h4v2H9z',eo:true},
@@ -61,6 +62,8 @@ export const ICONS = {
   chart: { d: 'M4 12h4v7H4zm6-6h4v13h-4zm6 3h4v10h-4zM3 20h18v2H3z' },
   refresh: { d: 'M12 4a8 8 0 0 1 7.4 5H17v2h6V5h-2v2.3A10 10 0 0 0 2 12h2a8 8 0 0 1 8-8zm0 16a8 8 0 0 1-7.4-5H7v-2H1v6h2v-2.3A10 10 0 0 0 22 12h-2a8 8 0 0 1-8 8z' },
   snow: { d: 'M11 2h2v4.2l2.3-2.3 1.4 1.4-3.7 3.7v2h2l3.7-3.7 1.4 1.4-2.3 2.3H22v2h-4.2l2.3 2.3-1.4 1.4-3.7-3.7h-2v2l3.7 3.7-1.4 1.4-2.3-2.3V22h-2v-4.2l-2.3 2.3-1.4-1.4 3.7-3.7v-2H9l-3.7 3.7-1.4-1.4L6.2 13H2v-2h4.2L3.9 8.7l1.4-1.4L9 11h2V9L7.3 5.3l1.4-1.4L11 6.2z' },
+  chevronDown: { d: 'M5 8.6 6.4 7.2 12 12.8l5.6-5.6L19 8.6l-7 7z' },
+  chevronUp: { d: 'M5 15.4 6.4 16.8 12 11.2l5.6 5.6L19 15.4l-7-7z' },
   chevronRight: { d: 'M8.6 5 7.2 6.4 12.8 12l-5.6 5.6L8.6 19l7-7z' },
   chevronLeft: { d: 'M15.4 5l1.4 1.4-5.6 5.6 5.6 5.6-1.4 1.4-7-7z' },
   chevrons: { d: 'M5.6 5 4.2 6.4 9.8 12l-5.6 5.6L5.6 19l7-7zm7 0-1.4 1.4 5.6 5.6-5.6 5.6 1.4 1.4 7-7z' },
@@ -78,6 +81,8 @@ export const ICONS = {
   wifiOff: { d: 'M2 17h3v4H2zm6-4h3v8H8zm6-4h3v12h-3zm6-4h3v16h-3zM2.4 1 23 21.6 21.6 23 1 2.4z' },
   expand: { d: 'M3 3h7v2H5v5H3zm11 0h7v7h-2V5h-5zM3 14h2v5h5v2H3zm16 0h2v7h-7v-2h5z' },
   collapse: { d: 'M8 3h2v7H3V8h5zm6 0h2v5h5v2h-7zM3 14h7v7H8v-5H3zm11 0h7v2h-5v5h-2z' },
+  // 添加到桌面 (add to home screen): a house outline with a + inside
+  homePlus: { d: 'M12 2 22 10.5V21H2V10.5zm0 2.6-8 6.8V19h16v-7.6zM11 10h2v2.5h2.5v2H13V17h-2v-2.5H8.5v-2H11z', eo: true },
   rotate: { d: 'M7 2h8a2 2 0 0 1 2 2v7h-2V4H7v16h4v2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm8 12h5a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2zm0 2v4h5v-4z', eo: true },
   book: { d: 'M2 4h7.5A3.5 3.5 0 0 1 12 5.1 3.5 3.5 0 0 1 14.5 4H22v16h-7.5a1.5 1.5 0 0 0-1.5 1.5h-2A1.5 1.5 0 0 0 9.5 20H2zm2 2v12h5.5c.5 0 1 .1 1.5.3V7.5A1.5 1.5 0 0 0 9.5 6zm10.5 0A1.5 1.5 0 0 0 13 7.5v10.8c.5-.2 1-.3 1.5-.3H20V6z', eo: true },
   // 观战 (spectator seats; the same eye as gameComponents.js GIcon 'eye')
@@ -826,7 +831,7 @@ export function DifficultyTag({ difficulty, size = 'md', class: cls, code }) {
  *   placeholder?: string, maxLength?: number, transform?: (v: string) => string, autoFocus?: boolean,
  *   disabled?: boolean, size?: 'md'|'lg'|'code', icon?: string, class?: string, inputRef?: any, name?: string }} props
  */
-export function TextField({ label, micro, value, onInput, onEnter, placeholder, maxLength, transform, autoFocus, disabled, size = 'md', icon, class: cls, inputRef, name, hint, invalid }) {
+export function TextField({ label, micro, value, onInput, onEnter, placeholder, maxLength, transform, autoFocus, disabled, size = 'md', icon, class: cls, inputRef, name, hint, invalid, ascii = false }) {
   const localRef = useRef(null);
   const ref = inputRef || localRef;
   const composing = useRef(false);
@@ -835,7 +840,7 @@ export function TextField({ label, micro, value, onInput, onEnter, placeholder, 
   }, []);
   const handle = (e) => {
     let v = e.currentTarget.value;
-    if (!composing.current && transform) {
+    if ((ascii || !composing.current) && transform) {
       const t = transform(v);
       if (t !== v) { v = t; e.currentTarget.value = t; }
     }
@@ -847,11 +852,22 @@ export function TextField({ label, micro, value, onInput, onEnter, placeholder, 
     <span class="field__box brackets">
       ${icon ? html`<${Icon} name=${icon} class="field__icon" />` : null}
       <input id=${id} ref=${ref} class="field__input" name=${name} value=${value} placeholder=${placeholder}
-        maxLength=${maxLength} disabled=${disabled} autocomplete="off" spellcheck=${false}
+        maxLength=${maxLength} disabled=${disabled} autocomplete="off" spellcheck=${false} lang=${ascii?'en':undefined} inputMode=${ascii?'url':undefined} autocapitalize=${ascii?'characters':undefined} autocorrect=${ascii?'off':undefined} style=${ascii?'ime-mode:disabled':undefined}
         onInput=${handle}
         oncompositionstart=${() => { composing.current = true; }}
         oncompositionend=${(e) => { composing.current = false; handle(e); }}
-        onKeyDown=${(e) => { if (e.key === 'Enter' && !e.isComposing && !composing.current) onEnter?.(e); }} />
+        onKeyDown=${(e) => {
+          if (ascii && !e.ctrlKey && !e.metaKey && !e.altKey && /^(Key[A-Z]|Digit[0-9]|Numpad[0-9])$/.test(e.code || '')) {
+            e.preventDefault();
+            const el=e.currentTarget, key=e.code.replace(/^(Key|Digit|Numpad)/,'');
+            const start=el.selectionStart ?? el.value.length, end=el.selectionEnd ?? start;
+            let next=el.value.slice(0,start)+key+el.value.slice(end);
+            if (transform) next=transform(next);
+            el.value=next;el.setSelectionRange(Math.min(start+1,next.length),Math.min(start+1,next.length));
+            onInput?.(next);return;
+          }
+          if (e.key === 'Enter' && !e.isComposing && !composing.current) onEnter?.(e);
+        }} />
     </span>
     ${hint ? html`<span class="field__hint">${hint}</span>` : null}
   </label>`;

@@ -1,0 +1,86 @@
+✔ a level-up opens the new level's operator slot EMPTY; the cards shown stay in place; a refresh fills it (32.050155ms)
+✔ a bought card stays sold; the empty new slot has nothing to freeze; the round start fills the shop to the new level (24.335811ms)
+✔ every mode's slot table: a level-up opens exactly the new positions, empty (标准: 3,4,4,4,4,5) (43.543985ms)
+▶ phases
+  ✔ phaseMode maps every phase (0.791793ms)
+  ✔ combat / boss predicates and banners (0.555898ms)
+  ✔ 战斗结束 SFX: the official BATTLEOVER_* variant for the round (0.211048ms)
+✔ phases (2.533638ms)
+▶ countdown
+  ✔ untimed phases show "--" (0.828208ms)
+  ✔ ceil seconds, warn at ≤10, gauge bars from total (0.204578ms)
+  ✔ phase totals from config (0.584811ms)
+✔ countdown (1.826402ms)
+▶ bonds
+  ✔ sortBonds: active, layers, count, tier, core, id (0.788188ms)
+  ✔ bondTier / nextThreshold incl. downward bonds (0.189315ms)
+  ✔ bondMembers marks on-board / owned / banned (0.543438ms)
+  ✔ memberHeadCount: the hand counts only for a bond that counts the hand, once per row (0.359842ms)
+  ✔ sortBonds puts a mode-off bond after every live bond (0.132009ms)
+  ✔ bannedPerBond counts banned visible members (0.253603ms)
+✔ bonds (2.662712ms)
+▶ shop
+  ✔ priceTone: discount / markup / normal / free (0.197147ms)
+  ✔ mergeProgress counts normal copies on board, hand and temp (0.316146ms)
+  ✔ shopBlockReason (0.236226ms)
+✔ shop (0.872134ms)
+▶ placement mirror (canPlace)
+  ✔ deploySets uses stage deployTiles, derived legend as fallback (0.629429ms)
+  ✔ melee vs ranged tiles (0.901549ms)
+  ✔ every trait holder (歌蕾蒂娅, 崖心, 见行者, normal and elite) lights the 高台 whatever the module; a plain melee stays on the ground (1.880624ms)
+  ✔ not editable ⇒ nothing is legal (0.209846ms)
+  ✔ deploy cap counts chess on board only; swap keeps count (1.062521ms)
+  ✔ board→board swap requires both positions to be legal (0.36489ms)
+  ✔ hand targets: move, swap, same slot, board unit vs hand item (0.204638ms)
+  ✔ items: equip on chess (board or hand), arts on tiles, not on tokens (0.227212ms)
+  ✔ boardTargets lists legal tiles for highlighting (0.49117ms)
+  ✔ dropIntent builds protocol-valid g.* messages (0.919326ms)
+  ✔ indexPieces tolerates junk (0.105529ms)
+✔ placement mirror (canPlace) (7.389635ms)
+▶ drafts
+  ✔ normalizeDraft: index or id turn, object or array picks (0.304549ms)
+  ✔ normalizeSp: picks map, array, takenBy; turn (0.373383ms)
+✔ drafts (0.766986ms)
+▶ fields, players, emotes
+  ✔ sortedPlayers by seat, junk dropped (0.148894ms)
+  ✔ cycleField wraps over live fields only (0.194002ms)
+  ✔ fieldLabel / homeFieldId (0.256537ms)
+  ✔ activeBubbles keeps the newest emote per player within ttl (0.138629ms)
+✔ fields, players, emotes (0.902259ms)
+▶ enemies, HUD, stats
+  ✔ groupEnemies merges and orders boss → bounty → elite → normal (0.304239ms)
+  ✔ factionTypes accepts strings and objects (0.110226ms)
+  ✔ snapHud / bossFrac (0.209466ms)
+  ✔ attackInterval, fmtNum, rangeGridBox (13.414074ms)
+✔ enemies, HUD, stats (14.326559ms)
+▶ keyboard & settings
+  ✔ shortcutFor (0.646814ms)
+  ✔ sanitizeSettings (1.181901ms)
+✔ keyboard & settings (1.977279ms)
+▶ result
+  ✔ normalizeResult fills from m.public and sorts by seat (0.432712ms)
+✔ result (0.510719ms)
+▶ prepCamera (research 09 §1.2: the Final Assault prep on the own half of the boss field)
+  ✔ normal rounds: the own board (0.218349ms)
+  ✔ boss / hidden round prep: bossPrep on the side of the server pairing (alive players by seat, two by two) (0.384179ms)
+✔ prepCamera (research 09 §1.2: the Final Assault prep on the own half of the boss field) (0.68377ms)
+▶ equipment dropped on a tile goes to the unit on it
+  ✔ the operator on the drop tile (board or bench), not the one whose head is drawn there; an empty tile says why (0.409167ms)
+✔ equipment dropped on a tile goes to the unit on it (0.467835ms)
+▶ special terrain tip
+  ✔ each terrain of the mode, with the numbers of the stage it stands on (1.088701ms)
+  ✔ an ordinary tile says nothing (the press keeps its other meanings); nonsense input is safe (0.746345ms)
+  ✔ the facts come from the tile's own legend entry; missing terrain parameters never crash (0.245329ms)
+✔ special terrain tip (2.227417ms)
+✔ bond member list includes only selected optional recruits, preserving owned and watched selections (0.344679ms)
+✔ saved default chat sound migrates while custom choices and cooldowns survive (0.429186ms)
+✔ saved shortcuts and shop side survive sanitization; rebinding swaps duplicate keys (1.986203ms)
+✔ normal and cooperative leaks never preview an HP deduction; settled HP still updates (0.858594ms)
+ℹ tests 52
+ℹ suites 13
+ℹ pass 52
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 580.325903

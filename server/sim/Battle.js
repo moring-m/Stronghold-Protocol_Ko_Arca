@@ -9,7 +9,7 @@ function pullUnbalance(level) {
   const l = Math.round(fin(level, -99));
   return l <= -3 ? 0 : l < -1 ? PULL_UNBALANCE_WEAK : PULL_UNBALANCE;
 }
-import { wolfView, negView } from './snapshot.js';
+import { wolfView, negView, coinView } from './snapshot.js';
 import { isPotential, isCultivate } from '../../shared/potential.js';
 import { installTraitAttackSpeed } from './content/traitMods.js';
 // server/sim/Battle.js — one field simulation (normal / unite / boss / hidden). Public API: DESIGN §5.1.
@@ -55,7 +55,7 @@ import { stampFear } from './fear.js';
 import { SkillRuntime } from './skills.js';
 import { updateAlly, updateEnemy, compileRoute, remainingDistance, effectiveProfile, performAttack, acquireTargets } from './ai.js';
 import { resolveProfile } from './professions.js';
-import { unitInfo, snapshotUnits } from './snapshot.js';
+import { unitInfo, snapshotUnits, storedEnergy } from './snapshot.js';
 import { toDataSource, normalizeRoute, normalizeStage, normalizeToken, normalizeEnemy } from './simdata.js';
 import { installContent, setupUnitKit } from './content/index.js';
 
@@ -2541,7 +2541,7 @@ export class Battle {
       fieldId: this.fieldId,
       t: Math.round(this.time * 1000) / 1000,
       units: snapshotUnits(this.units, this.time),
-      energy: Object.fromEntries(this.allyUnits.filter(u=>u.alive&&u.deployed&&u.profile?.storeEnergy).map(u=>[u.id,u.trait.stored||0])),
+      energy: Object.fromEntries(this.allyUnits.filter(u=>u.alive&&u.deployed&&u.profile?.storeEnergy).map(u=>[u.id,storedEnergy(u)])),
       dp: this.players.length ? Math.floor(this.players[0].dp) : 0,
       killed: this.killed,
       total: this.total,
@@ -2598,6 +2598,7 @@ export class Battle {
     snap.sakikoNotes = this.allyUnits.filter(u=>u.alive&&u.deployed&&!u.hidden).flatMap(u=>(u.mem.sakikoNotes||[]).map(n=>[u.id,n.id,r2(n.x),r2(n.y),n.type]));
     snap.skillRanges = this.allyUnits.flatMap(u=>{const keys=visibleSkillAreaKeys(u,this.time);return keys ? [[u.id,keys.map(k=>[Math.floor(k/COLS),k%COLS])]] : [];});
     snap.snow = this.allyUnits.filter(u=>u.alive&&u.deployed&&u.mem.snow instanceof Map).map(u=>[u.id,[...u.mem.snow].map(([k,n])=>[Math.floor(k/COLS),k%COLS,n])]);
+    snap.airHeights = this.units.filter(u=>u.alive && u.deployed && !u.hidden && (u.s.flags.levitate || u.s.flags.float)).map(u=>[u.id,0.35]);
     snap.states = this.units.filter(u => u.alive && u.deployed && !u.hidden).map(u => [u.id,
       [...new Set(u.buffs.filter(b => b.visible).map(b => b.key))]]);
     if (stand) snap.stand=stand;
@@ -2606,6 +2607,8 @@ export class Battle {
     if(wolfList.length)snap.wolves=wolfList;
     const negList=this.units.map(u=>[u.id,negView(u)]).filter(([,n])=>n);
     if(negList.length)snap.neg=negList;
+    const coinList = this.units.filter(u => u.alive && u.deployed && !u.hidden).map(u => [u.id, coinView(u)]).filter(([,c]) => c).map(([id,c]) => [id,...c]);
+    if (coinList.length) snap.coins = coinList;
     return snap;
   }
 

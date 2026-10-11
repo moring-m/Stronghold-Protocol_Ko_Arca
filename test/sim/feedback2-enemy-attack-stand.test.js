@@ -182,3 +182,8 @@ test('a melee enemy finishes its recovery after killing its blocker before movin
  assert.ok(e.atkStandUntil>h.b.time);h.run(.5);assert.equal(e.x,x);assert.equal(e.y,y);
  h.run(1);assert.ok(Math.hypot(e.x-x,e.y-y)>0);assert.ok(h.b.time>at+.75);
 });
+
+test('fast attacks keep recovery until the same capped clip used by windup and rendering finishes',()=>{
+ const enemy={def:{attackAnim:{dur:2,hit:.5}},s:{interval:.1},profile:{}};
+ assert.deepEqual(attackStand(enemy),{wind:.125,rest:.375});
+});

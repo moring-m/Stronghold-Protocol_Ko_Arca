@@ -1,0 +1,20 @@
+✔ data: every enemy with a real attack clip carries it as attackAnim (the clip the client plays, its length and strike frame) (20.603551ms)
+✔ 隐形弩手 with an operator in range stands for its 1.0 s Attack clip at every attack (0.533 s wind-up + 0.467 s), then walks (53.648442ms)
+✔ the stand shortens with the clip when the attacks come quicker than the clip: an enemy attacking every 1 s with a 2 s clip never walks while it has a target (3.645343ms)
+✔ a 「不停止移动」 attacker (attackMoves) keeps walking through its attacks (7.091998ms)
+✔ no attack clip known: ATTACK_PAUSE after the strike and no wind-up stand; a stun cuts a stand short (2.033284ms)
+✔ a ranged enemy with a target in range on a WAIT checkpoint leaves when the wait (and its current clip) is over, as without a target (6.187014ms)
+✔ DISAPPEAR / APPEAR legs proceed while an enemy stands for its attacks; leaving the field ends the stand (1.934705ms)
+✔ a melee enemy finishes its recovery after killing its blocker before moving (4.065748ms)
+✔ fast attacks keep recovery until the same capped clip used by windup and rendering finishes (0.188834ms)
+✔ Big Bob has a full heavy-swing windup before HP changes, without changing his six-second interval (47.605585ms)
+✔ barrel recommender switches permanently to its empty-barrel form after the first unsilenced attack (13.400656ms)
+✔ cathedral swordsman plays one ammunition-consumption gesture per enhancement and stops at five stacks (11.615095ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 596.216175

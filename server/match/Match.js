@@ -159,7 +159,7 @@ import { DataSource } from '../sim/simdata.js';
 import { createRng, deriveSeed } from '../sim/rng.js';
 import { GameData } from './gamedata.js';
 import { RealScheduler } from './scheduler.js';
-import { SharedPool, drawDisabledBonds } from './pool.js';
+import { SharedPool, SharedItemPool, drawDisabledBonds } from './pool.js';
 import { PlayerState } from './PlayerState.js';
 import { buildDeployMap, boardOrder, pieceDir, fieldTile } from './board.js';
 import { bondList, offBondCounts } from './bondsMeta.js';
@@ -367,6 +367,7 @@ export class Match {
     this.staticInactiveBonds = bans.staticOff;
     this.bannedChess = bans.banned;
     this.pool = new SharedPool(this.gd, { banned: bans.banned });
+    this.itemPool = new SharedItemPool(this.gd, () => this.order);
 
     this.phase = PHASE.LOBBY;
     this.round = 0;
@@ -1000,7 +1001,7 @@ export class Match {
     if (this.phase === PHASE.SP_DRAFT && this.sp) {
       const s = this.sp;
       v.sp = {
-        family: s.family, name: s.name, desc: s.desc, eventId: s.eventId, cards: s.cards.map(cardView), order: s.order.slice(),
+        family: s.family, name: s.name, desc: s.desc, eventId: s.eventId, cards: s.cards.map(c => ({ ...cardView(c), soldOut: c.kind === 'item' && !this.itemPool.canGain(c.id) })), order: s.order.slice(),
         turn: this.spTurn(), picks: { ...s.picks }, taken: { ...s.taken }, untimed: !!s.untimed,
       };
     }
@@ -1023,8 +1024,29 @@ export class Match {
 
   /** UnitInfo list of a player's board and hand (prep scouting): board pieces on their tiles, held pieces on the
    *   hand row (row 7) — the scout renders like the own prep bench. */
+  prepMapChars(ps) {
+    if (!ps?.alive || this.phase !== PHASE.PREP || !this.order.some((p) => p.alive && p.bandId === 'band_amedic')) return [];
+    const id = 'char_605_cmedic';
+    const slot = this.stage?.mapChars?.find((m) => m?.key === id && Array.isArray(m.pos) && m.pos[0] >= 9 && m.pos[0] <= 12
+      && m.pos[1] >= 0 && m.pos[1] <= 10 && !/multi_only/.test(String(m.alias)));
+    const rec = this.gd.token(id);
+    if (!slot || !rec) return [];
+    const dir = slot.dir || 'RIGHT';
+    return [{
+      id: -ps.seat - 1, uid: -ps.seat - 1, kind: 'token', side: 'ally', ownerId: ps.playerId, defId: id,
+      area: 'board', name: rec.name || id, tier: 1, golden: false,
+      spine: rec.assets?.spine || id, avatar: rec.assets?.avatar || id,
+      x: slot.pos[1], y: slot.pos[0], dir, facing: dir === 'LEFT' ? -1 : 1, maxHp: rec.stats?.maxHp || 1,
+    }];
+  }
+
   prepFieldMeta(ps) {
-    const units = [];
+    const groupForMedic = this.bossGroupOf(ps);
+    const units = this.prepMapChars(ps).map(u => {
+      const p = fieldTile(groupForMedic ? (groupForMedic.side === 'R' ? 'bossR' : 'bossL') : 'normal', u.y, u.x);
+      const dir = groupForMedic?.side === 'R' ? ({RIGHT:'LEFT',LEFT:'RIGHT',UP:'UP',DOWN:'DOWN'}[u.dir] || u.dir) : u.dir;
+      return { ...u, x:p.col, y:p.row, dir, facing:dir === 'LEFT' ? -1 : 1 };
+    });
     const group = this.bossGroupOf(ps);
     const bossPrep = !!group;
     for (const { r, c, piece } of boardOrder(ps.board)) {
@@ -1764,7 +1786,7 @@ export class Match {
   // SP_DRAFT (机变)
 
   enterSpDraft() {
-    const draft = generateDraft(this.gd, this.rngDraft, this.round, { stageId: this.stageId, bondAvailable: (bondId) => this.bondLive(bondId) });
+    const draft = generateDraft(this.gd, this.rngDraft, this.round, { stageId: this.stageId, bondAvailable: (bondId) => this.bondLive(bondId), itemAvailable: id => this.itemPool.canGain(id) });
     const alive = this.alivePlayers();
     if (!draft || !alive.length) { this.enterPrep(); return; }
     this.phase = PHASE.SP_DRAFT;
@@ -1778,6 +1800,11 @@ export class Match {
     this.setDeadline(0);
     this.startSpTurn();
     this.markPublic();
+  }
+
+  spCardAvailable(card) {
+    return !!card && this.sp?.taken[card.idx] == null
+      && (card.kind !== 'item' || this.itemPool.canGain(card.id));
   }
 
   spTurn() {
@@ -1795,8 +1822,8 @@ export class Match {
       if (ps && ps.alive && s.picks[ps.playerId] == null) break;
       s.idx++;
     }
-    const available = s.cards.map((c) => c.idx).filter((i) => s.taken[i] == null);
-    if (s.idx >= s.order.length || !available.length) { this.setDeadline(0); this.later(0, () => this.finishSpDraft()); return; }
+    const available = s.cards.filter(c => this.spCardAvailable(c)).map(c => c.idx);
+    if (s.idx >= s.order.length || !available.length) { this.setDeadline(0); this.later(1000, () => this.finishSpDraft()); return; }
     const token = ++this._turnToken;
     if (!s.untimed) {
       const first = s.idx === 0;
@@ -1805,7 +1832,7 @@ export class Match {
         if (this.phase !== PHASE.SP_DRAFT || token !== this._turnToken) return;
         const ps = this.players.get(this.spTurn());
         if (!ps) return;
-        const avail = s.cards.map((c) => c.idx).filter((i) => s.taken[i] == null);
+        const avail = s.cards.filter(c => this.spCardAvailable(c)).map(c => c.idx);
         if (!avail.length) { this.finishSpDraft(); return; }
         this._applyCard(ps, avail[Math.floor(this.rngDraft() * avail.length)]);
       });
@@ -1824,7 +1851,7 @@ export class Match {
       if (this.phase !== PHASE.SP_DRAFT || token !== this._turnToken || !this.sp) return;
       const ps = this.players.get(this.spTurn());
       if (!ps || !ps.botControlled) return;
-      const avail = this.sp.cards.map((c) => c.idx).filter((i) => this.sp.taken[i] == null);
+      const avail = this.sp.cards.filter(c => this.spCardAvailable(c)).map(c => c.idx);
       if (!avail.length) return;
       this._applyCard(ps, botPickCard(this, ps, this.sp.cards, avail));
     });
@@ -1836,14 +1863,14 @@ export class Match {
     if (this.sp.picks[ps.playerId] != null) return fail(ERR.ALREADY);
     if (this.spTurn() !== ps.playerId) return fail(ERR.NOT_YOUR_TURN);
     if (!Number.isInteger(idx) || idx < 0 || idx >= this.sp.cards.length) return fail(ERR.BAD_TARGET);
-    if (this.sp.taken[idx] != null) return fail(ERR.SOLD_OUT);
+    if (!this.spCardAvailable(this.sp.cards[idx])) return fail(ERR.SOLD_OUT);
     this._applyCard(ps, idx);
     return OK;
   }
 
   _applyCard(ps, idx) {
     const s = this.sp;
-    if (!s || s.picks[ps.playerId] != null || s.taken[idx] != null) return;
+    if (!s || s.picks[ps.playerId] != null || !this.spCardAvailable(s.cards[idx])) return;
     const card = s.cards[idx];
     if (!card) return;
     s.picks[ps.playerId] = idx;
@@ -1884,7 +1911,7 @@ export class Match {
     const tierList = (lo, hi) => { const out = []; for (let t = lo; t <= hi; t++) for (const id of this.gd.shopItemsByTier[t] || []) out.push(id); return out; };
     if (p && p.kind === 'equip') {
       if (Array.isArray(p.weighted) && p.weighted.length) {
-        const pairs = p.weighted.filter((x) => Array.isArray(x) && this.gd.item(x[0]));
+        const pairs = p.weighted.filter((x) => Array.isArray(x) && this.gd.item(x[0]) && this.itemPool.canGain(x[0]));
         let total = 0;
         for (const [, w] of pairs) total += Math.max(0, Number(w) || 0);
         let r = rng() * total;
@@ -1892,17 +1919,18 @@ export class Match {
         return pairs.length ? pairs[pairs.length - 1][0] : null;
       }
       if (Array.isArray(p.items) && p.items.length) {
-        const items = p.items.filter((id) => this.gd.item(id));
+        const items = p.items.filter((id) => this.gd.item(id) && this.itemPool.canGain(id));
         return items.length ? items[Math.floor(rng() * items.length)] : null;
       }
       let list;
       if (Array.isArray(p.tiers) && p.tiers.length) list = p.tiers.flatMap((t) => this.gd.shopItemsByTier[t] || []);
       else list = tierList(1, p.maxTier === 'shopLevel' ? Math.max(1, Math.min(6, shopLevel)) : 6);
       if (Array.isArray(p.excluded)) list = list.filter(id => !p.excluded.includes(id));
+      list = list.filter(id => this.itemPool.canGain(id));
       return list.length ? list[Math.floor(rng() * list.length)] : null;
     }
     const list = Number.isInteger(tier) ? tierList(tier, tier) : tierList(1, Math.max(1, Math.min(6, maxTier)));
-    return list.length ? list[Math.floor(rng() * list.length)] : null;
+    return this.itemPool.pick(rng, list);
   }
 
   /**
@@ -3347,8 +3375,11 @@ export class Match {
     // overtime drain starts (150 real s), both on the field clock
     const onClock = (realS) => this.sched.now() + Math.round(((realS * this.gd.bossTimeScale) / this.gameSpeed) * 1000);
     const levelTime = this.gd.bossLevelTime(this.round);
+    const team = this.order.filter(p => !p.left);
+    this.bossOvertimeStartReal = team.length > 1 && team.some(p => p.isBot)
+      ? this.gd.bossOvertimeAfterReal : (levelTime || this.gd.bossOvertimeAfterReal);
     this.deadline = this.sched.instant || !levelTime ? 0 : onClock(levelTime);
-    this.overtimeAt = this.sched.instant ? 0 : onClock(this.gd.bossOvertimeAfterReal);
+    this.overtimeAt = this.sched.instant ? 0 : onClock(this.bossOvertimeStartReal);
     if (this.clientCombat) { this._startFinalClient(hidden); return; }
     this._defaultWatch();
     this.markPublic();
@@ -3436,7 +3467,7 @@ export class Match {
    * (bossTurnHpReduceTime, gamedata.js bossOvertimeDue).
    */
   _applyOvertime(gt) {
-    const due = this.gd.bossOvertimeDue(gt);
+    const due = this.gd.bossOvertimeDue(gt, this.bossOvertimeStartReal);
     if (due > this.overtimeApplied) {
       const loss = due - this.overtimeApplied;
       this.overtimeApplied = due;

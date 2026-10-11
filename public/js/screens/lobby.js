@@ -83,6 +83,7 @@ const MODE_CARDS = [
     desc: `与至多 ${MAX_SEATS - 1} 名博士组成同盟，共享干员池，联防协作抵御敌潮。`,
     points: [`1–${MAX_SEATS} 名博士 · 可由 AI 队友补位`, '联防阶段 · 最终攻势合并生命值'],
   },
+  { id: 'laboratory', name: '실험실', en: 'LABORATORY', icon: 'flask', desc: '맵·보스·전략을 직접 고르고 원하는 조합을 시험합니다.', points: ['솔로 플레이 · 밴 없음', '한 라운드 전투 · 결과 통계 기록'] },
 ];
 
 /**
@@ -120,6 +121,20 @@ export function normalizeCode(v) {
   let s = String(v ?? '');
   const m = s.match(/[?&]room=([A-Za-z0-9]+)/);
   if (m) s = m[1];
+  const jamo='ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎㅏㅐㅑㅒㅓㅔㅕㅖㅗㅛㅜㅠㅡㅣ';
+  const keys='rRseEfaqQtTdwWczxvgkoiOjpuPhynbml';
+  // Decompose completed Korean syllables as well as uncombined IME consonants/vowels.
+  const initials='ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ';
+  const vowels=['ㅏ','ㅐ','ㅑ','ㅒ','ㅓ','ㅔ','ㅕ','ㅖ','ㅗ','ㅗㅏ','ㅗㅐ','ㅗㅣ','ㅛ','ㅜ','ㅜㅓ','ㅜㅔ','ㅜㅣ','ㅠ','ㅡ','ㅡㅣ','ㅣ'];
+  const finals=['','ㄱ','ㄲ','ㄱㅅ','ㄴ','ㄴㅈ','ㄴㅎ','ㄷ','ㄹ','ㄹㄱ','ㄹㅁ','ㄹㅂ','ㄹㅅ','ㄹㅌ','ㄹㅍ','ㄹㅎ','ㅁ','ㅂ','ㅂㅅ','ㅅ','ㅆ','ㅇ','ㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+  s=[...s].map(ch=>{
+    const n=ch.codePointAt(0)-0xAC00;
+    const text=n>=0&&n<11172?initials[Math.floor(n/588)]+vowels[Math.floor(n%588/28)]+finals[n%28]:ch;
+    return [...text].map(c=>{
+      const compat=c;
+      const idx=jamo.indexOf(compat);return idx>=0?keys[idx]:c;
+    }).join('');
+  }).join('');
   return s.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, ROOM_CODE_LEN);
 }
 
@@ -202,7 +217,7 @@ function TipsPanel() {
 }
 
 function ModeCard({ card, selected, onSelect }) {
-  return html`<button type="button" class=${`mode-card brackets${selected ? ' is-selected' : ''}`} onClick=${() => onSelect(card.id)}
+  return html`<button type="button" class=${`mode-card brackets${card.id==='laboratory'?' mode-card--lab':''}${selected ? ' is-selected' : ''}`} onClick=${() => onSelect(card.id)}
       aria-pressed=${selected ? 'true' : 'false'}>
     <span class="mode-card__bg" aria-hidden="true"></span>
     <span class="mode-card__icon"><${Icon} name=${card.icon} /></span>
@@ -217,7 +232,7 @@ function ModeCard({ card, selected, onSelect }) {
 }
 
 function DifficultyCard({ roomMode, difficulty, selected, onSelect }) {
-  const info = difficultyInfo(roomMode, difficulty);
+  const info = difficultyInfo(roomMode==='laboratory'?'solo':roomMode, difficulty);
   return html`<button type="button" class=${`diff-card${selected ? ' is-selected' : ''}`}
       style=${`--d-color:${DIFFICULTY_COLORS[difficulty]}`} onClick=${() => onSelect(difficulty)} aria-pressed=${selected ? 'true' : 'false'}>
     <span class="diff-card__bar" aria-hidden="true"></span>
@@ -226,11 +241,11 @@ function DifficultyCard({ roomMode, difficulty, selected, onSelect }) {
       <span class="diff-card__name">${DIFFICULTY_NAMES[difficulty]}</span>
       <span class="diff-card__code num">${info.code}</span>
       <span class="diff-card__meta">
-        <span class="num">${info.rounds}</span> 回合${info.hidden ? html`<span class="diff-card__hidden">+ 隐秘核心</span>` : null}
+        ${roomMode==='laboratory'?html`<span>1회 전투</span>`:html`<span class="num">${info.rounds}</span> 回合${info.hidden ? html`<span class="diff-card__hidden">+ 隐秘核心</span>` : null}`}
       </span>
     </span>
     <span class="diff-card__desc">${info.desc}</span>
-    <span class="diff-card__effects">${info.effects.map((e) => html`<span key=${e}>${e}</span>`)}${info.stageNote ? html`<span key="stage" class="diff-card__stage"><${Icon} name="rook" />${info.stageNote}</span>` : null}</span>
+    <span class="diff-card__effects">${(roomMode==='laboratory'?['밴 없음','일반·히든 보스 선택 가능']:info.effects).map((e) => html`<span key=${e}>${e}</span>`)}${roomMode!=='laboratory'&&info.stageNote ? html`<span key="stage" class="diff-card__stage"><${Icon} name="rook" />${info.stageNote}</span>` : null}</span>
     <span class="diff-card__check" aria-hidden="true"><${Icon} name="check" /><span>已选定</span></span>
   </button>`;
 }
@@ -240,7 +255,7 @@ export function LobbyScreen() {
   const me = useStore((s) => s.me, shallowEqual);
   const conn = useStore((s) => s.connection, shallowEqual);
   useData('config');
-  const [roomMode, setRoomMode] = useState(() => (loadPref('lobby.mode', 'coop') === 'solo' ? 'solo' : 'coop'));
+  const [roomMode, setRoomMode] = useState(() => (['solo','coop','laboratory'].includes(loadPref('lobby.mode','coop'))?loadPref('lobby.mode','coop'):'coop'));
   const [difficulty, setDifficulty] = useState(() => {
     const d = loadPref('lobby.difficulty', 'FUNNY');
     return DIFFICULTIES.includes(d) ? d : 'FUNNY';
@@ -277,7 +292,7 @@ export function LobbyScreen() {
       if (alive.current) setBusy(null);
     }
   };
-  const create = () => run('create', () => net.request('room.create', {
+  const create = () => roomMode === 'laboratory' ? store.patch('ui', { laboratorySetup: { difficulty } }) : run('create', () => net.request('room.create', {
     mode: roomMode,
     difficulty,
     customExtensions: loadCustomExtensionPrefs(),
@@ -358,7 +373,7 @@ export function LobbyScreen() {
         <div class="section-label"><span class="section-label__idx num">03</span>加入同盟<${MicroLabel}>JOIN WITH ALLIANCE KEY<//></div>
         <${Panel} class="join-panel" tone="amber">
           <div class="join-row">
-            <${TextField} size="code" icon="key" value=${code} placeholder="输入同盟密钥 / 粘贴邀请链接"
+            <${TextField} ascii=${true} size="code" icon="key" value=${code} placeholder="输入同盟密钥 / 粘贴邀请链接"
               transform=${normalizeCode} onInput=${(v) => setCode(normalizeCode(v))} onEnter=${() => join()} />
             <${Button} variant="amber" size="lg" icon="users" loading=${busy === 'join'} disabled=${!codeOk || !online} onClick=${() => join()}>加入同盟<//>
             <${Tooltip} text=${`以观战者身份进入：不占博士席位，只能观看（每个同盟的观战席由房主设定，最多 ${MAX_SPECTATOR_SEATS} 名；模拟进行中也可进入）`}>
@@ -372,7 +387,6 @@ export function LobbyScreen() {
               : html`<span class="t-dim">${`向同伴索取 ${ROOM_CODE_LEN} 位同盟密钥，或直接打开邀请链接`}</span>`}
           </div>
         <//>
-        <${TipsPanel} />
       </section>
 
       <section class="lobby-right">
@@ -394,17 +408,15 @@ export function LobbyScreen() {
                 disabled=${!spectateOn}
                 onClick=${() => { setSpectateCount(n); savePref('lobby.spectateCount', n); }}>${n}</button>`)}
             </div>
-            <div class="create-box__cap-hint t-dim">
-              ${spectateOn ? `本局最多 ${spectateCount} 名观众，不占博士席位` : '本局不接受观战'}
-            </div>
+
           </div>` : null}
-          <${Tooltip} block=${true} text=${online ? null : '正在连接服务器…'}>
-            <${Button} variant="primary" size="xl" block=${true} iconRight="chevrons" loading=${busy === 'create'} disabled=${!online} onClick=${create}>
-              ${roomMode === 'solo' ? '开始独立模拟' : '创建同盟'}
+          <${Tooltip} block=${true} text=${online || roomMode==='laboratory' ? null : '正在连接服务器…'}>
+            <${Button} variant="primary" size="xl" block=${true} iconRight="chevrons" loading=${busy === 'create'} disabled=${roomMode!=='laboratory'&&!online} onClick=${create}>
+              ${roomMode==='laboratory'?'실험실 진입':roomMode === 'solo' ? '开始独立模拟' : '创建同盟'}
             <//>
           <//>
           <div class="create-box__hint">
-            ${online
+            ${roomMode==='laboratory'?html`<span>진입 후 맵·보스·전략을 선택합니다.</span>`:online
               ? html`<span>${roomMode === 'solo' ? '创建后即可开始模拟' : '创建后可邀请好友或添加 AI 队友'}</span>`
               : html`<${Spinner} size="sm" label="CONNECTING" />`}
           </div>

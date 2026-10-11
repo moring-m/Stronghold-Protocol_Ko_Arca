@@ -10,6 +10,7 @@
   -webkit-mask-image: radial-gradient(70% 70% at 25% 50%, #000, transparent); mask-image: radial-gradient(70% 70% at 25% 50%, #000, transparent); }
 .result__main { position: relative; z-index: 1; flex: 1; min-height: 0; display: grid; grid-template-columns: 5.6rem 1fr; gap: .5rem; padding: .36rem .5rem .3rem .6rem; }
 .result__hero { display: flex; flex-direction: column; align-items: flex-start; gap: .16rem; padding-top: .3rem; min-height: 0; }
+.result__summary { display: flex; flex-direction: column; align-items: flex-start; gap: .16rem; min-height: 0; width: 100%; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; }
 .result__logoimg { height: 1.1rem; width: auto; opacity: .92; }
 .result__headline { font-size: calc(.96 * var(--t)); font-weight: 900; letter-spacing: .12em; line-height: 1.05; color: var(--mint-400); text-shadow: 0 0 .4rem rgba(23, 249, 183, .45); animation: head-in 600ms var(--ease-out); }
 .result.is-lose .result__headline { color: var(--red-premium); text-shadow: 0 0 .4rem rgba(255, 60, 60, .4); }
@@ -74,7 +75,7 @@
 .rstat { display: flex; align-items: baseline; justify-content: space-between; gap: .06rem; padding: .05rem .1rem; background: #0e1210; box-shadow: 0 0 0 1px var(--line); font-size: calc(.13 * var(--t)); color: var(--text-lo); white-space: nowrap; min-width: 0; }
 .rstat b { font-size: calc(.18 * var(--t)); color: #fff; }
 .rstat.is-best b { color: var(--gold); }
-.result__foot { margin-top: auto; padding-top: .2rem; display: flex; }
+.result__foot { flex: 0 0 auto; margin-top: auto; padding-top: .2rem; display: flex; }
 .result__foot .btn { min-width: 3.4rem; }
 
 .result__pages {position:relative;z-index:1;display:flex;justify-content:center;gap:.12rem;padding:.12rem;flex-shrink:0;}
@@ -117,3 +118,43 @@
 .combat-chart__legend{display:flex;flex-wrap:wrap;gap:.15rem;margin-top:.16rem;font-size:calc(var(--t)*.13)}.combat-chart__legend span{display:flex;align-items:center;gap:.06rem}.combat-chart__legend i{width:.1rem;height:.1rem;display:inline-block}
 .combat-report__table[hidden]{display:none}
 @media(max-width:600px){.combat-chart{padding:.12rem}.combat-chart__row{grid-template-columns:minmax(1.3rem,1.7rem) minmax(.35rem,1fr) .72rem;gap:.07rem}.combat-report__controls{justify-content:flex-start}}
+
+/* Live chat occupies the left column instead of covering settlement cards. */
+.result__main { grid-template-columns: minmax(0, 5.6rem) minmax(0, 1fr); }
+.result__hero, .result__combat { min-width: 0; }
+.result__summary { flex: 1 1 auto; }
+.result__hero > .game-chat--docked { position: relative; left: auto; bottom: auto; z-index: 2; width: 100%; flex: 0 0 auto; }
+.game-chat--docked .game-chat__panel, .game-chat--docked .game-chat__preview { width: 100%; max-width: 100%; box-sizing: border-box; }
+.game-chat--docked .game-chat__messages { height: min(20vh, 140px); }
+.game-chat--docked .game-chat__preview { max-height: 12vh; overflow-y: auto; pointer-events: auto; }
+.game-chat--docked .game-chat__factions { max-height: 14vh; overflow-y: auto; }
+
+/* Match the report controls and panels to the settlement screen. */
+.combat-report{gap:.18rem;max-width:18rem}
+.combat-report>h2{margin:0;font-size:.28rem;letter-spacing:.06em;color:var(--text-hi);border-left:3px solid var(--mint-500);padding-left:.12rem}
+.combat-report__players{gap:0;border-bottom:1px solid var(--line);padding-bottom:.1rem}
+.combat-report__players button{border:0;border-bottom:2px solid transparent;background:transparent;padding:.1rem .2rem;font-size:.17rem}
+.combat-report__players button[aria-pressed="true"]{border-bottom-color:var(--mint-500);background:#4ed8af0d}
+.combat-report__controls{margin:0;padding:.12rem;border:1px solid var(--line);background:#0c1813;justify-content:flex-start;gap:.16rem}
+.combat-report__controls label{font-size:.15rem;white-space:nowrap;margin:0}
+.combat-report__controls select{height:.4rem;font:inherit;max-width:3.2rem;min-width:1.4rem}
+.combat-report__views{margin-left:auto;gap:0}
+.combat-report__views button{height:.4rem;font:inherit;font-size:.15rem;padding:0 .16rem}
+.combat-report__summary{gap:.08rem}
+.combat-report__summary>div{padding:.12rem;border-color:#4ed8af22;background:linear-gradient(145deg,#14231b,#0d1712);min-width:0}
+.combat-report__summary span{font-size:.13rem;color:var(--text-lo);white-space:nowrap}
+.combat-report__summary b{font-size:.23rem;color:var(--text-hi);font-family:var(--font-num);white-space:nowrap}
+.combat-chart{padding:.18rem .2rem;background:#0b1612;border-color:#4ed8af30}
+.combat-chart__row{grid-template-columns:minmax(2.1rem,3.2rem) minmax(.8rem,1fr) 1rem;min-height:.62rem;gap:.16rem;padding:.05rem 0}
+.combat-chart__name{font-size:.16rem;line-height:1.35}.combat-chart__name>span{min-width:0;overflow-wrap:anywhere}
+.combat-chart__track{height:.18rem;border-radius:2px;overflow:hidden}.combat-chart__row>b{font-size:.17rem}
+.combat-chart__legend{justify-content:flex-end;font-size:.13rem}
+.combat-report__table th,.combat-report__table td{padding:.13rem .16rem}
+.combat-report__table tbody tr:hover{background:#4ed8af09}
+@media(max-width:700px){.combat-report__summary{grid-template-columns:repeat(3,minmax(0,1fr))}.combat-report__controls{gap:.1rem}.combat-report__views{margin-left:0}.combat-chart__row{grid-template-columns:minmax(1.3rem,2rem) minmax(.4rem,1fr) .8rem;gap:.08rem}}
+
+.result__laboratory{display:inline-flex;align-items:center;gap:.08rem;color:var(--mint-400);border:1px solid var(--mint-700);background:#4ed8af0d;padding:.08rem .16rem;font-size:.2rem;font-weight:700;align-self:center}.result__laboratory .icon{width:.23rem;height:.23rem}
+.result__pages{display:flex;align-items:center;justify-content:center;gap:.16rem;border-bottom:1px solid var(--line);padding:0 .18rem;background:transparent}
+.result__pages button{border:0;border-bottom:2px solid transparent;background:transparent;color:var(--text-lo);font:inherit;font-size:.21rem;font-weight:700;letter-spacing:.06em;padding:.12rem .2rem;white-space:nowrap}
+.result__pages button[aria-pressed="true"]{border:0;border-bottom:2px solid var(--mint-400);color:var(--text-hi);background:transparent}
+.result__pages button:hover{color:var(--mint-400)}

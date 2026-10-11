@@ -36,6 +36,8 @@ export function renderInfo(u) {
     form: typeof u.form === 'string' ? u.form : undefined,
     // DESIGN §16 loadout of an ally (UnitInfo.skillIndex / moduleId): the Spine actor plays that skill's clip, and a
     // tap hands them to the detail card (a teammate's unit shows its owner's skill / module)
+    energy: Number.isFinite(u.energy) ? Math.max(0, u.energy) : undefined,
+    energyMax: Number.isFinite(u.energyMax) ? Math.max(0, u.energyMax) : undefined,
     skillIndex: Number.isInteger(u.skillIndex) ? u.skillIndex : undefined,
     // an ally whose skill is an ammo magazine (UnitInfo.ammoSkill): its rounds are the cells under the HP bar, so no sustained
     // skill aura is drawn for it (render/fx/rings.js _aura)

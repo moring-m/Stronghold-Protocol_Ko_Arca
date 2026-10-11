@@ -307,17 +307,15 @@ function hammerAcquire(battle, rt, u) {
     if (m > 0) battle.dealDamage(u, c.target, { type: 'element', element: 'burn', amount: c.amount * num(p.damage_scale) * m, tags: procTags('hammer_burn') });
   });
   // 战栗: 地面干员 carrier (melee position, any tile — support isGroundOp), on attack prob × m ⇒ 战栗 disarmed_duration s
-  S.on('attack', (c) => {
-    if (c.attacker !== u || !isGroundOp(u)) return;
+  onAttackEnemies(S, u, (t) => {
+    if (!isGroundOp(u)) return;
     const p = hammerParams(hs, 'tremble');
     if (!p) return;
     const m = hammerMul(battle, rt, u, hs, 'tremble');
     if (!(m > 0)) return;
-    const pr = Math.min(1, num(p.prob) * m);
-    for (const t of c.targets) {
-      if (t && t.side === 'enemy' && t.alive && chance(battle, pr)) battle.applyStatus(t, 'tremble', { duration: num(p.disarmed_duration, 2), source: u });
-    }
+    if (chance(battle, Math.min(1, num(p.prob) * m))) battle.applyStatus(t, 'tremble', {duration:num(p.disarmed_duration,2), source:u});
   });
+
   // 坚固: the first lethal hit of each deployment (deploymentOf) ⇒ HP never below 1 for undeadable_duration × m s — the
   // window, held by the battle-level hook above. A new deployment re-arms the lock and leaves a window still running
   // behind (the retreat ends the unit's states). Any lethal HP loss sets it off, an ally's (the 阿戈尔 battle-start
@@ -363,10 +361,10 @@ function mitigated(amount, type, target, source, dmg) {
 
 /** Per enemy target of an attack by `u` (heals excluded). */
 function onAttackEnemies(S, u, fn) {
-  S.on('attack', (c) => {
-    if (c.attacker !== u) return;
-    const ts = c.targets;
-    for (let i = 0; i < ts.length; i++) { const t = ts[i]; if (t && t.side === 'enemy' && t.alive) fn(t, c); }
+  S.on('hit', (c) => {
+    const t = c.target;
+    if (c.source !== u || !c.dmg?.isAttack || c.dmg.type === 'element' || !t || t.side !== 'enemy' || !t.alive) return;
+    fn(t, c);
   });
 }
 
@@ -441,6 +439,7 @@ const BY_BUFF = {
 /** Item-key behaviours. */
 const BY_ITEM = {
   chess_item_custom_ursus_favor(battle, u, rec, scope) {
+    onAttackEnemies(scope,u,t=>{ if(isMember(battle,u,'ursusShip')) battle.dealDamage(u,t,{amount:u.s.maxHp*.05,type:'true',tags:procTags('ursus_favor')}); });
     scope.on('attack', c => {
       if (c.attacker !== u || !isMember(battle,u,'ursusShip')) return;
       // Scope already invokes this hook once for each equipment strike.
@@ -448,7 +447,6 @@ const BY_ITEM = {
       for(const strike of strikes){
         const targets=[...new Set(strike)].filter(t=>t?.side==='enemy');
         if(!targets.length)continue;
-        for(const t of targets)if(t.alive)battle.dealDamage(u,t,{amount:u.s.maxHp*.05,type:'true',tags:procTags('ursus_favor')});
         if(!carries(battle,u,'chess_item_custom_ursus'))continue;
         const state=battleStore(battle,'ursus:favor');state.counts??=new Map();
         const n=state.counts.get(u.ownerId)||0;if(n>=100)continue;
@@ -809,30 +807,30 @@ const BY_ITEM = {
     const partner = partnerOf(p);
     const key = S.key('stealth');
     const per = num(p.atk_per_sec), max = num(p.max_atk, 1);
-    const st = { bonus: 0, wasStealth: false, armed: false, seq: -1 };
+    const st = { bonus: 0, seq: -1 };
     const TICKS = 0.25;
     S.every(TICKS, () => {
-      if (u.deploySeq !== st.seq) { st.seq = u.deploySeq; st.bonus = 0; st.armed = false; st.wasStealth = false; }
+      if (u.deploySeq !== st.seq) { st.seq = u.deploySeq; st.bonus = 0; }
       if (!onField(u) || !memberOf(battle, u, 'siracusaShip')) return;
       const stealth = !!u.s.flags.stealth;
       if (stealth && st.bonus < max) {
         st.bonus = Math.min(max, st.bonus + per * TICKS);
         S.buff(u, { key, mods: directMods({ atk: st.bonus }), refresh: 'replace' });
       }
-      if (st.wasStealth && !stealth && st.bonus > 0) st.armed = true;
-      st.wasStealth = stealth;
     });
     S.on('damaged', (c) => {
-      if (c.source !== u || !st.armed || isProc(c.dmg) || !(c.amount > 0)) return;
-      st.armed = false;
+      // A hit may follow stealth ending before the next growth poll. Decide at the hit, and consume once before
+      // the combo deals synchronous damage; the ATK buff still supplies that combo's attack value.
+      if (c.source !== u || isProc(c.dmg) || !(c.amount > 0) || st.bonus <= 0
+        || u.deploySeq !== st.seq || !onField(u) || u.s.flags.stealth) return;
+      st.bonus = 0;
       if (partner && carries(battle, u, partner) && c.target && c.target.alive && c.target.side === 'enemy') {
         battle.dealDamage(u, c.target, { amount: u.s.atk * num(p.atk_scale), type: 'true', canDodge: false, tags: procTags('crest') });
         battle.fx('strike', { x: c.target.x, y: c.target.y, id: c.target.id, src: 'item:chess_item_6_11_e', key: rec.id, from: u.id });
       }
-      st.bonus = 0;
       battle.removeBuff(u, key);
     });
-    S.on('death', (c) => { if (c.unit === u) { st.bonus = 0; st.armed = false; } });
+    S.on('death', (c) => { if (c.unit === u) st.bonus = 0; });
   },
 };
 

@@ -296,22 +296,21 @@ describe('local stats: the match left early (放弃模拟)', () => {
     assert.equal(live.sawStart, true);
   });
 
-  test('recordQuit stores it through localStorage once; the settlement of the same match is a different record', () => {
+  test('recordQuit never writes history and stops the tracker', () => {
     withStorage(() => {
       const s = liveState({ phase: PHASE.PREP, round: 4 });
       const live = watched([liveState({ phase: PHASE.INFO_CHECK, round: 0 }), s]);
       const rec = recordQuit(s, { live, now: 3e6 });
-      assert.ok(rec);
+      assert.equal(rec, null);
       assert.equal(live.active, false, 'one record per match');
       assert.equal(recordQuit(s, { live, now: 3e6 }), null);
-      assert.equal(loadStats().records.length, 1);
-      assert.equal(loadStats().records[0].players[0].roundsPassed, 3);
+      assert.equal(loadStats().records.length, 0);
     });
   });
 });
 
 describe('local stats: following the app store', () => {
-  test('installStatsRecorder watches a match from its start; a quit is recorded with its duration, then the tracker rests', () => {
+  test('installStatsRecorder watches a match; abandoning leaves no history and stops the tracker', () => {
     withStorage(() => {
       const first = liveState({ phase: PHASE.INFO_CHECK, round: 0 });
       const store = createStore({ me: first.me, room: first.room, match: emptyMatch() });
@@ -323,9 +322,8 @@ describe('local stats: following the app store', () => {
         assert.equal(liveMatch.sawStart, true);
         store.patch('match', { public: liveState({ phase: PHASE.PREP, round: 3 }).match.public });
         const rec = recordQuit(store.get());
-        assert.ok(rec);
-        assert.equal(rec.players[0].roundsPassed, 2);
-        assert.ok(rec.durationMs >= 0);
+        assert.equal(rec, null);
+        assert.equal(loadStats().records.length, 0);
         assert.equal(liveMatch.active, false, 'recorded once');
         // the app clears the match: still at rest; a new match is a fresh start
         store.set({ match: emptyMatch() });
@@ -724,4 +722,28 @@ describe('local stats: recordToResult (history row → settlement re-view)', () 
     assert.equal(recordToResult(null), null);
     assert.equal(recordToResult({ players: [] }), null);
   });
+});
+
+ test('abandoned results never create history, while completed losses do', () => {
+   withStorage(() => {
+     for (const laboratory of [true, false]) {
+       assert.equal(recordResult(baseResult({reason:'abandoned'}), {myId:'p1',laboratory}), null);
+       assert.equal(recordResult(baseResult({reason:'quit'}), {myId:'p1',laboratory}), null);
+     }
+     assert.equal(loadStats().records.length, 0);
+     assert.ok(recordResult(baseResult({victory:false}), {myId:'p1', laboratory:true}));
+     assert.equal(loadStats().records.length, 1);
+   });
+ });
+
+test('laboratory settlements remain in history but contribute no aggregate statistics',()=>{
+ withStorage(()=>{
+  const rec=recordResult(baseResult(),{myId:'p1',laboratory:true});
+  assert.equal(rec.roomMode,'laboratory');
+  assert.equal(loadStats().records.length,1);
+  assert.equal(countsTowardStats(rec),false);
+  const aggregate=aggregateStats(loadStats().records);
+  assert.equal(aggregate.count,0);assert.equal(aggregate.wins,0);
+  assert.deepEqual(aggregate.bands,{});
+ });
 });

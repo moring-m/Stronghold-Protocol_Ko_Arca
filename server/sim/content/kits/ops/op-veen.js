@@ -146,6 +146,8 @@ export default {
 
     return {
       trait: {
+        storeMax: tMax * merge,
+        energyCount: unit => { const v = stateOf(unit); return v.s + v.t * merge; },
         hitsFn: () => 0,   // the volley's hits are the kit's (land)
         onEachHit(battle, unit, victim, hc) { if (hc.kind === 'main' && victim && victim.side === 'enemy') land(battle, unit, victim, hc.attackId, !!hc.isSkill); },
         // only enemies under her 战争技艺 in range: no valid target — she holds her fire (and stores energy)

@@ -136,16 +136,16 @@ describe('2: the own LP drops live while the battle runs', () => {
     assert.equal(pendingTip(30, 0), null);
   });
 
-  test('team panel rows: the own row takes the top bar\'s live value, a teammate\'s m.public players[].pendingLp; only in COMBAT / 联防', () => {
+  test('team panel rows: show settled HP without previewing leak deductions', () => {
     const pub = { phase: PHASE.COMBAT };
-    assert.deepEqual(rowLp({ lp: 30, pendingLp: 3 }, pub), { lp: 30, pending: 3, unite: false, left: null });
-    assert.deepEqual(rowLp({ lp: 2, pendingLp: 3 }, pub), { lp: 2, pending: 2, unite: false, left: null }, 'clamped at the LP left');
+    assert.deepEqual(rowLp({ lp: 30, pendingLp: 3 }, pub), { lp: 30, pending: 0, unite: false, left: null });
+    assert.deepEqual(rowLp({ lp: 2, pendingLp: 3 }, pub), { lp: 2, pending: 0, unite: false, left: null }, 'clamped at the LP left');
     assert.deepEqual(rowLp({ lp: 30 }, pub), { lp: 30, pending: 0, unite: false, left: null });
-    assert.deepEqual(rowLp({ lp: 30, pendingLp: 4 }, { phase: PHASE.UNITE }), { lp: 30, pending: 4, unite: true, left: null });
+    assert.deepEqual(rowLp({ lp: 30, pendingLp: 4 }, { phase: PHASE.UNITE }), { lp: 30, pending: 0, unite: false, left: null });
     assert.deepEqual(rowLp({ lp: 30, pendingLp: 4 }, { phase: PHASE.SETTLE }), { lp: 30, pending: 0, unite: false, left: null });
     assert.deepEqual(rowLp({ lp: 30, pendingLp: 4, alive: false }, pub), { lp: 30, pending: 0, unite: false, left: null });
     // the own row: the top bar's numbers (m.private lp — m.public may lag behind it by a throttle interval)
-    assert.deepEqual(rowLp({ lp: 30, pendingLp: 1 }, pub, { lp: 30, pending: 5, unite: false }), { lp: 30, pending: 5, unite: false, left: null });
+    assert.deepEqual(rowLp({ lp: 30, pendingLp: 1 }, pub, { lp: 30, pending: 5, unite: false }), { lp: 30, pending: 0, unite: false, left: null });
     assert.deepEqual(rowLp({ lp: 30 }, pub, { lp: 25, pending: 0, unite: false }), { lp: 25, pending: 0, unite: false, left: null }, 'settled m.private first');
     assert.deepEqual(rowLp({ lp: 30 }, { phase: PHASE.FINAL_ASSAULT }, { lp: 99, pending: 5 }), { lp: 30, pending: 0, unite: false, left: null }, 'boss rounds: the row keeps its own share');
   });

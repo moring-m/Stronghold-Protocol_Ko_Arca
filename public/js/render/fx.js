@@ -2319,55 +2319,10 @@ export class FxSystem {
   }
 
   /** Remove everything (battle reset). */
-  /** Weapon tips sampled from the currently animated attachment, not a ground slash. */
-  weaponTrail(view, dt, cam) {
-    const actor=view.actor, sp=actor?.spine;
-    const attacking=actor && ['attack','skillCast'].includes(actor.mode);
-    const kind=this.attackKinds?.get(view.id);
-    const ranged=(kind && kind!=='none') || ['SNIPER','CASTER','MEDIC','SUPPORT'].includes(view.info.profession);
-    const slots=sp?.skeleton?.slots;
-    let rec=this.weaponTrails.get(view);
-    if(!attacking || ranged || !view.alive || view.down || view.flags & 4){
-      if(rec){rec.samples.length=0;rec.g.clear();}return;
-    }
-    if(!slots)return;
-    const weapon=slots.find(slot=>/weapon|sword|blade|spear|hammer|knife|katana|lance|rapier|scythe|axe|mace/i.test((slot.data?.name || '')+' '+(slot.getAttachment?.()?.name || '')) && (slot.getAttachment?.()?.offset?.length>=8 || slot.getAttachment?.()?.worldVerticesLength>=4));
-    if(!weapon)return;
-    const att=weapon.getAttachment(),bone=weapon.bone;
-    let vertices;
-    if(att.offset?.length>=8){
-      vertices=[];
-      for(let i=0;i<att.offset.length;i+=2){const x=att.offset[i],y=att.offset[i+1];vertices.push(x*(bone.matrix?.a ?? bone.a)+y*(bone.matrix?.c ?? bone.b)+bone.worldX,x*(bone.matrix?.b ?? bone.c)+y*(bone.matrix?.d ?? bone.d)+bone.worldY);}
-    }else{
-      vertices=new Float32Array(att.worldVerticesLength);
-      att.computeWorldVertices(weapon,0,vertices.length,vertices,0,2);
-    }
-    let tip=null,far=-1;
-    for(let i=0;i<vertices.length;i+=2){
-      const x=vertices[i],y=vertices[i+1],d=(x-bone.worldX)**2+(y-bone.worldY)**2;
-      if(d>far){far=d;tip={x,y};}
-    }
-    if(!tip)return;
-    // Skeleton coordinates are model-local; retain the same world vertex through camera changes.
-    const modelScale=UNIT.modelScale*(view.modelK||1),flip=view.flipValue??1;
-    const world=modelPoint(view,-tip.y*modelScale,(tip.x-(view.bossModelCenter||0))*modelScale*flip);
-    const z=world.z;
-    if(!rec){const g=new this.P.Graphics();this.projLayer.addChild(g);rec={g,samples:[],age:0,actor};this.weaponTrails.set(view,rec);}
-    if(rec.actor!==actor){rec.samples.length=0;rec.actor=actor;}
-    rec.age+=dt;
-    const previous=rec.samples.at(-1);
-    if(!previous || Math.hypot(previous.x-world.x,previous.y-world.y)>.012)rec.samples.push({x:world.x,y:world.y,z,t:rec.age});
-    while(rec.samples.length && (rec.age-rec.samples[0].t>.10 || rec.samples.length>12))rec.samples.shift();
-    rec.g.clear();
-    const color=meleeStyle(view.info)==='arts'?0xa7b8dc:0xe6e4d8;
-    for(let i=1;i<rec.samples.length;i++){
-      const a=rec.samples[i-1],b=rec.samples[i],pa=cam.project(a.x,a.y,a.z,{}),pb=cam.project(b.x,b.y,b.z,{});
-      // No idle shimmer; only moving weapon tips leave a short, tapering tail.
-      const dx=pb.x-pa.x,dy=pb.y-pa.y,len=Math.hypot(dx,dy);if(len<.1)continue;
-      const nx=-dy/len,ny=dx/len,wa=pa.s*.075*(i-1)/rec.samples.length,wb=pb.s*.075*i/rec.samples.length;
-      rec.g.lineStyle(0);rec.g.beginFill(color,.34*i/rec.samples.length);
-      rec.g.drawPolygon([pa.x+nx*wa,pa.y+ny*wa,pb.x+nx*wb,pb.y+ny*wb,pb.x-nx*wb,pb.y-ny*wb,pa.x-nx*wa,pa.y-ny*wa]);rec.g.endFill();
-    }
+  /** Synthetic melee weapon tails are disabled; preserve the Spine artwork. */
+  weaponTrail(view) {
+    const rec=this.weaponTrails.get(view);
+    if(rec){rec.g.destroy();this.weaponTrails.delete(view);}
   }
 
   _updateWeaponTrails() {

@@ -212,6 +212,7 @@ export class Net {
 
   /** Open the socket (no-op when already open/connecting). Also resumes after close()/replacement. */
   connect() {
+    if (this.localSession) return;
     const quiet = this._quietSwap;
     this._quietSwap = false;
     if (this.ws && (this.ws.readyState === WS_OPEN || this.ws.readyState === WS_CONNECTING)) return;
@@ -250,6 +251,7 @@ export class Net {
 
   /** Skip the backoff wait and reconnect right now (used on `online` / tab focus / retry button). */
   retryNow() {
+    if (this.localSession) return;
     if (this._manualClose) return;
     if (this.ws && (this.ws.readyState === WS_OPEN || this.ws.readyState === WS_CONNECTING)) return;
     this.connect();
@@ -434,6 +436,7 @@ export class Net {
    * @returns {Promise<any>}
    */
   request(t, fields = {}, opts = {}) {
+    if (this.localSession) return this.localSession.request(t, fields);
     return new Promise((resolve, reject) => {
       if (t === 'hello') { reject(new NetError('BAD_MSG', 'use setName() for hello')); return; }
       const rid = this._nextRid();
@@ -473,6 +476,7 @@ export class Net {
    * @returns {boolean}
    */
   send(t, fields = {}) {
+    if (this.localSession) { this.localSession.request(t, fields).catch(err => this._emit('unhandledError', err)); return true; }
     if (t === 'hello') return false;
     const msg = { ...(fields && typeof fields === 'object' ? fields : {}), t };
     const bad = validateC2S(msg);

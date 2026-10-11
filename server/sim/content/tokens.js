@@ -1047,7 +1047,9 @@ function manifold(bb, raw, def) {
  * and a medic healed a hurt one.
  */
 export function champagneHold(battle, bomb) {
-  battle.addBuff(bomb, { key: 'token:champagneHold', flags: { noHeal: true, healFree: true }, persist: true, allowDead: true });
+  // PRTS 香槟炸弹: entity type 装置, not selected by ordinary auras/talents. The internal selection barrier has no
+  // visible status icon; it does not change the owner's explosion or the established HP protection (#476).
+  battle.addBuff(bomb, { key: 'token:champagneHold', flags: { noHeal: true, healFree: true, isolated: true }, persist: true, allowDead: true });
   battle.on('hit', (ctx) => { if (ctx.target === bomb) ctx.dmg.cancel = true; }, { owner: bomb, priority: 1000 });
   battle.on('elementHit', (ctx) => { if (ctx.target === bomb) ctx.dmg.cancel = true; }, { owner: bomb, priority: 1000 });
   battle.on('damaged', (ctx) => { if (ctx.target === bomb && bomb.alive) bomb.hp = bomb.s.maxHp; }, { owner: bomb, priority: 1000 });
@@ -1746,6 +1748,12 @@ export function install(battle) {
       battle.retreat(t, { reason: 'expired', permanent: true });
     }
   }, { priority: -90 });
+
+  battle.on('death', ({unit:owner}) => {
+    if (owner?.profile?.sub !== 'tactician') return;
+    for (const token of battle.allyUnits) if (token.kind === 'token' && token.ownerUnit === owner && token.alive) battle.retreat(token,{reason:'expired',permanent:true});
+    owner.trait.reinforcement=null;
+  }, {priority:100});
 
   // summon kills (夕 化境, …): owner kits listen to `summonKill`
   battle.on('kill', (ctx) => {

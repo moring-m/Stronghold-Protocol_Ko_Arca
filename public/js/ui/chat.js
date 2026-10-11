@@ -13,7 +13,7 @@ import { settingsStore, SettingsModal } from './settings.js';
 import { toastError } from './toasts.js';
 import { CHAT_MAX_LENGTH, CHAT_FACTIONS, chatFaction, normalizeChatText } from '../../../shared/chat.js';
 
-export function ChatPanel({room = false}) {
+export function ChatPanel({room = false, docked = false}) {
   useData('assets');
   const m = data.get('assets');
   const messages = useStore((s) => s.chat);
@@ -125,7 +125,7 @@ export function ChatPanel({room = false}) {
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11.5a8 8 0 0 1-8 8H8l-5 3v-6a8 8 0 0 1-1-5 9 9 0 0 1 18 0Z" /><path d="M7 10h8M7 14h5" /></svg>
       ${!open && unread ? html`<span class="game-chat__badge" aria-label=${`읽지 않은 메시지 ${unread}개`}>${unread > 99 ? '99+' : unread}</span>` : null}
     </button>`;
-  return [html`<aside class=${room ? 'game-chat game-chat--room' : 'game-chat'} aria-label="게임 채팅" onKeyDown=${keyboard} onPointerDown=${(e) => e.stopPropagation()}>
+  return [html`<aside class=${room ? 'game-chat game-chat--room' : docked ? 'game-chat game-chat--docked' : 'game-chat'} aria-label="게임 채팅" onKeyDown=${keyboard} onPointerDown=${(e) => e.stopPropagation()}>
     <${RestartVoteControls} requestVisible=${false} />
     ${room ? html`<header class="game-chat__room-header"><strong>대기실 채팅</strong></header>` : null}
     ${open ? html`<section class="game-chat__panel" id="game-chat-panel" aria-label="게임 채팅창">

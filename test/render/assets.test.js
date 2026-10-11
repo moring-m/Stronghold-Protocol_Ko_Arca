@@ -7,7 +7,7 @@ import { readFileSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
-  configureSpineTextures, avatarUrl, portraitUrl, enemyIconUrl, tokenAvatarUrl, bondIconUrl, bandIconUrl, itemIconUrl, skillIconUrl, uiUrl,
+  configureSpineTextures, installSpineTextureParser, loadSpineData, avatarUrl, portraitUrl, enemyIconUrl, tokenAvatarUrl, bondIconUrl, bandIconUrl, itemIconUrl, skillIconUrl, uiUrl,
   profIconUrl, subProfIconUrl, spineEntry, hasBackSpine, unitPictureUrl, bgmEntry, sfxUrl, unitSfxUrl, baseCharId,
   validSpine, RefLru, createAssets, unloadSpineData, spinePages, spineDataWeight, SPINE_WEIGHT_MIN, SPINE_IDLE_BYTES,
   SPINE_IDLE_GRACE_MS, SPINE_EVICT_DELAY_MS, SPINE_QUIET_DELAY_MS,
@@ -388,13 +388,14 @@ describe('Spine store: unload / reload of the same skeleton (user playtest #3 it
     const Assets = {
       loader,
       load(url) {
+        url=typeof url==='string'?url:url.src;
         if (!cache.has(url)) cache.set(url, Promise.resolve({ url, id: ++seq, destroyed: false, animations: [] }));
         return cache.get(url);
       },
       unload(url) { return loader.unload(url); },
     };
     const prev = globalThis.PIXI;
-    globalThis.PIXI = { Assets, spine: {} };
+    globalThis.PIXI = { Assets, spine: {}, extensions:{add(){}},ExtensionType:{LoadParser:1},ALPHA_MODES:{UNPACK:1,PMA:2} };
     return { Assets, restore: () => { if (prev === undefined) delete globalThis.PIXI; else globalThis.PIXI = prev; } };
   }
 
@@ -602,10 +603,28 @@ describe('spine unload frees the atlas page images too', () => {
 
 test('Spine pages preserve straight/PMA alpha without mipmap bleed between attachments',()=>{
  const P={ALPHA_MODES:{UNPACK:1,PMA:2},SCALE_MODES:{LINEAR:1},MIPMAP_MODES:{OFF:0},WRAP_MODES:{CLAMP:33071}};
- let updates=0;const base={alphaMode:0,update(){updates++}};
+ let updates=0;const base={alphaMode:0,resource:{alphaMode:null},update(){updates++}};
  const attachment={region:{texture:{baseTexture:base}}};
  const data={skins:[{getAttachments:()=>[{attachment},{attachment}]}]};
  assert.equal(configureSpineTextures(data,{pma:false},P),1);
- assert.equal(base.alphaMode,1);assert.equal(updates,1);assert.equal(base.mipmap,0);
+ assert.equal(base.alphaMode,1);assert.equal(base.resource.alphaMode,1);assert.equal(updates,1);assert.equal(base.mipmap,0);
  configureSpineTextures(data,{pma:true},P);assert.equal(base.alphaMode,2);assert.equal(updates,2);
+});
+
+
+test('Spine alpha convention reaches page decoding before the skeleton is loaded',async()=>{
+ const previous=globalThis.PIXI;const calls=[],parsers=[];const data={skins:[],animations:[]};
+ const P={ExtensionType:{LoadParser:'load-parser'},ALPHA_MODES:{UNPACK:1,PMA:2},spine:{},extensions:{add:p=>parsers.push(p)},Assets:{load:async a=>{calls.push(a);return {spineData:data};}}};
+ globalThis.PIXI=P;try{
+  await loadSpineData({skel:'/straight.skel',pma:false});await loadSpineData({skel:'/pma.skel',pma:true});
+  assert.equal(parsers.length,1);assert.equal(parsers[0].test('/image.png',{data:{spineTexture:true}}),true);assert.equal(parsers[0].test('/image.png',{}),false);
+  assert.equal(calls[0].data.imageMetadata.alphaMode,1);assert.equal(calls[1].data.imageMetadata.alphaMode,2);assert.equal(calls[1].data.imageMetadata.spineTexture,true);
+ }finally{globalThis.PIXI=previous;}
+});
+
+test('Atlas page PMA flags override stale manifest alpha and include unused pages',()=>{
+ const P={ALPHA_MODES:{UNPACK:1,PMA:2},SCALE_MODES:{LINEAR:1},MIPMAP_MODES:{OFF:0},WRAP_MODES:{CLAMP:33071}};
+ const straight={alphaMode:0,resource:{alphaMode:null},update(){}},pma={alphaMode:0,resource:{alphaMode:null},update(){}};
+ assert.equal(configureSpineTextures({skins:[]},{pma:false},P,{pages:[{baseTexture:straight,pma:false},{baseTexture:pma,pma:true}]}),2);
+ assert.equal(straight.alphaMode,1);assert.equal(straight.resource.alphaMode,1);assert.equal(pma.alphaMode,2);assert.equal(pma.resource.alphaMode,2);
 });

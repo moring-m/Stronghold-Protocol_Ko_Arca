@@ -17,7 +17,7 @@ export function customExtensionCatalog(raw = {}) {
     forcedAuxBonds:auxCatalog,protectedAuxBonds:auxCatalog,
     forcedBonds:banCatalog,protectedBonds:banCatalog,
     disabledBonds:Object.entries(raw.bonds||{}).filter(([,b])=>b.isCore).map(([id,b])=>({id,name:b.name||id,description:b.isCore?'핵심 맹약':'추가 맹약'})),
-    disabledStages:[...new Set(Object.values(raw.config?.modes||{}).flatMap(m=>m.stages||[]))].filter(id=>raw.stages?.[id]&&!isCustomStage(id,raw.stages[id])).map(id=>({id,name:raw.stages[id].name||id,description:'게임의 전장 추첨에서 제외합니다.'})),
+    disabledStages:[...new Set([...Object.values(raw.config?.modes||{}).flatMap(m=>m.stages||[]),...Object.keys(raw.stages||{}).filter(id=>isCustomStage(id,raw.stages[id]))])].filter(id=>raw.stages?.[id]).map(id=>({id,name:raw.stages[id].name||id,description:'게임의 전장 추첨에서 제외합니다.'})),
     disabledBosses:Object.entries(raw.bosses||{}).map(([id,b])=>({id,name:b.name||id,description:b.hidden?'히든 보스':'일반 보스'})),
     disabledBands:Object.entries(raw.bands||{}).map(([id,b])=>({id,name:b.name||id,description:'전략 선택에서 제외합니다.'})),
     bonds: [{ id: 'ursus', name: '우르수스', description: '우르수스 맹약과 오퍼레이터, 전용 장비, 카셰이 전략을 추가합니다.' }],

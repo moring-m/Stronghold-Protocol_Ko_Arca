@@ -1,3 +1,4 @@
+import { isLaboratory, stopLaboratory } from '../laboratory.js';
 import {CombatReport} from '../ui/combatReport.js';
 import {net} from '../net.js';
 import {toastError} from '../ui/toasts.js';
@@ -82,8 +83,10 @@ export function ResultScreen() {
   const pub = useStore((s) => s.match.public);
   const myId = useStore((s) => s.me.playerId);
   const hasRoom = useStore((s) => !!s.room);
-  const back = () => store.set({ match: emptyMatch() });
-  return html`<div class="screen result-screen"><${ChatPanel} /><${ResultView} res=${res} pub=${pub} myId=${myId} backLabel=${hasRoom ? t('返回同盟') : t('返回大厅')} onBack=${back} /></div>`;
+  const roomSolo = useStore((s) => s.room?.mode === 'solo');
+  const solo = roomSolo || String(pub?.modeId || '').includes('single');
+  const back = () => isLaboratory() ? stopLaboratory() : store.set({ match: emptyMatch() });
+  return html`<div class="screen result-screen"><${ResultView} chat=${!solo && !pub?.laboratory} res=${res} pub=${pub} myId=${myId} backLabel=${hasRoom && !isLaboratory() ? t('返回同盟') : t('返回大厅')} onBack=${back} /></div>`;
 }
 
 /**
@@ -91,7 +94,7 @@ export function ResultScreen() {
  * (screens/stats.js, which hands it the payload recordToResult rebuilt; `quiet`: no settlement jingle).
  * @param {{ res: any, pub?: any, myId?: string|null, backLabel: string, onBack: () => void, quiet?: boolean }} props
  */
-export function ResultView({ res, pub = null, myId = null, backLabel, onBack, quiet = false }) {
+export function ResultView({ res, pub = null, myId = null, backLabel, onBack, quiet = false, chat = false }) {
   const gd = useGameData();
   const [page,setPage]=useState('result');
   const r = normalizeResult(res, pub);
@@ -112,10 +115,12 @@ export function ResultView({ res, pub = null, myId = null, backLabel, onBack, qu
   return html`<div class=${cx('screen', 'result', r.victory ? 'is-win' : 'is-lose')}>
     <div class="result__bg" aria-hidden="true" style=${bg ? `--result-bg:url("${bg}")` : undefined}></div>
     <div class="result__grid" aria-hidden="true"></div>
-    <nav class="result__pages" aria-label="결과 페이지"><button type="button" aria-pressed=${page==='result'} onClick=${()=>setPage('result')}>‹ 결과 요약</button><button type="button" aria-pressed=${page==='combat'} onClick=${()=>setPage('combat')}>상세 전투 통계 ›</button></nav>
-    ${page==='combat'?html`<main class="result__combat"><${CombatReport} players=${r.players} myId=${myId}/><${Button} variant="secondary" icon="chevronLeft" onClick=${onBack}>${backLabel}<//></main>`:html`<main class="result__main">
+    <nav class="result__pages" aria-label="결과 페이지"><button type="button" aria-pressed=${page==='result'} onClick=${()=>setPage('result')}>결과 요약</button><button type="button" aria-pressed=${page==='combat'} onClick=${()=>setPage('combat')}>상세 전투 통계</button></nav>
+    <main class="result__main">
       <section class="result__hero">
+        <div class="result__summary">
         <div class="result__logo"><${Sprite} k="entry/season_logo_settle" class="result__logoimg" fallback=${html`<${MicroLabel} tone="mint">STRONGHOLD PROTOCOL</${MicroLabel}>`} /></div>
+        ${pub?.laboratory || res?.laboratory ? html`<span class="result__laboratory"><${Icon} name="flask"/>실험실</span>` : null}
         ${r.difficulty ? html`<${DifficultyTag} difficulty=${r.difficulty} size="lg" />` : null}
         <h1 class="result__headline">${r.victory ? '模拟完成' : '模拟失败'}</h1>
         <p class="result__sub">${r.victory ? '成功卫戍 · 敌方领袖已被击败' : '防线已被突破'}</p>
@@ -133,16 +138,18 @@ export function ResultView({ res, pub = null, myId = null, backLabel, onBack, qu
             <span class="medal__label">隐秘核心</span></div>` : null}
         </div>
         ${mins ? html`<p class="result__time t-lo">本局耗时 <b class="num">${mins}</b> 分钟</p>` : null}
+        </div>
+        ${chat ? html`<${ChatPanel} docked=${true} />` : null}
         <footer class="result__foot">
           <${Button} variant="primary" size="xl" icon="chevronLeft" onClick=${onBack}>${backLabel}<//>
         </footer>
       </section>
-      <section class="result__players">
+      ${page==='combat' ? html`<section class="result__combat"><${CombatReport} players=${r.players} myId=${myId}/></section>` : html`<section class="result__players">
         <h2 class="brief-h"><span>同盟成员</span><${MicroLabel}>ALLIANCE REPORT</${MicroLabel}></h2>
         ${r.players.length ? r.players.map((p) => html`<${PlayerCard} key=${p.playerId} p=${p} myId=${myId} titles=${titles} best=${best} solo=${r.players.length < 2} recommend=${!quiet&&r.matchNo&&r.players.some(p=>p.playerId===myId&&!p.isBot)?id=>net.request('room.commend',{playerId:id,matchNo:r.matchNo}):null} recommended=${(r.commendationsGiven[myId]||[]).includes(p.playerId)} />`)
           : html`<p class="t-dim">暂无结算数据</p>`}
-      </section>
-    </main>`}
+      </section>`}
+    </main>
   </div>`;
 }
 

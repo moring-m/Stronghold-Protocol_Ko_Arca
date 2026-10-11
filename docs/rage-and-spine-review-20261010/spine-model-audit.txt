@@ -1,0 +1,154 @@
+[
+  {
+    "key": "char_102_texas",
+    "back": false,
+    "pages": [
+      {
+        "alpha": 1,
+        "resAlpha": 1,
+        "type": "Kr",
+        "source": "HTMLImageElement",
+        "width": 512,
+        "height": 512
+      }
+    ],
+    "clips": 0
+  },
+  {
+    "key": "char_102_texas",
+    "back": true,
+    "pages": [
+      {
+        "alpha": 1,
+        "resAlpha": 1,
+        "type": "Kr",
+        "source": "HTMLImageElement",
+        "width": 256,
+        "height": 256
+      }
+    ],
+    "clips": 0
+  },
+  {
+    "key": "char_140_whitew",
+    "back": false,
+    "pages": [
+      {
+        "alpha": 1,
+        "resAlpha": 1,
+        "type": "Kr",
+        "source": "HTMLImageElement",
+        "width": 512,
+        "height": 512
+      }
+    ],
+    "clips": 0
+  },
+  {
+    "key": "char_140_whitew",
+    "back": true,
+    "pages": [
+      {
+        "alpha": 1,
+        "resAlpha": 1,
+        "type": "Kr",
+        "source": "HTMLImageElement",
+        "width": 512,
+        "height": 512
+      }
+    ],
+    "clips": 0
+  },
+  {
+    "key": "skin_char_358_lisa_epoque_22",
+    "back": false,
+    "pages": [
+      {
+        "alpha": 1,
+        "resAlpha": 1,
+        "type": "Kr",
+        "source": "HTMLImageElement",
+        "width": 512,
+        "height": 512
+      }
+    ],
+    "clips": 0
+  },
+  {
+    "key": "skin_char_358_lisa_epoque_22",
+    "back": true,
+    "pages": [
+      {
+        "alpha": 1,
+        "resAlpha": 1,
+        "type": "Kr",
+        "source": "HTMLImageElement",
+        "width": 512,
+        "height": 512
+      }
+    ],
+    "clips": 0
+  },
+  {
+    "key": "skin_char_358_lisa_wild_3",
+    "back": false,
+    "pages": [
+      {
+        "alpha": 1,
+        "resAlpha": 1,
+        "type": "Kr",
+        "source": "HTMLImageElement",
+        "width": 512,
+        "height": 512
+      }
+    ],
+    "clips": 0
+  },
+  {
+    "key": "skin_char_358_lisa_wild_3",
+    "back": true,
+    "pages": [
+      {
+        "alpha": 1,
+        "resAlpha": 1,
+        "type": "Kr",
+        "source": "HTMLImageElement",
+        "width": 512,
+        "height": 512
+      }
+    ],
+    "clips": 0
+  },
+  {
+    "key": "skin_char_358_lisa_lxh_1",
+    "back": false,
+    "pages": [
+      {
+        "alpha": 1,
+        "resAlpha": 1,
+        "type": "Kr",
+        "source": "HTMLImageElement",
+        "width": 512,
+        "height": 512
+      }
+    ],
+    "clips": 0
+  },
+  {
+    "key": "skin_char_358_lisa_lxh_1",
+    "back": true,
+    "pages": [
+      {
+        "alpha": 1,
+        "resAlpha": 1,
+        "type": "Kr",
+        "source": "HTMLImageElement",
+        "width": 512,
+        "height": 512
+      }
+    ],
+    "clips": 0
+  }
+]
+Animation audit [{"key":"char_102_texas:front","clips":8,"poses":40,"errors":[]},{"key":"char_102_texas:back","clips":6,"poses":30,"errors":[]},{"key":"char_140_whitew:front","clips":7,"poses":35,"errors":[]},{"key":"char_140_whitew:back","clips":6,"poses":30,"errors":[]},{"key":"skin_char_358_lisa_epoque_22:front","clips":9,"poses":45,"errors":[]},{"key":"skin_char_358_lisa_epoque_22:back","clips":5,"poses":25,"errors":[]},{"key":"skin_char_358_lisa_wild_3:front","clips":9,"poses":45,"errors":[]},{"key":"skin_char_358_lisa_wild_3:back","clips":5,"poses":25,"errors":[]},{"key":"skin_char_358_lisa_lxh_1:front","clips":9,"poses":45,"errors":[]},{"key":"skin_char_358_lisa_lxh_1:back","clips":5,"poses":25,"errors":[]}] null 2
+Pixel alpha test [{"pma":false,"pixels":[64,32,16,255],"alphaMode":1,"resource":"HTMLImageElement"},{"pma":true,"pixels":[64,32,16,255],"alphaMode":2,"resource":"HTMLImageElement"}]

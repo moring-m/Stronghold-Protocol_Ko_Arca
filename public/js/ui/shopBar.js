@@ -1,3 +1,6 @@
+import { LaboratoryBar } from './laboratory.js';
+import {useSettings} from './settings.js';
+import {hotkeyLabel} from './gameLogic/shortcuts.js';
 
 
 
@@ -77,7 +80,7 @@ function ArmedTag({ reason, free }) {
  * @param {{ slot:any, idx:number, priv:any, frozen?:boolean, reason?:string|null, free?:boolean, armed?:boolean,
  *   onTap?:(idx:number)=>void, onBuy:Function, onDetail:Function }} props
  */
-export function ChessCard({ slot, idx, priv, frozen = false, reason = null, free = false, armed = false, onTap = null, onBuy, onDetail, offBonds = null }) {
+export function ChessCard({ slot, idx, priv, frozen = false, reason = null, free = false, hidePrice = false, armed = false, onTap = null, onBuy, onDetail, offBonds = null }) {
   useStore(x=>x,Object.is,favoritesStore);
   const c = data.lookup('chess', slot.id);
   const m = data.get('assets');
@@ -94,7 +97,7 @@ export function ChessCard({ slot, idx, priv, frozen = false, reason = null, free
   const tap = () => { if (onTap) onTap(idx); else if (!disabled) onBuy(idx); else onDetail(slot.id, 'chess', hint); };
   const card = html`<button type="button" class=${cx('scard', `scard--t${tier}`, favorite && 'is-favorite', recruit && 'is-recruit', frozen && 'is-frozen', disabled && 'is-disabled', willMerge && 'is-merge', armed && 'is-armed')}
       onClick=${tap} onContextMenu=${(e) => { e.preventDefault(); onDetail(slot.id, 'chess', hint); }}
-      aria-label=${`${c?.name || '干员'}，价格 ${slot.price}${armed ? (disabled ? '，无法购买' : '，再次点击确认') : ''}`} aria-pressed=${onTap ? String(!!armed) : undefined}>
+      aria-label=${`${c?.name || '干员'}${hidePrice ? '' : `，价格 ${slot.price}`}${armed ? (disabled ? '，无法购买' : '，再次点击确认') : ''}`} aria-pressed=${onTap ? String(!!armed) : undefined}>
     <span class="scard__bg" aria-hidden="true"></span>
     ${favorite?html`<span class="scard__favorite" title="선호 오퍼레이터" aria-label="선호 오퍼레이터">★</span>`:null}
     ${recruit?html`<span class="scard__recruit" title="선발 오퍼레이터">선발</span>`:null}
@@ -102,7 +105,7 @@ export function ChessCard({ slot, idx, priv, frozen = false, reason = null, free
     <${Img} src=${chessPortraitUrl(m, {...(lo?.record || c),appearanceResolved:!!priv?.loadout})} class="scard__art" />
     <span class="scard__top">
       <${TierChip} tier=${tier} size="md" />
-      <${PriceHex} slot=${slot} free=${free} poor=${reason === '资金不足'} />
+      ${hidePrice ? null : html`<${PriceHex} slot=${slot} free=${free} poor=${reason === '资金不足'} />`}
       ${prog.copies > 0 ? html`<span class="scard__pips" title=${`已拥有 ${prog.copies}/${prog.need}`}>
         ${Array.from({ length: prog.need }, (_, i) => html`<i key=${i} class=${i < prog.copies ? 'on' : ''}></i>`)}
       </span>` : null}
@@ -131,7 +134,7 @@ export function ChessCard({ slot, idx, priv, frozen = false, reason = null, free
  * @param {{ slot:any, idx:number, frozen?:boolean, reason?:string|null, armed?:boolean, onTap?:(idx:number)=>void,
  *   onBuy:Function, onDetail:Function }} props
  */
-export function ItemCard({ slot, idx, frozen = false, reason = null, free = false, armed = false, onTap = null, onBuy, onDetail }) {
+export function ItemCard({ slot, idx, frozen = false, reason = null, free = false, hidePrice = false, armed = false, onTap = null, onBuy, onDetail }) {
   useStore(x=>x,Object.is,favoritesStore);
   const it = data.lookup('items', slot.id);
   const m = data.get('assets');
@@ -139,13 +142,13 @@ export function ItemCard({ slot, idx, frozen = false, reason = null, free = fals
   const tap = () => { if (onTap) onTap(idx); else if (!disabled) onBuy(idx); else onDetail(slot.id, 'item'); };
   const card = html`<button type="button" class=${cx('scard', 'scard--item', isFavorite('item',slot.id) && 'is-favorite', frozen && 'is-frozen', disabled && 'is-disabled', armed && 'is-armed')}
       onClick=${tap} onContextMenu=${(e) => { e.preventDefault(); onDetail(slot.id, 'item'); }}
-      aria-label=${`${it?.name || '装备'}，价格 ${slot.price}${armed ? (disabled ? '，无法购买' : '，再次点击确认') : ''}`}
+      aria-label=${`${it?.name || '装备'}${hidePrice ? '' : `，价格 ${slot.price}`}${armed ? (disabled ? '，无法购买' : '，再次点击确认') : ''}`}
       aria-pressed=${onTap ? String(!!armed) : undefined}>
     <span class="scard__bg" aria-hidden="true"></span>
     ${isFavorite('item',slot.id)?html`<span class="scard__favorite" title="선호 장비" aria-label="선호 장비">★</span>`:null}
     <span class="scard__top">
       <${TierChip} tier=${it?.tier ?? 1} size="md" />
-      <${PriceHex} slot=${slot} free=${free} poor=${reason === '资金不足'} />
+      ${hidePrice ? null : html`<${PriceHex} slot=${slot} free=${free} poor=${reason === '资金不足'} />`}
     </span>
     <span class="scard__itemart"><${Img} src=${itemIconUrl(m, it)} fallback=${html`<${GIcon} name="bolt" />`} /></span>
     <span class="scard__body">
@@ -175,7 +178,7 @@ function EmptyCard({ item = false }) {
     title=${t('空栏位：刷新或下回合开始时补满')}></div>`;
 }
 
-function LevelCard({ shop, reason, armed = false, onTap }) {
+function LevelCard({ shop, reason, armed = false, onTap, keyHint = 'D' }) {
   const lv = shop?.level ?? 1;
   const max = lv >= (shop?.maxLevel ?? 6);
   const price = shop?.upgradePrice ?? 0;
@@ -188,7 +191,7 @@ function LevelCard({ shop, reason, armed = false, onTap }) {
       <b class="lvcard__num num">${lv}</b>
     </span>
     <span class="lvcard__label">${max ? '已满级' : armed ? '确认升级' : '升级'}</span>
-    <kbd class="lvcard__key">D</kbd>
+    <kbd class="lvcard__key">${keyHint}</kbd>
   </button>`;
 }
 
@@ -273,8 +276,13 @@ export function RewardCards({ offer, priv, editable, onPick, onDetail, onLater, 
  *   reward?: any, onReward?: (idx:number)=>void, onRewardLater?: Function, offBonds?: Set<string>|null }} props — offBonds:
  *   the bonds this mode never activates (gameLogic modeOffBonds), struck through on the operator cards
  */
-export function ShopBar({ priv, editable, collapsed, onCollapse, onBuy, onLevel, onRefresh, onFreeze, onDetail, onDetailClose, onRefuse, barRef,
+export function ShopBar(props) {
+  return store.get().match.public?.laboratory ? html`<${LaboratoryBar} ...${props}/>` : html`<${RegularShopBar} ...${props}/>`;
+}
+function RegularShopBar({ priv, editable, collapsed, onCollapse, onBuy, onLevel, onRefresh, onFreeze, onDetail, onDetailClose, onRefuse, barRef,
   reward = null, onReward, onRewardLater, onArm = null, offBonds = null }) {
+  const preferences = useSettings();
+  const keyLabel = action => hotkeyLabel(preferences.keys[action]);
   const shop = priv?.shop || {};
   const slots = Array.isArray(shop.slots) ? shop.slots : [];
   const chessSlots = slots.map((s, i) => ({ s, i })).filter(({ s }) => !s || s.kind !== 'item');
@@ -322,29 +330,28 @@ export function ShopBar({ priv, editable, collapsed, onCollapse, onBuy, onLevel,
   if (collapsed) {
     return html`<div class="shopbar-tab" ref=${barRef}>
       <div class="shopbar-tab__funds"><${CoinGlyph} /><b class="num">${funds}</b></div>
-      <button type="button" class="shopbar-tab__btn" onClick=${() => onCollapse(false)}><${Icon} name="chevronLeft" />展开商店</button>
+      <button type="button" class="shopbar-tab__btn" onClick=${() => onCollapse(false)}><${Icon} name="chevronLeft" />展开商店 <kbd>${keyLabel('collapseShop')}</kbd></button>
     </div>`;
   }
 
-  return html`<section class=${cx('shopbar', frozen && 'is-frozen', !editable && 'is-locked', showReward && 'has-reward', armed && 'has-armed')} ref=${barRef} aria-label="调度中心">
+  return html`<section class=${cx('shopbar', frozen && 'is-frozen', !editable && 'is-locked', showReward && 'has-reward', armed && 'has-armed', preferences.shopItemLeft && 'shopbar--item-left')} ref=${barRef} aria-label="调度中心">
     <div class="shopbar__tools">
       <span class="shopbar__remain">剩余可放置角色：<b class=${cx('num', remaining === 0 && 't-orange')}>${remaining}</b></span>
-      <button type="button" class="toolbtn toolbtn--collapse toolbtn--icon" title="상점 접기" aria-label="상점 접기" onClick=${() => onCollapse(true)}><${Icon} name="chevronLeft" /></button>
       <${FavoritesButton}/>
       <button type="button" class=${cx('toolbtn', 'toolbtn--ice', frozen && 'is-on')} disabled=${!!frzReason} onClick=${onFreeze}
-        title=${frzReason || (frozen ? '解冻商店 · F' : '冻结商店（下回合保留） · F')}>
+        title=${frzReason || (frozen ? `解冻商店 · ${keyLabel('freeze')}` : `冻结商店（下回合保留） · ${keyLabel('freeze')}`)}>
         <${Img} src=${uiUrl(data.get('assets'), frozen ? 'shopPanel/frozen_icon2' : 'shopPanel/frozen_icon')} class="toolbtn__img" fallback=${html`<${Icon} name="snow" />`} />
-        <span>${frozen ? '解冻' : '冻结'}</span><kbd>F</kbd>
+        <span>${frozen ? '解冻' : '冻结'}</span><kbd>${keyLabel('freeze')}</kbd>
       </button>
-      <button type="button" class="toolbtn toolbtn--amber" disabled=${!!refReason} onClick=${onRefresh} title=${refReason || '刷新商店 · R'}>
+      <button type="button" class="toolbtn toolbtn--amber" disabled=${!!refReason} onClick=${onRefresh} title=${refReason || `刷新商店 · ${keyLabel('refresh')}`}>
         <${Img} src=${uiUrl(data.get('assets'), 'shopPanel/refresh_icon')} class="toolbtn__img" fallback=${html`<${Icon} name="refresh" />`} />
         <span>刷新</span>
         ${free > 0 ? html`<span class="toolbtn__free">免费 ×${free}</span>` : html`<${HexBadge} value=${shop.refreshPrice ?? 1} tone=${refReason ? 'dark' : 'gold'} size="sm" />`}
-        <kbd>R</kbd>
+        <kbd>${keyLabel('refresh')}</kbd>
       </button>
     </div>
     <div class="shopbar__row">
-      <${LevelCard} shop=${shop} reason=${lvReason} armed=${armed === levelKey} onTap=${tapLevel} />
+      <${LevelCard} shop=${shop} reason=${lvReason} armed=${armed === levelKey} onTap=${tapLevel} keyHint=${keyLabel('levelUp')} />
       ${showReward ? html`<${RewardCards} offer=${reward} priv=${priv} editable=${editable} onPick=${onReward} onDetail=${onDetail} onLater=${onRewardLater}
           armed=${armed} onTap=${tapCard} offBonds=${offBonds} />`
         : html`<div class="shopbar__cards">
@@ -372,7 +379,7 @@ export function ShopBar({ priv, editable, collapsed, onCollapse, onBuy, onLevel,
           <b class="funds__num num">${funds}</b>
         </div>
         <span class="funds__label">目前资金</span>
-        <button type="button" class="funds__collapse" onClick=${() => onCollapse(true)}><${Icon} name="chevronLeft" />접기</button>
+        <button type="button" class="funds__collapse" onClick=${() => onCollapse(true)}><${Icon} name="chevronLeft" />접기 <kbd>${keyLabel('collapseShop')}</kbd></button>
       </div>
     </div>
   </section>`;

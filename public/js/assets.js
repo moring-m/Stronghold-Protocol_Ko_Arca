@@ -155,7 +155,10 @@ export function spineEntry(m, id, opts) {
     return validSpine(sp) ? sp : null;
   }
   const tk = get(get(m, 'tokens'), s);
-  if (tk) return validSpine(tk.spine) ? tk.spine : null;
+  if (tk) {
+    const web = validSpine(tk.spine) ? tk.spine : null;
+    return (opts?.local && localSpineEntry(tk.spineLocal, opts.local, web)) || web;
+  }
   const en = get(get(m, 'enemies'), s);
   if (en) {
     let web = null;
@@ -556,8 +559,13 @@ export function loadImageElement(url) {
 
 /** Preserve the source atlas alpha convention and avoid sampling neighbouring
  * atlas regions through generated mipmaps. Apply once to each shared page. */
-export function configureSpineTextures(data, entry, P = globalThis.PIXI) {
+export function configureSpineTextures(data, entry, P = globalThis.PIXI, atlas = null) {
   const pages=new Set();
+  const pageAlpha=new Map();
+  for(const page of atlas?.pages || [])if(page.baseTexture){
+    pages.add(page.baseTexture);
+    if(typeof page.pma==='boolean')pageAlpha.set(page.baseTexture,page.pma);
+  }
   for(const skin of data?.skins || []) {
     const attachments=typeof skin.getAttachments==='function' ? skin.getAttachments().map(x=>x.attachment) :
       (skin.attachments || []).flatMap(slot=>Object.values(slot || {}));
@@ -567,8 +575,11 @@ export function configureSpineTextures(data, entry, P = globalThis.PIXI) {
     }
   }
   for(const base of pages) {
-    const alpha=entry.pma ? P.ALPHA_MODES.PMA : P.ALPHA_MODES.UNPACK;
+    const alpha=(pageAlpha.get(base) ?? entry.pma) ? P.ALPHA_MODES.PMA : P.ALPHA_MODES.UNPACK;
     if(base.alphaMode!==alpha) { base.alphaMode=alpha; base.update?.(); }
+    // ImageResource.upload can overwrite base.alphaMode. Keep both conventions
+    // in agreement; changing only the BaseTexture after decoding is too late.
+    if(base.resource && 'alphaMode' in base.resource) base.resource.alphaMode=alpha;
     base.scaleMode=P.SCALE_MODES.LINEAR;
     base.mipmap=P.MIPMAP_MODES.OFF;
     base.wrapMode=P.WRAP_MODES.CLAMP;
@@ -576,15 +587,42 @@ export function configureSpineTextures(data, entry, P = globalThis.PIXI) {
   return pages.size;
 }
 
+const spineTextureParsers = new WeakSet();
+
+/** Decode Spine pages without ImageBitmap's implicit premultiplication. Pixi 7's
+ * worker decoder ignores imageMetadata while decoding: PMA source pages would
+ * be premultiplied a second time before the atlas can set its alpha mode. Keep
+ * normal image loading untouched and use explicit WebGL unpack for Spine. */
+export function installSpineTextureParser(P = globalThis.PIXI) {
+  if(spineTextureParsers.has(P))return;
+  P.extensions.add({
+    name:'loadSpinePage',extension:{type:P.ExtensionType.LoadParser,priority:100},
+    test:(_url,asset)=>asset?.data?.spineTexture===true,
+    async load(url,asset){
+      const image=await loadImageElement(url);
+      return new P.Texture(P.BaseTexture.from(image,{
+        alphaMode:asset.data.alphaMode,scaleMode:P.SCALE_MODES.LINEAR,
+        mipmap:P.MIPMAP_MODES.OFF,wrapMode:P.WRAP_MODES.CLAMP,
+        resourceOptions:{alphaMode:asset.data.alphaMode,createBitmap:false},
+      }));
+    },
+    unload(texture){texture.destroy(true);},
+  });
+  spineTextureParsers.add(P);
+}
+
 /** Default Spine loader: PIXI.Assets.load(skel) → spineData (needs globalThis.PIXI + PIXI.spine). */
 export async function loadSpineData(entry, opts) {
   const PIXI = globalThis.PIXI;
   if (!PIXI || !PIXI.Assets || !PIXI.spine) throw new Error('PIXI / pixi-spine not loaded');
   if (opts && opts.fresh) forgetPendingSpine(entry, opts.keep);
-  const res = await PIXI.Assets.load(entry.skel);
+  installSpineTextureParser(PIXI);
+  const res = await PIXI.Assets.load({src:entry.skel,data:{imageMetadata:{
+    spineTexture:true,alphaMode:entry.pma ? PIXI.ALPHA_MODES.PMA : PIXI.ALPHA_MODES.UNPACK,
+  }}});
   const data = res && (res.spineData || res);
   if (!data || !Array.isArray(data.animations)) throw new Error(`bad spine data: ${entry.skel}`);
-  configureSpineTextures(data, entry, PIXI);
+  configureSpineTextures(data, entry, PIXI, res.spineAtlas);
   return data;
 }
 
@@ -858,10 +896,11 @@ export function createAssets(options) {
   });
 
   /** Image element (cached; failures resolve to null). */
-  function image(u) {
+  function image(u, { retry = false } = {}) {
     const s = str(u);
     if (!s) return Promise.resolve(null);
     let e = images.get(s);
+    if (retry && e?.done && !e.value) { images.delete(s); e = null; }
     if (!e) {
       e = { value: null, done: false, promise: null };
       e.promise = Promise.resolve().then(() => loadImage(s)).then(

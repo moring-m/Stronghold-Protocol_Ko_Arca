@@ -515,7 +515,7 @@ export class SkillRuntime {
     const prospective = this.spec.attack?.canAttack || (candidateRange && candidateRange.length > 100) ? null : candidateRange;
     const keys = range || (prospective ? [...new Set([...(baseKeys || []), ...prospective])] : baseKeys);
     if (keys) {
-      if (this.healSkill) return b.injuredAlliesInKeys(keys, u).length > 0 || (this.triggerEnemies && b.enemiesInKeys(keys, u, TRIGGER_PROFILE).length > 0);
+      if (this.healSkill) return b.injuredAlliesInKeys(keys, u, !!u.profile?.heal?.elementHealRatio).length > 0 || (this.triggerEnemies && b.enemiesInKeys(keys, u, TRIGGER_PROFILE).length > 0);
       const air = this.spec.targeting?.canHitFly;
       const profile = { ...u.profile, ...(air == null ? {} : { canHitFly: air, ...(air ? {groundOnly:false} : {}) }), ...this.spec.triggerProfile };
       if (b.enemiesInKeys(keys, u, profile).length > 0 || this._allyTargetIn(keys)) return true;

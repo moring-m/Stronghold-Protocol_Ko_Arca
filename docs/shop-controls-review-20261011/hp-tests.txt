@@ -1,0 +1,14 @@
+▶ 2: the own LP drops live while the battle runs
+  ✔ team panel rows: show settled HP without previewing leak deductions (1.299248ms)
+✔ 2: the own LP drops live while the battle runs (2.260186ms)
+▶ 3: the temp overflow row (临时整备区)
+  ✔ the ready button shows why it is refused, under it, not only on hover (1.622264ms)
+✔ 3: the temp overflow row (临时整备区) (1.888345ms)
+ℹ tests 2
+ℹ suites 2
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 117.385836

@@ -1,3 +1,4 @@
+import { statsPreview, LoadoutStats } from '../ui/loadoutStats.js';
 import { OperatorVoice } from '../ui/operatorVoice.js';
 import {RecruitPresetButton,RecruitPresetsHost} from '../ui/recruitPresets.js';
 
@@ -12,6 +13,7 @@ import {RecruitPresetButton,RecruitPresetsHost} from '../ui/recruitPresets.js';
 
 
 import { t } from '../../../shared/i18n.js';
+import { tr } from '../i18n/i18n.js';
 import {CultivationSection} from './cultivation.js';
 import {setOpsMap} from '../ui/loadoutSync.js';
 import {setOps} from '../ui/loadoutModel.js';
@@ -37,16 +39,16 @@ import {checkLoadout} from '../../../shared/protocol.js';
 
 import { useEffect, useMemo, useRef, useState } from '../../vendor/hooks.module.js';
 import { html, Icon, MicroLabel, Button, TierChip, TextField, Countdown, Spinner, confirmDialog, hasDeadline, Modal, Fragment } from '../ui/components.js';
-import { Img, RichText, UnitThumb } from '../ui/gameComponents.js';
-import { chessAvatarUrl, chessPortraitUrl, subProfIconUrl, bondIconUrl, moduleTypeIconUrl } from '../ui/assetUrls.js';
+import { Img, RichText, UnitThumb, BondGlyph } from '../ui/gameComponents.js';
+import { chessAvatarUrl, chessPortraitUrl, subProfIconUrl, profIconUrl, bondIconUrl, moduleTypeIconUrl } from '../ui/assetUrls.js';
 import { chessStatsBlock, traitText, chessTalents } from '../ui/detailPanel.js';
 import { chessLoadout } from '../ui/gameLogic.js';
 import { data, useData, localAsset } from '../data.js';
-import { useStore } from '../store.js';
+import { useStore, loadPref, savePref } from '../store.js';
 import { PHASE } from '../../../shared/constants.js';
 import {
   garrisonTexts, MODULE_NONE, PROF_ORDER, PROF_NAME, rosterOf, filterRoster, recordsOf, chessOptions, effectiveChoice, setChoice, resetChoice,
-  changedCount, skillLabel, moduleBadge, attrRows, skillTags, serializeExport, parseImport, LOADOUT_IMPORT_MAX_BYTES, sanitizeEntries,
+  changedCount, skillLabel, moduleBadge, attrRows, skillTags, serializeExport, parseImport, LOADOUT_IMPORT_MAX_BYTES, sanitizeEntries, setRecruitSelection,
 } from '../ui/loadoutModel.js';
 import { loadoutStore, openLoadout, closeLoadout, setEntries, applyLoadoutEntries } from '../ui/loadoutSync.js';
 import { copyText } from '../ui/clipboard.js';
@@ -154,7 +156,7 @@ export function ModuleGlyph({ m, rec, id, size = 'md' }) {
 
 // ---- roster card ---------------------------------------------------------------------------------------------------
 
-function RosterCard({ m, chess, golden, entries, selected, onPick }) {
+function RosterCard({ m, chess, golden, entries, selected, onPick, tier = chess.tier, recruitMode = false }) {
   const choice = effectiveChoice(entries, chess, golden);
   const opt = chessOptions(chess, golden);
   const skillRec = opt.skillOptions.find((s) => s.index === choice.skill)?.normal || chess.skill;
@@ -166,7 +168,7 @@ function RosterCard({ m, chess, golden, entries, selected, onPick }) {
     <span class="lo-card__art">
       <${Img} src=${chessAvatarUrl(m, {...loadoutRecord(chess,resolveRecordLoadout(chess,choice)),appearanceResolved:true})} fallback=${html`<span class="lo-card__glyph">${[...(chess.name || '?')][0]}</span>`} />
     </span>
-    <${TierChip} tier=${chess.tier} size="sm" class="lo-card__tier" />
+    ${tier ? html`<${TierChip} tier=${tier} size="sm" class="lo-card__tier" />` : recruitMode ? html`<span class="tier tier--sm lo-card__tier lo-tier-empty" aria-label="미선발">-</span>` : null}
     ${choice.changed ? html`<span class="lo-card__flag" aria-label="已调整"></span>` : null}
     <span class="lo-card__name">${chess.name}</span>
     <span class="lo-card__kit">
@@ -179,6 +181,28 @@ function RosterCard({ m, chess, golden, entries, selected, onPick }) {
       </span>` : null}
     </span>
   </button>`;
+}
+
+function orderedBonds(chess, getBond) {
+  return [...(chess.bonds||[])].sort((a,b)=>Number(!!getBond(b)?.isCore)-Number(!!getBond(a)?.isCore)||(getBond(a)?.bondOrder??0)-(getBond(b)?.bondOrder??0));
+}
+
+function RosterRow({m, chess, golden, entries, selected, onPick, tier, locked, onChange, getBond, recruitControl, recruitMode}) {
+  const choice=effectiveChoice(entries,chess,golden), opt=chessOptions(chess,golden);
+  const profession=PROF_NAME[chess.profession]||chess.profession||'';
+  const bonds=orderedBonds(chess,getBond).map(id=>getBond(id)?.name||id).join(' · ');
+  return html`<div class=${cx('lo-row',selected&&'is-sel')} data-chess=${chess.chessId} tabIndex=${0} aria-label=${chess.name+' 상세정보 선택'} onClick=${e=>{if(!e.target.closest('button,input,select,a'))onPick(chess.chessId);}} onKeyDown=${e=>{if(e.target===e.currentTarget&&(e.key==='Enter'||e.key===' ')){e.preventDefault();onPick(chess.chessId);}}}>
+    <button type="button" class="lo-row__pick" onClick=${()=>onPick(chess.chessId)} aria-pressed=${selected} title=${chess.name+' · '+profession+' · '+bonds}>
+      ${tier?html`<${TierChip} tier=${tier} size="sm" class="lo-row__tier"/>`:recruitMode?html`<span class="tier tier--sm lo-row__tier lo-tier-empty" aria-label="미선발">-</span>`:null}
+      <span class="lo-row__portrait"><${Img} src=${chessAvatarUrl(m,{...loadoutRecord(chess,resolveRecordLoadout(chess,choice)),appearanceResolved:true})}/></span>
+      <b>${chess.name}</b>
+    </button>
+    <span class="lo-row__meta" title=${profession+' · '+(chess.subProfessionName||'')} aria-label=${profession}><${Img} src=${profGlyphUrl(m,chess.profession)} class="lo-profglyph" /></span>
+    <span class="lo-row__bonds">${orderedBonds(chess,getBond).map(id=>html`<span title=${getBond(id)?.name||id} aria-label=${getBond(id)?.name||id}><${BondGlyph} bondId=${id}/></span>`)}</span>
+    <div class="lo-row__skills" role="group" aria-label=${chess.name+' 스킬'}>${opt.skillOptions.map(o=>html`<button type="button" disabled=${locked} data-skill=${o.index} aria-pressed=${choice.skill===o.index} title=${skillLabel(o.index)+' · '+(o.normal||o.elite)?.name} aria-label=${skillLabel(o.index)+' · '+(o.normal||o.elite)?.name} onClick=${()=>onChange({skill:o.index})}><${SkillIcon} m=${m} rec=${o.normal||o.elite} index=${o.index} size="sm"/></button>`)}</div>
+    ${golden?html`<div class="lo-row__modules" role="group" aria-label=${chess.name+' 모듈'}>${opt.moduleOptions.map(o=>html`<button type="button" disabled=${locked} data-module=${o.id} aria-pressed=${choice.module===o.id} title=${o.id===MODULE_NONE?'미장착':moduleBadge(o.rec)+' · '+(o.rec?.name||o.id)} aria-label=${o.id===MODULE_NONE?'모듈 미장착':moduleBadge(o.rec)+' · '+(o.rec?.name||o.id)} onClick=${()=>onChange({module:o.id})}><${ModuleGlyph} m=${m} rec=${o.rec} id=${o.id} size="sm"/></button>`)}</div>`:html`<span class="lo-row__modules" aria-label="모듈 없음"></span>`}
+    ${recruitControl||null}
+  </div>`;
 }
 
 // ---- detail --------------------------------------------------------------------------------------------------------------
@@ -249,45 +273,9 @@ const getChessRec = (id) => data.lookup('chess', id);
  * @param {(id: string) => any} getChess
  * @returns {{ elite: boolean, chess: any, lo: any, record: any, trait: string, talents: any[] } | null} null without a record
  */
-export function statsPreview(base, golden, entries, level, getChess, opts = {}) {
-  const elite = level === 'elite' && !!golden;
-  const chess = elite ? golden : base;
-  if (!chess) return null;
-  const lo = chessLoadout(chess, entries, getChess, opts);
-  const record = lo?.record || chess;
-  // (the card's own rule: the 特性 line exists when the chess has one; its text follows the chosen module)
-  return { elite, chess, lo, record, trait: chess.trait?.desc ? traitText(chess, !!chess.isGolden, lo) || '' : '', talents: chessTalents(record) };
-}
-
-/**
- * 局内数值: the stats, 攻击范围, 特性 and 天赋 of the selected chess under its chosen skill and module — the detail
- * card's stats block (ui/detailPanel.js chessStatsBlock) without live numbers, so what a player reads here is what the
- * shop / board card shows before a battle (not the equipment, bond or skill-cast changes of a running match). The
- * toggle picks the 普通 or the 精锐 record; 精锐 is the default because the module only exists there.
- * @param {{ base: any, golden: any, entries: Record<string, any>, level: 'normal'|'elite', onLevel: (l: 'normal'|'elite') => void, getChess?: (id: string) => any }} props
- */
-export function LoadoutStats({ base, golden, entries, ops, level, onLevel, getChess = getChessRec }) {
-  const pv = statsPreview(base, golden, entries, level, getChess, { ops, effects: data.get('effects') });
-  if (!pv) return null;
-  return html`<section class="lo-sec lo-sec--stats" aria-label="局内数值" data-variant=${pv.elite ? 'elite' : 'normal'}>
-    <header class="lo-sec__head">
-      <h3>局内数值<${MicroLabel}>STATS<//></h3>
-      <div class="lo-seg" role="tablist" aria-label="数值版本">
-        <button type="button" role="tab" aria-selected=${pv.elite ? 'false' : 'true'} class=${cx(!pv.elite && 'is-on')} data-variant="normal" onClick=${() => onLevel('normal')}>普通</button>
-        <button type="button" role="tab" aria-selected=${pv.elite ? 'true' : 'false'} class=${cx(pv.elite && 'is-on')} data-variant="elite" disabled=${!golden} onClick=${() => onLevel('elite')}>精锐</button>
-      </div>
-    </header>
-    ${chessStatsBlock({ rec: pv.record, chess: pv.chess })}
-    ${pv.trait || pv.talents.length ? html`<div class="lo-minfo lo-minfo--kit">
-      ${pv.trait ? html`<div class="lo-minfo__row"><span class="lo-minfo__k">特性</span><${RichText} class="lo-minfo__v" text=${pv.trait} /></div>` : null}
-      ${pv.talents.map((t, i) => html`<div key=${i} class="lo-minfo__row"><span class="lo-minfo__k">天赋</span>
-        <span class="lo-minfo__v"><b class="lo-minfo__tname">${t.name}</b><${RichText} text=${t.descRaw || t.desc || ''} /></span></div>`)}
-    </div>` : null}
-    <p class="lo-stats__cap">${pv.elite ? '数值含所选模组；' : golden ? '普通干员没有模组，所选模组在「精锐」中生效；' : ''}不含技能发动、装备、盟约等局内加成</p>
-  </section>`;
-}
-
+export { statsPreview, LoadoutStats } from '../ui/loadoutStats.js';
 function Detail({ m, chess, golden, entries, ops, onChange, onReset, locked }) {
+  const getBond = id=>data.lookup('bonds',id);
   const [level, setLevel] = useState('normal');
   const [statLevel, setStatLevel] = useState('elite'); // 局内数值: the 精锐 shows the chosen module's effect
   const bodyRef = useRef(null);
@@ -313,7 +301,7 @@ function Detail({ m, chess, golden, entries, ops, onChange, onReset, locked }) {
           <${Img} src=${profGlyphUrl(m, chess.profession)} class="lo-dhead__prof lo-profglyph" />${PROF_NAME[chess.profession] || ''}
           <i class="lo-sep"></i><${Img} src=${subProfIconUrl(m, chess)} class="lo-dhead__prof" />${chess.subProfessionName || ''}
         </span>
-        <span class="lo-dhead__bonds">${(chess.bonds || []).map((b) => html`<span key=${b} class="lo-bond">
+        <span class="lo-dhead__bonds">${orderedBonds(chess,getBond).map((b) => html`<span key=${b} class="lo-bond">
           <${Img} src=${bondIconUrl(m, b)} class="lo-bond__icon" fallback=${html`<i class="lo-bond__dot"></i>`} />${data.lookup('bonds', b)?.name || b}</span>`)}</span>
       </div>
       <${Button} variant="ghost" size="sm" icon="refresh" class="lo-dhead__reset" disabled=${!choice.changed && !choice.skin} onClick=${onReset}>恢复默认<//>
@@ -374,7 +362,7 @@ function Detail({ m, chess, golden, entries, ops, onChange, onReset, locked }) {
 
 // ---- filters -------------------------------------------------------------------------------------------------------------
 
-function Filters({ m, filters, onFilters, bonds }) {
+function Filters({ m, filters, onFilters, bonds, listView, onView, presetAction }) {
   const set = (patch) => onFilters({ ...filters, ...patch });
   return html`<div class="lo-filters">
     <div class="lo-frow">
@@ -383,6 +371,7 @@ function Filters({ m, filters, onFilters, bonds }) {
         ${[1, 2, 3, 4, 5, 6].map((t) => html`<button key=${t} type="button" class=${cx('lo-chip', 'lo-chip--tier', `lo-chip--t${t}`, filters.tier === t && 'is-on')}
           aria-pressed=${filters.tier === t ? 'true' : 'false'} title=${`${t}阶`} onClick=${() => set({ tier: filters.tier === t ? null : t })}><span class="num">${ROMAN[t]}</span></button>`)}
       </div>
+      <div class="lo-filter-presets lo-preset-actions">${presetAction}</div>
       <${TextField} size="sm" icon="search" value=${filters.query} placeholder="搜索干员 / 职业 / 盟约" class="lo-search"
         onInput=${(v) => set({ query: String(v).slice(0, 24) })} />
     </div>
@@ -390,7 +379,7 @@ function Filters({ m, filters, onFilters, bonds }) {
       <div class="lo-chips lo-chips--prof" role="group" aria-label="职业">
         ${PROF_ORDER.map((p) => html`<button key=${p} type="button" class=${cx('lo-chip', 'lo-chip--prof', filters.prof === p && 'is-on')}
           aria-pressed=${filters.prof === p ? 'true' : 'false'} title=${PROF_NAME[p]} onClick=${() => set({ prof: filters.prof === p ? null : p })}>
-          <${Img} src=${profGlyphUrl(m, p)} class="lo-chip__icon lo-profglyph" fallback=${html`<span>${PROF_NAME[p][0]}</span>`} /><span class="lo-chip__lbl">${PROF_NAME[p]}</span></button>`)}
+          <${Img} src=${profGlyphUrl(m, p)} class="lo-chip__icon lo-profglyph" fallback=${html`<${Icon} name="user"/>`} /></button>`)}
       </div>
       <label class="lo-select">
         <span class="lo-select__k">盟约</span>
@@ -401,6 +390,7 @@ function Filters({ m, filters, onFilters, bonds }) {
       </label>
       <button type="button" class=${cx('lo-toggle', filters.changedOnly && 'is-on')} aria-pressed=${filters.changedOnly ? 'true' : 'false'}
         onClick=${() => set({ changedOnly: !filters.changedOnly })}><i class="lo-toggle__box"><${Icon} name="check" /></i>仅看已调整</button>
+      <button type="button" class="lo-chip lo-view-toggle" aria-pressed=${listView} onClick=${onView} title=${listView?'초상화 보기로 전환':'세로 목록 보기로 전환'}>${listView?'초상화 보기':'목록 보기'}</button>
     </div>
   </div>`;
 }
@@ -424,12 +414,14 @@ function LoadoutScreen({ st }) {
   const getChess = (id) => data.lookup('chess', id);
   const getBond = (id) => data.lookup('bonds', id);
   const roster = useMemo(() => rosterOf(data.list('chess')), [ready]);
+  const nameLength = Math.max(6,...roster.map(c=>[...tr(c.name||'')].length));
   const bonds = useMemo(() => {
     const used = new Set(roster.flatMap((c) => c.bonds || []));
     return (data.list('bonds') || []).filter((b) => b && used.has(b.bondId))
       .sort((a, b) => (b.isCore ? 1 : 0) - (a.isCore ? 1 : 0) || (a.bondOrder ?? 0) - (b.bondOrder ?? 0) || String(a.name).localeCompare(String(b.name), 'zh'));
   }, [ready, roster]);
   const [tab, setTab] = useState('standard');
+  const [listView,setListView]=useState(()=>loadPref('loadout.listView',false)===true);
   const candidates = roster.filter(c => c.optionalRecruit && c.tier === 5);
   const selectedAt = (c,t) => !!st.entries[c.chessId.replace(/_[56]_a$/, `_${t}_a`)]?.selected;
   const displayTier = c => c.recruitPrototype && [5,6].find(t=>st.sel===c.chessId.replace(/_[56]_a$/, `_${t}_a`)) || selectedTier(c) || 5;
@@ -443,19 +435,15 @@ function LoadoutScreen({ st }) {
   const nChanged = changedCount(st.entries, getChess);
   const locked = (inMatch && phase && phase !== PHASE.INFO_CHECK && phase !== PHASE.BAND_DRAFT && phase !== PHASE.LOBBY) || st.sync === 'locked';
   const gridRef = useRef(null);
+  const listHeaderRef=useRef(null);
   const fileRef = useRef(null);                            // hidden <input type=file> of the 导入 dialog
   const [narrowDetail, setNarrowDetail] = useState(false); // phones: the detail slides over the roster
   const [io, setIo] = useState(null);                      // 导出 / 导入 dialog: { mode, text } | null
 
   const pick = (id) => { const c=data.lookup('chess',id);if(c?.charId){audio.warmVoices([c.charId]);} loadoutStore.set({ sel: id }); setNarrowDetail(true); };
   const recruit = (c, tier) => {
-    const next = sanitizeEntries(loadoutStore.get().entries, getChess), key = c.chessId.replace(/_[56]_a$/, '');
-    for (const t of c.recruitPrototype && tier ? [tier] : [5, 6]) {
-      const id = `${key}_${t}_a`;
-      if (next[id]) { next[id] = { ...next[id] }; delete next[id].selected; if (!Object.keys(next[id]).length) delete next[id]; }
-    }
-    const id = `${key}_${tier || 5}_a`;
-    if (tier && !(c.recruitPrototype && st.entries[id]?.selected)) next[id] = { ...next[id], selected: true };
+    const next = setRecruitSelection(loadoutStore.get().entries, c, tier, getChess);
+    const id = c.chessId.replace(/_[56]_a$/, `_${tier || 5}_a`);
     const check = checkLoadout(next, getChess);
     if (!check.ok) {
       toast(check.detail?.includes('최대 2명') ? '각 단계는 최대 2명까지 선발할 수 있습니다.' : '선발 설정을 확인하지 못했습니다. 오퍼레이터 데이터를 다시 불러와 주세요.', 'warn');
@@ -463,6 +451,7 @@ function LoadoutScreen({ st }) {
     }
     setEntries(next); loadoutStore.set({ sel: id });
   };
+  const recruitControls=c=>html`<div class="lo-seg lo-recruit-choice" aria-label=${c.name+' 선발 단계'}>${[0,5,6].map(t=>html`<button type="button" disabled=${locked||(t===6&&c.recruitReserve)} aria-pressed=${t?selectedAt(c,t):!selectedTier(c)} class=${cx((t?selectedAt(c,t):!selectedTier(c))&&'is-on')} onClick=${()=>recruit(c,t)}>${t?html`<${TierChip} tier=${t} size="sm"/>`:'-'}</button>`)}</div>`;
   const change = (patch) => { if (base) setEntries(setChoice(loadoutStore.get().entries, base, golden, patch)); };
   const resetOne = () => { if (base) setEntries(resetChoice(loadoutStore.get().entries, base.chessId)); };
   const resetAll = async () => {
@@ -544,7 +533,7 @@ function LoadoutScreen({ st }) {
       </div>
       <div class="lo-top__center">
         <${MicroLabel} tone="mint">OPERATOR LOADOUT<//>
-        <h1 class="lo-top__title"><${Img} src=${localAsset('ui/outer', 'operator_preset')} class="lo-top__icon" fallback=${html`<${Icon} name="edit" class="lo-top__icon" />`} />干员调配</h1>
+        <h1 class="lo-top__title"><${Img} src=${localAsset('ui/outer', 'operator_preset')} class="lo-top__icon" fallback=${html`<${Icon} name="edit" class="lo-top__icon" />`} /><nav class="lo-title-tabs" role="tablist" aria-label="오퍼레이터 구성">${[['standard','오퍼레이터 설정'],['recruits','선발 설정']].map(([key,label],i)=>html`${i?html`<span class="lo-title-tabs__separator" aria-hidden="true">/</span>`:null}<button type="button" role="tab" id=${`lo-tab-${key}`} aria-controls="lo-roster-panel" aria-selected=${tab===key} class=${tab===key?'is-on':''} onClick=${()=>{setTab(key);setNarrowDetail(false);}}>${label}</button>`)}</nav></h1>
       </div>
       <div class="lo-top__right">
         ${inMatch && hasDeadline(infoDeadline) ? html`<${Countdown} deadline=${infoDeadline} size="sm" gauge=${false} label="调配截止" class="lo-deadline" />` : null}
@@ -556,17 +545,14 @@ function LoadoutScreen({ st }) {
       </div>
     </header>
     <p class=${cx('lo-note', locked && 'is-locked')}><${Icon} name="info" />${locked ? '本局的调配已锁定（确认本局信息后无法修改），修改将在下一局生效' : fromText}</p>
-    <div class="lo-toolbar"><nav class="lo-tabs lo-seg" role="tablist" aria-label="오퍼레이터 구성">
-      ${[['standard', '기존 오퍼레이터'], ['recruits', '추가 선발']].map(([key, label]) => html`<button type="button" role="tab" id=${`lo-tab-${key}`} aria-controls="lo-roster-panel" aria-selected=${tab === key} class=${cx(tab === key && 'is-on')} onClick=${() => { setTab(key); setNarrowDetail(false); }}>${label}</button>`)}
-    </nav><div class="lo-preset-actions">${tab==='recruits'?html`<${RecruitPresetButton}/>`:null}<${FavoritesButton} view="editor"/></div></div>
-    ${!ready ? html`<div class="lo-loading"><${Spinner} size="sm" />正在载入干员数据（打开页面后仅载入一次）…</div>` : html`<main class=${cx('lo-body', narrowDetail && 'is-detail')}>
-      <section class="lo-roster" id="lo-roster-panel" role="tabpanel" aria-labelledby=${`lo-tab-${tab}`}>
-        ${html`<${Filters} m=${m} filters=${st.filters} bonds=${bonds} onFilters=${(filters) => loadoutStore.set({ filters })} />`}${tab === 'recruits' ? html`<div class="lo-recruit-note"><div>${[5,6].map(t => html`<span>${t}단계 <b class="num">${candidates.filter(c => selectedAt(c,t)).length}/2</b></span>`)}</div><p>선발한 오퍼레이터만 본인의 모집·보상에 등장합니다. 특질은 없습니다. 원형 오퍼레이터는 각 단계에 한 번씩 선발할 수 있습니다.</p></div>` : null}
-        <div class=${cx('lo-grid', tab === 'recruits' && 'lo-grid--recruits')} role="listbox" aria-label="干员列表" ref=${gridRef}>
-          ${list.length ? list.map((c) => html`<div class=${cx(tab === 'recruits' && 'lo-recruit-card')} key=${c.chessId}>
-            <${RosterCard} m=${m} chess=${c} golden=${c.goldenId ? getChess(c.goldenId) : null}
-              entries=${st.entries} selected=${c.chessId === selId} onPick=${pick} />
-            ${tab === 'recruits' ? html`<div class="lo-seg lo-recruit-choice" aria-label=${`${c.name} 선발 단계`}>${[0,5,6].map(t => html`<button type="button" disabled=${locked || (t===6 && c.recruitReserve)} aria-pressed=${t ? selectedAt(c,t) : !selectedTier(c)} class=${cx((t ? selectedAt(c,t) : !selectedTier(c)) && 'is-on')} onClick=${() => recruit(c,t)}>${t ? `${t}단계` : '미선발'}</button>`)}</div>` : null}
+    ${!ready ? html`<div class="lo-loading"><${Spinner} size="sm" />正在载入干员数据（打开页面后仅载入一次）…</div>` : html`<main class=${cx('lo-body', listView&&'lo-body--list',narrowDetail && 'is-detail')}>
+      <section class="lo-roster" style=${`--lo-name-length:${nameLength}`} id="lo-roster-panel" role="tabpanel" aria-labelledby=${`lo-tab-${tab}`}>
+        ${html`<${Filters} m=${m} filters=${st.filters} bonds=${bonds} presetAction=${tab==='recruits'?html`<${RecruitPresetButton}/>`:html`<${FavoritesButton} view="editor"/>`} listView=${listView} onView=${()=>{savePref("loadout.listView",!listView);setListView(!listView);setNarrowDetail(false);}} onFilters=${(filters) => loadoutStore.set({ filters })} />`}${tab === 'recruits' ? html`<div class="lo-recruit-note"><div>${[5,6].map(t => html`<span>${t}단계 <b class="num">${candidates.filter(c => selectedAt(c,t)).length}/2</b></span>`)}</div><p>선발한 오퍼레이터만 본인의 모집·보상에 등장합니다. 특질은 없습니다. 원형 오퍼레이터는 각 단계에 한 번씩 선발할 수 있습니다.</p></div>` : null}
+        ${listView?html`<div class="lo-list-header" ref=${listHeaderRef}><div class="lo-list-heading" aria-hidden="true"><span>오퍼레이터</span><span>직군</span><span>맹약</span><span>스킬</span><span>모듈</span>${tab==='recruits'?html`<span>선발</span>`:null}</div></div>`:null}
+        <div class=${cx('lo-grid', tab === 'recruits' && 'lo-grid--recruits',listView&&'lo-grid--list')} role="listbox" aria-label="干员列表" ref=${gridRef} onScroll=${e=>{if(listHeaderRef.current)listHeaderRef.current.scrollLeft=e.currentTarget.scrollLeft;}}>
+          ${list.length ? list.map((c) => html`<div class=${cx('lo-roster-entry',tab === 'recruits' && 'lo-recruit-card')} key=${c.chessId}>
+            ${listView ? html`<${RosterRow} m=${m} chess=${c} golden=${c.goldenId?getChess(c.goldenId):null} entries=${st.entries} selected=${c.chessId===selId} onPick=${pick} tier=${tab==='recruits'?(selectedAt(c,c.tier)?c.tier:selectedTier(c)):c.tier} locked=${locked} getBond=${getBond} recruitMode=${tab==='recruits'} recruitControl=${tab==='recruits'?recruitControls(c):null} onChange=${patch=>setEntries(setChoice(loadoutStore.get().entries,c,c.goldenId?getChess(c.goldenId):null,patch))}/>` : html`<${RosterCard} recruitMode=${tab==='recruits'} m=${m} chess=${c} golden=${c.goldenId?getChess(c.goldenId):null} entries=${st.entries} selected=${c.chessId===selId} onPick=${pick} tier=${tab==='recruits'?(selectedAt(c,c.tier)?c.tier:selectedTier(c)):c.tier}/>`}
+            ${!listView&&tab==='recruits'?recruitControls(c):null}
           </div>`) : html`<p class="lo-empty t-dim">没有符合条件的干员</p>`}
         </div>
       </section>
@@ -639,11 +625,11 @@ export function badgeCount(entries, getChess) {
  * Entry button (lobby / room / briefing).
  * @param {{ from: 'lobby'|'room'|'briefing', size?: string, variant?: string, class?: string, label?: string }} props
  */
-export function LoadoutButton({ from, size = 'md', variant = 'secondary', class: cls, label = '干员调配' }) {
-  useData('local'); // the official preset icon (re-render once the local-art manifest arrives)
+export function LoadoutButton({ from, size = 'md', variant = 'secondary', class: cls, label = '干员调配', disabled = false }) {
+  useData('local', 'chess'); // the official preset icon (re-render once the local-art manifest arrives)
   const entries = useStore((s) => s.entries, Object.is, loadoutStore);
   const n = badgeCount(entries, data.status('chess') === 'ready' ? (id) => data.lookup('chess', id) : null);
-  return html`<button type="button" class=${cx('btn', `btn--${variant}`, `btn--${size}`, 'lo-entry', cls)} data-testid="loadout-open"
+  return html`<button type="button" class=${cx('btn', `btn--${variant}`, `btn--${size}`, 'lo-entry', cls)} data-testid="loadout-open" disabled=${disabled}
       onClick=${() => openLoadout(from)} title="调整干员携带的技能与模组">
     <${Img} src=${localAsset('ui/outer', 'operator_preset')} class="lo-entry__icon" fallback=${html`<${Icon} name="edit" class="btn__icon" />`} />
     <span class="btn__label">${label}</span>

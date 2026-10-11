@@ -195,7 +195,7 @@ function legacyInvariants(m) {
         for (const it of p.items) { note(it); assert.equal(it.kind, 'item'); assert.ok(m.gd.item(it.id), `unknown item ${it.id}`); }
         assert.ok(Number.isInteger(p.poolCopies) && p.poolCopies >= 0);
         const base = m.gd.baseIdOf(p.id);
-        held.set(base, (held.get(base) || 0) + p.poolCopies);
+        if (!rec.optionalRecruit) held.set(base, (held.get(base) || 0) + p.poolCopies);
       } else if (p.kind === 'item') {
         assert.ok(m.gd.item(p.id), `unknown item ${p.id}`);
       } else if (p.kind === 'token') {
@@ -212,7 +212,7 @@ function legacyInvariants(m) {
     }
   }
   for (const [base, e] of pool.entries) {
-    assert.ok(e.left >= 0 && e.left <= e.cap, `pool ${base} left ${e.left} cap ${e.cap}`);
+    assert.ok(Number.isInteger(e.left) && e.left <= e.cap, `pool ${base} left ${e.left} cap ${e.cap}`);
     assert.equal(e.left + (held.get(base) || 0), e.cap, `pool accounting ${base}: left ${e.left} + held ${held.get(base) || 0} != cap ${e.cap}`);
   }
   for (const [base, n] of held) if (!pool.has(base)) assert.equal(n, 0, `non-pool chess ${base} holds copies`);

@@ -573,20 +573,14 @@ test('fixed trail lifetime gives faster shots a longer tail; pooled paths clear 
  assert.ok(fast.projs[0].path);fast.clear();assert.equal(fast.projs.length,0);
 });
 
-test('weapon tail follows mesh deformation and clears when the attack stops',()=>{
- const fx=makeFx().fx;let shift=0;
- const slot={data:{name:'F_Sword'},bone:{worldX:0,worldY:0},getAttachment:()=>({worldVerticesLength:8,computeWorldVertices(slot,start,count,out){out.set([shift,0,shift+25,0,shift+25,5,shift,5]);}})};
- const a=unit(1,3,10);a.actor={mode:'attack',spine:{toGlobal:p=>p,skeleton:{slots:[slot]}}};
- a.body={toGlobal:p=>({x:800+p.x,y:400+p.y})};a.modelK=1;a.flipValue=1;
- fx.weaponTrail(a,.016,cam);const polygons=[];fx.weaponTrails.get(a).g.drawPolygon=points=>polygons.push(points);shift=20;fx.weaponTrail(a,.016,cam);
- assert.ok(polygons.length>0,'camera scratch-point reuse must not collapse the trail to zero');
- assert.ok(polygons.every(p=>p.every(Number.isFinite)));
- assert.equal(fx.weaponTrails.get(a).samples.length,2);
- assert.notEqual(fx.weaponTrails.get(a).samples[0].x,fx.weaponTrails.get(a).samples[1].x);
+test('moving melee attachments do not generate synthetic weapon tails',()=>{
+ const fx=makeFx().fx;
+ const slot={data:{name:'F_Sword'},bone:{worldX:0,worldY:0},getAttachment:()=>({offset:[0,0,25,0,25,5,0,5]})};
+ const a=unit(1,3,10);a.actor={mode:'attack',spine:{skeleton:{slots:[slot]}}};
+ fx.weaponTrail(a,.016,cam);a.x+=1;fx.weaponTrail(a,.016,cam);
+ assert.equal(fx.weaponTrails.size,0);
  fx.weaponTrail(a,.016,presetCamera('boss',{width:1440,height:900,side:'R',half:true}));
- assert.equal(fx.weaponTrails.get(a).samples.length,2,'changing camera alone must not create weapon movement');
- a.actor.mode='stun';fx.weaponTrail(a,.016,cam);assert.equal(fx.weaponTrails.get(a).samples.length,0);
- fx.clear();assert.equal(fx.weaponTrails.size,0);
+ assert.equal(fx.weaponTrails.size,0);
 });
 
 

@@ -329,11 +329,25 @@ export function infectionGlowMaterial(THREE, tex, focus) {
       'float edge=min(min(vUv.x,1.0-vUv.x),min(vUv.y,1.0-vUv.y));',
       'float border=(1.0-smoothstep(0.0,0.10,edge))*smoothstep(0.0,0.018,edge);',
       'float pulse=0.65+0.35*sin(uTime*2.5+vWorld.x+vWorld.y);',
-      'float a=(0.09+border*0.38)*pulse*focusMask(vWorld.xy);',
-      'gl_FragColor=vec4(1.0,0.24,0.035,a);',
+      'float a=border*0.48*pulse*focusMask(vWorld.xy);',
+      'gl_FragColor=vec4(1.0,0.035,0.018,a);',
       '#include <colorspace_fragment>', '}'
     ].join('\n'),transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
   });
+}
+
+/** Rising red glow over Originium/rage tiles, in world space. */
+export function infectionRiseMaterial(THREE, focus) {
+ return new THREE.ShaderMaterial({uniforms:{uTime:{value:0},...focus},vertexShader:TERRAIN_VERT,
+ fragmentShader:[ 'uniform float uTime;',FOCUS_GLSL,'varying vec2 vUv; varying vec3 vWorld;',
+ 'void main(){',
+ 'float side=smoothstep(0.0,0.015,vUv.x)*(1.0-smoothstep(0.985,1.0,vUv.x));',
+ 'float rise=fract(vUv.y-uTime*0.65+vWorld.x*0.17+vWorld.y*0.11);',
+ 'float wisps=pow(max(0.0,sin(vUv.x*25.0+sin(vUv.y*5.0-uTime*2.0)*0.65)),5.0);',
+ 'float fade=exp(-vUv.y*4.5)*(1.0-smoothstep(0.65,1.0,vUv.y));',
+ 'float a=side*fade*(0.48+0.35*wisps*pow(1.0-rise,1.5))*focusMask(vWorld.xy);',
+ 'gl_FragColor=vec4(1.0,0.035,0.018,a);','#include <colorspace_fragment>','}'
+ ].join('\n'),transparent:true,depthWrite:false,side:THREE.DoubleSide,blending:THREE.NormalBlending});
 }
 
 /** Smog: drifting exhaust haze (vertical billboards over the grilles). */

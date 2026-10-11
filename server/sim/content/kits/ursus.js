@@ -102,7 +102,7 @@ function buildSkill(raw,sk){
     if(!unit.canAct || unit.s.flags.disarm)return;
     unit.mem.zimaSkillClock+=dt;
     const marks=[1.1,2.8,4.433,6.067,7.767];
-    while(skill.active && unit.mem.zimaStrikes<5 && unit.mem.zimaSkillClock+1e-9>=marks[unit.mem.zimaStrikes]){
+    if(skill.active && unit.mem.zimaStrikes<5 && unit.mem.zimaSkillClock+1e-9>=marks[unit.mem.zimaStrikes]){
      const profile={...effectiveProfile(unit),noAttack:false};const hits=acquireTargets(battle,unit,profile);
      if(!hits.length)battle._ev(['atk',unit.id,unit.id,'none',true]);
      performAttack(battle,unit,profile,hits);

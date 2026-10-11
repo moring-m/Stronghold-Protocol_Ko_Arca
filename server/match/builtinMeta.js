@@ -150,8 +150,10 @@ const ITEM_HANDLERS = {
         if (!ctx.grantChess(base, { requirePool: false })) toastNothing(ctx, ev);
         return;
       }
-      const id = rollSameBond(ctx, ctx.pieceBonds(ev.target.uid), 6);
-      if (!id || !ctx.grantChess(id)) toastNothing(ctx, ev);
+      const bonds = new Set(ctx.pieceBonds(ev.target.uid));
+      const id = ctx.rollChess({ maxTier: 6, ignoreCounts: true,
+        filter: cid => ctx.gd.chess(cid)?.bonds?.some(b => bonds.has(b)) });
+      if (!id || !ctx.grantChess(id, { requirePool: false })) toastNothing(ctx, ev);
     },
   },
   use_equip_reward_special_goods_char_chess: {
@@ -280,7 +282,8 @@ const EFFECT_HANDLERS = {
       to.giftTicker(ctx.name, p.chessId, ctx.playerId);
     },
   },
-  // 整备: the next purchased item becomes advanced (golden)
+  // 整备: the next purchased item becomes advanced (golden). upgradeItem leaves it normal, and this
+  // charge unspent, when the shared stock has no room for the golden's second copy.
   builtin_next_buy_golden_item: {
     onBuy(ctx, ev) {
       const ref = ctx.source.ref;

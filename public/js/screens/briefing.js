@@ -89,9 +89,9 @@ export function BriefingScreen() {
         <${MatchInfo} model=${info} />
       </section>
     </main>
-    <${SetupReroll} pub=${pub} />
     <footer class="brief__foot">
-      <span>리롤 ${room?.rerollLimit === -1 ? '무제한' : `${Math.max(0, (room?.rerollLimit ?? 0) - (room?.rerollsUsed ?? 0))}회 남음`}</span>
+      <div class="brief__reroll-group"><${SetupReroll} pub=${pub} />
+      <span>리롤 ${room?.rerollLimit === -1 ? '무제한' : `${Math.max(0, (room?.rerollLimit ?? 0) - (room?.rerollsUsed ?? 0))}회 남음`}</span></div>
       <${LoadoutButton} from="briefing" size="lg" class="brief-loadout" />
       <div class="brief-ready">
         <span class="brief-ready__txt">已就绪 <b class="num">${readyN}</b><span class="num">/${players.length}</span></span>
@@ -100,7 +100,7 @@ export function BriefingScreen() {
       <${Button} variant="primary" size="xl" icon=${me?.ready ? 'check' : me ? 'play' : 'eye'} active=${!!me?.ready} loading=${busy}
         disabled=${!!me?.ready || !me || !!pub.rerollVote} onClick=${ready}>${me?.ready ? '已就绪' : me ? '准备就绪' : '观战中'}<//>
     </footer>
-    <${ChatPanel} />
+    ${solo ? null : html`<${ChatPanel} />`}
     <${ExitModal} open=${exit} onClose=${() => setExit(false)} solo=${solo} />
   </div>`;
 }

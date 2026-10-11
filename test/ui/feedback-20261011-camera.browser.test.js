@@ -1,0 +1,21 @@
+import P from 'puppeteer-core';
+import {test} from 'node:test';
+import {existsSync} from 'node:fs';
+import {startServer} from '../../server/index.js';
+import {Match} from '../../server/match/Match.js';
+import assert from 'node:assert/strict';
+class ServerMatch extends Match{constructor(o){super({...o,clientCombat:false});}}
+test('spectator combat transition, lone cooperative framing and Korean strategy badge', {skip:process.env.SP_E2E!=='1'||!existsSync('/usr/bin/chromium'),timeout:90000}, async()=>{
+const srv=await startServer({port:0,host:'127.0.0.1',quiet:true,MatchClass:ServerMatch,dataDir:new URL('../../content/production/data/',import.meta.url).pathname});
+const b=await P.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox','--disable-dev-shm-usage']});const errors=[];
+try{
+ const pages=[];for(const name of ['host','observer']){const ctx=await b.createBrowserContext(),p=await ctx.newPage();p.on('pageerror',e=>errors.push(e.message));await p.evaluateOnNewDocument(name=>{window.qaRejected=[];addEventListener('unhandledrejection',e=>{const r=e.reason;qaRejected.push({type:r?.type,message:r?.message,tag:r?.target?.tagName,src:r?.target?.src});});localStorage.setItem('sp.resources.downloadConsent','1');localStorage.setItem('sp.name',name);sessionStorage.setItem('sp.entered','1');},name);await p.goto(`http://127.0.0.1:${srv.port}/?board=2d`);await p.waitForFunction(()=>window.__SP__?.store.get().connection.status==='online').catch(async e=>{console.log('BOOT',errors,await p.evaluate(()=>document.body.innerText.slice(0,600)));throw e;});pages.push(p);}
+ const [host,spec]=pages;const send=(p,t,args={})=>p.evaluate((t,args)=>__SP__.net.request(t,args),t,args);
+ await send(host,'room.create',{mode:'coop',difficulty:'FUNNY',spectators:2});const code=await host.evaluate(()=>__SP__.store.get().room.code);await send(spec,'room.spectate',{code});await send(host,'room.start');await host.waitForFunction(()=>__SP__.store.get().match.public?.phase==='INFO_CHECK');await send(host,'g.infoReady',{setupRevision:0});await host.waitForFunction(()=>__SP__.store.get().match.public?.phase==='BAND_DRAFT');await send(host,'g.band',{bandId:'band_bldsk'});await host.waitForFunction(()=>__SP__.store.get().match.public?.phase==='PREP');const badge=await host.evaluate(()=>{const el=document.createElement('div');el.className='dband is-mine';document.body.appendChild(el);const text=getComputedStyle(el,'::after').content;el.remove();return text;});assert.equal(badge,'"선택 완료"');await spec.waitForSelector('.gm');await new Promise(r=>setTimeout(r,200));
+ console.log('before',await spec.$eval('.gm',e=>e.dataset.camera));await send(host,'g.ready',{ready:true});await spec.waitForFunction(()=>document.querySelector('.gm')?.dataset.camera==='normal',{timeout:20000});console.log('spectator auto camera',await spec.$eval('.gm',e=>e.dataset.camera));
+ // Feed an actual single-member cooperative field into the mounted game component.
+ await host.evaluate(()=>{const store=__SP__.store,s=store.get(),pid=s.me.playerId;store.patch('match',{public:{...s.match.public,phase:'UNITE',fields:[{fieldId:'qa-unite',kind:'unite',players:[pid],live:true}]},field:{fieldId:'qa-unite',kind:'unite',players:[pid],sides:{[pid]:'L'},stageId:'act2autochess_m01',rect:{r0:9,r1:12,c0:2,c1:18},units:[]}});});
+ await host.waitForFunction(()=>document.querySelector('.gm')?.dataset.camera==='unite',{timeout:10000});console.log('lone cooperative',await host.evaluate(()=>({camera:document.querySelector('.gm').dataset.camera,stats:__SP_VIEW__.raw.stats().camera})));await host.waitForFunction(()=>Math.abs(__SP_VIEW__.raw.stats().camera.tx-6)<.01);assert.ok(Math.abs(await host.evaluate(()=>__SP_VIEW__.raw.stats().camera.tx)-6)<.01,'camera converges to the left battlefield, not the whole map');console.log('page errors',errors);for(const p of pages)console.log('rejections',await p.evaluate(()=>qaRejected));assert.deepEqual(errors,[],'no unhandled browser errors');
+}finally{await b.close();await srv.close();}
+
+});

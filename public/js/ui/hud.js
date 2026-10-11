@@ -1,3 +1,5 @@
+import {settingsStore, useSettings} from './settings.js';
+import {hotkeyLabel} from './gameLogic/shortcuts.js';
 
 
 import { t } from '../../../shared/i18n.js';
@@ -248,7 +250,9 @@ export function tempReadyReason(priv) {
  * under it (not only on hover): "临时整备区 N 个单位待处理" (user playtest #3 item 3), "请先完成教鞭选择".
  * @param {{ priv:any, onToggle:(ready:boolean)=>void, busy?:boolean, readyCount?:number, total?:number }} props
  */
-export function ReadyToggle({ priv, onToggle, busy, readyCount, total }) {
+function BoundReadyToggle(props) {const keys=useSettings().keys;return html`<${ReadyToggle} ...${props} keyHint=${hotkeyLabel(keys.ready)} />`;}
+
+export function ReadyToggle({ priv, onToggle, busy, readyCount, total, keyHint=hotkeyLabel(settingsStore.get().keys.ready) }) {
   const ready = !!priv?.ready;
   const temp = tempInfo(priv);
   const choice = !!priv?.personalChoice;
@@ -258,7 +262,7 @@ export function ReadyToggle({ priv, onToggle, busy, readyCount, total }) {
       aria-pressed=${ready ? 'true' : 'false'} aria-describedby=${why ? 'readywrap-why' : undefined} onClick=${() => onToggle(!ready)}>
     <span class="readybtn__box">${ready ? html`<${Icon} name="check" />` : null}</span>
     <span class="readybtn__label">${ready ? '取消准备' : '准备就绪'}</span>
-    <kbd class="readybtn__key">Space</kbd>
+    <kbd class="readybtn__key">${keyHint}</kbd>
   </button>`;
   return html`<div class="readywrap">
     ${reason ? html`<${Tooltip} text=${reason} placement="bottom">${btn}<//>` : btn}
@@ -329,8 +333,9 @@ function PauseGlyph() {
  * @param {{ paused: boolean, busy?: boolean, onToggle: () => void }} props
  */
 export function PauseButton({ paused, busy = false, onToggle }) {
+  const key=hotkeyLabel(useSettings().keys.ready);
   const label = paused ? '继续作战' : '暂停';
-  return html`<${Tooltip} text=${paused ? '继续作战（Space）' : '暂停作战（Space）'} placement="bottom">
+  return html`<${Tooltip} text=${paused ? `继续作战（${key}）` : `暂停作战（${key}）`} placement="bottom">
     <button type="button" class=${cx('pausebtn', 'tapx', paused && 'is-on', busy && 'is-busy')} aria-pressed=${paused ? 'true' : 'false'}
         aria-label=${label} disabled=${busy} data-testid="pause" onClick=${() => onToggle?.()}>
       ${paused ? html`<${Icon} name="play" class="pausebtn__glyph" />` : html`<${PauseGlyph} />`}
@@ -366,7 +371,7 @@ export function TopBar({ pub, priv, conn, hud, total, drawer, onExit, onDrawer, 
   const lp = boss && Number.isFinite(liveTeamLp ?? pub?.teamLp) ? (liveTeamLp ?? pub.teamLp) : currentPlayerLp(pub, priv, playerId);
   const watched = spectator ? pub?.players?.find(p => p.playerId === playerId) : null;
   // normal rounds: the leaks of the own battle so far (boss rounds: the team LP above already moves live)
-  const pending = !boss && Number.isFinite(lp) ? Math.min(lp, Math.max(0, Number(spectator ? watched?.pendingLp : live?.pending) || 0)) : 0;
+  const pending = 0; // Show settled HP; leaks are deducted by the server after combat.
   const hidden = phase === PHASE.HIDDEN_CORE || (Number.isFinite(pub?.lastRound) && pub.round > pub.lastRound);
   const roundText = hidden ? '??' : pub?.round > 0 ? String(pub.round) : '--';
   // a spectator seat (no m.private, community report #26) never readies
@@ -389,7 +394,7 @@ export function TopBar({ pub, priv, conn, hud, total, drawer, onExit, onDrawer, 
       <div class="gtop__meta">
         <${PingPill} ms=${conn?.ping} online=${conn?.status === 'online'} />
         <${SpectatorPill} spectators=${spectators} myId=${myId} isHost=${isHost} onRemove=${onRemoveSpectator} />
-        ${pub?.difficulty ? html`<${DifficultyTag} difficulty=${pub.difficulty} size="sm" />` : null}
+        ${pub?.laboratory?html`<span class="t-mint">실험실</span>`:pub?.difficulty ? html`<${DifficultyTag} difficulty=${pub.difficulty} size="sm" />` : null}
       </div>
     </div>
 
@@ -419,7 +424,7 @@ export function TopBar({ pub, priv, conn, hud, total, drawer, onExit, onDrawer, 
         ${pause && (pause.show || pause.paused) ? html`<${PauseButton} paused=${!!pause.paused} busy=${pause.busy} onToggle=${pause.onToggle} />` : null}
       </div>
       <${OvertimeWarning} ot=${ot} />
-      ${showReady ? html`<${ReadyToggle} priv=${priv} onToggle=${onReady} busy=${readyBusy} readyCount=${readyCount} total=${playerCount} />` : null}
+      ${showReady ? html`<${BoundReadyToggle} priv=${priv} onToggle=${onReady} busy=${readyBusy} readyCount=${readyCount} total=${playerCount} />` : null}
     </div>
   </header>`;
 }

@@ -102,6 +102,7 @@ export function selectRoute(s) {
   const phase = s.match?.public?.phase;
   if (phase && phase !== PHASE.LOBBY) return 'game';
   if (s.room?.inMatch) return 'game'; // match starting: m.public is on its way
+  if (s.ui?.laboratorySetup) return 'laboratory';
   if (s.room) return 'room';
   return 'lobby';
 }

@@ -93,3 +93,10 @@ test('spectator target follows the selected player through prep, ordinary combat
  players[2].alive=false;
  assert.equal(spectatorTarget(pub,'p2').playerId,'p0','fallback only after the chosen player is unavailable');
 });
+
+test('laboratory solo boss fights expose the regular left/full/right camera controls',()=>{
+ const field={kind:'boss',players:['a'],sides:{a:'L'},rect:{r0:0,r1:5,c0:0,c1:15}};
+ assert.deepEqual(cameraLayers(field,{laboratory:{},players:[P('a',0)]},'a').map(l=>l.key),['L','ALL','R']);
+ assert.deepEqual(cameraLayers({...field,kind:'hidden'},{laboratory:{}},'a').map(l=>l.key),['L','ALL','R']);
+ assert.deepEqual(cameraLayers(field,{},'a'),[]);
+});

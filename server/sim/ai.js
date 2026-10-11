@@ -1,3 +1,4 @@
+import { storedEnergy } from './snapshot.js';
 // server/sim/ai.js — operator attack loop and enemy AI (route following, blocking, attacks) (DESIGN §5.5).
 //
 // Operators/tokens: attack cooldown counts down while able to act; when ready and a valid target exists the
@@ -90,7 +91,7 @@ export function attackCountdown(cd, dt) {
 function storeEnergy(b, u, prof) {
   if (prof.storeEnergy && prof.storeEnergy(b,u)) {
     u.atkCd = Math.max(u.atkCd, u.s.interval);
-    b._ev(['energy',u.id,u.trait.stored || 0,u.s.interval]);
+    b._ev(['energy',u.id,storedEnergy(u),u.s.interval]);
   }
 }
 
@@ -274,7 +275,7 @@ export function performAttack(b, u, prof, targets, opts = null) {
       ...Array.from({ length: strikeCount }, () => targets),
       ...Array.from({ length: energy }, () => targets.slice(0, 1)),
     ] : null;
-  if (prof.releaseEnergy) b._ev(['energy',u.id,u.trait.stored || 0]);
+  if (prof.releaseEnergy) b._ev(['energy',u.id,storedEnergy(u)]);
   for (let i = 0; i < targets.length; i++) {
     const t = targets[i];
     b._ev(['atk', u.id, t.id, vis, !!prof.allInRange]);
@@ -842,7 +843,8 @@ const STAND = { wind: 0, rest: 0 };
 /** The attack clip's strike frame (s into the clip); half the clip when the manifest names none. */
 const clipHit = (a) => (Number.isFinite(a.hit) ? Math.min(a.dur, Math.max(0, a.hit)) : a.dur / 2);
 /** The clip plays faster when the attacks come quicker than it. */
-const clipSpeed = (e, a) => { const iv = e.s.interval; return iv > 0 && iv < a.dur ? a.dur / iv : 1; };
+// Match attackWindup and the renderer: attack clips never accelerate beyond 4×.
+const clipSpeed = (e, a) => Math.max(1, Math.min(4, a.dur / Math.max(.08, e.s.interval)));
 
 /**
  * The damage frame of an enemy's normal attack: seconds from the start of its swing to the strike — its attack clip's

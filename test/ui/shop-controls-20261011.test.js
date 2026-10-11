@@ -1,0 +1,23 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {sanitizeSettings,shortcutFor} from '../../public/js/ui/gameLogic.js';
+import {rebindHotkey,DEFAULT_HOTKEYS,facingSwallows} from '../../public/js/ui/gameLogic/shortcuts.js';
+import {rowLp} from '../../public/js/ui/teamPanel.js';
+test('saved shortcuts and shop side survive sanitization; rebinding swaps duplicate keys',()=>{
+ const change=rebindHotkey(DEFAULT_HOTKEYS,'collapseShop','KeyR');
+ const settings=sanitizeSettings({keys:change.keys,shopItemLeft:true});
+ assert.equal(settings.shopItemLeft,true);assert.equal(settings.keys.refresh,'KeyC');
+ assert.equal(shortcutFor({key:'r',code:'KeyR'},settings.keys),'collapseShop');
+ assert.equal(shortcutFor({key:'c',code:'KeyC'},settings.keys),'refresh');
+ assert.equal(shortcutFor({key:'r',code:'KeyR',repeat:true},settings.keys),null);
+ assert.equal(shortcutFor({key:'r',target:{tagName:'INPUT'}},settings.keys),null);
+ assert.equal(facingSwallows({key:'r',code:'KeyR'},settings.keys),true);
+});
+test('normal and cooperative leaks never preview an HP deduction; settled HP still updates',()=>{
+ for(const phase of ['COMBAT','UNITE']){
+  const pub={phase,unite:{leakers:['p1']}};
+  const p={playerId:'p1',lp:30,pendingLp:10,uniteLeft:12};
+  assert.deepEqual(rowLp(p,pub,{lp:30,pending:10,unite:true,left:12}),{lp:30,pending:0,unite:false,left:null});
+  assert.equal(rowLp(p,pub,{lp:20,pending:0}).lp,20);
+ }
+});

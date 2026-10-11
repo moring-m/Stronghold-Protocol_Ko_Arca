@@ -258,7 +258,12 @@ test('native rage tiles gain a world-space additive glow without replacing their
  const board=new BoardScene(THREE,fakePack(),{renderer:stubRenderer()});
  board.setStage(stages.act1autochess_m01);board.originalStage={};board._buildTerrain({terrain:{infection:[[10,5]],water:[],mire:[],smog:[]}});
  const glow=board.meshes.infectionGlow;assert.ok(glow);assert.equal(glow.material.blending,THREE.AdditiveBlending);assert.equal(glow.material.depthWrite,false);
- const positions=glow.geometry.getAttribute('position');assert.ok(Math.abs(positions.getX(0)-4.525)<1e-5);assert.ok(Math.abs(positions.getY(0)-9.525)<1e-5);assert.ok(Math.abs(positions.getZ(0)-.025)<1e-5);
+ const positions=glow.geometry.getAttribute('position');assert.ok(Math.abs(positions.getX(0)-4.525)<1e-5);assert.ok(Math.abs(positions.getY(0)-9.525)<1e-5);assert.ok(Math.abs(positions.getZ(0)-(board.board.grid[10][5].h+.025))<1e-5);
+ const rise=board.meshes.infectionRise;assert.ok(rise);assert.equal(rise.material.blending,THREE.NormalBlending);assert.equal(rise.material.depthWrite,false);
+ const vertices=rise.geometry.attributes.position;assert.equal(vertices.count,16);
+ for(let edge=0;edge<4;edge++){const i=edge*4;assert.ok(Math.abs(vertices.getX(i)-vertices.getX(i+1))<1e-5 || Math.abs(vertices.getY(i)-vertices.getY(i+1))<1e-5);for(let j=i;j<i+4;j++)assert.ok(Math.abs(Math.abs(vertices.getX(j)-5)-.475)<1e-5 && Math.abs(Math.abs(vertices.getY(j)-10)-.475)<1e-5);}
+ const z=Array.from(rise.geometry.attributes.position.array).filter((_,i)=>i%3===2);assert.ok(Math.max(...z)>.4);assert.ok(Math.min(...z)>.02);
+ assert.match(rise.material.fragmentShader,/uTime\*0.65/);assert.match(rise.material.fragmentShader,/1.0,0.035,0.018/);
  assert.equal(board.meshes.infection,undefined);board.destroy();
 });
 
@@ -331,4 +336,35 @@ test('all native cooperative right fields use ordinary source coordinates and te
    assert.ok(checked>0,`${stage.id}: actual native floor tested`);
   }finally{board.destroy();}
  }
+});
+
+test('idle prewarming keeps the current field and devices live, then restores the prepared layout without rebuilding',async()=>{
+ const {cooperativeBossStage}=await import('../../public/js/render/pen.js');
+ const board=new BoardScene(THREE,fakePack(),{renderer:stubRenderer(),layoutCacheSize:4});
+ try{
+  const stage=stages.act1autochess_m01;board.setStage(stage,AREAS.normal);
+  const active=board.meshes.board,children=[...board.root.children],device=board.createDevice(),dynamic=board.dynamic.children.at(-1);
+  const upcoming=cooperativeBossStage(stage);let turns=0;
+  const old=globalThis.requestIdleCallback;globalThis.requestIdleCallback=cb=>setTimeout(()=>{turns++;assert.equal(board.meshes.board,active);assert.deepEqual(board.root.children,children);cb({timeRemaining:()=>8});},0);
+  try{await board.prewarmLayouts([{stage,area:AREAS.normal},{stage:upcoming,area:boardArea('unite')}]);}finally{globalThis.requestIdleCallback=old;}
+  assert.ok(turns>=5,'preparation yields to the event loop between construction phases');assert.equal(board.layoutCache.size,1);
+  board.setStage(upcoming,boardArea('unite'));assert.equal(board.layoutCacheHits,1);assert.equal(board.dynamic.children.at(-1),dynamic);device.destroy();
+ }finally{board.destroy();}
+});
+test('destroying during idle prewarming cancels pending work and does not add cached layouts',async()=>{
+ const board=new BoardScene(THREE,fakePack(),{renderer:stubRenderer(),layoutCacheSize:4});
+ board.setStage(stages.act1autochess_m01);const work=board.prewarmLayouts([{stage:stages.act1autochess_m02,area:AREAS.normal}]);board.destroy();await work;assert.equal(board.layoutCache.size,0);
+});
+
+test('rising rage glow appears only with a native map and follows each rendered tile surface',()=>{
+ const board=new BoardScene(THREE,fakePack(),{renderer:stubRenderer()});
+ try{
+  board.setStage(stages.act1autochess_m04);assert.equal(board.meshes.infectionGlow,undefined);assert.equal(board.meshes.infectionRise,undefined);
+  board.originalStage='native-test';
+  const floor=new THREE.BufferGeometry();floor.setAttribute('position',new THREE.Float32BufferAttribute([5.5,9.5,.4,6.5,9.5,.4,6.5,10.5,.4,5.5,10.5,.4],3));floor.setIndex([0,1,2,0,2,3]);
+  board.meshes['original:test@platform']=new THREE.Mesh(floor,board.mat.board);board.root.add(board.meshes['original:test@platform']);
+  board._buildTerrain({grid:board.board.grid,terrain:{infection:[[10,6]],water:[],mire:[],smog:[]}});
+  assert.ok(Math.abs(board.meshes.infectionGlow.geometry.attributes.position.getZ(0)-.425)<1e-5);
+  assert.ok(Math.abs(board.meshes.infectionRise.geometry.attributes.position.getZ(0)-.43)<1e-5);
+ }finally{board.destroy();}
 });

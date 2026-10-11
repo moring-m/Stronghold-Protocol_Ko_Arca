@@ -287,7 +287,7 @@ const fastSniper = (o = {}) => chessRec({
   rangeGrid: [[0, 0], [0, 1], [0, 2], [0, 3], [1, 0], [1, 1], [1, 2], [-1, 0], [-1, 1], [-1, 2]], ...o,
 });
 
-test('#5 流形: a split clone alive when 缪尔赛思 redeploys is not taken for her 流形 — a real one comes back and stays', REAL, () => {
+test('#5 流形: split clones leave with their tactician; redeployment restores a real reinforcement', REAL, () => {
   const h = makeBattle({
     defs: { chess: { test_sniper: fastSniper() }, enemies: { enemy_dummy: dummy({ atk: 0 }) } }, timeLimit: 300, autoFinish: false,
     units: [{ chessId: 'chess_char_6_11_a', row: 12, col: 2, uid: 1 }, { chessId: 'test_sniper', row: 12, col: 6, uid: 2 }, { kind: 'token', tokenId: MF, row: 11, col: 5, uid: 3, ownerUid: 1 }],
@@ -301,13 +301,13 @@ test('#5 流形: a split clone alive when 缪尔赛思 redeploys is not taken fo
   h.b.dealDamage(null, m, { amount: 1e9, type: 'true' });
   h.step();
   assert.equal(standing(h).length, 0);
-  assert.equal(clones().length, 1, 'the clone outlives them (25 s)');
+  assert.equal(clones().length, 0, 'all tactician summons leave when their owner dies');
   assert.ok(h.b.redeploy(m, { free: true }));
   h.step(2);
-  assert.equal(standing(h).length, 1, 'her redeploy brings a real 流形 although a clone stands');
+  assert.equal(standing(h).length, 1, 'her redeploy brings a real 流形 after every summon left');
   assert.equal(m.trait.reinforcement, standing(h)[0], 'her 援军 is the 流形, not the clone');
   assert.deepEqual([standing(h)[0].tileR, standing(h)[0].tileC], [11, 5], 'on the tactical point the player chose');
-  h.run(60); // the clone expired long ago
+  h.run(60); // the restored primary reinforcement remains
   assert.equal(standing(h).length, 1, 'still has her 流形');
   noErrors(h);
 });

@@ -66,3 +66,28 @@ test('spectator benches render read-only, survive snapshots, and mirror on the r
   assert.deepEqual(errors,[]);
  } finally {await browser.close();}
 });
+
+test('Spine straight and premultiplied pages blend identically without double premultiplication', {skip:!preview||!existsSync(chrome),timeout:120000},async()=>{
+ const puppeteer=(await import('puppeteer-core')).default;
+ const browser=await puppeteer.launch({executablePath:chrome,headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
+ try{
+  const page=await browser.newPage();
+  await page.goto(preview+'/dev/render-demo.html?scene=prep&panel=0&board=2d',{waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>window.PIXI?.Assets&&window.PIXI?.spine,{timeout:40000});
+  const result=await page.evaluate(async()=>{
+   const {installSpineTextureParser}=await import('/js/assets.js');installSpineTextureParser(PIXI);
+   const out=[];
+   for(const pma of [false,true]){
+    const canvas=document.createElement('canvas');canvas.width=canvas.height=2;
+    const bytes=new Uint8ClampedArray(16);for(let i=0;i<16;i+=4)bytes.set(pma?[64,32,16,128]:[128,64,32,128],i);
+    canvas.getContext('2d').putImageData(new ImageData(bytes,2,2),0,0);
+    const texture=await PIXI.Assets.load({src:canvas.toDataURL(),data:{spineTexture:true,alphaMode:pma?PIXI.ALPHA_MODES.PMA:PIXI.ALPHA_MODES.UNPACK}});
+    const app=new PIXI.Application({width:2,height:2,backgroundColor:0,antialias:false});app.stage.addChild(new PIXI.Sprite(texture));app.render();
+    out.push({pma,pixels:[...app.renderer.extract.pixels()].slice(0,4),image:texture.baseTexture.resource.source.constructor.name});
+    app.destroy(true,{children:true});
+   }
+   return out;
+  });
+  for(const r of result){assert.equal(r.image,'HTMLImageElement');assert.deepEqual(r.pixels,[64,32,16,255],`PMA=${r.pma}`);}
+ }finally{await browser.close();}
+});

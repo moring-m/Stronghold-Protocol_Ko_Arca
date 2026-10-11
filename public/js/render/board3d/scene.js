@@ -21,11 +21,11 @@ import { applyNativeStageBlend } from './materials.js';
 // material), cyan field edges, terrain overlays (≤ 4), background plane + its shadow catcher — ~12–16 in total.
 // The key light's shadow map is rendered only when the geometry changes (autoUpdate off).
 
-import { buildBoard, buildDeviceSlabs, objToBoard, boxProjectUV, ROWS, COLS, DEVICE_H, AREAS } from './layout.js';
+import { buildBoard, buildDeviceSlabs, objToBoard, boxProjectUV, ROWS, COLS, DEVICE_H, AREAS, heightOf } from './layout.js';
 import { surfaceUV } from './atlas.js';
 import {
   focusUniforms, addFocus, makeTexture, boardMaterial, glassMaterial, decalMaterial, pipeMaterial, unlitMaterial, gateMaterial, glowMaterial,
-  waterMaterial, mireMaterial, infectionMaterial, infectionGlowMaterial, smogMaterial, dashTexture, environmentMap, nativePhysicalLighting, addShadowContrast,
+  waterMaterial, mireMaterial, infectionMaterial, infectionGlowMaterial, infectionRiseMaterial, smogMaterial, dashTexture, environmentMap, nativePhysicalLighting, addShadowContrast,
 } from './materials.js';
 import { syncThreeCamera } from '../projection.js';
 
@@ -331,6 +331,7 @@ export class BoardScene {
       mire: mireMaterial(T, this.tex, this.focus),
       infection: infectionMaterial(T, this.tex, this.focus),
       infectionGlow: infectionGlowMaterial(T, this.tex, this.focus),
+      infectionRise: infectionRiseMaterial(T, this.focus),
       smog: smogMaterial(T, this.tex, this.focus),
       shadowCatcher: new T.ShadowMaterial({ opacity: 0.60, color: 0x000000 }),
     };
@@ -486,6 +487,53 @@ export class BoardScene {
     }
   }
 
+  async prewarmLayouts(entries) {
+    if(this.layoutCacheSize<2 || this.destroyed || this.lost)return;
+    const generation=this.warmGeneration=(this.warmGeneration||0)+1;
+    const current=()=>!this.destroyed && !this.lost && generation===this.warmGeneration;
+    const idle=()=>new Promise(resolve=>{
+      if(globalThis.requestIdleCallback)requestIdleCallback(resolve,{timeout:500});
+      else setTimeout(resolve,32);
+    });
+    for(const {stage,area} of entries){
+      await idle();if(!current())return;
+      if(this.mapQuality!=='low' && this.pack?.original?.loadStage && !this.pack.original.scenes[stage.id]){
+        await this.pack.original.loadStage(stage.id);if(!current())return;
+      }
+      const stageKey=`${stage.id || ''}|${(stage.rows || []).join('/')}|${JSON.stringify((stage.devices || []).map(d=>[d.key,d.pos,d.active,d.dir]))}|${stage.previewLayout ? stage.previewLayout.worldOffset || 0 : 'native'}`;
+      const layoutKey=`${stageKey}|${areaKey(area)}|${this.mapQuality}|${!!this.pack?.original?.scenes?.[stage.id]}`;
+      if(layoutKey===this.activeLayoutKey || this.layoutCache.has(layoutKey))continue;
+      const scratch=Object.assign(Object.create(Object.getPrototypeOf(this)),this,{
+        root:new this.THREE.Group(),key:this.key.clone(),hemi:this.hemi.clone(),
+        stage:null,stageKey:null,activeLayoutKey:null,meshes:{},lightmapMaterials:[],lightmapTextures:{},
+        layoutCache:new Map(),layoutCacheSize:0,staticCrates:[],destroyed:false,
+      });
+      const steps=scratch._stageSteps(stage,area);
+      try{
+        let done=false;
+        while(current() && !done){await idle();if(!current())break;done=steps.next().done;}
+        if(!current() || !done)continue;
+        const key=scratch.activeLayoutKey;
+        if(!key || key===this.activeLayoutKey || this.layoutCache.has(key))continue;
+        // Compile offscreen shaders without switching the visible field.
+        if(this.renderer.compileAsync){
+          const scene=new this.THREE.Scene();scene.environment=this.scene.environment;
+          scene.add(scratch.root,scratch.key,scratch.key.target,scratch.hemi);
+          await this.renderer.compileAsync(scene,this.camera);
+          if(!current())continue;
+        }
+        const layout={children:[...scratch.root.children],meshes:scratch.meshes,board:scratch.board,staticCrates:scratch.staticCrates,
+          lightmapMaterials:scratch.lightmapMaterials,lightmapTextures:scratch.lightmapTextures,
+          originalStage:scratch.originalStage,stageLightDir:scratch.stageLightDir,
+          keyIntensity:scratch.key.intensity,keyColor:scratch.key.color.clone(),hemiIntensity:scratch.hemi.intensity};
+        for(const child of layout.children)scratch.root.remove(child);
+        scratch.lightmapMaterials=[];scratch.lightmapTextures={};
+        this.layoutCache.set(key,layout);
+        while(this.layoutCache.size>this.layoutCacheSize-1){const [oldKey,old]=this.layoutCache.entries().next().value;this.layoutCache.delete(oldKey);this._disposeLayout(old);}
+      }finally{steps.return();scratch.destroyed=true;scratch._clear();}
+    }
+  }
+
   /** The crate mesh in board space (s_common_box_01 when loaded, else a unit chamfer-free box), UVs on D. */
   crateGeometry() {
     if (this._crateGeom) return this._crateGeom;
@@ -514,6 +562,10 @@ export class BoardScene {
 
   /** Rebuild everything for a stage (no-op when the same stage object/grid is set again). */
   setStage(stage, area) {
+    for(const ignored of this._stageSteps(stage,area)) { /* foreground builds remain immediate */ }
+  }
+
+  *_stageSteps(stage, area) {
     if (this.destroyed) return;
     if (area) this.setArea(area, { rebuild: false });
     const key = stage ? `${stage.id || ''}|${(stage.rows || []).join('/')}|${JSON.stringify((stage.devices || []).map((d) => [d.key, d.pos, d.active, d.dir]))}|${stage.previewLayout ? stage.previewLayout.worldOffset || 0 : 'native'}` : '';
@@ -543,6 +595,7 @@ export class BoardScene {
         }
       });
     }
+    yield;
     const worldOffset=stage.previewLayout?.worldOffset || 0;
     const structuralStage=stage.structuralSource || stage;
     const board = buildBoard(stage, { uv: this.pack?.uv || null, area: this.area });
@@ -645,6 +698,7 @@ export class BoardScene {
           M[`preview:${material}`]=this._mesh(moved,runtimeMaterial,{cast:!runtimeMaterial.isShaderMaterial});
           borderSurfaces.push({...moved,footprints:[]});
         }
+        yield;
       }
     } else {
       const fallback=stage.previewLayout ? buildBoard(structuralStage,{uv:this.pack?.uv || null,area:[...AREAS.boss,{r0:7,r1:11,c0:6,c1:14}]}) : board;
@@ -692,8 +746,10 @@ export class BoardScene {
         const copy=mergeInto(copied);
         M[`sand-rim:${key}`]=this._mesh(copy,material,{cast:true});
         borderSurfaces.push({...copy,platform:true,footprints:[]});
+        yield;
       }
     }
+    yield;
     if (original) {
       const areas=structuralStage.previewLayout ? [{r0:0,r1:5,c0:0,c1:20}] : combatBorderAreas(stage,this.area);
       const raised=borderSurfaces.map(g=>g.platform ? g : ({...g,index:Array.from(g.index).filter((_,i,a)=>{const base=i-i%3;return Math.max(...a.slice(base,base+3).map(id=>g.position[id*3+2]))>.08 && a.slice(base,base+3).every(id=>g.normal?.[id*3+2]>.85);})}));
@@ -758,9 +814,12 @@ export class BoardScene {
     if(worldOffset)for(const mesh of Object.values(M)) {
       if(mesh?.position && mesh!==M.deviceSlabs && mesh!==M.deviceDecals){ mesh.position.y+=worldOffset; mesh.updateMatrix(); }
     }
+    yield;
     this._buildDevices(board);
+    yield;
     this._buildGates(board);
     if (!original) this._buildEdges(board);
+    yield;
     this._buildTerrain(board);
     this._buildBackground(board);
     this._fitShadow(board);
@@ -863,19 +922,51 @@ export class BoardScene {
     this.meshes.edges = this._mesh({ position: new Float32Array(pos), normal: nrm, uv: new Float32Array(uv), color: null, index: new Uint16Array(idx) }, this.mat.edge, { cast: false, receive: false, order: 3 });
   }
 
+  _nativeTileHeight(board,r,c){
+    let top=null;
+    const T=this.THREE,ray=new T.Ray(new T.Vector3(c,r,100),new T.Vector3(0,0,-1));
+    const a=new T.Vector3(),b=new T.Vector3(),d=new T.Vector3(),hit=new T.Vector3();
+    for(const [key,mesh] of Object.entries(this.meshes)){
+      if(!/^(original:|cooperative-functional:|preview:|sand-rim:)/.test(key) || !mesh?.geometry?.index || mesh.material?.isShaderMaterial)continue;
+      const pos=mesh.geometry.attributes.position,indices=mesh.geometry.index;
+      mesh.updateMatrix();
+      for(let i=0;i<indices.count;i+=3){
+        a.fromBufferAttribute(pos,indices.getX(i)).applyMatrix4(mesh.matrix);
+        b.fromBufferAttribute(pos,indices.getX(i+1)).applyMatrix4(mesh.matrix);
+        d.fromBufferAttribute(pos,indices.getX(i+2)).applyMatrix4(mesh.matrix);
+        if(c<Math.min(a.x,b.x,d.x)||c>Math.max(a.x,b.x,d.x)||r<Math.min(a.y,b.y,d.y)||r>Math.max(a.y,b.y,d.y))continue;
+        if(ray.intersectTriangle(a,b,d,false,hit) && (top==null || hit.z>top))top=hit.z;
+      }
+    }
+    return top??heightOf(board.grid || this.board?.grid || [],r,c);
+  }
+
   _buildTerrain(board) {
     const quads = (tiles, z, inset = 0) => {
       const pos = [], uv = [], idx = [];
       for (const [r, c] of tiles) {
-        const a = 0.5 - inset, b = pos.length / 3;
-        pos.push(c - a, r - a, z, c + a, r - a, z, c + a, r + a, z, c - a, r + a, z);
+        const a = 0.5 - inset, b = pos.length / 3, h=typeof z==='function'?z(r,c):z;
+        pos.push(c - a, r - a, h, c + a, r - a, h, c + a, r + a, h, c - a, r + a, h);
         uv.push(0, 0, 1, 0, 1, 1, 0, 1);
         idx.push(b, b + 1, b + 2, b, b + 2, b + 3);
       }
       const nrm = new Float32Array(pos.length); for (let i = 2; i < nrm.length; i += 3) nrm[i] = 1;
       return { position: new Float32Array(pos), normal: nrm, uv: new Float32Array(uv), color: null, index: new Uint16Array(idx) };
     };
-    if (board.terrain.infection.length) this.meshes.infectionGlow = this._mesh(quads(board.terrain.infection, 0.025, 0.025), this.mat.infectionGlow, {cast:false,receive:false,order:3});
+    const infectionHeights=new Map();
+    if(this.originalStage)for(const [r,c]of board.terrain.infection)infectionHeights.set(`${r},${c}`,this._nativeTileHeight(board,r,c));
+    if (this.originalStage && board.terrain.infection.length) this.meshes.infectionGlow = this._mesh(quads(board.terrain.infection, (r,c)=>infectionHeights.get(`${r},${c}`)+.025, 0.025), this.mat.infectionGlow, {cast:false,receive:false,order:3});
+    if(this.originalStage && board.terrain.infection.length){
+      const position=[],uv=[],index=[];
+      // Four upright curtains follow the tile outline; no crossed billboards
+      // through the middle of the tile (which obscure the original artwork).
+      for(const [r,c] of board.terrain.infection)for(const [ax,ay,bx,by] of [[-1,-1,1,-1],[1,-1,1,1],[1,1,-1,1],[-1,1,-1,-1]]){
+        const b=position.length/3,w=.475,z=infectionHeights.get(`${r},${c}`)+.03,h=.45;
+        position.push(c+ax*w,r+ay*w,z,c+bx*w,r+by*w,z,c+bx*w,r+by*w,z+h,c+ax*w,r+ay*w,z+h);
+        uv.push(0,0,1,0,1,1,0,1);index.push(b,b+1,b+2,b,b+2,b+3);
+      }
+      this.meshes.infectionRise=this._mesh({position:new Float32Array(position),normal:new Float32Array(position.length),uv:new Float32Array(uv),index:new Uint16Array(index)},this.mat.infectionRise,{cast:false,receive:false,order:4});
+    }
     // Native stage meshes already contain these environmental tile surfaces.
     if (this.originalStage) return;
     const T = board.terrain;
@@ -1044,7 +1135,7 @@ export class BoardScene {
     let flash = 0;
     for (let i = this.flashes.length - 1; i >= 0; i--) { const f = this.flashes[i]; f.t += dt; if (f.t > 1.2) this.flashes.splice(i, 1); else flash = Math.max(flash, 1 - f.t / 1.2); }
     for (const m of [this.mat.gateEndAdd, this.mat.gateEndAb]) if (m) m.uniforms.uFlash.value.setRGB(flash, flash * 0.12, flash * 0.1);
-    for (const k of ['water', 'mire', 'infection', 'infectionGlow', 'smog']) this.mat[k].uniforms.uTime.value = t;
+    for (const k of ['water', 'mire', 'infection', 'infectionGlow', 'infectionRise', 'smog']) this.mat[k].uniforms.uTime.value = t;
     for (const m of Object.values(this.originalMaterials)) if (m.uniforms?.uTime) m.uniforms.uTime.value = t;
     this.renderer.render(this.scene, this.camera);
     this.frames++;
@@ -1060,6 +1151,7 @@ export class BoardScene {
   destroy() {
     if (this.destroyed) return;
     this.destroyed = true;
+    this.warmGeneration=(this.warmGeneration||0)+1;
     for (const d of [...this.devices]) d.destroy();
     this._clear();
     for(const layout of this.layoutCache.values())this._disposeLayout(layout);

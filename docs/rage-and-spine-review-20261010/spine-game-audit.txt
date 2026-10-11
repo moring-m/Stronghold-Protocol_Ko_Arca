@@ -1,0 +1,22 @@
+{ units: 5 }
+low [
+  { id: 1, ready: true, impostor: true, clip: false, alpha: 1 },
+  { id: 2, ready: true, impostor: true, clip: false, alpha: 1 },
+  { id: 3, ready: true, impostor: true, clip: false },
+  { id: 4, ready: true, impostor: true, clip: false, alpha: 1 },
+  { id: 5, ready: true, impostor: true, clip: false, alpha: 1 }
+]
+medium [
+  { id: 1, ready: true, impostor: true, clip: false, alpha: 1 },
+  { id: 2, ready: true, impostor: true, clip: false, alpha: 1 },
+  { id: 3, ready: true, impostor: true, clip: false },
+  { id: 4, ready: true, impostor: true, clip: false, alpha: 1 },
+  { id: 5, ready: true, impostor: true, clip: false, alpha: 1 }
+]
+high [
+  { id: 1, ready: true, impostor: true, clip: false, alpha: 1 },
+  { id: 2, ready: true, impostor: true, clip: false, alpha: 1 },
+  { id: 3, ready: true, impostor: true, clip: false },
+  { id: 4, ready: true, impostor: true, clip: false, alpha: 1 },
+  { id: 5, ready: true, impostor: true, clip: false, alpha: 1 }
+]

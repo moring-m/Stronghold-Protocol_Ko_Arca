@@ -669,7 +669,7 @@ export async function createFieldView(host, options = {}) {
       tiles.setExternal(true);
       backdrop.visible = false;
       b.setArea(viewBoardArea(viewKind(camKind, camOpts)));
-      if (stageRec) b.setStage(visualStage());
+      if (stageRec) { b.setStage(visualStage());warmStageLayouts(); }
       b.setFocus(camRect());
       b.setBattleRect(mode === 'battle' && battleMeta && !battleMeta.prep ? battleMeta.rect : null);
       tiles.project(cam, true);
@@ -721,6 +721,13 @@ export async function createFieldView(host, options = {}) {
   }
   // Attach the board only after synchronous setup completes; enable3d also guards late arrivals.
   const boardReady = Promise.all([threePromise, packPromise]).then(([THREE, pack]) => (THREE && pack ? enable3d(THREE, pack) : false), () => false);
+  let boardRetry = null;
+  function retryBoard() {
+    if (!want3d || destroyed || board3d || recover.off || recover.timer || boardRetry) return;
+    boardRetry = Promise.all([loadThree(), loadBoardPack(assets, { native: settings.mapQuality !== 'low' })])
+      .then(([THREE, pack]) => enable3d(THREE, pack), () => false)
+      .finally(() => { boardRetry = null; });
+  }
   // the official soft shadow sprite replaces the procedural one once loaded (may already be cached; asked again when the
   // manifest arrives late)
   let shadowAsked = false;
@@ -730,20 +737,16 @@ export async function createFieldView(host, options = {}) {
     const shadowUrl = !shadowAsked && assets.ui ? assets.ui('battle/sprite_shadow') : null;
     if (!shadowUrl) return;
     shadowAsked = true;
-    try {
-      const t = P.Texture.from(shadowUrl);
-      const use = () => {
-        if (destroyed) return;
-        ctx.shadowTex = t;
-        for (const v of views.values()) if (v.shadow && !v.destroyed) v.shadow.texture = t;
-        for (const v of penViews.values()) if (v.shadow && !v.destroyed) v.shadow.texture = t;
-      };
-      if (t.baseTexture.valid) use();
-      else {
-        t.baseTexture.once('loaded', use);
-        offShadow = () => t.baseTexture.off('loaded', use);
-      }
-    } catch { /* optional */ }
+    Promise.resolve(assets.image?.(shadowUrl)).then(image => {
+      if (destroyed) return;
+      if (!image) { shadowAsked=false; return; }
+      // Decode through the resource-aware image loader first: a missing optional texture must not reject Pixi's
+      // internal ImageResource promise or block the rest of the renderer.
+      const t = P.Texture.from(image);
+      ctx.shadowTex=t;
+      for (const v of views.values()) if (v.shadow && !v.destroyed) v.shadow.texture=t;
+      for (const v of penViews.values()) if (v.shadow && !v.destroyed) v.shadow.texture=t;
+    }).catch(() => { shadowAsked=false; });
   }
   loadShadow();
   ensureDamageFonts();
@@ -930,6 +933,18 @@ export async function createFieldView(host, options = {}) {
     const k=viewKind(camKind,camOpts), previous=camBeforePen && viewKind(camBeforePen.kind,camBeforePen.opts);
     return bossPreview() ? bossPenStage(stageRec) : k==='unite' || k==='pen' && previous==='unite' ? cooperativeBossStage(stageRec) : stageRec;
   }
+  let warmStageRequest=null;
+  function warmStageLayouts(){
+    if(!board3d || !stageRec || settings.mapQuality==='minimal')return;
+    const signature=JSON.stringify([stageRec.id,stageRec.rows,stageRec.devices,settings.mapQuality]);
+    if(warmStageRequest?.board===board3d && warmStageRequest.signature===signature)return;
+    warmStageRequest={board:board3d,signature};
+    board3d.prewarmLayouts([
+      {stage:stageRec,area:AREAS.normal},
+      {stage:cooperativeBossStage(stageRec),area:boardArea('unite')},
+      {stage:bossPenStage(stageRec),area:boardArea('boss')},
+    ]).catch(err=>{warmStageRequest=null;console.warn('[map prewarm]',err);});
+  }
   function applyVisualStage(area) {
     const visual=visualStage();
     if (!visual) return;
@@ -948,6 +963,7 @@ export async function createFieldView(host, options = {}) {
     // a pen laid out before the stage arrived (setPrep / a scouting board first) used the default zones and the old
     // tile heights: lay it out again on this stage
     if (penList) { const l = penList; clearPen(); setPenList(l); }
+    warmStageLayouts();
     return true;
   }
 
@@ -1036,6 +1052,24 @@ export async function createFieldView(host, options = {}) {
         views.set(key, v);
       });
     }
+  }
+
+  function syncPrepMapChars(units) {
+    const keep = new Set();
+    for (const info of units) {
+      const p = prepXf.toDisp(info.y, info.x);
+      const dir = prepXf.dirToDisp(info.dir);
+      const key = `mapchar:${info.uid}`;
+      keep.add(key);
+      const sig = `${info.defId}:${p.row}:${p.col}:${dir}`;
+      let v = views.get(key);
+      if (v && v._sig !== sig) { dropView(key); v = null; }
+      if (!v) {
+        v = new UnitView(ctx, { ...info, id:key, x:p.col, y:p.row, dir, facing:dir === 'LEFT' ? -1 : 1 }, { prep:true });
+        v._sig = sig; v.setWorld(p.col, p.row, heightAt(p.row,p.col)); views.set(key,v);
+      }
+    }
+    for (const k of [...views.keys()]) if (String(k).startsWith('mapchar:') && !keep.has(k)) dropView(k);
   }
 
   function setPrep(ps, options) {
@@ -1137,6 +1171,7 @@ export async function createFieldView(host, options = {}) {
       if (e.area === 'board' && info.dir && !held.has(e.uid) && typeof v.setDir === 'function') v.setDir(info.dir);
     }
     for (const k of [...views.keys()]) if (String(k).startsWith('p:') && !seen.has(Number(String(k).slice(2)))) dropView(k);
+    syncPrepMapChars(Array.isArray(ps?.prepMapChars) ? ps.prepMapChars : []);
     prepPieces = list.filter((e) => e.key && views.has(e.key));
     if (dragState && !views.has(dragState.key)) { drag.reset(); endDragVisual(false); }
     holdScene(false); // the prep pieces reference their models now (a battle's hold ends here)
@@ -1811,7 +1846,7 @@ export async function createFieldView(host, options = {}) {
         const late = form !== undefined ? LATE.get(e) || 0 : 0;
         if (form !== undefined) {
           const inf = infos.get(e[4].id);
-          if (inf && (form === null || FORMS[inf.spine || inf.defId]?.[form])) inf.form = form;
+          if (inf && (form === null || (FORMS[inf.spine || inf.defId] || FORMS[inf.charId])?.[form])) inf.form = form;
           const x = late > 0 ? { ...e[4], late, ...(Number(e[4].dur) > 0 ? { dur: Math.max(0, Number(e[4].dur) - late) } : {}) } : e[4];
           views.get(e[4].id)?.setForm?.(form, x);
         }
@@ -2100,6 +2135,7 @@ export async function createFieldView(host, options = {}) {
   // load it again at once (their bounded retries never run while hidden: no frames).
   function onAssets() {
     if (destroyed) return;
+    retryBoard();
     loadShadow();
     loadMountains();
     if (mode === 'prep' && lastPrep) setPrep(lastPrep.ps, lastPrep.o);
@@ -2111,6 +2147,7 @@ export async function createFieldView(host, options = {}) {
   setupCleanup.push(() => offAssets?.());
   const onVisible = () => {
     if (destroyed || globalThis.document?.visibilityState !== 'visible') return;
+    retryBoard();
     lastNow = performance.now(); // Ignore the hidden-tab pause without ignoring real visible stalls.
     if (assets.loaded === false && typeof assets.ready === 'function') assets.ready();
     for (const v of views.values()) v.retryAssets?.();

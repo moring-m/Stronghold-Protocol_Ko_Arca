@@ -1,0 +1,13 @@
+Default { smallFold: false, keys: [ 'F', 'R', 'D', 'C' ] }
+Layout { item: 602.5, level: 732.5, cards: 831.5 }
+Folded key C
+Rebound {
+  refresh: 'KeyR',
+  freeze: 'KeyF',
+  levelUp: 'KeyD',
+  retreat: 'KeyQ',
+  sell: 'KeyX',
+  ready: 'Space',
+  collapseShop: 'KeyK'
+}
+Page errors []

@@ -121,6 +121,7 @@ export function normalizeSnapshot(snap) {
   if(Array.isArray(snap.moveRates)) for(const e of snap.moveRates){
     const tu=units.get(e?.[0]);if(tu && Number.isFinite(e[1]) && e[1]>=0)tu[20]=e[1];
   }
+  if(Array.isArray(snap.airHeights))for(const [id,height]of snap.airHeights){const tu=units.get(id);if(tu&&Number.isFinite(height)&&height>=0)tu[24]=height;}
   if(Array.isArray(snap.modelScales))for(const [id,scale]of snap.modelScales){const tu=units.get(id);if(tu&&Number.isFinite(scale)&&scale>0)tu[22]=scale;}
   if(Array.isArray(snap.attackRanges))for(const [id,radius]of snap.attackRanges){const tu=units.get(id);if(tu&&Number.isFinite(radius)&&radius>0)tu[23]=radius;}
   if (Array.isArray(snap.shields)) for (const e of snap.shields) {
@@ -143,7 +144,7 @@ export function normalizeSnapshot(snap) {
   }
   if(Array.isArray(snap.snow))for(const [id,tiles]of snap.snow){const tu=units.get(id);if(tu&&Array.isArray(tiles))tu[17]=tiles.filter(p=>Array.isArray(p)&&p.length===3&&p.every(Number.isFinite));}
   if(Array.isArray(snap.skillRanges))for(const [id,tiles]of snap.skillRanges){const tu=units.get(id);if(tu&&Array.isArray(tiles))tu[18]=tiles.filter(p=>Array.isArray(p)&&p.length===2&&p.every(Number.isFinite));}
-  const ammo = countList(snap.ammo, units), wolves = countList(snap.wolves, units);
+  const ammo = countList(snap.ammo, units), wolves = countList(snap.wolves, units), coins = countList(snap.coins, units);
   let neg = null;
   if (Array.isArray(snap.neg)) {
     for (const e of snap.neg) {
@@ -174,7 +175,7 @@ export function normalizeSnapshot(snap) {
       (standCut || (standCut = new Map())).set(e[0], e[1]);
     }
   }
-  return { t, units, down, ammo, wolves, neg, stand, standCut, raw: snap };
+  return { t, units, down, ammo, wolves, coins, neg, stand, standCut, raw: snap };
 }
 
 /**
@@ -398,6 +399,7 @@ export class SnapshotBuffer {
       o.states = a[15] ?? null;
       o.ammoLeft = a[13] ?? null; o.ammoMax = a[14] ?? 0;
       o.shieldHp = a[21] ?? 0;
+      o.airHeight = a[24] ?? null;
       o.modelScale = a[22] ?? 1;
       o.attackRangeRadius = a[23] ?? null;
       const b = B ? B.units.get(id) : null;
@@ -457,6 +459,7 @@ export class SnapshotBuffer {
       // the HP-bar readouts come with the older snapshot, like flags (whole rounds step with the skill flag)
       o.ammo = A.ammo ? A.ammo.get(id) || null : null;
       o.wolves = A.wolves ? A.wolves.get(id) || null : null;
+      o.coins = A.coins?.get(id) ?? null;
       o.neg = A.neg ? A.neg.get(id) || 0 : 0;
       o.seen = stamp;
     }

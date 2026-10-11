@@ -108,3 +108,12 @@
 .brief-banned__group h4 { margin: 0 0 max(.12rem, 7px); gap: max(.1rem, 6px); }
 .brief-banned__grid { grid-template-columns: repeat(auto-fill, minmax(max(.72rem, 42px), 1fr)); gap: max(.12rem, 7px); }
 .brief-banned__grid .uthumb { --ut: max(.72rem, 42px); }
+
+/* Keep reroll controls with the other briefing actions. */
+.brief__reroll-group { margin-right: auto; padding-left: .7rem; display: flex; flex-wrap: wrap; align-items: center; gap: .15rem; min-width: 0; }
+.brief-reroll { display: flex; align-items: center; gap: .15rem; min-width: 0; }
+.brief-reroll:not(.is-voting) .brief-reroll__text { display: none; }
+.brief-reroll__text { display: flex; flex-direction: column; gap: .06rem; max-width: 6rem; font-size: calc(.16 * var(--t)); overflow-wrap: anywhere; }
+.brief-reroll__actions, .brief-reroll__players { display: flex; flex-wrap: wrap; gap: .08rem; }
+.brief-reroll__players .is-agreed { color: var(--mint-400); }
+.brief-reroll.is-voting { flex-wrap: wrap; }

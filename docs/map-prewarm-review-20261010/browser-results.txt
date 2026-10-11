@@ -1,0 +1,34 @@
+checking m01
+checking m02
+checking m03
+checking m04
+{
+  "out": [
+    {
+      "id": "m01",
+      "ms": 12.599999964237213,
+      "cacheHit": true,
+      "lost": false
+    },
+    {
+      "id": "m02",
+      "ms": 9,
+      "cacheHit": true,
+      "lost": false
+    },
+    {
+      "id": "m03",
+      "ms": 10.599999964237213,
+      "cacheHit": true,
+      "lost": false
+    },
+    {
+      "id": "m04",
+      "ms": 6.800000011920929,
+      "cacheHit": true,
+      "lost": false
+    }
+  ],
+  "errors": []
+}
+shader errors []

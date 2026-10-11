@@ -1,3 +1,5 @@
+import {settingsStore} from './settings.js';
+import {facingSwallows} from './gameLogic/shortcuts.js';
 
 
 import { t } from '../../../shared/i18n.js';
@@ -252,7 +254,7 @@ export function FacingWheel({ view, row, col, grid, name = '', onPreview, onComm
       const k = dirFromKey(e.key);
       if (k) { e.preventDefault(); e.stopImmediatePropagation(); setDir(k); return; }
       if (e.key === 'Enter' && L.dir) { e.preventDefault(); e.stopImmediatePropagation(); L.onCommit(L.bdir); return; }
-      if (e.key === ' ' || /^Key[RFD]$/.test(e.code || '')) { e.preventDefault(); e.stopImmediatePropagation(); } // no ready / shop while choosing
+      if (facingSwallows(e,settingsStore.get().keys)) { e.preventDefault(); e.stopImmediatePropagation(); } // no ready / shop while choosing
     };
     window.addEventListener('keydown', onKey, true);
     try { rootRef.current?.focus({ preventScroll: true }); } catch { /* no focus: Enter still follows whatever has it */ }

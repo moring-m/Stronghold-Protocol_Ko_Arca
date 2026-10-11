@@ -98,7 +98,7 @@ export function collectViolations(m, { limit = 25 } = {}) {
         const maxCopies = rec.isGolden ? gd.goldenCopies : 1;
         if (!Number.isInteger(p.poolCopies) || p.poolCopies < 0 || p.poolCopies > maxCopies) fail(`${id}: ${p.id} holds ${p.poolCopies} copies`);
         const base = gd.baseIdOf(p.id);
-        held.set(base, (held.get(base) || 0) + (p.poolCopies || 0));
+        if (!rec.optionalRecruit) held.set(base, (held.get(base) || 0) + (p.poolCopies || 0));
       } else if (p.kind === 'item') {
         if (!gd.item(p.id)) fail(`${id}: unknown item ${p.id}`);
         countItem(p);
@@ -150,6 +150,10 @@ export function collectViolations(m, { limit = 25 } = {}) {
     } catch (e) {
       fail(`${id}: computeBonds threw ${e && e.message}`);
     }
+    for (const [base, e] of ps.pool.personal || []) {
+      const owned = all.filter(p => p.kind === 'chess' && gd.baseIdOf(p.id) === base).reduce((n,p) => n + (p.poolCopies || 0),0);
+      if (!Number.isInteger(e.left) || e.left > e.cap || e.left + owned !== e.cap) fail(`${id}: recruit stock ${base}: ${e.left} + ${owned} != ${e.cap}`);
+    }
     // shop
     if (ps.alive) {
       const layout = ps.shop.layout;
@@ -172,11 +176,22 @@ export function collectViolations(m, { limit = 25 } = {}) {
 
   // shared pool accounting
   for (const [base, e] of m.pool.entries) {
-    if (!(e.left >= 0 && e.left <= e.cap)) fail(`pool ${base}: left ${e.left} cap ${e.cap}`);
+    if (!(Number.isInteger(e.left) && e.left <= e.cap)) fail(`pool ${base}: left ${e.left} cap ${e.cap}`);
     const h = held.get(base) || 0;
     if (e.left + h !== e.cap) fail(`pool ${base}: left ${e.left} + held ${h} != cap ${e.cap}`);
   }
   for (const [base, n] of held) if (!m.pool.has(base) && n !== 0) fail(`non-pool chess ${base} holds ${n} copies`);
+
+  // Shared shop equipment. The chess pool above may go negative (Mimic). Item stock may not: held ≤ cap.
+  if (m.itemPool && gd.raw.items) {
+    for (const [id, rec] of Object.entries(gd.raw.items)) {
+      if (!rec || rec.isGolden) continue;
+      const cap = m.itemPool.cap(id);
+      if (!Number.isInteger(cap)) continue;
+      const h = m.itemPool.held(id);
+      if (h > cap) fail(`item ${id}: held ${h} > cap ${cap}`);
+    }
+  }
 
   // combat fields
   if (m.phase === PHASE.COMBAT) {

@@ -1,3 +1,4 @@
+import { isLaboratory, stopLaboratory } from '../laboratory.js';
 import { recordQuit } from './stats.js';
 
 // Chrome shared by every in-match screen: the step header of the pre-game screens (exit + ping +
@@ -44,6 +45,7 @@ store.subscribe((s, prev) => { if (awayStore.get().away && awayEnds(s, prev)) aw
  * @returns {Promise<void>}
  */
 export async function quitMatch() {
+  if (isLaboratory()) { await net.request('g.leave'); stopLaboratory(); return; }
   const before = store.get();
   let left = false;
   try {
@@ -130,7 +132,7 @@ export function StepHeader({ step, of, title, micro, pub, total, onExit }) {
       <${Button} variant="danger" size="lg" square=${true} icon="exit" onClick=${onExit} aria-label="离开" title="离开" />
       <div class="stephead__meta">
         <${PingPill} ms=${conn.ping} online=${conn.status === 'online'} />
-        ${pub?.difficulty ? html`<${DifficultyTag} difficulty=${pub.difficulty} />` : null}
+        ${pub?.laboratory?html`<span class="t-mint">실험실</span>`:pub?.difficulty ? html`<${DifficultyTag} difficulty=${pub.difficulty} />` : null}
       </div>
     </div>
     <div class="stephead__center">

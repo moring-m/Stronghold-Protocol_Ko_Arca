@@ -482,7 +482,7 @@ export class UnitView {
     this.shadowZTarget = null;
     this.flying = !!info.flying || info.motion === 'FLY';
     this.flightBaseZ = this.flying ? 0 : null;
-    this.hover = this.flying ? FLY_HOVER : 0;               // flying: body height above the road / the ground under it
+    this.hover = this.flying ? (this.airHeight ?? FLY_HOVER) : 0;               // flying: body height above the road / the ground under it
     this.dir = this.isEnemy ? null : unitDir(info);
     // whether the direction is known (UnitInfo / piece `dir`), not just the legacy ±1: battle and scouting views show
     // the ground wedge only then (a derived RIGHT would mislabel an UP / DOWN operator)
@@ -493,6 +493,8 @@ export class UnitView {
     this.sp = 0; this.spMax = 0;
     this.ammo = null;             // [rounds left, rounds in the magazine] while an ammo skill runs (sync; b.snap `ammo`)
     this.wolves = null;           // [狼影 left, the talent's maximum] of a 狼群 (sync; b.snap `wolves`)
+    this.coins = null;            // [balance, cap] of 琳琅诗怀雅's skill purse, including zero
+    this.coinHud = null;
     this.neg = 0;                 // the share of its cap a negative-HP pool holds, 0 = none (sync; b.snap `neg`, 斩业星熊's 我执)
     this.flags = 0; this.anim = ANIM.IDLE;
     this.statuses = new Set();
@@ -610,7 +612,11 @@ export class UnitView {
     let want = pic.state === 'img' ? 'img' : 'placeholder';
     if (pic.state === 'wait' && nowMs() - pic.t0 < PIC_WAIT_MS) want = null;
     if (!want || pic.shown === want) return;
-    this.fallback.texture = diamondTexture(pic.key, want === 'img' ? pic.img : null, pic.color, { enemy: this.isEnemy, golden: this.golden, ice: ICE_TOKENS.has(this.info.defId) });
+    // Catherine's support devices use their original transparent device art, without an operator portrait frame.
+    const supportDevice=/^token_1004[12]_cathy_/.test(this.info.defId||'');
+    this.fallback.texture = supportDevice && want === 'img'
+      ? this.P.Texture.from(pic.img)
+      : diamondTexture(pic.key, want === 'img' ? pic.img : null, pic.color, { enemy: this.isEnemy, golden: this.golden, ice: ICE_TOKENS.has(this.info.defId) });
     pic.shown = want;
   }
 
@@ -724,7 +730,7 @@ export class UnitView {
   }
 
   _formSpec() {
-    return this.form ? FORMS[this.info.spine || this.info.defId]?.[this.form] || null : null;
+    return this.form ? (FORMS[this.info.spine || this.info.defId] || FORMS[this.info.charId])?.[this.form] || null : null;
   }
 
   /**
@@ -738,14 +744,15 @@ export class UnitView {
   setForm(kind, fx = null) {
     const k = typeof kind === 'string' ? kind : null;
     if (k === this.form) return;
-    if (k && !FORMS[this.info.spine || this.info.defId]?.[k]) return;
+    if (k && !(FORMS[this.info.spine || this.info.defId] || FORMS[this.info.charId])?.[k]) return;
     const prev = this._formSpec();
     this.form = k;
     this.info.form = k;
+    if (this.imp) this.imp.dirty=true;
     const f = this._formSpec();
     if (!this.actor) return;
     const dur = fx && Number(fx.dur);
-    let next = f && f.next ? FORMS[this.info.spine || this.info.defId]?.[f.next]?.roles || null : null;
+    let next = f && f.next ? (FORMS[this.info.spine || this.info.defId] || FORMS[this.info.charId])?.[f.next]?.roles || null : null;
     if (next && typeof f.roles.die === 'string') next = { ...next, die: f.roles.die };
     // an fx handed out late (render/app.js: a stall, a hidden tab) skips a change clip that would already have ended
     const late = fx && Number(fx.late) > 0 ? Number(fx.late) : 0;
@@ -843,13 +850,14 @@ export class UnitView {
     this.elFill = this.el ? s.elFill || 0 : 0; this.elUntil = this.el ? s.elUntil || 0 : 0; this.elDur = this.el ? s.elDur || 0 : 0;
     this.followSample(s,t);
     // Snapshots carry the current airborne state, including temporary flight and landing.
+    this.airHeight = Number.isFinite(s.airHeight) ? s.airHeight : null;
     const wasFlying = this.flying;
     this.flying = !!(s.flags & UF.FLYING);
-    if (this.flying && !wasFlying) this.flightBaseZ = this._airStateSeen ? this.z : 0;
+    if (this.flying && !wasFlying) this.flightBaseZ = this._airStateSeen ? this.z : this.airHeight != null && !this.isEnemy ? groundZ(this.ctx,s.x,s.y) : 0;
     if (!this.flying) this.flightBaseZ = null;
     if (!this._airStateSeen) {
       this._airStateSeen = true;
-      if (this.flying) this.hover = FLY_HOVER;
+      if (this.flying) this.hover = this.airHeight ?? FLY_HOVER;
     }
     // ground enemies only ever walk low tiles (a rounding step onto a block edge must not pop them up)
     const gz = this.flying ? this.flightBaseZ ?? 0 : this.isEnemy ? 0 : groundZ(this.ctx, s.x, s.y);
@@ -874,6 +882,7 @@ export class UnitView {
     this.anim = s.anim | 0;
     this.moveAnimRate = this.isEnemy && Number.isFinite(s.moveAnimRate) ? Math.max(0,s.moveAnimRate) : 1;
     if (this.isEnemy && this.anim===ANIM.MOVE && !['attack','skillCast'].includes(this.actor?.mode) && Math.abs(s.vx) > 0.08) this.visFacing = s.vx < 0 ? -1 : 1;
+    this.coins = s.coins || null;
     this.ammo = s.ammo || null; this.wolves = s.wolves || null; this.neg = s.neg > 0 ? Math.min(1, s.neg) : 0;
     // a stealth-driven form (STEALTH_FORMS: 假想敌：骨刺) follows this snapshot's stealth bit at once — before a DIE in the
     // same snapshot, so it dies in the form it had
@@ -1062,9 +1071,9 @@ export class UnitView {
   }
 
   setEnergy(n) {
-    this.energy=Math.max(0,Math.floor(Number(n)||0));
+    this.energy=Math.min(this.info.energyMax || 3,Math.max(0,Math.floor(Number(n)||0)));
     if(!this.energyText){
-      this.energyText=new this.P.Text('',{fontFamily:'Bender, Oxanium, sans-serif',fontSize:17,fontWeight:'700',fill:'#ba9bff',stroke:'#080a10',strokeThickness:3});
+      this.energyText=new this.P.Text('',{fontFamily:'Bender, Oxanium, sans-serif',fontSize:12,fontWeight:'700',fill:'#ba9bff',stroke:'#080a10',strokeThickness:2});
       this.energyText.anchor.set(.5);this.hud.addChild(this.energyText);
     }
     this.energyText.text='●'.repeat(this.energy)+'○'.repeat(Math.max(0,(this.info.energyMax||3)-this.energy));
@@ -1074,6 +1083,8 @@ export class UnitView {
   onHit() { this.flash = 1; }
 
   setSkill(on) {
+    if (this.imp) this.imp.dirty=true;
+    this.flags = on ? this.flags | UF.SKILL : this.flags & ~UF.SKILL;
     if (on) this.statuses.add('skill'); else {
       this.statuses.delete('skill');
       this.skillTiles = undefined;
@@ -1233,7 +1244,7 @@ export class UnitView {
     }
     // a flyer keeps its lift through the Die clip and drops only as it fades out: the client removes the fly offset in
     // CharacterAnimator.OnFinish, when the finish state ends; a knocked-down flyer lies on the ground
-    const hoverTo = this.flying && (this.alive || (this.dying > DIE_FADE_TAIL && !this.down)) ? FLY_HOVER : 0;
+    const hoverTo = this.flying && (this.alive || (this.dying > DIE_FADE_TAIL && !this.down)) ? (this.airHeight ?? FLY_HOVER) : 0;
     if (this.hover !== hoverTo) this.hover = Math.abs(hoverTo - this.hover) < 1e-3 ? hoverTo : this.hover + (hoverTo - this.hover) * Math.min(1, dt * 6);
     const submerged = submergedVisual(this.ctx, this);
     const sinkTo = submerged ? (this.isEnemy ? -.28 : -.18) : 0;
@@ -1519,13 +1530,12 @@ export class UnitView {
         if (this._tint !== tint) { this._tint = tint; this.actor.spine.tint = tint; }
       }
     }
-    this.ctx.fx?.weaponTrail?.(this,dt,cam);
     // the diamond is only needed while no model shows (a cross-fade keeps whatever diamond was already up)
     if (!spineShown) this._ensurePicture();
     if (!spineShown || this.swapT < 1) {
       const size = s * UNIT.diamond * (this.isBoss ? 1.5 : 1);
       const bob = this.alive && this.isEnemy ? Math.sin(t * 2.4 + this.bob) * s * 0.03 : 0;
-      this.fallback.scale.set(size / 160);
+      this.fallback.scale.set(size / Math.max(this.fallback.texture.width,this.fallback.texture.height,1));
       this.fallback.position.set(0, -s * 0.08 + bob);
       this.fallback.tint = this.down ? DOWN_LOOK.tint : this.flash > 0 ? mixTint(0xffffff, 0xff8a80, this.flash) : (this.flags & UF.FROZEN ? 0x9fd4ff : 0xffffff);
       if (!this.alive) this.fallback.alpha = Math.max(0, this.fallback.alpha);
@@ -1604,7 +1614,6 @@ export class UnitView {
     const prep = this.prep;
     const showBars = !prep && this.alive && this.info.kind !== 'item';
     if(this.info.energyMax && !this.energyText)this.setEnergy(this.info.energy || 0);
-    if(this.energyText){this.energyText.visible=showBars;this.energyText.scale.set(clamp(s/90,.65,1));this.energyText.position.set(x,y-s*.16);}
 
     const damaged = this.hp < this.maxHp - 0.5;
     const showHp = showBars && (!this.isEnemy || damaged || this.isBoss || this.shieldHp > 0) && !NO_HP_BAR.has(this.info.defId);
@@ -1650,7 +1659,7 @@ export class UnitView {
     let ready = false;
     let sy = 0;
     if (showSp) {
-      const active = !!(this.flags & UF.SKILL);
+      const active = !!(this.flags & UF.SKILL) || this.form === 'doll';
       const k = ammo ? ammo[0] / ammo[1] : clamp(this.sp / this.spMax, 0, 1);
       ready = !active && k >= 0.999;
       sy = cy + bh / 2 + spH / 2 + 1.5;
@@ -1700,8 +1709,18 @@ export class UnitView {
     // 狼影 pips under the bars (b.snap `wolves`), then the element gauge row under them (b.snap `elem`); redeploy ring above a
     // knocked-down operator (b.snap `down`)
     const rowsTop = cy + bh / 2 + (showSp ? spH + 1.5 : 0);
-    const wolfH = this._updateWolfPips(showBars && !this.isEnemy && !!this.wolves, x0, rowsTop, s);
-    this._updateElementBar(showBars && !!this.el, x0, bw, rowsTop + wolfH + 1, spH, s, t);
+    let energyH = 0;
+    if (this.energyText) {
+      this.energyText.visible = showBars;
+      this.energyText.scale.set(clamp(s / 90, .55, .85));
+      if (this.energyText.width > bw) this.energyText.scale.set(this.energyText.scale.x * bw / this.energyText.width);
+      // Left aligned with the wolf-life row, below SP; reserve room for other gauges.
+      energyH = showBars ? this.energyText.height + 2 : 0;
+      this.energyText.position.set(x0 + this.energyText.width / 2, rowsTop + energyH / 2);
+    }
+    const wolfH = this._updateWolfPips(showBars && !this.isEnemy && !!this.wolves, x0, rowsTop + energyH, s);
+    const coinH = this._updateCoins(showBars && !this.isEnemy && !!this.coins, x0, rowsTop + energyH + wolfH, s);
+    this._updateElementBar(showBars && !!this.el, x0, bw, rowsTop + energyH + wolfH + coinH + 1, spH, s, t);
     this._updateDownRing(!prep && !!this.down && !this.alive, x, this.screen.y - DOWN_LOOK.height * s, s, t);
     // blocked marker at the feet (enemies held by a blocker)
     const blocked = !prep && this.alive && this.isEnemy && (this.flags & UF.BLOCKED);
@@ -1780,6 +1799,26 @@ export class UnitView {
     }
     r.root.visible = true;
     return d + 2 + WOLF_PIPS.pad;
+  }
+
+  /** Coin icon and balance/cap, read from the current snapshot rather than transient FX. */
+  _updateCoins(show, x, top, s) {
+    let r = this.coinHud;
+    if (!show) { if (r) r.root.visible = false; return 0; }
+    if (!r) {
+      const P = this.P, root = new P.Container(), icon = new P.Sprite(fxAtlas().tex.coin);
+      icon.width = icon.height = 16;
+      const text = new P.Text('', { fontFamily: 'Bender, Oxanium, sans-serif', fontSize: 16, fontWeight: '700', fill: '#ffd04a', stroke: '#0b0f0e', strokeThickness: 3 });
+      text.position.set(19, -2); root.addChild(icon, text); this.hud.addChild(root);
+      r = this.coinHud = { root, text, label: '' };
+    }
+    const label = `${this.coins[0]}/${this.coins[1]}`;
+    if (r.label !== label) { r.label = label; r.text.text = label; }
+    const size = clamp(s * 0.2, 10, 16);
+    r.root.scale.set(size / 16); r.root.position.set(x, top + 3); r.root.visible = true;
+    // Text includes font metrics and stroke beyond its nominal 16 px size; reserve the measured row so the next
+    // elemental gauge cannot overlap it (especially with a substituted browser font).
+    return Math.max(16, r.root.getLocalBounds?.().height || 24) * (size / 16) + 8;
   }
 
   /** True while the shown gauge is in its 爆发冷却 (b.snap `elem` carries the cooldown's end and length). */

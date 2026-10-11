@@ -1,0 +1,77 @@
+▶ URL helpers (synthetic manifest)
+  ✔ avatars & portraits with E2 handling (1.675385ms)
+  ✔ prototype keys never resolve (0.166902ms)
+  ✔ enemy, token, bond, band, item, skill, ui, prof icons (0.409186ms)
+  ✔ spine entries: front/back, tokens, enemies, aliases, missing (0.302606ms)
+  ✔ audio (0.19221ms)
+✔ URL helpers (synthetic manifest) (3.661177ms)
+▶ URL helpers (real data/assets.json)
+  ✔ every pool chess resolves avatar + front spine; enemies resolve icon; paths are site-absolute (79.339428ms)
+✔ URL helpers (real data/assets.json) (79.484346ms)
+▶ RefLru
+  ✔ dedupes concurrent loads, refcounts, evicts LRU idle entries above max (2.173275ms)
+  ✔ failures reject, are remembered for failTtl, then retried (0.660445ms)
+  ✔ timeout rejects slow loads (20.764349ms)
+  ✔ concurrency cap queues loads (1.065356ms)
+  ✔ an entry evicted while loading unloads the late value (0.329947ms)
+  ✔ requires a loader (0.129285ms)
+  ✔ memory budget: idle weight above maxIdleWeight goes LRU-first once past the grace; referenced never (0.596929ms)
+  ✔ memory budget: nothing referenced (no scene) ⇒ quietWeight after the grace; unweighted caches unchanged (0.304138ms)
+  ✔ a released-while-loading entry past its grace is dropped as soon as it is ready when over budget (0.177137ms)
+  ✔ a load of a key whose unload is still in flight waits for that unload (never the doomed value) (1.290264ms)
+  ✔ evictDelay: releases schedule one eviction pass; a scene rebuilt in one go keeps what it takes back (0.335445ms)
+  ✔ quietDelay: the instant zero of a scene switch is not "no scene"; a lasting one is (0.324018ms)
+✔ RefLru (28.924246ms)
+▶ Spine store: unload / reload of the same skeleton (user playtest #3 item 1)
+  ✔ the hazard: PIXI.Assets hands out an asset whose unload is in flight (0.804993ms)
+  ✔ battle → prep after a long battle: the bench models come back alive (defaults), with or without an eviction (1.672209ms)
+✔ Spine store: unload / reload of the same skeleton (user playtest #3 item 1) (2.687029ms)
+▶ spineDataWeight
+  ✔ counts timelines, deform frames, draw orders and mesh arrays; never throws (0.438621ms)
+  ✔ the store budgets idle skeletons by weight (defaults: SPINE_IDLE_BYTES, drain when no scene, 15 s grace) (0.465101ms)
+✔ spineDataWeight (0.993196ms)
+▶ createAssets store
+  ✔ fetches the manifest once; helpers bind to it; missing manifest ⇒ nulls (0.47131ms)
+  ✔ image cache + preload progress (failures resolve to null) (0.376487ms)
+  ✔ spine acquire/release through the store with an injected loader (0.322096ms)
+✔ createAssets store (1.27436ms)
+▶ spine unload frees the atlas page images too
+  ✔ spinePages: manifest textures, else <skel>.png (0.19227ms)
+  ✔ unloadSpineData unloads skeleton, atlas and every page (pages straight from the loader), minus kept ones (0.325881ms)
+  ✔ LRU eviction through the store unloads the evicted pages, never pages another cached skeleton uses (0.344849ms)
+  ✔ a late value of a dropped load does not unload the URLs a newer load of the same skeleton uses (0.229997ms)
+✔ spine unload frees the atlas page images too (1.230985ms)
+✔ Spine pages preserve straight/PMA alpha without mipmap bleed between attachments (0.223988ms)
+✔ Spine alpha convention reaches page decoding before the skeleton is loaded (0.186902ms)
+✔ Atlas page PMA flags override stale manifest alpha and include unused pages (0.131749ms)
+▶ BoardScene lifecycle
+  ✔ battle device meshes survive the area / stage rebuilds of a camera flight (prep → Final Assault) (121.95502ms)
+  ✔ every BufferGeometry created is disposed again (stage / area rebuilds, crates, devices, destroy) (258.62747ms)
+  ✔ the background plane covers every framing (official 16:9 / 21:9 / 4:3 and fitted portrait); clear = fog colour (17.039276ms)
+  ✔ settings quality: low drops the key-light shadow, back to high restores it (shadow map re-rendered) (6.47679ms)
+  ✔ extendPlane grows a plane about its centre with UVs scaled about the texture centre (0.392662ms)
+✔ BoardScene lifecycle (405.928013ms)
+▶ render/app.js glue
+  ✔ viewKind: the field a camera request shows (Final Assault prep = the boss field) (0.19896ms)
+  ✔ switchableBox: device boxes follow the board layer (3D scene ⇄ 2D Pixi box), never a dead scene (19.615518ms)
+  ✔ fitted Final Assault prep camera (portrait) frames the right half for the right-hand player (0.340633ms)
+✔ render/app.js glue (20.444457ms)
+▶ asset pack gate
+  ✔ boardArtListed: three.js is fetched only when the manifest lists the board atlas (0.473393ms)
+✔ asset pack gate (0.644161ms)
+✔ all fallback maps share boss geometry and apply the cooperative translation to their matrices (1283.223405ms)
+✔ native rage tiles gain a world-space additive glow without replacing their authored texture (10.616678ms)
+✔ a simultaneous cooperative stage and area change rebuilds once, retaining battle device handles (48.96951ms)
+✔ cached layouts reuse static geometry, refresh crates and free evicted layouts and teardown resources (49.244666ms)
+✔ all native cooperative right fields use ordinary source coordinates and texture UVs (13624.175256ms)
+✔ idle prewarming keeps the current field and devices live, then restores the prepared layout without rebuilding (59.38651ms)
+✔ destroying during idle prewarming cancels pending work and does not add cached layouts (42.329315ms)
+✔ rising rage glow appears only with a native map and follows each rendered tile surface (9.670102ms)
+ℹ tests 49
+ℹ suites 10
+ℹ pass 49
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 15727.428836

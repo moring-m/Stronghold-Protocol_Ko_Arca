@@ -484,3 +484,18 @@
 .favorites-preset .preset-name-row { display:flex; align-items:center; justify-content:space-between; gap:8px; }
 .preset-name-row > span { min-width:0; overflow-wrap:anywhere; }
 .preset-name-row .preset-faction-icon { width:max(.24rem,20px); height:max(.24rem,20px); flex:none; object-fit:contain; }
+
+/* Optional leftmost equipment slot, preserving server purchase indexes. */
+.shopbar--item-left .shopbar__item { order: -1; }
+.shopbar__tools { grid-template-columns: auto auto auto; }
+.funds__collapse kbd, .shopbar-tab__btn kbd { font-size: .13rem; margin-left: .05rem; }
+.extension-group-heading { grid-column: 1 / -1; margin: .16rem 0 .04rem; padding-bottom: .06rem; border-bottom: 1px solid var(--line); color: var(--mint-400); font-size: max(.18rem,13px); }
+/* Stack editing cards are stationary; only their inputs and apply buttons react. */
+.shopbar.lab-bar .lab-catalog--bonds .scard.lab-stack,
+.shopbar.lab-bar .lab-catalog--bonds .scard.lab-stack:hover,
+.shopbar.lab-bar .lab-catalog--bonds .scard.lab-stack:active {
+  transform:none;
+  border-color:rgba(78,216,175,.35);
+  box-shadow:none;
+  cursor:default;
+}

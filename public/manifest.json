@@ -1,8 +1,8 @@
 {
   "id": "/",
-  "name": "위수 협약: 맹약",
-  "short_name": "위수 협약",
-  "description": "명일방주 위수 협약: 맹약 · 비공식 팬 제작 웹 게임",
+  "name": "위수 협의: 맹약",
+  "short_name": "위수 협의",
+  "description": "명일방주 위수 협의: 맹약 · 비공식 팬 제작 웹 게임",
   "start_url": "/",
   "scope": "/",
   "display": "fullscreen",

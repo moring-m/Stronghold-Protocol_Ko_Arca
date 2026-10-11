@@ -2,7 +2,7 @@ import { ChatPanel } from '../ui/chat.js';
 // Band draft — BAND_DRAFT "2/2 选择策略" (research 06 §4.2, D1): left = draft order (avatar, name, state:
 // … waiting / ⌛ 决策中 / chosen band ✓), current picker highlighted; centre = grid of every band allowed
 // for the mode type (icon, name, LP); a band a teammate already picked carries the picker's avatar and is marked
-// 队友已选 — it cannot be chosen again (research 09 §5, guidebook 策略与轮选; the server refuses it too); right =
+// 다른 참가자가 선택함 — it cannot be chosen again (research 09 §5, guidebook 策略与轮选; the server refuses it too); right =
 // detail pane (icon, 初始生命值, name, effect name + rich description) with 跳过 (co-op, once) and 确认选择.
 // One countdown (user playtest #4 item 4): every turn has the same clock (Match BAND_TURN_SECONDS, m.public.draft
 // turnSeconds) and the step header counts it down — m.public.deadline IS the turn's end, the same number as the
@@ -63,7 +63,7 @@ export const DEFAULT_TIMEOUT_BAND = 'band_bldsk';
 /**
  * The strategy the server assigns me when my turn times out (server/match/Match.js defaultBand): the official default
  * 「华法琳」 while no teammate holds it, else the first free strategy in draft order (sortId) — never one a teammate
- * already picked (队友已选).
+ * already picked (다른 참가자가 선택함).
  * @param {any[]} bands allowedBands(...) (sortId order)
  * @param {Map<string, any>} taken teammateBands(...)
  * @param {string} [defaultId]
@@ -77,7 +77,7 @@ export function timeoutBand(bands, taken, defaultId = DEFAULT_TIMEOUT_BAND) {
 }
 
 /**
- * Bands taken by teammates (队友已选): bandId → the picking players (never the viewer).
+ * Bands taken by teammates (다른 참가자가 선택함): bandId → the picking players (never the viewer).
  * @param {Map<string, string>} picks normalizeDraft(...).picks (playerId → bandId)
  * @param {string} myId
  */
@@ -94,7 +94,7 @@ export function teammateBands(picks, myId) {
 /**
  * The band the detail pane shows (= the highlighted band a turn that runs out takes): the current one, else my pick,
  * else the band a timeout would give me (timeoutBand: 「华法琳」 while free, else the first free one). When it is my
- * turn and the shown band was taken meanwhile (队友已选), that default instead (confirm would be disabled).
+ * turn and the shown band was taken meanwhile (다른 참가자가 선택함), that default instead (confirm would be disabled).
  * @param {string|null} sel
  * @param {{ bands: any[], taken: Map<string, any>, myPick: string|null, myTurn: boolean, defaultId?: string }} o
  */
@@ -157,7 +157,7 @@ export function draftClock(pub) {
  * @returns {{ text: string, secs: number|null, tone: 'mint'|'gold'|'warn'|'dim' }}
  */
 export function draftInfoStatus({ myPick = null, pickName = null, myTurn, turnName = null, secs = null, waiting = false }) {
-  if (myPick) return { text: `已选择「${pickName || ''}」${waiting ? '，等待其他博士' : ''}`, secs: null, tone: 'mint' };
+  if (myPick) return { text: `선택 완료「${pickName || ''}」${waiting ? ' · 다른 참가자 선택 대기 중' : ''}`, secs: null, tone: 'mint' };
   const s = Number.isFinite(secs) ? Math.max(0, Math.round(secs)) : null;
   const tone = s != null && s <= 10 ? 'warn' : 'gold';
   if (myTurn) return { text: '轮到你决策', secs: s, tone };
@@ -197,7 +197,7 @@ export function BandDraftScreen() {
   }
 
   // default selection: my pick, else what a timeout gives me (华法琳 while free); when my turn comes while the selected
-  // band has been taken by a teammate meanwhile (队友已选), move the selection back to that default
+  // band has been taken by a teammate meanwhile (다른 참가자가 선택함), move the selection back to that default
   const defaultId = gd.config?.bandDraft?.timeoutBandId || DEFAULT_TIMEOUT_BAND;
   const sel = draftSelection(selection, { bands, taken, myPick, myTurn, defaultId });
   useEffect(() => {
@@ -222,7 +222,7 @@ export function BandDraftScreen() {
     act('g.bandFocus', { bandId: sel }, { sfx: false, quiet: true });
   }, [sel, timed, myPick]);
 
-  // what a timeout gives me: the highlighted band while free, else the default (never 队友已选 — Match.js timeoutBand)
+  // what a timeout gives me: the highlighted band while free, else the default (never 다른 참가자가 선택함 — Match.js timeoutBand)
   const autoId = autoPickBand(sel, { bands, taken, myPick, defaultId });
   const autoName = (autoId && gd.band(autoId)?.name) || gd.band(defaultId)?.name || '华法琳';
 
@@ -267,9 +267,9 @@ export function BandDraftScreen() {
             <${PlayerAvatar} player=${p} self=${p.playerId === myId} />
             <div class="dorder__text">
               <b class="dorder__name">${p.name || '博士'}${p.isBot ? html`<span class="dorder__ai">AI</span>` : null}</b>
-              <span class="dorder__state">${picked ? html`<span class="t-mint">${pband?.name || '已选择'}</span>`
+              <span class="dorder__state">${picked ? html`<span class="t-mint">${pband?.name || '선택 완료'}</span>`
                 : cur ? html`<span class="t-gold"><${Icon} name="hourglass" />决策中${turnSecs != null ? html`<b class="num dorder__secs">${turnSecs}s</b>` : null}</span>`
-                : html`<span class="t-dim"><${Icon} name="dots" />等待中</span>`}</span>
+                : html`<span class="t-dim"><${Icon} name="dots" />대기 중</span>`}</span>
             </div>
             <span class="dorder__box">
               ${picked ? html`<${BandIcon} bandId=${picked} size="sm" /><span class="dorder__check"><${Icon} name="check" /></span>`
@@ -289,14 +289,14 @@ export function BandDraftScreen() {
           const isTaken = taken.has(b.bandId);
           const offNames = bandOffBonds(b, offBonds).map((id) => gd.bond(id)?.name || id); // 本局禁用 (still selectable)
           return html`<button key=${b.bandId} type="button" role="option" aria-selected=${sel === b.bandId ? 'true' : 'false'} data-band=${b.bandId}
-              aria-disabled=${isTaken ? 'true' : 'false'} title=${isTaken ? '队友已选' : offNames.length ? bandOffLine(offNames) : undefined}
+              aria-disabled=${isTaken ? 'true' : 'false'} title=${isTaken ? '다른 참가자가 선택함' : offNames.length ? bandOffLine(offNames) : undefined}
               class=${cx('dband', sel === b.bandId && 'is-sel', myPick === b.bandId && 'is-mine', isTaken && 'is-taken', offNames.length && 'is-off')} onClick=${() => { setSel(b.bandId); audio.sfx('tab', { volume: 0.5 }); }}>
             <${BandIcon} bandId=${b.bandId} size="lg" />
             <span class="dband__name">${b.name}</span>
             <span class="dband__lp num"><i></i>${b.totalHp}</span>
             <${BandOffTag} names=${offNames} />
             ${who.length ? html`<span class="dband__who">${who.slice(0, 4).map((p) => html`<${PlayerAvatar} key=${p.playerId} player=${p} size="sm" />`)}</span>` : null}
-            ${isTaken ? html`<span class="dband__taken">队友已选</span>` : null}
+            ${isTaken ? html`<span class="dband__taken">다른 참가자가 선택함</span>` : null}
           </button>`;
         })}
       </section>
@@ -315,18 +315,18 @@ export function BandDraftScreen() {
             <${RichText} as="p" text=${band.descRaw || band.desc} class="draft-detail__desc" />
           </div>` : html`<p class="t-dim">选择一个策略查看详情</p>`}
         <div class="draft-detail__actions">
-          ${myPick ? html`<p class="draft-detail__status t-mint"><${Icon} name="check" />已选择「${gd.band(myPick)?.name || ''}」${!solo && !draft.done ? '，等待其他博士' : ''}</p>`
-            : selTaken ? html`<p class="draft-detail__status draft-detail__status--taken"><${Icon} name="close" />队友已选，请选择其他策略</p>`
+          ${myPick ? html`<p class="draft-detail__status t-mint"><${Icon} name="check" />선택 완료「${gd.band(myPick)?.name || ''}」${!solo && !draft.done ? ' · 다른 참가자 선택 대기 중' : ''}</p>`
+            : selTaken ? html`<p class="draft-detail__status draft-detail__status--taken"><${Icon} name="close" />다른 참가자가 선택함，请选择其他策略</p>`
             : !myTurn ? html`<p class="draft-detail__status"><${Icon} name="hourglass" />${turnName ? `${turnName} 正在决策…` : '等待轮到你'}</p>` : null}
           <div class="draft-detail__btns">
             ${!solo ? html`<${Button} variant="secondary" size="lg" icon="chevrons" disabled=${!canSkip} loading=${busy === 'skip'} onClick=${skip}
               title=${skipsLeft > 0 ? '跳过本轮，稍后再选' : '跳过次数已用完'}>跳过${skipsLeft > 0 ? '' : '（已用）'}<//>` : null}
-            <${Button} variant="primary" size="lg" icon="check" disabled=${!myTurn || !band || selTaken} loading=${busy === 'pick'} onClick=${confirm}>${selTaken ? '队友已选' : '确认选择'}<//>
+            <${Button} variant="primary" size="lg" icon="check" disabled=${!myTurn || !band || selTaken} loading=${busy === 'pick'} onClick=${confirm}>${selTaken ? '다른 참가자가 선택함' : '确认选择'}<//>
           </div>
         </div>
       </aside>
     </main>
-    <${ChatPanel} />
+    ${solo ? null : html`<${ChatPanel} />`}
     <${ExitModal} open=${exit} onClose=${() => setExit(false)} solo=${solo} />
     <${MatchInfoDialog} open=${infoOpen} onClose=${() => setInfoOpen(false)} model=${info}
       status=${infoStatus ? html`<span class=${cx('minfo-dlg__turn', `is-${infoStatus.tone}`)}>

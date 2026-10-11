@@ -94,7 +94,7 @@ export function pickBusy(busyIdx, card, mine) {
 export function cardPickable(sp, card, { myId, solo, busyIdx = null }) {
   if (!sp || !card) return false;
   const myTurn = solo || sp.turnPid === myId;
-  return myTurn && sp.pickOf.get(myId) == null && !card.takenBy && busyIdx == null;
+  return myTurn && sp.pickOf.get(myId) == null && !card.takenBy && !card.soldOut && busyIdx == null;
 }
 
 /**
@@ -213,7 +213,7 @@ export function ChoiceView({ pub, sp, myId, solo, personal = false, busyIdx = nu
           const busy = pickBusy(busyIdx, card, mine);
           const isArmed = can && armed === card.idx;
           const takerName = taker ? (card.takenBy === myId ? '你' : taker.name) : null;
-          return html`<button key=${card.idx} type="button" class=${cx('spcard', `spcard--${r.kind}`, card.takenBy && 'is-taken', card.takenBy === myId && 'is-mine', can && 'is-pickable', isArmed && 'is-armed', busy && 'is-busy')}
+          return html`<button key=${card.idx} type="button" class=${cx('spcard', `spcard--${r.kind}`, (card.takenBy || card.soldOut) && 'is-taken', card.takenBy === myId && 'is-mine', can && 'is-pickable', isArmed && 'is-armed', busy && 'is-busy')}
               aria-busy=${busy ? 'true' : undefined} aria-pressed=${can ? String(isArmed) : undefined} disabled=${!can} onClick=${() => can && onTap(card.idx)}
               aria-label=${isArmed ? `${r.name}，已选中，再次点击确认` : takerName ? `${r.name}，${takerName}已选择` : r.name} title=${`${r.name}\n${richTextPlain(r.desc)}`}>
             <span class="spcard__glow" aria-hidden="true"></span>

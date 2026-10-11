@@ -1,3 +1,4 @@
+import {HOTKEY_ACTIONS, hotkeyLabel, captureHotkey, rebindHotkey, DEFAULT_HOTKEYS} from './gameLogic/shortcuts.js';
 import { RestartVoteControls } from './restartVote.js';
 
 
@@ -84,6 +85,25 @@ function Choice({label,value,options,onChange,testId}) {
  */
 export function SettingsModal({ open, onClose }) {
   const s = useSettings();
+  const [binding,setBinding] = useState(null);
+  useLayoutEffect(() => {
+    if (!open || !binding) return;
+    const onKey = e => {
+      const result = captureHotkey(e);
+      if (result.kind === 'leave') { setBinding(null); return; }
+      e.preventDefault(); e.stopImmediatePropagation();
+      if (result.kind === 'cancel') setBinding(null);
+      if (result.kind === 'key') {
+        updateSettings({keys: rebindHotkey(settingsStore.get().keys, binding, result.code).keys});
+        setBinding(null);
+      }
+    };
+    const onPointer = e => { if (!e.target.closest?.('[data-hotkey-binding]')) setBinding(null); };
+    window.addEventListener('keydown', onKey, true);
+    window.addEventListener('pointerdown', onPointer, true);
+    return () => { window.removeEventListener('keydown', onKey, true); window.removeEventListener('pointerdown', onPointer, true); };
+  }, [open, binding]);
+  useLayoutEffect(() => { if (!open) setBinding(null); }, [open]);
   const [category,setCategory] = useState('graphics');
   const [candidateSound, setCandidateSound] = useState(s.chatSound);
   useLayoutEffect(() => { setCandidateSound(s.chatSound); if (!open) audio.stopChatNotification(); }, [open, s.chatSound]);
@@ -93,7 +113,7 @@ export function SettingsModal({ open, onClose }) {
     actions=${html`<${RestartVoteControls} voteVisible=${false} onRequested=${onClose} label="리방 투표" /><${Button} variant="secondary" icon="book" class="set-guide" onClick=${() => openGuide(0)}>玩法说明<//>
       <${Button} variant="primary" icon="check" onClick=${onClose}>完成<//>`}>
     <nav class="set-categories" aria-label="설정 종류" data-i18n-skip>
-      ${[['graphics','그래픽'],['audio','소리'],['chat','채팅'],['controls','조작·언어']].map(([id,label])=>html`<button type="button" class=${category===id?'is-on':''} aria-pressed=${category===id} onClick=${()=>setCategory(id)}>${label}</button>`)}
+      ${[['graphics','그래픽'],['audio','소리'],['chat','채팅'],['controls','조작·단축키']].map(([id,label])=>html`<button type="button" class=${category===id?'is-on':''} aria-pressed=${category===id} onClick=${()=>setCategory(id)}>${label}</button>`)}
     </nav>
     <div class="set-list">
     <section hidden=${category!=='audio'} class="set-category" data-category="audio">
@@ -146,9 +166,14 @@ export function SettingsModal({ open, onClose }) {
       <p class="set-hint" data-i18n-skip>합산: 연속 피해를 묶어 표시 · 모두: 타격마다 표시 · 기본: 명일방주의 붉은 대미지 표시 판정(예상 피해의 1.5배 이상)을 적용합니다.</p>
       <${Choice} testId="text-size" label="글자 크기" value=${s.textSize} options=${[['sm','작게'],['md','보통'],['lg','크게'],['xl','아주 크게']]} onChange=${v=>updateSettings({textSize:v})} />
     </section><section hidden=${category!=='controls'} class="set-category" data-category="controls">
-      ${touchUi
-        ? html`<p class="set-hint">触屏操作：点击单位选中（撤退 / 出售）· 长按单位或卡牌查看详情 · 拖动部署后滑动选择朝向</p>`
-        : html`<p class="set-hint">快捷键：<kbd>R</kbd> 刷新 · <kbd>F</kbd> 冻结 · <kbd>D</kbd> 升级 · <kbd>Q</kbd> 撤退选中干员 · <kbd>X</kbd> 出售选中干员 · <kbd>Space</kbd> 准备就绪 · <kbd>Esc</kbd> 关闭弹窗 · 右键查看详情</p>`}
+      <${Toggle} label="장비 칸 왼쪽 배치" micro="SHOP LAYOUT" value=${s.shopItemLeft} onChange=${v=>updateSettings({shopItemLeft:v})} />
+      <p class="set-hint">단축키 버튼을 누른 뒤 사용할 키를 입력하세요. 중복된 키는 서로 교환됩니다. Esc로 취소할 수 있습니다.</p>
+      ${HOTKEY_ACTIONS.map(action=>html`<div class="set-row" data-i18n-skip>
+        <span class="set-row__label">${({refresh:'상점 새로고침',freeze:'상점 동결',levelUp:'상점 레벨업',retreat:'선택한 오퍼레이터 퇴각',sell:'선택한 오퍼레이터 판매',ready:'준비 완료 / 일시정지',collapseShop:'상점 접기 / 펼치기'})[action]}</span>
+        <button type="button" class="btn btn--secondary" data-hotkey-binding=${action} aria-label=${'단축키 변경: '+action} onClick=${()=>setBinding(action)}>
+          ${binding===action?'키 입력 대기…':hotkeyLabel(s.keys[action])}</button>
+      </div>`)}
+      <${Button} variant="secondary" size="sm" onClick=${()=>{updateSettings({keys:DEFAULT_HOTKEYS});setBinding(null);}}>단축키 기본값 복원<//>
 
     </section></div>
   <//>`;
