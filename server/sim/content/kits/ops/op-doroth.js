@@ -123,11 +123,11 @@ export default {
 
     /** Free melee tiles of her range (or of `grid` around her) with no ground enemy: enemy paths first, then random. */
     function summonTiles(battle, unit, grid = null) {
-      const keys = grid ? absoluteRangeKeys(grid, unit.tileR, unit.tileC, unit.dir, unit.s.rangeExtend || 0) : unit.rangeKeys || [];
+      const keys = grid ? absoluteRangeKeys(grid, unit.tileR, unit.tileC, unit.dir, unit.s.rangeExtend || 0, battle.grid) : unit.rangeKeys || [];
       const path = battle.groundPathTiles();
       const out = [];
       for (const k of keys) {
-        const r = Math.floor(k / COLS), c = k % COLS;
+        const r = Math.floor(k / (battle.grid?.cols ?? COLS)), c = k % (battle.grid?.cols ?? COLS);
         if (!summonTileFree(battle, r, c) || !battle.grid.canStand(r, c) || groundEnemyOn(battle, r, c)) continue;
         out.push({ r, c, p: path.has(k) ? 0 : 1 });
       }
@@ -189,7 +189,7 @@ export default {
         }
         battle.fx('explode', { x: t.x, y: t.y, r: S2_RADIUS, id: t.id, consumed: true, kind: 'doroth:quicksand' });
       } else if (s3) {
-        const keys = absoluteRangeKeys(sk?.rangeGrid ?? X6, t.tileR, t.tileC, t.dir, 0);
+        const keys = absoluteRangeKeys(sk?.rangeGrid ?? X6, t.tileR, t.tileC, t.dir, 0, battle.grid);
         for (const x of battle.enemiesInKeys(keys, t, GROUND)) {
           battle.dealDamage(t, x, { amount: atk * num(tb2.atk_scale), type: 'arts', isSkill: true, tags });
           if (x.alive && num(tb2.sluggish) > 0) battle.applyStatus(x, 'sluggish', { duration: num(tb2.sluggish), source: t });
@@ -198,7 +198,7 @@ export default {
         const set = new Set(keys);
         const delay = num(tb2.interval, S3_DELAY);
         for (const o of traps(battle, unit)) {
-          if (o === t || !o.alive || o.mem.dorFired || o.mem.dorWaiting || !set.has(o.tileR * COLS + o.tileC)) continue;
+          if (o === t || !o.alive || o.mem.dorFired || o.mem.dorWaiting || !set.has(o.tileR * (battle.grid?.cols ?? COLS) + o.tileC)) continue;
           o.mem.dorWaiting = true;
           const seq = o.deploySeq;
           battle.after(delay, () => { if (o.alive && o.deploySeq === seq) fire(battle, unit, o, null); }, { owner: o });

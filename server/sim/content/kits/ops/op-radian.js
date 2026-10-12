@@ -126,7 +126,7 @@ function barrier(battle, u, owner, ratio) {
 function relayLink(battle, asker, target, seen) {
   for (const r of battle.allyUnits) {
     if (r.kind !== 'token' || r.defId !== TOWER3 || seen.has(r) || !up(r) || !r.canAct || r.s.flags.disarm || r.atkCd > 1e-9) continue;
-    if (!r.rangeKeySet || !r.rangeKeySet.has(asker.tileR * COLS + asker.tileC)) continue;
+    if (!r.rangeKeySet || !r.rangeKeySet.has(asker.tileR * (battle.grid?.cols ?? COLS) + asker.tileC)) continue;
     if (acquireTargets(battle, r, r.profile).length) continue;
     seen.add(r);
     r.atkCd = r.s.interval;

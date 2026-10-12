@@ -8,6 +8,7 @@ function weaponStyle(kind,info={},isEnemy=false){
  let family=kind==='bolt'?'arts':isEnemy&&info.attackType==='arts'?'arts':'bullet';
  if(kind==='arrow'&&BOW_USERS.has(id)||isEnemy&&/弩|弓|箭/.test(name))family='bow';
  if((isEnemy&&/炮|投石|抛掷|박격|곡사|투척|포병/.test(name)) || /bombarder|siegesniper|fortress|splashcaster/.test(info.subProf||''))family='shell';
+ if(kind==='arrow'&&info.charId==='char_1015_aglna2')return {...base,look:'dart',tint:0xb8f2e6,glow:0x64cbbb,len:.7,width:.08,head:.18,muzzle:null,trail:0x64cbbb,hit:'spark'};
  if(family==='bow')return {...base,look:'dart',tint:0xe6dcc4,glow:0xbcab82,len:.4,width:.065,head:.14,muzzle:null,trail:0xbcab82,hit:'spark'};
  if(family==='bullet')return {...base,look:'tracer',tint:0xfff0c8,glow:0xe6b46c,len:.65,width:.055,head:.13,muzzle:0xe6b46c,trail:null,hit:'spark'};
  if(family==='shell')return {...base,look:'shell',tint:0xd4c4a4,glow:0xc99763,len:.2,width:.09,head:.24,arc:.8,smoke:0x34302c,muzzle:0xc99763,hit:'boom'};

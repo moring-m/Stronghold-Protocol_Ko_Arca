@@ -150,7 +150,7 @@ export default {
     };
     /** The first ground enemy of the x-2 around his located tile standing on a tile he may take. */
     const pickTarget = (battle, unit, st) => {
-      const keys = absoluteRangeKeys(area, st.home[0], st.home[1], unit.dir, 0);
+      const keys = absoluteRangeKeys(area, st.home[0], st.home[1], unit.dir, 0, battle.grid);
       const list = battle.enemiesInKeys(keys, unit, { canHitFly: false, groundOnly: true })
         .filter((e) => !e.isFlying && tileOk(battle, unit, st, Math.round(e.y), Math.round(e.x)));
       sortEnemyTargets(battle, unit, list, unit.profile?.priority ?? null);

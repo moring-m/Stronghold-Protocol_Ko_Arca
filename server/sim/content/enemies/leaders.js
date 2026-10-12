@@ -219,7 +219,7 @@ function kitLeaderMisc(key, ab, e) {
       const rush = ab.sk.Rush;
       const prey = (b, e2) => {
         const keys = pathKeysAhead(e2);
-        return targetsNear(b, e2, RUSH_RADIUS).filter((u) => u.ground && keys.has(u.tileR * COLS + u.tileC));
+        return targetsNear(b, e2, RUSH_RADIUS).filter((u) => u.ground && keys.has(u.tileR * (u.battle?.grid?.cols ?? COLS) + u.tileC));
       };
       return [lowHpBuff(T(ab, 'atkup.hp_ratio') ?? 0.5, { atkPct: T(ab, 'AtkUp.atk', 'atkup.atk') ?? 0 }),
         reborn({ dur: T(ab, 'Reborn.duration') ?? 0, hpRatio: T(ab, 'Reborn.hp_ratio') ?? 0.5, invincible: T(ab, 'Reborn.invincible') ?? 0 }),

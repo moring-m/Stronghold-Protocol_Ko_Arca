@@ -1,3 +1,4 @@
+import {LaboratoryRestartButton} from '../ui/laboratory.js';
 import {EXTENSION_CATEGORIES,RULE_VALUES,customExtensionCatalog,recordCustomExtensions} from '../../../shared/customExtensions.js';
 import { isLaboratory, stopLaboratory } from '../laboratory.js';
 import {CombatReport} from '../ui/combatReport.js';
@@ -107,7 +108,7 @@ export function ResultView({ res, pub = null, myId = null, backLabel, onBack, qu
     if (top && r.players.length > 1) best[k] = top.id;
   }
   useEffect(() => { if (!quiet) audio.sfx(r.victory ? 'settlementSucceed' : 'settlementFail'); }, []);
-  const boss = r.bossId ? gd.boss(r.bossId) : null;
+  const boss = r.bossId==='boss_laboratory_jesselton'?{name:'제셀톤 윌리엄스',enemyKey:'enemy_1516_jakill'}:r.bossId ? gd.boss(r.bossId) : null;
   // the Hidden Core medal (and its corrupted leader) only once R15 was actually fought
   const hidden = r.hiddenBossId && r.hiddenReached ? gd.boss(r.hiddenBossId) : null;
   const bg = uiUrl(gd.m, r.victory ? 'settle/settlemen_teamshow_success' : 'settle/settlemen_teamshow_fail');
@@ -143,6 +144,7 @@ export function ResultView({ res, pub = null, myId = null, backLabel, onBack, qu
         </div>
         ${chat ? html`<${ChatPanel} docked=${true} />` : null}
         <footer class="result__foot">
+          ${!quiet&&isLaboratory()?html`<${LaboratoryRestartButton}/>`:null}
           <${Button} variant="primary" size="xl" icon="chevronLeft" onClick=${onBack}>${backLabel}<//>
         </footer>
       </section>

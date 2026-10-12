@@ -16,11 +16,11 @@ const pkg = JSON.parse(read('package.json'));
 const lock = JSON.parse(read('package-lock.json'));
 
 test('base package version and letter-suffixed site version stay consistent', () => {
-  assert.match(APP_VERSION, /^\d+\.\d+\.\d+[a-z]$/);
-  assert.equal(APP_VERSION.slice(0,-1),BASE_VERSION);
+  assert.match(APP_VERSION, /^\d+\.\d+\.\d+[a-z]\d*$/);
+  assert.equal(APP_VERSION.replace(/[a-z]\d*$/,''),BASE_VERSION);
   assert.equal(PATCH_NOTES[0].version,APP_VERSION);
   assert.equal(new Set(PATCH_NOTES.map(n=>n.version)).size,PATCH_NOTES.length);
-  for(const note of PATCH_NOTES)assert.match(note.version,/^\d+\.\d+\.\d+[a-z]$/);
+  for(const note of PATCH_NOTES)assert.match(note.version,/^\d+\.\d+\.\d+[a-z]\d*$/);
   assert.equal(pkg.version, BASE_VERSION);
   assert.equal(lock.version, BASE_VERSION);
   assert.equal(lock.packages[''].version, BASE_VERSION);

@@ -146,6 +146,7 @@ export function uvAt(uv, fx, fy) {
  */
 export function classifyStage(stage, area = null) {
   const rows = Array.isArray(stage?.rows) ? stage.rows : [];
+  const ROWS=Math.max(19,rows.length),COLS=Math.max(21,...rows.map(r=>r.length));
   const pen = parsePenRect(stage?.config?.enemy_place_rect) || PEN_RECT;
   const legend = stage && typeof stage.tiles === 'object' && stage.tiles ? stage.tiles : {};
   const grid = [];
@@ -318,6 +319,7 @@ export function buildBoard(stage, opts = {}) {
   const uvTable = opts.uv || null;
   const UVT = uvTable || Object.fromEntries(Object.entries(SURFACES).map(([k, v]) => [k, { ...v, rect: [...v.rect] }]));
   const grid = classifyStage(stage, opts.area || null);
+  const ROWS=grid.length,COLS=grid[0].length;
   const at = (r, c) => grid[r]?.[c] || null;
   const topZ = (t) => (t.glyph === 'd' ? -BASIN : t.h);
   const board = new Geom(), decal = new Geom(), pipe = new Geom(), glass = new Geom();

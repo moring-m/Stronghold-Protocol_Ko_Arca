@@ -132,6 +132,7 @@ export class GameData {
     const cs = this.config.bossHpScale && typeof this.config.bossHpScale === 'object' ? this.config.bossHpScale : {};
     const pick = (k, d) => (Number.isFinite(ms[k]) && ms[k] > 0 ? ms[k] : Number.isFinite(cs[k]) && cs[k] > 0 ? cs[k] : d);
     if (this.isSolo) return pick('solo', 1);
+    if(this.config.coop8)return Math.max(1,Math.min(8,Math.floor(Number(aliveCount)||8)));
     const scaling = typeof ms.aliveScaling === 'boolean' ? ms.aliveScaling : cs.aliveScaling !== false;
     const full = Math.max(1, Math.floor(pick('aliveFull', 4)));
     const n = Number(aliveCount);
@@ -232,6 +233,7 @@ export class GameData {
   get maxArtsPerRound() { return posIntOr(this.economy.maxArtsPerRound, DEFAULTS.maxArtsPerRound); }
   get goldenCopies() { return posIntOr(this.economy.goldenCopies, DEFAULTS.goldenCopies); }
   get itemMergeCount() { return posIntOr(this.economy.itemMergeCount, DEFAULTS.itemMergeCount); }
+  keepsFunds(bandId){return [bandId,...(this.config.commonBands||[])].some(id=>this.leftoverKeptBands.includes(id));}
   get leftoverKeptBands() { return Array.isArray(this.economy.leftoverFundsKeptByBands) ? this.economy.leftoverFundsKeptByBands : DEFAULTS.leftoverFundsKeptByBands; }
   get defaultBandId() { return typeof this.economy.defaultBandId === 'string' ? this.economy.defaultBandId : DEFAULTS.defaultBandId; }
   get defaultStartLp() { return posIntOr(this.economy.defaultStartLp, DEFAULTS.defaultStartLp); }
@@ -255,7 +257,7 @@ export class GameData {
     const base = Number.isInteger(v) && v >= 0 ? v : (DEFAULTS.poolCopies[tier] ?? 10);
     // The measured doubled pool is shared by the whole co-op team, independent of team size. DIY and optional recruits remain private stock.
     const multiplier = this.isSolo || this.chess(baseId)?.isDiy || this.chess(baseId)?.optionalRecruit ? 1 : posIntOr(this.economy.coopPoolMultiplier, 1);
-    return base * multiplier;
+    return base * multiplier * (this.config.coop8&&!this.chess(baseId)?.isDiy&&!this.chess(baseId)?.optionalRecruit?2:1);
   }
 
   /** Normal equipment copies in the shared pool; effect-only items have no shop stock limit. */
@@ -264,7 +266,7 @@ export class GameData {
     const base = this.baseIdOf(id), rec = this.item(base);
     if (!rec || !isShopItem(rec)) return null;
     const count = this.economy.itemPoolCopiesOverrides?.[base] ?? this.economy.itemPoolCopies?.[rec.tier];
-    return Number.isInteger(count) && count >= 0 ? count : null;
+    return Number.isInteger(count) && count >= 0 ? count*(this.config.coop8?2:1) : null;
   }
 
   /** Copies needed to merge (0 = never merges: golden chess). */
@@ -421,7 +423,7 @@ export class GameData {
   get unite() {
     const u = this.config.unite && typeof this.config.unite === 'object' ? this.config.unite : {};
     return {
-      maxHelpers: posIntOr(u.maxHelpers, DEFAULTS.unite.maxHelpers),
+      maxHelpers: this.config.coop8?4:posIntOr(u.maxHelpers, DEFAULTS.unite.maxHelpers),
       templates: u.templates && typeof u.templates === 'object' ? u.templates : DEFAULTS.unite.templates,
     };
   }

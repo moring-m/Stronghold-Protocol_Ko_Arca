@@ -216,10 +216,10 @@ export class EffectDispatcher {
       // 1. globals
       for (const [key, h] of reg.globals()) this._call(ps, key, h, hook, { kind: 'global', key }, ev);
       // 2. band
-      if (ps.bandId) {
-        const key = `band:${ps.bandId}`;
+      for(const bandId of new Set([ps.bandId,...(this.m.gd.config.commonBands||[])].filter(Boolean))) {
+        const key = `band:${bandId}`;
         const h = reg.get(key);
-        if (h) this._call(ps, key, h, hook, { kind: 'band', key, bandId: ps.bandId, band: this.m.gd.band(ps.bandId) }, ev);
+        if (h) this._call(ps, key, h, hook, { kind: 'band', key, bandId, band: this.m.gd.band(bandId) }, ev);
       }
       // 3. bonds
       for (const bondId of this.m.gd.bondIds) {
@@ -467,7 +467,7 @@ export function makeCtx(m, ps, source, hook, ev = null) {
     funds: () => ps.funds,
     lp: () => ps.lp,
     alive: () => ps.alive,
-    bandId: () => ps.bandId,
+    bandId: () => source.kind==='band'?source.bandId:ps.bandId,
     shopLevel: () => ps.shop.level,
     bond: (id) => (ps.bonds[id] ? { ...ps.bonds[id] } : null),
     bonds: () => Object.fromEntries(Object.entries(ps.bonds).map(([k, v]) => [k, { ...v }])),

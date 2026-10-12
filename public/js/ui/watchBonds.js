@@ -96,6 +96,7 @@ export function watchedPlayer(who, watching) {
 export function playerLayer(field, pub, myId, playerId) {
   if (!isObj(field) || typeof playerId !== 'string' || !playerId) return null;
   if (!cameraLayers(field, pub, myId).length) return null;
+  if(field.kind==='unite'&&(String(field.stageId||'').startsWith('coop8_unite_')||field.rect?.c1>20||field.players?.length>2)&&field.players?.includes(playerId))return 'P:'+playerId;
   const side = sidesOf(field)[playerId];
   return side === 'L' || side === 'R' ? side : null;
 }

@@ -127,10 +127,10 @@ export default {
       }
     };
     const bombard = (battle, unit, e, m, skill) => {
-      const [r, c] = tile(e), key = r * COLS + c;
+      const [r, c] = tile(e), key = r * (battle.grid?.cols ?? COLS) + c;
       if ((m.tiles.get(key) ?? -1) > battle.time) return false;
       m.tiles.set(key, battle.time + num(b3.projectile_life_time, 5));
-      const keys = new Set([[r, c], [r + 1, c], [r - 1, c], [r, c + 1], [r, c - 1]].map(([rr, cc]) => rr * COLS + cc));
+      const keys = new Set([[r, c], [r + 1, c], [r - 1, c], [r, c + 1], [r, c - 1]].map(([rr, cc]) => rr * (battle.grid?.cols ?? COLS) + cc));
       const atk = unit.s.atk;
       battle.fx('lock', { x: c, y: r, id: e.id, src: unit.id, dur: FIRST_BOMB });
       for (let n = 0; n < 3; n++) battle.after(FIRST_BOMB + n, () => {
@@ -217,7 +217,7 @@ export default {
           // [ASSUMED] No mode footage establishes a separate auto-cast shape for this new operator; use the expanded
           // skill attack grid with permanent extensions, retaining shared operation cooldown/control checks.
           unit.skill.addTriggerRange(() => [{
-            keys: absoluteRangeKeys(skillRec(raw, S2)?.rangeGrid, unit.tileR, unit.tileC, unit.dir, unit.s.baseRangeExtend || 0),
+            keys: absoluteRangeKeys(skillRec(raw, S2)?.rangeGrid, unit.tileR, unit.tileC, unit.dir, unit.s.baseRangeExtend || 0, battle.grid),
             profile: AIR,
           }]);
         }

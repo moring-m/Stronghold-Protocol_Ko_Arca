@@ -77,7 +77,7 @@ export function frontAlly(battle, unit, heal = false) {
   let best = null, bk = null;
   for (const a of battle.allyUnits) {
     if (a === unit || !a.alive || !a.deployed || a.hidden || a.kind === 'device') continue;
-    if (!keys.has(a.tileR * COLS + a.tileC) || !battle.allySelectable(a, unit)) continue;
+    if (!keys.has(a.tileR * (battle.grid?.cols ?? COLS) + a.tileC) || !battle.allySelectable(a, unit)) continue;
     if (heal && (a.s.flags.noHeal || a.s.flags.healFree || a.profile?.noHeal)) continue;
     const dr = a.tileR - unit.tileR, dc = a.tileC - unit.tileC;
     const [lr, lc] = toLocal(dr, dc, unit.dir);

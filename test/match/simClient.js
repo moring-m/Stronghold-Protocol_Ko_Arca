@@ -65,7 +65,7 @@ export class SimClient {
       }
       return;
     }
-    const entry = { spec: msg.spec, battleId: msg.battleId, fieldId: msg.fieldId, authoritative: !!msg.authoritative, finished: false, sentResult: false, timer: null, lastProgress: -Infinity };
+    const entry = { spec: msg.spec, battleId: msg.battleId, fieldId: msg.fieldId, authoritative: !!msg.authoritative, speed: Number(msg.speed)>0 ? Number(msg.speed) : this.o.speed, finished: false, sentResult: false, timer: null, lastProgress: -Infinity };
     entry.battle = createBattleFromSpec(msg.spec, this.o.ds, { BattleClass: this.o.BattleClass, recordEvents: false, quiet: true });
     entry.meter = attachLpMeter(entry.battle);
     this.battles.set(msg.battleId, entry);
@@ -111,7 +111,7 @@ export class SimClient {
       let n = 0;
       while (!b.finished && n++ < 200_000) b.step();
     } else {
-      const ticks = Math.max(1, Math.round(((this.o.speed || 2) * SLICE_MS) / 1000 / TICK));
+      const ticks = Math.max(1, Math.round(((e.speed || 2) * SLICE_MS) / 1000 / TICK));
       for (let i = 0; i < ticks && !b.finished; i++) b.step();
     }
     this._progress(e);
@@ -138,7 +138,7 @@ export class SimClient {
     } else {
       msg.leaks = p.leaks;
       // 联防: the leakers' enemies still standing (like public/js/battle/runner.js)
-      if (p.left) msg.left = Object.fromEntries(Object.entries(p.left).slice(0, 4));
+      if (p.left) msg.left = Object.fromEntries(Object.entries(p.left).slice(0, 8));
     }
     this.send(msg);
   }

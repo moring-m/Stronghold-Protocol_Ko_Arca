@@ -1,13 +1,14 @@
 import {useEffect,useRef,useState} from '../../vendor/hooks.module.js';
 import {html,Icon} from './components.js';
 import {tr} from '../i18n/i18n.js';
-const TYPES=[['물리','#f0b66a'],['마법','#72d6ef'],['트루','#ef8ba3'],['원소','#bc9bea']];
+import {DAMAGE_TYPES} from '../../../shared/damageTypes.js';
+const TYPES=DAMAGE_TYPES.map(({label,color})=>[label,color]);
 const sum=v=>v.reduce((a,b)=>a+b,0);
 const number=n=>Math.round(n).toLocaleString('ko-KR');
 export function appendDamageSample(previous,sample){
  if(!sample)return previous;
- const totals=[0,0,0,0];for(const row of sample.rows)row.values.forEach((v,i)=>totals[i]+=v);
- if(!previous||previous.battleId!==sample.battleId||sample.time<previous.time)return {...sample,totals,points:[{time:sample.time,values:[0,0,0,0]}]};
+ const totals=[0,0,0,0,0,0];for(const row of sample.rows)row.values.forEach((v,i)=>totals[i]+=(v||0));
+ if(!previous||previous.battleId!==sample.battleId||sample.time<previous.time)return {...sample,totals,points:[{time:sample.time,values:[0,0,0,0,0,0]}]};
  const dt=sample.time-previous.time;if(dt<.2)return previous;
  const values=totals.map((v,i)=>Math.max(0,v-previous.totals[i])/dt);
  return {...sample,totals,points:[...previous.points,{time:sample.time,values}].filter(p=>p.time>=sample.time-60).slice(-241)};
@@ -16,7 +17,7 @@ export function LaboratoryDamage({runner,fieldId}){
  const [open,setOpen]=useState(false),[state,setState]=useState(null),[metric,setMetric]=useState('dps');
  const current=useRef(null);
  useEffect(()=>{current.current=null;setState(null);const update=()=>{const next=appendDamageSample(current.current,runner?.damageSample());if(next!==current.current){current.current=next;setState(next);}};update();const timer=setInterval(update,250);return()=>clearInterval(timer);},[runner,fieldId]);
- const totals=state?.totals||[0,0,0,0],points=state?.points||[],last=points.at(-1)?.values||[0,0,0,0];
+ const totals=state?.totals||[0,0,0,0,0,0],points=state?.points||[],last=points.at(-1)?.values||[0,0,0,0,0,0];
  const rows=(state?.rows||[]).filter(r=>sum(r.values)>0).sort((a,b)=>sum(b.values)-sum(a.values)),maxRow=Math.max(1,...rows.map(r=>sum(r.values)));
  const scale=Math.max(1,...points.flatMap(p=>p.values)),start=points[0]?.time||0,end=Math.max(start+1,state?.time||0);
  return html`<aside class=${'lab-damage'+(open?' is-open':'')} aria-label="실험실 실시간 피해 그래프">

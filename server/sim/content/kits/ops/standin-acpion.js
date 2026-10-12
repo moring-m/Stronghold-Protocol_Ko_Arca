@@ -85,7 +85,7 @@ export default {
       const grid = r3.rangeGrid?.length ? r3.rangeGrid : null;
       const lastAt = SLASH_FIRST + (times - 1) * SLASH_GAP;
       const slash = (battle, unit) => {
-        const keys = grid ? absoluteRangeKeys(grid, unit.tileR, unit.tileC, unit.dir, 0) : unit.rangeKeys || [];
+        const keys = grid ? absoluteRangeKeys(grid, unit.tileR, unit.tileC, unit.dir, 0, battle.grid) : unit.rangeKeys || [];
         const v = battle.enemiesInKeys(keys, unit, SLASH_PROFILE);
         if (v.length) battle.fx('slash', { x: unit.x, y: unit.y, id: unit.id, n: v.length });
         for (const e of v) battle.dealDamage(unit, e, { amount: unit.s.atk * scale, type: 'phys', defIgnorePct: pen, isSkill: true, tags: ['skill', 'slash'] });

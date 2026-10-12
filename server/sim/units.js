@@ -28,9 +28,10 @@ export class Unit {
    */
   constructor(init) {
     // Heavy references are non-enumerable so assertion diffs / logs never walk the whole battle graph.
-    for (const k of ['def', 'player', 'ownerUnit', 'kit', 'profile', 'skill', 'route', 'bossPool', 'blockedBy', 'blocking', 'carry', 'mem', 'trait']) {
+    for (const k of ['battle', 'def', 'player', 'ownerUnit', 'kit', 'profile', 'skill', 'route', 'bossPool', 'blockedBy', 'blocking', 'carry', 'mem', 'trait']) {
       Object.defineProperty(this, k, { value: null, writable: true, enumerable: false, configurable: true });
     }
+    this.battle = init.battle ?? null;
     this.id = init.id;
     this.side = init.side;            // 'ally' | 'enemy'
     this.kind = init.kind;            // 'op' | 'token' | 'enemy' | 'device'

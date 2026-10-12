@@ -107,7 +107,7 @@ export default {
           battle.on('death', (ctx) => {
             const e = ctx.unit;
             if (e.side !== 'enemy' || ctx.reason !== 'killed' || !up(unit) || !unit.skill) return;
-            if (!bodyInKeys(e, new Set(absoluteRangeKeys(grid1, unit.tileR, unit.tileC, unit.dir, 0)))) return;
+            if (!bodyInKeys(e, new Set(absoluteRangeKeys(grid1, unit.tileR, unit.tileC, unit.dir, 0, battle.grid)))) return;
             // "无视自身的阻回": the 'init' reason passes 阻回; a running timed skill still takes no SP
             if (!skillBusy(unit)) unit.skill.gainSp(sp, 'init');
             if (other > 0) {

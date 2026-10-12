@@ -21,3 +21,14 @@ test('normal and cooperative leaks retain pending indicators and settled HP',()=
   assert.equal(rowLp(p,pub,{lp:20,pending:0}).lp,20);
  }
 });
+test('enemy preview has a persisted, rebindable shortcut and is disabled while typing',()=>{
+ const legacy=sanitizeSettings({keys:{refresh:'KeyR',freeze:'KeyF',levelUp:'KeyD',retreat:'KeyQ',sell:'KeyX',ready:'Space',collapseShop:'KeyC'}});
+ assert.equal(legacy.keys.enemyPreview,'KeyE');assert.equal(shortcutFor({key:'e',code:'KeyE'},legacy.keys),'enemyPreview');
+ const changed=rebindHotkey(legacy.keys,'enemyPreview','KeyR');const saved=sanitizeSettings({keys:changed.keys});
+ assert.equal(shortcutFor({key:'r',code:'KeyR'},saved.keys),'enemyPreview');assert.equal(saved.keys.refresh,'KeyE');
+ assert.equal(shortcutFor({key:'r',code:'KeyR',target:{tagName:'INPUT'}},saved.keys),null);
+});
+
+test('adding preview shortcut preserves older custom bindings that already use E',()=>{
+ const keys={...DEFAULT_HOTKEYS,refresh:'KeyE'};delete keys.enemyPreview;const saved=sanitizeSettings({keys});assert.equal(saved.keys.refresh,'KeyE');assert.notEqual(saved.keys.enemyPreview,'KeyE');assert.equal(new Set(Object.values(saved.keys)).size,Object.keys(DEFAULT_HOTKEYS).length);
+});

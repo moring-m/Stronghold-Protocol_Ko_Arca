@@ -98,10 +98,10 @@ function glueTiles(battle, unit, count) {
     if (!usable(battle, r, c)) return;
     sprayed.add(`${lr},${lc}`);
     list.push({ lr, lc, spread: false });
-    keys.push(r * COLS + c);
+    keys.push(r * (battle.grid?.cols ?? COLS) + c);
   };
   const near = ([lr, lc], [dr, dc]) => [lr + dr, lc + dc];
-  if (usable(battle, unit.tileR, unit.tileC)) { sprayed.add('0,0'); keys.push(unit.tileR * COLS + unit.tileC); }
+  if (usable(battle, unit.tileR, unit.tileC)) { sprayed.add('0,0'); keys.push(unit.tileR * (battle.grid?.cols ?? COLS) + unit.tileC); }
   const front = [0, 1];
   if (usable(battle, ...abs(...front))) {
     for (const d of [[0, 0], RIGHT, LEFT, FRONT]) spray(...near(front, d));
@@ -188,7 +188,7 @@ export default {
             const keys = glueTiles(battle, unit, glueCount);
             unit.mem.thumpyGlue = { keys: new Set(keys), acc: 0 };
             const mid = (f) => keys.reduce((s, k) => s + f(k), 0) / Math.max(1, keys.length);
-            battle.fx('zone', { x: mid((k) => k % COLS), y: mid((k) => Math.floor(k / COLS)), radius: 1.2, dur: num(skillRec(chess, S2)?.duration), id: unit.id, skill: 'thumpy:glue' });
+            battle.fx('zone', { x: mid((k) => k % (battle.grid?.cols ?? COLS)), y: mid((k) => Math.floor(k / (battle.grid?.cols ?? COLS))), radius: 1.2, dur: num(skillRec(chess, S2)?.duration), id: unit.id, skill: 'thumpy:glue' });
             gluePulse(battle, unit, unit.mem.thumpyGlue.keys);
           },
           onTick({ battle, unit, dt }) {
@@ -213,8 +213,8 @@ export default {
             const inField = ahead.filter(([r, c]) => battle.grid.inRect(r, c));
             const belt = {
               fwd: dirVec(unit.dir), acc: 0,
-              carryKeys: new Set(inField.filter(([r, c]) => usable(battle, r, c)).map(([r, c]) => r * COLS + c)),
-              hurtKeys: [unit.tileR * COLS + unit.tileC, ...inField.map(([r, c]) => r * COLS + c)],
+              carryKeys: new Set(inField.filter(([r, c]) => usable(battle, r, c)).map(([r, c]) => r * (battle.grid?.cols ?? COLS) + c)),
+              hurtKeys: [unit.tileR * (battle.grid?.cols ?? COLS) + unit.tileC, ...inField.map(([r, c]) => r * (battle.grid?.cols ?? COLS) + c)],
             };
             belt.hurtSet = new Set(belt.hurtKeys);
             unit.mem.thumpyBelt = belt;

@@ -88,7 +88,7 @@ test('荒芜拉普兰德 S3 ① ②: the drones spread attack@times s (evenly, o
   }
 });
 
-test('荒芜拉普兰德 S3 ③: a drone on its target attacks every attack interval of hers for ATK × its own funnel ramp; she makes no attack; neither attack nor skill damage; 缴械 does not stop it', () => {
+test('荒芜拉普兰德 S3 ③: a drone on its target attacks every attack interval of hers for ATK × its own funnel ramp; her own attacks continue; drone damage is neither attack nor skill damage; 缴械 does not stop it', () => {
   for (const id of BOTH) {
     const h = wolf(id, [{ key: 'e', pos: [10, 6] }]);
     const u = h.unit(id), bb = u.def.skill.bb;
@@ -102,7 +102,7 @@ test('荒芜拉普兰德 S3 ③: a drone on its target attacks every attack inte
     h.run(8);
     assert.ok(u.skill.active);
     const f = u.profile.funnel, e = h.enemies()[0];
-    assert.equal(h.hooksOf('attack').filter((c) => c.attacker === u && c.t >= t0).length, 0, 'no normal attack of hers during S3');
+    assert.ok(h.hooksOf('attack').some(c => c.attacker === u && c.t >= t0), 'normal attacks continue during S3');
     const hits = droneHits(h, u);
     assert.ok(hits.length >= 3 * 8, `${hits.length} drone hits in 14 s`);
     for (const c of hits) {
@@ -140,6 +140,8 @@ test('荒芜拉普兰德 S3: every drone picks the enemy nearest to itself; a de
     let deadAt = null, deadPos = null;
     h.b.on('death', (c) => { if (c.unit.defId === 'enemy_weak' || c.unit.defId === 'weak') { deadAt = h.b.time; deadPos = { x: c.unit.x, y: c.unit.y }; } });
     assert.ok(h.runUntil(() => u.skill.active, 5));
+    // This fixture measures drone retargeting independently of her own attacks.
+    h.b.applyStatus(u, 'disarm', { duration: 100, source: null });
     const D = u.mem.drones;
     const weak = h.enemies().find((x) => /weak/.test(x.defId)), far = h.enemies().find((x) => !/weak/.test(x.defId));
     h.step(Math.round(u.def.skill.bb['attack@times'] / TICK));

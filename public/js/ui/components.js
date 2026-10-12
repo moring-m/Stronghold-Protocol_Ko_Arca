@@ -51,6 +51,8 @@ export const ICONS = {
   crown: { d: 'M3 7l4.6 4.2L12 4l4.4 7.2L21 7l-1.8 10H4.8zM5 19h14v2H5z' },
   robot: { d: 'M11 2h2v3h4a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V8a3 3 0 0 1 3-3h4zM8.5 9.5a1.75 1.75 0 1 0 0 3.5 1.75 1.75 0 0 0 0-3.5zm7 0a1.75 1.75 0 1 0 0 3.5 1.75 1.75 0 0 0 0-3.5zM9 15v1.6h6V15zM1 10h2v5H1zm20 0h2v5h-2z', eo: true },
   copy: { d: 'M8 3h11v13h-2V5H8zM5 7h10v14H5zm2 2v10h6V9z', eo: true },
+  save: { d: 'M3 3h15l3 3v15H3zm3 2v6h11V5zm1 10v4h10v-4zM9 5h5v4H9z', eo: true },
+  load: { d: 'M3 5h7l2 2h9v14H3zm2 4v10h14V9zM11 10h2v3h3l-4 4-4-4h3z', eo: true },
   link: { d: 'M9 7H6.5a5 5 0 0 0 0 10H9v-2H6.5a3 3 0 0 1 0-6H9zm6 0h2.5a5 5 0 0 1 0 10H15v-2h2.5a3 3 0 0 0 0-6H15zM8 11h8v2H8z' },
   plus: { d: 'M11 4h2v7h7v2h-7v7h-2v-7H4v-2h7z' },
   minus: { d: 'M4 11h16v2H4z' },
@@ -362,12 +364,12 @@ export function secondsLeft(deadline) {
  *   size?: 'sm'|'md'|'lg', gauge?: boolean, onExpire?: Function, class?: string }} props
  *   deadline: server epoch ms (live); seconds: static value (overrides deadline); total: seconds for the gauge.
  */
-export function Countdown({ deadline, seconds, total, warnAt = 10, label = 'COUNTDOWN', size = 'md', gauge = true, onExpire, class: cls }) {
+export function Countdown({ deadline, seconds, total, warnAt = 10, label = 'COUNTDOWN', size = 'md', gauge = true, elapsed = false, onExpire, class: cls }) {
   const live = seconds == null && hasDeadline(deadline);
   useTicker(live ? 200 : 0);
   const remain = seconds != null && Number.isFinite(Number(seconds)) ? Math.max(0, Math.floor(Number(seconds))) : live ? secondsLeft(deadline) : null;
-  const warn = remain != null && remain <= warnAt;
-  const text = remain == null ? '--' : String(Math.min(999, remain)).padStart(2, '0');
+  const warn = !elapsed && remain != null && remain <= warnAt;
+  const text = remain == null ? '--' : elapsed?`${Math.floor(remain/60).toString().padStart(2,'0')}:${(remain%60).toString().padStart(2,'0')}`:String(Math.min(999, remain)).padStart(2, '0');
   const bars = 5;
   const lit = remain == null ? 0 : Number.isFinite(total) && total > 0 ? Math.max(0, Math.min(bars, Math.ceil((remain / total) * bars))) : bars;
 
@@ -382,7 +384,7 @@ export function Countdown({ deadline, seconds, total, warnAt = 10, label = 'COUN
 
   // untimed phase: no timer on screen (hooks above run unconditionally, so the component may toggle freely)
   if (remain == null) return null;
-  return html`<div class=${cx('countdown', `countdown--${size}`, warn && 'is-warn', cls)} role="timer" aria-label=${remain == null ? '无倒计时' : `剩余${remain}秒`}>
+  return html`<div class=${cx('countdown', `countdown--${size}`, warn && 'is-warn', cls)} role="timer" aria-label=${elapsed?`경과 시간 ${remain}초`:remain == null ? '无倒计时' : `剩余${remain}秒`}>
     <div class="countdown__main">
       <${SevenSeg} text=${text} tone=${warn ? 'orange' : 'mint'} flicker=${warn && remain > 0} />
       ${label ? html`<span class="countdown__label">${label}</span>` : null}
@@ -708,7 +710,7 @@ export function Spinner({ size = 'md', label, tone = 'mint', class: cls }) {
 
 // ---- Avatar frame ------------------------------------------------------------------------------
 
-const SEAT_HUES = [162, 196, 38, 280];
+const SEAT_HUES = [162, 196, 38, 280, 12, 225, 85, 325];
 /**
  * Square avatar frame with bracket corners. Falls back to a glyph (first letter / robot).
  * @param {{ name?: string, src?: string, size?: 'sm'|'md'|'lg'|'xl', seat?: number, host?: boolean, bot?: boolean,
@@ -717,7 +719,7 @@ const SEAT_HUES = [162, 196, 38, 280];
 export function AvatarFrame({ name = '', src, size = 'md', seat = 0, host, bot, self, ready, offline, dead, empty, badge = null, class: cls }) {
   const [badSrc, setBadSrc] = useState(null);
   const imgOk = !!src && badSrc !== src;
-  const hue = SEAT_HUES[((seat | 0) % 4 + 4) % 4];
+  const hue = SEAT_HUES[((seat | 0) % SEAT_HUES.length + SEAT_HUES.length) % SEAT_HUES.length];
   const glyph = [...(name || '').trim()][0] || '?';
   return html`<div class=${cx('avatar', `avatar--${size}`, 'brackets', host && 'is-host', bot && 'is-bot', self && 'is-self',
       ready && 'is-ready', offline && 'is-offline', dead && 'is-dead', empty && 'is-empty', cls)} style=${`--seat-hue:${hue}`}>

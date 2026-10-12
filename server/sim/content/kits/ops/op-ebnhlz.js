@@ -97,7 +97,7 @@ const remnantTileOk = (battle, r, c) => battle.grid.inRect(r, c) && battle.grid.
 
 /** Whether `unit`'s attack range holds one tile 荒芜回响 may use (its cast condition; no rng, unlike remnantTiles). */
 function hasRemnantTile(battle, unit) {
-  for (const k of unit.rangeKeys || []) if (remnantTileOk(battle, Math.floor(k / COLS), k % COLS)) return true;
+  for (const k of unit.rangeKeys || []) if (remnantTileOk(battle, Math.floor(k / (battle.grid?.cols ?? COLS)), k % (battle.grid?.cols ?? COLS))) return true;
   return false;
 }
 
@@ -109,17 +109,17 @@ function hasRemnantTile(battle, unit) {
 function remnantTiles(battle, unit) {
   const tiles = [];
   for (const k of unit.rangeKeys || []) {
-    const r = Math.floor(k / COLS), c = k % COLS;
+    const r = Math.floor(k / (battle.grid?.cols ?? COLS)), c = k % (battle.grid?.cols ?? COLS);
     if (remnantTileOk(battle, r, c)) tiles.push([r, c]);
   }
   if (!tiles.length) return tiles;
   const foes = battle.enemies.filter((e) => canTargetEnemy(unit, e, GROUND));
   sortEnemyTargets(battle, unit, foes, null);
   const rank = new Map();
-  foes.forEach((e, i) => { const k = Math.round(e.y) * COLS + Math.round(e.x); if (!rank.has(k)) rank.set(k, i); });
+  foes.forEach((e, i) => { const k = Math.round(e.y) * (e.battle?.grid?.cols ?? COLS) + Math.round(e.x); if (!rank.has(k)) rank.set(k, i); });
   battle.rng.shuffle(tiles);   // the random order of the last group, and of equal distances [ASSUMED]
   const dist = (r, c) => { let d = Infinity; for (const e of foes) d = Math.min(d, hypot(e.x - c, e.y - r)); return d; };
-  const keyed = tiles.map(([r, c], i) => ({ r, c, i, on: rank.get(r * COLS + c) ?? Infinity, d: dist(r, c) }));
+  const keyed = tiles.map(([r, c], i) => ({ r, c, i, on: rank.get(r * (battle.grid?.cols ?? COLS) + c) ?? Infinity, d: dist(r, c) }));
   keyed.sort((a, b) => a.on - b.on || a.d - b.d || a.i - b.i);
   return keyed.map((x) => [x.r, x.c]);
 }

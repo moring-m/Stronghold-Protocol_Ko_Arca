@@ -136,6 +136,7 @@ export function buildResult(m, outcome) {
     reason: outcome.reason,
     // the merged Final Assault pool (null before round 14); players[].lp are the alive players' shares of it
     teamLp: m.teamLp != null ? Math.max(0, Math.round(m.teamLp)) : null,
+    roomMode: m.mode,
     modeId: m.modeId,
     difficulty: m.difficulty,
     stageId: m.stageId,

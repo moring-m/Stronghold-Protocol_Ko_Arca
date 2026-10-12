@@ -90,7 +90,7 @@ function holdBuff(battle, u, key, want, mods) {
 /** 不毁重构's blast from Mon3tr's tile: `value` true damage (溅射) + `stun` s on every selectable enemy of its 3×3. */
 function rattle(battle, m, { value, stun, grid }) {
   battle.fx('aoe', { x: m.x, y: m.y, radius: 1.5, id: m.id, skill: TAG_RATTLE });
-  const keys = absoluteRangeKeys(grid, m.tileR, m.tileC, m.dir, 0);
+  const keys = absoluteRangeKeys(grid, m.tileR, m.tileC, m.dir, 0, battle.grid);
   for (const e of battle.enemiesInKeys(keys, m, { canHitFly: true })) {
     if (!e.alive) continue;
     battle.dealDamage(m, e, { amount: value, type: 'true', isSplash: true, canDodge: false, tags: [TAG_RATTLE] });
@@ -120,7 +120,7 @@ function mon3trKit(owner, { t0, b1, b2, b3 }) {
       // her range, her skills: buffs held every tick
       battle.on('tick', () => {
         if (!up(m)) return;
-        const inRange = up(owner) && !!owner.rangeKeySet && owner.rangeKeySet.has(m.tileR * COLS + m.tileC);
+        const inRange = up(owner) && !!owner.rangeKeySet && owner.rangeKeySet.has(m.tileR * (battle.grid?.cols ?? COLS) + m.tileC);
         holdBuff(battle, m, 'kalts:mon3tr:defZero', !inRange, { defMul: 0 });
         holdBuff(battle, m, 'kalts:mon3tr:near', inRange && (num(t0.attack_speed) > 0 || num(t0.def) > 0), { aspd: num(t0.attack_speed), defPct: num(t0.def) });
         holdBuff(battle, m, 'kalts:s1:mon3tr', skillOn(owner, S1), { defPct: num(b1['attack@def']) });

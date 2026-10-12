@@ -253,7 +253,7 @@ function permBuff(battle, unit, key, m) {
 
 /** Enemies inside an absolute-key grid of `grid` offsets around `unit` (best targets first). */
 function enemiesInGrid(battle, unit, grid, n = 0, { ignoreStealth = false } = {}) {
-  const keys = absoluteRangeKeys(grid || unit.rangeGrid || [[0, 0]], unit.tileR, unit.tileC, unit.dir, 0);
+  const keys = absoluteRangeKeys(grid || unit.rangeGrid || [[0, 0]], unit.tileR, unit.tileC, unit.dir, 0, battle.grid);
   let list;
   if (ignoreStealth) {
     const set = new Set(keys);
@@ -279,12 +279,12 @@ function straightRun(battle, r, c) {
         for (let k = cc + 1; k <= R.c1 && pass(rr, k); k++) h++;
         for (let k = rr - 1; k >= R.r0 && pass(k, cc); k--) v++;
         for (let k = rr + 1; k <= R.r1 && pass(k, cc); k++) v++;
-        m.set(rr * COLS + cc, Math.max(h, v));
+        m.set(rr * (battle.grid?.cols ?? COLS) + cc, Math.max(h, v));
       }
     }
     ROAD_CACHE.set(battle, m);
   }
-  return m.get(r * COLS + c) ?? 0;
+  return m.get(r * (battle.grid?.cols ?? COLS) + c) ?? 0;
 }
 
 // ==================================================================================================================
@@ -561,7 +561,7 @@ const KITS = {
           if (c.prevented || a.side !== 'ally' || a === unit) return;
           const guard = a.findBuff('titi:allySleep');
           if (guard) { if (guard.data.src === unit) c.prevented = true; return; }
-          if (!isOp(a) || !unit.skill?.active || !on(unit) || !unit.rangeKeySet?.has(a.tileR * COLS + a.tileC)) return;
+          if (!isOp(a) || !unit.skill?.active || !on(unit) || !unit.rangeKeySet?.has(a.tileR * (battle.grid?.cols ?? COLS) + a.tileC)) return;
           c.prevented = true;
           const entered = !a.buffs.some((b) => (b.status ?? b.key) === 'sleep');
           battle.addBuff(a, {
@@ -637,7 +637,7 @@ const KITS = {
           targeting: skillRange(chess, def, { maxTargets: Math.max(1, num(bb['attack@max_target'], 3)) }),
           attack: {
             onEachHit({ unit, target }) {
-              if (target && target.side === 'enemy') unit.mem.blazeTiles?.add(Math.round(target.y) * COLS + Math.round(target.x));
+              if (target && target.side === 'enemy') unit.mem.blazeTiles?.add(Math.round(target.y) * (unit.battle?.grid?.cols ?? COLS) + Math.round(target.x));
             },
           },
           onStart({ unit }) { unit.mem.blazeTiles = new Set(); unit.mem.blazeAcc2 = 0; },
@@ -845,7 +845,7 @@ const KITS = {
               // the anchor stops at the field edge and in front of a ground obstacle (crates, roadblocks)
               if (!battle.grid.inRect(r, c) || battle.grid.isObstacle(r, c)) break;
               stop = d;
-              if (battle.enemiesInKeys([r * COLS + c], unit, { canHitFly: true }).length) break;
+              if (battle.enemiesInKeys([r * (battle.grid?.cols ?? COLS) + c], unit, { canHitFly: true }).length) break;
             }
           }
           const [sr, sc] = frontOf(unit.tileR, unit.tileC, unit.dir, stop);
@@ -1452,7 +1452,7 @@ const KITS = {
         whileOn(battle, unit, AURA_IV, () => {
           const keys = new Set(unit.baseRangeKeys || []);
           let n = 0;
-          for (const a of battle.allies()) if (a !== unit && isOp(a) && keys.has(a.tileR * COLS + a.tileC)) n++;
+          for (const a of battle.allies()) if (a !== unit && isOp(a) && keys.has(a.tileR * (battle.grid?.cols ?? COLS) + a.tileC)) n++;
           if (n >= need) battle.addBuff(unit, { key: 'cetsyr:module', duration: AURA_DUR, mods: { atkPct: atk } });
         });
       },
@@ -1537,10 +1537,10 @@ const KITS = {
     const sid = selectedId(chess, def);
     const grid = skillGrid(chess, def) ?? [[0, 0]];
     const zone = (battle, unit) => {
-      const at = unit.tileR * COLS + unit.tileC;
-      if (unit.mem.sariaAt !== at) { unit.mem.sariaAt = at; unit.mem.sariaKeys = new Set(absoluteRangeKeys(grid, unit.tileR, unit.tileC, unit.dir, 0)); }
+      const at = unit.tileR * (battle.grid?.cols ?? COLS) + unit.tileC;
+      if (unit.mem.sariaAt !== at) { unit.mem.sariaAt = at; unit.mem.sariaKeys = new Set(absoluteRangeKeys(grid, unit.tileR, unit.tileC, unit.dir, 0, battle.grid)); }
       const keys = unit.mem.sariaKeys;
-      return battle.allies().filter((a) => keys.has(a.tileR * COLS + a.tileC) && (a === unit || !(a.s.flags.noHeal || a.profile?.noHeal)));
+      return battle.allies().filter((a) => keys.has(a.tileR * (a.battle?.grid?.cols ?? COLS) + a.tileC) && (a === unit || !(a.s.flags.noHeal || a.profile?.noHeal)));
     };
     const healable = (a, unit) => a.kind !== 'device' && (a === unit || !(a.s.flags.noHeal || a.profile?.noHeal));
     return {
@@ -1962,7 +1962,7 @@ const KITS = {
             const main = c.targets[0];
             const lat = (r, cc) => toLocal(r - unit.tileR, cc - unit.tileC, unit.dir)[0];
             const l0 = lat(Math.round(main.y), Math.round(main.x));
-            const onLine = (e) => bodyKeys(e).some((k) => lat(Math.floor(k / COLS), k % COLS) === l0);
+            const onLine = (e) => bodyKeys(e).some((k) => lat(Math.floor(k / (e.battle?.grid?.cols ?? COLS)), k % (e.battle?.grid?.cols ?? COLS)) === l0);
             const line = battle.enemiesInKeys(unit.rangeKeys, unit, unit.profile).filter((e) => e !== main && onLine(e));
             if (line.length) c.targets = [main, ...line];
           }, { owner: unit, priority: 10 });
@@ -2075,7 +2075,7 @@ const KITS = {
             // PRTS 备注: no enemy in range → thrown at the farthest tile straight ahead inside her range
             let best = null;
             for (const k of unit.rangeKeys || []) {
-              const r = Math.floor(k / COLS), c = k % COLS;
+              const r = Math.floor(k / (battle.grid?.cols ?? COLS)), c = k % (battle.grid?.cols ?? COLS);
               if (!battle.grid.inRect(r, c)) continue;
               const [lat, d] = toLocal(r - unit.tileR, c - unit.tileC, unit.dir);
               if (lat !== 0) continue;
@@ -2481,13 +2481,13 @@ const KITS = {
           for (let i = 0; i < ICICLE_ROWS.length && k == null; i++) {
             const idx = (num(unit.mem.iceRow) + i) % ICICLE_ROWS.length;
             const lat = ICICLE_ROWS[idx];
-            const keys = (unit.rangeKeys || []).filter((x) => toLocal(Math.floor(x / COLS) - unit.tileR, x % COLS - unit.tileC, unit.dir)[0] === lat);
+            const keys = (unit.rangeKeys || []).filter((x) => toLocal(Math.floor(x / (battle.grid?.cols ?? COLS)) - unit.tileR, x % (battle.grid?.cols ?? COLS) - unit.tileC, unit.dir)[0] === lat);
             if (!keys.length) continue;
             k = battle.rng.pick(keys);
             unit.mem.iceRow = (idx + 1) % ICICLE_ROWS.length;
           }
           if (k == null) return;
-          const r = Math.floor(k / COLS), c = k % COLS;
+          const r = Math.floor(k / (battle.grid?.cols ?? COLS)), c = k % (battle.grid?.cols ?? COLS);
           unit.lastAttackAt = battle.time;
           unit.stats.attacks++; // "攻击变为…召唤冰凌": every icicle is one of her attacks
           battle.fx('iceSpike', { x: c, y: r, id: unit.id, r: ICICLE_RADIUS });

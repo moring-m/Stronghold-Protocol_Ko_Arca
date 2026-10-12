@@ -40,7 +40,7 @@ const TICK_EPS = 0.01;     // minimal status duration (s)
 const AURA = 0.2;          // aura refresh period (s)
 const AURA_DUR = 0.25;     // aura buff lifetime (s): lapses ~1 tick after the source stops refreshing it
 const ABYSSAL = new Set(['char_143_ghost', 'char_263_skadi', 'char_474_glady', 'char_4145_ulpia', 'char_1023_ghost2']);
-const LINE = Object.freeze(Array.from({ length: COLS }, (_, i) => Object.freeze([0, i])));
+const LINE = Object.freeze(Array.from({ length: Math.max(COLS, 37) }, (_, i) => Object.freeze([0, i])));
 /** 卡涅利安 S3 食噬之印: the ATK bonus climbs in 1 s steps over 20 s (PRTS 备注; the blackboard has no ramp time). */
 const BILLRO_S3_RAMP = 20;
 /** 卡涅利安 S3 charged mark: one buff per enemy, shared by every 卡涅利安 (PRTS 备注), ≤ 5 stacks (skill text). */
@@ -59,7 +59,7 @@ const moduleBb = (def) => (def?.talents || []).filter((t) => !t.name && t.bb && 
 const grid = (g) => (Array.isArray(g) && g.length ? g.map((p) => [p[0], p[1]]) : null);
 /** Flat BAT change (s) → batPct. */
 const batFlat = (def, v) => { const b = num(def?.stats?.bat, 1) || 1; return Math.max(-0.9, num(v, 0) / b); };
-const tileKey = (u) => Math.round(u.y) * COLS + Math.round(u.x);
+const tileKey = (u) => Math.round(u.y) * (u.battle?.grid?.cols ?? COLS) + Math.round(u.x);
 const nationOf = (u) => u?.def?.raw?.nationId ?? null;
 const isAbyssal = (u) => u?.def?.raw?.groupId === 'abyssal' || ABYSSAL.has(u?.def?.charId ?? u?.def?.raw?.charId);
 const enemyHasTag = (e, tag) => !!e && e.side === 'enemy' && Array.isArray(e.def?.tags) && e.def.tags.includes(tag);
@@ -423,7 +423,7 @@ const kits = {
         battle.on('deploy', (c) => {
           if (c.unit !== unit) return;
           let low = 0;
-          for (const k of unit.rangeKeys || []) if (battle.grid.isLow((k / COLS) | 0, k % COLS)) low++;
+          for (const k of unit.rangeKeys || []) if (battle.grid.isLow((k / (battle.grid?.cols ?? COLS)) | 0, k % (battle.grid?.cols ?? COLS))) low++;
           const v = low >= num(t0.cnt, 2) ? num(t0['kjera_t_1[high].atk'], num(t0.atk)) : num(t0.atk);
           battle.addBuff(unit, { key: 'kjera:t1', mods: { atkPct: v } });
         }, { owner: unit });
@@ -660,7 +660,7 @@ const kits = {
           const ref = foes[0] || battle.aliveEnemies().filter((e) => !e.hidden).sort((a, b) => battle.remainingDistance(a) - battle.remainingDistance(b))[0] || unit;
           let best = null, bd = Infinity;
           for (const k of unit.rangeKeys || []) {
-            const r = (k / COLS) | 0, c = k % COLS;
+            const r = (k / (battle.grid?.cols ?? COLS)) | 0, c = k % (battle.grid?.cols ?? COLS);
             if (!freeTile(battle, r, c)) continue;
             const d = hypot(c - ref.x, r - ref.y) + (battle.grid.groundPassable(r, c) ? 0 : 5);
             if (d < bd - 1e-9) { bd = d; best = [r, c]; }
@@ -802,7 +802,7 @@ const kits = {
           const t = c.target;
           // "友方干员": operators only (summons/devices keep the full hit)
           if (!skillActive(unit) || !unit.alive || t.side !== 'ally' || t.kind !== 'op' || (c.dmg.type !== 'phys' && c.dmg.type !== 'arts')) return;
-          if (!keySet(unit).has(t.tileR * COLS + t.tileC)) return;
+          if (!keySet(unit).has(t.tileR * (battle.grid?.cols ?? COLS) + t.tileC)) return;
           c.dmg.mul *= scale;
           deferred.add(c.dmg);
         }, { owner: unit, priority: -5 });
@@ -1207,7 +1207,7 @@ const kits = {
       talents: [{ install(battle, unit) { // 学成于聚: an operator in range casts ⇒ +1 SP and ASPD +16 for 8 s
         battle.on('skillStart', (c) => {
           const a = c.unit;
-          if (a === unit || a.side !== 'ally' || a.kind !== 'op' || !unit.alive || !unit.deployed || !keySet(unit).has(a.tileR * COLS + a.tileC)) return;
+          if (a === unit || a.side !== 'ally' || a.kind !== 'op' || !unit.alive || !unit.deployed || !keySet(unit).has(a.tileR * (battle.grid?.cols ?? COLS) + a.tileC)) return;
           if (!battle.rng.chance(num(t0.prob, 1))) return;
           if (!skillActive(unit)) unit.skill?.gainSp(num(t0.sp, 1), 'talent');
           battle.addBuff(unit, { key: 'reckpr:t1', duration: num(t0.duration, 8), mods: { aspd: num(t0.attack_speed, 16) }, maxStacks: Math.max(1, num(t0.max_stack_cnt, 1)) });
@@ -1650,7 +1650,7 @@ const kits = {
           // unblocked enemy (a flyer…) standing on such a tile outside her own range is dropped for the next valid target
           battle.on('beforeAttack', (c) => {
             if (c.attacker !== unit || !skillActive(unit) || !unit.extraRangeKeys) return;
-            const own = new Set(absoluteRangeKeys(unit.rangeGrid, unit.tileR, unit.tileC, unit.dir, unit.s.rangeExtend));
+            const own = new Set(absoluteRangeKeys(unit.rangeGrid, unit.tileR, unit.tileC, unit.dir, unit.s.rangeExtend, battle.grid));
             const ok = (e) => bodyInKeys(e, own) || !!(e.blockedBy && e.blockedBy.side === 'ally' && e.blockedBy.alive);
             if (c.targets.every(ok)) return;
             const cands = battle.enemiesInKeys(unit.rangeKeys, unit, c.profile);
@@ -2052,7 +2052,7 @@ const kits = {
         if (!a) return;
         whileDeployed(battle, unit, AURA, () => {
           const set = new Set(unit.baseRangeKeys || []);
-          const n = battle.allies(unit.ownerId).filter((o) => o !== unit && o.kind === 'op' && set.has(o.tileR * COLS + o.tileC)).length;
+          const n = battle.allies(unit.ownerId).filter((o) => o !== unit && o.kind === 'op' && set.has(o.tileR * (battle.grid?.cols ?? COLS) + o.tileC)).length;
           toggleBuff(battle, unit, 'cetsyr:module', n >= cnt, { atkPct: a });
         });
       },

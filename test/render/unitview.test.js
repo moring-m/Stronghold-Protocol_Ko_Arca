@@ -562,3 +562,10 @@ test('fixed giant boss art and HUD use the hit-area centre without moving its si
  v.visFacing=1;v.flipValue=null;v.update(.016,camera,1);assert.ok(v.body.position.x<0);assert.equal(v.screen.x,centre.x);
  v.destroy();
 });
+
+test('active Notes display one foreground treble-clef effect regardless of stack count and hide on expiry',()=>{
+ const v=view({kind:'enemy',side:'enemy'});v.setNoteStacks(1);v.update(.016,cam(),0);
+ assert.ok(v.noteClef);assert.ok(v.noteFx.visible);assert.ok(v.root.children.indexOf(v.noteFx)>v.root.children.indexOf(v.body));
+ const clef=v.noteClef,fx=v.noteFx;v.setNoteStacks(600);v.update(.016,cam(),1);assert.equal(v.noteClef,clef);assert.equal(v.noteFx,fx);assert.ok(v.noteFx.visible);
+ v.setNoteStacks(0);v.update(.016,cam(),2);assert.equal(v.noteFx.visible,false);v.destroy();
+});

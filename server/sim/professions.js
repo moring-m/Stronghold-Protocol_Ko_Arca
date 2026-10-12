@@ -439,7 +439,7 @@ const installSkywalker = (battle, unit) => {
 
 /** Target's tile offset from the unit in the unit's facing-RIGHT frame ([dRow, dCol], sim/dir.js toLocal). */
 /** The target (its body: a huge enemy's every tile — body.js) on a tile of `grid` around the unit (its facing frame). */
-const inTraitGrid = (unit, target, grid) => bodyInKeys(target, absoluteRangeKeys(grid, unit.tileR, unit.tileC, unit.dir, 0));
+const inTraitGrid = (unit, target, grid) => bodyInKeys(target, absoluteRangeKeys(grid, unit.tileR, unit.tileC, unit.dir, 0, unit.battle?.grid));
 
 /**
  * 'reaperrange' default front test: the target stands on the unit's own line, at or ahead of it along its facing — a
@@ -452,7 +452,7 @@ const onFrontLine = (unit, target) => {
     return lateral(Math.round(target.y), Math.round(target.x)) === 0 && (target.x - unit.x) * fc + (target.y - unit.y) * fr >= 0;
   }
   for (const k of bodyKeys(target)) {
-    const r = Math.floor(k / COLS), c = k % COLS;
+    const r = Math.floor(k / (unit.battle?.grid?.cols ?? COLS)), c = k % (unit.battle?.grid?.cols ?? COLS);
     if (lateral(r, c) === 0 && (c - unit.tileC) * fc + (r - unit.tileR) * fr >= 0) return true;
   }
   return false;

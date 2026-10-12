@@ -38,7 +38,7 @@ export default withDefaults({
           const ref = foes[0] || battle.aliveEnemies().filter((e) => !e.hidden).sort((a, b) => battle.remainingDistance(a) - battle.remainingDistance(b))[0] || unit;
           let best = null, bd = Infinity;
           for (const k of unit.rangeKeys || []) {
-            const r = (k / COLS) | 0, c = k % COLS;
+            const r = (k / (battle.grid?.cols ?? COLS)) | 0, c = k % (battle.grid?.cols ?? COLS);
             if (!freeTile(battle, r, c)) continue;
             const d = hypot(c - ref.x, r - ref.y) + (battle.grid.groundPassable(r, c) ? 0 : 5);
             if (d < bd - 1e-9) { bd = d; best = [r, c]; }

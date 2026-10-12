@@ -100,3 +100,24 @@ test('laboratory solo boss fights expose the regular left/full/right camera cont
  assert.deepEqual(cameraLayers({...field,kind:'hidden'},{laboratory:{}},'a').map(l=>l.key),['L','ALL','R']);
  assert.deepEqual(cameraLayers(field,{},'a'),[]);
 });
+
+test('four consecutive helper fields expose overview and each player camera',()=>{
+ const field={kind:'unite',players:['a','b','c','d'],rect:{r0:9,r1:12,c0:0,c1:36}};
+ const layers=cameraLayers(field,{players:field.players.map(playerId=>({playerId,name:playerId}))},'a');
+ assert.deepEqual(layers.map(l=>l.key),['ALL','P:a','P:b','P:c','P:d']);
+ for(const [i,pid]of field.players.entries()){
+  const camera=layerCamera(field,'P:'+pid);assert.equal(camera.rect.c0,(3-i)*8);assert.equal(camera.rect.c1,(3-i)*8+10);assert.equal(camera.fit,true);assert.equal(camera.half,false);
+ }
+ assert.deepEqual(layerCamera(field,'ALL').rect,field.rect);
+});
+
+test('eight-player cooperative defense keeps all four camera slots when only one or two helpers enter',()=>{
+ for(const count of [1,2]){
+  const field={kind:'unite',stageId:'coop8_unite_original',rect:{r0:9,r1:12,c0:0,c1:36},players:['a','b'].slice(0,count)};
+  const layers=cameraLayers(field,{players:[{playerId:'a',name:'A'},{playerId:'b',name:'B'}]},'a');
+  assert.equal(layers.length,5);assert.equal(layers[0].key,'ALL');assert.equal(layers[1].key,'P:a');
+  assert.equal(layerCamera(field,'P:a').rect.c0,24);
+  for(let i=count;i<4;i++)assert.equal(layerCamera(field,'S:'+i).rect.c0,(3-i)*8);
+  assert.equal(layerCamera(field,'ALL').half,false);
+ }
+});

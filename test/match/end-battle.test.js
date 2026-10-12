@@ -34,3 +34,32 @@ test('pending shared termination is reevaluated when a nonvoter leaves',()=>{
  h.m.onLeave('p_1');
  h.run(()=>f.done,{maxSteps:10000});assert.equal(f.done,true);
 });
+
+test('early surrender includes every scheduled enemy for HP settlement',()=>{
+ const h=combat();const f=h.m.fields.find(f=>f.players.includes('p_0'));
+ const scheduled=f.spec.spawns.reduce((n,s)=>n+(s.count||1),0);
+ assert.ok(f.spec.spawns.some(s=>s.time>1));
+ const hp=h.m.players.get('p_0').lp;
+ h.m.handle('p_0',{t:'g.endBattle',fieldId:f.fieldId});h.run(()=>f.done,{maxSteps:10000});
+ const pp=f.result.perPlayer.p_0;
+ assert.equal(pp.killed+pp.leaked.filter(e=>e.counted!==false).length,scheduled);
+ assert.ok(pp.leaked.some(e=>e.spawned===false));assert.equal(f.result.unspawned,undefined);
+ h.runToPhase('PREP',2);assert.equal(h.m.players.get('p_0').lp,hp-Math.min(10,scheduled));
+});
+
+test('early surrender transfers scheduled enemies to cooperative defense',async()=>{
+ const {planUnite}=await import('../../server/match/unite.js');
+ const h=combat(2),f=h.m.fields.find(f=>f.players.includes('p_0'));
+ h.m.handle('p_0',{t:'g.endBattle',fieldId:f.fieldId});h.run(()=>f.done,{maxSteps:10000});
+ const results=new Map([['p_0',f.result.perPlayer.p_0],['p_1',{perfect:true,leaked:[],unitsEnd:[]}]]);
+ const plan=planUnite(h.m,results);assert.ok(plan);assert.ok(plan.helpers.some(p=>p.playerId==='p_1'));
+ assert.equal(plan.leaked.length,f.result.perPlayer.p_0.leaked.filter(e=>e.counted!==false).length);assert.ok(plan.leaked.length>1);
+});
+test('eight-player unite requires votes from all four human defenders, excludes leakers, and completes surrender',()=>{
+ const h=makeMatch({mode:'coop8',humans:8,clientCombat:true,instant:false});const m=h.m;m.start();m.startRound(1);m.enterPrep();const chess=m.gd.visibleChess.find(id=>m.gd.chess(id).position==='MELEE');
+ for(const p of m.order.slice(0,4)){p.board.set('10,3',p.newPiece('chess',chess));m.lastResults.set(p.playerId,{unitsEnd:[]});}
+ m.startUnite({helpers:m.order.slice(0,4),leakers:m.order.slice(4),leaked:[{enemyKey:Object.keys(m.data.enemies)[0],lpr:1,sourcePlayerId:'p_4'}],notReentered:new Map()});const f=m.fields[0];
+ assert.ok(m.handle('p_4',{t:'g.endBattle',fieldId:f.fieldId}).error);
+ for(let i=0;i<3;i++){assert.ok(m.handle('p_'+i,{t:'g.endBattle',fieldId:f.fieldId}).ok);assert.equal(f.done,false);assert.equal(f.endRequested,undefined);}
+ assert.ok(m.handle('p_3',{t:'g.endBattle',fieldId:f.fieldId}).ok);h.run(()=>f.done,{maxSteps:10000});assert.equal(f.done,true);assert.equal(f.endVotes.size,4);assert.equal(f.endRequested,true);assert.equal(f.result.reason,'timeout');m.dispose();
+});

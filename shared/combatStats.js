@@ -1,5 +1,5 @@
 // Compact per-operator battle metrics, shared by the sim, validated reports and result UI.
-export const COMBAT_METRICS=Object.freeze(['dmg','physicalDamage','artsDamage','trueDamage','elementalDamage','heal','taken','takenPhysical','takenArts','takenTrue','takenElemental','shieldAbsorbed','kills','attacks','skillUses','redeploys','deaths','activeTime']);
+export const COMBAT_METRICS=Object.freeze(['dmg','physicalDamage','artsDamage','noteDamage','trueDamage','elementalDamage','heal','taken','takenPhysical','takenArts','takenTrue','takenElemental','shieldAbsorbed','kills','attacks','skillUses','redeploys','deaths','activeTime']);
 const COUNTS=new Set(['kills','attacks','skillUses','redeploys','deaths']);
 export function combatMetrics(value={}) {
   if(!value||typeof value!=='object')value={};

@@ -169,7 +169,7 @@ export function SettingsModal({ open, onClose }) {
       <${Toggle} label="장비 칸 왼쪽 배치" micro="SHOP LAYOUT" value=${s.shopItemLeft} onChange=${v=>updateSettings({shopItemLeft:v})} />
       <p class="set-hint">단축키 버튼을 누른 뒤 사용할 키를 입력하세요. 중복된 키는 서로 교환됩니다. Esc로 취소할 수 있습니다.</p>
       ${HOTKEY_ACTIONS.map(action=>html`<div class="set-row" data-i18n-skip>
-        <span class="set-row__label">${({refresh:'상점 새로고침',freeze:'상점 동결',levelUp:'상점 레벨업',retreat:'선택한 오퍼레이터 퇴각',sell:'선택한 오퍼레이터 판매',ready:'준비 완료 / 일시정지',collapseShop:'상점 접기 / 펼치기'})[action]}</span>
+        <span class="set-row__label">${({refresh:'상점 새로고침',freeze:'상점 동결',levelUp:'상점 레벨업',retreat:'선택한 오퍼레이터 퇴각',sell:'선택한 오퍼레이터 판매',ready:'준비 완료 / 일시정지',collapseShop:'상점 접기 / 펼치기',enemyPreview:'적 미리보기 / 전장으로 돌아가기'})[action]}</span>
         <button type="button" class="btn btn--secondary" data-hotkey-binding=${action} aria-label=${'단축키 변경: '+action} onClick=${()=>setBinding(action)}>
           ${binding===action?'키 입력 대기…':hotkeyLabel(s.keys[action])}</button>
       </div>`)}

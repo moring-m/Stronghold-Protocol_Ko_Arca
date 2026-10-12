@@ -80,7 +80,7 @@ function crossfireOf(chess) {
 /** ARC-Y 正前方: the enemy's body touches the unit's straight line ahead (local row 0, local column ≥ 0). */
 function inFrontLine(unit, e) {
   for (const k of bodyKeys(e)) {
-    const [lr, lc] = toLocal(Math.floor(k / COLS) - unit.tileR, (k % COLS) - unit.tileC, unit.dir);
+    const [lr, lc] = toLocal(Math.floor(k / (unit.battle?.grid?.cols ?? COLS)) - unit.tileR, (k % (unit.battle?.grid?.cols ?? COLS)) - unit.tileC, unit.dir);
     if (lr === 0 && lc >= 0) return true;
   }
   return false;

@@ -102,13 +102,13 @@ function splashAttack({ scale = 1, meleeScale = 1, unblocked = true, tiles = 0, 
  * waypoints (ai.js planLeg; the last one is the leg's checkpoint), sampled every quarter tile.
  */
 function pathKeysAhead(e) {
-  const keys = new Set([Math.round(e.y) * COLS + Math.round(e.x)]);
+  const keys = new Set([Math.round(e.y) * (e.battle?.grid?.cols ?? COLS) + Math.round(e.x)]);
   const R = e.route;
   if (!R || !Array.isArray(R.pts)) return keys;
   let x = e.x, y = e.y;
   for (let i = R.ptIdx ?? 0; i < R.pts.length; i++) {
     const p = R.pts[i], n = Math.max(1, Math.ceil(hypot(p.x - x, p.y - y) * 4));
-    for (let k = 1; k <= n; k++) keys.add(Math.round(y + ((p.y - y) * k) / n) * COLS + Math.round(x + ((p.x - x) * k) / n));
+    for (let k = 1; k <= n; k++) keys.add(Math.round(y + ((p.y - y) * k) / n) * (e.battle?.grid?.cols ?? COLS) + Math.round(x + ((p.x - x) * k) / n));
     x = p.x; y = p.y;
   }
   return keys;

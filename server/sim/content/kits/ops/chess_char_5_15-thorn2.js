@@ -26,12 +26,12 @@ function straightRun(battle, r, c) {
         for (let k = cc + 1; k <= R.c1 && pass(rr, k); k++) h++;
         for (let k = rr - 1; k >= R.r0 && pass(k, cc); k--) v++;
         for (let k = rr + 1; k <= R.r1 && pass(k, cc); k++) v++;
-        m.set(rr * COLS + cc, Math.max(h, v));
+        m.set(rr * (battle.grid?.cols ?? COLS) + cc, Math.max(h, v));
       }
     }
     ROAD_CACHE.set(battle, m);
   }
-  return m.get(r * COLS + c) ?? 0;
+  return m.get(r * (battle.grid?.cols ?? COLS) + c) ?? 0;
 }
 
 export default {
@@ -137,7 +137,7 @@ export default {
             // PRTS 备注: no enemy in range → thrown at the farthest tile straight ahead inside her range
             let best = null;
             for (const k of unit.rangeKeys || []) {
-              const r = Math.floor(k / COLS), c = k % COLS;
+              const r = Math.floor(k / (battle.grid?.cols ?? COLS)), c = k % (battle.grid?.cols ?? COLS);
               if (!battle.grid.inRect(r, c)) continue;
               const [lat, d] = toLocal(r - unit.tileR, c - unit.tileC, unit.dir);
               if (lat !== 0) continue;

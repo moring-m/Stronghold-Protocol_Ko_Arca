@@ -63,7 +63,12 @@ const changesRange = (tg) => !!(tg && (tg.rangeGrid || tg.rangeExtend || tg.noRa
 /** Enemies that satisfy a content trigger range (any targetable enemy, flyers included). */
 const TRIGGER_PROFILE = Object.freeze({ canHitFly: true });
 /** Every tile of the stage (GDGLOW_SKILL_2: the whole field). */
-const ALL_TILES = new Set(Array.from({ length: ROWS * COLS }, (_, i) => i));
+const ALL_TILES = new Map();
+function allTiles(b) {
+  const size = b.grid.rows * b.grid.cols;
+  if (!ALL_TILES.has(size)) ALL_TILES.set(size, new Set(Array.from({length:size}, (_,i)=>i)));
+  return ALL_TILES.get(size);
+}
 
 /**
  * The 'skill' animation window the sim reports to the client: `unit.skillAnimUntil` (snapshot.js `animOf` → ANIM.SKILL,
@@ -436,10 +441,10 @@ export class SkillRuntime {
    */
   _triggerKeys() {
     const u = this.unit;
-    const tile = u.tileR * COLS + u.tileC;
+    const tile = u.tileR * (this.battle.grid?.cols ?? COLS) + u.tileC;
     const ext = this.rule === 'ACTIVE_RANGE' && !this.spec.targeting?.noRangeExtend ? (u.s.baseRangeExtend || 0) : 0;
     if (!this._trigKeys || this._trigTile !== tile || this._trigDir !== u.dir || this._trigExt !== ext) {
-      this._trigKeys = absoluteRangeKeys(this.triggerGrid, u.tileR, u.tileC, u.dir, ext);
+      this._trigKeys = absoluteRangeKeys(this.triggerGrid, u.tileR, u.tileC, u.dir, ext, this.battle.grid);
       this._trigSet = new Set(this._trigKeys);
       this._trigTile = tile;
       this._trigDir = u.dir;
@@ -480,8 +485,8 @@ export class SkillRuntime {
     if (this.rule === 'ACTIVE_RANGE') return this._defaultCondition(this.triggerGrid ? this._triggerKeys() : null);
     // GDGLOW_SKILL_2 "全场存在可选目标时释放技能": a targetable enemy anywhere (heal skill: an ally that needs healing)
     if (this.rule === 'GDGLOW_SKILL_2') {
-      if (this.healSkill) return b.injuredAlliesInKeys(ALL_TILES, u, !!u.profile?.heal?.elementHealRatio).length > 0;
-      return b.enemies.some((e) => canTargetEnemy(u, e, TRIGGER_PROFILE)) || this._allyTargetIn(ALL_TILES);
+      if (this.healSkill) return b.injuredAlliesInKeys(allTiles(b), u, !!u.profile?.heal?.elementHealRatio).length > 0;
+      return b.enemies.some((e) => canTargetEnemy(u, e, TRIGGER_PROFILE)) || this._allyTargetIn(allTiles(b));
     }
     return false;
   }
@@ -495,7 +500,7 @@ export class SkillRuntime {
     const extra = (tg?.rangeExtend || 0) + (this.spec.mods?.rangeExtend || 0);
     if (!grid && !extra) return null;
     const keys = absoluteRangeKeys(grid || u.rangeGrid || [[0,0]], u.tileR, u.tileC, u.dir,
-      (tg?.noRangeExtend ? 0 : u.s.rangeExtend) + extra);
+      (tg?.noRangeExtend ? 0 : u.s.rangeExtend) + extra, this.battle.grid);
     const base = new Set(u.baseRangeKeys || u.rangeKeys || []);
     return keys.some(k => !base.has(k)) ? keys : null;
   }

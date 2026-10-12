@@ -83,7 +83,7 @@ export const FRONT_KEY = 'sleach:front';
 export const CAMOU_KEY = 'sleach:camou';
 
 const bbOf = (chess, id) => skillRec(chess, id)?.bb ?? {};
-const tileKey = (r, c) => r * COLS + c;
+const tileKey = (r, c, grid) => r * (grid?.cols ?? COLS) + c;
 /** A living deployed operator (summons / devices are no 干员). */
 const isOp = (a) => !!a && a.kind === 'op' && a.alive && a.deployed && !a.hidden;
 
@@ -92,7 +92,7 @@ function flagTile(unit) {
   const f = unit.mem.sleachFlag;
   return f ? [f.r, f.c] : [unit.tileR, unit.tileC];
 }
-const areaKeys = (unit, r, c) => new Set(absoluteRangeKeys(X4, r, c, unit.dir, 0));
+const areaKeys = (unit, r, c) => new Set(absoluteRangeKeys(X4, r, c, unit.dir, 0, unit.battle?.grid));
 
 /**
  * A skill's DP over time: `step` DP every `iv` s from `first` s on, `total` in all; a skill that runs its full duration pays
@@ -127,8 +127,8 @@ function dpOverTime({ total, step = 1, iv, first = iv }) {
  * own effects, does not ignore 孤立), else her own tile.
  */
 function s2Tile(battle, unit, grid) {
-  const keys = new Set(absoluteRangeKeys(grid, unit.tileR, unit.tileC, unit.dir, 0));
-  const cands = battle.allyUnits.filter((a) => isOp(a) && a !== unit && battle.allySelectable(a, unit) && keys.has(tileKey(a.tileR, a.tileC)));
+  const keys = new Set(absoluteRangeKeys(grid, unit.tileR, unit.tileC, unit.dir, 0, battle.grid));
+  const cands = battle.allyUnits.filter((a) => isOp(a) && a !== unit && battle.allySelectable(a, unit) && keys.has(tileKey(a.tileR, a.tileC, a.battle?.grid)));
   cands.sort((a, b) => a.hpRatio - b.hpRatio || a.deploySeq - b.deploySeq || a.id - b.id);
   const t = cands[0];
   return t ? [t.tileR, t.tileC] : [unit.tileR, unit.tileC];
@@ -139,17 +139,17 @@ function s2Tile(battle, unit, grid) {
  * (her targeting order: the highest 仇恨), else the free ground tile of the range nearest to it, else her own tile.
  */
 function s3Tile(battle, unit, grid) {
-  const keys = absoluteRangeKeys(grid, unit.tileR, unit.tileC, unit.dir, 0);
+  const keys = absoluteRangeKeys(grid, unit.tileR, unit.tileC, unit.dir, 0, battle.grid);
   const ground = (r, c) => battle.grid.inRect(r, c) && battle.grid.isLow(r, c);
   const foes = battle.enemiesInKeys(keys, unit, GROUND).filter((e) => !e.isFlying);
   if (!foes.length) return [unit.tileR, unit.tileC];
   sortEnemyTargets(battle, unit, foes, null);
   const top = foes[0];
   const er = Math.round(top.y), ec = Math.round(top.x);
-  if (keys.includes(tileKey(er, ec)) && ground(er, ec)) return [er, ec];
+  if (keys.includes(tileKey(er, ec, battle.grid)) && ground(er, ec)) return [er, ec];
   let best = null, bd = Infinity;
   for (const k of keys) {
-    const r = (k / COLS) | 0, c = k % COLS;
+    const r = (k / (battle.grid?.cols ?? COLS)) | 0, c = k % (battle.grid?.cols ?? COLS);
     if (!ground(r, c) || battle.unitAt(r, c)) continue;
     const d = hypot(c - top.x, r - top.y);
     if (d < bd - 1e-9) { bd = d; best = [r, c]; }
@@ -279,7 +279,7 @@ export default {
               const keys = areaKeys(unit, r, c);
               if (allyAspd) {
                 for (const a of battle.allyUnits) {
-                  if (!isOp(a) || !keys.has(tileKey(a.tileR, a.tileC))) continue;
+                  if (!isOp(a) || !keys.has(tileKey(a.tileR, a.tileC, battle.grid))) continue;
                   battle.addBuff(a, { key: aKey, duration: AURA_DUR, refresh: 'extend', mods: { aspd: allyAspd }, source: unit, tags: ['aura'] });
                   next.add(a);
                 }

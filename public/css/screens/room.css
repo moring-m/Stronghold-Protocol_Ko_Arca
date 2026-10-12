@@ -351,3 +351,9 @@
 .room-bar__left .dpick { flex-shrink: 0; }
 .room-bar__label, .ailast__opt, .rpick__opt { white-space: nowrap; }
 .room-bar__label .micro { letter-spacing: .04em; }
+
+/* Eight participants retain the ordinary cards in two compact rows. */
+.seats--eight{grid-template-columns:repeat(4,minmax(0,3.8rem));grid-template-rows:repeat(2,minmax(0,1fr));align-content:stretch;gap:.15rem;padding-top:.15rem}
+.seats--eight .seat{padding:.1rem .15rem;gap:.04rem}
+.seats--eight .seat__art{min-height:.5rem;margin:0}
+.seats--eight .seat__name{font-size:.2rem}

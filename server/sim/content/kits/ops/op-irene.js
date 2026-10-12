@@ -54,7 +54,7 @@ const GROUND = Object.freeze({ canHitFly: false });
 
 const bbOf = (chess, id) => skillRec(chess, id)?.bb ?? {};
 /** Absolute tile keys of a skill range at the unit's tile and facing (a 技能范围 ignores 攻击距离: no extend). */
-const keysOf = (unit, grid) => absoluteRangeKeys(grid, unit.tileR, unit.tileC, unit.dir, 0);
+const keysOf = (unit, grid) => absoluteRangeKeys(grid, unit.tileR, unit.tileC, unit.dir, 0, unit.battle?.grid);
 /** A living 【海怪】 enemy on the field. */
 const seaMonsterOnField = (battle) => battle.enemies.some((e) => e.alive && !e.hidden && Array.isArray(e.def?.tags) && e.def.tags.includes('seamonster'));
 

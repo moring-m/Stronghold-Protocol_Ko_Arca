@@ -542,7 +542,7 @@ describe('websocket lobby', () => {
     assert.equal(st.mode, 'coop');
     assert.equal(st.difficulty, 'HARD');
     assert.equal(st.inMatch, false);
-    assert.equal(st.seats.length, MAX_SEATS);
+    assert.equal(st.seats.length, 4);
     assert.deepEqual(st.seats[0], { seat: 0, playerId: host.id, name: 'Host', chatFaction: null, isBot: false, ready: false, connected: true });
     assert.deepEqual(st.seats.slice(1), [null, null, null]);
 

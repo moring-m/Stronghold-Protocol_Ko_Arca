@@ -1,3 +1,5 @@
+import {withLaboratoryDummy,LAB_DUMMY_BOSS,LAB_DUMMY_ENEMY} from '../../../shared/laboratoryDummy.js';
+import {damageValues} from '../../../shared/damageTypes.js';
 import {attachAttackTimings} from '../../../shared/attackTiming.js';
 // Local battle runner — client-side combat (DESIGN §14, research 09 §3.2 / §6.4).
 //
@@ -458,13 +460,13 @@ export function createBattleRunner(deps) {
       msg.bossDmg = pool && Number.isFinite(pool.cum) ? pool.cum : 0;
       if (pool && pool.byPlayer) {
         const by = {};
-        for (const pid of Object.keys(pool.byPlayer).slice(0, 4)) by[pid] = pool.byPlayer[pid];
+        for (const pid of Object.keys(pool.byPlayer).slice(0, 8)) by[pid] = pool.byPlayer[pid];
         msg.by = by;
       }
     } else {
       msg.leaks = Math.min(1e6, p.leaks);
-      // 联防: the leakers' enemies still standing (shared/protocol.js b.progress `left`, ≤ 4 players)
-      if (p.left) msg.left = Object.fromEntries(Object.entries(p.left).slice(0, 4));
+      // 联防: the leakers' enemies still standing (shared/protocol.js b.progress `left`, ≤ 8 players)
+      if (p.left) msg.left = Object.fromEntries(Object.entries(p.left).slice(0, 8));
     }
     try { net.send('b.progress', msg); } catch { /* offline */ }
   }
@@ -701,7 +703,8 @@ export function createBattleRunner(deps) {
       if (!wanted()) return;
       let battle;
       try {
-        battle = sim.spec.createBattleFromSpec(e.spec, sim.ds, { logger });
+        const ds=e.spec.bossId===LAB_DUMMY_BOSS?new sim.ds.constructor(withLaboratoryDummy(sim.ds.raw,e.spec.enemyOverrides?.[LAB_DUMMY_ENEMY]?.stats),null):sim.ds;
+        battle = sim.spec.createBattleFromSpec(e.spec, ds, { logger });
       } catch (err) {
         console.warn('[runner] battle construction failed', err);
         recordError('runner', err, 'battle construction failed');
@@ -769,7 +772,7 @@ export function createBattleRunner(deps) {
     // A confirmed boss clear also reconciles a field that stopped before its final HP acknowledgement.
     const bossCleared=msg.reason === 'cleared' && (e.kind === 'boss' || e.kind === 'hidden');
     if (bossCleared) e.endReason='cleared';
-    else if (!e.endReason) e.endReason=msg.reason === 'timeout'?'timeout':'forced';
+    else if (!e.endReason) e.endReason=['timeout','surrender'].includes(msg.reason)?msg.reason:'forced';
     if (e.battle) endBattle(e);
   }
 
@@ -858,8 +861,8 @@ export function createBattleRunner(deps) {
         const owner = u.kind === 'op' ? u : u.ownerUnit;
         if (!owner || owner.kind !== 'op') continue;
         let row = rows.get(owner.id);
-        if (!row) { row = {id:owner.id,defId:owner.defId,name:owner.def?.name||owner.defId,values:[0,0,0,0]};rows.set(owner.id,row); }
-        ['physicalDamage','artsDamage','trueDamage','elementalDamage'].forEach((key,i)=>{row.values[i]+=Math.max(0,Number(u.stats?.[key])||0);});
+        if (!row) { row = {id:owner.id,defId:owner.defId,name:owner.def?.name||owner.defId,values:[0,0,0,0,0,0]};rows.set(owner.id,row); }
+        damageValues(u.stats).forEach((value,i)=>{row.values[i]+=value;});
       }
       return {battleId:e.battleId,time:b.time,rows:[...rows.values()]};
     },

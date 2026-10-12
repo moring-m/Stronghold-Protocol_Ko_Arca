@@ -79,7 +79,7 @@ const skillOn = (u, id) => !!(u.skill && u.skill.active && (id == null || u.skil
 const SMOKE = new WeakMap();
 
 /** The smoke's tiles of `u` now (S3: the skill's x-1, else her x-4). */
-const smokeKeys = (u, s3Grid) => absoluteRangeKeys(skillOn(u, S3) ? s3Grid : X4, u.tileR, u.tileC, u.dir, 0);
+const smokeKeys = (u, s3Grid) => absoluteRangeKeys(skillOn(u, S3) ? s3Grid : X4, u.tileR, u.tileC, u.dir, 0, u.battle?.grid);
 
 /** The 命中率 cut (0–1) that ground enemy `e`'s attack of damage type `type` suffers: the strongest smoke holding it. */
 function smokeCut(st, e, type) {
@@ -155,7 +155,7 @@ export default {
             // crosly_s_2[end]: STUNNED / FROZEN / DISARMED when it ends ⇒ no blast
             if (reason !== 'duration' || !up(unit) || !unit.canAct || unit.s.flags.disarm) return;
             const scale = num(b2['attack@atk_scale_s2']);
-            for (const e of battle.enemiesInKeys(absoluteRangeKeys(X4, unit.tileR, unit.tileC, unit.dir, 0), unit, GROUND)) {
+            for (const e of battle.enemiesInKeys(absoluteRangeKeys(X4, unit.tileR, unit.tileC, unit.dir, 0, battle.grid), unit, GROUND)) {
               if (e.alive && scale > 0) battle.dealDamage(unit, e, { amount: unit.s.atk * scale, type: 'phys', isSkill: true, tags: ['skill', TAG_BLAST] });
             }
             battle.fx('aoe', { x: unit.x, y: unit.y, radius: 1, id: unit.id, skill: TAG_BLAST });

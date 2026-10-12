@@ -70,13 +70,13 @@ function pasngr(bb, chess, def) {
     skill: {
       kind: 'charges',
       onStart({ battle, unit }) {
-        const keys = skillGrid ? absoluteRangeKeys(skillGrid, unit.tileR, unit.tileC, unit.dir, unit.s.rangeExtend) : unit.rangeKeys;
+        const keys = skillGrid ? absoluteRangeKeys(skillGrid, unit.tileR, unit.tileC, unit.dir, unit.s.rangeExtend, battle.grid) : unit.rangeKeys;
         const cands = enemiesIn(battle, unit, keys);
         if (!cands.length) return;
         const tgt = cands.reduce((a, b) => (b.hp > a.hp ? b : a));
         // 判定中心所在格: the tile of the target's centre (the rounding of body.js posKey); fixed for the storm's 4 s
         const cx = Math.round(tgt.x), cy = Math.round(tgt.y);
-        const zoneKeys = absoluteRangeKeys(STORM_GRID, cy, cx, 1, 0);
+        const zoneKeys = absoluteRangeKeys(STORM_GRID, cy, cx, 1, 0, battle.grid);
         const dur = num(bb.duration, 4), iv = Math.max(0.1, num(bb.interval, 0.5)), scale = num(bb.atk_scale, 1);
         const n = Math.max(1, Math.round(dur / iv));
         battle.fx('storm', { x: cx, y: cy, id: unit.id, duration: dur, r: STORM_FX_RADIUS });
@@ -105,7 +105,7 @@ function pasngr(bb, chess, def) {
       { install(battle, unit) { // 孤卒: no enemy on the 4 surrounding tiles
         const atk = num(t1.atk), spr = num(t1.sp_recovery_per_sec);
         aura(battle, unit, 0.25, () => {
-          const near = new Set(absoluteRangeKeys(N4, unit.tileR, unit.tileC, 1, 0));
+          const near = new Set(absoluteRangeKeys(N4, unit.tileR, unit.tileC, 1, 0, battle.grid));
           if (battle.enemies.some((e) => e.alive && !e.hidden && bodyInKeys(e, near))) return;
           battle.addBuff(unit, { key: 'pasngr:lone', mods: { atkPct: atk, spRecoveryFlat: spr }, duration: 0.4, refresh: 'replace' });
         });

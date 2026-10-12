@@ -132,7 +132,7 @@ function installOpusUse(battle, u, key) {
 function nightRaid(battle, u, rec) {
   const b = rec?.bb ?? {};
   const grid = Array.isArray(rec?.rangeGrid) && rec.rangeGrid.length ? rec.rangeGrid : X4;
-  const foes = battle.enemiesInKeys(absoluteRangeKeys(grid, u.tileR, u.tileC, u.dir, 0), u, { canHitFly: false, groundOnly: true });
+  const foes = battle.enemiesInKeys(absoluteRangeKeys(grid, u.tileR, u.tileC, u.dir, 0, battle.grid), u, { canHitFly: false, groundOnly: true });
   const pick = RAID[battle.rng.int(RAID.length)];   // one ability per cast (RandomCastAbility)
   const dur = num(b[pick.key]), scale = num(b.atk_scale), force = num(b.force, 0);
   for (const e of foes) {

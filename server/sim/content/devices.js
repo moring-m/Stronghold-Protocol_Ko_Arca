@@ -192,7 +192,7 @@ function deviceTile(battle, r0, c0) {
       const exact = r === r0 && c === c0;
       if (!exact && battle.grid.tile(r, c).build !== 'NONE') continue;
       const walk = !exact && battle.grid.groundPassable(r, c, true) ? 1 : 0;
-      const s = [exact ? 0 : 1, walk, hypot(r - r0, c - c0), r * COLS + c];
+      const s = [exact ? 0 : 1, walk, hypot(r - r0, c - c0), r * (battle.grid?.cols ?? COLS) + c];
       let less = !bs;
       if (!less) for (let i = 0; i < s.length; i++) { if (s[i] < bs[i] - 1e-9) { less = true; break; } if (s[i] > bs[i] + 1e-9) break; }
       if (less) { best = [r, c]; bs = s; }
@@ -221,7 +221,7 @@ function spawnTurret(battle, st, d) {
   u.dir = u.ownerId != null ? (battle.getPlayer(u.ownerId)?.dir ?? 'RIGHT') : 'RIGHT';
   u.mem.turret = {
     alias,
-    keys: tiles.map(([r, c]) => r * COLS + c),
+    keys: tiles.map(([r, c]) => r * (battle.grid?.cols ?? COLS) + c),
     baseAspd: u.base.aspd,
     aspdPer: num(bb.attack_speed_per_stack, 0),
     aspdMax: num(bb.max_attack_speed, Infinity),
@@ -283,7 +283,7 @@ function buildTerrain(battle, st) {
   for (let r = R.r0; r <= R.r1; r++) {
     for (let c = R.c0; c <= R.c1; c++) {
       const code = TERRAIN[battle.grid.tile(r, c).terrain] ?? 0;
-      if (code) { st.terrain[r * COLS + c] = code; any = true; }
+      if (code) { st.terrain[r * (battle.grid?.cols ?? COLS) + c] = code; any = true; }
     }
   }
   st.hasTerrain = any;
@@ -330,7 +330,7 @@ function buildTerrain(battle, st) {
     for (const p of tiles) {
       if (!Array.isArray(p) || !battle.grid.inRect(p[0], p[1])) continue;
       // world vector: x = col, y = row
-      st.flow.set(p[0] * COLS + p[1], { fx: f[1], fy: f[0], dir, bb });
+      st.flow.set(p[0] * (battle.grid?.cols ?? COLS) + p[1], { fx: f[1], fy: f[0], dir, bb });
     }
   }
 }
@@ -418,11 +418,11 @@ function tickMire(battle, st, u) {
 function terrainFor(battle, st, u) {
   if (u.hidden || u.isFlying || u.s.flags.liftoff) return 0;
   let k;
-  if (u.side === 'ally') k = u.tileR * COLS + u.tileC;
+  if (u.side === 'ally') k = u.tileR * (battle.grid?.cols ?? COLS) + u.tileC;
   else {
     const r = Math.round(u.y), c = Math.round(u.x);
-    if (r < 0 || r >= ROWS || c < 0 || c >= COLS) return 0;
-    k = r * COLS + c;
+    if (r < 0 || r >= (battle.grid?.rows ?? ROWS) || c < 0 || c >= (battle.grid?.cols ?? COLS)) return 0;
+    k = r * (battle.grid?.cols ?? COLS) + c;
   }
   let code = st.terrain[k];
   if (code === TERRAIN.smog && u.side !== 'ally') code = 0;
@@ -438,7 +438,7 @@ export function airflowRelationOf(unitDir, flowDir) {
 }
 
 function tickAirflowAlly(battle, st, u) {
-  const f = st.flow.get(u.tileR * COLS + u.tileC);
+  const f = st.flow.get(u.tileR * (battle.grid?.cols ?? COLS) + u.tileC);
   let atk = 0;
   if (f && u.motion !== 'FLY') atk = num(f.bb[`blower_s_character[${airflowRelationOf(u.dir, f.dir)}].atk`], 0);
   if (atk === (u.mem.airAtk ?? 0)) return;
@@ -453,7 +453,7 @@ function tickAirflowEnemy(battle, st, e) {
   let mul = 1;
   if (!e.hidden && px != null) {
     const r = Math.round(e.y), c = Math.round(e.x);
-    const f = r >= 0 && r < ROWS && c >= 0 && c < COLS ? st.flow.get(r * COLS + c) : null;
+    const f = r >= 0 && r < (battle.grid?.rows ?? ROWS) && c >= 0 && c < (battle.grid?.cols ?? COLS) ? st.flow.get(r * (battle.grid?.cols ?? COLS) + c) : null;
     const vx = e.x - px, vy = e.y - py;
     const v = hypot(vx, vy);
     if (f && v > 1e-6) {
@@ -506,7 +506,7 @@ function ensureTick(battle, st) {
 /** Terrain name under (r, c) for other content ('mire' | 'smog' | 'deepsea' | 'infection' | null). */
 export function terrainAt(battle, r, c) {
   const st = stateOf(battle);
-  const code = st && r >= 0 && r < ROWS && c >= 0 && c < COLS ? st.terrain[r * COLS + c] : 0;
+  const code = st && r >= 0 && r < (battle.grid?.rows ?? ROWS) && c >= 0 && c < (battle.grid?.cols ?? COLS) ? st.terrain[r * (battle.grid?.cols ?? COLS) + c] : 0;
   return TERRAIN_NAME[code] || null;
 }
 
@@ -517,7 +517,7 @@ export function install(battle) {
   const st = {
     byPlayer: new Map((battle.players || []).map((ps) => [ps.playerId, playerDeviceOverrides(ps)])),
     global: addOverrides(new Map(), battle.opts?.deviceOverrides),
-    terrain: new Uint8Array(ROWS * COLS),
+    terrain: new Uint8Array((battle.grid?.rows ?? ROWS) * (battle.grid?.cols ?? COLS)),
     hasTerrain: false,
     flow: new Map(),
     turrets: new Map(),
@@ -536,7 +536,7 @@ export function install(battle) {
     if (!battle.grid.inRect(d.row, d.col)) continue;
     const on = overrideOf(battle, st, d);
     if (on === undefined || on === dataActive(d)) continue;
-    const k = d.row * COLS + d.col;
+    const k = d.row * (battle.grid?.cols ?? COLS) + d.col;
     if (d.role === 'crate' && !on) st.crateOff.add(k);
     if (d.role === 'platform' || d.role === 'mound') (on ? st.platformOn : st.platformOff).add(k);
   }
@@ -544,7 +544,7 @@ export function install(battle) {
   battle.on('deploy', (ctx) => {
     const u = ctx.unit;
     if (!u || u.side !== 'ally') return;
-    const k = u.tileR * COLS + u.tileC;
+    const k = u.tileR * (battle.grid?.cols ?? COLS) + u.tileC;
     if (u.kind === 'device') {
       // stage crates switched off by a map card vanish before anybody deploys on their tile
       if (u.defId === CRATE_KEY && st.crateOff.has(k) && !st.started) { u.mem.removedByOverride = true; battle.retreat(u, { reason: 'removed', permanent: true }); }
@@ -569,8 +569,8 @@ export function install(battle) {
   battle.on('battleStart', () => {
     st.started = true;
     // platforms switched by map cards (the engine applied the data state)
-    for (const k of st.platformOn) battle.setObstacle((k / COLS) | 0, k % COLS, true);
-    for (const k of st.platformOff) battle.setObstacle((k / COLS) | 0, k % COLS, false);
+    for (const k of st.platformOn) battle.setObstacle((k / (battle.grid?.cols ?? COLS)) | 0, k % (battle.grid?.cols ?? COLS), true);
+    for (const k of st.platformOff) battle.setObstacle((k / (battle.grid?.cols ?? COLS)) | 0, k % (battle.grid?.cols ?? COLS), false);
     // hidden crates switched on by an override
     for (const d of devices) {
       if (d.role !== 'crate' || dataActive(d) || !isActive(battle, st, d) || !battle.grid.inRect(d.row, d.col) || battle.unitAt(d.row, d.col)) continue;

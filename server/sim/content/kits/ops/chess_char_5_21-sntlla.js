@@ -43,13 +43,13 @@ export default {
           for (let i = 0; i < ICICLE_ROWS.length && k == null; i++) {
             const idx = (num(unit.mem.iceRow) + i) % ICICLE_ROWS.length;
             const lat = ICICLE_ROWS[idx];
-            const keys = (unit.rangeKeys || []).filter((x) => toLocal(Math.floor(x / COLS) - unit.tileR, x % COLS - unit.tileC, unit.dir)[0] === lat);
+            const keys = (unit.rangeKeys || []).filter((x) => toLocal(Math.floor(x / (battle.grid?.cols ?? COLS)) - unit.tileR, x % (battle.grid?.cols ?? COLS) - unit.tileC, unit.dir)[0] === lat);
             if (!keys.length) continue;
             k = battle.rng.pick(keys);
             unit.mem.iceRow = (idx + 1) % ICICLE_ROWS.length;
           }
           if (k == null) return;
-          const r = Math.floor(k / COLS), c = k % COLS;
+          const r = Math.floor(k / (battle.grid?.cols ?? COLS)), c = k % (battle.grid?.cols ?? COLS);
           unit.lastAttackAt = battle.time;
           unit.stats.attacks++; // "攻击变为…召唤冰凌": every icicle is one of her attacks
           battle.fx('iceSpike', { x: c, y: r, id: unit.id, r: ICICLE_RADIUS });

@@ -51,3 +51,14 @@ test('minimum violations and addon exclusions are rejected without changing the 
   assert.deepEqual(updated.customExtensions.disabledBands,['band_bldsk']);
  }finally{await host?.terminate();await srv.close();}
 });
+
+test('eight-player room accepts eight human seats and rejects the ninth, preserving per-mode capacity',async()=>{
+ const srv=await startServer({port:0,host:'127.0.0.1',MatchClass:StubMatch,log:{info(){},warn(){},error(){}}}),clients=[];
+ try{
+  for(let i=0;i<9;i++){const c=await TestClient.connect(`ws://127.0.0.1:${srv.port}/ws`);await c.hello(`Player${i}`);clients.push(c);}
+  const host=clients[0];assert.equal((await host.request({t:'room.create',mode:'coop8',difficulty:'NORMAL'})).t,'ok');const room=await host.waitFor('room.state',r=>r.mode==='coop8');assert.equal(room.seats.length,8);
+  for(const c of clients.slice(1,8))assert.equal((await c.request({t:'room.join',code:room.code})).t,'ok');
+  assert.equal((await clients[8].request({t:'room.join',code:room.code})).code,'ROOM_FULL');
+  for(const c of clients.slice(1,8))assert.equal((await c.request({t:'room.ready',ready:true})).t,'ok');assert.equal((await host.request({t:'room.start'})).t,'ok');
+ }finally{for(const c of clients)await c.terminate();await srv.close();}
+});

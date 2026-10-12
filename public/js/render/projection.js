@@ -316,7 +316,7 @@ export function normRect(rect, rows = 19, cols = 21) {
  */
 export function fitCamera(rect, viewport, options) {
   const opts = options && typeof options === 'object' ? options : {};
-  const R = normRect(rect);
+  const R = normRect(rect,opts.rows,opts.cols);
   const W = Math.max(1, finite(viewport?.width, 1));
   const H = Math.max(1, finite(viewport?.height, 1));
   const pad = viewport?.padding || {};
@@ -441,7 +441,7 @@ export function presetCamera(kind, viewport, options) {
   const opts = options && typeof options === 'object' ? options : {};
   let k = kind === 'hidden' ? 'boss' : kind;
   if (!CAMERA_PRESETS[k]) k = 'normal';
-  let rect = opts.rect ? normRect(opts.rect) : null;
+  let rect = opts.rect ? normRect(opts.rect,opts.rows,opts.cols) : null;
   // the Final Assault prep happens on the boss field: a 'prep' camera asked for the boss rows is the boss one
   if (k === 'prep' && rect && rect.r1 <= 6) k = 'bossPrep';
   const preset = CAMERA_PRESETS[k];
@@ -486,7 +486,7 @@ export function presetCamera(kind, viewport, options) {
   return fitCamera(rect, viewport, {
     tilt: finite(opts.tilt, base.tilt), dist: finite(opts.dist, base.dist),
     margin: finite(opts.margin, preset.margin), headroom: finite(opts.headroom, preset.headroom),
-    maxTilePx: opts.maxTilePx, minTilePx: opts.minTilePx,
+    maxTilePx: opts.maxTilePx, minTilePx: opts.minTilePx, rows:opts.rows,cols:opts.cols,
   });
 }
 

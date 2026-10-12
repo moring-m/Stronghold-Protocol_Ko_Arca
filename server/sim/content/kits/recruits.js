@@ -20,7 +20,7 @@ function wisdelShadows(b,u,count){
  const list=(u.mem.wisdelShadows||=[]).filter(up);u.mem.wisdelShadows=list;
  const targetCount=Math.min(3,list.length+count);
  for(let i=list.length;i<targetCount;i++){
-  const p=u.rangeKeys.map(k=>[Math.floor(k/COLS),k%COLS]).find(([r,c])=>!b.isReservedTile(r,c)&&b.grid.inRect(r,c));
+  const p=u.rangeKeys.map(k=>[Math.floor(k/(b.grid?.cols ?? COLS)),k%(b.grid?.cols ?? COLS)]).find(([r,c])=>!b.isReservedTile(r,c)&&b.grid.inRect(r,c));
   if(!p)break;
   const token=b.spawnToken(u,'token_10035_wisdel_wward',p[0],p[1]);
   if(token){list.push(token);token.name='레버넌트의 그림자';token.profile.noHeal=true;token.rangeGrid=u.rangeGrid;token.profile.dmgType='arts';token.profile.projectile='arts';token.profile.canHitFly=true;b._refreshRange(token);
@@ -42,7 +42,7 @@ function skill(raw,s){
    const seq=unit.deploySeq;unit.profile.noAttack=true;battle.addBuff(unit,{key:'chen3:slashing',flags:{invulnerable:true},duration:2});const finish=()=>{unit.profile.noAttack=false;battle.removeBuff(unit,'chen3:slashing');if(up(unit)){unit.skill.timeLeft=unit.skill.duration;battle.addBuff(unit,{key:unit.skill._buffKey,mods:{atkPct:num(bb['chen3_s2[respawn_buff].atk']),dodgePhys:num(bb['chen3_s2[respawn_buff].prob']),dodgeArts:num(bb['chen3_s2[respawn_buff].prob'])},tags:['skill']})}};let target=battle.foesInRadius(unit.x,unit.y,3).sort((a,b)=>hypot(a.x-unit.x,a.y-unit.y)-hypot(b.x-unit.x,b.y-unit.y))[0];
    let remaining=10;const slash=()=>{if(!up(unit)||unit.deploySeq!==seq)return;
     if(!up(target)){target=battle.foesInRadius(unit.x,unit.y,3).sort((a,b)=>a.hp-b.hp)[0];if(!target){finish();return;}}
-    damage(battle,unit,target,num(bb.atk_scale),'arts',['chen3-slash']);battle._ev(['atk',unit.id,target.id,'slash']);remaining--;if(!up(target))remaining++;
+    battle._ev(['atk',unit.id,target.id,'none']);damage(battle,unit,target,num(bb.atk_scale),'arts',['chen3-slash']);remaining--;if(!up(target))remaining++;
     if(remaining>0)battle.after(.1,slash);else if(up(target)&&battle.grid.inRect(Math.round(target.y),Math.round(target.x))&&battle.grid.tile(Math.round(target.y),Math.round(target.x)).height!=='HIGH'){battle.relocate(unit,Math.round(target.y),Math.round(target.x));finish()}else finish();
    };slash();
   }});
@@ -85,7 +85,7 @@ function advanceNotes(b,u,dt){
   const hit=e=>{const mod=!!u.def.raw.module?.active&&u.skill.active;const scale=!u.blocking.includes(e)?(mod?1:num(traitBb(u.def.raw).atk_scale,.8)):1;b.dealDamage(u,e,{amount:n.amount*scale,type:n.type,isAttack:true,isSkill:u.skill.active,tags:['sakiko-note']});n.seen.add(e.id);};
   if(seek&&hypot(n.target.x-n.x,n.target.y-n.y)<=Math.max(.16,speed*dt)){hit(n.target);n.hit=true;n.tail=u.def.raw.skill.index===1&&n.type==='phys'?.5:0;}
   if(n.hit){n.tail-=dt;if(n.tail<=0)continue;for(const e of b.foesInRadius(n.x,n.y,.8))if(up(e)&&!n.seen.has(e.id))hit(e);}
-  const r=Math.round(n.y),c=Math.round(n.x),inside=b.grid.inRect(r,c)&&u.rangeKeySet.has(r*COLS+c);n.outside=inside?0:n.outside+dt;
+  const r=Math.round(n.y),c=Math.round(n.x),inside=b.grid.inRect(r,c)&&u.rangeKeySet.has(r*(b.grid?.cols ?? COLS)+c);n.outside=inside?0:n.outside+dt;
   if(n.outside>=1||n.age>30)continue;kept.push(n);
  }
  u.mem.sakikoNotes=kept;

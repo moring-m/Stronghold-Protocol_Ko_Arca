@@ -1,3 +1,4 @@
+import {eightUniteRoutes} from '../../shared/cooperativeEight.js';
 // server/match/unite.js — 联防 (Unite) planning and LP attribution (DESIGN §6.1, research 06 §5, research 08 §5).
 //
 // Trigger (co-op only): after the normal combats, ≥ 1 alive player leaked (a counted leak ⇒ not perfect) and
@@ -117,7 +118,8 @@ export function helperOrder(m, perfects, results) {
 
 /** Battle options for the unite field (without data/logger, added by the match). */
 export function uniteBattleOpts(m, plan, timeLimit) {
-  const wave = buildUniteWave(m.gd, plan.leaked, plan.helpers.length, timeLimit);
+  const wave = buildUniteWave(m.gd, plan.leaked, m.mode==='coop8'?2:Math.min(2,plan.helpers.length), timeLimit);
+  if(m.mode==='coop8'||plan.helpers.length>2)wave.routes=eightUniteRoutes(wave.routes);
   const players = plan.helpers.map((ps, i) => {
     const carry = new Map();
     const r = m.lastResults.get(ps.playerId);
@@ -136,9 +138,9 @@ export function uniteBattleOpts(m, plan, timeLimit) {
       carry.set(u.uid, { hpPct: Number.isFinite(u.hpPct) ? Math.max(0.01, Math.min(1, u.hpPct)) : 1, sp, ...egir });
     }
     // 2 helpers: the first one meets the enemies first on the right-hand field (escaped_multi enters at col 18)
-    const colOffset = plan.helpers.length > 1 && i === 0 ? 8 : 0;
+    const colOffset = (m.mode==='coop8'||plan.helpers.length>2)?(3-i)*8:plan.helpers.length > 1 && i === 0 ? 8 : 0;
     // the layers its own combat reached (bondsView, the round's pending gains; PRTS "以其阵地当前的状态") — see header
-    const input = ps.battleInput({ side: 'L', colOffset, carry, reached: true });
+    const input = ps.battleInput({ side: 'L', colOffset, rowOffset:0, carry, reached: true });
     const ev = { input, kind: 'unite', round: m.round, spawns: wave.spawns };
     m.dispatch(ps, 'onBattleStart', ev);
     return ev.input && typeof ev.input === 'object' ? ev.input : input;

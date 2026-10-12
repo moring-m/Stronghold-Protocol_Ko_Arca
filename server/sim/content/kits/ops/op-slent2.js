@@ -90,10 +90,10 @@ export const RHINE = Object.freeze(new Set([
 ]));
 
 const bbOf = (chess, id) => skillRec(chess, id)?.bb ?? {};
-const tileKey = (r, c) => r * COLS + c;
+const tileKey = (r, c, grid) => r * (grid?.cols ?? COLS) + c;
 /** An operator of the 莱茵生命 group (summons are no 干员). */
 export const isRhine = (a) => !!a && a.kind === 'op' && RHINE.has(a.def?.charId ?? a.defId);
-const inKeys = (keys, a) => !!keys && keys.has(tileKey(a.tileR, a.tileC));
+const inKeys = (keys, a) => !!keys && keys.has(tileKey(a.tileR, a.tileC, a.battle?.grid));
 
 /**
  * 无声砥柱's 庇护 for an ally at its HP: base × scale × (1 + rs × n), n = its lost HP in whole `step` steps (at most
@@ -130,7 +130,7 @@ function lampKit(t, owner, t1) {
     install(battle, lamp) {
       battle.every(TALENT_IV, () => {
         if (!up(lamp)) return;
-        const keys = new Set(absoluteRangeKeys(grid, lamp.tileR, lamp.tileC, lamp.dir, 0));
+        const keys = new Set(absoluteRangeKeys(grid, lamp.tileR, lamp.tileC, lamp.dir, 0, battle.grid));
         for (const a of alliesOn(battle, lamp, keys)) {
           const v = shelterOf(tb, a, scale);
           holdProtect(battle, a, v, HOLD, lamp);   // 庇护 (the client's damage_resistance[inf]): the shared effect

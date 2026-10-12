@@ -156,14 +156,14 @@ export function ModuleGlyph({ m, rec, id, size = 'md' }) {
 
 // ---- roster card ---------------------------------------------------------------------------------------------------
 
-function RosterCard({ m, chess, golden, entries, selected, onPick, tier = chess.tier, recruitMode = false }) {
+export function RosterCard({ m, chess, golden, entries, selected, onPick, tier = chess.tier, recruitMode = false, disabled = false }) {
   const choice = effectiveChoice(entries, chess, golden);
   const opt = chessOptions(chess, golden);
   const skillRec = opt.skillOptions.find((s) => s.index === choice.skill)?.normal || chess.skill;
   const modRec = golden && choice.module !== MODULE_NONE ? opt.moduleOptions.find((x) => x.id === choice.module)?.rec || null : null;
   const modChanged = golden && choice.module !== opt.defaultModule;
   return html`<button type="button" role="option" aria-selected=${selected ? 'true' : 'false'} data-chess=${chess.chessId}
-      class=${cx('lo-card', `lo-card--t${chess.tier}`, selected && 'is-sel', choice.changed && 'is-changed')} onClick=${() => onPick(chess.chessId)}
+      disabled=${disabled} class=${cx('lo-card', `lo-card--t${chess.tier}`, selected && 'is-sel', choice.changed && 'is-changed')} onClick=${() => onPick(chess.chessId)}
       title=${`${chess.name} · ${skillRec?.name || ''}`}>
     <span class="lo-card__art">
       <${Img} src=${chessAvatarUrl(m, {...loadoutRecord(chess,resolveRecordLoadout(chess,choice)),appearanceResolved:true})} fallback=${html`<span class="lo-card__glyph">${[...(chess.name || '?')][0]}</span>`} />
@@ -362,7 +362,7 @@ function Detail({ m, chess, golden, entries, ops, onChange, onReset, locked }) {
 
 // ---- filters -------------------------------------------------------------------------------------------------------------
 
-function Filters({ m, filters, onFilters, bonds, listView, onView, presetAction }) {
+export function Filters({ m, filters, onFilters, bonds, listView, onView, presetAction, showChanged = true }) {
   const set = (patch) => onFilters({ ...filters, ...patch });
   return html`<div class="lo-filters">
     <div class="lo-frow">
@@ -388,9 +388,9 @@ function Filters({ m, filters, onFilters, bonds, listView, onView, presetAction 
           ${bonds.map((b) => html`<option key=${b.bondId} value=${b.bondId}>${b.name}</option>`)}
         </select>
       </label>
-      <button type="button" class=${cx('lo-toggle', filters.changedOnly && 'is-on')} aria-pressed=${filters.changedOnly ? 'true' : 'false'}
-        onClick=${() => set({ changedOnly: !filters.changedOnly })}><i class="lo-toggle__box"><${Icon} name="check" /></i>仅看已调整</button>
-      <button type="button" class="lo-chip lo-view-toggle" aria-pressed=${listView} onClick=${onView} title=${listView?'초상화 보기로 전환':'세로 목록 보기로 전환'}>${listView?'초상화 보기':'목록 보기'}</button>
+      ${showChanged?html`<button type="button" class=${cx('lo-toggle', filters.changedOnly && 'is-on')} aria-pressed=${filters.changedOnly ? 'true' : 'false'}
+        onClick=${() => set({ changedOnly: !filters.changedOnly })}><i class="lo-toggle__box"><${Icon} name="check" /></i>仅看已调整</button>`:null}
+      ${onView?html`<button type="button" class="lo-chip lo-view-toggle" aria-pressed=${listView} onClick=${onView} title=${listView?'초상화 보기로 전환':'세로 목록 보기로 전환'}>${listView?'초상화 보기':'목록 보기'}</button>`:null}
     </div>
   </div>`;
 }
@@ -431,6 +431,7 @@ function LoadoutScreen({ st }) {
     ? candidates.map(c => getChess(c.chessId.replace(/_5_a$/, `_${displayTier(c)}_a`)))
     : roster.filter(c => !c.optionalRecruit);
   const list = filterRoster(visibleRoster, st.filters, st.entries, getChess, getBond);
+  if (tab === 'recruits') list.sort((a, b) => Number(!!selectedTier(b)) - Number(!!selectedTier(a)));
   const selId = st.sel && list.some((c) => c.chessId === st.sel) ? st.sel : list[0]?.chessId || roster[0]?.chessId || null;
   const { base, golden } = selId ? recordsOf(selId, getChess) : { base: null, golden: null };
   const nChanged = changedCount(st.entries, getChess);

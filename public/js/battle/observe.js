@@ -150,6 +150,7 @@ export function sidesOf(field) {
  */
 export function cameraLayers(field, pub, myId) {
   if (!isObj(field) || (field.kind !== 'unite' && field.kind !== 'boss' && field.kind !== 'hidden')) return [];
+  if(isEightUnite(field)){const ps=field.players||[];return [{key:'ALL',label:'全景',self:false,watch:false},...Array.from({length:4},(_,i)=>{const pid=ps[i];return {key:pid?'P:'+pid:'S:'+i,label:pid?(pid===myId?'你自己':nameOf(pub,pid)):`빈 전장 ${i+1}`,self:pid===myId,watch:!!pid&&pid!==myId};})];}
   const sides = sidesOf(field);
   const at = (side) => Object.keys(sides).find((pid) => sides[pid] === side) || null;
   const label = (pid) => (!pid ? '无人在家' : pid === myId ? '你自己' : nameOf(pub, pid));
@@ -163,9 +164,12 @@ export function cameraLayers(field, pub, myId) {
   ];
 }
 
+export function isEightUnite(field) {return field?.kind==='unite'&&(String(field.stageId||'').startsWith('coop8_unite_')||field.rect?.c1>20||field.players?.length>2);}
+
 /** Camera options of a layer for view.setCamera(kind, …). */
 export function layerCamera(field, layer, mySide = 'L') {
   const rect = field?.rect;
+  if(isEightUnite(field)){const i=layer?.startsWith('P:')?(field.players||[]).indexOf(layer.slice(2)):layer?.startsWith('S:')?Number(layer.slice(2)):-1;if(Number.isInteger(i)&&i>=0&&i<4){const c=(3-i)*8;return {rect:{r0:9,r1:12,c0:c,c1:c+10},side:'L',half:false,fit:true};}return {rect,side:'L',half:false,fit:true};}
   if (layer === 'L' || layer === 'R') return { rect, side: layer, half: true };
   return { rect, side: mySide };
 }

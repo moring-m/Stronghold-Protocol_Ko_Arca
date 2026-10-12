@@ -252,13 +252,13 @@ export function hasBattlePart(bandId) {
 }
 
 export function install(battle) {
-  for (const ps of battle.players) {
-    const band = ps.bandId ? bandRecord(ps.bandId) : null;
+  for (const ps of battle.players) for(const bandId of new Set([ps.bandId,...(battle.data.raw?.config?.commonBands||[])].filter(Boolean))) {
+    const band = bandRecord(bandId);
     if (!band) continue;
     for (const b of buffsOf(band)) {
       const f = b.bbKey ? BY_KEY[b.bbKey] : null;
       if (!f) continue;
-      try { f(battle, ps, b.p, ps.bandId); } catch (e) { battle._handlerError?.(`band:${ps.bandId}`, null, e); }
+      try { f(battle, ps, b.p, bandId); } catch (e) { battle._handlerError?.(`band:${ps.bandId}`, null, e); }
     }
   }
   installMapChars(battle);

@@ -80,7 +80,7 @@ const GROUND = Object.freeze({ canHitFly: false });
 
 const bbOf = (chess, id) => skillRec(chess, id)?.bb ?? {};
 const skillOn = (u, id) => !!(u && u.skill && u.skill.active && u.skill.id === id);
-const tileOf = (u) => u.tileR * COLS + u.tileC;
+const tileOf = (u) => u.tileR * (u.battle?.grid?.cols ?? COLS) + u.tileC;
 
 /** Her S1 / S3 acting on a summon (held from each skill start / end and each summon deployment). */
 function syncSoul(battle, owner, t, { b1, b3 }) {
@@ -131,7 +131,7 @@ function soulKit(t, owner, opts) {
         if (s.mem.lingAoeAt == null) { s.mem.lingAoeAt = battle.time + iv; return; }
         if (battle.time + 1e-9 < s.mem.lingAoeAt) return;
         s.mem.lingAoeAt += iv;
-        const keys = absoluteRangeKeys(X5, s.tileR, s.tileC, s.dir, 0);
+        const keys = absoluteRangeKeys(X5, s.tileR, s.tileC, s.dir, 0, battle.grid);
         for (const e of battle.enemiesInKeys(keys, s, GROUND)) {
           if (!e.alive) continue;
           battle.dealDamage(owner, e, { amount: owner.s.atk * num(opts.b3.atk_scale), type: 'arts', isSkill: true, isSplash: true, canDodge: false, tags: ['skill', TAG_S3] });
@@ -248,7 +248,7 @@ export default {
       ],
       install(battle, unit) {
         // S3's cast: a ground enemy on a standing summon's x-5 too (the owner's larger-range rule, 2026-10-06)
-        summonTriggerArea(battle, unit, S3, (t) => ({ keys: absoluteRangeKeys(X5, t.tileR, t.tileC, t.dir, 0), profile: GROUND }));
+        summonTriggerArea(battle, unit, S3, (t) => ({ keys: absoluteRangeKeys(X5, t.tileR, t.tileC, t.dir, 0, battle.grid), profile: GROUND }));
       },
     };
   },

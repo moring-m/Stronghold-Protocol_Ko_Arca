@@ -26,7 +26,7 @@ const RING_X4 = Object.freeze([[1, -1], [1, 0], [1, 1], [0, -1], [0, 0], [0, 1],
 
 /** Living enemies whose body is on her tile or the four beside it, targetable or not (flyers too). */
 function enemiesAround4(battle, unit) {
-  const keys = new Set(absoluteRangeKeys(AROUND4, unit.tileR, unit.tileC, unit.dir, 0));
+  const keys = new Set(absoluteRangeKeys(AROUND4, unit.tileR, unit.tileC, unit.dir, 0, battle.grid));
   let n = 0;
   for (const e of battle.enemies) if (e.alive && e.deployed && !e.hidden && bodyInKeys(e, keys)) n++;
   return n;
@@ -43,7 +43,7 @@ function enemiesAround4(battle, unit) {
 function spaceBurst(battle, unit, rec) {
   const sb = rec?.bb ?? {};
   const grid = Array.isArray(rec?.rangeGrid) && rec.rangeGrid.length ? rec.rangeGrid : RING_X4;
-  const keys = absoluteRangeKeys(grid, unit.tileR, unit.tileC, unit.dir, 0);
+  const keys = absoluteRangeKeys(grid, unit.tileR, unit.tileC, unit.dir, 0, battle.grid);
   const around = battle.enemiesInKeys(keys, unit, { canHitFly: false, groundOnly: true });
   for (const e of around) battle.dealDamage(unit, e, { amount: unit.s.atk * num(sb.atk_scale, 0), type: 'phys', isSkill: true, tags: ['skill', 'acspec:burst'] });
   const landed = new Set();

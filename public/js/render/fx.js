@@ -1635,7 +1635,8 @@ export class FxSystem {
     }
   }
 
-  deploy(view) {
+  deploy(view){return view?this._anchored(view.x,view.y,view.z||0,()=>this._deploy(view)):undefined}
+  _deploy(view) {
     if (!view) return;
     const p = this._proj(view.x, view.y, view.z || 0);
     const s = p.s;

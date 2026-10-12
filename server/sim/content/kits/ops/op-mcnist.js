@@ -225,7 +225,7 @@ function chargeGraf(battle, mcn, t, b3) {
 function throwCross(battle, unit, r, c, atk, scale) {
   battle.fx('aoe', { x: c, y: r, radius: 2, id: unit.id, skill: 'mcnist:cross', tiles: X6.map(([dr, dc]) => [r + dr, c + dc]) });
   battle.after(X6_DELAY, () => {
-    const keys = X6.map(([dr, dc]) => (r + dr) * COLS + (c + dc)).filter((k) => k >= 0);
+    const keys = X6.map(([dr, dc]) => (r + dr) * (battle.grid?.cols ?? COLS) + (c + dc)).filter((k) => k >= 0);
     for (const e of battle.enemiesInKeys(keys, unit, { canHitFly: true })) {
       if (e.alive) battle.dealDamage(unit, e, { amount: atk * scale, type: 'arts', isAttack: true, isSkill: true, tags: ['skill', TAG_CROSS] });
     }
@@ -361,7 +361,7 @@ export default {
           const keys = [];
           for (const t of grafsOf(battle, unit)) {
             if (!up(t)) continue;
-            for (const e of t.blocking) if (e.alive) keys.push(Math.round(e.y) * COLS + Math.round(e.x));
+            for (const e of t.blocking) if (e.alive) keys.push(Math.round(e.y) * (battle.grid?.cols ?? COLS) + Math.round(e.x));
           }
           const cur = unit.extraRangeKeys ?? [];
           if (keys.length !== cur.length || keys.some((k, i) => k !== cur[i])) battle.setExtraRange(unit, keys.length ? keys : null);

@@ -1663,7 +1663,7 @@ export class PlayerState {
     for (const uid of [...this._tempDue.keys()]) if (!this.temp.some((p) => p && p.uid === uid)) this._tempDue.delete(uid);
     this.offers = [];
     this.clearUnfrozenShop();
-    if (!this.gd.leftoverKeptBands.includes(this.bandId)) this.funds = 0;
+    if (!this.gd.keepsFunds(this.bandId)) this.funds = 0;
     this.ready = true;
     this.dirty();
   }
@@ -1732,7 +1732,7 @@ export class PlayerState {
    * like settle()) — the 联防 field (unite.js; PRTS 卫戍协议/帮助 §联防阶段 "将以其阵地当前的状态", [ASSUMED] the current
    * state includes those layers, as the strip shows them). The gains stay pending: settle() adds them once.
    */
-  battleInput({ side = 'L', colOffset = 0, carry = null, reached = false } = {}) {
+  battleInput({ side = 'L', colOffset = 0, rowOffset, carry = null, reached = false } = {}) {
     // a terrain change not yet followed by a recompute (a content hook at the prep end) never fields an illegal board
     this.deployMap();
     if (this._legalityStale) this.recompute();
@@ -1759,7 +1759,7 @@ export class PlayerState {
       playerId: this.playerId,
       seat: this.seat,
       side,
-      colOffset,
+      colOffset,...(rowOffset!==undefined?{rowOffset}:{}),
       units,
       bonds: bondSnapshot(reached ? this.bondsView() : this.bonds),
       bandId: this.bandId,

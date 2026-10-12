@@ -66,7 +66,7 @@ export function attachAudit(m, { invariants = true, limit = 200 } = {}) {
     audit.checks++;
     try { fn(); } catch (e) { fail(`audit ${label} threw: ${e && e.message}`); }
   };
-  const carries = (ps) => gd.leftoverKeptBands.includes(ps.bandId);
+  const carries = (ps) => gd.keepsFunds(ps.bandId);
   const wrap = (obj, name, around) => {
     const orig = obj[name];
     if (typeof orig !== 'function') return;
@@ -501,7 +501,7 @@ function hasSpendEffects(m, ps) {
   const keys = ['onBuy', 'onSpend', 'onSold', 'onRefresh', 'onLevelUp', 'onGain', 'onLayers'];
   const any = (h) => h && keys.some((k) => typeof h[k] === 'function');
   if (reg.globals().some(([, h]) => any(h))) return true;
-  if (ps.bandId && any(reg.get(`band:${ps.bandId}`))) return true;
+  if ([ps.bandId,...(m.gd.config.commonBands||[])].some(id=>any(reg.get(`band:${id}`)))) return true;
   for (const id of m.gd.bondIds) if (any(reg.get(`bond:${id}`))) return true;
   for (const e of ps.effects) if (e && typeof e.key === 'string' && any(reg.get(e.key))) return true;
   for (const p of ps.allChess()) {

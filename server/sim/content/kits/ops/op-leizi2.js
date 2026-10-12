@@ -113,9 +113,9 @@ const S2_ATK_KEY = 'skill:leizi2:thunderAtk';
 
 const bbOf = (chess, id) => skillRec(chess, id)?.bb ?? {};
 /** Absolute tile keys of a grid at the unit's tile and facing. */
-const keysOf = (unit, grid) => absoluteRangeKeys(grid, unit.tileR, unit.tileC, unit.dir, 0);
+const keysOf = (unit, grid) => absoluteRangeKeys(grid, unit.tileR, unit.tileC, unit.dir, 0, unit.battle?.grid);
 /** A tile of the battle's field — the official map of a battle: no lightning falls on a stage tile beyond it. */
-const onField = (battle, k) => battle.grid.inRect(Math.floor(k / COLS), k % COLS);
+const onField = (battle, k) => battle.grid.inRect(Math.floor(k / (battle.grid?.cols ?? COLS)), k % (battle.grid?.cols ?? COLS));
 
 /**
  * S2's range: the tiles reachable from hers in up to three 4-way steps over low tiles (her own tile always; a tile
@@ -124,14 +124,14 @@ const onField = (battle, k) => battle.grid.inRect(Math.floor(k / COLS), k % COLS
  */
 function floodGrid(battle, unit) {
   const r0 = unit.tileR, c0 = unit.tileC;
-  const seen = new Set([r0 * COLS + c0]);
+  const seen = new Set([r0 * (battle.grid?.cols ?? COLS) + c0]);
   const cells = [[r0, c0]];
   let frontier = [[r0, c0]];
   for (let step = 0; step < 3 && frontier.length; step++) {
     const next = [];
     for (const [r, c] of frontier) {
       for (const [dr, dc] of FOUR) {
-        const rr = r + dr, cc = c + dc, k = rr * COLS + cc;
+        const rr = r + dr, cc = c + dc, k = rr * (battle.grid?.cols ?? COLS) + cc;
         if (seen.has(k) || !battle.grid.inRect(rr, cc) || battle.grid.tile(rr, cc).height !== 'LOW') continue;
         seen.add(k);
         next.push([rr, cc]);
@@ -161,7 +161,7 @@ export default {
       const seq = unit.deploySeq;
       battle.after(STRIKE_DELAY, () => {
         if (!up(unit) || unit.deploySeq !== seq) return;    // _stopWhenSourceInvalid
-        const r = Math.floor(key / COLS), c = key % COLS;
+        const r = Math.floor(key / (battle.grid?.cols ?? COLS)), c = key % (battle.grid?.cols ?? COLS);
         battle.fx('lightning', { x: c, y: r, id: unit.id, skill: accuse ? 'leizi2:accuse' : 'leizi2:thunder' });
         const scale = num(accuse ? t1.atk_scale_t2 : t0.atk_scale_t, 1);
         for (const e of battle.enemiesInKeys([key], unit, AIR)) {
@@ -277,7 +277,7 @@ export default {
             const gap = unit.skill?.id === S1 ? RING_DELAY_S1 : RING_DELAY;
             const rings = new Map();
             for (const k of unit.rangeKeys) {
-              const r = Math.floor(k / COLS), cc = k % COLS;
+              const r = Math.floor(k / (battle.grid?.cols ?? COLS)), cc = k % (battle.grid?.cols ?? COLS);
               if (!onField(battle, k) || !battle.grid.isLow(r, cc)) continue;
               const d = Math.abs(r - unit.tileR) + Math.abs(cc - unit.tileC);
               if (!rings.has(d)) rings.set(d, []);
@@ -324,7 +324,7 @@ export default {
             } else { cur.x = nx; cur.y = ny; }
             keep.push(cur);
             const s3On = !!(unit.skill?.active && unit.skill.id === S3);
-            for (const e of battle.enemiesInKeys([Math.round(cur.y) * COLS + Math.round(cur.x)], unit, GROUND)) {
+            for (const e of battle.enemiesInKeys([Math.round(cur.y) * (battle.grid?.cols ?? COLS) + Math.round(cur.x)], unit, GROUND)) {
               const at = cur.hitAt.get(e);
               if (!e.alive || (at != null && battle.time - at < CURRENT_REHIT - 1e-9)) continue;
               cur.hitAt.set(e, battle.time);

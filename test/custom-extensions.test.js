@@ -35,3 +35,9 @@ test('multiple maps can coexist and switching extensions never mutates skill/ski
   assert.deepEqual(prefs,before);assert.equal(h.ps('p_0').loadout[id]?.skill,0);h.m.dispose();
  }
 });
+
+
+test('operator ban exclusion catalogue never exposes entries without stable operator IDs',()=>{
+ const catalog=customExtensionCatalog({...raw,chess:{...raw.chess,bad:{visible:true,name:'invalid',tier:1}}}).protectedOperators;
+ assert.ok(catalog.length>0);assert.ok(catalog.every(c=>typeof c.id==='string'&&c.id.length));assert.ok(!catalog.some(c=>c.name==='invalid'));
+});

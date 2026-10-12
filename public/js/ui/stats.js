@@ -65,8 +65,8 @@ const bool = (v, d = false) => (typeof v === 'boolean' ? v : d);
 const str = (v, max = 64) => (typeof v === 'string' && v.length ? v.slice(0, max) : null);
 
 // per-record bounds (an imported file is foreign data: nothing a row holds may grow without limit)
-const MAX_PLAYERS = 6; // the game seats 4
-const MAX_LINEUP = 12;
+const MAX_PLAYERS = 8; // up to eight cooperative participants
+const MAX_LINEUP = 16;
 const MAX_ITEMS = 4;
 const MAX_BONDS = 24;
 const MAX_STAT_KEYS = 24;
@@ -202,7 +202,7 @@ export function normalizeRecord(raw) {
     durationMs: num(r.durationMs),
     teamLp: num(r.teamLp),
     customExtensions:recordCustomExtensions(r.customExtensions),
-    roomMode: r.roomMode === 'solo' || r.roomMode === 'coop' || r.roomMode === 'laboratory' ? r.roomMode : null,
+    roomMode: r.roomMode === 'solo' || r.roomMode === 'coop' || r.roomMode === 'coop8' || r.roomMode === 'laboratory' ? r.roomMode : null,
     selfId: str(r.selfId),
     players,
   };
@@ -355,7 +355,7 @@ export function saveStats(stats) {
  */
 export function roomModeOf(modeId, roomMode) {
   if (roomMode === 'laboratory') return 'laboratory';
-  if (roomMode === 'solo' || roomMode === 'coop') return roomMode;
+  if (roomMode === 'solo' || roomMode === 'coop' || roomMode === 'coop8') return roomMode;
   if (typeof modeId !== 'string') return null;
   if (modeId.includes('_single_')) return 'solo';
   if (modeId.includes('_multi_')) return 'coop';
@@ -396,7 +396,7 @@ export function buildRecord(res, ctx = {}) {
     durationMs: num(r.durationMs),
     teamLp: num(r.teamLp),
     customExtensions:r.customExtensions,
-    roomMode: ctx.laboratory ? 'laboratory' : roomModeOf(str(r.modeId), ctx.roomMode),
+    roomMode: ctx.laboratory ? 'laboratory' : roomModeOf(str(r.modeId), ctx.roomMode||r.roomMode),
     selfId: myId,
     players: r.players,
   });
@@ -727,7 +727,7 @@ export function aggregateStats(records) {
     if (won) bd.wins++;
     if (rec.hiddenCleared) bd.hiddenCleared++;
 
-    if (rec.roomMode === 'solo' || rec.roomMode === 'coop') out.byMode[rec.roomMode]++;
+    if(rec.roomMode==='coop8')out.byMode.coop++;else if (rec.roomMode === 'solo' || rec.roomMode === 'coop') out.byMode[rec.roomMode]++;
 
     const titleId = self?.title?.id;
     if (titleId) {

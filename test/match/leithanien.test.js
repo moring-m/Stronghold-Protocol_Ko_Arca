@@ -14,8 +14,8 @@ test('acquisition and Bassline preparation trait use active bonds and per-operat
  ps.bondCountBonus.skillfulShip=3;ps.bondCountBonus.arcaneShip=3;ps.recompute();const before=ps.layers.leithanienShip;
  m.dispatch(ps,'onPrepEnd',{});assert.equal(ps.layers.leithanienShip,before+6);assert.equal(ps.layers.skillfulShip,2);assert.equal(ps.layers.arcaneShip,2);assert.equal(m.errorCount,0);
 });
-test('Witch King rewards each 40-layer milestone once, below shop tier, without shared stock',t=>{
+test('Witch King rewards each 40-layer milestone once, at or below shop tier on next preparation, without shared stock',t=>{
  const {m,ps}=create(t);ps.bandId='band_custom_leithanien_witchking';ps.shop.level=3;
- ps.addLayers('leithanienShip',80);const gifts=[...ps.hand,...ps.temp].filter(p=>p?.kind==='chess');assert.equal(gifts.length,1);for(const p of gifts){assert.ok(m.gd.chess(p.id).tier<3);assert.equal(p.poolCopies,0);}
+ ps.addLayers('leithanienShip',80);assert.equal([...ps.hand,...ps.temp].filter(p=>p?.kind==='chess').length,0);m.round++;m.dispatch(ps,'onPrepStart',{});const gifts=[...ps.hand,...ps.temp].filter(p=>p?.kind==='chess');assert.equal(gifts.length,1);for(const p of gifts){assert.ok(m.gd.chess(p.id).tier<=3);assert.equal(p.poolCopies,0);}
  m.dispatch(ps,'onPrepStart',{});assert.equal([...ps.hand,...ps.temp].filter(p=>p?.kind==='chess').length,1);m.round++;m.dispatch(ps,'onPrepStart',{});assert.equal([...ps.hand,...ps.temp].filter(p=>p?.kind==='chess').length,2);assert.equal(m.errorCount,0);
 });

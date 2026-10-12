@@ -1,3 +1,4 @@
+import {eightUniteStage} from '../../../shared/cooperativeEight.js';
 import {adaptiveElapsed, adaptiveMapScale} from './adaptiveMap.js';
 import { rangeTileInside } from './rangeClip.js';
 import { t } from '../../../shared/i18n.js';
@@ -302,7 +303,8 @@ export const showsDeathFx = (info, consumed = false, reason = null) => !consumed
 export function renderInfo(u) {
   if (!u || typeof u !== 'object' || (typeof u.id !== 'number' && typeof u.id !== 'string')) return null;
   return {
-    id: u.id, uid: u.uid ?? null, kind: u.kind || 'enemy', side: u.side === 'ally' ? 'ally' : 'enemy', ownerId: u.ownerId ?? null,
+    id: u.id,
+    modelScale:Number.isFinite(u.modelScale)?u.modelScale:undefined,hitArea:u.hitArea||undefined, uid: u.uid ?? null, kind: u.kind || 'enemy', side: u.side === 'ally' ? 'ally' : 'enemy', ownerId: u.ownerId ?? null,
     defId: u.defId ?? null, name: u.name ?? '', tier: u.tier ?? 1, golden: !!u.golden, spine: u.spine ?? u.defId ?? null,
     avatar: u.avatar ?? u.defId ?? null, x: Number(u.x) || 0, y: Number(u.y) || 0, facing: u.facing === -1 ? -1 : 1,
     maxHp: Number(u.maxHp) || 1, boss: !!u.boss, motion: u.motion,
@@ -669,7 +671,7 @@ export async function createFieldView(host, options = {}) {
       tiles.setExternal(true);
       backdrop.visible = false;
       b.setArea(viewBoardArea(viewKind(camKind, camOpts)));
-      if (stageRec) { b.setStage(visualStage());warmStageLayouts(); }
+      if (stageRec) { b.setStage(visualStage(),stageRec.coopEightStage?[{r0:6,r1:13,c0:0,c1:36}]:undefined);warmStageLayouts(); }
       b.setFocus(camRect());
       b.setBattleRect(mode === 'battle' && battleMeta && !battleMeta.prep ? battleMeta.rect : null);
       tiles.project(cam, true);
@@ -777,7 +779,7 @@ export async function createFieldView(host, options = {}) {
     const k = viewKind(camKind, camOpts);
     if (k === 'pen') return parsePenRect(visualStage()?.config?.enemy_place_rect) || { r0:14,r1:18,c0:7,c1:13 };
     // prep lights the bench (hand row 7 / temp row 8) with the field, like the official prep view
-    if (camOpts.rect) { const r = normRect(camOpts.rect); return k === 'prep' ? { ...r, r0: Math.min(r.r0, GEO.HAND_ROW) } : r; }
+    if (camOpts.rect) { const r = normRect(camOpts.rect,stageRec?.rows?.length,stageRec?.rows?.[0]?.length); return k === 'prep' ? { ...r, r0: Math.min(r.r0, GEO.HAND_ROW) } : r; }
     if (k === 'bossPrep') return camOpts.side === 'R' ? { r0: 0, r1: 5, c0: 10, c1: 20 } : { r0: 0, r1: 5, c0: 0, c1: 10 };
     return k === 'boss' ? { ...GEO.BOSS_RECT } : k === 'unite' ? { ...GEO.UNITE_RECT } : k === 'prep' ? { r0: 7, r1: 12, c0: 0, c1: 10 } : { ...GEO.NORMAL_RECT };
   }
@@ -785,7 +787,7 @@ export async function createFieldView(host, options = {}) {
   function targetCamera(kind, o) {
     const sz = size();
     const k = kind === 'hidden' ? 'boss' : (['prep', 'normal', 'unite', 'boss', 'bossPrep', 'pen'].includes(kind) ? kind : 'normal');
-    let rect = o.rect ? normRect(o.rect) : null;
+    let rect = o.rect ? normRect(o.rect,stageRec?.rows?.length,stageRec?.rows?.[0]?.length) : null;
     if (k === 'prep') rect = rect ? { ...rect, r0: Math.min(rect.r0, GEO.HAND_ROW) } : null;
     // official configBlackBoard framing (render/projection.js presetCamera); the padding only matters for the
     // fitted fallback (custom rects, portrait viewports); a prep camera keeps the bench and the field clear of the HUD
@@ -793,7 +795,7 @@ export async function createFieldView(host, options = {}) {
     // shop's HUD band (re-evaluated on resize: camOpts keep the flag)
     const vk = viewKind(kind, o); // (a 'prep' camera on the boss rows = the Final Assault prep)
     const camera = presetCamera(k, { width: sz.width, height: sz.height, padding: o.padding || defaultPadding(k, sz) }, {
-      rect, side: o.side, half: !!o.half, shop: o.shop, fit: !!o.fit, observedBench: !!o.observedBench, config: stageRec?.config || null,
+      rect, rows:stageRec?.rows?.length,cols:stageRec?.rows?.[0]?.length, side: o.side, half: !!o.half, shop: o.shop, fit: !!o.fit || !!stageRec?.coopEightStage, observedBench: !!o.observedBench, config: stageRec?.config || null,
       hud: hudBands(vk, sz, { shop: o.shop !== false }),
     });
     if (k === 'pen' && bossPreview()) { camera.ty -= visualStage()?.previewLayout?.offset || 0; camera.update(); }
@@ -802,6 +804,7 @@ export async function createFieldView(host, options = {}) {
   }
 
   function viewBoardArea(vk) {
+    if(stageRec?.coopEightStage)return [{r0:6,r1:13,c0:0,c1:36}];
     return boardAreaForView(vk, camBeforePen && viewKind(camBeforePen.kind, camBeforePen.opts));
   }
 
@@ -836,8 +839,8 @@ export async function createFieldView(host, options = {}) {
     if (vk === 'prep') setPrepField(IDENTITY);
     else if (vk === 'bossPrep') setPrepField(bossPrepField(camOpts.side === 'R' ? 'R' : 'L'));
     const target = targetCamera(camKind, camOpts);
-    const band = bandFor(vk);
-    const field = fieldRows(vk);
+    const band = stageRec?.coopEightStage?[6,13]:bandFor(vk);
+    const field = stageRec?.coopEightStage?[9,12]:fieldRows(vk);
     const focus = camRect();
     tiles.setArea(viewBoardArea(vk));
     board3d?.setFocus(focus);
@@ -931,17 +934,19 @@ export async function createFieldView(host, options = {}) {
   }
   function visualStage() {
     const k=viewKind(camKind,camOpts), previous=camBeforePen && viewKind(camBeforePen.kind,camBeforePen.opts);
+    if(stageRec?.coopEightStage)return stageRec;
     return bossPreview() ? bossPenStage(stageRec) : k==='unite' || k==='pen' && previous==='unite' ? cooperativeBossStage(stageRec) : stageRec;
   }
   let warmStageRequest=null;
   function warmStageLayouts(){
     if(!board3d || !stageRec || settings.mapQuality==='minimal')return;
-    const signature=JSON.stringify([stageRec.id,stageRec.rows,stageRec.devices,settings.mapQuality]);
+    const coop8=!!(opts.data?.get?.('config')||opts.data?.config)?.coop8;
+    const signature=JSON.stringify([stageRec.id,stageRec.rows,stageRec.devices,settings.mapQuality,coop8]);
     if(warmStageRequest?.board===board3d && warmStageRequest.signature===signature)return;
     warmStageRequest={board:board3d,signature};
-    board3d.prewarmLayouts([
+    board3d.prewarmLayouts(stageRec.coopEightStage?[{stage:stageRec,area:[{r0:6,r1:13,c0:0,c1:36}]}]:[
+      ...(coop8?[{stage:eightUniteStage(stageRec),area:[{r0:6,r1:13,c0:0,c1:36}]}]:[{stage:cooperativeBossStage(stageRec),area:boardArea('unite')}]),
       {stage:stageRec,area:AREAS.normal},
-      {stage:cooperativeBossStage(stageRec),area:boardArea('unite')},
       {stage:bossPenStage(stageRec),area:boardArea('boss')},
     ]).catch(err=>{warmStageRequest=null;console.warn('[map prewarm]',err);});
   }
@@ -949,7 +954,7 @@ export async function createFieldView(host, options = {}) {
     const visual=visualStage();
     if (!visual) return;
     tiles.setStage(visual);
-    board3d?.setStage(visual, area);
+    board3d?.setStage(visual,visual.coopEightStage?[{r0:6,r1:13,c0:0,c1:36}]:area);
     if (penList) { const list=penList; clearPen(); setPenList(list); }
   }
 
@@ -958,7 +963,7 @@ export async function createFieldView(host, options = {}) {
     stageRec = st;
     tiles.setStage(visualStage());
     tiles.setBattleRect(mode === 'battle' && battleMeta && !battleMeta.prep ? battleMeta.rect : null);
-    if (board3d) { board3d.setStage(visualStage()); board3d.setBattleRect(mode === 'battle' && battleMeta && !battleMeta.prep ? battleMeta.rect : null); }
+    if (board3d) { board3d.setStage(visualStage(),st.coopEightStage?[{r0:6,r1:13,c0:0,c1:36}]:undefined); board3d.setBattleRect(mode === 'battle' && battleMeta && !battleMeta.prep ? battleMeta.rect : null); }
     tiles.project(cam, true);
     // a pen laid out before the stage arrived (setPrep / a scouting board first) used the default zones and the old
     // tile heights: lay it out again on this stage
@@ -1338,7 +1343,7 @@ export async function createFieldView(host, options = {}) {
   }
 
   function visibleTileAt(x, y) {
-    const t = pickTile(cam, x, y, heightAt, tiles.levels);
+    const t = pickTile(cam, x, y, heightAt, tiles.levels,tiles.grid.length,tiles.grid[0].length);
     return t && tiles.tile(t.row,t.col).drawn && viewBoardArea(viewKind(camKind,camOpts)).some(a=>t.row>=a.r0 && t.row<=a.r1 && t.col>=a.c0 && t.col<=a.c1) ? t : null;
   }
 
@@ -1450,7 +1455,7 @@ export async function createFieldView(host, options = {}) {
       const g = cam.unproject(p.x, p.y, 0);
       const hold = item ? 0 : DRAG_HOLD_TILES;
       const s0 = g ? cam.scaleAt(g.x, g.y, 0) : cam.scale;
-      const t = pickTile(cam, p.x, p.y + hold * s0, heightAt, tiles.levels);
+      const t = pickTile(cam, p.x, p.y + hold * s0, heightAt, tiles.levels,tiles.grid.length,tiles.grid[0].length);
       const z = t ? heightAt(t.row, t.col) : 0;
       const up = item ? z : z + (v.lift || 0) + (v.hover || 0);
       let w = cam.unproject(p.x, p.y + hold * s0, up);
@@ -1645,7 +1650,7 @@ export async function createFieldView(host, options = {}) {
     clearHl();
     renderT0Battle = null;
     mode = 'battle';
-    const rect = meta.rect ? normRect(meta.rect) : (meta.kind === 'boss' || meta.kind === 'hidden' ? { ...GEO.BOSS_RECT } : meta.kind === 'unite' ? { ...GEO.UNITE_RECT } : { ...GEO.NORMAL_RECT });
+    const rect = meta.rect ? normRect(meta.rect,stageRec?.rows?.length,stageRec?.rows?.[0]?.length) : (meta.kind === 'boss' || meta.kind === 'hidden' ? { ...GEO.BOSS_RECT } : meta.kind === 'unite' ? { ...GEO.UNITE_RECT } : { ...GEO.NORMAL_RECT });
     // prep: true = a read-only scouting board (a teammate's lineup during prep): prep-style pieces, no bars
     battleMeta = { fieldId: meta.fieldId ?? null, kind: meta.kind || 'normal', rect, stageId: meta.stageId ?? null, prep: meta.prep === true };
     // a scouted teammate's board shows THEIR pen (m.field nextEnemies; without it the shared wave composition of the

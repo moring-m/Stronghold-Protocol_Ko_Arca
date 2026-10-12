@@ -110,7 +110,7 @@ const gone = (e) => !e || !e.alive || e.hidden || !!(e.s.flags.invulnerable && e
 function mineTiles(battle, unit) {
   const out = [];
   for (const k of unit.rangeKeys ?? []) {
-    const r = Math.floor(k / COLS), c = k % COLS;
+    const r = Math.floor(k / (battle.grid?.cols ?? COLS)), c = k % (battle.grid?.cols ?? COLS);
     if (!battle.grid.inRect(r, c) || !battle.grid.canStand(r, c, { ranged: true }) || battle.isReservedTile(r, c)) continue;
     out.push([r, c]);
   }
@@ -125,9 +125,9 @@ function mineTile(battle, unit) {
   if (!foes.length) return battle.rng.pick(tiles);
   // 可选敌人中点所在地块, by the enemies' order
   sortEnemyTargets(battle, unit, foes, null);
-  const byKey = new Map(tiles.map((t) => [t[0] * COLS + t[1], t]));
+  const byKey = new Map(tiles.map((t) => [t[0] * (battle.grid?.cols ?? COLS) + t[1], t]));
   for (const e of foes) {
-    const t = byKey.get(Math.round(e.y) * COLS + Math.round(e.x));
+    const t = byKey.get(Math.round(e.y) * (battle.grid?.cols ?? COLS) + Math.round(e.x));
     if (t) return t;
   }
   // 距离其它可选敌人最近地块

@@ -62,7 +62,7 @@ const SLOWED = new WeakMap();
 const bbOf = (chess, id) => skillRec(chess, id)?.bb ?? {};
 const tileOf = (p) => {
   const r = Math.round(p.y), c = Math.round(p.x);
-  return r >= 0 && r < ROWS && c >= 0 && c < COLS ? r * COLS + c : -1;
+  return r >= 0 && r < (p.source?.battle?.grid?.rows ?? ROWS) && c >= 0 && c < (p.source?.battle?.grid?.cols ?? COLS) ? r * (p.source?.battle?.grid?.cols ?? COLS) + c : -1;
 };
 /** Enemy projectiles on the field (ProjectileSystem list: the sim's only projectile store). */
 const enemyShots = (battle) => (battle.projectiles?.list ?? []).filter((p) => p && p.source && p.source.side === 'enemy');

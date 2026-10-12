@@ -1416,7 +1416,7 @@ function levelUp(m, ps, { spare = false } = {}) {
  * leftover is lost at the prep end, so spending it all is free value).
  */
 function fundsReserve(m, ps) {
-  if (!m.gd.leftoverKeptBands.includes(ps.bandId)) return 0;
+  if (!m.gd.keepsFunds(ps.bandId)) return 0;
   const band = m.gd.band(ps.bandId);
   const buff = band && Array.isArray(band.buffs) ? band.buffs.find((b) => b && b.key === 'coin_carry_over') : null;
   const cap = Number(buff && buff.bb && buff.bb.capital);

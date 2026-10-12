@@ -1,3 +1,4 @@
+import {LaboratoryRestartButton,LaboratoryTargetButton} from '../ui/laboratory.js';
 
 
 
@@ -423,15 +424,16 @@ function MatchScreen() {
   const ownView = showPrep || (shownField ? (shownMembers ? shownMembers.includes(myId) : shownField.fieldId === ownFieldId(myId)) : !watchingOther);
   useEffect(() => {
     if (!view) return;
-    const st = ownView ? ownStage : baseStage;
+    const battleStage=shownField&&!shownField.prep?gd.stage(shownField.stageId):null;
+    const st = battleStage?.coopEightStage ? battleStage : ownView ? ownStage : baseStage;
     if (st) view.setStage(st);
-  }, [view, ownView, ownStage, baseStage]);
+  }, [view, ownView, ownStage, baseStage, shownField?.stageId]);
   // the stage behind the board ON SCREEN — the own one (机变 overrides applied) or, while watching a teammate, the plain
   // one — and how a tapped BOARD tile maps to it (GitHub issue #184: tileClick → gameLogic.terrainInfo). Everywhere but a
   // boss-prep board the two spaces are the same: a 最终攻势 / 隐秘核心 battle renders the stage's own rows (GEO.BOSS_RECT),
   // 联防 / normal rects are stage rows; the boss PREP draws the player's half (stage rows 2–5) as board rows 9–12
   // (render/prepfield.js toDisp), which is exactly gameLogic.fieldTile.
-  live.current.terrainStage = ownView ? ownStage : baseStage;
+  live.current.terrainStage = shownField&&!shownField.prep&&gd.stage(shownField.stageId)?.coopEightStage ? gd.stage(shownField.stageId) : ownView ? ownStage : baseStage;
   live.current.terrainTile = showPrep && (deployField === 'bossL' || deployField === 'bossR')
     ? (row, col) => fieldTile(deployField, row, col)
     : (row, col) => [row, col];
@@ -503,14 +505,16 @@ function MatchScreen() {
     const side = sides && sides[myId] ? sides[myId] : members.length > 1 && members.indexOf(myId) === 1 ? 'R' : 'L';
     // local simulation (client-side combat) feeds a frame per animation frame: no network jitter buffer
     view.raw?.setLocalFeed?.({ on: !!field.local, speed: field.speed });
-    const observerHalf = (spectator || watchingOther) && (kind === 'boss' || (kind === 'unite' && members.length === 1));
+    const extendedUnite = kind === 'unite' && String(field.stageId||'').startsWith('coop8_unite_');
+    const observerHalf = !extendedUnite && (spectator || watchingOther) && (kind === 'boss' || (kind === 'unite' && members.length === 1));
     const observedId = watchWho?.playerId || members[0];
     const observedSide = sides?.[observedId] || (members.indexOf(observedId) === 1 ? 'R' : 'L');
-    const lone = (kind === 'boss' || kind === 'unite') && members.length === 1;
+    const lone = (kind === 'boss' || kind === 'unite' && !extendedUnite) && members.length === 1;
     setLayer(observerHalf ? observedSide : lone ? side : 'ALL');
     // a lone player's boss field (solo modes, the odd player of a co-op Final Assault: the `_s` templates route every
     // enemy to the left objective) is framed on its own half like the ‹ › half view; pairs start on 全景
-    setCam(kind, field.prep ? { rect: field.rect, side: field.prepSide || side, shop: false } : observerHalf ? {rect:field.rect,side:observedSide,half:true} : lone ? { rect: field.rect, side, half: true } : { rect: field.rect, side });
+    const retainPen = penRef.current.on && field.prep && sameField && phase === PHASE.PREP;
+    if (!retainPen) setCam(kind, field.prep ? { rect: field.rect, side: field.prepSide || side, shop: false } : extendedUnite ? layerCamera(field,'ALL') : observerHalf ? {rect:field.rect,side:observedSide,half:true} : lone ? { rect: field.rect, side, half: true } : { rect: field.rect, side });
     audio.setFieldUnits(field.units);
     if (early && early.length) {
       // replay state-bearing events only (a burst of stale hit sparks / damage numbers would look wrong)
@@ -651,7 +655,7 @@ function MatchScreen() {
     const A = whoAppliedRef.current;
     if (A.who === who && A.field === field) return;
     whoAppliedRef.current = { who, field };
-    if (field.kind === 'unite' && field.players?.length === 2 && A.field !== field) return;
+    if (field.kind === 'unite' && field.players?.length === 2 && !String(field.stageId||'').startsWith('coop8_unite_') && A.field !== field) return;
     const k = playerLayer(field, pub, myId, who.playerId);
     if (!k) return;
     setLayer(k);
@@ -780,7 +784,7 @@ function MatchScreen() {
     const ask = !r ? null : L.pub?.laboratory ? {
       title: '준비 완료 확인', micro: 'BATTLE READY', okText: '전투 시작', cancelText: '계속 준비',
       text: '현재 배치와 설정으로 전투를 시작하시겠습니까?',
-    } : readyFundsPrompt(L.priv, { keptBands: data.get('config')?.economy?.leftoverFundsKeptByBands, autoplay: !!me?.autoplay });
+    } : readyFundsPrompt(L.priv, { keptBands: (data.get('config')?.commonBands||[]).some(id=>data.get('config')?.economy?.leftoverFundsKeptByBands?.includes(id)) ? [L.priv.bandId] : data.get('config')?.economy?.leftoverFundsKeptByBands, autoplay: !!me?.autoplay });
     if (ask) {
       if (askingReady.current) return;
       askingReady.current = true;
@@ -1301,6 +1305,7 @@ function MatchScreen() {
         togglePauseRef.current(!L.paused);
         return;
       }
+      if (act === 'enemyPreview' && L.pub?.phase === PHASE.PREP && !L.drag && !L.facing) {e.preventDefault();togglePenRef.current(!L.pen);return;}
       if (act === 'collapseShop' && L.pub?.phase === PHASE.PREP && L.priv && !L.pen && !L.drag && !L.facing) {e.preventDefault();setCollapsed(c=>!c);return;}
       if (L.pub?.phase !== PHASE.PREP || !L.priv) return;
       e.preventDefault(); // a focused HUD button must not also activate (Space) — see shortcutFor
@@ -1347,7 +1352,7 @@ function MatchScreen() {
   // (an eliminated player auto-observes a teammate's normal field — research 09 "keep-watching" — without asking)
   const watchedFid = watchingOther ? watching : (cc && combat && !alive && battleState && battleState.watch && battleState.kind === 'normal' ? battleState.fieldId : null);
   // the ‹ › pill: on the 联防 / 最终攻势 field on screen — also one watched with 前往查看 (a leaker, an eliminated spectator)
-  const layers = cc && combat && field && field.local && (!watchingOther || field.fieldId === watching) ? cameraLayers(field, pub, myId) : [];
+  const layers = combat && field && (field.local || !cc) && (!watchingOther || field.fieldId === watching) ? cameraLayers(field, pub, myId) : [];
   // During boss preparation only the selected player's board is sent. Switch the
   // watched player as well as the camera, so the other half is never an empty board.
   const prepOwnerId = watchingOther ? watchWho?.playerId || (watching?.startsWith('n:') ? watching.slice(2) : null) : myId;
@@ -1467,13 +1472,13 @@ function MatchScreen() {
   return html`<div class=${cx('screen', 'gm', `gm--${mode}`, drag && 'is-dragging', collapsed && 'is-collapsed', (sp || hasPersonalChoice) && 'has-sp', pen && 'is-pen', readyWhy && 'has-readywhy')}
       data-camera=${pen ? 'pen' : camKind}>
     <div class="gm__field" ref=${hostRef} onContextMenu=${(e) => e.preventDefault()}></div>
+    ${pub?.laboratory&&myDone?html`<div class="lab-complete-notice" role="status"><span>전투 종료</span><${LaboratoryRestartButton}/></div>`:null}
     ${viewKind === 'loading' ? html`<div class="gm__loading"><${Spinner} label="LOADING FIELD" /></div>` : null}
     ${tempNotice ? html`<${TempRowNotice} view=${view} count=${temp.count} items=${temp.items} label=${!drag && !facing}
       ready=${phase === PHASE.PREP && !!priv?.ready} />` : null}
 
     <div class="gm__hud" ref=${hudElRef}>
-      ${pub?.laboratory && combat ? html`<${LaboratoryDamage} runner=${battleRunner} fieldId=${field?.fieldId}/>` : null}
-      <${TopBar} battleEnd=${combat && alive && !spectator && !myDone && endField && !['boss','hidden'].includes(endField.kind) ? html`<button type="button" class="gm__end-battle" data-i18n-skip disabled=${endField.endVotes?.includes(myId)} onClick=${async()=>{
+      <${TopBar} battleEnd=${pub?.laboratory && combat ? html`<${LaboratoryRestartButton} class="gm__end-battle"/>` : combat && alive && !spectator && !myDone && endField && !['boss','hidden'].includes(endField.kind) ? html`<button type="button" class="gm__end-battle" data-i18n-skip disabled=${endField.endVotes?.includes(myId)} onClick=${async()=>{
         const f=pub.fields?.find(f=>f.live && f.players?.includes(myId)); if(!f)return;
         const shared=f.kind==='boss'||f.kind==='hidden'||f.players.length>1;
         if(await confirmDialog({title:'현재 전투 포기',text:shared?'모든 참가자가 포기를 요청하면 전투를 끝냅니다. 남은 적은 미처치로 정산되며, 보스전은 패배합니다.':'지금 전투를 끝내고 다음 단계로 넘어갑니다. 남은 적은 미처치로 정산됩니다.',okText:'전투 포기',danger:true})) {
@@ -1527,7 +1532,7 @@ function MatchScreen() {
 
       ${combat || mode === 'settle' ? html`<${CombatHud} pub=${pub} myId=${myId} watching=${watchingNow} hud=${hud} myDone=${!!myDone && alive}
         spectating=${!alive} spectator=${spectator} onWatch=${watchField}
-        client=${cc ? { progress, observing: observingName ? { name: observingName } : null, onBack: alive ? backHome : null, layers, layer, onLayer: setLayer } : null} />` : null}
+        client=${cc || layers.length ? { progress, observing: observingName ? { name: observingName } : null, onBack: alive ? backHome : null, layers, layer, onLayer: setLayer, onLayerStep: delta => setLayer(previous => {const i=Math.max(0,layers.findIndex(x=>x.key===previous));return layers[Math.max(0,Math.min(layers.length-1,i+delta))].key;}) } : null} />` : null}
 
       ${!spectator && showDeadPill(alive, phase) ? html`<div class="gm__dead" role="status"><${Icon} name="close" />你已被淘汰 · 可继续观战队友</div>` : null}
 
@@ -1535,8 +1540,10 @@ function MatchScreen() {
       <${Ticker} />
 
       <div class="gm__corner">
+      ${pub?.laboratory && combat ? html`<${LaboratoryDamage} runner=${battleRunner} fieldId=${field?.fieldId}/>` : null}
         ${solo || pub?.laboratory ? null : html`<${ChatPanel} />`}
         ${spectator || solo || pub?.laboratory ? null : html`<${EmoteWheel} open=${emoteOpen} onToggle=${setEmoteOpen} onSend=${(id) => actions.emote(id)} disabled=${conn.status !== 'online'} />`}
+        ${pub?.laboratory?.bossId==='boss_laboratory_jesselton'?html`<${LaboratoryTargetButton}/>`:null}
         <button type="button" class="gm__gear" aria-label="设置" title="设置" onClick=${() => setSettingsOpen(true)}><${GIcon} name="gear" /></button>
         <button type="button" class="gm__gear gm__guide" aria-label="玩法说明" title="玩法说明" onClick=${() => openGuide(0)}><${Icon} name="book" /></button>
         <${FullscreenButton} class="gm__gear gm__fs" />

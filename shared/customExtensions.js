@@ -1,6 +1,8 @@
+import {eightUniteStage} from './cooperativeEight.js';
 import { customFactionData, filterCustomFaction } from './customFactions.js';
 
 export const RULE_VALUES = Object.freeze([
+ {id:'roundCount',name:'일반 라운드 수',default:13,min:1,max:100,step:1,unit:'라운드'},
  {id:'deployCap',name:'배치 수 제한',default:8,min:4,max:12,step:1,unit:'명'},
  ...[['enemyHp','적 최대 HP'],['enemyAtk','적 공격력'],['enemyDef','적 방어력'],['enemyRes','적 마법 저항'],['enemySpeed','적 이동 속도'],['enemyAspd','적 공격 속도']].map(([id,name])=>({id,name,default:100,min:id==='enemyHp'||id==='enemyAspd'?1:0,step:1,unit:'%'})),
 ]);
@@ -18,7 +20,7 @@ export function recordCustomExtensions(value) {
 }
 export function extensionSelectionCount(selection){const saved=recordCustomExtensions(selection);return saved?Object.values(saved).reduce((n,v)=>n+(Array.isArray(v)?v.length:Object.keys(v).length),0):0;}
 export const EXTENSION_CATEGORIES = Object.freeze([
-  {id:'rules',name:'게임 규칙'},
+  {id:'rules',name:'게임 규칙'}, {id:'commonBands',name:'공통 적용 전략'}, {id:'protectedOperators',name:'오퍼레이터 밴 제외'},
   { id: 'bonds', name: '맹약 추가' }, { id: 'stages', name: '전장 추가' },
   {id:'forcedBonds',name:'맹약 금지'}, {id:'protectedBonds',name:'맹약 밴 제외'},
   {id:'forcedAuxBonds',name:'보조맹약 금지'}, {id:'protectedAuxBonds',name:'보조맹약 밴 제외'},
@@ -32,7 +34,9 @@ export function customExtensionCatalog(raw = {}) {
   const banCatalog=Object.entries(raw.bonds||{}).filter(([,b])=>b.isCore&&Number(b.weight)>0).map(([id,b])=>({id,name:b.name||id}));
   const auxCatalog=Object.entries(raw.bonds||{}).filter(([,b])=>!b.isCore&&Number(b.weight)>0).map(([id,b])=>({id,name:b.name||id}));
   return {
-    rules:[{id:'sharedHp',name:'아군 HP 공유',description:'모든 참가자의 HP를 합산해 공유합니다. 전투 종료 시 감소 예정 HP를 합산해 차감합니다.'},{id:'unlimitedStock',name:'상점 재고 제한 해제',description:'오퍼레이터와 장비의 상점 재고 제한을 해제합니다.'},{id:'unlimitedLayers',name:'중첩 상한선 해제',description:'맹약의 999중첩 상한선을 해제합니다.'},{id:'defaultHarmony',name:'조화 기본 활성화',description:'조화 오퍼레이터가 없어도 조화 맹약을 활성화합니다.'},{id:'duplicateBands',name:'전략 중복 선택 허용',description:'여러 참가자가 같은 전략을 선택할 수 있습니다.'}],
+    commonBands:Object.entries(raw.bands||{}).map(([id,b])=>({id,name:b.name||id,description:b.desc||''})),
+    protectedOperators:[...new Map(Object.entries(raw.chess||{}).filter(([,c])=>c.visible&&!c.isDiy&&!c.isGolden&&!c.optionalRecruit&&!c.isHidden&&typeof c.charId==='string'&&c.charId.length).map(([id,c])=>[c.charId,{id:c.charId,name:c.name||id,description:`${c.tier}단계`}])).values()],
+    rules:[{id:'unlimitedHpLoss',name:'HP 감소 상한 해제',description:'한 라운드에 감소하는 HP의 10 상한을 해제합니다.'},{id:'sharedHp',name:'아군 HP 공유',description:'모든 참가자의 HP를 합산해 공유합니다. 전투 종료 시 감소 예정 HP를 합산해 차감합니다.'},{id:'unlimitedStock',name:'상점 재고 제한 해제',description:'오퍼레이터와 장비의 상점 재고 제한을 해제합니다.'},{id:'unlimitedLayers',name:'중첩 상한선 해제',description:'맹약의 999중첩 상한선을 해제합니다.'},{id:'defaultHarmony',name:'조화 기본 활성화',description:'조화 오퍼레이터가 없어도 조화 맹약을 활성화합니다.'},{id:'duplicateBands',name:'전략 중복 선택 허용',description:'여러 참가자가 같은 전략을 선택할 수 있습니다.'}],
     forcedAuxBonds:auxCatalog,protectedAuxBonds:auxCatalog,
     forcedBonds:banCatalog,protectedBonds:banCatalog,
     disabledBonds:Object.entries(raw.bonds||{}).filter(([,b])=>b.isCore).map(([id,b])=>({id,name:b.name||id,description:b.isCore?'핵심 맹약':'추가 맹약'})),
@@ -74,13 +78,32 @@ export function applyCustomExtensions(raw, selection) {
     ...m, activeBondIds:(m.activeBondIds||[]).filter(id=>!denied.has(id)),inactiveBondIds:(m.inactiveBondIds||[]).filter(id=>!denied.has(id)),bossWeights:Object.fromEntries(Object.entries(m.bossWeights||{}).filter(([id])=>data.bosses[id])),hiddenBossWeights:Object.fromEntries(Object.entries(m.hiddenBossWeights||{}).filter(([id])=>data.bosses[id])), stages: [...new Set([...(m.stages || []).filter(k => stages[k]), ...selection.stages.filter(k => stages[k]
       && (!Array.isArray(stages[k].customExtension?.modeIds) || stages[k].customExtension.modeIds.includes(id)))])],
   }]));
-  return { ...data, stages, config: { ...raw.config, modes, deployCap:normalizeRuleValues(selection.ruleValues).deployCap, customRules:{...normalizeRuleValues(selection.ruleValues),...Object.fromEntries((selection.rules||[]).map(id=>[id,true]))} } };
+  const roundCount=normalizeRuleValues(selection.ruleValues).roundCount;
+  if(roundCount!==13)for(const [id,m] of Object.entries(modes)){
+    const original=raw.config.modes[id];
+    const fallback=Object.values(raw.config.modes).find(x=>x.type===m.type&&x.rounds?.['13']&&!x.rounds['13'].isBoss);
+    const regular=original.rounds?.['13']||fallback?.rounds?.['13'];
+    if(!regular)continue;
+    const rounds={},enemyScale={},roundSource={};
+    const copy=(to,from,cfg)=>{rounds[to]={...cfg};enemyScale[to]={...(original.enemyScale?.[from]||fallback?.enemyScale?.[from]||{})};roundSource[to]=from;};
+    for(let r=1;r<=roundCount;r++){const from=Math.min(r,13),cfg=original.rounds?.[from];copy(r,from,cfg&&!cfg.isBoss&&!cfg.isHidden?cfg:regular);}
+    copy(roundCount+1,original.bossRound,original.rounds?.[original.bossRound]);
+    if(original.hiddenRound)copy(roundCount+2,original.hiddenRound,original.rounds?.[original.hiddenRound]);
+    Object.assign(m,{rounds,enemyScale,roundSource,bossRound:roundCount+1,lastRound:roundCount+1,hiddenRound:original.hiddenRound?roundCount+2:null,spRounds:(original.spRounds||[]).filter(r=>r<=roundCount)});
+  }
+  const battleStages={...stages,...Object.fromEntries(Object.values(stages).filter(s=>!s.coopEightStage).map(s=>{const four=eightUniteStage(s);return [four.id,four];}))};
+  return { ...data, stages:battleStages, config: { ...raw.config, modes, deployCap:normalizeRuleValues(selection.ruleValues).deployCap, commonBands:(selection.commonBands||[]).filter(id=>data.bands[id]),lpCapPerRound:selection.rules?.includes('unlimitedHpLoss')?Number.MAX_SAFE_INTEGER:raw.config?.lpCapPerRound,customRules:{...normalizeRuleValues(selection.ruleValues),...Object.fromEntries((selection.rules||[]).map(id=>[id,true]))} } };
 }
 /** Validate before creating/starting a match, with the same filtered tables used by combat. */
 export function validateExtensionMinimums(raw,selection,{mode='coop',difficulty='NORMAL'}={}){
  const data=applyCustomExtensions(raw,selection);
  const modes=Object.values(data.config?.modes||{}).filter(m=>m.difficulty===difficulty&&(mode==='solo'?m.type==='SINGLE':m.type==='MULTI'));
  const errors=[];
+ if(mode==='coop8')for(let tier=1;tier<=6;tier++){
+  const candidates=Object.entries(data.chess||{}).filter(([id,c])=>c.visible&&!c.isGolden&&!c.optionalRecruit&&c.tier===tier&&!selection.protectedOperators?.includes(c.charId)&&!selection.protectedOperators?.includes(id));
+  if(!candidates.length)errors.push(`${tier}단계에 밴 가능한 오퍼레이터를 최소 1명 남겨야 합니다.`);
+ }
+ if((selection.commonBands||[]).some(id=>!data.bands[id]))errors.push('공통 적용 전략은 활성화된 전략 중에서 선택해야 합니다.');
  for(const m of modes){
   const allowed=Object.entries(data.bonds||{}).filter(([id,b])=>Number(b.weight)>0&&!(m.inactiveBondIds||[]).includes(id));
   const forced=selection.forcedBonds||[],protectedIds=selection.protectedBonds||[];
@@ -96,8 +119,14 @@ export function validateExtensionMinimums(raw,selection,{mode='coop',difficulty=
 
   if(!(m.stages||[]).some(id=>data.stages[id]&&data.stages[id].active!==false&&Number(data.stages[id].weight)>0))errors.push('맵을 최소 1개 남겨야 합니다.');
   for(const [key,title,round] of [['bossWeights','일반 보스',m.bossRound],['hiddenBossWeights','히든 보스',m.hiddenRound]])if(round && !Object.entries(m[key]||{}).some(([id,w])=>data.bosses[id]&&w>0))errors.push(`${title}를 최소 1개 남겨야 합니다.`);
-  const n=mode==='solo'?1:4;
+  const n=selection.rules?.includes('duplicateBands')?1:mode==='solo'?1:mode==='coop8'?8:4;
   if(Object.values(data.bands||{}).filter(b=>!b.modeTypeList||b.modeTypeList.includes(m.type)).length<n)errors.push(`전략을 최소 ${n}개 남겨야 합니다.`);
  }
  return [...new Set(errors)];
+}
+
+/** Eight-player mode replaces bond bans with operator bans. Strip stale preset policies too. */
+export function modeExtensionSelection(selection,mode){
+ if(mode!=='coop8')return selection;
+ const result={...selection};for(const key of ['forcedBonds','protectedBonds','forcedAuxBonds','protectedAuxBonds','disabledBonds'])delete result[key];return result;
 }

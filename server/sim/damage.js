@@ -388,7 +388,7 @@ export function applyHpLoss(battle, source, target, amount, dmg) {
   // 史尔特尔 S3 …), friendly damage; `taken` and the kill credit do
   if (source && source.side !== target.side) {
     source.stats.dmg += dealt;
-    const key=type==='phys'?'physicalDamage':type==='arts'?'artsDamage':type==='elemental'?'elementalDamage':'trueDamage';
+    const key=dmg?.tags?.includes('leithanien:note')?'noteDamage':type==='phys'?'physicalDamage':type==='arts'?'artsDamage':type==='elemental'?'elementalDamage':'trueDamage';
     source.stats[key]=(source.stats[key]||0)+dealt;
     if (source.side === 'ally' && source.ownerId != null) { const pp = battle._pp(source.ownerId); if (pp) pp.damageDealt += dealt; }
   }

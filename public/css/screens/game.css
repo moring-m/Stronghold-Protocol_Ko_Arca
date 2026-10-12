@@ -792,3 +792,12 @@
 .settings-modal .modal__body { display:flex; flex-direction:column; min-height:0; overflow:hidden; }
 .settings-modal .set-categories { position:static; flex-shrink:0; }
 .settings-modal .set-list { min-height:0; overflow-y:auto; overscroll-behavior:contain; }
+
+.team--eight{top:1.95rem;gap:.06rem;max-height:none;overflow:visible;pointer-events:auto;padding:.06rem .1rem .1rem 0}
+.team--eight .team__btn{width:.4rem;height:.4rem;flex:0 0 .4rem}
+.team--eight .pavatar{--pa:.4rem}
+.team--eight .team__row{min-height:.4rem;gap:.07rem}
+.team--eight .team__seat,.team--eight .team__ai{font-size:.09rem}
+.team--eight .team__you{width:.15rem;height:.15rem}
+.team--eight .team__name{font-size:.13rem}
+.team--eight .team__info{gap:0;padding-top:0;padding-bottom:0}

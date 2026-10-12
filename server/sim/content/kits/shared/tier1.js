@@ -60,7 +60,7 @@ export const traitBb = (chess) => chess?.trait?.bb ?? {};
 export const moduleOn = (chess) => !!(chess?.module && chess.module.active);
 
 export const up = (u) => !!u && u.alive && u.deployed;
-export const posKey = (u) => Math.round(u.y) * COLS + Math.round(u.x);
+export const posKey = (u) => Math.round(u.y) * (u.battle?.grid?.cols ?? COLS) + Math.round(u.x);
 /** Chebyshev tile distance between two units (a huge enemy: from the nearest tile it occupies — sim/body.js). */
 export const cheb = (a, b) => (b.hitArea ? bodyTileReach(b, Math.round(a.y), Math.round(a.x))
   : a.hitArea ? bodyTileReach(a, Math.round(b.y), Math.round(b.x))
@@ -125,7 +125,7 @@ export function holdProtect(battle, target, value, duration, source = null) {
 
 /** Targetable enemies inside `grid` (relative to the unit; null ⇒ current range), best targets first. */
 export function enemiesInGrid(battle, unit, grid, { n = 0, priority = null, canHitFly = true, groundOnly = false } = {}) {
-  const keys = grid ? absoluteRangeKeys(grid, unit.tileR, unit.tileC, unit.dir, 0) : unit.rangeKeys;
+  const keys = grid ? absoluteRangeKeys(grid, unit.tileR, unit.tileC, unit.dir, 0, battle.grid) : unit.rangeKeys;
   const list = battle.enemiesInKeys(keys, unit, { canHitFly, groundOnly });
   sortEnemyTargets(battle, unit, list, priority ?? unit.profile?.priority ?? null);
   return n > 0 && list.length > n ? list.slice(0, n) : list;
@@ -135,8 +135,8 @@ export function enemiesInGrid(battle, unit, grid, { n = 0, priority = null, canH
  * (炎佑: Battle.allySelectable), as Battle.alliesInGrid.
  */
 export function alliesInGridOf(battle, unit, grid = null) {
-  const set = grid ? new Set(absoluteRangeKeys(grid, unit.tileR, unit.tileC, unit.dir, 0)) : (unit.rangeKeySet || new Set(unit.rangeKeys || []));
-  return battle.allyUnits.filter((a) => a.alive && a.deployed && !a.hidden && a.kind !== 'device' && set.has(a.tileR * COLS + a.tileC) && battle.allySelectable(a, unit));
+  const set = grid ? new Set(absoluteRangeKeys(grid, unit.tileR, unit.tileC, unit.dir, 0, battle.grid)) : (unit.rangeKeySet || new Set(unit.rangeKeys || []));
+  return battle.allyUnits.filter((a) => a.alive && a.deployed && !a.hidden && a.kind !== 'device' && set.has(a.tileR * (a.battle?.grid?.cols ?? COLS) + a.tileC) && battle.allySelectable(a, unit));
 }
 /** Any targetable enemy in the unit's current range. */
 export const enemyInRange = (battle, unit) => battle.enemiesInKeys(unit.rangeKeys, unit, { canHitFly: true }).length > 0;

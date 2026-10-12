@@ -116,12 +116,68 @@ for(const difficulty of ['FUNNY','NORMAL','HARD','ABYSS'])for(const players of [
   assert.equal(ps.battleInput({side:'L',colOffset:0}).units.find(u=>u.chessId===c.chessId).skinId,c.skins[0].id);
  });
 
-test('laboratory grants personnel file and applying it raises the deployment limit to nine',t=>{
- const {m,ps}=create(t);const chess=Object.values(raw.chess).find(c=>c.visible&&!c.isGolden&&!c.isHidden&&!c.isDiy);
- assert.deepEqual(m.handle('local',{t:'g.labGain',kind:'chess',id:chess.chessId}),{ok:true});
- const piece=ps.hand.find(p=>p?.id===chess.chessId);
- assert.deepEqual(m.handle('local',{t:'g.labGain',kind:'item',id:'chess_item_6_08_e_a'}),{ok:true});
- const item=ps.hand.find(p=>p?.id==='chess_item_6_08_e_a');assert.ok(item);
- assert.deepEqual(m.handle('local',{t:'g.equip',itemUid:item.uid,targetUid:piece.uid}),{ok:true});
- assert.equal(ps.deployCap,9);
+test('laboratory has fifteen deployment slots and does not grant personnel files',t=>{
+ const {m,ps}=create(t);assert.equal(ps.deployCap,15);assert.ok(m.handle('local',{t:'g.labGain',kind:'item',id:'chess_item_6_08_e_a'}).error);assert.ok(!ps.hand.some(p=>p?.id==='chess_item_6_08_e_a'));
+});
+
+test('laboratory snapshots restore placements and equipment, and put operators on an empty bench on another map',t=>{
+ const {m,ps}=create(t);ps.hand.fill(null);ps.temp.fill(null);ps.board.clear();
+ const chess=m.gd.visibleChess.find(id=>!m.gd.chess(id).optionalRecruit),item=Object.keys(m.data.items)[0];
+ const unit=ps.newPiece('chess',chess,{items:[ps.newPiece('item',item)],dir:2});ps.board.set('10,3',unit);ps.layers.yanShip=42;ps.recompute();
+ const saved=JSON.parse(JSON.stringify(m.saveSetup('local')));
+ assert.ok(m.loadSetup('local',saved).ok);assert.equal(ps.board.get('10,3').id,chess);assert.equal(ps.board.get('10,3').items[0].id,item);assert.equal(ps.layers.yanShip,42);assert.equal(ps.board.get('10,3').dir,2);assert.notEqual(ps.board.get('10,3').uid,unit.uid);
+ const other={...saved,stageId:'other-map'};ps.hand[0]=ps.newPiece('chess',chess);
+ assert.ok(m.loadSetup('local',other).ok);assert.equal(ps.board.size,0);assert.equal(ps.hand.filter(Boolean).length,1);assert.equal(ps.hand[0].id,chess);assert.equal(ps.hand[0].items[0].id,item);
+ const before=JSON.stringify(ps.hand);assert.ok(m.loadSetup('local',{...other,hand:Array(100).fill(unit)}).error);assert.equal(JSON.stringify(ps.hand),before);
+});
+
+test('laboratory cross-map presets use temporary benches and reject invalid snapshots without clearing the current setup',t=>{
+ const {m,ps}=create(t);ps.hand.fill(null);ps.temp.fill(null);ps.board.clear();
+ const id=m.gd.visibleChess.find(id=>!m.gd.chess(id).optionalRecruit);
+ const count=ps.hand.length+Math.min(ps.temp.length,3);
+ const board=Array.from({length:count},(_,i)=>({key:`${9+Math.floor(i/8)},${3+i%8}`,piece:ps.newPiece('chess',id)}));
+ const saved={...m.saveSetup('local'),stageId:'different-map',board};
+ assert.ok(m.loadSetup('local',saved).ok);
+ assert.equal(ps.board.size,0);assert.equal(ps.hand.filter(Boolean).length,ps.hand.length);assert.equal(ps.temp.filter(Boolean).length,Math.min(ps.temp.length,3));
+ const before=JSON.stringify([...ps.hand,...ps.temp]);
+ assert.ok(m.loadSetup('local',{...saved,board:[board[0],board[0]]}).error);
+ assert.equal(JSON.stringify([...ps.hand,...ps.temp]),before);
+});
+
+test('lab file saves only pieces and ignores legacy loadout, recruit and layer fields',t=>{
+ const {m,ps}=create(t);const c=Object.values(m.data.chess).find(c=>c.optionalRecruit&&!c.isGolden&&c.tier===5&&!c.recruitReserve);
+ const baseline=m.gd.visibleChess.find(id=>!m.gd.chess(id).optionalRecruit);ps.hand.fill(null);ps.temp.fill(null);ps.board.clear();ps.board.set('10,3',ps.newPiece('chess',baseline));ps.hand[0]=ps.newPiece('chess',c.chessId);
+ const saved=m.saveSetup('local');assert.equal(saved.v,2);for(const key of ['loadout','ops','layers','setup'])assert.ok(!(key in saved));
+ const old={...saved,v:1,loadout:{[c.chessId]:{selected:true}},ops:{[c.charId]:{potential:1}},layers:{yanShip:999}};
+ ps.layers.yanShip=17;const lo=JSON.stringify(ps.loadout),ops=JSON.stringify(ps.ops);assert.ok(m.loadSetup('local',old).ok);
+ assert.equal(JSON.stringify(ps.loadout),lo);assert.equal(JSON.stringify(ps.ops),ops);assert.equal(ps.layers.yanShip,17);assert.ok(![...ps.hand,...ps.temp,...ps.board.values()].some(p=>p?.id===c.chessId));assert.equal(ps.board.get('10,3').id,baseline);
+});
+
+test('battle restart snapshot captures preparation before skill/round mutations',t=>{
+ const {m,ps}=create(t);ps.layers.yanShip=13;const before=m.saveSetup('local');m.endPrep();assert.deepEqual(m.preparationSnapshot.pieces,before);assert.equal(m.preparationSnapshot.layers.yanShip,13);ps.layers.yanShip=999;assert.equal(m.preparationSnapshot.layers.yanShip,13);
+});
+
+import {withLaboratoryDummy,LAB_DUMMY_BOSS,LAB_DUMMY_ENEMY} from '../../shared/laboratoryDummy.js';
+import {bossPoolHp} from '../../server/match/finalAssault.js';
+import {DataSource} from '../../server/sim/simdata.js';
+import {createBattleFromSpec} from '../../server/sim/spec.js';
+for(const players of [1,4])test(`Jesselton dummy ${players}-person reference has armor defaults, no escorts/actions, fixed body and 3x model`,t=>{
+ const scheduler=new VirtualScheduler(),m=new LaboratoryMatch({data:raw,laboratory:{stageId:'act1autochess_m01',bossId:LAB_DUMMY_BOSS,bandId:'band_pith',kind:'boss',players},difficulty:'NORMAL',seed:29,scheduler,seats:[{seat:0,playerId:'local',name:'박사'}],send:()=>true,broadcast:()=>true,onEnd:()=>{}});t.after(()=>m.dispose());
+ const defaults={...m.dummyDefaults};assert.ok(defaults.maxHp>0);assert.equal(defaults.def,raw.enemies.enemy_9013_acstmk.stats.def);m.start();scheduler.advance(3000);m.endPrep();
+ const spec=m.fields[0].spec;assert.equal(spec.spawns.length,1);assert.equal(spec.spawns[0].enemyKey,LAB_DUMMY_ENEMY);assert.equal(m.bossPool.maxHp,defaults.maxHp);
+ const b=createBattleFromSpec(spec,new DataSource(m.data),{quiet:true});b.step();const e=b.enemies[0],xy=[e.x,e.y];assert.deepEqual(e.def.hitArea,raw.enemies.enemy_9013_acstmk.hitArea);assert.equal(e.def.spine,'enemy_1516_jakill');assert.equal(e.def.raw.modelScale,raw.enemies.enemy_1516_jakill.modelScale*3);
+ b.runToEnd(20);assert.deepEqual([e.x,e.y],xy);assert.equal(e.stats.attacks,0);assert.equal(b.enemies.length,1);assert.equal(b.errorCount,0);const lp=m.teamLp;m._applyOvertime(1e6);assert.equal(m.teamLp,lp);
+});
+
+test('dummy specs accept edits and restore armor values without touching the original data',t=>{
+ const scheduler=new VirtualScheduler(),m=new LaboratoryMatch({data:raw,laboratory:{stageId:'act1autochess_m01',bossId:LAB_DUMMY_BOSS,bandId:'band_pith',kind:'boss'},difficulty:'NORMAL',seed:29,scheduler,seats:[{seat:0,playerId:'local',name:'박사'}],send:()=>true,broadcast:()=>true,onEnd:()=>{}});t.after(()=>m.dispose());m.start();scheduler.advance(3000);
+ const initial={...m.dummyDefaults},next={...initial,maxHp:1000000,def:250,res:30,elementRes:50,elementDmgRes:25};assert.ok(m.handle('local',{t:'g.labDummyStats',stats:next}).ok);m.endPrep();assert.equal(m.bossPool.maxHp,1000000);
+ const b=createBattleFromSpec(m.fields[0].spec,new DataSource(m.data),{quiet:true});b.step();assert.equal(b.enemies[0].s.def,250);assert.equal(b.enemies[0].def.epResistance,50);assert.equal(b.enemies[0].def.epDamageResistance,25);
+ assert.ok(m.handle('local',{t:'g.labDummyStats',reset:true}).ok);assert.deepEqual(m.laboratory.dummyStats,initial);assert.ok(m.handle('local',{t:'g.labDummyStats',stats:{...initial,res:101}}).error);assert.ok(!raw.bosses[LAB_DUMMY_BOSS]);assert.ok(!raw.enemies[LAB_DUMMY_ENEMY]);
+});
+for(const kind of ['boss','hidden'])test(`Jesselton ${kind}: preview and live enemy identity match, and deployed ranged operators damage its pool`,t=>{
+ const scheduler=new VirtualScheduler(),m=new LaboratoryMatch({data:raw,laboratory:{stageId:'act1autochess_m01',bossId:LAB_DUMMY_BOSS,bandId:'band_pith',kind},difficulty:'NORMAL',seed:29,scheduler,seats:[{seat:0,playerId:'local',name:'박사'}],send:()=>true,broadcast:()=>true,onEnd:()=>{}});t.after(()=>m.dispose());m.start();scheduler.advance(3000);
+ assert.deepEqual(m.nextEnemiesFor(m.order[0]).map(e=>e.enemyKey),[LAB_DUMMY_ENEMY]);assert.equal(m.gd.enemy(LAB_DUMMY_ENEMY).name,'제셀톤 윌리엄스');
+ const ps=m.order[0];ps.board.set('9,5',{...ps.newPiece('chess','chess_char_1_01_a'),dir:'RIGHT'});ps.recompute();m.endPrep();
+ const b=createBattleFromSpec(m.fields[0].spec,new DataSource(m.data),{quiet:true});b.runToEnd(10);const u=b.allyUnits[0],e=b.enemies[0];assert.ok(u.alive);assert.ok(u.stats.attacks>0);assert.ok(b.sharedBoss.hp<b.sharedBoss.maxHp);assert.equal(e.stats.attacks,0);assert.equal(e.def.raw.staticBody,true);assert.equal(b.errorCount,0);
 });

@@ -145,7 +145,7 @@ export function opsOn(battle, dev, keys, { ignoreSelect = false } = {}) {
   const set = keys instanceof Set ? keys : new Set(keys);
   const out = [];
   for (const a of battle.allyUnits) {
-    if (!up(a) || a.hidden || !isOp(a) || !set.has(a.tileR * COLS + a.tileC)) continue;
+    if (!up(a) || a.hidden || !isOp(a) || !set.has(a.tileR * (battle.grid?.cols ?? COLS) + a.tileC)) continue;
     if (!ignoreSelect && !battle.allySelectable(a, dev)) continue;
     out.push(a);
   }
@@ -214,7 +214,7 @@ export default {
       const tb = sk?.bb ?? {};
       const aspd = num(tokBb(def, 'attack_speed').attack_speed);        // CRA-Y stage 2+ (the token's module talent)
       const grid = dev.rangeGrid ?? def.rangeGrid ?? FRONT1;
-      const keys = () => absoluteRangeKeys(grid, dev.tileR, dev.tileC, dev.dir, 0);
+      const keys = () => absoluteRangeKeys(grid, dev.tileR, dev.tileC, dev.dir, 0, dev.battle?.grid);
       const s1On = () => up(owner) && !!owner.skill?.active && owner.skill.id === S1;
       const s2On = () => up(owner) && !!owner.skill?.active && owner.skill.id === S2;
       const common = (battle) => {
@@ -222,7 +222,7 @@ export default {
         if (aspd) {
           // CRA-Y: "自身装置天赋生效的干员攻击速度+6（此效果不受技能影响）" — on the operators the device's talent reaches
           const reach = dev.defId === CRAB
-            ? () => opsOn(battle, dev, [dev.tileR * COLS + dev.tileC, (([r, c]) => r * COLS + c)(frontOf(dev.tileR, dev.tileC, dev.dir, -1))], { ignoreSelect: true })
+            ? () => opsOn(battle, dev, [dev.tileR * (battle.grid?.cols ?? COLS) + dev.tileC, (([r, c]) => r * (battle.grid?.cols ?? COLS) + c)(frontOf(dev.tileR, dev.tileC, dev.dir, -1))], { ignoreSelect: true })
             : () => opsOn(battle, dev, keys());
           deviceAura(battle, dev, { key: `ironmn:aspd:${dev.id}`, select: reach, mods: () => ({ aspd }) });
         }
@@ -290,7 +290,7 @@ export default {
           onStart({ battle, unit }) {
             // 技能开启时自身流失2.5%的生命 (PURE DamageViaMaxHpRatio, `_skipModifierEvent`: a 流失 its trait does not cancel)
             const atk = up(owner) ? owner.s.atk : 0;
-            const keysNow = absoluteRangeKeys(skillGrid, unit.tileR, unit.tileC, unit.dir, 0);
+            const keysNow = absoluteRangeKeys(skillGrid, unit.tileR, unit.tileC, unit.dir, 0, battle.grid);
             const list = battle.enemiesInKeys(keysNow, unit, { canHitFly: true });
             sortEnemyTargets(battle, unit, list, null);
             const target = list[0] ?? null;
@@ -332,7 +332,7 @@ export default {
           if (dr > 0) {
             const behind = () => {
               const [r, c] = frontOf(dev.tileR, dev.tileC, dev.dir, -1);
-              return opsOn(battle, dev, [dev.tileR * COLS + dev.tileC, r * COLS + c], { ignoreSelect: true });
+              return opsOn(battle, dev, [dev.tileR * (battle.grid?.cols ?? COLS) + dev.tileC, r * (battle.grid?.cols ?? COLS) + c], { ignoreSelect: true });
             };
             deviceAura(battle, dev, { key: `ironmn:crab:${dev.id}`, select: behind, mods: () => ({ physTakenMul: 1 - dr }) });
           }
@@ -372,7 +372,7 @@ export default {
           const prob = num(t1.prob), gain = num(t1.cnt, 1);
           // 节约经费: a device of his leaving his x-4 ⇒ prob ⇒ +cnt
           const onLeave = (dev) => {
-            if (!up(unit) || !absoluteRangeKeys(grid1, unit.tileR, unit.tileC, unit.dir, 0).includes(dev.tileR * COLS + dev.tileC)) return;
+            if (!up(unit) || !absoluteRangeKeys(grid1, unit.tileR, unit.tileC, unit.dir, 0, battle.grid).includes(dev.tileR * (battle.grid?.cols ?? COLS) + dev.tileC)) return;
             if (!(prob > 0) || !battle.rng.chance(prob)) return;
             rechargeDevices(unit, gain);
             battle.fx('spGift', { x: unit.x, y: unit.y, id: unit.id, from: dev.id });
@@ -394,8 +394,8 @@ export default {
           if (!(spDef > 0)) return;
           const key = 'talent:ironmn:spRecover';
           battle.on('tick', () => {
-            const area = new Set(absoluteRangeKeys(grid1, unit.tileR, unit.tileC, unit.dir, 0));
-            const want = up(unit) && devicesUp(unit).some((d) => area.has(d.tileR * COLS + d.tileC));
+            const area = new Set(absoluteRangeKeys(grid1, unit.tileR, unit.tileC, unit.dir, 0, battle.grid));
+            const want = up(unit) && devicesUp(unit).some((d) => area.has(d.tileR * (battle.grid?.cols ?? COLS) + d.tileC));
             const has = unit.findBuff(key);
             if (want && !has) battle.addBuff(unit, { key, mods: { spRecoveryFlat: spDef }, tags: ['talent'] });
             else if (!want && has) battle.removeBuff(unit, key);

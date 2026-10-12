@@ -7,10 +7,10 @@ import { isObj } from './shared.js';
 // ---- the key map ------------------------------------------------------------------------------------------------
 
 /** The rebindable shortcuts in the settings' order (the ready key also pauses / resumes a solo battle). Esc is fixed. */
-export const HOTKEY_ACTIONS = Object.freeze(['refresh', 'freeze', 'levelUp', 'retreat', 'sell', 'ready', 'collapseShop']);
+export const HOTKEY_ACTIONS = Object.freeze(['refresh', 'freeze', 'levelUp', 'retreat', 'sell', 'ready', 'collapseShop', 'enemyPreview']);
 
 /** Default key of each action (a KeyboardEvent.code): the keys of 0.1.4, so nothing changes for a player who never rebinds. */
-export const DEFAULT_HOTKEYS = Object.freeze({ refresh: 'KeyR', freeze: 'KeyF', levelUp: 'KeyD', retreat: 'KeyQ', sell: 'KeyX', ready: 'Space', collapseShop: 'KeyC' });
+export const DEFAULT_HOTKEYS = Object.freeze({ refresh: 'KeyR', freeze: 'KeyF', levelUp: 'KeyD', retreat: 'KeyQ', sell: 'KeyX', ready: 'Space', collapseShop: 'KeyC', enemyPreview: 'KeyE' });
 
 // The keys a shortcut may use → the `key` value each types on a US layout (lower case): letters, digits, Space, the
 // punctuation keys, and six named keys whose `key` equals their `code`. Everything else stays with the interface: Esc
@@ -59,6 +59,11 @@ export function sanitizeHotkeys(raw) {
   const r = isObj(raw) && !Array.isArray(raw) ? raw : {};
   const out = {};
   for (const a of HOTKEY_ACTIONS) out[a] = Object.hasOwn(r, a) && isBindableCode(r[a]) ? r[a] : DEFAULT_HOTKEYS[a];
+  // Preserve older saved bindings if E already belongs to another action.
+  if (!Object.hasOwn(r,'enemyPreview')) {
+    const used=new Set(HOTKEY_ACTIONS.filter(a=>a!=='enemyPreview').map(a=>out[a]));
+    if(used.has(out.enemyPreview))out.enemyPreview=[...KEY_OF.keys()].find(code=>!used.has(code));
+  }
   return new Set(Object.values(out)).size === HOTKEY_ACTIONS.length ? out : { ...DEFAULT_HOTKEYS };
 }
 

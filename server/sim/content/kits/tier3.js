@@ -108,10 +108,10 @@ function groundAspd(key, aspd, cnt = 1) {
 /** 周围 (around a target) for 空弦's scatter / bounce arrows [ASSUMED radius, tiles: not in the data]. */
 const AROUND_R = 1.5;
 const alive = (u) => !!(u && u.alive && u.deployed);
-const tileKeyOf = (u) => (u.side === 'ally' ? u.tileR * COLS + u.tileC : Math.round(u.y) * COLS + Math.round(u.x));
+const tileKeyOf = (u) => (u.side === 'ally' ? u.tileR * (u.battle?.grid?.cols ?? COLS) + u.tileC : Math.round(u.y) * (u.battle?.grid?.cols ?? COLS) + Math.round(u.x));
 /** On a tile of `set`: an ally by its tile, an enemy by its body (every tile a huge enemy occupies — sim/body.js). */
 const onTiles = (x, set) => (x.side === 'ally' ? set.has(tileKeyOf(x)) : bodyInKeys(x, set));
-const gridKeys = (grid, u, ext = 0) => absoluteRangeKeys(grid || [[0, 0]], u.tileR, u.tileC, u.dir, ext);
+const gridKeys = (grid, u, ext = 0) => absoluteRangeKeys(grid || [[0, 0]], u.tileR, u.tileC, u.dir, ext, u.battle?.grid);
 const fx = (battle, kind, u, extra = {}) => battle.fx(kind, { x: u.x, y: u.y, id: u.id, ...extra });
 const copyGrid = (g) => (Array.isArray(g) && g.length ? g.map((p) => [p[0], p[1]]) : null);
 const NINE = [[1, -1], [1, 0], [1, 1], [0, -1], [0, 0], [0, 1], [-1, -1], [-1, 0], [-1, 1]];
@@ -145,7 +145,7 @@ const groundTile = (battle, r, c) => battle.grid.groundPassable(r, c) && battle.
  * Battle.findTacticalPoint: a free walkable tile of its initial range on an enemy ground path first, then the nearest).
  */
 function tacticalPoint(battle, unit, prefer = null) {
-  const inRange = (r, c) => (unit.baseRangeKeys || unit.rangeKeys || []).includes(r * COLS + c);
+  const inRange = (r, c) => (unit.baseRangeKeys || unit.rangeKeys || []).includes(r * (battle.grid?.cols ?? COLS) + c);
   if (prefer && freeTile(battle, prefer[0], prefer[1]) && groundTile(battle, prefer[0], prefer[1]) && inRange(prefer[0], prefer[1])) return prefer;
   return sharedTacticalPoint(battle, unit);
 }
@@ -510,7 +510,7 @@ const KITS = {
     const bombTiles = (battle, unit) => {
       const out = [];
       for (const k of gridKeys(SWIRE2_BOMB_GRID, unit)) {
-        const r = (k / COLS) | 0, c = k % COLS;
+        const r = (k / (battle.grid?.cols ?? COLS)) | 0, c = k % (battle.grid?.cols ?? COLS);
         if (freeTile(battle, r, c) && groundTile(battle, r, c)) out.push(k);
       }
       return out;
@@ -528,11 +528,11 @@ const KITS = {
         const free = new Set(keys);
         let key = null;
         for (const e of enemiesOn(battle, unit, keys, 0, ground)) {
-          const k = Math.round(e.y) * COLS + Math.round(e.x);
+          const k = Math.round(e.y) * (battle.grid?.cols ?? COLS) + Math.round(e.x);
           if (!e.isFlying && free.has(k)) { key = k; break; }
         }
         if (key == null) key = battle.rng.pick(keys);
-        const bomb = battle.spawnToken(unit, tokenId, (key / COLS) | 0, key % COLS, { untargetable: true, kit: bombKit(unit, switchT) });
+        const bomb = battle.spawnToken(unit, tokenId, (key / (battle.grid?.cols ?? COLS)) | 0, key % (battle.grid?.cols ?? COLS), { untargetable: true, kit: bombKit(unit, switchT) });
         if (!bomb) { unit.mem.bombHold = battle.time + unit.s.interval; return; }
         unit.mem.coins -= coinCost;
         fx(battle, 'summon', bomb, { src: unit.id, token: tokenId, coins: unit.mem.coins });
@@ -1839,7 +1839,7 @@ const KITS = {
           if (ctx.unit !== unit) return;
           let low = 0;
           for (const k of unit.baseRangeKeys || []) {
-            const r = (k / COLS) | 0, c = k % COLS;
+            const r = (k / (battle.grid?.cols ?? COLS)) | 0, c = k % (battle.grid?.cols ?? COLS);
             if (battle.grid.inRect(r, c) && battle.grid.isLow(r, c)) low++;
           }
           const atk = low >= num(t0.cnt, 2) ? num(t0['kjera_t_1[high].atk'], num(t0.atk)) : num(t0.atk);

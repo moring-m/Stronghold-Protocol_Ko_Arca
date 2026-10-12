@@ -100,7 +100,7 @@ const skillOn = (unit, id) => !!(unit.skill && unit.skill.active && unit.skill.i
 const isProstsOf = (t, unit) => !!t && t.kind === 'token' && t.defId === PROSTS && t.ownerUnit === unit;
 const prostsOf = (battle, unit) => battle.allyUnits.filter((t) => isProstsOf(t, unit));
 /** Her 重构体 standing inside her current attack range. */
-const prostsInRange = (battle, unit) => prostsOf(battle, unit).find((t) => up(t) && !!unit.rangeKeySet && unit.rangeKeySet.has(t.tileR * COLS + t.tileC)) ?? null;
+const prostsInRange = (battle, unit) => prostsOf(battle, unit).find((t) => up(t) && !!unit.rangeKeySet && unit.rangeKeySet.has(t.tileR * (battle.grid?.cols ?? COLS) + t.tileC)) ?? null;
 /** `a` stands on the 3×3 around `b` (x-4: a heal jump's reach, the 重构体's aura). */
 const nearX4 = (a, b) => Math.abs(a.tileR - b.tileR) <= 1 && Math.abs(a.tileC - b.tileC) <= 1;
 

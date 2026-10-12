@@ -100,6 +100,7 @@ const SIDE_MAT = {
  */
 export function parseStage(stage, band = [0, ROWS - 1], field = [0, 13]) {
   const rows = Array.isArray(stage?.rows) ? stage.rows : [];
+  const ROWS=Math.max(19,rows.length),COLS=Math.max(21,...rows.map(r=>r.length));
   const legend = stage && typeof stage.tiles === 'object' && stage.tiles ? stage.tiles : {};
   const grid = [];
   for (let r = 0; r < ROWS; r++) {
@@ -263,7 +264,7 @@ export class TileField {
     this.flashes = [];             // objective leak flashes { r, c, t }
     this._p = { x: 0, y: 0, s: 0, depth: 0 };
     this.levels = [0];
-    this.band = [0, ROWS - 1];
+    this.band = [0, this.grid.length - 1];
     this.field = [0, 13];
     this.focus = null;
     this.boxMeshes = new Set();    // live BoxMesh instances (re-textured on art swaps)
@@ -298,7 +299,7 @@ export class TileField {
    * when something changed.
    */
   setView(band, focus, field) {
-    const b = Array.isArray(band) ? [Math.max(0, band[0] | 0), Math.min(ROWS - 1, band[1] | 0)] : [0, ROWS - 1];
+    const b = Array.isArray(band) ? [Math.max(0, band[0] | 0), Math.min(this.grid.length - 1, band[1] | 0)] : [0, this.grid.length - 1];
     const fb = Array.isArray(field) ? [field[0] | 0, field[1] | 0] : [b[0], Math.min(b[1], 13)];
     const f = focus ? { r0: focus.r0, r1: focus.r1, c0: focus.c0, c1: focus.c1 } : null;
     const same = b[0] === this.band[0] && b[1] === this.band[1] && fb[0] === this.field[0] && fb[1] === this.field[1] &&
@@ -380,7 +381,7 @@ export class TileField {
       if (!DEVICE_ROLES.has(d.role)) continue;
       const active = typeof d.active === 'boolean' ? d.active : !d.hidden;
       if (!active) continue;
-      if (d.pos[0] < 0 || d.pos[0] >= ROWS || d.pos[1] < 0 || d.pos[1] >= COLS || d.pos[0] >= 14) continue;
+      if (d.pos[0] < 0 || d.pos[0] >= this.grid.length || d.pos[1] < 0 || d.pos[1] >= this.grid[0].length || d.pos[0] >= 14) continue;
       const gt = this.grid[d.pos[0]] && this.grid[d.pos[0]][d.pos[1]];
       // devices stand on the island (playable tiles + the ring around them, dist ≤ 1 — the 3D board's drawn tiles), not
       // on the faded margin. A device on the field's edge wall is drawn like any other (board3d/layout.js stageDevices):
@@ -530,7 +531,7 @@ export class TileField {
     if (Array.isArray(tiles)) {
       for (const t of tiles) {
         const r = Array.isArray(t) ? t[0] : t?.row, c = Array.isArray(t) ? t[1] : t?.col;
-        if (Number.isInteger(r) && Number.isInteger(c) && r >= 0 && r < ROWS && c >= 0 && c < COLS) list.push([r, c]);
+        if (Number.isInteger(r) && Number.isInteger(c) && r >= 0 && r < this.grid.length && c >= 0 && c < this.grid[0].length) list.push([r, c]);
       }
     }
     if (!list.length) this.highlights.delete(key);
@@ -646,7 +647,7 @@ export class TileField {
     const P = this.P;
     const fx = fxAtlas();
     const R = rng(4242);
-    for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+    for (let r = 0; r < this.grid.length; r++) for (let c = 0; c < this.grid[0].length; c++) {
       const t = this.grid[r][c];
       if (!t.drawn || t.scenery || r >= 13) continue;
       const add = (kind, tex, blend, tint, n = 1) => {
@@ -730,7 +731,7 @@ export class TileField {
     // the field's gates / objectives, and the enemy preview pen's two gates (the red cubes behind which the next
     // round's enemies wait, also while the pen is dim scenery behind the prep board)
     const pen = parsePenRect(this.stage?.config?.enemy_place_rect) || PEN_RECT;
-    for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+    for (let r = 0; r < this.grid.length; r++) for (let c = 0; c < this.grid[0].length; c++) {
       const tile = this.grid[r][c];
       if (!tile.drawn || (tile.glyph !== 'S' && tile.glyph !== 'E')) continue;
       const penGate = tile.glyph === 'S' && r >= pen.r0 && r <= pen.r1 && c >= pen.c0 && c <= pen.c1;
@@ -885,6 +886,7 @@ export function boxQuads(quads, uv, cx, cy, z0, size, height, topMat, sideMat, o
  * shadows baked into the vertex shading near drawn tiles.
  */
 export function buildPlaneQuads(G, tilesPerRepeat = 5) {
+  const ROWS=G.length,COLS=G[0]?.length||21;
   const quads = [];
   const T = Math.max(1, Number(tilesPerRepeat) || 5);
   const z = -CLIFF_DEPTH;
@@ -906,7 +908,7 @@ export function buildPlaneQuads(G, tilesPerRepeat = 5) {
   const cache = new Map();
   const ao = (x, y) => { const k = x * 1000 + y; let v = cache.get(k); if (v === undefined) { v = occl(x, y); cache.set(k, v); } return v; };
   const S = PLANE.cell;
-  for (let y = PLANE.y0; y < PLANE.y1; y += S) for (let x = PLANE.x0; x < PLANE.x1; x += S) {
+  for (let y = PLANE.y0; y < PLANE.y1; y += S) for (let x = PLANE.x0; x < Math.max(PLANE.x1,COLS+6); x += S) {
     const xa = x - 0.5, xb = x - 0.5 + S, ya = y - 0.5, yb = y - 0.5 + S;
     quads.push({
       kind: 'plane', row: y, col: x, order: 0, faceDir: 0, alpha: 1, shade: 0.62,
@@ -977,6 +979,7 @@ export class BoxMesh {
  * row, col, rot? (top texture quarter turns) }`. Pure (uv map from the tile atlas).
  */
 export function buildTileQuads(G, uv) {
+  const ROWS=G.length,COLS=G[0]?.length||21;
   const quads = [];
   const blank = (uv && uv.blank) || [0, 0, 0, 0];
   const add = (kind, mat, pts, shade, alpha, order, faceDir, tile) => {

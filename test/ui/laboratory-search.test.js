@@ -10,5 +10,5 @@ test('laboratory excludes economy and recruitment equipment while keeping battle
  const gd=getData({dataDir:'content/production/data'});
  for(const item of Object.values(gd.items))if(['ECONOMY','RECRUIT'].includes(item.category)&&item.trapId!=='trap_1070_acarm070')assert.equal(laboratoryEquipment(item),false);
  assert.ok(laboratoryEquipment(gd.items.chess_item_1_02_e_a));
- assert.ok(laboratoryEquipment(gd.items.chess_item_6_08_e_a));
+ assert.equal(laboratoryEquipment(gd.items.chess_item_6_08_e_a),false);
 });

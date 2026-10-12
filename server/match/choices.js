@@ -140,7 +140,7 @@ export function generateDraft(gd, rng, round, { stageId = null, bondAvailable = 
   const sch = scheduleFor(gd, round);
   const fams = Array.isArray(sch.families) && sch.families.length ? sch.families.map((f) => [f.family, f.weight]) : [['supply', 1]];
   let family = weightedPick(rng, fams) || 'supply';
-  const n = Number.isInteger(sch.cards) && sch.cards > 0 ? Math.min(sch.cards, 6) : formatCount(gd);
+  const n = gd.config.coop8 ? 9 : Number.isInteger(sch.cards) && sch.cards > 0 ? Math.min(sch.cards, 6) : formatCount(gd);
   const opts = { stageId, bondAvailable, round, itemAvailable };
   let cards = buildCards(gd, rng, family, n, sch, opts);
   if (!cards.length && family !== 'supply') { family = 'supply'; cards = buildCards(gd, rng, family, n, sch, opts); }
@@ -319,6 +319,7 @@ function bountyDraftCards(gd, rng, n, sch, round) {
   const out = spec ? structuredBounty(rng, kind, spec, byId) : [];
   const taken = new Set(out);
   if (out.length < n) out.push(...drawDistinct(rng, eligible, n - out.length, taken));
+  if(gd.config.coop8)while(out.length<n&&eligible.length)out.push(eligible[Math.floor(rng()*eligible.length)]);
   return rng.shuffle(out).slice(0, n).map((c) => bountyCard(gd, c));
 }
 
@@ -341,7 +342,7 @@ export function shopDraftCards(gd, rng, n, round = null, itemAvailable = null) {
     return free(eligibleItems(gd, 1, 6));
   };
   const out = [];
-  for (const slot of slots) {
+  for (const slot of gd.config.coop8?Array.from({length:Math.max(n,slots.length)},(_,i)=>slots[i%slots.length]):slots) {
     const kinds = Object.entries(slot).filter(([k]) => k === 'coin' ? !!coin : Number.isInteger(Number(k)));
     const kind = weightedPick(rng, kinds);
     if (kind == null) continue;

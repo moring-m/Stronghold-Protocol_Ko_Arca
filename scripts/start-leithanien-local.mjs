@@ -28,7 +28,7 @@ async function handlePreview(req,res){
  const path=new URL(req.url,'http://localhost').pathname;
   if(path==='/dev/ursus-transport'){
    if(req.method!=='POST'){json(res,{error:'POST required'},405);return true}
-   let size=0,body='';for await(const chunk of req){size+=chunk.length;if(size>131072){json(res,{error:'Too large'},413);return true}body+=chunk}
+   let size=0,body='';for await(const chunk of req){size+=chunk.length;if(size>8*1024*1024){json(res,{error:'Too large'},413);return true}body+=chunk}
    let msg;try{msg=JSON.parse(body)}catch{json(res,{error:'Invalid JSON'},400);return true}
    if(msg.action==='open'){
     if(sessions.size>=32){json(res,{error:'Preview full'},503);return true}
@@ -40,7 +40,7 @@ async function handlePreview(req,res){
    if(msg.action==='close'){s.ws.close();sessions.delete(msg.id);json(res,{ok:true});return true}
    if(!Number.isInteger(msg.ack)||!Array.isArray(msg.send)||msg.send.length>64){json(res,{error:'Invalid poll'},400);return true}
    s.messages=s.messages.filter(m=>m.seq>msg.ack);s.bytes=s.messages.reduce((n,m)=>n+Buffer.byteLength(m.data),0);
-   for(const m of msg.send){if(!Number.isInteger(m.seq)||typeof m.data!=='string'||Buffer.byteLength(m.data)>65536){json(res,{error:'Invalid frame'},400);return true}if(m.seq>s.sent&&s.ws.readyState===WebSocket.OPEN){s.ws.send(m.data);s.sent=m.seq}}
+   for(const m of msg.send){if(!Number.isInteger(m.seq)||typeof m.data!=='string'||Buffer.byteLength(m.data)>2*1024*1024){json(res,{error:'Invalid frame'},400);return true}if(m.seq>s.sent&&s.ws.readyState===WebSocket.OPEN){s.ws.send(m.data);s.sent=m.seq}}
    json(res,{messages:s.messages,sent:s.sent,closed:s.closed});return true;
   }
  return false;

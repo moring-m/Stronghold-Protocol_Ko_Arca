@@ -4,10 +4,11 @@
 export const PROTOCOL_VERSION = 1;
 /** Upstream package version stays valid SemVer; the lowercase suffix identifies site updates. */
 export const BASE_VERSION = '0.2.4';
-export const APP_VERSION = `${BASE_VERSION}c`;
+export const APP_VERSION = `${BASE_VERSION}d`;
 export const DEV_BUILD = /-dev$/.test(APP_VERSION);
 
-export const MAX_SEATS = 4;
+export const MAX_SEATS = 8;
+export const roomSeatCap = mode => mode === 'solo' ? 1 : mode === 'coop8' ? 8 : 4;
 /**
  * Spectator seats of a co-op room (community report #26, owner's decision 2026-10-04) — a remake feature: the official
  * room has 1–4 players and no spectator seat (there only eliminated players and 联防 bystanders watch, research 09 §3.1).

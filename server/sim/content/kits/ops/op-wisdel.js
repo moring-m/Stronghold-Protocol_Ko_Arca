@@ -137,7 +137,7 @@ function shocks({ count, atkScale, shockScale, radius, prob, stun, mainScale, bo
 function shadowTile(battle, host) {
   let best = null, bd = Infinity;
   for (const k of host.rangeKeys ?? []) {
-    const r = Math.floor(k / COLS), c = k % COLS;
+    const r = Math.floor(k / (battle.grid?.cols ?? COLS)), c = k % (battle.grid?.cols ?? COLS);
     if (!battle.grid.inRect(r, c) || !battle.grid.canStand(r, c, { ranged: true }) || battle.isReservedTile(r, c)) continue;
     const d = hypot(r - host.tileR, c - host.tileC);
     if (d < bd - 1e-9 || (Math.abs(d - bd) <= 1e-9 && (r < best[0] || (r === best[0] && c < best[1])))) { bd = d; best = [r, c]; }
@@ -201,7 +201,7 @@ function shadowKit(host) {
 /** A shadow coming in: 迷彩 for its host while it stays, when she stands on its x-5 and may be selected by it. */
 function grantCamo(battle, host, t) {
   if (!up(host) || !battle.allySelectable(host, t)) return;
-  if (!absoluteRangeKeys(X5, t.tileR, t.tileC, t.dir, 0).includes(host.tileR * COLS + host.tileC)) return;
+  if (!absoluteRangeKeys(X5, t.tileR, t.tileC, t.dir, 0, battle.grid).includes(host.tileR * (battle.grid?.cols ?? COLS) + host.tileC)) return;
   battle.addBuff(host, { key: camoKey(t), flags: { camou: true }, source: t, tags: ['talent'], visible: true });
   battle.fx('camouflage', { x: host.x, y: host.y, id: host.id });
 }

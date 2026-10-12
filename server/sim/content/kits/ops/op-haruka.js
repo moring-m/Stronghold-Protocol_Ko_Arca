@@ -69,13 +69,13 @@ const S2_RADIUS = 1.7;
 const X4 = Object.freeze([[1, -1], [1, 0], [1, 1], [0, -1], [0, 0], [0, 1], [-1, -1], [-1, 0], [-1, 1]]);
 
 const bbOf = (chess, id) => skillRec(chess, id)?.bb ?? {};
-const tileKey = (r, c) => r * COLS + c;
+const tileKey = (r, c, grid) => r * (grid?.cols ?? COLS) + c;
 const skillOn = (u, id) => !!(u && u.skill && u.skill.id === id && u.skill.active);
 
 /** Allies that may get a bubble from `by` on tile keys `keys`: no bubble yet, not 孤立; the lowest HP share first. */
 function bubbleCands(battle, by, keys, except = null) {
   const out = battle.allyUnits.filter((a) => a.alive && a.deployed && !a.hidden && a.kind !== 'device' && a !== except
-    && keys.has(tileKey(a.tileR, a.tileC)) && !a.findBuff(BUBBLE) && battle.allySelectable(a, by));
+    && keys.has(tileKey(a.tileR, a.tileC, a.battle?.grid)) && !a.findBuff(BUBBLE) && battle.allySelectable(a, by));
   out.sort((a, b) => a.hpRatio - b.hpRatio || a.deploySeq - b.deploySeq || a.id - b.id);
   return out;
 }
@@ -159,7 +159,7 @@ export default {
         if (d.prob > 0 && d.sp > 0 && battle.rng.chance(d.prob)) giveSp(a, d.sp);
       }
       if (skillOn(u, S1) && up(u)) {
-        const keys = new Set(absoluteRangeKeys(X4, a.tileR, a.tileC, a.dir || 'RIGHT', 0));
+        const keys = new Set(absoluteRangeKeys(X4, a.tileR, a.tileC, a.dir || 'RIGHT', 0, battle.grid));
         const next = bubbleCands(battle, u, keys, a)[0];
         if (next) bubble(battle, u, next);
       }

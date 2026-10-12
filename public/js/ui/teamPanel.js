@@ -106,7 +106,7 @@ const AVATAR_CLICK_GAP_MS = 500;
  */
 export function rowLpTip(lp, cap = 10) {
   if (!lp || !(lp.pending > 0)) return null;
-  if (lp.unite && lp.left != null) return `目标生命值 ${lp.lp}，联防中：漏过的敌人还剩 ${lp.left} 个，按现在结算扣除 ${lp.pending} 点（每回合至多 ${cap} 点）`;
+  if (lp.unite && lp.left != null) return `目标生命值 ${lp.lp}，联防中：漏过的敌人还剩 ${lp.left} 个，按现在结算扣除 ${lp.pending} 点（${cap>=Number.MAX_SAFE_INTEGER?'감소 상한 없음':`每回合至多 ${cap} 点`}）`;
   return `目标生命值 ${lp.lp}，${lp.unite ? '联防中，' : ''}结算时扣除${lp.unite ? '至多' : ''} ${lp.pending} 点`;
 }
 
@@ -152,7 +152,7 @@ export function TeamPanel({ pub, myId, watching, bubbles, onWatch, compact = fal
     }
     setOpenPid((cur) => (cur === p.playerId ? null : p.playerId));
   };
-  return html`<aside class=${cx('team', compact && 'team--compact')} aria-label="同盟成员">
+  return html`<aside class=${cx('team', compact && 'team--compact',pub?.players?.length>4&&'team--eight')} aria-label="同盟成员">
     ${players.map((p) => {
       const self = p.playerId === myId;
       const status = p.alive === false ? 'dead' : p.status;

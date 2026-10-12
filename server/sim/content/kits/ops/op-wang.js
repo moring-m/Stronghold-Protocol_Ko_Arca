@@ -92,7 +92,7 @@ const TAG = 'wang:stone';
 const ANY = Object.freeze({ canHitFly: true });
 
 const bbOf = (chess, id) => skillRec(chess, id)?.bb ?? {};
-const keyOf = (r, c) => (r >= 0 && r < ROWS && c >= 0 && c < COLS ? r * COLS + c : -1);
+const keyOf = (r, c, grid) => (r >= 0 && r < (grid?.rows ?? ROWS) && c >= 0 && c < (grid?.cols ?? COLS) ? r * (grid?.cols ?? COLS) + c : -1);
 
 /**
  * The 跟子 placement class of a tile: 0 undeployable ground (walkable, nothing may be deployed there), 1 deployable
@@ -169,7 +169,7 @@ export default {
     };
     /** Tiles a 跟子 may take: in the field, a class, no character unit or knocked-out operator, no piece. */
     const followerFree = (battle, unit, r, c, taken) => {
-      const k = keyOf(r, c);
+      const k = keyOf(r, c, battle.grid);
       return k >= 0 && !taken.has(k) && tileClass(battle, r, c) != null && !battle.unitAt(r, c) && !battle.downOn(r, c);
     };
     /** 铸子: up to `n` 跟子 next to (r, c) in the PRTS order; returns how many were placed. */
@@ -177,7 +177,7 @@ export default {
       const w = unit.mem.wang;
       let placed = 0;
       for (let i = 0; i < n && w.followers.length < followCap; i++) {
-        const taken = new Set(piecesOf(battle, unit).map((p) => keyOf(p.r, p.c)));
+        const taken = new Set(piecesOf(battle, unit).map((p) => keyOf(p.r, p.c, battle.grid)));
         const sides = battle.getPlayer(unit.ownerId)?.mirror ? SIDES_MIRRORED : SIDES;
         const cands = [];
         sides.forEach(([dr, dc], idx) => {
@@ -201,7 +201,7 @@ export default {
       if (battle.hasHook('ammoUsed')) battle.emit('ammoUsed', { unit, left: w.ammo, skill: sk });
       if (w.ammo <= 0) sk.end('ammo');
     };
-    const inHerRange = (unit, r, c) => !!unit.rangeKeySet?.has(keyOf(r, c));
+    const inHerRange = (unit, r, c) => !!unit.rangeKeySet?.has(keyOf(r, c, unit.battle?.grid));
 
     /** A spent 棋子 comes back on its tile ("原地再部署"); its return drops the 铸子 跟子. */
     const scheduleReturn = (battle, unit, stone) => {
@@ -276,11 +276,11 @@ export default {
             // target order among enemy tiles, then nearest to her, then by tile
             const n = Math.min(over, followCap - w.followers.length);
             if (!(n > 0)) return;
-            const taken = new Set(piecesOf(battle, unit).map((p) => keyOf(p.r, p.c)));
+            const taken = new Set(piecesOf(battle, unit).map((p) => keyOf(p.r, p.c, battle.grid)));
             const foes = sortEnemyTargets(battle, unit, battle.enemiesInKeys(unit.rangeKeys, unit, ANY), unit.profile?.priority ?? null);
             const cands = [];
             for (const k of unit.rangeKeys ?? []) {
-              const r = Math.floor(k / COLS), c = k % COLS;
+              const r = Math.floor(k / (battle.grid?.cols ?? COLS)), c = k % (battle.grid?.cols ?? COLS);
               if (!followerFree(battle, unit, r, c, taken)) continue;
               const fi = foes.findIndex((e) => e.alive && bodyOnTile(e, r, c));
               cands.push({ r, c, k, foe: fi >= 0 ? 0 : 1, fi: fi >= 0 ? fi : 0, cls: tileClass(battle, r, c), d: Math.max(Math.abs(r - unit.tileR), Math.abs(c - unit.tileC)) });
@@ -314,13 +314,13 @@ export default {
         const line = Math.max(0, Math.floor(num(tbb.tile_count, LINE_FALLBACK) / 2));
         const trigGrid = sid === S3 ? (tok?.skill?.rangeGrid ?? X6) : null;
         /** Trigger / damage tiles of a piece: its own tile, or S3's area around it. */
-        const trigKeys = (n) => (trigGrid ? absoluteRangeKeys(trigGrid, n.r, n.c, 'RIGHT', 0) : [keyOf(n.r, n.c)].filter((k) => k >= 0));
+        const trigKeys = (n) => (trigGrid ? absoluteRangeKeys(trigGrid, n.r, n.c, 'RIGHT', 0, battle.grid) : [keyOf(n.r, n.c, battle.grid)].filter((k) => k >= 0));
         /** 连星's lines of a piece: its tile ± `line` along each side it was connected on. */
         const lineKeys = (n) => {
           const out = new Set();
           for (let k = -line; k <= line; k++) {
-            if (n.h) { const x = keyOf(n.r, n.c + k); if (x >= 0) out.add(x); }
-            if (n.v) { const x = keyOf(n.r + k, n.c); if (x >= 0) out.add(x); }
+            if (n.h) { const x = keyOf(n.r, n.c + k, battle.grid); if (x >= 0) out.add(x); }
+            if (n.v) { const x = keyOf(n.r + k, n.c, battle.grid); if (x >= 0) out.add(x); }
           }
           return [...out];
         };
@@ -374,10 +374,10 @@ export default {
           if (!up(unit) || battle.finished) return;
           const nodes = piecesOf(battle, unit);
           if (!nodes.length) return;
-          const at = new Map(nodes.map((n) => [keyOf(n.r, n.c), n]));
+          const at = new Map(nodes.map((n) => [keyOf(n.r, n.c, battle.grid), n]));
           for (const n of nodes) {    // 棋子相连时相互激活 (kept once active)
             for (const [dr, dc] of SIDES) {
-              const k = keyOf(n.r + dr, n.c + dc);
+              const k = keyOf(n.r + dr, n.c + dc, battle.grid);
               if (k < 0 || !at.has(k)) continue;
               n.act = true;
               if (dr) n.v = true; else n.h = true;
@@ -388,8 +388,8 @@ export default {
               if (!n.act) continue;
               for (const [dr, dc] of [[0, 1], [1, 0]]) {
                 let run = 1;   // (keyOf is −1 off the stage: never a piece)
-                for (let k = 1; at.has(keyOf(n.r + dr * k, n.c + dc * k)); k++) run++;
-                for (let k = 1; at.has(keyOf(n.r - dr * k, n.c - dc * k)); k++) run++;
+                for (let k = 1; at.has(keyOf(n.r + dr * k, n.c + dc * k, battle.grid)); k++) run++;
+                for (let k = 1; at.has(keyOf(n.r - dr * k, n.c - dc * k, battle.grid)); k++) run++;
                 if (run >= 2) n.stacks = Math.max(n.stacks, Math.min(t2cap, run));
               }
             }

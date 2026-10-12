@@ -91,7 +91,7 @@ const ANY = Object.freeze({ canHitFly: true });
 
 const bbOf = (chess, id) => skillRec(chess, id)?.bb ?? {};
 const skillOn = (u, id) => !!(u && u.skill && u.skill.id === id && u.skill.active);
-const keysAt = (grid, u) => new Set(absoluteRangeKeys(grid, u.tileR, u.tileC, u.dir, 0));
+const keysAt = (grid, u) => new Set(absoluteRangeKeys(grid, u.tileR, u.tileC, u.dir, 0, u.battle?.grid));
 
 /**
  * 神经损伤 of a fixed value that ignores the target's 损伤抵抗 (PRTS 群体性谵妄 备注 "不受目标损伤抗性影响": the client's

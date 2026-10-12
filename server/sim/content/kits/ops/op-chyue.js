@@ -80,7 +80,7 @@ export default {
       const n = killed ? num(t1.sp) : num(hb.sp);
       if (n > 0 && up(unit) && unit.skill) unit.skill.gainSp(n, 'init');   // ModifySp forceFlag: 阻回 does not stop it
     };
-    const s2Keys = (unit) => absoluteRangeKeys(s2?.rangeGrid?.length ? s2.rangeGrid : X4, unit.tileR, unit.tileC, unit.dir, 0);
+    const s2Keys = (unit) => absoluteRangeKeys(s2?.rangeGrid?.length ? s2.rangeGrid : X4, unit.tileR, unit.tileC, unit.dir, 0, unit.battle?.grid);
     /** S2's second segment (SecAttack). */
     const secondSegment = (battle, unit, seq) => {
       if (!up(unit) || unit.deploySeq !== seq) return;

@@ -47,7 +47,7 @@
 //                      into 战场#08's pool after an enemy wading in it); Battle.isReservedTile: never a tile a knocked-out
 //                      operator lies on (player report F5, members landed on a fallen teammate). A real redeployment
 //                      (retreat + free redeploy on the landing tile, full HP, `deploy` fires — 部署时 traits such as
-//                      史尔特尔, 突袭手雷, 卡西米尔, 叙拉古) with its SP / charges kept (engine redeploy tile + keepSp);
+//                      史尔特尔, 突袭手雷, 卡西米尔, 叙拉古) with its SP / charges kept plus initial SP (engine redeploy tile + keepSp + addInitialSp);
 //                      ATK/HP +(base + per·L) until it leaves the field; knocked out after a jump it lies where it fell
 //                      and comes back there (the engine's rest tile, Battle._layBody — PRTS 卫戍协议/帮助 "原地留下一个
 //                      “倒地干员”…自动部署至该位置"; its own home when it fell on another board piece's home);
@@ -293,7 +293,7 @@ function raidBoard(battle, r, c) {
   if (battle.onFieldBoard(r, c)) return true;
   return battle.modeId?.startsWith('mode_multi_') && (battle.kind === 'boss' || battle.kind === 'hidden')
     && r >= GEO.FIELD.r0 + BOSS_ROW_OFFSET && r <= GEO.FIELD.r1 + BOSS_ROW_OFFSET
-    && c >= GEO.FIELD.c0 && c <= COLS - 1 - GEO.FIELD.c0;
+    && c >= GEO.FIELD.c0 && c <= (battle.grid?.cols ?? COLS) - 1 - GEO.FIELD.c0;
 }
 
 function raidTile(battle, u, e, reach) {
@@ -303,12 +303,12 @@ function raidTile(battle, u, e, reach) {
   const path = !ranged && u.s.blockCnt > 0 ? battle.groundPathTiles() : null;
   let best = null, bp = 2, bd = Infinity, bo = null;
   for (const k of body) {
-    const br = Math.floor(k / COLS), bc = k - br * COLS;
+    const br = Math.floor(k / (battle.grid?.cols ?? COLS)), bc = k - br * (battle.grid?.cols ?? COLS);
     for (let i = 0; i < reach.length; i += 2) {
       const r = br - reach[i], c = bc - reach[i + 1], dr = r - er, dc = c - ec;
       if (Math.abs(dr) > RAID_SEARCH || Math.abs(dc) > RAID_SEARCH) continue;
       if (!battle.grid.inRect(r, c) || !raidBoard(battle, r, c) || !battle.grid.canStand(r, c, { ranged }) || battle.isReservedTile(r, c)) continue;
-      const t = r * COLS + c;
+      const t = r * (battle.grid?.cols ?? COLS) + c;
       const p = path && battle.grid.tile(r, c).pass === 'ALL' && (path.has(t) || body.includes(t)) ? 0 : 1;   // its block applies
       const d = Math.max(Math.abs(dr), Math.abs(dc)) + 0.01 * (Math.abs(dr) + Math.abs(dc));
       const o = localOrder(dr, dc, u.dir);
@@ -407,8 +407,8 @@ function raidPoll(battle, st) {
 }
 
 /**
- * "保留技力立即再部署": retreat the unit and redeploy it for free on (r, c) with its SP / charges kept (engine redeploy
- * `tile` + `keepSp`: restored before the `deploy` handlers run; the board tile stays its home). Should the landing fail
+ * "保留技力立即再部署": retreat the unit and redeploy it for free on (r, c) with its SP / charges kept plus initial SP (engine redeploy
+ * `tile` + `keepSp` + `addInitialSp`: restored before the `deploy` handlers run; the board tile stays its home). Should the landing fail
  * (raidTile skips taken, reserved and body tiles, so only content refusing it), the unit goes straight back to its home
  * tile (never stranded off the field).
  * Returns 'raid' | 'home' | false.
@@ -418,7 +418,7 @@ function raidRedeploy(battle, u, r, c) {
   try {
   battle.retreat(u, { reason: 'raid' });
   if (u.alive) return false;
-  if (battle.redeploy(u, { free: true, tile: [r, c], keepSp: true })) return 'raid';
+  if (battle.redeploy(u, { free: true, tile: [r, c], keepSp: true, addInitialSp: true })) return 'raid';
   return battle.redeploy(u, { free: true, keepSp: true }) ? 'home' : false;
   } finally {u.mem.raidRelocating=false;}
 }
@@ -464,6 +464,13 @@ export function install(battle) {
 
   // 突袭
   if (has(ID.raid)) {
+    battle.on('skillStart',({unit:u})=>{
+      const st=byPid[u?.ownerId];
+      if(onField(u)&&st?.members[ID.raid]?.has(u))battle.addBuff(u,{key:KEY.raid,mods:st.raidMods,refresh:'replace'});
+    });
+    battle.on('skillEnd',({unit:u})=>{
+      if(u&&byPid[u.ownerId]?.members[ID.raid]?.has(u))battle.removeBuff(u,KEY.raid);
+    });
     battle.on('deploy',({unit:u,initial})=>{if(u&&!initial&&!u.mem.raidRelocating&&byPid[u.ownerId]?.members[ID.raid]?.has(u))u.mem.raidEntryPending=true;});
     const raid = states.filter((st) => st.tiers[ID.raid] && st.members[ID.raid].size);
     if (raid.length) {

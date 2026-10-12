@@ -222,7 +222,7 @@ function land(battle, unit) {
 /** S3 ①②: the 待投放 operators and the flight to `anchor`. */
 function startTransport(battle, unit, anchor) {
   const picks = battle.allyUnits
-    .filter((a) => otherOp(a, unit) && a.ownerId === unit.ownerId && unit.rangeKeySet?.has(a.tileR * COLS + a.tileC))
+    .filter((a) => otherOp(a, unit) && a.ownerId === unit.ownerId && unit.rangeKeySet?.has(a.tileR * (a.battle?.grid?.cols ?? COLS) + a.tileC))
     .sort((a, b) => b.deploySeq - a.deploySeq)
     .slice(0, WITHDRAW_MAX);
   for (const a of picks) {
@@ -317,7 +317,7 @@ export default {
             if (!up(unit) || !unit.rangeKeySet) return;
             const now = new Set();
             for (const a of battle.allyUnits) {
-              if (!otherOp(a, unit) || !unit.rangeKeySet.has(a.tileR * COLS + a.tileC)) continue;
+              if (!otherOp(a, unit) || !unit.rangeKeySet.has(a.tileR * (battle.grid?.cols ?? COLS) + a.tileC)) continue;
               now.add(a);
               if (!inside.has(a)) enter(a);
             }

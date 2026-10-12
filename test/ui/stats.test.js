@@ -430,9 +430,9 @@ describe('local stats: bounded storage', () => {
       })),
       bigUnknown: 'y'.repeat(1e6),
     });
-    assert.ok(JSON.stringify(rec).length < 40_000, `${JSON.stringify(rec).length} chars`);
-    assert.equal(rec.players.length, 6);
-    assert.equal(rec.players[0].lineup.length, 12);
+    assert.ok(JSON.stringify(rec).length < 60_000, `${JSON.stringify(rec).length} chars`);
+    assert.equal(rec.players.length, 8);
+    assert.equal(rec.players[0].lineup.length, 16);
     assert.equal(rec.players[0].lineup[0].items.length, 4);
     assert.equal(rec.players[0].name.length, 24);
     assert.equal(Object.keys(rec.players[0].stats).length, 24);

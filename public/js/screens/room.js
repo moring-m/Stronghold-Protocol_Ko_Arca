@@ -15,7 +15,7 @@ import { ChatPanel } from '../ui/chat.js';
 // button for 观战中 and offers 入座 (room.join of the room) while a player seat is free.
 
 import { useEffect, useRef, useState } from '../../vendor/hooks.module.js';
-import { DIFFICULTIES, DIFFICULTY_NAMES, DIFFICULTY_COLORS, MAX_SEATS, MAX_SPECTATORS } from '../../../shared/constants.js';
+import { DIFFICULTIES, DIFFICULTY_NAMES, DIFFICULTY_COLORS, MAX_SEATS, roomSeatCap, MAX_SPECTATORS } from '../../../shared/constants.js';
 import {
   html, Button, Icon, MicroLabel, PingPill, AvatarFrame, DifficultyTag, DifficultyIcon, Tooltip, confirmDialog, doctorNo,
 } from '../ui/components.js';
@@ -40,7 +40,7 @@ import { difficultyInfo } from './lobby.js';
  * @returns {(null | {seat:number, playerId:any, name:string, isBot:boolean, ready:boolean, connected:boolean})[]}
  */
 export function normalizeSeats(room) {
-  const cap = room?.mode === 'solo' ? 1 : MAX_SEATS;
+  const cap = roomSeatCap(room?.mode);
   const src = Array.isArray(room?.seats) ? room.seats : [];
   const out = [];
   for (let i = 0; i < cap; i++) {
@@ -139,7 +139,7 @@ function SeatCard({ seat, index, room, facts, myId, busy, onAddBot, onRemoveBot,
     </header>
     <div class="seat__art">
       <div class="seat__stripes" aria-hidden="true"></div>
-      <${AvatarFrame} size="xl" name=${seat.name} seat=${index} bot=${seat.isBot} self=${isMe} ready=${state === 'ready'} offline=${offline} badge=${html`<${FactionBadge} playerId=${seat.playerId} faction=${seat.chatFaction} />`} />
+      <${AvatarFrame} size=${room.mode==='coop8'?'md':'xl'} name=${seat.name} seat=${index} bot=${seat.isBot} self=${isMe} ready=${state === 'ready'} offline=${offline} badge=${html`<${FactionBadge} playerId=${seat.playerId} faction=${seat.chatFaction} />`} />
       ${seat.isBot ? html`<span class="seat__bot-label"><${Icon} name="robot" />AI 队友</span>` : null}
     </div>
     <div class="seat__who">
@@ -255,8 +255,9 @@ export function RoomScreen() {
       const screen=footer.closest('.room-screen');
       if(card&&screen){
         const bounds=card.getBoundingClientRect();
+        const bottom=room.mode==='coop8'?Math.max(...Array.from(seatsRef.current.querySelectorAll('.seat'),el=>el.getBoundingClientRect().bottom)):bounds.bottom;
         screen.style.setProperty('--room-seat-top',`${bounds.top}px`);
-        screen.style.setProperty('--room-seat-height',`${bounds.height}px`);
+        screen.style.setProperty('--room-seat-height',`${bottom-bounds.top}px`);
       }
     };
     measure();
@@ -267,7 +268,7 @@ export function RoomScreen() {
     card?.addEventListener('animationend',measure);
     window.addEventListener('resize',measure);
     return()=>{observer?.disconnect();card?.removeEventListener('animationend',measure);window.removeEventListener('resize',measure);root.style.removeProperty('--room-bar-height');};
-  },[room?.code]);
+  },[room?.code,room?.mode]);
 
   if (!room) return null;
   const online = conn.status === 'online';
@@ -334,7 +335,7 @@ export function RoomScreen() {
   const statusLine = !online
     ? html`<span class="t-orange"><${Icon} name="wifiOff" />连接中断，正在重连…</span>`
     : facts.spectating
-      ? html`<span class="t-lo"><${Icon} name="eye" />观战中 · 不占博士席位，模拟开始后可切换观看各位博士</span>`
+      ? null
     : !coop
       ? html`<span class="t-mint">*模拟协议已就绪，准许进入模拟</span>`
     : facts.isHost
@@ -367,7 +368,7 @@ export function RoomScreen() {
       </div>
     </header>
 
-    <main ref=${seatsRef} class=${`seats${coop ? '' : ' seats--solo'}`}>
+    <main ref=${seatsRef} class=${`seats${coop ? room.mode==='coop8'?' seats--eight':'' : ' seats--solo'}`}>
       ${facts.seats.map((s, i) => html`<${SeatCard} key=${s ? `p${s.playerId}` : `e${i}`} seat=${s} index=${i} room=${room} facts=${facts}
         myId=${me.playerId} busy=${busy} onAddBot=${addBot} onRemoveBot=${removeBot} onKick=${kick} />`)}
       ${coop ? null : html`<aside class="solo-brief brackets">

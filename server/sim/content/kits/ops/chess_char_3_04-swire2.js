@@ -154,7 +154,7 @@ export default {
     const bombTiles = (battle, unit) => {
       const out = [];
       for (const k of gridKeys(SWIRE2_BOMB_GRID, unit)) {
-        const r = (k / COLS) | 0, c = k % COLS;
+        const r = (k / (battle.grid?.cols ?? COLS)) | 0, c = k % (battle.grid?.cols ?? COLS);
         if (freeTile(battle, r, c) && groundTile(battle, r, c)) out.push(k);
       }
       return out;
@@ -172,11 +172,11 @@ export default {
         const free = new Set(keys);
         let key = null;
         for (const e of enemiesOn(battle, unit, keys, 0, ground)) {
-          const k = Math.round(e.y) * COLS + Math.round(e.x);
+          const k = Math.round(e.y) * (battle.grid?.cols ?? COLS) + Math.round(e.x);
           if (!e.isFlying && free.has(k)) { key = k; break; }
         }
         if (key == null) key = battle.rng.pick(keys);
-        const bomb = battle.spawnToken(unit, tokenId, (key / COLS) | 0, key % COLS, { untargetable: true, kit: bombKit(unit, switchT) });
+        const bomb = battle.spawnToken(unit, tokenId, (key / (battle.grid?.cols ?? COLS)) | 0, key % (battle.grid?.cols ?? COLS), { untargetable: true, kit: bombKit(unit, switchT) });
         if (!bomb) { unit.mem.bombHold = battle.time + unit.s.interval; return; }
         unit.mem.coins -= coinCost;
         fx(battle, 'summon', bomb, { src: unit.id, token: tokenId, coins: unit.mem.coins });

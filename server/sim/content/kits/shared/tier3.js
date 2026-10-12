@@ -93,10 +93,10 @@ function groundAspd(key, aspd, cnt = 1) {
   };
 }
 const alive = (u) => !!(u && u.alive && u.deployed);
-const tileKeyOf = (u) => (u.side === 'ally' ? u.tileR * COLS + u.tileC : Math.round(u.y) * COLS + Math.round(u.x));
+const tileKeyOf = (u) => (u.side === 'ally' ? u.tileR * (u.battle?.grid?.cols ?? COLS) + u.tileC : Math.round(u.y) * (u.battle?.grid?.cols ?? COLS) + Math.round(u.x));
 /** On a tile of `set`: an ally by its tile, an enemy by its body (every tile a huge enemy occupies — sim/body.js). */
 const onTiles = (x, set) => (x.side === 'ally' ? set.has(tileKeyOf(x)) : bodyInKeys(x, set));
-const gridKeys = (grid, u, ext = 0) => absoluteRangeKeys(grid || [[0, 0]], u.tileR, u.tileC, u.dir, ext);
+const gridKeys = (grid, u, ext = 0) => absoluteRangeKeys(grid || [[0, 0]], u.tileR, u.tileC, u.dir, ext, u.battle?.grid);
 const fx = (battle, kind, u, extra = {}) => battle.fx(kind, { x: u.x, y: u.y, id: u.id, ...extra });
 const copyGrid = (g) => (Array.isArray(g) && g.length ? g.map((p) => [p[0], p[1]]) : null);
 const NINE = [[1, -1], [1, 0], [1, 1], [0, -1], [0, 0], [0, 1], [-1, -1], [-1, 0], [-1, 1]];
@@ -124,7 +124,7 @@ const groundTile = (battle, r, c) => battle.grid.groundPassable(r, c) && battle.
  * Battle.findTacticalPoint: a free walkable tile of its initial range on an enemy ground path first, then the nearest).
  */
 function tacticalPoint(battle, unit, prefer = null) {
-  const inRange = (r, c) => (unit.baseRangeKeys || unit.rangeKeys || []).includes(r * COLS + c);
+  const inRange = (r, c) => (unit.baseRangeKeys || unit.rangeKeys || []).includes(r * (battle.grid?.cols ?? COLS) + c);
   if (prefer && freeTile(battle, prefer[0], prefer[1]) && groundTile(battle, prefer[0], prefer[1]) && inRange(prefer[0], prefer[1])) return prefer;
   return sharedTacticalPoint(battle, unit);
 }

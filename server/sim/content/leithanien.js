@@ -25,13 +25,13 @@ export function install(b){
  };
  const apply=(u,t)=>{
   if(!field(t)||t.side!=='enemy')return;
-  const gate=noteCooldowns.get(u.id);
-  if(gate&&b.time<gate.time+.2-1e-8){if(Math.abs(b.time-gate.time)>1e-8||gate.targets.has(t.id))return;gate.targets.add(t.id);}
-  else noteCooldowns.set(u.id,{time:b.time,targets:new Set([t.id])});
-  const L=S.bondLayers(b,u.ownerId,BOND),duration=six(b,u)?10+Math.floor(L/30):5;
+  const gate=noteCooldowns.get(`${u.id}:${t.id}`);
+  if(gate&&b.time<gate.time+.1-1e-8)return;
+  noteCooldowns.set(`${u.id}:${t.id}`,{time:b.time});
+  const L=S.bondLayers(b,u.ownerId,BOND),duration=six(b,u)?10+Math.floor(L/25):5;
   const now=b.time,end=now+duration,key=`${u.id}:${t.id}:${now}:${duration}`;
   let c=cohorts.get(key);
-  if(c){c.amount+=u.s.atk*(.05+.00015*L);c.stacks++;}else{c={key,u,t,next:now+1,end,amount:u.s.atk*(.05+.00015*L),stacks:1};cohorts.set(key,c);push(heap,c);}
+  if(c){c.amount+=50+u.s.atk*(.01+.0001*L);c.stacks++;}else{c={key,u,t,next:now+1,end,amount:50+u.s.atk*(.01+.0001*L),stacks:1};cohorts.set(key,c);push(heap,c);}
   state.applications++;state.liveStacks++;t.mem.leithanienStacks=(t.mem.leithanienStacks||0)+1;
   // A single target marker, refreshed only when its expiry extends.
   const old=t.findBuff('leithanien:note');
@@ -41,10 +41,10 @@ export function install(b){
   }
   if(trait(u)?.effectKey==='custom_leithanien_notes'){
    const k=u.id+':notes',n=(counts.get(k)||0)+1;counts.set(k,n);
-   if(n%5===0)add(u,S.unitBonds(u),trait(u).bb.count,10,'notesGain');
+   if(n%5===0){add(u,[BOND],trait(u).bb.count,10,'notesGain');add(u,['skillfulShip'],trait(u).bb.skillfulCount,10,'notesSkillfulGain');}
   }
  };
- b.on('damaged',c=>{if(c.amount>0&&c.source?.kind==='op'&&c.source.side==='ally'&&c.target?.side==='enemy'&&!c.dmg?.tags?.includes(TAG)&&S.isMember(b,c.source,BOND)&&S.bondActive(b,c.source.ownerId,BOND))apply(c.source,c.target);});
+ b.on('damaged',c=>{const caster=c.source?.kind==='token'?c.source.ownerUnit:c.source;if(c.amount>0&&caster?.kind==='op'&&caster.side==='ally'&&c.target?.side==='enemy'&&!c.dmg?.tags?.includes(TAG)&&S.isMember(b,caster,BOND)&&S.bondActive(b,caster.ownerId,BOND))apply(caster,c.target);});
  b.on('hit',c=>{const source=c.source||c.credit;if(source?.side==='enemy'&&(source.mem.leithanienWeakenUntil||0)>b.time)c.dmg.mul*=.75;});
  b.on('tick',()=>{
   const sums=new Map();
@@ -66,7 +66,7 @@ export function install(b){
  });
  b.on('deploy',({unit:u,move})=>{refresh(u);if(!move&&trait(u)?.effectKey==='custom_leithanien_deploy')add(u,[BOND],trait(u).bb.count,8,'deploy');});
  b.on('layerGain',({playerId,bondId})=>{if(bondId===BOND)b.after(0,()=>{for(const u of b.allyUnits)if(u.ownerId===playerId)refresh(u);});});
- b.on('damaged',({target,type,dmg,amount})=>{if(type!=='element'||dmg?.element!=='necrosis'||!(amount>0))return;for(const u of members())if(field(u)&&trait(u)?.effectKey==='custom_leithanien_burst'&&S.inRange(u,target)){add(u,[BOND],trait(u).bb.count,6,'burst');add(u,['arcaneShip'],trait(u).bb.arcaneCount,6,'burstArcane');}});
+ b.on('damaged',({target,type,dmg,amount})=>{if(type!=='element'||dmg?.element!=='necrosis'||!(amount>0))return;for(const u of members())if(field(u)&&trait(u)?.effectKey==='custom_leithanien_burst'&&S.inRange(u,target)){add(u,[BOND],trait(u).bb.count,5,'burst');add(u,['arcaneShip'],trait(u).bb.arcaneCount,5,'burstArcane');}});
  b.on('kill',({killer:u,victim})=>{if(victim?.side==='enemy'&&trait(u)?.effectKey==='custom_leithanien_kill'){const k=u.id+':kill',used=counts.get(k)||0;if(used>=5)return;let gained=S.gainLayers(b,{playerId:u.ownerId,bonds:[BOND],n:trait(u).bb.count,source:u});gained+=S.gainLayers(b,{playerId:u.ownerId,bonds:['swiftShip'],n:trait(u).bb.swiftCount??trait(u).bb.count,source:u});if(gained>0)counts.set(k,used+1);}});
  for(const u of b.allyUnits)refresh(u);
 }
@@ -74,7 +74,6 @@ export function registerMeta(registry){
  registry.garrison('custom_leithanien_gain',{onGain(ctx){ctx.addLayers(BOND,ctx.source.bb.count);}});
  registry.garrison('custom_leithanien_prep',{onPrepEnd(ctx){for(const p of ctx.board())if(metaBonds(ctx,p).includes(BOND))for(const id of metaBonds(ctx,p))ctx.addLayers(id,ctx.source.bb.count,{requireActive:true});}});
  registry.band('band_custom_leithanien_witchking',{
-  onLayers(ctx,ev){if(ev.bondId!==BOND)return;const owed=Math.floor(ctx.layers(BOND)/40),key='leithanien:witchking:paid';let paid=ctx.counter(key);const roundKey=`leithanien:witchking:round:${ctx.round}`;if(paid>=owed||ctx.counter(roundKey)||ctx.shopLevel()<=1)return;const id=ctx.rollChess({bond:BOND,maxTier:ctx.shopLevel()-1,ignoreCounts:true});if(id&&ctx.grantChess(id,{requirePool:false})){ctx.setCounter(key,paid+1);ctx.setCounter(roundKey,1);}},
-  onPrepStart(ctx){this.onLayers(ctx,{bondId:BOND});},
+  onPrepStart(ctx){const owed=Math.floor(ctx.layers(BOND)/40),key='leithanien:witchking:paid',roundKey=`leithanien:witchking:round:${ctx.round}`,paid=ctx.counter(key);if(paid>=owed||ctx.counter(roundKey))return;const id=ctx.rollChess({bond:BOND,maxTier:ctx.shopLevel(),ignoreCounts:true});if(id&&ctx.grantChess(id,{requirePool:false})){ctx.setCounter(key,paid+1);ctx.setCounter(roundKey,1);}},
  });
 }

@@ -10,7 +10,7 @@
 // relative, like every other client module (the import map only resolves to this same URL; no bare specifier here)
 import { useEffect, useRef, useState } from '../../vendor/hooks.module.js';
 import { createFallbackView } from './fallbackField.js';
-import { data } from '../data.js';
+import { data, matchData } from '../data.js';
 import { audio } from '../audio.js';
 import { settingsStore } from './settings.js';
 
@@ -218,7 +218,7 @@ export function seedAssets(store) {
 export async function mountFieldView(host, { signal } = {}) {
   checkActive(signal);
   const pref = renderPref();
-  const opts = { data, assets: data.get('assets'), audio, settings: settingsStore.get(), padding: hudPadding, hud: hudBands };
+  const opts = { data:matchData, assets: data.get('assets'), audio, settings: settingsStore.get(), padding: hudPadding, hud: hudBands };
   if (pref !== 'fallback') {
     const controller = new AbortController();
     const onAbort = () => controller.abort(abortError(signal));

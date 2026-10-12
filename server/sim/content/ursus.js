@@ -73,7 +73,7 @@ export function installDroneFlight(battle,u){
  u.profile.attackSpeedDebuffImmune=true;u.markDirty();
  u.profile.acquireTargets=(b,unit)=>droneTargets(b,unit,true).slice(0,1);
  const speed=(u.def.raw.stats.moveSpeed??.5)*MOVE_SCALE*1.5;
- const refresh=()=>{const radius=droneRange(u),keys=[];for(let r=Math.max(0,Math.floor(u.y-radius));r<=Math.min(ROWS-1,Math.ceil(u.y+radius));r++)for(let c=Math.max(0,Math.floor(u.x-radius));c<=Math.min(COLS-1,Math.ceil(u.x+radius));c++)if(hypot(c-u.x,r-u.y)<=radius+1e-9)keys.push(r*COLS+c);u.rangeKeys=keys;u.rangeKeySet=new Set(keys);u.baseRangeKeys=keys;};
+ const refresh=()=>{const radius=droneRange(u),keys=[];for(let r=Math.max(0,Math.floor(u.y-radius));r<=Math.min((battle.grid?.rows ?? ROWS)-1,Math.ceil(u.y+radius));r++)for(let c=Math.max(0,Math.floor(u.x-radius));c<=Math.min((battle.grid?.cols ?? COLS)-1,Math.ceil(u.x+radius));c++)if(hypot(c-u.x,r-u.y)<=radius+1e-9)keys.push(r*(battle.grid?.cols ?? COLS)+c);u.rangeKeys=keys;u.rangeKeySet=new Set(keys);u.baseRangeKeys=keys;};
  u.motion='FLY';u.ground=false;for(const key of ['terrain:mire','terrain:smog','terrain:deepsea','terrain:infection'])battle.removeBuff(u,key);u.mem.terrain=0;refresh();
  battle.on('tick',({dt})=>{
   if(!u.alive||!u.deployed)return;

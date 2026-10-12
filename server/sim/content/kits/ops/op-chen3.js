@@ -88,7 +88,7 @@ const AFTER_KEY = 'skill:chen3:respawn';
 
 const bbOf = (chess, id) => skillRec(chess, id)?.bb ?? {};
 /** Absolute tile keys of a skill range at the unit's tile and facing (a 技能范围 ignores 攻击距离). */
-const keysOf = (unit, grid) => absoluteRangeKeys(grid, unit.tileR, unit.tileC, unit.dir, 0);
+const keysOf = (unit, grid) => absoluteRangeKeys(grid, unit.tileR, unit.tileC, unit.dir, 0, unit.battle?.grid);
 /** An S2 target that left the field — dead, removed or hidden [ASSUMED: a hidden one counts as gone]. */
 const gone = (e) => !e || !e.alive || e.removed || e.hidden;
 /** The enemy of `list` nearest to (x, y) (body distance; ties by spawn order), or null. */
@@ -291,7 +291,7 @@ export default {
         // targets in the existing ACTIVE_RANGE automation. [ASSUMED] Use its expanded attack grid (plus permanent
         // range extension), not the wave's entire eventual route; operation cooldown / control checks stay shared.
         unit.skill.addTriggerRange(() => [{
-          keys: absoluteRangeKeys(grid3, unit.tileR, unit.tileC, unit.dir, unit.s.baseRangeExtend || 0), profile: AIR,
+          keys: absoluteRangeKeys(grid3, unit.tileR, unit.tileC, unit.dir, unit.s.baseRangeExtend || 0, battle.grid), profile: AIR,
         }]);
         const ratio = num(b3.hp_ratio), minScale = num(b3.projectile_min_atk_scale);
         battle.on('tick', ({ dt }) => {

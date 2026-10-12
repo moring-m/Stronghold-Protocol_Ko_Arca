@@ -466,10 +466,10 @@ export class UnitView {
     this.isBoss = !!info.boss;
     // Giant models can have an off-centre skeleton origin (notably the organ boss).
     // Keep simulation coordinates intact; align their idle body to the authored hit-area centre.
-    this.bossArea = this.isBoss && this.isEnemy ? record?.hitArea ?? info.hitArea ?? null : null;
+    this.bossArea = this.isBoss && this.isEnemy ? info.hitArea ?? record?.hitArea ?? null : null;
     this.bossModelCenter = 0;
     // enemies: the official prefab's size factor (1 for operators, summons and enemies at the standard size)
-    this.modelK = this.isEnemy ? enemyModelScale(ctx.lookupDef ? ctx.lookupDef(info) : null) : 1;
+    this.modelK = this.isEnemy ? Number(info.modelScale)>0?Number(info.modelScale):enemyModelScale(ctx.lookupDef ? ctx.lookupDef(info) : null) : 1;
     this.isToken = info.kind === 'token';
     this.golden = !!info.golden;
     this.tier = clamp(Number(info.tier) || 1, 1, 6);
@@ -815,9 +815,19 @@ export class UnitView {
   /** Compact note count directly above the target HP bar. */
   setNoteStacks(n) {
     this.noteStacks=Math.max(0,Math.floor(Number(n)||0));
-    if(!this.noteStacks){if(this.noteText)this.noteText.visible=false;return;}
-    if(!this.noteText){this.noteText=new this.P.Text('',{fontFamily:'Bender, sans-serif',fontSize:12,fontWeight:'700',fill:'#b7a5ed',stroke:'#08120f',strokeThickness:3});this.noteText.anchor.set(.5,1);this.hud.addChild(this.noteText);}
-    this.noteText.text=`속세의 음 ${this.noteStacks}`;
+    if(this.noteFx)this.noteFx.visible=this.noteStacks>0;
+    if(!this.noteStacks){if(this.noteText)this.noteText.visible=false;if(this.noteIcon)this.noteIcon.visible=false;return;}
+    if(!this.noteFx){
+      const P=this.P,fx=new P.Container(),glow=new P.Sprite(fxAtlas().tex.glow);
+      glow.anchor.set(.5);glow.tint=0xac60f0;glow.alpha=.18;glow.width=92;glow.height=100;glow.x=36;glow.y=-46;glow.blendMode=P.BLEND_MODES.ADD;fx.addChild(glow);
+      const clef=new P.Sprite(P.Texture.from('/icons/leithanien-clef.svg'));clef.anchor.set(.5,1);clef.width=32;clef.height=64;clef.x=36;clef.y=-12;fx.addChild(clef);
+      const ring=new P.Graphics();ring.lineStyle(1.5,0xb775ed,.65);ring.drawEllipse(0,-8,42,12);fx.addChild(ring);
+      // Draw over the opaque enemy model so the active debuff remains visible.
+      this.root.addChild(fx);this.noteFx=fx;this.noteClef=clef;
+    }
+    this.noteFx.visible=true;
+    if(!this.noteText){this.noteText=new this.P.Text('',{fontFamily:'Bender, sans-serif',fontSize:12,fontWeight:'700',fill:'#b7a5ed',stroke:'#08120f',strokeThickness:3});this.noteText.anchor.set(0,1);this.hud.addChild(this.noteText);this.noteIcon=new this.P.Sprite(this.P.Texture.from('/icons/leithanien-note.svg'));this.noteIcon.anchor.set(0,1);this.hud.addChild(this.noteIcon);}
+    this.noteText.text=String(this.noteStacks);
   }
 
   /** Equipped item pips (prep): list of item icon URLs. */
@@ -1374,6 +1384,7 @@ export class UnitView {
     let bx = p.x, by = p.y;
     if (lungeK) { const q = cam.project(this.x + lx, this.y + ly, this.z + this.hover + this.lift + this.waterSink, LG_P); bx = q.x; by = q.y; }
     this.root.position.set(bx, by);
+    if(this.noteFx){this.noteFx.visible=this.noteStacks>0&&this.alive&&!this.down;this.noteFx.scale.set(s/100);this.noteFx.alpha=.85+.1*Math.sin(t*1.8);if(this.noteClef)this.noteClef.y=-12-3*Math.sin(t*1.8);}
     this.root.alpha = alpha;
     this.root.zIndex = unitDepthKey(cam, this.x, this.y, this.lift, this.flying, this.bossArea);
     // off-screen: nothing to animate or draw (bounds / hit-testing still follow `screen`)
@@ -1630,7 +1641,7 @@ export class UnitView {
     this.shake = Math.max(0, this.shake - dt);
     const x0 = x - bw / 2 + sx;
     let cy = y - 4;
-    if(this.noteText){this.noteText.visible=showBars&&this.noteStacks>0;this.noteText.scale.set(clamp(s/90,.65,1));this.noteText.position.set(x+sx,cy-3);}
+    if(this.noteText){this.noteText.visible=showBars&&this.noteStacks>0;this.noteText.scale.set(clamp(s/90,.65,1));this.noteText.position.set(x0-1+18*clamp(s/90,.65,1),cy-3);this.noteIcon.visible=this.noteText.visible;this.noteIcon.width=this.noteIcon.height=16*clamp(s/90,.65,1);this.noteIcon.position.set(x0-1,cy-3);}
     // HP
     this.hpBg.visible = this.hpFill.visible = this.hpGhost.visible = showHp;
     if (showHp) {

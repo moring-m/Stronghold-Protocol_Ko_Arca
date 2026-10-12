@@ -68,7 +68,7 @@ const tokTalent = (def, key) => (def?.talents ?? []).find((t) => t && t.bb && t.
 /** ARC-Y 正前方: the enemy's body touches the unit's straight line ahead (local row 0, local column ≥ 0). */
 function inFrontLine(unit, e) {
   for (const k of bodyKeys(e)) {
-    const [lr, lc] = toLocal(Math.floor(k / COLS) - unit.tileR, (k % COLS) - unit.tileC, unit.dir);
+    const [lr, lc] = toLocal(Math.floor(k / (unit.battle?.grid?.cols ?? COLS)) - unit.tileR, (k % (unit.battle?.grid?.cols ?? COLS)) - unit.tileC, unit.dir);
     if (lr === 0 && lc >= 0) return true;
   }
   return false;
@@ -211,7 +211,7 @@ export default {
           battle.on('hit', (ctx) => {
             const d = ctx.dmg, t = ctx.target;
             if (ctx.source !== unit || !t || t.side !== 'enemy' || !d.isAttack || !unit.skill?.active) return;
-            if (bodyInKeys(t, absoluteRangeKeys(FRONT_3, unit.tileR, unit.tileC, unit.dir, 0))) d.amount *= s3Front / s3Scale;
+            if (bodyInKeys(t, absoluteRangeKeys(FRONT_3, unit.tileR, unit.tileC, unit.dir, 0, battle.grid))) d.amount *= s3Front / s3Scale;
           }, { owner: unit });
         }
         // ARC-Y 打字机色带: 攻击正前方的敌人时攻击力提升至105%且无视其物理闪避

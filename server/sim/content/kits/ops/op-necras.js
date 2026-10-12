@@ -83,7 +83,7 @@ const DRAGON_KEY = 'necras:dragon';
 const DRAGON_UP_KEY = 'necras:dragonUp';
 
 const bbOf = (chess, id) => skillRec(chess, id)?.bb ?? {};
-const tileKey = (r, c) => r * COLS + c;
+const tileKey = (r, c, grid) => r * (grid?.cols ?? COLS) + c;
 /** The module the record fights with (its active one), or null. */
 function activeModule(chess) {
   if (!moduleOn(chess)) return null;
@@ -93,7 +93,7 @@ function activeModule(chess) {
 const stateOf = (unit) => unit.mem.necras ?? (unit.mem.necras = { queue: [], skels: [], dragon: null, timer: null });
 const skelsUp = (unit) => stateOf(unit).skels.filter((s) => up(s));
 /** Her own attack range (no extra keys): the live grid behind her rangeKeys. */
-const ownRange = (unit) => new Set(absoluteRangeKeys(unit.liveRangeGrid ?? unit.rangeGrid ?? [[0, 0]], unit.tileR, unit.tileC, unit.dir, 0));
+const ownRange = (unit) => new Set(absoluteRangeKeys(unit.liveRangeGrid ?? unit.rangeGrid ?? [[0, 0]], unit.tileR, unit.tileC, unit.dir, 0, unit.battle?.grid));
 
 export default {
   char_450_necras: (bb, chess) => {
@@ -115,7 +115,7 @@ export default {
       const keys = ownRange(unit);
       const free = [], withEnemy = [];
       for (const k of keys) {
-        const r = Math.floor(k / COLS), c = k % COLS;
+        const r = Math.floor(k / (battle.grid?.cols ?? COLS)), c = k % (battle.grid?.cols ?? COLS);
         if (!battle.grid.inRect(r, c) || battle.isReservedTile(r, c) || !battle.grid.canStand(r, c, { ranged: false })) continue;
         free.push([r, c]);
         if (battle.enemies.some((e) => e.alive && !e.hidden && Math.round(e.y) === r && Math.round(e.x) === c)) withEnemy.push([r, c]);
@@ -123,7 +123,7 @@ export default {
       return withEnemy.length ? withEnemy : free;
     };
     const tileOk = (battle, unit, r, c) => Number.isInteger(r) && Number.isInteger(c) && battle.grid.inRect(r, c)
-      && ownRange(unit).has(tileKey(r, c)) && !battle.isReservedTile(r, c) && battle.grid.canStand(r, c, { ranged: false });
+      && ownRange(unit).has(tileKey(r, c, battle.grid)) && !battle.isReservedTile(r, c) && battle.grid.canStand(r, c, { ranged: false });
 
     /** S1's passive strike around a summon made or upgraded. */
     const s1Strike = (battle, unit, s) => {
@@ -229,7 +229,7 @@ export default {
           const seq = me.skill.activations;
           const hit = () => {
             if (!me.skill.active || me.skill.activations !== seq || !up(me)) return false;
-            const keys = absoluteRangeKeys(grid, me.tileR, me.tileC, me.dir, me.s.rangeExtend || 0);
+            const keys = absoluteRangeKeys(grid, me.tileR, me.tileC, me.dir, me.s.rangeExtend || 0, b.grid);
             for (const e of b.enemiesInKeys(keys, me, { canHitFly: false })) b.dealDamage(me, e, { amount: me.s.atk * scale, type: 'arts', isSkill: true, tags: ['summon', 'skill'] });
             b.fx('aoe', { x: me.x, y: me.y, radius: 1, id: me.id, skill: 'necras:dragon' });
             return true;
@@ -385,7 +385,7 @@ export default {
         const blockedKeys = () => {
           if (!up(unit)) return [];
           const keys = [];
-          for (const s of skelsUp(unit)) for (const e of s.blocking) if (e.alive && e.blockedBy === s) keys.push(tileKey(Math.round(e.y), Math.round(e.x)));
+          for (const s of skelsUp(unit)) for (const e of s.blocking) if (e.alive && e.blockedBy === s) keys.push(tileKey(Math.round(e.y), Math.round(e.x), battle.grid));
           return [...new Set(keys)].sort((a, b) => a - b);
         };
         if (unit.skill?.id === S1 || unit.skill?.id === S2) {

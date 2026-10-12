@@ -119,7 +119,7 @@ function fireShell(battle, unit, b2) {
 function farthestAhead(unit) {
   let best = null, bc = -1;
   for (const k of unit.rangeKeys ?? []) {
-    const r = Math.floor(k / COLS), c = k % COLS;
+    const r = Math.floor(k / (unit.battle?.grid?.cols ?? COLS)), c = k % (unit.battle?.grid?.cols ?? COLS);
     const [lr, lc] = toLocal(r - unit.tileR, c - unit.tileC, unit.dir);
     if (lr === 0 && lc > bc) { bc = lc; best = [r, c]; }
   }

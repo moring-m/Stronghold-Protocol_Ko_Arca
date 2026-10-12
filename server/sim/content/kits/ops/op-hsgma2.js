@@ -282,7 +282,7 @@ export default {
         }
         // S3 临死模式: every other allied operator on her range holds 不死; the part of a damage instance past its HP is her 流失
         const shelters = (t) => !!unit.mem.hsDying && up(unit) && !!t && t !== unit && t.side === 'ally' && t.kind === 'op' && t.alive
-          && !!unit.rangeKeySet && unit.rangeKeySet.has(t.tileR * COLS + t.tileC);
+          && !!unit.rangeKeySet && unit.rangeKeySet.has(t.tileR * (battle.grid?.cols ?? COLS) + t.tileC);
         battle.on('hpDamage', (c) => {
           const t = c.target;
           if (!shelters(t) || c.amount < t.hp) return;

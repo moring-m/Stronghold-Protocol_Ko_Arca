@@ -182,13 +182,13 @@ function componentsForScenery(src) {
 
 /** Keep decorative mesh components whole. Only hide components wholly inside an
  * inactive board region; landscape and components crossing its boundary stay intact. */
-export function sceneryForArea(src, areas, {interiorOnly=false, surroundOnly=false, decorationOnly=false}={}) {
+export function sceneryForArea(src, areas, {interiorOnly=false, surroundOnly=false, decorationOnly=false,cols=21}={}) {
   const {find,bounds}=componentsForScenery(src);
   // UV/material seams duplicate vertices at identical positions. Join those
   // copies so separate faces of one decorative object cannot be clipped apart.
   const keep = new Set();
   for (const [root,b] of bounds) {
-    const landscape = b.x0 < -.5 || b.x1 > 20.5 || b.y0 < -.5 || b.y1 > 18.5;
+    const landscape = b.x0 < -.5 || b.x1 > cols-.5 || b.y0 < -.5 || b.y1 > 18.5;
     if (decorationOnly) {
       if (!landscape && b.z1 <= 2.5 && b.x1-b.x0 < 3.5 && b.y1-b.y0 < 2.5 && areas.some(a=>b.x0>=a.c0-.55 && b.x1<=a.c1+.55 && b.y0>=a.r0-.55 && b.y1<=a.r1+.55)) keep.add(root);
       continue;
@@ -230,6 +230,36 @@ const mergeInto = (list) => {
   }
   return { position, normal, uv, color, index, ...(uv1?{uv1}:{}) };
 };
+
+/** Blend the height of the two scenic cuts while retaining their UVs and board geometry. */
+export function blendCooperativeBackground(left,right){
+ const edge=17.5,width=2.5;
+ const samples=g=>{const m=new Map();for(let i=0;i<g.position.length;i+=3)if(Math.abs(g.position[i]-edge)<.0001){const y=Math.round(g.position[i+1]*20)/20;m.set(y,Math.max(m.get(y)??-Infinity,g.position[i+2]));}return [...m].sort((a,b)=>a[0]-b[0]);};
+ const a=samples(left),b=samples(right);if(!a.length||!b.length)return [left,right];
+ const height=(list,y)=>{let lo=0,hi=list.length-1;while(lo<hi){const mid=(lo+hi)>>1;if(list[mid][0]<y)lo=mid+1;else hi=mid;}const upper=list[lo],lower=list[Math.max(0,lo-1)];return upper[0]===lower[0]?upper[1]:lower[1]+(upper[1]-lower[1])*Math.max(0,Math.min(1,(y-lower[0])/(upper[0]-lower[0])));};
+ const warp=(g,own)=>{const position=Array.from(g.position);for(let i=0;i<position.length;i+=3){const x=position[i],y=position[i+1],distance=Math.abs(x-edge);if(distance>=width||(y>=8.5&&y<=12.5))continue;const target=(height(a,y)+height(b,y))/2,delta=target-height(own,y),weight=(1+Math.cos(Math.PI*distance/width))/2;position[i+2]+=delta*weight;}return {...g,position};};
+ return [warp(left,a),warp(right,b)];
+}
+
+const cooperativeGeometryCache=new WeakMap();
+
+/** Reuse the matching native cooperative map, preserving textures and baked lighting. */
+export function nativeCooperativeGeometry(src) {
+  if(cooperativeGeometryCache.has(src))return cooperativeGeometryCache.get(src);
+  const left=surfaceForArea(src,[{r0:-1000,r1:1000,c0:-1000,c1:17}]);
+  const right=surfaceForArea(src,[{r0:-1000,r1:1000,c0:2,c1:1000}]);
+  const shifted={...right,position:Array.from(right.position,(v,i)=>i%3===0?v+16:v)};
+  const [blendedLeft,blendedRight]=blendCooperativeBackground(left,shifted);
+  const joined={...src,...mergeInto([blendedLeft,blendedRight]),footprints:[]};
+  // Remove the former outer rim before inserting the authored middle divider.
+  const opened=surfaceForArea(joined,outsideTileAreas([{r0:9,r1:12,c0:16,c1:18}]));
+  // Reuse the existing divider between the two ordinary cooperative fields,
+  // including its raised blocks and floor, at the new middle boundary.
+  const divider=surfaceForArea(src,[{r0:9,r1:12,c0:8,c1:10}]);
+  const bridge={...divider,position:Array.from(divider.position,(v,i)=>i%3===0?v+8:v)};
+  const result=compactGeometry({...src,...mergeInto([opened,bridge]),footprints:[]});
+  cooperativeGeometryCache.set(src,result);return result;
+}
 
 /** Apply a 4×4-free transform (scale s, rotate about z by `rot` quarter turns, translate) to board-space data. */
 function placeMesh(src, { x = 0, y = 0, z = 0, s = 1, sz = s, rot = 0 }) {
@@ -492,16 +522,19 @@ export class BoardScene {
     const generation=this.warmGeneration=(this.warmGeneration||0)+1;
     const current=()=>!this.destroyed && !this.lost && generation===this.warmGeneration;
     const idle=()=>new Promise(resolve=>{
-      if(globalThis.requestIdleCallback)requestIdleCallback(resolve,{timeout:500});
-      else setTimeout(resolve,32);
+      if(globalThis.requestIdleCallback)requestIdleCallback(()=>setTimeout(resolve,75),{timeout:1500});
+      else setTimeout(resolve,100);
     });
+    // Let the initial field and HUD finish before using idle slices for optional maps.
+    await new Promise(resolve=>setTimeout(resolve,2000));
+    if(!current())return;
     for(const {stage,area} of entries){
       await idle();if(!current())return;
-      if(this.mapQuality!=='low' && this.pack?.original?.loadStage && !this.pack.original.scenes[stage.id]){
-        await this.pack.original.loadStage(stage.id);if(!current())return;
+      if(this.mapQuality!=='low' && this.pack?.original?.loadStage && !this.pack.original.scenes[stage.originalStageId || stage.id]){
+        await this.pack.original.loadStage(stage.originalStageId || stage.id);if(!current())return;
       }
       const stageKey=`${stage.id || ''}|${(stage.rows || []).join('/')}|${JSON.stringify((stage.devices || []).map(d=>[d.key,d.pos,d.active,d.dir]))}|${stage.previewLayout ? stage.previewLayout.worldOffset || 0 : 'native'}`;
-      const layoutKey=`${stageKey}|${areaKey(area)}|${this.mapQuality}|${!!this.pack?.original?.scenes?.[stage.id]}`;
+      const layoutKey=`${stageKey}|${areaKey(area)}|${this.mapQuality}|${!!this.pack?.original?.scenes?.[stage.originalStageId || stage.id]}`;
       if(layoutKey===this.activeLayoutKey || this.layoutCache.has(layoutKey))continue;
       const scratch=Object.assign(Object.create(Object.getPrototypeOf(this)),this,{
         root:new this.THREE.Group(),key:this.key.clone(),hemi:this.hemi.clone(),
@@ -570,7 +603,7 @@ export class BoardScene {
     if (area) this.setArea(area, { rebuild: false });
     const key = stage ? `${stage.id || ''}|${(stage.rows || []).join('/')}|${JSON.stringify((stage.devices || []).map((d) => [d.key, d.pos, d.active, d.dir]))}|${stage.previewLayout ? stage.previewLayout.worldOffset || 0 : 'native'}` : '';
     if (key === this.stageKey) return;
-    const layoutKey=stage ? `${key}|${this.areaKey}|${this.mapQuality}|${!!this.pack?.original?.scenes?.[stage.id]}` : null;
+    const layoutKey=stage ? `${key}|${this.areaKey}|${this.mapQuality}|${!!this.pack?.original?.scenes?.[stage.originalStageId || stage.id]}` : null;
     const cached=this.layoutCache.get(layoutKey);
     if(cached)this.layoutCache.delete(layoutKey);
     this._stashLayout();
@@ -587,8 +620,8 @@ export class BoardScene {
       this.renderer.shadowMap.needsUpdate=true;this.layoutCacheHits++;
       return;
     }
-    if (this.mapQuality !== 'low' && this.pack?.original?.loadStage && !this.pack.original.scenes[stage.id]) {
-      this.pack.original.loadStage(stage.id).then((scene) => {
+    if (this.mapQuality !== 'low' && this.pack?.original?.loadStage && !this.pack.original.scenes[stage.originalStageId || stage.id]) {
+      this.pack.original.loadStage(stage.originalStageId || stage.id).then((scene) => {
         if (scene && !this.destroyed && this.stage?.id === stage.id) {
           this.stageKey = null;
           this.setStage(this.stage);
@@ -602,7 +635,7 @@ export class BoardScene {
     this.board = board;
     const M = this.meshes = {};
     const borderSurfaces=[], borderSources=[], nativeParts=[];
-    const candidate = this.mapQuality === 'low' ? null : this.pack?.original?.scenes?.[stage.id];
+    const candidate = this.mapQuality === 'low' ? null : this.pack?.original?.scenes?.[stage.originalStageId || stage.id];
     // Missing/invalid material metadata must retain the working reconstructed board.
     const original = candidate && Object.entries(candidate.buckets).every(([k,g]) => this.originalMaterials[g.material || k]) ? candidate : null;
     this.originalStage = original?.stageId || null;
@@ -610,7 +643,7 @@ export class BoardScene {
     // runtime screenshot has short wall shadows and illuminated floor faces.
     // Preserve the azimuth, but match that elevation only for the city theme.
     this.stageLightDir = original?.lighting?.dir || null;
-    if (original && stage.id === 'act2autochess_m01' && this.stageLightDir) {
+    if (original && (stage.originalStageId||stage.id) === 'act2autochess_m01' && this.stageLightDir) {
       this.stageLightDir = [this.stageLightDir[0], this.stageLightDir[1], 1.05];
     }
     // Retain a restrained sky contribution for the native reflection/probe
@@ -620,7 +653,10 @@ export class BoardScene {
     if (original?.lighting?.color) this.key.color.setRGB(...original.lighting.color);
     else this.key.color.setHex(LIGHTING.key.color);
     if (original) {
-      for (const [material, geometry] of Object.entries(original.buckets)) {
+      for (const [material, sourceGeometry] of Object.entries(original.buckets)) {
+        // Allow background preparation to yield between native material buckets.
+        yield;
+        const geometry = stage.coopEightStage ? nativeCooperativeGeometry(sourceGeometry) : sourceGeometry;
         // Serialized Waterplane nodes carry a green runtime placeholder material.
         // Preserve their original geometry and provide the animated web water shader.
         const sourceName = geometry.material || material;
@@ -683,7 +719,7 @@ export class BoardScene {
           if(!waterSurface){borderSurfaces.push(sceneryForArea(movedRear,[{r0:6,r1:7,c0:-1,c1:21}],{decorationOnly:true}));borderSources.push({geometry:movedRear,ornamentGeometry:translateEnvironment(environment,structuralStage.previewLayout.offset),sourceArea:{r0:7,r1:100,c0:-100,c1:100},material:runtimeMaterial,platform:false});}
           visibleGeometry=waterSurface ? {...geometry,index:[]} : surfaceForArea(sceneryForArea(geometry,AREAS.boss),[{r0:-100,r1:6,c0:-100,c1:100}]);
         } else {
-          visibleGeometry=waterSurface ? surfaceForArea(geometry,nativeArea) : geometry.platform ? surfaceForArea(geometry,nativeArea) : sceneryForArea(geometry,scenicArea);
+          visibleGeometry=waterSurface ? surfaceForArea(geometry,nativeArea) : geometry.platform ? surfaceForArea(geometry,nativeArea) : sceneryForArea(geometry,scenicArea,{cols:stage.coopEightStage?37:21});
         }
         const patches=stage.previewLayout?.cooperativePatches;
         if(patches?.length) {
@@ -719,7 +755,7 @@ export class BoardScene {
       });
       for(const[key,list]of Object.entries(buckets))M[key]=this._mesh(mergeInto(list),this.mat[key],{cast:key!=='decal'});
     }
-    if (original && !['act2autochess_m01','act2autochess_m03'].includes(stage.id) && this.area.some(a=>a.c1>=20)) {
+    if (original && !stage.coopEightStage && !['act2autochess_m01','act2autochess_m03'].includes(stage.id) && this.area.some(a=>a.c1>=20)) {
       // The sand island has a water notch outside its right rim. Extend the
       // opposite authored hill strip only into uncovered cells; keep the sea
       // beyond the rim and the existing stairs/props intact in both modes.
@@ -754,7 +790,7 @@ export class BoardScene {
       }
     }
     yield;
-    if (original) {
+    if (original && !stage.coopEightStage) {
       const areas=structuralStage.previewLayout ? [{r0:0,r1:5,c0:0,c1:20}] : combatBorderAreas(stage,this.area);
       const raised=borderSurfaces.map(g=>g.platform ? g : ({...g,index:Array.from(g.index).filter((_,i,a)=>{const base=i-i%3;return Math.max(...a.slice(base,base+3).map(id=>g.position[id*3+2]))>.08 && a.slice(base,base+3).every(id=>g.normal?.[id*3+2]>.85);})}));
       const cells=stage.previewLayout ? vacantBorderCells(borderCells(structuralStage,areas),raised) : [];
@@ -813,6 +849,7 @@ export class BoardScene {
       M.deviceDecals = this._mesh(slabs.decal, this.mat.decal, { cast: false });
 
     }
+
     // Apply the same translation to every native structural mesh, including
     // copied supports and the preview pen. Devices retain gameplay positions.
     if(worldOffset)for(const mesh of Object.values(M)) {
@@ -997,7 +1034,7 @@ export class BoardScene {
   _buildBackground(board) {
     const T = this.THREE;
     const B = LIGHTING.bg;
-    const cx = (COLS - 1) / 2, cy = (ROWS - 1) / 2;
+    const cx = ((board.grid?.[0]?.length ?? COLS) - 1) / 2, cy = ((board.grid?.length ?? ROWS) - 1) / 2;
     let plane = null;
     const obj = this.pack?.meshes?.bgPlane;
     if (obj) plane = objToBoard(obj, B.size / 100);

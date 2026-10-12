@@ -23,7 +23,7 @@ function sbell2(bb, chess, def) {
   const addSnow = (battle, unit, k) => {
     const snow = unit.mem.snow;
     if (!snow) return false;
-    const r = (k / COLS) | 0, c = k % COLS;
+    const r = (k / (battle.grid?.cols ?? COLS)) | 0, c = k % (battle.grid?.cols ?? COLS);
     if (!battle.grid.inRect(r, c) || !battle.grid.groundPassable(r, c, true)) return false;
     // PRTS 备注 "存在自身的该召唤物的地块不会积雪"
     if (battle.allyUnits.some((t) => isTok(t, iceId, unit) && t.alive && t.tileR === r && t.tileC === c)) return false;
@@ -38,8 +38,8 @@ function sbell2(bb, chess, def) {
       for (const [dr, dc] of [[0, 1], [1, 0], [0, -1], [-1, 0]]) {
         const nr = r + dr, nc = c + dc;
         if (!battle.grid.inRect(nr, nc) || !battle.grid.groundPassable(nr, nc, true)) continue;
-        const L = snow.get(nr * COLS + nc) ?? 0;
-        if (L < maxL && L < bl) { bl = L; best = nr * COLS + nc; }
+        const L = snow.get(nr * (battle.grid?.cols ?? COLS) + nc) ?? 0;
+        if (L < maxL && L < bl) { bl = L; best = nr * (battle.grid?.cols ?? COLS) + nc; }
       }
       if (best == null) return false;
       S2.spreadLeft--;
@@ -58,7 +58,7 @@ function sbell2(bb, chess, def) {
    * operator could stand on froze at max snow, and the gate never did. Returns true when the token appeared.
    */
   const freezeTile = (battle, unit, k) => {
-    const r = (k / COLS) | 0, c = k % COLS;
+    const r = (k / (battle.grid?.cols ?? COLS)) | 0, c = k % (battle.grid?.cols ?? COLS);
     if (battle.grid.tile(r, c).special !== 'end') return false;
     if (battle.allyUnits.some((t) => isTok(t, iceId, unit) && t.alive)) return false;
     if (battle.isReservedTile(r, c)) return false;
@@ -169,7 +169,7 @@ function sbell2(bb, chess, def) {
         for (let d = 1; d <= n; d++) {
           const r = unit.tileR + fr * d, c = unit.tileC + fc * d;
           if (!battle.grid.inRect(r, c)) break;
-          if (addSnow(battle, unit, r * COLS + c)) laid++;
+          if (addSnow(battle, unit, r * (battle.grid?.cols ?? COLS) + c)) laid++;
         }
         battle.fx('frostNova', { x: unit.x, y: unit.y, id: unit.id, tiles: laid });
       },

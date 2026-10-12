@@ -211,7 +211,7 @@ export default {
           const seq = unit.deploySeq, act = sk.activations;
           battle.after(SPIKE_DELAY, () => {
             if (!up(unit) || unit.deploySeq !== seq || !unit.canAct || !unit.skill?.active || unit.skill.activations !== act) return;
-            const list = battle.enemiesInKeys(absoluteRangeKeys(grid2, unit.tileR, unit.tileC, unit.dir, 0), unit, AIR);
+            const list = battle.enemiesInKeys(absoluteRangeKeys(grid2, unit.tileR, unit.tileC, unit.dir, 0, battle.grid), unit, AIR);
             sortEnemyTargets(battle, unit, list, null);
             const targets = list.slice(0, n);
             if (!targets.length) return;

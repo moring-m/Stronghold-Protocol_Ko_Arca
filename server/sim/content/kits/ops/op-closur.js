@@ -84,7 +84,7 @@ export const RHODES_KEY = 'talent:closur:rhodes';
 export const SLOWDOWN = 'slowdown';
 
 const bbOf = (chess, id) => skillRec(chess, id)?.bb ?? {};
-const tileKey = (r, c) => r * COLS + c;
+const tileKey = (r, c, grid) => r * (grid?.cols ?? COLS) + c;
 /** First talent of a normalised token def holding `key` (token talents keep no index). */
 const tokTalent = (def, key) => (def?.talents ?? []).find((t) => t && t.bb && t.bb[key] != null) ?? null;
 
@@ -153,7 +153,7 @@ export default {
         const keys = base.rangeKeySet ?? new Set(base.rangeKeys ?? []);
         for (const a of battle.allyUnits) {
           if (!up(a) || a.hidden || (a.kind !== 'op' && a.kind !== 'token')) continue;
-          if (!battle.allySelectable(a, unit) || !keys.has(tileKey(a.tileR, a.tileC))) continue;
+          if (!battle.allySelectable(a, unit) || !keys.has(tileKey(a.tileR, a.tileC, battle.grid))) continue;
           set.add(a);
         }
       }
@@ -164,7 +164,7 @@ export default {
     /** Tiles of the enemies her 援军 block (S2 / S3: "能攻击到自身援军阻挡的敌人"). */
     const blockedTiles = (battle, unit, reinf) => {
       const keys = [];
-      for (const r of reinf) for (const e of r.blocking) if (e.alive && e.blockedBy === r) keys.push(tileKey(Math.round(e.y), Math.round(e.x)));
+      for (const r of reinf) for (const e of r.blocking) if (e.alive && e.blockedBy === r) keys.push(tileKey(Math.round(e.y), Math.round(e.x), battle.grid));
       return keys;
     };
     const setExtra = (battle, unit, keys) => {
@@ -366,7 +366,7 @@ export default {
               const a = ctx.unit;
               if (!(ret > 0) || ctx.initial || ctx.move || !a || a.kind !== 'op' || a.ownerId !== unit.ownerId || a === unit) return;
               if (!unit.skill?.active || unit.skill.id !== S2 || !up(unit)) return;
-              const inRange = basesOf(battle, unit).some((t) => up(t) && (t.rangeKeySet ?? new Set(t.rangeKeys)).has(tileKey(a.tileR, a.tileC)));
+              const inRange = basesOf(battle, unit).some((t) => up(t) && (t.rangeKeySet ?? new Set(t.rangeKeys)).has(tileKey(a.tileR, a.tileC, battle.grid)));
               if (!inRange) return;
               const back = Math.ceil(num(a.base.cost) * ret - 1e-9);
               if (back > 0) { battle.addDp(unit.ownerId, back); battle.fx('dp', { x: a.x, y: a.y, n: back, id: unit.id }); }

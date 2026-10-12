@@ -95,7 +95,7 @@ export function reachableTiles(b, e, st) {
       if (L > FEAR_RADIUS + 1e-9) continue;
       if (L > 1e-9 && vx * ux + vy * uy < FEAR_HALF_COS * L - 1e-9) continue;
       if (!passable(g, fly, r, c) || g.tile(r, c).special === 'end') continue;
-      const k = r * COLS + c;
+      const k = r * (b.grid?.cols ?? COLS) + c;
       if (field && field.dist[k] < 0 && field2.dist[k] < 0) continue;   // 该格可抵达其终点
       out.push(k);
     }
@@ -105,7 +105,7 @@ export function reachableTiles(b, e, st) {
 
 /** Whether the unit can stand on / step through tile key `k` (its passable terrain; ground: no block, no crate). */
 function openTile(g, fly, k) {
-  const r = (k / COLS) | 0, c = k - r * COLS;
+  const r = (k / (g?.cols ?? COLS)) | 0, c = k - r * (g?.cols ?? COLS);
   return passable(g, fly, r, c) && (fly || !g.isObstacle(r, c));
 }
 
@@ -123,11 +123,11 @@ function stepsBetween(b, e, from, to, limit) {
   for (let d = 1; d <= limit && frontier.length; d++) {
     const next = [];
     for (const k of frontier) {
-      const r = (k / COLS) | 0, c = k - r * COLS;
+      const r = (k / (b.grid?.cols ?? COLS)) | 0, c = k - r * (b.grid?.cols ?? COLS);
       for (const [dr, dc] of [[1, 0], [0, 1], [-1, 0], [0, -1]]) {
         const rr = r + dr, cc = c + dc;
         if (!g.inRect(rr, cc)) continue;
-        const kk = rr * COLS + cc;
+        const kk = rr * (b.grid?.cols ?? COLS) + cc;
         if (seen.has(kk)) continue;
         if (kk === to) return d;
         seen.add(kk);
@@ -143,7 +143,7 @@ function stepsBetween(b, e, from, to, limit) {
 function hereOf(g, e) {
   const r = Math.max(g.rect.r0, Math.min(g.rect.r1, Math.round(e.y)));
   const c = Math.max(g.rect.c0, Math.min(g.rect.c1, Math.round(e.x)));
-  return { r, c, k: r * COLS + c };
+  return { r, c, k: r * (g?.cols ?? COLS) + c };
 }
 
 /**
@@ -157,7 +157,7 @@ function planPath(b, e, m) {
   const pts = [];
   if (e.motion !== 'FLY' && m.k !== h.k) {
     if (!openTile(g, false, m.k)) return false;
-    const r = (m.k / COLS) | 0, c = m.k - r * COLS;
+    const r = (m.k / (b.grid?.cols ?? COLS)) | 0, c = m.k - r * (b.grid?.cols ?? COLS);
     const wp = g.waypoints(h.r, h.c, r, c);
     if (!wp) return false;
     for (let j = 1; j < wp.length - 1; j++) pts.push({ x: wp[j][1], y: wp[j][0] });
@@ -184,7 +184,7 @@ function pickCheckpoint(b, e, m) {
   }
   const ox = (b.rng() - 0.5) * FEAR_JITTER, oy = (b.rng() - 0.5) * FEAR_JITTER;
   const aim = (key) => {
-    const r = (key / COLS) | 0, c = key - r * COLS;
+    const r = (key / (b.grid?.cols ?? COLS)) | 0, c = key - r * (b.grid?.cols ?? COLS);
     m.k = key;
     m.goal = { x: c + ox, y: r + oy };
     return planPath(b, e, m);

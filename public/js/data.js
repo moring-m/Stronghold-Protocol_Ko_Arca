@@ -1,3 +1,4 @@
+import {withLaboratoryDummy} from '../../shared/laboratoryDummy.js';
 // Lazy loader + cache for the generated game data served at /data/*.json.
 //
 // Files are fetched on first use and cached for the page's lifetime (the Promise is shared, so concurrent callers
@@ -283,10 +284,10 @@ export const matchData = {
     const names=['chess','bonds','items','bands','bosses','stages','config','enemies'];
     const all=Object.fromEntries(names.map(k=>[k,data.get(k)||{}]));
     // Cache by table identities and selection so roster updates never erase saved preferences.
-    const key=JSON.stringify(selection);
+    const key=JSON.stringify([selection,pub.mode,pub.laboratory?.dummyStats||!!pub.laboratory]);
     const prior=matchViews.get(raw);
     if(prior?.key===key && names.every(k=>prior.sources[k]===all[k]))return prior.value;
-    const value=applyCustomExtensions(all,selection)[name];
+    const configured=applyCustomExtensions(pub.laboratory?withLaboratoryDummy(all,pub.laboratory.dummyStats):all,selection);if(pub.mode==='coop8')configured.config={...configured.config,coop8:true};const value=configured[name];
     matchViews.set(raw,{key,sources:all,value});return value;
   },
   lookup(name,id) { return id == null ? null : matchIndex(name,this.get(name)).get(String(id)) || null; },

@@ -185,5 +185,5 @@ export function formatBondEffect(bond, layers = 0, count = 0) {
     formats[p.index] = p.format || '0';
   }
   const text=fillPlaceholders(src, values, formats);
-  return bond.bondId==='leithanienShip'||bond.id==='leithanienShip'?text.replace('5초',`${count>=6?10+Math.floor(L/30):5}초`).replaceAll('{leithDurationBonus}',String(5+Math.floor(L/30))).replaceAll('{leithDurationStacks}',String(Math.floor(L/30))):text;
+  return bond.bondId==='leithanienShip'||bond.id==='leithanienShip'?text.replace('5초',`${count>=6?10+Math.floor(L/25):5}초`).replaceAll('{leithDurationBonus}',String(5+Math.floor(L/25))).replaceAll('{leithDurationStacks}',String(Math.floor(L/25))):text;
 }

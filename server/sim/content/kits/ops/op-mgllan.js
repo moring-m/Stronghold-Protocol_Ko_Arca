@@ -165,7 +165,7 @@ export default {
           battle.on('tick', () => {
             const deck = unit.mem.summonDeck;
             const want = up(unit) && !!deck && deck.standing().some((d) => battle.time < d.deployedAt + dur - 1e-9
-              && absoluteRangeKeys(grid, d.tileR, d.tileC, d.dir, 0).includes(unit.tileR * COLS + unit.tileC));
+              && absoluteRangeKeys(grid, d.tileR, d.tileC, d.dir, 0, battle.grid).includes(unit.tileR * (battle.grid?.cols ?? COLS) + unit.tileC));
             const has = unit.findBuff('mgllan:eHidden');
             if (want && !has) battle.addBuff(unit, { key: 'mgllan:eHidden', flags: { stealth: true }, status: 'stealth', tags: ['module'] });
             else if (!want && has) battle.removeBuff(unit, 'mgllan:eHidden');

@@ -585,9 +585,9 @@ test('moving melee attachments do not generate synthetic weapon tails',()=>{
 
 
 test('authored enemy ability FX resolves the live unit and plays its exact clip',()=>{
- let args=null;const v=unit(91,5,10,{actor:{has:clip=>clip==='Skill_Begin',setForm:(...a)=>args=a},_formSpec:()=>({roles:{idle:'Idle_B'}})});
+ let args=null;const v=unit(91,5,10,{actor:{has:clip=>clip==='Skill_Begin',playAbility:(...a)=>args=a},_formSpec:()=>({roles:{idle:'Idle_B'}})});
  const {fx}=makeFx({views:[v]});fx._simFx('enemySkill',5,10,{id:91,clip:'Skill_Begin',dur:1});
- assert.deepEqual(args,[{idle:'Idle_B'},'Skill_Begin']);
+ assert.deepEqual(args,['Skill_Begin',1]);
 });
 
 test('dedicated textures follow the selected skill and keep original boomerang textures at weapon scale', async()=>{
@@ -683,4 +683,15 @@ test('garrison/layer pop follows its owner in world space for every bond source'
  const first=fx.pops[0].c.position.x;v.x+=2;fx._updatePops(.1);
  assert.notEqual(fx.pops[0].c.position.x,first,'moving owners retain their own pop');
  fx.clear();
+});
+
+test('Angelina alter skill visual creates a visible wind projectile from the caster to its target',()=>{
+ const src=unit(1,3,10,{info:{charId:'char_1015_aglna2',skillIndex:2},statuses:new Set(['skill'])}),tgt=unit(2,6,10,{isEnemy:true});
+ const {fx}=makeFx({views:[src,tgt]});fx.attack(src,tgt,'arrow');
+ assert.equal(fx.projs.length,1);const pr=fx.projs[0];assert.equal(pr.src,src);assert.equal(pr.tgt,tgt);assert.equal(pr.spec.look,'dart');assert.equal(pr.spec.trail,0x64cbbb);
+ assert.ok(pr.dur>0);run(fx,2);assert.equal(fx.projs.length,0);fx.destroy();
+});
+test('deployment particles stay anchored to the world when the camera moves',()=>{
+ const {fx}=makeFx(),v=unit(701,3,10);fx.deploy(v);assert.ok(fx.parts.length>0);assert.ok(fx.parts.every(p=>p.world?.x===v.x&&p.world?.y===v.y));
+ const old=cam.tx;try{cam.tx+=3;cam.update();fx.update(.01);for(const p of fx.parts)assert.ok(Number.isFinite(p.sp.x)&&Number.isFinite(p.sp.y));}finally{cam.tx=old;cam.update();}
 });

@@ -64,7 +64,8 @@ function ClientHud({ hud, myDone, spectating, spectator = false, client }) {
   const idx = Math.max(0, layers.findIndex((l) => l.key === (client.layer || 'ALL')));
   const cur = layers[idx] || null;
   const step = (d) => {
-    if (!layers.length || !client.onLayer) return;
+    if (!layers.length || (!client.onLayer && !client.onLayerStep)) return;
+    if(client.onLayerStep){client.onLayerStep(d);return;}
     const n = Math.min(layers.length - 1, Math.max(0, idx + d));
     if (n !== idx) client.onLayer(layers[n].key);
   };

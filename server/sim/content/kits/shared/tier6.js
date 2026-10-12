@@ -147,7 +147,7 @@ const parseN = (text, re, d) => { const m = String(text ?? '').match(re); return
 const live = (u) => !!u && u.alive && u.deployed && !u.removed && !u.hidden;
 const isElite = (e) => !!e && (e.isBoss || e.def?.rank === 'ELITE' || e.def?.rank === 'BOSS');
 const hasBond = (u, id) => !!(u && u.def && Array.isArray(u.def.bonds) && u.def.bonds.includes(id));
-const keyOf = (u) => Math.round(u.y) * COLS + Math.round(u.x);
+const keyOf = (u) => Math.round(u.y) * (u.battle?.grid?.cols ?? COLS) + Math.round(u.x);
 const opsOf = (battle, ownerId) => battle.allies(ownerId).filter((a) => a.kind === 'op');
 const ANY = Object.freeze({ canHitFly: true });
 const enemiesIn = (battle, unit, keys) => battle.enemiesInKeys(keys || unit.rangeKeys || [], unit, ANY);
@@ -200,7 +200,7 @@ const N4 = Object.freeze([[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1]]);
 /** Every offset of the 19×21 field: "攻击范围扩大至整个战场". */
 const WHOLE_FIELD = (() => {
   const g = [];
-  for (let dr = -(ROWS - 1); dr <= ROWS - 1; dr++) for (let dc = -(COLS - 1); dc <= COLS - 1; dc++) g.push([dr, dc]);
+  for (let dr = -(ROWS - 1); dr <= ROWS - 1; dr++) for (let dc = -(Math.max(COLS, 37) - 1); dc <= Math.max(COLS, 37) - 1; dc++) g.push([dr, dc]);
   return Object.freeze(g);
 })();
 
@@ -219,10 +219,10 @@ function bstate(battle) {
  */
 function freeTiles(battle, unit, grid, { ranged = false, ground = true } = {}) {
   const out = [];
-  const own = unit.tileR * COLS + unit.tileC;
-  for (const k of absoluteRangeKeys(grid, unit.tileR, unit.tileC, unit.dir, 0)) {
+  const own = unit.tileR * (battle.grid?.cols ?? COLS) + unit.tileC;
+  for (const k of absoluteRangeKeys(grid, unit.tileR, unit.tileC, unit.dir, 0, battle.grid)) {
     if (k === own) continue;
-    const r = (k / COLS) | 0, c = k % COLS;
+    const r = (k / (battle.grid?.cols ?? COLS)) | 0, c = k % (battle.grid?.cols ?? COLS);
     if (!battle.grid.inRect(r, c) || battle.isReservedTile(r, c)) continue;
     if (!battle.grid.canStand(r, c, { ranged })) continue;
     if (ground && !battle.grid.groundPassable(r, c, true)) continue;

@@ -563,3 +563,10 @@
 .lo-tier-empty{min-width:0;width:var(--tier-h);height:var(--tier-h);background:none;clip-path:none;font-size:12px}.lo-tier-empty::before{content:none}
 .lo-filter-presets{display:flex;align-items:center;margin-left:auto;flex:none}.lo-filter-presets .btn{height:max(.5rem,36px);padding:0 .12rem;white-space:nowrap;font-size:max(.15rem,12px)}.lo-frow:first-child .lo-search{margin-left:0}
 @media(max-width:760px){.lo-filter-presets{margin-left:0}}
+.preset-files{flex-wrap:wrap}.preset-files__text{display:block;width:100%;min-height:2rem;margin-top:.14rem;padding:.12rem;background:var(--bg-1);color:var(--text-hi);border:1px solid var(--line-2);font:inherit;resize:vertical}
+
+.preset-code { width:100%; min-width:0; padding:.12rem; height:.48rem; border:1px solid var(--line-2); color:var(--text); background:var(--bg-1); font-family:var(--font-mono); font-size:max(.14rem,12px); }
+.extension-operators { display:flex; flex-direction:column; min-height:0; flex:1; }
+.extension-operators .lo-filters { flex:none; }
+.extension-operators .lo-grid { max-height:54vh; }
+.extension-operators .lo-card:disabled { opacity:.45; cursor:default; transform:none; }

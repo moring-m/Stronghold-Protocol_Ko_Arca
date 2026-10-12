@@ -261,7 +261,7 @@ export function rowMates(battle, u) {
   return out;
 }
 /** Tile key used by range sets (`unit.rangeKeySet`): an ally's tile, an enemy's position tile (range tests: onKeys). */
-export const tileKey = (u) => (u.side === 'ally' ? u.tileR * COLS + u.tileC : Math.round(u.y) * COLS + Math.round(u.x));
+export const tileKey = (u) => (u.side === 'ally' ? u.tileR * (u.battle?.grid?.cols ?? COLS) + u.tileC : Math.round(u.y) * (u.battle?.grid?.cols ?? COLS) + Math.round(u.x));
 /** Is `target` on a tile of `keys` (Set or array)? An ally: its tile; an enemy: its body (a huge one: every tile). */
 export const onKeys = (target, keys) => {
   if (!target || !keys) return false;

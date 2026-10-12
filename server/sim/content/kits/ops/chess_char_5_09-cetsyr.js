@@ -119,7 +119,7 @@ export default {
         whileOn(battle, unit, AURA_IV, () => {
           const keys = new Set(unit.baseRangeKeys || []);
           let n = 0;
-          for (const a of battle.allies()) if (a !== unit && isOp(a) && keys.has(a.tileR * COLS + a.tileC)) n++;
+          for (const a of battle.allies()) if (a !== unit && isOp(a) && keys.has(a.tileR * (battle.grid?.cols ?? COLS) + a.tileC)) n++;
           if (n >= need) battle.addBuff(unit, { key: 'cetsyr:module', duration: AURA_DUR, mods: { atkPct: atk } });
         });
       },

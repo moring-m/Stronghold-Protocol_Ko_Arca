@@ -52,7 +52,7 @@ const MARK_SCAN = 0.2;
 const RAIN_GAP = 0.1;
 /** S3 "攻击范围扩大至全场": every offset that reaches the whole 19 × 21 field whatever her direction. */
 const FIELD = (() => {
-  const m = Math.max(ROWS, COLS) - 1;
+  const m = Math.max(ROWS, COLS, 37) - 1;
   const g = [];
   for (let dr = -m; dr <= m; dr++) for (let dc = -m; dc <= m; dc++) g.push(Object.freeze([dr, dc]));
   return Object.freeze(g);

@@ -8,8 +8,8 @@ import { isHpLoss } from '../../../damage.js';
 import { num, tbb, whileDeployed, toggleBuff, skillActive, isSel, alt, withDefaults } from '../shared/tier4.js';
 import { hypot } from '../../../detmath.js';
 
-const LINE = Object.freeze(Array.from({ length: COLS }, (_, i) => Object.freeze([0, i])));
-const tileKey = (u) => Math.round(u.y) * COLS + Math.round(u.x);
+const LINE = Object.freeze(Array.from({ length: Math.max(COLS, 37) }, (_, i) => Object.freeze([0, i])));
+const tileKey = (u) => Math.round(u.y) * (u.battle?.grid?.cols ?? COLS) + Math.round(u.x);
 /** HP at 0 (boss pool: pool HP) — a `damaged` hook sees the lethal hit before the kill, while the unit is still `alive`. */
 const downed = (u) => (u.bossPool ? !(u.bossPool.hp > 0) : !(u.hp > 0));
 
@@ -63,7 +63,7 @@ export default withDefaults({
           // unblocked enemy (a flyer…) standing on such a tile outside her own range is dropped for the next valid target
           battle.on('beforeAttack', (c) => {
             if (c.attacker !== unit || !skillActive(unit) || !unit.extraRangeKeys) return;
-            const own = new Set(absoluteRangeKeys(unit.rangeGrid, unit.tileR, unit.tileC, unit.dir, unit.s.rangeExtend));
+            const own = new Set(absoluteRangeKeys(unit.rangeGrid, unit.tileR, unit.tileC, unit.dir, unit.s.rangeExtend, battle.grid));
             const ok = (e) => bodyInKeys(e, own) || !!(e.blockedBy && e.blockedBy.side === 'ally' && e.blockedBy.alive);
             if (c.targets.every(ok)) return;
             const cands = battle.enemiesInKeys(unit.rangeKeys, unit, c.profile);

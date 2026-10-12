@@ -95,7 +95,7 @@ test('COMBAT: humans get their own spec (authoritative), bots are simulated by t
   assert.deepEqual(m.handle('p_0', { t: 'b.progress', battleId: human.battleId, gt: 4, killed: 3, total: 9, leaks: 0 }), { ok: true });
   m.flush(true);
   const pub = m.publicView();
-  assert.deepEqual(pub.fields.find((f) => f.fieldId === 'n:p_0').progress, { killed: 3, total: 9, done: false });
+  assert.deepEqual(pub.fields.find((f) => f.fieldId === 'n:p_0').progress, { killed: 3, resolved: null, total: 9, done: false });
   // a stale / foreign report is ignored (never an error toast)
   assert.deepEqual(m.handle('p_1', { t: 'b.progress', battleId: human.battleId, gt: 9, killed: 9, total: 9 }), { ok: true });
   assert.equal(human.progress.killed, 3);
@@ -157,7 +157,7 @@ test('validation: implausible client results are rejected and replaced by the se
   // a structurally broken payload never reaches the match (protocol validator)
   assert.notEqual(validateC2S({ t: 'b.result', battleId: 'x', result: { ...ok, perPlayer: {} } }), null);
   assert.notEqual(validateC2S({ t: 'b.result', battleId: 'x', result: { ...ok, reason: 'won' } }), null);
-  assert.notEqual(validateC2S({ t: 'b.result', battleId: 'x', result: { ...ok, perPlayer: { p: { ...ok.perPlayer.p, leaked: Array(401).fill({ enemyKey: 'enemy_a' }) } } } }), null);
+  assert.notEqual(validateC2S({ t: 'b.result', battleId: 'x', result: { ...ok, perPlayer: { p: { ...ok.perPlayer.p, leaked: Array(3201).fill({ enemyKey: 'enemy_a' }) } } } }), null);
   assert.equal(specBounds(spec).bountyCoins, 6);
 });
 
@@ -279,7 +279,7 @@ test('Final Assault: two client-run pair fields share the server pool (b.progres
   m.dispose();
 });
 
-test('Final Assault: leaks and leader LP effects from b.progress drain the team LP; overtime after 150 real s at 1 LP/real s; team LP 0 → b.end → defeat', () => {
+test('Final Assault: leaks and leader LP effects from b.progress drain the team LP; human-only overtime after the level countdown at 1 LP/real s; team LP 0 → b.end → defeat', () => {
   const h = makeMatch({ mode: 'coop', difficulty: 'FUNNY', humans: 2, seed: 9109, fake: true, clientCombat: true, instant: false,
     script: (b) => (b.kind === 'boss' ? { bossDps: 0, leakEvents: [{ at: 2, lpr: 3 }], lpLossEvents: [{ at: 3, amount: 2 }] } : { duration: 2 }) }).start();
   const m = h.m;
@@ -289,14 +289,15 @@ test('Final Assault: leaks and leader LP effects from b.progress drain the team 
   h.sched.advance(4000);
   assert.equal(m.teamLp, lp0 - 5, 'leak lpr 3 + leader effect 2');
   const lp1 = m.teamLp;
-  // overtime (bossTurnHpReduceTime): 150 REAL s like the level's 120 s countdown, then 1 LP per real second
+  // Human-only rooms start overtime when the 120-real-second level countdown ends.
   const t0 = m._bossStartAt;
+  const overtimeMs = 120000;
   const pub = () => h.bc.filter((x) => x.t === 'm.public').pop();
   m.flush(true);
   assert.equal(pub().deadline, t0 + 120000, 'the HUD counts the boss level\'s 120 s down');
-  assert.equal(pub().overtimeAt, t0 + 150000, 'and knows when the drain starts');
-  h.sched.advance(t0 + 150000 - m.sched.now() + 500);
-  assert.equal(m.teamLp, lp1, 'no drain before 150 real s (the countdown ran out at 120 s, the battle went on)');
+  assert.equal(pub().overtimeAt, t0 + overtimeMs, 'and knows when the drain starts');
+  h.sched.advance(t0 + overtimeMs - m.sched.now() + 500);
+  assert.equal(m.teamLp, lp1, 'no whole-second drain before the configured overtime threshold');
   h.sched.advance(5000);
   assert.ok(m.teamLp <= lp1 - 4 && m.teamLp >= lp1 - 6, `overtime drain ≈ 5 LP over 5 real s (${lp1} → ${m.teamLp})`);
   const end = h.runToEnd();

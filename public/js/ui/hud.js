@@ -419,12 +419,14 @@ export function TopBar({ battleEnd = null, pub, priv, conn, hud, total, drawer, 
 
     <div class="gtop__right">
       <div class="gtop__clock">
-        ${frozenSecs != null
+        ${pub?.laboratory&&isCombatPhase(phase)
+          ? html`<${Countdown} seconds=${Math.max(0,hud?.elapsed||0)} gauge=${false} elapsed=${true} warnAt=${-1} size="md" label="ELAPSED" />`
+          : frozenSecs != null
           ? html`<${Countdown} seconds=${frozenSecs} total=${total ?? undefined} size="md" label="PAUSED" />`
           : html`<${Countdown} deadline=${pub?.deadline} total=${total ?? undefined} size="md" />`}
         ${pause && (pause.show || pause.paused) ? html`<${PauseButton} paused=${!!pause.paused} busy=${pause.busy} onToggle=${pause.onToggle} />` : null}
       </div>
-      <${OvertimeWarning} ot=${ot} />
+      ${pub?.laboratory?null:html`<${OvertimeWarning} ot=${ot} />`}
       ${battleEnd}
       ${showReady ? html`<${BoundReadyToggle} priv=${priv} onToggle=${onReady} busy=${readyBusy} readyCount=${readyCount} total=${playerCount} />` : null}
     </div>

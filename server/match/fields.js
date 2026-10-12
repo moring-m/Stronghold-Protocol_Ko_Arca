@@ -296,6 +296,7 @@ export class HeadlessJob {
     this.every = Math.max(1, Math.round(TIMELINE_EVERY / TICK));
     this.cap = Math.ceil(HARD_CAP_SECONDS / TICK);
     this.n = 0;
+    this.capReason = 'timeout';
     this.crashed = false;
     this.done = false;
     this._out = null;
@@ -315,7 +316,7 @@ export class HeadlessJob {
         if (this.n % this.every === 0) this.timeline.push(timelineSample(b));
         if (timed && (k & 15) === 0 && !b.finished && now() - t0 >= budgetMs) return false;
       }
-      if (!b.finished) b.forceEnd('timeout');
+      if (!b.finished) b.forceEnd(this.capReason);
     } catch (e) {
       this.crashed = true;
       if (this.onError) this.onError(e);
@@ -564,10 +565,12 @@ function layerBondsOf(p, gd) {
   const out = new Set(Object.keys(p.bonds && typeof p.bonds === 'object' ? p.bonds : {}));
   if (typeof gd.bond !== 'function') return out;
   const texts = [recJson(p.playerEffects), recJson(p.bonds)];
-  const band = p.bandId && typeof gd.band === 'function' ? gd.band(p.bandId) : null;
+  for(const bandId of new Set([p.bandId,...(gd.config?.commonBands||[])].filter(Boolean))){
+  const band = typeof gd.band === 'function' ? gd.band(bandId) : null;
   if (band) {
     texts.push(recJson(band));
     if (band.effectId && typeof gd.effect === 'function') texts.push(recJson(gd.effect(band.effectId)));
+  }
   }
   for (const u of Array.isArray(p.units) ? p.units : []) {
     if (!u) continue;

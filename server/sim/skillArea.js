@@ -32,7 +32,7 @@ export function skillAreaKeys(u) {
   const tg = u.skill?.spec?.targeting;
   if (tg?.rangeGrid || tg?.rangeExtend || (u.skill?.active && u.rangeKeys?.some(k => !(u.baseRangeKeys || []).includes(k)))) return u.rangeKeys || [];
   const grid = u.def?.skill?.rangeGrid;
-  return grid?.length ? absoluteRangeKeys(grid,u.tileR,u.tileC,u.dir,0) : u.rangeKeys || [];
+  return grid?.length ? absoluteRangeKeys(grid,u.tileR,u.tileC,u.dir,0, u.battle?.grid) : u.rangeKeys || [];
 }
 export function visibleSkillAreaKeys(u, time) {
   if (!u.alive || !u.deployed) return null;

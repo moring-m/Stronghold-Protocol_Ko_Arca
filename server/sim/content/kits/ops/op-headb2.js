@@ -94,18 +94,18 @@ function highlandsAround(battle, x, y, r = HIGHLAND_PICK_RADIUS) {
     for (let col = Math.floor(x - r); col <= Math.ceil(x + r); col++) {
       if (!g.inRect(row, col) || g.tile(row, col).height !== 'HIGH') continue;
       const dx = Math.max(Math.abs(x - col) - 0.5, 0), dy = Math.max(Math.abs(y - row) - 0.5, 0);
-      if (dx * dx + dy * dy <= r * r + 1e-9) out.push(row * COLS + col);
+      if (dx * dx + dy * dy <= r * r + 1e-9) out.push(row * (battle.grid?.cols ?? COLS) + col);
     }
   }
   return out;
 }
 /** The 高台 next to tile key `k` (the spread of S3). */
 function highlandNeighbours(battle, k) {
-  const r = Math.floor(k / COLS), c = k % COLS, g = battle.grid, out = [];
+  const r = Math.floor(k / (battle.grid?.cols ?? COLS)), c = k % (battle.grid?.cols ?? COLS), g = battle.grid, out = [];
   for (const [dr, dc] of X5) {
     if (!dr && !dc) continue;
     const rr = r + dr, cc = c + dc;
-    if (g.inRect(rr, cc) && g.tile(rr, cc).height === 'HIGH') out.push(rr * COLS + cc);
+    if (g.inRect(rr, cc) && g.tile(rr, cc).height === 'HIGH') out.push(rr * (battle.grid?.cols ?? COLS) + cc);
   }
   return out;
 }
@@ -123,9 +123,9 @@ export default {
 
     /** One 高台 taking effect: its x-5 ground enemies take the splash and 停顿 (束缚 during S3). */
     const highlandStrike = (battle, unit, k, atk, s3) => {
-      const r = Math.floor(k / COLS), c = k % COLS;
+      const r = Math.floor(k / (battle.grid?.cols ?? COLS)), c = k % (battle.grid?.cols ?? COLS);
       const keys = [];
-      for (const [dr, dc] of X5) if (battle.grid.inRect(r + dr, c + dc)) keys.push((r + dr) * COLS + c + dc);
+      for (const [dr, dc] of X5) if (battle.grid.inRect(r + dr, c + dc)) keys.push((r + dr) * (battle.grid?.cols ?? COLS) + c + dc);
       const foes = battle.enemiesInKeys(keys, unit, GROUND);
       battle.fx('aoe', { x: c, y: r, radius: 1, id: unit.id, skill: 'headb2:highland' });
       if (!foes.length) return;
@@ -168,7 +168,7 @@ export default {
       const tr = unit.tileR + fr, tc = unit.tileC + fc;
       let main = null;
       if (battle.grid.inRect(tr, tc)) {
-        const cands = battle.enemiesInKeys([tr * COLS + tc], unit, unit.profile);
+        const cands = battle.enemiesInKeys([tr * (battle.grid?.cols ?? COLS) + tc], unit, unit.profile);
         sortEnemyTargets(battle, unit, cands, unit.profile?.priority ?? null);
         main = cands[0] ?? null;
       }

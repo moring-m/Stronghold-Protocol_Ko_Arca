@@ -1,3 +1,4 @@
+import {EIGHT_UNITE_RECT,eightUniteStageId} from '../../shared/cooperativeEight.js';
 import { MatchSetupVote } from './match/setupVote.js';
 import { onHumanEmote, onSettle, resetRoundCounters, onPickCard, onStartUnite } from './botEmotes.js';
 import {recordCombatField} from './combatHistory.js';
@@ -19,7 +20,7 @@ function cultivationInfo(lo) {
   return out;
 }
 import {loadoutRecord, resolveRecordLoadout} from '../../shared/loadoutRecord.js';
-import { applyCustomExtensions, normalizeCustomExtensions } from '../../shared/customExtensions.js';
+import { modeExtensionSelection, applyCustomExtensions, normalizeCustomExtensions } from '../../shared/customExtensions.js';
 // server/match/Match.js — the match & meta engine: state machine, timers, round loop, co-op orchestration,
 // broadcasting views (DESIGN §6, §8). Rules are documented in the module headers of ./PlayerState.js, ./pool.js,
 // ./board.js, ./bondsMeta.js, ./effectsMeta.js, ./choices.js, ./waves.js, ./unite.js, ./finalAssault.js,
@@ -262,7 +263,7 @@ export class Match {
     }
     this.opts = opts;
     this.roomCode = opts.roomCode ?? '----';
-    this.mode = opts.mode === 'solo' ? 'solo' : 'coop';
+    this.mode = opts.mode === 'solo' ? 'solo' : opts.mode === 'coop8' ? 'coop8' : 'coop';
     this.difficulty = opts.difficulty;
     this.modeId = opts.modeId || modeIdFor(this.mode, opts.difficulty);
     this.seed = (Number(opts.seed) >>> 0) || 1;
@@ -271,11 +272,12 @@ export class Match {
     this.broadcastFn = opts.broadcast;
     this.onEndFn = opts.onEnd;
     this.data = opts.data && typeof opts.data === 'object' ? opts.data : {};
-    this.customExtensions = normalizeCustomExtensions(opts.customExtensions, this.data, opts.customFactions === true);
+    this.customExtensions = modeExtensionSelection(normalizeCustomExtensions(opts.customExtensions, this.data, opts.customFactions === true),this.mode);
     this.customFactions = this.customExtensions.bonds.includes('ursus') && !(this.customExtensions.disabledBonds||[]).includes('ursusShip');
     const unfilteredChess=this.data.chess||{};
     this.data = applyCustomExtensions(this.data, this.customExtensions);
     this.excludedChessIds=new Set(Object.keys(unfilteredChess).filter(id=>!this.data.chess?.[id]));
+    if(this.mode==='coop8')this.data={...this.data,config:{...this.data.config,coop8:true}};
     this.gd = new GameData(this.data, this.modeId);
     if (!this.difficulty) this.difficulty = this.gd.difficulty;
     this.isSolo = this.mode === 'solo' || this.gd.isSolo;
@@ -362,7 +364,7 @@ export class Match {
     this.factions = setup.factions;
     this.bossId = setup.bossId;
     this.hiddenBossId = setup.hiddenBossId;
-    const bans = drawDisabledBonds(this.gd, this.rngSetup, this.customExtensions);
+    const bans = drawDisabledBonds(this.gd, this.rngSetup, {...this.customExtensions,mode:this.mode});
     this.disabledBonds = bans.drawn;
     this.staticInactiveBonds = bans.staticOff;
     this.bannedChess = bans.banned;
@@ -927,6 +929,7 @@ export class Match {
       deadline: this.deadline,
       serverNow: this.sched.now(),
       modeId: this.modeId,
+      mode: this.mode,
       difficulty: this.difficulty,
       customFactions: this.customFactions,
       customExtensions: structuredClone(this.customExtensions),
@@ -1025,7 +1028,7 @@ export class Match {
   /** UnitInfo list of a player's board and hand (prep scouting): board pieces on their tiles, held pieces on the
    *   hand row (row 7) — the scout renders like the own prep bench. */
   prepMapChars(ps) {
-    if (!ps?.alive || this.phase !== PHASE.PREP || !this.order.some((p) => p.alive && p.bandId === 'band_amedic')) return [];
+    if (!ps?.alive || this.phase !== PHASE.PREP || !this.order.some((p) => p.alive && (p.bandId === 'band_amedic'||this.gd.config.commonBands?.includes('band_amedic')))) return [];
     const id = 'char_605_cmedic';
     const slot = this.stage?.mapChars?.find((m) => m?.key === id && Array.isArray(m.pos) && m.pos[0] >= 9 && m.pos[0] <= 12
       && m.pos[1] >= 0 && m.pos[1] <= 10 && !/multi_only/.test(String(m.alias)));
@@ -1230,15 +1233,16 @@ export class Match {
     votes.add(ps.playerId); this.markPublic();
     if (!required.every(p=>votes.has(p.playerId))) return OK;
     if (boss) { if(this.clientCombat)this._endFinal('forced');else this.runner?.forceAll('forced'); return OK; }
-    if (!this.clientCombat) { f.battle?.forceEnd('timeout'); return OK; }
+    if (!this.clientCombat) { f.battle?.forceEnd('surrender'); return OK; }
     f.endRequested=true;
     // Reconstruct only the elapsed fight on the authority; never grant future kills.
     const elapsed = Math.max(.01,this._fieldElapsed(f));
     const battle = this._specBattle(f.spec);
     const job = new HeadlessJob(battle,{players:f.players,onError:e=>this.reportError('end battle',e)});
     job.cap = Math.max(1,Math.ceil(elapsed / (battle.dt || 1/30)));
+    job.capReason = 'surrender';
     this._clearFieldTimers(f); f.mode='server'; f.authority=null; f.job=job;
-    for (const pid of this._humansShowing(f)) this.sendTo(pid,{t:'b.end',battleId:f.battleId,fieldId:f.fieldId,reason:'timeout'});
+    for (const pid of this._humansShowing(f)) this.sendTo(pid,{t:'b.end',battleId:f.battleId,fieldId:f.fieldId,reason:'surrender'});
     const step = () => {
       if (this.disposed || this.ended || f.done || f.job!==job) return;
       if (!job.run(this.headlessSliceMs)) { f.sliceTimer=this.later(0,step); return; }
@@ -2265,7 +2269,7 @@ export class Match {
     if (this.clientCombat) { this._startUniteClient(plan); return; }
     this.phase = PHASE.UNITE;
     this.unitePlan = plan;
-    const limit = this.wave ? this.wave.timeLimit : 60;
+    const limit = (this.wave ? this.wave.timeLimit : 60) * (this.mode === 'coop8' ? 4 : 1);
     const battle = this.newBattle(this._uniteOpts(plan, limit));
     this.fields = [{ fieldId: 'u', kind: 'unite', players: plan.helpers.map((p) => p.playerId), battle, live: true }];
     this.deadline = this.sched.instant ? 0 : this.sched.now() + Math.round((limit / this.gameSpeed) * 1000);
@@ -2296,8 +2300,8 @@ export class Match {
       kind: 'unite',
       modeId: this.modeId,
       round: this.round,
-      stageId: this.stageId,
-      rect: { ...(plan.helpers.length === 1 ? GEO.NORMAL_RECT : GEO.UNITE_RECT) },
+      stageId: (this.mode==='coop8'||plan.helpers.length>2)?eightUniteStageId(this.stageId):this.stageId,
+      rect: { ...((this.mode==='coop8'||plan.helpers.length>2)?EIGHT_UNITE_RECT:plan.helpers.length === 1 ? GEO.NORMAL_RECT : GEO.UNITE_RECT) },
       timeLimit: limit,
       players,
       spawns: this._sanitizeSpawns(wave.spawns),
@@ -2725,7 +2729,7 @@ export class Match {
   _startUniteClient(plan) {
     this.phase = PHASE.UNITE;
     this.unitePlan = plan;
-    const limit = this.wave ? this.wave.timeLimit : 60;
+    const limit = (this.wave ? this.wave.timeLimit : 60) * (this.mode === 'coop8' ? 4 : 1);
     const f = this._ccField({ fieldId: 'u', kind: 'unite', players: plan.helpers.map((p) => p.playerId), opts: this._uniteOpts(plan, limit) });
     this.deadline = this.sched.instant ? 0 : this.sched.now() + Math.round((limit / this.gameSpeed) * 1000);
     this.watchers.clear();

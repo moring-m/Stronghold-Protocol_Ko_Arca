@@ -22,7 +22,8 @@ import { bodyDist } from './body.js';
  * Build the absolute tile-key list of a grid for a unit standing at (r,c) facing `dir` ('UP'|'RIGHT'|'DOWN'|'LEFT';
  * a legacy facing sign ±1 is read as RIGHT / LEFT).
  */
-export function absoluteRangeKeys(grid, r, c, dir, extend = 0) {
+export function absoluteRangeKeys(grid, r, c, dir, extend = 0, dimensions = null) {
+  const COLS = dimensions?.cols ?? 21, ROWS = dimensions?.rows ?? 19;
   const keys = [];
   const seen = new Set();
   const d = normDir(dir);
@@ -53,8 +54,8 @@ export { extendedGrid } from '../../shared/loadoutRecord.js';
 /** Tile key of a unit's current position. */
 export function tileKeyOf(u) {
   const r = Math.round(u.y), c = Math.round(u.x);
-  if (r < 0 || r >= ROWS || c < 0 || c >= COLS) return -1;
-  return r * COLS + c;
+  if (r < 0 || r >= (u.battle?.grid?.rows ?? ROWS) || c < 0 || c >= (u.battle?.grid?.cols ?? COLS)) return -1;
+  return r * (u.battle?.grid?.cols ?? COLS) + c;
 }
 
 /** Key of the buff that keeps an enemy's 隐匿 source `sourceKey` switched off after a block (Battle._stealthSwitch). */
@@ -82,7 +83,7 @@ export function enemyStealthed(e) {
 export function canTargetEnemy(attacker, e, profile) {
   if (!e.alive || e.hidden || !e.deployed) return false;
   const f = e.s.flags;
-  if (f.untargetable || (f.sleep && !(profile && profile.hitSleep))) return false;
+  if (f.invulnerable || f.untargetable || (f.sleep && !(profile && profile.hitSleep))) return false;
   if (f.stealth && enemyStealthed(e)) return false;
   if (e.isFlying && !(profile && profile.canHitFly)) return false;
   if (profile && profile.groundOnly && e.isFlying) return false;

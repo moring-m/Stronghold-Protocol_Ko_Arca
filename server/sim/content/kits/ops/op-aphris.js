@@ -108,14 +108,14 @@ function relayLife(t) {
  */
 function aphrisPath(battle, unit, beam = false) {
   const tiles = [[unit.tileR, unit.tileC]];
-  const index = new Map([[unit.tileR * COLS + unit.tileC, 0]]);
+  const index = new Map([[unit.tileR * (battle.grid?.cols ?? COLS) + unit.tileC, 0]]);
   const relays = [];
   let [dr, dc] = dirVec(unit.dir);
   let reach = beam ? Infinity : baseReach(unit);
   let r = unit.tileR, c = unit.tileC, steps = 0;
   while (steps < reach) {
     const nr = r + dr, nc = c + dc;
-    const k = nr * COLS + nc;
+    const k = nr * (battle.grid?.cols ?? COLS) + nc;
     if (!battle.grid.inBounds(nr, nc) || index.has(k)) break;
     index.set(k, tiles.length);
     tiles.push([nr, nc]);
@@ -135,7 +135,7 @@ function refreshPath(battle, unit) {
   if (!up(unit)) return;
   const beam = !!(unit.skill && unit.skill.active && unit.skill.id === S2);
   const p = aphrisPath(battle, unit, beam);
-  const sig = p.tiles.map(([r, c]) => r * COLS + c).join(',');
+  const sig = p.tiles.map(([r, c]) => r * (battle.grid?.cols ?? COLS) + c).join(',');
   unit.mem.aphrisPath = p;
   if (unit.mem.aphrisSig === sig) return;
   unit.mem.aphrisSig = sig;
@@ -147,7 +147,7 @@ function refreshPath(battle, unit) {
 function relaysBefore(unit, e) {
   const p = unit.mem.aphrisPath;
   if (!p || !p.relays.length) return 0;
-  const i = p.index.get(Math.round(e.y) * COLS + Math.round(e.x));
+  const i = p.index.get(Math.round(e.y) * (unit.battle?.grid?.cols ?? COLS) + Math.round(e.x));
   return i == null ? 0 : p.relays.filter((j) => j < i).length;
 }
 
@@ -266,7 +266,7 @@ export default {
           battle.every(AURA_IV, () => {
             if (!up(unit) || !unit.rangeKeySet) return;
             for (const a of battle.alliesFor(unit)) {
-              if (a.kind !== 'op' || !unit.rangeKeySet.has(a.tileR * COLS + a.tileC)) continue;
+              if (a.kind !== 'op' || !unit.rangeKeySet.has(a.tileR * (battle.grid?.cols ?? COLS) + a.tileC)) continue;
               const cur = a.findBuff(SAMPLING_KEY);
               if (cur && cur.source !== unit && (cur.data?.v ?? 0) > v && cur.timeLeft > 0.05) continue;
               battle.addBuff(a, { key: SAMPLING_KEY, duration: AURA_DUR, mods: { resIgnoreFlat: v }, source: unit, data: { v }, tags: ['aura'] });
@@ -288,7 +288,7 @@ export default {
         battle.on('skillEnd', (c) => { if (c.unit === unit) refreshPath(battle, unit); }, { owner: unit });
         battle.on('tick', () => refreshPath(battle, unit), { owner: unit });
         // S2: the beam's path is its trigger range too (the owner's larger-range rule, see the header)
-        if (unit.skill?.id === S2) unit.skill.addTriggerRange(() => (up(unit) ? [aphrisPath(battle, unit, true).tiles.map(([r, c]) => r * COLS + c)] : []));
+        if (unit.skill?.id === S2) unit.skill.addTriggerRange(() => (up(unit) ? [aphrisPath(battle, unit, true).tiles.map(([r, c]) => r * (battle.grid?.cols ?? COLS) + c)] : []));
         // S3's 强制缴械 from the cast on: the attack loop goes on to the attack the cast was made for (ai.js updateAlly
         // checks `disarm` before the cast only) — no target, no attack, no bullet spent
         battle.on('beforeAttack', (c) => { if (c.attacker === unit && unit.findBuff(CHARGE_KEY)) c.targets = []; }, { owner: unit });

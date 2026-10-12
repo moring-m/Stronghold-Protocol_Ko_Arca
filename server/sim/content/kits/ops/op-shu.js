@@ -88,7 +88,7 @@ const gridOf = (chess, id, fallback) => { const g = skillRec(chess, id)?.rangeGr
 /** The talent record with data index `i` (null when absent). */
 const talentRec = (chess, i) => (chess?.talents ?? []).find((t) => t && t.index === i) ?? null;
 /** The tile key of a unit's position (an enemy: its 判定中心). */
-const tileKey = (u) => Math.round(u.y) * COLS + Math.round(u.x);
+const tileKey = (u) => Math.round(u.y) * (u.battle?.grid?.cols ?? COLS) + Math.round(u.x);
 /** An allied unit her heals and tiles may take: on the field, not a device. */
 const onField = (a) => !!a && a.alive && a.deployed && !a.hidden && a.kind !== 'device';
 
@@ -118,7 +118,7 @@ export default {
       const scale = unit.skill?.active && unit.skill.id === S2 ? num(b2.extra_extend_scale, 1) : 1;
       const hp = num(t0.hp_recovery_per_sec) * scale, dr = num(t0.damage_resistance) * scale;
       for (const a of battle.allyUnits) {
-        if (!onField(a) || !tiles.has(a.tileR * COLS + a.tileC) || !battle.allySelectable(a, unit)) continue;
+        if (!onField(a) || !tiles.has(a.tileR * (battle.grid?.cols ?? COLS) + a.tileC) || !battle.allySelectable(a, unit)) continue;
         const cur = a.findBuff(FARM);
         if (hp > 0 && !(cur && cur.source !== unit && (cur.data?.v ?? 0) > hp && cur.timeLeft > 0.05)) {
           battle.addBuff(a, { key: FARM, duration: FARM_HOLD, mods: { hpRegen: hp }, source: unit, data: { v: hp }, tags: ['talent'] });
@@ -135,7 +135,7 @@ export default {
         if (!battle.grid.inRect(rr, cc)) continue;
         const t = battle.grid.tile(rr, cc);
         if (!t || (t.build === 'NONE' && t.pass !== 'ALL')) continue;
-        const k = rr * COLS + cc;
+        const k = rr * (battle.grid?.cols ?? COLS) + cc;
         if (!tiles.has(k)) { tiles.add(k); n++; }
       }
       if (n > 0) { battle.fx('healField', { x: c, y: r, id: unit.id }); farm(battle, unit); }
@@ -184,7 +184,7 @@ export default {
             if (stacks > 0) {
               const keys = unit.rangeKeySet || new Set(unit.rangeKeys || []);
               for (const a of battle.allyUnits) {
-                if (a.kind !== 'op' || !onField(a) || !keys.has(a.tileR * COLS + a.tileC)) continue;
+                if (a.kind !== 'op' || !onField(a) || !keys.has(a.tileR * (battle.grid?.cols ?? COLS) + a.tileC)) continue;
                 battle.addBuff(a, { key: HARVEST, duration: 0.1, mods: { atkPct: num(b3.e_atk) * stacks, aspd: num(b3.e_attack_speed) * stacks }, source: unit, tags: ['skill'] });
               }
             }
@@ -201,13 +201,13 @@ export default {
               }
               if (k === m.last) continue;
               m.last = k;
-              const dist = Math.abs(Math.floor(k / COLS) - m.r) + Math.abs((k % COLS) - m.c);
+              const dist = Math.abs(Math.floor(k / (battle.grid?.cols ?? COLS)) - m.r) + Math.abs((k % (battle.grid?.cols ?? COLS)) - m.c);
               if (dist < far - 1e-9) continue;
               e.x = m.c;
               e.y = m.r;
               battle._unblock(e);
               if (e.route) e.route.pts = null;
-              m.last = m.r * COLS + m.c;
+              m.last = m.r * (battle.grid?.cols ?? COLS) + m.c;
               battle.fx('teleport', { x: m.c, y: m.r, id: e.id, src: unit.id });
             }
             // no enemy to attack: her attack heals the most injured allied unit of her range (herself included)

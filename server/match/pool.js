@@ -24,6 +24,14 @@
  * @returns {{ drawn: string[], staticOff: string[], banned: string[] }}
  */
 export function drawDisabledBonds(gd, rng, policy = {}) {
+  if(policy.mode==='coop8'){
+    const protectedIds=new Set(policy.protectedOperators||[]),banned=[];
+    for(let tier=1;tier<=6;tier++){
+      const eligible=gd.visibleChess.filter(id=>{const c=gd.chess(id);return c.tier===tier&&!c.optionalRecruit&&!protectedIds.has(c.charId)&&!protectedIds.has(id);});
+      banned.push(...sample(eligible,1,rng));
+    }
+    return {drawn:[],staticOff:[],banned};
+  }
   const { core: nCore, addon: nAddon } = gd.bans(gd.difficulty);
   const staticOff = [...gd.modeInactiveBonds].filter((b) => gd.bond(b)).sort();
   const eligible = gd.bondIds.filter((b) => {

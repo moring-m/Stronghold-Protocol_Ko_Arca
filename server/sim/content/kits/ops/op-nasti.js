@@ -100,8 +100,8 @@ const RANGED_POS = new Set(['RANGED', 'ALL']);
 
 const bbOf = (chess, id) => skillRec(chess, id)?.bb ?? {};
 const tokBb = (def, key) => (def?.talents ?? []).find((t) => t && t.bb && t.bb[key] != null)?.bb ?? {};
-const tileOf = (u) => u.tileR * COLS + u.tileC;
-const ownKeys = (u) => absoluteRangeKeys(u.rangeGrid ?? u.def?.rangeGrid ?? FRONT1, u.tileR, u.tileC, u.dir, 0);
+const tileOf = (u) => u.tileR * (u.battle?.grid?.cols ?? COLS) + u.tileC;
+const ownKeys = (u) => absoluteRangeKeys(u.rangeGrid ?? u.def?.rangeGrid ?? FRONT1, u.tileR, u.tileC, u.dir, 0, u.battle?.grid);
 /** The barrier key of the shields her S2 devices give (one per operator from her: nasti_nstchr_m2[shield_core]). */
 const shieldKey = (owner) => `nasti:shield:${owner.id}`;
 const SELF_SHIELD = 'nasti:s2shield';

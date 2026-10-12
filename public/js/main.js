@@ -196,7 +196,7 @@ function onRoomState(msg) {
   store.set({ room });
   identity.rememberMatch(room.inMatch && seats.some((seat) => seat?.playerId === myId)
     ? { name: store.get().me.name, code: room.code || '' } : null);
-  if (room.mode === 'coop' && typeof room.code === 'string') rememberRoom(room.code);
+  if (['coop','coop8'].includes(room.mode) && typeof room.code === 'string') rememberRoom(room.code);
   maybeFinishRestore();
 }
 

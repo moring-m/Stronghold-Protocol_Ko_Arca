@@ -1482,7 +1482,7 @@ export function normalizeSp(sp, players = []) {
   if (!isObj(sp)) return null;
   const ids = (Array.isArray(players) ? players : []).filter(isObj).map((p) => p.playerId);
   const order = Array.isArray(sp.order) && sp.order.length ? sp.order.filter((x) => typeof x === 'string') : ids;
-  const cards = (Array.isArray(sp.cards) ? sp.cards : []).slice(0, 6).map((c, idx) => {
+  const cards = (Array.isArray(sp.cards) ? sp.cards : []).slice(0, 9).map((c, idx) => {
     const card = typeof c === 'string' ? { id: c } : isObj(c) ? { ...c } : {};
     return { ...card, idx, takenBy: typeof card.takenBy === 'string' ? card.takenBy : null };
   });
@@ -1613,7 +1613,7 @@ export function snapHud(snap) {
   const n = (v) => (Number.isFinite(v) ? v : null);
   let boss = null;
   if (isObj(snap.boss) && Number.isFinite(snap.boss.hp)) boss = { hp: snap.boss.hp, max: n(snap.boss.max) ?? n(snap.boss.maxHp) };
-  return { killed: n(snap.killed), total: n(snap.total), dp: n(snap.dp), boss };
+  return { ...((n(snap.gt)??n(snap.t))!=null?{elapsed:n(snap.gt)??n(snap.t)}:{}), killed: n(snap.killed), total: n(snap.total), dp: n(snap.dp), boss };
 }
 
 /** Boss HP fraction 0..1 (null when unknown). */

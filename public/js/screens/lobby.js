@@ -81,8 +81,8 @@ const MODE_CARDS = [
   },
   {
     id: 'coop', name: '同盟模拟', en: 'ALLIANCE SIMULATION', icon: 'users',
-    desc: `与至多 ${MAX_SEATS - 1} 名博士组成同盟，共享干员池，联防协作抵御敌潮。`,
-    points: [`1–${MAX_SEATS} 名博士 · 可由 AI 队友补位`, '联防阶段 · 最终攻势合并生命值'],
+    desc: `与至多 ${3} 名博士组成同盟，共享干员池，联防协作抵御敌潮。`,
+    points: [`1–${4} 名博士 · 可由 AI 队友补位`, '联防阶段 · 最终攻势合并生命值'],
   },
   { id: 'laboratory', name: '실험실', en: 'LABORATORY', icon: 'flask', desc: '맵·보스·전략을 직접 고르고 원하는 조합을 시험합니다.', points: ['솔로 플레이 · 밴 없음', '한 라운드 전투 · 결과 통계 기록'] },
 ];
@@ -217,8 +217,9 @@ function TipsPanel() {
   </div>`;
 }
 
-function ModeCard({ card, selected, onSelect }) {
-  return html`<button type="button" class=${`mode-card brackets${card.id==='laboratory'?' mode-card--lab':''}${selected ? ' is-selected' : ''}`} onClick=${() => onSelect(card.id)}
+function ModeCard({ card, selected, onSelect, coopSize=4, onCoopSize }) {
+  if(card.id==='coop'&&coopSize===8)card={...card,desc:'최대 8명의 박사가 오퍼레이터 풀을 공유하며 함께 전투합니다.',points:['박사 1–8명 · 빈자리는 AI 팀원으로','협력방어 최대 4명']};
+  return html`<div role="button" tabindex="0" class=${`mode-card brackets${card.id==='laboratory'?' mode-card--lab':''}${selected ? ' is-selected' : ''}`} onClick=${() => onSelect(card.id==='coop'&&coopSize===8?'coop8':card.id)} onKeyDown=${e=>{if(e.target===e.currentTarget&&['Enter',' '].includes(e.key)){e.preventDefault();onSelect(card.id==='coop'&&coopSize===8?'coop8':card.id);}}}
       aria-pressed=${selected ? 'true' : 'false'}>
     <span class="mode-card__bg" aria-hidden="true"></span>
     <span class="mode-card__icon"><${Icon} name=${card.icon} /></span>
@@ -229,7 +230,8 @@ function ModeCard({ card, selected, onSelect }) {
       <span class="mode-card__points">${card.points.map((p) => html`<span key=${p}>${p}</span>`)}</span>
     </span>
     <span class="mode-card__check" aria-hidden="true"><${Icon} name="check" />已选定</span>
-  </button>`;
+    ${card.id==='coop'?html`<span class="mode-card__sizes" role="group" aria-label="협동 인원">${[4,8].map(n=>html`<button type="button" aria-pressed=${coopSize===n} onClick=${e=>{e.stopPropagation();onCoopSize(n);}}>${n}인</button>`)}</span>`:null}
+  </div>`;
 }
 
 function DifficultyCard({ roomMode, difficulty, selected, onSelect }) {
@@ -256,7 +258,8 @@ export function LobbyScreen() {
   const me = useStore((s) => s.me, shallowEqual);
   const conn = useStore((s) => s.connection, shallowEqual);
   useData('config');
-  const [roomMode, setRoomMode] = useState(() => (['solo','coop','laboratory'].includes(loadPref('lobby.mode','coop'))?loadPref('lobby.mode','coop'):'coop'));
+  const [coopSize,setCoopSize]=useState(()=>loadPref('lobby.mode','coop')==='coop8'?8:4);
+  const [roomMode, setRoomMode] = useState(() => (['solo','coop','coop8','laboratory'].includes(loadPref('lobby.mode','coop'))?loadPref('lobby.mode','coop'):'coop'));
   const [difficulty, setDifficulty] = useState(() => {
     const d = loadPref('lobby.difficulty', 'FUNNY');
     return DIFFICULTIES.includes(d) ? d : 'FUNNY';
@@ -298,7 +301,7 @@ export function LobbyScreen() {
     difficulty,
     customExtensions: loadCustomExtensionPrefs(),
     // only a co-op room carries the host's spectator cap (0 when the box is unticked)
-    ...(roomMode === 'coop' ? { spectators: spectateOn ? spectateCount : 0 } : {}),
+    ...(['coop','coop8'].includes(roomMode) ? { spectators: spectateOn ? spectateCount : 0 } : {}),
   }));
   const join = (c = code) => {
     // `onClick=${join}` hands the click EVENT as the first argument, and a default parameter only applies to
@@ -368,7 +371,7 @@ export function LobbyScreen() {
       <section class="lobby-left">
         <div class="section-label"><span class="section-label__idx num">01</span>模拟方式<${MicroLabel}>MODE<//></div>
         <div class="mode-cards">
-          ${MODE_CARDS.map((c) => html`<${ModeCard} key=${c.id} card=${c} selected=${roomMode === c.id} onSelect=${pickMode} />`)}
+          ${MODE_CARDS.map((c) => html`<${ModeCard} key=${c.id} card=${c} selected=${roomMode === c.id || c.id==='coop'&&roomMode==='coop8'} onSelect=${pickMode} coopSize=${coopSize} onCoopSize=${n=>{setCoopSize(n);pickMode(n===8?'coop8':'coop');}} />`)}
         </div>
 
         <div class="section-label"><span class="section-label__idx num">03</span>加入同盟<${MicroLabel}>JOIN WITH ALLIANCE KEY<//></div>
@@ -396,7 +399,7 @@ export function LobbyScreen() {
           ${DIFFICULTIES.map((d) => html`<${DifficultyCard} key=${d} roomMode=${roomMode} difficulty=${d} selected=${difficulty === d} onSelect=${pickDifficulty} />`)}
         </div>
         <div class="create-box">
-          ${roomMode === 'coop' ? html`<div class="create-box__spectate" role="group" aria-label="观战席">
+          ${['coop','coop8'].includes(roomMode) ? html`<div class="create-box__spectate" role="group" aria-label="观战席">
             <label class="create-box__check">
               <input type="checkbox" checked=${spectateOn}
                 onChange=${(e) => { const on = !!e.currentTarget.checked; setSpectateOn(on); savePref('lobby.spectateOn', on); }} />
@@ -437,7 +440,7 @@ export function LobbyScreen() {
       <${Button} variant="amber" icon="eye" loading=${busy === 'spectate'} onClick=${() => spectate(fullAsk.code)}>进入观战席<//>
     `}>
     <div class="full-ask">
-      <p>同盟 <b class="num">${fullAsk.code}</b> 的 ${MAX_SEATS} 个博士席位已经坐满。</p>
+      <p>同盟 <b class="num">${fullAsk.code}</b> 의 모든 박사 좌석이 가득 찼습니다.</p>
       <p class="t-lo">仍可以<b>观战者</b>身份进入：不占博士席位、只能观看，对局进行中也能切换观看各位博士。</p>
     </div>
   <//>` : null}`;

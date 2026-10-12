@@ -60,7 +60,7 @@ function activeModule(chess) {
   return (chess.modules ?? []).find((m) => m && m.uniEquipId === chess.module.id) ?? null;
 }
 /** Absolute tile keys of a skill range at the unit's tile and facing (a 技能范围 ignores 攻击距离: no extend). */
-const keysOf = (unit, grid) => absoluteRangeKeys(grid, unit.tileR, unit.tileC, unit.dir, 0);
+const keysOf = (unit, grid) => absoluteRangeKeys(grid, unit.tileR, unit.tileC, unit.dir, 0, unit.battle?.grid);
 
 /**
  * A skill that strikes ground enemies only cannot be opened while its range holds no ground enemy: every activation path

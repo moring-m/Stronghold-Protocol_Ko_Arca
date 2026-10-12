@@ -315,3 +315,7 @@
 
 .lab-player-count{display:flex;align-items:center;justify-content:space-between;gap:12px;flex:none;margin:0 0 12px;padding:10px 12px;border:1px solid #4ed8af35;background:#0d1c17;font-size:14px;color:var(--text-md)}
 .lab-player-count>div{display:flex;gap:0}.lab-player-count button{height:32px;min-width:44px;border:1px solid #40594f;background:#101e19;color:var(--text-lo);font:inherit;cursor:pointer}.lab-player-count button+button{border-left:0}.lab-player-count button[aria-pressed="true"]{background:#4ed8af20;color:var(--mint-400);box-shadow:inset 0 -2px var(--mint-400)}
+
+.mode-card__sizes{display:flex;gap:.08rem;position:relative;margin-top:.12rem;z-index:2;}
+.mode-card__sizes button{min-width:.72rem;padding:.07rem .16rem;border:1px solid var(--line-3);background:#14221f;color:var(--text-lo);font:inherit;cursor:pointer;}
+.mode-card__sizes button[aria-pressed="true"]{border-color:var(--mint-400);background:var(--mint-500);color:var(--text-on-mint);font-weight:700;}

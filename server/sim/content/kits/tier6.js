@@ -153,7 +153,7 @@ const parseN = (text, re, d) => { const m = String(text ?? '').match(re); return
 const live = (u) => !!u && u.alive && u.deployed && !u.removed && !u.hidden;
 const isElite = (e) => !!e && (e.isBoss || e.def?.rank === 'ELITE' || e.def?.rank === 'BOSS');
 const hasBond = (u, id) => !!(u && u.def && Array.isArray(u.def.bonds) && u.def.bonds.includes(id));
-const keyOf = (u) => Math.round(u.y) * COLS + Math.round(u.x);
+const keyOf = (u) => Math.round(u.y) * (u.battle?.grid?.cols ?? COLS) + Math.round(u.x);
 const opsOf = (battle, ownerId) => battle.allies(ownerId).filter((a) => a.kind === 'op');
 const ANY = Object.freeze({ canHitFly: true });
 const enemiesIn = (battle, unit, keys) => battle.enemiesInKeys(keys || unit.rangeKeys || [], unit, ANY);
@@ -232,7 +232,7 @@ const N4 = Object.freeze([[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1]]);
 /** Every offset of the 19×21 field: "攻击范围扩大至整个战场". */
 const WHOLE_FIELD = (() => {
   const g = [];
-  for (let dr = -(ROWS - 1); dr <= ROWS - 1; dr++) for (let dc = -(COLS - 1); dc <= COLS - 1; dc++) g.push([dr, dc]);
+  for (let dr = -(ROWS - 1); dr <= ROWS - 1; dr++) for (let dc = -(Math.max(COLS, 37) - 1); dc <= Math.max(COLS, 37) - 1; dc++) g.push([dr, dc]);
   return Object.freeze(g);
 })();
 
@@ -251,10 +251,10 @@ function bstate(battle) {
  */
 function freeTiles(battle, unit, grid, { ranged = false, ground = true } = {}) {
   const out = [];
-  const own = unit.tileR * COLS + unit.tileC;
-  for (const k of absoluteRangeKeys(grid, unit.tileR, unit.tileC, unit.dir, 0)) {
+  const own = unit.tileR * (battle.grid?.cols ?? COLS) + unit.tileC;
+  for (const k of absoluteRangeKeys(grid, unit.tileR, unit.tileC, unit.dir, 0, battle.grid)) {
     if (k === own) continue;
-    const r = (k / COLS) | 0, c = k % COLS;
+    const r = (k / (battle.grid?.cols ?? COLS)) | 0, c = k % (battle.grid?.cols ?? COLS);
     if (!battle.grid.inRect(r, c) || battle.isReservedTile(r, c)) continue;
     if (!battle.grid.canStand(r, c, { ranged })) continue;
     if (ground && !battle.grid.groundPassable(r, c, true)) continue;
@@ -631,7 +631,7 @@ function sbell2(bb, chess, def) {
   const addSnow = (battle, unit, k) => {
     const snow = unit.mem.snow;
     if (!snow) return false;
-    const r = (k / COLS) | 0, c = k % COLS;
+    const r = (k / (battle.grid?.cols ?? COLS)) | 0, c = k % (battle.grid?.cols ?? COLS);
     if (!battle.grid.inRect(r, c) || !battle.grid.groundPassable(r, c, true)) return false;
     // PRTS 备注 "存在自身的该召唤物的地块不会积雪"
     if (battle.allyUnits.some((t) => isTok(t, iceId, unit) && t.alive && t.tileR === r && t.tileC === c)) return false;
@@ -646,8 +646,8 @@ function sbell2(bb, chess, def) {
       for (const [dr, dc] of [[0, 1], [1, 0], [0, -1], [-1, 0]]) {
         const nr = r + dr, nc = c + dc;
         if (!battle.grid.inRect(nr, nc) || !battle.grid.groundPassable(nr, nc, true)) continue;
-        const L = snow.get(nr * COLS + nc) ?? 0;
-        if (L < maxL && L < bl) { bl = L; best = nr * COLS + nc; }
+        const L = snow.get(nr * (battle.grid?.cols ?? COLS) + nc) ?? 0;
+        if (L < maxL && L < bl) { bl = L; best = nr * (battle.grid?.cols ?? COLS) + nc; }
       }
       if (best == null) return false;
       S2.spreadLeft--;
@@ -666,7 +666,7 @@ function sbell2(bb, chess, def) {
    * operator could stand on froze at max snow, and the gate never did. Returns true when the token appeared.
    */
   const freezeTile = (battle, unit, k) => {
-    const r = (k / COLS) | 0, c = k % COLS;
+    const r = (k / (battle.grid?.cols ?? COLS)) | 0, c = k % (battle.grid?.cols ?? COLS);
     if (battle.grid.tile(r, c).special !== 'end') return false;
     if (battle.allyUnits.some((t) => isTok(t, iceId, unit) && t.alive)) return false;
     if (battle.isReservedTile(r, c)) return false;
@@ -777,7 +777,7 @@ function sbell2(bb, chess, def) {
         for (let d = 1; d <= n; d++) {
           const r = unit.tileR + fr * d, c = unit.tileC + fc * d;
           if (!battle.grid.inRect(r, c)) break;
-          if (addSnow(battle, unit, r * COLS + c)) laid++;
+          if (addSnow(battle, unit, r * (battle.grid?.cols ?? COLS) + c)) laid++;
         }
         battle.fx('frostNova', { x: unit.x, y: unit.y, id: unit.id, tiles: laid });
       },
@@ -974,7 +974,7 @@ function skadi2(bb, chess, def) {
     return [...set];
   };
   const inCover = (battle, unit, a) => {
-    const k = a.tileR * COLS + a.tileC;
+    const k = a.tileR * (battle.grid?.cols ?? COLS) + a.tileC;
     if (unit.rangeKeySet?.has(k)) return true;
     return seaborns(battle, unit).some((t) => t.rangeKeySet?.has(k));
   };
@@ -1164,7 +1164,7 @@ function pasngr(bb, chess, def) {
     skill: {
       kind: 'charges',
       onStart({ battle, unit }) {
-        const keys = skillGrid ? absoluteRangeKeys(skillGrid, unit.tileR, unit.tileC, unit.dir, unit.s.rangeExtend) : unit.rangeKeys;
+        const keys = skillGrid ? absoluteRangeKeys(skillGrid, unit.tileR, unit.tileC, unit.dir, unit.s.rangeExtend, battle.grid) : unit.rangeKeys;
         const cands = enemiesIn(battle, unit, keys);
         if (!cands.length) return;
         const tgt = cands.reduce((a, b) => (b.hp > a.hp ? b : a));
@@ -1197,7 +1197,7 @@ function pasngr(bb, chess, def) {
       { install(battle, unit) { // 孤卒: no enemy on the 4 surrounding tiles
         const atk = num(t1.atk), spr = num(t1.sp_recovery_per_sec);
         aura(battle, unit, 0.25, () => {
-          const near = new Set(absoluteRangeKeys(N4, unit.tileR, unit.tileC, 1, 0));
+          const near = new Set(absoluteRangeKeys(N4, unit.tileR, unit.tileC, 1, 0, battle.grid));
           if (battle.enemies.some((e) => e.alive && !e.hidden && bodyInKeys(e, near))) return;
           battle.addBuff(unit, { key: 'pasngr:lone', mods: { atkPct: atk, spRecoveryFlat: spr }, duration: 0.4, refresh: 'replace' });
         });
@@ -2414,7 +2414,7 @@ function lumen(bb, chess, def) {
         battle.on('statusApplied', (ctx) => {
           const t = ctx.target;
           if (!live(unit) || !t || t.side !== 'ally' || !ABNORMAL.has(ctx.status) || battle.time < ready || !(sc > 0)) return;
-          if (!unit.rangeKeySet?.has(t.tileR * COLS + t.tileC)) return;
+          if (!unit.rangeKeySet?.has(t.tileR * (battle.grid?.cols ?? COLS) + t.tileC)) return;
           ready = battle.time + cd;
           battle.heal(unit, t, unit.s.atk * sc);
           battle.fx('emergency', { x: t.x, y: t.y, id: t.id, src: unit.id });
@@ -2669,7 +2669,7 @@ function nearl2(bb, chess, def) {
   const skillGrid = def?.skill?.rangeGrid?.length ? def.skill.rangeGrid : null;
   const tokId = (chess?.tokens || []).find((t) => /nearl2_sword/.test(String(t))) || 'token_10019_nearl2_sword';
   const sunBurst = (battle, unit, r, c, scale, stun) => {
-    const keys = new Set(absoluteRangeKeys(N4, r, c, 1, 0));
+    const keys = new Set(absoluteRangeKeys(N4, r, c, 1, 0, battle.grid));
     battle.fx('sunBurst', { x: c, y: r, id: unit.id });
     for (const e of battle.enemies) {
       if (!e.alive || e.hidden || !bodyInKeys(e, keys)) continue;
@@ -2978,8 +2978,7 @@ function whitw2(bb, chess, def) {
         }, { owner: unit });
       }
     },
-    // S3 终幕·浩劫: ATK +atk; 1 + attack@cnt drones (+1 from 头狼 stage 3) fly the PRTS 技能流程 (WHITW2_* above). Every
-    // drone is out, so she makes no normal attack of her own (`noAttack`); a drone on its target attacks it every attack
+    // S3 终幕·浩劫: ATK +atk; 1 + attack@cnt drones (+1 from 头狼 stage 3) fly the PRTS 技能流程 (WHITW2_* above). Her own normal attack continues during the skill; a drone on its target attacks it every attack
     // interval of hers (her live ASPD; [ASSUMED] the first hit as it arrives) for ATK × its OWN funnel ramp — the trait's
     // init, +delta per hit on the same target, the cap (头狼 stage 1 raises it), back to init on a new target (PRTS 分支特性
     // 信息 驭械术师 "浮游单元攻击不同目标…时，上述的伤害立刻恢复至初始值"). That damage is arts and neither a normal attack
@@ -2996,7 +2995,7 @@ function whitw2(bb, chess, def) {
     skill: {
       kind: 'duration',
       mods: { atkPct: num(bb.atk) },
-      attack: { noAttack: true },
+      attack: { hits: 1 },
       onStart({ battle, unit }) {
         unit.mem.drones = [];
         unit.mem.droneAcc = 0;
@@ -3245,6 +3244,7 @@ function agoat2(bb, chess, def) {
     skchr_agoat2_2: {
       kind: 'instant',
       heal: true,
+      trigger: 'SP_FULL',
       onStart({ battle, unit }) {
         const er = num(unit.profile?.heal?.elementHealRatio, num(tb.ep_heal_ratio, 0.5));
         const allies = battle.alliesInGrid(unit);
@@ -3262,7 +3262,7 @@ function agoat2(bb, chess, def) {
             const t = ctx.target, d = ctx.dmg;
             if (!t || t.side !== 'ally' || !d || d.type !== 'element' || d.cancel) return;
             S.agoatVeils = S.agoatVeils.filter((v) => v.pool > 1e-9 && battle.time < v.until);
-            const k = t.tileR * COLS + t.tileC;
+            const k = t.tileR * (battle.grid?.cols ?? COLS) + t.tileC;
             for (const v of S.agoatVeils) {
               if (!v.keys.has(k)) continue;
               const eff = d.amount * d.mul;

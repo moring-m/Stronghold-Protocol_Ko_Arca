@@ -261,7 +261,7 @@ function enemiesOnKeys(battle, keys) {
  * ("对自身攻击范围内的敌人造成晕眩"), “耀阳”, 纸偶 (风丸 折纸生花) — so a stun here also drops a hovering 掠海漂移体.
  */
 function burst(battle, unit, { grid, amount = 0, type = 'phys', stun = 0, hits = 1, source = unit, fx = 'summonBurst' }) {
-  const keys = absoluteRangeKeys(grid || GRID_3X3, unit.tileR, unit.tileC, unit.dir, 0);
+  const keys = absoluteRangeKeys(grid || GRID_3X3, unit.tileR, unit.tileC, unit.dir, 0, battle.grid);
   const victims = enemiesOnKeys(battle, keys);
   for (const e of victims) {
     for (let i = 0; i < hits && e.alive && amount > 0; i++) battle.dealDamage(source, e, { amount, type, isSkill: true, canDodge: false, tags: ['summon', 'burst'] });
@@ -438,9 +438,9 @@ function countNear(list, r, c, rad = 1) {
 export function findSummonTile(battle, owner, placement = 'melee', opts = {}) {
   if (!owner || owner.tileR == null) return null;
   let keys;
-  if (placement === 'adjacent') keys = absoluteRangeKeys(GRID_3X3, owner.tileR, owner.tileC, owner.dir, 0);
-  else if (placement === 'plus') keys = absoluteRangeKeys(GRID_PLUS, owner.tileR, owner.tileC, owner.dir, 0);
-  else if (opts.grid) keys = absoluteRangeKeys(opts.grid, owner.tileR, owner.tileC, owner.dir, 0);
+  if (placement === 'adjacent') keys = absoluteRangeKeys(GRID_3X3, owner.tileR, owner.tileC, owner.dir, 0, battle.grid);
+  else if (placement === 'plus') keys = absoluteRangeKeys(GRID_PLUS, owner.tileR, owner.tileC, owner.dir, 0, battle.grid);
+  else if (opts.grid) keys = absoluteRangeKeys(opts.grid, owner.tileR, owner.tileC, owner.dir, 0, battle.grid);
   else keys = owner.rangeKeys || [];
   const melee = opts.melee ?? (placement === 'melee' || placement === 'adjacent' || placement === 'plus');
   const enemies = battle.enemies.filter((e) => e.alive && !e.hidden);
@@ -451,7 +451,7 @@ export function findSummonTile(battle, owner, placement = 'melee', opts = {}) {
     : null;
   let best = null, bestS = null;
   for (const k of keys) {
-    const r = (k / COLS) | 0, c = k % COLS;
+    const r = (k / (battle.grid?.cols ?? COLS)) | 0, c = k % (battle.grid?.cols ?? COLS);
     if (!tileFree(battle, r, c)) continue;
     if (!battle.grid.canStand(r, c, { ranged: !melee })) continue;
     const gp = battle.grid.groundPassable(r, c, true) ? 1 : 0;
@@ -620,7 +620,7 @@ function seaborn(bb, raw, def) {
           const ownerKeys = o && o.alive && o.deployed ? (o.rangeKeySet || new Set(o.rangeKeys || [])) : null;
           for (const a of battle.alliesInGrid(unit, { includeDevices: true })) {
             if (a === unit) continue;
-            if (ownerKeys && ownerKeys.has(a.tileR * COLS + a.tileC)) continue; // the owner's own trait already covers it
+            if (ownerKeys && ownerKeys.has(a.tileR * (battle.grid?.cols ?? COLS) + a.tileC)) continue; // the owner's own trait already covers it
             bardRegen(battle, o ?? unit, a, atk * healRatio, 1.25); // refreshed every second
           }
         }
@@ -1156,7 +1156,7 @@ function catShield(bb, raw, def) {
       const pick = () => {
         let best = null;
         for (const k of unit.rangeKeys || []) {
-          const a = battle.unitAt((k / COLS) | 0, k % COLS);
+          const a = battle.unitAt((k / (battle.grid?.cols ?? COLS)) | 0, k % (battle.grid?.cols ?? COLS));
           if (!valid(a) || a.ownerId !== unit.ownerId) continue;
           const holder = st.catTargets.get(a.id);
           if (holder && holder !== unit && holder.alive) continue; // 装置效果不叠加
@@ -1275,8 +1275,8 @@ function yanyouKit(bb, raw) {
     if (u.mem.keysAt && u.rangeKeys === u.mem.keysRef && Math.abs(u.mem.keysAt.x - u.x) < 0.05 && Math.abs(u.mem.keysAt.y - u.y) < 0.05) return;
     const keys = [];
     const r0 = Math.floor(u.y - radius), r1 = Math.ceil(u.y + radius), c0 = Math.floor(u.x - radius), c1 = Math.ceil(u.x + radius);
-    for (let r = Math.max(0, r0); r <= Math.min(ROWS - 1, r1); r++) {
-      for (let c = Math.max(0, c0); c <= Math.min(COLS - 1, c1); c++) if (hypot(c - u.x, r - u.y) <= radius + 1e-9) keys.push(r * COLS + c);
+    for (let r = Math.max(0, r0); r <= Math.min((u.battle?.grid?.rows ?? ROWS) - 1, r1); r++) {
+      for (let c = Math.max(0, c0); c <= Math.min((u.battle?.grid?.cols ?? COLS) - 1, c1); c++) if (hypot(c - u.x, r - u.y) <= radius + 1e-9) keys.push(r * (u.battle?.grid?.cols ?? COLS) + c);
     }
     u.rangeKeys = keys;
     u.rangeKeySet = new Set(keys);
@@ -1370,7 +1370,7 @@ function yanyouKit(bb, raw) {
 function mapCharKeys(battle) {
   const list = battle.stage?.raw?.mapChars ?? battle.stage?.mapChars ?? [];
   const out = new Set();
-  for (const m of Array.isArray(list) ? list : []) if (m && Array.isArray(m.pos)) out.add(m.pos[0] * COLS + m.pos[1]);
+  for (const m of Array.isArray(list) ? list : []) if (m && Array.isArray(m.pos)) out.add(m.pos[0] * (battle.grid?.cols ?? COLS) + m.pos[1]);
   return out;
 }
 
@@ -1390,10 +1390,10 @@ export function airTile(battle, playerId, taken = new Set()) {
   let best = null, bs = null;
   for (let r = R.r0; r <= R.r1; r++) {
     for (let c = c0; c <= c1; c++) {
-      if (taken.has(r * COLS + c) || held.has(r * COLS + c) || !tileFree(battle, r, c)) continue;
+      if (taken.has(r * (battle.grid?.cols ?? COLS) + c) || held.has(r * (battle.grid?.cols ?? COLS) + c) || !tileFree(battle, r, c)) continue;
       const t = battle.grid.tile(r, c);
       const cls = t.build === 'NONE' && t.pass !== 'ALL' ? 0 : t.build === 'NONE' ? 1 : 2;
-      const s = [cls, hypot(r - cr, c - cc), r * COLS + c];
+      const s = [cls, hypot(r - cr, c - cc), r * (battle.grid?.cols ?? COLS) + c];
       let less = !bs;
       if (!less) for (let i = 0; i < 3; i++) { if (s[i] < bs[i] - 1e-9) { less = true; break; } if (s[i] > bs[i] + 1e-9) break; }
       if (less) { best = [r, c]; bs = s; }
@@ -1423,7 +1423,7 @@ export function spawnYanyou(battle, playerId, { atk, hp, atkMul = 1, dmgTakenMul
   for (let i = 0; i < n; i++) {
     const tile = airTile(battle, playerId, taken);
     if (!tile) break;
-    taken.add(tile[0] * COLS + tile[1]);
+    taken.add(tile[0] * (battle.grid?.cols ?? COLS) + tile[1]);
     const u = battle.spawnToken(playerId, TOKEN_IDS.yanyou, tile[0], tile[1], { ...(def ? { def } : {}), stats, dir: ps ? ps.dir : 'RIGHT' });
     if (!u) continue;
     const mods = {};
@@ -1481,7 +1481,7 @@ export function mapCharTalents(def) {
         battle.on('death', (ctx) => {
           const d = ctx.unit;
           if (!touchExitCounts(ctx) || !unit.alive || !unit.deployed || !unit.skill || !d || d === unit || d.kind !== 'op' || d.ownerId !== unit.ownerId) return;
-          if ((unit.rangeKeySet || new Set(unit.rangeKeys || [])).has(d.tileR * COLS + d.tileC)) {
+          if ((unit.rangeKeySet || new Set(unit.rangeKeys || [])).has(d.tileR * (battle.grid?.cols ?? COLS) + d.tileC)) {
             unit.skill.gainSp(sp, 'talent');
             battle.fx('spGain', { x: unit.x, y: unit.y, id: unit.id, n: sp });
           }
@@ -1712,7 +1712,7 @@ function ensureReinforcement(battle, owner, tokenId) {
   // shared tactical point
   const inRange = new Set(owner.baseRangeKeys || owner.rangeKeys || []);
   const prev = mine.slice().sort((a, b) => (b.uid != null) - (a.uid != null) || b.deploySeq - a.deploySeq)
-    .map((t) => [t.homeR, t.homeC]).find(([r, c]) => Number.isInteger(r) && Number.isInteger(c) && inRange.has(r * COLS + c)
+    .map((t) => [t.homeR, t.homeC]).find(([r, c]) => Number.isInteger(r) && Number.isInteger(c) && inRange.has(r * (battle.grid?.cols ?? COLS) + c)
       && tileFree(battle, r, c) && battle.grid.canStand(r, c, { ranged: true }));
   const best = prev ?? tacticalPoint(battle, owner);
   if (!best) return null;

@@ -48,7 +48,7 @@ export function hitRect(u) {
 /** Tile key of a unit's position (-1 off the grid). */
 function posKey(u) {
   const r = Math.round(u.y), c = Math.round(u.x);
-  return r < 0 || r >= ROWS || c < 0 || c >= COLS ? -1 : r * COLS + c;
+  return r < 0 || r >= (u.battle?.grid?.rows ?? ROWS) || c < 0 || c >= (u.battle?.grid?.cols ?? COLS) ? -1 : r * (u.battle?.grid?.cols ?? COLS) + c;
 }
 
 /**
@@ -59,9 +59,9 @@ export function bodyKeys(u) {
   const R = hitRect(u);
   if (!R) { const k = posKey(u); return k < 0 ? [] : [k]; }
   const out = [];
-  const r0 = Math.max(0, Math.floor(R.y0 + 0.5 + 1e-9)), r1 = Math.min(ROWS - 1, Math.ceil(R.y1 - 0.5 - 1e-9));
-  const c0 = Math.max(0, Math.floor(R.x0 + 0.5 + 1e-9)), c1 = Math.min(COLS - 1, Math.ceil(R.x1 - 0.5 - 1e-9));
-  for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) out.push(r * COLS + c);
+  const r0 = Math.max(0, Math.floor(R.y0 + 0.5 + 1e-9)), r1 = Math.min((u.battle?.grid?.rows ?? ROWS) - 1, Math.ceil(R.y1 - 0.5 - 1e-9));
+  const c0 = Math.max(0, Math.floor(R.x0 + 0.5 + 1e-9)), c1 = Math.min((u.battle?.grid?.cols ?? COLS) - 1, Math.ceil(R.x1 - 0.5 - 1e-9));
+  for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) out.push(r * (u.battle?.grid?.cols ?? COLS) + c);
   return out;
 }
 
@@ -103,7 +103,7 @@ export function bodyTileReach(u, r, c) {
   if (!u.hitArea) return Math.max(Math.abs(Math.round(u.y) - r), Math.abs(Math.round(u.x) - c));
   let best = Infinity;
   for (const k of bodyKeys(u)) {
-    const kr = Math.floor(k / COLS), kc = k % COLS;
+    const kr = Math.floor(k / (u.battle?.grid?.cols ?? COLS)), kc = k % (u.battle?.grid?.cols ?? COLS);
     const d = Math.max(Math.abs(kr - r), Math.abs(kc - c));
     if (d < best) best = d;
   }

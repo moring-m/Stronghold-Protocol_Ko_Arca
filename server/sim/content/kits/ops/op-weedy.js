@@ -119,7 +119,7 @@ export function rupture(battle, src, e, { duration, perTile, interval }) {
  * Returns false when no enemy can be selected there (nothing fires).
  */
 export function liquidNitrogen(battle, { shooter, src, atk, sbb, grid, force, pick }) {
-  const keys = absoluteRangeKeys(grid ?? GRID_4_1, shooter.tileR, shooter.tileC, shooter.dir, 0);
+  const keys = absoluteRangeKeys(grid ?? GRID_4_1, shooter.tileR, shooter.tileC, shooter.dir, 0, battle.grid);
   const cands = battle.enemiesInKeys(keys, shooter, { canHitFly: true });
   if (!cands.length) return false;
   const key = pick === 'nearest' ? (e) => hypot(e.x - shooter.x, e.y - shooter.y) : (e) => battle.remainingDistance(e);
@@ -169,8 +169,8 @@ function cannonKit(t, owner) {
       // "能攻击单个敌人并将其小力度地推开，该位移效果仅对前方三格内的地面敌方单位生效"
       afterHit(battle, unit, target) {
         if (!target || !target.alive || target.side !== 'enemy' || target.isFlying) return;
-        const ahead = new Set(absoluteRangeKeys(AHEAD, unit.tileR, unit.tileC, unit.dir, 0));
-        if (!ahead.has(Math.round(target.y) * COLS + Math.round(target.x))) return;
+        const ahead = new Set(absoluteRangeKeys(AHEAD, unit.tileR, unit.tileC, unit.dir, 0, battle.grid));
+        if (!ahead.has(Math.round(target.y) * (battle.grid?.cols ?? COLS) + Math.round(target.x))) return;
         battle.push(target, forceUp, { from: unit, dir: along(unit) });
       },
     },

@@ -29,7 +29,7 @@ function fakeNet() {
   return n;
 }
 
-function rig({ hidden = false } = {}) {
+function rig({ hidden = false, ds = DS } = {}) {
   let t = 1000;
   const frames = [];
   const intervals = [];
@@ -43,7 +43,7 @@ function rig({ hidden = false } = {}) {
     caf: () => {},
     setInterval: (fn) => { intervals.push(fn); return intervals.length; },
     clearInterval: () => {},
-    loadSim: async () => ({ spec: specMod, ds: DS }),
+    loadSim: async () => ({ spec: specMod, ds }),
     logger: { error() {}, warn() {}, info() {}, debug() {} },
   });
   const feed = { snaps: [], evs: [], fields: [] };
@@ -479,4 +479,21 @@ test('server confirmed boss kill retains cleared; normal/forced endings never in
     r.net.emit('b.end',{battleId:start.battleId,reason});await r.settle();
     assert.deepEqual(calls,[expected]);r.runner.dispose();
   }
+});
+
+test('b.end surrender keeps future scheduled enemies in the local leak result',async()=>{
+ const start=realStart(7339),r=rig();start.elapsed=0;start.spec.spawns=start.spec.spawns.map(s=>({...s,time:100}));r.net.emit('b.start',start);await r.settle();
+ const remaining=r.runner._entries.get(start.battleId).battle._pending.length;assert.ok(remaining>0);
+ r.net.emit('b.end',{battleId:start.battleId,fieldId:start.fieldId,reason:'surrender'});await r.settle();
+ const msg=r.net.sent.find(x=>x.t==='b.result');assert.ok(msg);assert.equal(msg.result.reason,'timeout');assert.equal(msg.result.unspawned,undefined);
+ assert.ok(Object.values(msg.result.perPlayer).reduce((n,p)=>n+p.leaked.length,0)>=remaining);r.runner.dispose();
+});
+
+
+test('cold browser simulation data injects the laboratory dummy model and fixed hit area without a boss catalogue',async()=>{
+ const ds=new DataSource({...DATA,bosses:{}},null),r=rig({ds}),start=realStart();
+ start.spec={...start.spec,kind:'boss',bossId:'boss_laboratory_jesselton',players:[],boss:{poolHp:600000,poolMax:600000},spawns:[{time:0,enemyKey:'enemy_laboratory_jesselton',tag:'boss',count:1,pos:[3,10]}],routes:[],enemyOverrides:{}};
+ r.net.emit('b.start',start);await r.settle();r.advance(500);
+ const info=r.feed.evs.flatMap(p=>p.ev||[]).find(ev=>ev[0]==='spawn'&&ev[1]?.defId==='enemy_laboratory_jesselton')?.[1];
+ assert.ok(info);assert.equal(info.name,'제셀톤 윌리엄스');assert.equal(info.spine,'enemy_1516_jakill');assert.ok(info.modelScale>2);assert.equal(info.hitArea.w,4.95);r.runner.destroy?.();
 });
