@@ -349,7 +349,9 @@ export class Battle {
   }
 
   _makeAlly(ps, def, kind, r, c, extra = {}) {
-    const st = def.stats;
+    const original = def.stats,rules=this.data.raw?.config?.customRules||{};
+    const pct=id=>(Number.isFinite(rules[id])?rules[id]:100)/100;
+    const st={...original,maxHp:original.maxHp*pct('allyHp'),atk:original.atk*pct('allyAtk'),def:original.def*pct('allyDef'),res:original.res*pct('allyRes'),aspd:original.aspd*pct('allyAspd'),bat:original.bat*pct('allyBat'),blockCnt:original.blockCnt*pct('allyBlock'),cost:original.cost*pct('allyCost'),respawnTime:original.respawnTime*pct('allyRedeploy'),spRecovery:original.spRecovery*pct('allySpRecovery')};
     const u = new Unit({
       battle: this,
       id: ++this._idSeq, side: 'ally', kind, def, defId: def.id, name: def.name, ownerId: ps ? ps.playerId : null,

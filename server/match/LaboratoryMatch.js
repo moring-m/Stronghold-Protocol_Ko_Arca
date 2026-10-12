@@ -1,3 +1,4 @@
+import {RANDOM_BAND_ID} from '../../shared/randomBand.js';
 import {withLaboratoryDummy,LAB_DUMMY_BOSS,LAB_DUMMY_ENEMY,LAB_DUMMY_FIELDS,validDummyStats} from '../../shared/laboratoryDummy.js';
 import {bossPoolHp} from './finalAssault.js';
 // Local-only single-round mode. This class is never constructed by the lobby.
@@ -12,7 +13,9 @@ export class LaboratoryMatch extends Match {
     super({ ...opts, data:withLaboratoryDummy(opts.data), mode: 'solo', difficulty: opts.difficulty || 'NORMAL', clientCombat: true, verify: 'off' });
     this.gd.config.customRules={...this.gd.config.customRules,deployCap:15};
     if(this.customExtensions.ruleValues)delete this.customExtensions.ruleValues.deployCap;
-    const setup = opts.laboratory;
+    const setup = {...opts.laboratory};
+    if(this.gd.config.customRules?.scarecrow)setup.bossId=LAB_DUMMY_BOSS;
+    if(setup.bandId===RANDOM_BAND_ID)setup.bandId=this.rngDraft.pick(this.gd.bandIds().filter(id=>id!==RANDOM_BAND_ID));
     if (!setup || !this.gd.stage(setup.stageId) || !this.gd.boss(setup.bossId) || !this.gd.band(setup.bandId)
       || !['boss', 'hidden'].includes(setup.kind) || (setup.bossId!==LAB_DUMMY_BOSS && !!this.gd.boss(setup.bossId).hidden !== (setup.kind === 'hidden'))) {
       throw new TypeError('실험실 시작 설정이 올바르지 않습니다.');

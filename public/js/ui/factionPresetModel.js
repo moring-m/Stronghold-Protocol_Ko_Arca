@@ -2,7 +2,7 @@ import {chatFaction} from '../../../shared/chat.js';
 
 // One owner per faction. Assigning a new owner removes the old link.
 export function bindPresetFaction(presets, id, faction) {
- const value=chatFaction(faction)?.name || null;
+ const selected=chatFaction(faction);const value=selected&&selected.presetLink!==false?selected.name:null;
  return presets.map(p=>p.id===id?{...p,faction:value}:value&&p.faction===value?{...p,faction:null}:p);
 }
 export function normalizePresetFactions(presets) {

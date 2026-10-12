@@ -23,3 +23,8 @@ test('preset codes preserve Korean names in one line and distinguish favorite/re
   assert.throws(()=>readPresetPayload(code+'!',kind));
  }
 });
+
+test('stock selections and ally ratios have readable labels in game info and old unlimited presets migrate',async()=>{
+ const rows=customSettingsRows({ruleValues:{stockPlayers:-1,allyAtk:150,allySpCost:80}},{});assert.ok(rows.some(r=>r.items.includes('상점 재고 무제한')));assert.ok(rows.some(r=>r.items.includes('아군 공격력 150%')));assert.ok(rows.some(r=>r.items.includes('아군 최대 SP 80%')));
+ const {resolveExtensionPreset}=await import('../../public/js/ui/customExtensionPresets.js'),{customExtensionCatalog}=await import('../../shared/customExtensions.js');const preset=resolveExtensionPreset({selection:{rules:['unlimitedStock']}},customExtensionCatalog({}));assert.equal(preset.ruleValues.stockPlayers,-1);assert.ok(!preset.rules.includes('unlimitedStock'));
+});

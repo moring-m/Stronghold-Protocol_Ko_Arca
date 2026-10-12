@@ -395,7 +395,7 @@ export const DUCK_BAND = 'band_ducklord';
 /** "击倒这些敌人者获得1资金奖励" (the blackboard's `count` is 1 too). */
 export const DUCK_COINS = 1;
 /** Battle kinds the swap applies to (PRTS: the Final Assault and the Hidden Core too). */
-const DUCK_KINDS = new Set(['normal', 'boss', 'hidden']);
+const DUCK_KINDS = new Set(['normal']);
 /** Boss-field column between the left ('L') and the right ('R') player's half (the goals are at cols 2–3 / 17). */
 const BOSS_MID_COL = (GEO.BOSS_RECT.c0 + GEO.BOSS_RECT.c1) / 2;
 

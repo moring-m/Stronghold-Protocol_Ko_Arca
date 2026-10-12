@@ -99,6 +99,11 @@ export class SkillRuntime {
     this.ammo = Math.max(0, Math.floor(+s.ammo || 0));
     this.baseSpCost = Math.max(0, Number.isFinite(+s.spCost) ? +s.spCost : (d.spCost ?? 0));
     this.initSp = Math.max(0, Number.isFinite(+s.initSp) ? +s.initSp : (d.initSp ?? 0));
+    const rules=this.battle.data.raw?.config?.customRules||{};
+    if(unit.side==='ally'&&(unit.kind==='op'||unit.kind==='token')){
+      if(this.baseSpCost>0)this.baseSpCost=Math.max(1,this.baseSpCost*(Number.isFinite(rules.allySpCost)?rules.allySpCost/100:1));
+      this.initSp*=Number.isFinite(rules.allyInitSp)?rules.allyInitSp/100:1;
+    }
     this.maxCharges = Math.max(1, Math.floor(s.charges ?? d.maxCharges ?? 1));
     this.spType = s.spType ?? d.spType ?? 'time';
     const trig = typeof s.trigger === 'string' ? { rule: s.trigger } : (s.trigger || d.trigger || {});

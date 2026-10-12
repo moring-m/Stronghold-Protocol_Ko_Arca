@@ -2,6 +2,7 @@ export const CHAT_MAX_LENGTH = 200;
 export const CHAT_HISTORY_LIMIT = 100;
 export const CHAT_COOLDOWN_MS = 1000;
 export const CHAT_FACTIONS = Object.freeze([
+  { name:'협동방어',bondId:'emptyShip',color:'#5ce0c1',presetLink:false },
   { name: '염국', bondId: 'yanShip', color: '#ff3b42' },
   { name: '사르곤', bondId: 'sargonShip', color: '#b87850' },
   { name: '빅토리아', bondId: 'victoriaShip', color: '#ff782f' },

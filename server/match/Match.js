@@ -1,3 +1,4 @@
+import {RANDOM_BAND_ID} from '../../shared/randomBand.js';
 import {EIGHT_UNITE_RECT,eightUniteStageId} from '../../shared/cooperativeEight.js';
 import { MatchSetupVote } from './match/setupVote.js';
 import { onHumanEmote, onSettle, resetRoundCounters, onPickCard, onStartUnite } from './botEmotes.js';
@@ -1599,7 +1600,7 @@ export class Match {
       // a strategy a teammate already took is not selectable (队友已选): the bot re-draws, else the first free one
       let id = botPickBand(this, ps);
       for (let k = 0; k < 8 && this.bandTaken(id, ps.playerId); k++) id = botPickBand(this, ps);
-      if (this.bandTaken(id, ps.playerId)) id = this.gd.bandIds().find((b) => !this.bandTaken(b, ps.playerId)) || id;
+      if (this.bandTaken(id, ps.playerId)) id = this.gd.bandIds().find((b) => b!==RANDOM_BAND_ID&&!this.bandTaken(b, ps.playerId)) || id;
       this._applyBand(ps, id, { dedupe: true });
     });
   }
@@ -1610,6 +1611,7 @@ export class Match {
    * assignments — a turn that runs out and a departing seat — obey the same rule: see timeoutBand / defaultBand.
    */
   bandTaken(bandId, playerId) {
+    if(bandId===RANDOM_BAND_ID)return false;
     if (this.customExtensions.rules?.includes('duplicateBands')) return false;
     const picks = this.draft?.picks || {};
     for (const [pid, id] of Object.entries(picks)) if (pid !== playerId && id === bandId) return true;
@@ -1627,7 +1629,7 @@ export class Match {
   defaultBand(playerId) {
     const def = this.gd.bandDraft.timeoutBandId;
     if (!this.bandTaken(def, playerId)) return def;
-    return this.gd.bandIds().find((b) => !this.bandTaken(b, playerId)) || def;
+    return this.gd.bandIds().find((b) => b!==RANDOM_BAND_ID&&!this.bandTaken(b, playerId)) || def;
   }
 
   /**
@@ -1661,7 +1663,7 @@ export class Match {
     if (this.phase !== PHASE.BAND_DRAFT || !this.draft) return fail(ERR.WRONG_PHASE);
     if (this.draft.picks[ps.playerId]) return fail(ERR.ALREADY);
     if (this.draftTurn() !== ps.playerId) return fail(ERR.NOT_YOUR_TURN);
-    if (typeof bandId !== 'string' || !this.gd.bandAllowed(bandId)) return fail(ERR.BAD_TARGET);
+    if (typeof bandId !== 'string' || !this.gd.bandAllowed(bandId) || ps.isBot&&bandId===RANDOM_BAND_ID) return fail(ERR.BAD_TARGET);
     if (this.bandTaken(bandId, ps.playerId)) return fail(ERR.BAD_TARGET, '队友已选');
     this._applyBand(ps, bandId);
     return OK;
@@ -1670,8 +1672,8 @@ export class Match {
   _applyBand(ps, bandId, { dedupe = false } = {}) {
     const d = this.draft;
     if (!d || !ps || d.picks[ps.playerId]) return;
-    let id = this.gd.bandAllowed(bandId) ? bandId : this.defaultBand(ps.playerId);
-    if (dedupe && this.bandTaken(id, ps.playerId)) id = this.gd.bandIds().find((b) => !this.bandTaken(b, ps.playerId)) || id;
+    let id = this.gd.bandAllowed(bandId)&&!(ps.isBot&&bandId===RANDOM_BAND_ID) ? bandId : this.defaultBand(ps.playerId);
+    if (dedupe && this.bandTaken(id, ps.playerId)) id = this.gd.bandIds().find((b) => b!==RANDOM_BAND_ID&&!this.bandTaken(b, ps.playerId)) || id;
     d.picks[ps.playerId] = id;
     ps.bandId = id;
     ps.lp = this.gd.startLp(id);
@@ -1717,6 +1719,13 @@ export class Match {
         ps.lp = this.gd.startLp(id);
       }
       this.markPrivate(ps);
+    }
+    const used=new Set(Object.values(this.draft.picks).filter(id=>id!==RANDOM_BAND_ID));
+    for(const pid of this.draft.order){
+      const ps=this.players.get(pid);if(!ps||ps.bandId!==RANDOM_BAND_ID)continue;
+      const eligible=this.gd.bandIds().filter(id=>id!==RANDOM_BAND_ID&&(this.customExtensions.rules?.includes('duplicateBands')||!used.has(id)));
+      const id=this.rngDraft.pick(eligible);if(!id)throw new Error('No strategy available for random assignment');
+      used.add(id);this.draft.picks[pid]=ps.bandId=id;ps.lp=this.gd.startLp(id);this.markPrivate(ps);
     }
     void timeout;
     this.enterBattleCheck();

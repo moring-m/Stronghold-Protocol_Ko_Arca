@@ -1,3 +1,4 @@
+import {RANDOM_BAND_ID} from '../../shared/randomBand.js';
 // server/match/bot.js — AI player (DESIGN §6.6). Used for AI teammates and "AI 托管" (g.autoplay; a departed human
 // is eliminated, Match._quit). Every action goes through the same validated
 // PlayerState handlers a human uses; randomness only from the match's bot rng (deterministic per seed).
@@ -137,7 +138,7 @@ const DEFAULT_MELEE_RANGE = [[0, 0], [0, 1]];
  */
 export function botPickBand(m, ps) {
   const gd = m.gd;
-  const ids = gd.bandIds();
+  const ids = gd.bandIds().filter(id=>id!==RANDOM_BAND_ID);
   if (!ids.length) return gd.defaultBandId;
   const lateFunds = (id) => /暂存/.test(String(gd.band(id)?.desc || ''));
   const offBond = (id) => gd.bandBondIds(id).some((b) => gd.modeInactiveBonds.has(b));

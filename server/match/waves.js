@@ -391,9 +391,11 @@ export function buildNormalWave(gd, rng, factions, round) {
  * @param {{ bossId: string, solo: boolean }} opts solo → `_s` template (lone player or solo mode)
  */
 export function buildBossWave(gd, rng, factions, round, { bossId, solo }) {
+  const selectedBoss=gd.boss(bossId),dummy=!!selectedBoss?.laboratoryDummy;
   const rc = gd.roundCfg(round);
   const map = rc && rc.bossTemplates && typeof rc.bossTemplates === 'object' ? rc.bossTemplates : {};
   let templateId = typeof map[bossId] === 'string' ? map[bossId] : null;
+  if(dummy)templateId=selectedBoss.templates?.[gd.modeId]?.template || selectedBoss.templates?.mode_single_normal?.template || templateId;
   if (!templateId) {
     const first = Object.values(map).find((v) => typeof v === 'string');
     templateId = first || null;
@@ -404,15 +406,16 @@ export function buildBossWave(gd, rng, factions, round, { bossId, solo }) {
   if (!tpl) return { templateId, spawns: [], routes: [], extraRoutes: [], timeLimit: Infinity, overrides: {}, pick: null, entries: { ground: null, fly: null }, actions: [] };
   const pick = roundPick(gd, rng, factions, round);
   const { spawns, actions } = templateSpawns(gd, tpl, round, pick);
+  if(dummy){const original=spawns.find(s=>s.tag==='boss')||{time:0,pos:[3,10],tag:'boss'};spawns.splice(0,spawns.length,{...original,enemyKey:selectedBoss.enemyKey,count:1,tag:'boss',mods:null});actions.length=0;}
   return {
     templateId,
     spawns,
     routes: Array.isArray(tpl.routes) ? tpl.routes : [],
     extraRoutes: Array.isArray(tpl.extraRoutes) ? tpl.extraRoutes : [],
     timeLimit: Infinity,
-    overrides: tpl.overrides && typeof tpl.overrides === 'object' ? tpl.overrides : {},
+    overrides: dummy?{}:tpl.overrides && typeof tpl.overrides === 'object' ? tpl.overrides : {},
     pick,
-    entries: entriesView(gd, pick),
+    entries: dummy?{ground:null,fly:null}:entriesView(gd, pick),
     actions,
   };
 }

@@ -445,3 +445,9 @@ test('eight-player unite advances the unchanged camera order with the left arrow
   buttons[reverse?0:1].props.onClick();assert.equal(picked,1);assert.deepEqual(layers.map(x=>x.key),['ALL','P1','P2','P3','P4']);
  }
 });
+
+test('each eight-player cooperative-defense camera displays that player’s bonds instead of the viewer’s',()=>{
+ const ids=['p1','p2','p3','p4'],field={fieldId:'u',kind:'unite',stageId:'coop8_unite_map',players:ids};const pub={mode:'coop8',players:ids.map(playerId=>({playerId})),fields:[field]};
+ for(const pid of ids)assert.equal(bondOwnerId({pub,myId:'p1',fieldId:'u',field,layer:'P:'+pid,halves:true}),pid);
+ assert.equal(bondOwnerId({pub,myId:'p1',fieldId:'u',field,layer:'ALL',halves:true}),'p1');
+});

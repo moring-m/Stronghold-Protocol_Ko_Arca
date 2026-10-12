@@ -5,12 +5,12 @@ import {makeBattle,enemyRec}from './helpers/battleHarness.js';import {getDefault
 import {buildBattleSpec,createBattleFromSpec,compactResult}from '../server/sim/spec.js';import {validateClientResult}from '../server/match/fields.js';
 import {planUnite,uniteBattleOpts}from '../server/match/unite.js';import {modeExtensionSelection,EXTENSION_CATEGORIES}from '../shared/customExtensions.js';
 const eight=new GameData({...DATA,config:{...DATA.config,coop8:true}},'mode_multi_normal'),four=new GameData(DATA,'mode_multi_normal');
-test('eight-player pool matches four players except three discounted communication items',()=>{
+test('automatic eight-player pool is capped at four players, with three discounted communication items',()=>{
  for(const id of eight.visibleChess)assert.equal(eight.poolCopies(id),four.poolCopies(id),id);
  const special=new Set(['chess_item_2_06_e_a','chess_item_4_01_e_a','chess_item_5_04_e_a']);
  for(const[id,it]of Object.entries(DATA.items)){
   const base=eight.baseIdOf(id),n=four.itemPoolCopies(id);
-  assert.equal(eight.itemPoolCopies(id),n===null?null:n*(special.has(base)?2:1),id);
+  assert.equal(eight.itemPoolCopies(id),n===null?null:n,id);
   assert.equal(eight.itemPrice(id),Math.max(0,four.itemPrice(id)-(special.has(base)?1:0)),id);
  }
 });

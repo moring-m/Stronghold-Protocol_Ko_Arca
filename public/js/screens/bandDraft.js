@@ -1,3 +1,4 @@
+import {RANDOM_BAND_ID} from '../../../shared/randomBand.js';
 import { ChatPanel } from '../ui/chat.js';
 // Band draft — BAND_DRAFT "2/2 选择策略" (research 06 §4.2, D1): left = draft order (avatar, name, state:
 // … waiting / ⌛ 决策中 / chosen band ✓), current picker highlighted; centre = grid of every band allowed
@@ -71,7 +72,7 @@ export const DEFAULT_TIMEOUT_BAND = 'band_bldsk';
  */
 export function timeoutBand(bands, taken, defaultId = DEFAULT_TIMEOUT_BAND) {
   const list = Array.isArray(bands) ? bands : [];
-  const has = (id) => !!(taken && typeof taken.has === 'function' && taken.has(id));
+  const has = (id) => !!(taken && typeof taken.has === 'function' && id!==RANDOM_BAND_ID&&taken.has(id));
   if (defaultId && !has(defaultId) && (!list.length || list.some((b) => b.bandId === defaultId))) return defaultId;
   return list.find((b) => !has(b.bandId))?.bandId || defaultId || null;
 }
@@ -84,7 +85,7 @@ export function timeoutBand(bands, taken, defaultId = DEFAULT_TIMEOUT_BAND) {
 export function teammateBands(picks, myId) {
   const out = new Map();
   for (const [pid, bid] of picks instanceof Map ? picks : []) {
-    if (pid === myId || typeof bid !== 'string') continue;
+    if (pid === myId || bid===RANDOM_BAND_ID || typeof bid !== 'string') continue;
     if (!out.has(bid)) out.set(bid, []);
     out.get(bid).push(pid);
   }
@@ -103,7 +104,7 @@ export function draftSelection(sel, { bands, taken, myPick, myTurn, defaultId = 
   if (!Array.isArray(bands) || !bands.length) return sel;
   const free = timeoutBand(bands, taken, defaultId) || bands[0].bandId;
   if (!sel) return myPick || free;
-  if (!myPick && myTurn && taken.has(sel)) return free;
+  if (!myPick && myTurn && sel!==RANDOM_BAND_ID&&taken.has(sel)) return free;
   return sel;
 }
 
@@ -116,7 +117,7 @@ export function draftSelection(sel, { bands, taken, myPick, myTurn, defaultId = 
 export function autoPickBand(sel, { bands, taken, myPick = null, defaultId = DEFAULT_TIMEOUT_BAND }) {
   if (myPick) return null;
   const list = Array.isArray(bands) ? bands : [];
-  const has = (id) => !!(taken && typeof taken.has === 'function' && taken.has(id));
+  const has = (id) => !!(taken && typeof taken.has === 'function' && id!==RANDOM_BAND_ID&&taken.has(id));
   if (sel && !has(sel) && list.some((b) => b.bandId === sel)) return sel;
   return timeoutBand(list, taken, defaultId);
 }
@@ -227,7 +228,7 @@ export function BandDraftScreen() {
   const autoName = (autoId && gd.band(autoId)?.name) || gd.band(defaultId)?.name || '华法琳';
 
   const band = sel ? gd.band(sel) : null;
-  const selTaken = !!band && taken.has(band.bandId);
+  const selTaken = !!band && band.bandId!==RANDOM_BAND_ID && taken.has(band.bandId);
   const confirm = async () => {
     if (!band || busy || !myTurn || selTaken) return;
     setBusy('pick');
@@ -286,14 +287,14 @@ export function BandDraftScreen() {
       <section class="draft-grid" role="listbox" aria-label="策略">
         ${bands.map((b) => {
           const who = pickers.get(b.bandId) || [];
-          const isTaken = taken.has(b.bandId);
+          const isTaken = b.bandId!==RANDOM_BAND_ID&&taken.has(b.bandId);
           const offNames = bandOffBonds(b, offBonds).map((id) => gd.bond(id)?.name || id); // 本局禁用 (still selectable)
           return html`<button key=${b.bandId} type="button" role="option" aria-selected=${sel === b.bandId ? 'true' : 'false'} data-band=${b.bandId}
               aria-disabled=${isTaken ? 'true' : 'false'} title=${isTaken ? '다른 참가자가 선택함' : offNames.length ? bandOffLine(offNames) : undefined}
               class=${cx('dband', sel === b.bandId && 'is-sel', myPick === b.bandId && 'is-mine', isTaken && 'is-taken', offNames.length && 'is-off')} onClick=${() => { setSel(b.bandId); audio.sfx('tab', { volume: 0.5 }); }}>
             <${BandIcon} bandId=${b.bandId} size="lg" />
             <span class="dband__name">${b.name}</span>
-            <span class="dband__lp num"><i></i>${b.totalHp}</span>
+            <span class="dband__lp num"><i></i>${b.randomChoice?'?':b.totalHp}</span>
             <${BandOffTag} names=${offNames} />
             ${who.length ? html`<span class="dband__who">${who.slice(0, 8).map((p) => html`<${PlayerAvatar} key=${p.playerId} player=${p} size="sm" />`)}</span>` : null}
             ${isTaken ? html`<span class="dband__taken">다른 참가자가 선택함</span>` : null}

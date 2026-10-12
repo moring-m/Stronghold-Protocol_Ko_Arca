@@ -1,3 +1,4 @@
+import {RANDOM_BAND_ID,RANDOM_BAND} from '../../shared/randomBand.js';
 import { atPotential } from '../../shared/potential.js';
 // server/match/gamedata.js — typed, defaulted view of data/*.json for the match engine.
 //
@@ -162,7 +163,7 @@ export class GameData {
   chess(id) { return own(this._chess, id); }
   item(id) { return own(this._items, id); }
   bond(id) { return own(this._bonds, id); }
-  band(id) { return own(this.raw.bands, id); }
+  band(id) { return id===RANDOM_BAND_ID?RANDOM_BAND:own(this.raw.bands, id); }
   garrison(id) { return own(this.raw.garrisons, id); }
   effect(id) { return own(this.raw.effects, id); }
   enemy(key) { return own(this.raw.enemies, key); }
@@ -261,6 +262,9 @@ export class GameData {
     const base = Number.isInteger(v) && v >= 0 ? v : (DEFAULTS.poolCopies[tier] ?? 10);
     // The measured doubled pool is shared by the whole co-op team, independent of team size. DIY and optional recruits remain private stock.
     const multiplier = this.isSolo || this.chess(baseId)?.isDiy || this.chess(baseId)?.optionalRecruit ? 1 : posIntOr(this.economy.coopPoolMultiplier, 1);
+    const stock=this.config.customRules?.stockPlayers??0;
+    if(stock===-1)return Number.MAX_SAFE_INTEGER;
+    if(stock>0&&!this.chess(baseId)?.isDiy&&!this.chess(baseId)?.optionalRecruit)return Math.ceil(base*posIntOr(this.economy.coopPoolMultiplier,1)*stock/4);
     return base * multiplier;
   }
 
@@ -270,7 +274,8 @@ export class GameData {
     const base = this.baseIdOf(id), rec = this.item(base);
     if (!rec || !isShopItem(rec)) return null;
     const count = this.economy.itemPoolCopiesOverrides?.[base] ?? this.economy.itemPoolCopies?.[rec.tier];
-    return Number.isInteger(count) && count >= 0 ? count*(this.config.coop8&&COOP8_COMMUNICATION_ITEMS.has(base)?2:1) : null;
+    const stock=this.config.customRules?.stockPlayers??0;
+    return Number.isInteger(count) && count >= 0 ? Math.ceil(count*(stock>0?stock/4:1)) : null;
   }
 
   /** Copies needed to merge (0 = never merges: golden chess). */
@@ -471,7 +476,7 @@ export class GameData {
 
   bandIds() {
     const bands = this.raw.bands && typeof this.raw.bands === 'object' ? this.raw.bands : {};
-    return Object.keys(bands).filter((id) => this.bandAllowed(id)).sort((a, b) => numOr(bands[a].sortId, 99) - numOr(bands[b].sortId, 99) || (a < b ? -1 : 1));
+    return [...new Set([...Object.keys(bands),RANDOM_BAND_ID])].filter((id) => this.bandAllowed(id)).sort((a, b) => numOr(this.band(a)?.sortId, 99) - numOr(this.band(b)?.sortId, 99) || (a < b ? -1 : 1));
   }
 
   startLp(bandId) {

@@ -52,3 +52,9 @@ test('recruit preset activation respects current operator skills including retur
  assert.deepEqual(replaceRecruitEntries({op:{skill:1}},{op:{selected:true}},get),{op:{skill:1,selected:true}});
  assert.deepEqual(replaceRecruitEntries({op:{selected:true}},{op:{selected:true,skill:2}},get),{op:{selected:true}});
 });
+
+test('cooperative defense chat choice has a bond icon but cannot link favorites or recruit presets',async()=>{
+ const{chatFaction}=await import('../../shared/chat.js');assert.equal(chatFaction('협동방어').bondId,'emptyShip');assert.equal(chatFaction('협동방어').presetLink,false);
+ assert.deepEqual(bindPresetFaction([{id:'a',faction:null}],'a','협동방어'),[{id:'a',faction:null}]);
+ assert.deepEqual(normalizePresetFactions([{id:'a',faction:'협동방어'}]),[{id:'a',faction:null}]);
+});

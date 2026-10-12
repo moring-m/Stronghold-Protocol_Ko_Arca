@@ -1,3 +1,4 @@
+import {withRandomBands} from '../../shared/randomBand.js';
 import {withLaboratoryDummy} from '../../shared/laboratoryDummy.js';
 // Lazy loader + cache for the generated game data served at /data/*.json.
 //
@@ -182,6 +183,7 @@ export function createDataStore(opts = {}) {
       for (let attempt = 0; ; attempt++) {
         try {
           entry.value = await readJson(name);
+          if(name==='bands'&&entry.value)entry.value=withRandomBands(entry.value);
           entry.status = 'ready';
           break;
         } catch (err) {

@@ -19,6 +19,8 @@ export const NORMAL_ATTACK_BUFF_SKILLS = [
  // Eyjafjalla's unnumbered continuous Skill loop is Volcano (S3).
  // Ignition (S2) enhances one ordinary attack and has no separate body motion.
  ['char_180_amgoat',[0,1]],
+ // Nearl S2's Skill_2_Die is her withdrawal gesture, never an attack loop.
+ ['char_1014_nearl2',[1]],
 ];
 const ACTIVATION_GESTURE_SKILLS = [
  ['char_494_vendla',[0,1]], ['char_1020_reed2',[1]], ['char_1023_ghost2',[0]],

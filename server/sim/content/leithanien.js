@@ -31,7 +31,7 @@ export function install(b){
   const L=S.bondLayers(b,u.ownerId,BOND),duration=six(b,u)?10+Math.floor(L/25):5;
   const now=b.time,end=now+duration,key=`${u.id}:${t.id}:${now}:${duration}`;
   let c=cohorts.get(key);
-  if(c){c.amount+=50+u.s.atk*(.01+.0001*L);c.stacks++;}else{c={key,u,t,next:now+1,end,amount:50+u.s.atk*(.01+.0001*L),stacks:1};cohorts.set(key,c);push(heap,c);}
+  if(c){c.amount+=80+u.s.atk*(.01+.0001*L);c.stacks++;}else{c={key,u,t,next:now+1,end,amount:80+u.s.atk*(.01+.0001*L),stacks:1};cohorts.set(key,c);push(heap,c);}
   state.applications++;state.liveStacks++;t.mem.leithanienStacks=(t.mem.leithanienStacks||0)+1;
   // A single target marker, refreshed only when its expiry extends.
   const old=t.findBuff('leithanien:note');

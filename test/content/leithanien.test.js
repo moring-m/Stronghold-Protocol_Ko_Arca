@@ -21,7 +21,7 @@ test('independent notes last five seconds, merge equal-frame stacks, do not recu
  const h=setup();h.b.dealDamage(h.u,h.e,{amount:1,type:'arts'});h.b.dealDamage(h.u,h.e,{amount:1,type:'arts'});
  assert.equal(h.b.leithanien.applications,1);assert.equal(h.b.leithanien.heap.length,1);assert.equal(h.b.snapshot().noteStacks[h.e.id],1);
  h.run(1.1);assert.equal(h.b.leithanien.damageBatches,1);
- const d=h.hooksOf('damaged').filter(c=>c.dmg.tags.includes('leithanien:note'));assert.equal(d[0].amount,51);assert.equal(d[0].source,h.u);assert.equal(h.u.stats.artsDamage,2);assert.equal(h.u.stats.physicalDamage||0,0);
+ const d=h.hooksOf('damaged').filter(c=>c.dmg.tags.includes('leithanien:note'));assert.equal(d[0].amount,81);assert.equal(d[0].source,h.u);assert.equal(h.u.stats.artsDamage,2);assert.equal(h.u.stats.physicalDamage||0,0);
  h.b.dealDamage(h.u,h.e,{amount:1,type:'arts'});h.run(4);
  assert.equal(h.b.leithanien.liveStacks,1);h.run(1.1);assert.equal(h.b.leithanien.liveStacks,0);assert.equal(h.b.leithanien.applications,2);assert.equal(h.b.snapshot().noteStacks[h.e.id],undefined);assert.equal(h.b.errorCount,0);
 });
@@ -31,7 +31,7 @@ test('six synergy extends each duration by ten seconds + one per twenty-five lay
  const below=setup(6,24);below.b.dealDamage(below.u,below.e,{amount:1,type:'arts'});assert.equal(below.b.leithanien.heap[0].end-below.b.time,10);
  const hp=h.u.hp;h.b.dealDamage(h.e,h.u,{amount:100,type:'true'});assert.equal(hp-h.u.hp,75);const hpDot=h.u.hp;h.b.dealDamage(h.e,h.u,{amount:100,type:'true',sourceless:true});assert.equal(hpDot-h.u.hp,75);
  h.run(11.1);const hp2=h.u.hp;h.b.dealDamage(h.e,h.u,{amount:100,type:'true'});assert.equal(hp2-h.u.hp,100);
- assert.ok(Math.abs(h.hooksOf('damaged').find(c=>c.dmg.tags.includes('leithanien:note')).amount-51.3)<1e-6);assert.equal(h.b.errorCount,0);
+ assert.ok(Math.abs(h.hooksOf('damaged').find(c=>c.dmg.tags.includes('leithanien:note')).amount-81.3)<1e-6);assert.equal(h.b.errorCount,0);
 });
 test('faction content is opt-in and each custom core adds exactly one ban',()=>{
  const base=applyCustomExtensions(data,{bonds:[],stages:[]});assert.ok(!base.bonds.leithanienShip);assert.ok(!base.items.chess_item_custom_leithanien_bell_a);assert.ok(!base.bands.band_custom_leithanien_witchking);assert.ok(!base.choices.cards.tactic.some(c=>c.effectId==='allybuff_custom_leithanien_oath'));
@@ -92,7 +92,7 @@ test('battle entry preserves enabled Leithanien operators through DataSource and
 test('notes from multiple casters are recorded separately for each caster',()=>{
  const h=setup(3,0,true),second=h.unit('test2');
  h.b.dealDamage(h.u,h.e,{amount:1,type:'phys'});h.b.dealDamage(second,h.e,{amount:1,type:'phys'});h.run(1.1);
- assert.equal(h.u.stats.noteDamage,51);assert.equal(second.stats.noteDamage,52);
+ assert.equal(h.u.stats.noteDamage,81);assert.equal(second.stats.noteDamage,82);
  assert.equal(h.u.stats.physicalDamage,1);assert.equal(second.stats.physicalDamage,1);
  assert.equal(h.b.snapshot().noteStacks[h.e.id],2);assert.equal(h.b.errorCount,0);
 });
@@ -108,7 +108,7 @@ test('Leithanien description displays the current attack coefficient scaling',()
 
  test('notes suppress floating damage numbers while retaining caster statistics',()=>{
  const h=setup(6,30);h.b.dealDamage(h.u,h.e,{amount:1,type:'arts'});const before=h.eventsOf('dmg').length;h.run(1.1);
- assert.equal(h.eventsOf('dmg').length,before);assert.ok(Math.abs(h.u.stats.noteDamage-51.3)<1e-6);
+ assert.equal(h.eventsOf('dmg').length,before);assert.ok(Math.abs(h.u.stats.noteDamage-81.3)<1e-6);
  const bond=data.bonds.leithanienShip;assert.ok(richTextPlain(formatBondEffect(bond,90,6)).includes('13초간'));assert.ok(bond.descRaw.includes('<@ba.vup>속세의 음</>'));
  });
 test('Ebenholz uses two/four percent attack per three Leithanien layers',()=>{
@@ -148,7 +148,7 @@ test('note application cooldown is per caster and expires at 0.1 game seconds',(
  h.b.time+=.001;hit(h.u);assert.equal(h.b.leithanien.applications,3);
  h.run(1.1);
  const notes=h.hooksOf('damaged').filter(c=>c.dmg.tags.includes('leithanien:note'));
- assert.ok(notes.some(c=>c.source===second&&Math.abs(c.amount-64)<1e-6));
+ assert.ok(notes.some(c=>c.source===second&&Math.abs(c.amount-94)<1e-6));
 });
 
  test('one caster applies notes to a new target during the first target cooldown',()=>{

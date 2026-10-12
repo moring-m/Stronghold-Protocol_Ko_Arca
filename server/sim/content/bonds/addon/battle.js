@@ -471,9 +471,14 @@ export function install(battle) {
 
   // 突袭
   if (has(ID.raid)) {
-    battle.on('skillStart',({unit:u})=>{
+    battle.on('skillStart',({unit:u,reason})=>{
       const st=byPid[u?.ownerId];
-      if(onField(u)&&st?.members[ID.raid]?.has(u))battle.addBuff(u,{key:KEY.raid,mods:st.raidMods,refresh:'replace'});
+      if(onField(u)&&st?.members[ID.raid]?.has(u)){
+        battle.addBuff(u,{key:KEY.raid,mods:st.raidMods,refresh:'replace'});
+        // Deployment skills are already active when the poll checks readiness.
+        // Give them the same initial relocation as a ready ordinary skill.
+        if(reason==='deploy'&&!u.mem.raidRelocating)u.mem.raidEntryPending=true;
+      }
     });
     battle.on('skillEnd',({unit:u})=>{
       if(u&&byPid[u.ownerId]?.members[ID.raid]?.has(u))battle.removeBuff(u,KEY.raid);

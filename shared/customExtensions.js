@@ -1,7 +1,11 @@
+import {withLaboratoryDummy,LAB_DUMMY_BOSS} from './laboratoryDummy.js';
+import {RANDOM_BAND_ID,withRandomBands} from './randomBand.js';
 import {eightUniteStage} from './cooperativeEight.js';
 import { customFactionData, filterCustomFaction } from './customFactions.js';
 
 export const RULE_VALUES = Object.freeze([
+ {id:'stockPlayers',name:'상점 재고',default:0,min:-1,max:8,step:1,unit:'',options:[{value:0,label:'자동 (최대 4인 기준)'},...Array.from({length:8},(_,i)=>({value:i+1,label:`${i+1}인 기준`})),{value:-1,label:'무제한'}]},
+ ...[['allyHp','최대 HP'],['allyAtk','공격력'],['allyDef','방어력'],['allyRes','마법 저항'],['allyAspd','공격 속도'],['allyBat','공격 간격'],['allyBlock','저지 수'],['allyCost','배치 비용'],['allyRedeploy','재배치 시간'],['allySpCost','최대 SP'],['allyInitSp','초기 SP'],['allySpRecovery','SP 회복 속도']].map(([id,name])=>({id,name,category:'allies',default:100,min:['allyHp','allyAspd','allyBat','allySpCost'].includes(id)?1:0,step:1,unit:'%'})),
  {id:'roundCount',name:'일반 라운드 수',default:13,min:1,max:100,step:1,unit:'라운드'},
  {id:'deployCap',name:'배치 수 제한',default:8,min:4,max:12,step:1,unit:'명'},
  ...[['enemyHp','적 최대 HP'],['enemyAtk','적 공격력'],['enemyDef','적 방어력'],['enemyRes','적 마법 저항'],['enemySpeed','적 이동 속도'],['enemyAspd','적 공격 속도']].map(([id,name])=>({id,name,default:100,min:id==='enemyHp'||id==='enemyAspd'?1:0,step:1,unit:'%'})),
@@ -20,7 +24,7 @@ export function recordCustomExtensions(value) {
 }
 export function extensionSelectionCount(selection){const saved=recordCustomExtensions(selection);return saved?Object.values(saved).reduce((n,v)=>n+(Array.isArray(v)?v.length:Object.keys(v).length),0):0;}
 export const EXTENSION_CATEGORIES = Object.freeze([
-  {id:'rules',name:'게임 규칙'}, {id:'commonBands',name:'공통 적용 전략'},
+  {id:'rules',name:'게임 규칙'}, {id:'commonBands',name:'공통 적용 전략'}, {id:'allies',name:'아군 스펙 조정'},
   { id: 'bonds', name: '맹약 추가' }, { id: 'stages', name: '전장 추가' },
   {id:'forcedBonds',name:'맹약 금지'}, {id:'protectedBonds',name:'맹약 밴 제외'},
   {id:'forcedAuxBonds',name:'보조맹약 금지'}, {id:'protectedAuxBonds',name:'보조맹약 밴 제외'},
@@ -34,14 +38,14 @@ export function customExtensionCatalog(raw = {}) {
   const banCatalog=Object.entries(raw.bonds||{}).filter(([,b])=>b.isCore&&Number(b.weight)>0).map(([id,b])=>({id,name:b.name||id}));
   const auxCatalog=Object.entries(raw.bonds||{}).filter(([,b])=>!b.isCore&&Number(b.weight)>0).map(([id,b])=>({id,name:b.name||id}));
   return {
-    commonBands:Object.entries(raw.bands||{}).map(([id,b])=>({id,name:b.name||id,description:b.desc||''})),
-    rules:[{id:'unlimitedHpLoss',name:'HP 감소 상한 해제',description:'한 라운드에 감소하는 HP의 10 상한을 해제합니다.'},{id:'sharedHp',name:'아군 HP 공유',description:'모든 참가자의 HP를 합산해 공유합니다. 전투 종료 시 감소 예정 HP를 합산해 차감합니다.'},{id:'unlimitedStock',name:'상점 재고 제한 해제',description:'오퍼레이터와 장비의 상점 재고 제한을 해제합니다.'},{id:'unlimitedLayers',name:'중첩 상한선 해제',description:'맹약의 999중첩 상한선을 해제합니다.'},{id:'defaultHarmony',name:'조화 기본 활성화',description:'조화 오퍼레이터가 없어도 조화 맹약을 활성화합니다.'},{id:'duplicateBands',name:'전략 중복 선택 허용',description:'여러 참가자가 같은 전략을 선택할 수 있습니다.'}],
+    allies:[],commonBands:Object.entries(raw.bands||{}).filter(([id])=>id!==RANDOM_BAND_ID).map(([id,b])=>({id,name:b.name||id,description:b.desc||''})),
+    rules:[{id:'unlimitedHpLoss',name:'HP 감소 상한 해제',description:'한 라운드에 감소하는 HP의 10 상한을 해제합니다.'},{id:'sharedHp',name:'아군 HP 공유',description:'모든 참가자의 HP를 합산해 공유합니다. 전투 종료 시 감소 예정 HP를 합산해 차감합니다.'},{id:'scarecrow',name:'허수아비 모드',description:'일반 보스와 히든 보스를 공격하지 않는 제셀톤 윌리엄스로 교체합니다.'},{id:'unlimitedLayers',name:'중첩 상한선 해제',description:'맹약의 999중첩 상한선을 해제합니다.'},{id:'defaultHarmony',name:'조화 기본 활성화',description:'조화 오퍼레이터가 없어도 조화 맹약을 활성화합니다.'},{id:'duplicateBands',name:'전략 중복 선택 허용',description:'여러 참가자가 같은 전략을 선택할 수 있습니다.'}],
     forcedAuxBonds:auxCatalog,protectedAuxBonds:auxCatalog,
     forcedBonds:banCatalog,protectedBonds:banCatalog,
     disabledBonds:Object.entries(raw.bonds||{}).filter(([,b])=>b.isCore).map(([id,b])=>({id,name:b.name||id,description:b.isCore?'핵심 맹약':'추가 맹약'})),
     disabledStages:[...new Set([...Object.values(raw.config?.modes||{}).flatMap(m=>m.stages||[]),...Object.keys(raw.stages||{}).filter(id=>isCustomStage(id,raw.stages[id]))])].filter(id=>raw.stages?.[id]).map(id=>({id,name:raw.stages[id].name||id,description:'게임의 전장 추첨에서 제외합니다.'})),
     disabledBosses:Object.entries(raw.bosses||{}).map(([id,b])=>({id,name:b.name||id,description:b.hidden?'히든 보스':'일반 보스'})),
-    disabledBands:Object.entries(raw.bands||{}).map(([id,b])=>({id,name:b.name||id,description:'전략 선택에서 제외합니다.'})),
+    disabledBands:Object.entries(raw.bands||{}).filter(([id])=>id!==RANDOM_BAND_ID).map(([id,b])=>({id,name:b.name||id,description:'전략 선택에서 제외합니다.'})),
     bonds: [...(raw.bonds?.leithanienShip?[{id:'leithanien',name:'라이타니엔',description:'속세의 음 맹약과 오퍼레이터, 전용 장비, 위치킹 전략을 추가합니다.'}]:[]), { id: 'ursus', name: '우르수스', description: '우르수스 맹약과 오퍼레이터, 전용 장비, 카셰이 전략을 추가합니다.' }],
     stages: Object.entries(raw.stages || {}).filter(([id,s]) => isCustomStage(id,s)).map(([id,s]) => ({
       id, name: s.name || id, description: s.customExtension?.description || '선택하면 이번 게임의 전장 추첨 목록에 추가됩니다.',
@@ -58,17 +62,21 @@ export function extensionSelectionShape(value) {
 }
 export function normalizeCustomExtensions(value, raw, legacy = false) {
   const catalog = customExtensionCatalog(raw);
-  const input = value === undefined ? { bonds: legacy ? ['ursus'] : [] } : value || {};
+  let input = value === undefined ? { bonds: legacy ? ['ursus'] : [] } : value || {};
+  if(input.rules?.includes('unlimitedStock'))input={...input,ruleValues:{...input.ruleValues,stockPlayers:-1}};
   return {...(input.ruleValues?{ruleValues:normalizeRuleValues(input.ruleValues)}:{}),...Object.fromEntries(EXTENSION_CATEGORIES.map(c => [c.id, catalog[c.id].map(e => e.id).filter(id => input[c.id]?.includes(id))]).filter(([id,ids])=>['bonds','stages'].includes(id)||ids.length))};
 }
 /** Isolated match tables: only enabled and non-excluded content enters gameplay. */
 export function applyCustomExtensions(raw, selection) {
+  if(selection.rules?.includes('unlimitedStock'))selection={...selection,ruleValues:{...selection.ruleValues,stockPlayers:-1}};
+  if(selection.rules?.includes('scarecrow'))raw=withLaboratoryDummy(raw);
+  raw={...raw,bands:withRandomBands(raw.bands)};
   const enabled = selection.bonds.includes('ursus') && !(selection.disabledBonds||[]).includes('ursusShip');
   let data = customFactionData(raw, enabled);
   data=filterCustomFaction(data,'leithanien','leithanienShip',selection.bonds.includes('leithanien')&&!(selection.disabledBonds||[]).includes('leithanienShip'));
   const denied=new Set((selection.disabledBonds||[]).filter(id=>raw.bonds?.[id]?.isCore));
   const chess=Object.fromEntries(Object.entries(data.chess||{}).filter(([,c])=>{const core=(c.bonds||[]).filter(b=>data.bonds?.[b]?.isCore);return !core.some(b=>denied.has(b))||core.some(b=>!denied.has(b));}).map(([id,c])=>[id,{...c,bonds:(c.bonds||[]).filter(b=>!denied.has(b))}]));
-  data={...data,chess,bonds:Object.fromEntries(Object.entries(data.bonds||{}).filter(([id])=>!denied.has(id)).map(([id,b])=>[id,{...b,members:b.members?.filter(x=>chess[x]),visibleMembers:b.visibleMembers?.filter(x=>chess[x])}])),items:Object.fromEntries(Object.entries(data.items||{}).filter(([,i])=>!denied.has(i.giveBondId))),bands:Object.fromEntries(Object.entries(data.bands||{}).filter(([id,b])=>!(selection.disabledBands||[]).includes(id)&&!(b.bondIds||[]).some(x=>denied.has(x)))),bosses:Object.fromEntries(Object.entries(data.bosses||{}).filter(([id])=>!(selection.disabledBosses||[]).includes(id)))};
+  data={...data,chess,bonds:Object.fromEntries(Object.entries(data.bonds||{}).filter(([id])=>!denied.has(id)).map(([id,b])=>[id,{...b,members:b.members?.filter(x=>chess[x]),visibleMembers:b.visibleMembers?.filter(x=>chess[x])}])),items:Object.fromEntries(Object.entries(data.items||{}).filter(([,i])=>!denied.has(i.giveBondId))),bands:Object.fromEntries(Object.entries(data.bands||{}).filter(([id,b])=>(id===RANDOM_BAND_ID||!(selection.disabledBands||[]).includes(id))&&!(b.bondIds||[]).some(x=>denied.has(x)))),bosses:Object.fromEntries(Object.entries(data.bosses||{}).filter(([id])=>(selection.rules?.includes('scarecrow')&&id===LAB_DUMMY_BOSS||!(selection.disabledBosses||[]).includes(id))))};
   const bannedEnemyKeys=new Set((selection.disabledBosses||[]).map(id=>raw.bosses?.[id]?.enemyKey).filter(id=>id&&!Object.values(data.bosses).some(b=>b.enemyKey===id)));
   data.enemies=Object.fromEntries(Object.entries(data.enemies||{}).filter(([id])=>!bannedEnemyKeys.has(id)));
   const chosen = new Set(selection.stages);
@@ -77,6 +85,7 @@ export function applyCustomExtensions(raw, selection) {
     ...m, activeBondIds:(m.activeBondIds||[]).filter(id=>!denied.has(id)),inactiveBondIds:(m.inactiveBondIds||[]).filter(id=>!denied.has(id)),bossWeights:Object.fromEntries(Object.entries(m.bossWeights||{}).filter(([id])=>data.bosses[id])),hiddenBossWeights:Object.fromEntries(Object.entries(m.hiddenBossWeights||{}).filter(([id])=>data.bosses[id])), stages: [...new Set([...(m.stages || []).filter(k => stages[k]), ...selection.stages.filter(k => stages[k]
       && (!Array.isArray(stages[k].customExtension?.modeIds) || stages[k].customExtension.modeIds.includes(id)))])],
   }]));
+  if(selection.rules?.includes('scarecrow'))for(const m of Object.values(modes)){m.bossWeights={[LAB_DUMMY_BOSS]:1};m.hiddenBossWeights={[LAB_DUMMY_BOSS]:1};}
   const roundCount=normalizeRuleValues(selection.ruleValues).roundCount;
   if(roundCount!==13)for(const [id,m] of Object.entries(modes)){
     const original=raw.config.modes[id];
@@ -91,7 +100,7 @@ export function applyCustomExtensions(raw, selection) {
     Object.assign(m,{rounds,enemyScale,roundSource,bossRound:roundCount+1,lastRound:roundCount+1,hiddenRound:original.hiddenRound?roundCount+2:null,spRounds:(original.spRounds||[]).filter(r=>r<=roundCount)});
   }
   const battleStages={...stages,...Object.fromEntries(Object.values(stages).filter(s=>!s.coopEightStage).map(s=>{const four=eightUniteStage(s);return [four.id,four];}))};
-  return { ...data, stages:battleStages, config: { ...raw.config, modes, deployCap:normalizeRuleValues(selection.ruleValues).deployCap, commonBands:(selection.commonBands||[]).filter(id=>data.bands[id]),lpCapPerRound:selection.rules?.includes('unlimitedHpLoss')?Number.MAX_SAFE_INTEGER:raw.config?.lpCapPerRound,customRules:{...normalizeRuleValues(selection.ruleValues),...Object.fromEntries((selection.rules||[]).map(id=>[id,true]))} } };
+  return { ...data, stages:battleStages, config: { ...raw.config, modes, deployCap:normalizeRuleValues(selection.ruleValues).deployCap, commonBands:(selection.commonBands||[]).filter(id=>data.bands[id]),lpCapPerRound:selection.rules?.includes('unlimitedHpLoss')?Number.MAX_SAFE_INTEGER:raw.config?.lpCapPerRound,customRules:{...normalizeRuleValues(selection.ruleValues),unlimitedStock:normalizeRuleValues(selection.ruleValues).stockPlayers===-1,...Object.fromEntries((selection.rules||[]).map(id=>[id,true]))} } };
 }
 /** Validate before creating/starting a match, with the same filtered tables used by combat. */
 export function validateExtensionMinimums(raw,selection,{mode='coop',difficulty='NORMAL'}={}){
@@ -115,7 +124,7 @@ export function validateExtensionMinimums(raw,selection,{mode='coop',difficulty=
   if(!(m.stages||[]).some(id=>data.stages[id]&&data.stages[id].active!==false&&Number(data.stages[id].weight)>0))errors.push('맵을 최소 1개 남겨야 합니다.');
   for(const [key,title,round] of [['bossWeights','일반 보스',m.bossRound],['hiddenBossWeights','히든 보스',m.hiddenRound]])if(round && !Object.entries(m[key]||{}).some(([id,w])=>data.bosses[id]&&w>0))errors.push(`${title}를 최소 1개 남겨야 합니다.`);
   const n=selection.rules?.includes('duplicateBands')?1:mode==='solo'?1:mode==='coop8'?8:4;
-  if(Object.values(data.bands||{}).filter(b=>!b.modeTypeList||b.modeTypeList.includes(m.type)).length<n)errors.push(`전략을 최소 ${n}개 남겨야 합니다.`);
+  if(Object.values(data.bands||{}).filter(b=>b.bandId!==RANDOM_BAND_ID&&(!b.modeTypeList||b.modeTypeList.includes(m.type))).length<n)errors.push(`전략을 최소 ${n}개 남겨야 합니다.`);
  }
  return [...new Set(errors)];
 }

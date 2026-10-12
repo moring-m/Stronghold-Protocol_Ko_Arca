@@ -62,6 +62,7 @@ export function bondOwnerId({ pub, myId, fieldId = null, field = null, layer = '
   }
   const meta = isObj(field) && field.fieldId === fieldId ? field : null;
   const sides = meta ? sidesOf(meta) : {};
+  if(halves && meta && layer.startsWith('P:')){const pid=layer.slice(2);if(ok(pid)&&meta.players?.includes(pid))return pid;}
   if (halves && meta && (layer === 'L' || layer === 'R')) {
     const pid = Object.keys(sides).find((id) => sides[id] === layer);
     if (ok(pid)) return pid;
