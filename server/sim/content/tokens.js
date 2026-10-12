@@ -1591,7 +1591,7 @@ export function spawnMapChar(battle, playerId, tokenId, { alias = null } = {}) {
   const halfOk = (m) => !ps || battle.players.length < 2 || (span ? m.pos[1] >= span[0] && m.pos[1] <= span[1] : (ps.half === 'R' ? m.pos[1] >= 11 : m.pos[1] <= 10));
   cands.sort((a, b) => (halfOk(b) ? 1 : 0) - (halfOk(a) ? 1 : 0) || (/multi_only/.test(String(a.alias)) ? 1 : 0) - (/multi_only/.test(String(b.alias)) ? 1 : 0));
   for (const m of cands) {
-    if (!tileFree(battle, m.pos[0], m.pos[1])) continue;
+    if (!halfOk(m) || !tileFree(battle, m.pos[0], m.pos[1])) continue;
     // stage positions are field tiles: their direction is taken as it is (default RIGHT)
     const u = battle.spawnToken(playerId, tokenId, m.pos[0], m.pos[1], { dir: normDir(m.dir) });
     if (u) return u;

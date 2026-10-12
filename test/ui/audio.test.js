@@ -877,3 +877,23 @@ test('selected KR/JP bank passes its actual URL to playback, including Korean fa
  for(const language of ['kr','jp']){a.setVolumes({voiceLanguage:language});assert.equal(a.voice('char_test','select'),true);assert.equal(played.at(-1)[0],voice[language].char_test.select[0]);}
  assert.equal(played[0][3],voice.jp.char_test.select[0]);
 });
+
+test('a closed audio context is rebuilt on the next gesture with channel volumes retained',()=>{
+ const {win}=fakeWindow(),m=new AudioManager({win});m.install();m._unlock();
+ m.setVolumes({bgm:.3,sfx:.4,voice:.5,chatVolume:.6});const old=m.ctx;old.state='closed';m._unlock();
+ assert.notEqual(m.ctx,old);assert.equal(m.ctx.state,'running');assert.equal(m.bgmGain.gain.value,.3**2*.55);assert.equal(m.sfxGain.gain.value,.4**2*.9);
+ assert.equal(m.voiceGain.gain.value,.5**2);assert.equal(m.chatGain.gain.value,.6**2);
+});
+test('an unexpected visible audio suspension resumes without waiting for a tab switch',async()=>{
+ const{win}=fakeWindow(),Base=win.AudioContext;let changed,resumed=0;
+ win.AudioContext=class extends Base{addEventListener(type,fn){if(type==='statechange')changed=fn;}resume(){resumed++;this.state='running';return Promise.resolve();}};
+ const m=new AudioManager({win});m.install();m._unlock();m.ctx.state='interrupted';changed();await Promise.resolve();
+ assert.equal(resumed,1);assert.equal(m.ctx.state,'running');
+});
+
+test('a stalled audio decode releases its cached promise so later playback can retry',async()=>{
+ const{win}=fakeWindow(),Base=win.AudioContext;win.AudioContext=class extends Base{decodeAudioData(){return new Promise(()=>{});}};
+ const old=globalThis.fetch;globalThis.fetch=async()=>({ok:true,arrayBuffer:async()=>new ArrayBuffer(1)});
+ try{const m=new AudioManager({win,bufferTimeoutMs:10});m._unlock();assert.equal(await m._buffer('/test-stalled-audio.mp3'),null);await Promise.resolve();assert.equal(m.buffers.has('/test-stalled-audio.mp3'),false);
+ m.ctx.decodeAudioData=(ab,ok)=>ok({duration:1});assert.ok(await m._buffer('/test-stalled-audio.mp3'));}finally{globalThis.fetch=old;}
+});

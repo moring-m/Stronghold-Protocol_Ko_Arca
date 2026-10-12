@@ -39,7 +39,7 @@ import { mirrorDir, normDir } from '../sim/dir.js';
  * 0.8: "{0}博士对敌方领袖造成的伤害超过20%!"): a player's damage to the current leader's pool over that pool
  * (SharedBossPool.byPlayer — one pool per boss round, so the Final Assault and the Hidden Core count apart).
  */
-export const BOSS_HIT_STEPS = [0.2, 0.5, 0.8];
+export const BOSS_HIT_STEPS = [0.1, 0.2, 0.5, 0.8];
 
 /**
  * Where a board piece (board row / col / dir) stands on a boss field for side 'L' | 'R' — the same mapping as the

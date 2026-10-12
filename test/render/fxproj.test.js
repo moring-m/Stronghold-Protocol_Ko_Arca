@@ -695,3 +695,8 @@ test('deployment particles stay anchored to the world when the camera moves',()=
  const {fx}=makeFx(),v=unit(701,3,10);fx.deploy(v);assert.ok(fx.parts.length>0);assert.ok(fx.parts.every(p=>p.world?.x===v.x&&p.world?.y===v.y));
  const old=cam.tx;try{cam.tx+=3;cam.update();fx.update(.01);for(const p of fx.parts)assert.ok(Number.isFinite(p.sp.x)&&Number.isFinite(p.sp.y));}finally{cam.tx=old;cam.update();}
 });
+
+test('SP recovery shows a cyan amount anchored to the recovering unit',()=>{
+ const v=unit(990,4,10),{fx}=makeFx({views:[v]});fx.simFx('spRecovered',4,10,{id:990,n:3.5});
+ assert.equal(fx.labels.length,1);assert.equal(fx.labels[0].t.text,'+3.5');assert.equal(fx.labels[0].t.tint,0x6fd3ff);fx.clear();
+});

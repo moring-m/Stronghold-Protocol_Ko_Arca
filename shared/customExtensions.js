@@ -20,7 +20,7 @@ export function recordCustomExtensions(value) {
 }
 export function extensionSelectionCount(selection){const saved=recordCustomExtensions(selection);return saved?Object.values(saved).reduce((n,v)=>n+(Array.isArray(v)?v.length:Object.keys(v).length),0):0;}
 export const EXTENSION_CATEGORIES = Object.freeze([
-  {id:'rules',name:'게임 규칙'}, {id:'commonBands',name:'공통 적용 전략'}, {id:'protectedOperators',name:'오퍼레이터 밴 제외'},
+  {id:'rules',name:'게임 규칙'}, {id:'commonBands',name:'공통 적용 전략'},
   { id: 'bonds', name: '맹약 추가' }, { id: 'stages', name: '전장 추가' },
   {id:'forcedBonds',name:'맹약 금지'}, {id:'protectedBonds',name:'맹약 밴 제외'},
   {id:'forcedAuxBonds',name:'보조맹약 금지'}, {id:'protectedAuxBonds',name:'보조맹약 밴 제외'},
@@ -35,7 +35,6 @@ export function customExtensionCatalog(raw = {}) {
   const auxCatalog=Object.entries(raw.bonds||{}).filter(([,b])=>!b.isCore&&Number(b.weight)>0).map(([id,b])=>({id,name:b.name||id}));
   return {
     commonBands:Object.entries(raw.bands||{}).map(([id,b])=>({id,name:b.name||id,description:b.desc||''})),
-    protectedOperators:[...new Map(Object.entries(raw.chess||{}).filter(([,c])=>c.visible&&!c.isDiy&&!c.isGolden&&!c.optionalRecruit&&!c.isHidden&&typeof c.charId==='string'&&c.charId.length).map(([id,c])=>[c.charId,{id:c.charId,name:c.name||id,description:`${c.tier}단계`}])).values()],
     rules:[{id:'unlimitedHpLoss',name:'HP 감소 상한 해제',description:'한 라운드에 감소하는 HP의 10 상한을 해제합니다.'},{id:'sharedHp',name:'아군 HP 공유',description:'모든 참가자의 HP를 합산해 공유합니다. 전투 종료 시 감소 예정 HP를 합산해 차감합니다.'},{id:'unlimitedStock',name:'상점 재고 제한 해제',description:'오퍼레이터와 장비의 상점 재고 제한을 해제합니다.'},{id:'unlimitedLayers',name:'중첩 상한선 해제',description:'맹약의 999중첩 상한선을 해제합니다.'},{id:'defaultHarmony',name:'조화 기본 활성화',description:'조화 오퍼레이터가 없어도 조화 맹약을 활성화합니다.'},{id:'duplicateBands',name:'전략 중복 선택 허용',description:'여러 참가자가 같은 전략을 선택할 수 있습니다.'}],
     forcedAuxBonds:auxCatalog,protectedAuxBonds:auxCatalog,
     forcedBonds:banCatalog,protectedBonds:banCatalog,
@@ -99,10 +98,6 @@ export function validateExtensionMinimums(raw,selection,{mode='coop',difficulty=
  const data=applyCustomExtensions(raw,selection);
  const modes=Object.values(data.config?.modes||{}).filter(m=>m.difficulty===difficulty&&(mode==='solo'?m.type==='SINGLE':m.type==='MULTI'));
  const errors=[];
- if(mode==='coop8')for(let tier=1;tier<=6;tier++){
-  const candidates=Object.entries(data.chess||{}).filter(([id,c])=>c.visible&&!c.isGolden&&!c.optionalRecruit&&c.tier===tier&&!selection.protectedOperators?.includes(c.charId)&&!selection.protectedOperators?.includes(id));
-  if(!candidates.length)errors.push(`${tier}단계에 밴 가능한 오퍼레이터를 최소 1명 남겨야 합니다.`);
- }
  if((selection.commonBands||[]).some(id=>!data.bands[id]))errors.push('공통 적용 전략은 활성화된 전략 중에서 선택해야 합니다.');
  for(const m of modes){
   const allowed=Object.entries(data.bonds||{}).filter(([id,b])=>Number(b.weight)>0&&!(m.inactiveBondIds||[]).includes(id));
@@ -125,8 +120,8 @@ export function validateExtensionMinimums(raw,selection,{mode='coop',difficulty=
  return [...new Set(errors)];
 }
 
-/** Eight-player mode replaces bond bans with operator bans. Strip stale preset policies too. */
+/** Eight-player mode has no bans. Strip stale preset policies too. */
 export function modeExtensionSelection(selection,mode){
  if(mode!=='coop8')return selection;
- const result={...selection};for(const key of ['forcedBonds','protectedBonds','forcedAuxBonds','protectedAuxBonds','disabledBonds'])delete result[key];return result;
+ const result={...selection};for(const key of ['forcedBonds','protectedBonds','forcedAuxBonds','protectedAuxBonds','disabledBonds','protectedOperators'])delete result[key];return result;
 }

@@ -46,7 +46,7 @@ function toHiddenCore({ mode = 'coop', difficulty = 'NORMAL', humans = 1, client
 }
 
 /** The threshold a BOSS_HIT ticker announces (its config param, from the text: "超过N%"). */
-const stepOf = (hit) => Number(/超过(\d+)%/.exec(hit.text)[1]) / 100;
+const stepOf = (hit) => Number(/(\d+)%/.exec(hit.text)[1]) / 100;
 
 /** Every ticker of `phase` announces at most what the player really dealt to that leader, in rising order, once each. */
 function assertTruthful(hits, phase, players) {
@@ -71,7 +71,7 @@ test('C1 (solo 绝境, server-run fields): the Hidden Core\'s first hit announce
   assert.deepEqual(fa.map(stepOf), [0.8], 'the Final Assault cleared by one hit: 80 %');
   const hidden = assertTruthful(hits, PHASE.HIDDEN_CORE, ['p_0']);
   assert.deepEqual(hidden.map(stepOf), BOSS_HIT_STEPS, 'the Hidden Core announces its own 20 / 50 / 80 % as they are reached');
-  assert.ok(hidden[0].leaderHpPct <= 0.8 + 1e-9, `the first hidden ticker comes after 20 % of the hidden leader (leader at ${(hidden[0].leaderHpPct * 100).toFixed(2)} %)`);
+  assert.ok(hidden[0].leaderHpPct <= 0.9 + 1e-9, `the first hidden ticker comes after 20 % of the hidden leader (leader at ${(hidden[0].leaderHpPct * 100).toFixed(2)} %)`);
   // the result screen's 领袖伤害 keeps the whole match: the Final Assault's pool plus the hidden one
   assert.ok(end.players[0].stats.bossDamage > m.bossPool.maxHp, `领袖伤害 ${end.players[0].stats.bossDamage}`);
   checkInvariants(m);

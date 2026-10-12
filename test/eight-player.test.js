@@ -12,16 +12,16 @@ import {drawDisabledBonds} from '../server/match/pool.js';
 import {roomSeatCap} from '../shared/constants.js';
 import {modeExtensionSelection} from '../shared/customExtensions.js';
 
-test('eight seats retain four-seat mode, ban one per tier, respect protected operators and strip bond policies',t=>{
+test('eight seats retain four-seat mode, have no bans and strip outdated ban policies',t=>{
  assert.equal(roomSeatCap('coop'),4);assert.equal(roomSeatCap('coop8'),8);
  const first=Object.values(DATA.chess).find(c=>c.visible&&!c.isGolden&&!c.optionalRecruit&&c.tier===1);
  const selection={bonds:[],stages:[],protectedOperators:[first.charId],forcedBonds:['yanShip'],disabledBonds:['kazimierzShip']};
  const h=makeMatch({mode:'coop8',humans:8,customExtensions:selection});t.after(()=>h.m.dispose());const m=h.m;
  assert.equal(m.order.length,8);assert.equal(m.mode,'coop8');assert.deepEqual(m.disabledBonds,[]);assert.deepEqual(m.staticInactiveBonds,[]);
- assert.equal(m.bannedChess.length,6);assert.deepEqual(m.bannedChess.map(id=>m.gd.chess(id).tier),[1,2,3,4,5,6]);
+ assert.deepEqual(m.bannedChess,[]);
  assert.ok(m.bannedChess.every(id=>m.gd.chess(id).charId!==first.charId));assert.ok(!m.customExtensions.disabledBonds);
  assert.equal(m.gd.unite.maxHelpers,4);assert.equal(pairPlayers(m.order).length,4);assert.equal(m.gd.bossPoolShare(8),8);
- const bans=drawDisabledBonds(m.gd,createRng(12),{...m.customExtensions,mode:m.mode});assert.equal(bans.banned.length,6);assert.ok(bans.banned.every(id=>m.gd.chess(id).charId!==first.charId));
+ const bans=drawDisabledBonds(m.gd,createRng(12),{...m.customExtensions,mode:m.mode});assert.equal(bans.banned.length,0);assert.ok(bans.banned.every(id=>m.gd.chess(id).charId!==first.charId));
  assert.ok(!modeExtensionSelection(selection,'coop8').forcedBonds);
 });
 

@@ -58,6 +58,8 @@ export const COMBAT_TIME_SCALE = 2;
 /** Strip the _a/_b suffix of an item id (the registry key of an item family). */
 export const itemKey = (id) => (typeof id === 'string' ? id.replace(/_[ab]$/, '') : '');
 
+const COOP8_COMMUNICATION_ITEMS = new Set(['chess_item_2_06_e_a','chess_item_4_01_e_a','chess_item_5_04_e_a']);
+
 export class GameData {
   /**
    * @param {Readonly<Record<string, any>>} data server/data.js getData() (may be partial)
@@ -66,6 +68,7 @@ export class GameData {
   constructor(data, modeId) {
     this.raw = data && typeof data === 'object' ? data : {};
     this.config = getConfig(this.raw) || {};
+    if(!(this.config.broadcasts||[]).some(b=>b.type==='BOSS_HIT'&&b.params?.includes('0.1')))this.config={...this.config,broadcasts:[...(this.config.broadcasts||[]),{id:'comment_boss_hit_0',type:'BOSS_HIT',priority:30,params:['0.1'],text:'{0} 박사가 적 보스에게 전체 HP의 10%에 해당하는 피해를 입혔습니다!'}]};
     this.modeId = modeId;
     this.mode = getMode(modeId, this.raw) || {};
     this.economy = this.config.economy && typeof this.config.economy === 'object' ? this.config.economy : {};
@@ -222,7 +225,8 @@ export class GameData {
 
   itemPrice(id) {
     const it = this.item(id);
-    return it && Number.isFinite(it.price) && it.price >= 0 ? it.price : 2;
+    const price = it && Number.isFinite(it.price) && it.price >= 0 ? it.price : 2;
+    return this.config.coop8&&COOP8_COMMUNICATION_ITEMS.has(this.baseIdOf(id))?Math.max(0,price-1):price;
   }
 
   get refreshPrice() { return Math.max(0, numOr(this.economy.refreshPrice, DEFAULTS.refreshPrice)); }
@@ -257,7 +261,7 @@ export class GameData {
     const base = Number.isInteger(v) && v >= 0 ? v : (DEFAULTS.poolCopies[tier] ?? 10);
     // The measured doubled pool is shared by the whole co-op team, independent of team size. DIY and optional recruits remain private stock.
     const multiplier = this.isSolo || this.chess(baseId)?.isDiy || this.chess(baseId)?.optionalRecruit ? 1 : posIntOr(this.economy.coopPoolMultiplier, 1);
-    return base * multiplier * (this.config.coop8&&!this.chess(baseId)?.isDiy&&!this.chess(baseId)?.optionalRecruit?2:1);
+    return base * multiplier;
   }
 
   /** Normal equipment copies in the shared pool; effect-only items have no shop stock limit. */
@@ -266,7 +270,7 @@ export class GameData {
     const base = this.baseIdOf(id), rec = this.item(base);
     if (!rec || !isShopItem(rec)) return null;
     const count = this.economy.itemPoolCopiesOverrides?.[base] ?? this.economy.itemPoolCopies?.[rec.tier];
-    return Number.isInteger(count) && count >= 0 ? count*(this.config.coop8?2:1) : null;
+    return Number.isInteger(count) && count >= 0 ? count*(this.config.coop8&&COOP8_COMMUNICATION_ITEMS.has(base)?2:1) : null;
   }
 
   /** Copies needed to merge (0 = never merges: golden chess). */

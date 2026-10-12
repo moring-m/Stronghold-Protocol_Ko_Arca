@@ -37,7 +37,7 @@ function ProgressList({ list }) {
  */
 export function CombatHud({ pub, myId, watching, hud, myDone, onWatch, spectating = false, spectator = false, client = null }) {
   // `spectator`: a spectator seat (community report #26) watches like an eliminated player, under its own caption
-  if (client) return ClientHud({ hud, myDone, spectating, spectator, client });
+  if (client) return ClientHud({ hud, myDone, spectating, spectator, client, reverseLayers:pub?.mode==='coop8' && pub?.phase==='UNITE' });
   const fields = (Array.isArray(pub?.fields) ? pub.fields : []).filter((f) => f && f.live !== false);
   // the watched field may already have finished (not live): still name it
   const label = switcherLabel(pub, watching, myId, spectating);
@@ -59,7 +59,7 @@ export function CombatHud({ pub, myId, watching, hud, myDone, onWatch, spectatin
   </div>`;
 }
 
-function ClientHud({ hud, myDone, spectating, spectator = false, client }) {
+function ClientHud({ hud, myDone, spectating, spectator = false, client, reverseLayers=false }) {
   const layers = Array.isArray(client.layers) ? client.layers : [];
   const idx = Math.max(0, layers.findIndex((l) => l.key === (client.layer || 'ALL')));
   const cur = layers[idx] || null;
@@ -84,10 +84,10 @@ function ClientHud({ hud, myDone, spectating, spectator = false, client }) {
           <span class="btn__label">返回战场</span></button>` : null}
       </div>` : null}
       ${halves ? html`<div class=${cx('vswitch', 'chud__layers', observing && 'is-observing')}>
-        <button type="button" class="vswitch__arrow" disabled=${idx <= 0} aria-label="左侧战场" onClick=${() => step(-1)}><${Icon} name="chevronLeft" /></button>
+        <button type="button" class="vswitch__arrow" disabled=${reverseLayers?idx >= layers.length-1:idx <= 0} aria-label=${reverseLayers?'다음 전장':'左侧战场'} onClick=${() => step(reverseLayers?1:-1)}><${Icon} name="chevronLeft" /></button>
         <span class="vswitch__label">
           ${cur && cur.watch ? html`<${GIcon} name="eye" />` : null}<span>${cur ? cur.label : '全景'}</span></span>
-        <button type="button" class="vswitch__arrow" disabled=${idx >= layers.length - 1} aria-label="右侧战场" onClick=${() => step(1)}><${Icon} name="chevronRight" /></button>
+        <button type="button" class="vswitch__arrow" disabled=${reverseLayers?idx <= 0:idx >= layers.length - 1} aria-label=${reverseLayers?'이전 전장':'右侧战场'} onClick=${() => step(reverseLayers?-1:1)}><${Icon} name="chevronRight" /></button>
         ${observing && client.onBack ? html`<button type="button" class="btn btn--secondary btn--sm chud__back" onClick=${() => client.onBack()}>
           <span class="btn__label">返回战场</span></button>` : null}
       </div>` : null}

@@ -754,7 +754,7 @@ export class PlayerState {
   /** Normal item → golden version in place (整备). */
   upgradeItem(piece) {
     const rec = this.gd.item(piece.id);
-    if (!rec || rec.isGolden) return false;
+    if (!rec || rec.isGolden || this.gd.baseIdOf(piece.id)==='chess_item_5_08_e_a') return false;
     const gid = rec.upgradeChessId || rec.goldenId;
     if (!gid || !this.gd.item(gid)) return false;
     const exempt = piece.stockCopies === 0;

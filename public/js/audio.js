@@ -492,6 +492,7 @@ export class AudioManager {
     this.random = typeof opts.random === 'function' ? opts.random : Math.random;   // a unit sound's chance (mix.p)
     this.win = opts.win ?? (typeof window !== 'undefined' ? window : null);
     this.ctx = null;
+    this.bufferTimeoutMs = Number.isFinite(opts.bufferTimeoutMs)&&opts.bufferTimeoutMs>0?opts.bufferTimeoutMs:15000;
     this.master = null;
     this.bgmGain = null;
     this.sfxGain = null;
@@ -515,6 +516,7 @@ export class AudioManager {
     this.voiceOverrides={};
     this.startVoiceDone = false; // One randomly selected deployed operator per field.
     this.uiVoices = 0;
+    this.desiredBgm = null;
     this.wantBgm = null;      // desired key (kept while locked)
     this.bgm = null;          // { key, loopUrl, nodes: [{src, gain}], gain }
     this.bgmToken = 0;
@@ -552,6 +554,13 @@ export class AudioManager {
    * unlocks output after something was started in a gesture).
    */
   _unlock() {
+    if (this.ctx?.state === 'closed') {
+      this.wantBgm=this.desiredBgm;
+      ++this.bgmToken;this.bgm=null;this.pendingBgm=null;
+      this.stopChatNotification();this._stopVoice();
+      this.uiVoices=0;this.limiter=new SfxLimiter();this.buffers.clear();this.bufBytes.clear();
+      this.ctx=null;this.master=this.bgmGain=this.sfxGain=this.voiceGain=this.chatGain=null;
+    }
     if (this.ctx) {
       const st = this.ctx.state;
       if (st === 'running') { this._dropUnlock(); return; }
@@ -581,7 +590,7 @@ export class AudioManager {
       try {
         this.ctx.addEventListener?.('statechange', () => {
           const s = this.ctx?.state;
-          if (s && s !== 'running' && s !== 'closed' && !this.win?.document?.hidden) this._armUnlock();
+          if (s && s !== 'running' && !this.win?.document?.hidden) {this._armUnlock();if(s!=='closed')this._onVis();}
         });
       } catch { /* ignore */ }
       this._applyVolumes();
@@ -629,6 +638,7 @@ export class AudioManager {
   _onVis() {
     try {
       if (!this.ctx) return;
+      if(this.ctx.state==='closed'){this._armUnlock();if(!this.win?.document?.hidden)this._unlock();return;}
       if (this.win?.document?.hidden) this.ctx.suspend().catch(() => {});
       else if (this.ctx.state !== 'running') {
         // back on the page: resume, and keep a gesture ready in case the browser wants one first (iOS after a call)
@@ -710,21 +720,25 @@ export class AudioManager {
         const media = mediaUrl(url);
         const voiceFile = /\/voice\//.test(url),chatFile=url.startsWith('/audio/chat-notification/');
         const cache = (voiceFile||chatFile) && globalThis.caches ? await globalThis.caches.open(chatFile?'stronghold-chat-notifications-v1':'stronghold-operator-voices-v1').catch(()=>null) : null;
-        let res = await cache?.match(url) || await fetch(media);
+        let res = await cache?.match(url) || await fetch(media,{signal:globalThis.AbortSignal?.timeout?.(this.bufferTimeoutMs)});
         if (media !== url && !isAudioResponse(res)) {
           // Drop the unusable response (404, or a 200 that is really index.html) before trying the original URL.
           try { await res.body?.cancel?.(); } catch { /* the fallback request matters more than draining this one */ }
-          res = await fetch(url);
+          res = await fetch(url,{signal:globalThis.AbortSignal?.timeout?.(this.bufferTimeoutMs)});
         }
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         if (cache && res.ok) await cache.put(url,res.clone()).catch(()=>{});
         const ab = await res.arrayBuffer();
-        return await new Promise((resolve) => {
+        const decoded = await new Promise((resolve) => {
+          const timeout=setTimeout(()=>finish(null),this.bufferTimeoutMs);
+          const finish=value=>{clearTimeout(timeout);resolve(value);};
           try {
-            const r = this.ctx.decodeAudioData(ab, resolve, () => resolve(null));
-            if (r && typeof r.then === 'function') r.then(resolve, () => resolve(null));
-          } catch { resolve(null); }
+            const r = this.ctx.decodeAudioData(ab, finish, () => finish(null));
+            if (r && typeof r.then === 'function') r.then(finish, () => finish(null));
+          } catch { finish(null); }
         });
+        if(!decoded)await cache?.delete(url).catch(()=>{});
+        return decoded;
       } catch (err) {
         this._warn(url, err);
         return null;
@@ -815,6 +829,7 @@ export class AudioManager {
    * @param {string|null} key see bgmKeyFor
    */
   playBgm(key) {
+    this.desiredBgm=key;
     try {
       if (!this.ctx) { this.wantBgm = key; return; }
       const track = resolveBgm(this.getManifest(), key);

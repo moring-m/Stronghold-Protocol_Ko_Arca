@@ -22,7 +22,7 @@ export function eightUniteStage(stage){
  const shifted=(d,offset,alias)=>({...d,pos:[d.pos[0],d.pos[1]+offset],alias:`${d.alias||d.key}:${alias}`,...(Array.isArray(d.rangeTiles)?{rangeTiles:d.rangeTiles.map(p=>[p[0],p[1]+offset])}:{})});
  const allDevices=[...devices,...fieldDevices.map(d=>shifted(d,16,'right'))].filter(d=>!(d.pos?.[0]>=9&&d.pos?.[0]<=12&&d.pos?.[1]>=16&&d.pos?.[1]<=18));
  allDevices.push(...fieldDevices.filter(d=>d.pos[1]>=8&&d.pos[1]<=10).map(d=>shifted(d,8,'middle')));
- const result={...stage,id:eightUniteStageId(stage.id),name:`${stage.name||stage.id} · 4인 협력방어`,active:false,coopEightStage:true,originalStageId:stage.id,size:[rows.length,37],rows,devices:allDevices};
+ const result={...stage,id:eightUniteStageId(stage.id),name:`${stage.name||stage.id} · 4인 협력방어`,active:false,coopEightStage:true,originalStageId:stage.id,size:[rows.length,37],rows,devices:allDevices,mapChars:[...(stage.mapChars||[]),...(stage.mapChars||[]).filter(m=>m.pos?.[0]>=9&&m.pos?.[0]<=12).map(m=>({...m,pos:[m.pos[0],m.pos[1]+16],alias:`${m.alias}:right`}))]};
  stageCache.set(stage,result);return result;
 }
 export function eightUniteRoutes(routes){

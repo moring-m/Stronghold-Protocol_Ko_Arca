@@ -569,3 +569,13 @@ test('active Notes display one foreground treble-clef effect regardless of stack
  const clef=v.noteClef,fx=v.noteFx;v.setNoteStacks(600);v.update(.016,cam(),1);assert.equal(v.noteClef,clef);assert.equal(v.noteFx,fx);assert.ok(v.noteFx.visible);
  v.setNoteStacks(0);v.update(.016,cam(),2);assert.equal(v.noteFx.visible,false);v.destroy();
 });
+
+test('Eyjafjalla Volcano uses its front model while facing up, returning to back when the skill ends',async()=>{
+ const {UF}=await import('../../shared/constants.js');
+ for(const id of ['char_180_amgoat','skin_char_180_amgoat_summer_5','skin_char_180_amgoat_sanrio_2']){
+  const a=store();a.hasBack=()=>true;
+  const v=view({spine:id,charId:'char_180_amgoat',skillIndex:2}, {},a);v.dir='UP';v.alive=true;
+  v.flags=0;assert.equal(v._wantsBack(),true);v.flags=UF.SKILL;assert.equal(v._wantsBack(),false);
+  v.info.skillIndex=1;assert.equal(v._wantsBack(),true);v.destroy();
+ }
+});

@@ -152,7 +152,7 @@ export function ensureDamageFonts() {
         fontFamily: ['Bender', 'Oxanium', 'Rajdhani', 'Arial Black', 'sans-serif'], fontSize: 44, fontWeight: '700',
         fill: st.fill, fillGradientStops: [0.25, 1], stroke: st.stroke, strokeThickness: 7,
         dropShadow: true, dropShadowColor: '#000000', dropShadowAlpha: 0.45, dropShadowDistance: 2, dropShadowBlur: 2,
-      }, { chars: [['0', '9'], '+-×!BLOCK'], resolution: 2, padding: 6 });
+      }, { chars: [['0', '9'], '+-.×!BLOCK'], resolution: 2, padding: 6 });
     } catch (err) { console.warn('[fx] bitmap font', st.font, err?.message || err); }
   }
   fontsReady = true;
@@ -188,7 +188,7 @@ export const FX_KINDS = Object.freeze({
   // support
   heal: { a: 'heal', c: 0x62f08a }, healAoe: { a: 'healAoe', c: 0x62f08a, r: 1.5 }, bandage: { a: 'heal', c: 0x62f08a }, blessing: { a: 'healAoe', c: 0xfff0a8 },
   cleanse: { a: 'healAoe', c: 0xdfffff, r: 0.9 }, revive: { a: 'summon', c: 0xfff0a8 }, reborn: { a: 'summon', c: 0xffd45a }, hpShare: { a: 'heal', c: 0xff9aa6 },
-  spGift: { a: 'sp', c: 0x6fd3ff }, spGain: { a: 'sp', c: 0x6fd3ff }, reload: { a: 'sp', c: 0xffe066 },
+  spRecovered: { a: 'sp', c: 0x6fd3ff }, spGift: { a: 'sp', c: 0x6fd3ff }, spGain: { a: 'sp', c: 0x6fd3ff }, reload: { a: 'sp', c: 0xffe066 },
   shield: { a: 'shield', c: 0xdfe8ff }, catShield: { a: 'shield', c: 0xffe0a8 }, saltWard: { a: 'shield', c: 0xbfeeff }, shell: { a: 'shield', c: 0xc8b890 },
   vest: { a: 'shield', c: 0xdfe8ff }, sleepGuard: { a: 'shield', c: 0xa8b6ff }, truesilver: { a: 'shield', c: 0xfff3b8 }, shieldBreak: { a: 'shatter', c: 0xdfe8ff },
   // arrivals / departures
@@ -1843,6 +1843,7 @@ export class FxSystem {
         break;
       }
       case 'sp': {
+        if(kind==='spRecovered' && Number(ex.n)>0)this.numberAt(p.x,p.y,`+${Math.round(Number(ex.n)*100)/100}`,col,.8,at);
         for (let i = 0; i < (this.quality === 'low' ? 3 : 7); i++) {
           this.particle('dot', p.x + (Math.random() - 0.5) * s * 0.6, p.y + (Math.random() - 0.2) * s * 0.4, { tint: col, vy: -s * (0.6 + Math.random() * 0.6), life: 0.7, s0: s / 32 * 0.2, s1: 0, a0: 1, a1: 0, fadeIn: 0.05 });
         }

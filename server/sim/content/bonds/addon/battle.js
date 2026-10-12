@@ -352,11 +352,13 @@ function raidTargets(battle, u, pid, { taunt = false } = {}) {
   const own = [], other = [];
   for (const e of battle.enemies) {
     if (!raidGroundEnemy(u, e)) continue;
-    (e.ownerId === pid ? own : other).push(e);
+    const onOwnField = battle.kind==='unite' ? battle.onOwnBoard(battle.getPlayer(pid),Math.round(e.y),Math.round(e.x)) : e.ownerId===pid;
+    (onOwnField ? own : other).push(e);
   }
-  const list = own.length ? own : other;
+  const list = battle.kind === 'unite' ? [...own,...other] : own.length ? own : other;
+  const ownSet = new Set(own);
   const dist = new Map(list.map((e) => [e, num(battle.remainingDistance ? battle.remainingDistance(e) : 0)]));
-  list.sort((a, b) => (taunt ? num(b.s.taunt) - num(a.s.taunt) : 0) || dist.get(a) - dist.get(b) || a.id - b.id);
+  list.sort((a, b) => (battle.kind==='unite'&&!taunt ? Number(ownSet.has(b))-Number(ownSet.has(a)) : 0) || (taunt ? num(b.s.taunt) - num(a.s.taunt) : 0) || dist.get(a) - dist.get(b) || a.id - b.id);
   return list;
 }
 
@@ -388,8 +390,13 @@ function raidPoll(battle, st) {
     // target would redeploy — firing every 部署时 effect — at every poll; the idle trigger, which lacked it up to
     // 0.1.1, hopped every 10 s: issue #51)
     const reach = raidReach(u);
-    for (let i = 0; i < list.length && i < RAID_TARGETS; i++) {
-      const tile = raidTile(battle, u, list[i], reach);
+    const counts = new Map();
+    const candidates = battle.kind==='unite' ? list.filter(e=>{
+      const field=battle.players.find(ps=>battle.onOwnBoard(ps,Math.round(e.y),Math.round(e.x)))?.playerId ?? 'outside';
+      const n=counts.get(field)||0;counts.set(field,n+1);return n<RAID_TARGETS;
+    }) : list.slice(0,RAID_TARGETS);
+    for (const target of candidates) {
+      const tile = raidTile(battle, u, target, reach);
       if (!tile) continue;
       targets = taunted = null; // the retreat / redeploy handlers (部署时 effects) may change the enemies: the next member re-sorts
       const res = raidRedeploy(battle, u, tile[0], tile[1]);
@@ -399,7 +406,7 @@ function raidPoll(battle, st) {
       u.mem[KEY.raid] = battle.time; // with deployedAt: the idle time starts again from the landing
       if (res === 'raid') {
         battle.addBuff(u, { key: KEY.raid, mods: st.raidMods });
-        fxOn(battle, 'blink', u, KEY.raid, 'relocate', { target: list[i].id });
+        fxOn(battle, 'blink', u, KEY.raid, 'relocate', { target: target.id });
       }
       break;
     }

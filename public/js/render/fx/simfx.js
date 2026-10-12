@@ -120,6 +120,7 @@ export class FxSim {
         break;
       }
       case 'sp': {
+        if(kind==='spRecovered' && Number(ex.n)>0)this.numberAt(p.x,p.y,`+${Math.round(Number(ex.n)*100)/100}`,col,.8,at);
         for (let i = 0; i < (this.quality === 'low' ? 3 : 7); i++) {
           this.particle('dot', p.x + (Math.random() - 0.5) * s * 0.6, p.y + (Math.random() - 0.2) * s * 0.4, { tint: col, vy: -s * (0.6 + Math.random() * 0.6), life: 0.7, s0: s / 32 * 0.2, s1: 0, a0: 1, a1: 0, fadeIn: 0.05 });
         }

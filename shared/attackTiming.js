@@ -16,9 +16,9 @@ export const NORMAL_ATTACK_BUFF_SKILLS = [
  ['char_183_skgoat',[0]], ['char_381_bubble',[0]], ['char_150_snakek',[0]],
  ['char_136_hsguma',[0,1]], ['char_128_plosis',[0]], ['char_213_mostma',[0]],
  ['char_197_poca',[0,1]], ['char_1023_ghost2',[0]],
- // Eyjafjalla's unnumbered Skill_Start/Loop/End belongs to S2.
- // S1 and S3 use the ordinary Attack clip; never borrow S2's motion for S3.
- ['char_180_amgoat',[0,2]],
+ // Eyjafjalla's unnumbered continuous Skill loop is Volcano (S3).
+ // Ignition (S2) enhances one ordinary attack and has no separate body motion.
+ ['char_180_amgoat',[0,1]],
 ];
 const ACTIVATION_GESTURE_SKILLS = [
  ['char_494_vendla',[0,1]], ['char_1020_reed2',[1]], ['char_1023_ghost2',[0]],

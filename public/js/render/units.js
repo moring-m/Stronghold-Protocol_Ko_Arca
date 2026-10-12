@@ -980,6 +980,8 @@ export class UnitView {
   _wantsBack() {
     const a = this.ctx.assets;
     const id = this.info.spine || this.info.defId;
+    // Eyjafjalla's Back skeleton has no Volcano animation, including both skins.
+    if (!this.isEnemy && this.info.skillIndex===2 && (this.flags & UF.SKILL) && String(this.info.charId || id).includes('char_180_amgoat')) return false;
     if (this.isEnemy || this.dir !== 'UP' || !id || !a || typeof a.hasBack !== 'function' || !a.hasBack(id)) return false;
     return this.alive || dieClipDur(typeof a.spineEntry === 'function' ? a.spineEntry(id, { back: true }) : null) > 0;
   }

@@ -435,3 +435,13 @@ describe('§20.15 the popup of a card\'s bond chip: the UNIT owner\'s bond (a sh
     assert.deepEqual([pop2.self, pop2.name, pop2.entry.layers], [true, null, 12]);
   });
 });
+
+test('eight-player unite advances the unchanged camera order with the left arrow only',()=>{
+ const layers=['ALL','P1','P2','P3','P4'].map(key=>({key,label:key}));
+ for(const[mode,phase,reverse]of[['coop8','UNITE',true],['coop','UNITE',false],['coop8','FINAL_ASSAULT',false]]){
+  let picked;const v=CombatHud({pub:{mode,phase},hud:null,myDone:false,client:{layers,layer:'ALL',onLayerStep:d=>{picked=d;}}});
+  const buttons=[...walk(v)].filter(v=>v.type==='button'&&hasClass(v,'vswitch__arrow'));
+  assert.equal(buttons.length,2);assert.equal(buttons[0].props.disabled,!reverse);assert.equal(buttons[1].props.disabled,reverse);
+  buttons[reverse?0:1].props.onClick();assert.equal(picked,1);assert.deepEqual(layers.map(x=>x.key),['ALL','P1','P2','P3','P4']);
+ }
+});
