@@ -1,0 +1,365 @@
+[
+  {
+    "name": "卡涅利安",
+    "skill": 1,
+    "attacks": [],
+    "skillEffects": [
+      "spRecovered",
+      "shell"
+    ],
+    "errors": 0
+  },
+  {
+    "name": "卡涅利安",
+    "skill": 2,
+    "attacks": [
+      "beam",
+      "beam",
+      "beam",
+      "beam"
+    ],
+    "skillEffects": [
+      "spRecovered",
+      "sandChainsCharged"
+    ],
+    "errors": 0
+  },
+  {
+    "name": "卡涅利安",
+    "skill": 3,
+    "attacks": [
+      "beam",
+      "beam",
+      "beam"
+    ],
+    "skillEffects": [
+      "spRecovered",
+      "devour"
+    ],
+    "errors": 0
+  },
+  {
+    "name": "纯烬艾雅法拉",
+    "skill": 1,
+    "attacks": [
+      "orb",
+      "orb"
+    ],
+    "skillEffects": [
+      "spRecovered"
+    ],
+    "errors": 0
+  },
+  {
+    "name": "纯烬艾雅法拉",
+    "skill": 2,
+    "attacks": [
+      "orb",
+      "orb"
+    ],
+    "skillEffects": [
+      "spRecovered",
+      "shield"
+    ],
+    "errors": 0
+  },
+  {
+    "name": "纯烬艾雅法拉",
+    "skill": 3,
+    "attacks": [
+      "orb",
+      "orb",
+      "orb",
+      "orb",
+      "orb",
+      "orb",
+      "orb",
+      "orb",
+      "orb",
+      "orb"
+    ],
+    "skillEffects": [
+      "spRecovered"
+    ],
+    "errors": 0
+  },
+  {
+    "name": "어스스피릿",
+    "skill": 1,
+    "attacks": [
+      "bolt",
+      "bolt",
+      "bolt"
+    ],
+    "skillEffects": [
+      "spRecovered"
+    ],
+    "errors": 0
+  },
+  {
+    "name": "어스스피릿",
+    "skill": 2,
+    "attacks": [],
+    "skillEffects": [
+      "spRecovered"
+    ],
+    "errors": 0
+  },
+  {
+    "name": "체르니",
+    "skill": 1,
+    "attacks": [
+      "none",
+      "none",
+      "none"
+    ],
+    "skillEffects": [
+      "spRecovered"
+    ],
+    "errors": 0
+  },
+  {
+    "name": "체르니",
+    "skill": 2,
+    "attacks": [
+      "none",
+      "none",
+      "none"
+    ],
+    "skillEffects": [
+      "spRecovered"
+    ],
+    "errors": 0
+  },
+  {
+    "name": "디아만테",
+    "skill": 1,
+    "attacks": [
+      "bolt",
+      "bolt",
+      "bolt"
+    ],
+    "skillEffects": [
+      "spRecovered"
+    ],
+    "errors": 0
+  },
+  {
+    "name": "디아만테",
+    "skill": 2,
+    "attacks": [
+      "bolt",
+      "bolt",
+      "bolt",
+      "bolt",
+      "bolt"
+    ],
+    "skillEffects": [
+      "spRecovered"
+    ],
+    "errors": 0
+  },
+  {
+    "name": "레싱",
+    "skill": 1,
+    "attacks": [
+      "none",
+      "none",
+      "none",
+      "none"
+    ],
+    "skillEffects": [
+      "spRecovered"
+    ],
+    "errors": 0
+  },
+  {
+    "name": "레싱",
+    "skill": 2,
+    "attacks": [
+      "none",
+      "none",
+      "none",
+      "none"
+    ],
+    "skillEffects": [],
+    "errors": 0
+  },
+  {
+    "name": "레싱",
+    "skill": 3,
+    "attacks": [
+      "none",
+      "none",
+      "none"
+    ],
+    "skillEffects": [
+      "spRecovered"
+    ],
+    "errors": 0
+  },
+  {
+    "name": "에이야퍄들라",
+    "skill": 1,
+    "attacks": [
+      "bolt",
+      "bolt",
+      "bolt",
+      "bolt"
+    ],
+    "skillEffects": [
+      "spRecovered",
+      "spRecovered"
+    ],
+    "errors": 0
+  },
+  {
+    "name": "에이야퍄들라",
+    "skill": 2,
+    "attacks": [
+      "bolt",
+      "bolt",
+      "bolt"
+    ],
+    "skillEffects": [
+      "spRecovered",
+      "explosion",
+      "explosion"
+    ],
+    "errors": 0
+  },
+  {
+    "name": "에이야퍄들라",
+    "skill": 3,
+    "attacks": [
+      "bolt",
+      "bolt",
+      "bolt",
+      "bolt",
+      "bolt",
+      "bolt",
+      "bolt",
+      "bolt",
+      "bolt",
+      "bolt"
+    ],
+    "skillEffects": [
+      "spRecovered",
+      "spRecovered"
+    ],
+    "errors": 0
+  },
+  {
+    "name": "베이스라인",
+    "skill": 1,
+    "attacks": [
+      "none",
+      "none",
+      "none",
+      "none"
+    ],
+    "skillEffects": [
+      "spRecovered"
+    ],
+    "errors": 0
+  },
+  {
+    "name": "베이스라인",
+    "skill": 2,
+    "attacks": [
+      "none",
+      "none",
+      "none",
+      "none"
+    ],
+    "skillEffects": [
+      "spRecovered"
+    ],
+    "errors": 0
+  },
+  {
+    "name": "비비아나",
+    "skill": 1,
+    "attacks": [
+      "none",
+      "none",
+      "none",
+      "none"
+    ],
+    "skillEffects": [
+      "spRecovered",
+      "shield"
+    ],
+    "errors": 0
+  },
+  {
+    "name": "비비아나",
+    "skill": 2,
+    "attacks": [
+      "none",
+      "none",
+      "none",
+      "none"
+    ],
+    "skillEffects": [
+      "spRecovered",
+      "shield"
+    ],
+    "errors": 0
+  },
+  {
+    "name": "비비아나",
+    "skill": 3,
+    "attacks": [
+      "none",
+      "none",
+      "none"
+    ],
+    "skillEffects": [
+      "spRecovered",
+      "shield"
+    ],
+    "errors": 0
+  },
+  {
+    "name": "에벤홀츠",
+    "skill": 1,
+    "attacks": [
+      "bolt",
+      "bolt"
+    ],
+    "skillEffects": [
+      "spRecovered"
+    ],
+    "errors": 0
+  },
+  {
+    "name": "에벤홀츠",
+    "skill": 2,
+    "attacks": [
+      "bolt",
+      "bolt"
+    ],
+    "skillEffects": [
+      "spRecovered",
+      "summon",
+      "aoe",
+      "displace",
+      "pull"
+    ],
+    "errors": 0
+  },
+  {
+    "name": "에벤홀츠",
+    "skill": 3,
+    "attacks": [
+      "bolt",
+      "bolt",
+      "bolt"
+    ],
+    "skillEffects": [
+      "spRecovered"
+    ],
+    "errors": 0
+  }
+]

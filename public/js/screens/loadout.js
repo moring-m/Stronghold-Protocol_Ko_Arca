@@ -12,7 +12,7 @@ import {RecruitPresetButton,RecruitPresetsHost} from '../ui/recruitPresets.js';
 
 
 
-import { t } from '../../../shared/i18n.js';
+import { t, N_ } from '../../../shared/i18n.js';
 import { tr } from '../i18n/i18n.js';
 import {CultivationSection} from './cultivation.js';
 import {setOpsMap} from '../ui/loadoutSync.js';
@@ -43,7 +43,7 @@ import { Img, RichText, UnitThumb, BondGlyph } from '../ui/gameComponents.js';
 import { chessAvatarUrl, chessPortraitUrl, subProfIconUrl, profIconUrl, bondIconUrl, moduleTypeIconUrl } from '../ui/assetUrls.js';
 import { chessStatsBlock, traitText, chessTalents } from '../ui/detailPanel.js';
 import { chessLoadout } from '../ui/gameLogic.js';
-import { data, useData, localAsset } from '../data.js';
+import { data, useData, localAsset, DATA_FILES } from '../data.js';
 import { useStore, loadPref, savePref } from '../store.js';
 import { PHASE } from '../../../shared/constants.js';
 import {
@@ -401,6 +401,61 @@ const SYNC_TEXT = {
   idle: ['', ''], pending: ['保存中…', 'is-busy'], sending: ['同步中…', 'is-busy'], synced: ['已同步', 'is-ok'],
   locked: ['本局已锁定 · 下一局生效', 'is-warn'], error: ['同步失败', 'is-bad'],
 };
+/** The 干员持有 tab's status line: the setting never applies to a running match. */
+const OWN_SYNC_TEXT = { ...SYNC_TEXT, locked: [N_('下一局生效'), 'is-warn'] };
+/** The 自选编队 tab's status line (msgids, translated where shown): out of match, like 干员持有. */
+const DIY_SYNC_TEXT = { ...OWN_SYNC_TEXT };
+
+/**
+ * The game-data files a tab cannot work without — its roster and its import's sanitiser: chess.json, plus backups.json
+ * for 自选编队 (its slots and the picks' forms) — that did not load. useData counts a file that never arrived (a 404, a
+ * blocked request, bad JSON: status 'missing') as settled like a loaded one, so the tab drew an empty roster and an
+ * import sanitised every entry away (GitHub #173). Empty while the files load and once they have.
+ * @param {string} tab 'loadout' | 'ownership' | 'diy'
+ * @param {(name: string) => string} [status] the data store's status (data.status)
+ * @returns {string[]} data file names
+ */
+export function missingGameData(tab, status = data.status) {
+  return (tab === 'diy' ? ['chess', 'backups'] : ['chess']).filter((name) => status(name) === 'missing');
+}
+
+/**
+ * Why an import of `kind` cannot run now, as its toast — the files still loading, or the game data missing — or null.
+ * Either way nothing is applied: sanitised against absent data, the 干员持有 / 自选编队 imports stored an empty list over
+ * the saved one (GitHub #173).
+ * @param {string} kind the dialog's tab @param {boolean} ready the screen's files are settled
+ * @param {(name: string) => string} [status]
+ * @returns {{ text: string, tone: 'warn'|'error' } | null}
+ */
+export function importRefusal(kind, ready, status = data.status) {
+  if (!ready) return { text: t('干员数据仍在载入，请稍候再导入'), tone: 'warn' };
+  if (missingGameData(kind, status).length) return { text: t('导入失败：游戏数据没有载入，未做任何改动。请刷新页面；仍不行时，请检查广告拦截插件和网络'), tone: 'error' };
+  return null;
+}
+
+/**
+ * A loadout payload that carries `ops` (including empty `ops`) replaces 潜能 / 练度. 自选 operators are in that list
+ * and only backups.json names them, so the refusal is the 自选编队 one: chess.json and backups.json both loaded.
+ * Null when the payload has no `ops` (an older file leaves the current 练度 alone) or that data is ready (GitHub #538).
+ * @param {Record<string, any> | null | undefined} ops
+ * @param {boolean} ready
+ * @param {(name: string) => string} [status]
+ * @returns {{ text: string, tone: 'warn'|'error' } | null}
+ */
+export function loadoutOpsImportRefusal(ops, ready, status = data.status) {
+  if (ops == null) return null;
+  return importRefusal('diy', ready, status);
+}
+
+/** In place of a tab whose game data did not load (missingGameData): which files, and what to try (GitHub #173). */
+export function DataMissing({ files }) {
+  const urls = files.map((name) => `/data/${DATA_FILES[name] || `${name}.json`}`);
+  return html`<div class="lo-loading lo-missing" role="alert" data-testid="loadout-data-missing">
+    <${Icon} name="warn" />
+    <b>${t('游戏数据没有载入')}</b>
+    <p>${t('{files} 没有下载成功，这一页无法显示；已保存的设置不受影响。请刷新页面；仍不行时，请检查广告拦截插件和网络。', { files: urls })}</p>
+  </div>`;
+}
 
 /** The overlay screen. */
 function LoadoutScreen({ st }) {
@@ -484,7 +539,11 @@ function LoadoutScreen({ st }) {
     // an import before chess.json is loaded would sanitise every entry away — refuse instead of wiping the loadout
     if (!ready) { toast('干员数据仍在载入，请稍候再导入', 'warn'); return; }
     const res = parseImport(ioText);
-    if (!res.ok) { toast(`导入失败：${res.error}`, 'error'); return; }
+    if (!res.ok) { toast(t('导入失败：{error}', { error: res.error }), 'error'); return; }
+    // ops replaces 潜能 / 练度, including 自选 operators that only backups.json names. Missing data used to drop
+    // them and still save, clearing a 练度 the file did not mean to erase (GitHub #538).
+    const opsRefused = loadoutOpsImportRefusal(res.ops, ready);
+    if (opsRefused) { toast(opsRefused.text, opsRefused.tone); return; }
     const { applied, dropped } = applyLoadoutEntries(res.entries, getChess);
     // nothing survived sanitising (unknown chess, or every choice already the default): keep the current loadout
     if (!applied) { toast('导入失败：这份数据在当前版本没有可用的调配，未做任何改动', 'error'); return; }

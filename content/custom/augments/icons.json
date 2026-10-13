@@ -1,0 +1,163 @@
+[
+  {
+    "path": "/assets/custom/augments/g_char_tile_summon_1.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/%5Buc%5Dcrisisv2/runeicon/g_char_tile_summon_1.png",
+    "gitBlob": "7a3f3e1735a3c436f33987a8c45d429dc7f2c77b",
+    "sha256": "89a22d82f029d425487c08fc55ab348e9310aa51669d44ae1ac6ac2d8ca6d5d9",
+    "bytes": 1113
+  },
+  {
+    "path": "/assets/custom/augments/g_char_atk_p1.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/%5Buc%5Dcrisisv2/runeicon/g_char_atk_p1.png",
+    "gitBlob": "545f9cd051b3a455615dc889feac7bdcfb0585ba",
+    "sha256": "7cf46aec48ebb3430cdfa41968939a6aace1945f945fe1124a70da89d52d02b8",
+    "bytes": 1167
+  },
+  {
+    "path": "/assets/custom/augments/g_enemy_hp_1.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/%5Buc%5Dcrisisv2/runeicon/g_enemy_hp_1.png",
+    "gitBlob": "80185fc5db951b7421b084633f345d129853d77c",
+    "sha256": "af83208b1bc6131f712c2dd5cb3df019a15e7889763ceffadbbc7efe6359d027",
+    "bytes": 621
+  },
+  {
+    "path": "/assets/custom/augments/g_enemy_def_1.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/%5Buc%5Dcrisisv2/runeicon/g_enemy_def_1.png",
+    "gitBlob": "19d04cb148503ef5a083020bdd380c7ba10a1b50",
+    "sha256": "ae33cc0ccc6f20c26f6a7b3ca316da90e19730163cb710ce6ecce3bebf947d25",
+    "bytes": 1340
+  },
+  {
+    "path": "/assets/custom/augments/g_enemy_magical_reduction_1.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/%5Buc%5Dcrisisv2/runeicon/g_enemy_magical_reduction_1.png",
+    "gitBlob": "1d17e1d811ad9bc186506677ee750744b59d4f4e",
+    "sha256": "6d838d893bd983f10c32bc18823f6403c579099e9b939d6358560ac4ea492769",
+    "bytes": 1358
+  },
+  {
+    "path": "/assets/custom/augments/g_char_atkspeed_p1.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/%5Buc%5Dcrisisv2/runeicon/g_char_atkspeed_p1.png",
+    "gitBlob": "ae55599f9e2fac43d46b561fc6c7b3ec1c50d844",
+    "sha256": "d2e588671db967bed602755c0978e1274b5ea992190e5eaa8ed84efa257e176b",
+    "bytes": 1617
+  },
+  {
+    "path": "/assets/custom/augments/g_char_sp_reduce_1.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/%5Buc%5Dcrisisv2/runeicon/g_char_sp_reduce_1.png",
+    "gitBlob": "06c3d4da0a8ec0711af2ac14b4f91abbf1908dcc",
+    "sha256": "b32a03a6e6b76e8db9f24f83fb1c3037cd3c1f1d7f124466b31ec7cd424a37dc",
+    "bytes": 1699
+  },
+  {
+    "path": "/assets/custom/augments/g_extra_cost_1.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/%5Buc%5Dcrisisv2/runeicon/g_extra_cost_1.png",
+    "gitBlob": "e3576cf8cffa859dc099206791ab8cb4ac838edb",
+    "sha256": "c4f63a6c25b7b002b2185630f3a473b4583cb045503b810a6fb6f1cc2c87cffc",
+    "bytes": 1455
+  },
+  {
+    "path": "/assets/custom/augments/g_global_costrecovery_1.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/%5Buc%5Dcrisisv2/runeicon/g_global_costrecovery_1.png",
+    "gitBlob": "d3eedbe2b9f00b36f638c70b009f1e2e4fe61cd5",
+    "sha256": "fb5c75b5d24537528b420b889a2250a377f9a7062e655e26037aa0fa1fbda20d",
+    "bytes": 1534
+  },
+  {
+    "path": "/assets/custom/augments/g_enemy_movespeed_1.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/%5Buc%5Dcrisisv2/runeicon/g_enemy_movespeed_1.png",
+    "gitBlob": "c9d5f0aeb7ae88edbd66445befdf87e71af566ba",
+    "sha256": "667daf1cf6f0ed819bcc3391c447d340376b4581f31d857150b33c5a0b9cddf3",
+    "bytes": 1183
+  },
+  {
+    "path": "/assets/custom/augments/g_enemy_atk_1.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/%5Buc%5Dcrisisv2/runeicon/g_enemy_atk_1.png",
+    "gitBlob": "43725802102ce0002992ed8cb86c9a0d8397c359",
+    "sha256": "7ab0694889a969b0831fd4301f71877268ef31359a82e55355492dbcf632299e",
+    "bytes": 882
+  },
+  {
+    "path": "/assets/custom/augments/g_char_deploy_attribute_add_1.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/%5Buc%5Dcrisisv2/runeicon/g_char_deploy_attribute_add_1.png",
+    "gitBlob": "c11cfb7d5520e04ec837ea17778d3de7f45342f9",
+    "sha256": "580fb3a23887916bd716458dbbe1c289d6ea5d50928958f91249e5663904247b",
+    "bytes": 1160
+  },
+  {
+    "path": "/assets/custom/augments/g_char_magicdamage_1.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/%5Buc%5Dcrisisv2/runeicon/g_char_magicdamage_1.png",
+    "gitBlob": "30b9a7392beb3884e0cf8c32fd5b5344e7267ead",
+    "sha256": "c28b33716304e6b9c5d3cb7e056d845dc1de60e44c84c8af6dff9166712e48b8",
+    "bytes": 1109
+  },
+  {
+    "path": "/assets/custom/augments/g_enemy_attackspeed_1.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/%5Buc%5Dcrisisv2/runeicon/g_enemy_attackspeed_1.png",
+    "gitBlob": "e03f64d205dce17e04b281044a695f620f7f42af",
+    "sha256": "643664fb577ae0dc3dc54d29cf99067f50024b9386752abe31187892a095770d",
+    "bytes": 1714
+  },
+  {
+    "path": "/assets/custom/augments/g_enemy_element_res_1.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/%5Buc%5Dcrisisv2/runeicon/g_enemy_element_res_1.png",
+    "gitBlob": "d52568f86586187f385c5d0ce06feb8a953e68b3",
+    "sha256": "57705b7d4efbc6640a19a21d07a7ff0da9a43e2a193dd560463399d271c23686",
+    "bytes": 1981
+  },
+  {
+    "path": "/assets/custom/augments/g_enemy_block_dmgreduce_1.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/%5Buc%5Dcrisisv2/runeicon/g_enemy_block_dmgreduce_1.png",
+    "gitBlob": "e0c4fa1847a5903ce2df359dac74d7334830a24c",
+    "sha256": "c2ad09ce231c74434d9bd20506f9383d083855ace0d2398aa87b2a87389906a8",
+    "bytes": 1199
+  },
+  {
+    "path": "/assets/custom/augments/g_char_deploy_stun_1.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/%5Buc%5Dcrisisv2/runeicon/g_char_deploy_stun_1.png",
+    "gitBlob": "6b420d4d984bdc7160028b78f0a4937296403479",
+    "sha256": "caa86920eaa1415c8f85735692b50e90528d982e41a8771288f051c2837ee6ba",
+    "bytes": 1886
+  },
+  {
+    "path": "/assets/custom/augments/g_zom_hprec_1.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/%5Buc%5Dcrisisv2/runeicon/g_zom_hprec_1.png",
+    "gitBlob": "ceb48fca08904d2bc2fca22a64f1a37c7357e6eb",
+    "sha256": "6139eeba169360d0bb0154f33bd2964788b60dcf14d50c1246b93285cfcf48d6",
+    "bytes": 1419
+  },
+  {
+    "path": "/assets/custom/augments/g_tsz_hp_immune_1.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/%5Buc%5Dcrisisv2/runeicon/g_tsz_hp_immune_1.png",
+    "gitBlob": "3e425250e7657a66010f85f3d7e21d7aab8e25e5",
+    "sha256": "815271f24e57f3a7ecea3bf6c25ccb5d700aa4439a608a25ae6c09bd2990a8f9",
+    "bytes": 2019
+  },
+  {
+    "path": "/assets/custom/augments/g_lyfrog_hplife_1.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/%5Buc%5Dcrisisv2/runeicon/g_lyfrog_hplife_1.png",
+    "gitBlob": "4a5ff81d2c7113f8cb2fff93f63f4232148598e2",
+    "sha256": "147332fe09c48cdd7763ed447f7038343591df626f013e63a420fd2a7ed6bd70",
+    "bytes": 2837
+  },
+  {
+    "path": "/assets/custom/augments/g_gx_char_attackspeed_1.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/%5Buc%5Dcrisisv2/runeicon/g_gx_char_attackspeed_1.png",
+    "gitBlob": "73742055fd33ee3465c3541009524ed44f9a522f",
+    "sha256": "3c7016375bdd296d533af129031120db5c64fbfd4db5a0f068fa449f932e1039",
+    "bytes": 1045
+  },
+  {
+    "path": "/assets/custom/augments/g_char_cost_pioneer_1.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/%5Buc%5Dcrisisv2/runeicon/g_char_cost_pioneer_1.png",
+    "gitBlob": "bc7ae66059d19dae75434b359a93a748beebe7d7",
+    "sha256": "53c9bcea81b702c42f3b0adb877cd9b4cc4a8c27f0c47a16239ddc5e8a5546b3",
+    "bytes": 1497
+  },
+  {
+    "path": "/assets/custom/augments/g_ly_defres_1.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/%5Buc%5Dcrisisv2/runeicon/g_ly_defres_1.png",
+    "gitBlob": "f61db1d36ceb0916e89969992fa828f0c8669c54",
+    "sha256": "29eae88514c11d1473fa2096290715866b282c102122da62fe2ab91eaf6ebbbf",
+    "bytes": 1836
+  }
+]

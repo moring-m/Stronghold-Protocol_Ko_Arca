@@ -15,8 +15,9 @@ export class LaboratoryMatch extends Match {
     if(this.customExtensions.ruleValues)delete this.customExtensions.ruleValues.deployCap;
     const setup = {...opts.laboratory};
     if(this.gd.config.customRules?.scarecrow)setup.bossId=LAB_DUMMY_BOSS;
+    const randomBandBonus=setup.bandId===RANDOM_BAND_ID?5:0;
     if(setup.bandId===RANDOM_BAND_ID)setup.bandId=this.rngDraft.pick(this.gd.bandIds().filter(id=>id!==RANDOM_BAND_ID));
-    if (!setup || !this.gd.stage(setup.stageId) || !this.gd.boss(setup.bossId) || !this.gd.band(setup.bandId)
+    if (!setup || !this.gd.stage(setup.stageId) || !this.gd.boss(setup.bossId) || !this.gd.bandAllowed(setup.bandId)
       || !['boss', 'hidden'].includes(setup.kind) || (setup.bossId!==LAB_DUMMY_BOSS && !!this.gd.boss(setup.bossId).hidden !== (setup.kind === 'hidden'))) {
       throw new TypeError('실험실 시작 설정이 올바르지 않습니다.');
     }
@@ -58,7 +59,7 @@ export class LaboratoryMatch extends Match {
     for (const ps of this.order) {
       Object.defineProperty(ps,'deployCap',{get:()=>15});
       ps.bandId = setup.bandId;
-      ps.lp = this.gd.startLp(setup.bandId);
+      ps.randomBandBonus=randomBandBonus;ps.lp = this.gd.startLp(setup.bandId)+randomBandBonus;
       ps.shop.level = this.gd.maxShopLevel;
     }
   }

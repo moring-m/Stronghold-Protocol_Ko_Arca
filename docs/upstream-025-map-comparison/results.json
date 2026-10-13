@@ -1,0 +1,223 @@
+{
+  "results": [
+    {
+      "id": "act2autochess_m01",
+      "mode": "normal",
+      "variant": "custom",
+      "stats": {
+        "calls": 14,
+        "triangles": 61626,
+        "textures": 22,
+        "geometries": 14,
+        "frames": 4,
+        "cpuMs": 27.71,
+        "lost": false,
+        "originalStage": "act2autochess_m01",
+        "cachedLayouts": 0,
+        "layoutCacheHits": 0
+      },
+      "official": false,
+      "original": "act2autochess_m01",
+      "elapsedMs": 6569
+    },
+    {
+      "id": "act2autochess_m01",
+      "mode": "normal",
+      "variant": "upstream",
+      "stats": {
+        "calls": 12,
+        "triangles": 79862,
+        "textures": 13,
+        "geometries": 12,
+        "frames": 4,
+        "cpuMs": 16.98,
+        "lost": false
+      },
+      "official": true,
+      "elapsedMs": 2694
+    },
+    {
+      "id": "act2autochess_m01",
+      "mode": "unite",
+      "variant": "custom",
+      "stats": {
+        "calls": 37,
+        "triangles": 91817,
+        "textures": 22,
+        "geometries": 38,
+        "frames": 4,
+        "cpuMs": 34.82,
+        "lost": false,
+        "originalStage": "act2autochess_m01",
+        "cachedLayouts": 0,
+        "layoutCacheHits": 0
+      },
+      "official": false,
+      "original": "act2autochess_m01",
+      "elapsedMs": 9217
+    },
+    {
+      "id": "act2autochess_m01",
+      "mode": "unite",
+      "variant": "upstream",
+      "stats": {
+        "calls": 12,
+        "triangles": 86769,
+        "textures": 13,
+        "geometries": 12,
+        "frames": 4,
+        "cpuMs": 16.77,
+        "lost": false
+      },
+      "official": true,
+      "elapsedMs": 2753
+    },
+    {
+      "id": "act2autochess_m01",
+      "mode": "boss",
+      "variant": "custom",
+      "stats": {
+        "calls": 29,
+        "triangles": 75871,
+        "textures": 22,
+        "geometries": 29,
+        "frames": 4,
+        "cpuMs": 32.43,
+        "lost": false,
+        "originalStage": "act2autochess_m01",
+        "cachedLayouts": 0,
+        "layoutCacheHits": 0
+      },
+      "official": false,
+      "original": "act2autochess_m01",
+      "elapsedMs": 8277
+    },
+    {
+      "id": "act2autochess_m01",
+      "mode": "boss",
+      "variant": "upstream",
+      "stats": {
+        "calls": 12,
+        "triangles": 85775,
+        "textures": 13,
+        "geometries": 12,
+        "frames": 4,
+        "cpuMs": 16.05,
+        "lost": false
+      },
+      "official": true,
+      "elapsedMs": 2686
+    },
+    {
+      "id": "act2autochess_m02",
+      "mode": "normal",
+      "variant": "custom",
+      "stats": {
+        "calls": 23,
+        "triangles": 20582,
+        "textures": 26,
+        "geometries": 24,
+        "frames": 4,
+        "cpuMs": 44.55,
+        "lost": false,
+        "originalStage": "act2autochess_m02",
+        "cachedLayouts": 0,
+        "layoutCacheHits": 0
+      },
+      "official": false,
+      "original": "act2autochess_m02",
+      "elapsedMs": 7336
+    },
+    {
+      "id": "act2autochess_m02",
+      "mode": "normal",
+      "variant": "upstream",
+      "stats": {
+        "calls": 18,
+        "triangles": 17506,
+        "textures": 23,
+        "geometries": 18,
+        "frames": 4,
+        "cpuMs": 28.93,
+        "lost": false
+      },
+      "official": true,
+      "elapsedMs": 3167
+    },
+    {
+      "id": "act2autochess_m02",
+      "mode": "unite",
+      "variant": "custom",
+      "stats": {
+        "calls": 68,
+        "triangles": 46608,
+        "textures": 27,
+        "geometries": 70,
+        "frames": 4,
+        "cpuMs": 53.8,
+        "lost": false,
+        "originalStage": "act2autochess_m02",
+        "cachedLayouts": 0,
+        "layoutCacheHits": 0
+      },
+      "official": false,
+      "original": "act2autochess_m02",
+      "elapsedMs": 9202
+    },
+    {
+      "id": "act2autochess_m02",
+      "mode": "unite",
+      "variant": "upstream",
+      "stats": {
+        "calls": 19,
+        "triangles": 23223,
+        "textures": 24,
+        "geometries": 19,
+        "frames": 4,
+        "cpuMs": 32.79,
+        "lost": false
+      },
+      "official": true,
+      "elapsedMs": 3067
+    },
+    {
+      "id": "act2autochess_m02",
+      "mode": "boss",
+      "variant": "custom",
+      "stats": {
+        "calls": 52,
+        "triangles": 35001,
+        "textures": 26,
+        "geometries": 53,
+        "frames": 4,
+        "cpuMs": 44.98,
+        "lost": false,
+        "originalStage": "act2autochess_m02",
+        "cachedLayouts": 0,
+        "layoutCacheHits": 0
+      },
+      "official": false,
+      "original": "act2autochess_m02",
+      "elapsedMs": 8172
+    },
+    {
+      "id": "act2autochess_m02",
+      "mode": "boss",
+      "variant": "upstream",
+      "stats": {
+        "calls": 17,
+        "triangles": 27235,
+        "textures": 19,
+        "geometries": 17,
+        "frames": 4,
+        "cpuMs": 23.65,
+        "lost": false
+      },
+      "official": true,
+      "elapsedMs": 2825
+    }
+  ],
+  "errors": [
+    "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  ]
+}

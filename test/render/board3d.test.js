@@ -602,7 +602,7 @@ test('inactive field vertices are discarded before GPU geometry is created',asyn
  const {compactGeometry}=await import('../../public/js/render/board3d/scene.js');
  const src={position:[0,10,0,1,10,0,0,11,0,0,2,0,1,2,0,0,3,0],uv:[0,0,1,0,0,1,0,0,1,0,0,1],index:[0,1,2,3,4,5]};
  const filtered=compactGeometry(geometryForArea(src,AREAS.boss));
- assert.equal(filtered.position.length,9);assert.deepEqual(filtered.index,[0,1,2]);
+ assert.equal(filtered.position.length,9);assert.deepEqual(Array.from(filtered.index),[0,1,2]);
  for(let i=1;i<filtered.position.length;i+=3)assert.ok(filtered.position[i]<=6.5);
  assert.equal(filtered.uv.length,6);
 });

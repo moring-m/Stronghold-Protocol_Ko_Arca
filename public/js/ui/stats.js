@@ -1,3 +1,4 @@
+import {recordAugments} from '../../../shared/augments.js';
 import {recordCustomExtensions} from '../../../shared/customExtensions.js';
 import {combatRound} from '../../../shared/combatStats.js';
 // Local match statistics: every match the local player took part in is appended as one record to localStorage
@@ -202,6 +203,7 @@ export function normalizeRecord(raw) {
     durationMs: num(r.durationMs),
     teamLp: num(r.teamLp),
     customExtensions:recordCustomExtensions(r.customExtensions),
+    ...(r.augments?{augments:recordAugments(r.augments)}:{}),
     roomMode: r.roomMode === 'solo' || r.roomMode === 'coop' || r.roomMode === 'coop8' || r.roomMode === 'laboratory' ? r.roomMode : null,
     selfId: str(r.selfId),
     players,
@@ -286,7 +288,7 @@ export function loadStats() {
 // ---- compaction + the storage budget ---------------------------------------------------------------------------
 
 const COMPACT_FRAME = ['id', 'v', 't', 'end', 'victory', 'roundsPassed', 'lastRound', 'hiddenReached', 'hiddenCleared', 'reason', 'modeId',
-  'difficulty', 'roomMode', 'durationMs', 'selfId', 'customExtensions'];
+  'difficulty', 'roomMode', 'durationMs', 'selfId', 'customExtensions','augments'];
 
 /**
  * The compact form of a record: the frame and the player's OWN row without lineup, bonds and name — everything the
@@ -396,6 +398,7 @@ export function buildRecord(res, ctx = {}) {
     durationMs: num(r.durationMs),
     teamLp: num(r.teamLp),
     customExtensions:r.customExtensions,
+    ...(r.augments?{augments:recordAugments(r.augments)}:{}),
     roomMode: ctx.laboratory ? 'laboratory' : roomModeOf(str(r.modeId), ctx.roomMode||r.roomMode),
     selfId: myId,
     players: r.players,
@@ -518,6 +521,7 @@ export function recordToResult(rec) {
   const res = {
     laboratory: r.roomMode === 'laboratory',
     customExtensions:r.customExtensions,
+    ...(r.augments?{augments:recordAugments(r.augments)}:{}),
     victory: r.victory,
     roundsPassed: r.roundsPassed,
     hiddenReached: r.hiddenReached,

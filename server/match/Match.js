@@ -1,3 +1,4 @@
+import {AugmentMode} from './augments.js';
 import {RANDOM_BAND_ID} from '../../shared/randomBand.js';
 import {EIGHT_UNITE_RECT,eightUniteStageId} from '../../shared/cooperativeEight.js';
 import { MatchSetupVote } from './match/setupVote.js';
@@ -374,6 +375,7 @@ export class Match {
 
     this.phase = PHASE.LOBBY;
     this.round = 0;
+    this.augments = new AugmentMode(this);
     this.deadline = 0;
     /** Final Assault / Hidden Core: ms epoch when the overtime drain starts (m.public.overtimeAt) */
     this.overtimeAt = 0;
@@ -407,6 +409,7 @@ export class Match {
     this.sp = null;
     this.wave = null;
     this.bossWaves = null;
+    this.bossPairs = null; // drawn once per match; the hidden round retains partners and sides
     this.fields = [];
     this.runner = null;
     /** playerId → fieldId */
@@ -606,6 +609,7 @@ export class Match {
         return;
       }
       this._quit(ps);
+      if(this.augments.ready())this.augments.settle();
       for (const f of this.fields) {
         if (!f.live || f.done || f.endRequested) continue;
         const votes = f.kind === 'boss' || f.kind === 'hidden' ? this._endBattleVotes : f.endVotes;
@@ -861,6 +865,7 @@ export class Match {
   _sendPrivate(ps, force) {
     let view;
     try { view = ps.privateView(); } catch (e) { this.reportError('privateView', e); return; }
+    if(this.augments.enabled)view.augments=this.augments.privateView(ps);
     const json = JSON.stringify(view);
     if (!force && json === ps._lastPriv) return;
     ps._lastPriv = json;
@@ -903,6 +908,7 @@ export class Match {
         if (this.draft && this.draft.picks[ps.playerId]) return 'ready';
         return this.draft && this.draftTurn() === ps.playerId ? 'deciding' : 'acting';
       case PHASE.SP_DRAFT:
+        if(this.augments.current)return this.augments.current.side==='ally'?(this.augments.current.slots.get(ps.playerId)?.picked!=null?'ready':'deciding'):(this.augments.host()===ps.playerId?'deciding':'acting');
         if (this.sp && this.sp.picks[ps.playerId] != null) return 'ready';
         return this.sp && this.spTurn() === ps.playerId ? 'deciding' : 'acting';
       case PHASE.PREP: return ps.ready ? 'ready' : 'acting';
@@ -945,6 +951,7 @@ export class Match {
       hiddenBossId: this.hiddenBossId,
       bossRound: this.gd.bossRound,
       hiddenRound: this.gd.hiddenRound,
+      bossPairs: this.bossWaves ? this.bossWaves.map(w=>w.players.slice()) : this.bossPairs ? this.bossPairs.map(ids=>ids.slice()) : null,
       spRound: this.gd.spRounds().includes(this.round),
       // DESIGN §14: 'client' = battles are simulated by the browsers (b.start specs), 'server' = legacy streaming
       combatMode: this.clientCombat ? 'client' : 'server',
@@ -1002,6 +1009,7 @@ export class Match {
         turnSeconds: d.untimed ? 0 : this.bandTurnMs() / 1000, untimed: !!d.untimed,
       };
     }
+    if(this.augments.enabled)v.augments=this.augments.publicView();
     if (this.phase === PHASE.SP_DRAFT && this.sp) {
       const s = this.sp;
       v.sp = {
@@ -1028,8 +1036,10 @@ export class Match {
 
   /** UnitInfo list of a player's board and hand (prep scouting): board pieces on their tiles, held pieces on the
    *   hand row (row 7) — the scout renders like the own prep bench. */
+  teamMedicGranted() {return this.gd.config.commonBands?.includes('band_amedic') || this.order.some(p=>p.bandId==='band_amedic');}
+
   prepMapChars(ps) {
-    if (!ps?.alive || this.phase !== PHASE.PREP || !this.order.some((p) => p.alive && (p.bandId === 'band_amedic'||this.gd.config.commonBands?.includes('band_amedic')))) return [];
+    if (!ps?.alive || this.phase !== PHASE.PREP || !this.teamMedicGranted()) return [];
     const id = 'char_605_cmedic';
     const slot = this.stage?.mapChars?.find((m) => m?.key === id && Array.isArray(m.pos) && m.pos[0] >= 9 && m.pos[0] <= 12
       && m.pos[1] >= 0 && m.pos[1] <= 10 && !/multi_only/.test(String(m.alias)));
@@ -1188,6 +1198,8 @@ export class Match {
         if ((msg.setupRevision ?? 0)!==this.setupRevision) return fail(ERR.BAD_TARGET);
         if (!ps.infoReady) { ps.infoReady = true; this.markPublic(); this.maybeEndInfo(); }
         return OK;
+      case 'g.augmentPick':return this.augments.select(ps,msg);
+      case 'g.augmentReroll':return this.augments.select(ps,msg,true);
       case 'g.rerollVote':return this.voteSetupReroll(ps,msg.voteId,msg.agree);
       case 'g.band': return this.pickBand(ps, msg.bandId);
       case 'g.bandSkip': return this.skipBand(ps);
@@ -1404,7 +1416,7 @@ export class Match {
     this.dispatch(ps, 'onBattleStart', ev);
     const players = [ev.input && typeof ev.input === 'object' ? ev.input : input];
     let key = null;
-    try { key = JSON.stringify([this.round, this.stageId, this.battleContent, players]); } catch { key = null; }
+    try { key = JSON.stringify([this.round, this.stageId, this.battleContent, players,this.augments.battleState()]); } catch { key = null; }
     if (!this._unitStatsCache) this._unitStatsCache = new WeakMap(); // PlayerState → { key, units } (the last preview)
     const cached = this._unitStatsCache.get(ps);
     if (key && cached && cached.key === key) return cached.units;
@@ -1628,7 +1640,7 @@ export class Match {
    */
   defaultBand(playerId) {
     const def = this.gd.bandDraft.timeoutBandId;
-    if (!this.bandTaken(def, playerId)) return def;
+    if (this.gd.bandAllowed(def)&&!this.bandTaken(def, playerId)) return def;
     return this.gd.bandIds().find((b) => b!==RANDOM_BAND_ID&&!this.bandTaken(b, playerId)) || def;
   }
 
@@ -1725,7 +1737,7 @@ export class Match {
       const ps=this.players.get(pid);if(!ps||ps.bandId!==RANDOM_BAND_ID)continue;
       const eligible=this.gd.bandIds().filter(id=>id!==RANDOM_BAND_ID&&(this.customExtensions.rules?.includes('duplicateBands')||!used.has(id)));
       const id=this.rngDraft.pick(eligible);if(!id)throw new Error('No strategy available for random assignment');
-      used.add(id);this.draft.picks[pid]=ps.bandId=id;ps.lp=this.gd.startLp(id);this.markPrivate(ps);
+      used.add(id);this.draft.picks[pid]=ps.bandId=id;ps.randomBandBonus=5;ps.lp=this.gd.startLp(id)+ps.randomBandBonus;this.markPrivate(ps);
     }
     void timeout;
     this.enterBattleCheck();
@@ -1790,13 +1802,16 @@ export class Match {
   _planBossWaves() {
     const r = this.round;
     const bossId = r === this.gd.hiddenRound && r !== this.gd.bossRound ? this.hiddenBossId : this.bossId;
-    this.bossWaves = pairPlayers(this.alivePlayers()).map((g) => ({
+    const groups = pairPlayers(this.alivePlayers(), createRng(deriveSeed(this.seed, 'boss-pairs')), this.bossPairs);
+    this.bossPairs = groups.map(g => g.map(p => p.playerId));
+    this.bossWaves = groups.map((g) => ({
       players: g.map((p) => p.playerId),
       wave: buildBossWave(this.gd, this.rngWaves, this.factions, r, { bossId, solo: this.isSolo || g.length === 1 }),
     }));
   }
 
   afterRoundStart() {
+    if(this.augments.enter())return;
     if (this.gd.spRounds().includes(this.round)) this.enterSpDraft();
     else this.enterPrep();
   }
@@ -2138,7 +2153,7 @@ export class Match {
 
   /** Construct a battle; a constructor failure yields a finished stand-in (clean result) and is logged. */
   newBattle(opts) {
-    const full = { data: this.ds, content: this.battleContent, logger: this.log, ...opts };
+    const full = { data: this.ds, content: this.battleContent, logger: this.log, ...opts,flags:{...opts.flags,...(this.augments.enabled?{augments:this.augments.battleState()}: {})} };
     try {
       return new this.BattleClass(full);
     } catch (e) {
@@ -2352,7 +2367,7 @@ export class Match {
     const seq = `${this.battlePrefix}.${this.round}.${++this._battleSeq}`;
     // protocol ids are ≤ 64 chars (shared/protocol.js isId): the field id is informational, the sequence is unique
     const battleId = seq.length + 1 + String(fieldId).length <= 64 ? `${seq}.${fieldId}` : seq;
-    const spec = buildBattleSpec({ ...opts, flags: {...opts.flags, customFactions:this.customFactions,customExtensions:this.customExtensions}, battleId, fieldId, kind, content: this.battleContent, boss });
+    const spec = buildBattleSpec({ ...opts, flags: {...opts.flags, ...(this.augments.enabled?{augments:this.augments.battleState()}:{}), customFactions:this.customFactions,customExtensions:this.customExtensions}, battleId, fieldId, kind, content: this.battleContent, boss });
     let total = 0;
     for (const x of spec.spawns) if (x && x.tag !== 'boss' && x.tag !== 'part' && x.countInTotal !== false) total += Math.max(1, Math.floor(Number(x.count) || 1));
     return {
@@ -3327,7 +3342,7 @@ export class Match {
     // the pool's own per-player tally, one pool per boss round. stats.bossDamage (the result's 领袖伤害) adds up both
     // rounds, so it would credit the Final Assault's damage to the hidden leader ("隐藏boss还没打就出了50%播报").
     const hitSteps = new Map();
-    const pool = new SharedBossPool(bossPoolHp(this.gd, bossId, alive.length), {
+    const pool = new SharedBossPool(bossPoolHp(this.gd, bossId, alive.length)*this.augments.bossHpMultiplier(), {
       onHit: (pid, dmg) => {
         const ps = this.players.get(pid);
         if (!ps) return;
@@ -3343,7 +3358,8 @@ export class Match {
       },
     });
     this.bossPool = pool;
-    const groups = pairPlayers(alive);
+    const groups = pairPlayers(alive, createRng(deriveSeed(this.seed, 'boss-pairs')), this.bossPairs);
+    this.bossPairs = groups.map(g => g.map(p => p.playerId));
     const reuse = this.bossWaves && this.bossWaves.length === groups.length && this.bossWaves.every((w, i) => w.players.join() === groups[i].map((p) => p.playerId).join());
     this.fields = groups.map((g, i) => {
       const solo = this.isSolo || g.length === 1;

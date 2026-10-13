@@ -9,6 +9,7 @@ from collections import Counter
 import numpy as np
 sys.path.insert(0,str(Path(__file__).parent))
 import aklz4, UnityPy
+from pack_native_maps import pack
 from UnityPy.helpers.MeshHelper import MeshHandler
 from extract import derive_rough_from_gloss
 from map_geometry import lightmap_uv
@@ -19,7 +20,12 @@ out=root/('public/assets/local/map/original-verify' if verify else 'public/asset
 manifest_path=root/'.cache/ursus-local-assets.json'
 manifest=json.loads(manifest_path.read_text());group={};materials={};report=[]
 resources=list((src/'arts').rglob('*.ab'))+list((src/'shaders').glob('*.ab'))
-def register(name,path,kind):group[name]={'path':'/'+str(path.relative_to(root/'public')),'kind':kind}
+def register(name,path,kind):
+ group[name]={'path':'/'+str(path.relative_to(root/'public')),'kind':kind}
+ if kind=='original-unity-scene':
+  binary=path.with_name(path.name.replace('.json.gz','.bin.gz'))
+  binary.write_bytes(gzip.compress(pack(json.loads(gzip.decompress(path.read_bytes()))),mtime=0))
+  group[name]['binaryPath']='/'+str(binary.relative_to(root/'public'))
 def finite_json(value):
  if isinstance(value,dict):return {k:finite_json(v) for k,v in value.items()}
  if isinstance(value,list):return [finite_json(v) for v in value]

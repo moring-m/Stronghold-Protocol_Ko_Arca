@@ -32,6 +32,7 @@ const PRISONER = prisoner('2', '');
 const PRISONER_COLOURED = prisoner('_orange', '_red');
 
 export const FORMS = Object.freeze({
+  enemy_10116_ymgtop:Object.freeze({spin:Object.freeze({change:"Skill_Begin",leave:"Skill_End",roles:clipSet("Skill_Loop","Skill_Loop","Die")})}),
   enemy_10044_wintun: Object.freeze({
     emptied: Object.freeze({change:null,roles:clipSet('B_Idle','B_Move','B_Die','B_Attack')}),
   }),

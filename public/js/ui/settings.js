@@ -163,6 +163,7 @@ export function SettingsModal({ open, onClose }) {
           ${[['none','표시 안함'],['sum','합산'],['all','모두'],['basic','기본']].map(([id,label])=>html`<button type="button" role="radio" aria-checked=${s.damageNumberMode===id?'true':'false'} class=${s.damageNumberMode===id?'is-on':''} onClick=${()=>updateSettings({damageNumberMode:id})}>${label}</button>`)}
         </div>
       </div>
+      <${Toggle} label="원본 대미지 숫자" micro="OFFICIAL NUMBERS" value=${s.officialDamageNumbers} onChange=${v=>updateSettings({officialDamageNumbers:v})}/>
       <p class="set-hint" data-i18n-skip>합산: 연속 피해를 묶어 표시 · 모두: 타격마다 표시 · 기본: 명일방주의 붉은 대미지 표시 판정(예상 피해의 1.5배 이상)을 적용합니다.</p>
       <${Choice} testId="text-size" label="글자 크기" value=${s.textSize} options=${[['sm','작게'],['md','보통'],['lg','크게'],['xl','아주 크게']]} onChange=${v=>updateSettings({textSize:v})} />
     </section><section hidden=${category!=='controls'} class="set-category" data-category="controls">

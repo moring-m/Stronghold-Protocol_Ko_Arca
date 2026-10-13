@@ -10,7 +10,7 @@ export const OPERATORS=[
  ['eyja','char_180_amgoat','에이야퍄들라',4,1,['leithanienShip','swiftShip'],'kill',3],
  ['bassline','char_4109_baslin','베이스라인',5,0,['leithanienShip'],'prep',2],
  ['viviana','char_4098_vvana','비비아나',5,2,['leithanienShip','skillfulShip','kazimierzShip'],'notes',2],
- ['ebenholz','char_4046_ebnhlz','에벤홀츠',6,2,['leithanienShip','arcaneShip'],'atk',.02],
+ ['ebenholz','char_4046_ebnhlz','에벤홀츠',6,2,['leithanienShip','arcaneShip'],'atk',.01],
 ];
 export async function buildLeithanien(root=process.cwd(),dir=join(root,'.cache/leithanien-data')){
  await mkdir(dir,{recursive:true});
@@ -35,11 +35,11 @@ export async function buildLeithanien(root=process.cwd(),dir=join(root,'.cache/l
  }
  const ranks=Array.from({length:6},(_,potRank)=>buildChess({...ctx,potRank}).chess),errs=[];
  for(const o of OPERATORS)for(const suffix of ['a','b']){
-  const [key,charId,name,tier,skill,bondIds,trait,n]=o,id=`chess_custom_leithanien_${key}_${suffix}`,elite=suffix==='b',amount=key==='ebenholz'?(elite?.04:.02):n*(elite?2:1);
+  const [key,charId,name,tier,skill,bondIds,trait,n]=o,id=`chess_custom_leithanien_${key}_${suffix}`,elite=suffix==='b',amount=key==='ebenholz'?(elite?.02:.01):n*(elite?2:1);
   const r=withPotentialData(ranks.map(c=>c[id]),id,errs);localizeOperator(r,kr,act.charChessDataDict[id].status);r.name=name;r.customKit=true;
   const existing=Object.values(chess).find(c=>c.charId===charId&&c.skins?.length);if(existing)r.skins=existing.skins;
-  const text={gain:`<획득 시> [라이타니엔] 맹약의 중첩 수 +${amount}`,hp:`[라이타니엔] 맹약이 3회 중첩할 때마다 최대 HP +${amount*100}%`,atk:`[라이타니엔] 맹약이 3회 중첩할 때마다 공격력 +${amount*100}%`,burst:`<전투 중> 공격 범위 내 적의 쇠약 손상이 부여될 때마다 활성화된 [라이타니엔]/[아케인] 맹약의 중첩 수 각각 +${amount}/+${elite?2:1} (전투당 최대 5회)`,deploy:`<배치 시> 활성화된 [라이타니엔] 맹약의 중첩 수 +${amount} (전투당 최대 8회)`,kill:`<전투 중> 적을 처치할 때마다 활성화된 [라이타니엔]/[신속] 맹약의 중첩 수 각각 +${amount}/+${elite?4:2} (전투당 최대 5회)`,prep:`<휴식 기간 종료 시> 배치된 모든 [라이타니엔] 오퍼레이터의 활성화된 맹약 중첩 수 각각 +${amount}`,notes:`<전투 중> 자신이 '속세의 음'을 5회 적용할 때마다 활성화된 [라이타니엔]/[기민] 맹약의 중첩 수 각각 +${amount}/+${elite?2:1} (전투당 최대 10회)`}[trait];
-  garrisons[r.garrisonIds[0]]={garrisonId:r.garrisonIds[0],name,desc:text,descRaw:text.replace(/\+\d+%?|속세의 음/g,'<@ba.vup>$&</>'),effectKey:`custom_leithanien_${trait}`,eventType:trait==='gain'?'SERVER_GAIN':trait==='prep'?'SERVER_PREP_FIN':'BATTLE',bb:{count:amount,...(trait==='burst'?{arcaneCount:elite?2:1}:{}),...(trait==='kill'?{swiftCount:elite?4:2}:{}),...(trait==='notes'?{skillfulCount:elite?2:1}:{})},bbStr:{},requireActive:trait!=='gain',owners:[id]};r.customTrait={effectKey:`custom_leithanien_${trait}`,bb:{count:amount,...(trait==='burst'?{arcaneCount:elite?2:1}:{}),...(trait==='kill'?{swiftCount:elite?4:2}:{}),...(trait==='notes'?{skillfulCount:elite?2:1}:{})}};chess[id]=r;
+  const text={gain:`<획득 시> [라이타니엔] 맹약의 중첩 수 +${amount}`,hp:`[라이타니엔] 맹약이 3회 중첩할 때마다 최대 HP +${amount*100}%`,atk:`[라이타니엔] 맹약이 3회 중첩할 때마다 공격력 +${amount*100}%`,burst:`<전투 중> 공격 범위 내 적의 쇠약 손상이 부여될 때마다 활성화된 [라이타니엔]/[아케인] 맹약의 중첩 수 각각 +${amount}/+${elite?2:1} (전투당 최대 5회)`,deploy:`재배치 시간 -50%\n<배치 시> 활성화된 [라이타니엔]/[기습] 맹약의 중첩 수 각각 +${amount} (전투당 최대 8회)`,kill:`<전투 중> 적을 처치할 때마다 활성화된 [라이타니엔]/[신속] 맹약의 중첩 수 각각 +${amount}/+${elite?4:2} (전투당 최대 5회)`,prep:`<휴식 기간 종료 시> 배치된 모든 [라이타니엔] 오퍼레이터의 활성화된 맹약 중첩 수 각각 +${amount}`,notes:`<전투 중> 자신이 '속세의 음'을 5회 적용할 때마다 활성화된 [라이타니엔]/[기민] 맹약의 중첩 수 각각 +${amount}/+${elite?2:1} (전투당 최대 10회)`}[trait];
+  garrisons[r.garrisonIds[0]]={garrisonId:r.garrisonIds[0],name,desc:text,descRaw:text.replace(/\+\d+%?|속세의 음/g,'<@ba.vup>$&</>'),effectKey:`custom_leithanien_${trait}`,eventType:trait==='gain'?'SERVER_GAIN':trait==='prep'?'SERVER_PREP_FIN':'BATTLE',bb:{count:amount,...(trait==='deploy'?{redeployMul:.5}:{}),...(trait==='burst'?{arcaneCount:elite?2:1}:{}),...(trait==='kill'?{swiftCount:elite?4:2}:{}),...(trait==='notes'?{skillfulCount:elite?2:1}:{})},bbStr:{},requireActive:trait!=='gain',owners:[id]};r.customTrait={effectKey:`custom_leithanien_${trait}`,bb:{count:amount,...(trait==='deploy'?{redeployMul:.5}:{}),...(trait==='burst'?{arcaneCount:elite?2:1}:{}),...(trait==='kill'?{swiftCount:elite?4:2}:{}),...(trait==='notes'?{skillfulCount:elite?2:1}:{})}};chess[id]=r;
  }
  if(errs.length)throw Error(errs.join('\n'));
  for(const c of Object.values(chess))if(['char_426_billro','char_1016_agoat2'].includes(c.charId)&&!c.bonds.includes('leithanienShip'))c.bonds.push('leithanienShip');

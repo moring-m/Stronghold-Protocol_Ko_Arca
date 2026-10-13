@@ -135,7 +135,7 @@ export function uniteBattleOpts(m, plan, timeLimit) {
       if (!u.alive) { carry.set(u.uid, { down: true, ...egir }); continue; }
       // HP ratio and SP only: a skill still running at the end is not carried (unitsEnd `skillActive` stays unused —
       // community report #34, GitHub #82)
-      carry.set(u.uid, { hpPct: Number.isFinite(u.hpPct) ? Math.max(0.01, Math.min(1, u.hpPct)) : 1, sp, ...egir });
+      carry.set(u.uid, { hpPct: Number.isFinite(u.hpPct) ? Math.max(0, Math.min(1, u.hpPct)) : 1, sp, ...egir });
     }
     // 2 helpers: the first one meets the enemies first on the right-hand field (escaped_multi enters at col 18)
     const colOffset = (m.mode==='coop8'||plan.helpers.length>2)?(3-i)*8:plan.helpers.length > 1 && i === 0 ? 8 : 0;

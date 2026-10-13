@@ -81,3 +81,8 @@ test('true channel skills keep their separate authored loops',()=>{
   assert.equal(a.roles.skill.via,undefined,id);
  }
 });
+
+test('a 0.1-second extra attack accelerates the entire authored clip including recovery',()=>{
+ const a=actor(assets.chars.char_494_vendla.spine.front),clip=a._attackClip(),duration=a.dur(clip.loop),hit=a._hitTime(clip.loop,duration),speed=duration/.1;
+ a.beginAttack(.1,hit/speed);assert.ok(Math.abs(a.spine.state.tracks[0].timeScale-speed)<1e-8);a.update(hit/speed);a.attack(.1);assert.ok(Math.abs(a.spine.state.tracks[0].timeScale-speed)<1e-8);
+});

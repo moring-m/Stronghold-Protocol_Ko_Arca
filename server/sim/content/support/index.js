@@ -48,7 +48,7 @@ export function setGameData(d) { DATA = d ?? null; CORE = null; }
 export const bondRecord = (id) => own(gameData().bonds, id);
 export const itemRecord = (id) => own(gameData().items, id);
 export const garrisonRecord = (id) => own(gameData().garrisons, id);
-export const bandRecord = (id) => own(gameData().bands, id);
+export const bandRecord = (id) => own(gameData().bands, id)||own(gameData().config?.commonBandRecords,id);
 export const effectRecord = (id) => own(gameData().effects, id);
 export const chessRecord = (id) => own(gameData().chess, id);
 /** Registry key of an item: id without the `_a` / `_b` suffix (Arts have none). */
@@ -129,11 +129,11 @@ export function contentInfo(battle, pid) {
   const ci = player(battle, pid)?.input?.contentInfo;
   return ci && typeof ci === 'object' ? ci : {};
 }
-/** Band ids of every alive player of the match (own first); falls back to this battle's players. */
+/** Alive players' bands (own first), plus a retained Touch team grant; falls back to this battle's players. */
 export function matchBands(battle, pid) {
   const mb = contentInfo(battle, pid).matchBands;
   if (Array.isArray(mb) && mb.length) return mb;
-  return (battle.players || []).map((p) => p.bandId).filter(Boolean);
+  return [...(battle.data.raw?.config?.commonBands||[]),...(battle.players || []).map((p) => p.bandId)].filter(Boolean);
 }
 
 // =====================================================================================================================

@@ -1,0 +1,122 @@
+[
+  {
+    "name": "카넬리안",
+    "side": "front",
+    "animations": 12,
+    "okay": true
+  },
+  {
+    "name": "카넬리안",
+    "side": "back",
+    "animations": 11,
+    "okay": true
+  },
+  {
+    "name": "에이야퍄들라 더 크비트 아스카",
+    "side": "front",
+    "animations": 13,
+    "okay": true
+  },
+  {
+    "name": "에이야퍄들라 더 크비트 아스카",
+    "side": "back",
+    "animations": 12,
+    "okay": true
+  },
+  {
+    "name": "어스스피릿",
+    "side": "front",
+    "animations": 8,
+    "okay": true
+  },
+  {
+    "name": "어스스피릿",
+    "side": "back",
+    "animations": 7,
+    "okay": true
+  },
+  {
+    "name": "체르니",
+    "side": "front",
+    "animations": 9,
+    "okay": true
+  },
+  {
+    "name": "체르니",
+    "side": "back",
+    "animations": 8,
+    "okay": true
+  },
+  {
+    "name": "디아만테",
+    "side": "front",
+    "animations": 10,
+    "okay": true
+  },
+  {
+    "name": "디아만테",
+    "side": "back",
+    "animations": 8,
+    "okay": true
+  },
+  {
+    "name": "레싱",
+    "side": "front",
+    "animations": 13,
+    "okay": true
+  },
+  {
+    "name": "레싱",
+    "side": "back",
+    "animations": 12,
+    "okay": true
+  },
+  {
+    "name": "에이야퍄들라",
+    "side": "front",
+    "animations": 8,
+    "okay": true
+  },
+  {
+    "name": "에이야퍄들라",
+    "side": "back",
+    "animations": 4,
+    "okay": true
+  },
+  {
+    "name": "베이스라인",
+    "side": "front",
+    "animations": 10,
+    "okay": true
+  },
+  {
+    "name": "베이스라인",
+    "side": "back",
+    "animations": 9,
+    "okay": true
+  },
+  {
+    "name": "비비아나",
+    "side": "front",
+    "animations": 22,
+    "okay": true
+  },
+  {
+    "name": "비비아나",
+    "side": "back",
+    "animations": 19,
+    "okay": true
+  },
+  {
+    "name": "에벤홀츠",
+    "side": "front",
+    "animations": 16,
+    "okay": true
+  },
+  {
+    "name": "에벤홀츠",
+    "side": "back",
+    "animations": 15,
+    "okay": true
+  }
+]

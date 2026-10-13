@@ -4,7 +4,8 @@ import { EXTENSION_CATEGORIES, extensionSelectionShape } from '../../../shared/c
 const KEY = 'customExtensions';
 const copySelection = selection => ({...(selection.ruleValues?{ruleValues:{...selection.ruleValues}}:{}),...Object.fromEntries(EXTENSION_CATEGORIES.map(({id}) => [id,[...(selection[id] || [])]]).filter(([id,ids])=>['bonds','stages'].includes(id)||ids.length))});
 export function loadCustomExtensionPrefs() {
-  const saved=loadPref(KEY,null);
+  let saved=loadPref(KEY,null);
+  if(saved?.disabledAugments!==undefined){const {disabledAugments,...selection}=saved;saved=selection;}
   return copySelection(extensionSelectionShape(saved) ? saved : {});
 }
 export function saveCustomExtensionPrefs(selection) {

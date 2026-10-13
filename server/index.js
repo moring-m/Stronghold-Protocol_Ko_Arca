@@ -1,3 +1,4 @@
+import {workerControls} from './release/runtime.js';
 import { lanUrls as dualStackLanUrls } from './http/boot.js';
 
 
@@ -644,7 +645,12 @@ export async function startServer(opts = {}) {
   for (const k of ['lobbyGraceMs', 'maxRooms', 'maxRoomsPerAddr', 'maxMatchesPerAddr', 'resyncMinGapMs', 'soloReconnectWindowMs']) {
     if (opts[k] != null) lobbyOptions[k] = opts[k];
   }
+  const release=opts.releaseId??process.env.SP_RELEASE_ID;
+  const releaseToken=opts.releaseToken??(process.env.SP_RELEASE_TOKEN_FILE?fs.readFileSync(process.env.SP_RELEASE_TOKEN_FILE,'utf8').trim():process.env.SP_RELEASE_TOKEN);
+  if(release&&(!/^[a-f0-9]{12,40}$/.test(release)||!releaseToken))throw Error('Release requires a commit ID and private control token');
+  if(release){lobbyOptions.roomCodePrefix=opts.roomCodePrefix??process.env.SP_ROOM_PREFIX;lobbyOptions.draining=opts.draining??true;if(!lobbyOptions.roomCodePrefix)throw Error('Release requires room prefix');}
   const lobby = new Lobby({ registry, log, MatchClass: opts.MatchClass, getData: () => data, seedFn: opts.seedFn, options: lobbyOptions });
+  const releaseControl=release?workerControls(lobby,{release,token:releaseToken}):null;
   const network = new Network({ registry, handler: lobby, log, options: netOptions });
   const serveStatic = createStaticHandler({ publicDir, dataDir, sharedDir, log });
   const startedAt = Date.now();
@@ -665,6 +671,7 @@ export async function startServer(opts = {}) {
   async function handleRequest(req, res) {
     const url = req.url || '/';
     if (url.length > MAX_URL_LENGTH) { sendError(req, res, 414, '请求地址过长 · URI too long'); return; }
+    if(releaseControl&&await releaseControl(req,res))return;
     if (opts.handleRequest && await opts.handleRequest(req, res)) return;
     const parts = splitUrl(url);
     if (!parts) { sendError(req, res, 400, '请求地址无效 · Bad request'); return; }

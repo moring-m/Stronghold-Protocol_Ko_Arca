@@ -58,6 +58,7 @@ ENV NODE_ENV=production \
 WORKDIR /app
 COPY --chown=node:node --from=deps /app/package.json ./package.json
 COPY --chown=node:node --from=deps /app/node_modules ./node_modules
+COPY --chown=node:node deploy ./deploy
 COPY --chown=node:node --from=build /app/shared ./shared
 COPY --chown=node:node --from=build /app/server ./server
 COPY --chown=node:node --from=build /app/data ./data

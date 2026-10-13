@@ -1,0 +1,202 @@
+[
+  {
+    "name": "shaders/dynamicwatertile.ab",
+    "same": true,
+    "listed": true
+  },
+  {
+    "name": "shaders/standard.ab",
+    "same": true,
+    "listed": true
+  },
+  {
+    "name": "shaders/standardblend.ab",
+    "same": true,
+    "listed": true
+  },
+  {
+    "name": "shaders/standardrealtimeshadow.ab",
+    "same": true,
+    "listed": true
+  },
+  {
+    "name": "shaders/standardwater.ab",
+    "same": true,
+    "listed": true
+  },
+  {
+    "name": "shaders/stylizedwater.ab",
+    "same": true,
+    "listed": true
+  },
+  {
+    "name": "shaders/stylizedwaterdepth.ab",
+    "same": true,
+    "listed": true
+  },
+  {
+    "name": "arts/maps/effect.ab",
+    "same": true,
+    "listed": true
+  },
+  {
+    "name": "arts/maps/common/meshes/s_background_common.ab",
+    "same": true,
+    "listed": true
+  },
+  {
+    "name": "scenes/activities/act1autochess/level_act1autochess_m01/level_act1autochess_m01.ab",
+    "same": true,
+    "listed": true
+  },
+  {
+    "name": "scenes/activities/act1autochess/level_act1autochess_m02/level_act1autochess_m02.ab",
+    "same": true,
+    "listed": true
+  },
+  {
+    "name": "scenes/activities/act1autochess/level_act1autochess_m03/level_act1autochess_m03.ab",
+    "same": true,
+    "listed": true
+  },
+  {
+    "name": "scenes/activities/act1autochess/level_act1autochess_m04/level_act1autochess_m04.ab",
+    "same": true,
+    "listed": true
+  },
+  {
+    "name": "scenes/activities/act1autochess/level_act1autochess_m05/level_act1autochess_m05.ab",
+    "same": true,
+    "listed": true
+  },
+  {
+    "name": "scenes/activities/act1autochess/level_act1autochess_m06/level_act1autochess_m06.ab",
+    "same": true,
+    "listed": true
+  },
+  {
+    "name": "scenes/activities/act1autochess/level_act1autochess_m07/level_act1autochess_m07.ab",
+    "same": true,
+    "listed": true
+  },
+  {
+    "name": "scenes/activities/act2autochess/level_act2autochess_m01/level_act2autochess_m01.ab",
+    "same": true,
+    "listed": true
+  },
+  {
+    "name": "scenes/activities/act2autochess/level_act2autochess_m02/level_act2autochess_m02.ab",
+    "same": true,
+    "listed": true
+  },
+  {
+    "name": "scenes/activities/act2autochess/level_act2autochess_m03/level_act2autochess_m03.ab",
+    "same": true,
+    "listed": true
+  },
+  {
+    "name": "scenes/activities/act2autochess/level_act2autochess_m04/level_act2autochess_m04.ab",
+    "same": true,
+    "listed": true
+  },
+  {
+    "name": "arts/maps/common/trap/trap_110.ab",
+    "same": true,
+    "listed": true
+  },
+  {
+    "name": "arts/maps/map_autochesssand/res.ab",
+    "same": true,
+    "listed": true
+  },
+  {
+    "name": "arts/maps/map_doss_shore/res.ab",
+    "same": true,
+    "listed": true
+  },
+  {
+    "name": "arts/maps/map_kxmr/res.ab",
+    "same": true,
+    "listed": true
+  },
+  {
+    "name": "arts/maps/map_lakegarden/res.ab",
+    "same": true,
+    "listed": true
+  },
+  {
+    "name": "arts/maps/map_lm_center/res.ab",
+    "same": true,
+    "listed": true
+  },
+  {
+    "name": "arts/maps/map_survivaloasis_city/res.ab",
+    "same": true,
+    "listed": true
+  },
+  {
+    "name": "arts/maps/map_syracuse_metro/res.ab",
+    "same": true,
+    "listed": true
+  },
+  {
+    "name": "arts/maps/map_yumen/res.ab",
+    "same": true,
+    "listed": true
+  },
+  {
+    "name": "scenes/activities/act1autochess/level_act1autochess_m01/level_act1autochess_m01/lightingdata.ab",
+    "same": true,
+    "listed": true
+  },
+  {
+    "name": "scenes/activities/act1autochess/level_act1autochess_m02/level_act1autochess_m02/lightingdata.ab",
+    "same": true,
+    "listed": true
+  },
+  {
+    "name": "scenes/activities/act1autochess/level_act1autochess_m03/level_act1autochess_m03/lightingdata.ab",
+    "same": true,
+    "listed": true
+  },
+  {
+    "name": "scenes/activities/act1autochess/level_act1autochess_m04/level_act1autochess_m04/lightingdata.ab",
+    "same": true,
+    "listed": true
+  },
+  {
+    "name": "scenes/activities/act1autochess/level_act1autochess_m05/level_act1autochess_m05/lightingdata.ab",
+    "same": true,
+    "listed": true
+  },
+  {
+    "name": "scenes/activities/act1autochess/level_act1autochess_m06/level_act1autochess_m06/lightingdata.ab",
+    "same": true,
+    "listed": true
+  },
+  {
+    "name": "scenes/activities/act1autochess/level_act1autochess_m07/level_act1autochess_m07/lightingdata.ab",
+    "same": true,
+    "listed": true
+  },
+  {
+    "name": "scenes/activities/act2autochess/level_act2autochess_m01/level_act2autochess_m01/lightingdata.ab",
+    "same": true,
+    "listed": true
+  },
+  {
+    "name": "scenes/activities/act2autochess/level_act2autochess_m02/level_act2autochess_m02/lightingdata.ab",
+    "same": true,
+    "listed": true
+  },
+  {
+    "name": "scenes/activities/act2autochess/level_act2autochess_m03/level_act2autochess_m03/lightingdata.ab",
+    "same": true,
+    "listed": true
+  },
+  {
+    "name": "scenes/activities/act2autochess/level_act2autochess_m04/level_act2autochess_m04/lightingdata.ab",
+    "same": true,
+    "listed": true
+  }
+]

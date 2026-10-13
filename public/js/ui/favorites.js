@@ -9,8 +9,8 @@ import {Img} from './gameComponents.js';
 import {chessPortraitUrl,itemIconUrl,bondIconUrl} from './assetUrls.js';
 const KEY='sp.pref.favorites';
 export function normalizeFavorites(raw){
- const presets=(Array.isArray(raw?.presets)?raw.presets:[]).filter(p=>typeof p?.id==='string').slice(0,30).map(p=>({id:p.id,name:String(p.name||'프리셋').slice(0,40),operators:[...new Set((Array.isArray(p.operators)?p.operators:[]).filter(x=>typeof x==='string'))],faction:p.faction,items:[...new Set((Array.isArray(p.items)?p.items:[]).filter(x=>typeof x==='string'))]}));
- return {presets:normalizePresetFactions(presets),active:presets.some(p=>p.id===raw?.active)?raw.active:presets[0]?.id||null};
+ const presets=normalizePresetFactions((Array.isArray(raw?.presets)?raw.presets:[]).filter(p=>typeof p?.id==='string').slice(0,30).map(p=>({id:p.id,name:String(p.name||'프리셋').slice(0,40),operators:[...new Set((Array.isArray(p.operators)?p.operators:[]).filter(x=>typeof x==='string'))],faction:p.faction,items:[...new Set((Array.isArray(p.items)?p.items:[]).filter(x=>typeof x==='string'))]})));
+ return {presets,active:presets.some(p=>p.id===raw?.active)?raw.active:presets[0]?.id||null};
 }
 export const favoritesStore=createStore({...normalizeFavorites(loadPref(KEY,{})),open:false});
 function save(next){const clean=normalizeFavorites(next);savePref(KEY,clean);favoritesStore.set(clean);}

@@ -437,6 +437,9 @@ export class Net {
    */
   request(t, fields = {}, opts = {}) {
     if (this.localSession) return this.localSession.request(t, fields);
+    if(globalThis.__SP_RELEASE&&['room.join','room.spectate'].includes(t)&&!opts.ownerChecked){
+      return fetch('/__roll/room/'+encodeURIComponent(fields.code)).then(async response=>{if(response.ok){const owner=await response.json();if(owner.release!==globalThis.__SP_RELEASE){const url=new URL('/r/'+owner.release+'/',location.href);url.searchParams.set('room',fields.code);location.assign(url.href);throw new NetError('OFFLINE','해당 방의 게임 버전으로 이동합니다. 이동 후 방 참가 또는 관전을 선택해주세요.');}}else if(response.status!==404)throw new NetError('OFFLINE','방 서버를 확인할 수 없습니다. 잠시 후 다시 시도해주세요.');return this.request(t,fields,{...opts,ownerChecked:true});});
+    }
     return new Promise((resolve, reject) => {
       if (t === 'hello') { reject(new NetError('BAD_MSG', 'use setName() for hello')); return; }
       const rid = this._nextRid();
@@ -677,10 +680,11 @@ export class Net {
 // its own token (never another tab's), so it can't steal a live session either.
 
 const K_NAME = 'sp.name';
-const K_TOKEN = 'sp.token';      // sessionStorage: this tab's token
-const K_WELCOME = 'sp.tokenWelcome'; // sessionStorage: { hash, at } from the first welcome for this token
-const K_RECENT = 'sp.tokens';    // localStorage: this browser's recent tokens, most recent first
-const K_MATCHES = 'sp.matches'; // local metadata for explicit recovery of another closed tab's seat
+const RELEASE_SUFFIX=globalThis.__SP_RELEASE?':'+globalThis.__SP_RELEASE:'';
+const K_TOKEN = 'sp.token'+RELEASE_SUFFIX;      // sessionStorage: this tab's token
+const K_WELCOME = 'sp.tokenWelcome'+RELEASE_SUFFIX; // sessionStorage: { hash, at } from the first welcome for this token
+const K_RECENT = 'sp.tokens'+RELEASE_SUFFIX;    // localStorage: this browser's recent tokens, most recent first
+const K_MATCHES = 'sp.matches'+RELEASE_SUFFIX; // local metadata for explicit recovery of another closed tab's seat
 const K_ENTERED = 'sp.entered';  // sessionStorage: this tab passed the title screen
 const RECENT_MAX = 4;
 const TOKEN_MAX_LEN = 64;        // protocol limit for hello.token

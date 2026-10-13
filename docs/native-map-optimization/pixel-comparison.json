@@ -1,0 +1,42 @@
+[
+  {
+    "case": "act2autochess_m01-boss-custom",
+    "meanChannelDifference": 0.0,
+    "pixelsDifferenceAbove8Percent": 0.0
+  },
+  {
+    "case": "act2autochess_m01-normal-custom",
+    "meanChannelDifference": 0.0,
+    "pixelsDifferenceAbove8Percent": 0.0
+  },
+  {
+    "case": "act2autochess_m01-unite-custom",
+    "meanChannelDifference": 0.0,
+    "pixelsDifferenceAbove8Percent": 0.0
+  },
+  {
+    "case": "act2autochess_m02-boss-custom",
+    "meanChannelDifference": 0.0022340494791666665,
+    "pixelsDifferenceAbove8Percent": 0.011328125000000001
+  },
+  {
+    "case": "act2autochess_m02-normal-custom",
+    "meanChannelDifference": 2.63671875e-05,
+    "pixelsDifferenceAbove8Percent": 9.765625e-05
+  },
+  {
+    "case": "act2autochess_m02-unite-custom",
+    "meanChannelDifference": 0.0013072916666666667,
+    "pixelsDifferenceAbove8Percent": 0.00615234375
+  },
+  {
+    "case": "eight-act2autochess_m01-unite-custom",
+    "meanChannelDifference": 0.0,
+    "pixelsDifferenceAbove8Percent": 0.0
+  },
+  {
+    "case": "eight-act2autochess_m02-unite-custom",
+    "meanChannelDifference": 0.0,
+    "pixelsDifferenceAbove8Percent": 0.0
+  }
+]

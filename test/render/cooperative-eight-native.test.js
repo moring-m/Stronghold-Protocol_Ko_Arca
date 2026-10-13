@@ -18,7 +18,7 @@ test('native join preserves the ordinary middle divider, including raised geomet
  const triangle=(x,y,z)=>{const n=g.position.length/3;g.position.push(x-.49,y-.49,z,x+.49,y-.49,z,x,y+.49,z);g.normal.push(0,0,1,0,0,1,0,0,1);g.uv.push(0,0,1,0,.5,1);g.index.push(n,n+1,n+2);};
  for(let r=9;r<=12;r++)for(let c=8;c<=10;c++)triangle(c,r,c===10?.43:-.04);
  triangle(16,16,-1);triangle(17,16,-1);
- const joined=nativeCooperativeGeometry(g),cells=new Set(joined.index.map(i=>`${Math.round(joined.position[i*3])},${Math.round(joined.position[i*3+1])},${Math.round(joined.position[i*3+2]*100)/100}`));
+ const joined=nativeCooperativeGeometry(g),cells=new Set(Array.from(joined.index,i=>`${Math.round(joined.position[i*3])},${Math.round(joined.position[i*3+1])},${Math.round(joined.position[i*3+2]*100)/100}`));
  for(let r=9;r<=12;r++)for(let c=16;c<=18;c++)assert.ok(cells.has(`${c},${r},${c===18?.43:-.04}`),`divider ${c},${r}`);
  assert.ok(cells.has('16,16,-1'));assert.ok(cells.has('17,16,-1'));
 });

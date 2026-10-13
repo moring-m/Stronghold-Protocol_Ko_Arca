@@ -1,3 +1,4 @@
+import {augmentEffectEntries} from '../../shared/augments.js';
 import {onMerge} from './botEmotes.js';
 
 import { checkLoadoutOps, cultivationCharIds } from '../../shared/protocol.js';
@@ -85,7 +86,8 @@ import { bountyCard } from './choices.js';
 //     rerolls everything and the new slots stay frozen), level-up price = base − rounds elapsed (floor 0).
 //   * Merge: 3 normal copies (风丸 2) on board/hand/temp → 1 elite; equipment returns to the hand; a
 //     reward offer of 3 different free chess of tier min(level+1, 6) is queued (never one operator twice — user
-//     playtest #6 item 19; a short tier tops up from the tier below; pick 1, expires at prep end; an offer earned
+//     playtest #6 item 19; a short tier tops up from the tier below; the player's stocked 自选 of that tier joins,
+//     §30.23; pick 1, expires at prep end; an offer earned
 //     after the prep — SETTLE / Final Assault effects — is kept for the next prep). Where the elite goes (PRTS
 //     卫戍协议/帮助 "发送1名【精锐】状态的该干员至手牌区（若消耗已部署至作战区的干员，则发送至作战区对应位置）", user
 //     playtest #6 follow-up): when a consumed copy stood on the board, onto that copy's tile with its facing (of several,
@@ -404,7 +406,7 @@ export class PlayerState {
     return moved;
   }
 
-  dirty() { this.m.markPrivate(this); }
+  dirty() { this.m.augments?.drain(this);this.m.markPrivate(this); }
 
   // =================================================================================================
   // piece bookkeeping
@@ -810,6 +812,7 @@ export class PlayerState {
   /** Item merge candidates: normal, mergeable, with a golden version. */
   _itemMergeable(id) {
     const rec = this.gd.item(id);
+    if (id==='chess_item_5_04_e_a')return false;
     if (!rec || rec.isGolden || rec.itemType !== 'EQUIP' || !rec.mergeable) return false;
     const n = Number.isInteger(rec.upgradeNum) ? rec.upgradeNum : this.gd.itemMergeCount;
     if (!(n > 1 && n < 100)) return false;
@@ -948,6 +951,7 @@ export class PlayerState {
     if (add <= 0) return 0;
     this.layers[bondId] = before + add;
     this.recompute();
+    if ([PHASE.ROUND_START,PHASE.SP_DRAFT,PHASE.PREP].includes(this.m.phase)) this.m.sendTo(this.playerId,{t:'m.layer',playerId:this.playerId,bondId,add});
     this.m.dispatch(this, 'onLayers', { bondId, from: before, to: before + add, reason });
     return add;
   }
@@ -960,7 +964,7 @@ export class PlayerState {
     if (!slot) return 0;
     const ev = { slot, kind: slot.kind, id: slot.id, price: slot.basePrice };
     this.m.dispatch(this, 'onPrice', ev, { quiet: true });
-    const p = Number(ev.price);
+    const p = Number(ev.price)-(slot.kind==='chess'?(this.m.augments?.price(this)||0):0);
     return Number.isFinite(p) ? Math.max(0, Math.round(p)) : slot.basePrice;
   }
 
@@ -1042,7 +1046,7 @@ export class PlayerState {
       if (!rec) return fail(ERR.BAD_TARGET);
       const base = this.gd.baseIdOf(slot.id);
       const need = rec.isGolden ? this.gd.goldenCopies : 1;
-      if (this.pool.has(base) && this.pool.left(base) < need) return fail(ERR.SOLD_OUT);
+      // Already displayed operator offers remain available; acquisition records the stock deficit.
       if (handFull) return fail(ERR.HAND_FULL);
       this.spend(price);
       slot.sold = true;
@@ -1570,14 +1574,14 @@ export class PlayerState {
       if (!this.gd.item(slot.id)) return fail(ERR.BAD_TARGET);
       if (!this.m.itemPool.canGain(slot.id)) return fail(ERR.SOLD_OUT);
       if (handFull && freeSlot(this.temp) < 0 && !this.completesItemMerge(slot.id)) return fail(ERR.HAND_FULL);
-    } else {
+    } else if (slot.kind === 'chess') {
       const rec = this.gd.chess(slot.id);
       if (!rec) return fail(ERR.BAD_TARGET);
       const base = this.gd.baseIdOf(slot.id);
       const need = rec.isGolden ? this.gd.goldenCopies : 1;
-      if (this.pool.has(base) && this.pool.left(base) < need) return fail(ERR.SOLD_OUT);
+      // Already displayed operator offers remain available; acquisition records the stock deficit.
       if (handFull) return fail(ERR.HAND_FULL);
-    }
+    } else return fail(ERR.BAD_TARGET);
     const price = Number.isFinite(slot.price) && slot.price > 0 ? Math.trunc(slot.price) : 0;
     if (price > this.funds) return fail(ERR.NO_FUNDS);
     slot.sold = true;
@@ -1639,7 +1643,7 @@ export class PlayerState {
     this.pendingFunds = 0;
     this.m.dispatch(this, 'onIncome', ev);
     const nonNeg = (v) => (Number.isFinite(v) && v > 0 ? Math.trunc(v) : 0);
-    this.addFunds(nonNeg(ev.income) + nonNeg(ev.pending), { reason: 'income' });
+    this.addFunds(nonNeg(ev.income) + nonNeg(ev.pending)+(this.m.augments?.income(this)||0), { reason: 'income' });
     // temp is NOT wiped here: the last prep's deadline resolved what the player could act on (endPrep); what overflowed
     // after it (battle-result grants, SETTLE merges, returned equipment) is shown and usable in this prep (tempDue).
     // Likewise reward offers of the last prep already expired at its end; what is still queued was earned after it —
@@ -1810,6 +1814,7 @@ export class PlayerState {
         counter: left, counterText: left == null ? '之后的每场作战' : `还剩 ${left} 场作战`,
       });
     }
+    if(this.m.augments?.enabled)out.push(...augmentEffectEntries(this.m.augments.allyCards(this),this.m.augments.enemies));
     return out;
   }
 

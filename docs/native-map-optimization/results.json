@@ -1,0 +1,125 @@
+{
+  "results": [
+    {
+      "id": "act2autochess_m01",
+      "mode": "normal",
+      "variant": "custom",
+      "stats": {
+        "calls": 12,
+        "triangles": 61626,
+        "textures": 22,
+        "geometries": 12,
+        "frames": 4,
+        "cpuMs": 29.18,
+        "lost": false,
+        "originalStage": "act2autochess_m01",
+        "cachedLayouts": 0,
+        "layoutCacheHits": 0
+      },
+      "official": false,
+      "original": "act2autochess_m01",
+      "elapsedMs": 6752
+    },
+    {
+      "id": "act2autochess_m01",
+      "mode": "unite",
+      "variant": "custom",
+      "stats": {
+        "calls": 13,
+        "triangles": 91943,
+        "textures": 22,
+        "geometries": 13,
+        "frames": 4,
+        "cpuMs": 30.58,
+        "lost": false,
+        "originalStage": "act2autochess_m01",
+        "cachedLayouts": 0,
+        "layoutCacheHits": 0
+      },
+      "official": false,
+      "original": "act2autochess_m01",
+      "elapsedMs": 9030
+    },
+    {
+      "id": "act2autochess_m01",
+      "mode": "boss",
+      "variant": "custom",
+      "stats": {
+        "calls": 12,
+        "triangles": 75871,
+        "textures": 22,
+        "geometries": 12,
+        "frames": 4,
+        "cpuMs": 30.29,
+        "lost": false,
+        "originalStage": "act2autochess_m01",
+        "cachedLayouts": 0,
+        "layoutCacheHits": 0
+      },
+      "official": false,
+      "original": "act2autochess_m01",
+      "elapsedMs": 7881
+    },
+    {
+      "id": "act2autochess_m02",
+      "mode": "normal",
+      "variant": "custom",
+      "stats": {
+        "calls": 18,
+        "triangles": 20582,
+        "textures": 27,
+        "geometries": 19,
+        "frames": 4,
+        "cpuMs": 50.37,
+        "lost": false,
+        "originalStage": "act2autochess_m02",
+        "cachedLayouts": 0,
+        "layoutCacheHits": 0
+      },
+      "official": false,
+      "original": "act2autochess_m02",
+      "elapsedMs": 7385
+    },
+    {
+      "id": "act2autochess_m02",
+      "mode": "unite",
+      "variant": "custom",
+      "stats": {
+        "calls": 20,
+        "triangles": 46758,
+        "textures": 27,
+        "geometries": 20,
+        "frames": 4,
+        "cpuMs": 56.15,
+        "lost": false,
+        "originalStage": "act2autochess_m02",
+        "cachedLayouts": 0,
+        "layoutCacheHits": 0
+      },
+      "official": false,
+      "original": "act2autochess_m02",
+      "elapsedMs": 9755
+    },
+    {
+      "id": "act2autochess_m02",
+      "mode": "boss",
+      "variant": "custom",
+      "stats": {
+        "calls": 17,
+        "triangles": 35127,
+        "textures": 26,
+        "geometries": 17,
+        "frames": 4,
+        "cpuMs": 46.87,
+        "lost": false,
+        "originalStage": "act2autochess_m02",
+        "cachedLayouts": 0,
+        "layoutCacheHits": 0
+      },
+      "official": false,
+      "original": "act2autochess_m02",
+      "elapsedMs": 9054
+    }
+  ],
+  "errors": []
+}

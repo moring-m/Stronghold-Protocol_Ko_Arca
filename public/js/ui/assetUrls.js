@@ -186,6 +186,7 @@ export function moduleTypeIconUrl(local, typeName) {
 export function effectIconUrl(m, eff) {
   const kind = eff?.iconKind;
   const id = str(eff?.iconId);
+  if (kind === 'augment')return id?.startsWith('/assets/custom/augments/')?id:null;
   if (kind === 'band') return bandIconUrl(m, id) || (id && id.startsWith('icon_') ? bandIconUrl(m, `band_${id.slice(5)}`) : null);
   if (kind === 'item') return itemIconUrl(m, id);
   if (kind === 'garrison') return uiUrl(m, `garrisonTypeIcon/${id || 's_icon_bond'}`) || uiUrl(m, 'garrisonTypeIcon/s_icon_bond');

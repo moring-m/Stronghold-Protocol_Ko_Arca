@@ -317,7 +317,7 @@ export function BandDraftScreen() {
           </div>` : html`<p class="t-dim">选择一个策略查看详情</p>`}
         <div class="draft-detail__actions">
           ${myPick ? html`<p class="draft-detail__status t-mint"><${Icon} name="check" />선택 완료「${gd.band(myPick)?.name || ''}」${!solo && !draft.done ? ' · 다른 참가자 선택 대기 중' : ''}</p>`
-            : selTaken ? html`<p class="draft-detail__status draft-detail__status--taken"><${Icon} name="close" />다른 참가자가 선택함，请选择其他策略</p>`
+            : selTaken ? html`<p class="draft-detail__status draft-detail__status--taken"><${Icon} name="close" />다른 참가자가 선택했습니다. 다른 전략을 선택하세요.</p>`
             : !myTurn ? html`<p class="draft-detail__status"><${Icon} name="hourglass" />${turnName ? `${turnName} 正在决策…` : '等待轮到你'}</p>` : null}
           <div class="draft-detail__btns">
             ${!solo ? html`<${Button} variant="secondary" size="lg" icon="chevrons" disabled=${!canSkip} loading=${busy === 'skip'} onClick=${skip}

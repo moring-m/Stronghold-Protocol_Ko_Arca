@@ -4,6 +4,7 @@ import {eightUniteStage} from './cooperativeEight.js';
 import { customFactionData, filterCustomFaction } from './customFactions.js';
 
 export const RULE_VALUES = Object.freeze([
+ ...[["augmentSilver","실버 가중치",1,1000],["augmentGold","골드 가중치",2,1000],["augmentPrism","프리즘 가중치",1,1000],["augmentAllyRerolls","아군 리롤",1,10],["augmentEnemyRerolls","적 리롤",1,10]].map(([id,name,value,max])=>({id,name,category:"augments",default:value,min:0,max,step:1,unit:id.includes("Rerolls")?"회":""})),
  {id:'stockPlayers',name:'상점 재고',default:0,min:-1,max:8,step:1,unit:'',options:[{value:0,label:'자동 (최대 4인 기준)'},...Array.from({length:8},(_,i)=>({value:i+1,label:`${i+1}인 기준`})),{value:-1,label:'무제한'}]},
  ...[['allyHp','최대 HP'],['allyAtk','공격력'],['allyDef','방어력'],['allyRes','마법 저항'],['allyAspd','공격 속도'],['allyBat','공격 간격'],['allyBlock','저지 수'],['allyCost','배치 비용'],['allyRedeploy','재배치 시간'],['allySpCost','최대 SP'],['allyInitSp','초기 SP'],['allySpRecovery','SP 회복 속도']].map(([id,name])=>({id,name,category:'allies',default:100,min:['allyHp','allyAspd','allyBat','allySpCost'].includes(id)?1:0,step:1,unit:'%'})),
  {id:'roundCount',name:'일반 라운드 수',default:13,min:1,max:100,step:1,unit:'라운드'},
@@ -24,7 +25,7 @@ export function recordCustomExtensions(value) {
 }
 export function extensionSelectionCount(selection){const saved=recordCustomExtensions(selection);return saved?Object.values(saved).reduce((n,v)=>n+(Array.isArray(v)?v.length:Object.keys(v).length),0):0;}
 export const EXTENSION_CATEGORIES = Object.freeze([
-  {id:'rules',name:'게임 규칙'}, {id:'commonBands',name:'공통 적용 전략'}, {id:'allies',name:'아군 스펙 조정'},
+  {id:'rules',name:'게임 규칙'}, {id:'augmentSettings',name:'증강 설정'}, {id:'commonBands',name:'공통 적용 전략'}, {id:'allies',name:'아군 스펙 조정'},
   { id: 'bonds', name: '맹약 추가' }, { id: 'stages', name: '전장 추가' },
   {id:'forcedBonds',name:'맹약 금지'}, {id:'protectedBonds',name:'맹약 밴 제외'},
   {id:'forcedAuxBonds',name:'보조맹약 금지'}, {id:'protectedAuxBonds',name:'보조맹약 밴 제외'},
@@ -38,8 +39,8 @@ export function customExtensionCatalog(raw = {}) {
   const banCatalog=Object.entries(raw.bonds||{}).filter(([,b])=>b.isCore&&Number(b.weight)>0).map(([id,b])=>({id,name:b.name||id}));
   const auxCatalog=Object.entries(raw.bonds||{}).filter(([,b])=>!b.isCore&&Number(b.weight)>0).map(([id,b])=>({id,name:b.name||id}));
   return {
-    allies:[],commonBands:Object.entries(raw.bands||{}).filter(([id])=>id!==RANDOM_BAND_ID).map(([id,b])=>({id,name:b.name||id,description:b.desc||''})),
-    rules:[{id:'unlimitedHpLoss',name:'HP 감소 상한 해제',description:'한 라운드에 감소하는 HP의 10 상한을 해제합니다.'},{id:'sharedHp',name:'아군 HP 공유',description:'모든 참가자의 HP를 합산해 공유합니다. 전투 종료 시 감소 예정 HP를 합산해 차감합니다.'},{id:'scarecrow',name:'허수아비 모드',description:'일반 보스와 히든 보스를 공격하지 않는 제셀톤 윌리엄스로 교체합니다.'},{id:'unlimitedLayers',name:'중첩 상한선 해제',description:'맹약의 999중첩 상한선을 해제합니다.'},{id:'defaultHarmony',name:'조화 기본 활성화',description:'조화 오퍼레이터가 없어도 조화 맹약을 활성화합니다.'},{id:'duplicateBands',name:'전략 중복 선택 허용',description:'여러 참가자가 같은 전략을 선택할 수 있습니다.'}],
+    augmentSettings:[],allies:[],commonBands:Object.entries(raw.bands||{}).filter(([id])=>id!==RANDOM_BAND_ID).map(([id,b])=>({id,name:b.name||id,description:b.desc||''})),
+    rules:[{id:'augments',name:'증강 모드',description:'4·7·10라운드에 아군·적 증강을 선택합니다.'},{id:'unlimitedHpLoss',name:'HP 감소 상한 해제',description:'한 라운드에 감소하는 HP의 10 상한을 해제합니다.'},{id:'sharedHp',name:'아군 HP 공유',description:'모든 참가자의 HP를 합산해 공유합니다. 전투 종료 시 감소 예정 HP를 합산해 차감합니다.'},{id:'scarecrow',name:'허수아비 모드',description:'일반 보스와 히든 보스를 공격하지 않는 제셀톤 윌리엄스로 교체합니다.'},{id:'unlimitedLayers',name:'중첩 상한선 해제',description:'맹약의 999중첩 상한선을 해제합니다.'},{id:'defaultHarmony',name:'조화 기본 활성화',description:'조화 오퍼레이터가 없어도 조화 맹약을 활성화합니다.'},{id:'duplicateBands',name:'전략 중복 선택 허용',description:'여러 참가자가 같은 전략을 선택할 수 있습니다.'}],
     forcedAuxBonds:auxCatalog,protectedAuxBonds:auxCatalog,
     forcedBonds:banCatalog,protectedBonds:banCatalog,
     disabledBonds:Object.entries(raw.bonds||{}).filter(([,b])=>b.isCore).map(([id,b])=>({id,name:b.name||id,description:b.isCore?'핵심 맹약':'추가 맹약'})),
@@ -74,6 +75,7 @@ export function applyCustomExtensions(raw, selection) {
   const enabled = selection.bonds.includes('ursus') && !(selection.disabledBonds||[]).includes('ursusShip');
   let data = customFactionData(raw, enabled);
   data=filterCustomFaction(data,'leithanien','leithanienShip',selection.bonds.includes('leithanien')&&!(selection.disabledBonds||[]).includes('leithanienShip'));
+  const commonBandRecords=Object.fromEntries((selection.commonBands||[]).filter(id=>data.bands[id]&&id!==RANDOM_BAND_ID).map(id=>[id,data.bands[id]]));
   const denied=new Set((selection.disabledBonds||[]).filter(id=>raw.bonds?.[id]?.isCore));
   const chess=Object.fromEntries(Object.entries(data.chess||{}).filter(([,c])=>{const core=(c.bonds||[]).filter(b=>data.bonds?.[b]?.isCore);return !core.some(b=>denied.has(b))||core.some(b=>!denied.has(b));}).map(([id,c])=>[id,{...c,bonds:(c.bonds||[]).filter(b=>!denied.has(b))}]));
   data={...data,chess,bonds:Object.fromEntries(Object.entries(data.bonds||{}).filter(([id])=>!denied.has(id)).map(([id,b])=>[id,{...b,members:b.members?.filter(x=>chess[x]),visibleMembers:b.visibleMembers?.filter(x=>chess[x])}])),items:Object.fromEntries(Object.entries(data.items||{}).filter(([,i])=>!denied.has(i.giveBondId))),bands:Object.fromEntries(Object.entries(data.bands||{}).filter(([id,b])=>(id===RANDOM_BAND_ID||!(selection.disabledBands||[]).includes(id))&&!(b.bondIds||[]).some(x=>denied.has(x)))),bosses:Object.fromEntries(Object.entries(data.bosses||{}).filter(([id])=>(selection.rules?.includes('scarecrow')&&id===LAB_DUMMY_BOSS||!(selection.disabledBosses||[]).includes(id))))};
@@ -100,14 +102,15 @@ export function applyCustomExtensions(raw, selection) {
     Object.assign(m,{rounds,enemyScale,roundSource,bossRound:roundCount+1,lastRound:roundCount+1,hiddenRound:original.hiddenRound?roundCount+2:null,spRounds:(original.spRounds||[]).filter(r=>r<=roundCount)});
   }
   const battleStages={...stages,...Object.fromEntries(Object.values(stages).filter(s=>!s.coopEightStage).map(s=>{const four=eightUniteStage(s);return [four.id,four];}))};
-  return { ...data, stages:battleStages, config: { ...raw.config, modes, deployCap:normalizeRuleValues(selection.ruleValues).deployCap, commonBands:(selection.commonBands||[]).filter(id=>data.bands[id]),lpCapPerRound:selection.rules?.includes('unlimitedHpLoss')?Number.MAX_SAFE_INTEGER:raw.config?.lpCapPerRound,customRules:{...normalizeRuleValues(selection.ruleValues),unlimitedStock:normalizeRuleValues(selection.ruleValues).stockPlayers===-1,...Object.fromEntries((selection.rules||[]).map(id=>[id,true]))} } };
+  return { ...data, stages:battleStages, config: { ...raw.config, modes, deployCap:normalizeRuleValues(selection.ruleValues).deployCap, commonBandRecords,commonBands:Object.keys(commonBandRecords),lpCapPerRound:selection.rules?.includes('unlimitedHpLoss')?Number.MAX_SAFE_INTEGER:raw.config?.lpCapPerRound,customRules:{...normalizeRuleValues(selection.ruleValues),unlimitedStock:normalizeRuleValues(selection.ruleValues).stockPlayers===-1,...Object.fromEntries((selection.rules||[]).map(id=>[id,true]))} } };
 }
 /** Validate before creating/starting a match, with the same filtered tables used by combat. */
 export function validateExtensionMinimums(raw,selection,{mode='coop',difficulty='NORMAL'}={}){
  const data=applyCustomExtensions(raw,selection);
  const modes=Object.values(data.config?.modes||{}).filter(m=>m.difficulty===difficulty&&(mode==='solo'?m.type==='SINGLE':m.type==='MULTI'));
  const errors=[];
- if((selection.commonBands||[]).some(id=>!data.bands[id]))errors.push('공통 적용 전략은 활성화된 전략 중에서 선택해야 합니다.');
+ if(selection.rules?.includes("augments")){const v=normalizeRuleValues(selection.ruleValues);if(v.augmentSilver+v.augmentGold+v.augmentPrism<=0)errors.push("증강 등급 가중치를 최소 1개 설정해야 합니다.");else if(v.augmentGold+v.augmentPrism<=0)errors.push("실버 3회 연속 방지를 위해 골드 또는 프리즘 가중치가 필요합니다.");}
+ if((selection.commonBands||[]).some(id=>!data.config.commonBandRecords?.[id]))errors.push('공통 적용 전략의 확장 콘텐츠를 활성화해야 합니다.');
  for(const m of modes){
   const allowed=Object.entries(data.bonds||{}).filter(([id,b])=>Number(b.weight)>0&&!(m.inactiveBondIds||[]).includes(id));
   const forced=selection.forcedBonds||[],protectedIds=selection.protectedBonds||[];

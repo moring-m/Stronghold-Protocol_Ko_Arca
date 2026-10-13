@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {bindPresetFaction,normalizePresetFactions,canApplyRecruitPreset,replaceRecruitEntries} from '../../public/js/ui/factionPresetModel.js';
-import {normalizeFavorites,favoritesStore,applyFavoriteFaction} from '../../public/js/ui/favorites.js';
+import {normalizeFavorites,favoritesStore,applyFavoriteFaction,isFavorite} from '../../public/js/ui/favorites.js';
 import {normalizeRecruitPresets,recruitPresetStore,applyRecruitPreset} from '../../public/js/ui/recruitPresets.js';
 import {loadoutStore} from '../../public/js/ui/loadoutSync.js';
 
@@ -57,4 +57,49 @@ test('cooperative defense chat choice has a bond icon but cannot link favorites 
  const{chatFaction}=await import('../../shared/chat.js');assert.equal(chatFaction('협동방어').bondId,'emptyShip');assert.equal(chatFaction('협동방어').presetLink,false);
  assert.deepEqual(bindPresetFaction([{id:'a',faction:null}],'a','협동방어'),[{id:'a',faction:null}]);
  assert.deepEqual(normalizePresetFactions([{id:'a',faction:'협동방어'}]),[{id:'a',faction:null}]);
+});
+
+test('duplicate preset IDs retain separate faction links and activate the matching favorite list',()=>{
+ const before=favoritesStore.get();try{
+ const normalized=normalizeFavorites({active:'same',presets:[
+  {id:'same',name:'염국 목록',faction:'염국',operators:['yan']},
+  {id:'same',name:'라이타니엔 목록',faction:'라이타니엔',operators:['leithanien']},
+  {id:'same~2',name:'우르수스 목록',faction:'우르수스',operators:['ursus']},
+ ]});
+ assert.equal(new Set(normalized.presets.map(p=>p.id)).size,3);
+ assert.deepEqual(normalized.presets.map(p=>p.faction),['염국','라이타니엔','우르수스']);
+ assert.deepEqual(normalizeFavorites(normalized),normalized,'repair is stable across saves/reloads');
+ favoritesStore.set(normalized);
+ for(const [faction,op]of [['염국','yan'],['라이타니엔','leithanien'],['우르수스','ursus']]){
+  assert.equal(applyFavoriteFaction(faction),faction+' 목록');
+  assert.ok(isFavorite('chess',op,()=>null));
+  for(const other of ['yan','leithanien','ursus'].filter(x=>x!==op))assert.equal(isFavorite('chess',other,()=>null),false);
+ }
+ }finally{favoritesStore.set(before);}
+});
+
+test('recruit presets also repair duplicate IDs without moving links or dropping entries',()=>{
+ const raw={active:'same',presets:[{id:'same',faction:'염국',entries:{yan:{selected:true}}},{id:'same',faction:'라이타니엔',entries:{leithanien:{selected:true}}}]};
+ const next=normalizeRecruitPresets(raw);
+ assert.notEqual(next.presets[0].id,next.presets[1].id);
+ assert.deepEqual(next.presets.map(p=>p.faction),['염국','라이타니엔']);
+ assert.deepEqual(next.presets.map(p=>p.entries),raw.presets.map(p=>p.entries));
+ assert.deepEqual(normalizeRecruitPresets(next),next);
+});
+
+test('a stale preset ID cannot remove another presets faction link',()=>{
+ const presets=[{id:'a',faction:'염국'},{id:'b',faction:'라이타니엔'}];
+ assert.deepEqual(bindPresetFaction(presets,'deleted','염국'),presets);
+});
+
+test('every linkable chat faction selects its own preset regardless of faction list order',async()=>{
+ const {CHAT_FACTIONS}=await import('../../shared/chat.js');const before=favoritesStore.get();try{
+ const presets=CHAT_FACTIONS.filter(f=>f.presetLink!==false).map(f=>({id:f.bondId,name:f.name,faction:f.name,operators:[f.bondId],items:[]}));
+ favoritesStore.set(normalizeFavorites({presets:presets.toReversed()}));
+ for(const faction of CHAT_FACTIONS.filter(f=>f.presetLink!==false)){
+  assert.equal(applyFavoriteFaction(faction.name),faction.name);
+  assert.equal(favoritesStore.get().active,faction.bondId);
+ }
+ const active=favoritesStore.get().active;assert.equal(applyFavoriteFaction('협동방어'),null);assert.equal(favoritesStore.get().active,active);
+ }finally{favoritesStore.set(before);}
 });

@@ -115,11 +115,11 @@ test('联防 with two helpers (escaped_multi): a member lands on its teammate\'s
     kind: 'unite', stageId: 'act1autochess_m01', seed: 5, autoFinish: false, timeLimit: 120, defs,
     players: [seat('L', 0, { bonds: {}, units: [unitAt(10, 7, 1, ULPIA)] }), mate('R', 1, { colOffset: 8 })],
   });
-  ul.step();
+  ul.run(2); // finish the fork's authored deployment before casting
   const a = ul.unit(ULPIA);
   a.skill.gainSp(999, 'test');
   if (!a.skill.active) assert.ok(a.skill.activate('test'), 'S3 cast');
-  ul.run(0.2);
+  ul.run(4); // let the full anchor flight resolve
   checkInvariants(ul.b);
   assert.ok(ul.b.onFieldBoard(10, 13) && !ul.b.onOwnBoard(a.player, 10, 13));
   assert.deepEqual([a.tileR, a.tileC], [10, 7], 'he stays on his own half');

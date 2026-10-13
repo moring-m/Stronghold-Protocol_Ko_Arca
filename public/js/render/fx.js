@@ -136,7 +136,8 @@ const feetZ = (v) => (v.z || 0) + (v.hover || 0) + (v.waterSink || 0) + 0.2;
 /** Cheap fingerprint of a camera's framing (the damage-number layout cache is reused only while it is unchanged). */
 const camKey = (c) => (c ? c.tx + c.ty * 1e3 + c.tz * 1e6 + c.tilt * 7.13 + c.dist * 1e4 + c.scale * 3.7e-2 + c.cx * 1.1e-5 + c.cy * 1.3e-8 : 0);
 /** Characters of a damage number as drawn (heals get a '+'). */
-const numChars = (v, style) => String(Math.round(v)).length + (style === 'heal' ? 1 : 0);
+const numChars = (v, style) => style === 'miss' ? 4 : String(Math.round(v)).length + (style === 'heal' ? 1 : 0);
+const OFFICIAL_JITTER_X = .7, OFFICIAL_LIFT_MIN = .15, OFFICIAL_LIFT_SPAN = .4;
 
 /** Sub-professions whose attacks splash around the struck target (the 阵法术师 / 轰击术师 strike every enemy in range). */
 const SPLASH_SUBS = new Set(['aoesniper', 'splashcaster', 'bombarder', 'fortress', 'hammer']);
@@ -412,6 +413,7 @@ export class FxSystem {
   explosion(x,y,z,...args){return this._anchored(x,y,z,()=>this._explosion(x,y,z,...args))}
   _impact(pr,cam){return pr.tgt&&pr.spec.look!=='shell'?this._bodyAnchored(pr.tgt,SHOT_HEIGHT.aim,()=>this._impactAnchored(pr,cam)):this._anchored(pr.tx,pr.ty,pr.tz,()=>this._impactAnchored(pr,cam))}
   simFx(kind,x,y,extra){
+    if(kind==='dodge'&&extra?.num==='m'&&this.ctx.settings?.officialDamageNumbers&&this.ctx.settings.damageNumbers!==false)this.officialNumber(this.ctx.view?.(extra.id),0,'miss');
     if(kind==='bombardAim')return this._simFx(kind,x,y,extra);
     const ex=extra&&typeof extra==='object'?extra:{},spec=fxSpec(kind,ex);
     if(spec.a==='none')return;
@@ -1305,6 +1307,37 @@ export class FxSystem {
   // ---- hits / numbers -----------------------------------------------------------------------------------------
 
   /** b.ev 'dmg' visual: glow + sparks in the hit colour; a melee blow (atk 'none' just before) adds its slash. */
+  officialNumber(view, amount, style) {
+    if (!view) return;
+    const miss = style === 'miss';
+    const n = miss ? 0 : Math.round(amount);
+    if (!miss && (!Number.isFinite(n) || n < 0)) return;
+    const now = this.time;
+    const cam = this.ctx.cam();
+    const base = (view.z || 0) + (view.hover || 0) + (view._headTiles || 1.2) * 0.8;
+    const a = cam.project(view.x, view.y, base, this._p);
+    const ax = a.x, ay = a.y, s = a.s > 0 ? a.s : 100;
+    const pxPerZ = ay - cam.project(view.x, view.y, base + 1, this._q).y;
+    const tile = pxPerZ > 1e-3 ? pxPerZ : s;
+    const cx = ax + (Math.random() - 0.5) * OFFICIAL_JITTER_X * tile;
+    const cy = ay - (OFFICIAL_LIFT_MIN + Math.random() * OFFICIAL_LIFT_SPAN) * tile;
+    const sc = numScale(s, false, style);
+    const w = numChars(n, style) * NUM_DIGIT_EM * 24 * sc * NUM_POP + NUM_GAP_PX;
+    const h = 24 * NUM_LINE_EM * sc * NUM_POP;
+    const maxNums = this.load >= 2 ? MAX_NUMBERS >> 1 : MAX_NUMBERS;
+    while (this.nums.length >= maxNums) this._releaseNum(this.nums.shift());
+    const t = this._takeNum(style);
+    t.text.visible = true;
+    t.text.alpha = 1;
+    t.text.text = miss ? 'MISS' : String(n);
+    Object.assign(t, {
+      unit: view, style, value: n, life: 0, end: NUM_LIFE, born: now, lastHit: now, pop: 1, big: false, fading: false,
+      official: true, ox: cx - ax, oy: cy - ay, x0: view.x, y0: view.y, z0: base,
+      risePx: NUM_RISE * tile * 0.5, _x: cx, _y: cy, _w: w, _h: h,
+    });
+    this.nums.push(t);
+  }
+
   _damage(view, amount, type, srcView, meta) {
     if (!view) return;
     const style = dmgStyleKey(type);
@@ -1322,6 +1355,7 @@ export class FxSystem {
       }
     }
     view.onHit?.();
+    if(this.ctx.settings?.officialDamageNumbers){if(this.ctx.settings.damageNumbers!==false&&(meta==='r'||meta?.officialMark==='r'))this.officialNumber(view,amount,'crit');return;}
     if (showDamageNumber(this.ctx.settings,meta)) {
       if (damageNumberMode(this.ctx.settings)==='basic' && meta?.blocked==='shield') this.numberAt(p.x,p.y,'BLOCK',0xffd65a);
       else this.number(view, meta?.value ?? amount, damageNumberMode(this.ctx.settings)==='basic' ? meta?.blocked ? 'barrier' : 'critical' : style, big, damageNumberMode(this.ctx.settings)==='basic');
@@ -1372,7 +1406,7 @@ export class FxSystem {
         tint: 0x7dffa8, vy: -s * 0.9, life: 0.7, s0: s / 64 * 0.32, s1: s / 64 * 0.2, a0: 0.95, a1: 0, fadeIn: 0.08,
       });
     }
-    if (showDamageNumber(this.ctx.settings,null,true)) this.number(view, amount, 'heal', false);
+    if (!this.ctx.settings?.officialDamageNumbers && showDamageNumber(this.ctx.settings,null,true)) this.number(view, amount, 'heal', false);
   }
 
   /** All hits start at one head height with a narrow horizontal variation.

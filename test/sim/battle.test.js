@@ -359,7 +359,8 @@ test('snapshot / event wire format (DESIGN §8.2)', () => {
   });
   h.run(10.5); // walker (0.5 tiles/s) reaches the guard at ~9 s
   const snap = h.snapshot();
-  assert.deepEqual(Object.keys(snap).slice(0, 6), ['fieldId', 't', 'units', 'dp', 'killed', 'total']);
+  for(const key of ['fieldId','t','units','dp','killed','total','resolved'])assert.ok(Object.hasOwn(snap,key),key);
+  assert.ok(Number.isInteger(snap.resolved)&&snap.resolved>=0&&snap.resolved<=snap.total);
   assert.equal(snap.fieldId, 'n:p1');
   for (const u of snap.units) {
     assert.equal(u.length, 9);
@@ -382,7 +383,8 @@ test('snapshot / event wire format (DESIGN §8.2)', () => {
   assert.equal(atk.length, 5);
   assert.equal(typeof atk[4], 'boolean');
   const dmg = allEv.find((e) => e[0] === 'dmg');
-  assert.equal(dmg.length, 4);
+  assert.ok(dmg.length===4||dmg.length===5);
+  if(dmg.length===5)assert.equal(typeof dmg[4],"object");
   assert.ok(['phys', 'arts', 'true', 'burn', 'neural', 'necrosis', 'apoptosis'].includes(dmg[3]));
   const flyInSnap = h.b.units.find((u) => u.defId === 'enemy_fly');
   if (flyInSnap.alive) assert.ok(snap.units.find((u) => u[0] === flyInSnap.id)[7] & UF.FLYING);

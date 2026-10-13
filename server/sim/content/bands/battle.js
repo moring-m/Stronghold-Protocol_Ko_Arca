@@ -27,11 +27,12 @@
 //                                               elite or not) stand on the field get ATK +atk
 //   act2autochess_band3_buff  伊奥莱塔 统御号令 at combat start n = elite operators on the field ⇒ every elite operator
 //                                               ATK +atk_per_cnt × n, HP +max_hp_per_cnt × n (all 直接乘算)
-//   auto_chess_change_map     Touch 外勤医疗    "所有玩家场地上出现一名<预备干员-医疗>": while any alive player of the match
-//                                               holds band_amedic, every player's field gets the map character of the
+//   auto_chess_change_map     Touch 外勤医疗    "所有玩家场地上出现一名<预备干员-医疗>": once selected in this match, its
+//                                               retained team grant gives every player's field the map character of the
 //                                               variant whose common_condition holds for that player's elites on the field
 //                                               (condition_golden_chess_le cnt → 预备干员-医疗, _ge cnt → Touch), spawned at
-//                                               combat start on its stage slot (tokens.spawnMapChar)
+//                                               combat start on its stage slot (tokens.spawnMapChar). [ASSUMED] that slot's
+//                                               aggroSeq precedes ordinary initial operators; deploySeq stays the runtime spawn
 // Prep-only bands (economy / shop / grants / layers at prep end or round start) live in bands/meta.js.
 
 import {
@@ -231,12 +232,20 @@ function installMapChars(battle) {
   const holders = battle.players.filter((ps) => matchBands(battle, ps.playerId).includes(AMEDIC_BAND));
   if (!holders.length) return;
   battle.on('battleStart', () => {
+    const chars = [];
     for (const ps of holders) {
+      const copies=matchBands(battle,ps.playerId).filter(id=>id===AMEDIC_BAND).length;
+      const multiplier=1+.5*Math.max(0,copies-1);
       const elites = deployedOps(battle, ps.playerId).filter(isElite).length;
-      for (const id of amedicCharsFor(elites, variants)) {
-        const u = spawnMapChar(battle, ps.playerId, id);
-        if (u) fxOn(battle, 'summon', u, keyOf(AMEDIC_BAND), AMEDIC_BAND);
-      }
+      for (const id of amedicCharsFor(elites, variants)) chars.push({ playerId: ps.playerId, id, multiplier });
+    }
+    for (const [i, { playerId, id, multiplier }] of chars.entries()) {
+      // The reserve medic occupies this stage slot in preparation; Touch replaces it at battle start. [ASSUMED]
+      // Replacement preserves the slot's priority before ordinary deployments. Shared-field ordering between
+      // prepared characters follows player order, as for other initial placements (lifecycle.js).
+      const u = spawnMapChar(battle, playerId, id, { preBattleAggroSeq: i - chars.length });
+      if(u){for(const key of ['maxHp','atk','def','res','aspd','blockCnt','moveSpeed','spRecovery','hpRecoveryPerSec'])u.base[key]*=multiplier;u.markDirty();u.hp=u.s.maxHp;}
+      if (u) fxOn(battle, 'summon', u, keyOf(AMEDIC_BAND), AMEDIC_BAND);
     }
   });
 }
@@ -252,13 +261,14 @@ export function hasBattlePart(bandId) {
 }
 
 export function install(battle) {
-  for (const ps of battle.players) for(const bandId of new Set([ps.bandId,...(battle.data.raw?.config?.commonBands||[])].filter(Boolean))) {
+  for (const ps of battle.players) for(const [index,bandId] of [ps.bandId,...(battle.data.raw?.config?.commonBands||[])].entries()) {
+    if(!bandId)continue;
     const band = bandRecord(bandId);
     if (!band) continue;
     for (const b of buffsOf(band)) {
       const f = b.bbKey ? BY_KEY[b.bbKey] : null;
       if (!f) continue;
-      try { f(battle, ps, b.p, bandId); } catch (e) { battle._handlerError?.(`band:${ps.bandId}`, null, e); }
+      try { f(battle, ps, b.p, index>0?`${bandId}:common`:bandId); } catch (e) { battle._handlerError?.(`band:${bandId}`, null, e); }
     }
   }
   installMapChars(battle);

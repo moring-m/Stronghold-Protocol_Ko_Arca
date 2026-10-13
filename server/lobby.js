@@ -290,6 +290,8 @@ export class Lobby {
     this.now = now;
     this.seedFn = seedFn || (() => randomInt(2 ** 32));
     this.opts = { ...LOBBY_DEFAULTS, ...options };
+    this.draining=!!options.draining;
+    if(options.roomCodePrefix&&(!/^[A-Z]$/.test(options.roomCodePrefix)||!CODE_ALPHABET.includes(options.roomCodePrefix)))throw new Error("Invalid release room prefix");
     /** @type {Map<string, Room>} */
     this.rooms = new Map();
     /** @type {Map<string, NodeJS.Timeout>} lobby grace timers by playerId */
@@ -435,6 +437,7 @@ export class Lobby {
   // ---------------------------------------------------------------------------------------------------
 
   create(session, { mode, difficulty, spectators, customExtensions }) {
+    if(this.draining)return fail(ERR.INTERNAL,'업데이트가 적용되었습니다. 메인화면을 새로고침한 뒤 새 방을 만들어주세요.');
     const cur = this.roomOf(session);
     if (cur && cur.match) return fail(ERR.ROOM_STARTED, 'leave your running match first');
     if (this.rooms.size >= this.opts.maxRooms) return fail(ERR.INTERNAL, 'too many rooms');
@@ -815,6 +818,7 @@ export class Lobby {
     try {
       const match = new this.MatchClass({
         roomCode: room.code,
+        getHostId:()=>room.hostId,
         mode: room.mode,
         difficulty: room.difficulty,
         customFactions: room.customFactions,
@@ -1253,8 +1257,8 @@ export class Lobby {
 
   genCode() {
     for (let attempt = 0; attempt < 1000; attempt++) {
-      let code = '';
-      for (let i = 0; i < ROOM_CODE_LEN; i++) code += CODE_ALPHABET[randomInt(CODE_ALPHABET.length)];
+      let code = this.opts.roomCodePrefix||'';
+      for (let i = code.length; i < ROOM_CODE_LEN; i++) code += CODE_ALPHABET[randomInt(CODE_ALPHABET.length)];
       if (!this.rooms.has(code)) return code;
     }
     return null;

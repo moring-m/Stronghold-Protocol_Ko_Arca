@@ -1,0 +1,107 @@
+name: Rolling production deployment
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+    inputs:
+      build_only:
+        description: Build the first image without changing EC2
+        type: boolean
+        default: true
+permissions:
+  contents: read
+  packages: write
+concurrency:
+  group: stronghold-rolling-production
+  cancel-in-progress: false
+jobs:
+  build:
+    if: github.event_name == 'workflow_dispatch' || vars.ROLLING_DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.tag.outputs.image }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Validate release routing and game-preservation behavior
+        run: |
+          node --test test/release/*.test.js test/ui/buildGuard.test.js
+          SP_RELEASE_BROWSER=1 CHROMIUM_PATH=$(command -v google-chrome) node --test test/release/browser.test.js
+          bash -n deploy/ec2/rolling-install.sh deploy/ec2/rolling-update.sh deploy/ec2/rolling-maintain.sh
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - id: tag
+        run: echo "image=ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          tags: ${{ steps.tag.outputs.image }}
+          build-args: |
+            NODE_IMAGE=node:24-alpine
+            BROWSER_RESOURCES=1
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Smoke-test the built image before publishing
+        env:
+          IMAGE: ${{ steps.tag.outputs.image }}
+        run: |
+          docker run -d --name release-smoke -e SP_COMBAT=client "$IMAGE"
+          trap 'docker rm -f release-smoke >/dev/null' EXIT
+          for n in $(seq 1 30); do
+            if docker exec release-smoke node -e 'fetch("http://127.0.0.1:3000/healthz").then(async r=>{if(!r.ok||!(await r.json()).ok)process.exit(1)}).catch(()=>process.exit(1))'; then
+              exit 0
+            fi
+            sleep 2
+          done
+          docker logs release-smoke
+          exit 1
+      - name: Verify two containers preserve an eight-player room across rollover
+        env:
+          IMAGE: ${{ steps.tag.outputs.image }}
+        run: bash deploy/ec2/verify-rolling-image.sh "$IMAGE"
+      - name: Publish the verified immutable image
+        env:
+          IMAGE: ${{ steps.tag.outputs.image }}
+        run: docker push "$IMAGE"
+  deploy:
+    needs: build
+    if: vars.ROLLING_DEPLOY_ENABLED == 'true' && (github.event_name == 'push' || inputs.build_only == false)
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Install verified SSH credentials
+        env:
+          SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.EC2_KNOWN_HOSTS }}
+        run: |
+          test -n "$SSH_KEY" && test -n "$KNOWN_HOSTS"
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_ed25519
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/id_ed25519 ~/.ssh/known_hosts
+      - name: Deploy or queue without stopping any active game
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+          IMAGE: ${{ needs.build.outputs.image }}
+          RELEASE: ${{ github.sha }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -Eeuo pipefail
+          latest=$(curl -fsSL -H "Authorization: Bearer $GH_TOKEN"             "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/git/ref/heads/master" | jq -r '.object.sha')
+          if [[ "$latest" != "$RELEASE" ]]; then
+            echo 'A newer commit is already on master; this older deployment is skipped.'
+            exit 0
+          fi
+          [[ "$EC2_HOST" =~ ^[a-zA-Z0-9.-]+$ && "$EC2_USER" =~ ^[a-z_][a-z0-9_-]*$ ]]
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15 \
+            "$EC2_USER@$EC2_HOST" "sudo -n bash /opt/stronghold/rolling/update.sh '$RELEASE' '$IMAGE'"

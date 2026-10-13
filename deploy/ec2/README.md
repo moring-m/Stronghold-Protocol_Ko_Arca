@@ -1,3 +1,5 @@
+> For the new reviewed rolling-update procedure, see [ROLLING.md](ROLLING.md). It is not installed yet. The manual procedure below still replaces the running process and ends active games. Do not use it after rolling migration.
+
 # Manual EC2 updates
 
 GitHub pushes do not deploy automatically. Run the update command on EC2 when you want to publish the latest `master` revision. Replacing the game process ends active rooms and matches.

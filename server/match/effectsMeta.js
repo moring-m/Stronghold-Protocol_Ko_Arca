@@ -216,10 +216,13 @@ export class EffectDispatcher {
       // 1. globals
       for (const [key, h] of reg.globals()) this._call(ps, key, h, hook, { kind: 'global', key }, ev);
       // 2. band
-      for(const bandId of new Set([ps.bandId,...(this.m.gd.config.commonBands||[])].filter(Boolean))) {
+      // Personal and common strategies are separate effect sources, even when
+      // they select the same strategy (e.g. two Quintus cells at round three).
+      for(const [index,bandId] of [ps.bandId,...(this.m.gd.config.commonBands||[])].entries()) {
+        if(!bandId)continue;
         const key = `band:${bandId}`;
         const h = reg.get(key);
-        if (h) this._call(ps, key, h, hook, { kind: 'band', key, bandId, band: this.m.gd.band(bandId) }, ev);
+        if (h) this._call(ps, key, h, hook, { kind: 'band', key, common:index>0, bandId, band: this.m.gd.band(bandId) }, ev);
       }
       // 3. bonds
       for (const bondId of this.m.gd.bondIds) {
@@ -445,6 +448,7 @@ function grantSpeaker(gd, source) {
  */
 export function makeCtx(m, ps, source, hook, ev = null) {
   const gd = m.gd;
+  const counterKey=k=>source.kind==='band'&&source.common?`common:${source.bandId}:${k}`:k;
   const view = (p) => (p ? ps.pieceView(p) : null);
   const ctx = {
     hook,
@@ -468,6 +472,7 @@ export function makeCtx(m, ps, source, hook, ev = null) {
     lp: () => ps.lp,
     alive: () => ps.alive,
     bandId: () => source.kind==='band'?source.bandId:ps.bandId,
+    teamMedicGranted: () => m.teamMedicGranted(),
     shopLevel: () => ps.shop.level,
     bond: (id) => (ps.bonds[id] ? { ...ps.bonds[id] } : null),
     bonds: () => Object.fromEntries(Object.entries(ps.bonds).map(([k, v]) => [k, { ...v }])),
@@ -506,9 +511,9 @@ export function makeCtx(m, ps, source, hook, ev = null) {
     shopSlots: () => ps.shop.slots.map((s) => (s ? { kind: s.kind, id: s.id, basePrice: s.basePrice, sold: !!s.sold, frozen: !!s.frozen } : null)),
 
     // ---- counters (player scope, persistent)
-    counter: (k) => (Number.isFinite(ps.counters[k]) ? ps.counters[k] : 0),
-    setCounter: (k, v) => { if (typeof k === 'string' && Number.isFinite(v)) ps.counters[k] = v; return ps.counters[k] ?? 0; },
-    incCounter: (k, n = 1) => { if (typeof k !== 'string' || !Number.isFinite(n)) return 0; ps.counters[k] = (Number.isFinite(ps.counters[k]) ? ps.counters[k] : 0) + n; return ps.counters[k]; },
+    counter: (k) => (Number.isFinite(ps.counters[counterKey(k)]) ? ps.counters[counterKey(k)] : 0),
+    setCounter: (k, v) => { if (typeof k === 'string' && Number.isFinite(v)) ps.counters[counterKey(k)] = v; return ps.counters[counterKey(k)] ?? 0; },
+    incCounter: (k, n = 1) => { if (typeof k !== 'string' || !Number.isFinite(n)) return 0; const key=counterKey(k);ps.counters[key] = (Number.isFinite(ps.counters[key]) ? ps.counters[key] : 0) + n; return ps.counters[key]; },
     /** Per-piece counter of the current round (0 in a new round / for a new piece; an elite merged this round keeps the
      *  highest of its copies' — PlayerState.pieceRoundCount). */
     pieceCounter: (uid, k) => { const l = ps.find(uid); return l ? ps.pieceRoundCount(l.piece, k) : 0; },

@@ -1,5 +1,5 @@
 // Regression tests (Node) of user playtest #3, HUD / UI items:
-//   2  the own LP drops live while the own battle's enemies enter the blue gate — pendingLoss / liveLp (the settle
+//   2  the own LP's pending loss is marked live while the own battle's enemies enter the blue gate — pendingLoss / liveLp (the settle
 //      rule min(lpCapPerRound, counted leaks), reset when the settled m.private lands, 联防中 during 联防), the team
 //      panel rows (rowLp: own live value, teammates' m.public players[].pendingLp), the LP tower's −N tick, and the
 //      server's pendingLp (server/match/Match.js _pendingLpView)
@@ -59,7 +59,7 @@ const hasClass = (v, c) => typeof v?.props?.class === 'string' && v.props.class.
 
 // ---- 2: live LP ----------------------------------------------------------------------------------------------------
 
-describe('2: the own LP drops live while the battle runs', () => {
+describe("2: the own LP's pending loss is marked live while the battle runs", () => {
   test('pendingLoss is the settle rule: min(lpCapPerRound, counted leaks), never negative', () => {
     assert.equal(pendingLoss(0), 0);
     assert.equal(pendingLoss(3), 3);

@@ -1,0 +1,85 @@
+{
+  "results": [
+    {
+      "id": "act2autochess_m01",
+      "mode": "unite",
+      "variant": "baseline",
+      "stats": {
+        "calls": 14,
+        "triangles": 107917,
+        "textures": 22,
+        "geometries": 14,
+        "frames": 4,
+        "cpuMs": 30.36,
+        "lost": false,
+        "originalStage": "act2autochess_m01",
+        "cachedLayouts": 0,
+        "layoutCacheHits": 0
+      },
+      "official": false,
+      "original": "act2autochess_m01",
+      "elapsedMs": 10185
+    },
+    {
+      "id": "act2autochess_m01",
+      "mode": "unite",
+      "variant": "custom",
+      "stats": {
+        "calls": 12,
+        "triangles": 107917,
+        "textures": 22,
+        "geometries": 12,
+        "frames": 4,
+        "cpuMs": 30.02,
+        "lost": false,
+        "originalStage": "act2autochess_m01",
+        "cachedLayouts": 0,
+        "layoutCacheHits": 0
+      },
+      "official": false,
+      "original": "act2autochess_m01",
+      "elapsedMs": 10525
+    },
+    {
+      "id": "act2autochess_m02",
+      "mode": "unite",
+      "variant": "baseline",
+      "stats": {
+        "calls": 23,
+        "triangles": 50842,
+        "textures": 27,
+        "geometries": 23,
+        "frames": 4,
+        "cpuMs": 51.19,
+        "lost": false,
+        "originalStage": "act2autochess_m02",
+        "cachedLayouts": 0,
+        "layoutCacheHits": 0
+      },
+      "official": false,
+      "original": "act2autochess_m02",
+      "elapsedMs": 7844
+    },
+    {
+      "id": "act2autochess_m02",
+      "mode": "unite",
+      "variant": "custom",
+      "stats": {
+        "calls": 18,
+        "triangles": 50842,
+        "textures": 27,
+        "geometries": 18,
+        "frames": 4,
+        "cpuMs": 54.71,
+        "lost": false,
+        "originalStage": "act2autochess_m02",
+        "cachedLayouts": 0,
+        "layoutCacheHits": 0
+      },
+      "official": false,
+      "original": "act2autochess_m02",
+      "elapsedMs": 8313
+    }
+  ],
+  "errors": []
+}

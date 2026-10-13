@@ -513,7 +513,7 @@ export function bandMetaHandler(bandId) {
 }
 
 export function registerMeta(registry) {
-  for (const id of Object.keys(gameData().bands || {})) {
+  for (const id of new Set([...Object.keys(gameData().bands || {}),...Object.keys(gameData().config?.commonBandRecords||{})])) {
     const h = bandMetaHandler(id);
     if (h) registry.band(id, h);
   }

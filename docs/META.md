@@ -55,7 +55,7 @@ LOBBY → INFO_CHECK (co-op 25 s; solo and single-human matches untimed; all hum
 ```
 
 **Deploy field (user playtest #5 item 7).** From the ROUND_START of a boss round (最终攻势 / 隐秘核心) a player deploys on
-its half of the boss field (`Match.deployFieldOf` → `'bossL'`, or `'bossR'` for the second player of a seat pair — the
+its half of the boss field (`Match.deployFieldOf` → `'bossL'`, or `'bossR'` for the second player of a drawn pair — the
 same pairing as the fields, `bossWaves` / `Match.bossGroupOf`, planned in `startRound` BEFORE the players' round start
 so R14 → R15 never re-checks a boss-half board against the normal field, and re-paired — with an immediate re-check —
 when a teammate quits before the fight): `board.js buildDeployMap`
@@ -400,7 +400,7 @@ garrison ID, so her normal and elite traits each count their own first manual re
 or in-place promotion (player feedback: "获得该干员后该回合的首次刷新" also stacks; a copy
 bought after selling one this round is a new copy and fires on its own first refresh [ASSUMED]).
 
-Writes (all validated, never throw on bad input, never make funds / pools negative):
+Writes (validated, never throw on bad input; funds and available stock stay non-negative; authorized operator overdraw records an internal deficit):
 
 | helper | effect |
 |---|---|
@@ -424,6 +424,7 @@ Writes (all validated, never throw on bad input, never make funds / pools negati
 | `addBounty(card)` | a bounty (choices.json cards.bounty shape) on the next battles |
 | `toast(text, kind)` / `ticker(text)` / `giftTicker(fromName, chessId)` | messages |
 | `teammates()` / `player(playerId)` | ctx objects of other alive players (team effects) |
+| `teamMedicGranted()` | Whether this match has a confirmed Touch selection, including an eliminated/departed holder; only the retained 外勤医疗 grant uses this exception ([ASSUMED], §30.14) |
 
 ### 2.5 Items: consume-on-equip and Arts
 Items whose data `kind` starts with `consume_on_equip` resolve through their `item:` handler's `onEquip` and are
@@ -651,6 +652,12 @@ smallest stat (坚若磐石 "目标生命值损失最少" = least `lpLost`). doc
 ---
 
 ## 4. 联防 (Unite)
+
+HP/SP restoration is completed after deployment and all `battleStart` effects. Living carry ratios remain exact,
+including below 1% or fractional HP under a smaller new maximum. As approved for the reported Egir bug, opening
+devour rebuilds attributes/mark chains without repeating HP loss or death/revive effects on a carried survivor.
+Forced-down carry still participates in attribute chains and stays down without using a revive slot. Fresh units
+without carry and other battle kinds retain normal devour damage; later redeploys do not reuse the old carry.
 Planned after the normal combats, at the end of the COMBAT_END pause from the players still in (`Match._afterCombat`, so a
 player who quit during the last field or the pause is neither a helper nor a leaker whose enemies re-enter; unite.js):
 helpers = `unite.js helperOrder` (research 08 §5, PRTS 卫戍协议/帮助 §联防阶段): ≤ `unite.maxHelpers` (2) perfect players
@@ -684,6 +691,8 @@ leaker's own capsule / row (`ui/hud.js uniteRemaining`) and the leakers' team ro
 ---
 
 ## 5. Views (DESIGN §8.2 / §8.3) and deviations
+
+The client's stored loadout and `m.private.loadout` / `ops` must agree after a successful sync. In `public/js/ui/loadoutSync.js`, edits and `welcome` invalidate preparation still awaiting game data, so an older payload cannot overwrite a newer reset on the session or seat, or enter the next match (DESIGN §16, DESIGN §30.17). Request reply ordering, debounce, close flush and retry/lock handling remain unchanged.
 
 `m.public` (throttled ≤ 10/s, only sent when it changed) carries the DESIGN fields plus: `drawnDisabledBonds` (the 3+4
 drawn set; `disabledBonds` = drawn ∪ the mode's static list), `hiddenBossId`, `bossRound`, `hiddenRound`, `spRound`,

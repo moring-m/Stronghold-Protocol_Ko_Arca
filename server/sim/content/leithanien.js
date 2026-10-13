@@ -18,7 +18,7 @@ export function install(b){
  const add=(u,bonds,n,limit,key)=>{const k=`${u.id}:${key}`,used=counts.get(k)||0;if(used>=limit)return;const gained=S.gainLayers(b,{playerId:u.ownerId,bonds,n,source:u,reason:'leithanien:trait'});if(gained>0)counts.set(k,used+1);};
  const refresh=u=>{
   if(u.kind!=='op')return;
-  const g=trait(u),layers=S.bondLayers(b,u.ownerId,BOND);
+  const g=trait(u);if(g?.effectKey==='custom_leithanien_deploy')S.passiveBuff(b,u,'leithanien:trait:redeploy',{redeployMul:g.bb.redeployMul??.5});const layers=S.bondLayers(b,u.ownerId,BOND);
   if(g?.effectKey==='custom_leithanien_hp'||g?.effectKey==='custom_leithanien_atk')S.passiveBuff(b,u,'leithanien:trait:stats',S.directMods({[g.effectKey.endsWith('_hp')?'hp':'atk']:Math.floor(layers/3)*g.bb.count}));
   const score=u.items?.find(id=>id.startsWith('chess_item_custom_leithanien_score_'));
   if(score)S.passiveBuff(b,u,'leithanien:score:arts',{artsDealtMul:score.endsWith('_b')?1.6:1.4});
@@ -64,7 +64,7 @@ export function install(b){
   const shared=members().some(a=>a.ownerId===u.ownerId&&field(a)&&has(a,'score')&&has(a,'bell'));
   if(has(u,'score')||shared)for(const e of b.enemies)apply(u,e);
  });
- b.on('deploy',({unit:u,move})=>{refresh(u);if(!move&&trait(u)?.effectKey==='custom_leithanien_deploy')add(u,[BOND],trait(u).bb.count,8,'deploy');});
+ b.on('deploy',({unit:u,move})=>{refresh(u);if(!move&&trait(u)?.effectKey==='custom_leithanien_deploy')add(u,[BOND,'raidShip'],trait(u).bb.count,8,'deploy');});
  b.on('layerGain',({playerId,bondId})=>{if(bondId===BOND)b.after(0,()=>{for(const u of b.allyUnits)if(u.ownerId===playerId)refresh(u);});});
  b.on('damaged',({target,type,dmg,amount})=>{if(type!=='element'||dmg?.element!=='necrosis'||!(amount>0))return;for(const u of members())if(field(u)&&trait(u)?.effectKey==='custom_leithanien_burst'&&S.inRange(u,target)){add(u,[BOND],trait(u).bb.count,5,'burst');add(u,['arcaneShip'],trait(u).bb.arcaneCount,5,'burstArcane');}});
  b.on('kill',({killer:u,victim})=>{if(victim?.side==='enemy'&&trait(u)?.effectKey==='custom_leithanien_kill'){const k=u.id+':kill',used=counts.get(k)||0;if(used>=5)return;let gained=S.gainLayers(b,{playerId:u.ownerId,bonds:[BOND],n:trait(u).bb.count,source:u});gained+=S.gainLayers(b,{playerId:u.ownerId,bonds:['swiftShip'],n:trait(u).bb.swiftCount??trait(u).bb.count,source:u});if(gained>0)counts.set(k,used+1);}});

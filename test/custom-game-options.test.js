@@ -28,7 +28,7 @@ test('all humans can select random, which resolves in order without duplicates o
  const h=makeMatch({mode:'coop8',humans:8});t.after(()=>h.m.dispose());const m=h.m;m.phase='INFO_CHECK';m.enterBandDraft();assert.equal(m.gd.bandIds()[0],RANDOM_BAND_ID);const fixed=m.gd.bandIds().find(id=>id!==RANDOM_BAND_ID);
  let i=0;while(m.draftTurn()){const ps=m.players.get(m.draftTurn());assert.ok(m.pickBand(ps,i++===0?fixed:RANDOM_BAND_ID).ok);}
  m.finishBandDraft(false);assert.ok(m.order.every(p=>p.bandId!==RANDOM_BAND_ID));assert.equal(new Set(m.order.map(p=>p.bandId)).size,8);assert.equal(m.order.filter(p=>p.bandId===fixed).length,1);
- for(const p of m.order)assert.equal(p.lp,m.gd.startLp(p.bandId));assert.equal(m.errorCount,0);
+ for(const p of m.order)assert.equal(p.lp,m.gd.startLp(p.bandId)+(p.bandId===fixed?0:5));assert.equal(m.errorCount,0);
 });
 test('random is AI-ineligible and cannot be disabled, but duplicate-enabled random assignments may repeat',t=>{
  const catalog=customExtensionCatalog({...DATA,bands:{...DATA.bands,[RANDOM_BAND_ID]:{}}});assert.ok(!catalog.disabledBands.some(x=>x.id===RANDOM_BAND_ID));

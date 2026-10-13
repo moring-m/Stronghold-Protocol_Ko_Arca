@@ -72,12 +72,12 @@ test('eight-player simulation advances shared events and all personal fields int
  assert.ok(h.drive(()=>!!h.ended));assert.equal(h.ended.players.length,8);assert.equal(h.ended.roomMode,'coop8');assert.equal(m.errorCount,0);
 });
 
-test('common strategy battle buffs apply alongside personal strategies and do not stack the same strategy twice',()=>{
+test('common strategy battle buffs apply alongside personal strategies and stack identical strategies independently',()=>{
  const bonds=Object.fromEntries(['yanShip','swiftShip','arcaneShip'].map(id=>[id,{active:true,count:3,tier:1,layers:0}]));
  const raw={...DATA,config:{...DATA.config,commonBands:['band_amiya']},chess:{...DATA.chess,test:chessRec({id:'test',stats:{atk:100,maxHp:1000},skill:null})}};
  for(const bandId of ['band_pith','band_amiya']){
   const h=makeBattle({data:raw,bandId,units:[{chessId:'test',row:10,col:3}],bonds,autoFinish:false});h.run(.1);
-  assert.equal(h.unit('test').s.atk,120);assert.equal(h.b.errorCount,0);
+  assert.equal(h.unit('test').s.atk,bandId==='band_amiya'?140:120);assert.equal(h.b.errorCount,0);
  }
 });
 

@@ -21,7 +21,9 @@ import { store } from '../store.js';
 // pointer): there is no ⓘ corner (the official cards have none; user playtest #6 item 10 — on phones its invisible
 // 44 px touch area covered the card's bottom-right quarter, half the strip, and a second tap there only re-opened the
 // detail); a card that cannot be bought right now (the bar is not editable: ready, round start) opens its detail. The
-// D / R / F keys stay one-press shortcuts. There is no drag-to-sell zone: selling is the 出售 +N button of a tapped
+// D / R / F keys stay one-press shortcuts — a 刷新 whose request is still on the wire dims the button and swallows
+// further taps and the R key until the reply lands (GitHub #501; the single-flight lives in ui/gameActions.js
+// onRefreshBusy, ui/shopBar.js only draws it). There is no drag-to-sell zone: selling is the 出售 +N button of a tapped
 // unit's underframe (ui/underframe.js). After a promotion the operator cards are replaced by
 // the 晋升奖励 cards (3 free operators, pick 1 — also two taps) until picked or put off (稍后 → rewardOverlay.js pill);
 // a special refresh (凯瑟琳 定向投放's 3 items, 娜仁图亚, 寻呼模块, 信标, 松果) takes the same place under its own name, an
@@ -270,7 +272,7 @@ export function RewardCards({ offer, priv, editable, onPick, onDetail, onLater, 
 
 /**
  * The bar.
- * @param {{ priv:any, editable:boolean, collapsed:boolean, onCollapse:(c:boolean)=>void,
+ * @param {{ priv:any, editable:boolean, collapsed:boolean, refreshBusy?:boolean, onCollapse:(c:boolean)=>void,
  *   onBuy:(i:number)=>void, onLevel:Function, onRefresh:Function, onFreeze:Function, onDetail:(id:string, kind?:string, hint?:string|null)=>void,
  *   onDetailClose?: () => void, onRefuse?: (reason: string) => void, barRef:any,
  *   reward?: any, onReward?: (idx:number)=>void, onRewardLater?: Function, offBonds?: Set<string>|null }} props — offBonds:
@@ -279,7 +281,7 @@ export function RewardCards({ offer, priv, editable, onPick, onDetail, onLater, 
 export function ShopBar(props) {
   return store.get().match.public?.laboratory ? html`<${LaboratoryBar} ...${props}/>` : html`<${RegularShopBar} ...${props}/>`;
 }
-function RegularShopBar({ priv, editable, collapsed, onCollapse, onBuy, onLevel, onRefresh, onFreeze, onDetail, onDetailClose, onRefuse, barRef,
+function RegularShopBar({ priv, editable, collapsed, refreshBusy = false, onCollapse, onBuy, onLevel, onRefresh, onFreeze, onDetail, onDetailClose, onRefuse, barRef,
   reward = null, onReward, onRewardLater, onArm = null, offBonds = null }) {
   const preferences = useSettings();
   const keyLabel = action => hotkeyLabel(preferences.keys[action]);
@@ -343,10 +345,10 @@ function RegularShopBar({ priv, editable, collapsed, onCollapse, onBuy, onLevel,
         <${Img} src=${uiUrl(data.get('assets'), frozen ? 'shopPanel/frozen_icon2' : 'shopPanel/frozen_icon')} class="toolbtn__img" fallback=${html`<${Icon} name="snow" />`} />
         <span>${frozen ? '解冻' : '冻结'}</span><kbd>${keyLabel('freeze')}</kbd>
       </button>
-      <button type="button" class="toolbtn toolbtn--amber" disabled=${!!refReason} onClick=${onRefresh} title=${refReason || `刷新商店 · ${keyLabel('refresh')}`}>
+      <button type="button" class="toolbtn toolbtn--amber" disabled=${!!refReason || refreshBusy} onClick=${onRefresh} title=${refReason || (refreshBusy ? t('正在刷新…') : t('刷新商店 · {key}', { key: keyLabel('refresh') }))}>
         <${Img} src=${uiUrl(data.get('assets'), 'shopPanel/refresh_icon')} class="toolbtn__img" fallback=${html`<${Icon} name="refresh" />`} />
-        <span>刷新</span>
-        ${free > 0 ? html`<span class="toolbtn__free">免费 ×${free}</span>` : html`<${HexBadge} value=${shop.refreshPrice ?? 1} tone=${refReason ? 'dark' : 'gold'} size="sm" />`}
+        <span>${t('刷新')}</span>
+        ${free > 0 ? html`<span class="toolbtn__free">${t('免费 ×{free}', { free })}</span>` : html`<${HexBadge} value=${shop.refreshPrice ?? 1} tone=${refReason || refreshBusy ? 'dark' : 'gold'} size="sm" />`}
         <kbd>${keyLabel('refresh')}</kbd>
       </button>
     </div>

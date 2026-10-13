@@ -20,6 +20,7 @@ import { hypot, powi } from '../../detmath.js';
 /** 转译基底·α: "变化过程持续2s" (PRTS 天赋; the model's A_Die_B / _C / _D change clips last 2 s); the original form's
  *  immunities ("免疫晕眩/沉睡/寒冷/冻结/浮空/恐惧", plus 失衡免疫). */
 export const TRANSLATOR_CHANGE = 2;
+const UNBALANCE_SPEED = 5; // Match the displacement speed used by the shared enemy kits.
 
 const TRANSLATOR_IMMUNE = Object.freeze(['stun', 'sleep', 'cold', 'freeze', 'levitate', 'fear']);
 
@@ -473,6 +474,9 @@ function kitXi(ab) {
   };
   const re = reborn({
     dur: T(ab, 'reborn.duration') ?? 0, invincible: T(ab, 'reborn.invincible') ?? 0,
+    // #510: Xi's post-rebirth 无敌 also prevents hostile selection (PRTS “自在” / 无敌).
+    // Explicit opt-in: the engine's general invulnerable flag remains damage protection only.
+    invincibleUntargetable: true,
     onKo(b, e) { b.removeBuff(e, 'ab:xiShield'); },
     onReborn(b, e) {
       P.form2 = true;
@@ -771,23 +775,12 @@ export const LEADER_KITS = Object.freeze({
   enemy_2085_skzjxd: (ab) => [unblockable(), frontGuard(T(ab, 'Weakness.damage_resistance') ?? 0, faceCrowd)],
   enemy_2085_skzjxd_2: (ab) => [unblockable(), frontGuard(T(ab, 'Weakness.damage_resistance') ?? 0, faceCrowd)], // (鸭爵 strategy) same
   // 失衡 (pushed / pulled by operators)
-  enemy_1328_cbjedi: (ab) => {                                       // 弧光锋卫 · bleeds while in its 失衡 state
-    // PRTS 修正 "失衡移动时持续受到真实伤害", 天赋 "处于失衡状态时，每0.066s受到400点无来源真实持续伤害" (data unbalanced_bleed.damage /
-    // .interval; 伤害分类: 弧光锋卫失衡状态下的自残伤害 is BUFF damage): damage, not a 流失 (player report D1 audit) — every `interval`
-    // s for as long as the state lasts (battle/displacement.js _unbalance: a push's 位移时间, a pull's force window even
-    // after the 急停 or with no movement). Until 0.2.2 one hit in proportion to the tiles moved [ASSUMED], from the position jump.
-    const v = T(ab, 'unbalanced_bleed.damage') ?? 0, iv = T(ab, 'unbalanced_bleed.interval') ?? 0;
-    return [{
-      tick(b, e, a, dt) {
-        if (!(v > 0 && iv > 0) || !unbalancedNow(b, e)) { a.bleed = 0; return; }
-        a.bleed = (a.bleed ?? 0) + dt;
-        while (a.bleed >= iv - 1e-9 && e.alive) {
-          a.bleed -= iv;
-          b.dealDamage(null, e, { ...periodicDamage(v), tags: ['dot', 'periodic', 'unbalanced'] });
-        }
-      },
-    }];
-  },
+  enemy_1328_cbjedi: (ab) => [unbalanced((b, e, a, d) => {           // 弧光锋卫 · takes damage in proportion to the distance moved while unbalanced
+    // PRTS 修正 "失衡移动时持续受到真实伤害", "处于失衡状态时，每0.066s受到400点无来源真实持续伤害" (伤害分类: 弧光锋卫失衡状态下的自残
+    // 伤害 is BUFF damage): damage, not a 流失 (player report D1 audit)
+    const v = T(ab, 'unbalanced_bleed.damage') ?? 0, iv = T(ab, 'unbalanced_bleed.interval') ?? 1;
+    if (v > 0 && iv > 0) b.dealDamage(null, e, { ...periodicDamage((v * d) / (iv * UNBALANCE_SPEED)), tags: ['dot', 'periodic', 'unbalanced'] });
+  })],
   enemy_10112_ymgds: (ab) => [unbalanced((b, e) => {                 // 冒失的小弟 · stunned after being unbalanced
     const st = T(ab, 'StunAfterUnbalance.stun') ?? 0;
     if (st > 0) b.applyStatus(e, 'stun', { duration: st, source: null });

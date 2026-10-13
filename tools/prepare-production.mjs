@@ -22,7 +22,7 @@ for(const path of ['.cache/ursus-voice-resources.json','.cache/skin-resources.js
 for(const path of files.keys())if(/^\/assets\/audio\/voice\/(cn|voice_cn)\//.test(path))files.delete(path);
 const paths=new Set();
 function walk(value){if(typeof value==='string'&&value.startsWith('/assets/'))paths.add(value);else if(value&&typeof value==='object')Object.values(value).forEach(walk);}
-walk(manifest);const local=JSON.parse(await readFile(join(overlay,'local-assets.json'),'utf8'));walk(local);
+walk(manifest);walk(await read('content/custom/augments/icons.json'));const local=JSON.parse(await readFile(join(overlay,'local-assets.json'),'utf8'));walk(local);
 // Additional custom operators and locally extracted board/VFX art are served by the application.
 // They need an index entry even though they are not in the original upstream resource plan.
 for(const path of paths)if(!files.has(path)){

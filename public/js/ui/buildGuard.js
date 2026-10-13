@@ -40,7 +40,7 @@ export async function fetchBuild(fetchFn, o = {}) {
     timer = setT(() => { try { ctrl?.abort(); } catch { /* ignore */ } reject(new Error('timeout')); }, timeoutMs);
   });
   try {
-    const res = await Promise.race([fetchFn('/healthz', { cache: 'no-store', signal: ctrl ? ctrl.signal : undefined }), tooSlow]);
+    const res = await Promise.race([fetchFn(globalThis.__SP_RELEASE?'/__roll/latest':'/healthz', { cache: 'no-store', signal: ctrl ? ctrl.signal : undefined }), tooSlow]);
     if (!res || !res.ok) return null;
     const body = await res.json();
     return body && typeof body.build === 'string' && body.build ? body.build : null;
@@ -73,12 +73,12 @@ export async function checkBuildOnce(o = {}) {
  */
 export function startBuildGuard(o = {}) {
   const fetchFn = o.fetchFn || ((url, init) => globalThis.fetch(url, init));
-  const reload = o.reload || (() => globalThis.location.reload());
+  const reload = o.reload || (() => globalThis.__SP_RELEASE?globalThis.location.assign('/'):globalThis.location.reload());
   const inMatch = typeof o.inMatch === 'function' ? o.inMatch : () => false;
   const setIv = o.setInterval || ((fn, ms) => globalThis.setInterval(fn, ms));
   const clearIv = o.clearInterval || ((h) => globalThis.clearInterval(h));
   const intervalMs = Number.isFinite(o.intervalMs) && o.intervalMs > 0 ? o.intervalMs : BUILD_CHECK_MS;
-  let known = null;      // the build this page runs — memory only (one page == one set of loaded modules)
+  let known = globalThis.__SP_RELEASE||null;      // the build this page runs — memory only (one page == one set of loaded modules)
   let candidate = null;  // the last new build seen; needs BUILD_CONFIRMATIONS checks in a row to be acted on
   let seen = 0;          // consecutive checks that reported `candidate`
   let stale = false;     // a new build is confirmed → reload as soon as no match is on screen

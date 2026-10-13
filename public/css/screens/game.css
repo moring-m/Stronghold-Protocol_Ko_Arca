@@ -449,12 +449,12 @@
 .chud { position: absolute; inset: 0; pointer-events: none; }
 .chud > * { pointer-events: auto; }
 .dpbox {
-  position: absolute; right: .3rem; top: 50%; transform: translateY(-50%);
-  display: flex; flex-direction: column; align-items: center; gap: .02rem; padding: .1rem .12rem;
+  position: absolute; right: .3rem; top: auto; bottom: 1.3rem; transform: none;
+  display: flex; flex-direction: column; align-items: center; gap: .04rem; min-width: max(.92rem,84px); min-height: 112px; padding: .14rem .18rem;
   background: rgba(8, 11, 10, .85); border: 1px solid var(--line-2); border-right: 3px solid var(--mint-500);
 }
-.dpbox__icon { width: .26rem; height: .26rem; color: var(--mint-500); }
-.dpbox b { font-size: .34rem; line-height: 1; color: #fff; }
+.dpbox__icon { width: max(.32rem,28px); height: max(.32rem,28px); color: var(--mint-500); }
+.dpbox b { font-size: max(.46rem,34px); line-height: 1; color: #fff; }
 .chud__bottom { position: absolute; left: 50%; bottom: .3rem; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: .12rem; pointer-events: none; }
 .chud__bottom > * { pointer-events: auto; }
 .chud__msg {
@@ -621,6 +621,8 @@
 .ff-float--critical { color: #ff534c; }
 .ff-float--barrier { color: #78c5ff; }
 .ff-float--block { color: #ffd65a; }
+.ff-float--crit { color: #ff2a2a; }
+.ff-float--miss { color: #ff9000; }
 @keyframes float-up { to { transform: translate(-50%, -.4rem); opacity: 0; } }
 .ff-badge { position: absolute; left: 50%; bottom: .08rem; transform: translateX(-50%); font-family: var(--font-display); font-size: .1rem; letter-spacing: .3em; color: var(--text-dim); opacity: .5; pointer-events: none; }
 .gm--combat .ff-badge { display: none; }
@@ -801,3 +803,10 @@
 .team--eight .team__you{width:.15rem;height:.15rem}
 .team--eight .team__name{font-size:.13rem}
 .team--eight .team__info{gap:0;padding-top:0;padding-bottom:0}
+/* Keep every selected augment in the existing effects column. */
+.gm__effects{overflow:visible}
+.effect--augment{border-color:var(--augment-color);box-shadow:inset 0 0 .08rem color-mix(in srgb,var(--augment-color) 20%,transparent)}
+
+.gm__effects{display:flex;flex-direction:row;align-items:flex-start;gap:.08rem}
+
+.effects__icons{display:grid;grid-auto-flow:column;grid-template-rows:repeat(var(--effect-rows),.5rem);gap:.08rem;overflow:visible}

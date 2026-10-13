@@ -7099,11 +7099,39 @@
     },
     "pool_equip_rockr": {
       "kind": "equip",
-      "items": [
-        "chess_item_4_09_e_a",
-        "chess_item_3_09_e_a",
-        "chess_item_3_10_e_a",
-        "chess_item_2_03_e_a"
+      "weighted": [
+        [
+          "chess_item_1_01_e_a",
+          10
+        ],
+        [
+          "chess_item_2_03_e_a",
+          2
+        ],
+        [
+          "chess_item_3_09_e_a",
+          2
+        ],
+        [
+          "chess_item_3_10_e_a",
+          2
+        ],
+        [
+          "chess_item_4_09_e_a",
+          2
+        ],
+        [
+          "chess_item_4_03_e_a",
+          1
+        ],
+        [
+          "chess_item_4_11_e_a",
+          4
+        ],
+        [
+          "chess_item_3_03_e_a",
+          4
+        ]
       ],
       "assumed": true
     },
@@ -7121,15 +7149,15 @@
       "weighted": [
         [
           "chess_char_1_19_a",
-          45
+          10
         ],
         [
           "chess_char_2_18_a",
-          45
+          10
         ],
         [
           "chess_char_4_20_a",
-          10
+          3
         ]
       ],
       "assumed": true

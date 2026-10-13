@@ -93,7 +93,7 @@
   /* layers */
   --z-screen: 1;
   --z-banner: 40;
-  --z-conn: 60;
+  --z-conn: 75;
   --z-modal: 80;
   --z-toast: 90;
   --z-tooltip: 95;
@@ -383,3 +383,7 @@ h1, h2, h3, h4, p { margin: 0; }
     transition-duration: 1ms !important;
   }
 }
+
+/* Native select popups must retain the dark palette, including Windows menus. */
+select { color-scheme: dark; }
+select option, select optgroup { background-color: var(--bg-2, #111b17); color: var(--text-hi, #e2efea); }

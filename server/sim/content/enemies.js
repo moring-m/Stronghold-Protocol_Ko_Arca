@@ -27,7 +27,10 @@ import { FORMS } from '../../../shared/animationForms.js';
 //   hidden from later 'kill' handlers) · death(c,…) · status(c,…) (statusApplied on e) · burst(c,…) (elementBurst on e)
 //   · tick(b,e,a,dt) every `iv` s (every tick when iv is 0) · skill: `cd`/`left`(=icd)/`cond`/`fire` (cooldown runs
 //   continuously; fires when ready, the enemy can act and `cond` holds). `sil: true` = the ability's handbook line
-//   is flagged SILENCE (沉默 disables it: exactly the data's `format: "SILENCE"` lines); stun / freeze / sleep block
+//   is flagged SILENCE (沉默 disables it: exactly the data's `format: "SILENCE"` lines). 萨卡兹枯朽战士 / 组长's
+//   【污染秽蚀】 death fog is the one NORMAL line also silenced (archetypes.js kitPolluted, `enemy_1267_nhpbr` and
+//   `_2` only): the owner's official-play recall of 2026-10-12 is that a death while silenced creates no fog, and
+//   that recall contradicts the PRTS / in-game text 「不可沉默」 (DESIGN §30.23). stun / freeze / sleep block
 //   skills. Enemy SP skills ("数次攻击后…"): SP +1 per attack, the (spCost+1)-th attack is the skill attack (official
 //   粉碎攻坚手 text: spCost 2 = "攻击2次后，下一次攻击").
 // Shared mechanics: reborn() — "首次被击倒后重生 / 第二形态" (the first KO is hidden from kill credit and bounty; a
@@ -994,7 +997,7 @@ function rebirthCleanse(b, e) {
  * `a.state`: undefined → 'reborn' → 'form2'. The 'telegraph' fx of the knock-out carries `form: 'reborn'` and the 'revive'
  * fx `form: 'form2'`: models with those clip sets (render/units.js FORMS — 锏, 扎罗, “复仇者”, 杰斯顿) play them.
  */
-function reborn({ dur = 0, hpRatio = 1, invincible = 0, onKo = null, during = null, onReborn = null, key = 'ab:reborn' } = {}) {
+function reborn({ dur = 0, hpRatio = 1, invincible = 0, invincibleUntargetable = false, onKo = null, during = null, onReborn = null, key = 'ab:reborn' } = {}) {
   const finish = (b, e, a) => {
     if (!e.alive || a.state !== 'reborn') return;
     a.state = 'form2';
@@ -1002,7 +1005,7 @@ function reborn({ dur = 0, hpRatio = 1, invincible = 0, onKo = null, during = nu
     e.profile.noAttack = a.noAtk;
     if (onReborn) safe(b, e, () => onReborn(b, e, a));
     e.hp = Math.max(1, e.s.maxHp * Math.max(0, Math.min(1, hpRatio)));
-    if (invincible > 0) b.addBuff(e, { key: `${key}:inv`, duration: invincible, visible: true, flags: { invulnerable: true } });
+    if (invincible > 0) b.addBuff(e, { key: `${key}:inv`, duration: invincible, visible: true, flags: { invulnerable: true, ...(invincibleUntargetable ? {untargetable:true}: {}) } });
     if (e.route) e.route.pts = null;
     e.atkCd = 0;
     rebirthCooldowns(e);
@@ -2504,6 +2507,7 @@ function kitXi(ab) {
   };
   const re = reborn({
     dur: T(ab, 'reborn.duration') ?? 0, invincible: T(ab, 'reborn.invincible') ?? 0,
+    invincibleUntargetable:true,
     onKo(b, e) { b.removeBuff(e, 'ab:xiShield'); },
     onReborn(b, e) {
       P.form2 = true;
@@ -3109,7 +3113,7 @@ const LEGACY_KITS = Object.freeze({
   enemy_10116_ymgtop: (ab) => {                                     // 水遁忍者 · spinning phase (SILENCE): phys AoE every s; 失衡 stops it
     const spin = {
       sil: true, cd: ab.sk.SwitchModeTrigger ? ab.sk.SwitchModeTrigger.cd : 60, icd: ab.sk.SwitchModeTrigger ? ab.sk.SwitchModeTrigger.icd : 10,
-      fire(b, e, a) { a.until = b.time + (T(ab, 'EndRotate.rotate_duration') ?? 0); b.fx('telegraph', { x: e.x, y: e.y, r: 1, kind: 'spin', id: e.id }); },
+      fire(b, e, a) { a.until = b.time + (T(ab, 'EndRotate.rotate_duration') ?? 0); setForm(b,e,'spin','telegraph',{r:1,kind:'spin'}); },
       iv: T(ab, 'RotateDamage.interval') ?? 1,
       // "每秒对半径1.0范围内的所有我方单位造成…（无视迷彩，不可对空），自身受阻止攻击类异常效果影响期间无法造成此伤害": an area
       // selection, skipped while 晕眩 / 冻结 / 浮空 (flag stun), 沉睡 or 缴械 hold it (PRTS 异常效果 §阻止攻击; until 0.1.3 it spun on)
@@ -3119,8 +3123,8 @@ const LEGACY_KITS = Object.freeze({
       },
     };
     // 漩涡形态 "不进行普通攻击" (PRTS 天赋): no blocked attack while it spins (until 0.1.3 its blocker took both)
-    const noAtk = { tick(b, e) { e.profile.noAttack = spin.until > b.time; } };
-    return [spin, noAtk, unbalanced((b, e) => { if (spin.until > b.time) { spin.until = 0; b.fx('phase', { x: e.x, y: e.y, id: e.id, kind: 'spinStop' }); } })];
+    const noAtk = { tick(b, e) { e.profile.noAttack = spin.until > b.time; if(!e.profile.noAttack&&e.form==='spin')setForm(b,e,null); } };
+    return [spin, noAtk, unbalanced((b, e) => { if (spin.until > b.time) { spin.until = 0; setForm(b,e,null); } })];
   },
   enemy_10118_ymgprc: (ab) => {                                      // 澪 · double hits; 寒晖: every 4th attack (spCost 3) is a ×1.5 double hit
     const scale = (ab.sk.PowerAttack && ab.sk.PowerAttack.bb.atk_scale) || 1;
@@ -3361,23 +3365,12 @@ const LEADER_KITS = Object.freeze({
   enemy_2085_skzjxd: (ab) => [unblockable(), frontGuard(T(ab, 'Weakness.damage_resistance') ?? 0, faceCrowd)],
   enemy_2085_skzjxd_2: (ab) => [unblockable(), frontGuard(T(ab, 'Weakness.damage_resistance') ?? 0, faceCrowd)], // (鸭爵 strategy) same
   // 失衡 (pushed / pulled by operators)
-  enemy_1328_cbjedi: (ab) => {                                       // 弧光锋卫 · bleeds while in its 失衡 state
-    // PRTS 修正 "失衡移动时持续受到真实伤害", 天赋 "处于失衡状态时，每0.066s受到400点无来源真实持续伤害" (data unbalanced_bleed.damage /
-    // .interval; 伤害分类: 弧光锋卫失衡状态下的自残伤害 is BUFF damage): damage, not a 流失 (player report D1 audit) — every `interval`
-    // s for as long as the state lasts (battle/displacement.js _unbalance: a push's 位移时间, a pull's force window even
-    // after the 急停 or with no movement). Until 0.2.2 one hit in proportion to the tiles moved [ASSUMED], from the position jump.
-    const v = T(ab, 'unbalanced_bleed.damage') ?? 0, iv = T(ab, 'unbalanced_bleed.interval') ?? 0;
-    return [{
-      tick(b, e, a, dt) {
-        if (!(v > 0 && iv > 0) || !unbalancedNow(b, e)) { a.bleed = 0; return; }
-        a.bleed = (a.bleed ?? 0) + dt;
-        while (a.bleed >= iv - 1e-9 && e.alive) {
-          a.bleed -= iv;
-          b.dealDamage(null, e, { ...periodicDamage(v), tags: ['dot', 'periodic', 'unbalanced'] });
-        }
-      },
-    }];
-  },
+  enemy_1328_cbjedi: (ab) => [unbalanced((b, e, a, d) => {           // 弧光锋卫 · takes damage in proportion to the distance moved while unbalanced
+    // PRTS 修正 "失衡移动时持续受到真实伤害", "处于失衡状态时，每0.066s受到400点无来源真实持续伤害" (伤害分类: 弧光锋卫失衡状态下的自残
+    // 伤害 is BUFF damage): damage, not a 流失 (player report D1 audit)
+    const v = T(ab, 'unbalanced_bleed.damage') ?? 0, iv = T(ab, 'unbalanced_bleed.interval') ?? 1;
+    if (v > 0 && iv > 0) b.dealDamage(null, e, { ...periodicDamage((v * d) / (iv * UNBALANCE_SPEED)), tags: ['dot', 'periodic', 'unbalanced'] });
+  })],
   enemy_10112_ymgds: (ab) => [unbalanced((b, e) => {                 // 冒失的小弟 · stunned after being unbalanced
     const st = T(ab, 'StunAfterUnbalance.stun') ?? 0;
     if (st > 0) b.applyStatus(e, 'stun', { duration: st, source: null });
@@ -3491,27 +3484,34 @@ const SPECIAL_KITS = Object.freeze({
       for (const o of b.aliveEnemies()) b.addBuff(o, { key: 'ab:songOfWar', duration: T(ab, 'AttackSpeedUp.duration') ?? 0, refresh: 'extend', mods: { aspd: T(ab, 'AttackSpeedUp.attack_speed') ?? 0 }, visible: true });
     },
   }],
-  enemy_10001_trslim: (ab) => [skill(ab.sk.StartRun, (b, e) => {    // 简饲源石虫 · below half: runs (faster, unblockable 3 s)
+  enemy_10001_trslim: (ab) => [skill(ab.sk.StartRun, (b, e) => {
     const s = ab.sk.StartRun.bb;
-    b.addBuff(e, { key: 'ab:run', duration: s.block_free_time ?? 0, mods: { moveMul: 1 + (s.move_speed ?? 0) }, flags: { unblockable: true }, visible: true });
-  }, { sil: true, cond: (b, e) => e.hpRatio < 0.5 })],
+    e.mem.trslimRunUsed = true;
+    const wind = 1; // Original model Skill_Begin is 1 second.
+    b.addBuff(e,{key:'ab:runWindup',duration:wind,flags:{noMove:true,noAttack:true}});
+    setForm(b,e,'run', 'phase',{dur:wind});
+    b.after(wind,()=>{
+      if(!e.alive)return;
+      b.addBuff(e,{key:'ab:run',duration:s.block_free_time ?? 0,mods:{moveMul:1+(s.move_speed ?? 0)},flags:{unblockable:true},visible:true});
+      b.after(s.block_free_time ?? 0,()=>{if(e.alive)setForm(b,e,null)});
+    });
+  }, {sil:true,cond:(b,e)=>e.hpRatio<.5 && !e.mem.trslimRunUsed})],
   enemy_10027_vtsk: (ab) => {                                        // “帝国的甲胄” · entrance barrage on the highest-HP unit; ranged ×0.8; 3-hit charge attack
     const ap = ab.sk.Appear, mc = ab.sk.MultiCombat;
     return [{
       spawn(b, e) {
         const n = ap ? ap.bb.times ?? 0 : 0;
-        b.after(0.5, () => {
-          if (!e.alive || !n) return;
-          const lock = allTargets(b, e).sort((p, q) => q.hp - p.hp)[0];
-          if (!lock) return;
-          b.fx('telegraph', { x: lock.x, y: lock.y, r: 1, kind: 'barrage', id: e.id });
-          for (let i = 0; i < n; i++) {
-            // "对碰撞范围内的1名当前生命值最高的我方单位" — an area selection: never an airborne 起飞 ally nor an unblocking
-            // 隐匿 one (PRTS “帝国的甲胄”; areaAlliesInTiles)
-            const t = areaAlliesInTiles(b, e, lock.tileR, lock.tileC, 'box', 1).sort((p, q) => q.hp - p.hp)[0];
-            if (t) hurt(b, e, t, e.s.atk, 'phys');
-          }
-        }, { owner: e });
+        if (!n) return;
+        const lock = allTargets(b, e).sort((p, q) => q.hp - p.hp)[0] ?? e;
+        const r = lock.tileR, c = lock.tileC, atk = e.s.atk;
+        // PRTS “帝国的甲胄” / Appear: fixed 3×3 projectile zone, first hit at 1.33 s,
+        // then every 0.53 s, at most eight. It persists independently of the shooter.
+        b.fx('telegraph', { x: c, y: r, r: 1, tiles: 'box', dur: 5.85, kind: 'barrage', id: e.id });
+        for (let i = 0; i < n; i++) b.after(1.33 + i * 0.53, () => {
+          const t = areaAlliesInTiles(b, e, r, c, 'box', 1).sort((p, q) => q.hp - p.hp)[0];
+          b.fx('bombard', { x: c, y: r, r: 1, kind: 'barrage' });
+          if (t) hurt(b, e, t, atk, 'phys', {tags:['entranceBarrage']});
+        });
       },
       hitOut(c, b, e) { if (c.dmg.isAttack && c.target !== e.blockedBy) c.dmg.amount *= T(ab, 'range.attack@atk_scale_range') ?? 1; },
     }, mc ? {
@@ -3571,7 +3571,7 @@ const SPECIAL_KITS = Object.freeze({
   enemy_10116_ymgtop: (ab) => {                                     // 水遁忍者 · spinning phase (SILENCE): phys AoE every s; 失衡 stops it
     const spin = {
       sil: true, cd: ab.sk.SwitchModeTrigger ? ab.sk.SwitchModeTrigger.cd : 60, icd: ab.sk.SwitchModeTrigger ? ab.sk.SwitchModeTrigger.icd : 10,
-      fire(b, e, a) { a.until = b.time + (T(ab, 'EndRotate.rotate_duration') ?? 0); b.fx('telegraph', { x: e.x, y: e.y, r: 1, kind: 'spin', id: e.id }); },
+      fire(b, e, a) { a.until = b.time + (T(ab, 'EndRotate.rotate_duration') ?? 0); setForm(b,e,'spin','telegraph',{r:1,kind:'spin'}); },
       iv: T(ab, 'RotateDamage.interval') ?? 1,
       // "每秒对半径1.0范围内的所有我方单位造成…（无视迷彩，不可对空），自身受阻止攻击类异常效果影响期间无法造成此伤害": an area
       // selection, skipped while 晕眩 / 冻结 / 浮空 (flag stun), 沉睡 or 缴械 hold it (PRTS 异常效果 §阻止攻击; until 0.1.3 it spun on);
@@ -3582,8 +3582,8 @@ const SPECIAL_KITS = Object.freeze({
       },
     };
     // 漩涡形态 "不进行普通攻击" (PRTS 天赋): no blocked attack while it spins (until 0.1.3 its blocker took both)
-    const noAtk = { tick(b, e) { e.profile.noAttack = spin.until > b.time; } };
-    return [spin, noAtk, unbalanced((b, e) => { if (spin.until > b.time) { spin.until = 0; b.fx('phase', { x: e.x, y: e.y, id: e.id, kind: 'spinStop' }); } })];
+    const noAtk = { tick(b, e) { e.profile.noAttack = spin.until > b.time; if(!e.profile.noAttack&&e.form==='spin')setForm(b,e,null); } };
+    return [spin, noAtk, unbalanced((b, e) => { if (spin.until > b.time) { spin.until = 0; setForm(b,e,null); } })];
   },
   enemy_10118_ymgprc: (ab) => {                                      // 澪 · double hits; 寒晖: every 4th attack (spCost 3) is a ×1.5 double hit
     const scale = (ab.sk.PowerAttack && ab.sk.PowerAttack.bb.atk_scale) || 1;

@@ -453,6 +453,8 @@ export const C2S = {
   'g.art': { itemUid: isUid, row: (v) => isInt(v, 0, GEO.ROWS - 1), col: (v) => isInt(v, 0, GEO.COLS - 1), dir: isDir, $optional: ['dir'] },
   'g.destroy': { uid: isUid },
   'g.reward': { idx: (v) => isInt(v, 0, 5) },
+  'g.augmentPick': {eventId:isId,side:(v)=>v==='ally'||v==='enemy',idx:(v)=>isInt(v,0,2),cardId:isId},
+  'g.augmentReroll': {eventId:isId,side:(v)=>v==='ally'||v==='enemy',idx:(v)=>isInt(v,0,2),cardId:isId},
   'g.choice': { idx: (v) => isInt(v, 0, 8), choiceId: isId, $optional: ['choiceId'] },
   'g.ready': { ready: isBool },
   'g.endBattle': { fieldId: isId },
@@ -493,6 +495,7 @@ export const S2C = [
   'welcome', 'ok', 'error', 'pong',
   'room.state', 'room.closed',
   'm.public', 'm.private', 'm.field', 'm.toast', 'm.ticker', 'm.emote', 'm.result', 'm.chat', 'm.chatHistory',
+  'm.layer',
   // m.unitStats { seq, round, units: [unitStatsEntry] } — the answer to g.unitStats (the requester only)
   'm.unitStats', 'room.commended',
   // client-side combat (DESIGN §14): b.start { battleId, fieldId, kind, spec, authoritative, startAt, serverNow, elapsed,

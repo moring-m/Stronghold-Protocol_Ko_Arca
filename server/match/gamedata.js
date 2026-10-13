@@ -76,6 +76,10 @@ export class GameData {
     const chess = this.raw.chess && typeof this.raw.chess === 'object' ? this.raw.chess : {};
     this._chess = chess;
     this._items = this.raw.items && typeof this.raw.items === 'object' ? this.raw.items : {};
+    // Fixed operator gifts are unlimited outputs, but every produced normal/advanced item still occupies 1/2 copies
+    // (card-pool experiment BV1eLXXBqEgF, maintainer-confirmed 2026-10-11). Random subset gifts are not exempt.
+    this._fixedGiftItems = new Set(Object.values(this.raw.garrisons || {})
+      .filter(g => g.effectKey === 'SERVER_GAIN_EQUIP').map(g => g.bbStr?.chess).filter(id => this._items[id]));
     this._bonds = this.raw.bonds && typeof this.raw.bonds === 'object' ? this.raw.bonds : {};
     /** visible, shop-eligible base (normal) chess ids */
     this.visibleChess = Object.keys(chess).filter((id) => {
@@ -163,7 +167,7 @@ export class GameData {
   chess(id) { return own(this._chess, id); }
   item(id) { return own(this._items, id); }
   bond(id) { return own(this._bonds, id); }
-  band(id) { return id===RANDOM_BAND_ID?RANDOM_BAND:own(this.raw.bands, id); }
+  band(id) { return id===RANDOM_BAND_ID?RANDOM_BAND:own(this.raw.bands, id)||own(this.config.commonBandRecords,id); }
   garrison(id) { return own(this.raw.garrisons, id); }
   effect(id) { return own(this.raw.effects, id); }
   enemy(key) { return own(this.raw.enemies, key); }
@@ -277,6 +281,9 @@ export class GameData {
     const stock=this.config.customRules?.stockPlayers??0;
     return Number.isInteger(count) && count >= 0 ? Math.ceil(count*(stock>0?stock/4:1)) : null;
   }
+
+  /** Whether a fixed trait gift may be produced beyond stock (including the advanced version of that item). */
+  isUnlimitedGiftItem(id) { return this._fixedGiftItems.has(this.baseIdOf(id)); }
 
   /** Copies needed to merge (0 = never merges: golden chess). */
   mergeCount(id) {
@@ -467,6 +474,7 @@ export class GameData {
 
   /** Band usable in this mode type. */
   bandAllowed(bandId) {
+    if(bandId!==RANDOM_BAND_ID&&!own(this.raw.bands,bandId))return false;
     const b = this.band(bandId);
     if (!b) return false;
     const list = Array.isArray(b.modeTypeList) ? b.modeTypeList : null;

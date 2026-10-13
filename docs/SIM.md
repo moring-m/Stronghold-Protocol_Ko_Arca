@@ -72,7 +72,15 @@ summon that came in during the initial deployment (also one an operator's deploy
 the operators in the aggro order (`unit.aggroSeq`, §1.2). On a shared field (联防, the boss field)
 the players' fields deploy side by side: the i-th operators of all players come in together (in `players` order), then
 the summons the same way, and the summons rank after the operators of all players **[ASSUMED]** (PRTS describes one
-field — units deploy one after another with a fixed delay from the battle start — and "两处阵地将前后拼接为一处阵地"). Register hooks before the first step (e.g. `opts.setup(battle)` or right after `new Battle`).
+field — units deploy one after another with a fixed delay from the battle start — and "两处阵地将前后拼接为一处阵地").
+
+外勤医疗's prepared slot is a preparation view record, not a combat `Unit`. The `battleStart` handler creates either
+预备干员-医疗 or Touch after counting deployed elites. [ASSUMED] Its effective targeting order precedes ordinary
+initial deployments (`preBattleAggroSeq`); its actual `deploySeq` still identifies the later runtime spawn. Prepared
+slots on a shared field follow player order [ASSUMED]. A later `spawnMapChar` without this option keeps its ordinary
+summon order (§30.22).
+
+Register hooks before the first step (e.g. `opts.setup(battle)` or right after `new Battle`).
 
 **Tick order:** scheduled callbacks → spawns → DP → buffs (+HP regen) → enemies (attack, move, block) →
 enemy tile index → allies (skill tick, attack) → projectiles → auto-redeploys → boss pool sync → `tick` hook →
@@ -144,14 +152,18 @@ the old tile-key order), so a rotated layout plays the same (test/sim/facing-inv
 directions on an open field). 余 S3's fire wall runs through his tile perpendicular to his direction (his column facing
 RIGHT / LEFT, his row facing UP / DOWN; fx `firewall.axis` = `'col'|'row'`).
 `carryState: { hpPct, sp }` restores unite helpers' operators (HP ratio, and the SP = the official 技力, stored charges
-included: `unitsEnd` reports `skill.spTotal`, reset rebuilds the charges from it, and `skill.setSpTotal` sets it again after
-the `deploy` hook — PRTS "部署完成后…技力修改至与上一阶段结束时相同", so 独行 / 黄沙罗盘's deploy-time SP does not add to it;
+included: `unitsEnd` reports `skill.spTotal`; after all initial deployments and `battleStart` hooks, HP is restored
+against the new maximum and `skill.setSpTotal` restores the charges — PRTS "部署完成后…技力修改至与上一阶段结束时相同",
+so 独行 / 黄沙罗盘's opening SP does not add to it. Positive ratios are not raised to 1% or 1 HP;
 later redeploys keep those gifts); `carryState: { sp }` a board summon
 piece's SP only (PRTS "召唤物仅修改技力"). Nothing else is carried: a skill running at the end of the own combat enters
 switched off with the SP it had left — spent at its activation, 0 for a one-charge skill (`unitsEnd.skillActive` is
 reported, never carried; community report #34 — it used to restart for free).
 Timed deployment skills (`activateOnDeploy`) trigger once from the new deployment, consuming their deployment charge;
 they do not resume the previous skill state.
+The approved Egir carry policy rebuilds opening devour attributes while skipping its repeated HP loss on a living
+carry target; this prevents artificial knock-outs and revival-slot consumption before restoration. A fresh target
+without a previous state still takes that opening damage. Later combat, HP loss and redeploys follow the normal rules.
 `carryState: { down: true }` = an operator knocked out at the end of the helper's own combat (PRTS 卫戍协议/帮助 "上一阶段为
 退场状态的干员强制退场", user playtest #5 item 2): `start()` deploys it with everyone (initial `deploy` fires), then — before
 `battleStart` — withdraws it with reason `FORCED_EXIT` (constants.js `'forcedExit'`) and HP 0 (the end-of-phase HP ratio, as after
@@ -463,7 +475,7 @@ returns their current `weight` (including modifiers). The same tick's count and 
 list and budget (DESIGN §28.27); this is local to the kit, not a change to general displacement.
 
 **Hit areas (`body.js`, user playtest #5 item 10).** A regular enemy is a point: in a grid range when the tile of its
-position (`round(y)`, `round(x)`) is a range tile, in a radius when its position is (DESIGN §3). A huge enemy (巨型单位:
+position (`roundHalfEven(y)`, `roundHalfEven(x)` — PRTS 作战机制 "四舍六入五成双"; `Math.round` would take 2.5 to 3) is a range tile, in a radius when its position is (DESIGN §3). An enemy held on the field edge is inset by `FIELD_EDGE_INSET` (1/1048576) [ASSUMED] so that rounding keeps it on the edge tile; movement, knockback and a unit's standing tile for range keys still use `Math.round` (§30.27). A huge enemy (巨型单位:
 `enemy.hitArea` from data/enemies.json `hitArea` — 假想敌：胄 / 管 / 盐风主教昆图斯 / 阿利斯泰尔 / “萨米的意志”, PRTS
 "受击判定区域为长4.95、宽2.95的长方形，向上偏移1.0") is hit anywhere on a rectangle `w` × `h` tiles centred on its position
 moved `dx` columns right / `dy` rows up: it occupies every tile the rectangle overlaps (`bodyKeys` — 5 × 3 tiles; PRTS
@@ -767,7 +779,7 @@ or guard with a per-unit flag while dealing it. When the guard trips, the logged
 | `applyStatus(tgt, key, {duration, source, value, force, point})`, `removeStatus(tgt, key)`, `resistOf(unit)` | §3 |
 | `applyStrongest(tgt, key, {duration, value, mods, source})` | §3 — "同名效果取最高" for a non-catalogue effect |
 | `addBuff(unit, buff)`, `removeBuff(unit, key)` | §3 |
-| `spawnToken(ownerUnit | playerId, tokenId, row, col, { def, stats, hp, duration, untargetable, dir, kit, force, anySource })` | field tiles; def from data/tokens.json `variants[ownerChessId]` for the owner unit's selected skill / module (`tokenDef`); `dir` defaults to the owner unit's (else the player's: RIGHT, mirrored side LEFT; a legacy `facing` ±1 is still read); returns the token or null (tile busy; or the owner runs a **non-default** skill that does not produce the token — `producesToken` — unless `anySource`: kit install hooks written for the default skill run under every skill). `spawnDevice(key, row, col, { …, dir })` likewise |
+| `spawnToken(ownerUnit | playerId, tokenId, row, col, { def, stats, hp, duration, untargetable, dir, kit, force, anySource, preBattleAggroSeq })` | field tiles; def from data/tokens.json `variants[ownerChessId]` for the owner unit's selected skill / module (`tokenDef`); `dir` defaults to the owner unit's (else the player's: RIGHT, mirrored side LEFT; a legacy `facing` ±1 is still read); `preBattleAggroSeq` is a negative priority reserved for a prepared stage map character, before ordinary initial units; returns the token or null (tile busy; or the owner runs a **non-default** skill that does not produce the token — `producesToken` — unless `anySource`: kit install hooks written for the default skill run under every skill). `spawnDevice(key, row, col, { …, dir })` likewise |
 | `tokenDef(tokenId, ownerUnit | chessId)`, `producesToken(ownerUnit, tokenId)` | the token def a summon of that owner gets — `getToken(id, owner.defId, owner.def.loadout)`, exact even when two players of one field give the same chess different loadouts (prefer it over an id-only `battle.data.getToken(id, unit.defId)` for summon stats / blackboards); whether the owner's loadout makes the token (DATA.md §14 `sources` has 'skill' or 'talent'; true when the data does not tell: no own variant, player-owned summons) |
 | `spawnEnemy(enemyKey, { routeIndex, route, pos, mods, tag, sourcePlayerId, ownerPlayerId, bounty, countInTotal, def })` | returns the enemy, or null past `MAX_ALIVE_ENEMIES`; `def` = inline record (enemies.json shape or normalised) for keys missing from data |
 | `spawnDevice(key, row, col, { hp, obstacle, blockCnt, name, def, res, atk, bat, aspd })`, `setObstacle(r, c, on)` | obstacles re-path enemies; spawnDevice returns null outside the rect, on a living unit or on a knocked-out operator's tile |
@@ -896,6 +908,11 @@ has the generic spec. Summons: `battle.tokenDef(tokenId, unit)` / `battle.spawnT
 (token skill of that slot: `variants[owner].bySkill[i]`, module attributes: `.byModule[id]`). Coverage of the selectable
 skills: `node tools/kit-coverage.mjs --missing [--tier N] [--strict]`.
 
+忍冬's 追凶 records the per-enemy start time and applies its arts addition in the same `damaged` callback,
+including the first instance (PRTS talent remarks; DESIGN §30.3). It does not refresh the ten-second window on
+repeated hits. Its `vulpisHunt` / `addition` tags and re-entrancy guard prevent the rider from feeding itself.
+`test/content/vulpis-first-hit.test.js` checks actual HP loss and damage events with naturally ready skills.
+
 Timed deployment kits: 宴 S2 uses `bb.duration` and skill ATK mods, loses current HP once on landing, and converts normal
 physical attacks to arts only while S2 is active; S1 has no such conversion. 斯卡蒂 S2 uses its own record's
 `s.bb.duration` / `s.bb.atk`; DRE-Y revival in place does not restart it. 野鬃 S1 uses its record's `duration` /
@@ -945,7 +962,7 @@ Element conventions of the kits (user playtest #5 #3; official term dictionary: 
   targeting: { maxTargets, rangeGrid, rangeExtend, priority, allInRange, canHitFly,
                noRangeExtend /* the skill's range ignores the unit's 攻击距离 (rangeExtend): 信仰搅拌机 S3, PRTS 备注 */,
                showOwnRange /* rangeGrid only selects targets, no official range change: the card keeps the unit's own range */ },
-  attack: { dmgType, atkScale, healScale, splashRadius, splashScale, hits, projectile, maxTargets, dmgMul,
+  attack: { dmgType, atkScale, healScale, splashRadius, splashScale, hits, funnelMul, funnelBodyHits, projectile, maxTargets, dmgMul,
             chain: {count, falloff, radius, sluggish}, heal: {mode, count, falloff, hpAtMost /* targets at or below this HP ratio only */}, onHitStatus: {key, duration, value},
             onHit(ctx),                           // once per attack (main target; target may be null for a splash landing)
             onEachHit(ctx) },                     // per victim: main, every splash / chain victim — ctx += { dealt, kind:'main'|'splash'|'chain', isSplash, isChain, main, attackId }
@@ -1025,10 +1042,11 @@ chess_char_2_07_a: (bb) => ({
 ```
 
 **3. Instant burst caster — 至简 `chess_char_3_13_a` 神工意匠** (bb `atk_scale 1.3, ct 2`; next attack 130 % arts, hits
-twice; 2 charges; the funnel profile already ramps damage on the same target):
+twice; 2 charges; the funnel profile's unreleased drones are additional damage that ramps on the same target, and this
+charged attack sets two body hits):
 ```js
 chess_char_3_13_a: (bb) => ({
-  skill: { kind: 'charges', attack: { atkScale: bb.atk_scale, hits: 2, dmgType: 'arts' } },
+  skill: { kind: 'charges', attack: { atkScale: bb.atk_scale, hits: 2, funnelBodyHits: 2, dmgType: 'arts' } },
 }),
 ```
 An AoE instant (德克萨斯 剑雨, bb `stun 2`: two hits of 120 % arts around her + stun) uses `onStart` instead:
@@ -1279,6 +1297,11 @@ objects), and call `checkInvariants` at the end. Run: `node --test test/sim/*.te
 
 ## 11. Tools
 
+Equipment/fortress corrections (§30.3): Kjerag Ice and Tear Gas use actual enemy damage events, including DoT,
+not attack declarations or element-gauge/HP-loss events. Fortress fallback targeting and skill automation include
+the operator's own tile after blocked/ranged candidates; only explicitly enabled skills retain melee splash.
+`performAttack` captures each shot's `fortressMelee` flag for impact resolution, independent of later target changes.
+
 `node tools/simrun.mjs --mode mode_multi_normal --round 5 --stage act2autochess_m01 --lineup "角峰@9,7 隐现@10,4 艾丝黛尔*@12,5" --ascii 10`
 prints a per-unit damage/DPS/kills/heal table (+ ASCII frames: letters = operators, digits = ground enemies per tile,
 `^` = flyers, `■` = crates). `--wave <template>`, `--seed`, `--content generic`, `--hpMul/--atkMul/--speedMul`,
@@ -1288,6 +1311,30 @@ Golden results (`tools/golden.mjs`, `test/golden/README.md`): a fixed corpus of 
 skill × module, every bond at its threshold and at 999 layers, every leader field, 联防 — and bot-only matches,
 reduced to digests in `test/golden/*.json`; `test/golden.test.js` fails, naming the scenario and the field, when a
 digest moves. A refactor must leave them unchanged; `npm run golden:update` records an intended gameplay change.
+
+Cross-engine check (`tools/sim-check.mjs`, `public/dev/sim-check.html`): a browser simulates its battles and the server
+re-simulates them (SP_VERIFY, takeovers), so every engine must give the bits Node gives. `node tools/sim-check.mjs`
+builds the golden battle corpus (roster, bonds, fields, standins, diy — 267 BattleSpecs) and traces it in Node into
+`public/dev/simcheck/data/` (git-ignored, about a minute): after every tick the state (battle time, RNG state and per
+unit alive / removed / deployed, x, y, hp, atkCd, SP, the five element gauges, damage dealt / taken, healing, blocking
+count) hashed to the exact IEEE-754 bits, one hash per 30 ticks; every 30 ticks `b.snapshot()` (what viewers are sent);
+every 150 ticks a bounded traversal of unit-reachable state (depth 8; definitions, profile/kit, battle pointers, functions,
+accessors and `seq` left out); and `resultDigest(b.result())`. `/dev/sim-check.html` — on any device that reaches the server, a phone
+included — runs the corpus (or its fast subset, or a family) with the client's own loader (`loadBrowserSim`) and
+compares block by block: a battle that parts is reported with the first interval where a difference was detected, the level (the outcome, the
+snapshot, the state, or the hidden state only), and a download of that block's state vectors;
+`node tools/sim-check.mjs --diff <file>` replays the same ticks in Node and names differing recorded vector entries
+(with both values' bits). It cannot locate view-only/deep-only differences absent from those vectors.
+Special float values, including negative zero, survive JSON export. `--engines chromium,firefox,webkit [--subset fast|all|<family>]` runs the page headless after
+the trace (Firefox and WebKit through the `playwright` package when it is installed, `npx playwright install firefox
+webkit`; Chrome through puppeteer-core otherwise) and exits 1 on a difference. The tracing, comparison and page
+(`public/dev/simcheck/core.js`, `ui.js`, `node.mjs`) have no dependency on this repository; `stronghold.js` is the part
+that knows the sim. `--engines chrome` uses the local executable selected by `CHROME_PATH` (including Edge).
+The reference, corpus and dump share a content identity over scenarios, served sim/shared code and data. Dirty changes
+invalidate the reference. The page rechecks inputs before runs/dumps; `--diff` rejects stale or mismatched inputs.
+An empty/unknown selection, max-tick truncation or runtime exception is an error, never a zero-battle success.
+All-green means the recorded fields, sampled snapshots and result hashes agree: it does not prove equality of every
+internal field, event, projectile queue or rendered frame. Verification results belong to the tested revision.
 
 ## 12. Data notes (simdata.js)
 

@@ -101,6 +101,7 @@ export function buildResult(m, outcome) {
     // the team's clear counts for the players still in; an eliminated / departed teammate did not pass the boss round
     const cleared = victory && ps.alive;
     return {
+      ...(m.augments?.enabled?{augments:m.augments.allyCards(ps).map(a=>({id:a.id,name:a.name,grade:a.grade,description:a.description}))}:{}),
       playerId: ps.playerId,
       seat: ps.seat,
       name: ps.name,
@@ -143,6 +144,7 @@ export function buildResult(m, outcome) {
     bossId: m.bossId,
     hiddenBossId: m.hiddenBossId,
     seed: m.seed,
+    ...(m.augments?.enabled?{augments:{history:m.augments.history.slice(),picks:structuredClone(m.augments.roundLog)}}:{}),
     durationMs: Math.max(0, m.sched.now() - m.startedAt),
     players: rows,
   };

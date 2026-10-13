@@ -229,7 +229,8 @@ export class SkillRuntime {
   get spCost() {
     const c = Math.floor(this.baseSpCost * this.spCostMul + (this.unit.s ? this.unit.s.spCostFlat : 0));
     // content writes spCostMul / spCostFlat: a NaN/Infinity cost would freeze SP forever — use the base cost instead
-    return Number.isFinite(c) ? Math.max(0, c) : this.baseSpCost;
+    const value=Number.isFinite(c)?Math.max(0,c):this.baseSpCost;
+    return this.unit.mem?.augmentSpCost!=null?Math.ceil(value*this.unit.mem.augmentSpCost):value;
   }
 
   /** SP cost multiplier (content-writable). Invalid values count as 1; SP/charges are re-normalised immediately. */
@@ -534,6 +535,11 @@ export class SkillRuntime {
       const air = this.spec.targeting?.canHitFly;
       const profile = { ...u.profile, ...(air == null ? {} : { canHitFly: air, ...(air ? {groundOnly:false} : {}) }), ...this.spec.triggerProfile };
       if (b.enemiesInKeys(keys, u, profile).length > 0 || this._allyTargetIn(keys)) return true;
+    }
+    if (!this.healSkill && u.profile?.fortress) {
+      // The branch's own-tile melee range also satisfies the basic cast condition for unblockable fragments.
+      const here = [u.tileR * COLS + u.tileC];
+      if (b.enemiesInKeys(here, u, u.profile).length > 0 || this._allyTargetIn(here)) return true;
     }
     // the enemies a unit blocks are always its targets (Battle.blockedTargets), in range or not — PRTS 卫戍协议/帮助
     // "敌人被近战干员自身阻挡" satisfies the target condition of the basic strategy (a ranged blocker too: user playtest #6)

@@ -1,3 +1,14 @@
+function prepPair(pub, myId) {
+  const alive = (Array.isArray(pub?.players) ? pub.players : []).filter(p => isObj(p) && p.alive !== false);
+  if (!alive.some(p => p.playerId === myId)) return [];
+  if (pub.bossPairs !== undefined) {
+    return (Array.isArray(pub.bossPairs) ? pub.bossPairs : []).find(g => Array.isArray(g) && g.includes(myId)) || [];
+  }
+  const ids = alive.sort((a, b) => int(a.seat, 99) - int(b.seat, 99)).map(p => p.playerId);
+  const i = ids.indexOf(myId);
+  return ids.slice(i - i % 2, i - i % 2 + 2);
+}
+
 import { summonPlacementGrid } from '../../../shared/summonPlacement.js';
 import { shortcutFor as configuredShortcut, sanitizeHotkeys, DEFAULT_HOTKEYS } from './gameLogic/shortcuts.js';
 import { DAMAGE_NUMBER_MODES, damageNumberMode } from '../../../shared/damageDisplay.js';
@@ -94,9 +105,7 @@ export function prepCamera(pub, myId) {
   const normal = { kind: 'prep', opts: { rect: { ...GEO.NORMAL_RECT }, side: 'L' } };
   const r = pub?.round;
   if (!Number.isInteger(r) || r <= 0 || !(r === pub.bossRound || r === pub.hiddenRound)) return normal;
-  const alive = (Array.isArray(pub.players) ? pub.players : []).filter((p) => isObj(p) && p.alive !== false)
-    .sort((a, b) => int(a.seat, 99) - int(b.seat, 99));
-  const idx = alive.findIndex((p) => p.playerId === myId);
+  const idx = prepPair(pub, myId).indexOf(myId);
   if (idx < 0) return normal; // eliminated / unknown: no board of its own on the boss field
   return { kind: 'bossPrep', opts: { side: idx % 2 === 1 ? 'R' : 'L' } };
 }
@@ -173,7 +182,7 @@ export function phaseBanner(phase, pub, myId = null, alive = true) {
   switch (phase) {
     case PHASE.BATTLE_CHECK: return { title: '协议启动', micro: 'PROTOCOL START', tone: 'mint', sub: '模拟即将开始', duration: 2600 };
     case PHASE.ROUND_START: return { title: `第 ${r} 回合`, micro: `ROUND ${String(r).padStart(2, '0')}`, tone: 'mint', sub: alive === false ? '观战中' : '资金已到账' };
-    case PHASE.SP_DRAFT: return { title: '机变阶段', micro: 'CONTINGENCY', tone: 'gold', sub: '依次选择机变' };
+    case PHASE.SP_DRAFT: if(pub?.augments?.selection)return {title:pub.augments.selection.side==='ally'?'아군 증강 선택':'적 증강 선택',micro:'AUGMENT',tone:'gold',sub:pub.augments.selection.settling?'선택 완료':'증강 선택 중'};return { title: '机变阶段', micro: 'CONTINGENCY', tone: 'gold', sub: '依次选择机变' };
     case PHASE.PREP: return { title: '休整期', micro: `ROUND ${String(r).padStart(2, '0')} // REST`, tone: 'mint', sub: '部署干员，准备迎敌' };
     case PHASE.COMBAT: return { title: '作战开始', micro: 'COMBAT', tone: 'orange', sub: '各自行动阶段' };
     case PHASE.UNITE: {
@@ -212,8 +221,8 @@ export function battleOverSfx(cost) {
 }
 
 /** Label of the prep capsule ("休息一下" in the original). */
-export function prepCapsuleLabel(phase) {
-  if (phase === PHASE.SP_DRAFT) return '机变阶段';
+export function prepCapsuleLabel(phase,pub=null) {
+  if (phase === PHASE.SP_DRAFT) return pub?.augments?.selection?'증강 선택':'机变阶段';
   if (phase === PHASE.ROUND_START) return '回合开始';
   if (phase === PHASE.BATTLE_CHECK) return '协议启动';
   if (phase === PHASE.SETTLE) return '回合结算';
@@ -258,6 +267,7 @@ export function phaseTotalSeconds(pub, config, myId = null) {
     case PHASE.BAND_DRAFT: return num(pub.draft?.turnSeconds) ?? num(timers.bandTurn) ?? 30;
     case PHASE.BATTLE_CHECK: return num(timers.battleCheck) ?? 3;
     case PHASE.SP_DRAFT: {
+      if(pub?.augments?.selection)return pub.augments.selection.settling?3:60;
       const sp = normalizeSp(pub.sp, pub.players);
       const first = !sp || sp.pickedCount === 0;
       return first ? (num(timers.spFirst) ?? 30) : (num(timers.spTurn) ?? 16);
@@ -1613,7 +1623,7 @@ export function snapHud(snap) {
   const n = (v) => (Number.isFinite(v) ? v : null);
   let boss = null;
   if (isObj(snap.boss) && Number.isFinite(snap.boss.hp)) boss = { hp: snap.boss.hp, max: n(snap.boss.max) ?? n(snap.boss.maxHp) };
-  return { ...((n(snap.gt)??n(snap.t))!=null?{elapsed:n(snap.gt)??n(snap.t)}:{}), killed: n(snap.killed), total: n(snap.total), dp: n(snap.dp), boss };
+  return { ...((n(snap.gt)??n(snap.t))!=null?{elapsed:n(snap.gt)??n(snap.t)}:{}), killed: n(snap.killed), ...(n(snap.resolved)!=null?{resolved:n(snap.resolved)}:{}), total: n(snap.total), dp: n(snap.dp), boss };
 }
 
 /** Boss HP fraction 0..1 (null when unknown). */
@@ -1716,7 +1726,7 @@ export function shortcutBlocked(act, { modal = false, drawer = false } = {}) {
 
 // ---- settings ------------------------------------------------------------------------------------------------------
 
-export const DEFAULT_SETTINGS = Object.freeze({ keys: DEFAULT_HOTKEYS, shopItemLeft: false, bgm: 0.6, sfx: 0.8, voice: 0.6, voiceLanguage: 'kr', voiceOverrides: Object.freeze({}), textSize: 'sm', chatVolume: 0.5, chatSound: 'emote', chatSoundCustomized: false, chatFactionNotifications: false, chatCooldown: defaultChatCooldown('emote'), muted: false, damageNumbers: true, damageNumberMode: 'basic', quality: 'high', mapQuality: 'high', renderScale: 1, effectsQuality: 'high', shadows: true, skillRanges: true, unitRanges: true, animationQuality: 'high', frameLimit: 60, adaptiveQuality: true });
+export const DEFAULT_SETTINGS = Object.freeze({ keys: DEFAULT_HOTKEYS, shopItemLeft: false, bgm: 0.6, sfx: 0.8, voice: 0.6, voiceLanguage: 'kr', voiceOverrides: Object.freeze({}), textSize: 'sm', chatVolume: 0.5, chatSound: 'emote', chatSoundCustomized: false, chatFactionNotifications: false, chatCooldown: defaultChatCooldown('emote'), muted: false, damageNumbers: true, damageNumberMode: 'basic', officialDamageNumbers:false, quality: 'high', mapQuality: 'high', renderScale: 1, effectsQuality: 'high', shadows: true, skillRanges: true, unitRanges: true, animationQuality: 'high', frameLimit: 60, adaptiveQuality: true });
 const QUALITIES = ['high', 'medium', 'low'];
 
 /**
@@ -1743,6 +1753,7 @@ export function sanitizeSettings(raw) {
     chatCooldown: Number.isFinite(r.chatCooldown) ? clamp(Math.round(r.chatCooldown), 1, 5) : defaultChatCooldown(chatSound),
     voiceLanguage: VOICE_LANGS.includes(r.voiceLanguage)?r.voiceLanguage:'kr',
     muted: typeof r.muted === 'boolean' ? r.muted : DEFAULT_SETTINGS.muted,
+    officialDamageNumbers:r.officialDamageNumbers===true,
     damageNumbers: damageNumberMode(r) !== 'none',
     damageNumberMode: DAMAGE_NUMBER_MODES.includes(r.damageNumberMode) || typeof r.damageNumbers === 'boolean' ? damageNumberMode(r) : DEFAULT_SETTINGS.damageNumberMode,
     quality: QUALITIES.includes(r.quality) ? r.quality : DEFAULT_SETTINGS.quality,

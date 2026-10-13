@@ -1,3 +1,4 @@
+import {AugmentOverlay} from '../ui/augmentOverlay.js';
 import {LaboratoryRestartButton,LaboratoryTargetButton} from '../ui/laboratory.js';
 
 
@@ -95,7 +96,7 @@ import { CombatHud } from '../ui/combatHud.js';
 import { settingsStore, SettingsModal } from '../ui/settings.js';
 import { ExitModal, AwayOverlay, awayStore } from '../ui/matchChrome.js';
 import { openGuide } from '../ui/guide.js';
-import { actions } from '../ui/gameActions.js';
+import { actions, onRefreshBusy } from '../ui/gameActions.js';
 import { FacingWheel, holdPiece, setPieceDir, syncPieceDirs, showRange, useTileScreen } from '../ui/facingWheel.js';
 import { Underframe, underframeRect, TempRowNotice } from '../ui/underframe.js';
 import { needsFacing, facingIntent, previewGrid, pieceDir, underframeActions, retreatSlot, itemDestroyable } from '../ui/facing.js';
@@ -238,6 +239,10 @@ function MatchScreen() {
   const cardTap = useRef(0);
   const [collapsed, setCollapsed] = useState(false);
   const [bondsHidden, setBondsHidden] = useState(false);
+  // GitHub #501: a g.refresh is still waiting for its reply — the shop's 刷新 button dims while it is (gameActions.js
+  // single-flights the intent; the R hotkey is dropped by the same guard)
+  const [refreshBusy, setRefreshBusy] = useState(false);
+  useEffect(() => onRefreshBusy(setRefreshBusy), []);
   const [rewardMin, setRewardMin] = useState(false);
   const [emoteOpen, setEmoteOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -458,6 +463,7 @@ function MatchScreen() {
     if (showPrep) {
       if (field?.prep) staleFieldRef.current = field; // a prep scouting board is never a battle to enter
       if (viewModeRef.current !== 'prep') {
+        audio.stopBondCue('battle');
         // the battle we just left (or whatever was stored before mount) must not be re-entered next combat;
         // an m.field that arrives during prep (the upcoming battle) is a new object and will be entered
         staleFieldRef.current = field;
@@ -758,7 +764,8 @@ function MatchScreen() {
   const activeBonds = (priv?.bonds || []).filter((b) => b && b.active).length;
   const prevActive = useRef(activeBonds);
   useEffect(() => {
-    if (activeBonds > prevActive.current && phase === PHASE.PREP) audio.sfx('bondUp', { volume: 0.7 });
+    // a layer gain of the same update already started the cue (audio.bondCueRecent): keep it, don't restart it
+    if (activeBonds > prevActive.current && phase === PHASE.PREP && !audio.bondCueRecent('prep')) audio.sfx('bondUp', { volume: 0.7, scope: 'prep' });
     prevActive.current = activeBonds;
   }, [activeBonds]);
 
@@ -1001,7 +1008,7 @@ function MatchScreen() {
           const char = unit?.kind === 'op' ? (unit.defId ?? unit.def) : null;
           const rec = char ? data.lookup('chess', char) : null;
           if (rec?.charId && unit?.ownerId === live.current.myId) audio.voice(rec.charId, 'select', {unitKey:e.unitId});
-          setDetail({ kind: 'unit', unit: e.unit || null, unitId: e.unitId, uid: e.uid }); return; }
+          setDetail({ kind: 'unit', unit: e.unit || null, unitId: e.unitId, uid: e.uid, prepMapChar:e.prepMapChar === true }); return; }
         if (!Number.isInteger(e.uid)) return;
         const p = [...(live.current.priv?.board || []), ...(live.current.priv?.hand || []), ...(live.current.priv?.temp || [])].find(p => p?.uid === e.uid);
         const rec = p?.kind === 'chess' ? data.lookup('chess', p.id) : null;
@@ -1445,7 +1452,7 @@ function MatchScreen() {
     return priv?.loadout ?? null; // own pieces, shop / reward / bond-member cards
   })();
   // the open detail card's unit draws its attack range on the field (screens/game/range.js inspectRange, GitHub PR #281):
-  // an own board piece in prep (its loadout / stand-in record, its facing); in battle or on a scouted board an ally
+  // an own board piece or read-only prepared map character in prep; in battle or on a scouted board an ally
   // operator / summon on the field — the range it fights with now (the live stats' `range` and `dir`, the snapshot's
   // tile) — never an enemy, a dead unit or a bench unit (UnitInfo `area` hand / temp); drag, the wheel and the pen
   // draw their own
@@ -1469,7 +1476,7 @@ function MatchScreen() {
   // bonds this mode never activates (标准: 10 of 23, 奥术 among them) — shown 本局禁用 on cards, chips and the popup
   const offBonds = modeOffBonds(getMode(pub?.modeId));
 
-  return html`<div class=${cx('screen', 'gm', `gm--${mode}`, drag && 'is-dragging', collapsed && 'is-collapsed', (sp || hasPersonalChoice) && 'has-sp', pen && 'is-pen', readyWhy && 'has-readywhy')}
+  return html`<div class=${cx('screen', 'gm', `gm--${mode}`, drag && 'is-dragging', collapsed && 'is-collapsed', (sp || hasPersonalChoice || pub?.augments?.selection) && 'has-sp', pen && 'is-pen', readyWhy && 'has-readywhy')}
       data-camera=${pen ? 'pen' : camKind}>
     <div class="gm__field" ref=${hostRef} onContextMenu=${(e) => e.preventDefault()}></div>
     ${pub?.laboratory&&myDone?html`<div class="lab-complete-notice" role="status"><span>전투 종료</span><${LaboratoryRestartButton}/></div>`:null}
@@ -1508,14 +1515,14 @@ function MatchScreen() {
         self=${Number.isFinite(priv?.lp) ? { lp: priv.lp, pending: liveLpNow.pending, unite: liveLpNow.unite, left: liveLpNow.left } : null}
         observe=${cc ? { canObserve: (p) => observeTarget(p, pub, myId, { observing: watchingOther, ownDone: localDone }), observing: watchingOther, onBack: backHome } : null} />
 
-      <div class="gm__effects"><${EffectsList} effects=${watchingOther && field ? (field.effects ?? null) : priv?.effects} /></div>
+      <div class="gm__effects"><${EffectsList} augmentsOnly=${true} pub=${pub} ownerId=${strip.ownerId||myId}/><${EffectsList} pub=${pub} ownerId=${strip.ownerId||myId} effects=${watchingOther && field ? (field.effects ?? null) : priv?.effects} /></div>
 
       ${watchingOther && !combat && !prepLayers.length ? html`<div class="gm__watching" role="status">
         <${GIcon} name="eye" /><span data-i18n-ctx="watching">正在查看 <b>${watchedName}</b>的阵地（只读）</span>
         ${spectator ? null : html`<${Button} size="sm" variant="primary" icon="back" onClick=${() => watchPlayer({ playerId: myId })}>返回自己<//>`}
       </div>` : null}
 
-      ${showShop ? html`<${ShopBar} priv=${priv} editable=${editable} collapsed=${collapsed} onCollapse=${setCollapsed}
+      ${showShop ? html`<${ShopBar} priv=${priv} editable=${editable} collapsed=${collapsed} refreshBusy=${refreshBusy} onCollapse=${setCollapsed}
         barRef=${barRef} offBonds=${offBonds}
         onBuy=${buy} onLevel=${() => actions.levelUp()} onRefresh=${() => actions.refresh()} onFreeze=${() => actions.freeze()}
         onDetail=${(id, kind, hint) => setDetail({ kind: kind === 'item' ? 'item' : 'chess', id, hint: hint || null })}
@@ -1568,6 +1575,7 @@ function MatchScreen() {
         onRetreat=${retreatSel} onSell=${sellSel} onDestroy=${sellSel} />` : null}
     </div>
 
+    ${pub?.augments?.selection?html`<${AugmentOverlay} pub=${pub} priv=${priv} myId=${myId}/>`:null}
     ${sp ? html`<${ChoiceOverlay} pub=${pub} sp=${sp} myId=${myId} solo=${solo} busyIdx=${spBusy} total=${total}
       onPick=${async (i) => { setSpBusy(i); await actions.choice(i); setSpBusy(null); }} />` : null}
     ${personalChoice ? html`<${ChoiceOverlay} key=${personalChoice.id} pub=${pub} sp=${personalChoice} myId=${myId} solo=${solo} personal=${true}

@@ -1,3 +1,4 @@
+import {EnemyAugments} from './enemyAugments.js';
 import {CustomSettingsInfo} from './customSettingsInfo.js';
 // 本局信息 dialog under the top bar (opened by the left 🔍, official btn_check_player / autochess_hud_player_info_dialog,
 // research 09 §2.1) with two tabs:
@@ -116,9 +117,9 @@ export function EnemyDrawer({ tab, onTab, pub, priv, onClose, onEnemy, onChess, 
   }, [onClose]);
   return html`<div ref=${ref} class="edrawer brackets" role="dialog" aria-label=${tab === 'info' ? '本局信息' : '敌方情报'}>
     <div class="edrawer__top">
-      <${Tabs} size="sm" value=${tab} onChange=${onTab} items=${[{ id: 'info', label: '本局信息' }, { id: 'enemies', label: '敌方情报' }, {id:'custom',label:'커스텀 설정'}]} />
+      <${Tabs} size="sm" value=${tab} onChange=${onTab} items=${[{ id: 'info', label: '本局信息' }, { id: 'enemies', label: '敌方情报' }, {id:'custom',label:'커스텀 설정'},...(pub.augments?[{id:'augments',label:'적 증강'}]:[])]} />
       <button type="button" class="edrawer__close tapx" aria-label="关闭" onClick=${onClose}><${Icon} name="close" /></button>
     </div>
-    ${tab === 'custom' ? html`<${CustomSettingsInfo} pub=${pub}/>` : tab === 'info' ? html`<${InfoTab} pub=${pub} priv=${priv} onChess=${onChess} bandId=${bandId} bandOwner=${bandOwner} />` : html`<${EnemiesTab} pub=${pub} priv=${priv} onEnemy=${onEnemy} />`}
+    ${tab === 'augments' ? html`<${EnemyAugments} pub=${pub}/>` : tab === 'custom' ? html`<${CustomSettingsInfo} pub=${pub}/>` : tab === 'info' ? html`<${InfoTab} pub=${pub} priv=${priv} onChess=${onChess} bandId=${bandId} bandOwner=${bandOwner} />` : html`<${EnemiesTab} pub=${pub} priv=${priv} onEnemy=${onEnemy} />`}
   </div>`;
 }

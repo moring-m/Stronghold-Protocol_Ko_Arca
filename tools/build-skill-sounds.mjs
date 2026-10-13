@@ -3,6 +3,7 @@ import {readFile,writeFile} from 'node:fs/promises';
 import {join} from 'node:path';
 import {indexAudio} from './assets/audio.mjs';
 import {skillCombatSounds} from './assets/skill-combat-sounds.mjs';
+import {unitCombatSounds} from './assets/unit-combat-sounds.mjs';
 import {RAW} from './assets/sources.mjs';
 export async function buildSkillSounds(root,dir){
  const read=async p=>JSON.parse(await readFile(p,'utf8'));
@@ -28,7 +29,9 @@ export async function buildSkillSounds(root,dir){
    }}
    audit.push({charId:id,skillId:s.skillId,index:i,sound:sound||null,combat:resolved,abilityBanks:Object.fromEntries(audio.unitBanks.get(id)||[])});
   }
-  units[id]={...(units[id]||{}),skills:mapping,skillCombat:combat};
+  const resolved=unitCombatSounds(audio,id,[...skills.values()],units[id]);
+  units[id]={...resolved.unit,skills:mapping,skillCombat:combat};
+  for(const path of resolved.paths)files.push({path:`/assets/audio/sfx/${path}`,sources:[RAW.aa2voice+path]});
  }
  await writeFile(join(dir,'assets.json'),JSON.stringify(assets));
  await writeFile(join(root,'.cache/skill-sound-resources.json'),JSON.stringify({files:[...new Map(files.map(f=>[f.path,f])).values()]}));

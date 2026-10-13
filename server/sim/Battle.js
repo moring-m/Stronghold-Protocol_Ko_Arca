@@ -1,6 +1,6 @@
 import {combatMetrics} from '../../shared/combatStats.js';
-import { PUSH_UNBALANCE, PULL_UNBALANCE, PULL_UNBALANCE_WEAK, UNBALANCE_MIN } from './constants.js';
-import { hypot } from './detmath.js';
+import { FIELD_EDGE_INSET, PUSH_UNBALANCE, PULL_UNBALANCE, PULL_UNBALANCE_WEAK, UNBALANCE_MIN } from './constants.js';
+import { hypot, roundHalfEven } from './detmath.js';
 function pushUnbalance(level) {
   const l = Math.round(fin(level, -99));
   return l <= -3 ? 0 : PUSH_UNBALANCE[Math.min(3, l)];
@@ -53,6 +53,7 @@ import { normDir, mirrorDir, localOrder, localBefore } from './dir.js';
 import { ProjectileSystem } from './projectiles.js';
 import { stampFear } from './fear.js';
 import { SkillRuntime } from './skills.js';
+import {attackClipTiming} from '../../shared/attackTiming.js';
 import { updateAlly, updateEnemy, compileRoute, remainingDistance, effectiveProfile, performAttack, acquireTargets } from './ai.js';
 import { resolveProfile } from './professions.js';
 import { unitInfo, snapshotUnits, storedEnergy } from './snapshot.js';
@@ -460,6 +461,16 @@ export class Battle {
         }
       }
       this.emit('battleStart', {});
+    // 联防 restores the previous phase's state after all opening effects have established the new stats. In
+    // particular, Egir rebuilds devour attributes without charging carried targets for its opening damage again.
+    // Keep fractional HP: a legal survivor below 1% (or below 1 HP after max-HP changes) must not be healed by carry.
+    if (this.kind === 'unite') for (const u of this.allyUnits) {
+      const cs = u.carry;
+      if (!cs || cs.down || !u.alive || !u.deployed || u.deploySeq <= seq0) continue;
+      if (u.kind === 'op' && Number.isFinite(cs.hpPct) && cs.hpPct > 0) u.hp = u.s.maxHp * Math.min(1, cs.hpPct);
+      if (Number.isFinite(cs.sp) && u.skill) u.skill.setSpTotal(cs.sp);
+    }
+
       // redeploy-time effects that start with the battle (机变 征召 "所有干员的再部署时间-50%", added by a battleStart
       // handler) cover the operators forced out above too: their timer is re-read with them, as a later knock-out's is
       for (const u of this.allyUnits) {
@@ -594,7 +605,7 @@ export class Battle {
         const pp = this._pp(owner);
         const def = this.data.getEnemy(p.enemyKey);
         if (pp) {
-          pp.leaked.push({enemyKey:p.enemyKey,mods:p.mods ?? null,lpr:def?.lpr ?? 1,sourcePlayerId:p.sourcePlayerId ?? owner,tag:p.tag ?? null,counted:!!p.counted,spawned:false});
+          pp.leaked.push({enemyKey:p.enemyKey,mods:p.mods ?? null,lpr:(def?.lpr ?? 1)+(this.flags.augments?.enemies||[]).reduce((n,a)=>n+(a.effect.kind==='leak'?a.effect.amount:0),0),sourcePlayerId:p.sourcePlayerId ?? owner,tag:p.tag ?? null,counted:!!p.counted,spawned:false});
           if (p.counted) pp.perfect=false;
           if (p.inTotal) pp.leakedInTotal++;
         }
@@ -890,6 +901,8 @@ export class Battle {
    * Spawn an enemy now. opts: { routeIndex, route, pos:[r,c], mods:{hpMul,atkMul,defMul,resMul,speedMul}, tag,
    * sourcePlayerId, ownerPlayerId, bounty:{coins,ownerPlayerId}, countInTotal }
    */
+  get resolved() { return Math.min(this.total, this.killedInTotal + this.leakedInTotal); }
+
   spawnEnemy(enemyKey, opts = {}) {
     if (this.enemies.length >= MAX_ALIVE_ENEMIES && this.aliveEnemies().length >= MAX_ALIVE_ENEMIES) {
       this._handlerError('spawnEnemy', null, new Error(`more than ${MAX_ALIVE_ENEMIES} living enemies; spawn of ${enemyKey} refused`));
@@ -995,7 +1008,7 @@ export class Battle {
    * operator that left the field comes back on its body tile, restTile). `keepSp` = { sp, charges }
    * restored right after the skill reset, before the `deploy` hook fires.
    */
-  _deploy(u, { initial = false, carry = null, tile = null, keepSp = null } = {}) {
+  _deploy(u, { initial = false, carry = null, tile = null, keepSp = null, preBattleAggroSeq = null } = {}) {
     if ((u.alive && u.deployed) || u._removing) return false;
     const R0 = tile ? tile[0] : u.homeR, C0 = tile ? tile[1] : u.homeC;
     if (!this.grid.inRect(R0, C0)) {
@@ -1020,7 +1033,9 @@ export class Battle {
     u.x = C0; u.y = R0; u.tileR = R0; u.tileC = C0;
     u.blocking = [];
     u.deploySeq = ++this._deploySeq;
-    u.aggroSeq = u.deploySeq;
+    // A prepared map character is instantiated after the board deployment but keeps an earlier target order.
+    // Its deploySeq remains the identity of this actual deployment for scheduled effects and redeploy checks.
+    u.aggroSeq = preBattleAggroSeq ?? u.deploySeq;
     u.deployedAt = this.time;
     u.deployRemaining = Math.max(0,((u.dir === 'UP' && u.def.attackTiming?.back) || u.def.attackTiming?.front)?.deploy || 0);
     u.deployUntil = this.time + u.deployRemaining;
@@ -1031,13 +1046,15 @@ export class Battle {
     u.markDirty();
     u.hp = u.s.maxHp;
     // 联防 carry (PRTS 卫戍协议/帮助 §联防阶段 "将对应单位的生命比例、技力修改至与上一阶段结束时相同（召唤物仅修改技力…）"):
-    // an operator's HP ratio here, the SP in skill.reset and again after the `deploy` hook (below) — a summon's SP only
+    // an operator restores HP/SP, a summon SP only; actual 联防 opening restoration is deferred until Battle.start ends
     const cs = initial || (first && this._startDeploying) ? (carry ?? u.carry) : null;
-    if (cs && u.kind === 'op' && Number.isFinite(cs.hpPct)) u.hp = Math.max(1, u.s.maxHp * Math.max(0.01, Math.min(1, cs.hpPct)));
+    // 联防 reconstructs deployment/battle-start effects first, then restores HP/SP once in Battle.start.
+    const restoreLater = this.kind === 'unite' && this._startDeploying;
+    if (!restoreLater && cs && u.kind === 'op' && Number.isFinite(cs.hpPct) && cs.hpPct > 0) u.hp = u.s.maxHp * Math.min(1, cs.hpPct);
     this._occ[k] = u;
     this._refreshRange(u); // also rebuilds baseRangeKeys (initial range incl. permanent rangeExtend)
     if (!u.skill) this._setupUnit(u);
-    u.skill.reset(cs);
+    u.skill.reset(restoreLater ? null : cs);
     const sk = u.skill;
     // "自动操作具有3s冷却，在完成一次操作或作战开始时部署的单位将进入冷却" (PRTS 卫戍协议/帮助; skills.js)
     if (initial) sk.opReadyAt = this.time + this.flags.startOpCooldown;
@@ -1050,9 +1067,9 @@ export class Battle {
     if (first) this._ev(['spawn', unitInfo(u)]);
     this._ev(['deploy', u.id]);
     if (this._hooks.deploy) this.emit('deploy', { unit: u, initial });
-    // 联防: "部署完成后，将对应单位的…技力修改至与上一阶段结束时相同" — the carried SP is set again once the deployment is
-    // done, so a deploy-time SP gift (独行, 黄沙罗盘 …) does not come on top of it; later redeploys keep those gifts
-    if (cs && Number.isFinite(cs.sp) && u.alive && u.skill) u.skill.setSpTotal(cs.sp);
+    // Explicit carry outside the 联防 opening follows this one deployment. The opening itself restores at the end
+    // of Battle.start, so deployment/battle-start gifts do not come on top of it; later redeploys keep their gifts.
+    if (!restoreLater && cs && Number.isFinite(cs.sp) && u.alive && u.skill) u.skill.setSpTotal(cs.sp);
     return true;
   }
 
@@ -1735,7 +1752,7 @@ export class Battle {
    * attack that spends no ammo (no `ammoUsed`, the skill never ends on it; 圣约送葬人 "不额外消耗弹药").
    * Returns true when an attack was made.
    */
-  forceAttack(u, targets = null, { noAmmo = false, castImpact = false } = {}) {
+  forceAttack(u, targets = null, { noAmmo = false, castImpact = false, attackInterval = null } = {}) {
     if (!u || !u.alive || !u.profile) return false;
     // A charged next attack must not bypass the normal recovery/wind-up.
     // Genuine extra attacks of running skills remain independent.
@@ -1743,6 +1760,12 @@ export class Battle {
     const prof = effectiveProfile(u);
     const t = targets ?? acquireTargets(this, u, prof);
     if (!t || !t.length) return false;
+    if(attackInterval>0){
+      const clip=attackClipTiming(u),lead=clip?.dur>0?attackInterval*Math.max(0,Math.min(1,clip.hit/clip.dur)):attackInterval/2,seq=u.deploySeq;
+      this._ev(['atkStart',u.id,t[0].id,lead,attackInterval,!!prof.allInRange,prof._fortressMelee?'melee':'ranged']);
+      this.after(Math.max(this.dt||.05,lead),()=>{if(u.alive&&u.deployed&&u.deploySeq===seq&&u.canAct){const profile=effectiveProfile(u),targets=acquireTargets(this,u,profile);if(targets.length){performAttack(this,u,profile,targets,{noAmmo,attackInterval});}}},{owner:u});
+      return true;
+    }
     const n0 = u.stats.attacks;
     performAttack(this, u, prof, t, noAmmo ? { noAmmo: true } : null);
     return u.stats.attacks > n0;
@@ -2018,7 +2041,7 @@ export class Battle {
     if (opts.stats) for (const [k, v] of Object.entries(opts.stats)) if (Number.isFinite(v)) u.base[k] = v;
     this._setupUnit(u, opts.kit ?? null);
     if (opts.untargetable) this.addBuff(u, { key: 'trait:untargetable', flags: { untargetable: true }, persist: true, allowDead: true });
-    if (!this._deploy(u, { initial: false })) {
+    if (!this._deploy(u, { initial: false, preBattleAggroSeq: opts.preBattleAggroSeq })) {
       // tile still busy (a unit stands there even with `force`): drop the half-built token and its hooks
       u.removed = true;
       this.offOwner(u);
@@ -2529,11 +2552,11 @@ export class Battle {
   }
 
   _clampPos(e) {
-    const R = this.rect;
-    if (e.x < R.c0 - 0.5) e.x = R.c0 - 0.5;
-    if (e.x > R.c1 + 0.5) e.x = R.c1 + 0.5;
-    if (e.y < R.r0 - 0.5) e.y = R.r0 - 0.5;
-    if (e.y > R.r1 + 0.5) e.y = R.r1 + 0.5;
+    const R = this.rect, m = 0.5 - FIELD_EDGE_INSET; // inside the edge: on the edge tile, never halfway (body.js)
+    if (e.x < R.c0 - m) e.x = R.c0 - m;
+    if (e.x > R.c1 + m) e.x = R.c1 + m;
+    if (e.y < R.r0 - m) e.y = R.r0 - m;
+    if (e.y > R.r1 + m) e.y = R.r1 + m;
   }
 
   _compactEnemies() {
@@ -2568,6 +2591,7 @@ export class Battle {
       fieldId: this.fieldId,
       t: Math.round(this.time * 1000) / 1000,
       units: snapshotUnits(this.units, this.time),
+      ...(this.flags.augments?{corrosionStacks:Object.fromEntries(this.enemies.filter(u=>u.alive&&u.deployed&&!u.hidden&&u.mem.augmentCorrosion>0).map(u=>[u.id,u.mem.augmentCorrosion]))}:{}),
       noteStacks: Object.fromEntries(this.enemies.filter(u=>u.alive&&u.deployed&&!u.hidden&&u.mem.leithanienStacks>0).map(u=>[u.id,u.mem.leithanienStacks])),
       energy: Object.fromEntries(this.allyUnits.filter(u=>u.alive&&u.deployed&&u.profile?.storeEnergy).map(u=>[u.id,storedEnergy(u)])),
       dp: this.players.length ? Math.floor(this.players[0].dp) : 0,
@@ -2775,7 +2799,7 @@ export class Battle {
         for (const k of bodyKeys(e)) { const b = this._eb[k]; if (!b.length) this._ebUsed.push(k); b.push(e); }
         continue;
       }
-      const r = Math.round(e.y), c = Math.round(e.x);
+      const r = roundHalfEven(e.y), c = roundHalfEven(e.x);
       if (r < 0 || r >= this.grid.rows || c < 0 || c >= this.grid.cols) continue;
       const k = r * this.grid.cols + c;
       const b = this._eb[k];

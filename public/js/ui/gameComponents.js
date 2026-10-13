@@ -1,3 +1,4 @@
+import { t as tr } from '../../../shared/i18n.js';
 import {RANDOM_BAND_ID} from '../../../shared/randomBand.js';
 // Shared in-match building blocks (Preact + htm): data hook, images with fallbacks, rich text,
 // unit thumbnails, LP tower, coin badge, official UI sprites. Styles: css/screens/game*.css.
@@ -194,8 +195,9 @@ export function GIcon({ name, class: cls, title }) {
 
 /**
  * Green LP tower + number. `pending` (> 0): the loss the running battle's leaks will cost at settlement (user
- * playtest #3 item 2) — the number shows value − pending in red followed by a −N tick that pops again on every change
- * (keyed); `note` a small tag after it (联防中); `tip` the title text.
+ * playtest #3 item 2) — the number keeps the settled LP (owner-approved #479 / #504),
+ * shown in red with a −N tick that pops again on every change (keyed); `note` a
+ * small tag after it (联防中); `tip` the title text.
  * @param {{ value: any, size?: 'sm'|'md'|'lg', class?: string, tone?: string|null, pending?: number, note?: string|null, tip?: string|null }} props
  */
 export function LpTower({ value, size = 'md', class: cls, tone, pending = 0, note = null, tip = null }) {
@@ -205,7 +207,7 @@ export function LpTower({ value, size = 'md', class: cls, tone, pending = 0, not
       data-pending=${p > 0 ? p : null}>
     <${Sprite} k="hudPanel/icon_hp" class="lp__icon" fallback=${html`<${Icon} name="rook" class="lp__icon" />`} />
     <b class="num lp__val">${ok ? Math.max(0, value) : '--'}</b>
-    ${p > 0 ? html`<span key=${p} class="lp__pend num" aria-label=${`结算时扣除 ${p}`}>−${p}</span>` : null}
+    ${p > 0 ? html`<span key=${p} class="lp__pend num" aria-label=${tr('结算时扣除 {p}', { p })}>−${p}</span>` : null}
     ${note ? html`<span class="lp__note">${note}</span>` : null}
   </span>`;
 }

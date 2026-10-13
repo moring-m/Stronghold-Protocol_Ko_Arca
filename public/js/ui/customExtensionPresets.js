@@ -7,7 +7,7 @@ export function copyExtensionSelection(selection={}) {
 }
 export function normalizeExtensionPresets(raw) {
   const seen=new Set();
-  return (Array.isArray(raw)?raw:[]).filter(p=>p&&typeof p.id==='string'&&!seen.has(p.id)&&seen.add(p.id)&&extensionSelectionShape(p.selection)).slice(0,30).map(p=>({id:p.id,name:String(p.name||'확장 프리셋').trim().slice(0,40)||'확장 프리셋',selection:copyExtensionSelection(p.selection)}));
+  return (Array.isArray(raw)?raw:[]).map(p=>{if(p?.selection?.disabledAugments!==undefined){const {disabledAugments,...selection}=p.selection;return {...p,selection};}return p;}).filter(p=>p&&typeof p.id==='string'&&!seen.has(p.id)&&seen.add(p.id)&&extensionSelectionShape(p.selection)).slice(0,30).map(p=>({id:p.id,name:String(p.name||'확장 프리셋').trim().slice(0,40)||'확장 프리셋',selection:copyExtensionSelection(p.selection)}));
 }
 export const loadExtensionPresets=()=>normalizeExtensionPresets(loadPref(KEY,[]));
 export function saveExtensionPresets(presets){const saved=normalizeExtensionPresets(presets);savePref(KEY,saved);return saved;}

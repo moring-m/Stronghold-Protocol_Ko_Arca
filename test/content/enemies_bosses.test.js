@@ -2484,7 +2484,7 @@ test('“斩胄之剑” / “破胄之锤” 初始模式 attack: every ally in
     const h = bossArena({ units: [{ chessId: 't_wall', row: 10, col: 9 }, { chessId: 't_wall2', row: 10, col: 7 }] });
     h.step();
     put(h, key, [3, 8], { tag: 'part' });
-    h.run(1);
+    h.run(1.5); // Include both native attack windups, before the next attack cycle.
     approx(h.unit('t_wall').stats.taken, E[key].stats.atk * scale, 1e-6, key);
     approx(h.unit('t_wall2').stats.taken, E[key].stats.atk * scale, 1e-6, key);
   }
@@ -2957,7 +2957,6 @@ test(`${nm('enemy_2008_flking')}: unblocked, a ranged attack at ${tb('enemy_2008
   eb.atkCd = 0;
   const n0 = hb.hooksOf('damaged').length;
   hb.runUntil(() => hb.hooksOf('damaged').slice(n0).some((c) => c.source === eb && c.dmg.isAttack), 10);
-  hb.run(1);
   const hits = hb.hooksOf('damaged').slice(n0).filter((c) => c.source === eb);
   assert.deepEqual(hits.map((c) => [c.target.defId, c.dmg.isAttack]), [['t_wall', true]], 'blocked: its blocker only');
   approx(hits[0].amount, eb.s.atk);
@@ -3124,4 +3123,9 @@ test('Sarkaz lancer stun/bind cancels charge within 0.1 seconds instead of waiti
   const h=arena();h.step();const e=put(h,'enemy_1072_dlancer',[9,10],{move:true});h.run(2);assert.ok(e.findBuff('ab:rush'));
   h.b.applyStatus(e,status,{duration:2});h.run(.14);assert.ok(!e.findBuff('ab:rush'),status);h.b.removeStatus(e,status);approx(e.s.moveSpeed,e.base.moveSpeed);
  }
+});
+
+test('water ninja spin animation state persists until timeout or displacement',()=>{
+ const h=arena({units:[{chessId:'t_wall',row:10,col:6}]});h.step();const e=put(h,'enemy_10116_ymgtop',[10,7]);h.run(skb('enemy_10116_ymgtop','SwitchModeTrigger').initCooldown+.5);assert.equal(e.form,'spin');assert.equal(h.b.fieldMeta().units.find(u=>u.id===e.id).form,'spin');h.b.displace(e,{x:-1,y:0},.2,{force:3});h.step();assert.equal(e.form,null);
+ const timeout=arena({units:[{chessId:'t_wall',row:10,col:6}]});timeout.step();const enemy=put(timeout,'enemy_10116_ymgtop',[10,7]);timeout.run(skb('enemy_10116_ymgtop','SwitchModeTrigger').initCooldown+.5);assert.equal(enemy.form,'spin');timeout.b.applyStatus(enemy,"silence",{duration:100,force:true});timeout.run(tb("enemy_10116_ymgtop","EndRotate.rotate_duration")+1);assert.equal(enemy.form,null);
 });
