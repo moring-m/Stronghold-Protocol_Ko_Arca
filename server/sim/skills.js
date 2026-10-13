@@ -303,9 +303,7 @@ export class SkillRuntime {
     // a free (spCost 0) non-passive skill is available once per deployment
     if (this.spCost <= 0) this.charges = this.maxCharges;
     if (this.spec.activateOnDeploy) {
-      const delay=this.unit.deployRemaining || 0, seq=this.unit.deploySeq;
-      if(delay>0)this.battle.after(delay,()=>{if(this.unit.alive && this.unit.deployed && this.unit.deploySeq===seq)this.activate('deploy');},{owner:this.unit});
-      else this.activate('deploy');
+      this.activate('deploy');
     }
   }
 
@@ -575,7 +573,7 @@ export class SkillRuntime {
     if (this.active && this.isTimed) return false;
     const u = this.unit;
     if (!u.alive || !u.deployed) return false;
-    if (this.battle.time < (u.deployUntil || 0) || this.battle.time < (u.mem.skillCastUntil || 0)) return false;
+    if (reason !== 'deploy' && this.battle.time < (u.mem.skillCastUntil || 0)) return false;
     if (!free) {
       const wasFull = this.charges >= this.maxCharges;
       this.charges--;

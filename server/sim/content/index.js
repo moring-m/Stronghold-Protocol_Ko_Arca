@@ -20,7 +20,7 @@
 //   are resolved by Battle (getToken(id, owner.defId, owner.def.loadout)), not here.
 // registerAllMeta(registry) — calls each domain module's registerMeta(registry) (prep side, server boot).
 
-import { genericKit } from './generic.js';
+import { genericKit, genericTalents } from './generic.js';
 import { withUnitLoadouts } from '../simdata.js';
 import { isPotential } from '../../../shared/potential.js';
 
@@ -35,22 +35,7 @@ async function safeImport(path) {
   }
 }
 
-const TIERS = await Promise.all([
-  ...[1, 2, 3, 4, 5, 6].map((t) => safeImport(`./kits/tier${t}.js`)),
-  safeImport('./kits/ursus.js'),
-  safeImport('./kits/leithanien.js'),
-  safeImport('./kits/recruits.js'),
-  safeImport('./kits/upstreamRecruits.js'),
-  safeImport('./kits/upstream022.js'),
-  safeImport('./kits/ops/chess_char_2_10-rockr.js'),
-  safeImport('./kits/ops/chess_char_3_13-malist.js'),
-  safeImport('./kits/ops/chess_char_3_18-vulpis.js'),
-  safeImport('./kits/ops/chess_char_3_20-kjera.js'),
-  safeImport('./kits/ops/chess_char_4_03-kjera.js'),
-  safeImport('./kits/ops/chess_char_5_08-horn.js'),
-  safeImport('./kits/ops/chess_char_6_18-whitw2.js'),
-
-]);
+const TIERS = await Promise.all([safeImport('./kits/nativeRegistry.js'),safeImport('./kits/ursus.js'),safeImport('./kits/leithanien.js'),safeImport('./kits/recruits.js'),safeImport('./kits/upstreamRecruits.js'),safeImport('./kits/upstream022.js')]);
 const DOMAIN_NAMES = ['tokens', 'devices', 'enemies', 'bosses', 'bonds', 'garrisons', 'items', 'bands', 'choices', 'ursus', 'leithanien', 'augments'];
 const DOMAINS = await Promise.all(DOMAIN_NAMES.map((n) => safeImport(`./${n}.js`)));
 const tokens = DOMAINS[0];
@@ -61,6 +46,42 @@ export const KITS = Object.freeze(Object.assign({}, ...TIERS.map((m) => (m && m.
 
 /** Domain modules in install order: tokens, devices, enemies, bosses, bonds, garrisons, items, bands, choices. */
 export const MODULES = Object.freeze(DOMAIN_NAMES.map((n, i) => [n, DOMAINS[i]]));
+
+export function isStandInDef(def) {
+  return !!(def && def.standInFor && def.charId && def.charId !== def.standInFor);
+}
+
+/**
+ * Whether `def` is a 自选 piece: a DIY slot fielded with a picked operator's body (simdata getDiy — `diyFor` = the slot's
+ * base id, `charId` = the operator's).
+ */
+export function isDiyDef(def) {
+  return !!(def && def.diyFor && def.charId);
+}
+
+/** A def whose body is another character than its chess id names (补位 stand-in, 自选 piece): its kit is keyed by charId. */
+const isOtherBody = (def) => isStandInDef(def) || isDiyDef(def);
+
+/**
+ * The kit builder of an operator def in `reg` ({ [key]: (bb, chess, def) => Kit }), or undefined. A stand-in's and a
+ * 自选 piece's kit is keyed by its charId (`char_609_acguad`, `char_112_siege`) and by nothing else: the chess id it keeps
+ * names the replaced operator's kit (a DIY slot has none). Any other def: baseId (`…_a`, data/SIM.md), the exact id, or
+ * the suffix-less id of DESIGN §5.6's example.
+ */
+export function kitOf(def, reg) {
+  if (!def || !reg) return undefined;
+  if (isOtherBody(def) || def.raw?.optionalRecruit || def.raw?.customKit) return Object.prototype.hasOwnProperty.call(reg, def.charId) ? reg[def.charId] : undefined;
+  const bare = String(def.baseId ?? def.id ?? '').replace(/_[ab]$/, '');
+  return reg[def.baseId] ?? reg[def.id] ?? reg[bare];
+}
+
+/** The generic kit of an operator def; a stand-in's / 自选 piece's also carries the talents generic.js can apply exactly. */
+function fallbackKit(bb, raw, def) {
+  const k = genericKit(bb, raw, def);
+  if (!isOtherBody(def)) return k;
+  const talents = genericTalents(def);
+  return talents.length ? { ...k, talents: [...(k.talents ?? []), ...talents] } : k;
+}
 
 /** Resolve the Kit of an ally unit. Never throws (falls back to the generic kit). */
 export function setupUnitKit(battle, unit, mode = 'full') {
@@ -79,10 +100,7 @@ export function setupUnitKit(battle, unit, mode = 'full') {
   if (unit.kind !== 'op') return {};
   const injected = battle.opts && battle.opts.kits;
   if (mode === 'full' || injected) {
-    // DESIGN §5.6's example keys kits by the suffix-less id (`chess_char_1_01`), data/SIM.md by baseId (`…_a`): accept both
-    const bare = String(def.baseId ?? def.id ?? '').replace(/_[ab]$/, '');
-    const pick = (reg) => ((raw.isDiy || raw.diyFor) ? reg?.[raw.charId] : undefined) ?? reg?.[def.baseId] ?? reg?.[def.id] ?? reg?.[bare] ?? ((raw.optionalRecruit || raw.isDiy || raw.customKit) ? reg?.[raw.charId] : undefined);
-    const f = pick(injected) ?? (mode === 'full' ? pick(KITS) : undefined);
+    const f = kitOf(def, injected) ?? (mode === 'full' ? kitOf(def,KITS) : undefined);
     if (typeof f === 'function') {
       try {
         const k = f(bb, raw, def);
@@ -92,7 +110,7 @@ export function setupUnitKit(battle, unit, mode = 'full') {
       }
     }
   }
-  return genericKit(bb, raw, def);
+  return fallbackKit(bb, raw, def);
 }
 
 /** A unit's own PlayerBattleInput entry (operators: kind ≠ 'token'; tokens: kind 'token'), or null. */
@@ -170,7 +188,7 @@ export function syncUnitLoadout(battle, unit) {
 const selectedSkillId = (def) => def?.skill?.id ?? def?.raw?.skill?.skillId ?? null;
 
 /** True when the def's selected skill is the chess's default skill (no loadout info ⇒ default). */
-const skillIsDefault = (def) => !def?.loadout || def.loadout.skillIsDefault !== false;
+const skillIsDefault = (def) => !isOtherBody(def) && (!def?.loadout || def.loadout.skillIsDefault !== false);
 
 /**
  * The kit with the skill spec of the SELECTED skill (see header): `kit.skills[id]` → `kit.skill` (default skill only)
@@ -198,8 +216,7 @@ export function selectSkillSpec(kit, bb, raw, def) {
  * @returns {'skills'|'kit'|'generic'|'none'} where the spec comes from ('none' = no kit function at all)
  */
 export function skillSpecSource(def, kits = KITS) {
-  const bare = String(def?.baseId ?? def?.id ?? '').replace(/_[ab]$/, '');
-  const f = kits?.[def?.baseId] ?? kits?.[def?.id] ?? kits?.[bare];
+  const f = kitOf(def, kits);
   if (typeof f !== 'function') return 'none';
   let k = null;
   try { k = f(def.skill?.bb ?? {}, def.raw ?? def, def); } catch { return 'generic'; }

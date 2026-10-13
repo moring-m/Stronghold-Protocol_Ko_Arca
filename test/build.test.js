@@ -23,8 +23,8 @@ function fixture() {
   return root;
 }
 
-test('BUILD_INPUTS: only the runtime the browser loads (server/, data/ and shared/ are not part of it)', () => {
-  assert.deepEqual([...BUILD_INPUTS], ['public/index.html', 'public/js', 'public/css']);
+test('BUILD_INPUTS: includes the browser-served simulation, local laboratory and shared data', () => {
+  assert.deepEqual([...BUILD_INPUTS], ['public/index.html', 'public/js', 'public/css', 'server/sim', 'server/match', 'shared', 'data']);
 });
 
 test('computeBuildTag: stable for one tree, different when a runtime file changes (size or mtime)', () => {

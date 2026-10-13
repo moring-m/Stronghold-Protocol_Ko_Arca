@@ -5059,6 +5059,126 @@
         "kind": "terrain",
         "stageId": "act1autochess_m07",
         "team": false
+      },
+      {
+        "effectId": "allybuff_custom_ursus_oath",
+        "name": "지마의 맹세",
+        "desc": "자신의 우르수스, 기습, 불굴 맹약 중첩 +8. 다른 아군이 있으면 해당 아군도 획득.",
+        "kind": "ally",
+        "stageId": null,
+        "team": true
+      },
+      {
+        "effectId": "allybuff_custom_ursus_support",
+        "name": "우르수스 지원",
+        "desc": "우르수스 맹약의 무작위 오퍼레이터 1명 획득.",
+        "kind": "ally",
+        "stageId": null,
+        "team": false
+      },
+      {
+        "effectId": "allybuff_custom_leithanien_oath",
+        "name": "에벤홀츠의 맹세",
+        "desc": "[라이타니엔]/[신속]/[아케인] 맹약의 중첩 수 각각 +8/+8/+8\n다른 아군이 있으면 해당 아군도 획득",
+        "kind": "ally",
+        "stageId": null,
+        "team": true
+      },
+      {
+        "effectId": "allybuff_custom_leithanien_oath",
+        "name": "에벤홀츠의 맹세",
+        "desc": "[라이타니엔]/[신속]/[아케인] 맹약의 중첩 수 각각 +8/+8/+8\n다른 아군이 있으면 해당 아군도 획득",
+        "kind": "ally",
+        "stageId": null,
+        "team": true
+      },
+      {
+        "effectId": "allybuff_custom_leithanien_oath",
+        "name": "에벤홀츠의 맹세",
+        "desc": "[라이타니엔]/[신속]/[아케인] 맹약의 중첩 수 각각 +8/+8/+8\n다른 아군이 있으면 해당 아군도 획득",
+        "kind": "ally",
+        "stageId": null,
+        "team": true
+      },
+      {
+        "effectId": "allybuff_custom_leithanien_oath",
+        "name": "에벤홀츠의 맹세",
+        "desc": "[라이타니엔]/[신속]/[아케인] 맹약의 중첩 수 각각 +8/+8/+8\n다른 아군이 있으면 해당 아군도 획득",
+        "kind": "ally",
+        "stageId": null,
+        "team": true
+      },
+      {
+        "effectId": "allybuff_custom_leithanien_oath",
+        "name": "에벤홀츠의 맹세",
+        "desc": "[라이타니엔]/[신속]/[아케인] 맹약의 중첩 수 각각 +8/+8/+8\n다른 아군이 있으면 해당 아군도 획득",
+        "kind": "ally",
+        "stageId": null,
+        "team": true
+      },
+      {
+        "effectId": "allybuff_custom_leithanien_oath",
+        "name": "에벤홀츠의 맹세",
+        "desc": "[라이타니엔]/[신속]/[아케인] 맹약의 중첩 수 각각 +8/+8/+8\n다른 아군이 있으면 해당 아군도 획득",
+        "kind": "ally",
+        "stageId": null,
+        "team": true
+      },
+      {
+        "effectId": "allybuff_custom_leithanien_oath",
+        "name": "에벤홀츠의 맹세",
+        "desc": "[라이타니엔]/[신속]/[아케인] 맹약의 중첩 수 각각 +8/+8/+8\n다른 아군이 있으면 해당 아군도 획득",
+        "kind": "ally",
+        "stageId": null,
+        "team": true
+      },
+      {
+        "effectId": "allybuff_custom_leithanien_oath",
+        "name": "에벤홀츠의 맹세",
+        "desc": "[라이타니엔]/[신속]/[아케인] 맹약의 중첩 수 각각 +8/+8/+8\n다른 아군이 있으면 해당 아군도 획득",
+        "kind": "ally",
+        "stageId": null,
+        "team": true
+      },
+      {
+        "effectId": "allybuff_custom_leithanien_oath",
+        "name": "에벤홀츠의 맹세",
+        "desc": "[라이타니엔]/[신속]/[아케인] 맹약의 중첩 수 각각 +8/+8/+8\n다른 아군이 있으면 해당 아군도 획득",
+        "kind": "ally",
+        "stageId": null,
+        "team": true
+      },
+      {
+        "effectId": "allybuff_custom_leithanien_oath",
+        "name": "에벤홀츠의 맹세",
+        "desc": "[라이타니엔]/[신속]/[아케인] 맹약의 중첩 수 각각 +8/+8/+8\n다른 아군이 있으면 해당 아군도 획득",
+        "kind": "ally",
+        "stageId": null,
+        "team": true
+      },
+      {
+        "effectId": "allybuff_custom_leithanien_oath",
+        "name": "에벤홀츠의 맹세",
+        "desc": "[라이타니엔]/[신속]/[아케인] 맹약의 중첩 수 각각 +8/+8/+8\n다른 아군이 있으면 해당 아군도 획득",
+        "kind": "ally",
+        "stageId": null,
+        "team": true
+      },
+      {
+        "effectId": "allybuff_custom_leithanien_oath",
+        "name": "에벤홀츠의 맹세",
+        "desc": "[라이타니엔]/[신속]/[아케인] 맹약의 중첩 수 각각 +8/+8/+8\n다른 아군이 있으면 해당 아군도 획득",
+        "kind": "ally",
+        "stageId": null,
+        "team": true
+      },
+      {
+        "effectId": "allybuff_custom_leithanien_oath",
+        "name": "에벤홀츠의 맹세",
+        "desc": "[라이타니엔]/[신속]/[아케인] 맹약의 중첩 수 각각 +8/+8/+8\n다른 아군이 있으면 해당 아군도 획득",
+        "kind": "ally",
+        "stageId": null,
+        "team": true
       }
     ]
   },

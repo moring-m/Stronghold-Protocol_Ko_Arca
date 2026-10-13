@@ -1,11 +1,12 @@
 // Player-facing history. Letters a/b were assigned retroactively to the two deployed update batches.
 export const PATCH_NOTES = [
 {
-  "version": "0.2.5a",
+  "version": "0.2.6a",
   "date": "2026-10-13",
   "status": "released",
-  "title": "원본 v0.2.5 · 증강 모드 · 전투 개선",
+  "title": "원본 v0.2.6 · 증강 모드 · 전투 개선",
   "sections": [
+    {"title":"원본 v0.2.6 및 화면 개선","items":["원본 v0.2.6의 리소스 캐시·압축·트래픽 진단·배치 연출 개선을 반영했습니다.","게임 정보의 커스텀 설정·적 증강 탭 하단이 눌리지 않는 문제를 수정했습니다.","소드마스터 추가 공격 간격을 0.2초로 조정했습니다."]},
     {
       "title": "원본 v0.2.5 반영",
       "items": [

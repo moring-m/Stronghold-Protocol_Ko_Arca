@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { APP_VERSION, BASE_VERSION, PROTOCOL_VERSION } from '../shared/constants.js';
+import { APP_VERSION, BASE_VERSION, PROTOCOL_VERSION, DEV_BUILD } from '../shared/constants.js';
 
 import { PATCH_NOTES } from '../shared/patchNotes.js';
 
@@ -16,9 +16,9 @@ const pkg = JSON.parse(read('package.json'));
 const lock = JSON.parse(read('package-lock.json'));
 
 test('base package version and letter-suffixed site version stay consistent', () => {
-  assert.match(APP_VERSION, /^\d+\.\d+\.\d+[a-z]\d*$/);
-  assert.equal(APP_VERSION.replace(/[a-z]\d*$/,''),BASE_VERSION);
-  assert.equal(PATCH_NOTES[0].version,APP_VERSION);
+  assert.match(APP_VERSION, /^\d+\.\d+\.\d+[a-z]\d*(?:-dev)?$/);
+  assert.equal(APP_VERSION.replace(/-dev$/,'').replace(/[a-z]\d*$/,''),BASE_VERSION);
+  if(!DEV_BUILD)assert.equal(PATCH_NOTES[0].version,APP_VERSION);
   assert.equal(new Set(PATCH_NOTES.map(n=>n.version)).size,PATCH_NOTES.length);
   for(const note of PATCH_NOTES)assert.match(note.version,/^\d+\.\d+\.\d+[a-z]\d*$/);
   assert.equal(pkg.version, BASE_VERSION);
@@ -32,17 +32,17 @@ test('CHANGELOG.md opens with the release version, and the README links it', () 
   const log = read('CHANGELOG.md');
   const first = log.match(/^## (\d+\.\d+\.\d+[a-z]?) — (\d{4}-\d{2}-\d{2})/m);
   assert.ok(first, 'a "## x.y.z — date" heading');
-  assert.equal(first[1], APP_VERSION, 'the newest entry is the current version');
+  assert.equal(first[1], DEV_BUILD ? PATCH_NOTES[0].version : APP_VERSION, 'published notes follow the published release');
   assert.match(log, /^## 0\.1\.0 — 2026-10-02/m, 'the first public release stays listed');
   const readme = read('README.md');
   assert.match(readme, /\[CHANGELOG\.md\]\(CHANGELOG\.md\)/);
-  assert.match(readme, new RegExp(`badge/version-${APP_VERSION.replace(/\./g, '\\.')}-`), 'the README badge');
+  assert.match(readme, new RegExp(`badge/version-${APP_VERSION.replace(/-dev$/,'--dev').replace(/\./g, '\\.')}-`), 'the README badge');
 });
 
 test('the release version is what players see', () => {
   assert.match(read('public/js/screens/title.js'), /v\$\{APP_VERSION\}/, 'title screen footer');
   assert.ok(!/PROTOCOL v1/.test(read('public/js/screens/title.js')), 'no protocol number posing as a version');
-  const server = read('server/index.js');
+  const server = read('server/index.js') + read('server/http/boot.js');
   assert.match(server, /Stronghold Protocol: Alliance v\$\{APP_VERSION\}/, 'boot banner');
   assert.match(server, /app: APP_VERSION/, '/healthz');
 });

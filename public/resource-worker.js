@@ -184,7 +184,8 @@ self.addEventListener('fetch', event => {
   event.respondWith((async () => {
     const resources = await index();
     const cache = await caches.open(PREFIX + resources.version);
-    let path = url.pathname + url.search;
+    const assetPath = url.pathname.replace(/^\/(assets|fonts|media)\/~[a-f0-9]+\//, '/$1/');
+    let path = assetPath + url.search;
     if(/^\/(data|i18n)\//.test(url.pathname)||url.pathname==='/vendor/browser-resources.json'){
       try{const response=await fetch(event.request);if(response.ok)await cache.put(path,response.clone());return response;}
       catch(error){const old=await cache.match(path);if(old)return old;throw error;}

@@ -9,7 +9,7 @@ import { startServer } from '../server/index.js';
 
 const chrome = process.env.CHROME_PATH || '/usr/bin/chromium';
 test('two browsers chat over real game sockets: toggle, unread, safe text, Korean composition and reconnect',
-  { skip: !existsSync(chrome), timeout: 60000 }, async () => {
+  { skip: process.env.SP_E2E !== '1' || !existsSync(chrome), timeout: 60000 }, async () => {
     const fixtureDir = await mkdtemp(path.join(tmpdir(), 'stronghold-chat-'));
     const publicDir = fileURLToPath(new URL('../public/', import.meta.url));
     for (const name of ['js', 'vendor', 'css', 'assets', 'audio']) await symlink(path.join(publicDir, name), path.join(fixtureDir, name), process.platform === 'win32' ? 'junction' : 'dir');
@@ -198,7 +198,7 @@ test('two browsers chat over real game sockets: toggle, unread, safe text, Korea
   });
 
 test('opening chat and restart controls does not move the corner buttons',
-  {skip:!existsSync(chrome),timeout:30000},async()=>{
+  {skip:process.env.SP_E2E !== '1'||!existsSync(chrome),timeout:30000},async()=>{
     const dir=await mkdtemp(path.join(tmpdir(),'stronghold-chat-corner-'));
     const publicDir=fileURLToPath(new URL('../public/',import.meta.url));
     for(const name of ['js','vendor','css','assets','audio'])await symlink(path.join(publicDir,name),path.join(dir,name));

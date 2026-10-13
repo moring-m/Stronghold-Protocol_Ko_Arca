@@ -3,7 +3,7 @@ import WebSocket from 'ws';
 import {randomUUID} from 'node:crypto';
 import {readFile,writeFile,mkdir,access,statfs} from 'node:fs/promises';
 import {join,dirname} from 'node:path';
-import {normalizeAtlas} from '../public/vendor/resource-atlas.mjs';
+import {normalizeAtlas} from '../tools/assets/atlas.mjs';
 export async function previewHandler(root,port){
  let closed=false;
  const sessions=new Map(),pending=new Map();const resources=JSON.parse(await readFile(join(root,'public/vendor/browser-resources.json'),'utf8'));const voices=JSON.parse(await readFile(join(root,'.cache/ursus-voice-resources.json'),'utf8').catch(()=>'{"files":[]}'));resources.files.push(...voices.files);const skins=JSON.parse(await readFile(join(root,'.cache/skin-resources.json'),'utf8').catch(()=>'{"files":[]}'));resources.files.push(...skins.files);const skillSounds=JSON.parse(await readFile(join(root,'.cache/skill-sound-resources.json'),'utf8').catch(()=>'{"files":[]}'));resources.files.push(...skillSounds.files);const bands=JSON.parse(await readFile(join(root,'.cache/ursus-band-resources.json'),'utf8').catch(()=>' {"files":[]}'));resources.files.push(...bands.files);const localArt=JSON.parse(await readFile(join(root,'.cache/ursus-local-assets.json'),'utf8').catch(()=>'{"groups":{}}'));for(const group of Object.values(localArt.groups || {}))for(const entry of Object.values(group))if(entry?.path)resources.files.push({path:entry.path,local:true,sources:[]});const recruits=JSON.parse(await readFile(join(root,'.cache/upstream-recruit-resources.json'),'utf8').catch(()=>'{"files":[]}'));const files=new Map([...recruits.files,...resources.files].map(f=>[f.path,f]));

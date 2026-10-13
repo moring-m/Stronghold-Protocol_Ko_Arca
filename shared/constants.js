@@ -3,8 +3,8 @@
 
 export const PROTOCOL_VERSION = 1;
 /** Upstream base version; Korean custom release is tracked separately. */
-export const BASE_VERSION = '0.2.5';
-export const APP_VERSION = '0.2.5a';
+export const BASE_VERSION = '0.2.6';
+export const APP_VERSION = '0.2.6a';
 export const DEV_BUILD = /-dev$/.test(APP_VERSION);
 
 export const MAX_SEATS = 8;

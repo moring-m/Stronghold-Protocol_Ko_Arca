@@ -23,6 +23,8 @@ describe('render engine in headless Chrome', { skip }, () => {
     const puppeteer = (await import('puppeteer-core')).default;
     const { startServer } = await import('../../server/index.js');
     srv = await startServer({ port: 0, host: '127.0.0.1', quiet: true });
+    // the content-hash index first: every page then loads the served manifest's /assets/~<hash>/… URLs (ASSETS.md)
+    await srv.assetIndex?.whenReady();
     browser = await puppeteer.launch({ executablePath: CHROME, headless: true, args: ['--no-first-run'] });
     mkdirSync(OUT, { recursive: true });
   });

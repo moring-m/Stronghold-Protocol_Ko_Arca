@@ -10,7 +10,7 @@ import { CHAT_NOTIFICATION_SOUNDS } from '../public/js/chatNotificationSounds.js
 
 const chrome = process.env.CHROME_PATH || '/usr/bin/chromium';
 test('all chat sounds decode; settings persist; live chat sounds in expanded game chat and waiting room',
-  {skip: !existsSync(chrome), timeout: 30000}, async () => {
+  {skip: process.env.SP_E2E !== '1' || !existsSync(chrome), timeout: 30000}, async () => {
     const fixtureDir = await mkdtemp(path.join(tmpdir(), 'stronghold-notifications-'));
     const publicDir = fileURLToPath(new URL('../public/', import.meta.url));
     for (const name of ['js', 'vendor', 'css', 'assets', 'audio', 'i18n'])

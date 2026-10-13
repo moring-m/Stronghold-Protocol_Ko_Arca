@@ -38,8 +38,8 @@ test('enemy elemental damage and elemental buildup scale once, not twice',()=>{
 test('deployment attack speed expires after ten seconds',()=>{
  const {h,u}=fixture({allies:[find('기습 I')]});close(u.s.aspd,140);h.run(10);close(u.s.aspd,100);
 });
-test('extra attack launches at a 0.1-second interval and can recursively proc',()=>{
- const {h,u}=fixture({allies:[{id:'forced-extra',effect:{kind:'extraAttack',probability:1}}]});let attacks=0;h.b.on('attack',({attacker})=>{if(attacker===u)attacks++;});h.b.forceAttack(u);assert.equal(attacks,1);h.run(.59);assert.equal(attacks,2);h.run(.3);assert.ok(attacks>=4);u.alive=false;const stopped=attacks;h.run(.3);assert.equal(attacks,stopped);
+test('extra attack launches at a 0.2-second interval and can recursively proc',()=>{
+ const {h,u}=fixture({allies:[{id:'forced-extra',effect:{kind:'extraAttack',probability:1}}]});let attacks=0;h.b.on('attack',({attacker})=>{if(attacker===u)attacks++;});h.b.forceAttack(u);assert.equal(attacks,1);h.run(.69);assert.equal(attacks,2);h.run(.5);assert.ok(attacks>=4);u.alive=false;const stopped=attacks;h.run(.3);assert.equal(attacks,stopped);
 });
 
 test('skill SP recovery works while duration skills are active, and Sargon stacks expire individually',()=>{
@@ -68,11 +68,11 @@ test('per-second recovery augments also recover attack and defensive SP types',(
 
 test('swordmaster uses a thirty-five percent proc threshold',()=>{
  const augment=find('소드마스터');assert.equal(augment.effect.probability,.35);
- for(const [roll,expected]of [[.349,2],[.35,1]]){const {h,u}=fixture({allies:[augment]});let attacks=0;h.b.on('attack',({attacker})=>{if(attacker===u)attacks++;});h.b.rng=()=>roll;h.b.forceAttack(u);h.run(.59);assert.equal(attacks,expected);u.alive=false;}
+ for(const [roll,expected]of [[.349,2],[.35,1]]){const {h,u}=fixture({allies:[augment]});let attacks=0;h.b.on('attack',({attacker})=>{if(attacker===u)attacks++;});h.b.rng=()=>roll;h.b.forceAttack(u);h.run(.69);assert.equal(attacks,expected);u.alive=false;}
 });
 
 test('extra attacks preserve the remaining normal-attack cooldown',()=>{
- const {h,u}=fixture({allies:[{id:'test-extra',effect:{kind:'extraAttack',probability:1}}]});u.atkCd=.8;let attacks=0;h.b.on('attack',({attacker})=>{if(attacker===u)attacks++;});h.b.forceAttack(u);h.run(.59);assert.equal(attacks,2);assert.ok(u.atkCd<.8&&u.atkCd>.05,`extra attack reset cooldown: ${u.atkCd}`);u.alive=false;
+ const {h,u}=fixture({allies:[{id:'test-extra',effect:{kind:'extraAttack',probability:1}}]});u.atkCd=.8;let attacks=0;h.b.on('attack',({attacker})=>{if(attacker===u)attacks++;});h.b.forceAttack(u);h.run(.69);assert.equal(attacks,2);assert.ok(u.atkCd<.8&&u.atkCd>.05,`extra attack reset cooldown: ${u.atkCd}`);u.alive=false;
 });
 
 test('runtime enemies never advance the stage enemy counter but leaks retain HP loss',async()=>{
@@ -81,5 +81,5 @@ test('runtime enemies never advance the stage enemy counter but leaks retain HP 
 });
 
 test('swordmaster waits for the full current recovery and serializes each bonus animation',()=>{
- const {h,u}=fixture({allies:[{id:'queue',effect:{kind:'extraAttack',probability:1}}]});u.def={...u.def,attackTiming:{front:{attack:{dur:1,hit:.4}}}};const starts=[],emit=h.b._ev;h.b._ev=function(ev){if(ev[0]==='atkStart'&&ev[1]===u.id)starts.push({t:this.time,lead:ev[3],interval:ev[4]});return emit.call(this,ev);};const hit=h.b.time;h.b.forceAttack(u);h.run(.55);assert.equal(starts.length,0,'the original attack is still recovering');h.run(.25);assert.ok(starts.length>=2);assert.ok(starts[0].t>=hit+.6-1e-9,'the normal clip finishes before the bonus starts');assert.equal(starts[0].interval,.1);close(starts[0].lead,.04);for(let i=1;i<starts.length;i++)assert.ok(starts[i].t>=starts[i-1].t+.1-1e-9,'bonus clips never interrupt each other');u.alive=false;const stopped=starts.length;h.run(.5);assert.equal(starts.length,stopped);
+ const {h,u}=fixture({allies:[{id:'queue',effect:{kind:'extraAttack',probability:1}}]});u.def={...u.def,attackTiming:{front:{attack:{dur:1,hit:.4}}}};const starts=[],emit=h.b._ev;h.b._ev=function(ev){if(ev[0]==='atkStart'&&ev[1]===u.id)starts.push({t:this.time,lead:ev[3],interval:ev[4]});return emit.call(this,ev);};const hit=h.b.time;h.b.forceAttack(u);h.run(.55);assert.equal(starts.length,0,'the original attack is still recovering');h.run(.45);assert.ok(starts.length>=2);assert.ok(starts[0].t>=hit+.6-1e-9,'the normal clip finishes before the bonus starts');assert.equal(starts[0].interval,.2);close(starts[0].lead,.08);for(let i=1;i<starts.length;i++)assert.ok(starts[i].t>=starts[i-1].t+.2-1e-9,'bonus clips never interrupt each other');u.alive=false;const stopped=starts.length;h.run(.5);assert.equal(starts.length,stopped);
 });

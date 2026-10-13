@@ -1726,7 +1726,7 @@ export function shortcutBlocked(act, { modal = false, drawer = false } = {}) {
 
 // ---- settings ------------------------------------------------------------------------------------------------------
 
-export const DEFAULT_SETTINGS = Object.freeze({ keys: DEFAULT_HOTKEYS, shopItemLeft: false, bgm: 0.6, sfx: 0.8, voice: 0.6, voiceLanguage: 'kr', voiceOverrides: Object.freeze({}), textSize: 'sm', chatVolume: 0.5, chatSound: 'emote', chatSoundCustomized: false, chatFactionNotifications: false, chatCooldown: defaultChatCooldown('emote'), muted: false, damageNumbers: true, damageNumberMode: 'basic', officialDamageNumbers:false, quality: 'high', mapQuality: 'high', renderScale: 1, effectsQuality: 'high', shadows: true, skillRanges: true, unitRanges: true, animationQuality: 'high', frameLimit: 60, adaptiveQuality: true });
+export const DEFAULT_SETTINGS = Object.freeze({ keys: DEFAULT_HOTKEYS, shopItemLeft: false, bgm: 0.6, sfx: 0.8, voice: 0.6, voiceLanguage: 'kr', voiceOverrides: Object.freeze({}), textSize: 'sm', chatVolume: 0.5, chatSound: 'emote', chatSoundCustomized: false, chatFactionNotifications: false, chatCooldown: defaultChatCooldown('emote'), muted: false, damageNumbers: true, damageNumberMode: 'basic', officialDamageNumbers:false, ammoCount:false, quality: 'high', mapQuality: 'high', renderScale: 1, effectsQuality: 'high', shadows: true, skillRanges: true, unitRanges: true, animationQuality: 'high', frameLimit: 60, adaptiveQuality: true });
 const QUALITIES = ['high', 'medium', 'low'];
 
 /**
@@ -1754,6 +1754,7 @@ export function sanitizeSettings(raw) {
     voiceLanguage: VOICE_LANGS.includes(r.voiceLanguage)?r.voiceLanguage:'kr',
     muted: typeof r.muted === 'boolean' ? r.muted : DEFAULT_SETTINGS.muted,
     officialDamageNumbers:r.officialDamageNumbers===true,
+    ammoCount:r.ammoCount===true,
     damageNumbers: damageNumberMode(r) !== 'none',
     damageNumberMode: DAMAGE_NUMBER_MODES.includes(r.damageNumberMode) || typeof r.damageNumbers === 'boolean' ? damageNumberMode(r) : DEFAULT_SETTINGS.damageNumberMode,
     quality: QUALITIES.includes(r.quality) ? r.quality : DEFAULT_SETTINGS.quality,
@@ -1852,6 +1853,7 @@ export function normalizeResult(res, pub) {
  */
 export { chessLoadout, unitCultivation } from './gameLogic/loadout.js';
 export { standInLoadout, standInOf } from './gameLogic/standIn.js';
+export { roundStartReplay, deployOrder } from './gameLogic/phases.js';
 export { ownDiyPick, ownDiyRecord, cardDiy } from './gameLogic/diy.js';
 
 /**

@@ -356,4 +356,4 @@
 .seats--eight{grid-template-columns:repeat(4,minmax(0,3.8rem));grid-template-rows:repeat(2,minmax(0,1fr));align-content:stretch;gap:.15rem;padding-top:.15rem}
 .seats--eight .seat{padding:.1rem .15rem;gap:.04rem}
 .seats--eight .seat__art{min-height:.5rem;margin:0}
-.seats--eight .seat__name{font-size:.2rem}
+.seats--eight .seat__name{font-size:calc(.2 * var(--t))}

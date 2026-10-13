@@ -1,11 +1,11 @@
-import { LaboratoryScreen } from './ui/laboratory.js';
 import './ui/compat.js';
+import { LaboratoryScreen } from './ui/laboratory.js';
 import { StatsHost } from './screens/stats.js';
 import { recordResult, installStatsRecorder } from './ui/stats.js';
 
 
 import { t } from '../../shared/i18n.js';
-import { recordError } from './diag.js';
+import { recordError, installTrafficMeter } from './diag.js';
 // Client entry: boot (fonts, identity, socket), net → store wiring, router, global overlays.
 //
 // Router (derived from the store, no URL routes):
@@ -360,6 +360,8 @@ function installGlobalErrorHandlers() {
 
 async function boot() {
   installGlobalErrorHandlers();
+  // what this page downloads, by category, for the 问题反馈 report's traffic line (diag.js; nothing is sent anywhere)
+  installTrafficMeter();
   // touch / hover / fullscreen classes, zoom-gesture blocking, rotation re-layout (ui/device.js, css/devices.css)
   installDeviceSupport();
   // A page restored from the back/forward cache has a dead socket and a stale token choice: start over.

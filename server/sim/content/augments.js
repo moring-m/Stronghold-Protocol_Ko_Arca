@@ -65,12 +65,12 @@ export function install(b){
   const speed=clip?.dur>0?(attackInterval?clip.dur/interval:Math.max(1,Math.min(4,clip.dur/Math.max(.08,interval)))):1;
   const recovery=clip?.dur>0?Math.max(0,clip.dur-clip.hit)/speed:interval/2;
   const start=Math.max(b.time+recovery,u.mem.augmentAttackUntil||0),seq=u.deploySeq;
-  u.mem.augmentAttackUntil=start+.1;
+  u.mem.augmentAttackUntil=start+.2;
   const run=()=>{
    if(!u.alive||!u.deployed||u.deploySeq!==seq||!u.canAct)return;
    // An automatic skill cast triggered by this hit also retains its authored animation.
-   if(u.mem.skillCastUntil>b.time+1e-9){const wait=u.mem.skillCastUntil-b.time;u.mem.augmentAttackUntil=Math.max(u.mem.augmentAttackUntil,u.mem.skillCastUntil+.1);b.after(wait,run,{owner:u});return;}
-   b.forceAttack(u,null,{castImpact:true,attackInterval:.1});
+   if(u.mem.skillCastUntil>b.time+1e-9){const wait=u.mem.skillCastUntil-b.time;u.mem.augmentAttackUntil=Math.max(u.mem.augmentAttackUntil,u.mem.skillCastUntil+.2);b.after(wait,run,{owner:u});return;}
+   b.forceAttack(u,null,{castImpact:true,attackInterval:.2});
   };
   b.after(Math.max(b.dt,start-b.time),run,{owner:u});
  });

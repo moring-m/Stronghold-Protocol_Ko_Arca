@@ -21,7 +21,8 @@ import { applyNativeStageBlend } from './materials.js';
 // static crates (merged, same material),
 // decals (MT_autochess_common), fence pipes, blowers (merged, unlit), gate boxes (additive + alpha, merged per
 // material), cyan field edges, terrain overlays (≤ 4), background plane + its shadow catcher — ~12–16 in total.
-// An official scene replaces the tiles, glass, decals, pipes and background with one mesh per material and lightmap
+// An official scene replaces the tiles, glass, decals, pipes and background (all but the device slabs, layout.js
+// buckets.raised — GitHub #569) with one mesh per material and lightmap
 // page of the parts the built areas show (load.js mergeSceneChunks). Devices, gates, edges and terrain stay.
 // The key light's shadow map is rendered only when the geometry changes (autoUpdate off).
 
@@ -656,6 +657,7 @@ export class BoardScene {
     this.board = board;
     const M = this.meshes = {};
     this.official = !stage.coopEightStage && !stage.previewLayout && official && this._buildScene(official) ? official : null;
+    if(this.official){M.raised=this._mesh(board.buckets.raised,this.mat.board);M.raisedDecal=this._mesh(board.buckets.raisedDecal,this.mat.decal,{cast:false});}
     const borderSurfaces=[], borderSources=[], nativeParts=[];
     const candidate = this.official || this.mapQuality === 'low' ? null : this.pack?.original?.scenes?.[stage.originalStageId || stage.id];
     // Missing/invalid material metadata must retain the working reconstructed board.
