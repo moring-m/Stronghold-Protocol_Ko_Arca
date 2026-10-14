@@ -27,6 +27,7 @@ jobs:
           node-version: "24"
           cache: npm
       - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: node tools/vendor.mjs
       - name: Validate release routing and game-preservation behavior
         run: |
           node --test test/release/*.test.js test/ui/buildGuard.test.js
