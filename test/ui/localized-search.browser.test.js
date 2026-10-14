@@ -1,0 +1,8 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {existsSync} from 'node:fs';import {startServer} from '../../server/index.js';
+const chrome=process.env.CHROME_PATH||'/usr/bin/chromium';
+test('favorite and operator filters search Korean names and initials when records contain Chinese',{skip:process.env.SP_E2E!=='1'||!existsSync(chrome)},async()=>{
+ const fixture=`<!doctype html><meta charset="utf-8"><link rel="icon" href="data:,"><script type="module">import{filterFavoriteOperators}from'/js/ui/favorites.js';import{filterRoster}from'/js/ui/loadoutModel.js';import{tr}from'/js/i18n/i18n.js';const c={chessId:'test',name:'德克萨斯',profession:'PIONEER',tier:3,bonds:[]};window.results={translated:tr(c.name),favorites:['텍사스','ㅌㅅㅅ'].map(query=>filterFavoriteOperators([c],{query}).length),roster:['텍사스','ㅌㅅㅅ'].map(query=>filterRoster([c],{query}).length)};</script>`;
+ const s=await startServer({port:0,host:'127.0.0.1',quiet:true,assetIndex:false,handleRequest:(req,res)=>{if(req.url==='/fixture'){res.setHeader('Content-Type','text/html');res.end(fixture);return true;}return false;}});
+ const puppeteer=(await import('puppeteer-core')).default,browser=await puppeteer.launch({executablePath:chrome,args:['--no-sandbox','--disable-dev-shm-usage'],headless:true});
+ try{const page=await browser.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(s.url+'/fixture');await page.waitForFunction(()=>window.results);const result=await page.evaluate(()=>window.results);assert.equal(result.translated,'텍사스');assert.deepEqual(result.favorites,[1,1]);assert.deepEqual(result.roster,[1,1]);assert.deepEqual(errors,[]);}finally{await browser.close();await s.close();}
+});

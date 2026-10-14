@@ -924,8 +924,13 @@ export class SpineActor {
     }
 
     switch (this.mode) {
-      case 'attack':
-        if (this.clock > this.attackUntil) {
+      case 'attack': {
+        const track = this.spine.state.tracks[0];
+        // A single attack returns to rest only when its actual Spine timeline finishes.
+        // The predicted deadline can drift when wind-up/recovery speed changes.
+        const complete = track && !track.loop && this.current === this._attackClip()?.loop
+          ? track.trackTime >= this.dur(this.current) : this.clock > this.attackUntil;
+        if (complete) {
           if (this.pendingSkillEnd) {
             this.pendingSkillEnd = false;
             this.mode = 'base'; this.skillOn = true; this.setSkill(false);
@@ -946,6 +951,7 @@ export class SpineActor {
           else this._play(this._baseName(), true, { mix: 0.15 });
         }
         break;
+      }
       case 'attackRest':
         if (this.clock > this.attackPoseUntil || this.base === 'move') {
           this.mode = 'base';

@@ -16,7 +16,10 @@ export function normalizeRecruitPresets(raw){
  return {presets,active:presets.some(p=>p.id===raw?.active)?raw.active:presets[0]?.id||null};
 }
 export const recruitPresetStore=createStore({...normalizeRecruitPresets(loadPref(KEY,{})),open:false});
-function save(next){const clean=normalizeRecruitPresets(next);savePref(KEY,clean);recruitPresetStore.set(clean);}
+export function saveRecruitPresets(next){const clean=normalizeRecruitPresets(next),faction=store.get().chatFaction,linked=clean.presets.find(p=>p.faction===faction),old=recruitPresetStore.get().presets.find(p=>p.faction===faction);savePref(KEY,clean);recruitPresetStore.set(clean);if(faction&&linked&&linked.id!==old?.id)applyRecruitFaction(faction,{guardFaction:true}).catch(error=>toast(error.message,'warn'));}
+const save=saveRecruitPresets;
+let factionSyncSeq=0,factionRequest=null;
+if(typeof window!=='undefined'){let previousFaction=store.get().chatFaction,previousAllowed=canApplyRecruitPreset(store.get());store.subscribe(state=>{const faction=state.chatFaction,allowed=canApplyRecruitPreset(state);if(faction===previousFaction&&allowed===previousAllowed)return;previousFaction=faction;previousAllowed=allowed;if(!faction||!allowed){factionSyncSeq++;return;}applyRecruitFaction(faction,{guardFaction:true}).catch(error=>toast(error.message,'warn'));});}
 function capture(){return Object.fromEntries(Object.entries(loadoutStore.get().entries).filter(([id,e])=>data.lookup('chess',id)?.optionalRecruit&&e.selected).map(([id,e])=>[id,{...e}]));}
 export function applyRecruitPreset(id,state=store.get()) {
  if(!canApplyRecruitPreset(state))return {ok:false,locked:true};
@@ -28,14 +31,21 @@ export function applyRecruitPreset(id,state=store.get()) {
  if(!check.ok)return {ok:false,detail:check.detail};
  setEntries(next);save({...s,active:id});return {ok:true,name:p.name};
 }
-export async function applyRecruitFaction(faction){
+export function applyRecruitFaction(faction,{guardFaction=false}={}){
+ const linked=recruitPresetStore.get().presets.find(p=>p.faction===faction);
+ if(factionRequest?.faction===faction&&factionRequest?.id===linked?.id&&factionRequest.seq===factionSyncSeq)return factionRequest.promise;
+ const seq=++factionSyncSeq;
+ const promise=(async()=>{
  if(!faction||!canApplyRecruitPreset(store.get()))return null;
  const p=recruitPresetStore.get().presets.find(p=>p.faction===faction);if(!p)return null;
  await data.load('chess');
+ if(seq!==factionSyncSeq||(guardFaction&&(store.get().chatFaction!==faction||recruitPresetStore.get().presets.find(p=>p.faction===faction)?.id!==p.id)))return null;
  const result=applyRecruitPreset(p.id);
  if(!result.ok){if(!result.locked)toast('연결된 선발 프리셋을 적용하지 못했습니다. 단계별 선발 인원과 오퍼레이터 설정을 확인해주세요.','warn');return null;}
  await flushPendingLoadout();
  return result.name;
+})();
+ const request={faction,id:linked?.id,seq,promise:null};request.promise=promise.finally(()=>{if(factionRequest===request)factionRequest=null;});factionRequest=request;return request.promise;
 }
 export function RecruitPresetButton({size='sm',class:cls=''}={}){return html`<${Button} variant="secondary" size=${size} class=${cls} icon="users" onClick=${()=>recruitPresetStore.set({open:true})}>선발 프리셋<//>`;}
 export function RecruitPresetsHost(){

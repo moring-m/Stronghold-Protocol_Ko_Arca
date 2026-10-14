@@ -136,6 +136,11 @@ export class Unit {
     const prevMax = this._s ? this._s.maxHp : this.base.maxHp;
     const statBuffs = this.profile?.attackSpeedDebuffImmune ? this.buffs.map(buff => ({...buff,mods:buff.mods && {...buff.mods,aspd:Math.max(0,buff.mods.aspd ?? 0),batPct:Math.min(0,buff.mods.batPct ?? 0)}})) : this.buffs;
     const { add, mul, flags, shield, permRangeExtend } = aggregateMods(statBuffs);
+    // Some enemy kits switch to hit-count HP after the augment deploy hook ran.
+    // Exclude augment regeneration whenever that form is active, including transfers.
+    const augmentRegen = this.side === 'enemy' && (flags.hitCount || flags.hitCountArts)
+      ? this.buffs.reduce((sum, buff) => sum + (buff.key?.startsWith('augment:') && buff.key.endsWith(':regen') ? (buff.mods?.hpRegen || 0) : 0), 0)
+      : 0;
     const a = (k) => add[k] ?? 0;
     const m = (k) => mul[k] ?? 1;
     const b = this.base;
@@ -186,7 +191,7 @@ export class Unit {
       spRecovery: Math.max(0, fin((b.spRecovery + a('spRecoveryFlat')) * m('spRecoveryMul'), 0)),
       spCostFlat: a('spCostFlat'),
       redeployMul: m('redeployMul'),
-      hpRegen: fin(b.hpRecoveryPerSec + a('hpRegen') + a('hpRegenRatio') * maxHp, 0),
+      hpRegen: fin(b.hpRecoveryPerSec + a('hpRegen') - augmentRegen + a('hpRegenRatio') * maxHp, 0),
       shield,
       flags: flags || EMPTY,
     };

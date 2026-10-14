@@ -531,6 +531,7 @@ export class Match {
   _resync(ps) {
     const playerId = ps.playerId;
     this.sendTo(playerId, this.publicView());
+    if(ps.spectator&&this.augments.enabled)this.sendTo(playerId,this.augments.spectatorView());
     this.sendTo(playerId, {t:'m.chatHistory',messages:this.chatHistory,faction:ps.chatFaction});
     if (!this.ended) {
       if (!ps.spectator) {

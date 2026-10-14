@@ -30,6 +30,14 @@ test('removing individual augment exclusions preserves saved preset rules and we
  const {normalizeExtensionPresets}=await import('../../public/js/ui/customExtensionPresets.js');const [preset]=normalizeExtensionPresets([{id:'old',name:'기존 설정',selection:{bonds:[],stages:[],rules:['augments'],disabledAugments:['augment_ally_prism_51'],ruleValues:{augmentGold:3,augmentAllyRerolls:2}}}]);assert.ok(preset);assert.deepEqual(preset.selection.rules,['augments']);assert.equal(preset.selection.ruleValues.augmentGold,3);assert.equal(preset.selection.disabledAugments,undefined);
 });
 
-test('renamed augments and equipment descriptions use actual Korean item names, without harmony cards',async()=>{
- const {AUGMENT_ITEM_NAMES}=await import('../../shared/augmentItemNames.js');for(const round of[4,7,10]){const catalog=createAugmentCatalog(data,round);assert.ok(catalog.some(a=>a.name==='아츠 마스터'));assert.ok(!catalog.some(a=>a.iconBond==='maniShip'||a.name.includes('조화')));assert.ok(!catalog.some(a=>['대마법사','영광스러운 진화'].includes(a.name)));for(const a of catalog.filter(a=>a.id.includes('equipment_')))for(const id of a.effect.items)assert.ok(a.description.includes(AUGMENT_ITEM_NAMES[id]||data.items[id].name),a.description);const sword=catalog.find(a=>a.name==='소드마스터');assert.ok(!sword.description.includes('간격'));assert.ok(sword.iconBond==null);assert.equal(augmentView(sword).icon,'/assets/custom/augments/g_char_atk_p1.png');}assert.ok(createAugmentCatalog(data,4).some(a=>a.name==='이샤믈라의 축복'));
+test('renamed augments and equipment descriptions use actual Korean item names, without harmony support cards',async()=>{
+ const {AUGMENT_ITEM_NAMES}=await import('../../shared/augmentItemNames.js');for(const round of[4,7,10]){const catalog=createAugmentCatalog(data,round);assert.ok(catalog.some(a=>a.name==='아츠 마스터'));assert.deepEqual(catalog.filter(a=>a.name.includes('조화')).map(a=>a.name),['조화']);assert.equal(catalog.find(a=>a.name==='조화').iconBond,'maniShip');assert.ok(!catalog.some(a=>['대마법사','영광스러운 진화'].includes(a.name)));for(const a of catalog.filter(a=>a.id.includes('equipment_')))for(const id of a.effect.items)assert.ok(a.description.includes(AUGMENT_ITEM_NAMES[id]||data.items[id].name),a.description);const sword=catalog.find(a=>a.name==='소드마스터');assert.ok(!sword.description.includes('간격'));assert.ok(sword.iconBond==null);assert.equal(augmentView(sword).icon,'/assets/custom/augments/g_char_atk_p1.png');}assert.ok(createAugmentCatalog(data,4).some(a=>a.name==='이샤믈라의 축복'));
+});
+
+test('every offered augment has an indexed or local icon, including newly added effects',()=>{
+ const manifest=JSON.parse(readFileSync('content/production/data/assets.json')),indexed=new Set(JSON.parse(readFileSync('content/production/resources.json')).files.map(f=>f.path));
+ for(const round of [4,7,10])for(const a of createAugmentCatalog(data,round)){
+  const v=augmentView(a),path=v.iconBond?manifest.bonds[v.iconBond]:v.icon;assert.ok(path,a.name);
+  if(!indexed.has(path))assert.ok(readFileSync('public'+path).length>0,a.name);
+ }
 });

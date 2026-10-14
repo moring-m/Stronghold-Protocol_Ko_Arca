@@ -120,6 +120,6 @@ export function EnemyDrawer({ tab, onTab, pub, priv, onClose, onEnemy, onChess, 
       <${Tabs} size="sm" value=${tab} onChange=${onTab} items=${[{ id: 'info', label: '本局信息' }, { id: 'enemies', label: '敌方情报' }, {id:'custom',label:'커스텀 설정'},...(pub.augments?[{id:'augments',label:'적 증강'}]:[])]} />
       <button type="button" class="edrawer__close tapx" aria-label="关闭" onClick=${onClose}><${Icon} name="close" /></button>
     </div>
-    ${tab === 'augments' ? html`<${EnemyAugments} pub=${pub}/>` : tab === 'custom' ? html`<${CustomSettingsInfo} pub=${pub}/>` : tab === 'info' ? html`<${InfoTab} pub=${pub} priv=${priv} onChess=${onChess} bandId=${bandId} bandOwner=${bandOwner} />` : html`<${EnemiesTab} pub=${pub} priv=${priv} onEnemy=${onEnemy} />`}
+    ${tab === 'augments' ? html`<div class="edrawer__body"><${EnemyAugments} pub=${pub}/></div>` : tab === 'custom' ? html`<div class="edrawer__body"><${CustomSettingsInfo} pub=${pub}/></div>` : tab === 'info' ? html`<${InfoTab} pub=${pub} priv=${priv} onChess=${onChess} bandId=${bandId} bandOwner=${bandOwner} />` : html`<${EnemiesTab} pub=${pub} priv=${priv} onEnemy=${onEnemy} />`}
   </div>`;
 }

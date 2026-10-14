@@ -2,6 +2,7 @@
 export const AUGMENT_SOURCES = [
  {
   "source": 1,
+  "identity": 1,
   "grade": "silver",
   "name": "(맹약 이름) 지원 I",
   "rounds": [
@@ -13,6 +14,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 2,
+  "identity": 1,
   "grade": "silver",
   "name": "(맹약 이름) 지원 I",
   "rounds": [
@@ -24,6 +26,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 3,
+  "identity": 1,
   "grade": "silver",
   "name": "(맹약 이름) 지원 I",
   "rounds": [
@@ -35,6 +38,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 4,
+  "identity": 4,
   "grade": "silver",
   "name": "공격력 증가 I",
   "rounds": [
@@ -48,6 +52,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 5,
+  "identity": 5,
   "grade": "silver",
   "name": "HP 증가 I",
   "rounds": [
@@ -61,6 +66,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 6,
+  "identity": 6,
   "grade": "silver",
   "name": "방어력 증가 I",
   "rounds": [
@@ -74,6 +80,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 7,
+  "identity": 7,
   "grade": "silver",
   "name": "마법 저항 증가 I",
   "rounds": [
@@ -87,6 +94,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 8,
+  "identity": 8,
   "grade": "silver",
   "name": "공격 속도 증가 I",
   "rounds": [
@@ -100,6 +108,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 9,
+  "identity": 9,
   "grade": "silver",
   "name": "SP 회복 증가 I",
   "rounds": [
@@ -113,6 +122,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 10,
+  "identity": 10,
   "grade": "silver",
   "name": "도박 I",
   "rounds": [
@@ -125,6 +135,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 11,
+  "identity": 11,
   "grade": "silver",
   "name": "새로고침 지원 I",
   "rounds": [
@@ -138,6 +149,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 12,
+  "identity": 12,
   "grade": "silver",
   "name": "감속 I",
   "rounds": [
@@ -151,6 +163,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 13,
+  "identity": 13,
   "grade": "silver",
   "name": "약화 I",
   "rounds": [
@@ -164,6 +177,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 14,
+  "identity": 14,
   "grade": "silver",
   "name": "(맹약 이름) 장비 지원 I",
   "rounds": [
@@ -177,6 +191,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 15,
+  "identity": 15,
   "grade": "gold",
   "name": "(맹약 이름) 지원 II",
   "rounds": [
@@ -188,6 +203,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 16,
+  "identity": 15,
   "grade": "gold",
   "name": "(맹약 이름) 지원 II",
   "rounds": [
@@ -199,6 +215,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 17,
+  "identity": 15,
   "grade": "gold",
   "name": "(맹약 이름) 지원 II",
   "rounds": [
@@ -210,6 +227,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 18,
+  "identity": 18,
   "grade": "gold",
   "name": "공격력 증가 II",
   "rounds": [
@@ -223,6 +241,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 19,
+  "identity": 19,
   "grade": "gold",
   "name": "HP 증가 II",
   "rounds": [
@@ -236,6 +255,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 20,
+  "identity": 20,
   "grade": "gold",
   "name": "방어력 증가 II",
   "rounds": [
@@ -249,6 +269,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 21,
+  "identity": 21,
   "grade": "gold",
   "name": "마법 저항 증가 II",
   "rounds": [
@@ -262,6 +283,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 22,
+  "identity": 22,
   "grade": "gold",
   "name": "공격 속도 증가 II",
   "rounds": [
@@ -275,6 +297,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 23,
+  "identity": 23,
   "grade": "gold",
   "name": "SP 회복 증가 II",
   "rounds": [
@@ -288,6 +311,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 24,
+  "identity": 24,
   "grade": "gold",
   "name": "도박 II",
   "rounds": [
@@ -300,6 +324,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 25,
+  "identity": 25,
   "grade": "gold",
   "name": "새로고침 지원 II",
   "rounds": [
@@ -313,6 +338,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 26,
+  "identity": 26,
   "grade": "gold",
   "name": "감속 II",
   "rounds": [
@@ -326,6 +352,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 27,
+  "identity": 27,
   "grade": "gold",
   "name": "약화 II",
   "rounds": [
@@ -339,6 +366,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 28,
+  "identity": 28,
   "grade": "gold",
   "name": "(맹약 이름) 장비 지원 II",
   "rounds": [
@@ -351,6 +379,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 29,
+  "identity": 29,
   "grade": "gold",
   "name": "신속 I",
   "rounds": [
@@ -364,6 +393,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 30,
+  "identity": 30,
   "grade": "gold",
   "name": "기습 I",
   "rounds": [
@@ -372,11 +402,12 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "ally",
-  "description": "모든 아군 오퍼레이터가 배치 후 10초 동안 공격 속도 +40",
+  "description": "모든 아군 오퍼레이터가 배치 후 30초 동안 공격 속도 +40",
   "notes": ""
  },
  {
   "source": 31,
+  "identity": 31,
   "grade": "gold",
   "name": "정밀 I",
   "rounds": [
@@ -390,6 +421,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 32,
+  "identity": 32,
   "grade": "prism",
   "name": "(맹약 이름) 지원 III",
   "rounds": [
@@ -401,6 +433,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 33,
+  "identity": 32,
   "grade": "prism",
   "name": "(맹약 이름) 지원 III",
   "rounds": [
@@ -412,6 +445,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 34,
+  "identity": 32,
   "grade": "prism",
   "name": "(맹약 이름) 지원 III",
   "rounds": [
@@ -423,6 +457,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 35,
+  "identity": 35,
   "grade": "prism",
   "name": "공격력 증가 III",
   "rounds": [
@@ -436,6 +471,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 36,
+  "identity": 36,
   "grade": "prism",
   "name": "HP 증가 III",
   "rounds": [
@@ -449,6 +485,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 37,
+  "identity": 37,
   "grade": "prism",
   "name": "방어력 증가 III",
   "rounds": [
@@ -462,6 +499,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 38,
+  "identity": 38,
   "grade": "prism",
   "name": "마법 저항 증가 III",
   "rounds": [
@@ -475,6 +513,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 39,
+  "identity": 39,
   "grade": "prism",
   "name": "공격 속도 증가 III",
   "rounds": [
@@ -488,6 +527,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 40,
+  "identity": 40,
   "grade": "prism",
   "name": "SP 회복 증가 III",
   "rounds": [
@@ -501,6 +541,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 41,
+  "identity": 41,
   "grade": "prism",
   "name": "도박 III",
   "rounds": [
@@ -513,6 +554,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 42,
+  "identity": 42,
   "grade": "prism",
   "name": "새로고침 지원 III",
   "rounds": [
@@ -526,6 +568,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 43,
+  "identity": 43,
   "grade": "prism",
   "name": "감속 III",
   "rounds": [
@@ -539,6 +582,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 44,
+  "identity": 44,
   "grade": "prism",
   "name": "약화 III",
   "rounds": [
@@ -552,6 +596,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 45,
+  "identity": 45,
   "grade": "prism",
   "name": "(맹약 이름) 장비 지원 III",
   "rounds": [
@@ -564,6 +609,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 46,
+  "identity": 46,
   "grade": "prism",
   "name": "신속 II",
   "rounds": [
@@ -577,6 +623,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 47,
+  "identity": 47,
   "grade": "prism",
   "name": "기습 II",
   "rounds": [
@@ -585,11 +632,12 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "ally",
-  "description": "모든 아군 오퍼레이터가 배치 후 10초 동안 공격 속도 +80",
+  "description": "모든 아군 오퍼레이터가 배치 후 30초 동안 공격 속도 +80",
   "notes": ""
  },
  {
   "source": 48,
+  "identity": 48,
   "grade": "prism",
   "name": "정밀 II",
   "rounds": [
@@ -603,6 +651,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 49,
+  "identity": 49,
   "grade": "prism",
   "name": "약점 공격",
   "rounds": [
@@ -616,6 +665,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 50,
+  "identity": 50,
   "grade": "prism",
   "name": "아츠 마스터",
   "rounds": [
@@ -629,6 +679,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 51,
+  "identity": 51,
   "grade": "prism",
   "name": "소드마스터",
   "rounds": [
@@ -637,11 +688,12 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "ally",
-  "description": "모든 아군 유닛이 공격 시 35% 확률로 추가 공격",
+  "description": "모든 아군 유닛이 공격 시 33% 확률로 추가 공격",
   "notes": "발동이 되면, 해당 공격 이후 추가 공격 즉시 진행, 추가 공격으로도 이 효과가 발동할 수 있음."
  },
  {
   "source": 52,
+  "identity": 52,
   "grade": "prism",
   "name": "페가수스",
   "rounds": [
@@ -653,6 +705,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 53,
+  "identity": 53,
   "grade": "prism",
   "name": "이샤믈라의 축복",
   "rounds": [
@@ -664,6 +717,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 54,
+  "identity": 54,
   "grade": "prism",
   "name": "신병",
   "rounds": [
@@ -676,6 +730,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 55,
+  "identity": 55,
   "grade": "prism",
   "name": "뮤엘시스의 지원",
   "rounds": [
@@ -689,8 +744,9 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 56,
+  "identity": 56,
   "grade": "prism",
-  "name": "정예화",
+  "name": "박사의 머리",
   "rounds": [
    4,
    7,
@@ -702,6 +758,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 57,
+  "identity": 57,
   "grade": "prism",
   "name": "인력사무소",
   "rounds": [
@@ -714,6 +771,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 58,
+  "identity": 58,
   "grade": "prism",
   "name": "대발견",
   "rounds": [
@@ -727,8 +785,9 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 59,
+  "identity": 59,
   "grade": "prism",
-  "name": "알뜰살뜰",
+  "name": "알뜰살뜰 II",
   "rounds": [
    4
   ],
@@ -738,17 +797,19 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 60,
+  "identity": 60,
   "grade": "prism",
   "name": "예견",
   "rounds": [
    10
   ],
   "side": "ally",
-  "description": "상점에 등장하는 모든 오퍼레이터의 가격 -1",
+  "description": "상점에 등장하는 3등급 이하 오퍼레이터의 가격 -1",
   "notes": ""
  },
  {
   "source": 61,
+  "identity": 61,
   "grade": "prism",
   "name": "사르곤",
   "rounds": [
@@ -756,11 +817,12 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "ally",
-  "description": "오퍼레이터가 스킬 발동 시 모든 오퍼레이터의 공격 속도 +12 (최대 +300), 10초간 지속 (각 중첩별 지속 시간은 독립 계산)",
+  "description": "오퍼레이터가 스킬 발동 시 모든 오퍼레이터의 공격 속도 +12 (최대 +300), 15초간 지속 (각 중첩별 지속 시간은 독립 계산)",
   "notes": ""
  },
  {
   "source": 62,
+  "identity": 62,
   "grade": "prism",
   "name": "헤드헌팅",
   "rounds": [
@@ -772,6 +834,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 63,
+  "identity": 63,
   "grade": "prism",
   "name": "부식",
   "rounds": [
@@ -783,6 +846,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 64,
+  "identity": 64,
   "grade": "silver",
   "name": "공격력 증가 I",
   "rounds": [
@@ -796,6 +860,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 65,
+  "identity": 65,
   "grade": "silver",
   "name": "HP 증가 I",
   "rounds": [
@@ -809,6 +874,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 66,
+  "identity": 66,
   "grade": "silver",
   "name": "방어력 증가 I",
   "rounds": [
@@ -822,6 +888,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 67,
+  "identity": 67,
   "grade": "silver",
   "name": "마법 저항 증가 I",
   "rounds": [
@@ -835,6 +902,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 68,
+  "identity": 68,
   "grade": "silver",
   "name": "공격 속도 증가 I",
   "rounds": [
@@ -848,6 +916,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 69,
+  "identity": 69,
   "grade": "silver",
   "name": "이동 속도 증가 I",
   "rounds": [
@@ -861,6 +930,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 70,
+  "identity": 70,
   "grade": "silver",
   "name": "원소 피해 증가 I",
   "rounds": [
@@ -874,6 +944,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 71,
+  "identity": 71,
   "grade": "silver",
   "name": "실드 I",
   "rounds": [
@@ -887,6 +958,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 72,
+  "identity": 72,
   "grade": "silver",
   "name": "상태이상 증가 I",
   "rounds": [
@@ -900,6 +972,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 73,
+  "identity": 73,
   "grade": "silver",
   "name": "재생 I",
   "rounds": [
@@ -913,6 +986,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 74,
+  "identity": 74,
   "grade": "silver",
   "name": "극복",
   "rounds": [
@@ -926,6 +1000,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 75,
+  "identity": 75,
   "grade": "gold",
   "name": "공격력 증가 II",
   "rounds": [
@@ -939,6 +1014,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 76,
+  "identity": 76,
   "grade": "gold",
   "name": "HP 증가 II",
   "rounds": [
@@ -952,6 +1028,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 77,
+  "identity": 77,
   "grade": "gold",
   "name": "방어력 증가 II",
   "rounds": [
@@ -965,6 +1042,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 78,
+  "identity": 78,
   "grade": "gold",
   "name": "마법 저항 증가 II",
   "rounds": [
@@ -978,6 +1056,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 79,
+  "identity": 79,
   "grade": "gold",
   "name": "공격 속도 증가 II",
   "rounds": [
@@ -991,6 +1070,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 80,
+  "identity": 80,
   "grade": "gold",
   "name": "이동 속도 증가 II",
   "rounds": [
@@ -1004,6 +1084,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 81,
+  "identity": 81,
   "grade": "gold",
   "name": "원소 피해 증가 II",
   "rounds": [
@@ -1017,6 +1098,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 82,
+  "identity": 82,
   "grade": "gold",
   "name": "실드 II",
   "rounds": [
@@ -1030,6 +1112,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 83,
+  "identity": 83,
   "grade": "gold",
   "name": "상태이상 증가 II",
   "rounds": [
@@ -1043,6 +1126,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 84,
+  "identity": 84,
   "grade": "gold",
   "name": "재생 II",
   "rounds": [
@@ -1056,6 +1140,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 85,
+  "identity": 85,
   "grade": "prism",
   "name": "공격력 증가 III",
   "rounds": [
@@ -1069,6 +1154,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 86,
+  "identity": 86,
   "grade": "prism",
   "name": "HP 증가 III",
   "rounds": [
@@ -1082,6 +1168,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 87,
+  "identity": 87,
   "grade": "prism",
   "name": "방어력 증가 III",
   "rounds": [
@@ -1095,6 +1182,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 88,
+  "identity": 88,
   "grade": "prism",
   "name": "마법 저항 증가 III",
   "rounds": [
@@ -1108,6 +1196,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 89,
+  "identity": 89,
   "grade": "prism",
   "name": "공격 속도 증가 III",
   "rounds": [
@@ -1121,6 +1210,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 90,
+  "identity": 90,
   "grade": "prism",
   "name": "이동 속도 증가 III",
   "rounds": [
@@ -1134,6 +1224,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 91,
+  "identity": 91,
   "grade": "prism",
   "name": "원소 피해 증가 III",
   "rounds": [
@@ -1147,6 +1238,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 92,
+  "identity": 92,
   "grade": "prism",
   "name": "실드 III",
   "rounds": [
@@ -1160,6 +1252,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 93,
+  "identity": 93,
   "grade": "prism",
   "name": "상태이상 증가 III",
   "rounds": [
@@ -1173,6 +1266,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 94,
+  "identity": 94,
   "grade": "prism",
   "name": "재생 III",
   "rounds": [
@@ -1186,6 +1280,7 @@ export const AUGMENT_SOURCES = [
  },
  {
   "source": 95,
+  "identity": 95,
   "grade": "prism",
   "name": "돌파",
   "rounds": [
@@ -1196,5 +1291,538 @@ export const AUGMENT_SOURCES = [
   "side": "enemy",
   "description": "적이 방어 포인트 진입 시 차감되는 HP +1",
   "notes": "HP 감소 제한을 초과하지는 않음"
+ },
+ {
+  "source": 96,
+  "identity": 96,
+  "grade": "prism",
+  "name": "시라쿠사",
+  "rounds": [
+   7,
+   10
+  ],
+  "side": "ally",
+  "description": "모든 오퍼레이터가 은신 획득",
+  "notes": ""
+ },
+ {
+  "source": 97,
+  "identity": 97,
+  "grade": "gold",
+  "name": "카란의 눈",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "ally",
+  "description": "모든 적의 은신 무효화",
+  "notes": "자신의 전투에만 적용, 연합방어와 보스전에는 적용되지 않음"
+ },
+ {
+  "source": 98,
+  "identity": 98,
+  "grade": "silver",
+  "name": "회피 I",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "ally",
+  "description": "모든 아군 유닛의 물리/마법 회피 +25%",
+  "notes": ""
+ },
+ {
+  "source": 99,
+  "identity": 99,
+  "grade": "gold",
+  "name": "회피 II",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "ally",
+  "description": "모든 아군 유닛의 물리/마법 회피 +35%",
+  "notes": ""
+ },
+ {
+  "source": 100,
+  "identity": 100,
+  "grade": "prism",
+  "name": "회피 III",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "ally",
+  "description": "모든 아군 유닛의 물리/마법 회피 +50%",
+  "notes": ""
+ },
+ {
+  "source": 101,
+  "identity": 101,
+  "grade": "prism",
+  "name": "스타터 팩",
+  "rounds": [
+   4
+  ],
+  "side": "ally",
+  "description": "무작위 맹약의 무작위 1, 2, 3, 4단계 오퍼레이터 획득",
+  "notes": "1단계 1명, 2단계 1명....4단계 1명 이렇게 줘야 하고, 각 단계가 모두 있는 맹약만 선택될 수 있어야 함."
+ },
+ {
+  "source": 102,
+  "identity": 101,
+  "grade": "prism",
+  "name": "스타터 팩",
+  "rounds": [
+   7
+  ],
+  "side": "ally",
+  "description": "무작위 맹약의 무작위 1, 2, 3, 4, 5단계 오퍼레이터 획득",
+  "notes": "1단계 1명, 2단계 1명....5단계 1명 이렇게 줘야 하고, 각 단계가 모두 있는 맹약만 선택될 수 있어야 함."
+ },
+ {
+  "source": 103,
+  "identity": 101,
+  "grade": "prism",
+  "name": "스타터 팩",
+  "rounds": [
+   10
+  ],
+  "side": "ally",
+  "description": "무작위 맹약의 무작위 1, 2, 3, 4, 5, 6단계 오퍼레이터 획득",
+  "notes": "1단계 1명, 2단계 1명....6단계 1명 이렇게 줘야 하고, 각 단계가 모두 있는 맹약만 선택될 수 있어야 함."
+ },
+ {
+  "source": 104,
+  "identity": 104,
+  "grade": "gold",
+  "name": "조화",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "ally",
+  "description": "조화 활성화",
+  "notes": ""
+ },
+ {
+  "source": 105,
+  "identity": 105,
+  "grade": "silver",
+  "name": "중첩 I",
+  "rounds": [
+   4
+  ],
+  "side": "ally",
+  "description": "활성화된 모든 핵심 맹약 중첩 +8, 보조 맹약 중첩 +4",
+  "notes": "중첩을 쌓을 수 있는 맹약에만 적용"
+ },
+ {
+  "source": 106,
+  "identity": 105,
+  "grade": "silver",
+  "name": "중첩 I",
+  "rounds": [
+   7
+  ],
+  "side": "ally",
+  "description": "활성화된 모든 핵심 맹약 중첩 +16, 보조 맹약 중첩 +8",
+  "notes": "중첩을 쌓을 수 있는 맹약에만 적용"
+ },
+ {
+  "source": 107,
+  "identity": 105,
+  "grade": "silver",
+  "name": "중첩 I",
+  "rounds": [
+   10
+  ],
+  "side": "ally",
+  "description": "활성화된 모든 핵심 맹약 중첩 +24, 보조 맹약 중첩 +12",
+  "notes": "중첩을 쌓을 수 있는 맹약에만 적용"
+ },
+ {
+  "source": 108,
+  "identity": 108,
+  "grade": "gold",
+  "name": "중첩 II",
+  "rounds": [
+   4
+  ],
+  "side": "ally",
+  "description": "활성화된 모든 핵심 맹약 중첩 +12, 보조 맹약 중첩 +6",
+  "notes": "중첩을 쌓을 수 있는 맹약에만 적용"
+ },
+ {
+  "source": 109,
+  "identity": 108,
+  "grade": "gold",
+  "name": "중첩 II",
+  "rounds": [
+   7
+  ],
+  "side": "ally",
+  "description": "활성화된 모든 핵심 맹약 중첩 +20, 보조 맹약 중첩 +10",
+  "notes": "중첩을 쌓을 수 있는 맹약에만 적용"
+ },
+ {
+  "source": 110,
+  "identity": 108,
+  "grade": "gold",
+  "name": "중첩 II",
+  "rounds": [
+   10
+  ],
+  "side": "ally",
+  "description": "활성화된 모든 핵심 맹약 중첩 +30, 보조 맹약 중첩 +15",
+  "notes": "중첩을 쌓을 수 있는 맹약에만 적용"
+ },
+ {
+  "source": 111,
+  "identity": 111,
+  "grade": "prism",
+  "name": "중첩 III",
+  "rounds": [
+   4
+  ],
+  "side": "ally",
+  "description": "활성화된 모든 핵심 맹약 중첩 +20, 보조 맹약 중첩 +10",
+  "notes": "중첩을 쌓을 수 있는 맹약에만 적용"
+ },
+ {
+  "source": 112,
+  "identity": 111,
+  "grade": "prism",
+  "name": "중첩 III",
+  "rounds": [
+   7
+  ],
+  "side": "ally",
+  "description": "활성화된 모든 핵심 맹약 중첩 +32, 보조 맹약 중첩 +16",
+  "notes": "중첩을 쌓을 수 있는 맹약에만 적용"
+ },
+ {
+  "source": 113,
+  "identity": 111,
+  "grade": "prism",
+  "name": "중첩 III",
+  "rounds": [
+   10
+  ],
+  "side": "ally",
+  "description": "활성화된 모든 핵심 맹약 중첩 +48, 보조 맹약 중첩 +24",
+  "notes": "중첩을 쌓을 수 있는 맹약에만 적용"
+ },
+ {
+  "source": 114,
+  "identity": 114,
+  "grade": "silver",
+  "name": "무사 I",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "ally",
+  "description": "오퍼레이터가 공격할 때마다 HP 30 회복",
+  "notes": ""
+ },
+ {
+  "source": 115,
+  "identity": 115,
+  "grade": "gold",
+  "name": "무사 II",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "ally",
+  "description": "오퍼레이터가 공격할 때마다 HP 50 회복",
+  "notes": ""
+ },
+ {
+  "source": 116,
+  "identity": 116,
+  "grade": "prism",
+  "name": "무사 III",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "ally",
+  "description": "오퍼레이터가 공격할 때마다 HP 80 회복",
+  "notes": ""
+ },
+ {
+  "source": 117,
+  "identity": 117,
+  "grade": "gold",
+  "name": "알뜰살뜰 I",
+  "rounds": [
+   4
+  ],
+  "side": "ally",
+  "description": "라운드마다 추가로 자금 2 획득",
+  "notes": ""
+ },
+ {
+  "source": 118,
+  "identity": 118,
+  "grade": "silver",
+  "name": "아군 공격력 감소 I",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "enemy",
+  "description": "모든 아군 유닛의 공격력 -10%",
+  "notes": ""
+ },
+ {
+  "source": 119,
+  "identity": 119,
+  "grade": "silver",
+  "name": "아군 HP 감소 I",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "enemy",
+  "description": "모든 아군 유닛의 최대 HP -10%",
+  "notes": ""
+ },
+ {
+  "source": 120,
+  "identity": 120,
+  "grade": "silver",
+  "name": "아군 방어력 감소 I",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "enemy",
+  "description": "모든 아군 유닛의 방어력 -10%",
+  "notes": ""
+ },
+ {
+  "source": 121,
+  "identity": 121,
+  "grade": "silver",
+  "name": "아군 마법 저항 감소 I",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "enemy",
+  "description": "모든 아군 유닛의 마법 저항 -8",
+  "notes": ""
+ },
+ {
+  "source": 122,
+  "identity": 122,
+  "grade": "silver",
+  "name": "아군 공격 속도 감소 I",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "enemy",
+  "description": "모든 아군 유닛의 공격속도 -10",
+  "notes": ""
+ },
+ {
+  "source": 123,
+  "identity": 123,
+  "grade": "silver",
+  "name": "아군 지속 피해 I",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "enemy",
+  "description": "모든 아군 유닛이 초당 10의 HP 감소",
+  "notes": ""
+ },
+ {
+  "source": 124,
+  "identity": 124,
+  "grade": "gold",
+  "name": "아군 공격력 감소 II",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "enemy",
+  "description": "모든 아군 유닛의 공격력 -20%",
+  "notes": ""
+ },
+ {
+  "source": 125,
+  "identity": 125,
+  "grade": "gold",
+  "name": "아군 HP 감소 II",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "enemy",
+  "description": "모든 아군 유닛의 최대 HP -20%",
+  "notes": ""
+ },
+ {
+  "source": 126,
+  "identity": 126,
+  "grade": "gold",
+  "name": "아군 방어력 감소 II",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "enemy",
+  "description": "모든 아군 유닛의 방어력 -20%",
+  "notes": ""
+ },
+ {
+  "source": 127,
+  "identity": 127,
+  "grade": "gold",
+  "name": "아군 마법 저항 감소 II",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "enemy",
+  "description": "모든 아군 유닛의 마법 저항 -15",
+  "notes": ""
+ },
+ {
+  "source": 128,
+  "identity": 128,
+  "grade": "gold",
+  "name": "아군 공격 속도 감소 II",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "enemy",
+  "description": "모든 아군 유닛의 공격속도 -20",
+  "notes": ""
+ },
+ {
+  "source": 129,
+  "identity": 129,
+  "grade": "gold",
+  "name": "아군 지속 피해 II",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "enemy",
+  "description": "모든 아군 유닛이 초당 20의 HP 감소",
+  "notes": ""
+ },
+ {
+  "source": 130,
+  "identity": 130,
+  "grade": "prism",
+  "name": "아군 공격력 감소 III",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "enemy",
+  "description": "모든 아군 유닛의 공격력 -30%",
+  "notes": ""
+ },
+ {
+  "source": 131,
+  "identity": 131,
+  "grade": "prism",
+  "name": "아군 HP 감소 III",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "enemy",
+  "description": "모든 아군 유닛의 최대 HP -30%",
+  "notes": ""
+ },
+ {
+  "source": 132,
+  "identity": 132,
+  "grade": "prism",
+  "name": "아군 방어력 감소 III",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "enemy",
+  "description": "모든 아군 유닛의 방어력 -30%",
+  "notes": ""
+ },
+ {
+  "source": 133,
+  "identity": 133,
+  "grade": "prism",
+  "name": "아군 마법 저항 감소 III",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "enemy",
+  "description": "모든 아군 유닛의 마법 저항 -30",
+  "notes": ""
+ },
+ {
+  "source": 134,
+  "identity": 134,
+  "grade": "prism",
+  "name": "아군 공격 속도 감소 III",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "enemy",
+  "description": "모든 아군 유닛의 공격속도 -30",
+  "notes": ""
+ },
+ {
+  "source": 135,
+  "identity": 135,
+  "grade": "prism",
+  "name": "아군 지속 피해 III",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "enemy",
+  "description": "모든 아군 유닛이 초당 30의 HP 감소",
+  "notes": ""
  }
 ];

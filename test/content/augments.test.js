@@ -35,17 +35,17 @@ test('archmage SP cost rounds up after the forty-percent reduction and remains s
 test('enemy elemental damage and elemental buildup scale once, not twice',()=>{
  const {h,u,e}=fixture({enemies:[find('원소 피해 증가 III','enemy')]});const before=u.hp;h.b.dealDamage(e,u,{amount:100,type:'elemental'});close(before-u.hp,150);
 });
-test('deployment attack speed expires after ten seconds',()=>{
- const {h,u}=fixture({allies:[find('기습 I')]});close(u.s.aspd,140);h.run(10);close(u.s.aspd,100);
+for(const [name,aspd]of [['기습 I',140],['기습 II',180]])test(`${name} deployment attack speed lasts thirty seconds`,()=>{
+ const {h,u}=fixture({allies:[find(name)]});close(u.s.aspd,aspd);h.run(29);close(u.s.aspd,aspd);h.run(1);close(u.s.aspd,100);
 });
-test('extra attack launches at a 0.2-second interval and can recursively proc',()=>{
+test('extra attack launches at a 0.18-second interval and can recursively proc',()=>{
  const {h,u}=fixture({allies:[{id:'forced-extra',effect:{kind:'extraAttack',probability:1}}]});let attacks=0;h.b.on('attack',({attacker})=>{if(attacker===u)attacks++;});h.b.forceAttack(u);assert.equal(attacks,1);h.run(.69);assert.equal(attacks,2);h.run(.5);assert.ok(attacks>=4);u.alive=false;const stopped=attacks;h.run(.3);assert.equal(attacks,stopped);
 });
 
 test('skill SP recovery works while duration skills are active, and Sargon stacks expire individually',()=>{
  const skill={skillId:'test',spCost:30,initSp:0,spType:'INCREASE_WITH_TIME',skillType:'MANUAL',duration:25};
  const {h,u}=fixture({allies:[find('신속 I'),find('사르곤')],skill,content:'generic'});u.skill.gainSp(1000,'test');u.skill.activate('test');h.run(.05);assert.ok(u.skill.active);close(u.skill.sp,3);close(u.s.aspd,112);
- h.run(5);h.b.emit('skillStart',{unit:u});h.run(.05);close(u.s.aspd,124);h.run(5);close(u.s.aspd,112);h.run(5);close(u.s.aspd,100);
+ h.run(5);h.b.emit('skillStart',{unit:u});h.run(.05);close(u.s.aspd,124);h.run(10);close(u.s.aspd,112);h.run(5);close(u.s.aspd,100);
 });
 test('breakthrough includes enemies not yet spawned when the field is surrendered',()=>{
  const h=makeBattle({defs:{enemies:{enemy_test:enemyRec({key:'enemy_test',hp:100,lpr:1})}},content:'none',extraContent:[{install}],enemies:[{key:'enemy_test',time:50}],flags:{augments:{allies:{},enemies:[item(find('돌파','enemy'))]}},autoFinish:false});h.run(.1);h.b.forceEnd('surrender');const leaks=h.b.result().perPlayer.p1.leaked;assert.equal(leaks.length,1);assert.equal(leaks[0].lpr,2);
@@ -67,8 +67,8 @@ test('per-second recovery augments also recover attack and defensive SP types',(
 });
 
 test('swordmaster uses a thirty-five percent proc threshold',()=>{
- const augment=find('소드마스터');assert.equal(augment.effect.probability,.35);
- for(const [roll,expected]of [[.349,2],[.35,1]]){const {h,u}=fixture({allies:[augment]});let attacks=0;h.b.on('attack',({attacker})=>{if(attacker===u)attacks++;});h.b.rng=()=>roll;h.b.forceAttack(u);h.run(.69);assert.equal(attacks,expected);u.alive=false;}
+ const augment=find('소드마스터');assert.equal(augment.effect.probability,.33);
+ for(const [roll,expected]of [[.329,2],[.33,1]]){const {h,u}=fixture({allies:[augment]});let attacks=0;h.b.on('attack',({attacker})=>{if(attacker===u)attacks++;});h.b.rng=()=>roll;h.b.forceAttack(u);h.run(.69);assert.equal(attacks,expected);u.alive=false;}
 });
 
 test('extra attacks preserve the remaining normal-attack cooldown',()=>{
@@ -81,5 +81,29 @@ test('runtime enemies never advance the stage enemy counter but leaks retain HP 
 });
 
 test('swordmaster waits for the full current recovery and serializes each bonus animation',()=>{
- const {h,u}=fixture({allies:[{id:'queue',effect:{kind:'extraAttack',probability:1}}]});u.def={...u.def,attackTiming:{front:{attack:{dur:1,hit:.4}}}};const starts=[],emit=h.b._ev;h.b._ev=function(ev){if(ev[0]==='atkStart'&&ev[1]===u.id)starts.push({t:this.time,lead:ev[3],interval:ev[4]});return emit.call(this,ev);};const hit=h.b.time;h.b.forceAttack(u);h.run(.55);assert.equal(starts.length,0,'the original attack is still recovering');h.run(.45);assert.ok(starts.length>=2);assert.ok(starts[0].t>=hit+.6-1e-9,'the normal clip finishes before the bonus starts');assert.equal(starts[0].interval,.2);close(starts[0].lead,.08);for(let i=1;i<starts.length;i++)assert.ok(starts[i].t>=starts[i-1].t+.2-1e-9,'bonus clips never interrupt each other');u.alive=false;const stopped=starts.length;h.run(.5);assert.equal(starts.length,stopped);
+ const {h,u}=fixture({allies:[{id:'queue',effect:{kind:'extraAttack',probability:1}}]});u.def={...u.def,attackTiming:{front:{attack:{dur:1,hit:.4}}}};const starts=[],emit=h.b._ev;h.b._ev=function(ev){if(ev[0]==='atkStart'&&ev[1]===u.id)starts.push({t:this.time,lead:ev[3],interval:ev[4]});return emit.call(this,ev);};const hit=h.b.time;h.b.forceAttack(u);h.run(.55);assert.equal(starts.length,0,'the original attack is still recovering');h.run(.45);assert.ok(starts.length>=2);assert.ok(starts[0].t>=hit+.6-1e-9,'the normal clip finishes before the bonus starts');assert.equal(starts[0].interval,.18);close(starts[0].lead,.072);for(let i=1;i<starts.length;i++)assert.ok(starts[i].t>=starts[i-1].t+.18-1e-9,'bonus clips never interrupt each other');u.alive=false;const stopped=starts.length;h.run(.5);assert.equal(starts.length,stopped);
+});
+
+test('regeneration augments stop when an enemy becomes hit-count after deployment',()=>{
+ for(const flag of ['hitCount','hitCountArts']){
+  const {h,e}=fixture({enemies:[find('재생 III','enemy')]});
+  assert.ok(e.s.hpRegen>0);
+  h.b.addBuff(e,{key:'late-frequency',flags:{[flag]:true}});
+  assert.equal(e.s.hpRegen,0);
+  e.hp=e.s.maxHp-3;const hp=e.hp;h.run(1);assert.equal(e.hp,hp);
+ }
+});
+
+for(const [name,chance]of [['회피 I',.25],['회피 II',.35],['회피 III',.5]])test(`${name} grants the stated physical and magical dodge`,()=>{const {u}=fixture({allies:[find(name)]});close(u.s.dodgePhys,chance);close(u.s.dodgeArts,chance);});
+for(const [name,amount]of [['무사 I',30],['무사 II',50],['무사 III',80]])test(`${name} heals the operator once per attack`,()=>{const {h,u}=fixture({allies:[find(name)]});u.hp=500;h.b.forceAttack(u);close(u.hp,500+amount);});
+test('Siracusa augment grants stealth to operators and Karlans eye reveals only the personal field',async()=>{
+ const {enemyStealthed}=await import('../../server/sim/targeting.js');const {u}=fixture({allies:[find('시라쿠사')]});assert.equal(u.s.flags.stealth,true);
+ for(const kind of ['normal','unite','boss','hidden']){const {h,e}=fixture({kind,allies:[find('카란의 눈')]});h.b.addBuff(e,{key:'late-stealth',flags:{stealth:true}});assert.equal(enemyStealthed(e),kind!=='normal');}
+});
+
+for(const [tier,pct,res,aspd]of [['I',10,8,10],['II',20,15,20],['III',30,30,30]])test(`enemy allied reductions ${tier} apply to allies rather than enemies`,()=>{
+ const names=['공격력','HP','방어력','마법 저항','공격 속도'].map(n=>find(`아군 ${n} 감소 ${tier}`,'enemy'));const {u,e}=fixture({enemies:names});close(u.s.atk,100*(1-pct/100));close(u.s.maxHp,1000*(1-pct/100));close(u.s.def,100*(1-pct/100));close(u.s.res,Math.max(0,10-res));close(u.s.aspd,100-aspd);close(e.s.atk,100);close(e.s.maxHp,1e6);close(e.s.def,100);close(e.s.res,20);close(e.s.aspd,100);
+});
+for(const [tier,rate]of [['I',10],['II',20],['III',30]])test(`enemy allied drain ${tier} removes HP per second irrespective of defenses`,()=>{
+ const {h,u,e}=fixture({enemies:[find(`아군 지속 피해 ${tier}`,'enemy')]});h.b.addBuff(e,{key:'disarm-test',flags:{disarm:true}});h.b.addBuff(u,{key:'armor-test',mods:{defFlat:1e6,resFlat:90}});const before=u.hp;h.run(1);close(u.hp,before-rate);assert.ok(u.alive);
 });

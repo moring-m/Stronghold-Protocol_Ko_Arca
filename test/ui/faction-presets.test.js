@@ -103,3 +103,14 @@ test('every linkable chat faction selects its own preset regardless of faction l
  const active=favoritesStore.get().active;assert.equal(applyFavoriteFaction('협동방어'),null);assert.equal(favoritesStore.get().active,active);
  }finally{favoritesStore.set(before);}
 });
+
+test('restored chat faction activates the linked favorite preset without requiring another button click',async()=>{
+ const {store}=await import('../../public/js/store.js');const previous=store.get(),favorites=favoritesStore.get();
+ try{store.set({chatFaction:null});favoritesStore.set(normalizeFavorites({active:'a',presets:[{id:'a'},{id:'b',faction:'라이타니엔'}]}));store.set({chatFaction:'라이타니엔'});assert.equal(favoritesStore.get().active,'b');}
+ finally{store.set(previous);favoritesStore.set(favorites);}
+});
+test('linking a preset to the already selected faction immediately activates that preset',async()=>{
+ const {store}=await import('../../public/js/store.js'),{saveFavorites}=await import('../../public/js/ui/favorites.js');const previous=store.get(),favorites=favoritesStore.get();
+ try{store.set({chatFaction:'우르수스'});favoritesStore.set(normalizeFavorites({active:'a',presets:[{id:'a'},{id:'b'}]}));saveFavorites({active:'a',presets:[{id:'a'},{id:'b',faction:'우르수스'}]});assert.equal(favoritesStore.get().active,'b');saveFavorites({...favoritesStore.get(),active:'a'});assert.equal(favoritesStore.get().active,'a','manual preset selection remains possible');}
+ finally{store.set(previous);favoritesStore.set(favorites);}
+});

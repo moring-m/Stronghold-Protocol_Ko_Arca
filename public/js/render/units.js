@@ -1836,14 +1836,11 @@ export class UnitView {
     let cy = y - 4;
     if(this.noteText){this.noteText.visible=showBars&&this.noteStacks>0;this.noteText.scale.set(clamp(s/90,.65,1));this.noteText.position.set(x0-1+18*clamp(s/90,.65,1),cy-3);this.noteIcon.visible=this.noteText.visible;this.noteIcon.width=this.noteIcon.height=16*clamp(s/90,.65,1);this.noteIcon.position.set(x0-1,cy-3);}
     // HP
-    this.hpBg.visible = this.hpFill.visible = this.hpGhost.visible = showHp;
+    this.hpBg.visible = this.hpFill.visible = showHp;
+    this.hpGhost.visible = false;
     if (showHp) {
       const k = this.maxHp > 0 ? clamp(this.hp / this.maxHp, 0, 1) : 0;
-      if (this.ghostHp < this.hp) this.ghostHp = this.hp;
-      else this.ghostHp = Math.max(this.hp, this.ghostHp - this.maxHp * dt * 0.9);
-      const g = this.maxHp > 0 ? clamp(this.ghostHp / this.maxHp, 0, 1) : 0;
       this.hpBg.position.set(x0 - 1, cy); this.hpBg.width = bw + 2; this.hpBg.height = bh + 2;
-      this.hpGhost.position.set(x0, cy); this.hpGhost.width = bw * g; this.hpGhost.height = bh;
       this.hpFill.position.set(x0, cy); this.hpFill.width = bw * k; this.hpFill.height = bh;
       if (!this.isEnemy) this.hpFill.tint = COLORS.hpAlly;
     }
@@ -2287,7 +2284,8 @@ export class UnitView {
 
   _updateImpostor(sc, flip, tint, animDt, interval, held = false) {
     const P = this.P;
-    const atlas = this.ctx.impostors || null;
+    // Keep Spine stencil masks in a private target: they must not affect other slots or HUDs.
+    const atlas = this.actor.clipped && this.actor.clipOn ? null : this.ctx.impostors || null;
     if (!this.imp) {
       const sprite = new P.Sprite(P.Texture.EMPTY);
       if (this.actor.spine.parent) this.actor.spine.parent.removeChild(this.actor.spine);
@@ -2335,6 +2333,7 @@ export class UnitView {
 
   _renderImpostor(sc, atlas) {
     const P = this.P, R = this.ctx.renderer, imp = this.imp;
+    if(!atlas&&imp.slot){this.ctx.impostors?.free(imp.slot);imp.slot=null;}
     const box = this._impBox();
     const w = Math.max(8, Math.ceil(box.w * sc)), h = Math.max(8, Math.ceil(box.h * sc));
     const sp = this.actor.spine;

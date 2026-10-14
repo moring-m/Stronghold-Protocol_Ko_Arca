@@ -1,9 +1,11 @@
+import {tr} from '../i18n/i18n.js';
+import {matchesKoreanSearch} from '../../../shared/search.js';
 import {PresetFiles} from './presetFiles.js';
 import {CHAT_FACTIONS,chatFaction} from '../../../shared/chat.js';
 import {bindPresetFaction,normalizePresetFactions} from './factionPresetModel.js';
 import {useEffect,useState} from '../../vendor/hooks.module.js';
 import {html,Modal,Button,Icon} from './components.js';
-import {createStore,loadPref,savePref,useStore} from '../store.js';
+import {createStore,loadPref,savePref,useStore,store} from '../store.js';
 import {data} from '../data.js';
 import {Img} from './gameComponents.js';
 import {chessPortraitUrl,itemIconUrl,bondIconUrl} from './assetUrls.js';
@@ -13,8 +15,11 @@ export function normalizeFavorites(raw){
  return {presets,active:presets.some(p=>p.id===raw?.active)?raw.active:presets[0]?.id||null};
 }
 export const favoritesStore=createStore({...normalizeFavorites(loadPref(KEY,{})),open:false});
-function save(next){const clean=normalizeFavorites(next);savePref(KEY,clean);favoritesStore.set(clean);}
-export function applyFavoriteFaction(faction){const s=favoritesStore.get(),p=s.presets.find(p=>p.faction===faction);if(!faction||!p)return null;save({...s,active:p.id});return p.name;}
+export function saveFavorites(next){const clean=normalizeFavorites(next),faction=store.get().chatFaction,linked=clean.presets.find(p=>p.faction===faction),old=favoritesStore.get().presets.find(p=>p.faction===faction);if(faction&&linked&&linked.id!==old?.id)clean.active=linked.id;savePref(KEY,clean);favoritesStore.set(clean);}
+const save=saveFavorites;
+let previousFaction=store.get().chatFaction;
+store.subscribe(()=>{const faction=store.get().chatFaction;if(faction===previousFaction)return;previousFaction=faction;applyFavoriteFaction(faction);});
+export function applyFavoriteFaction(faction){const s=favoritesStore.get(),p=s.presets.find(p=>p.faction===faction);if(!faction||!p)return null;if(s.active!==p.id)save({...s,active:p.id});return p.name;}
 export function isFavorite(kind,id,getChess=(id)=>data.lookup('chess',id)){
  const s=favoritesStore.get(),p=s.presets.find(p=>p.id===s.active);if(!p)return false;
  const c=kind==='chess'?getChess(id):data.lookup('items',id);
@@ -22,14 +27,14 @@ export function isFavorite(kind,id,getChess=(id)=>data.lookup('chess',id)){
  return (kind==='chess'?p.operators:p.items).includes(c?.baseId||c?.chessId||id);
 }
 export function FavoritesButton({class:cls='',view='shop'}){if(view==='editor')return html`<${Button} variant="secondary" size="sm" icon="star" class=${`lo-favorites ${cls}`} onClick=${()=>favoritesStore.set({open:true})} title="선호 오퍼레이터·장비 프리셋">선호 프리셋<//>`;return html`<button type="button" class=${`toolbtn toolbtn--favorite toolbtn--icon ${cls}`} onClick=${()=>favoritesStore.set({open:true})} title="선호 프리셋" aria-label="선호 프리셋"><${Icon} name="star" /></button>`;}
-export function filterFavoriteOperators(rows,{query='',bond='',tier=''}={}) { return rows.filter(c=>c.globalReleased!==false&&!c.optionalRecruit&&String(c.name||'').toLowerCase().includes(query.toLowerCase())&&(!bond||(c.bonds||[]).includes(bond))&&(!tier||c.tier===Number(tier))); }
+export function filterFavoriteOperators(rows,{query='',bond='',tier=''}={}) { return rows.filter(c=>c.globalReleased!==false&&!c.optionalRecruit&&(matchesKoreanSearch(tr(c.name||''),query)||matchesKoreanSearch(c.name||'',query))&&(!bond||(c.bonds||[]).includes(bond))&&(!tier||c.tier===Number(tier))); }
 export function FavoritesHost(){
  const s=useStore(x=>x,Object.is,favoritesStore),[ready,setReady]=useState(false),[tab,setTab]=useState('operators'),[query,setQuery]=useState(''),[bond,setBond]=useState(''),[tier,setTier]=useState('');
  useEffect(()=>{if(s.open)Promise.all(['chess','items','bonds','assets','local'].map(k=>data.load(k))).then(()=>setReady(true));},[s.open]);
  if(!s.open)return null;
  const p=s.presets.find(p=>p.id===s.active),m=data.get('assets');
  const available=Object.values(data.get(tab==='operators'?'chess':'items')||{}).filter(c=>tab==='operators'?(c.globalReleased!==false&&!c.isGolden&&!c.isHidden&&!c.isDiy&&!c.optionalRecruit&&c.visible):(!c.isGolden&&!c.hideInShop&&!c.shopExcluded&&c.visible!==false));
- const rows=tab==='operators'?filterFavoriteOperators(available,{query,bond,tier}):available.filter(c=>String(c.name||'').toLowerCase().includes(query.toLowerCase()));
+ const rows=tab==='operators'?filterFavoriteOperators(available,{query,bond,tier}):available.filter(c=>(matchesKoreanSearch(tr(c.name||''),query)||matchesKoreanSearch(c.name||'',query)));
  const update=(patch)=>save({...s,presets:s.presets.map(x=>x.id===p.id?{...x,...patch}:x)});
  const create=()=>{const id=`fav-${Date.now()}-${Math.random().toString(36).slice(2,7)}`;save({...s,active:id,presets:[...s.presets,{id,name:`프리셋 ${s.presets.length+1}`,operators:[],items:[]}]});};
  return html`<${Modal} class="favorites-modal ui-editor" width="min(15rem,96vw)" open=${true} title="선호 오퍼레이터·장비" micro="FAVORITE PRESETS" onClose=${()=>favoritesStore.set({open:false})} actions=${html`<${Button} onClick=${()=>favoritesStore.set({open:false})}>닫기<//>`}>

@@ -453,7 +453,7 @@ export const C2S = {
   'g.art': { itemUid: isUid, row: (v) => isInt(v, 0, GEO.ROWS - 1), col: (v) => isInt(v, 0, GEO.COLS - 1), dir: isDir, $optional: ['dir'] },
   'g.destroy': { uid: isUid },
   'g.reward': { idx: (v) => isInt(v, 0, 5) },
-  'g.augmentPick': {eventId:isId,side:(v)=>v==='ally'||v==='enemy',idx:(v)=>isInt(v,0,2),cardId:isId},
+  'g.augmentPick': {eventId:isId,side:(v)=>v==='ally'||v==='enemy',idx:(v)=>isInt(v,0,3),cardId:isId},
   'g.augmentReroll': {eventId:isId,side:(v)=>v==='ally'||v==='enemy',idx:(v)=>isInt(v,0,2),cardId:isId},
   'g.choice': { idx: (v) => isInt(v, 0, 8), choiceId: isId, $optional: ['choiceId'] },
   'g.ready': { ready: isBool },

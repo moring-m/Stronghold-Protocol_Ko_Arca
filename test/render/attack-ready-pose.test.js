@@ -25,3 +25,15 @@ test('ready pose is interrupted by stun/cancellation and does not apply to enemi
  const enemy=actor(false);enemy.beginAttack(1.6,0);enemy.attack(1.6);enemy.update(1.01);assert.equal(enemy.current,'Attack_End');
  const cast=actor();cast.attack(1.6,true);cast.update(1.01);assert.equal(cast.current,'Attack_End');
 });
+test('rapid attacks finish their real timeline before idle without freezing the final pose',()=>{
+ const ordinary={anims:{idle:'Idle',attack:{loop:'Attack'}},animations:{Idle:1,Attack:1},hits:{Attack:[.4]}};
+ for(const interval of [.18,.5]){
+  const a=new SpineActor({animations:[{name:'Idle',duration:1},{name:'Attack',duration:1}]},ordinary);a.clipPerAttack=true;a.continuousAttacks=true;
+  const hit=.4*interval;
+  a.beginAttack(interval,hit);a.update(hit);a.attack(interval);
+  const track=a.spine.state.tracks[0];a.attackUntil=a.clock; // stale prediction must not truncate the actual clip
+  a.update((interval-hit)/2);assert.equal(a.current,'Attack');assert.ok(track.timeScale>0);assert.ok(track.trackTime<1);
+  a.beginAttack(interval,hit);assert.equal(a.current,'Attack');assert.equal(a.spine.state.tracks[0].trackTime,0);
+  a.update(hit);a.attack(interval);a.update(interval-hit+.001);assert.equal(a.current,'Idle','completed attack rests immediately without holding');
+ }
+});

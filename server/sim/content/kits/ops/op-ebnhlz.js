@@ -270,6 +270,7 @@ export default {
           },
         },
         [S3]: {
+          hasTargets: ({battle,unit}) => battle.enemiesInKeys(unit.rangeKeys||[],unit,{...unit.profile,canHitFly:true}).some(eliteOrLeader),
           kind: 'duration',
           mods: { aspd: num(b3.attack_speed), atkPct: num(b3.atk) },
           attack: { skipEnemy: (e) => !eliteOrLeader(e) },

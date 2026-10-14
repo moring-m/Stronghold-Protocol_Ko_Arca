@@ -810,3 +810,10 @@
 .gm__effects{display:flex;flex-direction:row;align-items:flex-start;gap:.08rem}
 
 .effects__icons{display:grid;grid-auto-flow:column;grid-template-rows:repeat(var(--effect-rows),.5rem);gap:.08rem;overflow:visible}
+
+@media (max-width: 760px), (pointer: coarse) {
+ .dpbox { right: max(10px, env(safe-area-inset-right)); bottom: max(76px, calc(env(safe-area-inset-bottom) + 60px)); min-width: 58px; min-height: 0; width: 62px; box-sizing: border-box; padding: 8px 6px; gap: 3px; }
+ .dpbox__icon { width: 20px; height: 20px; }
+ .dpbox b { font-size: 26px; }
+ .dpbox .micro { font-size: 9px; }
+}

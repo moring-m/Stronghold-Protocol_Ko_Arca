@@ -1857,6 +1857,13 @@ export async function createFieldView(host, options = {}) {
   function pushSnapshot(snap) {
     if (destroyed || mode !== 'battle') return false;
     if (battleMeta?.fieldId && snap && snap.fieldId && snap.fieldId !== battleMeta.fieldId) return false;
+    // A scout frame can precede combat frames while its replacement meta is in flight.
+    // Only real advancing simulation time promotes it; scouting snapshots stay at gt=0.
+    if(battleMeta?.prep && Number(snap?.gt ?? snap?.t)>0){
+      battleMeta.prep=false;
+      for(const v of views.values())v.prep=false;
+      tiles.setBattleRect(battleMeta.rect);board3d?.setBattleRect(battleMeta.rect);setPenList(null);
+    }
     for (const [id,n] of Object.entries(snap?.energy || {})) views.get(Number(id))?.setEnergy?.(n);
     for(const [id,v] of views)if(v.isEnemy){v.setNoteStacks?.(snap?.noteStacks?.[id]||0);v.setCorrosion?.(snap?.corrosionStacks?.[id]||0);}
     return interp.push(snap, performance.now() / 1000);
@@ -1962,6 +1969,7 @@ export async function createFieldView(host, options = {}) {
       case 'die': {
         const v = views.get(e[1]);
         const used = consumedIds.delete(e[1]);
+        if (e[2] === 'raid') break; // Relocation redeploys immediately; it is not a knock-out.
         if (v && v.alive) { v.die(e[2] === FORCED_EXIT); if (showsDeathFx(v.info, used, e[2])) fx.death(v); }
         break;
       }

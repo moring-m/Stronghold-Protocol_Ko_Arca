@@ -964,7 +964,7 @@ export class PlayerState {
     if (!slot) return 0;
     const ev = { slot, kind: slot.kind, id: slot.id, price: slot.basePrice };
     this.m.dispatch(this, 'onPrice', ev, { quiet: true });
-    const p = Number(ev.price)-(slot.kind==='chess'?(this.m.augments?.price(this)||0):0);
+    const p = Number(ev.price)-(slot.kind==='chess'?(this.m.augments?.price(this,this.gd.chess(slot.id))||0):0);
     return Number.isFinite(p) ? Math.max(0, Math.round(p)) : slot.basePrice;
   }
 

@@ -111,15 +111,15 @@ export function computeBonds(gd, ps) {
   const bonus = ps.bondCountBonus || {};
   const bonusOf = (id) => (Number.isInteger(bonus[id]) ? bonus[id] : 0);
 
+  const defaultHarmony=!!gd.config.customRules?.defaultHarmony||!!ps.m?.augments?.allyCards?.(ps)?.some(a=>a.effect.kind==='harmony');
   // first pass: raw counts
   const raw = {};
   for (const id of gd.bondIds) {
-    if (gd.modeInactiveBonds.has(id) && !(id===HARMONY_BOND && gd.config.customRules?.defaultHarmony)) continue;
+    if (gd.modeInactiveBonds.has(id) && !(id===HARMONY_BOND && defaultHarmony)) continue;
     raw[id] = rawCount(gd, id, mem, ps);
   }
   // 调和: +1 to core bonds with ≥ 1 real board member while it is active
   const harmony = gd.bond(HARMONY_BOND);
-  const defaultHarmony=!!gd.config.customRules?.defaultHarmony;
   if(defaultHarmony && harmony) raw[HARMONY_BOND]=Math.max(raw[HARMONY_BOND]||0,thresholdsOf(harmony)[0]||1);
   const harmonyActive = harmony && raw[HARMONY_BOND] != null && tierFor(harmony, raw[HARMONY_BOND]) >= 1;
   for (const id of Object.keys(raw)) {

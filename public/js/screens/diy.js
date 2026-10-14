@@ -1,3 +1,5 @@
+import {tr} from '../i18n/i18n.js';
+import {matchesKoreanSearch} from '../../../shared/search.js';
 // 自选编队 (0.2.0 DIY; research 0.2.0 §2, the owner's decisions of 2026-10-05): the third tab of the 干员调配 overlay
 // (screens/loadout.js). Four slots — 5阶 ×2, 6阶 ×2 — each filled with an operator: a 6★ the player owns outside the
 // chess pool (any of its three skills, any module of its elite form but a 集成战略 one) or a prototype (原型干员, its skill
@@ -178,7 +180,7 @@ export function DiyPickerView({ m, slot, picks, kitted, onDone, onClose, filter,
   const options = pickOptions(slot.slotId, picks, D, kitted);
   const q = query.trim().toLowerCase();
   const list = options.filter((o) => (filter === 'all' || (filter === 'proto') === o.proto)
-    && (!q || [o.unit?.name, o.unit?.appellation, o.unit?.subProfessionName, t(PROF_NAME[o.unit?.profession] || ''), ...o.bonds.map(bondName)].some((x) => typeof x === 'string' && x.toLowerCase().includes(q))));
+    && (!q || [o.unit?.name, o.unit?.appellation, o.unit?.subProfessionName, t(PROF_NAME[o.unit?.profession] || ''), ...o.bonds.map(bondName)].some((x) => typeof x === 'string' && (matchesKoreanSearch(tr(x),q)||matchesKoreanSearch(x,q)))));
   const ch = draft ? pickChoices(draft.charId, slot.slotId, D) : null;
   const sel = (charId) => {
     if (draft?.charId === charId) return;

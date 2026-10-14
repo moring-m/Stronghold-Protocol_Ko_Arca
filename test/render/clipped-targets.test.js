@@ -1,0 +1,4 @@
+import{test}from'node:test';import assert from'node:assert/strict';import{installFakePixi,fakeViewCtx}from'./fakepixi.js';
+test('clipped Spine poses use cleared private targets instead of sharing stencil slots',async()=>{
+ const fake=installFakePixi();try{const{UnitView}=await import('../../public/js/render/units.js');const draws=[];let shared=0;const ctx=fakeViewCtx(fake.P,{renderer:{resolution:1,render:(obj,opts)=>draws.push(opts)},impostors:{alloc(){shared++;},park(){},unpark(){},free(){}}});const v=new UnitView(ctx,{id:1,kind:'op',side:'ally',maxHp:100});v.actor={spine:new fake.P.Container(),clipped:true,clipOn:true,clock:0,update(){}};v._impBox=()=>({x0:-32,y0:-32,w:64,h:64});v._impOver=()=>false;v._updateImpostor(1,1,0xffffff,.1,1);v.imp.dirty=true;v._updateImpostor(1,1,0xffffff,.1,1);assert.equal(shared,0);assert.ok(v.imp.rt);assert.equal(draws.length,2);assert.ok(draws.every(o=>o.clear===true));v.destroy();}finally{fake.restore();}
+});

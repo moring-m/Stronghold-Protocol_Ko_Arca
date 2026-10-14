@@ -1,3 +1,4 @@
+import {matchesKoreanSearch} from '../../../shared/search.js';
 // Operator loadout model (DESIGN §16) — pure logic of the 干员调配 screen (screens/loadout.js), shared with the sync
 // (ui/loadoutSync.js) and usable by the in-match UI (shop cards / detail panel: `effectiveChoice`, `selectedSkill`).
 //
@@ -424,7 +425,7 @@ export function filterRoster(roster, f = {}, entries = {}, getChess = () => null
     if (q) {
       const hay = [c.name, c.appellation, c.subProfessionName, PROF_NAME[c.profession], ...(c.bonds || []).map((b) => getBond(b)?.name)]
         .filter(Boolean).join(' ').toLowerCase();
-      if (!hay.includes(q)) return false;
+      if (!matchesKoreanSearch(hay,q) && ![c.name,c.appellation,c.subProfessionName,PROF_NAME[c.profession],...(c.bonds||[]).map(b=>getBond(b)?.name)].filter(Boolean).some(x=>matchesKoreanSearch(tr(x),q))) return false;
     }
     return true;
   });
