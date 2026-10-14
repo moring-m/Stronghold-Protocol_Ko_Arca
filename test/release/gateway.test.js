@@ -195,3 +195,14 @@ test("import rewriting preserves static, dynamic and commented text", async () =
   assert.ok(output.includes(`import("./dynamic.js?release=${OLD}")`));
   assert.ok(output.includes("import.meta.url"));
 });
+
+ test("interpolated and computed dynamic imports preserve expressions and pin evaluated URLs",async()=>{
+ const input='const a=import(`./ops/${file}`);const b=import(path);const c=import(`./fixed.js`);';
+ const output=await transform(input,'text/javascript',OLD);
+ assert.ok(!output.includes('./ops/*'));
+ assert.ok(output.includes(')(`./ops/${file}`)'));
+ assert.ok(output.includes(')(path)'));
+ assert.ok(output.includes('import.meta.url'));
+ assert.ok(output.includes('searchParams.set("release",'));
+ assert.ok(output.includes('import("./fixed.js?release='+OLD+'")'));
+ });

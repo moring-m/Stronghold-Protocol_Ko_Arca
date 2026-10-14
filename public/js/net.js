@@ -34,6 +34,7 @@ import { validateC2S } from '../../shared/protocol.js';
 
 export const REQUEST_TIMEOUT_MS = 8000;
 export const HELLO_TIMEOUT_MS = 8000;
+export const CONNECT_TIMEOUT_MS = 10000;
 export const PING_INTERVAL_MS = 4000;
 export const DEAD_AFTER_MS = 15000;
 export const BACKOFF = Object.freeze({ base: 500, factor: 2, max: 10000, jitter: 0.2 });
@@ -156,6 +157,7 @@ export class Net {
     this._reconnectTimer = null;
     this._pingTimer = null;
     this._helloTimer = null;
+    this._connectTimer = null;
     this._helloRid = null;
     this._helloSentName = null;
     this._helloToken = null;
@@ -235,6 +237,15 @@ export class Net {
     ws.onmessage = (ev) => { if (ws === this.ws) this._onMessage(ev?.data); };
     ws.onerror = () => { /* followed by close */ };
     ws.onclose = (ev) => { if (ws === this.ws) this._onClose(ev); };
+    // A TCP/WebSocket handshake can remain CONNECTING without firing close/error.
+    // Bound that wait so retryNow and automatic recovery cannot stay blocked forever.
+    this._connectTimer = this.timers.setTimeout(() => {
+      this._connectTimer = null;
+      if (this.ws !== ws || ws.readyState !== WS_CONNECTING) return;
+      this._teardownSocket();
+      try { ws.close(4000, 'connect timeout'); } catch { /* ignore */ }
+      this._scheduleReconnect();
+    }, CONNECT_TIMEOUT_MS);
   }
 
   /** Close for good (no reconnect). Pending requests reject with CLOSED. */
@@ -291,6 +302,7 @@ export class Net {
   }
 
   _onOpen() {
+    this._clearTimer('_connectTimer', 'clearTimeout');
     this._openedAt = this.now();
     this._lastRx = this._openedAt;
     this._unansweredSince = null;
@@ -349,6 +361,7 @@ export class Net {
     }
     this.ws = null;
     this._unansweredSince = null;
+    this._clearTimer('_connectTimer', 'clearTimeout');
     this._clearTimer('_pingTimer', 'clearInterval');
     this._clearTimer('_helloTimer', 'clearTimeout');
     this._helloRid = null;

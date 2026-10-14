@@ -12,8 +12,15 @@ export async function transform(text, type, release, options = {}) {
     const [imports] = parse(text),
       edits = [];
     for (const rec of imports) {
+      // The lexer reports interpolated templates as glob specifiers (e.g. ./ops/*).
+      // Preserve the expression and pin its evaluated URL, never import the glob.
+      if (rec.type === "dynamic" && (rec.glob || !rec.specifier)) {
+        const expression = text.slice(rec.start, rec.end);
+        edits.push([rec.start, rec.end, `((s)=>{if(typeof s!=="string"||(!s.startsWith(".")&&!s.startsWith("/")&&!/^https?:/.test(s)))return s;const u=new URL(s,import.meta.url);if(u.origin!==new URL(import.meta.url).origin)return s;u.searchParams.set("release",${JSON.stringify(release)});return u.href;})(${expression})`]);
+        continue;
+      }
       if (
-        !rec.specifier ||
+        !rec.specifier || rec.specifier.startsWith("//") ||
         (!rec.specifier.startsWith(".") && !rec.specifier.startsWith("/"))
       )
         continue;
