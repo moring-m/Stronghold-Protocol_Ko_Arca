@@ -119,8 +119,8 @@ export const AUGMENT_ITEM_NAMES = {
  "chess_item_custom_ursus_b": "우르수스 곡도",
  "chess_item_custom_ursus_favor_a": "황제의 은총",
  "chess_item_custom_ursus_favor_b": "황제의 은총",
- "chess_item_custom_leithanien_bell_a": "의식용 종",
+ "chess_item_custom_leithanien_bell_a": "라이타니엔 종",
  "chess_item_custom_leithanien_score_a": "낡은 악보 조각",
- "chess_item_custom_leithanien_bell_b": "의식용 종",
+ "chess_item_custom_leithanien_bell_b": "라이타니엔 종",
  "chess_item_custom_leithanien_score_b": "낡은 악보 조각"
 };

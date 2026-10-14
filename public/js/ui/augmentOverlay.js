@@ -11,11 +11,11 @@ const rich=s=>String(s||'').replace(/([+-]?\d+(?:\.\d+)?%?)/g,'<@ba.vup>$1</>');
 let latestWatch=null;
 net.on('m.augmentWatch',packet=>{latestWatch=packet;});
 net.on('welcome',()=>{latestWatch=null;});
-export function AugmentOverlay({pub,priv,myId}){
+export function AugmentOverlay({pub,priv,myId,watchedPlayerId}){
  const s=pub.augments?.selection,[armed,setArmed]=useState(null),[busy,setBusy]=useState(false);
- const [watch,setWatch]=useState(()=>latestWatch),[watchId,setWatchId]=useState(null);
+ const [watch,setWatch]=useState(()=>latestWatch);
  useEffect(()=>net.on('m.augmentWatch',setWatch),[]);
- const spectatorChoices=watch?.eventId===s?.id?watch.choices||{}:{},spectating=Object.keys(spectatorChoices).length>0&&!(pub.players||[]).some(p=>p.playerId===myId&&p.alive),viewId=spectatorChoices[watchId]?watchId:Object.keys(spectatorChoices)[0];
+ const spectatorChoices=watch?.eventId===s?.id?watch.choices||{}:{},spectating=Object.keys(spectatorChoices).length>0&&!(pub.players||[]).some(p=>p.playerId===myId&&p.alive),viewId=spectatorChoices[watchedPlayerId]?watchedPlayerId:watch?.playerId;
  const vote=!!s?.vote;
  const own=spectating?spectatorChoices[viewId]:priv?.augments?.selection,cards=s?.side==='ally'?(own?.cards||[]):[...(s?.cards||[])],rerolls=s?.side==='ally'?(own?.rerolls||[]):s?.rerolls||[];
  if(vote)cards.push({id:'augment-reroll',name:'전체 리롤',description:`모든 선택지를 다시 뽑습니다. 남은 리롤 ${s.rerollsLeft}회`,icon:null});
@@ -28,7 +28,7 @@ export function AugmentOverlay({pub,priv,myId}){
  return html`<section class=${`spov augment-overlay augment-overlay--${s.side}`} role="dialog" aria-modal="true" aria-label=${s.side==='ally'?'아군 증강 선택':'적 증강 선택'} style=${{'--augment-color':grade.color}}>
   <div class="spov__veil"></div><div class="spov__inner augment-inner">
    <header class="spov__head"><div class="spov__titles"><${MicroLabel}>AUGMENT // ROUND ${s.round}<//><h2 class="spov__title"><${Icon} name=${s.side==='ally'?'bolt':'shield'}/>${s.side==='ally'?'아군 증강':'적 증강'}<span class="augment-grade">${grade.name}</span></h2><p class="spov__desc">${s.side==='ally'?'각자의 선택지 3개 중 하나를 선택하세요.':vote?'최다 득표한 증강이 모든 적에게 적용됩니다. 동률이면 무작위로 결정됩니다.':'방장이 선택한 증강은 모든 적에게 적용됩니다.'}</p></div><${Countdown} deadline=${pub.deadline} total=${s.settling?3:120} label=${s.settling?'선택 완료':'선택 시간'}/></header>
-   ${spectating?html`<label class="augment-watch">관전 대상 <select value=${viewId} onChange=${e=>setWatchId(e.target.value)}>${Object.keys(spectatorChoices).map(id=>html`<option value=${id}>${tr(pub.players?.find(p=>p.playerId===id)?.name||id)}</option>`)}</select></label>`:null}
+   ${spectating?html`<p class="augment-status">${tr(pub.players?.find(p=>p.playerId===viewId)?.name||'')} 님의 증강 선택을 관전 중입니다.</p>`:null}
    <div class="augment-progress">${(pub.players||[]).filter(p=>p.alive&&!p.left).map(p=>html`<span key=${p.playerId} class=${`spov__who ${(vote?s.votes?.[p.playerId]!=null:s.picked[p.playerId])?'is-done':''}`}><${PlayerAvatar} player=${p} size="sm"/><b>${tr(p.name)}</b><${Icon} name=${(vote?s.votes?.[p.playerId]!=null:s.picked[p.playerId])?'check':'hourglass'}/></span>`)}</div>
    <p class="augment-status" role="status">${s.settling?(vote?'투표 완료 · 3초 뒤 결과가 확정됩니다.':'선택 완료 · 다음 단계로 이동합니다.'):picked?(chosen?`${chosen.name} 선택 완료 · 다른 참가자를 기다리고 있습니다.`:'선택 완료'):s.side==='enemy'&&!vote&&myId!==s.hostId?`${tr(host?.name||'방장')} 님이 적 증강을 선택하고 있습니다.`:own||s.side==='enemy'?vote?'각자 한 곳에 투표하세요. 전체 리롤도 투표로 결정합니다.':'선택지마다 설정된 횟수만큼 리롤할 수 있습니다.':'참가자의 증강 선택을 관전하고 있습니다.'}</p>
    ${cards.length?html`<div class=${`augment-grid ${vote?'augment-grid--vote':''}`}>${cards.map((card,idx)=>card?html`<article key=${card.id} class=${`augment-slot ${armed===idx?'is-armed':''} ${chosen?.id===card.id?'is-picked':''}`}><button type="button" class=${`spcard ${canChoose?'is-pickable':''} ${armed===idx?'is-armed':''}`} disabled=${!canChoose||(vote&&idx===3&&s.rerollsLeft<=0)} aria-pressed=${chosen?.id===card.id||armed===idx} onClick=${()=>tap(idx)}>

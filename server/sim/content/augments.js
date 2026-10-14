@@ -12,6 +12,7 @@ export function install(b){
   const effects=u.side==='enemy'?enemyEffects:forUnit(u);
   if(u.s.flags.hitCount||u.s.flags.hitCountArts){const hpBonus=effects.reduce((n,e)=>n+(e.mods?.hpPct||0),0);if(hpBonus){u.mem.augmentFrequencyHpBase??=u.base.maxHp;u.base.maxHp=u.mem.augmentFrequencyHpBase*(1+hpBonus);u.markDirty();}}
   effects.forEach((e,i)=>{
+   if(e.kind==='equipmentAtk'&&u.kind==='op')add(u,`${i}:equipment-atk`,{atkPct:e.amount*(u.items?.length||0)});
    if(e.mods&&e.kind!=='normalEnemy'&&e.kind!=='alliedDebuff'&&(!e.opsOnly||u.kind==='op'))add(u,`${i}:stats`,e.mods);
    if(u.side==='enemy'){
     if(e.kind==='shields'&&!u.mem['augment:shields:'+i]){b.addBuff(u,{key:'augment:shields:'+i,shieldHits:e.count,visible:true,persist:true});u.mem['augment:shields:'+i]=true;}
@@ -24,7 +25,7 @@ export function install(b){
    }
   });
   if(u.side==='ally'){
-   enemyEffects.forEach((e,i)=>{if(e.kind==='alliedDebuff')add(u,`enemy-ally:${i}`,e.mods);});
+   enemyEffects.forEach((e,i)=>{if(e.kind==='alliedDebuff'){const mods={...e.mods};if(u.kind==='device'&&mods.hpPct<0)delete mods.hpPct;if(Object.keys(mods).length)add(u,`enemy-ally:${i}`,mods);}});
    u.mem.augmentAttackUntil=0;
    const aspd=effects.find(e=>e.kind==='skillAspd'),owner=u.ownerId;if(aspd&&b._augmentAspd?.has(owner))refreshAspd(owner,aspd);
    u.mem.augmentSpCost=effects.filter(e=>e.kind==='spCost').reduce((n,e)=>n*e.multiplier,1);u.skill?._normalize();
@@ -48,7 +49,7 @@ export function install(b){
  const extraRecovery=Object.fromEntries(Object.entries(allied).map(([owner,effects])=>[owner,effects.reduce((n,e)=>n+(e.mods?.spRecoveryFlat||0),0)]));
  const hpDrain=enemyEffects.filter(e=>e.kind==='alliedDrain').reduce((n,e)=>n+e.amount,0);
  b.on('tick',({dt})=>{
-  if(hpDrain>0)for(const u of b.allyUnits)if(u.alive&&u.deployed)b.loseHp(u,hpDrain*dt,{silent:true,tags:['augment:alliedDrain']});
+  if(hpDrain>0)for(const u of b.allyUnits)if(u.alive&&u.deployed&&u.kind!=='device')b.loseHp(u,hpDrain*dt,{silent:true,tags:['augment:alliedDrain']});
   for(const u of b.allyUnits)if(u.alive&&u.deployed&&!u.hidden&&u.skill&&u.skill.spType!=='time'){
    const rate=extraRecovery[u.ownerId||u.ownerUnit?.ownerId||u.player?.playerId||normalOwner]||0;
    if(rate>0)u.skill.gainSp(rate*dt,'time');

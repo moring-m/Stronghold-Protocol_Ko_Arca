@@ -1,0 +1,6 @@
+import{test}from'node:test';import assert from'node:assert/strict';import{startServer}from'../../server/index.js';
+test('server status page shows live health and handles unavailable responses on mobile',{skip:process.env.SP_E2E!=='1'},async()=>{
+ const s=await startServer({port:0,host:'127.0.0.1',quiet:true,assetIndex:false});const P=(await import('puppeteer-core')).default,browser=await P.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox'],headless:true});
+ try{const page=await browser.newPage();await page.setViewport({width:390,height:844});await page.goto(s.url+'/status/');await page.waitForFunction(()=>document.getElementById('state').textContent==='정상 응답');assert.equal(await page.$$eval('.metric',els=>els.length),5);assert.equal(await page.$$eval('.worker',els=>els.length),1);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);await page.setRequestInterception(true);page.on('request',r=>r.url().includes('healthz')||r.url().includes('status.json')?r.abort():r.continue());await page.click('#refresh');await page.waitForFunction(()=>document.getElementById('state').textContent==='연결 실패');assert.ok(await page.$eval('#error',el=>!el.hidden&&el.textContent.includes('최근 수치')));
+ }finally{await browser.close();await s.close();}
+});

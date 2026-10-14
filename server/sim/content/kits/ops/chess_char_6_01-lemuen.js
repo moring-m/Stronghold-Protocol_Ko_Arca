@@ -177,7 +177,7 @@ function lemuen(bb, chess, def) {
       onEnd({ battle, unit }) { endAim(battle, unit); },
     },
   };
-  return {
+  const kit = {
     skills,
     // S3 礼炮·强制追思, the lock phase: one lock every aim_interval s on an enemy in her range (the least locked first,
     // then the lowest DEF), one bullet each; the skill ends when the bullets are spent, then bombard. With nothing in
@@ -265,8 +265,12 @@ function lemuen(bb, chess, def) {
       } },
     ],
   };
+  // Explicit loadouts and alternate bodies must resolve S3 to the authored lock/bombardment kit.
+  kit.skills.skchr_lemuen_3 = kit.skill;
+  return kit;
 }
 
 export default {
   chess_char_6_01_a: lemuen,
+  char_4193_lemuen: lemuen,
 };

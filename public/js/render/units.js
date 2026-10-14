@@ -1399,6 +1399,7 @@ export class UnitView {
   /** @param {number} dt real seconds @param {any} cam camera @param {number} t real clock */
   update(dt, cam, t) {
     if (this.destroyed) return;
+    this._updateHpTrail(dt);
     if(this._pendingDeployElapsed != null)this._pendingDeployElapsed += dt*(this.ctx.animRate?.() || 1);
     // a displacement's slide (slideTo): held where it stood until the snapshot with the destination is shown, then
     // eased into the sampled position (sync keeps `lx, ly` current) under a constant deceleration
@@ -1819,6 +1820,21 @@ export class UnitView {
     return off;
   }
 
+  _updateHpTrail(dt) {
+    const hp = clamp(this.hp, 0, this.maxHp);
+    const previous = this._trailHp ?? this.maxHp;
+    this.ghostHp = clamp(this.ghostHp, hp, this.maxHp);
+    if (hp < previous - .000001) this._trailRemaining = .3;
+    if (hp >= this.ghostHp) this._trailRemaining = 0;
+    const remaining = this._trailRemaining || 0;
+    const step = Math.max(0, Number.isFinite(dt) ? dt : 0);
+    if (remaining > 0) {
+      this.ghostHp += (hp - this.ghostHp) * Math.min(1, step / remaining);
+      this._trailRemaining = Math.max(0, remaining - step);
+    } else this.ghostHp = hp;
+    this._trailHp = hp;
+  }
+
   _updateHud(dt, s, x, y, alpha, t) {
     const prep = this.prep;
     const showBars = !prep && this.alive && this.info.kind !== 'item';
@@ -1837,9 +1853,11 @@ export class UnitView {
     if(this.noteText){this.noteText.visible=showBars&&this.noteStacks>0;this.noteText.scale.set(clamp(s/90,.65,1));this.noteText.position.set(x0-1+18*clamp(s/90,.65,1),cy-3);this.noteIcon.visible=this.noteText.visible;this.noteIcon.width=this.noteIcon.height=16*clamp(s/90,.65,1);this.noteIcon.position.set(x0-1,cy-3);}
     // HP
     this.hpBg.visible = this.hpFill.visible = showHp;
-    this.hpGhost.visible = false;
+    this.hpGhost.visible = showHp && this.ghostHp > this.hp + .5;
     if (showHp) {
       const k = this.maxHp > 0 ? clamp(this.hp / this.maxHp, 0, 1) : 0;
+      const g = this.maxHp > 0 ? clamp(this.ghostHp / this.maxHp, 0, 1) : 0;
+      this.hpGhost.position.set(x0, cy); this.hpGhost.width = bw * g; this.hpGhost.height = bh;
       this.hpBg.position.set(x0 - 1, cy); this.hpBg.width = bw + 2; this.hpBg.height = bh + 2;
       this.hpFill.position.set(x0, cy); this.hpFill.width = bw * k; this.hpFill.height = bh;
       if (!this.isEnemy) this.hpFill.tint = COLORS.hpAlly;

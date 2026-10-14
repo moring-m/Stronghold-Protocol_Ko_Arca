@@ -667,7 +667,7 @@ export const AUGMENT_SOURCES = [
   "source": 50,
   "identity": 50,
   "grade": "prism",
-  "name": "아츠 마스터",
+  "name": "아츠 마스터 III",
   "rounds": [
    4,
    7,
@@ -681,7 +681,7 @@ export const AUGMENT_SOURCES = [
   "source": 51,
   "identity": 51,
   "grade": "prism",
-  "name": "소드마스터",
+  "name": "소드마스터 III",
   "rounds": [
    4,
    7,
@@ -787,7 +787,7 @@ export const AUGMENT_SOURCES = [
   "source": 59,
   "identity": 59,
   "grade": "prism",
-  "name": "알뜰살뜰 II",
+  "name": "알뜰살뜰 III",
   "rounds": [
    4
   ],
@@ -824,12 +824,12 @@ export const AUGMENT_SOURCES = [
   "source": 62,
   "identity": 62,
   "grade": "prism",
-  "name": "헤드헌팅",
+  "name": "헤드헌팅 III",
   "rounds": [
    10
   ],
   "side": "ally",
-  "description": "무작위 6등급 오퍼레이터 4명 획득",
+  "description": "무작위 6등급 오퍼레이터 5명 획득",
   "notes": ""
  },
  {
@@ -1565,7 +1565,7 @@ export const AUGMENT_SOURCES = [
   "source": 117,
   "identity": 117,
   "grade": "gold",
-  "name": "알뜰살뜰 I",
+  "name": "알뜰살뜰 II",
   "rounds": [
    4
   ],
@@ -1823,6 +1823,180 @@ export const AUGMENT_SOURCES = [
   ],
   "side": "enemy",
   "description": "모든 아군 유닛이 초당 30의 HP 감소",
+  "notes": ""
+ },
+ {
+  "source": 136,
+  "identity": 136,
+  "grade": "silver",
+  "name": "알뜰살뜰 I",
+  "rounds": [
+   4
+  ],
+  "side": "ally",
+  "description": "라운드마다 추가로 자금 1 획득",
+  "notes": ""
+ },
+ {
+  "source": 137,
+  "identity": 137,
+  "grade": "silver",
+  "name": "헤드헌팅 I",
+  "rounds": [
+   10
+  ],
+  "side": "ally",
+  "description": "무작위 6등급 오퍼레이터 1명 획득",
+  "notes": ""
+ },
+ {
+  "source": 138,
+  "identity": 138,
+  "grade": "gold",
+  "name": "헤드헌팅 II",
+  "rounds": [
+   10
+  ],
+  "side": "ally",
+  "description": "무작위 6등급 오퍼레이터 3명 획득",
+  "notes": ""
+ },
+ {
+  "source": 139,
+  "identity": 139,
+  "grade": "silver",
+  "name": "아츠 마스터 I",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "ally",
+  "description": "모든 아군 유닛의 최대 SP -10%",
+  "notes": "소수점 이하는 올림 처리"
+ },
+ {
+  "source": 140,
+  "identity": 140,
+  "grade": "silver",
+  "name": "소드마스터 I",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "ally",
+  "description": "모든 아군 유닛이 공격 시 10% 확률로 추가 공격",
+  "notes": ""
+ },
+ {
+  "source": 141,
+  "identity": 141,
+  "grade": "gold",
+  "name": "아츠 마스터 II",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "ally",
+  "description": "모든 아군 유닛의 최대 SP -20%",
+  "notes": "소수점 이하는 올림 처리"
+ },
+ {
+  "source": 142,
+  "identity": 142,
+  "grade": "gold",
+  "name": "소드마스터 II",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "ally",
+  "description": "모든 아군 유닛이 공격 시 20% 확률로 추가 공격",
+  "notes": ""
+ },
+ {
+  "source": 143,
+  "identity": 143,
+  "grade": "silver",
+  "name": "대격변",
+  "rounds": [
+   4
+  ],
+  "side": "ally",
+  "description": "전장에 배치된 모든 오퍼레이터를 한 단계 높은 무작위 오퍼레이터로 교체",
+  "notes": "획득 판정이 아니며, 승급 여부를 유지하고, 위치와 방향이 동일하게 배치되어야 하고, 장비를 그대로 승계"
+ },
+ {
+  "source": 144,
+  "identity": 144,
+  "grade": "prism",
+  "name": "부재중 전화",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "ally",
+  "description": "간이 통신기 8개 획득",
+  "notes": ""
+ },
+ {
+  "source": 145,
+  "identity": 145,
+  "grade": "prism",
+  "name": "빅토리아",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "ally",
+  "description": "오퍼레이터가 장비를 1개 장착할 때마다 공격력 +30%",
+  "notes": ""
+ },
+ {
+  "source": 146,
+  "identity": 146,
+  "grade": "silver",
+  "name": "피해 증가 I",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "ally",
+  "description": "모든 아군 유닛이 입히는 대미지가 110%로 증가",
+  "notes": ""
+ },
+ {
+  "source": 147,
+  "identity": 147,
+  "grade": "gold",
+  "name": "피해 증가 II",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "ally",
+  "description": "모든 아군 유닛이 입히는 대미지가 120%로 증가",
+  "notes": ""
+ },
+ {
+  "source": 148,
+  "identity": 148,
+  "grade": "prism",
+  "name": "피해 증가 III",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "ally",
+  "description": "모든 아군 유닛이 입히는 대미지가 135%로 증가",
   "notes": ""
  }
 ];

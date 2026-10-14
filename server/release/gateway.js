@@ -58,6 +58,29 @@ export async function startGateway({
       throw Error("Worker release mismatch");
     return result;
   }
+  let statusCache = null, statusAt = 0, statusPending = null;
+  async function publicStatus() {
+    if (statusCache && Date.now() - statusAt < 4000) return statusCache;
+    if (statusPending) return statusPending;
+    statusPending = (async () => {
+      const workers = await Promise.all(Object.keys(state.releases).map(async release => {
+        try {
+          const r = state.releases[release];
+          const response = await fetch(`http://127.0.0.1:${r.port}/healthz`, {signal:AbortSignal.timeout(2500)});
+          if (!response.ok) throw Error('Unavailable worker');
+          const h = await response.json();
+          // Only existing public health fields; never publish room codes or control data.
+          const row = {release, available:true, draining:release!==state.current, app:h.app, build:h.build, uptimeSec:h.uptimeSec};
+          for (const key of ['rooms','matches','humans','bots','spectators','sockets']) row[key] = Number.isFinite(h[key]) ? h[key] : 0;
+          return row;
+        } catch { return {release, available:false, draining:release!==state.current}; }
+      }));
+      const totals = Object.fromEntries(['rooms','matches','humans','bots','spectators','sockets'].map(key=>[key,workers.reduce((n,w)=>n+(w[key]||0),0)]));
+      statusCache = {ok:workers.length>0&&workers.every(w=>w.available), rolling:true, current:state.current, totals, workers};
+      statusAt = Date.now(); return statusCache;
+    })();
+    try { return await statusPending; } finally { statusPending = null; }
+  }
   async function owner(code) {
     const candidate = Object.entries(state.releases).find(
       ([, r]) => r.prefix === code[0],
@@ -232,6 +255,10 @@ export async function startGateway({
     res.setHeader("x-content-type-options", "nosniff");
     if (url.pathname.startsWith("/__roll/admin/")) {
       await admin(req, res, url);
+      return;
+    }
+    if (url.pathname === "/__roll/status.json" && req.method === "GET") {
+      json(res, 200, await publicStatus());
       return;
     }
     if (url.pathname === "/__roll/latest") {

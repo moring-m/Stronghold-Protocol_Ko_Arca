@@ -38,7 +38,7 @@ test('solo choices have no deadline but retain three-second settling',t=>{
 test('disabled augments never change normal phases or expose selected cards',t=>{const {m}=fixture(t,{enabled:false});m.round=4;m.afterRoundStart();assert.equal(m.augments.current,null);assert.equal(m.augments.battleState(),null);assert.equal(m.augments.publicView(),null);assert.equal(m.augments.income(m.players.get('p0')),0);});
 test('grant rewards ignore stock, beacon remains separate, and funds/price effects persist',t=>{
  const {m,ps}=fixture(t);m.round=4;const catalog=createAugmentCatalog(m.data,10);const beacon=catalog.find(a=>a.name==='인력사무소');m.augments.grant(ps,beacon);assert.equal([...ps.hand,...ps.temp].filter(p=>p?.id==='chess_item_5_04_e_a').length,4);assert.equal(ps.completesItemMerge('chess_item_5_04_e_a'),false);
- const frugal=createAugmentCatalog(m.data,4).find(a=>a.name==='알뜰살뜰 II'),price=catalog.find(a=>a.name==='예견');m.augments.allies.set(ps.playerId,[frugal,price]);assert.equal(m.augments.income(ps),3);for(const tier of [1,2,3,4,5,6]){const id=Object.keys(m.data.chess).find(id=>m.data.chess[id].tier===tier&&!m.data.chess[id].isGolden);assert.equal(ps.priceOf({kind:'chess',id,basePrice:2}),tier<=3?1:2);}assert.equal(ps.priceOf({kind:'item',id:'x',basePrice:2}),2);
+ const frugal=createAugmentCatalog(m.data,4).find(a=>a.name==='알뜰살뜰 III'),price=catalog.find(a=>a.name==='예견');m.augments.allies.set(ps.playerId,[frugal,price]);assert.equal(m.augments.income(ps),3);for(const tier of [1,2,3,4,5,6]){const id=Object.keys(m.data.chess).find(id=>m.data.chess[id].tier===tier&&!m.data.chess[id].isGolden);assert.equal(ps.priceOf({kind:'chess',id,basePrice:2}),tier<=3?1:2);}assert.equal(ps.priceOf({kind:'item',id:'x',basePrice:2}),2);
  const result=buildResult(m,{victory:false,hiddenReached:false,hiddenCleared:false,reason:'test'});assert.ok(result.augments);assert.equal(result.players[0].augments.length,2);
 });
 
@@ -94,7 +94,7 @@ for(const [round,tier]of [[4,4],[7,5],[10,6]])test(`Starter pack grants one oper
  const {m,ps}=fixture(t);m.round=round;const card=createAugmentCatalog(data,round).find(a=>a.name==='스타터 팩'),families=m.augments.starterFamilies(card.effect,ps);assert.ok(families.length);const expected=families[0].tiers.map(ids=>ids[0]);m.augments.rng=()=>0;m.augments.grant(ps,card);const pieces=[...ps.hand,...ps.temp].filter(p=>p?.kind==='chess');assert.equal(expected.length,tier);for(const id of expected)assert.ok(pieces.some(p=>p.id===id),id);assert.deepEqual(expected.map(id=>data.chess[id].tier),Array.from({length:tier},(_,i)=>i+1));const blocked=card.effect.families[0];m.bannedChess.push(...blocked.tiers[0]);assert.ok(!m.augments.starterFamilies(card.effect,ps).some(f=>f.bondId===blocked.bondId));
 });
 test('round variants of the same named augment retain one identity while tiers remain distinct',()=>{
- const rows=[4,7,10].map(round=>createAugmentCatalog(data,round));for(const name of ['스타터 팩','중첩 I','중첩 II','중첩 III'])assert.equal(new Set(rows.map(list=>list.find(a=>a.name===name).id)).size,1,name);assert.notEqual(rows[0].find(a=>a.name==='중첩 I').id,rows[0].find(a=>a.name==='중첩 II').id);const catalog=rows[0];assert.equal(catalog.find(a=>a.name==='알뜰살뜰 I').effect.amount,2);assert.equal(catalog.find(a=>a.name==='알뜰살뜰 II').effect.amount,3);
+ const rows=[4,7,10].map(round=>createAugmentCatalog(data,round));for(const name of ['스타터 팩','중첩 I','중첩 II','중첩 III'])assert.equal(new Set(rows.map(list=>list.find(a=>a.name===name).id)).size,1,name);assert.notEqual(rows[0].find(a=>a.name==='중첩 I').id,rows[0].find(a=>a.name==='중첩 II').id);const catalog=rows[0];assert.equal(catalog.find(a=>a.name==='알뜰살뜰 II').effect.amount,2);assert.equal(catalog.find(a=>a.name==='알뜰살뜰 III').effect.amount,3);
 });
 
 test('spectators see all ally offers and selected card without exposing offers publicly',t=>{
@@ -102,4 +102,21 @@ test('spectators see all ally offers and selected card without exposing offers p
  const before=m.augments.spectatorView();assert.equal(Object.keys(before.choices).length,4);assert.equal(before.choices.p0.cards.length,3);assert.equal(m.augments.publicView().selection.cards,null);
  assert.equal(before.choices.p0.picked,null);request(m,ps,1);assert.equal(m.augments.spectatorView().choices.p0.picked,1);
  for(const p of m.alivePlayers().slice(1))request(m,p,0);
+});
+test('Swordmaster and Arts master exclude every other tier in their own family after selection',t=>{
+ const {m,ps}=fixture(t);m.round=4;m.afterRoundStart();
+ for(const family of ['소드마스터','아츠 마스터'])for(const suffix of ['I','II','III']){
+  const selected=createAugmentCatalog(data,4).find(a=>a.name===`${family} ${suffix}`);m.augments.allies.set(ps.playerId,[selected]);
+  for(const grade of ['silver','gold','prism']){m.augments.current.grade=grade;const pool=m.augments.catalog('ally',ps);assert.ok(!pool.some(a=>a.name.startsWith(family)));assert.ok(pool.some(a=>a.effect.kind==='income'));}
+ }
+});
+test('cataclysm replaces deployed operators without gains, retaining promotion, equipment, position and direction',t=>{
+ const{m,ps}=fixture(t);const normal=Object.keys(data.chess).find(id=>data.chess[id].tier===2&&!data.chess[id].isGolden&&!data.chess[id].isDiy&&!data.chess[id].isHidden&&!data.chess[id].optionalRecruit),gold=m.gd.goldenIdOf(normal);
+ const piece=ps.newPiece('chess',gold,{dir:'LEFT',poolExempt:true});piece.items=[ps.newPiece('item','chess_item_2_06_e_a')];ps.board.set('10,3',piece);const items=piece.items,uid=piece.uid,gained=ps.round.gainedChess;
+ m.augments.grant(ps,createAugmentCatalog(data,4).find(a=>a.name==='대격변'));assert.equal(ps.board.get('10,3'),piece);assert.equal(m.gd.chess(piece.id).tier,3);assert.equal(m.gd.chess(piece.id).isGolden,true);assert.equal(piece.dir,'LEFT');assert.equal(piece.uid,uid);assert.equal(piece.items,items);assert.equal(ps.round.gainedChess,gained);assert.equal(piece.poolCopies,0);
+});
+test('Head hunting grants one, three or five operators and absent call grants eight communicators',t=>{
+ const{m,ps}=fixture(t);ps.hand.fill(null);ps.temp.fill(null);
+ for(const [suffix,n]of [['I',1],['II',3],['III',5]]){const c=createAugmentCatalog(data,10).find(a=>a.name===`헤드헌팅 ${suffix}`);assert.equal(c.effect.count,n);const before=ps.round.gainedChess;m.augments.grant(ps,c);assert.equal(ps.round.gainedChess-before,n);ps.hand.fill(null);ps.temp.fill(null);}
+ const c=createAugmentCatalog(data,4).find(a=>a.name==='부재중 전화');assert.equal(c.effect.count,8);assert.deepEqual(c.effect.items,['chess_item_2_06_e_a']);
 });

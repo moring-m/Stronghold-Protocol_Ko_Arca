@@ -1,6 +1,6 @@
 # Rolling updates on the existing EC2 host
 
-Status: implementation and local tests; not installed on the production server.
+Status: v0.2.6c is the initial migration baseline; implementation and local tests, not yet installed on the production server.
 The existing manual `update.sh` still stops active games. **After migration, use the rolling updater only.**
 
 ## Architecture
@@ -125,3 +125,9 @@ sudo cat /opt/stronghold/rolling/pending.json  # absent when nothing is pending
 
 Do not print the control token or dump container environments. Do not run `docker system prune` or remove
 active release images. The updater removes only an explicitly empty, retired release's container/image tag.
+
+## Public server status page
+
+`/status/` is a lightweight read-only page that refreshes every five seconds. Before rolling migration it uses the existing public `/healthz` counts. With the updated gateway, `/__roll/status.json` reports sanitized per-worker and aggregate room, match, player, bot, spectator and connection counts. No room codes, tokens, worker ports or control actions are published. Unreachable workers are explicitly marked and excluded from totals; their absence must not be taken as permission to retire them.
+
+This endpoint is a gateway change. For an installation that has not started, build and install the reviewed commit containing this feature, rather than the earlier image. On an already migrated host, ordinary worker deployments do not replace the gateway; plan a separate gateway maintenance update. CPU and memory metrics remain available through EC2 Docker tools, not this public page.

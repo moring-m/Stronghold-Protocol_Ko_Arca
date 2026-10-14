@@ -1589,7 +1589,7 @@ function MatchScreen() {
         onRetreat=${retreatSel} onSell=${sellSel} onDestroy=${sellSel} />` : null}
     </div>
 
-    ${pub?.augments?.selection?html`<${AugmentOverlay} pub=${pub} priv=${priv} myId=${myId}/>`:null}
+    ${pub?.augments?.selection?html`<${AugmentOverlay} pub=${pub} priv=${priv} myId=${myId} watchedPlayerId=${strip.ownerId}/>`:null}
     ${sp ? html`<${ChoiceOverlay} pub=${pub} sp=${sp} myId=${myId} solo=${solo} busyIdx=${spBusy} total=${total}
       onPick=${async (i) => { setSpBusy(i); await actions.choice(i); setSpBusy(null); }} />` : null}
     ${personalChoice ? html`<${ChoiceOverlay} key=${personalChoice.id} pub=${pub} sp=${personalChoice} myId=${myId} solo=${solo} personal=${true}

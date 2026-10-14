@@ -30,7 +30,7 @@ test('weakness uses whichever mitigation yields more damage',()=>{
  const {h,u,e}=fixture({allies:[find('약점 공격')]});const damage=h.b.dealDamage(u,e,{amount:100,type:'phys'});close(damage,80);close(u.s.atk,115);
 });
 test('archmage SP cost rounds up after the forty-percent reduction and remains stable',()=>{
- const skill={skillId:'test',spCost:11,initSp:0,spType:'INCREASE_WITH_TIME',skillType:'MANUAL',duration:0};const {u}=fixture({allies:[find('아츠 마스터')],skill});assert.equal(u.skill.spCost,7);u.skill.spCostMul=.5;assert.equal(u.skill.spCost,3);
+ const skill={skillId:'test',spCost:11,initSp:0,spType:'INCREASE_WITH_TIME',skillType:'MANUAL',duration:0};const {u}=fixture({allies:[find('아츠 마스터 III')],skill});assert.equal(u.skill.spCost,7);u.skill.spCostMul=.5;assert.equal(u.skill.spCost,3);
 });
 test('enemy elemental damage and elemental buildup scale once, not twice',()=>{
  const {h,u,e}=fixture({enemies:[find('원소 피해 증가 III','enemy')]});const before=u.hp;h.b.dealDamage(e,u,{amount:100,type:'elemental'});close(before-u.hp,150);
@@ -67,7 +67,7 @@ test('per-second recovery augments also recover attack and defensive SP types',(
 });
 
 test('swordmaster uses a thirty-five percent proc threshold',()=>{
- const augment=find('소드마스터');assert.equal(augment.effect.probability,.33);
+ const augment=find('소드마스터 III');assert.equal(augment.effect.probability,.33);
  for(const [roll,expected]of [[.329,2],[.33,1]]){const {h,u}=fixture({allies:[augment]});let attacks=0;h.b.on('attack',({attacker})=>{if(attacker===u)attacks++;});h.b.rng=()=>roll;h.b.forceAttack(u);h.run(.69);assert.equal(attacks,expected);u.alive=false;}
 });
 
@@ -106,4 +106,19 @@ for(const [tier,pct,res,aspd]of [['I',10,8,10],['II',20,15,20],['III',30,30,30]]
 });
 for(const [tier,rate]of [['I',10],['II',20],['III',30]])test(`enemy allied drain ${tier} removes HP per second irrespective of defenses`,()=>{
  const {h,u,e}=fixture({enemies:[find(`아군 지속 피해 ${tier}`,'enemy')]});h.b.addBuff(e,{key:'disarm-test',flags:{disarm:true}});h.b.addBuff(u,{key:'armor-test',mods:{defFlat:1e6,resFlat:90}});const before=u.hp;h.run(1);close(u.hp,before-rate);assert.ok(u.alive);
+});
+
+test('structural devices ignore enemy max HP reduction and continuous HP drain while operators retain them',()=>{
+ const{h,u}=fixture({enemies:[find('아군 HP 감소 III','enemy'),find('아군 지속 피해 III','enemy')]});
+ const device=h.b.spawnDevice('crate',9,3,{hp:100,obstacle:true});assert.ok(device);close(device.s.maxHp,100);const hp=device.hp,before=u.hp;h.run(1);close(device.hp,hp);close(u.hp,before-30);
+});
+for(const [grade,percent]of [['I',10],['II',20],['III',33]])test(`Swordmaster ${grade} uses the requested probability`,()=>assert.equal(find(`소드마스터 ${grade}`).effect.probability,percent/100));
+for(const [grade,percent]of [['I',10],['II',20],['III',40]])test(`Arts master ${grade} reduces maximum SP with upward rounding`,()=>{
+ const skill={skillId:'test',spCost:11,initSp:0,spType:'INCREASE_WITH_TIME',skillType:'MANUAL',duration:0};const {u}=fixture({allies:[find(`아츠 마스터 ${grade}`)],skill});assert.equal(u.skill.spCost,Math.ceil(11*(1-percent/100)));
+});
+for(const [grade,multiplier]of [['I',1.1],['II',1.2],['III',1.35]])test(`damage increase ${grade} multiplies physical, magical and true damage`,()=>{
+ const {h,u,e}=fixture({allies:[find(`피해 증가 ${grade}`)]});for(const [type,base]of [['phys',5],['arts',80],['true',100]])close(h.b.dealDamage(u,e,{amount:100,type}),base*multiplier);
+});
+test('Victoria grants thirty percent attack per equipped item',()=>{
+ const {h,u}=fixture({allies:[find('빅토리아')]});u.items=['a','b'];h.b.emit('deploy',{unit:u});close(u.s.atk,160);u.items=['a'];h.b.emit('deploy',{unit:u});close(u.s.atk,130);
 });
