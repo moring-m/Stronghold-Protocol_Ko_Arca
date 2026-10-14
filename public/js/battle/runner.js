@@ -148,8 +148,18 @@ function deepFreeze(root) {
  * content bug that writes into a record fails identically on both sides).
  */
 export async function loadBrowserSim({ base = '/sim/', dataBase = '/data/', fetchFn = (...a) => globalThis.fetch(...a) } = {}) {
+  // Expression-based imports are not rewritten by the release gateway. Pin these
+  // entry modules too, so setSimData and content's getSimData share one instance.
+  const release = globalThis.__SP_RELEASE || new URL(import.meta.url).searchParams.get('release');
+  const moduleUrl = name => {
+    const path = `${base}${name}`;
+    if (!release || typeof location === 'undefined') return path;
+    const url = new URL(path, location.href);
+    if (url.origin === location.origin) url.searchParams.set('release', release);
+    return url.href;
+  };
   const [spec, simdata, support] = await Promise.all([
-    import(`${base}spec.js`), import(`${base}simdata.js`), import(`${base}content/support/index.js`),
+    import(moduleUrl('spec.js')), import(moduleUrl('simdata.js')), import(moduleUrl('content/support/index.js')),
   ]);
   const fetchOnce = async (n) => {
     try {

@@ -1,6 +1,21 @@
 // Player-facing history. Letters a/b were assigned retroactively to the two deployed update batches.
 export const PATCH_NOTES = [
 {
+  "version": "0.2.6c1",
+  "date": "2026-10-14",
+  "status": "released",
+  "title": "전투 효과 및 업데이트 안내 핫픽스",
+  "sections": [
+    {
+      "title": "핫픽스",
+      "items": [
+        "롤링 업데이트 환경에서 전투 데이터가 분리되어 맹약 등 전투 효과가 적용되지 않던 문제를 수정했습니다.",
+        "서버 업데이트 안내에 닫기 버튼을 추가했습니다. 현재 버전과 일치하면 안내가 사라지도록 수정했습니다."
+      ]
+    }
+  ]
+},
+{
   "version": "0.2.6c",
   "date": "2026-10-14",
   "status": "released",

@@ -136,3 +136,7 @@ test('startBuildGuard: stop() ends the watch', async () => {
   assert.equal(m.guard.stale(), false);
   assert.equal(BUILD_CHECK_MS, 60_000);
 });
+test('rolling guard compares release IDs and clears an obsolete notice when the live release matches again',async()=>{
+ const previous=globalThis.__SP_RELEASE;globalThis.__SP_RELEASE='current-release';let build='new-release',fresh=0,stale=0,reloaded=0,guard;
+ try{guard=startBuildGuard({fetchFn:async url=>{assert.equal(url,'/__roll/latest');return{ok:true,json:async()=>({build})};},inMatch:()=>true,reload:()=>reloaded++,setInterval:()=>0,clearInterval(){},onCurrent:()=>fresh++,onStale:()=>stale++});await new Promise(r=>setTimeout(r,0));await guard.check();assert.equal(guard.stale(),true);assert.equal(stale,1);assert.equal(reloaded,0);build='current-release';const result=await guard.check();assert.equal(result.status,'current');assert.equal(guard.stale(),false);assert.equal(fresh,1);assert.equal(reloaded,0);}finally{guard?.stop();if(previous===undefined)delete globalThis.__SP_RELEASE;else globalThis.__SP_RELEASE=previous;}
+});

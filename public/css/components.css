@@ -1002,3 +1002,10 @@
 .patch-notes .modal__body { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
 .patch-notes__hint, .patch-notes__versions { flex: 0 0 auto; }
 .patch-notes__entry { min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+
+.conn-banner--update { max-width:calc(100vw - 24px); }
+.conn-banner--update > span { min-width:0; }
+.conn-banner__close { flex-shrink:0; display:grid; place-items:center; min-width:28px; min-height:28px; padding:4px; color:var(--text-hi); background:transparent; border:1px solid transparent; cursor:pointer; }
+.conn-banner__close:hover { background:rgba(255,255,255,.08); border-color:var(--line-2); }
+.conn-banner__close:focus-visible { outline:2px solid var(--mint-500); }
+.conn-banner__close .icon { color:currentColor; width:16px; height:16px; }

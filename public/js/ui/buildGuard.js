@@ -68,7 +68,8 @@ export async function checkBuildOnce(o = {}) {
  * Watch for a new build.
  * @param {{ fetchFn?: Function, reload?: Function, inMatch?: () => boolean, intervalMs?: number, timeoutMs?: number,
  *           setInterval?: Function, clearInterval?: Function, setTimeout?: Function, clearTimeout?: Function,
- *           onStale?: (info: { build: string, known: string|null, waiting: boolean }) => void }} [o]
+ *           onStale?: (info: { build: string, known: string|null, waiting: boolean }) => void,
+ *           onCurrent?: (info: { build: string, known: string|null }) => void }} [o]
  * @returns {{ stop: () => void, check: () => Promise<object>, stale: () => boolean, known: () => string|null }}
  */
 export function startBuildGuard(o = {}) {
@@ -81,6 +82,7 @@ export function startBuildGuard(o = {}) {
   let known = globalThis.__SP_RELEASE||null;      // the build this page runs — memory only (one page == one set of loaded modules)
   let candidate = null;  // the last new build seen; needs BUILD_CONFIRMATIONS checks in a row to be acted on
   let seen = 0;          // consecutive checks that reported `candidate`
+  let notifiedBuild = null;
   let stale = false;     // a new build is confirmed → reload as soon as no match is on screen
   let pending = false;
   let timer = null;
@@ -98,16 +100,16 @@ export function startBuildGuard(o = {}) {
     finally { pending = false; }
     if (stopped) return { status: 'stopped', build: null };
     if (r.status === 'unknown') { candidate = null; seen = 0; return r; }   // review: a failed check never reloads
-    if (r.status === 'first') { known = r.build; return r; }
-    if (r.status === 'current') { candidate = null; seen = 0; return r; }
+    if (r.status === 'first') { known = r.build; try { o.onCurrent?.({build:r.build,known}); } catch {} return r; }
+    if (r.status === 'current') { candidate = null; seen = 0; stale = false; notifiedBuild = null; try { o.onCurrent?.({build:r.build,known}); } catch {} return r; }
     // a different build: only BUILD_CONFIRMATIONS checks in a row with the SAME tag count (a deploy that is still
     // copying files exposes a tag that keeps moving, and must not ping-pong the page)
     if (candidate !== r.build) { candidate = r.build; seen = 1; } else { seen++; }
     if (seen < BUILD_CONFIRMATIONS) return { status: 'new', build: r.build };
-    const first = !stale;
+    const first = !stale || notifiedBuild !== r.build;
     stale = true;
     const waiting = inMatch();
-    if (first) { try { o.onStale?.({ build: r.build, known, waiting }); } catch { /* ignore */ } }
+    if (first) { notifiedBuild = r.build; try { o.onStale?.({ build: r.build, known, waiting }); } catch { /* ignore */ } }
     if (!waiting) reloadNow();
     return { status: 'stale', build: r.build, known };
   };

@@ -411,7 +411,8 @@ async function boot() {
   try {
     startBuildGuard({
       inMatch: () => selectRoute(store.get()) === 'game',
-      onStale: ({ waiting }) => { if (waiting) store.patch('ui', { buildStale: true }); },
+      onStale: ({ waiting, build }) => { if (waiting) store.patch('ui', { buildStale: true, buildStaleTarget: build }); },
+      onCurrent: () => store.patch('ui', { buildStale: false, buildStaleTarget: null }),
     });
   } catch (err) {
     console.warn('[app] build guard failed to start', err);

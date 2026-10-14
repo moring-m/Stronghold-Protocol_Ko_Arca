@@ -7,6 +7,7 @@
 
 import { html, Button, Icon, useTicker } from './components.js';
 import { net, CLIENT_ERR_TEXT } from '../net.js';
+import { useState } from '../../vendor/hooks.module.js';
 import { useStore, shallowEqual } from '../store.js';
 import { useDocClass } from './device.js';
 
@@ -22,7 +23,10 @@ export function ConnectionBanner() {
   const conn = useStore((s) => s.connection, shallowEqual);
   const entered = useStore((s) => s.session.entered);
   const restoring = useStore((s) => s.ui.restoring);
-  const buildStale = useStore((s) => !!s.ui.buildStale);
+  const staleFlag = useStore((s) => !!s.ui.buildStale);
+  const staleTarget = useStore((s) => s.ui.buildStaleTarget || 'legacy');
+  const [dismissed,setDismissed] = useState(null);
+  const buildStale = staleFlag && staleTarget !== globalThis.__SP_RELEASE && dismissed !== staleTarget;
   useTicker(conn.status === 'reconnecting' ? 500 : 0);
   useDocClass('sp-conn', bannerVisible(conn, entered, restoring, buildStale));
   if (!entered) return null;
@@ -33,10 +37,11 @@ export function ConnectionBanner() {
   if (conn.status === 'online' && buildStale) {
     // the server has a newer build than this page: the guard reloads by itself once the match is over, the button is
     // for a player who would rather do it now
-    return html`<div class="conn-banner" role="alert">
+    return html`<div class="conn-banner conn-banner--update" role="status">
       <${Icon} name="refresh" />
-      <span>服务器已更新，本局结束后刷新</span>
+      <span>${globalThis.__SP_RELEASE?'새 버전이 있습니다. 현재 게임은 기존 버전으로 계속 진행됩니다.':'服务器已更新，本局结束后刷新'}</span>
       <${Button} size="sm" variant="secondary" icon="refresh" onClick=${() => location.reload()}>刷新页面<//>
+      <button type="button" class="conn-banner__close" aria-label="업데이트 안내 닫기" onClick=${()=>setDismissed(staleTarget)}><${Icon} name="close"/></button>
     </div>`;
   }
   if (!conn.everOnline && (conn.status === 'connecting' || conn.status === 'handshaking' || conn.status === 'idle')) return null;
