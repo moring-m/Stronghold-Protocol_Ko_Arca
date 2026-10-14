@@ -86,3 +86,10 @@ test('a 0.1-second extra attack accelerates the entire authored clip including r
  const a=actor(assets.chars.char_494_vendla.spine.front),clip=a._attackClip(),duration=a.dur(clip.loop),hit=a._hitTime(clip.loop,duration),speed=duration/.1;
  a.beginAttack(.1,hit/speed);assert.ok(Math.abs(a.spine.state.tracks[0].timeScale-speed)<1e-8);a.update(hit/speed);a.attack(.1);assert.ok(Math.abs(a.spine.state.tracks[0].timeScale-speed)<1e-8);
 });
+test('Executor S1 keeps normal attacks for the base model and every skin; S2 keeps its dedicated motion',()=>{
+ let checked=0;for(const[assetId,value]of Object.entries(releaseAssets.chars))for(const[face,entry]of Object.entries(value.spine||{})){
+  if(!(entry?.skel||'').includes('char_279_excu'))continue;
+  const a=actor(entry,0);assert.equal(a._attackClip().loop,entry.anims.attack.loop,`${assetId}/${face} S1`);assert.equal(spineAttackTiming(entry).skills[0],undefined);
+  const second=actor(entry,1);assert.notEqual(second._attackClip().loop,entry.anims.attack.loop,`${assetId}/${face} S2`);checked++;
+ }assert.ok(checked>=4);
+});

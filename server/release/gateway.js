@@ -282,11 +282,12 @@ export async function startGateway({
         json(res, 503, { error: "No release is available" });
         return;
       }
-      res.writeHead(302, {
-        location: `/r/${id}/${url.search}`,
-        "cache-control": "no-store",
-      });
-      res.end();
+      // Tab-local version selection preserves reloads without a release in the visible URL.
+      // Room invites explicitly choose their owner; a retired version falls back to current.
+      const available=Object.keys(state.releases),invited=/^[A-Z]{4}$/.test(code);
+      const html=`<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>위수 프로토콜</title></head><body><p>서버에 연결 중입니다.</p><script>(()=>{const releases=${JSON.stringify(available)},current=${JSON.stringify(id)},invited=${invited};let remembered;try{remembered=sessionStorage.getItem('sp.activeRelease');}catch{}const navigation=performance.getEntriesByType('navigation')[0]?.type,resuming=navigation==='reload'||navigation==='back_forward';const release=!invited&&resuming&&releases.includes(remembered)?remembered:current;const url=new URL(location.href);url.pathname='/r/'+release+'/';url.searchParams.delete('release');location.replace(url.pathname+url.search+url.hash);})();</script></body></html>`;
+      res.writeHead(200,{'content-type':'text/html; charset=utf-8','cache-control':'no-store'});
+      res.end(req.method==='HEAD'?undefined:html);
       return;
     }
     const target = route(req);
@@ -365,7 +366,7 @@ export async function startGateway({
             chunks.push(chunk);
           }
           const content = Buffer.from(
-            await transform(Buffer.concat(chunks).toString(), type, target.id),
+            await transform(Buffer.concat(chunks).toString(), type, target.id, {cleanUrls:true}),
           );
           delete out["content-encoding"];
           delete out.etag;

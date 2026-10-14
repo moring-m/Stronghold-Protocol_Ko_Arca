@@ -481,3 +481,7 @@ Corrections to §2 and §11:
 Other notes:
 - **人事部文档** (`chess_item_6_08_e`) sets the deploy cap to **9**: "最大可部署人数变为9". The UI counter "剩余可放置角色" must read the cap per player, not the constant 8.
 - The item card in the shop shows the tier chip and a price badge. There is always exactly 1 item slot at every level in all real modes (`itemCount` = 1).
+
+### Narantuya pool correction (2026-10-14)
+
+PRTS [lower-half strategy report](https://prts.wiki/w/卫戍协议：盟约_下半/PRTS盟约记录#S.W.E.E.P.策略报告), checked through the official mobile site, documents the even-round two-item free offer but does not publish the full server-side draw pool or its weights. A community report confirms that the offer draws non-consumable combat equipment; 精打细算玩偶 (알뜰살뜰 인형) must not appear. `pool_equip_narant` now explicitly lists original shop equipment with `kind` passive/passive_counter, excluding consumables, player-only recruitment effects and custom equipment. Tier VI remains eligible irrespective of shop level. Uniform weights remain an assumption; this restriction is community-verified rather than claimed as a PRTS-provided exact pool table.

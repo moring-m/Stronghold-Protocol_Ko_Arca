@@ -73,7 +73,7 @@ export async function checkBuildOnce(o = {}) {
  */
 export function startBuildGuard(o = {}) {
   const fetchFn = o.fetchFn || ((url, init) => globalThis.fetch(url, init));
-  const reload = o.reload || (() => globalThis.__SP_RELEASE?globalThis.location.assign('/'):globalThis.location.reload());
+  const reload = o.reload || (() => globalThis.__SP_GO_LATEST?globalThis.__SP_GO_LATEST():globalThis.__SP_RELEASE?globalThis.location.assign('/'):globalThis.location.reload());
   const inMatch = typeof o.inMatch === 'function' ? o.inMatch : () => false;
   const setIv = o.setInterval || ((fn, ms) => globalThis.setInterval(fn, ms));
   const clearIv = o.clearInterval || ((h) => globalThis.clearInterval(h));

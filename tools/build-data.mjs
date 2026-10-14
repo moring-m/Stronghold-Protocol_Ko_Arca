@@ -3391,7 +3391,9 @@ function buildChoices(ctx, effects, items, chess) {
       pool_equip_cathy_garrison: { kind: 'equip', rule: 'shopEligible', tiers: [1, 2, 3, 4], excluded: ['chess_item_1_03_e_a', 'chess_item_2_05_e_a', 'chess_item_2_07_e_a', 'chess_item_3_12_e_a', 'chess_item_2_03_e_a', 'chess_item_3_09_e_a', 'chess_item_3_10_e_a', 'chess_item_4_09_e_a'], assumed: ['uniform item weights'] },
       pool_equip_shop_1: { kind: 'equip', rule: 'shopEligible', tiers: [1], assumed: true },
       pool_equip_kathe: { kind: 'equip', rule: 'shopEligible', assumed: true },
-      pool_equip_narant: { kind: 'equip', rule: 'shopEligible', assumed: true },
+      // PRTS documents the two-item offer; community verified its pool contains
+      // non-consumable combat equipment only. Player/economy effects are excluded.
+      pool_equip_narant: { kind: 'equip', items: equipNormal.filter(i => /^chess_item_[1-6]_\d+_e_a$/.test(i.id) && !i.hideInShop && !i.shopExcluded && ['passive', 'passive_counter'].includes(i.kind)).map(i => i.id), assumed: ['uniform item weights'] },
       // "获得一件带有随机特殊效果的维式重锤": the 4 hammers with a special effect (never sold, SHOP_EXCLUDED_ITEMS); the
       // weights are server-side (PRTS 11-25 note: "装备【灼燃维式重锤】的出现概率调整") — uniform [ASSUMED]
       pool_equip_vict: { kind: 'equip', items: ['灼燃维式重锤', '坚固维式重锤', '加速维式重锤', '战栗维式重锤'].map(itemByName), assumed: true },

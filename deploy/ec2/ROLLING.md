@@ -131,3 +131,9 @@ active release images. The updater removes only an explicitly empty, retired rel
 `/status/` is a lightweight read-only page that refreshes every five seconds. Before rolling migration it uses the existing public `/healthz` counts. With the updated gateway, `/__roll/status.json` reports sanitized per-worker and aggregate room, match, player, bot, spectator and connection counts. No room codes, tokens, worker ports or control actions are published. Unreachable workers are explicitly marked and excluded from totals; their absence must not be taken as permission to retire them.
 
 This endpoint is a gateway change. For an installation that has not started, build and install the reviewed commit containing this feature, rather than the earlier image. On an already migrated host, ordinary worker deployments do not replace the gateway; plan a separate gateway maintenance update. CPU and memory metrics remain available through EC2 Docker tools, not this public page.
+
+## Hidden version URLs
+
+The updated gateway shows the root address in the browser while requests remain pinned to their game release. A per-tab session entry selects the existing version on refresh; newly opened main-page tabs select the current release. Room invites select their owning worker, and a retired version falls back to the current release. The old URL routes remain available internally.
+
+This is a router infrastructure change: ordinary game deployments do not install it. After a reviewed image containing this change is built, run `sudo bash rolling-router-update.sh FULL_COMMIT_ID` using that commit's script. It validates a candidate on loopback port 3020 before replacing the router. The game worker containers and room state are retained. Browser connections may briefly reconnect; on failure the old router is restarted. The maintenance timer and Actions deployment share its lock. Do not rerun the first-installation script.

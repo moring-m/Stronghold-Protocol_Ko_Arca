@@ -6,7 +6,7 @@ export function pinPath(path, release) {
   u.searchParams.set("release", release);
   return u.pathname + u.search + u.hash;
 }
-export async function transform(text, type, release) {
+export async function transform(text, type, release, options = {}) {
   if (type.includes("javascript")) {
     await init();
     const [imports] = parse(text),
@@ -39,7 +39,7 @@ export async function transform(text, type, release) {
     );
     return text.replace(
       "<head>",
-      "<head><script>" + bootstrap(release) + "</script>",
+      "<head><script>" + bootstrap(release, options) + "</script>",
     );
   }
   if (type.includes("text/css"))

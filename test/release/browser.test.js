@@ -119,6 +119,7 @@ test(
     await page.goto(base);
     await page.waitForFunction(() => !!window.workerVersion);
     assert.equal(await page.evaluate(() => value), old);
+    assert.equal(new URL(page.url()).pathname,'/');
     assert.deepEqual(await page.evaluate(() => workerVersion), [old, old]);
     await admin("register", {
       id: next,
@@ -134,6 +135,12 @@ test(
       (el) => getComputedStyle(el).backgroundImage,
     );
     assert.ok(css.includes("release=" + old));
+    assert.ok((await page.$eval('img',img=>img.src)).includes('release='+old));
+    await page.reload();await page.waitForFunction(()=>!!window.workerVersion);
+    assert.equal(new URL(page.url()).pathname,'/');
+    assert.equal(await page.evaluate(()=>value),old,'refresh resumes the same tab version');
+    assert.deepEqual(await page.evaluate(()=>workerVersion),[old,old]);
+
     const second = await browser.newPage();
     await second.goto(base);
     await second.waitForFunction(() => !!window.workerVersion);
@@ -142,6 +149,14 @@ test(
       await second.evaluate(() => localStorage.getItem("release-test")),
       "preserved",
     );
+
+    await page.evaluate(()=>window.__SP_GO_LATEST());
+    await page.waitForFunction(expected=>window.value===expected,{},next);
+    assert.equal(new URL(page.url()).pathname,'/');
+    const retired=await fetch(base+'/__roll/admin/retire',{method:'POST',headers:{authorization:'Bearer '+token,'content-type':'application/json'},body:JSON.stringify({id:old})});assert.equal(retired.status,200);
+    await second.evaluate(id=>sessionStorage.setItem('sp.activeRelease',id),old);
+    await second.reload();await second.waitForFunction(expected=>window.value===expected,{},next);
+    assert.equal(new URL(second.url()).pathname,'/');
     assert.deepEqual(errors, []);
   },
 );
