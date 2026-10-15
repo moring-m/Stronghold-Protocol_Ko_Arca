@@ -2068,5 +2068,121 @@ export const AUGMENT_SOURCES = [
   "side": "ally",
   "description": "오퍼레이터가 스킬 사용 시 5초간 공격력 +75%",
   "notes": "사용된 스킬에도 증가된 공격력이 적용되어야 함"
+ },
+ {
+  "source": 154,
+  "identity": 154,
+  "grade": "prism",
+  "name": "야수의 심장",
+  "rounds": [
+   10
+  ],
+  "side": "ally",
+  "description": "전장과 대기석의 모든 오퍼레이터를 판매하고 모든 장비 파기. 무작위 정예화 오퍼레이터 10명 획득",
+  "notes": "상점 등급에 관계없이 완전 무작위로 획득"
+ },
+ {
+  "source": 155,
+  "identity": 155,
+  "grade": "prism",
+  "name": "우리들의 빛",
+  "rounds": [
+   4,
+   7
+  ],
+  "side": "ally",
+  "description": "라운드가 시작할 때마다 전장 내 오퍼레이터 1명의 <획득 시> 특질이 1회 발동 (가장 오른쪽 및 가장 하단 우선 선택)",
+  "notes": "스즈란 전략과 중복 적용"
+ },
+ {
+  "source": 156,
+  "identity": 156,
+  "grade": "prism",
+  "name": "레벨 업",
+  "rounds": [
+   7,
+   10
+  ],
+  "side": "ally",
+  "description": "자금 3 획득, 이번 상점 승급 비용 0",
+  "notes": "이미 6레벨이면 등장하지 않아야 함"
+ },
+ {
+  "source": 157,
+  "identity": 157,
+  "grade": "silver",
+  "name": "캐서린의 지원 I",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "ally",
+  "description": "무작위 효과의 빅토리아 해머 2개 획득",
+  "notes": "기본 빅토리아 해머를 제외한 모든 해머 중 랜덤으로 획득"
+ },
+ {
+  "source": 158,
+  "identity": 158,
+  "grade": "gold",
+  "name": "캐서린의 지원 II",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "ally",
+  "description": "무작위 효과의 빅토리아 해머 4개 획득",
+  "notes": "기본 빅토리아 해머를 제외한 모든 해머 중 랜덤으로 획득"
+ },
+ {
+  "source": 159,
+  "identity": 159,
+  "grade": "prism",
+  "name": "캐서린의 지원 III",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "ally",
+  "description": "무작위 효과의 빅토리아 해머 7개 획득",
+  "notes": "기본 빅토리아 해머를 제외한 모든 해머 중 랜덤으로 획득"
+ },
+ {
+  "source": 160,
+  "identity": 160,
+  "grade": "silver",
+  "name": "골리앗 I",
+  "rounds": [
+   4
+  ],
+  "side": "ally",
+  "description": "목표 HP +11",
+  "notes": "공유 HP일 경우 공유 HP에 합산"
+ },
+ {
+  "source": 161,
+  "identity": 161,
+  "grade": "gold",
+  "name": "골리앗 II",
+  "rounds": [
+   4
+  ],
+  "side": "ally",
+  "description": "목표 HP +21",
+  "notes": "공유 HP일 경우 공유 HP에 합산"
+ },
+ {
+  "source": 162,
+  "identity": 162,
+  "grade": "prism",
+  "name": "골리앗 III",
+  "rounds": [
+   4
+  ],
+  "side": "ally",
+  "description": "목표 HP +31",
+  "notes": "공유 HP일 경우 공유 HP에 합산"
  }
 ];

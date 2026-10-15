@@ -1,3 +1,5 @@
+import {makeCtx} from './effectsMeta.js';
+import {triggerGainEffects} from '../sim/content/garrisons/meta.js';
 import {createRng,deriveSeed} from '../sim/rng.js';
 import {normalizeRuleValues} from '../../shared/customExtensions.js';
 import {PHASE,ERR} from '../../shared/constants.js';
@@ -13,7 +15,7 @@ export class AugmentMode {
   return effect.families.map(f=>({bondId:f.bondId,tiers:f.tiers.map(ids=>ids.filter(id=>this.operatorAvailable(id,ps)))})).filter(f=>this.m.bondLive(f.bondId)&&f.tiers.every(ids=>ids.length));
  }
  host(){const m=this.m,id=m.opts.getHostId?.()||m.opts.hostId;const chosen=m.players.get(id);return chosen&&!chosen.left?id:m.order.find(p=>!p.isBot&&!p.left)?.playerId||m.alivePlayers()[0]?.playerId||null;}
- catalog(side,ps){return createAugmentCatalog(this.m.data,this.m.round).filter(a=>a.side===side&&a.grade===this.current.grade&&!(a.effect.kind==='harmony'&&this.m.gd.config.customRules?.defaultHarmony)&&(a.effect.kind!=='starterPack'||this.starterFamilies(a.effect,ps).length>0)&&!(side==='enemy'?this.enemies:this.allies.get(ps?.playerId)||[]).some(chosen=>chosen.id===a.id||(['extraAttack','spCost'].includes(a.effect.kind)&&chosen.effect.kind===a.effect.kind))&&(!a.bondId||this.m.bondLive(a.bondId))&&(a.effect.kind!=='elemental'||this.m.factions.some(f=>/element|ele|元素|원소/i.test(f)))&&(a.effect.kind!=='chess'||this.chessCandidates(a.effect,ps).length>0));}
+ catalog(side,ps){return createAugmentCatalog(this.m.data,this.m.round).filter(a=>a.side===side&&a.grade===this.current.grade&&!(a.effect.kind==='freeUpgrade'&&ps?.shop.level>=this.m.gd.maxShopLevel)&&!(a.effect.kind==='harmony'&&this.m.gd.config.customRules?.defaultHarmony)&&(a.effect.kind!=='starterPack'||this.starterFamilies(a.effect,ps).length>0)&&!(side==='enemy'?this.enemies:this.allies.get(ps?.playerId)||[]).some(chosen=>chosen.id===a.id||(['extraAttack','spCost'].includes(a.effect.kind)&&chosen.effect.kind===a.effect.kind))&&(!a.bondId||this.m.bondLive(a.bondId))&&(a.effect.kind!=='elemental'||this.m.factions.some(f=>/element|ele|元素|원소/i.test(f)))&&(a.effect.kind!=='chess'||this.chessCandidates(a.effect,ps).length>0));}
  makeSlots(side,ps){const seen=side==='enemy'?this.enemySeen:this.seen.get(ps.playerId)||new Set();if(ps)this.seen.set(ps.playerId,seen);const candidates=this.catalog(side,ps),cards=[];for(let i=0;i<3;i++)cards.push(drawAugmentCard(candidates,seen,cards,this.rng));return {cards,rerolls:Array(3).fill(side==='ally'?this.settings.augmentAllyRerolls:this.settings.augmentEnemyRerolls),picked:cards.some(Boolean)?null:-1};}
  enter(){const m=this.m;if(!this.enabled||!AUGMENT_ROUNDS.includes(m.round)||this.completed.has(m.round)||m.round>=m.gd.bossRound)return false;const grade=rollAugmentGrade(this.rng,this.history,{silver:this.settings.augmentSilver,gold:this.settings.augmentGold,prism:this.settings.augmentPrism});this.history.push(grade);this.completed.add(m.round);this.current={id:`augment-${m.round}`,round:m.round,grade,side:'ally',settling:false,slots:new Map(),boss:null};m.phase=PHASE.SP_DRAFT;m.sp=null;for(const p of m.alivePlayers())this.current.slots.set(p.playerId,this.makeSlots('ally',p));m.setDeadline(m.soloUntimed?0:120,()=>this.timeout());this.notify();for(const p of m.alivePlayers())if(p.botControlled)m.later(m.scaled(400),()=>{if(this.current?.side==='ally')this.choose(p,0);});if(this.ready())this.settle();return true;}
  notify(){for(const ps of this.m.spectators.values())this.m.sendTo(ps.playerId,this.spectatorView(ps));this.m.markPublic();for(const p of this.m.order)this.m.markPrivate(p);}
@@ -40,13 +42,29 @@ export class AugmentMode {
   }
   ps.recompute();
  }
- grant(ps,card){const e=card.effect;if(e.kind==='recast')this.recast(ps);if(e.kind==='harmony')ps.recompute();if(e.kind==='layers'){const ids=Object.keys(ps.bonds).filter(id=>ps.bonds[id].active&&this.m.bondLive(id)&&!this.m.gd.bond(id)?.noStack);for(const id of ids)ps.addLayers(id,this.m.gd.bond(id).isCore?e.core:e.aux,{requireActive:true,reason:'augment'});}if(e.kind==='refresh')ps.shop.freeRefreshes+=e.count;if(e.kind==='income')ps.addFunds(e.amount,{reason:'augment'});const grants=[];
+ grant(ps,card){const e=card.effect;if(e.kind==='beastHeart')this.beastHeart(ps);if(e.kind==='freeUpgrade'){ps.addFunds(e.amount,{reason:'augment'});ps.shop.upgradePrice=0;}if(e.kind==='playerHp'){if(this.m.gd.config.customRules?.sharedHp&&this.m.teamLp!=null){this.m.teamLp+=e.amount;this.m._syncTeamLp();}else ps.lp+=e.amount;this.m.markPublic();}if(e.kind==='recast')this.recast(ps);if(e.kind==='harmony')ps.recompute();if(e.kind==='layers'){const ids=Object.keys(ps.bonds).filter(id=>ps.bonds[id].active&&this.m.bondLive(id)&&!this.m.gd.bond(id)?.noStack);for(const id of ids)ps.addLayers(id,this.m.gd.bond(id).isCore?e.core:e.aux,{requireActive:true,reason:'augment'});}if(e.kind==='refresh')ps.shop.freeRefreshes+=e.count;if(e.kind==='income')ps.addFunds(e.amount,{reason:'augment'});const grants=[];
   if(e.kind==='starterPack'){const families=this.starterFamilies(e,ps);if(families.length){const family=families[Math.floor(this.rng()*families.length)];for(const ids of family.tiers)grants.push({kind:'chess',id:ids[Math.floor(this.rng()*ids.length)]});}}
+  if(e.kind==='hammerGrant')for(let n=0;n<e.count&&e.items.length;n++)grants.push({kind:'item',id:e.items[Math.floor(this.rng()*e.items.length)]});
+  if(e.kind==='beastHeart'){const pool=Object.keys(this.m.data.chess).filter(id=>{const c=this.m.data.chess[id];return c.isGolden&&!c.isHidden&&!c.isDiy&&!c.optionalRecruit&&c.visible!==false&&this.operatorAvailable(id,ps);});for(let n=0;n<e.count&&pool.length;n++)grants.push({kind:'chess',id:pool[Math.floor(this.rng()*pool.length)]});}
   if(e.kind==='items')e.items.forEach((id,i)=>{for(let n=0;n<(e.counts?.[i]??e.count);n++)grants.push({kind:'item',id});});
   if(e.kind==='chess'){const pool=this.chessCandidates(e,ps);for(let n=0;n<e.count&&pool.length;n++)grants.push({kind:'chess',id:pool[Math.floor(this.rng()*pool.length)]});}
   if(grants.length){this.pending.set(ps.playerId,[...(this.pending.get(ps.playerId)||[]),...grants]);this.drain(ps);if(this.pending.get(ps.playerId)?.length)this.m.toast(ps,'info','증강 보상을 보관 중입니다. 대기석의 빈 공간이 생기면 지급합니다.');}ps.dirty();
  }
  drain(ps){if(!this.enabled||this.delivering)return;const queue=this.pending.get(ps.playerId);if(!queue?.length)return;this.delivering=true;try{while(queue.length){const stale=queue.findIndex(g=>g.kind==='chess'&&!this.operatorAvailable(g.id,ps));if(stale>=0){queue.splice(stale,1);continue;}const free=ps.hand.some(x=>!x)||ps.temp.some(x=>!x),idx=queue.findIndex(g=>free||(g.kind==='item'?ps.completesItemMerge(g.id):ps.completesChessMerge(g.id)));if(idx<0)break;const g=queue[idx];const p=g.kind==='item'?ps.acquireItem(g.id,{source:'augment',fromPool:false}):ps.acquireChess(g.id,{source:'augment',fromPool:false});if(!p)break;queue.splice(idx,1);}}finally{this.delivering=false;}}
+ beastHeart(ps){
+  // Sell the snapshot of all operators first, including equipment returns, then destroy all equipment.
+  const pieces=[...ps.board.values(),...ps.hand,...ps.temp].filter(p=>p?.kind==='chess');
+  for(const piece of pieces){const loc=ps.find(piece.uid);if(!loc)continue;ps._detach(loc);ps.removeTokensOf(piece.uid);ps.returnCopies(piece);for(const item of piece.items||[])this.m.dispatchItem(ps,item,piece,'onDestroy',{item,holder:piece,reason:'augment'});piece.items=[];const ev={piece,gain:ps.gd.sellPrice(piece.id)};this.m.dispatch(ps,'onSold',ev);ps.addFunds(Math.max(0,Math.trunc(Number(ev.gain)||0)),{reason:'sell'});ps.stats.sells++;ps.round.sells++;}
+  for(const item of [...ps.hand,...ps.temp].filter(p=>p?.kind==='item')){const loc=ps.find(item.uid);if(loc){ps._detach(loc);this.m.dispatchItem(ps,item,null,'onDestroy',{item,holder:null,reason:'augment'});}}
+  ps.recompute();
+ }
+ roundStart(ps){
+  for(const card of this.allyCards(ps))if(card.effect.kind==='gainTrait'){
+   const ctx=makeCtx(this.m,ps,{kind:'augment',key:card.id},'onRoundStart');
+   const candidates=ctx.board().filter(p=>p.kind==='chess'&&ctx.garrisonsOf(p.uid).some(g=>g.eventType==='SERVER_GAIN')).sort((a,b)=>(b.col-a.col)||(a.row-b.row));
+   if(candidates[0])triggerGainEffects(ctx,candidates[0]);
+  }
+ }
  allyCards(ps){return this.allies.get(ps.playerId)||[];}
  income(ps){return this.allyCards(ps).reduce((n,a)=>n+(a.effect.kind==='income'?a.effect.amount:0),0);}
  price(ps,chess){return this.allyCards(ps).reduce((n,a)=>n+(a.effect.kind==='price'&&Number.isFinite(chess?.tier)&&chess.tier<=(a.effect.maxTier??Infinity)?a.effect.amount:0),0);}

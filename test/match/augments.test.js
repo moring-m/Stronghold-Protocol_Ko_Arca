@@ -181,3 +181,44 @@ test('recast transformation skips every banned operator at the upgraded tier',t=
  const piece=ps.acquireChess(source,{fromPool:false});assert.ok(piece);ps.hand[ps.hand.indexOf(piece)]=null;ps.board.set('9,3',piece);ps.recompute();m.augments.rng=()=>0;
  m.augments.recast(ps);assert.equal(piece.id,allowed);assert.ok(!m.bannedChess.includes(piece.id));
 });
+
+test('new CSV augments expose correct rounds, grade, effects and existing icons',()=>{
+ const names=['야수의 심장','우리들의 빛','레벨 업','캐서린의 지원 I','캐서린의 지원 II','캐서린의 지원 III','골리앗 I','골리앗 II','골리앗 III'];
+ for(const name of names){const cards=[4,7,10].flatMap(r=>createAugmentCatalog(data,r).filter(a=>a.name===name));assert.ok(cards.length,name);for(const card of cards)assert.ok(card.effect.kind);}
+ assert.ok(!createAugmentCatalog(data,4).some(a=>a.name==='야수의 심장'));
+ assert.ok(!createAugmentCatalog(data,4).some(a=>a.name==='레벨 업'));
+ assert.ok(!createAugmentCatalog(data,10).some(a=>a.name==='우리들의 빛'));
+ for(const [name,count] of [['실드 II',3],['실드 III',5]])assert.equal(createAugmentCatalog(data,4).find(a=>a.name===name).effect.count,count);
+});
+for(const [grade,count] of [['silver',2],['gold',4],['prism',7]])test(`Catherine support ${grade}: variant hammers only, correct quantity, stock exempt`,t=>{
+ const {m,ps}=fixture(t);const card=createAugmentCatalog(data,4).find(a=>a.effect.kind==='hammerGrant'&&a.grade===grade);
+ assert.equal(card.effect.items.length,4);assert.ok(!card.effect.items.includes('chess_item_1_01_e_a'));
+ const grants=[];ps.acquireItem=(id,opts)=>{grants.push({id,opts});return {};};m.augments.grant(ps,card);
+ assert.equal(grants.length,count);assert.ok(grants.every(g=>card.effect.items.includes(g.id)&&g.opts.fromPool===false));
+});
+for(const shared of [false,true])test(`Goliath HP applies once, shared=${shared}`,t=>{
+ const {m,ps}=fixture(t,{n:4,rules:shared?['sharedHp']:[]});m.startRound(4);const before=shared?m.teamLp:ps.lp;
+ const card=createAugmentCatalog(data,4).find(a=>a.name==='골리앗 I');m.augments.grant(ps,card);
+ assert.equal(shared?m.teamLp:ps.lp,before+11);if(shared)assert.equal(m.order.reduce((n,p)=>n+p.lp,0),m.teamLp);
+});
+test('level up grants three funds, waives only next upgrade, hides at max shop level',t=>{
+ const {m,ps}=fixture(t);m.round=7;m.phase=PHASE.PREP;m.augments.current={grade:'prism'};
+ const card=m.augments.catalog('ally',ps).find(a=>a.name==='레벨 업'),before=ps.funds;assert.ok(card);m.augments.grant(ps,card);
+ assert.equal(ps.funds,before+3);assert.equal(ps.shop.upgradePrice,0);const level=ps.shop.level;ps.levelUp();assert.equal(ps.shop.level,level+1);assert.equal(ps.shop.upgradePrice,m.gd.upgradeBase(ps.shop.level));
+ ps.shop.level=m.gd.maxShopLevel;assert.ok(!m.augments.catalog('ally',ps).some(a=>a.name==='레벨 업'));
+});
+test('beast heart sells board/bench operators, destroys equipment and queues ten ban-safe elites',t=>{
+ const {m,ps}=fixture(t);m.round=10;const ids=Object.keys(data.chess).filter(id=>!data.chess[id].isGolden&&!data.chess[id].optionalRecruit&&data.chess[id].visible!==false);
+ const p=ps.acquireChess(ids[0],{fromPool:false});const item=ps.newPiece('item','chess_item_1_01_e_a');p.items.push(item);
+ const q=ps.acquireChess(ids[1],{fromPool:false});ps._detach(ps.find(q.uid));ps.board.set('0,0',q);
+ const banned=ids[2];m.bannedChess.push(banned);const before=ps.funds;const card=createAugmentCatalog(data,10).find(a=>a.name==='야수의 심장');
+ const grants=[];ps.acquireChess=(id,opts)=>{grants.push({id,opts});return null;};m.augments.grant(ps,card);
+ assert.ok(!ps.find(p.uid));assert.ok(!ps.find(q.uid));assert.ok(!ps.find(item.uid));assert.ok(ps.funds>=before+m.gd.sellPrice(p.id)+m.gd.sellPrice(q.id));
+ const queued=m.augments.pending.get(ps.playerId);assert.equal(queued.length,10);assert.ok(queued.every(g=>data.chess[g.id].isGolden&&m.gd.baseIdOf(g.id)!==banned));assert.ok(grants.every(g=>g.opts.fromPool===false));
+});
+test('our light repeats the same gain trait as Suzuran and stacks with her strategy',t=>{
+ const {m,ps}=fixture(t);const card=createAugmentCatalog(data,4).find(a=>a.name==='우리들의 빛');m.augments.allies.set(ps.playerId,[card]);
+ const candidate=Object.entries(data.chess).find(([,c])=>!c.isGolden&&!c.optionalRecruit&&c.garrisonIds?.some(id=>data.garrisons[id]?.eventType==='SERVER_GAIN'));assert.ok(candidate);
+ const p=ps.newPiece('chess',candidate[0]);ps.board.set('0,0',p);let calls=0;const orig=m.dispatcher.triggerGarrisons.bind(m.dispatcher);m.dispatcher.triggerGarrisons=(...args)=>{calls++;return orig(...args);};
+ ps.bandId='band_lisa';m.startRound(5);assert.equal(calls,2);
+});
