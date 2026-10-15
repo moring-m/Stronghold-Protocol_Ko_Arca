@@ -24,6 +24,9 @@ function effectOf(source,dataForStarter={}){
  const key={'공격력 증가':'atkPct','HP 증가':'hpPct','방어력 증가':'defPct','마법 저항 증가':'resFlat','공격 속도 증가':'aspd','SP 회복 증가':'spRecoveryFlat','이동 속도 증가':'moveMul'}[base];
  if(key)return {kind:'stats',mods:{[key]:key.endsWith('Pct')?n/100:key==='moveMul'?1+n/100:n}};
  if(base==='회피')return {kind:'stats',mods:{dodgePhys:n/100,dodgeArts:n/100}};
+ if(base==='라이타니엔')return {kind:'leithanienNote'};
+ if(base==='쉐라그')return {kind:'kjerag',bonus:.8,chance:.15,duration:3};
+ if(base==='강타')return {kind:'skillAtk',amount:Number(description.match(/([\d.]+)%/)?.[1]||0)/100,duration:5};
  if(base==='시라쿠사')return {kind:'stealth'};
  if(base==='카란의 눈')return {kind:'normalEnemy',flags:{reveal:true}};
  if(base==='조화')return {kind:'harmony'};
@@ -60,7 +63,7 @@ export function createAugmentCatalog(data,round){
     const suffix=s.grade==='silver'?'I':s.grade==='gold'?'II':'III',name=`${BASIC_NAMES[bondId]||bond.name} ${equipment?'장비 지원':'지원'} ${suffix}`;
     out.push({id:prefix+(equipment?'equipment_':'support_')+bondId,name,grade:s.grade,side:s.side,rounds:s.rounds,description,bondId,iconBond:bondId,effect});
    }
-  }else out.push({id:prefix+(s.identity??s.source),name:s.name,grade:s.grade,side:s.side,rounds:s.rounds,description:s.description,notes:s.notes,iconBond:({신속:"swiftShip",기습:"raidShip",정밀:"preciShip",예견:"visiShip",사르곤:"sargonShip",시라쿠사:"siracusaShip",조화:"maniShip"})[s.name.replace(/ (?:I|II|III)$/,"")]||null,effect:effectOf(s,data)});
+  }else out.push({id:prefix+(s.identity??s.source),name:s.name,grade:s.grade,side:s.side,rounds:s.rounds,description:s.description,notes:s.notes,...(s.name==='라이타니엔'?{bondId:'leithanienShip'}:{}),iconBond:({...Object.fromEntries(Object.entries(BASIC_NAMES).map(([id,name])=>[name,id])),신속:"swiftShip",기습:"raidShip",정밀:"preciShip",예견:"visiShip",사르곤:"sargonShip",시라쿠사:"siracusaShip",조화:"maniShip"})[s.name.replace(/ (?:I|II|III)$/,"")]||null,effect:effectOf(s,data)});
  }
  return out;
 }
@@ -71,8 +74,8 @@ export function drawAugmentCard(candidates,seen,current,rng){const held=new Set(
 /** Original Contingency Contract rune glyphs, selected by the actual augment effect. */
 export function augmentIcon(a){
  const e=a.effect||{},key=Object.keys(e.mods||{})[0];
- const stats={atkPct:a.side==='enemy'?'g_enemy_atk_1':'g_char_atk_p1',hpPct:'g_enemy_hp_1',defPct:'g_enemy_def_1',resFlat:'g_enemy_magical_reduction_1',aspd:a.side==='enemy'?'g_enemy_attackspeed_1':'g_char_atkspeed_p1',dmgDealtMul:'g_char_magicdamage_1',spRecoveryFlat:'g_char_sp_reduce_1',moveMul:'g_enemy_movespeed_1',defIgnorePct:'g_enemy_def_1',dodgePhys:'g_tsz_hp_immune_1'};
- const kinds={items:'g_extra_cost_1',chess:'g_char_tile_summon_1',refresh:'g_global_costrecovery_1',normalEnemy:key==='moveMul'?'g_enemy_movespeed_1':'g_enemy_atk_1',skillSp:'g_char_sp_reduce_1',deployAspd:'g_char_deploy_attribute_add_1',weakness:'g_char_magicdamage_1',spCost:'g_char_sp_reduce_1',extraAttack:'g_char_atk_p1',income:'g_extra_cost_1',starterPack:'g_char_tile_summon_1',layers:'g_global_costrecovery_1',attackHeal:'g_zom_hprec_1',stealth:'g_tsz_hp_immune_1',harmony:'g_global_costrecovery_1',alliedDebuff:key==='resFlat'?'g_enemy_magical_reduction_1':key==='aspd'?'g_char_atkspeed_p1':key==='hpPct'?'g_enemy_hp_1':key==='defPct'?'g_char_def_1':'g_char_atk_p1',alliedDrain:'g_zom_hprec_1',recast:'g_char_tile_summon_1',equipmentAtk:'g_char_atk_p1',price:'g_char_cost_pioneer_1',skillAspd:'g_gx_char_attackspeed_1',corrosion:'g_ly_defres_1',elemental:'g_enemy_element_res_1',shields:'g_enemy_block_dmgreduce_1',statusDuration:'g_char_deploy_stun_1',regen:'g_zom_hprec_1',silenceImmune:'g_tsz_hp_immune_1',leak:'g_lyfrog_hplife_1'};
+ const stats={atkPct:a.side==='enemy'?'g_enemy_atk_1':'g_char_atk_p1',hpPct:a.side==='enemy'?'g_enemy_hp_1':'g_char_hp_1',defPct:a.side==='enemy'?'g_enemy_def_1':'g_char_def_1',resFlat:'g_enemy_magical_reduction_1',aspd:a.side==='enemy'?'g_enemy_attackspeed_1':'g_char_atkspeed_p1',dmgDealtMul:'g_char_magicdamage_1',spRecoveryFlat:'g_char_sp_reduce_1',moveMul:'g_enemy_movespeed_1',defIgnorePct:'g_enemy_def_1',dodgePhys:'g_tsz_hp_immune_1'};
+ const kinds={skillAtk:'g_char_atk_p1',items:'g_extra_cost_1',chess:'g_char_tile_summon_1',refresh:'g_global_costrecovery_1',normalEnemy:key==='moveMul'?'g_enemy_movespeed_1':'g_enemy_atk_1',skillSp:'g_char_sp_reduce_1',deployAspd:'g_char_deploy_attribute_add_1',weakness:'g_char_magicdamage_1',spCost:'g_char_sp_reduce_1',extraAttack:'g_char_atk_p1',income:'g_extra_cost_1',starterPack:'g_char_tile_summon_1',layers:'g_global_costrecovery_1',attackHeal:'g_zom_hprec_1',stealth:'g_tsz_hp_immune_1',harmony:'g_global_costrecovery_1',alliedDebuff:key==='resFlat'?'g_enemy_magical_reduction_1':key==='aspd'?'g_char_atkspeed_p1':key==='hpPct'?'g_enemy_hp_1':key==='defPct'?'g_char_def_1':'g_char_atk_p1',alliedDrain:'g_zom_hprec_1',recast:'g_char_tile_summon_1',equipmentAtk:'g_char_atk_p1',price:'g_char_cost_pioneer_1',skillAspd:'g_gx_char_attackspeed_1',corrosion:'g_ly_defres_1',elemental:'g_enemy_element_res_1',shields:'g_enemy_block_dmgreduce_1',statusDuration:'g_char_deploy_stun_1',regen:'g_zom_hprec_1',silenceImmune:'g_tsz_hp_immune_1',leak:'g_lyfrog_hplife_1'};
  return '/assets/custom/augments/'+(e.kind==='stats'?stats[key]:kinds[e.kind]||'g_extra_cost_1')+'.png';
 }
 

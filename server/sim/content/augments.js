@@ -36,6 +36,10 @@ export function install(b){
   if(u.s.maxHp!==oldMax)u.hp=Math.min(u.s.maxHp,u.s.maxHp*ratio);
  };
  b.on('deploy',({unit})=>initialize(unit));
+ b.on('skillActivating',({unit:u})=>{
+  if(u.side!=='ally'||u.kind!=='op')return;
+  const effects=forUnit(u).filter(e=>e.kind==='skillAtk');if(effects.length)add(u,'skillAtk',{atkPct:effects.reduce((n,e)=>n+e.amount,0)},{duration:Math.max(...effects.map(e=>e.duration)),persist:false});
+ });
  b.on('skillStart',({unit:u})=>{
   if(u.side!=='ally'||u.kind!=='op')return;
   for(const e of forUnit(u)){
@@ -57,14 +61,16 @@ export function install(b){
   if(b._augmentAspd)for(const [owner,list]of b._augmentAspd)if(list.length&&list[0]<=b.time+1e-9){const e=(allied[owner]||empty).find(e=>e.kind==='skillAspd');if(e)refreshAspd(owner,e);}
  });
  b.on('hit',c=>{
+  if(c.source?.side==='ally'&&c.source.kind==='op'&&c.target?.side==='enemy'&&(c.target.s.flags.cold||c.target.s.flags.freeze)){const e=forUnit(c.source).find(e=>e.kind==='kjerag');if(e){const base=c.dmg.kjeragScale||1;c.dmg.mul*=(base+e.bonus)/base;}}
   if(c.source?.side==='ally'&&forUnit(c.source).some(e=>e.kind==='weakness'))weaknessRetype(c.dmg,c.source,c.target);
   if(c.source?.side==='enemy')for(const e of enemyEffects)if(e.kind==='elemental'&&(c.dmg.type==='element'||c.dmg.type==='elemental'))c.dmg.amount*=e.multiplier;
  });
  // Element buildup exits the HP damage pipeline before hit; scale it at creation too (damage.js invokes this).
  b.augmentElementMultiplier=source=>source?.side==='enemy'?enemyEffects.filter(e=>e.kind==='elemental').reduce((n,e)=>n*e.multiplier,1):1;
  b.on('beforeStatus',c=>{if(c.source?.side==='enemy'&&c.target?.side==='ally'&&Number.isFinite(c.duration))for(const e of enemyEffects)if(e.kind==='statusDuration')c.duration*=e.multiplier;});
- b.on('attack',({attacker:u,attackInterval})=>{
+ b.on('attack',({attacker:u,attackInterval,targets=[]})=>{
   if(u.side!=='ally'||!u.alive)return;
+  if(u.kind==='op')for(const e of forUnit(u))if(e.kind==='kjerag')for(const target of targets)if(target?.alive&&target.side==='enemy'&&b.rng()<e.chance)b.applyStatus(target,'cold',{duration:e.duration,source:u});
   if(u.kind==='op')for(const effect of forUnit(u))if(effect.kind==='attackHeal')b.heal(u,u,effect.amount,{self:true});
   const e=forUnit(u).find(e=>e.kind==='extraAttack');if(!e||u.profile?.heal||b.rng()>=e.probability)return;
   const clip=attackClipTiming(u),interval=attackInterval||u.s.interval;

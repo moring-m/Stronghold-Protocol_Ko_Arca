@@ -608,6 +608,7 @@ export class SkillRuntime {
         this.end('instant');
       }
     };
+    if(b._hooks.skillActivating)b.emit('skillActivating',{unit:u,skill:this,reason});
     this._call('onCastStart', {reason});
     if (cast) {
       const seq=u.deploySeq, activation=this.activations;

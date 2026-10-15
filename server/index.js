@@ -82,7 +82,7 @@ export async function startServer(opts = {}) {
   if(release&&(!/^[a-f0-9]{12,40}$/.test(release)||!releaseToken))throw Error('Release requires a commit ID and private control token');
   if(release){opts={...opts,roomCodePrefix:opts.roomCodePrefix??process.env.SP_ROOM_PREFIX,draining:opts.draining??true};if(!opts.roomCodePrefix)throw Error('Release requires room prefix');}
   const { registry, lobby, network } = createSessionStack(opts, { data, log });
-  const releaseControl=release?workerControls(lobby,{release,token:releaseToken}):null;
+  const releaseControl=release?workerControls(lobby,{release,token:releaseToken,network}):null;
   // content packs (docs/PACKS.md): scanned now — the start log names them — and again whenever their folders change
   const packs = createPackRegistry({ publicDir, dataDir, packsDir }, { log });
   packs.refresh(true);
@@ -146,6 +146,7 @@ export async function startServer(opts = {}) {
   async function close() {
     if (closing) return closing;
     closing = (async () => {
+      releaseControl?.close?.();
       try { lobby.shutdown('shutdown'); } catch (e) { log.error('[shutdown] lobby', e); }
       network.close();
       assetIndex?.close();

@@ -120,3 +120,18 @@ test('Head hunting grants one, three or five operators and absent call grants ei
  for(const [suffix,n]of [['I',1],['II',3],['III',5]]){const c=createAugmentCatalog(data,10).find(a=>a.name===`헤드헌팅 ${suffix}`);assert.equal(c.effect.count,n);const before=ps.round.gainedChess;m.augments.grant(ps,c);assert.equal(ps.round.gainedChess-before,n);ps.hand.fill(null);ps.temp.fill(null);}
  const c=createAugmentCatalog(data,4).find(a=>a.name==='부재중 전화');assert.equal(c.effect.count,8);assert.deepEqual(c.effect.items,['chess_item_2_06_e_a']);
 });
+test('breakthrough doubles each goal entry before the round HP cap',t=>{
+ const {m}=fixture(t,{n:2});const players=[...m.players.values()];for(const p of players){p.bandId=m.gd.bandIds()[0];p.lp=30;}m.startRound(1);
+ m.augments.enemies=[{effect:{kind:'leak',amount:1}}];
+ const hp=players[0].lp;
+ m.lastResults=new Map(players.map((p,i)=>[p.playerId,{leaked:Array.from({length:i?0:3},()=>({counted:true})),perfect:!!i,layerGains:{}}]));
+ m.settle(null,null);assert.equal(players[0].lp,hp-6);assert.equal(players[0].stats.leaks,3);
+});
+test('random operator rewards draw with replacement rather than guaranteeing unique operators',t=>{
+ const {m,ps}=fixture(t);const candidates=m.gd.visibleChess.filter(id=>{const c=m.data.chess[id];return c.tier===1&&!c.isGolden&&!c.isHidden&&!c.isDiy&&!c.optionalRecruit&&ps.canRecruit(id)&&!m.bannedChess.includes(id);});
+ assert.ok(candidates.length>1);m.augments.rng=()=>0;
+ const before=new Set(ps.hand.filter(Boolean).map(p=>p.uid));
+ m.augments.grant(ps,{effect:{kind:'chess',tier:1,count:2,candidates}});
+ const gained=ps.hand.filter(p=>p?.kind==='chess'&&!before.has(p.uid));
+ assert.equal(gained.length,2);assert.equal(gained[0].id,gained[1].id);
+});

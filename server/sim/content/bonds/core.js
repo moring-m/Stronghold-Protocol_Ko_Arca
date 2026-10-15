@@ -299,7 +299,7 @@ function installKjerag(battle, pid, bb, members) {
     const f = t.s.flags;
     if (!f.cold && !f.freeze) return;
     const target = ex + per * S.bondLayers(battle, pid, 'kjeragShip');
-    if (base > 0 && target > 0) c.dmg.mul *= target / base;
+    if (base > 0 && target > 0) {c.dmg.mul *= target / base;c.dmg.kjeragScale=target;}
   };
   for (const u of members) onUnitHit(battle, u, onHit);
   if (reached(battle, pid, 'kjeragShip', bb.power_bond_char_cnt)) kjeragColdWind(battle, pid, bb);

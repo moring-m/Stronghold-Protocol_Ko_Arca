@@ -15,6 +15,7 @@ curl)
  esac;;
 docker)
  case "$*" in
+ cp*) touch "\${@: -1}";;
  'inspect stronghold-router '*) echo true;;
  'run -d --name stronghold-router --network '*) [[ "$SCENARIO" != replacement-failed ]] || exit 1;;
  'rename stronghold-router '*) [[ "$SCENARIO" != rename-failed ]] || exit 1;;

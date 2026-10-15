@@ -10,7 +10,8 @@ function push(h,x){let i=h.length;h.push(x);while(i){let p=(i-1)>>1;if(h[p].next
 function pop(h){const x=h[0],last=h.pop();if(h.length){let i=0;while(i*2+1<h.length){let c=i*2+1;if(c+1<h.length&&h[c+1].next<h[c].next)c++;if(h[c].next>=last.next)break;h[i]=h[c];i=c;}h[i]=last;}return x;}
 const six=(b,u)=>S.bondActive(b,u.ownerId,BOND)&&S.bondState(b,u.ownerId,BOND).count>=6;
 export function install(b){
- if(!b.players.some(p=>p.bonds?.[BOND])&&!b.allyUnits.some(u=>u.def?.bonds?.includes(BOND)))return;
+ const augmentOwners=new Set(Object.entries(b.flags.augments?.allies||{}).filter(([,cards])=>cards.some(a=>a.effect.kind==='leithanienNote')).map(([id])=>id));
+ if(!augmentOwners.size&&!b.players.some(p=>p.bonds?.[BOND])&&!b.allyUnits.some(u=>u.def?.bonds?.includes(BOND)))return;
  const heap=[],cohorts=new Map(),counts=new Map(),noteCooldowns=new Map();
  const state={heap,cohorts,applications:0,damageBatches:0,liveStacks:0};
  b.leithanien=state;
@@ -23,20 +24,20 @@ export function install(b){
   const score=u.items?.find(id=>id.startsWith('chess_item_custom_leithanien_score_'));
   if(score)S.passiveBuff(b,u,'leithanien:score:arts',{artsDealtMul:score.endsWith('_b')?1.6:1.4});
  };
- const apply=(u,t)=>{
+ const apply=(u,t,augment=false)=>{
   if(!field(t)||t.side!=='enemy')return;
-  const gate=noteCooldowns.get(`${u.id}:${t.id}`);
+  const gate=noteCooldowns.get(`${u.id}:${t.id}:${augment}`);
   if(gate&&b.time<gate.time+.1-1e-8)return;
-  noteCooldowns.set(`${u.id}:${t.id}`,{time:b.time});
-  const L=S.bondLayers(b,u.ownerId,BOND),duration=six(b,u)?10+Math.floor(L/25):5;
-  const now=b.time,end=now+duration,key=`${u.id}:${t.id}:${now}:${duration}`;
+  noteCooldowns.set(`${u.id}:${t.id}:${augment}`,{time:b.time});
+  const L=S.bondLayers(b,u.ownerId,BOND),duration=augment?10:six(b,u)?10+Math.floor(L/25):5;
+  const now=b.time,end=now+duration,key=`${u.id}:${t.id}:${now}:${duration}:${augment}`;
   let c=cohorts.get(key);
-  if(c){c.amount+=80+u.s.atk*(.01+.0001*L);c.stacks++;}else{c={key,u,t,next:now+1,end,amount:80+u.s.atk*(.01+.0001*L),stacks:1};cohorts.set(key,c);push(heap,c);}
+  if(c){c.amount+=80+u.s.atk*(.01+(augment?0:.0001*L));c.stacks++;}else{c={key,u,t,next:now+1,end,amount:80+u.s.atk*(.01+(augment?0:.0001*L)),stacks:1};cohorts.set(key,c);push(heap,c);}
   state.applications++;state.liveStacks++;t.mem.leithanienStacks=(t.mem.leithanienStacks||0)+1;
   // A single target marker, refreshed only when its expiry extends.
   const old=t.findBuff('leithanien:note');
   if(!old||old.timeLeft<duration)b.addBuff(t,{key:'leithanien:note',duration,refresh:'replace',source:u});
-  if(six(b,u)){t.mem.leithanienWeakenUntil=Math.max(t.mem.leithanienWeakenUntil||0,end);
+  if(!augment&&six(b,u)){t.mem.leithanienWeakenUntil=Math.max(t.mem.leithanienWeakenUntil||0,end);
    const slow=t.findBuff('leithanien:slow');if(!slow||slow.timeLeft<duration)b.addBuff(t,{key:'leithanien:slow',duration,refresh:'replace',mods:{moveMul:.75},source:u});
   }
   if(trait(u)?.effectKey==='custom_leithanien_notes'){
@@ -44,7 +45,7 @@ export function install(b){
    if(n%5===0){add(u,[BOND],trait(u).bb.count,10,'notesGain');add(u,['skillfulShip'],trait(u).bb.skillfulCount,10,'notesSkillfulGain');}
   }
  };
- b.on('damaged',c=>{const caster=c.source?.kind==='token'?c.source.ownerUnit:c.source;if(c.amount>0&&caster?.kind==='op'&&caster.side==='ally'&&c.target?.side==='enemy'&&!c.dmg?.tags?.includes(TAG)&&S.isMember(b,caster,BOND)&&S.bondActive(b,caster.ownerId,BOND))apply(caster,c.target);});
+ b.on('damaged',c=>{const caster=c.source?.kind==='token'?c.source.ownerUnit:c.source;if(c.amount>0&&caster?.kind==='op'&&caster.side==='ally'&&c.target?.side==='enemy'&&!c.dmg?.tags?.includes(TAG)){if(S.isMember(b,caster,BOND)&&S.bondActive(b,caster.ownerId,BOND))apply(caster,c.target);if(augmentOwners.has(caster.ownerId))apply(caster,c.target,true);}});
  b.on('hit',c=>{const source=c.source||c.credit;if(source?.side==='enemy'&&(source.mem.leithanienWeakenUntil||0)>b.time)c.dmg.mul*=.75;});
  b.on('tick',()=>{
   const sums=new Map();

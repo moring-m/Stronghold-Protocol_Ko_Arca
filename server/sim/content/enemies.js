@@ -240,10 +240,11 @@ const ELK_FAIL_SCALE = 2;
 // ---------------------------------------------------------------------------------------------------------------
 // per-battle state + installation
 
-const STATE = new WeakMap();
+// Keep installation and dispatch state on the battle, including across distinct release-pinned module URLs.
+const STATE = Symbol.for('stronghold.enemyContentState');
 function stOf(b) {
-  let st = STATE.get(b);
-  if (!st) { st = { lpLoss: 0, freedAll: false, deathWatch: new Set() }; STATE.set(b, st); }
+  let st = b[STATE];
+  if (!st) { st = { lpLoss: 0, freedAll: false, deathWatch: new Set() }; b[STATE] = st; }
   return st;
 }
 

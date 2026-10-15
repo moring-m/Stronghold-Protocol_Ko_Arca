@@ -14,7 +14,7 @@ test('numeric rules validate and retain their values through normalization',()=>
  for(const n of [3,13,NaN,8.5])assert.equal(extensionSelectionShape({...selection,ruleValues:{deployCap:n}}),false);
  assert.equal(gd.deployCap,12);
  const normal=new GameData(applyCustomExtensions(DATA,{bonds:[],stages:[]}),'mode_single_normal');
- const boss=Object.keys(DATA.bosses)[0];assert.equal(gd.bossPoolHp(boss,1),normal.bossPoolHp(boss,1)*2);
+ const boss=Object.keys(DATA.bosses)[0];assert.equal(gd.bossPoolHp(boss,1),normal.bossPoolHp(boss,1));
 });
 test('unlimited inventory keeps finite sampling weights and never reserves copies',()=>{
  const pool=new SharedPool(gd),id=[...pool.entries.keys()][0];

@@ -137,3 +137,42 @@ This endpoint is a gateway change. For an installation that has not started, bui
 The updated gateway shows the root address in the browser while requests remain pinned to their game release. A per-tab session entry selects the existing version on refresh; newly opened main-page tabs select the current release. Room invites select their owning worker, and a retired version falls back to the current release. The old URL routes remain available internally.
 
 This is a router infrastructure change: ordinary game deployments do not install it. After a reviewed image containing this change is built, run `sudo bash rolling-router-update.sh FULL_COMMIT_ID` using that commit's script. It validates a candidate on loopback port 3020 before replacing the router. The game worker containers and room state are retained. Browser connections may briefly reconnect; on failure the old router is restarted. The maintenance timer and Actions deployment share its lock. Do not rerun the first-installation script.
+
+### Router memory and disconnects
+
+The router uses a 256 MiB container limit and a 16 MiB transformed-module cache.
+Concurrent requests for the same module share one transformation. An `oom` Docker
+event followed by `die` with exit code 137 confirms a memory kill; `OOMKilled=false`
+after restart does not exclude earlier kills. Increase an existing 128 MiB router
+without restarting it with:
+
+```bash
+sudo docker update --memory 256m --memory-swap 256m stronghold-router
+```
+
+The updated installation and router replacement scripts preserve the 256 MiB limit.
+
+### Two-hour retained-release deadline
+
+Activating a new release gives the previous release an absolute two-hour deadline.
+It is stored in router state and never extended by reactivating the current release
+or restarting the router. Retained clients are warned at activation and with one
+hour, 30 minutes, 10 minutes, five minutes and one minute remaining. Workers close
+their rooms at the deadline; the router also disconnects and rejects expired-release
+connections. The maintenance timer removes the old container and starts the queued
+deployment on its next run (within about a minute). The current release is never
+force-retired. Older workers without this feature receive browser fallback notices
+after a page reload. Existing retained releases without metadata get a two-hour
+deadline when the upgraded router first reconciles them.
+
+The router updater installs the new update, maintenance and manual retirement
+scripts under `/opt/stronghold/rolling/`. To terminate all retained releases early
+while keeping the current release and its rooms, run:
+
+```bash
+sudo bash /opt/stronghold/rolling/retire-old.sh
+```
+
+This explicitly ends retained rooms and matches and then processes a queued update.
+The protected `force-retire` API refuses the current release. The shared deployment
+lock prevents the manual command from racing an update.

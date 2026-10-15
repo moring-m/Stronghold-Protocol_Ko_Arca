@@ -1,7 +1,7 @@
 import{test}from 'node:test';import assert from 'node:assert/strict';import{DATA,makeMatch}from './match/harness.js';
 import{applyCustomExtensions,normalizeCustomExtensions,extensionSelectionShape,customExtensionCatalog,recordCustomExtensions}from '../shared/customExtensions.js';
 import{GameData}from '../server/match/gamedata.js';import{RANDOM_BAND_ID}from '../shared/randomBand.js';import{LAB_DUMMY_BOSS}from '../shared/laboratoryDummy.js';
-import{makeBattle,chessRec}from './helpers/battleHarness.js';import{botPickBand}from '../server/match/bot.js';
+import{makeBattle,chessRec,enemyRec}from './helpers/battleHarness.js';import{botPickBand}from '../server/match/bot.js';
 const selection=ruleValues=>({bonds:[],stages:[],ruleValues});
 test('custom stock supports 1–8 player scaling against four-player copies and migrates legacy unlimited stock',()=>{
  const base=new GameData(DATA,'mode_multi_normal');const id=base.visibleChess.find(id=>!base.chess(id).optionalRecruit&&!base.chess(id).isDiy),item='chess_item_2_06_e_a';
@@ -67,4 +67,13 @@ test('eight real clients complete random strategy, modified allied stats and bot
  h.onBroadcast.push(()=>{if(h.m.phase==='PREP'&&h.m.round===h.m.gd.bossRound)for(const p of h.m.order){p.bondCountBonus.yanShip=3;p.layers.yanShip=601;p.recompute();}});
  h.runToEnd();assert.ok(h.ended);assert.equal(h.ended.hiddenReached,true);assert.equal(h.m.errorCount,0);assert.deepEqual(h.logs.error,[]);assert.deepEqual(h.logs.warn,[]);
  const fields=[...h.clients.values()].flatMap(c=>[...c.battles.values()]);for(const kind of ['boss','hidden']){const group=fields.filter(b=>b.spec.kind===kind);assert.ok(group.length>=4);for(const e of group){assert.equal(e.spec.spawns.length,1);assert.equal(e.spec.spawns[0].enemyKey,'enemy_laboratory_jesselton');assert.equal(e.battle.errorCount,0);}}
+});
+
+test('enemy ratios exclude bosses and boss parts; boss ratios independently affect stats and shared HP',()=>{
+ const enemy=enemyRec({key:'normal-spec',hp:1000,atk:100,def:100,res:20,speed:1}),boss={...enemyRec({key:'boss-spec',hp:1000,atk:100,def:100,res:20,speed:1}),rank:'BOSS'};
+ const raw={...DATA,enemies:{...DATA.enemies,'normal-spec':enemy,'boss-spec':boss}};
+ const configured=applyCustomExtensions(raw,selection({enemyHp:200,enemyAtk:150,bossHp:300,bossAtk:50,bossDef:200}));
+ const h=makeBattle({data:configured,autoFinish:false});h.step();const n=h.spawn('normal-spec',{pos:[10,5]}),b=h.spawn('boss-spec',{pos:[10,6],tag:'boss'}),p=h.spawn('normal-spec',{pos:[10,7],tag:'part'});
+ assert.equal(n.s.maxHp,2000);assert.equal(n.s.atk,150);assert.equal(b.s.maxHp,3000);assert.equal(b.s.atk,50);assert.equal(b.s.def,200);assert.equal(p.s.maxHp,3000);
+ const before=new GameData(applyCustomExtensions(DATA,selection({})),'mode_multi_normal'),after=new GameData(configured,'mode_multi_normal'),id=Object.keys(DATA.bosses)[0];assert.equal(after.bossPoolHp(id,2),before.bossPoolHp(id,2)*3);
 });

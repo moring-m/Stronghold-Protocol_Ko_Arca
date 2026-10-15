@@ -67,8 +67,8 @@ test('per-second recovery augments also recover attack and defensive SP types',(
 });
 
 test('swordmaster uses a thirty-five percent proc threshold',()=>{
- const augment=find('소드마스터 III');assert.equal(augment.effect.probability,.33);
- for(const [roll,expected]of [[.329,2],[.33,1]]){const {h,u}=fixture({allies:[augment]});let attacks=0;h.b.on('attack',({attacker})=>{if(attacker===u)attacks++;});h.b.rng=()=>roll;h.b.forceAttack(u);h.run(.69);assert.equal(attacks,expected);u.alive=false;}
+ const augment=find('소드마스터 III');assert.equal(augment.effect.probability,.35);
+ for(const [roll,expected]of [[.349,2],[.35,1]]){const {h,u}=fixture({allies:[augment]});let attacks=0;h.b.on('attack',({attacker})=>{if(attacker===u)attacks++;});h.b.rng=()=>roll;h.b.forceAttack(u);h.run(.69);assert.equal(attacks,expected);u.alive=false;}
 });
 
 test('extra attacks preserve the remaining normal-attack cooldown',()=>{
@@ -112,13 +112,45 @@ test('structural devices ignore enemy max HP reduction and continuous HP drain w
  const{h,u}=fixture({enemies:[find('아군 HP 감소 III','enemy'),find('아군 지속 피해 III','enemy')]});
  const device=h.b.spawnDevice('crate',9,3,{hp:100,obstacle:true});assert.ok(device);close(device.s.maxHp,100);const hp=device.hp,before=u.hp;h.run(1);close(device.hp,hp);close(u.hp,before-30);
 });
-for(const [grade,percent]of [['I',10],['II',20],['III',33]])test(`Swordmaster ${grade} uses the requested probability`,()=>assert.equal(find(`소드마스터 ${grade}`).effect.probability,percent/100));
+for(const [grade,percent]of [['I',15],['II',25],['III',35]])test(`Swordmaster ${grade} uses the requested probability`,()=>assert.equal(find(`소드마스터 ${grade}`).effect.probability,percent/100));
 for(const [grade,percent]of [['I',10],['II',20],['III',40]])test(`Arts master ${grade} reduces maximum SP with upward rounding`,()=>{
  const skill={skillId:'test',spCost:11,initSp:0,spType:'INCREASE_WITH_TIME',skillType:'MANUAL',duration:0};const {u}=fixture({allies:[find(`아츠 마스터 ${grade}`)],skill});assert.equal(u.skill.spCost,Math.ceil(11*(1-percent/100)));
 });
 for(const [grade,multiplier]of [['I',1.1],['II',1.2],['III',1.35]])test(`damage increase ${grade} multiplies physical, magical and true damage`,()=>{
  const {h,u,e}=fixture({allies:[find(`피해 증가 ${grade}`)]});for(const [type,base]of [['phys',5],['arts',80],['true',100]])close(h.b.dealDamage(u,e,{amount:100,type}),base*multiplier);
 });
-test('Victoria grants thirty percent attack per equipped item',()=>{
- const {h,u}=fixture({allies:[find('빅토리아')]});u.items=['a','b'];h.b.emit('deploy',{unit:u});close(u.s.atk,160);u.items=['a'];h.b.emit('deploy',{unit:u});close(u.s.atk,130);
+test('Victoria grants thirty-five percent attack per equipped item',()=>{
+ const {h,u}=fixture({allies:[find('빅토리아')]});u.items=['a','b'];h.b.emit('deploy',{unit:u});close(u.s.atk,170);u.items=['a'];h.b.emit('deploy',{unit:u});close(u.s.atk,135);
+});
+
+test('updated augment probabilities, equipment bonus and grade labels match the requested values',()=>{
+ for(const[suffix,p]of[['I',.15],['II',.25],['III',.35]])close(find('소드마스터 '+suffix).effect.probability,p);
+ close(find('빅토리아').effect.amount,.35);
+ const c=createAugmentCatalog(data,4);assert.equal(c.find(a=>a.grade==='gold'&&a.effect.kind==='income').name,'알뜰살뜰 II');assert.equal(c.find(a=>a.grade==='prism'&&a.effect.kind==='income').name,'알뜰살뜰 III');
+ for(const name of ['강타 I','강타 II','강타 III','쉐라그','라이타니엔'])assert.ok(find(name),name);
+});
+
+test('Strong Strike buffs the triggering immediate skill, expires at 5s, and combines distinct grades',()=>{
+ for(const names of [['강타 I'],['강타 II'],['강타 III'],['강타 I','강타 II']]){
+  const cards=names.map(name=>find(name)),factor=1+cards.reduce((n,c)=>n+c.effect.amount,0),rec=chessRec({id:'strike-op',stats:{atk:100,maxHp:1000},skill:{skillId:'strike',spCost:100,initSp:0,spType:'INCREASE_WITH_TIME',skillType:'MANUAL',trigger:{rule:'NEVER'}}});
+  const h=makeBattle({defs:{chess:{'strike-op':rec},enemies:{dummy:enemyRec({key:'dummy',hp:1e6,atk:0,def:0,res:0,speed:0})}},units:[{chessId:'strike-op',row:10,col:4}],enemies:[{key:'dummy',pos:[10,5]}],kits:{'strike-op':()=>({skill:{kind:'instant',onStart({battle,unit}){battle.dealDamage(unit,battle.enemies[0],{amount:unit.s.atk,type:'arts',isSkill:true});}},trait:{noAttack:true}})},flags:{augments:{allies:{p1:cards.map(item)},enemies:[]}},autoFinish:false});h.run(.1);const u=h.unit('strike-op'),e=h.enemy(),hp=e.hp;assert.ok(u.skill.activate('manual',{free:true}));close(hp-e.hp,100*factor);h.run(5.1);close(u.s.atk,100);assert.equal(h.b.errorCount,0);
+ }
+});
+
+test('Kjerag augment adds 80 percentage points to native cold-target damage instead of multiplying it',async()=>{
+ const {setGameData}=await import('../../server/sim/content/support/index.js');
+ const raw={...data,chess:{...data.chess,'cold-op':chessRec({id:'cold-op',bonds:['kjeragShip'],stats:{atk:100,maxHp:10000},skill:null})},enemies:{enemy_cold:enemyRec({key:'enemy_cold',hp:1e8,atk:0,def:0,res:0,speed:0})}};setGameData(raw);
+ for(const active of[false,true]){
+  const amounts=[];for(const augmented of[false,true]){
+   const h=makeBattle({data:raw,units:[{chessId:'cold-op',row:10,col:3}],enemies:[{key:'enemy_cold',pos:[10,8]}],bonds:active?{kjeragShip:{active:true,count:3,tier:1,layers:115}}:{},flags:{augments:{allies:{p1:augmented?[item(find('쉐라그'))]:[]},enemies:[]}},autoFinish:false});h.run(.1);const u=h.unit('cold-op'),e=h.enemy();h.b.applyStatus(e,'cold',{duration:5,source:u});amounts.push(h.b.dealDamage(u,e,{amount:100,type:'arts'}));assert.equal(h.b.errorCount,0);
+  }close(amounts[1]-amounts[0],80);if(active){close(amounts[0],250);close(amounts[1],330);}
+ }setGameData(null);
+});
+
+test('Leithanien augment gives any operator ten independent ticks unaffected by native bond layers',async()=>{
+ const {setGameData}=await import('../../server/sim/content/support/index.js');
+ const raw={...data,chess:{...data.chess,'note-op':chessRec({id:'note-op',bonds:[],stats:{atk:100,aspd:0},skill:null})},enemies:{enemy_note:enemyRec({key:'enemy_note',hp:1e9,atk:0,def:0,res:0,speed:0})}};setGameData(raw);
+ for(const layers of[0,1000]){
+  const h=makeBattle({data:raw,units:[{chessId:'note-op',row:10,col:3}],enemies:[{key:'enemy_note',pos:[10,8]}],bonds:{leithanienShip:{active:true,count:6,tier:2,layers}},flags:{augments:{allies:{p1:[item(find('라이타니엔'))]},enemies:[]}},captureNoisy:true,autoFinish:false});h.run(.1);const u=h.unit('note-op'),e=h.enemy();h.b.dealDamage(u,e,{amount:1,type:'arts'});h.b.dealDamage(u,e,{amount:1,type:'arts'});assert.equal(h.b.leithanien.applications,1);h.run(10.1);const ticks=h.hooksOf('damaged').filter(c=>c.dmg.tags?.includes('leithanien:note'));assert.equal(ticks.length,10);assert.ok(ticks.every(c=>c.source===u&&Math.abs(c.amount-81)<1e-6));assert.equal(h.b.leithanien.liveStacks,0);assert.equal(h.b.errorCount,0);
+ }setGameData(null);
 });

@@ -186,3 +186,15 @@ test('resource redownload deletes resource caches only and prevents pending old 
  release();await old;
  assert.deepEqual([...stores.keys()],['user-history']);assert.equal(stores.get('user-history').get('history'),'keep');
 });
+
+test('rolling release pins reuse cached art and font keys while data stays isolated by release',async()=>{
+ const handlers={},saved=new Map([['/assets/char/test.skel',new Response('cached-model')]]),calls=[];
+ const index={version:'rolling',files:[{path:'/assets/char/test.skel',sources:['https://cdn.test/model']}],fontCss:'cached-fonts'};let offline=false;
+ const cache={match:async key=>saved.get(typeof key==='string'?key:key.url)?.clone(),put:async(key,response)=>saved.set(key,response.clone())};
+ runInNewContext(readFileSync(new URL('../../public/resource-worker.js',import.meta.url),'utf8').replace(/^import[^\n]+\n/,''),{URL,Response,AbortSignal,setTimeout,clearTimeout,normalizeAtlas(){},caches:{open:async()=>cache,match:cache.match},self:{location:{origin:'https://example.test'},addEventListener:(k,fn)=>handlers[k]=fn},fetch:async request=>{const url=typeof request==='string'?request:request.url;calls.push(url);if(url==='/vendor/browser-resources.json')return new Response(JSON.stringify(index));if(offline)throw Error('offline');if(url.includes('/data/config.json'))return new Response(new URL(url).searchParams.get('release'));throw Error('art should already be cached: '+url);}});
+ const get=async path=>{let response;handlers.fetch({request:{url:'https://example.test'+path,method:'GET'},respondWith:p=>response=p});return(await response).text();};
+ for(const path of ['/assets/char/test.skel?release=111111111111','/assets/char/test.skel?release=222222222222','/assets/~abc123/char/test.skel?release=222222222222'])assert.equal(await get(path),'cached-model');
+ assert.equal(await get('/fonts/fonts.css?release=111111111111'),'cached-fonts');assert.ok(!calls.some(url=>url.includes('/assets/')||url.includes('cdn.test')));
+ assert.equal(await get('/data/config.json?release=111111111111'),'111111111111');assert.equal(await get('/data/config.json?release=222222222222'),'222222222222');offline=true;
+ assert.equal(await get('/data/config.json?release=111111111111'),'111111111111');assert.equal(await get('/data/config.json?release=222222222222'),'222222222222');
+});

@@ -14,7 +14,7 @@ for suffix in old new;do
  d run -d --name "$qa-$suffix" --memory=700m --memory-swap=700m -p "127.0.0.1:$port:3000" \
   -v "$qa-state:/state:ro" -e SP_RELEASE_TOKEN_FILE=/state/token -e SP_RELEASE_ID="$release" -e SP_ROOM_PREFIX="$prefix" -e SP_COMBAT=client "$image" >/dev/null
 done
-d run -d --name "$qa-router" --network host --memory=128m --memory-swap=128m -v "$qa-state:/state" \
+d run -d --name "$qa-router" --network host --memory=256m --memory-swap=256m -v "$qa-state:/state" \
  -e PORT=3037 -e SP_RELEASE_TOKEN_FILE=/state/token -e SP_RELEASE_STATE_FILE=/state/state.json --entrypoint node "$image" server/release/gateway.js >/dev/null
 ready=0
 for attempt in {1..30};do

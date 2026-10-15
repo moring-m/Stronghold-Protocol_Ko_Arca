@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { pipeline } from "node:stream";
 import { authorized, json, body } from "./runtime.js";
+import {RELEASE_RETENTION_MS} from "../../shared/releaseRetirement.js";
 import { transform } from "./transform.js";
 export async function startGateway({
   port = 3000,
@@ -11,6 +12,7 @@ export async function startGateway({
   stateFile,
   token,
   log = console,
+  now = Date.now,
 } = {}) {
   if (!stateFile || !token)
     throw Error("Gateway requires a state file and private token");
@@ -18,9 +20,11 @@ export async function startGateway({
     ? JSON.parse(fs.readFileSync(stateFile, "utf8"))
     : { current: null, releases: {} };
   const transformed = new Map(),
+    transforming = new Map(),
     lookupRates = new Map();
+  const releaseSockets = new Map(), expiring = new Set();
   let cachedBytes = 0;
-  const cacheLimit = 32 * 1024 * 1024;
+  const cacheLimit = 16 * 1024 * 1024;
   const validId = (id) => /^[a-f0-9]{12,40}$/.test(id || "");
   for (const [id, r] of Object.entries(state.releases))
     if (
@@ -31,6 +35,7 @@ export async function startGateway({
       !/^[AB]$/.test(r.prefix)
     )
       throw Error("Invalid gateway state");
+  for(const r of Object.values(state.releases))delete r.deadlineSynced;
   const save = () => {
     fs.mkdirSync(path.dirname(stateFile), { recursive: true });
     const temp = stateFile + ".tmp";
@@ -59,6 +64,22 @@ export async function startGateway({
     return result;
   }
   let statusCache = null, statusAt = 0, statusPending = null;
+  const expired = id => id!==state.current && Number.isSafeInteger(state.releases[id]?.expiresAt) && state.releases[id].expiresAt<=now();
+  async function ensureDeadlines(){
+    let changed=false;
+    for(const [id,r] of Object.entries(state.releases))if(id!==state.current&&!r.expiresAt){r.expiresAt=now()+RELEASE_RETENTION_MS;changed=true;}
+    if(changed)save();
+    for(const [id,r] of Object.entries(state.releases))if(id!==state.current&&r.expiresAt&&!r.deadlineSynced){
+      try{const status=await control(id);r.retirementNotices=!!status.retirementNotices;await control(id,'drain',{draining:true,expiresAt:r.expiresAt});r.deadlineSynced=true;save();}catch{}
+    }
+  }
+  async function expireRetained(){
+    for(const id of Object.keys(state.releases))if(expired(id)&&!expiring.has(id)){
+      expiring.add(id);
+      for(const socket of releaseSockets.get(id)||[])socket.destroy();
+      try{await control(id,'shutdown',{});}catch{}
+    }
+  }
   async function publicStatus() {
     if (statusCache && Date.now() - statusAt < 4000) return statusCache;
     if (statusPending) return statusPending;
@@ -70,7 +91,7 @@ export async function startGateway({
           if (!response.ok) throw Error('Unavailable worker');
           const h = await response.json();
           // Only existing public health fields; never publish room codes or control data.
-          const row = {release, available:true, draining:release!==state.current, app:h.app, build:h.build, uptimeSec:h.uptimeSec};
+          const row = {release, expiresAt:r.expiresAt??null, available:true, draining:release!==state.current, app:h.app, build:h.build, uptimeSec:h.uptimeSec};
           for (const key of ['rooms','matches','humans','bots','spectators','sockets']) row[key] = Number.isFinite(h[key]) ? h[key] : 0;
           return row;
         } catch { return {release, available:false, draining:release!==state.current}; }
@@ -83,7 +104,7 @@ export async function startGateway({
   }
   async function owner(code) {
     const candidate = Object.entries(state.releases).find(
-      ([, r]) => r.prefix === code[0],
+      ([id, r]) => r.prefix === code[0] && !expired(id),
     );
     if (!candidate) return null;
     const [id] = candidate;
@@ -115,9 +136,12 @@ export async function startGateway({
       return;
     }
     if (url.pathname === "/__roll/admin/status" && req.method === "GET") {
+      await ensureDeadlines();await expireRetained();
       const workers = {};
-      for (const id of Object.keys(state.releases))
-        workers[id] = { ...state.releases[id], ...(await control(id)) };
+      for (const id of Object.keys(state.releases)) {
+        try{const status=await control(id);workers[id]={...status,...state.releases[id]};}
+        catch{workers[id]={...state.releases[id],unavailable:true};}
+      }
       json(res, 200, { current: state.current, workers });
       return;
     }
@@ -161,6 +185,7 @@ export async function startGateway({
         const worker = await control(id);
         if (worker.roomPrefix !== input.prefix)
           throw Error("Worker prefix mismatch");
+        state.releases[id].retirementNotices=!!worker.retirementNotices;
         save();
       } catch (e) {
         delete state.releases[id];
@@ -185,13 +210,20 @@ export async function startGateway({
         json(res, 409, { error: "New worker must start draining" });
         return;
       }
-      if (old) await control(old, "drain", { draining: true });
+      const previousOldDeadline=old?state.releases[old]?.expiresAt:null;
+      const deadline=previousOldDeadline||now()+RELEASE_RETENTION_MS;
+      if (old) await control(old, "drain", { draining: true, expiresAt:deadline });
       try {
         await control(id, "drain", { draining: false });
         state.current = id;
+        delete state.releases[id].expiresAt;delete state.releases[id].deadlineSynced;
+        if(old){state.releases[old].expiresAt=deadline;state.releases[old].deadlineSynced=true;}
+        expiring.delete(id);
         save();
+        statusCache=null;
       } catch (e) {
         state.current = old;
+        if(old){if(previousOldDeadline)state.releases[old].expiresAt=previousOldDeadline;else delete state.releases[old].expiresAt;}
         await control(id, "drain", { draining: true }).catch(() => {});
         if (old)
           await control(old, "drain", { draining: false }).catch(() => {});
@@ -200,12 +232,15 @@ export async function startGateway({
       json(res, 200, { current: id, retained: old });
       return;
     }
-    if (url.pathname === "/__roll/admin/retire") {
+    if (url.pathname === "/__roll/admin/retire" || url.pathname === "/__roll/admin/force-retire") {
       if (id === state.current) {
         json(res, 409, { error: "Cannot retire current release" });
         return;
       }
-      const status = await control(id);
+      if(!state.releases[id]){json(res,404,{error:'Unknown release'});return;}
+      const forced=url.pathname.endsWith('/force-retire');
+      if(forced){for(const socket of releaseSockets.get(id)||[])socket.destroy();await control(id,'shutdown',{}).catch(()=>{});}
+      const status = forced?{draining:true,rooms:0,matches:0}:await control(id);
       if (!status.draining || status.rooms || status.matches) {
         json(res, 409, { error: "Release still owns rooms; never stop it" });
         return;
@@ -223,6 +258,7 @@ export async function startGateway({
         state.releases[id] = original;
         throw e;
       }
+      releaseSockets.delete(id);expiring.delete(id);statusCache=null;
       json(res, 200, { retired: id });
       return;
     }
@@ -253,6 +289,10 @@ export async function startGateway({
       }
     }
     res.setHeader("x-content-type-options", "nosniff");
+    if(url.pathname==='/__roll/retirement-monitor.js'){
+      res.writeHead(200,{'content-type':'text/javascript; charset=utf-8','cache-control':'no-store'});
+      res.end(fs.readFileSync(new URL('./retirement-browser.js',import.meta.url),'utf8'));return;
+    }
     if (url.pathname.startsWith("/__roll/admin/")) {
       await admin(req, res, url);
       return;
@@ -260,6 +300,10 @@ export async function startGateway({
     if (url.pathname === "/__roll/status.json" && req.method === "GET") {
       json(res, 200, await publicStatus());
       return;
+    }
+    if(url.pathname==='/__roll/retirement'){
+      const id=url.searchParams.get('id');if(!validId(id)){json(res,400,{error:'Invalid release'});return;}
+      await ensureDeadlines();const r=state.releases[id];json(res,200,{current:state.current,expiresAt:id!==state.current?r?.expiresAt??null:null,expired:!r||expired(id),serverNotices:!!r?.retirementNotices,serverNow:now()});return;
     }
     if (url.pathname === "/__roll/latest") {
       json(res, state.current ? 200 : 503, { build: state.current });
@@ -284,7 +328,7 @@ export async function startGateway({
       }
       // Tab-local version selection preserves reloads without a release in the visible URL.
       // Room invites explicitly choose their owner; a retired version falls back to current.
-      const available=Object.keys(state.releases),invited=/^[A-Z]{4}$/.test(code);
+      const available=Object.keys(state.releases).filter(id=>!expired(id)),invited=/^[A-Z]{4}$/.test(code);
       const html=`<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>위수 프로토콜</title></head><body><p>서버에 연결 중입니다.</p><script>(()=>{const releases=${JSON.stringify(available)},current=${JSON.stringify(id)},invited=${invited};let remembered;try{remembered=sessionStorage.getItem('sp.activeRelease');}catch{}const navigation=performance.getEntriesByType('navigation')[0]?.type,resuming=navigation==='reload'||navigation==='back_forward';const release=!invited&&resuming&&releases.includes(remembered)?remembered:current;const url=new URL(location.href);url.pathname='/r/'+release+'/';url.searchParams.delete('release');location.replace(url.pathname+url.search+url.hash);})();</script></body></html>`;
       res.writeHead(200,{'content-type':'text/html; charset=utf-8','cache-control':'no-store'});
       res.end(req.method==='HEAD'?undefined:html);
@@ -303,7 +347,7 @@ export async function startGateway({
       return;
     }
     const worker = state.releases[target.id];
-    if (!worker) {
+    if (!worker || expired(target.id)) {
       if (req.headers.accept?.includes("text/html")) {
         res.writeHead(302, { location: "/", "cache-control": "no-store" });
         res.end();
@@ -314,9 +358,19 @@ export async function startGateway({
       return;
     }
     const headers = { ...req.headers, host: `127.0.0.1:${worker.port}` };
-    delete headers["accept-encoding"];
-    delete headers["if-none-match"];
-    delete headers["if-modified-since"];
+    // JSON, model/texture and font bodies are forwarded unchanged. Preserve their
+    // compression and validators; only text rewritten below needs identity bytes.
+    const passthrough=/\.(?:json|skel|atlas|png|jpe?g|webp|gif|svg|woff2?|ttf|otf|mp3|ogg|wav|gz)$/i.test(target.pathname);
+    if(!passthrough){
+      delete headers["accept-encoding"];
+      delete headers["if-none-match"];
+      delete headers["if-modified-since"];
+    }
+    const pinned=target.url.searchParams.has('release')||/^\/r\/[a-f0-9]{12,40}\//.test(target.url.pathname);
+    const clientHeaders=out=>{
+      const type=String(out['content-type']||'');
+      return type.includes('javascript')||type.includes('text/css')?{...out,'cache-control':pinned?'public, max-age=31536000, immutable':'no-store'}:out;
+    };
     const cacheKey = target.id + ":" + target.pathname;
     if (
       req.method === "GET" &&
@@ -326,9 +380,30 @@ export async function startGateway({
       const hit = transformed.get(cacheKey);
       transformed.delete(cacheKey);
       transformed.set(cacheKey, hit);
-      res.writeHead(200, hit.headers);
+      res.writeHead(200, clientHeaders(hit.headers));
       res.end(hit.content);
       return;
+    }
+    // Coalesce module loads during join/reconnect bursts. Otherwise every browser
+    // allocates and parses another copy of the same source before it enters cache.
+    const shareTransform = req.method === "GET" && !req.headers.range &&
+      (/\.(?:js|css|html)$/.test(target.pathname) || target.pathname === "/");
+    if (shareTransform && transforming.has(cacheKey)) {
+      const shared = await transforming.get(cacheKey);
+      if (shared) {
+        if (!res.destroyed) { res.writeHead(200, clientHeaders(shared.headers)); res.end(shared.content); }
+        return;
+      }
+    }
+    let completeTransform;
+    if (shareTransform) {
+      const pending = new Promise(resolve => { completeTransform = resolve; });
+      transforming.set(cacheKey, pending);
+      const resolve = completeTransform;
+      completeTransform = value => {
+        if (transforming.get(cacheKey) === pending) transforming.delete(cacheKey);
+        resolve(value);
+      };
     }
     const proxy = http.request(
       {
@@ -346,12 +421,14 @@ export async function startGateway({
           type.includes("text/css");
         const out = { ...upstream.headers, "referrer-policy": "same-origin" };
         if (req.method === "HEAD") {
+          completeTransform?.(null);
           res.writeHead(upstream.statusCode, out);
           upstream.resume();
           res.end();
           return;
         }
         if (!rewrite) {
+          completeTransform?.(null);
           res.writeHead(upstream.statusCode, out);
           pipeline(upstream, res, () => {});
           return;
@@ -369,6 +446,7 @@ export async function startGateway({
             await transform(Buffer.concat(chunks).toString(), type, target.id, {cleanUrls:true}),
           );
           delete out["content-encoding"];
+          delete out["transfer-encoding"];
           delete out.etag;
           out["content-length"] = content.length;
           out["cache-control"] = "no-store";
@@ -391,9 +469,10 @@ export async function startGateway({
             transformed.set(cacheKey, { headers: out, content });
             cachedBytes += content.length;
           }
-          res.writeHead(upstream.statusCode, out);
-          res.end(content);
+          completeTransform?.(upstream.statusCode === 200 ? {headers:out, content} : null);
+          if (!res.destroyed) { res.writeHead(upstream.statusCode, clientHeaders(out)); res.end(content); }
         } catch (e) {
+          completeTransform?.(null);
           log.error(e);
           if (!res.headersSent)
             json(res, 502, { error: "Cannot serve release asset" });
@@ -402,6 +481,7 @@ export async function startGateway({
       },
     );
     proxy.on("error", () => {
+      completeTransform?.(null);
       if (!res.headersSent)
         json(res, 502, {
           error: "Worker unavailable; room ownership retained",
@@ -419,23 +499,38 @@ export async function startGateway({
     }),
   );
   server.on("upgrade", (req, socket, head) => {
+    // A client can reset the TCP connection before the worker accepts the upgrade.
+    // Register handlers immediately: an unhandled socket error exits the router.
+    let request, upstreamSocket;
+    const cancel = () => { request?.destroy(); upstreamSocket?.destroy(); };
+    socket.on("error", cancel);
+    socket.on("close", cancel);
+    socket.setTimeout(0);
     const target = route(req),
       worker = state.releases[target.id];
     if (
       target.pathname !== "/ws" ||
-      !worker ||
+      !worker || expired(target.id) ||
       !target.url.searchParams.has("release")
     ) {
       socket.end("HTTP/1.1 426 Upgrade Required\r\nConnection: close\r\n\r\n");
       return;
     }
-    const request = http.request({
+    if(!releaseSockets.has(target.id))releaseSockets.set(target.id,new Set());
+    releaseSockets.get(target.id).add(socket);
+    socket.on('close',()=>releaseSockets.get(target.id)?.delete(socket));
+    request = http.request({
       host: "127.0.0.1",
       port: worker.port,
       path: "/ws",
       headers: { ...req.headers, host: `127.0.0.1:${worker.port}` },
     });
     request.on("upgrade", (response, upstream, extra) => {
+      upstreamSocket = upstream;
+      upstream.on("error", () => socket.destroy());
+      upstream.on("close", () => socket.destroy());
+      upstream.setTimeout(0);
+      if (socket.destroyed) { upstream.destroy(); return; }
       socket.write(
         `HTTP/1.1 ${response.statusCode} Switching Protocols\r\n` +
           Object.entries(response.headers)
@@ -446,10 +541,6 @@ export async function startGateway({
       if (extra.length) socket.write(extra);
       if (head.length) upstream.write(head);
       socket.pipe(upstream).pipe(socket);
-      socket.on("error", () => upstream.destroy());
-      upstream.on("error", () => socket.destroy());
-      socket.on("close", () => upstream.destroy());
-      upstream.on("close", () => socket.destroy());
     });
     request.on("response", (response) => {
       response.resume();
@@ -462,12 +553,15 @@ export async function startGateway({
     server.once("error", reject);
     server.listen(port, host, resolve);
   });
+  const expiryTimer=setInterval(()=>expireRetained().catch(e=>log.error(e)),1000);expiryTimer.unref();
   return {
+    expireRetained,
     server,
     port: server.address().port,
     state: () => structuredClone(state),
     close: () =>
       new Promise((resolve) => {
+        clearInterval(expiryTimer);
         server.close(resolve);
         server.closeIdleConnections();
       }),

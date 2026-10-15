@@ -1028,7 +1028,11 @@ export class UnitView {
     const gz = this.flying ? this.flightBaseZ ?? 0 : this.isEnemy ? 0 : groundZ(this.ctx, s.x, s.y);
     if (this.zTarget == null || (this.flying && gz > this.z)) this.z = gz;
     this.zTarget = gz;
-    if (s.maxHp > 0) this.maxHp = s.maxHp;
+    if (s.maxHp > 0 && s.maxHp !== this.maxHp) {
+      this.maxHp=s.maxHp;
+      // A skill changing max HP is not a hit. Reset the damage trail baseline.
+      this.ghostHp=clamp(s.hp,0,this.maxHp);this._trailHp=this.ghostHp;this._trailRemaining=0;
+    }
     const hp = clamp(s.hp, 0, this.maxHp);
     if (hp < this.hp - 0.5 && this.isBoss) this.shake = 0.25;
     this.hp = hp;
@@ -1822,6 +1826,8 @@ export class UnitView {
 
   _updateHpTrail(dt) {
     const hp = clamp(this.hp, 0, this.maxHp);
+    if(this._trailMaxHp!=null&&this._trailMaxHp!==this.maxHp){this.ghostHp=hp;this._trailHp=hp;this._trailRemaining=0;}
+    this._trailMaxHp=this.maxHp;
     const previous = this._trailHp ?? this.maxHp;
     this.ghostHp = clamp(this.ghostHp, hp, this.maxHp);
     if (hp < previous - .000001) this._trailRemaining = .3;

@@ -10,6 +10,16 @@ release=${1:-};image=${2:-}
 api() { curl --fail-with-body -sS --max-time 10 -H "Authorization: Bearer $(cat "$root/state/token")" -H 'Content-Type: application/json' "http://127.0.0.1:3000/__roll/admin/$1" "${@:2}"; }
 status=$(api status)
 current=$(python3 -c 'import json,sys;print(json.load(sys.stdin)["current"] or "")' <<<"$status")
+# Expired releases may be removed even if a match never finishes.
+while read -r old;do
+ [[ -n $old ]] || continue
+ api force-retire -X POST --data "{\"id\":\"$old\"}" >/dev/null
+ docker stop "stronghold-release-$old" >/dev/null
+ docker rm "stronghold-release-$old" >/dev/null
+ docker image rm "ghcr.io/moring-m/stronghold-protocol_ko_arca:$old" >/dev/null 2>&1 || true
+ echo "Retired expired release $old"
+done < <(python3 -c 'import json,sys,time;s=json.load(sys.stdin);print("\n".join(k for k,v in s["workers"].items() if k!=s["current"] and isinstance(v.get("expiresAt"),(int,float)) and v["expiresAt"]<=time.time()*1000))' <<<"$status")
+status=$(api status)
 # Retire only workers explicitly drained and reporting no remaining rooms/matches.
 while read -r old; do
  [[ -n $old ]] || continue
@@ -19,7 +29,7 @@ while read -r old; do
  oldimage="ghcr.io/moring-m/stronghold-protocol_ko_arca:$old"
  docker image rm "$oldimage" >/dev/null 2>&1 || true
  echo "Retired empty release $old"
-done < <(python3 -c 'import json,sys;s=json.load(sys.stdin);print("\n".join(k for k,v in s["workers"].items() if k!=s["current"] and v["draining"] and not v["rooms"] and not v["matches"]))' <<<"$status")
+done < <(python3 -c 'import json,sys;s=json.load(sys.stdin);print("\n".join(k for k,v in s["workers"].items() if k!=s["current"] and v.get("draining") and not v.get("rooms",1) and not v.get("matches",1)))' <<<"$status")
 status=$(api status)
 if [[ $current == "$release" ]]; then api activate -X POST --data "{\"id\":\"$release\"}" >/dev/null; rm -f "$root/pending.json"; echo 'Requested release is already current.'; exit 0; fi
 count=$(python3 -c 'import json,sys;print(len(json.load(sys.stdin)["workers"]))' <<<"$status")

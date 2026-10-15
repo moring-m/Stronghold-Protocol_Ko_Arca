@@ -1,4 +1,6 @@
 // Protected worker controls. Kept separate from public game protocol.
+import {sendSession} from "../net.js";
+import {createRetirement} from "./retirement.js";
 import { timingSafeEqual } from "node:crypto";
 export function authorized(req, token) {
   const value = req.headers.authorization || "",
@@ -26,8 +28,12 @@ export async function body(req) {
   }
   return value ? JSON.parse(value) : {};
 }
-export function workerControls(lobby, { release, token }) {
-  return async (req, res) => {
+export function workerControls(lobby, { release, token, network }) {
+  const retire = createRetirement({
+    notify: text => {for(const session of lobby.registry.byPlayerId.values())sendSession(session,{t:'m.toast',text,kind:'warn',ttl:10000});},
+    expire: () => {lobby.draining=true;lobby.shutdown('version_retired');network?.close();},
+  });
+  const handler = async (req, res) => {
     const path = new URL(req.url, "http://worker").pathname;
     if (!path.startsWith("/__release/")) return false;
     if (!authorized(req, token)) {
@@ -39,6 +45,7 @@ export function workerControls(lobby, { release, token }) {
         release,
         draining: lobby.draining,
         roomPrefix: lobby.opts.roomCodePrefix,
+        retirementNotices:true, expiresAt:retire.deadline(),
         ...lobby.stats(),
         codes: [...lobby.rooms.keys()],
       });
@@ -50,11 +57,19 @@ export function workerControls(lobby, { release, token }) {
         json(res, 400, { error: "Expected boolean draining" });
         return true;
       }
+      if(input.expiresAt!=null && (!Number.isSafeInteger(input.expiresAt)||input.expiresAt<=0)){json(res,400,{error:'Invalid retirement deadline'});return true;}
       lobby.draining = input.draining;
+      retire.setDeadline(input.draining?input.expiresAt??retire.deadline():null);
       json(res, 200, { draining: lobby.draining });
       return true;
+    }
+    if(path==='/__release/shutdown' && req.method==='POST'){
+      if(!lobby.draining){json(res,409,{error:'Cannot shut down active release'});return true;}
+      retire.stop();lobby.shutdown('version_retired');network?.close();json(res,200,{closed:true});return true;
     }
     json(res, 404, { error: "Not found" });
     return true;
   };
+  handler.close=()=>retire.stop();
+  return handler;
 }

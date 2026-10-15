@@ -16,7 +16,7 @@ docker pull "$image"
 install -d -m 750 "$root" "$root/state"
 chown 1000:1000 "$root/state"
 if [[ ! -f "$root/state/token" ]];then openssl rand -hex 32 > "$root/state/token";chmod 600 "$root/state/token";chown 1000:1000 "$root/state/token";fi
-for file in rolling-update.sh rolling-maintain.sh;do docker run --rm --entrypoint cat "$image" "/app/deploy/ec2/$file" > "$root/${file#rolling-}";chmod 700 "$root/${file#rolling-}";done
+for file in rolling-update.sh rolling-maintain.sh rolling-retire-old.sh;do docker run --rm --entrypoint cat "$image" "/app/deploy/ec2/$file" > "$root/${file#rolling-}";chmod 700 "$root/${file#rolling-}";done
 docker run --rm --entrypoint cat "$image" /app/deploy/ec2/ssh-deploy-command.sh > /usr/local/bin/stronghold-deploy-ssh
 chmod 755 /usr/local/bin/stronghold-deploy-ssh
 # Use Caddy's adapted config for temporary maintenance; leave its source file and cert volumes intact.
@@ -58,7 +58,7 @@ done
 (( quiet )) || { echo 'Old sockets remain; initial installation aborted safely.';exit 1; }
 docker stop stronghold-game >/dev/null
 old_stopped=1
-docker run -d --name stronghold-router --network host --restart unless-stopped --memory=128m --memory-swap=128m \
+docker run -d --name stronghold-router --network host --restart unless-stopped --memory=256m --memory-swap=256m \
  -v "$root/state:/state" -e PORT=3000 -e SP_RELEASE_TOKEN_FILE=/state/token -e SP_RELEASE_STATE_FILE=/state/state.json \
  --entrypoint node "$image" server/release/gateway.js >/dev/null
 for attempt in {1..15};do if curl -sS --max-time 2 http://127.0.0.1:3000/__roll/latest >/dev/null;then break;fi;sleep 1;done

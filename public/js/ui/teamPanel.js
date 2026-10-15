@@ -54,8 +54,9 @@ export function rowLp(p, pub, self = null, { uniteLocal = null, normalLeaks = nu
   const rawLeft = pub.phase !== PHASE.UNITE ? null : self ? self.left : local != null ? local : p.uniteLeft;
   const left = Number.isFinite(rawLeft) && rawLeft >= 0 ? Math.trunc(rawLeft) : null;
   if (lp == null) return { lp, pending: 0, unite: false, left };
-  const normalPending = pub.phase === PHASE.COMBAT && normalLeaks && Number.isFinite(normalLeaks[`n:${p.playerId}`]) ? Math.min(cap, normalLeaks[`n:${p.playerId}`]) : 0;
-  const raw = self ? self.pending : local != null ? Math.min(cap, local) : Math.max(Number(p.pendingLp) || 0, normalPending);
+  const leakHpCost = pub.augments?.leakHpCost || 1;
+  const normalPending = pub.phase === PHASE.COMBAT && normalLeaks && Number.isFinite(normalLeaks[`n:${p.playerId}`]) ? Math.min(cap, normalLeaks[`n:${p.playerId}`]*leakHpCost) : 0;
+  const raw = self ? self.pending : local != null ? Math.min(cap, local*leakHpCost) : Math.max(Number(p.pendingLp) || 0, normalPending);
   const pending = Math.min(lp, Math.max(0, Math.trunc(Number(raw) || 0)));
   return { lp, pending, unite: (pending > 0 || left != null) && (self ? !!self.unite : pub.phase === PHASE.UNITE), left };
 }

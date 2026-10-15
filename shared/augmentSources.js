@@ -688,7 +688,7 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "ally",
-  "description": "모든 아군 유닛이 공격 시 33% 확률로 추가 공격",
+  "description": "모든 아군 유닛이 공격 시 35% 확률로 추가 공격",
   "notes": "발동이 되면, 해당 공격 이후 추가 공격 즉시 진행, 추가 공격으로도 이 효과가 발동할 수 있음."
  },
  {
@@ -1289,7 +1289,7 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "enemy",
-  "description": "적이 방어 포인트 진입 시 차감되는 HP +1",
+  "description": "일반 전투·협력방어에서 적이 방어 포인트에 진입할 때마다 HP 2 감소",
   "notes": "HP 감소 제한을 초과하지는 않음"
  },
  {
@@ -1886,7 +1886,7 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "ally",
-  "description": "모든 아군 유닛이 공격 시 10% 확률로 추가 공격",
+  "description": "모든 아군 유닛이 공격 시 15% 확률로 추가 공격",
   "notes": ""
  },
  {
@@ -1914,7 +1914,7 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "ally",
-  "description": "모든 아군 유닛이 공격 시 20% 확률로 추가 공격",
+  "description": "모든 아군 유닛이 공격 시 25% 확률로 추가 공격",
   "notes": ""
  },
  {
@@ -1954,7 +1954,7 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "ally",
-  "description": "오퍼레이터가 장비를 1개 장착할 때마다 공격력 +30%",
+  "description": "오퍼레이터가 장비를 1개 장착할 때마다 공격력 +35%",
   "notes": ""
  },
  {
@@ -1998,5 +1998,75 @@ export const AUGMENT_SOURCES = [
   "side": "ally",
   "description": "모든 아군 유닛이 입히는 대미지가 135%로 증가",
   "notes": ""
+ },
+ {
+  "source": 149,
+  "identity": 149,
+  "grade": "prism",
+  "name": "라이타니엔",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "ally",
+  "description": "오퍼레이터가 피해를 입히면 대상 적에게 10초간 '속세의 음'을 적용하여, 매 초마다 80 + 공격력의 1%에 해당하는 마법 대미지를 입힘 (무한 중첩 가능)",
+  "notes": "라이타니엔이 활성화된 게임에만 등장, 매커니즘은 라이타니엔과 동일하지만 라이타니엔 맹약 중첩에 영향받지 않음"
+ },
+ {
+  "source": 150,
+  "identity": 150,
+  "grade": "prism",
+  "name": "쉐라그",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "ally",
+  "description": "오퍼레이터가 냉각/빙결 상태의 적에게 입히는 대미지가 180%로 증가, 오퍼레이터가 공격 시 대상 적에게 15% 확률로 3초간 냉각 적용",
+  "notes": "쉐라그 맹약의 대미지 증가량과 합산 (예: 맹약 활성화되어있며 250% 대미지고 쉐라그 증강을 얻었다면 대미지 증가량이 합산되어 총 330%)"
+ },
+ {
+  "source": 151,
+  "identity": 151,
+  "grade": "silver",
+  "name": "강타 I",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "ally",
+  "description": "오퍼레이터가 스킬 사용 시 5초간 공격력 +40%",
+  "notes": "사용된 스킬에도 증가된 공격력이 적용되어야 함"
+ },
+ {
+  "source": 152,
+  "identity": 152,
+  "grade": "gold",
+  "name": "강타 II",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "ally",
+  "description": "오퍼레이터가 스킬 사용 시 5초간 공격력 +55%",
+  "notes": "사용된 스킬에도 증가된 공격력이 적용되어야 함"
+ },
+ {
+  "source": 153,
+  "identity": 153,
+  "grade": "prism",
+  "name": "강타 III",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "ally",
+  "description": "오퍼레이터가 스킬 사용 시 5초간 공격력 +75%",
+  "notes": "사용된 스킬에도 증가된 공격력이 적용되어야 함"
  }
 ];

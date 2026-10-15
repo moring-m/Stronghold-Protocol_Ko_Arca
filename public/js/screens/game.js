@@ -310,8 +310,9 @@ function MatchScreen() {
   const localLeft = leaker && uniteLocal ? (uniteLocal[myId] ?? 0) : undefined;
   const liveLpNow = liveLp(lpBaseRef.current, {
     phase, round: pub?.round, lp: pub?.customExtensions?.rules?.includes('sharedHp')?pub.teamLp:priv?.lp, statsLeaks: priv?.stats?.leaks, alive,
-    leaks: ownLeaks(localLeaks, meP?.pendingLp), cap: gd.config?.lpCapPerRound,
-    uniteLeft: leaker ? uniteRemaining(localLeft, meP?.uniteLeft) : null,
+    leaks: ownLeaks(localLeaks, (meP?.pendingLp||0)/(pub?.augments?.leakHpCost||1)), cap: gd.config?.lpCapPerRound,
+    uniteLeft: leaker?uniteRemaining(localLeft,meP?.uniteLeft):null,
+    leakHpCost:pub?.augments?.leakHpCost||1,
   });
   lpBaseRef.current = liveLpNow.base;
   // What this round's battle will cost me, remembered while it still runs: at SETTLE the settlement has already landed

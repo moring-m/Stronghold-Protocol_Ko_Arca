@@ -129,7 +129,7 @@ export class GameData {
     let base = boss && boss.bloodPoint && Number.isFinite(boss.bloodPoint[diff]) ? boss.bloodPoint[diff] : null;
     if (base == null && boss && boss.bloodPoint) base = Object.values(boss.bloodPoint).find((v) => Number.isFinite(v)) ?? null;
     if (base == null) base = 500000;
-    return Math.max(1, Math.round(base * this.bossPoolShare(aliveCount) * (this.config.customRules?.enemyHp??100)/100));
+    return Math.max(1, Math.round(base * this.bossPoolShare(aliveCount) * (this.config.customRules?.bossHp??100)/100));
   }
 
   /** Solo uses the full base HP. Co-op uses base × alive participants (1–4)

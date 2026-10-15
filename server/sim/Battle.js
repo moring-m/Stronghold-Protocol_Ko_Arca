@@ -936,7 +936,8 @@ export class Battle {
     const m0 = opts.mods || {};
     const m = { hpMul: mm(m0.hpMul, true), atkMul: mm(m0.atkMul), defMul: mm(m0.defMul), resMul: mm(m0.resMul), speedMul: mm(m0.speedMul) };
     const rules=this.data.raw?.config?.customRules||{};
-    const percent=id=>(rules[id]??100)/100;
+    const bossStats=def.rank==='BOSS'||opts.tag==='boss'||opts.tag==='part';
+    const percent=id=>(rules[bossStats?id.replace(/^enemy/,'boss'):id]??100)/100;
     const e = new Unit({
       battle: this,
       id: ++this._idSeq, side: 'enemy', kind: 'enemy', def, defId: def.key ?? enemyKey, name: def.name,

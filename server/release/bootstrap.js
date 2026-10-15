@@ -1,6 +1,7 @@
 // Injected before the game's scripts. All fetches/worker scripts stay on this release.
 export function bootstrap(release, { cleanUrls = false } = {}) {
   return `(()=>{const release=${JSON.stringify(release)};globalThis.__SP_RELEASE=release;
+ import('/__roll/retirement-monitor.js').catch(()=>{});
  ${cleanUrls ? `
  const storedKey='sp.activeRelease';
  try{sessionStorage.setItem(storedKey,release);}catch{}

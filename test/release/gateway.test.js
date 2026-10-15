@@ -134,7 +134,7 @@ test("rollover retains rooms and websocket reconnects; only new rooms move to th
   assert.equal(statusResponse.headers.get('cache-control'),'no-store');
   const status = await statusResponse.json();
   assert.equal(status.rolling,true);assert.equal(status.ok,true);assert.equal(status.workers.length,2);
-  assert.ok(status.totals.rooms>=1);assert.equal(status.workers.find(w=>w.release===OLD).draining,true);
+  assert.equal(status.totals.rooms,1);assert.equal(status.totals.matches,1);assert.equal(status.workers.find(w=>w.release===NEW).rooms,0);assert.equal(status.workers.find(w=>w.release===OLD).draining,true);
   assert.ok(!JSON.stringify(status).includes('codes'));assert.ok(!JSON.stringify(status).includes(token));
 
   assert.equal(
@@ -162,6 +162,10 @@ test("rollover retains rooms and websocket reconnects; only new rooms move to th
   );
   const newFrame = await newer.wait((x) => x.t === "room.state");
   assert.ok((newFrame.code || newFrame.room?.code).startsWith("B"));
+  // The old room is retained, never copied into the new worker.
+  assert.equal(old.lobby.rooms.size,1);assert.equal(next.lobby.rooms.size,1);
+  assert.equal(old.lobby.getRoom(newFrame.code || newFrame.room?.code),null);
+  assert.equal(next.lobby.getRoom(code),null);
   client.ws.close();
   await new Promise((resolve) => client.ws.once("close", resolve));
   const resumed = await socket(gateway.port, OLD, client.welcome.token);
@@ -206,3 +210,16 @@ test("import rewriting preserves static, dynamic and commented text", async () =
  assert.ok(output.includes('searchParams.set("release",'));
  assert.ok(output.includes('import("./fixed.js?release='+OLD+'")'));
  });
+
+test('two-hour deadline and forced retirement close only the old release; active rooms are counted once',async t=>{
+ const dir=await mkdtemp(join(tmpdir(),'deadline-release-'));t.after(()=>rm(dir,{recursive:true,force:true}));let now=Date.now();
+ const old=await startServer({port:0,host:'127.0.0.1',quiet:true,assetIndex:false,releaseId:OLD,releaseToken:token,roomCodePrefix:'A'}),next=await startServer({port:0,host:'127.0.0.1',quiet:true,assetIndex:false,releaseId:NEW,releaseToken:token,roomCodePrefix:'B'});t.after(()=>Promise.all([old.close(),next.close()]));
+ const gateway=await startGateway({port:0,stateFile:join(dir,'state.json'),token,now:()=>now,log:{error(){}}});t.after(()=>gateway.close());const base=`http://127.0.0.1:${gateway.port}`;
+ const post=async(action,input)=>fetch(base+'/__roll/admin/'+action,{method:'POST',headers:{authorization:'Bearer '+token,'content-type':'application/json'},body:JSON.stringify(input)});
+ assert.equal((await post('register',{id:OLD,port:old.port,prefix:'A'})).status,200);await post('activate',{id:OLD});const a=await socket(gateway.port,OLD);t.after(()=>a.ws.close());await a.request('room.create',{mode:'solo',difficulty:'NORMAL'});await a.request('room.start');
+ await post('register',{id:NEW,port:next.port,prefix:'B'});await post('activate',{id:NEW});const deadline=gateway.state().releases[OLD].expiresAt;assert.equal(deadline,now+7200000);assert.equal(gateway.state().releases[NEW].expiresAt,undefined);await post('activate',{id:NEW});assert.equal(gateway.state().releases[OLD].expiresAt,deadline);
+ await a.wait(m=>m.t==='m.toast'&&m.text.includes('2시간'));const b=await socket(gateway.port,NEW);t.after(()=>b.ws.close());await b.request('room.create',{mode:'solo',difficulty:'NORMAL'});await b.request('room.start');
+ const summary=await(await fetch(base+'/__roll/status.json')).json();assert.equal(summary.totals.rooms,2);assert.equal(summary.totals.matches,2);assert.equal((await post('force-retire',{id:NEW})).status,409);assert.equal(next.lobby.rooms.size,1);
+ now=deadline-1;await gateway.expireRetained();assert.equal(old.lobby.rooms.size,1);now=deadline;await gateway.expireRetained();assert.equal(old.lobby.rooms.size,0);assert.equal(next.lobby.rooms.size,1);assert.equal(next.lobby.stats().matches,1);assert.equal((await fetch(base+`/r/${OLD}/`)).status,410);
+ assert.equal((await post('force-retire',{id:OLD})).status,200);assert.deepEqual(Object.keys(gateway.state().releases),[NEW]);assert.equal((await b.request('ping',{c:Date.now()})).t,'pong');
+});

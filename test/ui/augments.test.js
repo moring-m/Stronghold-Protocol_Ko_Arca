@@ -17,7 +17,7 @@ test('all dynamically expanded augment labels use Korean bond names',()=>{
 });
 
 test('bond-related augment names resolve to the corresponding existing bond icon',()=>{
- const manifest=JSON.parse(readFileSync('content/production/data/assets.json'));const names={swiftShip:'신속',raidShip:'기습',preciShip:'정밀',visiShip:'예견',sargonShip:'사르곤'};
+ const manifest=JSON.parse(readFileSync('content/production/data/assets.json'));const names={swiftShip:'신속',raidShip:'기습',preciShip:'정밀',visiShip:'예견',sargonShip:'사르곤',victoriaShip:'빅토리아',kjeragShip:'쉐라그',leithanienShip:'라이타니엔'};
  for(const round of [4,7,10])for(const a of createAugmentCatalog(data,round))if(a.iconBond){assert.ok(manifest.bonds[a.iconBond],a.name);if(a.bondId)assert.equal(a.iconBond,a.bondId);if(names[a.iconBond])assert.ok(a.name.startsWith(names[a.iconBond]),a.name);assert.equal(augmentEffectEntries([a])[0].iconBond,a.iconBond);}
 });
 
@@ -40,4 +40,8 @@ test('every offered augment has an indexed or local icon, including newly added 
   const v=augmentView(a),path=v.iconBond?manifest.bonds[v.iconBond]:v.icon;assert.ok(path,a.name);
   if(!indexed.has(path))assert.ok(readFileSync('public'+path).length>0,a.name);
  }
+});
+
+test('named faction augments always carry their matching bond icon',()=>{
+ const names={빅토리아:'victoriaShip',쉐라그:'kjeragShip',라이타니엔:'leithanienShip'};for(const [name,bond]of Object.entries(names)){const a=createAugmentCatalog(data,10).find(a=>a.name===name);assert.ok(a);assert.equal(a.iconBond,bond);}
 });

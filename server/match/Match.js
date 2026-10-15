@@ -2459,7 +2459,7 @@ export class Match {
     // 联防: a leaker's enemies still standing on the 联防 field (uncapped), the loss capped like settle()
     const left = this._uniteLeft(ps);
     if (left != null) {
-      const loss = Math.min(this.gd.lpCapPerRound, left);
+      const loss = Math.min(this.gd.lpCapPerRound, left*(this.augments?.leakHpCost()||1));
       return loss > 0 ? { uniteLeft: left, pendingLp: loss } : { uniteLeft: left };
     }
     let n = 0;
@@ -2469,7 +2469,7 @@ export class Match {
       if (f && f.cc) n = f.done && f.result ? counted(f.result.perPlayer && f.result.perPlayer[ps.playerId]) : Number(f.progress && f.progress.leaks) || 0;
       else if (f && f.battle) { try { n = battleProgress(f.battle).leaks; } catch { n = 0; } }
     }
-    const loss = Math.min(this.gd.lpCapPerRound, Math.max(0, Math.trunc(Number(n) || 0)));
+    const loss = Math.min(this.gd.lpCapPerRound, Math.max(0, Math.trunc(Number(n) || 0))*(this.augments?.leakHpCost()||1));
     return loss > 0 ? { pendingLp: loss } : {};
   }
 
@@ -3258,7 +3258,7 @@ export class Match {
     for (const ps of alive) {
       const r = this.lastResults.get(ps.playerId) || { leaked: [], perfect: true, coins: 0, layerGains: {}, killed: 0, damageDealt: 0 };
       const counted = (r.leaked || []).filter((l) => l && l.counted !== false).length;
-      const loss = uniteRan && plan.leakers.includes(ps) ? Math.min(cap, survivors.get(ps.playerId) || 0) : Math.min(cap, counted);
+      const loss = uniteRan && plan.leakers.includes(ps) ? Math.min(cap, (survivors.get(ps.playerId) || 0)*(this.augments?.leakHpCost()||1)) : Math.min(cap, counted*(this.augments?.leakHpCost()||1));
       if(this.gd.config.customRules?.sharedHp)this.teamLp=Math.max(0,this.teamLp-loss);
       else ps.lp -= loss;
       ps.stats.lpLost += loss;

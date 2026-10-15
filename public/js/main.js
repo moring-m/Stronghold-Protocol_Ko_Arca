@@ -202,6 +202,7 @@ function onRoomState(msg) {
 
 const CLOSE_REASON = {
   // 'timeout' = this player was removed after staying disconnected past the lobby grace (server/lobby.js)
+  version_retired:'기존 버전 유지 시간이 끝나 방과 게임이 종료되었습니다. 새 버전으로 다시 접속해주세요.',
   host_left: '创建者已离开，同盟已解散', timeout: '由于长时间断开连接，你已离开同盟', empty: '同盟已解散',
   kicked: '你已被移出同盟', ended: '模拟已结束', expired: '同盟已过期', shutdown: '服务器维护中，同盟已关闭',
 };
@@ -251,7 +252,7 @@ function wireNet() {
   });
   net.on('m.toast', (msg) => {
     const kind = ['info', 'success', 'warn', 'error'].includes(msg.kind) ? msg.kind : 'info';
-    toast(msg.text, kind);
+    toast(msg.text, kind, {ttl:msg.ttl});
   });
   net.on('m.ticker', (msg) => {
     if (typeof msg.text !== 'string' || msg.type === 'CHAR_DAMAGE') return;

@@ -185,10 +185,15 @@ self.addEventListener('fetch', event => {
     const resources = await index();
     const cache = await caches.open(PREFIX + resources.version);
     const assetPath = url.pathname.replace(/^\/(assets|fonts|media)\/~[a-f0-9]+\//, '/$1/');
-    let path = assetPath + url.search;
+    const assetQuery = new URL(url.href).searchParams;
+    // Release pins isolate game code/data, but do not change downloaded art bytes.
+    // Reuse manifest cache keys instead of downloading a copy for every release.
+    assetQuery.delete('release');
+    let path = assetPath + (assetQuery.toString() ? '?'+assetQuery.toString() : '');
     if(/^\/(data|i18n)\//.test(url.pathname)||url.pathname==='/vendor/browser-resources.json'){
-      try{const response=await fetch(event.request);if(response.ok)await cache.put(path,response.clone());return response;}
-      catch(error){const old=await cache.match(path);if(old)return old;throw error;}
+      const metadataKey=url.pathname+url.search;
+      try{const response=await fetch(event.request);if(response.ok)await cache.put(metadataKey,response.clone());return response;}
+      catch(error){const old=await cache.match(url.pathname+url.search);if(old)return old;throw error;}
     }
     if (path === '/fonts/fonts.css') { const response = new Response(resources.fontCss,{headers:{'Content-Type':'text/css'}}); await cache.put(path,response.clone()); return response; }
     if (path.startsWith('/media/')) {
