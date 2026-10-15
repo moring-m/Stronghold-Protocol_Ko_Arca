@@ -1,5 +1,7 @@
 # SIM.md — battle simulation engine reference (server/sim)
 
+> Korean custom rules: boss single-hit damage is clamped to the custom `maxDamage` setting (default 300000, 0 disables the ceiling). Historical descriptions of the original 300000 cancellation below do not apply to the current Korean ruleset. Bond layers remain capped at 999 unless the unlimited-layers custom rule is enabled.
+
 Audience: **content authors** (kits, bonds, garrisons, items, bands, enemies, bosses, devices, choices) and the
 **match owner** who drives `Battle`. The normative contract is DESIGN.md §5; this file documents the concrete
 implementation, every hook and helper, the SkillSpec schema with worked examples, the profession defaults and

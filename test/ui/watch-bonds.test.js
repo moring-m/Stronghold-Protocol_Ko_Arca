@@ -451,3 +451,13 @@ test('each eight-player cooperative-defense camera displays that player’s bond
  for(const pid of ids)assert.equal(bondOwnerId({pub,myId:'p1',fieldId:'u',field,layer:'P:'+pid,halves:true}),pid);
  assert.equal(bondOwnerId({pub,myId:'p1',fieldId:'u',field,layer:'ALL',halves:true}),'p1');
 });
+
+test('unlimited layer games retain live counts above 999 in own, spectator and detail bond views',()=>{
+ const list=[bond('yanShip',3,999,1)];
+ assert.equal(withLiveLayers(list,{yanShip:2600})[0].layers,999);
+ assert.equal(withLiveLayers(list,{yanShip:2600},Infinity)[0].layers,2600);
+ const pub=PUB({customExtensions:{rules:['unlimitedLayers']}}),live={[ME]:{yanShip:2600},p2:{sargonShip:10000}};
+ assert.equal(playerBonds({pub,priv:PRIV,myId:ME,ownerId:ME,live}).find(b=>b.bondId==='yanShip').layers,2600);
+ assert.equal(playerBonds({pub,priv:PRIV,myId:ME,ownerId:'p2',live}).find(b=>b.bondId==='sargonShip').layers,10000);
+ assert.equal(stripView({pub,priv:PRIV,myId:ME,fieldId:'n:p1',live}).bonds.find(b=>b.bondId==='yanShip').layers,2600);
+});

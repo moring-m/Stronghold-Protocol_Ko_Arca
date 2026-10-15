@@ -1247,7 +1247,7 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "enemy",
-  "description": "모든 적의 실드 +7",
+  "description": "모든 적의 실드 +5",
   "notes": ""
  },
  {

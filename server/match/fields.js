@@ -610,6 +610,9 @@ function layerAllowanceOf(p, gd) {
     for (const b of bonds) out.set(b, (out.get(b) || 0) + cap * times);
   };
   for (const u of units) {
+    if(gd.chess(u.chessId)?.customTrait?.effectKey==='custom_leithanien_notes'){
+      for(const id of ['leithanienShip','kazimierzShip','skillfulShip'])if(gd.bond(id))out.set(id,Infinity);
+    }
     for (const gid of gd.chess(u.chessId)?.garrisonIds || []) {
       const g = gd.garrison(gid);
       if (!g || g.eventType !== 'IN_BATTLE') continue;

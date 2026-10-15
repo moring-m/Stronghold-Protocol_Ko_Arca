@@ -84,7 +84,7 @@ export class MatchInfra {
    * is dead are not offered (choices.js).
    */
   bondLive(bondId) {
-    return !this.gd.modeInactiveBonds.has(bondId) && this.bondInPool(bondId);
+    return !this.disabledBonds?.includes(bondId) && !this.staticInactiveBonds?.includes(bondId) && !this.gd.modeInactiveBonds.has(bondId) && this.bondInPool(bondId);
   }
   humans() { return this.order.filter((p) => !p.isBot && !p.left); }
 

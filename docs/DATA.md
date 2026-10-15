@@ -1,5 +1,7 @@
 # DATA.md — generated game data (`data/*.json`)
 
+> Korean custom rules: boss single-hit damage is clamped to the custom `maxDamage` setting (default 300000, 0 disables the ceiling). Historical descriptions of the original 300000 cancellation below do not apply to the current Korean ruleset. Bond layers remain capped at 999 unless the unlimited-layers custom rule is enabled.
+
 All files in `data/` except `data/assets.json` are produced by **`node tools/build-data.mjs`** (task F1) from the
 official zh_CN client data ([Kengxxiao/ArknightsGameData](https://github.com/Kengxxiao/ArknightsGameData)) joined
 with `docs/research/*.json`. Do not edit them by hand — change the build script and rebuild.

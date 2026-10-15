@@ -139,7 +139,14 @@ export async function startGateway({
       await ensureDeadlines();await expireRetained();
       const workers = {};
       for (const id of Object.keys(state.releases)) {
-        try{const status=await control(id);workers[id]={...status,...state.releases[id]};}
+        try{
+          const status=await control(id);
+          // Older workers expose sockets only on healthz. A failed/missing metric is never zero.
+          if(!Number.isFinite(status.sockets)){
+            try{const response=await fetch(`http://127.0.0.1:${state.releases[id].port}/healthz`,{signal:AbortSignal.timeout(2500)});if(response.ok){const health=await response.json();if(Number.isFinite(health.sockets))status.sockets=health.sockets;}}catch{}
+          }
+          workers[id]={...status,...state.releases[id]};
+        }
         catch{workers[id]={...state.releases[id],unavailable:true};}
       }
       json(res, 200, { current: state.current, workers });

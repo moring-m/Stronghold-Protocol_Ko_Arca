@@ -1,5 +1,7 @@
 # META.md — match & meta engine (server/match)
 
+> Korean custom rules: boss single-hit damage is clamped to the custom `maxDamage` setting (default 300000, 0 disables the ceiling). Historical descriptions of the original 300000 cancellation below do not apply to the current Korean ruleset. Bond layers remain capped at 999 unless the unlimited-layers custom rule is enabled.
+
 Audience: **content authors** writing prep-side ("SERVER_*") effects in `server/sim/content/*.js → registerMeta(registry)`,
 the **UI owner** consuming `m.public` / `m.private` / `m.result`, and anyone driving matches in tests or tools.
 Normative contracts stay in DESIGN.md §6 and §8; this file documents the implementation and every assumption it makes.

@@ -46,7 +46,7 @@ export function workerControls(lobby, { release, token, network }) {
         draining: lobby.draining,
         roomPrefix: lobby.opts.roomCodePrefix,
         retirementNotices:true, expiresAt:retire.deadline(),
-        ...lobby.stats(),
+        ...lobby.stats(), sockets:network?.connectionCount,
         codes: [...lobby.rooms.keys()],
       });
       return true;

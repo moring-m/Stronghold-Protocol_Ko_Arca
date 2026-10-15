@@ -10,15 +10,22 @@ release=${1:-};image=${2:-}
 api() { curl --fail-with-body -sS --max-time 10 -H "Authorization: Bearer $(cat "$root/state/token")" -H 'Content-Type: application/json' "http://127.0.0.1:3000/__roll/admin/$1" "${@:2}"; }
 status=$(api status)
 current=$(python3 -c 'import json,sys;print(json.load(sys.stdin)["current"] or "")' <<<"$status")
-# Expired releases may be removed even if a match never finishes.
+retired=0
+cache_cleaned=0
+clean_build_cache() {
+ docker builder prune --force || echo 'Build cache cleanup failed; continuing with disk checks.' >&2
+ cache_cleaned=1
+}
+# Expired or disconnected retained releases may be removed even if rooms remain.
 while read -r old;do
  [[ -n $old ]] || continue
  api force-retire -X POST --data "{\"id\":\"$old\"}" >/dev/null
  docker stop "stronghold-release-$old" >/dev/null
  docker rm "stronghold-release-$old" >/dev/null
  docker image rm "ghcr.io/moring-m/stronghold-protocol_ko_arca:$old" >/dev/null 2>&1 || true
- echo "Retired expired release $old"
-done < <(python3 -c 'import json,sys,time;s=json.load(sys.stdin);print("\n".join(k for k,v in s["workers"].items() if k!=s["current"] and isinstance(v.get("expiresAt"),(int,float)) and v["expiresAt"]<=time.time()*1000))' <<<"$status")
+ retired=1
+ echo "Retired expired or disconnected release $old"
+done < <(python3 -c 'import json,sys,time;s=json.load(sys.stdin);print("\n".join(k for k,v in s["workers"].items() if k!=s["current"] and (isinstance(v.get("expiresAt"),(int,float)) and v["expiresAt"]<=time.time()*1000 or not v.get("unavailable") and type(v.get("sockets")) in (int,float) and v["sockets"]==0)))' <<<"$status")
 status=$(api status)
 # Retire only workers explicitly drained and reporting no remaining rooms/matches.
 while read -r old; do
@@ -28,8 +35,13 @@ while read -r old; do
  docker rm "stronghold-release-$old" >/dev/null
  oldimage="ghcr.io/moring-m/stronghold-protocol_ko_arca:$old"
  docker image rm "$oldimage" >/dev/null 2>&1 || true
+ retired=1
  echo "Retired empty release $old"
 done < <(python3 -c 'import json,sys;s=json.load(sys.stdin);print("\n".join(k for k,v in s["workers"].items() if k!=s["current"] and v.get("draining") and not v.get("rooms",1) and not v.get("matches",1)))' <<<"$status")
+if (( retired )); then
+ echo 'Retired release removed; pruning unused build cache.'
+ clean_build_cache
+fi
 status=$(api status)
 if [[ $current == "$release" ]]; then api activate -X POST --data "{\"id\":\"$release\"}" >/dev/null; rm -f "$root/pending.json"; echo 'Requested release is already current.'; exit 0; fi
 count=$(python3 -c 'import json,sys;print(len(json.load(sys.stdin)["workers"]))' <<<"$status")
@@ -40,8 +52,15 @@ if (( count >= 2 )); then
  exit 0
 fi
 available=$(awk '/MemAvailable:/ {print $2}' /proc/meminfo)
+(( available >= 524288 )) || { echo 'Need at least 512 MiB available RAM; current games were not changed.' >&2; exit 1; }
 free_kb=$(df -Pk /var/lib/docker | awk 'NR==2 {print $4}')
-(( available >= 524288 && free_kb >= 2097152 )) || { echo 'Need at least 512 MiB available RAM and 2 GiB free Docker disk; current games were not changed.' >&2; exit 1; }
+if (( free_kb < 2097152 && !cache_cleaned )); then
+ echo 'Docker disk is below 2 GiB free; pruning unused build cache only.'
+ # No image/container/volume prune: retained game releases must remain available.
+ clean_build_cache
+ free_kb=$(df -Pk /var/lib/docker | awk 'NR==2 {print $4}')
+fi
+(( free_kb >= 2097152 )) || { echo 'Need at least 2 GiB free Docker disk after build cache cleanup; current games were not changed.' >&2; exit 1; }
 prefix=$(python3 -c 'import json,sys;s=json.load(sys.stdin);used={v["prefix"] for v in s["workers"].values()};print(next(p for p in "AB" if p not in used))' <<<"$status")
 port=3010;[[ $prefix == B ]] && port=3011
 name="stronghold-release-$release"

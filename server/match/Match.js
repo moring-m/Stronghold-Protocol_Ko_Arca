@@ -760,7 +760,7 @@ export class Match {
    * is dead are not offered (choices.js).
    */
   bondLive(bondId) {
-    return !this.gd.modeInactiveBonds.has(bondId) && this.bondInPool(bondId);
+    return !this.disabledBonds?.includes(bondId) && !this.staticInactiveBonds?.includes(bondId) && !this.gd.modeInactiveBonds.has(bondId) && this.bondInPool(bondId);
   }
   humans() { return this.order.filter((p) => !p.isBot && !p.left); }
 
@@ -1984,6 +1984,7 @@ export class Match {
       return id ? { kind: 'item', id } : null;
     }
     if (p.kind !== 'chess') return null;
+    if (typeof p.bond === 'string' && !this.bondLive(p.bond)) return null;
     const rng = this.rngMeta;
     const owner = this.players.get(playerId);
     const pool = owner?.pool ?? this.pool;
@@ -1991,6 +1992,7 @@ export class Match {
       if (typeof id !== 'string' || !this.gd.chess(id)) return false;
       if (this.gd.chess(id).optionalRecruit && !this.players.get(playerId)?.canRecruit(id)) return false;
       const base = this.gd.baseIdOf(id);
+      if (this.bannedChess.includes(base)) return false;
       return !pool.has(base) || pool.left(base) > 0;
     };
     let id = null;

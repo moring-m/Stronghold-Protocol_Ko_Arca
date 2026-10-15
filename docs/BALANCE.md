@@ -1,5 +1,7 @@
 # BALANCE.md — difficulty model and measurement (official numbers, no custom tuning)
 
+> Korean custom rules: boss single-hit damage is clamped to the custom `maxDamage` setting (default 300000, 0 disables the ceiling). Historical descriptions of the original 300000 cancellation below do not apply to the current Korean ruleset. Bond layers remain capped at 999 unless the unlimited-layers custom rule is enabled.
+
 Owner: match / balance. Tools: `tools/balance.mjs` (competent-board model — now a **measuring** tool only),
 `tools/matchrun.mjs` (bot matches). Tests: `test/match/balance.test.js`, `test/match/waves-official.test.js`,
 `test/match/waves.test.js`, `test/sim/pathing.test.js`.

@@ -224,10 +224,12 @@ export class MatchSpDraft {
       return id ? { kind: 'item', id } : null;
     }
     if (p.kind !== 'chess') return null;
+    if (typeof p.bond === 'string' && !this.bondLive(p.bond)) return null;
     const rng = this.rngMeta;
     const free = (id) => {
       if (typeof id !== 'string' || !this.gd.chess(id)) return false;
       const base = this.gd.baseIdOf(id);
+      if (this.bannedChess.includes(base)) return false;
       return !this.pool.has(base) || this.pool.left(base) > 0;
     };
     let id = null;

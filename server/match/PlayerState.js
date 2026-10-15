@@ -1620,12 +1620,23 @@ export class PlayerState {
     for (let i = 0; i < this.temp.length; i++) {
       const p = this.temp[i];
       if (!p || this.tempDue(p) > this.prepsEnded) continue;
+      if (p.kind === 'chess') {
+        const free=x=>x==null||(x.kind==='token'&&x.ownerUid===p.uid);
+        const room=this.hand.filter(free).length+this.temp.filter(free).length+1;
+        // As with manual selling, never destroy a carrier if its equipment cannot be returned.
+        if ((p.items||[]).length>room) {this._tempDue.set(p.uid,this.prepsEnded+1);continue;}
+      }
       this.temp[i] = null;
       this._tempDue.delete(p.uid);
       changed = true;
       if (p.kind === 'chess') {
         this.removeTokensOf(p.uid);
         this.returnCopies(p);
+        for(const item of p.items||[]){
+          this.stow(item,{allowTemp:true});
+          if(this.temp.includes(item))this._tempDue.set(item.uid,this.prepsEnded+1);
+        }
+        p.items=[];
       }
     }
     if (changed) this.recompute();

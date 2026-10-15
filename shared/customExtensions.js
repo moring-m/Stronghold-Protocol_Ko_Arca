@@ -6,6 +6,7 @@ import { customFactionData, filterCustomFaction } from './customFactions.js';
 export const RULE_VALUES = Object.freeze([
  {id:"augmentEnemyVote",name:"적 증강 선택 방식",category:"augments",default:0,min:0,max:1,step:1,unit:"",options:[{value:0,label:"방장 선택"},{value:1,label:"참가자 투표"}]},
  ...[["augmentSilver","실버 가중치",1,1000],["augmentGold","골드 가중치",2,1000],["augmentPrism","프리즘 가중치",1,1000],["augmentAllyRerolls","아군 리롤",1,10],["augmentEnemyRerolls","적 리롤",1,10]].map(([id,name,value,max])=>({id,name,category:"augments",default:value,min:0,max,step:1,unit:id.includes("Rerolls")?"회":""})),
+ {id:'maxDamage',name:'보스 단일 피해 상한',default:300000,min:0,step:10000,unit:''},
  {id:'stockPlayers',name:'상점 재고',default:0,min:-1,max:8,step:1,unit:'',options:[{value:0,label:'자동 (최대 4인 기준)'},...Array.from({length:8},(_,i)=>({value:i+1,label:`${i+1}인 기준`})),{value:-1,label:'무제한'}]},
  ...[['allyHp','최대 HP'],['allyAtk','공격력'],['allyDef','방어력'],['allyRes','마법 저항'],['allyAspd','공격 속도'],['allyBat','공격 간격'],['allyBlock','저지 수'],['allyCost','배치 비용'],['allyRedeploy','재배치 시간'],['allySpCost','최대 SP'],['allyInitSp','초기 SP'],['allySpRecovery','SP 회복 속도']].map(([id,name])=>({id,name,category:'allies',default:100,min:['allyHp','allyAspd','allyBat','allySpCost'].includes(id)?1:0,step:1,unit:'%'})),
  {id:'roundCount',name:'일반 라운드 수',default:13,min:1,max:100,step:1,unit:'라운드'},

@@ -1,5 +1,7 @@
 # 玩法指南
 
+> Korean custom rules: boss single-hit damage is clamped to the custom `maxDamage` setting (default 300000, 0 disables the ceiling). Historical descriptions of the original 300000 cancellation below do not apply to the current Korean ruleset. Bond layers remain capped at 999 unless the unlimited-layers custom rule is enabled.
+
 「卫戍协议：盟约」是自走棋 + 塔防：休整期在调度中心招募干员、摆阵、配装备，作战期干员自动部署并迎击从红门涌来的敌人，漏过去的敌人扣目标生命值（LP）。同盟模拟中 1–4 人**合作**（没有 PvP），撑到第 14 回合打倒敌方领袖即胜利。
 
 本文数值来自官方数据表（`data/config.json` 等）与 [research](research/00-INDEX.md)；游戏内左下角 📖「玩法说明」有官方教程图（随素材一起下载；没下载到时显示文字要点）。操作方式见 [README · 操作](../README.md#操作)。

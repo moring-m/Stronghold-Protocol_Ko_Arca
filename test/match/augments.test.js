@@ -2,7 +2,7 @@ import {test} from 'node:test';import assert from 'node:assert/strict';
 import {Match} from '../../server/match/Match.js';import {loadData} from '../../server/data.js';import {VirtualScheduler} from '../../server/match/scheduler.js';
 import {PHASE,ERR} from '../../shared/constants.js';import {rollAugmentGrade,createAugmentCatalog,drawAugmentCard} from '../../shared/augments.js';import {buildResult} from '../../server/match/results.js';
 const data=loadData('content/production/data');
-function fixture(t,{n=1,enabled=true,host='p0',seed=1,ruleValues={},rules=[]}={}){const sched=new VirtualScheduler();const m=new Match({data,mode:n===8?'coop8':n===1?'solo':'coop',difficulty:'NORMAL',seed,customExtensions:{rules:enabled?['augments',...rules]:[],ruleValues},seats:Array.from({length:n},(_,i)=>({seat:i,playerId:'p'+i,name:'P'+i,connected:true})),getHostId:()=>host,scheduler:sched,send:()=>true,broadcast:()=>{},onEnd:()=>{}});t.after(()=>m.dispose());return {m,sched,ps:m.players.get('p0')};}
+function fixture(t,{n=1,enabled=true,host='p0',seed=1,ruleValues={},rules=[],protectedBonds=[],protectedAuxBonds=[]}={}){const sched=new VirtualScheduler();const m=new Match({data,mode:n===8?'coop8':n===1?'solo':'coop',difficulty:'NORMAL',seed,customExtensions:{rules:enabled?['augments',...rules]:[],ruleValues,protectedBonds,protectedAuxBonds},seats:Array.from({length:n},(_,i)=>({seat:i,playerId:'p'+i,name:'P'+i,connected:true})),getHostId:()=>host,scheduler:sched,send:()=>true,broadcast:()=>{},onEnd:()=>{}});t.after(()=>m.dispose());return {m,sched,ps:m.players.get('p0')};}
 function request(m,ps,idx=0,reroll=false){const s=m.augments.current,slot=s.side==='ally'?s.slots.get(ps.playerId):s.boss;return m.handle(ps.playerId,{t:reroll?'g.augmentReroll':'g.augmentPick',eventId:s.id,side:s.side,idx,cardId:slot.cards[idx].id});}
 test('grade probability boundaries and three consecutive silver prevention preserve gold/prism ratio',()=>{
  assert.deepEqual([0,.249,.25,.749,.75,.999].map(x=>rollAugmentGrade(()=>x)),['silver','silver','gold','gold','prism','prism']);
@@ -88,7 +88,7 @@ test('only the new Harmony activation augment exists, is personal and is exclude
  const other=fixture(t,{rules:['defaultHarmony']});other.m.round=4;other.m.afterRoundStart();other.m.augments.current.grade='gold';assert.equal(other.ps.bonds.maniShip.active,true);assert.ok(!other.m.augments.catalog('ally',other.ps).some(c=>c.name==='조화'));
 });
 for(const [round,core,aux]of [[4,8,4],[7,16,8],[10,24,12]])test(`Stack I gives only active stackable core/aux bonds their round ${round} amounts`,t=>{
- const {m,ps}=fixture(t);ps.bondCountBonus={yanShip:5,swiftShip:5,maniShip:1};ps.recompute();assert.ok(ps.bonds.yanShip.active&&ps.bonds.swiftShip.active);const card=createAugmentCatalog(data,round).find(a=>a.name==='중첩 I');m.augments.grant(ps,card);assert.equal(ps.layers.yanShip,core);assert.equal(ps.layers.swiftShip,aux);assert.equal(ps.layers.maniShip||0,0);assert.equal(ps.layers.arcaneShip||0,0);
+ const {m,ps}=fixture(t,{protectedBonds:['yanShip'],protectedAuxBonds:['swiftShip']});ps.bondCountBonus={yanShip:5,swiftShip:5,maniShip:1};ps.recompute();assert.ok(ps.bonds.yanShip.active&&ps.bonds.swiftShip.active);const card=createAugmentCatalog(data,round).find(a=>a.name==='중첩 I');m.augments.grant(ps,card);assert.equal(ps.layers.yanShip,core);assert.equal(ps.layers.swiftShip,aux);assert.equal(ps.layers.maniShip||0,0);assert.equal(ps.layers.arcaneShip||0,0);
 });
 for(const [round,tier]of [[4,4],[7,5],[10,6]])test(`Starter pack grants one operator of each tier up to ${tier} from one eligible bond`,t=>{
  const {m,ps}=fixture(t);m.round=round;const card=createAugmentCatalog(data,round).find(a=>a.name==='스타터 팩'),families=m.augments.starterFamilies(card.effect,ps);assert.ok(families.length);const expected=families[0].tiers.map(ids=>ids[0]);m.augments.rng=()=>0;m.augments.grant(ps,card);const pieces=[...ps.hand,...ps.temp].filter(p=>p?.kind==='chess');assert.equal(expected.length,tier);for(const id of expected)assert.ok(pieces.some(p=>p.id===id),id);assert.deepEqual(expected.map(id=>data.chess[id].tier),Array.from({length:tier},(_,i)=>i+1));const blocked=card.effect.families[0];m.bannedChess.push(...blocked.tiers[0]);assert.ok(!m.augments.starterFamilies(card.effect,ps).some(f=>f.bondId===blocked.bondId));
@@ -134,4 +134,50 @@ test('random operator rewards draw with replacement rather than guaranteeing uni
  m.augments.grant(ps,{effect:{kind:'chess',tier:1,count:2,candidates}});
  const gained=ps.hand.filter(p=>p?.kind==='chess'&&!before.has(p.uid));
  assert.equal(gained.length,2);assert.equal(gained[0].id,gained[1].id);
+});
+test('drawn bond bans suppress named supports and starter families even when dual-bond operators remain',t=>{
+ const {m,ps}=fixture(t);m.round=4;m.afterRoundStart();
+ const bond='yanShip';assert.ok(m.bondInPool(bond));m.disabledBonds=[bond];assert.equal(m.bondLive(bond),false);
+ for(const round of [4,7,10])for(const grade of ['silver','gold','prism']){
+  m.round=round;m.augments.current.grade=grade;
+  assert.ok(!m.augments.catalog('ally',ps).some(a=>a.bondId===bond));
+  for(let i=0;i<10;i++)assert.ok(!m.augments.makeSlots('ally',ps).cards.some(a=>a?.bondId===bond));
+ }
+ assert.deepEqual(m.augments.starterFamilies({families:[{bondId:bond,tiers:[[m.gd.visibleChess[0]]]}]},ps),[]);
+ m.augments.current.slots.set(ps.playerId,m.augments.makeSlots('ally',ps));assert.deepEqual(request(m,ps,0,true),{ok:true});assert.ok(!m.augments.current.slots.get(ps.playerId).cards.some(a=>a?.bondId===bond));
+});
+test('random operator augments and pending rewards never grant a banned operator',t=>{
+ const {m,ps}=fixture(t);const candidates=m.gd.visibleChess.filter(id=>{const c=m.data.chess[id];return c.tier===1&&!c.isGolden&&!c.isHidden&&!c.isDiy&&!c.optionalRecruit&&ps.canRecruit(id)&&!m.bannedChess.includes(id);});assert.ok(candidates.length>=2);
+ const [banned,allowed]=candidates;m.bannedChess.push(banned);m.augments.rng=()=>0;
+ assert.equal(m.augments.operatorAvailable(banned,ps),false);assert.equal(m.augments.operatorAvailable(m.gd.goldenIdOf(banned),ps),false);
+ m.augments.grant(ps,{effect:{kind:'chess',tier:1,count:2,candidates:[banned,allowed]}});
+ assert.ok(ps.hand.filter(p=>p?.kind==='chess').every(p=>p.id===allowed));
+ m.augments.pending.set(ps.playerId,[{kind:'chess',id:banned},{kind:'chess',id:allowed}]);m.augments.drain(ps);
+ assert.equal(m.augments.pending.get(ps.playerId).length,0);assert.ok(![...ps.hand,...ps.temp,...ps.board.values()].some(p=>p?.id===banned));
+});
+test('generic layer augments skip banned bonds even if a stale active state exists',t=>{
+ const {m,ps}=fixture(t);m.disabledBonds=['yanShip'];ps.bonds.yanShip={active:true,tier:1,count:3,layers:0};const before=ps.layers.yanShip||0;
+ m.augments.grant(ps,{effect:{kind:'layers',core:24,aux:12}});assert.equal(ps.layers.yanShip||0,before);
+});
+
+test('listed and weighted random operator pools reject banned operators and banned bond pools',t=>{
+ const {m}=fixture(t);const ids=m.gd.visibleChess.filter(id=>!m.bannedChess.includes(id)&&!m.data.chess[id].optionalRecruit);const [banned,allowed]=ids;assert.ok(allowed);m.bannedChess.push(banned);
+ m.gd.raw={...m.gd.raw,choices:{...m.gd.choices,pools:{...m.gd.choices.pools,test_list:{kind:'chess',items:[banned,allowed]},test_weight:{kind:'chess',weighted:[[banned,1000],[allowed,1]]},test_bond:{kind:'chess',bond:'yanShip',items:[allowed]}}}};
+ for(let i=0;i<20;i++){assert.equal(m.rollPool('test_list').id,allowed);assert.equal(m.rollPool('test_weight').id,allowed);}
+ m.disabledBonds=['yanShip'];assert.equal(m.rollPool('test_bond'),null);
+ m.gd.choices.pools.test_list.items=[banned];assert.equal(m.rollPool('test_list'),null);
+});
+
+test('generic headhunting offers disappear when all operators at the reward tier are banned',t=>{
+ const {m,ps}=fixture(t);m.round=10;m.afterRoundStart();m.augments.current.grade='prism';
+ const card=createAugmentCatalog(data,10).find(a=>a.effect.kind==='chess'&&!a.bondId);assert.ok(card);
+ m.bannedChess.push(...m.gd.visibleChess.filter(id=>m.gd.tierOf(id)===card.effect.tier));
+ assert.ok(!m.augments.catalog('ally',ps).some(a=>a.id===card.id));
+});
+
+test('recast transformation skips every banned operator at the upgraded tier',t=>{
+ const {m,ps}=fixture(t);const eligible=tier=>m.gd.visibleChess.filter(id=>{const c=m.data.chess[id];return c.tier===tier&&!c.isGolden&&!c.isHidden&&!c.isDiy&&!c.optionalRecruit&&c.visible!==false&&!m.bannedChess.includes(id);});
+ const source=eligible(1)[0],choices=eligible(2);assert.ok(source&&choices.length>1);const allowed=choices.at(-1);m.bannedChess.push(...choices.slice(0,-1));
+ const piece=ps.acquireChess(source,{fromPool:false});assert.ok(piece);ps.hand[ps.hand.indexOf(piece)]=null;ps.board.set('9,3',piece);ps.recompute();m.augments.rng=()=>0;
+ m.augments.recast(ps);assert.equal(piece.id,allowed);assert.ok(!m.bannedChess.includes(piece.id));
 });

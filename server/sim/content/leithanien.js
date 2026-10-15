@@ -40,12 +40,14 @@ export function install(b){
   if(!augment&&six(b,u)){t.mem.leithanienWeakenUntil=Math.max(t.mem.leithanienWeakenUntil||0,end);
    const slow=t.findBuff('leithanien:slow');if(!slow||slow.timeLeft<duration)b.addBuff(t,{key:'leithanien:slow',duration,refresh:'replace',mods:{moveMul:.75},source:u});
   }
-  if(trait(u)?.effectKey==='custom_leithanien_notes'){
-   const k=u.id+':notes',n=(counts.get(k)||0)+1;counts.set(k,n);
-   if(n%5===0){add(u,[BOND],trait(u).bb.count,10,'notesGain');add(u,['skillfulShip'],trait(u).bb.skillfulCount,10,'notesSkillfulGain');}
-  }
+
  };
  b.on('damaged',c=>{const caster=c.source?.kind==='token'?c.source.ownerUnit:c.source;if(c.amount>0&&caster?.kind==='op'&&caster.side==='ally'&&c.target?.side==='enemy'&&!c.dmg?.tags?.includes(TAG)){if(S.isMember(b,caster,BOND)&&S.bondActive(b,caster.ownerId,BOND))apply(caster,c.target);if(augmentOwners.has(caster.ownerId))apply(caster,c.target,true);}});
+ b.on('damaged',c=>{
+  const u=c.source||c.credit;if(!(c.amount>0)||u?.kind!=='op'||u.side!=='ally'||c.target?.side!=='enemy'||trait(u)?.effectKey!=='custom_leithanien_notes')return;
+  const k=u.id+':damageHits',n=(counts.get(k)||0)+1;counts.set(k,n);
+  if(n%8===0){add(u,[BOND,'kazimierzShip'],trait(u).bb.count,Infinity,'damageGain');add(u,['skillfulShip'],trait(u).bb.skillfulCount,Infinity,'damageSkillfulGain');}
+ });
  b.on('hit',c=>{const source=c.source||c.credit;if(source?.side==='enemy'&&(source.mem.leithanienWeakenUntil||0)>b.time)c.dmg.mul*=.75;});
  b.on('tick',()=>{
   const sums=new Map();

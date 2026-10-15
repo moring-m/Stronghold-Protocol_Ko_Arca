@@ -176,3 +176,25 @@ sudo bash /opt/stronghold/rolling/retire-old.sh
 This explicitly ends retained rooms and matches and then processes a queued update.
 The protected `force-retire` API refuses the current release. The shared deployment
 lock prevents the manual command from racing an update.
+
+### Automatic build-cache cleanup
+
+After removing retired workers and their image tags (empty releases or releases
+past their deadline), the updater prunes unused build cache once. The manual
+`retire-old.sh` command does the same after closing retained workers. Shared cache
+records still in use are protected by Docker. Cleanup failure does not prevent
+maintenance from continuing.
+
+Before pulling a new worker image, the updater requires 512 MiB available RAM and
+2 GiB free Docker disk. If disk space is below that threshold, it runs
+`docker builder prune --force` once and checks the free space again. Only unused
+build cache is pruned; no game containers, images or volumes are pruned. If space
+is still insufficient, deployment stops and existing games continue. If no release was retired, cleanup is skipped when the requested version is
+already current or a deployment is queued behind two occupied workers. Install the updated `update.sh` through the reviewed
+router updater; pushing game code alone does not replace host deployment scripts.
+
+Retained workers are also force-retired when their live socket count is zero,
+even if abandoned rooms or games remain. The current worker is always excluded.
+Missing socket counts and failed status requests never count as zero. Older workers
+are checked through healthz. The maintenance timer applies this check about once a
+minute; install both the updated router and host update script for this policy.

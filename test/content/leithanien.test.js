@@ -46,13 +46,13 @@ test('all eight new normal/elite operators enter actual combat without content e
   h.run(15);assert.equal(h.b.errorCount,0,`${id}: ${JSON.stringify(h.b.errors)}`);assert.ok(h.unit(id).kit);
  }
 });
-test('Viviana gain and other battle traits respect per-battle limits; equipment sharing applies once per caster',()=>{
+test('Viviana damage gains and other battle traits respect their limits; equipment sharing applies once per caster',()=>{
  const vivi='chess_custom_leithanien_viviana_a',less='chess_custom_leithanien_lessing_a',diam='chess_custom_leithanien_diamante_a';
  const raw={...data,enemies:{...data.enemies,dummy:enemyRec({key:'dummy',hp:1e9,speed:0,atk:0,def:0,res:0})}};setGameData(raw);
  const h=makeBattle({data:raw,autoFinish:false,units:[{chessId:vivi,row:10,col:3,items:['chess_item_custom_leithanien_score_a','chess_item_custom_leithanien_bell_a']},{chessId:less,row:10,col:4},{chessId:diam,row:10,col:5}],enemies:[{key:'dummy',route:{motion:'WALK',start:[10,9],end:[10,8],checkpoints:[]}}],bonds:{leithanienShip:{active:true,count:6,tier:2,layers:0},skillfulShip:{active:true,count:3,tier:1,layers:0},arcaneShip:{active:true,count:3,tier:1,layers:0},raidShip:{active:true,count:3,tier:1,layers:0}},flags:{layerGainsEnabled:true},captureNoisy:true});h.run(.1);
  const v=h.unit(vivi),l=h.unit(less),d=h.unit(diam),e=h.enemy();const p=h.b.getPlayer(v.ownerId);assert.equal(p.bonds.leithanienShip.layers,4);
  for(let i=0;i<20;i++)h.b.emit('deploy',{unit:l,initial:false});assert.equal(p.bonds.leithanienShip.layers,32);assert.equal(p.bonds.raidShip.layers,32);assert.equal(l.s.redeployMul,.5);
- for(let i=0;i<60;i++){h.b.dealDamage(v,e,{amount:1,type:'arts'});h.b.time+=.2;}assert.equal(p.bonds.leithanienShip.layers,52);assert.equal(p.bonds.skillfulShip.layers,10);
+ for(let i=0;i<60;i++){h.b.dealDamage(v,e,{amount:1,type:'arts'});h.b.time+=.2;}assert.equal(p.bonds.leithanienShip.layers,46);assert.equal(p.bonds.skillfulShip.layers,7);
  const arcaneBefore=p.bonds.arcaneShip.layers,nimbleBefore=p.bonds.skillfulShip.layers;e.x=6;e.y=10;for(let i=0;i<9;i++)h.b.emit('damaged',{target:e,type:'element',dmg:{element:'necrosis'},amount:1});assert.equal(p.bonds.arcaneShip.layers-arcaneBefore,5);assert.equal(p.bonds.skillfulShip.layers,nimbleBefore);
  const before=h.b.leithanien.applications;h.b.emit('skillStart',{unit:l});assert.equal(h.b.leithanien.applications,before+1);
  assert.equal(v.findBuff('leithanien:score:arts').mods.artsDealtMul,1.4);assert.equal(v.s.aspd>=120,true);assert.equal(h.b.errorCount,0,JSON.stringify(h.b.errors));
