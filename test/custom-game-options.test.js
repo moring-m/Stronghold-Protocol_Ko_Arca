@@ -69,11 +69,17 @@ test('eight real clients complete random strategy, modified allied stats and bot
  const fields=[...h.clients.values()].flatMap(c=>[...c.battles.values()]);for(const kind of ['boss','hidden']){const group=fields.filter(b=>b.spec.kind===kind);assert.ok(group.length>=4);for(const e of group){assert.equal(e.spec.spawns.length,1);assert.equal(e.spec.spawns[0].enemyKey,'enemy_laboratory_jesselton');assert.equal(e.battle.errorCount,0);}}
 });
 
-test('enemy ratios exclude bosses and boss parts; boss ratios independently affect stats and shared HP',()=>{
+test('boss ratios apply only to final and hidden bosses, never bounty leaders',()=>{
  const enemy=enemyRec({key:'normal-spec',hp:1000,atk:100,def:100,res:20,speed:1}),boss={...enemyRec({key:'boss-spec',hp:1000,atk:100,def:100,res:20,speed:1}),rank:'BOSS'};
  const raw={...DATA,enemies:{...DATA.enemies,'normal-spec':enemy,'boss-spec':boss}};
  const configured=applyCustomExtensions(raw,selection({enemyHp:200,enemyAtk:150,bossHp:300,bossAtk:50,bossDef:200}));
- const h=makeBattle({data:configured,autoFinish:false});h.step();const n=h.spawn('normal-spec',{pos:[10,5]}),b=h.spawn('boss-spec',{pos:[10,6],tag:'boss'}),p=h.spawn('normal-spec',{pos:[10,7],tag:'part'});
- assert.equal(n.s.maxHp,2000);assert.equal(n.s.atk,150);assert.equal(b.s.maxHp,3000);assert.equal(b.s.atk,50);assert.equal(b.s.def,200);assert.equal(p.s.maxHp,3000);
+ for(const kind of ['normal','unite','boss','hidden']){
+  const h=makeBattle({kind,data:configured,autoFinish:false});h.step();
+  const normal=h.spawn('normal-spec',{pos:[3,5]}),bounty=h.spawn('boss-spec',{pos:[3,6],tag:'bounty'});
+  for(const e of [normal,bounty]){assert.equal(e.s.maxHp,2000,kind);assert.equal(e.s.atk,150,kind);assert.equal(e.s.def,100,kind);}
+  const b=h.spawn('boss-spec',{pos:[3,7],tag:'boss'}),part=h.spawn('normal-spec',{pos:[3,8],tag:'part'});
+  const encounter=kind==='boss'||kind==='hidden';
+  for(const e of [b,part]){assert.equal(e.s.maxHp,encounter?3000:2000,kind);assert.equal(e.s.atk,encounter?50:150,kind);assert.equal(e.s.def,encounter?200:100,kind);}
+ }
  const before=new GameData(applyCustomExtensions(DATA,selection({})),'mode_multi_normal'),after=new GameData(configured,'mode_multi_normal'),id=Object.keys(DATA.bosses)[0];assert.equal(after.bossPoolHp(id,2),before.bossPoolHp(id,2)*3);
 });

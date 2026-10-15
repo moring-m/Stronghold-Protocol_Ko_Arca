@@ -1,6 +1,22 @@
 // Player-facing history. Letters a/b were assigned retroactively to the two deployed update batches.
 export const PATCH_NOTES = [
 {
+  "version": "0.2.6d1",
+  "date": "2026-10-15",
+  "status": "released",
+  "title": "보스 스펙 및 사키코 핫픽스",
+  "sections": [
+    {
+      "title": "핫픽스",
+      "items": [
+        "보스 스펙 설정이 일반 보스전·히든 보스전의 보스와 부위에 적용되도록 수정했습니다. 수배 보스와 나머지 적은 기존 적 스펙 설정을 따릅니다.",
+        "실제 보스전 공유 체력에 최대 HP 배율이 누락되던 문제를 수정했습니다. 일부 보스의 자체 공격 속도 보정이 커스텀 설정을 덮어쓰던 문제를 수정했습니다.",
+        "사키코 전용 전투 구현이 연결되지 않아 마법 음표와 전용 효과가 적용되지 않던 문제를 수정했습니다."
+      ]
+    }
+  ]
+},
+{
   "version": "0.2.6d",
   "date": "2026-10-15",
   "status": "released",

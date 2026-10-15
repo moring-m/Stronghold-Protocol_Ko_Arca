@@ -147,4 +147,5 @@ function kit(bb,raw){
   }
  }};
 }
-export default Object.fromEntries(['oblvns','chen3','wisdel','narant','ascln'].flatMap(k=>[5,6].map(t=>[`chess_custom_recruit_${k}_${t}_a`,kit])));
+// Optional recruits resolve their kit by character ID, including saved loadouts and DIY bodies.
+export default {...Object.fromEntries(['oblvns','chen3','wisdel','narant','ascln'].flatMap(k=>[5,6].map(t=>[`chess_custom_recruit_${k}_${t}_a`,kit]))),char_4182_oblvns:kit};

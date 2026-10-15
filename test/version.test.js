@@ -30,7 +30,7 @@ test('base package version and letter-suffixed site version stay consistent', ()
 
 test('CHANGELOG.md opens with the release version, and the README links it', () => {
   const log = read('CHANGELOG.md');
-  const first = log.match(/^## (\d+\.\d+\.\d+[a-z]?) — (\d{4}-\d{2}-\d{2})/m);
+  const first = log.match(/^## (\d+\.\d+\.\d+(?:[a-z]\d*)?) — (\d{4}-\d{2}-\d{2})/m);
   assert.ok(first, 'a "## x.y.z — date" heading');
   assert.equal(first[1], DEV_BUILD ? PATCH_NOTES[0].version : APP_VERSION, 'published notes follow the published release');
   assert.match(log, /^## 0\.1\.0 — 2026-10-02/m, 'the first public release stays listed');
