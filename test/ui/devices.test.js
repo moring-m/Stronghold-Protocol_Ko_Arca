@@ -116,6 +116,9 @@ describe('ui/device.js feature detection', () => {
     assert.equal(cls(w(coarse, {}, undefined)), true, 'unknown screen orientation on a touch device: the hint may show');
     assert.equal(cls(w(coarse, { orientation: { type: 'landscape-primary' } })), false, 'split-view iPad: the screen is landscape');
     assert.equal(cls(w(fine, { orientation: { type: 'portrait-primary' } })), false, 'a desktop window (even on a portrait monitor)');
+    assert.equal(cls(w({...coarse,...fine}, {orientation:{type:'portrait-primary'}})),false,'touch laptop on a portrait monitor');
+    assert.equal(cls(w({...coarse,...fine}, {})),false,'hybrid PC with unknown screen orientation');
+    assert.equal(cls(w({...coarse,'(any-hover: hover)':true}, {})),false,'mouse hover prevents a desktop rotation overlay');
   });
   test('fullscreen: standard API, and unsupported (iPhone Safari) → false', async () => {
     const f = fakeWindow();

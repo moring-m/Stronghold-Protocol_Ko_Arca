@@ -91,8 +91,9 @@ export function featureClasses(f) {
     'sp-standalone': !!f.standalone,
     'sp-reduced-motion': !!f.reducedMotion,
     // the rotate hint (css/theme.css) is for a device you can turn: a touch screen whose screen is not in landscape —
-    // never a desktop browser window that happens to be narrow, nor a split-view iPad
-    'sp-rotatable': !!f.coarse && f.screenLandscape !== true,
+    // Touch laptops also report a coarse pointer. Mouse/hover support keeps the hint off
+    // on desktops and hybrids, including portrait monitors and narrow windows.
+    'sp-rotatable': !!f.coarse && !f.fine && !f.hover && f.screenLandscape !== true,
   };
 }
 

@@ -1,6 +1,23 @@
 // Player-facing history. Letters a/b were assigned retroactively to the two deployed update batches.
 export const PATCH_NOTES = [
 {
+  "version": "0.3.0b1",
+  "date": "2026-10-17",
+  "status": "released",
+  "title": "맵 셰이더·기기 안내 및 이펙트 설정 수정",
+  "sections": [
+    {
+      "title": "수정사항",
+      "items": [
+        "뒤늦게 로딩된 원본 장면이 기존 커스텀 맵 셰이더를 덮어쓰지 않도록 수정했습니다. 모래 등 기존 맵 표현을 유지합니다.",
+        "정적 장면의 모래 혼합 처리로 바닥 타일 무늬가 단색에 가려지던 문제를 수정했습니다.",
+        "터치를 지원하는 PC에서 기기를 가로로 돌리라는 안내가 표시될 수 있던 문제를 수정했습니다.",
+        "맵 품질 최하·경량 2D에서도 공식 전투 이펙트가 별도 설정을 따르도록 수정했습니다. 이펙트 품질 옵션의 기존 동작은 유지합니다."
+      ]
+    }
+  ]
+},
+{
   "version": "0.3.0b",
   "date": "2026-10-17",
   "status": "released",

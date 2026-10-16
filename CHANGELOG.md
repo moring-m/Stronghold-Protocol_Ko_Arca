@@ -1,5 +1,12 @@
 # 패치노트
 
+## 0.3.0b1 — 2026-10-17
+
+- Preserve custom native map shaders when upstream scene packs arrive later.
+- Prevent static terrain masks from hiding patterned floor textures.
+- Suppress rotation prompts on touch-enabled PCs with mouse or hover support.
+- Keep official battle effects independent of map quality, including minimal 2D maps.
+
 ## 0.3.0b — 2026-10-17
 
 - Restore terrain blending, authored hazard surfaces and slightly stronger lighting contrast while keeping current colours.

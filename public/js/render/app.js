@@ -682,8 +682,8 @@ export async function createFieldView(host, options = {}) {
   });
   setupCleanup.push(() => fx.destroy());
   ctx.fx = fx;
-  // the official battle effects (设置「官方特效」, render/vfx): drawn on the 3D board only (the 2D board fallback keeps the
-  // procedural fx), on the battle clock; their files load on demand (data/local-fx.json)
+  // Official effects use the Pixi WebGL layer independently of the map renderer.
+  // Map quality may select a 2D board without disabling these battle effects.
   const ofx = new OfficialFx({ P, renderer: app.renderer, assets, cam: () => cam, heightAt });
   setupCleanup.push(() => ofx.destroy());
   layers.vfxGround.addChild(ofx.ground);
@@ -704,10 +704,10 @@ export async function createFieldView(host, options = {}) {
   ctx.ofx = ofx;
   ctx.officialStatusKey = name=>wiring.statusKey(name);
   let ofxPrevT = null;        // renderT of the last effects step (the battle clock)
-  /** The tier the effects run at now: the setting (auto: 精简 on touch devices) while the 3D board draws. */
+  /** Battle effects follow their own setting, including on a lightweight 2D map. */
   function syncOfficialFx() {
     const wasActive=ofx.active;
-    ofx.setTier(board3d && officialFxDownloaded() && settings.officialFx!=='lite' ? resolveOfficialFx(settings.officialFx, ofx.available) : 'off');
+    ofx.setTier(officialFxDownloaded() && settings.officialFx!=='lite' ? resolveOfficialFx(settings.officialFx, ofx.available) : 'off');
     if(!wasActive&&ofx.active){fx.clear();wiring.ready().then(()=>wiring.begin(views.values())).catch(()=>{});}
   }
   ofx.init().then((ok) => { if (!destroyed && ok) { syncOfficialFx(); } }, () => {});

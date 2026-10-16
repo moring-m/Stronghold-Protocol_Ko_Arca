@@ -649,7 +649,12 @@ export class BoardScene {
   *_stageSteps(stage, area) {
     if (this.destroyed) return;
     if (area) this.setArea(area, { rebuild: false });
-    const official = stage ? this.scenePacks.get(stage.id) || null : null;
+    // The custom native stage owns its terrain/material treatment. A late static
+    // scene pack must not replace it with the upstream shader path.
+    const native = this.mapQuality !== 'low' && stage ? this.pack?.original?.scenes?.[stage.originalStageId || stage.id] : null;
+    const nativeReady = native && Object.keys(native.buckets).length > 0
+      && Object.entries(native.buckets).every(([k,g]) => this.originalMaterials[g.material || k]);
+    const official = stage && !nativeReady ? this.scenePacks.get(stage.id) || null : null;
     const key = stage ? `${stage.id || ''}|${official ? official.key : ''}|${stage.previewLayout ? stage.previewLayout.worldOffset || 0 : 'native'}|${(stage.rows || []).join('/')}|${JSON.stringify((stage.devices || []).map((d) => [d.key, d.pos, d.active, d.dir]))}` : '';
     if (key === this.stageKey) return;
     const layoutKey=stage ? `${key}|${this.areaKey}|${this.mapQuality}|${!!this.pack?.original?.scenes?.[stage.originalStageId || stage.id]}` : null;

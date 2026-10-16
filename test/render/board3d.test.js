@@ -419,6 +419,9 @@ test('original stage geometry is used with its UVs and disposed with the scene',
   scene.setArea(AREAS.all);scene.setStage(stages.act1autochess_m01);
   assert.equal(scene.stats().originalStage, 'act1autochess_m01');
   assert.ok(scene.meshes['original:original']);
+  scene.setScenePack('act1autochess_m01',{key:'late-upstream-scene'});
+  assert.equal(scene.originalStage,'act1autochess_m01','late upstream art keeps the custom native terrain shader');
+  assert.equal(scene.official,null);
   assert.equal(scene.meshes.board, undefined, 'no procedural board underneath original meshes');
   assert.deepEqual([...scene.meshes['original:original'].geometry.attributes.uv.array].map(x => +x.toFixed(2)), mesh.uv);
   let disposed = false; scene.originalMaterials.original.addEventListener('dispose', () => { disposed = true; });
