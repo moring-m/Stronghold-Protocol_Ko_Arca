@@ -1454,7 +1454,7 @@ export class UnitView {
       this.energyText.anchor.set(.5);this.hud.addChild(this.energyText);
     }
     this.energyText.text='●'.repeat(this.energyCount)+'○'.repeat(Math.max(0,(this.info.energyMax||3)-this.energyCount));
-    this.energyText.visible=this.alive&&!this.prep;
+    this.energyText.visible=this.alive&&!this.prep&&!this.ctx.ofx?.active;
   }
 
   onHit() { this.flash = 1; }
@@ -1877,7 +1877,7 @@ export class UnitView {
       }
     }
     if(this.attackRange){
-      const g=this.attackRange,r=Number(this.info.rangeRadius);g.clear();g.visible=this.ctx.settings?.unitRanges !== false && this.alive&&!this.down;
+      const g=this.attackRange,r=Number(this.info.rangeRadius);g.clear();g.visible=this.ctx.settings?.unitRanges !== false && this.alive&&!this.down && !(this.ctx.ofx?.active && /emppnt/.test(this.info.spine||this.info.defId||''));
       if(g.visible){
         placeOnGround(this.ctx,g,this.ctx.layers.groundFx,this.y,this.z);
         const segment=(x0,y0,x1,y1)=>{
@@ -2153,11 +2153,11 @@ export class UnitView {
     const gaugeTop = rowsTop + ammoH;
     let energyH = 0;
     if (this.energyText) {
-      this.energyText.visible = showBars;
+      this.energyText.visible = showBars && !this.ctx.ofx?.active;
       this.energyText.scale.set(clamp(s / 90, .55, .85));
       if (this.energyText.width > bw) this.energyText.scale.set(this.energyText.scale.x * bw / this.energyText.width);
       // Left aligned with the wolf-life row, below SP; reserve room for other gauges.
-      energyH = showBars ? this.energyText.height + 2 : 0;
+      energyH = this.energyText.visible ? this.energyText.height + 2 : 0;
       this.energyText.position.set(x0 + this.energyText.width / 2, gaugeTop + energyH / 2);
     }
     const wolfH = this._updateWolfPips(showBars && !this.isEnemy && !!this.wolves, x0, gaugeTop + energyH, s);
@@ -2295,6 +2295,7 @@ export class UnitView {
    * the energies as an effect on the operator (the maintainer's decision of 2026-10-15, GitHub #633).
    */
   _updateEnergy(show, x, top, s) {
+    show = show && !this.ctx.ofx?.active;
     let r = this.energyHud;
     if (!show) { if (r) r.root.visible = false; return 0; }
     if (!r) {

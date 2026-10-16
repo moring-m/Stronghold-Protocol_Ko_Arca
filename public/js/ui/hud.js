@@ -399,8 +399,10 @@ export function TopBar({ battleEnd = null, pub, priv, conn, hud, total, drawer, 
     <div class="gtop__left">
       <${Button} variant="danger" size="lg" square=${true} icon="exit" onClick=${onExit} aria-label="离开" title="离开 / 暂离" class="gtop__exit tapx" />
       <div class="gtop__meta">
-        <${PingPill} ms=${conn?.ping} online=${conn?.status === 'online'} />
-        <${SpectatorPill} spectators=${spectators} myId=${myId} isHost=${isHost} onRemove=${onRemoveSpectator} />
+        <div class="gtop__net">
+          <${PingPill} ms=${conn?.ping} online=${conn?.status === 'online'} />
+          <${SpectatorPill} spectators=${spectators} myId=${myId} isHost=${isHost} onRemove=${onRemoveSpectator} />
+        </div>
         ${pub?.laboratory?html`<span class="t-mint">실험실</span>`:pub?.difficulty ? html`<${DifficultyTag} difficulty=${pub.difficulty} size="sm" />` : null}
         <${UnofficialMark} room=${room} compact=${true} class="gtop__mod" />
       </div>

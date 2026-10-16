@@ -421,6 +421,14 @@ export async function startGateway({
         headers,
       },
       async (upstream) => {
+        // Response callbacks run after the request handler has returned. A browser
+        // may have cancelled meanwhile; piping to its destroyed response can throw
+        // synchronously, outside pipeline's completion callback.
+        if (res.destroyed || res.writableEnded) {
+          completeTransform?.(null);
+          upstream.destroy();
+          return;
+        }
         const type = String(upstream.headers["content-type"] || "");
         const rewrite =
           type.includes("javascript") ||
@@ -436,8 +444,14 @@ export async function startGateway({
         }
         if (!rewrite) {
           completeTransform?.(null);
-          res.writeHead(upstream.statusCode, out);
-          pipeline(upstream, res, () => {});
+          try {
+            res.writeHead(upstream.statusCode, out);
+            pipeline(upstream, res, () => {});
+          } catch (error) {
+            upstream.destroy();
+            res.destroy();
+            if (error.code !== 'ERR_STREAM_UNABLE_TO_PIPE' && error.code !== 'ERR_STREAM_DESTROYED') log.error(error);
+          }
           return;
         }
         try {
@@ -489,6 +503,7 @@ export async function startGateway({
     );
     proxy.on("error", () => {
       completeTransform?.(null);
+      if (res.destroyed || res.writableEnded) return;
       if (!res.headersSent)
         json(res, 502, {
           error: "Worker unavailable; room ownership retained",

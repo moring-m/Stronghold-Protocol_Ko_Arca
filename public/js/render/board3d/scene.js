@@ -1153,7 +1153,7 @@ export class BoardScene {
     const T=this.THREE,ray=new T.Ray(new T.Vector3(c,r,100),new T.Vector3(0,0,-1));
     const a=new T.Vector3(),b=new T.Vector3(),d=new T.Vector3(),hit=new T.Vector3();
     for(const [key,mesh] of Object.entries(this.meshes)){
-      if(!/^(original:|cooperative-functional:|preview:|sand-rim:)/.test(key) || !mesh?.geometry?.index || mesh.material?.isShaderMaterial)continue;
+      if(!/^(original:|cooperative-functional:|preview:|sand-rim:|scene\d+$)/.test(key) || !mesh?.geometry?.index || (mesh.material?.isShaderMaterial && !/^scene\d+$/.test(key)))continue;
       const pos=mesh.geometry.attributes.position,indices=mesh.geometry.index;
       mesh.updateMatrix();
       for(let i=0;i<indices.count;i+=3){
@@ -1180,9 +1180,9 @@ export class BoardScene {
       return { position: new Float32Array(pos), normal: nrm, uv: new Float32Array(uv), color: null, index: new Uint16Array(idx) };
     };
     const infectionHeights=new Map();
-    if(this.originalStage)for(const [r,c]of board.terrain.infection)infectionHeights.set(`${r},${c}`,this._nativeTileHeight(board,r,c));
-    if (this.originalStage && board.terrain.infection.length) this.meshes.infectionGlow = this._mesh(quads(board.terrain.infection, (r,c)=>infectionHeights.get(`${r},${c}`)+.025, 0.025), this.mat.infectionGlow, {cast:false,receive:false,order:3});
-    if(this.originalStage && board.terrain.infection.length){
+    if((this.originalStage || this.official))for(const [r,c]of board.terrain.infection)infectionHeights.set(`${r},${c}`,this._nativeTileHeight(board,r,c));
+    if ((this.originalStage || this.official) && board.terrain.infection.length) this.meshes.infectionGlow = this._mesh(quads(board.terrain.infection, (r,c)=>infectionHeights.get(`${r},${c}`)+.025, 0.025), this.mat.infectionGlow, {cast:false,receive:false,order:3});
+    if((this.originalStage || this.official) && board.terrain.infection.length){
       const position=[],uv=[],index=[];
       // Four upright curtains follow the tile outline; no crossed billboards
       // through the middle of the tile (which obscure the original artwork).
@@ -1194,14 +1194,12 @@ export class BoardScene {
       this.meshes.infectionRise=this._mesh({position:new Float32Array(position),normal:new Float32Array(position.length),uv:new Float32Array(uv),index:new Uint16Array(index)},this.mat.infectionRise,{cast:false,receive:false,order:4});
     }
     // Native stage meshes already contain these environmental tile surfaces.
-    if (this.originalStage) return;
+    if ((this.originalStage || this.official)) return;
     const T = board.terrain;
     const opt = { cast: false, receive: false, order: 2 };
     if (T.water.length && !Object.keys(this.meshes).some(k=>k.startsWith('original:') && k.includes('Dosshore_UI'))) this.meshes.water = this._mesh(quads(T.water, -0.035), this.mat.water, opt);
     if (T.mire.length) this.meshes.mire = this._mesh(quads(T.mire, 0.006, 0.02), this.mat.mire, opt);
-    // The infection (活性源石) glow is our own flat patch; an official scene already carries that floor in its own
-    // geometry and textures, so drawing ours on top just overlaps it (#549).
-    if (T.infection.length && !this.official) this.meshes.infection = this._mesh(quads(T.infection, 0.007, 0.02), this.mat.infection, opt);
+    if (T.infection.length) this.meshes.infection = this._mesh(quads(T.infection, 0.007, 0.02), this.mat.infection, opt);
     if (T.smog.length) {
       // two crossed haze cards per grille tile, standing up
       const pos = [], uv = [], idx = [];

@@ -51,6 +51,15 @@ import { UF } from '../../../../shared/constants.js';
 
 /** Battle seconds a non-oneshot cast effect lasts without its end event. */
 export const CAST_LOOP_S = 0.6;
+// Confirmed in each enemy's death/attack projectile, not inferred from the zone colour.
+const ENEMY_ZONES = Object.freeze({
+  enemy_1267_nhpbr: ['pollution', 'projectile_enemy_nhpbr_polluted', 'toTargetOnStart'],
+  enemy_1267_nhpbr_2: ['pollution', 'projectile_enemy_nhpbr_polluted', 'toTargetOnStart'],
+  enemy_1272_nhtank: ['pollution', 'projectile_enemy_nhtank_polluted', 'onReached'],
+  enemy_1272_nhtank_2: ['pollution', 'projectile_enemy_nhtank_polluted', 'onReached'],
+  enemy_9006_actoxi: ['poison', 'projectile_enemy_actoxi', 'onReached'],
+});
+
 /** Battle seconds a melee blow waits for its damage. */
 const MELEE_WINDOW = 0.4;
 /** Battle seconds a projectile's arrival covers the damage event it stands for. */
@@ -330,6 +339,8 @@ export class FxWiring {
         if (m.overrideStartEffect) keys.add(m.overrideStartEffect);
         if (m.overrideDeadEffect) keys.add(m.overrideDeadEffect);
       }
+      const zone = ENEMY_ZONES[this.unitKeyOf(v)];
+      if (zone) for (const k of this.idx.projectiles?.[zone[1]]?.[zone[2]] || []) keys.add(k);
       if (u.startEffect) keys.add(u.startEffect);
       if (u.deadEffect) keys.add(u.deadEffect);
     }
@@ -475,6 +486,7 @@ export class FxWiring {
    * started in the battle's first frames used to sit at the HitPoint for good).
    */
   playOn(key, v, o = {}) {
+    if (v?.prep) return null;
     let k = lc(key);
     if (!k || !this.ofx.lib.has(k)) return null;
     let def = this.ofx.lib.def(k);
@@ -809,6 +821,9 @@ export class FxWiring {
     // a sim-melee attack whose official ability is a ranged one with a projectile (蒂比): the projectile flies for show
     const heal = !!tgt && !tgt.isEnemy && !src.isEnemy;
     const display = !isShot && !!proj && !!tgt && !src.isEnemy && !sk?.projectile && fitsAttack(set?.shotClass, { heal, ranged: true });
+    // Imperial drones use the sim's dedicated three-second shell event below.
+    // Starting a generic distance-timed flight here would duplicate that clock.
+    if (pk === 'projectile_enemy_emppnt') return true;
     const flies = !!proj && !!tgt && (isShot || display);
     if (flies && fun?.skipBody) return true;
     if (flies) {
@@ -952,7 +967,7 @@ export class FxWiring {
       return Number.isInteger(o.mount) ? mountPoint(sSkin, o.mount, pose, out) : unitPoint(sSkin, 'muzzle', pose, out);
     };
     const from = startAt([0, 0, 0], !o.later);
-    const to0 = unitPoint(tSkin, 'hit', this.pose(tgt));
+    const to0 = o.groundTarget ? [tgt.x-10,tgt.y-9,-(tgt.z||0)] : unitPoint(tSkin, 'hit', this.pose(tgt));
     const dur = o.dur > 0 ? o.dur : this._flightTime(src, tgt, kind);
     const mv = proj.movement || {};
     const id = src.id ?? src.info?.id;
@@ -976,22 +991,34 @@ export class FxWiring {
     const rows = Array.isArray(o.hits) && o.hits.length ? o.hits : null;
     if (tgt && !o.followUp) this._expect(tgt, hitAt);
     if (!mainKey && !ropeKey) { this._arrive(proj, tgt, to0, t0 + hitAt, rows, src); return hitAt; }
+    const comesBack = !!mv.comeBack && !!mainKey;
+    const backScale = Number(mv.comeBackSpeedScale) > 0 ? Number(mv.comeBackSpeedScale) : 1;
+    const returnDelay = comesBack ? Math.max(0, Number(mv.delayAfterReached) || 0) : 0;
+    const returnDuration = comesBack ? dur / backScale : 0;
+    const totalDuration = dur + returnDelay + returnDuration;
     const flight = { t: -1, dur, from, to: to0.slice(), pos: from.slice(), next: from.slice(), done: false, rope: null };
     // the flight at t battle s: the head and a point a little further on (its direction), homing on the target's point
     const step = (t) => {
       if (t === flight.t) return;
-      if (tgt && !tgt.destroyed && tgt.alive !== false) unitPoint(tSkin, 'hit', this.pose(tgt), flight.to);
+      if (!o.groundTarget && tgt && !tgt.destroyed && tgt.alive !== false) unitPoint(tSkin, 'hit', this.pose(tgt), flight.to);
       flight.t = t;
       const k = Math.min(1, t / flight.dur);
       this._flightPoint(flight, arc, wob, k, t, flight.pos);
       this._flightPoint(flight, arc, wob, Math.min(1, k + 0.02), t + 0.02 * flight.dur, flight.next);
+    };
+    let arrived = false, returnFrom = null;
+    const arrive = () => {
+      if (arrived) return;
+      arrived = true;
+      returnFrom = flight.pos.slice();
+      this._arrive(proj, tgt, flight.to, hitAt > dur ? t0 + hitAt : null, rows, src);
     };
     const finish = (fx) => {
       flight.done = true;
       fx.stop({ hit: true });
       if (flight.rope && flight.rope !== fx) flight.rope.stop();
       this.flights.delete(flight);
-      this._arrive(proj, tgt, flight.to, hitAt > dur ? t0 + hitAt : null, rows, src);
+      arrive();
     };
     const def = mainKey ? this.ofx.lib.def(mainKey) : null;
     const flipIfLeft = def ? def.flipIfLeft : false;
@@ -999,7 +1026,16 @@ export class FxWiring {
       important: true,
       track: (fx) => {
         if (flight.done) return;
-        step(Math.min(flight.dur, fx.time));
+        if (comesBack && fx.time >= dur) {
+          if (!arrived) { step(dur); arrive(); }
+          if (src.destroyed || src.alive === false) { finish(fx); return; }
+          const home = startAt([0,0,0]);
+          const k = Math.max(0, Math.min(1, (fx.time - dur - returnDelay) / returnDuration));
+          for (let i=0;i<3;i++) {
+            flight.pos[i] = returnFrom[i] + (home[i] - returnFrom[i]) * k;
+            flight.next[i] = returnFrom[i] + (home[i] - returnFrom[i]) * Math.min(1,k+.02);
+          }
+        } else step(Math.min(flight.dur, fx.time));
         // direction of travel (Unity frame): yaw in the board plane, pitch with the climb
         const p = flight.pos, q = flight.next;
         const dx = q[0] - p[0], dy = q[1] - p[1], dz = q[2] - p[2];
@@ -1008,7 +1044,7 @@ export class FxWiring {
         if (flipIfLeft && dx < 0) { fx.mirror = true; fx.yaw = Math.atan2(dy, -dx); } // mirrored art: +x after the mirror
         else { fx.mirror = false; fx.yaw = Math.atan2(dy, dx); }
         fx.pitch = horiz > 1e-5 || Math.abs(dz) > 1e-5 ? Math.atan2(-dz, horiz) : 0;
-        if (fx.time >= flight.dur) finish(fx);
+        if (fx.time >= totalDuration) finish(fx);
       },
     }) : null;
     if (ropeKey) {
@@ -1267,7 +1303,7 @@ export class FxWiring {
    * same key hands over to it: SkillFx.status).
    */
   status(v, name, on) {
-    if (!v || !this.idx) return false;
+    if (!v || v.prep || !this.idx) return false;
     const id = v.id ?? v.info?.id;
     name = name==='invuln'?'invulnerable':name;
     const slot = `${id}|${name}`;
@@ -1294,7 +1330,7 @@ export class FxWiring {
     const names=v._iconKeys?[...v._iconKeys(Infinity)]:[...(v.statuses||[])];
     const flags=v.flags||0;
     for(const [flag,name]of [[UF.SHIELD,'shield'],[UF.INVULN,'invulnerable'],[UF.STEALTH,'stealth'],[UF.FROZEN,'freeze'],[UF.STUNNED,'stun'],[UF.SLEEP,'sleep'],[UF.COLD,'cold']])if((!v._iconKeys||flag===UF.SHIELD)&&(flags&flag))names.push(name);
-    const current=new Set(v.alive===false||v.down?[]:names.map(name=>name==='invuln'?'invulnerable':name).filter(name=>this.statusKey(name)));
+    const current=new Set(v.prep||v.alive===false||v.down?[]:names.map(name=>name==='invuln'?'invulnerable':name).filter(name=>this.statusKey(name)));
     const previous=this.statusSeen.get(id)||new Set();
     for(const name of previous)if(!current.has(name))this.status(v,name,false);
     for(const name of current)if(!previous.has(name)||!this.loops.get(`${id}|${name}`)?.alive)this.status(v,name,true);
@@ -1313,7 +1349,7 @@ export class FxWiring {
 
   /** b.ev ['skill', id, on] (SkillFx.skill): true when the official layer shows the skill (no procedural burst / aura). */
   skill(v, on) {
-    if (!v || !this.idx) return false;
+    if (!v || v.prep || !this.idx) return false;
     const drew = this.skills.skill(v, !!on);
     this.talents.skill(v, !!on);   // the talents a skill start casts (ON_SKILL_START)
     this.funnels.skill(v, !!on);   // the floating units of the skill's mode (render/vfx/funnelfx.js)
@@ -1330,7 +1366,10 @@ export class FxWiring {
   sync(views) {
     if (!this.idx) return;
     if(!this.ofx.active){this.statusSeen.clear();return;}
-    const list = Array.isArray(views) ? views : [...views];   // (render/app.js passes the views Map's iterator)
+    const all = Array.isArray(views) ? views : [...views];
+    // Observed preparation fields also use the snapshot view, but are not combat.
+    for (const v of all) if (v.prep) this.release(v);
+    const list = all.filter(v => !v.prep);
     for(const v of list)this.syncStatuses(v);
     this.skills.sync(list);
     this.talents.sync(list);
@@ -1344,6 +1383,35 @@ export class FxWiring {
    */
   simFx(kind, x, y, extra) {
     if (!this.idx) return false;
+    if (kind === 'zone' && this.ofx.active) {
+      const zone = ENEMY_ZONES[extra?.sourceDef];
+      if (zone && extra.kind === zone[0] && Number(extra.dur) > 0) {
+        const keys = this.idx.projectiles?.[zone[1]]?.[zone[2]] || [];
+        // A detached ground anchor survives the source's death/removal. Each cloud has
+        // its own lifetime; overlapping clouds must not replace one another.
+        const at = { x, y, z: 0 };
+        let drawn = false;
+        for (const key of keys) {
+          const h = this.playOn(key, at, { loop: true, important: true });
+          if (!h) continue;
+          setTimeout0(this.ofx, h, Number(extra.dur));
+          drawn = true;
+        }
+        if (drawn) return true;
+      }
+    }
+    if (kind === 'bombardShell') {
+      const src = this.view(extra?.id);
+      if (src && /enemy_1112_emppnt/.test(src.info?.spine || src.info?.defId || '')) {
+        const proj = this.idx.projectiles?.projectile_enemy_emppnt;
+        if (proj && Number(extra.t) > 0) {
+          const target = {x,y,z:0,alive:true,isEnemy:false};
+          this._fly(proj,src,target,'mortar',this.ofx.time,{dur:Number(extra.t),groundTarget:true});
+          return true;
+        }
+      }
+    }
+    if (kind === 'bombard' && extra?.kind === 'emppnt') return true;
     const t = this.talents.fx(kind, extra);
     // the floating units stand for the kit's 'drone' / 'drones' / 'droneLock' / 'overload' (render/vfx/funnelfx.js)
     const f = this.funnels.simFx(kind, x, y, extra);
@@ -1364,7 +1432,7 @@ export class FxWiring {
 
   /** b.ev 'deploy': the unit's own start effect or the generic deploy (operators and summons). */
   deploy(v) {
-    if (!v || !this.idx) return false;
+    if (!v || v.prep || !this.idx) return false;
     this.skills.deployed(v);   // a passive's loops and start one-shots (it is drawn whatever the deploy effect is)
     this.talents.deployed(v);  // the deploy talents' one-shots (耀骑士临光's birth), once per life
     if (!this.ofx.active || v.isEnemy) return false;
@@ -1379,7 +1447,7 @@ export class FxWiring {
    * (TalentFx.deployed, once per life: an enemy's AppearSyncedTalent auras, its birth effects). Returns true when drawn.
    */
   spawned(v) {
-    if (!v || !this.idx) return false;
+    if (!v || v.prep || !this.idx) return false;
     return this.talents.deployed(v);
   }
 

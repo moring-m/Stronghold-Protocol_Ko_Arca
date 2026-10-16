@@ -617,3 +617,10 @@ test('official shield replaces custom status geometry while Notes remain visible
  assert.equal(bubbles,0);assert.equal(v.noteFx.visible,true);assert.ok(v.noteClef);assert.equal(v.corrosionFx.visible,true);
  v.ctx.ofx.active=false;v.update(.016,cam(),2);assert.ok(bubbles>0);v.destroy();
 });
+
+test('official effects replace mystic stored-attack displays and imperial drone range circles',()=>{
+ const caster=view({energyMax:3});caster.ctx.ofx={active:true};caster.setEnergy(2);caster.update(.016,cam(),0);assert.equal(caster.energyText.visible,false);
+ caster.ctx.ofx.active=false;caster.update(.016,cam(),.1);assert.equal(caster.energyText.visible,true);caster.destroy();
+ const drone=view({side:'enemy',defId:'enemy_1112_emppnt',spine:'enemy_1112_emppnt',rangeRadius:2});drone.ctx.ofx={active:true};drone.update(.016,cam(),0);assert.equal(drone.attackRange.visible,false);
+ drone.ctx.ofx.active=false;drone.update(.016,cam(),.1);assert.equal(drone.attackRange.visible,true);drone.destroy();
+});

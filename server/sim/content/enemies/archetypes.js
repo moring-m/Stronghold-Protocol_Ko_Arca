@@ -581,7 +581,7 @@ function bleed(ab) {
  * her low tile: `low`); a unit inside several zones takes one tick per second (`mem.pollutedAt`: the last tick it took).
  */
 function pollution(b, src, x, y, r, life, low, high) {
-  zone(b, { x, y, r, life, iv: POLLUTION_INTERVAL, kind: 'pollution', tick(units) {
+  zone(b, { x, y, r, life, iv: POLLUTION_INTERVAL, kind: 'pollution', visualSource: src, tick(units) {
     for (const u of units) {
       const v = u.ground ? low : high;
       if (!(v > 0) || b.time - (u.mem.pollutedAt ?? -Infinity) < POLLUTION_INTERVAL - 1e-6) continue;
@@ -599,8 +599,8 @@ function pollution(b, src, x, y, r, life, low, high) {
  * airborne 起飞 ally reached (§21.22; until 0.1.2 it took everyone inside). `noAir`: "不可对空" — a flying ally (the 炎佑
  * dragon) is skipped too (集团军重型火炮's 【燃烧区域】, since 0.1.3).
  */
-function dmgZone(b, src, x, y, r, life, iv, amount, type = 'arts', kind = 'zone', el = null, elAmount = 0, { noAir = false } = {}) {
-  zone(b, { x, y, r, life, iv, kind, pick: (zx, zy, zr) => areaAllies(b, src, zx, zy, zr).filter((u) => !(noAir && u.isFlying)), tick(units) {
+function dmgZone(b, src, x, y, r, life, iv, amount, type = 'arts', kind = 'zone', el = null, elAmount = 0, { noAir = false, visualSource = src } = {}) {
+  zone(b, { x, y, r, life, iv, kind, visualSource, pick: (zx, zy, zr) => areaAllies(b, src, zx, zy, zr).filter((u) => !(noAir && u.isFlying)), tick(units) {
     for (const u of units) {
       hurt(b, src, u, amount, type, { tags: [kind] });
       if (el && elAmount > 0) elem(b, src, u, el, elAmount, { tags: [kind] });

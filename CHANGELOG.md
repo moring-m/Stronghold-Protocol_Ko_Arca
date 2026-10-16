@@ -1,5 +1,14 @@
 # 패치노트
 
+## 0.3.0b — 2026-10-17
+
+- Restore terrain blending, authored hazard surfaces and slightly stronger lighting contrast while keeping current colours.
+- Fix official returning projectiles, imperial drone bombard timing, preparation effect cleanup and enemy ground-zone bindings.
+- Match SP/bond gain number sizing to healing; limit the 10% boss damage notice to eight-player games.
+- Simplify the lobby toolbar, centre its title, move resource redownload into settings and use eight spectator seats.
+- Scope individual voice/effect downloads and prompt for missing selected voice packs.
+- Prevent a disconnected downstream response from crashing the release gateway during stream setup.
+
 ## 0.3.0a — 2026-10-16
 
 ### 원본 업데이트 병합

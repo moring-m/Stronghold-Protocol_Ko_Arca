@@ -1881,7 +1881,7 @@ export class FxSystem {
         break;
       }
       case 'sp': {
-        if(kind==='spRecovered' && Number(ex.n)>0)this.numberAt(p.x,p.y,`+${Math.round(Number(ex.n)*100)/100}`,col,.8,at);
+        if(kind==='spRecovered' && Number(ex.n)>0)this.numberAt(p.x,p.y,`+${Math.round(Number(ex.n)*100)/100}`,col,.8,at,true);
         for (let i = 0; i < (this.quality === 'low' ? 3 : 7); i++) {
           this.particle('dot', p.x + (Math.random() - 0.5) * s * 0.6, p.y + (Math.random() - 0.2) * s * 0.4, { tint: col, vy: -s * (0.6 + Math.random() * 0.6), life: 0.7, s0: s / 32 * 0.2, s1: 0, a0: 1, a1: 0, fadeIn: 0.05 });
         }
@@ -2147,10 +2147,10 @@ export class FxSystem {
   }
 
   /** Floating label ('!', '+10') at a screen point, using the damage-number pool. */
-  numberAt(x, y, label, tint, life = 0.8, at = null) {
+  numberAt(x, y, label, tint, life = 0.8, at = null, healSize = false) {
     const P = this.P;
     if (this.labels.length >= 24) { const o = this.labels.shift(); o.t.destroy(); }
-    const t = new P.BitmapText(String(label), { fontName: DMG_STYLE.true.font, fontSize: 26, align: 'center' });
+    const t = new P.BitmapText(String(label), { fontName: healSize ? DMG_STYLE.heal.font : DMG_STYLE.true.font, fontSize: healSize ? 24 : 26, align: 'center' });
     t.anchor.set(0.5, 1);
     t.tint = tint;
     t.position.set(x, y);
@@ -2158,7 +2158,7 @@ export class FxSystem {
     const cam=this.ctx.cam(),anchor=at||this._particleAnchor;
     let world=null;
     if(anchor){const p=cam.project(anchor.x,anchor.y,anchor.z||0),height=-(y-p.y)/p.s;world={x:anchor.x+(x-p.x)/p.s,y:anchor.y+height*MODEL_UP.y,z:(anchor.z||0)+height*MODEL_UP.z};}
-    this.labels.push({t,y0:y,world,life:0,max:life});
+    this.labels.push({t,y0:y,world,life:0,max:life,healSize});
   }
 
   _updateLabels(dt) {
@@ -2171,6 +2171,7 @@ export class FxSystem {
       else l.t.position.y=l.y0-22*easeOut(k);
       l.t.alpha = k > 0.6 ? 1 - (k - 0.6) / 0.4 : 1;
       l.t.scale.set(k < 0.12 ? 0.6 + (k / 0.12) * 0.5 : 1.1 - Math.min(0.1, k - 0.12));
+      if(l.healSize){const p=l.world?this.ctx.cam().project(l.world.x,l.world.y,l.world.z):null;l.t.scale.set(numScale(p?.s||100,false,'heal')*(1+Math.max(0,1-l.life*6)*(NUM_POP-1)));}
       this.labels[w++] = l;
     }
     this.labels.length = w;
@@ -2302,7 +2303,7 @@ export class FxSystem {
   }
 
   /** Screen-space pop (bond layer gain / bounty coins). `icon` = texture or null. */
-  pop(icon, label, tint, i = 0, at = null, ownerId = null) {
+  pop(icon, label, tint, i = 0, at = null, ownerId = null, healSize = false) {
     const P = this.P;
     const size = this.ctx.screenSize();
     const top = this.ctx.fieldTop ? this.ctx.fieldTop() : size.height * 0.2;
@@ -2328,15 +2329,16 @@ export class FxSystem {
       else { sp.visible = false; icon.once('update', fit); }
       c.addChild(glow, sp);
     }
+    let labelText=null;
     if (label) {
-      const t = new P.BitmapText(label, { fontName: DMG_STYLE.heal.font, fontSize: at ? 22 : 26 });
+      const t = labelText = new P.BitmapText(label, { fontName: DMG_STYLE.heal.font, fontSize: healSize ? 24 : at ? 22 : 26 });
       t.anchor.set(0, 0.5);
       t.position.set(at ? 18 : 26, 0);
       if (tint === COLORS.gold) t.tint = 0xffe066;
       c.addChild(t);
     }
     this.ctx.layers.screen.addChild(c);
-    this.pops.push({ c, t: 0, dur: 1.4, y0: c.position.y, at, ownerId });
+    this.pops.push({ c, t: 0, dur: 1.4, y0: c.position.y, at, ownerId, labelText, healSize });
     if (this.pops.length > 12) { const o = this.pops.shift(); o.c.destroy({ children: true }); }
   }
 
@@ -2353,6 +2355,7 @@ export class FxSystem {
       p.c.alpha = k < 0.15 ? k / 0.15 : k > 0.7 ? 1 - (k - 0.7) / 0.3 : 1;
       const s = k < 0.15 ? 0.6 + (k / 0.15) * 0.5 : 1.1 - Math.min(0.1, (k - 0.15));
       p.c.scale.set(s);
+      if(p.healSize && p.labelText){const pos=owner|| (p.at?{x:p.at[0],y:p.at[1],z:0}:null);const a=pos?this._proj(pos.x,pos.y,pos.z||0):null;p.labelText.scale.set(numScale(a?.s||100,false,'heal')*(1+Math.max(0,1-p.t*6)*(NUM_POP-1))/s);}
       this.pops[w++] = p;
     }
     this.pops.length = w;

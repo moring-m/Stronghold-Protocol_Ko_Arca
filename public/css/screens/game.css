@@ -34,12 +34,12 @@
 .specpill .icon { width: .18rem; height: .18rem; }
 .specpill__num { font-size: .18rem; font-weight: 700; color: var(--mint-300, #99f6e4); }
 .specpill.is-me { border-color: var(--mint-600, #0d9488); }
-/* the roster inside the modal */
-.gtop__meta { display: flex; flex-direction: column; align-items: flex-start; gap: .06rem; }
+/* Keep connection and spectators side by side; difficulty may wrap below. */
+.gtop__meta { display: flex; flex-flow: row wrap; align-items: center; gap: .06rem .14rem; }
 /* a match with gameplay plugins (DESIGN §32.6): the HUD corner's MOD mark */
 .gtop__mod { pointer-events: auto; }
 /* the latency pill and, beside it, the 观战席 capsule (ui/hud.js SpectatorPill: an eye + how many are watching; opens the roster) */
-.gtop__net { display: flex; align-items: center; gap: .08rem; }
+.gtop__net { display: flex; flex-wrap: nowrap; align-items: center; gap: .08rem; }
 .specpill { --btn-bg: rgba(0, 0, 0, .5); --btn-bg-hover: rgba(0, 0, 0, .66); --btn-bd: var(--line); height: .32rem; min-width: 0; padding: 0 .12rem; gap: .05rem; border-radius: 99px; }
 .specpill .btn__icon { width: .18rem; height: .18rem; color: var(--mint-500); }
 .specpill__num { font-size: .18rem; font-weight: 700; color: var(--mint-400); }

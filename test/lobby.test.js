@@ -11,7 +11,7 @@ import path from 'node:path';
 import { randomBytes } from 'node:crypto';
 import { setTimeout as delay } from 'node:timers/promises';
 
-import { startServer, parseRange, acceptsGzip, parseTrustProxy, WS_MAX_PAYLOAD } from '../server/index.js';
+import { startServer, parseRange, acceptsGzip, pickEncoding, parseTrustProxy, WS_MAX_PAYLOAD } from '../server/index.js';
 import { loadData, lookup, getChess, getBond, getBand, getMode, getConfig, INDEXED_FILES } from '../server/data.js';
 import * as dataModule from '../server/data.js';
 import { CODE_ALPHABET, BOT_NAMES } from '../server/lobby.js';
@@ -769,9 +769,13 @@ describe('websocket lobby', () => {
     // the cap; spectators never count toward the players: two player seats still free
     const s2 = await pool.player('Watcher2');
     await expectOk(s2, { t: 'room.spectate', code: st.code });
-    assert.equal(MAX_SPECTATORS, 2);
+    assert.equal(MAX_SPECTATORS, 8);
+    assert.equal(st.spectatorCap, 8);
+    const extraWatchers=[];
+    for(let i=2;i<MAX_SPECTATORS;i++){const w=await pool.player(`Extra${i}`);await expectOk(w,{t:'room.spectate',code:st.code});extraWatchers.push(w);}
     const s3 = await pool.player('Watcher3');
     await expectError(s3, { t: 'room.spectate', code: st.code }, ERR.ROOM_FULL);
+    for(const w of extraWatchers)await expectOk(w,{t:'room.leave'});
     await joinRoom(s3, st.code);
     await expectOk(host, { t: 'room.addBot' });
     const full = await host.waitFor('room.state', (s) => s.seats.every(Boolean));
@@ -1760,7 +1764,7 @@ describe('match result replay', () => {
   }
 
   /** Frames of a resumed socket in arrival order (types + phase), after welcome. */
-  const order = (c) => c.log.filter((m) => m.t !== 'welcome' && m.t !== 'pong').map((m) => m.t + (m.t === 'm.public' ? `:${m.phase}` : ''));
+  const order = (c) => c.log.filter((m) => m.t !== 'welcome' && m.t !== 'pong' && m.t !== 'room.restartVote').map((m) => m.t + (m.t === 'm.public' ? `:${m.phase}` : ''));
 
   for (const unicast of [true, false]) {
     test(`a human disconnected when the match ends gets room.state, the final m.public and m.result on resume (${unicast ? 'per-player' : 'broadcast'} result)`, async () => {

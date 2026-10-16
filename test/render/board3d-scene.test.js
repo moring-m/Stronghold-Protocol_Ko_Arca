@@ -420,7 +420,8 @@ describe('BoardScene with an official scene (stub renderer)', () => {
     assert.equal(board.setScenePack(stage.id, fakeScenePack()), true);
     assert.ok(board.official, 'official scene on');
     assert.ok(!board.meshes.board && !board.meshes.glass && !board.meshes.decal && !board.meshes.pipe && !board.meshes.bg && !board.meshes.bgShadow);
-    assert.ok(board.meshes.crates && board.meshes.edges && board.meshes.mire, Object.keys(board.meshes).join());
+    assert.ok(board.meshes.crates && board.meshes.edges, Object.keys(board.meshes).join());
+    assert.equal(board.meshes.mire,undefined,'authored mire surface is kept without a procedural patch');
     const meshes = sceneMeshes(board);
     assert.equal(meshes.length, 3, 'base + the left field: the two M quads share one mesh');
     assert.deepEqual(meshes.map((m) => m.geometry.getAttribute('position').count).sort((a, b) => a - b), [4, 4, 8]);
@@ -642,3 +643,24 @@ test('battle crate preserves its native prep dimensions and shrinks only on dest
  device.update(null,{x:0,y:0,z:0,size:.7,height:.3,nativeScale:.5,alpha:.5});
  assert.deepEqual(mesh.scale.toArray(),[.5,.5,.5]);device.destroy();board.destroy();
 });
+
+ test('painted terrain restores legacy sand coverage and surface response without replacing current colours',()=>{
+ const info={shader:'Torappu/Scene/StandardRealtimeShadow',keywords:['_HG_VERTEX_COLOR_BLEND_ON'],colors:{_Color:[.7,.6,.5,1],_BlendColor:[.8,.65,.4,1],_BlendRangeCtrl:[.2,.8,0,0]},floats:{_BlendStrength:.75,_Glossiness2:.2,_Metallic2:.1,_GlossMapScale2:.4}};
+ const light={dir:[0,0,1],color:[1,.9,.8],intensity:1.2};
+ const m=sceneMaterial(THREE,{info,light,env:new THREE.CubeTexture()},focusUniforms(THREE));
+ assert.equal(m.defines.SCENE_TERRAIN_BLEND,1);assert.deepEqual(m.uniforms.uColor.value.toArray(),[.7,.6,.5,1]);
+ assert.deepEqual(m.uniforms.uLightColor.value.toArray(),[1.2,1.08,.96]);
+ assert.deepEqual(m.uniforms.uTerrainRange.value.toArray(),[.2,.8]);assert.equal(m.uniforms.uTerrainStrength.value,.75);
+ assert.ok(m.vertexShader.includes('vTerrainMask = aColor.r'));assert.ok(m.fragmentShader.includes('uTerrainColor * uColor.rgb'));
+ assert.ok(m.fragmentShader.includes('mix(n, terrainNormal, terrainMask)'));assert.ok(m.fragmentShader.includes('mix(uSurface.z, uTerrainSurface.z, terrainMask)'));
+ const plain=sceneMaterial(THREE,{info:{...info,keywords:[]},light},focusUniforms(THREE));assert.equal(plain.defines.SCENE_TERRAIN_BLEND,undefined);
+ assert.ok(m.fragmentShader.includes('(luminance - .5) * 1.08 + .5'),'small luminance contrast retains RGB ratios');m.dispose();plain.dispose();
+ });
+ test('official rage tiles retain legacy glow and edge curtains at the authored floor height',()=>{
+ const board=new BoardScene(THREE,fakePack(),{renderer:stubRenderer()});board.setStage(stages.act2autochess_m02);board.setScenePack(stages.act2autochess_m02.id,fakeScenePack());
+ const floor=new THREE.Mesh(new THREE.PlaneGeometry(1,1).translate(5,10,.3),new THREE.ShaderMaterial());board.root.add(floor);board.meshes.scene99=floor;
+ board._buildTerrain({grid:board.board.grid,terrain:{infection:[[10,5]],water:[],mire:[[10,6]],smog:[]}});
+ assert.ok(board.meshes.infectionGlow&&board.meshes.infectionRise);assert.equal(board.meshes.infection,undefined);
+ assert.equal(board.meshes.mire,undefined);assert.ok(Math.abs(board.meshes.infectionGlow.geometry.attributes.position.getZ(0)-.325)<1e-5);
+ assert.equal(board.meshes.infectionRise.geometry.attributes.position.count,16);board.destroy();
+ });

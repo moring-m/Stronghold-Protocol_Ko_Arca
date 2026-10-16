@@ -70,7 +70,7 @@ test('C1 (solo 绝境, server-run fields): the Hidden Core\'s first hit announce
   const fa = assertTruthful(hits, PHASE.FINAL_ASSAULT, ['p_0']);
   assert.deepEqual(fa.map(stepOf), [0.8], 'the Final Assault cleared by one hit: 80 %');
   const hidden = assertTruthful(hits, PHASE.HIDDEN_CORE, ['p_0']);
-  assert.deepEqual(hidden.map(stepOf), BOSS_HIT_STEPS, 'the Hidden Core announces its own 20 / 50 / 80 % as they are reached');
+  assert.deepEqual(hidden.map(stepOf), BOSS_HIT_STEPS.filter(s => s !== 0.1), 'the Hidden Core announces its own 20 / 50 / 80 % as they are reached');
   assert.ok(hidden[0].leaderHpPct <= 0.9 + 1e-9, `the first hidden ticker comes after 20 % of the hidden leader (leader at ${(hidden[0].leaderHpPct * 100).toFixed(2)} %)`);
   // the result screen's 领袖伤害 keeps the whole match: the Final Assault's pool plus the hidden one
   assert.ok(end.players[0].stats.bossDamage > m.bossPool.maxHp, `领袖伤害 ${end.players[0].stats.bossDamage}`);
@@ -118,7 +118,18 @@ test('C1 (solo, client-side combat, server takeover mid-fight): the re-simulated
   assert.equal(end.hiddenReached, true);
   assertTruthful(hits, PHASE.FINAL_ASSAULT, ['p_0']);
   const hidden = assertTruthful(hits, PHASE.HIDDEN_CORE, ['p_0']);
-  assert.deepEqual(hidden.map(stepOf), BOSS_HIT_STEPS);
+  assert.deepEqual(hidden.map(stepOf), BOSS_HIT_STEPS.filter(s => s !== 0.1));
   checkInvariants(m);
   m.dispose();
+});
+
+
+for (const mode of ['solo', 'coop', 'coop8']) test(`10% boss notice is restricted to eight-player mode: ${mode}`, async () => {
+  const {Match} = await import('../../server/match/Match.js');
+  const messages=[];
+  const m={mode,gd:{config:{broadcasts:[0.1,0.2].map(n=>({id:String(n),type:'BOSS_HIT',params:[String(n)],text:`{0} ${n*100}%`}))}},broadcast:msg=>messages.push(msg)};
+  Match.prototype.tickerFor.call(m,'BOSS_HIT',['Doctor'],{param:'0.1'});
+  assert.equal(messages.length,mode==='coop8'?1:0);
+  Match.prototype.tickerFor.call(m,'BOSS_HIT',['Doctor'],{param:'0.2'});
+  assert.equal(messages.at(-1).id,'0.2');
 });

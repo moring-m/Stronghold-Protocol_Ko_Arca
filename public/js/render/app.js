@@ -2155,7 +2155,7 @@ export async function createFieldView(host, options = {}) {
         if (url) { try { tex = P.Texture.from(url); } catch { tex = null; } }
         const owner = e[4] != null ? infos.get(e[4]) : null;
         const at = Number.isFinite(e[5]) && Number.isFinite(e[6]) ? [e[5],e[6]] : owner ? [owner.x,owner.y] : null;
-        fx.pop(tex, `+${n}`, 0xffffff, layerPops.size, at, e[4] ?? null);
+        fx.pop(tex, `+${n}`, 0xffffff, layerPops.size, at, e[4] ?? null, true);
         break;
       }
       case 'bounty': {

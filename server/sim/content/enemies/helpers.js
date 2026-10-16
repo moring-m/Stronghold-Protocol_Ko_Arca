@@ -249,8 +249,8 @@ export function byPriority(e, list) { return sortAllyTargets(e, list.slice()); }
  * them — by default every ally in the circle (【污染秽蚀】 "无视无法选择"); the other zones (dmgZone, 烹泉's steam) pass
  * their area selection (areaAllies).
  */
-export function zone(b, { x, y, r, life, iv = 1, kind = 'zone', tick, pick = null }) {
-  b.fx('zone', { x, y, r, dur: life, kind });
+export function zone(b, { x, y, r, life, iv = 1, kind = 'zone', tick, pick = null, visualSource = null }) {
+  b.fx('zone', { x, y, r, dur: life, kind, ...(visualSource ? { sourceDef: visualSource.defId } : {}) });
   let left = life;
   const h = b.every(iv, () => {
     tick((pick ? pick(x, y, r) : b.alliesInRadius(x, y, r)).filter(u => !u.isFlying && !u.s.flags.liftoff));

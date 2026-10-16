@@ -1,5 +1,3 @@
-import { ResourceRedownloadButton } from '../ui/resourceRedownload.js';
-import { PwaInstallButton } from '../ui/device.js';
 import { openStats } from '../ui/statsEntry.js';
 
 import { t } from '../../../shared/i18n.js';
@@ -217,7 +215,7 @@ function TipsPanel() {
   </div>`;
 }
 
-function ModeCard({ card, selected, onSelect, coopSize=4, onCoopSize }) {
+function ModeCard({ card, selected, onSelect, coopSize=4, onCoopSize, spectateOn, onSpectateChange }) {
   if(card.id==='coop'&&coopSize===8)card={...card,desc:'최대 8명의 박사가 오퍼레이터 풀을 공유하며 함께 전투합니다.',points:['박사 1–8명 · 빈자리는 AI 팀원으로','협력방어 최대 4명']};
   return html`<div role="button" tabindex="0" class=${`mode-card brackets${card.id==='laboratory'?' mode-card--lab':''}${selected ? ' is-selected' : ''}`} onClick=${() => onSelect(card.id==='coop'&&coopSize===8?'coop8':card.id)} onKeyDown=${e=>{if(e.target===e.currentTarget&&['Enter',' '].includes(e.key)){e.preventDefault();onSelect(card.id==='coop'&&coopSize===8?'coop8':card.id);}}}
       aria-pressed=${selected ? 'true' : 'false'}>
@@ -230,6 +228,10 @@ function ModeCard({ card, selected, onSelect, coopSize=4, onCoopSize }) {
       <span class="mode-card__points">${card.points.map((p) => html`<span key=${p}>${p}</span>`)}</span>
     </span>
     <span class="mode-card__check" aria-hidden="true"><${Icon} name="check" />已选定</span>
+    ${card.id==='coop'?html`<label class="mode-card__spectate create-box__check" onClick=${e=>e.stopPropagation()} onKeyDown=${e=>e.stopPropagation()}>
+      <input type="checkbox" checked=${spectateOn} onChange=${e=>onSpectateChange(!!e.currentTarget.checked)} />
+      <${Icon} name="eye" /><span>관전 허용</span>
+    </label>`:null}
     ${card.id==='coop'?html`<span class="mode-card__sizes" role="group" aria-label="협동 인원">${[4,8].map(n=>html`<button type="button" aria-pressed=${coopSize===n} onClick=${e=>{e.stopPropagation();onCoopSize(n);}}>${n}인</button>`)}</span>`:null}
   </div>`;
 }
@@ -268,10 +270,6 @@ export function LobbyScreen() {
   // host's spectator seats (room.create {spectators}): a co-op room may offer 0–MAX_SPECTATOR_SEATS of them; the same
   // choice seeds the 观战 button hint. Persisted like the mode/difficulty preferences.
   const [spectateOn, setSpectateOn] = useState(() => loadPref('lobby.spectateOn', true) !== false);
-  const [spectateCount, setSpectateCount] = useState(() => {
-    const n = Number(loadPref('lobby.spectateCount', MAX_SPECTATORS));
-    return Number.isInteger(n) && n >= 1 && n <= MAX_SPECTATOR_SEATS ? n : MAX_SPECTATORS;
-  });
   const [busy, setBusy] = useState(null);
   /** Set when an 加入同盟 was refused with ROOM_FULL: `{ code }` opens the "enter as a spectator?" prompt. */
   const [fullAsk, setFullAsk] = useState(null);
@@ -301,7 +299,7 @@ export function LobbyScreen() {
     difficulty,
     customExtensions: loadCustomExtensionPrefs(),
     // only a co-op room carries the host's spectator cap (0 when the box is unticked)
-    ...(['coop','coop8'].includes(roomMode) ? { spectators: spectateOn ? spectateCount : 0 } : {}),
+    ...(['coop','coop8'].includes(roomMode) ? { spectators: spectateOn ? MAX_SPECTATOR_SEATS : 0 } : {}),
   }));
   const join = (c = code) => {
     // `onClick=${join}` hands the click EVENT as the first argument, and a default parameter only applies to
@@ -353,9 +351,8 @@ export function LobbyScreen() {
         <h1 class="topbar__title">选择模拟协议</h1>
       </div>
       <div class="topbar__right">
-        <${ResumeMatchButton} /><${PwaInstallButton} class="lobby-pwa" />
-        <${ResourceRedownloadButton} /><${SettingsButton} />
-        <${GuideButton} class="lobby-guide" variant="secondary" />
+        <${ResumeMatchButton} /><${SettingsButton} />
+        <${GuideButton} class="lobby-guide" variant="secondary" square=${true} />
         <${LoadoutButton} from="lobby" size="sm" class="lobby-loadout" />
         <div class="me-chip">
           <${AvatarFrame} size="sm" name=${me.name} seat=${0} self=${true} />
@@ -371,7 +368,7 @@ export function LobbyScreen() {
       <section class="lobby-left">
         <div class="section-label"><span class="section-label__idx num">01</span>模拟方式<${MicroLabel}>MODE<//></div>
         <div class="mode-cards">
-          ${MODE_CARDS.map((c) => html`<${ModeCard} key=${c.id} card=${c} selected=${roomMode === c.id || c.id==='coop'&&roomMode==='coop8'} onSelect=${pickMode} coopSize=${coopSize} onCoopSize=${n=>{setCoopSize(n);pickMode(n===8?'coop8':'coop');}} />`)}
+          ${MODE_CARDS.map((c) => html`<${ModeCard} key=${c.id} card=${c} selected=${roomMode === c.id || c.id==='coop'&&roomMode==='coop8'} onSelect=${pickMode} coopSize=${coopSize} onCoopSize=${n=>{setCoopSize(n);pickMode(n===8?'coop8':'coop');}} spectateOn=${spectateOn} onSpectateChange=${on=>{setSpectateOn(on);savePref('lobby.spectateOn',on);}} />`)}
         </div>
 
         <div class="section-label"><span class="section-label__idx num">03</span>加入同盟<${MicroLabel}>JOIN WITH ALLIANCE KEY<//></div>
@@ -380,7 +377,7 @@ export function LobbyScreen() {
             <${TextField} ascii=${true} size="code" icon="key" value=${code} placeholder="输入同盟密钥 / 粘贴邀请链接"
               transform=${normalizeCode} onInput=${(v) => setCode(normalizeCode(v))} onEnter=${() => join()} />
             <${Button} variant="amber" size="lg" icon="users" loading=${busy === 'join'} disabled=${!codeOk || !online} onClick=${() => join()}>加入同盟<//>
-            <${Tooltip} text=${`以观战者身份进入：不占博士席位，只能观看（每个同盟的观战席由房主设定，最多 ${MAX_SPECTATOR_SEATS} 名；模拟进行中也可进入）`}>
+            <${Tooltip} text=${`관전자는 플레이어 자리를 차지하지 않습니다. 관전 허용 시 최대 ${MAX_SPECTATOR_SEATS}명까지 입장할 수 있으며, 진행 중에도 관전할 수 있습니다.`}>
               <${Button} variant="secondary" size="lg" icon="eye" class="join-spectate" loading=${busy === 'spectate'} disabled=${!codeOk || !online} onClick=${spectate}>观战<//>
             <//>
           </div>
@@ -399,21 +396,6 @@ export function LobbyScreen() {
           ${DIFFICULTIES.map((d) => html`<${DifficultyCard} key=${d} roomMode=${roomMode} difficulty=${d} selected=${difficulty === d} onSelect=${pickDifficulty} />`)}
         </div>
         <div class="create-box">
-          ${['coop','coop8'].includes(roomMode) ? html`<div class="create-box__spectate" role="group" aria-label="观战席">
-            <label class="create-box__check">
-              <input type="checkbox" checked=${spectateOn}
-                onChange=${(e) => { const on = !!e.currentTarget.checked; setSpectateOn(on); savePref('lobby.spectateOn', on); }} />
-              <${Icon} name="eye" /><span>允许观战</span>
-            </label>
-            <div class="create-box__cap">
-              <span class="t-lo">观战席</span>
-              ${[1, 2, 3, 4, MAX_SPECTATOR_SEATS].map((n) => html`<button key=${n} type="button"
-                class=${`create-box__cap-chip num${spectateOn && spectateCount === n ? ' is-on' : ''}`}
-                disabled=${!spectateOn}
-                onClick=${() => { setSpectateCount(n); savePref('lobby.spectateCount', n); }}>${n}</button>`)}
-            </div>
-
-          </div>` : null}
           <${Tooltip} block=${true} text=${online || roomMode==='laboratory' ? null : '正在连接服务器…'}>
             <${Button} variant="primary" size="xl" block=${true} iconRight="chevrons" loading=${busy === 'create'} disabled=${roomMode!=='laboratory'&&!online} onClick=${create}>
               ${roomMode==='laboratory'?'실험실 진입':roomMode === 'solo' ? '开始独立模拟' : '创建同盟'}

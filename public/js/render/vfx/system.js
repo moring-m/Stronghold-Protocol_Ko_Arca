@@ -311,6 +311,15 @@ export class OfficialFx {
     this.effects.length = 0;
     for (const h of this.pending) h.cancelled = true;
     this.pending.length = 0;
+    // Preparation does not advance the battle clock. Drop the last GPU draw
+    // lists too, so shader warming cannot redraw a previous battle's shield.
+    this.items.ground.length = 0;
+    this.items.over.length = 0;
+    this.fd.reset();
+    this.prepared = -1;
+    this.depthDone = -1;
+    this.needDepth = false;
+    this.particles = 0;
   }
 
   /** The board's heights for the ZTest materials' depth pre-pass (rebuilt when they change). */

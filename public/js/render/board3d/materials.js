@@ -373,9 +373,8 @@ export function smogMaterial(THREE, tex, focus) {
  *   - reflection probes — one cubemap per scene, chosen at the board's anchor: the baked cubemap of the
  *     ReflectionProbe whose box holds the board (act2autochess_m01 / m03, at the probe's intensity), else the
  *     scene's default reflection; a renderer outside that box and the blend at its edge are not reproduced;
- *   - the vertex-colour blend is left out on the reading that it is a tile buried in sand
- *     (mix(albedo, _BlendColor, smoothstep(colour.r) · _BlendStrength) in the program) which the client uncovers at
- *     run time by a rule not found yet; drawn as written it covers every patterned tile of the field.
+ * Painted terrain blending retains the custom surface treatment (sand coverage,
+ * normal flattening and secondary roughness) independently of this colour pipeline.
  */
 export const SCENE_LIGHT = Object.freeze({ range: 3.0, ambient: 0.5, direct: 1, indirect: 1 });
 
@@ -445,6 +444,10 @@ export function sceneMaterial(THREE, o, focus) {
   const gamma = o.lightEncoding === 'gamma';
   const range = o.lightRange > 0 ? o.lightRange : (gamma ? SCENE_LIGHT.range : 8);
   const pbs = !!o.env;
+  const terrainBlend = info?.shader === 'Torappu/Scene/StandardRealtimeShadow'
+    && hasKeyword(info, '_HG_VERTEX_COLOR_BLEND_ON') && floatOf(info, '_BlendStrength', 0) > .01;
+  const blendRange = colorOf(info, '_BlendRangeCtrl', [0,1,0,0]);
+  const blendColor = colorOf(info, '_BlendColor');
   const uniforms = {
     uMap: { value: o.map || null }, uLm: { value: o.lightMap || null },
     uColor: { value: new THREE.Vector4(col[0], col[1], col[2], col[3]) },   // display values, like the texture's stored ones
@@ -453,6 +456,10 @@ export function sceneMaterial(THREE, o, focus) {
     uAmbient: { value: o.lightMap ? 0 : SCENE_LIGHT.ambient },
     uLightDir: { value: new THREE.Vector3(...L.dir).normalize() },
     uLightColor: { value: new THREE.Vector3(L.color[0] * k, L.color[1] * k, L.color[2] * k) },
+    uTerrainColor: { value: new THREE.Vector3(...blendColor.slice(0,3)) },
+    uTerrainRange: { value: new THREE.Vector2(blendRange[0],blendRange[1]) },
+    uTerrainStrength: { value: floatOf(info, '_BlendStrength', 0) },
+    uTerrainSurface: { value: new THREE.Vector3(floatOf(info, '_Metallic2', 0),floatOf(info, '_Glossiness2', .5),floatOf(info, '_GlossMapScale2', 1)) },
     uEnv: { value: o.env || null }, uEnvScale: { value: pbs ? (o.envRange > 0 ? o.envRange : 1) : 0 },
     uNormal: { value: pbs ? o.normalMap || null : null }, uGlossMap: { value: pbs ? o.glossMap || null : null },
     // _BumpScale, metallic, smoothness (the gloss map's scale with a map, else the material's own two values)
@@ -463,13 +470,16 @@ export function sceneMaterial(THREE, o, focus) {
     uniforms,
     defines: {
       ...(o.map ? { SCENE_MAP: 1 } : {}), ...(o.lightMap ? { SCENE_LM: 1 } : {}), ...(o.lightMap && !gamma ? { SCENE_LM_V1: 1 } : {}),
+      ...(terrainBlend ? { SCENE_TERRAIN_BLEND: 1 } : {}),
       ...(pbs ? { SCENE_PBS: 1 } : {}), ...(pbs && o.normalMap ? { SCENE_NORMAL: 1 } : {}), ...(pbs && o.glossMap ? { SCENE_GLOSS: 1 } : {}),
     },
     vertexShader: [
       'attribute vec2 aLm;',
+      '#ifdef SCENE_TERRAIN_BLEND\nattribute vec4 aColor; varying float vTerrainMask;\n#endif',
       'varying vec2 vUv; varying vec2 vLm; varying vec3 vN; varying vec3 vWorld;',
       'void main() {',
       '  vUv = uv; vLm = aLm;',
+      '#ifdef SCENE_TERRAIN_BLEND\nvTerrainMask = aColor.r;\n#endif',
       '  vN = normalize(mat3(modelMatrix) * normal);',
       '  vec4 w = modelMatrix * vec4(position, 1.0);',
       '  vWorld = w.xyz;',
@@ -479,6 +489,7 @@ export function sceneMaterial(THREE, o, focus) {
     fragmentShader: [
       'uniform sampler2D uMap; uniform sampler2D uLm; uniform vec4 uColor; uniform float uCutoff;',
       'uniform float uLmScale; uniform float uAmbient; uniform vec3 uLightDir; uniform vec3 uLightColor;',
+      '#ifdef SCENE_TERRAIN_BLEND\nvarying float vTerrainMask; uniform vec3 uTerrainColor; uniform vec2 uTerrainRange; uniform float uTerrainStrength; uniform vec3 uTerrainSurface;\n#endif',
       'uniform samplerCube uEnv; uniform float uEnvScale; uniform sampler2D uNormal; uniform sampler2D uGlossMap; uniform vec3 uSurface;',
       FOCUS_GLSL,
       'varying vec2 vUv; varying vec2 vLm; varying vec3 vN; varying vec3 vWorld;',
@@ -490,6 +501,11 @@ export function sceneMaterial(THREE, o, focus) {
       '  #ifdef SCENE_MAP',
       '    vec4 t = texture2D(uMap, vUv);',
       '    a *= vec4(toDisplay(t.rgb), t.a);',
+      '  #endif',
+      '  float terrainMask = 0.0;',
+      '  #ifdef SCENE_TERRAIN_BLEND',
+      '    terrainMask = smoothstep(uTerrainRange.x, max(uTerrainRange.x + .00001, uTerrainRange.y), vTerrainMask) * uTerrainStrength;',
+      '    a.rgb = mix(a.rgb, uTerrainColor * uColor.rgb, terrainMask);',
       '  #endif',
       '  if (a.a < uCutoff) discard;',
       '  vec3 light = vec3(uAmbient); float shade = 1.0;',
@@ -505,10 +521,18 @@ export function sceneMaterial(THREE, o, focus) {
       '  vec3 n = normalize(gl_FrontFacing ? vN : -vN);',
       '  #ifdef SCENE_PBS',
       '    float metallic = uSurface.y, smoothness = uSurface.z;',
+      '    #ifdef SCENE_TERRAIN_BLEND',
+      '      metallic = mix(metallic, uTerrainSurface.x, terrainMask);',
+      '      smoothness = mix(smoothness, uTerrainSurface.y, terrainMask);',
+      '    #endif',
       '    #ifdef SCENE_GLOSS',
       '      vec4 mg = texture2D(uGlossMap, vUv);',
       '      metallic = mg.r; smoothness = mg.a * uSurface.z;',
+      '      #ifdef SCENE_TERRAIN_BLEND',
+      '        smoothness = mg.a * mix(uSurface.z, uTerrainSurface.z, terrainMask);',
+      '      #endif',
       '    #endif',
+      '    vec3 terrainNormal = n;',
       '    #ifdef SCENE_NORMAL',
       // [ASSUMED] tangent frame from the screen-space derivatives (scene.bin has no tangents): t along +u, b along +v
       '      vec3 q0 = dFdx(vWorld), q1 = dFdy(vWorld); vec2 s0 = dFdx(vUv), s1 = dFdy(vUv);',
@@ -521,6 +545,7 @@ export function sceneMaterial(THREE, o, focus) {
       '        n = normalize(normalize(tu) * nt.x + normalize(bv) * nt.y + n * nt.z);',
       '      }',
       '    #endif',
+      '    n = normalize(mix(n, terrainNormal, terrainMask));',
       '    float omr = 0.779083729 * (1.0 - metallic);',
       '    vec3 diff = a.rgb * omr, spec = mix(vec3(0.220916301), a.rgb, metallic);',
       '    vec3 view = normalize(vWorld - cameraPosition);',
@@ -538,6 +563,10 @@ export function sceneMaterial(THREE, o, focus) {
       '  #else',
       '    vec3 lit = a.rgb * (light + uLightColor * max(dot(n, uLightDir), 0.0) * shade);',
       '  #endif',
+      '  float luminance = dot(lit, vec3(.2126, .7152, .0722));',
+      '  float contrasted = clamp((luminance - .5) * 1.08 + .5, 0.0, 1.0);',
+      '  float maxChannel = max(max(lit.r, lit.g), max(lit.b, .00001));',
+      '  lit *= min(contrasted / max(luminance, .00001), 1.0 / maxChannel);',
       '  vec3 c = toLinear(clamp(lit, 0.0, 1.0));',
       '  gl_FragColor = vec4(c * focusMask(vWorld.xy), a.a);',
       '  #include <colorspace_fragment>',
@@ -546,6 +575,7 @@ export function sceneMaterial(THREE, o, focus) {
     transparent: blend === 'blend', depthWrite: blend !== 'blend',
   });
   m.userData.blend = blend;
+  m.userData.nativeBlend = terrainBlend;
   return m;
 }
 
@@ -916,7 +946,7 @@ export function addShadowContrast(THREE, material) {
     shader.fragmentShader = shader.fragmentShader.replace('#include <shadowmap_pars_fragment>',
       THREE.ShaderChunk.shadowmap_pars_fragment.replaceAll(
         'return mix( 1.0, shadow, shadowIntensity );',
-        'return pow( clamp( mix( 1.0, shadow, shadowIntensity ), 0.0, 1.0 ), 1.35 );'));
+        'return pow( clamp( mix( 1.0, shadow, shadowIntensity ), 0.0, 1.0 ), 1.5 );'));
   };
   return material;
 }

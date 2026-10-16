@@ -4,7 +4,7 @@ import {N_} from './i18n.js';
 
 export const PROTOCOL_VERSION = 1;
 export const BASE_VERSION = '0.3.0';
-export const APP_VERSION = '0.3.0a';
+export const APP_VERSION = '0.3.0b';
 export const DEV_BUILD = /-dev$/.test(APP_VERSION);
 /**
  * The plugin API levels this build supports (DESIGN §32, shared/plugins/manifest.js): a manifest 2 states the level it
@@ -25,7 +25,7 @@ export const roomSeatCap = mode => mode === 'solo' ? 1 : mode === 'coop8' ? 8 : 
  * `MAX_SPECTATOR_SEATS` the ceiling the protocol accepts; 0 disables spectating for that room (the lobby then refuses
  * every `room.spectate` with ROOM_FULL and the room does not show the 观战席 strip).
  */
-export const MAX_SPECTATORS = 2;
+export const MAX_SPECTATORS = 8;
 /** Ceiling of a room's own spectator cap (`room.create {spectators}`); the default is `MAX_SPECTATORS`. */
 export const MAX_SPECTATOR_SEATS = 8;
 /** The cap a host picks: an integer in 0…MAX_SPECTATOR_SEATS (0 = the room refuses every spectator). */

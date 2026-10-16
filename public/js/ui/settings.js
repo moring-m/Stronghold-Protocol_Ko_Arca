@@ -1,4 +1,5 @@
-import {officialFxDownloaded} from '../../../shared/resourceSelection.js';
+import { ResourceRedownloadButton } from './resourceRedownload.js';
+import {officialFxDownloaded,voiceDownloaded} from '../../../shared/resourceSelection.js';
 import {useEffect} from "../../vendor/hooks.module.js";
 import {store} from "../store.js";
 import {tc} from "../../../shared/i18n.js";
@@ -64,9 +65,13 @@ audio.setVoiceLang(settingsStore.get().voiceLanguage, settingsStore.get().voiceO
 applyTextSize(settingsStore.get().textSize);
 
 /** @param {Partial<ReturnType<typeof sanitizeSettings>>} patch */
-export function updateSettings(patch) {
+export function updateSettings(patch,{skipDownloadPrompt=false}={}) {
   if(patch.officialFx==='full'&&!officialFxDownloaded()){window.dispatchEvent(new CustomEvent('sp-request-official-fx-download'));return;}
   const current = settingsStore.get();
+  if(!skipDownloadPrompt){
+    const languages=new Set([patch.voiceLanguage,...Object.entries(patch.voiceOverrides||{}).filter(([id,lang])=>lang!==current.voiceOverrides[id]).map(([,lang])=>lang)]);
+    for(const language of languages)if(['kr','jp'].includes(language)&&!voiceDownloaded(language))window.dispatchEvent(new CustomEvent('sp-request-voice-download',{detail:{language}}));
+  }
   if (patch.chatSound !== undefined) patch = {...patch, chatSoundCustomized: true};
   if (typeof patch.damageNumbers === 'boolean' && patch.damageNumberMode === undefined) patch = {...patch,damageNumberMode:patch.damageNumbers?'sum':'none'};
   const soundChanged = patch.chatSound !== undefined && patch.chatSound !== current.chatSound && patch.chatSound !== 'off';
@@ -207,7 +212,7 @@ export function SettingsModal({ open, onClose }) {
   const [tested, setTested] = useState(false);
   const [touchUi] = useState(() => detectFeatures().coarse && !detectFeatures().fine);
   return html`<${Modal} open=${open} onClose=${onClose} title="设置" micro="SETTINGS" class="settings-modal" width="7.4rem"
-    actions=${html`<${RestartVoteControls} voteVisible=${false} onRequested=${onClose} label="리방 투표" /><${Button} variant="secondary" icon="book" class="set-guide" onClick=${() => openGuide(0)}>玩法说明<//>
+    actions=${html`<${ResourceRedownloadButton} /><${RestartVoteControls} voteVisible=${false} onRequested=${onClose} label="리방 투표" /><${Button} variant="secondary" icon="book" class="set-guide" onClick=${() => openGuide(0)}>玩法说明<//>
       <${Button} variant="primary" icon="check" onClick=${onClose}>完成<//>`}>
     <nav class="set-categories" aria-label="설정 종류" data-i18n-skip>
       ${[['graphics','그래픽'],['audio','소리'],['chat','채팅'],['controls','조작·단축키'],['plugins','플러그인']].map(([id,label])=>html`<button type="button" class=${category===id?'is-on':''} aria-pressed=${category===id} onClick=${()=>setCategory(id)}>${label}</button>`)}
@@ -293,6 +298,6 @@ export function SettingsButton({class: cls = ''}) {
 }
 
 if(typeof window!=='undefined'){
- window.addEventListener('sp-resource-selection',e=>updateSettings({voiceLanguage:e.detail.voice,...(e.detail.effects==='simple'?{officialFx:'lite'}:{})}));
+ window.addEventListener('sp-resource-selection',e=>updateSettings({voiceLanguage:e.detail.voice,...(e.detail.effects==='simple'?{officialFx:'lite'}:{})},{skipDownloadPrompt:true}));
  window.addEventListener('sp-official-fx-ready',()=>updateSettings({officialFx:'full'}));
 }

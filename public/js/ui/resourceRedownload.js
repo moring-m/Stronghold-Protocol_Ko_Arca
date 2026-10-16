@@ -15,7 +15,7 @@ export async function redownloadResources() {
     for(const name of await caches.keys())if(name.startsWith('stronghold-resources-')||name.startsWith('stronghold-ursus-preview-assets-'))await caches.delete(name);
   }
   // Explicit re-download must show the download notice again after reload.
-  try { localStorage.removeItem('sp.resources.officialFxReady');localStorage.removeItem('sp.resources.downloadConsent'); localStorage.setItem('sp.resources.redownloadPending','1'); } catch {}
+  try { localStorage.removeItem('sp.resources.officialFxReady');localStorage.removeItem('sp.resources.voiceReady.kr');localStorage.removeItem('sp.resources.voiceReady.jp');localStorage.removeItem('sp.resources.downloadConsent');localStorage.removeItem('sp.resources.downloadScope'); localStorage.setItem('sp.resources.redownloadPending','1'); } catch {}
   location.reload();
 }
 

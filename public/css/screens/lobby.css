@@ -319,3 +319,7 @@
 .mode-card__sizes{display:flex;gap:.08rem;position:relative;margin-top:.12rem;z-index:2;}
 .mode-card__sizes button{min-width:.72rem;padding:.07rem .16rem;border:1px solid var(--line-3);background:#14221f;color:var(--text-lo);font:inherit;cursor:pointer;}
 .mode-card__sizes button[aria-pressed="true"]{border-color:var(--mint-400);background:var(--mint-500);color:var(--text-on-mint);font-weight:700;}
+
+/* Keep the spectator toggle inside the co-op card, clear of the size buttons. */
+.mode-card:has(.mode-card__spectate) { padding-bottom: .85rem; }
+.mode-card__spectate { position: absolute; right: .24rem; bottom: .22rem; z-index: 2; }

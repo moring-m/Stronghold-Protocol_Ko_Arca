@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {existsSync} from 'node:fs';
 import {startServer} from '../../server/index.js';
 
-for(const lazyResources of [false,true]) test(`explicit redownload restores the notice and keeps the menu usable (${lazyResources?'preview':'production'})`,{skip:!existsSync('/usr/bin/chromium'),timeout:30000},async()=>{
+for(const lazyResources of [false,true]) test(`explicit redownload restores the notice and keeps the menu usable (${lazyResources?'preview':'production'})`,{skip:!existsSync('/usr/bin/chromium'),timeout:60000},async()=>{
  const server=await startServer({host:'127.0.0.1',port:0,quiet:true,dataDir:new URL('../../content/production/data',import.meta.url).pathname,handleRequest:async(req,res)=>{
   const path=new URL(req.url,'http://local').pathname;
   if(path==='/dev/ursus-config.json'){res.setHeader('Content-Type','application/json');res.end(JSON.stringify({lazyResources}));return true;}
@@ -13,8 +13,8 @@ self.addEventListener('activate',e=>e.waitUntil(self.clients.claim()));
 self.addEventListener('message',e=>{
  if(e.data.type==='resetResources'){ready=false;e.ports[0].postMessage({type:'reset'});}
  if(e.data.type==='status')e.ports[0].postMessage({type:'status',ready,patch:false});
- if(e.data.type==='preparePatch'){const p=e.ports[0];p.postMessage({type:'progress',done:1,total:2,bytesDone:1048576,bytesTotal:2097152});setTimeout(()=>{ready=true;p.postMessage({type:'ready'});},500);}
- if(e.data.type==='warmPatch')e.waitUntil((async()=>{const clients=await self.clients.matchAll();for(const c of clients)c.postMessage({type:'resourceProgress',id:'preview',done:1,total:2,bytesDone:1048576,bytesTotal:2097152,active:true});await new Promise(r=>setTimeout(r,500));for(const c of clients)c.postMessage({type:'resourceProgress',id:'preview',active:false});ready=true;})());
+ if(e.data.type==='preparePatch'){const p=e.ports[0];p.postMessage({type:'progress',done:1,total:2,bytesDone:1048576,bytesTotal:2097152});setTimeout(()=>{ready=true;p.postMessage({type:'ready'});},2000);}
+ if(e.data.type==='warmPatch')e.waitUntil((async()=>{const clients=await self.clients.matchAll();for(const c of clients)c.postMessage({type:'resourceProgress',id:'preview',done:1,total:2,bytesDone:1048576,bytesTotal:2097152,active:true});await new Promise(r=>setTimeout(r,2000));for(const c of clients)c.postMessage({type:'resourceProgress',id:'preview',active:false});ready=true;})());
 });`);return true;}
   if(path==='/vendor/browser-resources.json'){res.setHeader('Content-Type','application/json');res.end(JSON.stringify({estimatedBytes:2097152,files:[]}));return true;}
   return false;
@@ -71,16 +71,24 @@ self.addEventListener('message',e=>{
   await p.click('[data-testid="settings-btn"]');await p.waitForSelector('.settings-modal');
   await p.evaluate(async()=>{(await import('/js/ui/settings.js')).updateSettings({officialFx:'full'});});
   await p.waitForSelector('.resource-consent');
-  assert.equal(await p.$eval('.resource-consent select[aria-label="전투 이펙트"]',e=>e.value),'official');
+  assert.equal(await p.$('.resource-consent select'),null,'single-pack notice has no dropdowns');
   assert.equal(await p.evaluate(()=>localStorage.getItem('sp.resources.officialFxReady')),null);
   assert.notEqual(await p.evaluate(async()=>(await import('/js/ui/settings.js')).settingsStore.get().officialFx),'full','full is deferred until download completes');
-  await p.click('.resource-consent select[aria-label="음성"]');
-  assert.equal(await p.evaluate(()=>document.activeElement?.getAttribute('aria-label')),'음성','settings modal does not steal download input focus');
-  await p.select('.resource-consent select[aria-label="음성"]','jp');
+  assert.equal(await p.$('.resource-consent select[aria-label="음성"]'),null,'official-only download does not offer voice changes');
+  assert.ok(await p.$eval('.resource-consent',e=>e.textContent.includes('공식 전투 이펙트 다운로드')));
   await p.click('.resource-consent .btn--primary');
   await p.waitForFunction(()=>localStorage.getItem('sp.resources.officialFxReady')==='1');
   assert.equal(await p.evaluate(async()=>(await import('/js/ui/settings.js')).settingsStore.get().officialFx),'full');
+  assert.equal(await p.evaluate(async()=>(await import('/js/ui/settings.js')).settingsStore.get().voiceLanguage),'kr');
+  await p.evaluate(async()=>{(await import('/js/ui/settings.js')).updateSettings({voiceLanguage:'jp'});});
+  await p.waitForSelector('.resource-consent');
+  assert.ok(await p.$eval('.resource-consent',e=>e.textContent.includes('일본어 음성 다운로드')));
+  assert.equal(await p.$('.resource-consent select'),null);
+  await p.click('.resource-consent .btn--primary');
+  await p.waitForFunction(()=>localStorage.getItem('sp.resources.voiceReady.jp')==='1');
+  assert.equal(await p.evaluate(()=>localStorage.getItem('sp.resources.officialFxReady')),'1');
   assert.equal(await p.evaluate(async()=>(await import('/js/ui/settings.js')).settingsStore.get().voiceLanguage),'jp');
+
 
  }finally{await b.close();await server.close();}
 });

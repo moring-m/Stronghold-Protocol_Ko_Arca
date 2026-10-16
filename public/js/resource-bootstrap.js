@@ -1,5 +1,7 @@
 import {readResourceSelection,selectedResources,RESOURCE_SELECTION_KEY,OFFICIAL_FX_READY_KEY,officialFxDownloaded,missingResourceBytes} from '../../shared/resourceSelection.js';
 import {reportResourceProgress} from './resourceProgress.js';
+const DOWNLOAD_SCOPE_KEY='sp.resources.downloadScope';
+function downloadSelection(){const choice=readResourceSelection();try{const scope=localStorage.getItem(DOWNLOAD_SCOPE_KEY);if(['officialFx','voice-kr','voice-jp'].includes(scope))choice.scope=scope;}catch{}return choice;}
 // Start after the download notice; optional resources cache in the background.
 globalThis.performance?.mark?.('sp-bootstrap-start');
 async function messageOnce(type, onProgress, resume) {
@@ -15,7 +17,7 @@ async function messageOnce(type, onProgress, resume) {
       if (data.type === 'progress') { onProgress?.(data); return; }
       finish(data.type === 'error' ? new Error(data.message) : null, data);
     };
-    try { navigator.serviceWorker.controller.postMessage({type, resume,selection:readResourceSelection()}, [channel.port2]); }
+    try { navigator.serviceWorker.controller.postMessage({type, resume,selection:downloadSelection()}, [channel.port2]); }
     catch (error) { finish(error); }
   });
 }
@@ -35,28 +37,30 @@ async function message(type, onProgress) {
   }
 }
 
-async function requestDownloadConsent(resources, forOfficial=false) {
+async function requestDownloadConsent(resources, forOfficial=false,voiceLanguage=null) {
+    const individual=forOfficial||!!voiceLanguage;
+    const scope=forOfficial?'officialFx':voiceLanguage?'voice-'+voiceLanguage:null;
     const panel = document.createElement('aside');
     panel.className='resource-consent panel panel--mint brackets';
     panel.setAttribute('role','dialog');
     panel.setAttribute('aria-label','게임 리소스 다운로드 안내');
     document.body.append(panel);
-    const title = document.createElement('h2');title.className='panel__title'; title.textContent = '게임 리소스 다운로드';
+    const title = document.createElement('h2');title.className='panel__title'; title.textContent = forOfficial?'공식 전투 이펙트 다운로드':voiceLanguage?(voiceLanguage==='jp'?'일본어':'한국어')+' 음성 다운로드':'게임 리소스 다운로드';
     const description = document.createElement('p');
     description.textContent = `처음 한 번 약 ${Math.ceil(resources.estimatedBytes / 1048576)}MB의 이미지·모델·소리·폰트를 공개 GitHub 미러에서 내려받습니다. Wi-Fi 사용을 권장합니다. 게임을 먼저 시작하고 리소스는 백그라운드에서 내려받습니다. 준비되지 않은 맵은 단순 맵으로 표시합니다. 파일은 이 브라우저에 저장해 다음 접속에 재사용합니다. 브라우저 저장소가 삭제되면 다시 다운로드합니다.`;
     const choice=readResourceSelection();if(forOfficial)choice.effects='official';
     const options=document.createElement('div');options.className='resource-consent__options';
     const select=(name,values,value)=>{const label=document.createElement('label');label.className='resource-consent__choice';const text=document.createElement('span');text.className='set-row__label';text.textContent=name;label.append(text);const input=document.createElement('select');input.setAttribute('aria-label',name);for(const [id,text]of values){const option=document.createElement('option');option.value=id;option.textContent=text;input.append(option);}input.value=value;label.append(input);options.append(label);return input;};
-    const voice=select('음성',[['kr','한국어'],['jp','일본어']],choice.voice);
-    const effects=select('전투 이펙트',[['simple','간소'],['official','공식']],choice.effects);
-    const estimateSelection=()=>{const selected=selectedResources(resources,{voice:voice.value,effects:effects.value});description.textContent='선택한 이미지·모델·소리·폰트 약 '+Math.ceil(selected.estimatedBytes/1048576)+'MB를 다운로드합니다. 게임은 계속 이용할 수 있으며, 받은 파일은 다음 접속에 재사용합니다.';return selected;};
+    const voice=individual?{value:choice.voice}:select('음성',[['kr','한국어'],['jp','일본어']],choice.voice);
+    const effects=individual?{value:choice.effects}:select('전투 이펙트',[['simple','간소'],['official','공식']],choice.effects);
+    const estimateSelection=()=>{const selected=selectedResources(resources,{voice:voice.value,effects:effects.value,...(scope?{scope}:{})});description.textContent=voiceLanguage?(voiceLanguage==='jp'?'일본어':'한국어')+' 음성 약 '+Math.ceil(selected.estimatedBytes/1048576)+'MB를 추가로 다운로드합니다. 이미지와 전투 이펙트는 이번 다운로드에 포함하지 않습니다.':forOfficial?'공식 전투 이펙트 약 '+Math.ceil(selected.estimatedBytes/1048576)+'MB를 추가로 다운로드합니다. 음성과 기본 리소스는 이번 다운로드에 포함하지 않습니다.':'선택한 이미지·모델·소리·폰트 약 '+Math.ceil(selected.estimatedBytes/1048576)+'MB를 다운로드합니다. 게임은 계속 이용할 수 있으며, 받은 파일은 다음 접속에 재사용합니다.';return selected;};
     voice.onchange=effects.onchange=estimateSelection;estimateSelection();
     const notice = document.createElement('p');
     notice.textContent = '비공식 팬 게임입니다. 게임 소재의 권리는 Hypergryph·Yostar 등 원 권리자에게 있으며, 개인적인 비상업적 이용만 가능합니다.';
     const sources = document.createElement('a'); sources.href = 'https://github.com/moring-m/Stronghold-Protocol_Ko_Arca/blob/master/docs/ASSETS.md'; sources.target = '_blank'; sources.rel = 'noopener'; sources.textContent = '리소스 출처와 이용 안내';
     const progress = document.createElement('progress'); progress.max = resources.files.length; progress.value = 0;
     const status = document.createElement('p'); status.setAttribute('role', 'status'); status.style.whiteSpace = 'pre-wrap';
-    const button = document.createElement('button');button.className='btn btn--primary btn--sm'; button.textContent = '다운로드하며 시작'; button.type = 'button';
+    const button = document.createElement('button');button.className='btn btn--primary btn--sm'; button.textContent = individual?'다운로드':'다운로드하며 시작'; button.type = 'button';
     const head=document.createElement('header');head.className='panel__head';
     const titles=document.createElement('div');titles.className='panel__titles';
     const micro=document.createElement('span');micro.className='micro';micro.textContent='RESOURCES';titles.append(micro,title);head.append(titles);
@@ -64,7 +68,7 @@ async function requestDownloadConsent(resources, forOfficial=false) {
     const actions=document.createElement('div');actions.className='modal__actions';actions.append(button);
     panel.append(head,body,actions);
     return await new Promise(resolve => {
-      if(forOfficial){const cancel=document.createElement('button');cancel.className='btn btn--ghost btn--sm';cancel.textContent='취소';cancel.onclick=()=>{panel.remove();resolve(false);};actions.prepend(cancel);}
+      if(individual){const cancel=document.createElement('button');cancel.className='btn btn--ghost btn--sm';cancel.textContent='취소';cancel.onclick=()=>{panel.remove();resolve(false);};actions.prepend(cancel);}
       button.onclick = async () => {
         button.disabled = true;
         try {
@@ -76,8 +80,8 @@ async function requestDownloadConsent(resources, forOfficial=false) {
             if(estimate.quota-estimate.usage<required*1.15)throw new Error('브라우저 저장 공간이 부족합니다. 공간을 확보한 뒤 다시 시도해 주세요.');
           }
           await navigator.storage?.persist?.();
-          try { localStorage.setItem(RESOURCE_SELECTION_KEY,JSON.stringify({voice:voice.value,effects:effects.value}));localStorage.setItem('sp.resources.downloadConsent', '1'); localStorage.removeItem('sp.resources.redownloadPending'); localStorage.setItem('sp.resources.downloadActive','1'); } catch {}
-          window.dispatchEvent(new CustomEvent('sp-resource-selection',{detail:{voice:voice.value,effects:effects.value}}));
+          try { if(scope)localStorage.setItem(DOWNLOAD_SCOPE_KEY,scope);else localStorage.removeItem(DOWNLOAD_SCOPE_KEY);localStorage.setItem(RESOURCE_SELECTION_KEY,JSON.stringify({voice:voice.value,effects:effects.value}));localStorage.setItem('sp.resources.downloadConsent', '1'); localStorage.removeItem('sp.resources.redownloadPending'); localStorage.setItem('sp.resources.downloadActive','1'); } catch {}
+          if(!individual)window.dispatchEvent(new CustomEvent('sp-resource-selection',{detail:{voice:voice.value,effects:effects.value}}));
           panel.remove();
           resolve(true);
         } catch (error) { status.textContent = error.message; button.textContent = '다운로드 다시 시도'; button.disabled = false; }
@@ -87,7 +91,7 @@ async function requestDownloadConsent(resources, forOfficial=false) {
 
 function showDownloadProgress(resources, run, visible=false) {
     document.querySelectorAll('.resource-download').forEach(node=>node.remove());
-    const choice=readResourceSelection();resources=selectedResources(resources,choice);
+    const choice=downloadSelection();resources=selectedResources(resources,choice);
     if(visible)try{localStorage.setItem('sp.resources.downloadActive','1');}catch{}
     const notice = document.createElement('div');
     notice.setAttribute('role', 'status');
@@ -134,8 +138,9 @@ function showDownloadProgress(resources, run, visible=false) {
         detail.textContent = progress.phase === 'retry' ? '실패한 파일을 다시 시도합니다. 받은 파일은 유지됩니다.' : '리소스 확인·다운로드 중 · 게임을 이용할 수 있습니다.';
       }).then(() => {
         if(!notice.isConnected)return;
-        try{localStorage.removeItem('sp.resources.downloadActive');if(choice.effects==='official')localStorage.setItem(OFFICIAL_FX_READY_KEY,'1');}catch{}
-        if(visible&&choice.effects==='official')window.dispatchEvent(new CustomEvent('sp-official-fx-ready'));
+        try{localStorage.removeItem('sp.resources.downloadActive');localStorage.removeItem(DOWNLOAD_SCOPE_KEY);if(choice.scope?.startsWith('voice-'))localStorage.setItem('sp.resources.voiceReady.'+choice.scope.slice(6),'1');else {if(choice.effects==='official')localStorage.setItem(OFFICIAL_FX_READY_KEY,'1');if(!choice.scope)localStorage.setItem('sp.resources.voiceReady.'+choice.voice,'1');}}catch{}
+        if(visible&&choice.effects==='official'&&!choice.scope?.startsWith('voice-'))window.dispatchEvent(new CustomEvent('sp-official-fx-ready'));
+        window.dispatchEvent(new Event('sp-resource-download-finished'));
         reportResourceProgress('resources',0,0,false);
         count.textContent = `${bar.max}/${bar.max}`; bar.value = bar.max;
         if(bytesTotal)size.textContent=formatBytes(bytesTotal)+' / '+formatBytes(bytesTotal)+' · 완료';
@@ -172,7 +177,7 @@ function warmPreview(onProgress) {
       if(data?.type==='resourceProgress'&&data.id==='preview'){lastMessage=Date.now();if(data.active===false){cleanup();resolve();}else onProgress(data);}
     };
     // A browser can stop a long-running worker. Wake it again and reuse stored files.
-    const wake=()=>{lastMessage=Date.now();navigator.serviceWorker.controller.postMessage({type:'warmPatch',selection:readResourceSelection()});};
+    const wake=()=>{lastMessage=Date.now();navigator.serviceWorker.controller.postMessage({type:'warmPatch',selection:downloadSelection()});};
     const watchdog=setInterval(()=>{if(Date.now()-lastMessage>10000)try{wake();}catch(error){cleanup();reject(error);}},5000);
     const cleanup=()=>{clearInterval(watchdog);navigator.serviceWorker.removeEventListener('message',receive);};
     navigator.serviceWorker.addEventListener('message',receive);
@@ -193,11 +198,15 @@ async function boot() {
   const appEarly=startApp();
   appEarly?.catch(error=>console.error('[resources] Early application load failed',error));
   const preview=await previewReady;
-  let requested=null;
+  let requested=null,voiceRequest=null;
+  const queuedVoices=new Set();
+  const flushVoiceQueue=()=>{if(requested||voiceRequest||document.querySelector('.resource-consent')||!queuedVoices.size)return;const language=queuedVoices.values().next().value;queuedVoices.delete(language);window.dispatchEvent(new CustomEvent('sp-request-voice-download',{detail:{language}}));};
+  window.addEventListener('sp-resource-download-finished',()=>setTimeout(flushVoiceQueue,0));
   window.addEventListener('sp-request-official-fx-download',()=>{
-    if(requested)return;
+    if(requested||voiceRequest)return;
     const current=document.querySelector('.resource-consent select[aria-label="전투 이펙트"]');
     if(current){current.value='official';current.dispatchEvent(new Event('change'));current.focus();return;}
+    if(document.querySelector('.resource-consent'))return;
     requested=(async()=>{
       const response=await fetch('/vendor/browser-resources.json',{cache:'no-store'});
       if(!response.ok)throw new Error('리소스 목록을 불러오지 못했습니다.');
@@ -207,7 +216,24 @@ async function boot() {
       if(!navigator.serviceWorker.controller)await new Promise(resolve=>navigator.serviceWorker.addEventListener('controllerchange',resolve,{once:true}));
       // A change of choices invalidates only pending work, not downloaded files.
       await showDownloadProgress(resources,preview?.lazyResources?warmPreview:progress=>message('preparePatch',progress),true);
-    })().catch(error=>console.warn('[resources]',error)).finally(()=>{requested=null;});
+    })().catch(error=>console.warn('[resources]',error)).finally(()=>{requested=null;flushVoiceQueue();});
+  });
+  window.addEventListener('sp-request-voice-download',({detail})=>{
+    const language=detail?.language;if(!['kr','jp'].includes(language))return;
+    try{if(localStorage.getItem('sp.resources.voiceReady.'+language)==='1'){setTimeout(flushVoiceQueue,0);return;}}catch{}
+    if(voiceRequest||requested){queuedVoices.add(language);return;}
+    voiceRequest=(async()=>{
+      const response=await fetch('/vendor/browser-resources.json',{cache:'no-store'});if(!response.ok)throw Error('음성 목록을 불러오지 못했습니다.');
+      const resources=await response.json(),selection={...readResourceSelection(),scope:'voice-'+language};
+      const selected=selectedResources(resources,selection);
+      if(selected.files.length&&await missingResourceBytes(selected)===0){localStorage.setItem('sp.resources.voiceReady.'+language,'1');return;}
+      // One download dialog at a time; an initial/full choice already includes voice selection.
+      if(document.querySelector('.resource-consent')){queuedVoices.add(language);return;}
+      if(!await requestDownloadConsent(resources,false,language))return;
+      await navigator.serviceWorker.ready;
+      if(!navigator.serviceWorker.controller)await new Promise(resolve=>navigator.serviceWorker.addEventListener('controllerchange',resolve,{once:true}));
+      await showDownloadProgress(resources,preview?.lazyResources?warmPreview:progress=>message('preparePatch',progress),true);
+    })().catch(error=>console.warn('[resources]',error)).finally(()=>{voiceRequest=null;flushVoiceQueue();});
   });
   if(!officialFxDownloaded()){try{if(consent&&!redownloadPending&&!downloadActive&&JSON.parse(localStorage.getItem('sp.pref.settings')||'null')?.officialFx==='full')setTimeout(()=>window.dispatchEvent(new CustomEvent('sp-request-official-fx-download')),500);}catch{}}
 

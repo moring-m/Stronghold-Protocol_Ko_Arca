@@ -863,6 +863,7 @@ export class Match {
 
   /** Broadcast ticker from config.broadcasts by type; `param` picks the variant (SHOP_LEVEL level, BOSS_HIT share…). */
   tickerFor(type, args = [], { playerId = null, to = null, param = null } = {}) {
+    if (type === 'BOSS_HIT' && Number(param) === 0.1 && this.mode !== 'coop8') return;
     const list = Array.isArray(this.gd.config.broadcasts) ? this.gd.config.broadcasts.filter((b) => b && b.type === type) : [];
     let b = list[0];
     if (param != null) b = list.find((x) => Array.isArray(x.params) && x.params.includes(String(param))) || b;
