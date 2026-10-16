@@ -23,6 +23,7 @@ import assert from 'node:assert/strict';
 import { existsSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { cameraSettled } from '../e2e/client.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const OUT = path.join(ROOT, 'test/e2e/out');
@@ -194,6 +195,20 @@ describe('user playtest #3 items 1 and 7 (mock match, headless Chrome)', { skip 
     const near = [nl[0] + (nr[0] - nl[0]) * a, nl[1] + (nr[1] - nl[1]) * a], far = [fl[0] + (fr[0] - fl[0]) * a, fl[1] + (fr[1] - fl[1]) * a];
     return { x: near[0] + (far[0] - near[0]) * b, y: near[1] + (far[1] - near[1]) * b };
   }, row, col, u, v);
+  /** Press on `from` and pick the piece up with a short move, then wait for the camera: picking a piece up on the own
+   * prep board folds the shop and zooms the board (the deploy fold, GitHub #602), so targets are aimed after it. Returns
+   * the point the pointer rests on. */
+  const pickUp = async (page, from) => {
+    await page.mouse.move(from.x, from.y); await page.mouse.down();
+    for (let i = 1; i <= 3; i++) { await page.mouse.move(from.x, from.y - i * 4); await sleep(16); }
+    await cameraSettled(page);
+    return { x: from.x, y: from.y - 12 };
+  };
+  /** The centre of the folded shop's tab (DOM over the canvas while a piece is carried), or null. */
+  const shopTab = (page) => page.evaluate(() => {
+    const r = document.querySelector('.shopbar-tab')?.getBoundingClientRect();
+    return r && r.width > 0 ? { x: r.left + r.width / 2, y: r.top + r.height / 2 } : null;
+  });
   /** The render engine's own pick at a client point (render/pick.js through app.js pieceAt / battleUnitAt). */
   const pickAt = (page, pt, battle = false) => page.evaluate((x, y, b) => {
     const R = globalThis.__SP_VIEW__.raw, cv = R.debug.app.view.getBoundingClientRect();
@@ -336,9 +351,9 @@ describe('user playtest #3 items 1 and 7 (mock match, headless Chrome)', { skip 
     const hand = await page.evaluate(() => { const p = globalThis.__MOCK__.S().priv; const i = p.hand.findIndex((x) => x && x.kind === 'chess'); return { uid: p.hand[i].uid, idx: i }; });
     await page.evaluate(() => { window.__hover = []; globalThis.__SP_VIEW__.raw.on('tileHover', (t) => window.__hover.push(t && [t.row, t.col])); });
     const from = await tileSpot(page, 7, hand.idx);
+    const p0 = await pickUp(page, from); // (the deploy fold's zoom: aimed after it)
     const to = await tileSpot(page, 9, 4, 0.3, 0.4); // an occupied melee tile (a swap), off its centre
-    await page.mouse.move(from.x, from.y); await page.mouse.down();
-    for (let i = 1; i <= 12; i++) { await page.mouse.move(from.x + ((to.x - from.x) * i) / 12, from.y + ((to.y - from.y) * i) / 12); await sleep(16); }
+    for (let i = 1; i <= 12; i++) { await page.mouse.move(p0.x + ((to.x - p0.x) * i) / 12, p0.y + ((to.y - p0.y) * i) / 12); await sleep(16); }
     await sleep(150);
     assertHeld(await ghostAt(page, hand.uid), to, 'mouse');
     assert.deepEqual(await page.evaluate(() => window.__hover.at(-1)), [9, 4], 'tileHover = the tile under the pointer');
@@ -377,25 +392,28 @@ describe('user playtest #3 items 1 and 7 (mock match, headless Chrome)', { skip 
     const target = st.board.find((b) => b.row === 10 && b.col === 4), front = st.board.find((b) => b.row === 9 && b.col === 4);
     const benchIdx = st.hand.findIndex((x) => x && x.kind === 'chess');
     assert.ok(items.length >= 3 && target && front && benchIdx >= 0, 'premise');
-    const dragTo = async (it, to) => {
+    // `spot` is read after the pickup (the deploy fold zooms the board, GitHub #602)
+    const dragTo = async (it, spot) => {
+      await cameraSettled(page);
       const from = await tileSpot(page, 7, it.idx);
-      await page.mouse.move(from.x, from.y); await page.mouse.down();
-      for (let i = 1; i <= 10; i++) { await page.mouse.move(from.x + ((to.x - from.x) * i) / 10, from.y + ((to.y - from.y) * i) / 10); await sleep(16); }
+      const p0 = await pickUp(page, from);
+      const to = await spot();
+      for (let i = 1; i <= 10; i++) { await page.mouse.move(p0.x + ((to.x - p0.x) * i) / 10, p0.y + ((to.y - p0.y) * i) / 10); await sleep(16); }
       await sleep(120);
       await page.mouse.up();
       await sleep(700);
     };
     // (10,4) behind (9,4): the tile of the one behind — near its front edge, where the front one's head is drawn
-    await dragTo(items[0], await tileSpot(page, 10, 4, 0, -0.6));
+    await dragTo(items[0], () => tileSpot(page, 10, 4, 0, -0.6));
     st = await S();
     assert.ok(st.board.find((b) => b.uid === target.uid).items.includes(items[0].uid), 'equipped on the unit behind');
     assert.ok(!st.board.find((b) => b.uid === front.uid).items.includes(items[0].uid), 'not on the one in front');
-    await dragTo(items[1], await tileSpot(page, 7, benchIdx, 0.4, 0.4));
+    await dragTo(items[1], () => tileSpot(page, 7, benchIdx, 0.4, 0.4));
     st = await S();
     assert.ok(st.hand[benchIdx].items.includes(items[1].uid), 'equipped on the bench operator');
     // the empty high-ground tile behind (12,4)? use a free deploy tile: the item stays in the hand
     const free = await page.evaluate(() => { const S = globalThis.__MOCK__.S(), used = new Set(S.priv.board.map((b) => `${b.row},${b.col}`)); return S.stage.deployTiles.normal.melee.find(([r, c]) => !used.has(`${r},${c}`)); });
-    await dragTo(items[2], await tileSpot(page, free[0], free[1]));
+    await dragTo(items[2], () => tileSpot(page, free[0], free[1]));
     st = await S();
     assert.ok(st.hand.some((x) => x && x.uid === items[2].uid), 'an empty tile takes nothing: the item is back in the hand');
     await page.close();
@@ -415,13 +433,19 @@ describe('user playtest #3 items 1 and 7 (mock match, headless Chrome)', { skip 
     await page.evaluate(installHelpers);
     await page.evaluate(() => globalThis.__MOCK__.mutate((S) => { S.priv.hand[5] = null; }));
     await sleep(2000);
-    const touchDrag = async (from, to, { hold = null } = {}) => {
+    // `spot` is read after the pickup (the deploy fold zooms the board and folds the shop, GitHub #602); `hold` gets it
+    const touchDrag = async (from, spot, { hold = null } = {}) => {
+      await cameraSettled(page);
       await page.touchscreen.touchStart(from.x, from.y);
-      for (let i = 1; i <= 12; i++) { await page.touchscreen.touchMove(from.x + ((to.x - from.x) * i) / 12, from.y + ((to.y - from.y) * i) / 12); await sleep(16); }
+      for (let i = 1; i <= 3; i++) { await page.touchscreen.touchMove(from.x, from.y - i * 4); await sleep(16); }
+      await cameraSettled(page);
+      const p0 = { x: from.x, y: from.y - 12 }, to = await spot();
+      for (let i = 1; i <= 12; i++) { await page.touchscreen.touchMove(p0.x + ((to.x - p0.x) * i) / 12, p0.y + ((to.y - p0.y) * i) / 12); await sleep(16); }
       await sleep(100);
-      if (hold) await hold();
+      if (hold) await hold(to);
       await page.touchscreen.touchEnd();
       await sleep(800);
+      return to;
     };
     // a tap on a unit's tile selects it — and only that: the tap's compatibility click used to land on the underframe
     // that had just opened over the tile (clamped under the top bar for rows 11–12) and pressed 撤退 (the unit left)
@@ -446,7 +470,8 @@ describe('user playtest #3 items 1 and 7 (mock match, headless Chrome)', { skip 
     assert.ok(Math.hypot(w.x - c.x, w.y - c.y) < 2, 'the wheel opens on the finger\'s tile');
     await page.evaluate(() => document.querySelector('.fwheel__cancel')?.click());
     await sleep(500);
-    // a board unit back onto the free bench slot 5: the finger on the slot → lands; on the shop bar below it → back
+    // a board unit back onto the free bench slot 5: the finger on the slot → lands; on the shop (folded to its tab while
+    // a piece is carried, GitHub #602 — DOM over the canvas) → back
     const unit = await page.evaluate(() => { const u = globalThis.__MOCK__.S().priv.board[0]; return { uid: u.uid, row: u.row, col: u.col }; });
     const slot = await tileSpot(page, 7, 5);
     // the first point below the slot's centre that the shop bar covers (it starts right below the bench — the prep

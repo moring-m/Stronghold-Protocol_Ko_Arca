@@ -14,7 +14,7 @@ export function eightUniteStage(stage){
   for(let c=0;c<line.length;c++){
    if(/[aAI]/.test(line[c]))line[c]='#';
    else if(line[c]==='E')line[c]=c===2?'E':'R';
-   else if(line[c]==='S')line[c]=c===34?'S':'R';
+   // Keep each field's original entry markers; routes still spawn at the far right.
   }
   return line.join('');
  });

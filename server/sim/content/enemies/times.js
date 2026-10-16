@@ -32,17 +32,12 @@ function kitBlades(ab) {
   const cnt = T(ab, 'DeadSpawn.cnt') ?? 0, add = T(ab, 'DeadSpawn.cnt_add') ?? 0, atk = T(ab, 'Atkup.atk', 'AtkUp.atk') ?? 0;
   const key = ab.tS['DeadSpawn.enemy_key'];
   return [{
-    spawn(b, e, a) {
-      a.used = 0;
-      if (cnt > 0 && atk) b.addBuff(e, { key: 'ab:blade', mods: { atkPct: atk }, persist: true, visible: true });
-    },
+    spawn(b, e, a) { a.used = 0; },
     attack(c, b, e, a) {
       if (a.used >= cnt) return;
-      if (++a.used < cnt) return;
-      b.removeBuff(e, 'ab:blade'); // 无断刃模式
-      a.clearCd = true;
+      a.used++;
+      b.addBuff(e, { key: 'ab:blade', refresh: 'stack', stacks: 1, maxStacks: Math.max(1, cnt), mods: { atkPct: atk }, persist: true, visible: true });
     },
-    tick(b, e, a) { if (a.clearCd) { a.clearCd = false; e.atkCd = 0; } },
     death(c, b, e, a) { if (c.reason === 'killed' && key) spawnChildren(b, e, key, Math.max(1, cnt + add * a.used)); },
   }];
 }

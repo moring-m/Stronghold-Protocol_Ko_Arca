@@ -1,5 +1,5 @@
-import {absoluteRangeKeys} from './targeting.js';
-import {unlimitedSkillRange} from '../../shared/skillRangeDisplay.js';
+import { absoluteRangeKeys } from './targeting.js';
+import { unlimitedSkillRange } from '../../shared/skillRangeDisplay.js';
 // Area effects and expanded attack ranges; ordinary stat buffs remain unmarked.
 const AREA_SKILLS = new Set([
   'skchr_lisa_3', 'skchr_mostma_2', 'skchr_mostma_3',

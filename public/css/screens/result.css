@@ -162,3 +162,5 @@
 .result__custom{margin:.15rem 0;font-size:calc(.12 * var(--t));max-width:3rem}.result__custom summary{color:var(--mint);cursor:pointer}.result__custom p{margin:.05rem 0 .12rem;overflow-wrap:anywhere}
 
 .combat-chart .is-note{background:#b49bd8}.combat-chart .is-unclassified{background:#90999b}
+/* a match with gameplay plugins (DESIGN §32.6): the unofficial mark under the headline */
+.result__modmark { align-self: flex-start; margin-top: .06rem; }

@@ -29,10 +29,9 @@
 // - S3 碎颅击 (MANUAL, 18 / 21 s): attack interval +base_attack_time s (a flat +1.0 on her 1.05 s), each attack at
 //   attack@atk_scale × ATK with attack@buff_prob to stun the target attack@stun s.
 
-import { num, talentBb, talentGrid, moduleBb, traitBb, moduleOn, skillRec, statBuff, toggleBuff, installAura, batMod,
-  up, skillBusy, giveSp } from '../shared/tier1.js';
+import { num, talentBb, talentGrid, moduleBb, traitBb, moduleOn, skillRec, statBuff, toggleBuff, installAura, batMod, up, skillBusy, giveSp } from '../shared/tier1.js';
 import { absoluteRangeKeys } from '../../../targeting.js';
-import { bodyInKeys } from '../../../body.js';
+import { bodyInRange } from '../../../body.js';
 
 const S1 = 'skcom_charge_cost[3]';
 const S2 = 'skchr_siege_2';
@@ -107,7 +106,7 @@ export default {
           battle.on('death', (ctx) => {
             const e = ctx.unit;
             if (e.side !== 'enemy' || ctx.reason !== 'killed' || !up(unit) || !unit.skill) return;
-            if (!bodyInKeys(e, new Set(absoluteRangeKeys(grid1, unit.tileR, unit.tileC, unit.dir, 0, battle.grid)))) return;
+            if (!bodyInRange(e, new Set(absoluteRangeKeys(grid1, unit.tileR, unit.tileC, unit.dir, 0, battle.grid)))) return;
             // "无视自身的阻回": the 'init' reason passes 阻回; a running timed skill still takes no SP
             if (!skillBusy(unit)) unit.skill.gainSp(sp, 'init');
             if (other > 0) {

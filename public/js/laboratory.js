@@ -1,4 +1,4 @@
-import {withLaboratoryDummy,LAB_DUMMY_ENEMY} from '../../shared/laboratoryDummy.js';
+import { withLaboratoryDummy, LAB_DUMMY_ENEMY } from '../../shared/laboratoryDummy.js';
 import { net, NetError } from './net.js';
 import { store, emptyMatch } from './store.js';
 import { data } from './data.js';

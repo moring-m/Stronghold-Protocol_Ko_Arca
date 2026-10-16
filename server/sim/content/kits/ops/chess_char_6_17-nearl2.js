@@ -2,10 +2,8 @@
 // Conventions of the tier-6 kits: ../shared/tier6.js; kit contract and rules: ../README.md.
 
 import { absoluteRangeKeys } from '../../../targeting.js';
-import { bodyInKeys } from '../../../body.js';
-import {
-  num, tbb, live, hasBond, onDefaultSkill, selectedSkill, N4, bstate, freeTiles, bestTile,
-} from '../shared/tier6.js';
+import { bodyInRange } from '../../../body.js';
+import { num, tbb, live, hasBond, onDefaultSkill, selectedSkill, N4, bstate, freeTiles, bestTile } from '../shared/tier6.js';
 
 /** Deploy-order tracker: last op deployed per owner (read before the update by priority-0 deploy handlers). */
 function ensureDeployTracker(battle) {
@@ -25,10 +23,10 @@ function nearl2(bb, chess, def) {
   const skillGrid = def?.skill?.rangeGrid?.length ? def.skill.rangeGrid : null;
   const tokId = (chess?.tokens || []).find((t) => /nearl2_sword/.test(String(t))) || 'token_10019_nearl2_sword';
   const sunBurst = (battle, unit, r, c, scale, stun) => {
-    const keys = new Set(absoluteRangeKeys(N4, r, c, 1, 0));
+    const keys = new Set(absoluteRangeKeys(N4, r, c, 1, 0, battle.grid));
     battle.fx('sunBurst', { x: c, y: r, id: unit.id });
     for (const e of battle.enemies) {
-      if (!e.alive || e.hidden || !bodyInKeys(e, keys)) continue;
+      if (!e.alive || e.hidden || !bodyInRange(e, keys)) continue;
       battle.dealDamage(unit, e, { amount: unit.s.atk * scale, type: 'true', isSkill: true, tags: ['skill'] });
       if (stun > 0 && e.alive) battle.applyStatus(e, 'stun', { duration: stun, source: unit });
     }

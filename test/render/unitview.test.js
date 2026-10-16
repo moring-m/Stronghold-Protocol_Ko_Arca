@@ -356,15 +356,15 @@ test('concealed allies keep opaque bodies and textured mist; refraction draws on
  arcs=0; e.statuses.delete('ab:refraction'); e.update(1/60,cam(),1); assert.equal(arcs,0);
 });
 
-test('impostor bounds grow for taller attack poses and never crop back to the initial pose',()=>{
- let bounds={x:-80,y:-150,width:160,height:180};
- const view={actor:{spine:{getLocalBounds:()=>bounds}},_box:null};
- const first=UnitView.prototype._impBox.call(view);
- bounds={x:-110,y:-520,width:230,height:560};
- const attack=UnitView.prototype._impBox.call(view);
- assert.ok(attack.y0<=bounds.y);assert.ok(attack.y0<first.y0,'the initial pose must not permanently crop the head');
- bounds={x:-80,y:-150,width:160,height:180};
- assert.deepEqual(UnitView.prototype._impBox.call(view),attack,'returning to idle retains stable texture bounds');
+test('impostor bounds include the measured attack pose and stay stable after returning to idle',()=>{
+ const v=view({});
+ const rects=new Map([['Idle',[-80,-150,80,30]],['Attack',[-110,-520,120,40]]]);
+ v.actor={entry:{anims:{idle:'Idle',attack:{loop:'Attack'}}},has:name=>rects.has(name),names:new Set(rects.keys()),clipBounds:()=>rects};
+ v._box=null;
+ const box=v._impBox();
+ assert.ok(box.over.has('Attack') || (box.y0<=-520 && box.y0+box.h>=40),'a tall attack is fully included or rendered directly without cropping');
+ assert.equal(v._impBox(),box,'idle and attack share stable measured texture bounds');
+ v.actor=null;v.destroy();
 });
 
 test('skill tiles follow each tile height, and raised overlays clear immediately on retreat',()=>{
@@ -578,4 +578,42 @@ test('Eyjafjalla Volcano uses its front model while facing up, returning to back
   v.flags=0;assert.equal(v._wantsBack(),true);v.flags=UF.SKILL;assert.equal(v._wantsBack(),false);
   v.info.skillIndex=1;assert.equal(v._wantsBack(),true);v.destroy();
  }
+});
+
+describe('GitHub #648: the Hidden Core 假想敌：管 (enemy_9021_acduml_2)', () => {
+  const boss = (defId) => view({ side: 'enemy', kind: 'enemy', defId, boss: true, x: 9, y: 3, maxHp: 600000 });
+
+  test('faces right as authored whatever turn it is given — so do the other 管 and both 胄; other leaders still turn', () => {
+    for (const key of ['enemy_9021_acduml_2', 'enemy_9021_acduml', 'enemy_9013_acstmk', 'enemy_9013_acstmk_2']) {
+      const h = boss(key);
+      assert.equal(h.visFacing, 1, `${key}: right from the start`);
+      h.visFacing = -1; // an attack, a walk or the prep leader's faceLeader
+      assert.equal(h.visFacing, 1, `${key}: still right`);
+    }
+    const b = boss('enemy_1521_dslily'); // 盐风主教昆图斯: a huge leader with the regular FaceSwitcher 3
+    assert.equal(b.visFacing, -1, 'an enemy starts facing left');
+    b.visFacing = 1;
+    assert.equal(b.visFacing, 1, 'and turns');
+  });
+
+  test('its boss HUD sits 1.4 tiles right of the model (the prefab _bossHudOffset); the model stays on its tile', () => {
+    const h = boss('enemy_9021_acduml_2');
+    const b = boss('enemy_9021_acduml');
+    for (const v of [h, b]) v.update(1 / 60, cam(), 0);
+    assert.equal(h.screen.x, b.screen.x, 'the model is drawn at the unit position');
+    const c = cam();
+    const dx = c.project(10.4, 3, 0).x - c.project(9, 3, 0).x;
+    assert.ok(dx > 0);
+    assert.ok(Math.abs((h.hpFill.position.x - b.hpFill.position.x) - dx) < 1, `HP bar moved by ${h.hpFill.position.x - b.hpFill.position.x} px (1.4 tiles ≈ ${dx})`);
+  });
+});
+
+test('official shield replaces custom status geometry while Notes remain visible',async()=>{
+ const {UF}=await import('../../shared/constants.js');const v=view({side:'enemy'});
+ v.flags=UF.SHIELD;let bubbles=0;v.stateFx.drawEllipse=()=>{bubbles++;return v.stateFx;};
+ v.update(.016,cam(),0);assert.ok(bubbles>0);
+ bubbles=0;v.ctx.ofx={active:true};v.ctx.officialStatusKey=name=>name==='shield'?'common_shield_01':null;
+ v.setNoteStacks(3);v.setCorrosion(1);v.update(.016,cam(),1);
+ assert.equal(bubbles,0);assert.equal(v.noteFx.visible,true);assert.ok(v.noteClef);assert.equal(v.corrosionFx.visible,true);
+ v.ctx.ofx.active=false;v.update(.016,cam(),2);assert.ok(bubbles>0);v.destroy();
 });

@@ -1,4 +1,4 @@
-import {combatMetrics,combatRound,sumCombatMetrics} from '../../shared/combatStats.js';
+import { combatMetrics, combatRound, sumCombatMetrics } from '../../shared/combatStats.js';
 /** Called once per completed field, including normal, alliance and both boss phases. */
 export function recordCombatField(match,field,result) {
   if(!field || !result || field.combatRecorded)return;

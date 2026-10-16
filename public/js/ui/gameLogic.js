@@ -1,3 +1,4 @@
+import {chessLoadout} from './gameLogic/loadout.js';
 function prepPair(pub, myId) {
   const alive = (Array.isArray(pub?.players) ? pub.players : []).filter(p => isObj(p) && p.alive !== false);
   if (!alive.some(p => p.playerId === myId)) return [];
@@ -1726,7 +1727,7 @@ export function shortcutBlocked(act, { modal = false, drawer = false } = {}) {
 
 // ---- settings ------------------------------------------------------------------------------------------------------
 
-export const DEFAULT_SETTINGS = Object.freeze({ keys: DEFAULT_HOTKEYS, shopItemLeft: false, bgm: 0.6, sfx: 0.8, voice: 0.6, voiceLanguage: 'kr', voiceOverrides: Object.freeze({}), textSize: 'sm', chatVolume: 0.5, chatSound: 'emote', chatSoundCustomized: false, chatFactionNotifications: false, chatCooldown: defaultChatCooldown('emote'), muted: false, damageNumbers: true, damageNumberMode: 'basic', officialDamageNumbers:false, ammoCount:false, quality: 'high', mapQuality: 'high', renderScale: 1, effectsQuality: 'high', shadows: true, skillRanges: true, unitRanges: true, animationQuality: 'high', frameLimit: 60, adaptiveQuality: true });
+export const DEFAULT_SETTINGS = Object.freeze({ keys: DEFAULT_HOTKEYS, shopItemLeft: false, bgm: 0.6, sfx: 0.8, voice: 0.6, voiceLanguage: 'kr', voiceOverrides: Object.freeze({}), textSize: 'sm', chatVolume: 0.5, chatSound: 'emote', chatSoundCustomized: false, chatFactionNotifications: false, chatCooldown: defaultChatCooldown('emote'), muted: false, damageNumbers: true, damageNumberMode: 'basic', officialDamageNumbers:false, ammoCount:false, combatMetrics:false, deployCameraZoom:true, mysticEnergy:false, officialFx:'auto', quality: 'high', mapQuality: 'high', renderScale: 1, effectsQuality: 'high', shadows: true, skillRanges: true, unitRanges: true, animationQuality: 'high', frameLimit: 60, adaptiveQuality: true });
 const QUALITIES = ['high', 'medium', 'low'];
 
 /**
@@ -1757,6 +1758,10 @@ export function sanitizeSettings(raw) {
     ammoCount:r.ammoCount===true,
     damageNumbers: damageNumberMode(r) !== 'none',
     damageNumberMode: DAMAGE_NUMBER_MODES.includes(r.damageNumberMode) || typeof r.damageNumbers === 'boolean' ? damageNumberMode(r) : DEFAULT_SETTINGS.damageNumberMode,
+    combatMetrics:r.combatMetrics===true,
+    deployCameraZoom:r.deployCameraZoom!==false,
+    mysticEnergy:r.mysticEnergy===true,
+    officialFx:['auto','off','lite','full'].includes(r.officialFx)?r.officialFx:'auto',
     quality: QUALITIES.includes(r.quality) ? r.quality : DEFAULT_SETTINGS.quality,
     mapQuality: ['high','medium','low','minimal'].includes(r.mapQuality) ? r.mapQuality : 'high',
     renderScale: [.5,.75,1,1.25,1.5,2].includes(r.renderScale) ? r.renderScale : 1,
@@ -1851,10 +1856,10 @@ export function normalizeResult(res, pub) {
  * @returns {{ skill: any, skillIndex: number|null, defaultSkill: boolean, module: { id: string, name: string, typeName: string, none: boolean }|null,
  *   defaultModule: boolean, changed: boolean, choices: number } | null}
  */
-export { chessLoadout, unitCultivation } from './gameLogic/loadout.js';
-export { standInLoadout, standInOf } from './gameLogic/standIn.js';
-export { roundStartReplay, deployOrder } from './gameLogic/phases.js';
-export { ownDiyPick, ownDiyRecord, cardDiy } from './gameLogic/diy.js';
+export {chessLoadout, unitCultivation} from './gameLogic/loadout.js';
+export {standInLoadout, standInOf} from './gameLogic/standIn.js';
+export {roundStartReplay, deployOrder} from './gameLogic/phases.js';
+export {ownDiyPick, ownDiyRecord, cardDiy} from './gameLogic/diy.js';
 
 /**
  * The loadout (m.private.loadout shape) a battle / scouting unit fights with, from the unit itself — a teammate's
@@ -1956,9 +1961,21 @@ export function bondPopupPlace(uf, vp, rem, card = null) {
   return order.find((p) => !hit(uf, rectOf(p))) || order[0];
 }
 
-export { deviceInfo, deviceTipAt, noteDeviceUnits } from './gameLogic/terrain.js';
-export { readyShopFold } from './gameLogic/shop.js';
+export {deviceInfo, deviceTipAt, noteDeviceUnits} from './gameLogic/terrain.js';
+export {readyShopFold} from './gameLogic/shop.js';
 
-export { normalizePersonalChoice } from './gameLogic/draft.js';
+export {normalizePersonalChoice} from './gameLogic/draft.js';
 
-export { deviceUnitsForEntry } from './gameLogic/terrain.js';
+export {deviceUnitsForEntry} from './gameLogic/terrain.js';
+
+export {deployFoldsShop} from './gameLogic/camera.js';
+export {prepShortcutsSuspended} from './gameLogic/shortcuts.js';
+export {deployedRecord, ownStandIn} from './gameLogic/standIn.js';
+
+
+export {teamFrameIds} from './gameLogic/camera.js';
+export {RESULT_BOX_MS,ownRoundLoss,roundResultBox,uniteResultBox,battleResultBox} from './gameLogic/phases.js';
+export {summonExcluded,equipReplaces} from './gameLogic/placement.js';
+export {HOTKEY_ACTIONS,DEFAULT_HOTKEYS,isBindableCode,hotkeyLabel,sanitizeHotkeys,rebindHotkey,isDefaultHotkeys,hotkeyOf,actionForKey,captureHotkey,facingSwallows,facingEnter} from './gameLogic/shortcuts.js';
+export {standInIds,fieldsStandIn,cardStandIn,memberStandIn,standInGetter,deployedModuleId,standInLabel,standInForText,standInTip} from './gameLogic/standIn.js';
+export {diyPicks,diyRecordFor,unitPick,diyGetter,pickGetter,isDiyRecord,diyBannedPieces} from './gameLogic/diy.js';

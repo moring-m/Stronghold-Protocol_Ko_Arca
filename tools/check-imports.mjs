@@ -208,6 +208,8 @@ export function classify(spec, fromFile, area) {
   }
   const escaped = resolved.startsWith('..') || path.posix.isAbsolute(spec);
   if (area === 'sim') {
+    // This loader is dynamically imported behind simdata's IS_NODE guard; no browser module loads Node APIs.
+    if (fromFile === 'server/sim/nodeData.js' && ['node:fs', 'node:path', 'node:url'].includes(spec)) return { note: true, resolved };
     if (resolved === 'server/match' || resolved.startsWith('server/match/')) return { code: 'sim-match', resolved };
     if (resolved === 'server/lobby.js' || resolved.startsWith('server/lobby/')) return { code: 'sim-lobby', resolved };
     if (resolved === 'server/index.js') return { code: 'sim-entry', resolved };

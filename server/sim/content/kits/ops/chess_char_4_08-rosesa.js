@@ -2,9 +2,7 @@
 // Conventions of the tier-4 kits: ../shared/tier4.js; kit contract and rules: ../README.md.
 
 import { COLS } from '../../../constants.js';
-import {
-  AURA, num, tbb, batFlat, keySet, whileDeployed, pulse, skillActive, applyModuleRange, withDefaults,
-} from '../shared/tier4.js';
+import { AURA, num, tbb, batFlat, keySet, whileDeployed, pulse, skillActive, applyModuleRange, withDefaults } from '../shared/tier4.js';
 
 export default withDefaults({
   // ===== 瑰盐 (ringhealer, hidden) S2 绝妙的长效药呀 — allies in range: 20 % of phys/arts damage → 5 s HP loss
@@ -26,7 +24,7 @@ export default withDefaults({
           const t = c.target;
           // "友方干员": operators only (summons/devices keep the full hit)
           if (!skillActive(unit) || !unit.alive || t.side !== 'ally' || t.kind !== 'op' || (c.dmg.type !== 'phys' && c.dmg.type !== 'arts')) return;
-          if (!keySet(unit).has(t.tileR * COLS + t.tileC)) return;
+          if (!keySet(unit).has(t.tileR * (battle.grid?.cols ?? COLS) + t.tileC)) return;
           c.dmg.mul *= scale;
           deferred.add(c.dmg);
         }, { owner: unit, priority: -5 });

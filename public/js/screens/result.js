@@ -1,10 +1,10 @@
-import {AUGMENT_GRADES} from '../../../shared/augments.js';
-import {LaboratoryRestartButton} from '../ui/laboratory.js';
-import {EXTENSION_CATEGORIES,RULE_VALUES,customExtensionCatalog,recordCustomExtensions} from '../../../shared/customExtensions.js';
+import { AUGMENT_GRADES } from '../../../shared/augments.js';
+import { LaboratoryRestartButton } from '../ui/laboratory.js';
+import { EXTENSION_CATEGORIES, RULE_VALUES, customExtensionCatalog, recordCustomExtensions } from '../../../shared/customExtensions.js';
 import { isLaboratory, stopLaboratory } from '../laboratory.js';
-import {CombatReport} from '../ui/combatReport.js';
-import {net} from '../net.js';
-import {toastError} from '../ui/toasts.js';
+import { CombatReport } from '../ui/combatReport.js';
+import { net } from '../net.js';
+import { toastError } from '../ui/toasts.js';
 import { ChatPanel } from '../ui/chat.js';
 
 import { t } from '../../../shared/i18n.js';
@@ -28,6 +28,9 @@ import { normalizeResult, fmtNum } from '../ui/gameLogic.js';
 import { enemyIconUrl, titleIconUrl, uiUrl } from '../ui/assetUrls.js';
 import { store, useStore, emptyMatch } from '../store.js';
 import { audio } from '../audio.js';
+import { sentText } from '../ui/lang.js';
+import { UnofficialMark } from '../ui/pluginTag.js';
+import { tParts, N_ } from '../../../shared/i18n.js';
 
 const cx = (...p) => p.flat().filter(Boolean).join(' ');
 
@@ -88,16 +91,19 @@ export function ResultScreen() {
   const hasRoom = useStore((s) => !!s.room);
   const roomSolo = useStore((s) => s.room?.mode === 'solo');
   const solo = roomSolo || String(pub?.modeId || '').includes('single');
+  const content=useStore(s=>s.room?.content??null);
   const back = () => isLaboratory() ? stopLaboratory() : store.set({ match: emptyMatch() });
-  return html`<div class="screen result-screen"><${ResultView} chat=${!solo && !pub?.laboratory} res=${res} pub=${pub} myId=${myId} backLabel=${hasRoom && !isLaboratory() ? t('返回同盟') : t('返回大厅')} onBack=${back} /></div>`;
+  return html`<div class="screen result-screen"><${ResultView} chat=${!solo && !pub?.laboratory} content=${content} res=${res} pub=${pub} myId=${myId} backLabel=${hasRoom && !isLaboratory() ? t('返回同盟') : t('返回大厅')} onBack=${back} /></div>`;
 }
 
 /**
  * The settlement view of one m.result payload — the live screen above, and the stats page's re-view of a stored match
  * (screens/stats.js, which hands it the payload recordToResult rebuilt; `quiet`: no settlement jingle).
- * @param {{ res: any, pub?: any, myId?: string|null, backLabel: string, onBack: () => void, quiet?: boolean }} props
+ * `content`: the room's content (room.state.content, or a stats record's) — gameplay plugins mark the result unofficial
+ * (DESIGN §32.6).
+ * @param {{ res: any, pub?: any, myId?: string|null, backLabel: string, onBack: () => void, quiet?: boolean, content?: any }} props
  */
-export function ResultView({ res, pub = null, myId = null, backLabel, onBack, quiet = false, chat = false }) {
+export function ResultView({ res, pub = null, myId = null, backLabel, onBack, quiet = false, chat = false, content = null }) {
   const gd = useGameData();
   const [page,setPage]=useState('result');
   const r = normalizeResult(res, pub);
@@ -125,8 +131,9 @@ export function ResultView({ res, pub = null, myId = null, backLabel, onBack, qu
         <div class="result__logo"><${Sprite} k="entry/season_logo_settle" class="result__logoimg" fallback=${html`<${MicroLabel} tone="mint">STRONGHOLD PROTOCOL</${MicroLabel}>`} /></div>
         ${pub?.laboratory || res?.laboratory ? html`<span class="result__laboratory"><${Icon} name="flask"/>실험실</span>` : null}
         ${r.difficulty ? html`<${DifficultyTag} difficulty=${r.difficulty} size="lg" />` : null}
-        <h1 class="result__headline">${r.victory ? '模拟完成' : '模拟失败'}</h1>
-        <p class="result__sub">${r.victory ? '成功卫戍 · 敌方领袖已被击败' : '防线已被突破'}</p>
+        <h1 class="result__headline">${r.victory ? t('模拟完成') : t('模拟失败')}</h1>
+        <${UnofficialMark} room=${content ? { content } : null} class="result__modmark" />
+        <p class="result__sub">${r.victory ? t('成功卫戍 · 敌方领袖已被击败') : t('防线已被突破')}</p>
         <div class="result__rounds">
           <span class="result__rlabel">通过回合</span>
           <b class="result__rnum num">${r.roundsPassed}</b>
@@ -155,6 +162,7 @@ export function ResultView({ res, pub = null, myId = null, backLabel, onBack, qu
         ${r.players.length ? r.players.map((p) => html`<${PlayerCard} key=${p.playerId} p=${p} myId=${myId} titles=${titles} best=${best} solo=${r.players.length < 2} recommend=${!quiet&&r.matchNo&&r.players.some(p=>p.playerId===myId&&!p.isBot)?id=>net.request('room.commend',{playerId:id,matchNo:r.matchNo}):null} recommended=${(r.commendationsGiven[myId]||[]).includes(p.playerId)} />`)
           : html`<p class="t-dim">暂无结算数据</p>`}
       </section>`}
+      <div class="ui-slot" data-ui-slot="result.tab"></div>
     </main>
   </div>`;
 }

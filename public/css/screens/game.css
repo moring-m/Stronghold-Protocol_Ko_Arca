@@ -35,6 +35,16 @@
 .specpill__num { font-size: .18rem; font-weight: 700; color: var(--mint-300, #99f6e4); }
 .specpill.is-me { border-color: var(--mint-600, #0d9488); }
 /* the roster inside the modal */
+.gtop__meta { display: flex; flex-direction: column; align-items: flex-start; gap: .06rem; }
+/* a match with gameplay plugins (DESIGN §32.6): the HUD corner's MOD mark */
+.gtop__mod { pointer-events: auto; }
+/* the latency pill and, beside it, the 观战席 capsule (ui/hud.js SpectatorPill: an eye + how many are watching; opens the roster) */
+.gtop__net { display: flex; align-items: center; gap: .08rem; }
+.specpill { --btn-bg: rgba(0, 0, 0, .5); --btn-bg-hover: rgba(0, 0, 0, .66); --btn-bd: var(--line); height: .32rem; min-width: 0; padding: 0 .12rem; gap: .05rem; border-radius: 99px; }
+.specpill .btn__icon { width: .18rem; height: .18rem; color: var(--mint-500); }
+.specpill__num { font-size: .18rem; font-weight: 700; color: var(--mint-400); }
+.specpill.is-me { --btn-bd: var(--mint-600); }
+/* the roster inside its modal */
 .spec__roster { display: flex; flex-direction: column; gap: .06rem; margin: 0 0 .1rem; padding: 0; list-style: none; }
 .spec__row { display: flex; align-items: center; gap: .1rem; padding: .06rem .1rem; border-radius: .08rem; background: rgba(255, 255, 255, .03); }
 .spec__row.is-me { background: rgba(45, 212, 191, .1); }
@@ -365,6 +375,78 @@
 .gm__gear .icon { width: .28rem; height: .28rem; }
 .gm__gear:hover { color: var(--mint-400); border-color: var(--mint-700); }
 
+.gm__metrics[aria-expanded="true"] { color: var(--mint-400); border-color: var(--mint-700); background: var(--mint-900); }
+
+/* Local combat meter, docked above the corner's actual height (including mobile wrapped rows). */
+.combat-metrics {
+  --bk-c: var(--mint-500);
+  position: absolute; left: 0; bottom: calc(100% + max(.1rem, 8px)); z-index: 12;
+  width: min(max(5.2rem, 340px), calc(100vw - var(--sa-l, 0px) - var(--sa-r, 0px) - .48rem));
+  max-height: min(max(6.6rem, 280px), calc(100vh - var(--combat-corner-height, 110px) - max(.9rem, 48px) - .34rem - var(--sa-t, 0px) - var(--sa-b, 0px)));
+  max-height: min(max(6.6rem, 280px), calc(100dvh - var(--combat-corner-height, 110px) - max(.9rem, 48px) - .34rem - var(--sa-t, 0px) - var(--sa-b, 0px)));
+  display: flex; flex-direction: column; overflow: hidden;
+  background: linear-gradient(180deg, rgba(28, 35, 32, .98), rgba(17, 21, 19, .98));
+  border: 1px solid var(--line-2); border-top: 2px solid var(--mint-700);
+  box-shadow: 0 .12rem .4rem rgba(0, 0, 0, .6); color: var(--text-md);
+  font-size: max(calc(.14 * var(--t)), 12px); line-height: 1.35; text-align: left;
+}
+.combat-metrics__head { display: flex; flex: none; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 8px; padding: max(.1rem, 8px) max(.14rem, 10px) 0; }
+.combat-metrics__micro { font-family: var(--font-display); font-size: max(calc(.1 * var(--t)), 10px); letter-spacing: .12em; color: var(--mint-500); }
+.combat-metrics__head h2 { margin: 0; font-size: max(calc(.2 * var(--t)), 16px); color: var(--text-hi); }
+.combat-metrics__body { display: flex; flex: 1 1 auto; flex-direction: column; min-height: 0; overflow: hidden; }
+.combat-metrics__close { display: grid; place-items: center; flex: none; width: max(.36rem, 32px); height: max(.36rem, 32px); color: var(--text-md); border: 1px solid var(--line-2); background: var(--bg-1); }
+.combat-metrics__close .icon { width: max(.18rem, 16px); height: max(.18rem, 16px); }
+.combat-metrics__tools { display: flex; flex: none; gap: 8px; padding: 8px max(.14rem, 10px); }
+.combat-metrics__head > .combat-metrics__tools { flex-basis: 100%; padding-left: 0; padding-right: 0; }
+.combat-metrics__scopes { display: flex; flex: 1; min-width: 0; }
+.combat-metrics__scopes button { flex: 1; min-width: 0; padding: 4px 6px; min-height: 32px; color: var(--text-lo); background: var(--bg-1); border: 1px solid var(--line-2); white-space: nowrap; font-size: inherit; }
+.combat-metrics__scopes button[aria-pressed="true"] { background: var(--mint-900); color: var(--mint-400); border-color: var(--mint-700); }
+.combat-metrics__totals { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); flex: none; gap: 8px; padding: 0 max(.14rem, 10px) 8px; }
+.combat-metrics__totals span { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px; color: var(--text-lo); }
+.combat-metrics__totals b { font-family: var(--font-num); color: var(--text-hi); font-size: max(calc(.18 * var(--t)), 14px); overflow-wrap: anywhere; }
+.combat-metrics__totals span:last-child b { color: var(--mint-400); }
+.combat-metrics__legend { display: flex; flex: none; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 0 max(.14rem, 10px) 8px; font-size: max(calc(.12 * var(--t)), 11px); }
+.combat-metrics__type { display: inline-flex; align-items: center; gap: 4px; }
+.combat-metrics__type::before { content: ''; width: 10px; height: 4px; background: var(--damage-color); }
+.combat-metrics__type--phys, .combat-metrics__segment--phys { --damage-color: #f6a329; }
+.combat-metrics__type--arts, .combat-metrics__segment--arts { --damage-color: #9fd4ff; }
+.combat-metrics__type--true, .combat-metrics__segment--true { --damage-color: #ff7272; }
+.combat-metrics__type--elemental, .combat-metrics__segment--elemental { --damage-color: #cf9fff; }
+.combat-metrics__sort { margin-left: auto; color: var(--text-lo); }
+.combat-metrics__list { flex: 1 1 auto; min-height: 0; margin: 0; padding: 0 max(.14rem, 10px); list-style: none; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; -webkit-overflow-scrolling: touch; }
+.combat-metrics__row { display: grid; grid-template-columns: max(.2rem, 18px) max(.42rem, 30px) minmax(0, 1fr); gap: max(.08rem, 6px); align-items: center; padding: max(.09rem, 7px) 0; border-top: 1px solid var(--line); }
+.combat-metrics__rank { align-self: start; color: var(--text-lo); font-family: var(--font-num); padding-top: 2px; }
+.combat-metrics__row > .uthumb { width: max(.42rem, 30px); height: max(.42rem, 30px); }
+.combat-metrics__unit { min-width: 0; }
+.combat-metrics__name { display: flex; align-items: baseline; justify-content: space-between; gap: 6px; }
+.combat-metrics__name b { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-hi); }
+.combat-metrics__bar { display: flex; width: 100%; height: max(.05rem, 5px); margin: 5px 0; background: var(--bg-4); overflow: hidden; }
+.combat-metrics__segment { flex: none; height: 100%; background: var(--damage-color); }
+.combat-metrics__values { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+.combat-metrics__values span { min-width: 0; display: flex; flex-direction: column; }
+.combat-metrics__values small { color: var(--text-lo); font-size: max(calc(.1 * var(--t)), 10px); }
+.combat-metrics__values b { color: var(--text-hi); overflow-wrap: anywhere; font-size: max(calc(.14 * var(--t)), 12px); font-weight: 500; }
+.combat-metrics__values .combat-metrics__heal b { color: var(--mint-400); }
+.combat-metrics__empty { padding: 20px 8px; color: var(--text-md); text-align: center; }
+.combat-metrics__empty small { display: inline-block; margin-top: 6px; color: var(--text-lo); }
+.combat-metrics__note { flex: none; margin: 0; padding: 8px max(.14rem, 10px); border-top: 1px solid var(--line); color: var(--text-lo); font-size: max(calc(.1 * var(--t)), 10px); }
+.combat-metrics button:hover { color: var(--mint-400); border-color: var(--mint-700); }
+.combat-metrics button:focus-visible { outline: 2px solid var(--mint-400); outline-offset: -2px; }
+@media (pointer: coarse), (any-pointer: coarse) {
+  .combat-metrics__close, .combat-metrics__scopes button { min-height: 44px; }
+  .combat-metrics__close { min-width: 44px; }
+}
+@media (max-height: 460px) {
+  .combat-metrics__body { display: block; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; -webkit-overflow-scrolling: touch; }
+  .combat-metrics__list { overflow: visible; }
+  .combat-metrics__micro { display: none; }
+  .combat-metrics__head { padding-top: 4px; }
+  .combat-metrics__tools { padding-top: 4px; padding-bottom: 4px; }
+  .combat-metrics__totals, .combat-metrics__legend { padding-bottom: 4px; }
+  .combat-metrics__note { padding-top: 4px; padding-bottom: 4px; }
+  .combat-metrics__note br { display: none; }
+}
+
 .ewheel { position: relative; }
 .ewheel__btn {
   display: flex; align-items: center; gap: .08rem; height: .56rem; padding: 0 .2rem 0 .14rem;
@@ -494,45 +576,6 @@
 .chud__layers.is-observing { gap: .1rem; padding-right: .08rem; border-color: rgba(246, 163, 41, .55); }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ---- settings modal ------------------------------------------------------------------------------------------------ */
-/* the 设置 trigger of the lobby and the room (ui/settings.js SettingsButton, GitHub #238): the 玩法说明 button's twin; its gear sits
-   inside the label, so the label lays glyph and text out like the button itself */
-.settings-btn .btn__label { display: inline-flex; align-items: center; gap: .1rem; }
-.settings-btn .btn__icon { color: var(--mint-500); }
-/* square (the lobby's gear alone): the label box drops out so the gear sizes and centres against the button, like an `icon` */
-.settings-btn.btn--square .btn__label { display: contents; }
-.settings-btn.btn--square .btn__icon { width: 62%; height: 62%; } /* the gear glyph is drawn smaller in its box than the book */
-.set-list { display: flex; flex-direction: column; gap: .16rem; padding-top: .06rem; }
-.set-row { display: grid; grid-template-columns: 3.3rem 1fr auto; align-items: center; gap: .18rem; min-height: .44rem; }
-.set-row--chat-sound select { min-width: 0; width: 100%; padding: .06rem; color: var(--text-hi); background: var(--bg-1, #111817); border: 1px solid var(--line-2); font: inherit; font-size: calc(.16 * var(--t)); }
-.set-chat-actions { display: flex; gap: .08rem; }
-.set-row--chat-sound { grid-template-columns: 2.4rem minmax(0, 1fr) auto; }
-.set-row__label { display: flex; align-items: center; gap: .1rem; font-size: calc(.18 * var(--t)); color: var(--text-hi); white-space: normal; }
-.set-row__label .icon { width: .2rem; height: .2rem; color: var(--mint-500); }
-.set-row__label .micro { margin-left: .04rem; }
-/* a floor, not a fixed width: the %. value grows with the text step (20 px on a phone, 3 digits at 特大) */
-.set-row__val { min-width: .5rem; text-align: right; font-size: calc(.2 * var(--t)); color: var(--mint-400); }
-.set-range {
-  -webkit-appearance: none; appearance: none; width: 100%; height: .08rem; background: linear-gradient(90deg, var(--mint-500) var(--pct), #0a0d0c var(--pct));
-  border: 1px solid var(--line-2); outline: none; cursor: pointer;
-}
-.set-range::-webkit-slider-thumb { -webkit-appearance: none; width: .2rem; height: .26rem; background: var(--mint-400); clip-path: polygon(50% 0, 100% 30%, 100% 100%, 0 100%, 0 30%); cursor: grab; }
-.set-range::-moz-range-thumb { width: .2rem; height: .26rem; background: var(--mint-400); border: 0; }
-.set-toggle { grid-column: 2 / 4; justify-self: start; display: flex; align-items: center; gap: .1rem; height: .38rem; padding: 0 .14rem 0 .06rem; background: #0a0d0c; border: 1px solid var(--line-2); color: var(--text-lo); font-size: calc(.15 * var(--t)); }
-.set-toggle i { width: .46rem; height: .24rem; background: var(--bg-3); position: relative; transition: background var(--t-fast); }
-.set-toggle i::after { content: ''; position: absolute; left: .03rem; top: .03rem; width: .18rem; height: .18rem; background: var(--text-lo); transition: transform var(--t-fast), background var(--t-fast); }
-.set-toggle.is-on { color: var(--mint-400); border-color: var(--mint-700); }
-.set-toggle.is-on i { background: var(--mint-800); }
-.set-toggle.is-on i::after { transform: translateX(.22rem); background: var(--mint-400); }
-.set-seg { grid-column: 2 / 4; justify-self: start; display: flex; flex-wrap: wrap; max-width: 100%; border: 1px solid var(--line-2); }
-.set-seg button { flex: 1 1 auto; min-width: .8rem; min-height: .38rem; height: auto; white-space: normal; background: #0a0d0c; border: 0; border-right: 1px solid var(--line-2); color: var(--text-lo); font-size: calc(.16 * var(--t)); }
-/* 文字大小 (ui/settings.js): four steps, so its buttons are narrower than the two- and three-step groups' — at .8rem each
-   the group would be wider than the row's 1fr column on a phone (1rem = 40 px) */
-.set-seg.set-textsize button { min-width: .62rem; }
-.set-seg button:last-child { border-right: 0; }
-.set-seg button.is-on { background: var(--mint-500); color: var(--text-on-mint); font-weight: 700; }
-.set-hint { margin-top: .06rem; font-size: calc(.14 * var(--t)); color: var(--text-dim); line-height: 1.8; }
-.set-hint kbd, .lvcard__key, .toolbtn kbd { font-family: var(--font-num); font-size: .11rem; border: 1px solid var(--line-2); padding: 0 .04rem; color: var(--text-lo); background: rgba(0, 0, 0, .3); }
 
 /* ---- exit / away ------------------------------------------------------------------------------------------------------ */
 .exitm { display: flex; flex-direction: column; gap: .1rem; font-size: calc(.17 * var(--t)); line-height: 1.7; }
@@ -681,32 +724,6 @@
 .capsule:not(.capsule--combat):not(.capsule--boss) { position:relative; padding:0 .22rem; justify-content:center; }
 .capsule:not(.capsule--combat):not(.capsule--boss) .capsule__icon { position:absolute; left:.12rem; }
 .capsule__label { text-align:center; }
-
-.set-categories { display:flex; gap:.06rem; position:sticky; top:0; z-index:2; padding:.08rem 0; background:var(--panel,#101b18); }
-.set-categories button { flex:1; min-height:.4rem; padding:.08rem; border:1px solid #46594f; background:#101b18; color:#a9bbb3; cursor:pointer; }
-.set-categories button.is-on { color:#09221b; background:#55d9b4; border-color:#55d9b4; }
-.set-category { display:flex; flex-direction:column; gap:.16rem; }
-.set-category[hidden] { display:none; }
-.set-category .set-row select { grid-column:2 / 4; justify-self:end; width:2.6rem; max-width:100%; min-height:.36rem; padding:.05rem .08rem; color:#e2efea; background:#101b18; border:1px solid #46594f; }
-@media (max-width:600px) and (orientation:portrait) {
-  .modal__box.settings-modal { width:calc(100vw - 24px)!important; max-height:calc(100dvh - 24px); font-size:14px; }
-  .modal__box.settings-modal .modal__body { padding:12px; }
-  .modal__box.settings-modal .modal__title { font-size:18px; }
-  .modal__box.settings-modal .modal__actions .btn { font-size:12px; min-height:32px; }
-  .set-categories { gap:4px; padding:6px 0; }
-  .set-categories button { min-height:36px; font-size:12px; padding:6px 2px; }
-  .set-category { gap:12px; }
-  .set-category .set-row { grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto; gap:8px; min-height:34px; }
-  .set-category .set-row__label { font-size:13px; white-space:normal; }
-  .set-category .set-row select { width:100%; font-size:13px; min-height:34px; }
-  .set-category .set-hint { font-size:12px; line-height:1.6; }
-  .set-category .set-toggle { min-height:30px; font-size:12px; }
-  .set-category .set-seg button { min-width:30px; height:32px; font-size:11px; padding:3px; }
-  .set-category .micro { display:none; }
-  .set-category .set-chat-actions { flex-wrap:wrap; }
-  .set-category .set-row--chat-sound { grid-template-columns:1fr; }
-  .set-category .set-row--chat-sound select { grid-column:1; }
-}
 .gm__end-battle { position:absolute; right:2.7rem; top:.2rem; z-index:8; display:flex; align-items:center; height:.56rem; min-width:2.3rem; padding:0 .16rem 0 .12rem; gap:.12rem; border:2px solid #865957; background:rgba(28,17,17,.9); color:#ffd9d3; font:inherit; font-size:.22rem; font-weight:700; letter-spacing:.14em; box-shadow:0 0 .18rem #86595726; cursor:pointer; }
 .gm__end-battle .readybtn__box {border-color:#865957;}
 .gm__end-battle .icon { width:.26rem; height:.26rem; }
@@ -789,11 +806,6 @@
 
 .gtop__right .gm__end-battle{position:static;height:.46rem;min-width:2rem;padding:0 .12rem;gap:.08rem;font-size:.17rem;white-space:nowrap;align-self:flex-end}
 .gtop__right .gm__end-battle .readybtn__box{width:.28rem;height:.28rem}.gtop__right .gm__end-battle .icon{width:.18rem;height:.18rem}
-
-/* Keep settings tabs outside the scrolling content, including its top padding. */
-.settings-modal .modal__body { display:flex; flex-direction:column; min-height:0; overflow:hidden; }
-.settings-modal .set-categories { position:static; flex-shrink:0; }
-.settings-modal .set-list { min-height:0; overflow-y:auto; overscroll-behavior:contain; }
 
 .team--eight{top:1.95rem;gap:.06rem;max-height:none;overflow:visible;pointer-events:auto;padding:.06rem .1rem .1rem 0}
 .team--eight .team__btn{width:.4rem;height:.4rem;flex:0 0 .4rem}

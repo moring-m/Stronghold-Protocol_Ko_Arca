@@ -287,3 +287,13 @@ test('live drone attack radius reaches both normal and spectated snapshot views'
  assert.equal(b.sample(.1).get(1).attackRangeRadius,2.6);
  assert.equal(normalizeSnapshot({...snap(0,[U(1,4,10)]),attackRanges:[[1,-1],[1,NaN]]}).units.get(1)[23],undefined);
 });
+
+
+test('legacy scalar energy metadata cannot discard the entire combat frame',()=>{
+ const s=normalizeSnapshot({...snap(1,[U(1,4,10),U(2,6,10)]),energy:{1:0}});
+ assert.equal(s.units.size,2);assert.equal(s.energy,null);
+ const list=normalizeSnapshot({...snap(1,[U(1,4,10)]),energy:[[1,2,4]]});
+ assert.deepEqual(list.energy.get(1),[2,4]);
+ const previous=normalizeSnapshot({...snap(1,[U(1,4,10)]),energy:{1:[2,4]}});
+ assert.deepEqual(previous.energy.get(1),[2,4]);
+});

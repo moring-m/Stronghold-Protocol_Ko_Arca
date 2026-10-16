@@ -4,15 +4,11 @@
 import { TICK, COLS } from '../../constants.js';
 import { aggroCmp, areaSelectable } from '../../targeting.js';
 import { periodicDamage } from '../../damage.js';
-import {
-  nthOf, T, hurt, alliesInTiles, targetsNear, allTargets, areaAllies, areaAlliesInTiles, auraAllies, targetAndArea,
-  byPriority, setForm, auraBuff, watchDeaths, unbalancedNow,
-} from './helpers.js';
-import {
-  unblockable, maxTargets, onHitStatus, splashAttack, pathKeysAhead, noAirTargets, resist, nthAttackStatus, lowHpBuff,
-  freeAllPrisoners, reborn, frontGuard, faceCrowd, unbalanced, artsBarrier, skill, blinkForward,
-} from './archetypes.js';
+import { nthOf, T, hurt, alliesInTiles, targetsNear, allTargets, areaAllies, areaAlliesInTiles, auraAllies, targetAndArea, byPriority, setForm, auraBuff, watchDeaths, unbalancedNow, castSlot } from './helpers.js';
+import { unblockable, maxTargets, onHitStatus, splashAttack, pathKeysAhead, noAirTargets, resist, nthAttackStatus, lowHpBuff, freeAllPrisoners, reborn, frontGuard, faceCrowd, unbalanced, artsBarrier, skill, blinkForward } from './archetypes.js';
 import { hypot, powi } from '../../detmath.js';
+import { bbCap } from '../../../../shared/plugins/officialBounds.js';
+import { burstLimit, stepOf, STEP_PER_TICK } from '../../../../shared/plugins/steps.js';
 
 // ---------------------------------------------------------------------------------------------------------------
 // constants (numbers that exist nowhere in the data)
@@ -170,8 +166,8 @@ function kitLeaderMisc(key, ab, e) {
       const bar = artsBarrier(s ? s.bb.dynamic ?? 0 : T(ab, 'shield.dynamic') ?? 0, { key: 'ab:rockPower',
         whileUp: { hpPct: (s ? s.bb.max_hp : null) ?? T(ab, 'shield.max_hp') ?? 0, aspd: (s ? s.bb.attack_speed : null) ?? T(ab, 'shield.attack_speed') ?? 0 } });
       return [bar, {
-        // 攻击时攻击力永久提升，最多六层 (the blackboard ATK is the 6-stack total [ASSUMED split])
-        attack(c, b, e2) { b.addBuff(e2, { key: 'ab:rockCharge', refresh: 'stack', stacks: 1, maxStacks: 6, persist: true, mods: { atkPct: (T(ab, 'charge.attack@enemy_mdrock_s_1[charge].atk') ?? 0) / 6 } }); },
+        // PRTS / enemy handbook: +60% ATK per attack, up to six stacks, not +60% total.
+        attack(c, b, e2) { b.addBuff(e2, { key: 'ab:rockCharge', refresh: 'stack', stacks: 1, maxStacks: 6, persist: true, visible: true, mods: { atkPct: T(ab, 'charge.attack@enemy_mdrock_s_1[charge].atk') ?? 0 } }); },
       }, skill(s, (b, e2) => bar.refresh(b, e2, bar))];
     }
     case 'enemy_1513_dekght': {
@@ -326,7 +322,7 @@ function kitLeaderMisc(key, ab, e) {
           .sort((p, q) => hypot(p.x - x, p.y - y) - hypot(q.x - x, q.y - y) || p.spawnSeq - q.spawnSeq)[0];
         const seen = new Set();
         let prev = e2, cur = near(e2.x, e2.y, e2.base.rangeRadius || 3.5, seen);
-        while (cur && seen.size < max) {
+        while (cur && seen.size < max) { // loop-cap: units
           seen.add(cur);
           b.fx('beam', { x: prev.x, y: prev.y, from: prev.id, to: cur.id, kind: 'chainBuff' });
           b.addBuff(cur, { key: 'ab:chainBuff', duration: bb.duration ?? 0, refresh: 'replace', visible: true, mods: { moveMul: 1 + (bb.move_speed ?? 0), aspd: bb.attack_speed ?? 0 } });
@@ -338,7 +334,7 @@ function kitLeaderMisc(key, ab, e) {
     case 'enemy_2052_smgia': {
       // 数次攻击后晕眩; 受到来自自然环境的伤害时 (terrain damage), 自身在短时间内获得高额脆弱 (damage taken ×damage_scale)
       const lim = T(ab, 'Weak.weak[limit]') ?? 0, scale = T(ab, 'Weak.damage_scale') ?? 1;
-      return [nthAttackStatus(nthOf(ab.sk.StunAttack), 'stun', (ab.sk.StunAttack && ab.sk.StunAttack.bb.stun) || 0, false), {
+      return [nthAttackStatus(nthOf(ab.sk.StunAttack), 'stun', (ab.sk.StunAttack && ab.sk.StunAttack.bb.stun) || 0, false, ab.sk.StunAttack), {
         taken(c, b, e2) {
           if (!(lim > 0) || !(c.amount > 0) || !(c.dmg.tags && c.dmg.tags.includes('terrain'))) return;
           b.addBuff(e2, { key: 'ab:natureWeak', duration: lim, refresh: 'replace', visible: true, mods: { dmgTakenMul: scale } });
@@ -385,6 +381,7 @@ function kitUglyThing(ab) {
       dur: T(ab, 'reborn.duration') ?? 0,
       onKo(b, e) {                                  // 生命值降至0后自爆，造成大范围晕眩 (an area selection), 2.17 s into the 重生
         const x = e.x, y = e.y;
+        castSlot(b, e, ab.sk['bomb[reborning]']);   // the self-destruct is its bomb[reborning] skill (display only)
         b.fx('telegraph', { x, y, r: MCM_BOMB_RADIUS, dur: MCM_BOMB_DELAY, kind: 'mechBomb', id: e.id });
         b.after(MCM_BOMB_DELAY, () => {
           if (!e.alive || e.removed) return;
@@ -421,11 +418,14 @@ function kitWarden(ab) {
       e.profile.melee = false;
       b.addBuff(e, { key: 'ab:warden', persist: true, visible: true, mods: { resFlat: en('magic_resistance') } });  // 法术抗性大幅提升
     },
-    before(c, b) { const s = P.killer ? pierce : iron; P.power = !!s && (P.n + 1) % nthOf(s) === 0; },
+    // the (sp+1)th attack is the form's skill: its slot for the client (castSlot, display only)
+    before(c, b, e) { const s = P.killer ? pierce : iron; P.power = !!s && (P.n + 1) % nthOf(s) === 0; if (P.power) castSlot(b, e, s); },
     hitOut(c) { if (P.killer && P.power && c.dmg.isAttack) c.dmg.defIgnorePct = Math.min(1, (c.dmg.defIgnorePct || 0) + pen()); },
     dealt(c, b, e) {
       if (!P.killer || !P.power || !pierce) return;
-      for (let i = 1; i < (pierce.bb.times ?? 1) && c.target.alive; i++) b.dealDamage(e, c.target, { amount: e.s.atk, type: 'phys', defIgnorePct: pen(), canDodge: true, isSkill: true, tags: ['enemyAbility', 'armorPiercing'] });
+      // [ASSUMED] DESIGN §32.5: extra pierce hits share the `times` cap. Official values stay at or below 12.
+      const pierceTimes = Math.min(bbCap('times'), typeof pierce.bb.times === 'number' && Number.isFinite(pierce.bb.times) ? pierce.bb.times : 1);
+      for (let i = 1; i < pierceTimes && c.target.alive; i++) b.dealDamage(e, c.target, { amount: e.s.atk, type: 'phys', defIgnorePct: pen(), canDodge: true, isSkill: true, tags: ['enemyAbility', 'armorPiercing'] });
     },
     attack(c, b, e) {
       P.n++;
@@ -525,8 +525,12 @@ function kitMace(ab) {
     hitOut(c, b, e) { const p = penOn(c, e); if (c.dmg.isAttack && p > 0) c.dmg.defIgnorePct = Math.min(1, (c.dmg.defIgnorePct || 0) + p); },
     taken(c, b, e) {                                             // 【瞬息杀机】 every hp_ratio of max HP lost (second form)
       if (!P.form2 || !(cs.ratio > 0)) return;
-      while (e.alive && e.hpRatio <= P.next - cs.ratio + 1e-9 && P.next - cs.ratio > 1e-9) {
+      let guard = 0;
+      const ratioCap = burstLimit(1); // official crossings of one hit stay under this (hp_ratio is a fraction of max HP)
+      while (e.alive && e.hpRatio <= P.next - cs.ratio + 1e-9 && P.next - cs.ratio > 1e-9 && guard++ < ratioCap) { // loop-cap: burstLimit hp_ratio
+        const prev = P.next;
         P.next -= cs.ratio;
+        if (P.next === prev) break;
         b.fx('explode', { x: e.x, y: e.y, r: cs.r, kind: 'clearSp', id: e.id });
         for (const u of areaAllies(b, e, e.x, e.y, cs.r)) {
           const sk = u.skill;
@@ -798,6 +802,7 @@ export const LEADER_KITS = Object.freeze({
   enemy_10141_xdpeng_2: (ab) => [noAirTargets(), unbalanced((b, e, a) => {
     if (a.done) return;
     a.done = true;
+    castSlot(b, e, ab.sk.switch);   // losing the egg is its `switch` skill (display only)
     e.profile.noAttack = true;
     b.addBuff(e, { key: 'ab:noEgg', persist: true, visible: true, flags: { unblockable: true }, mods: { moveMul: 1 + (T(ab, 'speed.move_speed') ?? 0) } });
   })],

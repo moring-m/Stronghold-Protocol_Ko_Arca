@@ -45,7 +45,7 @@ test('scarecrow boss and hidden waves contain only the laboratory Jesselton, whi
  for(const round of [gd.bossRound,gd.hiddenRound]){
   const wave=buildBossWave(gd,createRng(6),null,round,{bossId:LAB_DUMMY_BOSS,solo:false});assert.equal(wave.spawns.length,1);assert.equal(wave.spawns[0].enemyKey,'enemy_laboratory_jesselton');
   const b=createBattleFromSpec(buildBattleSpec({kind:round===gd.bossRound?'boss':'hidden',stageId:'act1autochess_m01',spawns:wave.spawns,routes:wave.routes,timeLimit:30,players:[{playerId:'p',units:[{chessId:'chess_char_1_01_a',uid:1,row:10,col:9}],bonds:{}}]}),data,{quiet:true});
-  b.step();const boss=b.enemies[0];assert.ok(boss.profile.noAttack);assert.equal(boss.def.raw.modelScale,3*DATA.enemies.enemy_1516_jakill.modelScale);assert.deepEqual(boss.hitArea,DATA.enemies.enemy_9013_acstmk.hitArea);const hp=boss.hp,at=[boss.x,boss.y];
+  b.step();const boss=b.enemies[0];assert.ok(boss.profile.noAttack);assert.equal(boss.def.raw.modelScale,2.5*DATA.enemies.enemy_1516_jakill.modelScale);assert.deepEqual(boss.hitArea,DATA.enemies.enemy_9013_acstmk.hitArea);const hp=boss.hp,at=[boss.x,boss.y];
   for(let i=0;i<300&&!b.finished;i++)b.step();assert.ok(boss.hp<hp,'allies can damage the dummy');assert.deepEqual([boss.x,boss.y],at);assert.equal(b.errorCount,0);assert.ok(!b.drainEvents().some(e=>e[0]==='atk'&&e[1]===boss.id));
  }
 });

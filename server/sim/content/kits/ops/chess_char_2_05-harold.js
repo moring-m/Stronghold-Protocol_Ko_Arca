@@ -43,7 +43,7 @@ export default {
           battle.on('elementHit', (ctx) => {
             const a = ctx.target, d = ctx.dmg;
             if (!up(unit) || !a || a.side !== 'ally' || !d || d.type !== 'element' || !(elemLoad(a) > half)) return;
-            if (!(unit.rangeKeySet || new Set(unit.rangeKeys || [])).has(a.tileR * COLS + a.tileC)) return;
+            if (!(unit.rangeKeySet || new Set(unit.rangeKeys || [])).has(a.tileR * (battle.grid?.cols ?? COLS) + a.tileC)) return;
             const prev = d.haroldCut || 0;               // the strongest 我即军营 of the hit only
             if (r <= prev) return;
             d.mul *= (1 - r) / (1 - prev);

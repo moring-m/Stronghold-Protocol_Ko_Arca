@@ -1,4 +1,4 @@
-import {appearanceRecord} from './appearance.js';
+import { appearanceRecord } from './appearance.js';
 // Asset URL resolution against data/assets.json (docs/ASSETS.md). Pure: every function takes the
 // manifest object (or null) and returns a URL string or null — callers draw their own fallback
 // (glyph, CSS shape) when null. Only URLs present in the manifest are ever returned, so the client

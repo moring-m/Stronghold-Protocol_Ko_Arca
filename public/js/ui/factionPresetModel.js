@@ -1,4 +1,4 @@
-import {chatFaction} from '../../../shared/chat.js';
+import { chatFaction } from '../../../shared/chat.js';
 
 // One owner per faction. Assigning a new owner removes the old link.
 export function bindPresetFaction(presets, id, faction) {

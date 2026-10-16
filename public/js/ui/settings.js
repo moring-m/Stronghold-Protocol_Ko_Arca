@@ -1,4 +1,23 @@
-import {HOTKEY_ACTIONS, hotkeyLabel, captureHotkey, rebindHotkey, DEFAULT_HOTKEYS} from './gameLogic/shortcuts.js';
+import {officialFxDownloaded} from '../../../shared/resourceSelection.js';
+import {useEffect} from "../../vendor/hooks.module.js";
+import {store} from "../store.js";
+import {tc} from "../../../shared/i18n.js";
+import {catalog} from "../content.js";
+import {loadCatalog} from "../content.js";
+import {cosmeticPlugins} from "../content.js";
+import {installedCount} from "../content.js";
+import {personal} from "../content.js";
+import {personalSet} from "../content.js";
+import {pluginName} from "../content.js";
+import {setPersonalPlugin} from "../content.js";
+import {setUiPlugin} from "./uiPlugins.js";
+import {uiPluginEntries} from "./uiPlugins.js";
+import {uiPlugins} from "./uiPlugins.js";
+import {UI_LIMITS} from "../../../shared/plugins/ui.js";
+import {toast} from "./toasts.js";
+import {describeError} from "./toasts.js";
+import {pluginMicro} from "./pluginTag.js";
+import { HOTKEY_ACTIONS, hotkeyLabel, captureHotkey, rebindHotkey, DEFAULT_HOTKEYS } from './gameLogic/shortcuts.js';
 import { RestartVoteControls } from './restartVote.js';
 
 
@@ -46,6 +65,7 @@ applyTextSize(settingsStore.get().textSize);
 
 /** @param {Partial<ReturnType<typeof sanitizeSettings>>} patch */
 export function updateSettings(patch) {
+  if(patch.officialFx==='full'&&!officialFxDownloaded()){window.dispatchEvent(new CustomEvent('sp-request-official-fx-download'));return;}
   const current = settingsStore.get();
   if (patch.chatSound !== undefined) patch = {...patch, chatSoundCustomized: true};
   if (typeof patch.damageNumbers === 'boolean' && patch.damageNumberMode === undefined) patch = {...patch,damageNumberMode:patch.damageNumbers?'sum':'none'};
@@ -56,6 +76,13 @@ export function updateSettings(patch) {
 
 /** Preact hook: current settings. */
 export const useSettings = () => useStore((s) => s, Object.is, settingsStore);
+
+/**
+ * The label of the key a rebindable shortcut has right now ('R', 'Space' …) — the HUD's key hints (shop bar, ready /
+ * pause, underframe). Read at render: the game screen re-renders when the settings dialog closes.
+ * @param {'buy'|'refresh'|'freeze'|'levelUp'|'retreat'|'sell'|'ready'} action
+ */
+export const hotkeyLabelOf = (action) => hotkeyLabel(settingsStore.get().keys?.[action]);
 
 function Slider({ label, micro, value, onInput, icon }) {
   const pct = Math.round(value * 100);
@@ -77,6 +104,76 @@ function Toggle({ label, micro, value, onChange, id }) {
 
 function Choice({label,value,options,onChange,testId}) {
   return html`<div class="set-row" data-i18n-skip><label class="set-row__label">${label}</label><select aria-label=${label} data-testid=${testId} value=${value} onChange=${e=>onChange(e.currentTarget.value)}>${options.map(([id,text])=>html`<option value=${id}>${text}</option>`)}</select></div>`;
+}
+
+/**
+ * 外观插件 (see the header): the server's cosmetic plugins of scope `personal`, each with its switch; nothing when there
+ * is none. The catalogue is fetched again when the section opens (a plugin dropped in meanwhile shows) — on a server that
+ * has plugins only (content.js installedCount: a server without any is never asked for it).
+ */
+function CosmeticSection() {
+  const cat = useStore((s) => s, Object.is, catalog);
+  const ids = useStore((s) => s.ids, Object.is, personal);
+  const installed = useStore(installedCount);
+  useEffect(() => { if (installed) loadCatalog({ force: true }); }, [installed]);
+  const list = installed ? cosmeticPlugins(cat.plugins, 'personal') : [];
+  if (!list.length) return null;
+  const set = personalSet(ids, list.filter((p) => typeof p.vs === 'string'));
+  const applied = new Set(set.order);
+  const auto = new Set(set.auto);
+  const flip = (id, on) => { const r = setPersonalPlugin(id, on); if ('error' in r) toast(describeError(r.error), 'warn'); };
+  return html`<section class="set-plugins" aria-labelledby="set-plugins-title" data-testid="personal-plugins">
+    <div class="set-keys__head">
+      <span class="set-row__label" id="set-plugins-title">${t('外观插件')}<${MicroLabel}>COSMETIC PLUGINS<//></span>
+    </div>
+    <p class="set-hint">${t('只改变你自己看到的画面和声音，不影响其他博士，也不影响战斗；插件为非官方制作。')}</p>
+    ${list.map((p) => {
+      // on: applied (chosen, or 「自动」: another one needs it) — or chosen but left out now (a conflict): switch it off
+      const skipped = set.skipped.includes(p.id);
+      const on = applied.has(p.id) || skipped;
+      const isAuto = auto.has(p.id);
+      return html`<div key=${p.id} class="set-row" data-plugin=${p.id}>
+        <span class="set-row__label">${pluginName(p)}${isAuto ? html` <span class="plugrow__badge">${t('自动')}</span>` : null}<${MicroLabel}>${pluginMicro(p)}<//>
+          ${skipped ? html`<span class="set-hint is-warn">${t('与其他已开启的插件冲突或缺少所需插件，没有生效')}</span>` : null}</span>
+        <button type="button" class=${`set-toggle${on ? ' is-on' : ''}`} role="switch" aria-checked=${on ? 'true' : 'false'} aria-label=${pluginName(p)}
+          disabled=${isAuto && !ids.includes(p.id)} onClick=${() => flip(p.id, !on)}><i></i><span>${on ? tc('toggle', '开启') : tc('toggle', '关闭')}</span></button>
+      </div>`;
+    })}
+  </section>`;
+}
+
+/**
+ * 界面插件 (DESIGN §32.8): each loaded ui plugin of scope `personal`, switched on in this browser only
+ * (`sp.pref.ui-plugins`). It cannot play the match and it does not change what anyone else sees.
+ */
+function UiPluginSection() {
+  const cat = useStore((s) => s, Object.is, catalog);
+  const ids = useStore((s) => s.ids, Object.is, uiPlugins);
+  const installed = useStore(installedCount);
+  useEffect(() => { if (installed) loadCatalog({ force: true }); }, [installed]);
+  const list = installed ? uiPluginEntries(cat.plugins) : [];
+  if (!installed || (cat.status !== 'ready' && !list.length && !ids.length)) return null;
+  if (!list.length && !ids.length) return null;
+  const onIds = new Set(ids);
+  const flip = (id, on) => {
+    const r = setUiPlugin(id, on);
+    if (!r.error) return;
+    toast(r.error === 'PLUGIN_LIMIT' ? t('最多同时开启 {n} 个界面插件', { n: UI_LIMITS.maxPlugins }) : describeError(r.error), 'warn');
+  };
+  return html`<section class="set-plugins" aria-labelledby="set-ui-plugins-title" data-testid="ui-plugins">
+    <div class="set-keys__head">
+      <span class="set-row__label" id="set-ui-plugins-title">${t('界面插件')}<${MicroLabel}>UI PLUGINS<//></span>
+    </div>
+    <p class="set-hint">${t('只改变这个浏览器里的界面，不能替你操作对局，也不影响其他博士；插件为非官方制作。')}</p>
+    ${!list.length ? html`<p class="set-hint">${t('本服务器没有可开启的界面插件')}</p>` : list.map((p) => {
+      const on = onIds.has(p.id);
+      return html`<div key=${p.id} class="set-row" data-plugin=${p.id}>
+        <span class="set-row__label">${pluginName(p)}<${MicroLabel}>${pluginMicro(p)}<//></span>
+        <button type="button" class=${`set-toggle${on ? ' is-on' : ''}`} role="switch" aria-checked=${on ? 'true' : 'false'} aria-label=${pluginName(p)}
+          onClick=${() => flip(p.id, !on)}><i></i><span>${on ? tc('toggle', '开启') : tc('toggle', '关闭')}</span></button>
+      </div>`;
+    })}
+  </section>`;
 }
 
 /**
@@ -113,7 +210,7 @@ export function SettingsModal({ open, onClose }) {
     actions=${html`<${RestartVoteControls} voteVisible=${false} onRequested=${onClose} label="리방 투표" /><${Button} variant="secondary" icon="book" class="set-guide" onClick=${() => openGuide(0)}>玩法说明<//>
       <${Button} variant="primary" icon="check" onClick=${onClose}>完成<//>`}>
     <nav class="set-categories" aria-label="설정 종류" data-i18n-skip>
-      ${[['graphics','그래픽'],['audio','소리'],['chat','채팅'],['controls','조작·단축키']].map(([id,label])=>html`<button type="button" class=${category===id?'is-on':''} aria-pressed=${category===id} onClick=${()=>setCategory(id)}>${label}</button>`)}
+      ${[['graphics','그래픽'],['audio','소리'],['chat','채팅'],['controls','조작·단축키'],['plugins','플러그인']].map(([id,label])=>html`<button type="button" class=${category===id?'is-on':''} aria-pressed=${category===id} onClick=${()=>setCategory(id)}>${label}</button>`)}
     </nav>
     <div class="set-list">
     <section hidden=${category!=='audio'} class="set-category" data-category="audio">
@@ -152,6 +249,10 @@ export function SettingsModal({ open, onClose }) {
       <${Choice} label="렌더링 해상도" value=${s.renderScale} options=${[[.5,'50%'],[.75,'75%'],[1,'100%'],[1.25,'125%'],[1.5,'150%'],[2,'200%']]} onChange=${v=>updateSettings({renderScale:Number(v)})} />
       <${Choice} label="최대 프레임" value=${s.frameLimit} options=${[[30,'30 FPS'],[60,'60 FPS'],[120,'120 FPS']]} onChange=${v=>updateSettings({frameLimit:Number(v)})} />
       <${Choice} label="애니메이션 품질" value=${s.animationQuality} options=${[['high','높음'],['medium','중간'],['low','낮음']]} onChange=${v=>updateSettings({animationQuality:v})} />
+      <${Choice} label="공식 전투 이펙트" value=${s.officialFx} options=${[['auto','자동'],['off','끄기'],['lite','간소'],['full','전체']]} onChange=${v=>updateSettings({officialFx:v})} />
+      <${Toggle} label="배치 시 카메라 확대" value=${s.deployCameraZoom} onChange=${v=>updateSettings({deployCameraZoom:v})} />
+      <${Toggle} label="전투 통계" value=${s.combatMetrics} onChange=${v=>updateSettings({combatMetrics:v})} />
+      <${Toggle} label="차지 캐스터 에너지" value=${s.mysticEnergy} onChange=${v=>updateSettings({mysticEnergy:v})} />
       <${Choice} label="이펙트 품질" value=${s.effectsQuality} options=${[['high','높음'],['medium','중간'],['low','낮음']]} onChange=${v=>updateSettings({effectsQuality:v})} />
       <${Toggle} label="그림자" value=${s.shadows} onChange=${v=>updateSettings({shadows:v})} />
       <${Toggle} label="스킬 범위 표시" value=${s.skillRanges} onChange=${v=>updateSettings({skillRanges:v})} />
@@ -172,12 +273,15 @@ export function SettingsModal({ open, onClose }) {
       <${Toggle} label="장비 칸 왼쪽 배치" micro="SHOP LAYOUT" value=${s.shopItemLeft} onChange=${v=>updateSettings({shopItemLeft:v})} />
       <p class="set-hint">단축키 버튼을 누른 뒤 사용할 키를 입력하세요. 중복된 키는 서로 교환됩니다. Esc로 취소할 수 있습니다.</p>
       ${HOTKEY_ACTIONS.map(action=>html`<div class="set-row" data-i18n-skip>
-        <span class="set-row__label">${({refresh:'상점 새로고침',freeze:'상점 동결',levelUp:'상점 레벨업',retreat:'선택한 오퍼레이터 퇴각',sell:'선택한 오퍼레이터 판매',ready:'준비 완료 / 일시정지',collapseShop:'상점 접기 / 펼치기',enemyPreview:'적 미리보기 / 전장으로 돌아가기'})[action]}</span>
+        <span class="set-row__label">${({refresh:'상점 새로고침',freeze:'상점 동결',levelUp:'상점 레벨업',buy:'마우스 위치 상품 구매',retreat:'마우스 위치 오퍼레이터 퇴각',sell:'마우스 위치 오퍼레이터 판매',ready:'준비 완료 / 일시정지',collapseShop:'상점 접기 / 펼치기',enemyPreview:'적 미리보기 / 전장으로 돌아가기'})[action]}</span>
         <button type="button" class="btn btn--secondary" data-hotkey-binding=${action} aria-label=${'단축키 변경: '+action} onClick=${()=>setBinding(action)}>
           ${binding===action?'키 입력 대기…':hotkeyLabel(s.keys[action])}</button>
       </div>`)}
       <${Button} variant="secondary" size="sm" onClick=${()=>{updateSettings({keys:DEFAULT_HOTKEYS});setBinding(null);}}>단축키 기본값 복원<//>
 
+    </section><section hidden=${category!=='plugins'} class="set-category" data-category="plugins">
+      <${CosmeticSection} /><${UiPluginSection} />
+      <p class="set-hint">설치된 외형·UI 플러그인은 이곳에서 개인별로 설정할 수 있습니다.</p>
     </section></div>
   <//>`;
 }
@@ -186,4 +290,9 @@ export function SettingsModal({ open, onClose }) {
 export function SettingsButton({class: cls = ''}) {
   const [open, setOpen] = useState(false);
   return html`<span class=${`settings-entry ${cls}`}><${Button} variant="secondary" size="sm" square=${true} data-testid="settings-btn" aria-label="设置" title="设置" onClick=${() => setOpen(true)}><${GIcon} name="gear" /><//><${SettingsModal} open=${open} onClose=${() => setOpen(false)} /></span>`;
+}
+
+if(typeof window!=='undefined'){
+ window.addEventListener('sp-resource-selection',e=>updateSettings({voiceLanguage:e.detail.voice,...(e.detail.effects==='simple'?{officialFx:'lite'}:{})}));
+ window.addEventListener('sp-official-fx-ready',()=>updateSettings({officialFx:'full'}));
 }

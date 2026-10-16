@@ -1,6 +1,6 @@
-import {ResourceRedownloadButton} from '../ui/resourceRedownload.js';
+import { ResourceRedownloadButton } from '../ui/resourceRedownload.js';
 import { PwaInstallButton } from '../ui/device.js';
-import { openStats } from './stats.js';
+import { openStats } from '../ui/statsEntry.js';
 
 import { t } from '../../../shared/i18n.js';
 // Lobby screen: pick 独立模拟 / 同盟模拟 and a difficulty (标准/险境/绝境/终极), create a room,
@@ -22,7 +22,7 @@ import { toast, toastError } from '../ui/toasts.js';
 import { GuideButton } from '../ui/guide.js';
 import { SettingsButton } from '../ui/settings.js';
 import { PatchNotesButton } from '../ui/patchNotes.js';
-import { LoadoutButton } from './loadout.js';
+import { LoadoutButton } from '../ui/loadoutEntry.js';
 import { net, identity } from '../net.js';
 import { store, useStore, shallowEqual, loadPref, savePref } from '../store.js';
 import { getConfig, getMode, getStage, useData } from '../data.js';

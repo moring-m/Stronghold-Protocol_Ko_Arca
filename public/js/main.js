@@ -1,6 +1,13 @@
 import './ui/compat.js';
-import { LaboratoryScreen } from './ui/laboratory.js';
-import { StatsHost } from './screens/stats.js';
+import { lazyComponent, loadScreenStyles } from './ui/lazyComponent.js';
+import { loadoutStore } from './ui/loadoutSync.js';
+import { statsStore } from './ui/statsEntry.js';
+import { favoritesStore } from './ui/favorites.js';
+import { recruitPresetStore } from './ui/recruitPresets.js';
+// Keep transport listeners eager: reconnecting directly into combat must never lose b.start.
+import './battle/runner.js';
+const StatsHost=lazyComponent(()=>Promise.all([import('./screens/stats.js'),loadScreenStyles(['/css/screens/stats.css','/css/screens/result.css'])]).then(([module])=>module),'StatsHost');
+const LaboratoryScreen=lazyComponent(()=>import('./ui/laboratory.js'),'LaboratoryScreen');
 import { recordResult, installStatsRecorder } from './ui/stats.js';
 
 
@@ -31,6 +38,12 @@ import { recordError, installTrafficMeter } from './diag.js';
 // kept in sync with the server by installLoadoutSync (room.loadout after every welcome and edit).
 // Game data: every text of the game is static data (/data/*.json) downloaded once per page; the in-match files are
 // warmed in the background as soon as the player is in a room (warmGameData), before the match needs them.
+// Language (ui/lang.js, docs/I18N.md): chosen before the first render (initLang); App re-renders on a switch (useLang).
+// Server texts are translated on arrival: m.toast / m.ticker frames (msgid + params, or the text as a msgid; a
+// config.broadcasts line from its id + args), error codes (ui/toasts.js describeError) and room.closed reasons.
+// Cosmetic plugins (DESIGN §32 P1a): installContent (content.js) lays the room's visual set and the player's personal
+// plugins over the art manifest every screen reads. Gameplay plugins (§32.6): installContentSet (content.js) downloads and
+// checks a room's content set and makes it the data every screen and the battle runner read.
 
 // Polyfills first (older Safari / Firefox ESR): every module evaluated after this one sees them.
 
@@ -48,16 +61,22 @@ import { data } from './data.js';
 import { GAME_FILES } from './ui/gameComponents.js';
 import { TitleScreen, sanitizeName } from './screens/title.js';
 import { LobbyScreen, rememberRoom, parseRoomParam } from './screens/lobby.js';
-import { RoomScreen } from './screens/room.js';
-import { GameScreen } from './screens/game.js';
+import { RoomScreen, TrustedNotice } from './screens/room.js';
+const GameScreen=lazyComponent(()=>Promise.all([import('./screens/game.js'),loadScreenStyles(['game','game-shop','game-panels','briefing','draft','result'].map(name=>'/css/screens/'+name+'.css'))]).then(([module])=>module),'GameScreen');
 import { audio, installAudio } from './audio.js';
 import { settingsStore } from './ui/settings.js';
 import { GuideHost } from './ui/guide.js';
 import { installDeviceSupport } from './ui/device.js';
-import { LoadoutHost } from './screens/loadout.js';
+const LoadoutHost=lazyComponent(()=>Promise.all([import('./screens/loadout.js'),loadScreenStyles(['/css/screens/loadout.css'])]).then(([module])=>module),'LoadoutHost');
 import { installLoadoutSync } from './ui/loadoutSync.js';
 import { CHAT_HISTORY_LIMIT } from '../../shared/chat.js';
 import { startBuildGuard } from './ui/buildGuard.js';
+import { registerImportedAssetWorker } from './assetCache.js';
+import { installRehearsal } from './battle/rehearsal.js';
+import { initLang, useLang, tickerText } from './ui/lang.js';
+import { N_, translateWire } from '../../shared/i18n.js';
+import { installContent, installContentSet } from './content.js';
+import { cosmetics } from './cosmetics.js';
 
 const RESTORE_GRACE_MS = 1500;
 const JOIN_DELAY_MS = 350;
@@ -90,6 +109,8 @@ let matchAt = 0;
 let restoreTimer = null;
 let joinTimer = null;
 let joinInFlight = false;
+/** The rehearsal installer (battle/rehearsal.js): its tasks follow the match on screen (see wireNet's store hook). */
+let rehearsal = null;
 
 function clearPendingJoin() {
   store.patch('ui', { pendingJoin: null });
@@ -146,6 +167,9 @@ function backToLobby() {
   store.patch('ui', { restoring: false });
 }
 
+/** The unofficial plugins a server counts in welcome / /healthz `content.plugins` (absent: none — DESIGN §32 P1a). */
+const pluginCount = (content) => (content && Number.isInteger(content.plugins) && content.plugins > 0 ? content.plugins : 0);
+
 function onWelcome(msg) {
   identity.saveToken(msg.token);
   identity.rememberMatch(null);
@@ -153,7 +177,13 @@ function onWelcome(msg) {
   const prevId = prev.me.playerId;
   const name = typeof msg.name === 'string' && msg.name ? msg.name : prev.me.name;
   identity.saveName(name);
-  store.set({ me: { playerId: msg.playerId ?? null, name, token: typeof msg.token === 'string' ? msg.token : null } });
+  store.set({
+    me: { playerId: msg.playerId ?? null, name, token: typeof msg.token === 'string' ? msg.token : null },
+    // the server's content identity (DESIGN §32): the diagnostics name it (diag.js contentLine)
+    content: msg.content && typeof msg.content.vanilla === 'string' ? { vanilla: msg.content.vanilla } : null,
+    // how many unofficial plugins it has (P1a — absent: none; content.js fetches the catalogue only when there are some)
+    installedPlugins: pluginCount(msg.content),
+  });
   welcomeAt = Date.now();
 
   if (prevId != null && prevId !== msg.playerId) {
@@ -242,7 +272,7 @@ function wireNet() {
     store.patch('match', { result: res });
     // 本机统计 (PR #323): every arrival, including the lobby's result replay after a reconnect / reload —
     // replays dedupe by content id inside recordResult (spectator seats' copies build no record at all)
-    recordResult(res, { laboratory:!!store.get().room?.laboratory, myId: store.get().me.playerId, roomMode: store.get().room?.mode ?? null, now: Date.now() });
+    recordResult(res, { laboratory:!!store.get().room?.laboratory, myId: store.get().me.playerId, roomMode: store.get().room?.mode ?? null, vs:store.get().room?.content?.vs??null, content:store.get().room?.content??null, now: Date.now() });
   });
   net.on('room.commended',msg=>{
     const result=store.get().match.result;
@@ -280,7 +310,10 @@ function wireNet() {
   store.subscribe((s, prev) => {
     if (s.session.entered && !prev.session.entered) schedulePendingJoin();
     // in a room (co-op or solo, also a resumed one) a match is near: its data starts downloading
-    if (s.room && !prev.room) warmGameData();
+    if (s.room && !prev.room) { warmGameData(); GameScreen.preload().catch(()=>{}); }
+    // the match on screen is over (left, closed, kicked, a new session): a rehearsal task of it is dead, and the frame
+    // that cancels it may never arrive (a disposed match sends nothing) — the page stops what it is running itself
+    if (selectRoute(prev) === 'game' && selectRoute(s) !== 'game') rehearsal?.clear();
   });
 }
 
@@ -292,7 +325,7 @@ function wireNet() {
  * data store shares each file's promise).
  */
 function warmGameData() {
-  const go = () => { data.loadAll(GAME_FILES).catch(() => {}); };
+  const go = async () => { if(store.get().room?.content?.vanilla === false)return; for(const name of GAME_FILES){await data.load(name).catch(()=>{});await new Promise(resolve=>setTimeout(resolve,0));} };
   if (typeof globalThis.requestIdleCallback === 'function') globalThis.requestIdleCallback(go, { timeout: 2500 });
   else setTimeout(go, 600);
 }
@@ -313,17 +346,22 @@ function ScreenCrashed({ error, reset }) {
 function App() {
   useStore(s=>s.ui.appearanceRevision);
   const route = useStore(selectRoute);
+  const loadoutOpen=useStore(s=>s.open,Object.is,loadoutStore);
+  const statsOpen=useStore(s=>s.open,Object.is,statsStore);
+  const favoritesOpen=useStore(s=>s.open,Object.is,favoritesStore);
+  const recruitPresetsOpen=useStore(s=>s.open,Object.is,recruitPresetStore);
   const [error, resetError] = useErrorBoundary((err) => console.error('[ui] screen crashed', err));
   const Screen = SCREENS[route] || LobbyScreen;
   return html`<div class="app-root">
     <div class="app-bg" aria-hidden="true"></div>
     ${error ? html`<${ScreenCrashed} error=${error} reset=${resetError} />` : html`<${Screen} key=${route} />`}
+    <${TrustedNotice} />
     <${ConnectionBanner} />
     <${ToastHost} />
     <${UiHosts} />
     <${GuideHost} />
-    <${LoadoutHost} />
-    <${StatsHost} />
+    ${loadoutOpen||favoritesOpen||recruitPresetsOpen?html`<${LoadoutHost} />`:null}
+    ${statsOpen?html`<${StatsHost} />`:null}
   </div>`;
 }
 
@@ -365,6 +403,8 @@ async function boot() {
   installTrafficMeter();
   // touch / hover / fullscreen classes, zoom-gesture blocking, rotation re-layout (ui/device.js, css/devices.css)
   installDeviceSupport();
+  // Hashed art a player imported. HTTPS or localhost only; a failure here must not stop boot.
+  void registerImportedAssetWorker();
   // A page restored from the back/forward cache has a dead socket and a stale token choice: start over.
   window.addEventListener('pageshow', (ev) => { if (ev.persisted) location.reload(); });
   // Pick this tab's reconnect token (asks other live tabs; ≤150 ms) while fonts load.
@@ -382,20 +422,32 @@ async function boot() {
   wireNet();
   installStatsRecorder(store); // follows the match on screen, so a 放弃模拟 can be recorded (ui/stats.js)
   installLoadoutSync({ net });
+  // the room's cosmetic plugins and the player's own over the art manifest (content.js; nothing is fetched without them)
+  installContent({ toast });
+  // a room with gameplay plugins: its content set downloaded, checked and shown (content.js — DESIGN §32.6)
+  installContentSet({ toast });
+  // A bot prep's layout rehearsal the server offers this host's browser (DESIGN §14, SP_BOT_REHEARSAL=host on the
+  // server): a same-origin module Worker simulates the candidates off the main thread and answers with its pick; a
+  // browser that cannot run one answers `error` and the server rehearses itself. Nothing happens while the server
+  // does not delegate. A gameplay-plugin room is never offered (the server keeps that rehearsal).
+  rehearsal = installRehearsal({ net });
   net.attachBrowserHooks();
   // Audio: unlock on first gesture, BGM follows the route / match phase (js/audio.js).
-  installAudio({ getOperator: id => data.lookup('chess',id), getManifest: () => data.get('assets'), subscribe: store.subscribe, getState: store.get, selectRoute, settings: settingsStore.get() });
-  data.load('assets').catch(() => {});
-  // Warm the data cache in the background (missing files are tolerated).
-  data.loadAll('config').catch(() => {});
-  // Optional local-client art manifest (emotes, tutorial pages, official UI sprites; DESIGN §13).
-  data.load('local').catch(() => {});
-
-  const connectWhenReady = identityReady.then(() => {
+  // a cosmetic plugin's sound that will not load falls back like its art (content.js, DESIGN §32 P1a)
+  installAudio({ getOperator:id=>data.lookup('chess',id), getManifest: () => data.get('assets'), subscribe: store.subscribe, getState: store.get, selectRoute, settings: settingsStore.get(),
+    onFailed: (url) => cosmetics.fail(url) });
+  // …and the music follows the art: the screen's track again when the cosmetic layers change its URLs
+  cosmetics.subscribe(() => audio.refreshBgm());
+  const connectWhenReady = identityReady.then(async () => {
+    await globalThis.__SP_TRANSPORT_READY__;
     if (entered) net.setName(savedName);
     else net.connect();
   });
-  await Promise.all([waitForFonts(1200), connectWhenReady]);
+  // Font fallback can render immediately; font downloads must not hold the splash open.
+  requestAnimationFrame(()=>requestAnimationFrame(()=>void waitForFonts(1200)));
+  // The screen can render before identity coordination/socket setup finishes.
+  // Connection state already disables online-only actions until welcome.
+  void connectWhenReady.catch(error=>{console.error('[boot] connection setup failed',error);recordError('boot-connect',error);toastError(error);});
   const root = document.getElementById('app');
   render(html`<${App} />`, root);
 
@@ -405,6 +457,20 @@ async function boot() {
     setTimeout(() => splash.remove(), 300);
   }
   globalThis.__SP__ = { store, net, data, version: 1 };
+  globalThis.performance?.mark?.('sp-ui-ready');
+  globalThis.__SP_UI_READY__=true;
+  window.dispatchEvent(new Event('sp-ui-ready'));
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    data.load('assets').then(() => {
+      const warm = () => { audio.warmBackground(); audio.warmEffects(); };
+      if (typeof requestIdleCallback === 'function') requestIdleCallback(warm, {timeout:2500});
+      else setTimeout(warm, 600);
+    }).catch(() => {});
+    data.loadAll('config').catch(() => {});
+  }));
+  // Optional local art follows the first UI paint too.
+  if(typeof requestIdleCallback==='function')requestIdleCallback(()=>data.load('local').catch(()=>{}),{timeout:2500});
+  else setTimeout(()=>data.load('local').catch(()=>{}),300);
   // A page keeps the modules it imported at load time for its whole lifetime, so a deploy cannot reach an open tab
   // (ui/buildGuard.js): watch `/healthz.build`. Outside a match the page reloads itself; during a match the guard says
   // so instead (the connection banner offers 刷新页面) and reloads once the match — settlement screen included — is over,
@@ -414,6 +480,8 @@ async function boot() {
       inMatch: () => selectRoute(store.get()) === 'game',
       onStale: ({ waiting, build }) => { if (waiting) store.patch('ui', { buildStale: true, buildStaleTarget: build }); },
       onCurrent: () => store.patch('ui', { buildStale: false, buildStaleTarget: null }),
+      // the same /healthz names how many plugins the server has: the title screen shows it before any hello
+      onHealth: (h) => { const n = pluginCount(h.content); if (n !== store.get().installedPlugins) store.set({ installedPlugins: n }); },
     });
   } catch (err) {
     console.warn('[app] build guard failed to start', err);

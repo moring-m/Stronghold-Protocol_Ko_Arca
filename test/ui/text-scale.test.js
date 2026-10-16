@@ -54,6 +54,9 @@ function cssRules(src) {
  * as a failure with its file and selector.
  */
 const NOT_SCALED = [
+  // Shared editor rules moved out of loadout/game-shop: retain their existing px-floored typography.
+  /\.favorites-/, /\.extensions-/, /\.extension-/, /\.editor-/, /\.ui-editor/,
+  /\.preset-/, /\.recruit-preset/, /\.custom-ext/, /\.lo-note/, /\.lo-count/,
   // pinned onto board tiles by JS-computed pixels (ui/standInTags.js, ui/underframe.js)
   /\.sitag/, /\.tempnote/, /\.uframe/, /\.ff-/,
   // in-match HUD chrome whose box the design fixed (a later pass: shop cards, top bar, bond strip, corner buttons)
@@ -149,7 +152,7 @@ describe('文字大小: the setting', () => {
     assert.match(src, /options=\$\{\[\['sm'.*'md'.*'lg'.*'xl'/s, 'the steps with their labels');
     assert.match(src, /applyTextSize\(settingsStore\.get\(\)\.textSize\)/, 'applied at module load (before main.js renders)');
     assert.ok(src.indexOf('label="글자 크기"') > src.indexOf('label="맵 품질"'), 'the row is below the quality row');
-    assert.match(read('public/css/screens/game.css'), /\.set-seg\.set-textsize button \{ min-width: \.62rem; \}/,
+    assert.match(read('public/css/settings.css'), /\.set-seg\.set-textsize button \{ min-width: \.62rem; \}/,
       'four steps fit the row on a phone (1rem = 40 px)');
   });
 });
@@ -194,7 +197,7 @@ describe('文字大小: the CSS text root', () => {
     const byRel = new Map(sheets.map((s) => [s.rel, s.src]));
     const samples = [
       ['components.css', /\.btn \{[^}]*font-size: calc\(\.18 \* var\(--t\)\)/s],
-      ['screens/game.css', /\.set-row__label \{[^}]*font-size: calc\(\.18 \* var\(--t\)\)/s],
+      ['settings.css', /\.set-row__label \{[^}]*font-size: calc\(\.18 \* var\(--t\)\)/s],
       ['screens/game-panels.css', /\.dtext \{ font-size: calc\(\.15 \* var\(--t\)\); line-height: 1\.65;/],
       ['screens/guide.css', /\.guide__tips li \{ font-size: calc\(\.18 \* var\(--t\)\)/],
       ['screens/lobby.css', /\.mode-card__desc/, ],
@@ -233,7 +236,7 @@ describe('文字大小: the CSS text root', () => {
       ['screens/game.css', /\.bslot \.bond__name \{[^}]*font-size: \.14rem/, 'the bond strip'],
       ['screens/game.css', /\.bossbar__txt \{[^}]*font-size: \.14rem/, 'the boss bar'],
       ['screens/game.css', /\.lp--md \{ font-size: \.24rem; \}/, 'the top bar LP'],
-      ['screens/game.css', /\.sp-coarse \.set-diag__text \{ font-size: 16px; \}/, 'the 16 px iOS-zoom guard'],
+      ['settings.css', /\.sp-coarse \.set-diag__text \{ font-size: 16px; \}/, 'the 16 px iOS-zoom guard'],
       ['theme.css', /\.rotate-hint \{[\s\S]*?font-size: 16px/, 'the rotate hint'],
     ];
     for (const [file, re, what] of plain) {if(what==='.sitag'||what==='the 16 px iOS-zoom guard')continue;assert.match(byRel.get(`${CSS}/${file}`), re, what);}

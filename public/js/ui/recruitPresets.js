@@ -1,15 +1,15 @@
-import {PresetFiles} from './presetFiles.js';
-import {html,Modal,Button} from './components.js';
-import {createStore,loadPref,savePref,useStore,store} from '../store.js';
-import {data} from '../data.js';
-import {useEffect,useState} from '../../vendor/hooks.module.js';
-import {loadoutStore,setEntries,flushPendingLoadout} from './loadoutSync.js';
-import {checkLoadout} from '../../../shared/protocol.js';
-import {CHAT_FACTIONS,chatFaction} from '../../../shared/chat.js';
-import {bindPresetFaction,normalizePresetFactions,canApplyRecruitPreset,replaceRecruitEntries} from './factionPresetModel.js';
-import {toast} from './toasts.js';
-import {Img} from './gameComponents.js';
-import {chessPortraitUrl,bondIconUrl} from './assetUrls.js';
+import { PresetFiles } from './presetFiles.js';
+import { html, Modal, Button } from './components.js';
+import { createStore, loadPref, savePref, useStore, store } from '../store.js';
+import { data } from '../data.js';
+import { useEffect, useState } from '../../vendor/hooks.module.js';
+import { loadoutStore, setEntries, flushPendingLoadout } from './loadoutSync.js';
+import { checkLoadout } from '../../../shared/protocol.js';
+import { CHAT_FACTIONS, chatFaction } from '../../../shared/chat.js';
+import { bindPresetFaction, normalizePresetFactions, canApplyRecruitPreset, replaceRecruitEntries } from './factionPresetModel.js';
+import { toast } from './toasts.js';
+import { Img } from './gameComponents.js';
+import { chessPortraitUrl, bondIconUrl } from './assetUrls.js';
 const KEY='recruitPresets';
 export function normalizeRecruitPresets(raw){
  const presets=normalizePresetFactions((Array.isArray(raw?.presets)?raw.presets:[]).filter(p=>typeof p?.id==='string').slice(0,30).map(p=>({id:p.id,name:String(p.name||'선발 프리셋').slice(0,40),faction:p.faction,entries:Object.fromEntries(Object.entries(p.entries||{}).filter(([id,e])=>typeof id==='string'&&e&&typeof e==='object'&&!Array.isArray(e)&&e.selected===true))})));

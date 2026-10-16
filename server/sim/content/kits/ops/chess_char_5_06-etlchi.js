@@ -2,9 +2,7 @@
 // Conventions of the tier-5 kits: ../shared/tier5.js; kit contract and rules: ../README.md.
 
 import { mitigate } from '../../../damage.js';
-import {
-  RING1, num, on, talent, talentRec, skillGrid, mods, dist, lazySkills, instantKind,
-} from '../shared/tier5.js';
+import { RING1, num, on, talent, talentRec, skillGrid, mods, dist, lazySkills, instantKind } from '../shared/tier5.js';
 
 /** 隐德来希 S3 "每次攻击对心烛至少造成35%攻击力的伤害". */
 const CANDLE_MIN_ATK = 0.35;
@@ -43,7 +41,7 @@ export default {
           onTick({ battle, unit, dt }) {
             const iv = Math.max(0.1, num(bb.interval, 0.5));
             unit.mem.sickleAcc += dt;
-            while (unit.mem.sickleAcc >= iv - 1e-9) {
+            while (unit.mem.sickleAcc >= iv - 1e-9) { // loop-cap: interval floored before the loop
               unit.mem.sickleAcc -= iv;
               for (const a of unit.mem.sickles || []) {
                 if (!a.alive || !a.deployed) continue;

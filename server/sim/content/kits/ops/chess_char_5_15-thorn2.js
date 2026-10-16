@@ -4,10 +4,7 @@
 import { COLS } from '../../../constants.js';
 import { sortEnemyTargets } from '../../../targeting.js';
 import { toLocal } from '../../../dir.js';
-import {
-  AURA_IV, AURA_DUR, RING1, num, on, talent, skillGrid, maxCharges, mods, dist, isOp, selectedId, lazySkills,
-  instantKind, whileOn, permBuff,
-} from '../shared/tier5.js';
+import { AURA_IV, AURA_DUR, RING1, num, on, talent, skillGrid, maxCharges, mods, dist, isOp, selectedId, lazySkills, instantKind, whileOn, permBuff } from '../shared/tier5.js';
 import { hypot } from '../../../detmath.js';
 
 /** Straight-road length through each tile (max of the horizontal and vertical runs of ground-passable tiles). */

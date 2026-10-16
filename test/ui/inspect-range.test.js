@@ -116,3 +116,13 @@ test('a scouted prep board (the server\'s m.field): the board operator draws its
   assert.equal(range(waiting), null, 'nor one in the 临时整备区 (area temp)');
   m.dispose();
 });
+
+test('spectator prep bench never gets a range even with a living snapshot and live attack-range stats',()=>{
+ const record=Object.values(chess).find(c=>!c.isGolden&&c.rangeGrid?.length);
+ for(const area of ['hand','temp']){
+  const unit={id:123,kind:'op',side:'ally',area,defId:record.chessId,x:4,y:7,dir:'RIGHT'};
+  const input={target:{kind:'unit',unit},detail:{type:'chess',chess:record,unitId:unit.id},showPrep:false,field:{prep:true},snapshot:[123,4,7,100,100],live:{alive:true,range:[[0,0],[0,1]]},getChess};
+  assert.equal(inspectRange(input),null,area);
+  assert.ok(inspectRange({...input,target:{kind:'unit',unit:{...unit,area:'board',y:10}},snapshot:[123,4,10,100,100]}),'deployed operator still has range');
+ }
+});

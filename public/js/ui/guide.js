@@ -118,7 +118,7 @@ function TipsFallback() {
 /** The viewer (mounted once near the root). */
 export function GuideHost() {
   const { open, page } = useStore((s) => s, Object.is, guideStore);
-  const ready = useData('local', 'assets', 'config');
+  const ready = useData(...(open?['local','assets','config']:[]));
   const pages = useMemo(() => (ready ? guidePages() : []), [ready]);
   const [loaded, setLoaded] = useState(() => new Set());
   const [failed, setFailed] = useState(() => new Set());

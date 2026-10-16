@@ -2,9 +2,7 @@
 // Conventions of the tier-5 kits: ../shared/tier5.js; kit contract and rules: ../README.md.
 
 import { COLS } from '../../../constants.js';
-import {
-  AURA_IV, AURA_DUR, RING1, num, on, talent, mods, dist, inFaction, isOp, selectedId, lazySkills, whileOn,
-} from '../shared/tier5.js';
+import { AURA_IV, AURA_DUR, RING1, num, on, talent, mods, dist, inFaction, isOp, selectedId, lazySkills, whileOn } from '../shared/tier5.js';
 
 const isSargonMinos = (u) => inFaction(u, 'sargonShip', ['sargon', 'minos']);
 
@@ -174,7 +172,7 @@ export default {
           if (c.prevented || a.side !== 'ally' || a === unit) return;
           const guard = a.findBuff('titi:allySleep');
           if (guard) { if (guard.data.src === unit) c.prevented = true; return; }
-          if (!isOp(a) || !unit.skill?.active || !on(unit) || !unit.rangeKeySet?.has(a.tileR * COLS + a.tileC)) return;
+          if (!isOp(a) || !unit.skill?.active || !on(unit) || !unit.rangeKeySet?.has(a.tileR * (battle.grid?.cols ?? COLS) + a.tileC)) return;
           c.prevented = true;
           const entered = !a.buffs.some((b) => (b.status ?? b.key) === 'sleep');
           battle.addBuff(a, {

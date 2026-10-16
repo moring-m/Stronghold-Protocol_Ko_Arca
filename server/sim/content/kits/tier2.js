@@ -17,11 +17,7 @@ import { hypot } from '../../detmath.js';
 import { COLS, ELEMENT_GAUGE_MAX } from '../../constants.js';
 import { canTargetEnemy } from '../../targeting.js';
 import { bodyInKeys } from '../../body.js';
-import {
-  num, talentBb, moduleBb, traitBb, up, cheb, byEnemyAttack, onHitBy, onHitOn, onDamagedOn, enemiesInGrid,
-  alliesInGridOf, enemyInRange, statBuff, toggleBuff, installAura, spTimeBonus, freeTileAround, instantKind,
-  tinmanKit, batMod,
-} from './tier1.js';
+import { num, talentBb, moduleBb, traitBb, up, cheb, byEnemyAttack, onHitBy, onHitOn, onDamagedOn, enemiesInGrid, alliesInGridOf, enemyInRange, statBuff, toggleBuff, installAura, spTimeBonus, freeTileAround, instantKind, tinmanKit, batMod } from './tier1.js';
 import { releaseSkillSummon } from '../tokens.js';
 
 /** Largest element gauge of a unit (every element — 侵蚀 included: the bosses' attacks fill it on operators). */

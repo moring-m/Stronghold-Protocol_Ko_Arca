@@ -74,6 +74,10 @@ export function makeMatch(o = {}) {
     // simulation work of full-match suites; test/match/bot.test.js covers it
     botRehearsal: o.botRehearsal ?? 0,
     botSliceMs: o.botSliceMs,
+    hostId: o.hostId,
+    botRehearsalDelegate: o.botRehearsalDelegate,
+    botRehearsalDelegateMs: o.botRehearsalDelegateMs,
+    cs: o.cs, vs: o.vs, requireCs: o.requireCs,
     clientCombat: o.clientCombat ?? false,
     verify: o.verify ?? 'off',
     headlessSliceMs: o.headlessSliceMs,
@@ -161,7 +165,7 @@ function legacyInvariants(m) {
     assert.ok(Number.isInteger(ps.funds) && ps.funds >= 0, `${ps.playerId} funds ${ps.funds}`);
     assert.ok(Number.isInteger(ps.pendingFunds) && ps.pendingFunds >= 0, `${ps.playerId} pending ${ps.pendingFunds}`);
     assert.equal(ps.hand.length, GEO.HAND_SIZE);
-    assert.equal(ps.temp.length, GEO.TEMP_SIZE);
+    assert.ok(ps.temp.length >= GEO.TEMP_SIZE, 'temp retains five visible slots and may have queued overflow');
     assert.ok(ps.shop.level >= 1 && ps.shop.level <= m.gd.maxShopLevel);
     assert.ok(ps.shop.upgradePrice >= 0);
     assert.ok(ps.shop.freeRefreshes >= 0);

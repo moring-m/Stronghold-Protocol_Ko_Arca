@@ -4,10 +4,7 @@
 import { COLS } from '../../../constants.js';
 import { bodyKeys } from '../../../body.js';
 import { toLocal } from '../../../dir.js';
-import {
-  AURA_IV, AURA_DUR, num, on, talent, talentRec, skillGrid, mods, inFaction, isOp, selectedId, lazySkills, instantKind,
-  skillRange, whileOn, enemiesInGrid,
-} from '../shared/tier5.js';
+import { AURA_IV, AURA_DUR, num, on, talent, talentRec, skillGrid, mods, inFaction, isOp, selectedId, lazySkills, instantKind, skillRange, whileOn, enemiesInGrid } from '../shared/tier5.js';
 
 const isKjerag = (u) => inFaction(u, 'kjeragShip', ['kjerag']);
 
@@ -104,7 +101,7 @@ export default {
           onTick({ battle, unit, dt }) {
             const iv = Math.max(0.1, num(bb['svash2_s_3[cost].interval'], 2));
             unit.mem.svashDpAcc += dt;
-            while (unit.mem.svashDpAcc >= iv - 1e-9) { unit.mem.svashDpAcc -= iv; battle.addDp(unit.ownerId, num(bb['svash2_s_3[cost].cost'], 1)); }
+            while (unit.mem.svashDpAcc >= iv - 1e-9) { unit.mem.svashDpAcc -= iv; battle.addDp(unit.ownerId, num(bb['svash2_s_3[cost].cost'], 1)); } // loop-cap: interval floored before the loop
             unit.mem.svashReveal += dt;
             if (unit.mem.svashReveal < AURA_IV - 1e-9) return;
             unit.mem.svashReveal = 0;
@@ -165,7 +162,7 @@ export default {
             const main = c.targets[0];
             const lat = (r, cc) => toLocal(r - unit.tileR, cc - unit.tileC, unit.dir)[0];
             const l0 = lat(Math.round(main.y), Math.round(main.x));
-            const onLine = (e) => bodyKeys(e).some((k) => lat(Math.floor(k / COLS), k % COLS) === l0);
+            const onLine = (e) => bodyKeys(e).some((k) => lat(Math.floor(k / (battle.grid?.cols ?? COLS)), k % (battle.grid?.cols ?? COLS)) === l0);
             const line = battle.enemiesInKeys(unit.rangeKeys, unit, unit.profile).filter((e) => e !== main && onLine(e));
             if (line.length) c.targets = [main, ...line];
           }, { owner: unit, priority: 10 });

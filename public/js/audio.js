@@ -1,10 +1,13 @@
+import {resourceFileSelected,readResourceSelection} from '../../shared/resourceSelection.js';
+import {reportResourceProgress} from './resourceProgress.js';
 // Audio manager (Web Audio): BGM per phase, UI SFX, per-unit battle SFX, operator battle voice. Never throws.
 //
 // Sources: data/assets.json → audio (docs/ASSETS.md):
 //   bgm { lobby, prep, combat, combatAlts?: [ {intro?, loop}, … ], boss: { intro?, loop } },
 //   bossBgm { [bossId]: { intro?, loop } },
 //   voice { [charId]: { start, faceEnemy, select, place, skill1…skill4, squad, squadFirst, result*, gacha } },
-//   voiceJp { [charId]: { …the same slots } } (the Japanese dub, settings 语音语言 日本語; see voiceLine),
+//   voiceJp / voiceEn / voiceKr / voiceNative { [charId]: { …the same slots } } (日本語 / English / 한국어 / the
+//   operator's own-language dub; settings 语音语言 and the per-operator override; see voiceLine / VOICE_TREES),
 //   sfx.ui { click, buy, sell, refresh, freeze, levelup, merge, equip, ready, timer, yourTurn, … },
 //   sfx.battle { deploy, tokenDeploy, charDie, tokenDie?, enemyDie, enemyHit, heal, killCoin, … },
 //   sfx.units { [charId|tokenId|enemyId]: { attack?, hit?, skill?, die?, born?, mix?: { [role]: { p?, vol? } } } }.
@@ -13,7 +16,25 @@
 //   never block or warn; everything requested before that is remembered (BGM) or dropped (SFX).
 // - Channels: master → { bgm, sfx, voice } gains; volumes from settings (0..1) + mute. Tab hidden ⇒ suspend.
 // - BGM: `intro` then `loop` (1 s crossfade); switching tracks fades out/in (0.8 s). The same loop URL
-//   keeps playing through repeated updates; rest selects its own track.
+//   keeps playing across phases (prep and combat share a track). While the music is silent — muted, or the BGM volume
+//   at 0 — no track is downloaded (≈ 14 MB a match): the wanted one is remembered, another one playing stops, and the
+//   track the screen wants then starts once the music is audible again (`setVolumes`; host bandwidth, layer 0).
+// - 开战 BGM: `bgm.combatAlts` are the mode's own battle tracks (塞壬唱片 骑士之日 / 无畏者). The track is fixed per
+//   round, not drawn: 无畏者 through rounds 1–7 and 骑士之日 from round 8 on (`combatTrackFor`, the official
+//   schedule), so every client of a match hears the same one, a fight never switches track halfway through and the
+//   联防 that follows a 作战 keeps its round's track.
+// - 干员战斗语音 (`audio.voice`, user request): an operator says the official line of the moment it is in —
+//   行动出发 start, 行动开始 faceEnemy, 部署 place, 作战中1-4 skillN and the settlement's 结算 result* (battle-only),
+//   and 选中干员 select whenever the player taps an operator — in the prep, the shop and the hand too (the owner's
+//   request of 2026-10-08 「添加一下干员点击上去的语气一样的语音」, which lifts 2026-10-03's 「整备阶段不需要干员语音」 for
+//   this line only). Voices are seconds long and a battle deploys eight
+//   operators, then fires dozens of skills, so they run on their own channel (own gain, settings 干员语音) through
+//   VoiceGate: one line at a time, a global gap, a per-unit per-slot cooldown, and a higher-priority line taking the
+//   channel over — the official scheduling of `audio_data.json battleVoice.voiceTypeOptions` (a tap's 选中 line skips
+//   the gap: VOICE_TAP_SLOTS). Dubs: 中文 `audio.voice` (default), 日本語 `audio.voiceJp`, English `audio.voiceEn`,
+//   한국어 `audio.voiceKr` and the operator's own-language dub `audio.voiceNative` (settings 语音语言, the 本土语言
+//   switch and the per-operator override; not tied to the interface language). A line the chosen tree or the host
+//   lacks falls back to the Chinese file of the same name (voiceLine).
 // - Battle SFX from `b.ev` tuples (`handleBattleEvents`): at most MAX_VOICES concurrent unit sounds, at most
 //   MAX_PER_URL overlapping copies of one sound (the official banks' maxSoundAllowed 2), a per-unit cooldown and a
 //   per-URL minimum gap (SfxLimiter), so a 60-unit fight stays listenable. A `['skill', id, 1]` that arrives before its
@@ -49,12 +70,18 @@
 //   board, a purchase, a move onto or across the board) makes its battle deploy sound once (`deployCue`): the same file
 //   and gain through the SFX channel's volume and mute, in its own voices (LAND_VOICES) instead of the battle limiter —
 //   a full pool hands the oldest landing's voice to the newest, so every piece of the chain is heard.
-// - Buffers are fetched once and cached (LRU); failed fetch/decode ⇒ silent (logged once as a warning).
+// - Buffers are fetched once and cached (LRU); failed fetch/decode ⇒ silent (logged once as a warning). A cosmetic
+//   plugin's sound that fails (DESIGN §32 P1a) is reported (`onFailed`, main.js: the cosmetic layers — its entry falls
+//   back to the art beneath it) and the entry the manifest names then plays instead, once: the BGM track, the voice line
+//   of the same slot, the same UI / battle / unit sound, the bond cue (`fellBack`). When the manifest changes under the music (a room's
+//   set arriving, a personal plugin switched — main.js), the screen's track plays again if its URLs changed
+//   (`refreshBgm`; the same loop keeps playing).
 //
 // `bgmKeyFor(route, pub)` picks the track for the current screen/phase (main.js calls `audio.install()`,
 // which follows the store).
 
-import { sanitizeVoiceOverrides, voiceLangFor } from './voicePrefs.js';
+import { sanitizeVoiceOverrides, voiceLangFor, VOICE_LANGS, VOICE_TREES, VOICE_PICKS } from './voicePrefs.js';
+export { VOICE_TREES } from './voicePrefs.js';
 import { PHASE } from '../../shared/constants.js';
 import { mediaUrl } from './media.js';
 import { chatNotificationSound, defaultChatCooldown } from './chatNotificationSounds.js';
@@ -296,7 +323,7 @@ export function voiceLine(audio, charId, slot, lang = 'kr', random = Math.random
   const draw = list => list.length ? list[Math.min(list.length - 1, Math.floor(random() * list.length))] : null;
   const base = audio?.voice || {};
   const jp = lines((base.jp || audio?.voiceJp)?.[charId]?.[slot]);
-  const selected = draw(lang === 'jp' ? jp : lines(base.kr?.[charId]?.[slot]));
+  const selected = draw(lang === 'jp' ? jp : lines((base.kr || audio?.voiceKr)?.[charId]?.[slot]));
   if (selected) {
     const file = u => u.slice(u.lastIndexOf('/') + 1);
     const fallback = lang === 'jp' ? null : jp.find(u => file(u) === file(selected)) ?? draw(jp);
@@ -518,10 +545,14 @@ function isAudioResponse(res) {
 }
 export class AudioManager {
   /**
-   * @param {{ getManifest?: () => any, win?: any }} [opts]
+   * @param {{ getManifest?: () => any, win?: any, onFailed?: (url: string) => boolean }} [opts]
+   *   onFailed: a sound did not load — whether that made the manifest fall back (a cosmetic plugin's file: see the header)
    */
   constructor(opts = {}) {
     this.getManifest = typeof opts.getManifest === 'function' ? opts.getManifest : () => null;
+    this.onFailed = typeof opts.onFailed === 'function' ? opts.onFailed : null;
+    /** sounds whose failure made the manifest fall back (a cosmetic plugin's file): a caller picks its entry again */
+    this.fellBack = new Set();
     this.random = typeof opts.random === 'function' ? opts.random : Math.random;   // a unit sound's chance (mix.p)
     this.win = opts.win ?? (typeof window !== 'undefined' ? window : null);
     this.ctx = null;
@@ -556,11 +587,13 @@ export class AudioManager {
     this.bondCueToken = 0;
     this.bondCueScope = null;
     this.voiceOverrides = {};
-    this.voiceLang = 'cn';    // settings 语音语言: 'cn' (audio.voice) | 'jp' (audio.voiceJp, falling back to audio.voice)
-    this.startVoiceDone = false; // One randomly selected deployed operator per field.
+    this.voiceLang = 'cn';    // settings 语音语言: cn | jp | en | kr (VOICE_TREES; a missing line falls back to audio.voice)
+    this.voiceNative = false; // settings 本土语言: an operator with an own-language dub speaks it unless their own pick wins
+    this.startVoiceDone = false; // 行动出发 of this field (the first operator deployed says it)
     this.uiVoices = 0;
     this.desiredBgm = null;
     this.wantBgm = null;      // desired key (kept while locked)
+    this.lastBgmKey = null;   // the key the screen asked for last (refreshBgm)
     this.bgm = null;          // { key, loopUrl, nodes: [{src, gain}], gain }
     this.bgmToken = 0;
     this.pendingBgm = null;
@@ -645,6 +678,7 @@ export class AudioManager {
         if (p && typeof p.then === 'function') p.then(() => { if (this.ctx?.state === 'running') this._dropUnlock(); }, () => {});
       }
       this.warmVoices([]);
+      if (this.effectsWarmRequested) this.warmEffects();
       this.warmChatNotification();
       if (this.wantBgm) { const k = this.wantBgm; this.wantBgm = null; this.playBgm(k); }
     } catch (err) {
@@ -734,13 +768,30 @@ export class AudioManager {
   get bgmSilent() { return this.volumes.muted || this.volumes.bgm <= 0; }
 
   /**
-   * The voice dub (settings 语音语言): 'jp' plays `audio.voiceJp`, anything else `audio.voice` (中文, the default). The
-   * line on air finishes in its own dub; the next one follows the setting.
+   * The voice dub (settings 语音语言): a VOICE_LANGS value plays that tree (voiceLine), anything else `audio.voice`
+   * (中文, the default). The line on air finishes in its own dub; the next one follows the setting. A per-operator
+   * override (the second argument, settings.voiceOverrides) wins when this server has that tree (voiceLangFor).
+   * Changing the global language does not clear those overrides.
    * @param {string} lang
+   * @param {Record<string, string>} [overrides]
    */
   setVoiceLang(lang, overrides = this.voiceOverrides) {
     this.voiceLang = ['kr','jp'].includes(lang)?lang:'kr';
     this.voiceOverrides = sanitizeVoiceOverrides(overrides);
+  }
+
+  /**
+   * The settings' 本土语言 switch: an operator with an own-language dub (`audio.voiceNative`) speaks it instead of
+   * the global dub; the operator's own pick still wins (voiceLangFor).
+   * @param {boolean} on
+   */
+  setVoiceNative(on) {
+    this.voiceNative = on === true;
+  }
+
+  /** The dub `charId` speaks now (voiceLangFor), given the manifest this manager reads. */
+  _voiceLangOf(charId) {
+    return voiceLangFor(charId, this.voiceLang, this.voiceOverrides, { native: this.voiceNative, audio: this.getManifest()?.audio });
   }
 
   _applyVolumes() {
@@ -757,6 +808,12 @@ export class AudioManager {
     } catch { /* ignore */ }
   }
 
+  /** A sound did not load: tell `onFailed` (a cosmetic plugin's file falls back) and remember that it did. */
+  _failed(url) {
+    try { if (this.onFailed?.(url)) { this.fellBack.add(url); return true; } } catch { /* ignore */ }
+    return false;
+  }
+
   /** Fetch + decode (cached, LRU). Resolves null on failure. */
   _buffer(url) {
     if (!this.ctx || typeof url !== 'string' || !url) return Promise.resolve(null);
@@ -771,15 +828,16 @@ export class AudioManager {
         // Extension-less URL first so download managers leave the BGM alone; a host without /media/ still works.
         const media = mediaUrl(url);
         const voiceFile = /\/voice\//.test(url),chatFile=url.startsWith('/audio/chat-notification/');
-        const cache = (voiceFile||chatFile) && globalThis.caches ? await globalThis.caches.open(chatFile?'stronghold-chat-notifications-v1':'stronghold-operator-voices-v1').catch(()=>null) : null;
-        let res = await cache?.match(url) || await fetch(media,{signal:globalThis.AbortSignal?.timeout?.(this.bufferTimeoutMs)});
+        const cache = globalThis.caches ? await globalThis.caches.open(chatFile?'stronghold-chat-notifications-v1':voiceFile?'stronghold-operator-voices-v1':'stronghold-audio-v1').catch(()=>null) : null;
+        const saved = await cache?.match(url);
+        let res = saved || await fetch(media,{signal:globalThis.AbortSignal?.timeout?.(this.bufferTimeoutMs)});
         if (media !== url && !isAudioResponse(res)) {
           // Drop the unusable response (404, or a 200 that is really index.html) before trying the original URL.
           try { await res.body?.cancel?.(); } catch { /* the fallback request matters more than draining this one */ }
           res = await fetch(url,{signal:globalThis.AbortSignal?.timeout?.(this.bufferTimeoutMs)});
         }
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        if (cache && res.ok) await cache.put(url,res.clone()).catch(()=>{});
+        if (cache && res.ok && res !== saved) await cache.put(url,res.clone()).catch(()=>{});
         const ab = await res.arrayBuffer();
         const decoded = await new Promise((resolve) => {
           const timeout=setTimeout(()=>finish(null),this.bufferTimeoutMs);
@@ -790,9 +848,11 @@ export class AudioManager {
           } catch { finish(null); }
         });
         if(!decoded)await cache?.delete(url).catch(()=>{});
+        if(!decoded)this._failed(url);
         return decoded;
       } catch (err) {
         this._warn(url, err);
+        this._failed(url);
         return null;
       }
     })();
@@ -832,21 +892,76 @@ export class AudioManager {
     for (const u of Array.isArray(urls) ? urls : []) this._buffer(u);
   }
 
+  /** Compressed effects warm after the menu paints; never decode the whole bank into RAM. */
+  warmBackground() {
+    const bank = this.getManifest()?.audio;
+    if (!bank || !globalThis.caches || this.effectBank === bank) return;
+    this.effectBank = bank;
+    const collect = value => typeof value === 'string' ? [value] : value && typeof value === 'object' ? Object.values(value).flatMap(collect) : [];
+    const urls = [...new Set([...collect(bank.bgm), ...collect(bank.bossBgm), ...collect(bank.sfx)].filter(url => /(?:\.(?:mp3|ogg|wav)(?:\?|$)|^\/media\/)/i.test(url)))];
+    const run = async () => {
+      const cache = await globalThis.caches.open('stronghold-audio-v1');
+      let done=0;reportResourceProgress('audio',done,urls.length);
+      for (const url of urls) {
+        try {
+          if (!await cache.match(url)) {
+            let response = await fetch(mediaUrl(url), {signal: globalThis.AbortSignal?.timeout?.(this.bufferTimeoutMs)});
+            if (!isAudioResponse(response)) {
+              await response.body?.cancel?.();
+              response = await fetch(url, {signal: globalThis.AbortSignal?.timeout?.(this.bufferTimeoutMs)});
+            }
+            if (response.ok && isAudioResponse(response)) await cache.put(url, response);
+          }
+        } catch { /* playback retries missing files */ }
+        reportResourceProgress('audio',++done,urls.length);
+      }
+    };
+    this.backgroundWarm = run().catch(() => {}).finally(()=>reportResourceProgress('audio',0,0,false));
+    return this.backgroundWarm;
+  }
+
+  /** Decode only the current roster ahead of its first attack, with bounded concurrency. */
+  warmEffects(charIds = []) {
+    this.effectsWarmRequested = true;
+    this.effectIds ||= new Set();
+    for (const id of charIds) if (id) this.effectIds.add(id);
+    if (!this.ctx || this.volumes.muted || this.volumes.sfx <= 0) return;
+    const bank = this.getManifest()?.audio?.sfx;
+    if (!bank) return;
+    const collect = value => typeof value === 'string' ? [value] : value && typeof value === 'object' ? Object.values(value).flatMap(collect) : [];
+    this.effectQueue ||= [];
+    this.effectSeen ||= new Set();
+    const urls = [...collect(bank.battle), ...[...this.effectIds].flatMap(id => collect(bank.units?.[id]))];
+    for (const url of urls) if (/\.(?:mp3|ogg|wav)(?:\?|$)/i.test(url) && !this.effectSeen.has(url)) {
+      this.effectSeen.add(url); this.effectQueue.push(url);
+    }
+    const pump = () => {
+      while ((this.effectActive || 0) < 2 && this.effectQueue.length) {
+        const url = this.effectQueue.shift();
+        this.effectActive = (this.effectActive || 0) + 1;
+        this._buffer(url).finally(() => { this.effectActive--; pump(); });
+      }
+    };
+    pump();
+  }
+
   /** Cache compressed voice files in the background, without keeping the whole voice bank in RAM. */
   cacheVoiceBank(bank) {
     if (!globalThis.caches || !bank || this.cachedVoiceBank === bank) return;
     this.cachedVoiceBank=bank;
-    const urls=[...new Set(Object.values(bank).flatMap(slots=>Object.values(slots||{}).flat()).filter(u=>typeof u==='string'))];
+    const urls=[...new Set(Object.values(bank).flatMap(slots=>Object.values(slots||{}).flat()).filter(u=>typeof u==='string'&&resourceFileSelected(u,readResourceSelection())))];
     const run=async()=>{
       const cache=await globalThis.caches.open('stronghold-operator-voices-v1');
+      const total=urls.length;let done=0;reportResourceProgress('voices',done,total);
       const worker=async()=>{while(urls.length){const url=urls.shift();try{
-        if(await cache.match(url))continue;
+        if(await cache.match(url)){reportResourceProgress('voices',++done,total);continue;}
         const response=await fetch(url);
         if(response.ok)await cache.put(url,response);
-      }catch{/* a failed file is retried by the normal playback path */}}};
+      }catch{/* a failed file is retried by the normal playback path */}
+        reportResourceProgress('voices',++done,total);}};
       await Promise.all([worker(),worker()]);
     };
-    run().catch(()=>{});
+    run().catch(()=>{}).finally(()=>reportResourceProgress('voices',0,0,false));
   }
 
   /** Prepare likely lines before their click/cast, bounded to two simultaneous downloads. */
@@ -885,6 +1000,7 @@ export class AudioManager {
   playBgm(key) {
     this.desiredBgm=key;
     try {
+      this.lastBgmKey = key;
       if (!this.ctx) { this.wantBgm = key; return; }
       if (this.bgmSilent) {
         this.wantBgm = key;
@@ -908,9 +1024,23 @@ export class AudioManager {
     } catch (err) { this._warn('bgm', err); }
   }
 
+  /**
+   * The manifest changed under the music (a cosmetic plugin switched on or off, a room's set arriving, a file that fell
+   * back — main.js): the screen's track again — playBgm keeps the same loop playing and starts another one.
+   */
+  refreshBgm() {
+    if (this.lastBgmKey != null) this.playBgm(this.lastBgmKey);
+  }
+
   async _startBgm(key, track, token) {
     const [intro, loop] = await Promise.all([track.intro ? this._buffer(track.intro) : null, this._buffer(track.loop)]);
-    if (token !== this.bgmToken || !this.ctx || !loop) return;
+    if (token !== this.bgmToken || !this.ctx) return;
+    // a cosmetic plugin's track that would not load: the track the manifest names now (its entry fell back)
+    if ((!loop && this.fellBack.has(track.loop)) || (track.intro && !intro && this.fellBack.has(track.intro))) {
+      const again = resolveBgm(this.getManifest(), key);
+      if (again && (again.loop !== track.loop || again.intro !== track.intro)) { this._startBgm(key, again, token); return; }
+    }
+    if (!loop) return;
     try {
       this._fadeOutBgm();
       const ctx = this.ctx;
@@ -1033,13 +1163,23 @@ export class AudioManager {
     cur.end();
   }
 
-  _playBondCue(url, volume, scope = 'prep') {
+  /**
+   * @param {string} url @param {number} volume @param {string} [scope]
+   * @param {(() => unknown) | null} [again] the cue's URL picked from the manifest again — played instead once when this
+   *   one was a cosmetic plugin's file that would not load (its entry fell back: see the header), like _play's
+   */
+  _playBondCue(url, volume, scope = 'prep', again = null) {
     this.stopBondCue();
     const token = this.bondCueToken, ctx = this.ctx;
     if (!ctx || !url || this.volumes.muted || this.volumes.sfx <= 0) return;
     this.bondCueScope = scope;
     this.bondCueAt = typeof performance !== 'undefined' ? performance.now() : 0;
     this._buffer(url).then((buf) => {
+      if (!buf && again && this.fellBack.has(url) && token === this.bondCueToken && ctx === this.ctx) {
+        const next = again();
+        if (typeof next === 'string' && next !== url) this._playBondCue(next, volume, scope);
+        return;
+      }
       if (!buf || token !== this.bondCueToken || ctx !== this.ctx || this.volumes.muted || this.volumes.sfx <= 0) return;
       let src, gain;
       const end = () => {
@@ -1063,7 +1203,13 @@ export class AudioManager {
     if (typeof bondId === 'string' && bondId && Number.isFinite(add) && add > 0) this.sfx('bondUp', { volume: 0.7, scope });
   }
 
-  _play(url, { volume = 1, rate = 1, limited = false, unitKey = null, maxDuration = null } = {}) {
+  /**
+   * @param {string} url
+   * @param {{ volume?: number, rate?: number, limited?: boolean, unitKey?: string | null, again?: (() => unknown) | null }} [o]
+   *   again: the sound's URL picked from the manifest again — played instead once when this one was a cosmetic plugin's
+   *   file that would not load (its entry fell back: see the header)
+   */
+  _play(url, { volume = 1, rate = 1, limited = false, unitKey = null, again = null, maxDuration = null } = {}) {
     if (!this.ctx || !url || this.volumes.muted || this.volumes.sfx <= 0) return;
     const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
     if (limited) { if (!this.limiter.tryAcquire(now, unitKey, url)) return; }
@@ -1072,6 +1218,12 @@ export class AudioManager {
     const deadline = Number.isFinite(maxDuration) ? this.ctx.currentTime + Math.max(0,maxDuration) : null;
     const release = () => { if (limited) this.limiter.release(url); else this.uiVoices = Math.max(0, this.uiVoices - 1); };
     this._buffer(url).then((buf) => {
+      if (!buf && again && this.fellBack.has(url)) {
+        release();
+        const next = again();
+        if (typeof next === 'string' && next !== url) this._play(next, { volume, rate, limited, unitKey });
+        return;
+      }
       if (!buf || !this.ctx || (deadline !== null && this.ctx.currentTime >= deadline)) { release(); return; }
       try {
         const s = this.ctx.createBufferSource();
@@ -1101,10 +1253,11 @@ export class AudioManager {
 
   sfx(name, o = {}) {
     try {
-      const url = this.getManifest()?.audio?.sfx?.ui?.[name];
+      const pick = () => this.getManifest()?.audio?.sfx?.ui?.[name];
+      const url = pick();
       if (typeof url === 'string') {
-        if (name === 'bondUp') this._playBondCue(url, o.volume ?? 0.9, o.scope);
-        else this._play(url, { volume: o.volume ?? 0.9 });
+        if (name === 'bondUp') this._playBondCue(url, o.volume ?? 0.9, o.scope, pick);
+        else this._play(url, { volume: o.volume ?? 0.9, again: pick });
       }
     } catch { /* ignore */ }
   }
@@ -1112,8 +1265,9 @@ export class AudioManager {
   /** Battle sound by name (sfx.battle keys), limited like unit sounds. */
   battle(name, o = {}) {
     try {
-      const url = this.getManifest()?.audio?.sfx?.battle?.[name];
-      if (typeof url === 'string') this._play(url, { volume: o.volume ?? 0.7, limited: true, unitKey: o.unitKey ?? `b:${name}`, maxDuration:o.maxDuration });
+      const pick = () => this.getManifest()?.audio?.sfx?.battle?.[name];
+      const url = pick();
+      if (typeof url === 'string') this._play(url, { volume: o.volume ?? 0.7, limited: true, unitKey: o.unitKey ?? `b:${name}`, again: pick, maxDuration:o.maxDuration });
     } catch { /* ignore */ }
   }
 
@@ -1128,6 +1282,7 @@ export class AudioManager {
    */
   unit(defId, kind, unitId, skillIndex, skillActive = false) {
     try {
+      const pick=()=>{
       const u = this.getManifest()?.audio?.sfx?.units?.[defId];
       // DESIGN §16: the equipped skill's own ON_SKILL_START sound (`skills[index]`) when the manifest has it
       const combat = (kind === 'attack' || kind === 'hit') && skillActive && Number.isInteger(skillIndex) ? u?.skillCombat?.[skillIndex] : null;
@@ -1135,13 +1290,15 @@ export class AudioManager {
       const table=kind==='attack'?u?.attacks:kind==='hit'?u?.hits:null;
       const mode=skillActive&&Number.isInteger(skillIndex)?table?.[skillIndex]:null;
       const indexedSkill = kind === 'skill' && Number.isInteger(skillIndex) && u?.skills && Object.hasOwn(u.skills,skillIndex);
-      const url = combat?.[kind] || (indexedSkill ? own : typeof own === 'string' ? own : typeof mode==='string'?mode:u?.[kind]);
+      return {u,mode,combat,url: combat?.[kind] || (indexedSkill ? own : typeof own === 'string' ? own : typeof mode==='string'?mode:u?.[kind])};
+      };
+      const {u,mode,combat,url}=pick();
       if (typeof url !== 'string') return false;
       if ((kind === 'attack' || kind === 'hit') && !combat?.[kind] && typeof mode!=='string' && !normalAttackSfx(defId, url)) return false;
       // the official bank's mix (header): a silent roll still counts as the unit's own sound (no generic fallback)
       const mix = kind === 'skill' ? null : combat?.[kind] ? combat.mix?.[kind] : typeof mode==='string'?(kind==='attack'?u?.attackMix:u?.hitMix)?.[skillIndex]:u?.mix?.[kind];
       if (!unitSoundPlays(mix, this.random())) return true;
-      this._play(url, { volume: unitGain(kind === 'attack' || kind === 'hit' ? 0.55 : 0.8, mix), limited: true, unitKey: `${unitId}:${kind}` });
+      this._play(url, { volume: unitGain(kind === 'attack' || kind === 'hit' ? 0.55 : 0.8, mix), limited: true, unitKey: `${unitId}:${kind}`, again: () => pick().url });
       return true;
     } catch { return false; }
   }
@@ -1162,8 +1319,8 @@ export class AudioManager {
   // ---- operator battle voice ----------------------------------------------------------------------------------
 
   /**
-   * Play an operator's battle line (`audio.voice[charId][slot]`, or `audio.voiceJp` when the 语音语言 setting is 日本語 —
-   * voiceLine; a slot with several lines draws one at random).
+   * Play an operator's battle line (the tree voiceLangFor picks — voiceLine; a slot with several lines draws one
+   * at random).
    * Every caller is a running battle's own event stream or its settlement, except 选中干员: the detail panel opening on
    * an operator the player tapped, in every phase (ui/detailPanel.js `voice`; the owner's request of 2026-10-08). The
    * line must pass VoiceGate: one at a time, a global gap, a per-unit cooldown, higher priority wins.
@@ -1177,10 +1334,10 @@ export class AudioManager {
     try {
       if (!this.ctx || !this.voiceGain || this.volumes.muted || this.volumes.voice <= 0) return false;
       if (typeof charId !== 'string' || typeof slot !== 'string') return false;
-      const lang=voiceLangFor(charId,this.volumes.voiceLanguage,this.voiceOverrides);
-      const line=voiceLine(this.getManifest()?.audio,charId,slot,lang);
-      if(!line)return false;
-      const {url,fallback}=line;
+      // the chosen dub's line (settings 语音语言), with the Chinese file of the same name as its fallback (voiceLine)
+      const pick = () => voiceLine(this.getManifest()?.audio, charId, slot, voiceLangFor(charId,this.volumes.voiceLanguage,this.voiceOverrides));
+      const line = pick();
+      if (!line) return false;
       const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
       const gateSlot=o.gateSlot || slot;
       const verdict = this.voiceGate.request(gateSlot, o.unitKey ?? null, now);
@@ -1188,28 +1345,59 @@ export class AudioManager {
       this._stopVoice();
       this.voiceGate.start(gateSlot, o.unitKey ?? null, now);
       const token = ++this.voiceToken;
-      this._playVoice(url, token, o.volume, fallback);
+      this._playVoice(line.url, token, o.volume, line.fallback, pick);
       return true;
     } catch (err) { this._warn('voice', err); return false; }
   }
 
   /**
-   * A deployed operator of the current field, for a line that belongs to the battle rather than to one unit (结算).
-   * @returns {string|null} charId, or null while no operator is on the field
+   * 试听 (the per-operator dropdown): one line of `charId` in `lang`, outside a battle — roster and DIY details are
+   * no battle, so it skips VoiceGate's cooldowns and takes the voice channel over from whatever is on air.
+   * An omitted `lang` (跟随全局, or a saved choice this server does not have) uses voiceLangFor. An explicit lang
+   * plays that tree, with the Chinese file of the same name when the line is missing.
+   * @param {string} charId
+   * @param {string} [lang] cn | jp | en | kr | native
+   * @returns {boolean} whether a line exists and started
    */
-  anyOperator() {
-    const out = [];
-    for (const u of this.units.values()) {
-      if (u && u.side !== 'enemy' && typeof u.def === 'string' && u.def.startsWith('char_')) out.push(u.def);
-    }
-    return out.length ? out[Math.floor(Math.random() * out.length)] : null;
+  previewVoice(charId, lang) {
+    try {
+      this._unlock();
+      if (!this.ctx || !this.voiceGain || this.volumes.muted || this.volumes.voice <= 0) return false;
+      if (typeof charId !== 'string') return false;
+      const audio = this.getManifest()?.audio;
+      const resolved = VOICE_PICKS.includes(lang) ? lang : this._voiceLangOf(charId);
+      const slots = audio?.voice?.[resolved]?.[charId] || audio?.[resolved==='kr'?'voiceKr':'voiceJp']?.[charId] || audio?.voice?.jp?.[charId] || audio?.voiceJp?.[charId];
+      if (!slots || typeof slots !== 'object') return false;
+      const slot = ['select', 'place', 'start'].find((s) => slots[s]) || Object.keys(slots)[0];
+      if (!slot) return false;
+      const line = voiceLine(this.getManifest()?.audio, charId, slot, resolved);
+      if (!line) return false;
+      this._stopVoice();
+      this.voiceGate.start(slot, null, typeof performance !== 'undefined' ? performance.now() : Date.now());
+      const token = ++this.voiceToken;
+      this._playVoice(line.url, token, 1, line.fallback);
+      return true;
+    } catch (err) { this._warn('voice-preview', err); return false; }
   }
 
-  /** Fetch/decode and start one voice line through the voice channel. */
-  _playVoice(url, token, volume, fallback = null) {
+  /**
+   * Fetch/decode and start one voice line through the voice channel. `fallback`: the line to play instead when this one
+   * cannot be loaded (a JP file the host lacks → the Chinese file of the same name; voiceLine) — same token, same gate.
+   * `again`: the slot's line picked from the manifest again — played instead (once) when this one was a cosmetic plugin's
+   * file that would not load (its entry fell back: see the header).
+   */
+  _playVoice(url, token, volume, fallback = null, again = null) {
+    // `token` is the line's own `voiceToken`. Every deferred step below — the decode, a failed fetch, `onended` and the
+    // safety timer — can land AFTER this line was taken over or stopped: `voiceToken` has moved on and the channel then
+    // belongs to the line that replaced it. So each step re-checks its token and, when it is stale, touches NOTHING:
+    // `_stopVoice` (takeover / stop) and `setFieldUnits` released the gate themselves. An unconditional release here let
+    // a stale callback free the channel the NEW line had just taken, and the next line walked in on top of it (review
+    // on #73).
     const failed = () => {
-      if (token !== this.voiceToken) return;
-      if (fallback && fallback !== url && this.ctx && this.voiceGain) this._playVoice(fallback, token, volume);
+      if (token !== this.voiceToken) return;   // taken over / stopped meanwhile: not ours to release
+      const next = again && this.fellBack.has(url) ? again() : null;
+      if (next && next.url !== url && this.ctx && this.voiceGain) this._playVoice(next.url, token, volume, next.fallback);
+      else if (fallback && fallback !== url && this.ctx && this.voiceGain) this._playVoice(fallback, token, volume);
       else this.voiceGate.release();
     };
     this._buffer(url).then((buf) => {
@@ -1275,6 +1463,7 @@ export class AudioManager {
     try { this.voiceGate.reset(); this._stopVoice(); } catch { /* ignore */ }
     for (const u of Array.isArray(units) ? units : []) this._track(u);
     if (this.ctx) for (const u of this.units.values()) { const url=deploySfxUrl(this.getManifest(),u); if(url)this._buffer(url).catch(()=>{}); }
+    if (this.effectsWarmRequested) this.warmEffects([...this.units.values()].map(u => u.def));
     this.startVoicePool = [...this.units.values()].filter(u => u.side !== 'enemy' && unitSoundClass(u) === 'char').map(u => u.def);
     this.warmVoices([...this.units.values()].filter(u=>u.kind==='op').map(u=>u.def));
   }
@@ -1529,17 +1718,21 @@ export const audio = new AudioManager({ getManifest: () => manifestGetter() });
 /**
  * Wire the singleton to the app (called once by main.js): manifest source, settings and store-driven BGM.
  * @param {{ getManifest: () => any, subscribe: (fn: (s:any, prev:any) => void) => () => void, getState: () => any,
- *   selectRoute: (s:any) => string, settings?: { bgm:number, sfx:number, voice:number, muted:boolean, voiceLang?:string } }} deps
+ *   selectRoute: (s:any) => string, settings?: { bgm:number, sfx:number, voice:number, muted:boolean, voiceLang?:string, voiceOverrides?:Record<string,string>, voiceNative?:boolean },
+ *   onFailed?: (url: string) => boolean }} deps  onFailed: a sound did not load (the cosmetic layers: see the header)
  */
 export function installAudio(deps) {
   try {
     manifestGetter = typeof deps?.getManifest === 'function' ? deps.getManifest : manifestGetter;
+    if (typeof deps?.onFailed === 'function') audio.onFailed = deps.onFailed;
     audio.install();
-    if (deps?.settings) { audio.setVolumes(deps.settings); audio.setVoiceLang(deps.settings.voiceLang, deps.settings.voiceOverrides); }
+    if (deps?.settings) { audio.setVolumes(deps.settings); audio.setVoiceLang(deps.settings.voiceLang, deps.settings.voiceOverrides); audio.setVoiceNative(deps.settings.voiceNative); }
     if (typeof deps?.subscribe === 'function' && typeof deps?.getState === 'function') {
       const sync = (s) => {
+        audio.inCombat = [PHASE.COMBAT, PHASE.UNITE, PHASE.FINAL_ASSAULT, PHASE.HIDDEN_CORE].includes(s.match?.public?.phase);
         const priv = s.match?.private;
         const pieces = [...(priv?.board || []), ...(priv?.hand || []), ...(priv?.shop?.slots || [])];
+        audio.warmEffects(pieces.filter(p=>p?.kind==='chess').map(p=>deps.getOperator?.(p.id)?.charId).filter(Boolean));
         audio.warmVoices(pieces.filter(p=>p?.kind==='chess').map(p=>deps.getOperator?.(p.id)?.charId).filter(Boolean));
         try {
           const pub = s.match?.public ?? null;

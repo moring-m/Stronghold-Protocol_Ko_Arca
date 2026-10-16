@@ -18,7 +18,7 @@ export default withDefaults({
         battle.on('deploy', (c) => {
           if (c.unit !== unit) return;
           let low = 0;
-          for (const k of unit.rangeKeys || []) if (battle.grid.isLow((k / COLS) | 0, k % COLS)) low++;
+          for (const k of unit.rangeKeys || []) if (battle.grid.isLow((k / (battle.grid?.cols ?? COLS)) | 0, k % (battle.grid?.cols ?? COLS))) low++;
           const v = low >= num(t0.cnt, 2) ? num(t0['kjera_t_1[high].atk'], num(t0.atk)) : num(t0.atk);
           battle.addBuff(unit, { key: 'kjera:t1', mods: { atkPct: v } });
         }, { owner: unit });

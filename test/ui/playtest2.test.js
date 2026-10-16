@@ -1,5 +1,7 @@
 // Regression tests (Node) of user playtest #2, UI items 6–10 + the loadout display (DESIGN §16):
-//   6  the enemy preview pen belongs to the pen camera only: bandFor / boardArea / penShown of render/app.js
+//   6  (superseded by the maintainer's decision of 2026-10-15, from their recording of the official game: the prep camera
+//      shows the pen too) the enemy preview pen with the prep and pen cameras, never with a battle camera or the Final
+//      Assault prep: bandFor / fieldRows / boardArea / showsPen / penShown / flightView of render/app.js
 //   8  the detail card docks on the side away from a selected unit's underframe — for every bench / temp / board tile
 //      at the official prep / Final Assault prep cameras of 10 viewports (16:9, 16:10, 21:9, 32:13.4, 4:3, 1280×720,
 //      1366×768, iPad landscape, 1024×768, 1440×900) the chosen slot never overlaps the underframe

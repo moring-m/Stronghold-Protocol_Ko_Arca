@@ -2,11 +2,7 @@
 
 > 현재 본 Readme의 번역은 GPT에 의해 생성되었습니다. 추후 수정/검수가 필요합니다.
 
-《명일방주》의 시즌 오토체스 타워 디펜스 모드 「위수 프로토콜: 맹약」을 **비공식 팬 메이크로 재현한 작품**입니다. 브라우저에서 바로 플레이할 수 있으며, 싱글 플레이 또는 1–4인 온라인 협동을 지원합니다.
-
-![version](https://img.shields.io/badge/version-0.2.6e-2ea44f)
-
-현재 로컬 테스트 버전: **0.2.4a**. [원본 0.2.4 기능별 이식 내역](docs/upstream-024-port-review/README.md).
+![version](https://img.shields.io/badge/version-0.3.0a-2ea44f)
 ![license](https://img.shields.io/badge/code%20license-GPL--3.0--or--later-blue)
 ![node](https://img.shields.io/badge/node-22%20%7C%2024-339933)
 
@@ -26,7 +22,12 @@
 | **배치 방향 휠** | **전투** | **최종 공세** |
 | ![方向](docs/img/facing-wheel.jpg) | ![作战](docs/img/combat.jpg) | ![最终攻势](docs/img/final-assault.jpg) |
 
-## 목차
+## 目录
+
+- [声明](#声明) · [简介](#简介) · [功能一览](#功能一览)
+- [快速开始](#快速开始)：[整合包](#方式一整合包推荐) · [从源码运行](#方式二从源码运行) · [系统要求](#系统要求) · [端口与配置](#端口与配置) · [局域网联机](#和朋友一起玩局域网)
+- [插件](#插件) · [联机方式](#联机方式) · [操作](#操作) · [文档](#文档) · [开发与测试](#开发与测试) · [项目结构](#项目结构)
+- [许可证](#许可证) · [致谢与数据来源](#致谢与数据来源) · [贡献](#贡献)
 
 - [고지사항](#고지사항) · [소개](#소개) · [기능 개요](#기능-개요)
 - [빠른 시작](#빠른-시작)：[통합 패키지](#방법-1-통합-패키지-권장) · [소스 코드에서 실행](#방법-2-소스-코드에서-실행) · [시스템 요구 사항](#시스템-요구-사항) · [포트 및 설정](#포트-및-설정) · [친구와 함께 LAN으로 플레이](#친구와-함께-플레이-lan)
@@ -35,7 +36,9 @@
 
 ## 소개
 
-「위수 프로토콜: 맹약」은 오토체스 + 타워 디펜스 게임입니다. 정비 기간에는 지휘 센터에서 오퍼레이터를 모집하고, 진형을 구성하며, 장비를 배치합니다. 전투 기간에는 오퍼레이터가 자동으로 배치되어 빨간 문에서 몰려오는 적을 상대하며, 놓친 적은 목표의 생명력을 감소시킵니다. 본 프로젝트는 이 게임플레이를 브라우저에서 재현했으며, 규칙과 수치는 가능한 한 공식 데이터 테이블 및 PRTS를 대조하여 구현했습니다.
+- **独立模拟**（单人）与**同盟模拟**（1–4 人**合作**，没有 PvP；空位可以加 AI 队友）。
+- 服务器是一个 Node.js 程序，**战斗在各玩家的浏览器里模拟**（和官方一样），服务器只管经济与回合，一台低功耗小主机就能开服。
+- 当前版本 0.3.0：加入插件系统——外观、数据、DSL、脚本与界面插件，浏览器插件工作台和安装工具；可选的「官方特效」用本机客户端提取的官方战斗特效（完整包附带）；官方场景按客户端着色器重新打光并补上水面，伊利昂的木驮兽和「越长尘」会载客，冻结后手动刷新会取消冻结，机器人的布阵、采购和演习也有改进，详见 [CHANGELOG.md](CHANGELOG.md)。仍有少数规则按推断实现，与官方不一致的地方欢迎在 Issue 里反馈。
 
 - **싱글 시뮬레이션**(1인)과 **동맹 시뮬레이션**(1–4인 **협동**, PvP 없음, 빈 자리는 AI 팀원을 추가할 수 있음).
 - 서버는 Node.js 프로그램이며, **전투는 각 플레이어의 브라우저에서 시뮬레이션**됩니다(공식과 동일). 서버는 경제와 라운드만 관리하므로 저전력 소형 PC 한 대로도 서버를 열 수 있습니다.
@@ -64,17 +67,11 @@
 
 ### 방법 1: 통합 패키지 (권장)
 
-통합 패키지에는 코드, 실행에 필요한 의존성 및 모든 미술 / 오디오 소재(공식 3D 체스판 텍스처 포함)가 이미 들어 있으므로 압축을 풀기만 하면 바로 플레이할 수 있으며, 별도로 다운로드할 필요가 없습니다.
+- **完整包** `Stronghold-Protocol-v<版本>.zip`（约 800 MB，解压后约 1.16 GB）：附带全部美术 / 音频（含中文、日文、英文、韩文和本土语言的干员语音、官方 3D 棋盘贴图、各战场的官方场景和官方战斗特效），解压就能玩，不需要再下载任何东西。**推荐。**
+- **精简包** `Stronghold-Protocol-v<版本>-lite.zip`（约 25 MB）：不带素材，第一次启动时自动从公开镜像下载美术、Spine 模型、音频、字体、表情和「玩法说明」教程图（约 720 MB，可中断，再次启动会续传）；官方 3D 棋盘等本地客户端素材不在其中（见下面的「本地客户端素材」；各战场的官方场景可以用 `node tools/setup.mjs --scenes` 在本机下载并提取）。适合下载大文件不方便的情况。
+- **更新包** `Stronghold-Protocol-v<版本>-update.zip`（0.2.1 起提供，大小看改动多少，通常只有几 MB）：只含比之前的 0.2.x 版本改动过的文件，用来把已经装好的 0.2.x（完整包或精简包装的都行）升级到新版本，不用重新下载整个包。用法：先停止服务器（关掉窗口；装了开机自启的运行 `scripts\install-service-windows.ps1 -Stop`），把 zip 里 `Stronghold-Protocol` 文件夹的全部内容合并到安装文件夹、覆盖同名文件（Windows 资源管理器里复制粘贴即可；macOS 不要用访达拖放，它会整个替换文件夹，请用 `unzip -o`，见 [docs/DEPLOY.md](docs/DEPLOY.md) 第 1.5 节），再照常启动。启动时会先核对全部程序文件、删除新版本不再用的旧文件，然后正常运行；如果这个文件夹不是更新包对应的版本（例如 0.1.x，或者程序文件被改过），会提示下载完整包，服务器不启动。全新安装请用完整包或精简包。
 
-1. **Node.js 22 또는 24 (LTS) 설치**
-   - Windows: PowerShell에서 `winget install OpenJS.NodeJS.LTS`를 실행하거나 <https://nodejs.org/zh-cn/download>에서 설치 프로그램을 다운로드합니다.
-   - macOS: `brew install node@22`를 실행하거나 공식 웹사이트에서 설치 프로그램을 다운로드합니다.
-   - Linux: 배포판의 패키지 관리자, nvm 또는 fnm을 사용합니다.
-2. **다운로드**: [Releases](../../releases/latest) 페이지에서 최신 버전(v0.1.4)의 통합 패키지(zip)를 다운로드하고, 경로가 짧은 폴더에 압축을 풉니다(Windows에서는 OneDrive 동기화 폴더에 넣지 않는 것을 권장합니다).
-3. **실행**
-   - Windows: **`scripts\start-windows.bat`**를 더블 클릭합니다. 「보안 경고」가 표시되면 「실행」을 클릭합니다. Windows 방화벽 팝업에서는 「개인 네트워크」를 선택하고 허용합니다.
-   - macOS / Linux: 압축을 푼 폴더에서 `./scripts/start.sh`(또는 `bash scripts/start.sh`)를 실행합니다.
-4. 브라우저가 자동으로 `http://localhost:3000`을 엽니다. 창에 표시된 LAN 주소를 같은 네트워크의 친구에게 바로 공유할 수 있습니다. 창을 닫거나 `Ctrl+C`를 누르면 서버가 중지됩니다.
+两种包都包含运行和部署文件，以及插件作者需要的工具、模板、Schemas、插件文档和战斗测试助手。完整开发测试与设计文档仍在源码仓库里。
 
 ### 방법 2: 소스 코드에서 실행
 
@@ -82,23 +79,23 @@
 git clone https://github.com/sganggs/Stronghold-Protocol.git
 cd Stronghold-Protocol
 npm install        # 安装依赖（postinstall 会把 pixi / preact / three 复制到 public/vendor）
-npm run setup      # 检查环境，并从公开镜像下载约 250 MB 美术 / 音频（可中断，再次运行会续传）
+npm run setup      # 检查环境，并从公开镜像下载约 720 MB 美术 / 音频（可中断，再次运行会续传）
 npm start          # 启动服务器：http://localhost:3000
 ```
 
 시작 스크립트(Windows `scripts\start-windows.bat`, macOS / Linux `scripts/start.sh`)를 직접 실행할 수도 있습니다. 처음 실행할 때 자동으로 의존성을 설치하고 소재를 다운로드한 뒤 서버를 시작하고 브라우저를 엽니다.
 
-- **공식 3D 체스판**은 로컬 《명일방주》 PC 클라이언트에서 텍스처를 추출해야 합니다(Windows 네이티브 클라이언트, macOS의 CrossOver 또는 PlayCover). `npm run setup`이 클라이언트를 감지하면 추출 여부를 묻습니다(Python 3.8+ 필요, 의존성은 프로젝트 내부의 `.venv-extract`에 설치되어 시스템에는 영향을 주지 않음). 이후 `node tools/setup.mjs --local`로 다시 추출하거나 `--game "<…/StreamingAssets/AB/Windows>"`로 경로를 지정할 수 있습니다. 클라이언트가 없으면 2D 체스판과 대체 아이콘·모델을 사용합니다. 소통과 플레이 방법의 튜토리얼 이미지는 공개 미러에서 다운로드됩니다. 클라이언트가 없는 서버에는 **동일 버전** 통합 패키지의 `public/assets/local/`와 `data/local-assets.json`을 복사할 수 있습니다. 자세한 내용은 [배포 문서](docs/DEPLOY.md)의 로컬 클라이언트 소재 항목을 참고하세요.
-- 소재 다운로드는 GitHub를 우선 사용하며, 실패하면 자동으로 jsDelivr 미러로 전환합니다.
-- `npm run doctor`(즉 `node tools/doctor.mjs`)를 언제든 실행하여 Node 버전, 소재의 완전성, 포트 사용 여부, LAN 주소 및 방화벽을 진단할 수 있습니다.
+- **本地客户端素材（可选）**：官方 3D 棋盘、官方战斗特效（0.3.0「官方特效」）、部分官方界面图标（交流按钮与表情面板的边框、模组类型图标等）、灼热 / 炽焰源石虫和 39 个召唤物（多数自选召唤物）的官方模型需要从本机的《明日方舟》PC 客户端提取（Windows 原生客户端、macOS 的 CrossOver 或 PlayCover）。`npm run setup` 检测到客户端时会询问是否提取（需要 Python 3.8+，依赖装在项目内的 `.venv-extract`，不影响系统）；之后可以用 `node tools/setup.mjs --local` 重新提取，或用 `--game "<…/StreamingAssets/AB/Windows>"` 指定路径。没有客户端时游戏照常运行，这几样换成替代样式：2D 棋盘、样式相近的图标、染色的普通源石虫、召唤物头像。表情和「玩法说明」的教程图随上面的素材一起从公开镜像下载，不需要客户端。没有客户端的服务器（例如 Linux VPS）也可以从**同一版本**的整合包（完整包；精简包没有）里复制 `public/assets/local/` 和 `data/local-assets.json`，见 [docs/DEPLOY.md](docs/DEPLOY.md) 的「本地客户端素材」。
+- 素材下载优先使用 GitHub，失败时自动改用 jsDelivr 镜像。
+- `npm run doctor`（即 `node tools/doctor.mjs`）可以随时诊断：Node 版本、素材是否完整、端口占用、局域网地址和防火墙。
 
 ### 시스템 요구 사항
 
 | 항목 | 요구 사항 |
 |---|---|
-| 서버를 실행하는 컴퓨터 | Windows / macOS / Linux, Node.js 22 또는 24 (LTS); 디스크 약 400–500 MB(소재, 의존성 및 선택적 로컬 추출 텍스처); 여유 메모리 약 100 MB, 게임 한 판당 몇 MB 추가 |
-| 플레이어 | WebGL을 지원하는 최신 브라우저(Chrome / Edge / Firefox / Safari 최신 버전), PC·휴대폰·태블릿(가로 화면) |
-| 네트워크 | 게임에 처음 접속할 때 각 플레이어가 서버 컴퓨터에서 수십 MB의 소재를 다운로드합니다(이후에는 브라우저 캐시 사용). 게임 중 네트워크 트래픽은 매우 적습니다. |
+| 开服的电脑 | Windows / macOS / Linux，Node.js 22 或 24（LTS）；磁盘约 1.2–1.4 GB（素材、依赖与本地提取的贴图、场景和特效：完整包解压后约 1.16 GB）；内存空闲约 100 MB，每局再加几 MB |
+| 玩家 | 支持 WebGL 的现代浏览器（Chrome / Edge / Firefox / Safari 最新版），电脑、手机或平板（横屏） |
+| 网络 | 首次进入游戏时，每位玩家要从开服的电脑下载几十 MB 素材（之后走浏览器缓存）；对局中流量很小。已有素材的玩家可以在标题画面点「导入素材包」（「下载完整素材」旁边），从素材包 zip、完整包 zip 或自己的 `public/assets` 文件夹导入，这部分美术不再从开服的电脑下载；需要 HTTPS 或 localhost（[docs/DEPLOY.md](docs/DEPLOY.md) 2.5 节）。0.3.0 的素材包 `Stronghold-Protocol-v0.3.0-assets.zip` 由维护者另行提供下载，不在 Releases 附件里 |
 
 그래픽 카드가 약한 경우 「설정」에서 화질을 낮추거나 URL 뒤에 `?board=2d`(2D 체스판 강제 사용) / `?render=fallback`(WebGL을 사용하지 않는 간소화 화면)를 추가할 수 있습니다.
 
@@ -108,15 +105,16 @@ npm start          # 启动服务器：http://localhost:3000
 
 | 환경 변수 | 기본값 | 설명 |
 |---|---|---|
-| `PORT` | `3000` | 수신 포트 |
-| `HOST` | `0.0.0.0` | 수신 주소 (`127.0.0.1` = 로컬 컴퓨터만 허용, 리버스 프록시 뒤에서 사용할 때) |
-| `SP_COMBAT` | `client` | `client`: 각 플레이어의 브라우저에서 자신의 전투를 시뮬레이션(서버 부하가 매우 낮음); `server`: 서버에서 시뮬레이션하여 스트리밍 |
-| `SP_VERIFY` | `off` | 서버가 클라이언트에서 보고한 전투 결과를 재계산: `off` / `sample`(약 1/8 무작위 검사) / `all`(전체 재계산, CPU 사용량 증가) |
-| `TRUST_PROXY` | `auto` | `X-Forwarded-For` 등의 전달 헤더를 신뢰할지 여부: `auto`는 로컬 / 내부 네트워크에서 온 프록시만 신뢰; `1`은 항상; `0`은 절대 신뢰하지 않음 |
-| `DEBUG` | 비어 있음 | 임의의 값으로 설정하면 상세 로그 출력 |
-| `SP_NO_BROWSER` | 비어 있음 | `1`로 설정하면 시작 스크립트가 브라우저를 자동으로 열지 않음 |
-
-설정 방법: macOS / Linux `PORT=8080 npm start`; PowerShell `$env:PORT=8080; npm start`; cmd `set "PORT=8080" && npm start`. 상태 확인: `GET /healthz`.
+| `PORT` | `3000` | 监听端口 |
+| `HOST` | `::` | 监听地址。默认 `::` 是双栈：同一个端口同时接受 IPv6 和 IPv4；`0.0.0.0` = 只 IPv4；`127.0.0.1` = 只允许本机，放在反向代理后面时使用 |
+| `SP_COMBAT` | `client` | `client`：各玩家浏览器模拟自己的战斗（服务器负载极低）；`server`：由服务器模拟并推流 |
+| `SP_VERIFY` | `off` | 服务器复算客户端上报的战斗结果：`off` / `sample`（约 1/8 抽查）/ `all`（全部复算，更耗 CPU） |
+| `SP_BOT_REHEARSAL` | 不设（服务器试算） | 仅 `host` 让房主浏览器帮 AI 队友试算布阵（同源 Worker，只回候选序号）；不设或 `server` 仍由服务器试算。房主无法完成时服务器用同一批候选接手。玩法插件房间始终由服务器试算。真人「AI 托管」和正式战斗不受影响 |
+| `TRUST_PROXY` | `auto` | 是否信任 `X-Forwarded-For` 等转发头：`auto` 只信任来自本机 / 内网的代理；`1` 总是；`0` 从不 |
+| `DEBUG` | 空 | 设为任意值输出详细日志 |
+| `SP_NO_BROWSER` | 空 | 设为 `1` 时启动脚本不自动打开浏览器 |
+| `SP_BOT_EMOTES` | 空 | AI 队友的对局表情回应（战斗、整备、合成、联防、收礼时即刻的 `m.emote` 广播）；设为 `0` 时整体关闭 |
+| `SP_ASSET_INDEX` | 空 | 素材地址带内容哈希、浏览器长期缓存（0.2.6 起默认开启，哈希存在 `.cache/asset-hashes.json`）；设为 `0` 时关闭，素材清单原样下发 |
 
 ### 친구와 함께 플레이 (LAN)
 
@@ -130,7 +128,18 @@ npm start          # 启动服务器：http://localhost:3000
 
 ## 온라인 플레이 방법
 
-EC2에서 GitHub의 코드를 수동으로 업데이트하려면 **[Git 기반 EC2 업데이트 안내](deploy/ec2/README.md)**를 참조하십시오. GitHub에 push하는 것만으로는 배포되지 않으며, EC2에서 업데이트 명령을 실행해야 적용됩니다.
+## 插件
+
+0.3.0 开发版已支持插件；不开插件时按原版游玩。
+
+- **服主安装**：将插件文件夹放进服务器的 `plugins/`，或用 `node tools/plugin.mjs install <zip路径或HTTPS地址>` 安装；远程地址需带 `--sha256`。工作台也支持从社区目录安装和导入 Forge 工坊包。服主可在 `plugins/config.json` 限定可用插件。
+- **房主开启**：在房间顶部的「原版 / 插件 ×N」面板里选外观或玩法插件、修改插件设置、选择插件模式。玩法插件的内容会由所有玩家下载并校验，房间标为「非官方」，统计总览默认不计入。
+- **玩家个人设置**：「设置 → 外观插件 / 界面插件」只影响自己的浏览器；个人不能另装玩法插件改变房间规则。外观插件只换画面与声音，界面插件只读允许的对局信息。
+- **自己制作**：打开启动窗口 `Studio:` 行的地址，使用 `/studio/` 插件工作台选模板、按官方名称选目标、拖放素材、实时预览、试一场并回放，最后打包分享。工作台限本机和局域网，修改需要钥匙。
+
+脚本执行默认关闭。服主可以用 `SP_PLUGIN_SCRIPTS=sandbox` 开启沙箱脚本（或启动时加 `--scripts sandbox`；Windows 双击 `scripts\start-windows-sandbox.bat`）；原生受信任模式还需审查、固定锁文件哈希和玩家同意，公网部署需 `trusted-force`。开服设置见 [部署指南](docs/DEPLOY.md)，作者从[插件新手指南](docs/PLUGIN-GUIDE.md)开始，格式与限制见[插件参考](docs/PLUGINS.md)，接口列表见[插件 API 表](docs/PLUGIN-API.md)。
+
+## 联机方式
 
 친구가 같은 LAN에 있지 않은 경우 아래와 같은 일반적인 방법을 사용할 수 있습니다. 자신의 상황에 맞는 방법을 하나 선택하면 됩니다. 여기서는 간단한 소개만 제공하며, 언급된 도구와 서비스는 예시일 뿐 본 프로젝트와 아무런 관계가 없고 추천하는 것도 아닙니다. 구체적인 설치, 비용 및 사용 규칙은 각 서비스의 공식 안내를 따르십시오. 배포 세부 사항(방화벽, 부팅 시 자동 실행, 리버스 프록시 및 HTTPS, Docker)은 **[docs/DEPLOY.md](docs/DEPLOY.md)**를 참조하십시오.
 
@@ -151,37 +160,42 @@ EC2에서 GitHub의 코드를 수동으로 업데이트하려면 **[Git 기반 E
 
 | 조작 | 방법 |
 |---|---|
-| 구매 / 지휘 센터 업그레이드 / 기변 카드 선택 | 한 번 클릭하여 선택하고 다시 한 번 클릭하여 확인 (`D` 업그레이드) |
-| 오퍼레이터 배치 / 이동 | 정비 구역에서 체스판 칸으로 드래그 → 방향 휠 표시 → 위 / 오른쪽 / 아래 / 왼쪽으로 슬라이드하여 방향을 선택한 뒤 놓습니다. 중앙에서 놓거나 「✕ 클릭하여 취소」를 누르면 취소됩니다. 드래그 중 모델은 포인터 / 손가락 아래에 표시되며 포인터가 있는 칸이 배치 위치입니다. |
-| 방향 조정 | 오퍼레이터를 자신의 칸으로 다시 드래그한 뒤 방향을 선택합니다. |
-| 판매 / 철수 / 장비 파괴 | 유닛이 있는 칸을 클릭 → 하단 버튼 「판매 +1」「철수」. 체스판의 오퍼레이터를 정비 구역으로 드래그하여 철수할 수도 있습니다. 정비 구역의 장비와 주문은 「파괴」만 가능하며, 이미 장착된 장비는 오퍼레이터에게 귀속됩니다(오퍼레이터를 판매하거나 정예로 합성하면 정비 구역으로 돌아옵니다). |
-| 장비 | 장비를 오퍼레이터가 있는 칸으로 드래그합니다(1인당 2개. 가득 차면 교체 창이 나타나며 교체된 장비는 파괴됩니다). 주문은 지형으로 드래그한 뒤 방향을 선택합니다. |
-| 상세 정보 보기 | 유닛 / 카드를 우클릭하거나 길게 누릅니다(능력치는 실시간 수치이며 기본값보다 높으면 녹색, 낮으면 빨간색으로 표시됩니다). |
-| 단축키 | `R` 새로고침 · `F` 동결 · `D` 업그레이드 · `Space` 준비 완료 · `Esc` 취소 / 닫기 |
-| 방향 휠 키보드 조작 | 방향키로 미리 보기 · `Enter` 확인 · `Esc` 취소 |
-| 일시정지 (싱글 시뮬레이션) | 전투 중(최종 공세 / 비밀 핵심 포함) 상단의 「일시정지」를 클릭하거나 `Space`를 누른 뒤, 「전투 계속」(또는 `Space`)을 눌러 계속합니다. 동맹 시뮬레이션의 전투는 일시정지할 수 없습니다. |
-| 이모트 | 왼쪽 아래의 「교류」를 누르고 좌우로 슬라이드(또는 방향키)하여 테마를 변경합니다. 재사용 대기 시간은 1초입니다. |
-| 관전 | 자신의 전투가 끝난 후(또는 정비 기간) 왼쪽의 팀원 아바타를 클릭 → 「보러 가기」 |
+| 购买 / 升级调度中心 / 机变选卡 | 点一次选中，再点一次确认（`D` 升级） |
+| 部署 / 移动干员 | 从整备区拖到棋盘格 → 出现方向轮盘 → 往上 / 右 / 下 / 左滑动选择朝向后松手；松在中心或点「✕ 点击取消」取消。拖动时指针 / 手指所在的格子就是落点，能放下时模型直接站在这一格上（不能放下时跟在指针下） |
+| 调整朝向 | 把干员拖回它自己的格子，再选方向 |
+| 出售 / 撤退 / 销毁装备 | 点击单位所在的格子 → 底部按钮「出售 +1」「撤退」；也可以把棋盘上的干员拖回整备区撤退。整备区里的装备与法术只能「销毁」，已配发的装备锁定在干员身上（干员出售或合成精锐时退回整备区） |
+| 装备 | 把装备拖到干员所在的格子上（每人 2 件；满了会弹出替换窗口，被替换的一件会被销毁）；法术拖到地块上并选方向 |
+| 查看详情 | 右键或长按单位 / 卡牌（属性为实时数值，高于基础值为绿色、低于为红色） |
+| 快捷键 | `W` 购买鼠标指向的商品（无需点击） · `R` 刷新 · `F` 冻结 · `D` 升级 · `Q` 撤退 / `X` 出售鼠标指向的干员（无需点击） · `Space` 准备就绪 · `Esc` 取消 / 关闭；除 `Esc` 外都可以在「设置 → 快捷键」里改成别的键（[玩法指南 §11](docs/PLAYING.md#11-快捷键)） |
+| 方向轮盘键盘操作 | 方向键预览 · `Enter` 确认 · `Esc` 取消 |
+| 暂停（独立模拟） | 作战中（含最终攻势 / 隐秘核心）点顶栏的「暂停」或按 `Space`，再点「继续作战」（或 `Space`）继续；同盟模拟的作战不能暂停 |
+| 表情 | 左下角「交流」，左右滑动（或方向键）换主题，冷却 1 秒 |
+| 观战 | 自己的作战结束后（或休整期）点左侧队友头像 →「前往查看」；不参战的朋友可以在大厅输入同盟密钥点「观战」（每个同盟最多 2 名观战者，本作新增） |
+| 统计（本机） | 标题画面右上角、大厅、等待室的「统计」：胜率、策略通过率、称号、战斗累计和对局记录（点一行回看结算页）；只存在本机浏览器里，可以导出 / 导入，没清完第一个回合就退出的对局不计入统计（[玩法指南 §12](docs/PLAYING.md#13-统计本机)） |
 
-전체 규칙, 수치 및 팁은 **[docs/PLAYING.md](docs/PLAYING.md)**를 참조하십시오(게임 내 왼쪽 아래에도 「게임플레이 설명」이 있습니다).
+完整的规则、数值和小技巧见 **[docs/PLAYING.md](docs/PLAYING.md)**（游戏内左下角也有「玩法说明」）。
 
-## 문서
+## 文档
 
-| 문서 | 내용 |
+| 文档 | 内容 |
 |---|---|
-| [CHANGELOG.md](CHANGELOG.md) | 변경 기록: 각 버전에서 수정된 사항과 확인 결과 문제가 아니었던 피드백 |
-| [docs/PLAYING.md](docs/PLAYING.md) | 게임플레이 가이드: 진행 과정, 경제, 모집 및 승급, 진형 구성, 공동 방어, 맹약, 최종 공세, 정산 칭호 |
-| [docs/DEPLOY.md](docs/DEPLOY.md) | 배포 가이드: Windows 서버 실행 및 부팅 시 자동 실행, 방화벽, 네트워크 구성 / 터널, 리버스 프록시 및 HTTPS, Docker, systemd, 문제 해결 |
-| [docs/WINDOWS.md](docs/WINDOWS.md) | Windows 휴대용 패키지 생성 및 구성 안내 |
-| [docs/DESIGN.md](docs/DESIGN.md) | 아키텍처 및 계약(영문): 기술 스택, 디렉터리 역할, 네트워크 프로토콜, 렌더링 및 UI, 각 테스트 플레이 후 규칙 수정 사항 |
-| [docs/SIM.md](docs/SIM.md) | 전투 시뮬레이션 엔진 참고(영문): 훅, 스킬 설명 형식, 직군 기본 행동 |
-| [docs/META.md](docs/META.md) | 게임 및 경제 엔진(영문): 라운드 진행, 상점, 공동 방어, 최종 공세의 구현 세부 사항 |
-| [docs/DATA.md](docs/DATA.md) | 공식 데이터 테이블에서 생성된 게임 데이터(영문) |
-| [docs/ASSETS.md](docs/ASSETS.md) | 소재 출처, 디렉터리 구조 및 목록(영문) |
-| [docs/BALANCE.md](docs/BALANCE.md) | 난이도 모델 및 측정(영문) |
-| [docs/research/](docs/research/00-INDEX.md) | 공식 규칙, 데이터 및 인터페이스 조사 기록 |
+| [CHANGELOG.md](CHANGELOG.md) | 更新记录：每个版本修复了什么、哪些反馈经核实不是问题 |
+| [docs/PLAYING.md](docs/PLAYING.md) | 玩法指南：流程、经济、招募与晋升、摆阵、联防、盟约、最终攻势、结算称号 |
+| [docs/PLUGINS.md](docs/PLUGINS.md) · [docs/PLUGIN-GUIDE.md](docs/PLUGIN-GUIDE.md) | 插件格式、安装与服主策略；中文工作台入门、DSL 和对战试验 |
+| [docs/DEPLOY.md](docs/DEPLOY.md) | 部署指南：Windows 开服与开机自启、防火墙、组网 / 隧道、反向代理与 HTTPS、Docker、systemd、排错 |
+| [docs/WINDOWS.md](docs/WINDOWS.md) | Windows 便携包：怎么打一份「零安装」包（`scripts/make-windows-bundle.mjs`）、包里放了什么、授权注意事项 |
+| [docs/DESIGN.md](docs/DESIGN.md) | 架构与契约（英文）：索引，按章节号找到文件；现行规则在 `docs/design/`（范围与目录分工、坐标与时间、战斗引擎、对局、网络协议、渲染与 UI），各次试玩和各版本的规则修订与依据在 `docs/history/` |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | 代码地图（英文）：服务器、联机协议和前后端共用的战斗模拟，0.2.0 重构后的目录，数据流，黄金结果与导入边界，常见改动从哪里入手 |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | 参与贡献：准备环境、运行测试、忠实原则、提交与 PR 约定、怎样添加自选干员（中文，末尾附英文摘要） |
+| [docs/SIM.md](docs/SIM.md) | 战斗模拟引擎参考（英文）：钩子、技能描述格式、职业默认行为 |
+| [docs/META.md](docs/META.md) | 对局与经济引擎（英文）：回合流程、商店、联防、最终攻势的实现细节 |
+| [docs/DATA.md](docs/DATA.md) | 由官方数据表生成的游戏数据（英文） |
+| [docs/ASSETS.md](docs/ASSETS.md) | 素材来源、目录结构与清单（英文） |
+| [docs/I18N.md](docs/I18N.md) | 界面语言（英文）：界面文字、游戏文本与服务器消息怎样翻译，覆盖范围；**添加一种语言只需在 `public/i18n/` 放一个语言文件**（社区翻译步骤见「Adding a language」，内容包格式见 [docs/PACKS.md](docs/PACKS.md)） |
+| [docs/BALANCE.md](docs/BALANCE.md) | 难度模型与测量（英文） |
+| [docs/research/](docs/research/00-INDEX.md) | 官方规则、数据与界面的调研记录 |
 
-## 개발 및 테스트
+## 开发与测试
 
 ```bash
 npm run dev                 # node --watch：改动服务器代码后自动重启
@@ -244,7 +258,8 @@ GOLDEN_FULL=1 node --test test/golden.test.js           # 黄金结果：固定�
 
 An **unofficial, non-commercial fan remake** of Arknights' seasonal auto-chess tower-defense mode *Stronghold Protocol: Alliance*, played in the browser: solo, or 1–4 player co-op (AI teammates can fill seats). Combat is simulated in each player's browser, so a low-power PC can host.
 
-- **Run:** download the all-in-one bundle from [Releases](../../releases/latest), install Node.js 22 or 24, then double-click `scripts\start-windows.bat` (Windows) or run `./scripts/start.sh` (macOS / Linux) and open <http://localhost:3000>. From source: `npm install && npm run setup && npm start` (setup downloads ~270 MB of art from public mirrors, the emotes and the how-to-play pages included; the official 3D board, some official HUD icons and two enemy models are extracted from a local Arknights client — without one the game uses the 2D board and look-alike stand-ins, and a server can copy `public/assets/local/` and `data/local-assets.json` from the release bundle of the same version).
+- **Run:** download the full bundle `Stronghold-Protocol-v<version>.zip` (~800 MB, all the art inside, the Chinese, Japanese, English, Korean and own-language operator voices, the official battlefield scenes and the official battle effects included) from [Releases](../../releases/latest) — or the lite one, `…-lite.zip` (~25 MB), which downloads the art (~720 MB) on its first start; from 0.2.1 on, `…-update.zip` holds only the files changed since the earlier 0.2.x releases: stop the server, extract it over an existing 0.2.x folder and start again (the first start deletes the files the new version dropped and verifies the install) — install Node.js 22 or 24, then double-click `scripts\start-windows.bat` (Windows) or run `./scripts/start.sh` (macOS / Linux) and open <http://localhost:3000>. From source: `npm install && npm run setup && npm start` (setup downloads ~720 MB of art from public mirrors, the emotes and the how-to-play pages included; the official 3D board, some official HUD icons, two enemy models and 39 summon models are extracted from a local Arknights client — without one the game uses the 2D board and look-alike stand-ins (the summons show their avatars), and a server can copy `public/assets/local/` and `data/local-assets.json` from the full bundle of the same version).
+- **Languages:** Chinese (the default), English, 日本語, 한국어 and 繁體中文 — switch on the title screen or in Settings. Game texts come from the official clients; the Japanese, Korean and Traditional Chinese interface strings are machine translations (corrections welcome: [docs/I18N.md](docs/I18N.md)).
 - **Play with friends:** create a co-op room and share the 4-letter key or the `?room=KEY` link. On a LAN, use the address printed at start; otherwise use a virtual-LAN tool, a tunnel or a VPS — see [docs/DEPLOY.md](docs/DEPLOY.md).
 - **Disclaimer:** not affiliated with or endorsed by Hypergryph or Yostar. All Arknights names, art, audio, text and data are © their respective owners and are **not** covered by this project's GPL licence. For study and personal non-commercial use only — no selling, paid distribution, paid servers or monetisation of any kind. Content will be removed on request of the rights holders. Provided "as is", without warranty.
 - **License:** code GPL-3.0-or-later ([LICENSE](LICENSE)); game assets excluded.

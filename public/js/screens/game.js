@@ -1,5 +1,5 @@
-import {AugmentOverlay} from '../ui/augmentOverlay.js';
-import {LaboratoryRestartButton,LaboratoryTargetButton} from '../ui/laboratory.js';
+import { AugmentOverlay } from '../ui/augmentOverlay.js';
+import { LaboratoryRestartButton, LaboratoryTargetButton } from '../ui/laboratory.js';
 
 
 
@@ -35,16 +35,21 @@ import { ChatPanel } from '../ui/chat.js';
 // b.ev frames the server used to stream. Observing follows research 09 §3.1 (battle/observe.js): no looking elsewhere
 // while the own normal battle runs; afterwards a teammate row → 前往查看 → a local replica, 返回战场 goes back; in
 // 联防 / 最终攻势 the ‹ › pill switches the camera between the field's halves and 全景.
-// Enemy preview pen (research 09 §2 / §6.2 item 3): in 休整期 the right HUD 🔍▶▶ pans the camera to the pen
-// (view.setCamera('pen')); the left button turns into 🔍◀◀ and returns to the camera in use before (the grey right
-// button, Esc or any camera change of the game flow return too). The shop bar folds away while the pen is shown and
-// comes back as it was. Tapping an enemy in the pen (view pieceClick with `enemyKey` / a `preview` enemy unit) opens its
-// detail card; the old enemy list lives on as the 敌方情报 tab of the 本局信息 dialog (left 🔍).
+// Enemy preview pen (research 09 §2 / §6.2 item 3): in 休整期 the next round's enemies stand in the pen at the top right
+// of the prep view (render/app.js: the prep camera shows it, the battle cameras do not — the maintainer's decision of
+// 2026-10-15); the right HUD 🔍▶▶ pans the camera to the pen (view.setCamera('pen')); the left button turns into 🔍◀◀
+// and returns to the camera in use before (the grey right button, Esc or any camera change of the game flow return
+// too). The shop bar folds away while the pen is shown and comes back as it was. Tapping an enemy in the pen (view
+// pieceClick with `enemyKey` / a `preview` enemy unit) opens its detail card; the old enemy list lives on as the 敌方情报
+// tab of the 本局信息 dialog (left 🔍).
 // Every camera request of this screen goes through setCam (it remembers the camera the pen returns to);
 // `.gm[data-camera]` mirrors the current camera kind (E2E / styling). Folding the shop bar (收起) on the own prep board
 // flies the camera to the official shop-collapsed framing and unfolding back to the shop camera (public issue #5:
 // gameLogic prepCameraFor / foldCamera — never over the pen, a teammate's board or a battle; deferred while a piece is
-// dragged or its direction is chosen).
+// dragged or its direction is chosen). A deploy is the other way round (GitHub #602, PR #646 by @Euqorab): picking up a
+// piece on the own prep board, and a legal drop's direction wheel, fold the shop bar for as long as they last and zoom
+// to that framing at once (gameLogic deployFoldsShop); the player's own fold state comes back after. The fold flights
+// take FOLD_CAMERA_MS (render/app/tune.js), not the generic camera flight.
 // Equipment dropped on an operator whose two slots are used opens the equip-replace dialog (ui/equipReplace.js): the
 // player picks the equipped item to destroy → g.equip {itemUid, targetUid, replaceUid}; 取消 sends nothing. 销毁 is only
 // offered for loose items (equipped ones are locked, ui/facing.js itemDestroyable).
@@ -97,7 +102,8 @@ import { Ticker } from '../ui/ticker.js';
 import { EmoteWheel } from '../ui/emotes.js';
 import { EffectsList } from '../ui/effectsList.js';
 import { CombatHud } from '../ui/combatHud.js';
-import { settingsStore, SettingsModal } from '../ui/settings.js';
+import { CombatMetricsPanel } from '../ui/combatMetrics.js';
+import { SettingsModal, settingsStore, useSettings } from '../ui/settings.js';
 import { ExitModal, AwayOverlay, awayStore } from '../ui/matchChrome.js';
 import { openGuide } from '../ui/guide.js';
 import { actions, onRefreshBusy } from '../ui/gameActions.js';
@@ -107,15 +113,8 @@ import { needsFacing, facingIntent, previewGrid, pieceDir, underframeActions, re
 import { EquipReplaceDialog, replaceRequest, replaceIntent } from '../ui/equipReplace.js';
 import { pauseAvailable, isPaused, frozenNow } from '../ui/matchStatus.js';
 import { pieceTile } from '../render/drag.js';
-import {
-  phaseMode, phaseBanner, isCombatPhase, showDeadPill, isBossPhase, placementContext, canPlace, boardTargets, dropIntent,
-  battleOverSfx,
-  snapHud, activeBubbles, shortcutFor, shortcutBlocked, closesOnFieldPress, phaseTotalSeconds, homeFieldId, ownFieldId, normalizeSp, normalizePersonalChoice, sortedPlayers,
-  terrainInfo,
-  countdownState, shopBlockReason, stageOverrides, effectiveStage, watchTarget, dropFailureReason,
-  previewEnemyKey, prepCamera, prepCameraFor, foldCamera, deployFieldOf, fieldTile, panelSide, panelSlots, bondPopupPlace, chessLoadout, unitLoadout,
-  mergeTarget, modeOffBonds, readyFundsPrompt, ownerBandId, roundStartReplay,
-} from '../ui/gameLogic.js';
+import { FOLD_CAMERA_MS } from '../render/app/tune.js';
+import { phaseMode, phaseBanner, isCombatPhase, showDeadPill, isBossPhase, placementContext, canPlace, boardTargets, dropIntent, battleOverSfx, snapHud, activeBubbles, shortcutFor, shortcutBlocked, closesOnFieldPress, phaseTotalSeconds, homeFieldId, ownFieldId, normalizeSp, normalizePersonalChoice, sortedPlayers, terrainInfo, countdownState, shopBlockReason, stageOverrides, effectiveStage, watchTarget, dropFailureReason, previewEnemyKey, prepCamera, prepCameraFor, foldCamera, deployFieldOf, fieldTile, panelSide, panelSlots, bondPopupPlace, chessLoadout, unitLoadout, mergeTarget, modeOffBonds, readyFundsPrompt, ownerBandId, roundStartReplay, uniteResultBox, battleResultBox, prepShortcutsSuspended, deployFoldsShop, deployedRecord, ownDiyRecord, ownStandIn } from '../ui/gameLogic.js';
 import { toast } from '../ui/toasts.js';
 import { BriefingScreen } from './briefing.js';
 import { BandDraftScreen } from './bandDraft.js';
@@ -124,7 +123,11 @@ import { net } from '../net.js';
 import { store, useStore, shallowEqual, serverNow, emptyMatch, isSpectating } from '../store.js';
 import { battleRunner } from '../battle/runner.js';
 import { LaboratoryDamage } from '../ui/laboratoryDamage.js';
-import { isClientCombat, observeTarget, teammateProgress, cameraLayers, layerCamera, sidesOf, resumedWatch } from '../battle/observe.js';
+import { isClientCombat, observeTarget, teammateProgress, cameraLayers, layerCamera, sidesOf, resumedWatch, loneHalf, followedScout } from '../battle/observe.js';
+
+
+import '../ui/pluginFrame.js';
+
 import { screenStrip, playerBonds, playerLayer, detailBondOwner, toggleBond, popupView } from '../ui/watchBonds.js';
 import { data, localAsset, getMode } from '../data.js';
 import { audio } from '../audio.js';
@@ -140,6 +143,14 @@ const STATE_EV = new Set(['spawn', 'die', 'deploy', 'status', 'skill']);
 /** Event tuples replayed when a field is entered late: the state-bearing kinds and the fx that change an enemy's model
  *  form (shared/protocol.js fxForm — the field meta's UnitInfo `form` predates them). */
 const keepEarly = (e) => Array.isArray(e) && (STATE_EV.has(e[0]) || fxForm(e) !== undefined);
+
+// 作战统计 is opt-in (settings `combatMetrics`, default off). The runner does not import the settings store;
+// this screen pushes the switch. Outside a browser battleRunner is null, so this is a no-op.
+if (battleRunner) {
+  const applyCombatMetrics = (s) => battleRunner.setCombatMetrics(s?.combatMetrics === true);
+  applyCombatMetrics(settingsStore.get());
+  settingsStore.subscribe(applyCombatMetrics);
+}
 
 /** Router for the in-match screens. */
 export function GameScreen() {
@@ -211,9 +222,13 @@ function MatchScreen() {
   const emotes = useStore((s) => s.emotes);
   const roomSolo = useStore((s) => s.room?.mode === 'solo');
   const spectator = useStore((s) => isSpectating(s.room, s.me.playerId));
-  // the room's spectator seats, for the in-match 观战席 capsule (ui/hud.js SpectatorPill): the room screen showed them
-  // but the game screen did not, so the host could not free a seat while a match ran. shallowEqual keeps this from
-  // re-rendering on every unrelated room.state push (the array element references are stable).
+  const userSettings = useSettings();
+  const metricsSetting = userSettings.combatMetrics === true;
+  const deployCameraZoom = userSettings.deployCameraZoom !== false;
+  // gameplay plugins (DESIGN §32.6): the HUD corner's MOD mark — re-rendered only when the room's content changes
+  const modRoom = useStore((s) => (s.room?.content?.vanilla === false ? s.room : null), (a, b) => (a?.content ?? null) === (b?.content ?? null));
+  // the room's spectator seats for the top bar's 观战席 capsule (ui/hud.js SpectatorPill; GitHub #120): room.state keeps coming
+  // during the match, the list is replaced only when a seat changes — shallowEqual keeps an unrelated push from re-rendering
   const specFacts = useStore((s) => ({
     list: Array.isArray(s.room?.spectators) ? s.room.spectators : null,
     isHost: !!s.room && s.room.hostId === s.me.playerId,
@@ -248,6 +263,12 @@ function MatchScreen() {
   const [refreshBusy, setRefreshBusy] = useState(false);
   useEffect(() => onRefreshBusy(setRefreshBusy), []);
   const [rewardMin, setRewardMin] = useState(false);
+  // 作战统计 (battle/metrics.js): a client-only local damage/healing panel — never uploaded to the server.
+  // Off unless the setting is on. A gameplay-plugin room (modRoom: content.vanilla === false) is simulated in a
+  // Worker, which has no damaged/heal data, so the button stays hidden. The hud.right ui-slot is not this gate.
+  const [metricsOpen, setMetricsOpen] = useState(false);
+  const showMetrics = metricsSetting && !modRoom && !spectator;
+  useEffect(() => { if (!showMetrics) setMetricsOpen(false); }, [showMetrics]);
   const [emoteOpen, setEmoteOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [exitOpen, setExitOpen] = useState(false);
@@ -255,6 +276,8 @@ function MatchScreen() {
   const [facing, setFacing] = useState(null);            // direction step: { uid, piece, row, col, grid, name }
   const [sel, setSel] = useState(null);                  // tapped own piece: { uid }
   const [selBusy, setSelBusy] = useState(false);
+  const pieceActionBusy = useRef(false);
+  const buyPending = useRef(new Set());
   const [holdSeq, setHoldSeq] = useState(0);             // bumped when a held piece is released (re-apply the prep state)
   const [hud, setHud] = useState(null);
   const [banner, setBanner] = useState(null);
@@ -331,7 +354,7 @@ function MatchScreen() {
     priv, stage: gd.stage(pub?.stageId), editable, field: deployField,
     getChess: gd.chess, getToken: gd.token, getItem: gd.item, getEffect: gd.effect,
   }), [priv, pub?.stageId, editable, gd.ready, deployField]);
-  live.current = { pub, priv, field, editable, hasPersonalChoice, placeCtx, watching, watchWho, home, myId, detail, drawer, bondOpen, emoteOpen, settingsOpen, exitOpen, drag, facing, sel, selBusy, pen, collapsedNow: collapsed, localDone: false, canPause: false, paused };
+  live.current = { pub, priv, field, view, editable, hasPersonalChoice, placeCtx, watching, watchWho, watchingOther, home, myId, alive, spectator, detail, drawer, bondOpen, emoteOpen, settingsOpen, exitOpen, drag, facing, sel, selBusy, pen, collapsedNow: collapsed, localDone: false, canPause: false, paused };
 
   // ---- camera: every request goes through setCam, which remembers it for the pen's way back -----------------------
   // the own prep board: the normal board, or — in the prep of a boss round — the player's half of the boss field
@@ -343,9 +366,7 @@ function MatchScreen() {
   const prepCamSeen = useRef(prepCamKey);                // the prep camera last requested
   const camRef = useRef({ kind: 'prep', opts: { rect: { ...GEO.NORMAL_RECT }, side: 'L' } });
   const penRef = useRef({ on: false, collapsed: false });
-  // the shop bar is shown folded (收起; the pen folds it for itself: the player's own state is the one it returns to) —
-  // the own prep board then takes the official shop-collapsed camera (public issue #5, gameLogic prepCameraFor)
-  const shopFolded = showShop && (pen ? penRef.current.collapsed : collapsed);
+  // shopFolded (the own prep board's folded-shop camera state) is derived with the prep-view flags below (showPrep).
   // 准备就绪 folds the shop bar, cancelling it unfolds the bar again (GitHub #138; gameLogic readyShopFold): the board is set,
   // the fight is what to look at — the board camera follows the fold like a hand-made one (the effect below). Inside the pen
   // the bar is folded for itself: the state it returns to is the one that changes.
@@ -362,6 +383,10 @@ function MatchScreen() {
   const setCam = useCallback((kind, opts) => {
     opts = { ...opts, ...(spectator || watchingOther ? { shop: false } : {}), observedBench: !combat && (spectator || watchingOther) };
     camRef.current = { kind, opts: opts || {} };
+    // remembered without its flight time: the pen's way back (togglePen) repeats the framing, and a fold zoom's
+    // FOLD_CAMERA_MS would replace the pen's own 0.25 s return (render/app.js PEN_CAMERA_MS)
+    const { ms: _ms, instant: _instant, ...framing } = opts || {};
+    camRef.current = { kind, opts: framing };
     setCamKind(kind);
     if (penRef.current.on) { penRef.current.on = false; setPen(false); setCollapsed(penRef.current.collapsed); }
     view?.setCamera(kind, opts);
@@ -425,6 +450,20 @@ function MatchScreen() {
   // (last round's battle): combat only enters an m.field pushed after that (a new object), and every new m.field
   // push (watch switch, reconnect) re-enters the battle view.
   const showPrep = (mode === 'prep' || mode === 'boot') && !watchingOther && !spectator;
+
+  // public issue #602: while a piece is picked up on the own prep board — a deploy / equip / reposition drag, or the
+  // direction wheel a legal drop opens — the official client folds the shop and zooms to the shop-collapsed prep
+  // camera (the same framing as 收起, left_prepare_camera_param), then gives the player's own shop state back. It is
+  // derived from the interaction state only: `collapsed` (the 收起/展开 state) is never set by it.
+  const deployFold = deployFoldsShop({
+    ownPrep: !!view && viewModeRef.current === 'prep' && showPrep, editable, pen, drag: !!drag, facing: !!facing,
+  });
+  // the shop bar is shown folded (收起; the pen folds it for itself: the player's own state is the one it returns to) —
+  // the own prep board then takes the official shop-collapsed camera (public issue #5, gameLogic prepCameraFor);
+  // a deploy interaction folds it for the interaction's duration (public issue #602).
+  const shopFolded = showShop && (pen ? penRef.current.collapsed : (collapsed || (deployFold && deployCameraZoom)));
+  // the shop bar / board layout's displayed fold: the player's 收起 state, temporarily folded while deploying.
+  const barCollapsed = collapsed || deployFold;
 
   // own board (prep, or a battle field the player fights on) → the stage with the player's overrides; a teammate's
   // board → the plain stage (their overrides are not known here)
@@ -647,16 +686,26 @@ function MatchScreen() {
 
   // the shop bar folded (收起) or unfolded on the own prep board (public issue #5: the board did not grow, while the
   // battle and scouting views had no bar to make room for): the official shop-collapsed camera or the shop camera
-  // again, flown like any camera change. Never over the pen or a teammate's board or in battle; deferred while a piece
-  // is dragged or its direction is chosen (the drop target and the wheel sit on tiles of the camera in use) — this
-  // effect runs again when that ends (gameLogic foldCamera). Picking reads the camera of every frame (render/pick.js).
+  // again, flown like any camera change. Never over the pen or a teammate's board or in battle; a hand-made fold is
+  // deferred while a piece is dragged or its direction is chosen (the drop target and the wheel sit on tiles of the
+  // camera in use) and this effect runs again when that ends (gameLogic foldCamera). Picking reads the camera of
+  // every frame (render/pick.js). A deploy interaction is the opposite (public issue #602, gameLogic
+  // deployFoldsShop): it zooms to the shop-collapsed camera as soon as the piece is picked up, for the drag and the
+  // wheel's whole duration, and the fold / unfold choice below restores the player's own shop state when it ends.
   useEffect(() => {
+    if (deployFold && deployCameraZoom) {
+      const want = prepCameraFor(pub, myId, true);
+      const cur = camRef.current;
+      // the fold zoom flies with the short FOLD_CAMERA_MS, not a generic camera flight (render/app/tune.js)
+      if (cur.kind !== want.kind || cur.opts?.shop !== false) setCam(want.kind, { ...want.opts, ms: FOLD_CAMERA_MS });
+      return;
+    }
     const next = foldCamera({
       pub, myId, folded: shopFolded, ownPrep: !!view && viewModeRef.current === 'prep' && showPrep,
       pen, busy: !!drag || !!facing, current: camRef.current,
     });
-    if (next) setCam(next.kind, next.opts);
-  }, [view, shopFolded, showPrep, pen, !!drag, !!facing, prepCamKey]);
+    if (next) setCam(next.kind, { ...next.opts, ms: FOLD_CAMERA_MS });
+  }, [view, deployFold, deployCameraZoom, shopFolded, showPrep, pen, !!drag, !!facing, prepCamKey]);
 
   // 联防 / 最终攻势: the ‹ › pill moves the camera between the field's halves and 全景 (research 09 §3.1)
   useEffect(() => {
@@ -795,7 +844,13 @@ function MatchScreen() {
   }, [emotes]);
 
   // ---- actions ----------------------------------------------------------------------------------------------
-  const buy = useCallback((i) => actions.buy(i), []);
+  const buy = useCallback(async (i) => {
+    // Clicks and hotkeys share this guard while the same slot's purchase is awaiting a reply.
+    if (buyPending.current.has(i)) return false;
+    buyPending.current.add(i);
+    try { return await actions.buy(i); }
+    finally { buyPending.current.delete(i); }
+  }, []);
   const removeSpectator = useCallback((playerId) => actions.removeSpectator(playerId), []);
   // 准备 with funds left asks first: the prep's end wipes them (community report #4; not 坎诺特, not at 0 funds, not
   // under AI 托管 — gameLogic.readyFundsPrompt). The button and Space both come here.
@@ -1201,25 +1256,33 @@ function MatchScreen() {
   // the gold tile of an armed merge card (mergeAt): the detail card the first tap opened docks away from it (QA 6b — at
   // 1920×1080 the left card covered half of a target tile in the leftmost legal column)
   const mergeGeo = useTileScreen(view, mergeAt ? mergeAt.row : null, mergeAt ? mergeAt.col : null);
-  const retreatSel = useCallback(async () => {
+  const retreatPiece = useCallback(async (uid) => {
     const L = live.current;
-    const uid = L.sel?.uid;
+    if (pieceActionBusy.current || !underframeActions(L.placeCtx, uid)?.retreat) return;
     const to = uid != null ? retreatSlot(L.placeCtx, uid) : null;
-    if (!to) { toast('整备区已满', 'warn'); audio.sfx('error', { volume: 0.5 }); return; }
+    if (!to) { toast(t('整备区已满'), 'warn'); audio.sfx('error', { volume: 0.5 }); return; }
+    pieceActionBusy.current = true;
     setSelBusy(true);
-    if (await actions.move(uid, to)) {
-      setSel(null);
-      setDetail((d) => (d?.kind === 'piece' && d.uid === uid ? null : d)); // its card would cover the bench
+    try {
+      if (await actions.move(uid, to)) {
+        setSel((s) => s?.uid === uid ? null : s);
+        setDetail((d) => (d?.kind === 'piece' && d.uid === uid ? null : d));
+      }
+    } finally {
+      pieceActionBusy.current = false;
+      setSelBusy(false);
     }
-    setSelBusy(false);
   }, []);
-  const sellSel = useCallback(async () => {
-    const e = live.current.sel ? live.current.placeCtx.pieces.get(live.current.sel.uid) : null;
-    if (!e) return;
+  const sellOwnPiece = useCallback(async (uid) => {
+    const e = live.current.placeCtx.pieces.get(uid);
+    if (!e || pieceActionBusy.current) return;
+    pieceActionBusy.current = true;
     setSelBusy(true);
-    await sellPiece(e.piece);
-    setSelBusy(false);
+    try { await sellPiece(e.piece); }
+    finally { pieceActionBusy.current = false; setSelBusy(false); }
   }, []);
+  const retreatSel = useCallback(() => retreatPiece(live.current.sel?.uid), [retreatPiece]);
+  const sellSel = useCallback(() => sellOwnPiece(live.current.sel?.uid), [sellOwnPiece]);
 
   // unit clicks from the engine may only carry an id: resolve through m.field / spawn infos
   const detailTarget = useMemo(() => {
@@ -1287,21 +1350,50 @@ function MatchScreen() {
     const refresh = () => {
       const stats = typeof liveStats === 'function' ? liveStats() : liveStats;
       const t = snapUnitsRef.current.get(resolved.unitId);
-      if (!t || !stats?.alive || !Array.isArray(stats.range)) { showRange(view,null,0,0,null,SEL_RANGE); return; }
-      showRange(view,stats.range,Math.round(t[2]),Math.round(t[1]),detailTarget?.unit?.dir || 'RIGHT',SEL_RANGE);
+      // Use the same field/bench checks as the detail-card range. A spectator's
+      // prepared bench also has snapshot/live data, but is never a deployed unit.
+      const range=t&&stats?.alive&&Array.isArray(stats.range)?inspectRange({
+        target:detailTarget,detail:resolved,showPrep:false,field,snapshot:t,live:stats,
+        loadout:priv?.loadout,getChess:gd.chess,backups:gd.backups,
+      }):null;
+      showRange(view,range?.grid,range?.row,range?.col,range?.dir,SEL_RANGE);
     };
     refresh(); const timer=setInterval(refresh,100);
     return () => {clearInterval(timer);showRange(view,null,0,0,null,SEL_RANGE);};
-  }, [view, combat, resolved?.unitId, resolved?.type, field?.fieldId]);
+  }, [view, combat, resolved?.unitId, resolved?.type, field?.fieldId, detailTarget]);
 
   // ---- keyboard ---------------------------------------------------------------------------------------------
   useEffect(() => {
+    // Remember only pointer coordinates. Hit-test again on keydown so moved/removed pieces, overlays,
+    // camera changes and an old click selection cannot redirect a destructive action.
+    let pointer = null;
+    const trackPointer = (e) => {
+      pointer = e.pointerType === 'touch' ? null : { x: e.clientX, y: e.clientY, buttons: e.buttons };
+    };
+    const clearPointer = () => { pointer = null; };
+    const leaveWindow = (e) => { if (!e.relatedTarget) clearPointer(); };
     const onKey = async (e) => {
       const act = shortcutFor(e, settingsStore.get().keys);
       if (!act) return;
       const L = live.current;
       // dialogs / the guide own the keyboard; behind the 本局信息 / 敌方情报 drawer only Esc (closing it) acts
       if (shortcutBlocked(act, { modal: !!document.querySelector('.modal, .guide'), drawer: !!L.drawer })) return;
+      // Spectating, eliminated, watching another board, or AI 托管: prep shortcuts do nothing. Esc still closes,
+      // except a pending 教鞭 choice, whose overlay keeps Escape. Solo pause is below and does not run for these seats.
+      const suspended = prepShortcutsSuspended({
+        spectator: L.spectator,
+        alive: L.alive,
+        watchingOther: L.watchingOther,
+        away: awayStore.get().away === true,
+        autoplay: Array.isArray(L.pub?.players) && L.pub.players.some((p) => p && p.playerId === L.myId && p.autoplay),
+      });
+      if (suspended) {
+        if (act === 'escape' && L.hasPersonalChoice) return;
+        if (act !== 'escape') {
+          if (L.pub?.phase === PHASE.PREP) e.preventDefault();
+          return;
+        }
+      }
       if (L.hasPersonalChoice) {
         if (act !== 'escape') e.preventDefault();
         if (act === 'ready') {
@@ -1340,13 +1432,25 @@ function MatchScreen() {
         return;
       }
       if (!L.editable) return;
+      if (act === 'buy') {
+        if (L.drag || L.facing || !pointer || pointer.buttons) return;
+        const card = document.elementFromPoint(pointer.x, pointer.y)?.closest('.scard[data-shop-slot]');
+        if (!card || !barRef.current?.contains(card)) return;
+        const idx = Number(card.dataset.shopSlot);
+        if (!Number.isInteger(idx) || idx < 0) return;
+        const reason = shopBlockReason('buy', { priv: L.priv, editable: L.editable, slot: L.priv.shop?.slots?.[idx] });
+        if (reason) { toast(reason, 'warn'); audio.sfx('error', { volume: 0.5 }); return; }
+        await buy(idx);
+        return;
+      }
       if (act === 'retreat' || act === 'sell') {
-        if (!L.showPrep || L.drag || L.facing || L.selBusy || !L.sel) return;
-        const selected = L.placeCtx.pieces.get(L.sel.uid);
-        if (selected?.piece.kind !== 'chess') return;
-        const available = underframeActions(L.placeCtx, L.sel.uid);
-        if (act === 'retreat' && available?.retreat) await retreatSel();
-        else if (act === 'sell' && available?.sell != null) await sellSel();
+        if (!L.showPrep || L.drag || L.facing || L.selBusy || L.pen || !pointer || pointer.buttons) return;
+        const uid = L.view?.pieceAtClientPoint(pointer.x, pointer.y);
+        const hovered = Number.isInteger(uid) ? L.placeCtx.pieces.get(uid) : null;
+        if (hovered?.piece.kind !== 'chess') return;
+        const available = underframeActions(L.placeCtx, uid);
+        if (act === 'retreat' && available?.retreat) await retreatPiece(uid);
+        else if (act === 'sell' && available?.sell != null) await sellOwnPiece(uid);
         return;
       }
       const reason = shopBlockReason(act, { priv: L.priv, editable: L.editable });
@@ -1355,8 +1459,16 @@ function MatchScreen() {
       else if (act === 'freeze') actions.freeze();
       else if (act === 'levelUp') actions.levelUp();
     };
+    for (const name of ['pointermove', 'pointerdown', 'pointerup']) window.addEventListener(name, trackPointer, true);
+    window.addEventListener('pointerout', leaveWindow, true);
+    window.addEventListener('blur', clearPointer);
     window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    return () => {
+      for (const name of ['pointermove', 'pointerdown', 'pointerup']) window.removeEventListener(name, trackPointer, true);
+      window.removeEventListener('pointerout', leaveWindow, true);
+      window.removeEventListener('blur', clearPointer);
+      window.removeEventListener('keydown', onKey);
+    };
   }, []);
 
   // ---- render ---------------------------------------------------------------------------------------------------
@@ -1417,7 +1529,7 @@ function MatchScreen() {
   const bondPop = popupView({ open: bondOpen, pub, priv, myId, field, units: popOps, live: liveLayers });
   const openBond = (id, ownerId, from) => { setBondOpen((b) => toggleBond(b, id, ownerId, from)); audio.sfx('click', { volume: 0.4 }); };
   const watchingNow = combat ? (watching || field?.fieldId || home) : watching;
-  const shopOpen = showShop && !collapsed;
+  const shopOpen = showShop && !barCollapsed;
   const ufShown = !!(selEntry && editable && !facing && !drag && showPrep && ufGeo);
   // the temp overflow row holds pieces (user playtest #3 item 3): framed and labelled on the own prep board
   const temp = tempInfo(priv);
@@ -1491,7 +1603,7 @@ function MatchScreen() {
   // bonds this mode never activates (标准: 10 of 23, 奥术 among them) — shown 本局禁用 on cards, chips and the popup
   const offBonds = modeOffBonds(getMode(pub?.modeId));
 
-  return html`<div class=${cx('screen', 'gm', `gm--${mode}`, drag && 'is-dragging', collapsed && 'is-collapsed', (sp || hasPersonalChoice || pub?.augments?.selection) && 'has-sp', pen && 'is-pen', readyWhy && 'has-readywhy')}
+  return html`<div class=${cx('screen', 'gm', `gm--${mode}`, drag && 'is-dragging', barCollapsed && 'is-collapsed', (sp || hasPersonalChoice || pub?.augments?.selection) && 'has-sp', pen && 'is-pen', readyWhy && 'has-readywhy')}
       data-camera=${pen ? 'pen' : camKind}>
     <div class="gm__field" ref=${hostRef} onContextMenu=${(e) => e.preventDefault()}></div>
     ${pub?.laboratory&&myDone?html`<div class="lab-complete-notice" role="status"><span>전투 종료</span><${LaboratoryRestartButton}/></div>`:null}
@@ -1537,7 +1649,7 @@ function MatchScreen() {
         ${spectator ? null : html`<${Button} size="sm" variant="primary" icon="back" onClick=${() => watchPlayer({ playerId: myId })}>返回自己<//>`}
       </div>` : null}
 
-      ${showShop ? html`<${ShopBar} priv=${priv} editable=${editable} collapsed=${collapsed} refreshBusy=${refreshBusy} onCollapse=${setCollapsed}
+      ${showShop ? html`<${ShopBar} priv=${priv} editable=${editable} collapsed=${barCollapsed} refreshBusy=${refreshBusy} onCollapse=${setCollapsed}
         barRef=${barRef} offBonds=${offBonds}
         onBuy=${buy} onLevel=${() => actions.levelUp()} onRefresh=${() => actions.refresh()} onFreeze=${() => actions.freeze()}
         onDetail=${(id, kind, hint) => setDetail({ kind: kind === 'item' ? 'item' : 'chess', id, hint: hint || null })}
@@ -1546,7 +1658,7 @@ function MatchScreen() {
         reward=${phase === PHASE.PREP && !rewardMin ? priv?.shop?.rewardOffer || null : null}
         onReward=${(i) => actions.reward(i)} onRewardLater=${() => setRewardMin(true)} onArm=${setArmedCard} />` : null}
 
-      ${phase === PHASE.PREP && priv?.shop?.rewardOffer ? html`<${RewardOverlay} priv=${priv} minimized=${rewardMin || collapsed}
+      ${phase === PHASE.PREP && priv?.shop?.rewardOffer ? html`<${RewardOverlay} priv=${priv} minimized=${rewardMin || barCollapsed}
         onMinimize=${(m) => { setRewardMin(m); if (!m) setCollapsed(false); }} />` : null}
 
       ${prepLayers.length && (!showShop || collapsed) ? html`<${CombatHud} pub=${pub} myId=${myId} watching=${watchingNow} hud=${null} myDone=${false}
@@ -1561,6 +1673,8 @@ function MatchScreen() {
 
       <${Ticker} />
 
+      <div class="ui-slot gm__ui-slot" data-ui-slot="hud.right" aria-label=${t('界面插件')} dangerouslySetInnerHTML=${{ __html: '' }}></div>
+
       <div class="gm__corner">
       ${pub?.laboratory && combat ? html`<${LaboratoryDamage} runner=${battleRunner} fieldId=${field?.fieldId}/>` : null}
         ${solo || pub?.laboratory ? null : html`<${ChatPanel} />`}
@@ -1568,6 +1682,7 @@ function MatchScreen() {
         ${pub?.laboratory?.bossId==='boss_laboratory_jesselton'?html`<${LaboratoryTargetButton}/>`:null}
         <button type="button" class="gm__gear" aria-label="设置" title="设置" onClick=${() => setSettingsOpen(true)}><${GIcon} name="gear" /></button>
         <button type="button" class="gm__gear gm__guide" aria-label="玩法说明" title="玩法说明" onClick=${() => openGuide(0)}><${Icon} name="book" /></button>
+        ${showMetrics && metricsOpen ? html`<${CombatMetricsPanel} myId=${myId} onClose=${() => setMetricsOpen(false)} />` : null}
         <${FullscreenButton} class="gm__gear gm__fs" />
       </div>
 

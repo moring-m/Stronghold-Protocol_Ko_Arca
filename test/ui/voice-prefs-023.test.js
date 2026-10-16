@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { sanitizeSettings } from '../../public/js/ui/gameLogic/settings.js';
-import { sanitizeVoiceOverrides, voiceLangFor } from '../../public/js/voicePrefs.js';
+import { sanitizeVoiceOverrides, voiceLangFor, VOICE_PICKS } from '../../public/js/voicePrefs.js';
 import { AudioManager, voiceLine } from '../../public/js/audio.js';
 const a = 'char_263_skadi', b = 'char_103_angel';
 test('old settings migrate to inherit, malformed or prototype entries are discarded', () => {

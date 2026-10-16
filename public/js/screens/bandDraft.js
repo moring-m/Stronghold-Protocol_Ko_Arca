@@ -1,4 +1,4 @@
-import {RANDOM_BAND_ID} from '../../../shared/randomBand.js';
+import { RANDOM_BAND_ID } from '../../../shared/randomBand.js';
 import { ChatPanel } from '../ui/chat.js';
 // Band draft — BAND_DRAFT "2/2 选择策略" (research 06 §4.2, D1): left = draft order (avatar, name, state:
 // … waiting / ⌛ 决策中 / chosen band ✓), current picker highlighted; centre = grid of every band allowed
@@ -24,7 +24,7 @@ import { useEffect, useMemo, useRef, useState } from '../../vendor/hooks.module.
 import { html, Button, Icon, MicroLabel, useTicker, secondsLeft } from '../ui/components.js';
 import { useGameData, BandIcon, RichText, PlayerAvatar, LpTower, Sprite } from '../ui/gameComponents.js';
 import { StepHeader, ExitModal } from '../ui/matchChrome.js';
-import { LoadoutButton } from './loadout.js';
+import { LoadoutButton } from '../ui/loadoutEntry.js';
 import { RecruitPresetButton } from '../ui/recruitPresets.js';
 import { MatchInfoDialog, matchInfoModel } from '../ui/matchInfo.js';
 import { actions, act } from '../ui/gameActions.js';

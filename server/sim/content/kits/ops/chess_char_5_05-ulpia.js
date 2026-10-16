@@ -4,10 +4,7 @@
 import { COLS } from '../../../constants.js';
 import { frontOf } from '../../../dir.js';
 import { isHpLoss } from '../../../damage.js';
-import {
-  RING1, num, on, inRange, talent, traitBb, skillGrid, mods, dist, isAbyssal, isOp, selectedId, lazySkills, instantKind,
-  permBuff, enemiesInGrid,
-} from '../shared/tier5.js';
+import { RING1, num, on, inRange, talent, traitBb, skillGrid, mods, dist, isAbyssal, isOp, selectedId, lazySkills, instantKind, permBuff, enemiesInGrid } from '../shared/tier5.js';
 
 export default {
   // ---------------------------------------------------------------------------------------------------------------
@@ -79,7 +76,7 @@ export default {
               // the anchor stops at the field edge and in front of a ground obstacle (crates, roadblocks)
               if (!battle.grid.inRect(r, c) || battle.grid.isObstacle(r, c)) break;
               stop = d;
-              if (battle.enemiesInKeys([r * COLS + c], unit, { canHitFly: true }).length) break;
+              if (battle.enemiesOnTiles([r * (battle.grid?.cols ?? COLS) + c], unit, { canHitFly: true }).length) break;
             }
           }
           const [sr, sc] = frontOf(unit.tileR, unit.tileC, unit.dir, stop);

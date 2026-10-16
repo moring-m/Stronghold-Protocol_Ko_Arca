@@ -22,7 +22,7 @@ export default withDefaults({
       talents: [{ install(battle, unit) { // 学成于聚: an operator in range casts ⇒ +1 SP and ASPD +16 for 8 s
         battle.on('skillStart', (c) => {
           const a = c.unit;
-          if (a === unit || a.side !== 'ally' || a.kind !== 'op' || !unit.alive || !unit.deployed || !keySet(unit).has(a.tileR * COLS + a.tileC)) return;
+          if (a === unit || a.side !== 'ally' || a.kind !== 'op' || !unit.alive || !unit.deployed || !keySet(unit).has(a.tileR * (battle.grid?.cols ?? COLS) + a.tileC)) return;
           if (!battle.rng.chance(num(t0.prob, 1))) return;
           if (!skillActive(unit)) unit.skill?.gainSp(num(t0.sp, 1), 'talent');
           battle.addBuff(unit, { key: 'reckpr:t1', duration: num(t0.duration, 8), mods: { aspd: num(t0.attack_speed, 16) }, maxStacks: Math.max(1, num(t0.max_stack_cnt, 1)) });

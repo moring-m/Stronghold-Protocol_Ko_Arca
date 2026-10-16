@@ -4,15 +4,13 @@
 import { ALLY_COLLIDER_RADIUS, PROJECTILE_SPEEDS } from '../../constants.js';
 import { canTargetAlly, areaSelectable } from '../../targeting.js';
 import { periodicDamage } from '../../damage.js';
-import {
-  BOOM_RADIUS, nthOf, stOf, T, elem, hurt, targetsNear, allTargets, areaAllies, areaAlliesInTiles, byPriority,
-  stayRoute, spawnChildren, setForm, expose, auraBuff, watchDeaths, onTerrain,
-} from './helpers.js';
-import {
-  unblockable, runWhenHit, blockWeight, taunt, maxTargets, ep, nthAttackPower, lowHpBuff, deathBoom, setFloat, float,
-  reborn, frontGuard, faceMove, unbalanced, skill, kitEp, kitPrisoner, kitStun3,
-} from './archetypes.js';
+import { BOOM_RADIUS, nthOf, stOf, T, elem, hurt, targetsNear, allTargets, areaAllies, areaAlliesInTiles, byPriority, stayRoute, spawnChildren, setForm, expose, auraBuff, watchDeaths, onTerrain, castSlot } from './helpers.js';
+import { unblockable, runWhenHit, blockWeight, taunt, maxTargets, ep, nthAttackPower, lowHpBuff, deathBoom, setFloat, float, reborn, frontGuard, faceMove, unbalanced, skill, kitEp, kitPrisoner, kitStun3 } from './archetypes.js';
 import { hypot } from '../../detmath.js';
+import { passengerBus } from './passengers.js';
+import { boundedCount, PLUGIN_TIMES_MAX } from '../../../../shared/plugins/limits.js';
+import { bbCap } from '../../../../shared/plugins/officialBounds.js';
+import { stepOf, STEP_PER_TICK } from '../../../../shared/plugins/steps.js';
 
 // ---------------------------------------------------------------------------------------------------------------
 // constants (numbers that exist nowhere in the data)
@@ -48,6 +46,7 @@ function kitChimera(ab) {
     if (a.on || !onTerrain(b, e, 'infection')) return;
     a.on = true;
     e.mem.ab.atkType = 'arts';
+    castSlot(b, e, ab.sk.triggerAnim);   // its activation (triggerAnim): the skill slot for the client, display only
     b.fx('telegraph', { x: e.x, y: e.y, r: CHIMERA_AURA_RADIUS, kind: 'chimera', id: e.id });
   };
   return [{
@@ -104,7 +103,7 @@ function kitParrot(ab) {
     },
     status(c, b, e, a) {
       if (c.status === 'freeze') { a.chill = true; return; }
-      if (a.down || !(c.status === 'stun' || c.status === 'sleep' || c.status === 'groundbind')) return;
+      if (a.down || !(c.status === 'stun' || c.status === 'sleep')) return;
       a.down = true;
       setFloat(b, e, false);
       b.removeBuff(e, 'ab:parrotRun');
@@ -115,8 +114,8 @@ function kitParrot(ab) {
     tick(b, e, a) {
       if (a.chill && !e.s.flags.freeze) { a.chill = false; b.applyStatus(e, 'stun', { duration: PARROT_CHILL_STUN, source: null }); }
       // "离开上述异常效果影响后进入初始模式": s.flags.stun also holds while asleep / frozen (units.js), so a sleep that
-      // outlasts the mode stun keeps it down; so does a 缚地 (flag `groundbind`)
-      if (a.down && !e.s.flags.stun && !e.s.flags.groundbind) {
+      // outlasts the mode stun keeps it down
+      if (a.down && !e.s.flags.stun) {
         a.down = false;
         b.removeBuff(e, 'ab:parrotDown');
         b.removeBuff(e, 'ab:parrotRun');
@@ -142,34 +141,34 @@ function kitParrot(ab) {
 const RUSH_LISTEN = 0.1;
 
 function kitRush(ab) {
-  const ms = T(ab, 'rush.dlancer_t[trigger].move_speed') ?? 0, iv = T(ab, 'rush.dlancer_t[trigger].interval') ?? 0.5;
-  const max = T(ab, 'rush.dlancer_t[trigger].trig_cnt') ?? 0, scale = T(ab, 'firstattack.atk_scale') ?? 0;
-  // 晕眩 / 束缚 only (the client's STUNNED / UNMOVABLE flags: not 冻结, 沉睡 or 浮空, which hold flags.stun here too)
-  const held = (e) => e.buffs.some((x) => x.status === 'stun' || x.status === 'bind');
-  const stop = (b, e, a) => { a.on = false; a.n = 0; b.removeBuff(e, 'ab:rush'); };
+  const ms = T(ab, 'rush.dlancer_t[trigger].move_speed') ?? 0, iv = stepOf('rush.dlancer_t[trigger].interval',T(ab,'rush.dlancer_t[trigger].interval')??0.5,0.5);
+  const max = boundedCount(T(ab,'rush.dlancer_t[trigger].trig_cnt')??0,bbCap('rush.dlancer_t[trigger].trig_cnt'),0), first = T(ab, 'firstattack.atk_scale') ?? 0;
   return [{
-    iv: RUSH_LISTEN,
-    // the listeners first look at once (waitFirstTriggerInterval 0): a walker spawned unblocked starts at t = 0
-    spawn(b, e, a) { a.on = !e.blockedBy && !held(e); a.n = 0; a.tries = 0; a.acc = 0; },
+    // Control detection is every 0.1 s; speed stacks have their own 0.5 s cadence (PRTS).
+    iv: .1,
+    spawn(b, e, a) { a.n = 0; a.elapsed=0; },
     tick(b, e, a, dt) {
-      if (held(e)) { if (a.on) stop(b, e, a); return; }
-      if (!a.on) {
-        if (!e.blockedBy) { a.on = true; a.tries = 0; a.acc = 0; }
-        return;
-      }
-      if (a.tries >= max || !(iv > 0)) return;
-      a.acc += dt;
-      let grew = false;
-      while (a.acc >= iv - 1e-9 && a.tries < max) { a.acc -= iv; a.tries++; a.n++; grew = true; }
-      if (grew) b.addBuff(e, { key: 'ab:rush', mods: { moveMul: 1 + ms * a.n }, persist: true });
+      if(e.s.flags.stun || e.s.flags.noMove){a.n=0;a.charge=0;a.elapsed=0;b.removeBuff(e,'ab:rush');return;}
+      if (e.blockedBy || a.n >= max) return;
+      a.elapsed+=dt;
+      if(a.elapsed+1e-9<iv)return;
+      a.elapsed-=iv;a.n++;
+      b.addBuff(e, { key: 'ab:rush', mods: { moveMul: 1 + ms * a.n }, persist: true });
+    },
+    blocked(c, b, e, a) { a.charge = a.n; },
+    hitOut(c, b, e, a) {
+      if (!c.dmg.isAttack || !(a.charge > 0)) return;
+      // PRTS: an additional precomputed physical hit, not extra ATK folded into the basic hit.
+      // Cache speed before ending acceleration; each hit must receive DEF/shield/dodge handling separately.
+      c.dmg.rushExtra = Math.max(0,e.s.moveSpeed) * first;
     },
     dealt(c, b, e, a) {
-      if (!a.on) return;
-      const t = c.target;
-      const amount = e.s.moveSpeed * scale;
-      stop(b, e, a);
-      if (t && t.alive && amount > 0) b.dealDamage(e, t, { amount, type: 'phys', canDodge: false, isSkill: true, noSp: true, tags: ['enemyAbility', 'rush'] });
+      const amount=c.dmg.rushExtra;
+      if(!(amount>0) || c.dmg.tags?.includes('lancerRush'))return;
+      a.charge=0;a.n=0;a.elapsed=0;b.removeBuff(e,'ab:rush');
+      if(c.target.alive)b.dealDamage(e,c.target,{amount,type:'phys',isAttack:true,tags:['lancerRush']});
     },
+    attack(c, b, e, a) { if (a.charge > 0) { a.charge = 0; a.n = 0; a.elapsed=0; b.removeBuff(e, 'ab:rush'); } },
   }];
 }
 
@@ -181,6 +180,8 @@ function kitRush(ab) {
 function kitFirstAoe(ab) {
   const scale = T(ab, 'AOEAttack.atk_scale') ?? 0;
   return [blockWeight(3), {
+    // the splashing first attack is its AOEAttack: the skill slot for the client (castSlot, display only)
+    before(c, b, e, a) { if (!a.done && !a.cast) { a.cast = true; castSlot(b, e, ab.sk.AOEAttack); } },
     dealt(c, b, e, a) {
       if (a.done) return;
       a.done = true;
@@ -195,9 +196,20 @@ function kitFirstAoe(ab) {
 function kitDefDecay(ab) {
   const max = T(ab, 'def_reduce.max_stack_cnt') ?? 0, def = T(ab, 'def_reduce.def') ?? 0, res = T(ab, 'def_reduce.magic_resistance') ?? 0;
   return [{
-    taken(c, b, e) {
+    taken(c, b, e, a) {
       if (!(max > 0)) return;
-      b.addBuff(e, { key: 'ab:defDecay', refresh: 'stack', stacks: 1, maxStacks: max, persist: true, mods: { defFlat: def / max, resFlat: res / max } });
+      a.hits = Math.min(max, (a.hits || 0) + 1);
+      // PRTS: the first layer is inert; from the second layer the full layer count applies.
+      const n = a.hits >= 2 ? a.hits : 0;
+      b.addBuff(e, { key: 'ab:defDecay', refresh: 'replace', persist: true, visible: true, mods: { defFlat: def * n / max, resFlat: res * n / max } });
+      const stage = a.hits >= (T(ab, 'def_reduce.change2_stack_cnt') ?? Infinity) ? 2
+        : a.hits >= (T(ab, 'def_reduce.change1_stack_cnt') ?? Infinity) ? 1 : 0;
+      if (stage && stage !== a.stage) {
+        if (a.stage) b.removeBuff(e, `ab:mirrorCrack${a.stage}`);
+        b.addBuff(e, { key: `ab:mirrorCrack${stage}`, persist: true, visible: true });
+        b.fx('phase', { id: e.id, x: e.x, y: e.y, kind: 'mirrorCrack', stage });
+        a.stage = stage;
+      }
     },
   }];
 }
@@ -205,6 +217,67 @@ function kitDefDecay(ab) {
 function kitExposeOnHit(ab) {
   const dur = T(ab, 'Expose.weak[limit]') ?? 0, scale = T(ab, 'Expose.damage_scale') ?? 1;
   return [{ sil: true, taken(c, b) { const s = c.source; if (s && s.side === 'ally' && s.alive && s.kind !== 'device') expose(b, s, dur, scale); } }];
+}
+
+/**
+ * 自制投石机 (PRTS 天赋). A normal stone is a physical attack that splashes every ally within 1.5 of the impact
+ * (the page's 半径1.5; the blackboard `projectile_range` 0.5 is the 入戏 stone, not this volley). `times` stones
+ * land `hit_interval` (0.3 s) apart, each its own damage instance — DEF, shields and 「每次受到攻击」 effects
+ * (坚守 thorns, cd 0.2 s) see them separately. The attack does not end when the target is lost: a later stone
+ * still splashes at the last aim, and a stone already scheduled still lands if the catapult dies (no `owner`
+ * on the timer, so offOwner does not cancel it). 入戏(敌方) — a buff key or flag `inPlay`, which this mode's
+ * tables never grant — aims each stone at a random point of the side-`offset_bound`*2 square (默认 ±3, side 6)
+ * and splashes `projectile_range` (0.5) there, without forcing a hit on the main target. The roll is `battle.rng`.
+ */
+const CATAPULT_SPLASH = 1.5;
+const CATAPULT_STONE = 'catapult:stone';
+
+function catapultInPlay(e) {
+  if (e?.s?.flags?.inPlay) return true;
+  for (const bf of e?.buffs ?? []) if (bf && (bf.key === 'inPlay' || bf.flags?.inPlay)) return true;
+  return false;
+}
+
+function catapultSplash(b, e, x, y, r, skip) {
+  if (!(r > 0)) return;
+  for (const u of areaAllies(b, e, x, y, r)) {
+    if (u === skip) continue;
+    b.dealDamage(e, u, { amount: e.s.atk, type: 'phys', isAttack: true, isSplash: true, tags: [CATAPULT_STONE] });
+  }
+}
+
+/** One stone. `forcePrimary` hits the locked ally when they are still selectable, then splashes around the impact. */
+function catapultStone(b, e, aim, radius, forcePrimary, inPlay, bound) {
+  let x = aim.x, y = aim.y;
+  const t = aim.target;
+  if (inPlay) {
+    if (t && t.alive) { x = t.x; y = t.y; aim.x = x; aim.y = y; }
+    const span = bound > 0 ? bound : 0;
+    x += (b.rng() * 2 - 1) * span;
+    y += (b.rng() * 2 - 1) * span;
+    catapultSplash(b, e, x, y, radius, null);
+    return;
+  }
+  if (t && t.alive) { x = t.x; y = t.y; aim.x = x; aim.y = y; }
+  let skip = null;
+  if (forcePrimary && t && t.alive && canTargetAlly(e, t, true)) {
+    b.dealDamage(e, t, { amount: e.s.atk, type: 'phys', isAttack: true, tags: [CATAPULT_STONE] });
+    skip = t;
+  }
+  catapultSplash(b, e, x, y, radius, skip);
+}
+
+function catapultVolley(ab, b, e, aim) {
+  const n = Math.max(1, Math.floor(boundedCount(T(ab, 'Attack.attack@times') ?? 1, PLUGIN_TIMES_MAX, 1)));
+  const interval = T(ab, 'Attack.attack@hit_interval') ?? 0.3;
+  const inPlay = catapultInPlay(e);
+  const radius = inPlay ? (T(ab, 'Attack.attack@projectile_range') ?? 0.5) : CATAPULT_SPLASH;
+  const bound = T(ab, 'Attack.attack@offset_bound') ?? 3;
+  for (let i = 0; i < n; i++) {
+    const fire = () => catapultStone(b, e, aim, radius, true, inPlay, bound);
+    if (i === 0 || !(interval > 0)) fire();
+    else b.after(interval * i, fire);
+  }
 }
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -222,7 +295,7 @@ export const SPECIAL_KITS = Object.freeze({
   enemy_1121_lifbos_2: kitPrisoner(true),                            // 传奇重犯 · same
   enemy_1072_dlancer: kitRush,                                       // 萨卡兹穿刺手 · accelerates while walking; first hit after block ×speed
   enemy_1320_wdrrl_2: kitFirstAoe,                                   // 萨卡兹悖谬暴虐兵长 · block ≥3 only; first attack splashes
-  enemy_1302_ymtro_2: () => [blockWeight(4)],                        // “越长尘” · block ≥4 only (passengers n/a)
+  enemy_1302_ymtro_2: (ab) => [blockWeight(4), passengerBus(ab)],    // “越长尘” · block ≥4, carries up to Bus.max_cnt
   enemy_1329_cbshld: kitDefDecay,                                    // 弧光镜卫 · DEF/RES drop with every damage instance
   enemy_1329_cbshld_2: kitDefDecay,                                  // 弧光镜卫长 · same
   enemy_1249_lysdb_2: (ab) => [{ spawn(b, e, a, ab2) { ab2.hitShield = T(ab, 'Shield.max_block_damage_cnt') ?? 0; } }], // 莱茵生命防卫科高级成员 · blocks one phys/arts hit
@@ -243,7 +316,7 @@ export const SPECIAL_KITS = Object.freeze({
   enemy_1069_icebrk_2: (ab) => [{ hitOut(c, b, e) { if (c.dmg.isAttack && c.target.s.flags.freeze) c.dmg.amount *= T(ab, 'atkup.atk_scale') ?? 1; } }], // 雪怪小队破冰者 · ×3 vs frozen
   enemy_1026_aghost: () => [unblockable()],                          // 幽灵组长 · unblockable
   enemy_1062_rager_2: (ab) => [{ iv: 1, tick(b, e) { const v = T(ab, 'periodic_damage.damage') ?? 0; if (v > 0) b.dealDamage(null, e, periodicDamage(v)); } }], // 狂暴宿主组长 · "自身每秒受到500无来源真实伤害" (damage, not 流失)
-  enemy_1183_mlasrt: (ab) => [ep('erosion', T(ab, 'EpDamage.attack@ep_damage_ratio') ?? 0), nthAttackPower(nthOf(ab.sk.PowerAttack), (ab.sk.PowerAttack && ab.sk.PowerAttack.bb.atk_scale) || 1)], // 无胄盟清扫小队 · erosion; every 4th attack ×1.5
+  enemy_1183_mlasrt: (ab) => [ep('erosion', T(ab, 'EpDamage.attack@ep_damage_ratio') ?? 0), nthAttackPower(nthOf(ab.sk.PowerAttack), (ab.sk.PowerAttack && ab.sk.PowerAttack.bb.atk_scale) || 1, null, 0, ab.sk.PowerAttack)], // 无胄盟清扫小队 · erosion; every 4th attack ×1.5
   enemy_1273_stmgun_2: (ab) => {                                     // 高准度伦蒂尼姆城防自行炮 · locks the highest max-HP unit in range, bombards the highest HP% on its 9 tiles
     // the allies in its range (the engine's ranged reach: radius + the ally collider)
     const inRange = (b, e) => allTargets(b, e).filter((a) => hypot(a.x - e.x, a.y - e.y) <= (e.base.rangeRadius || 0) + ALLY_COLLIDER_RADIUS + 1e-9);
@@ -290,7 +363,7 @@ export const SPECIAL_KITS = Object.freeze({
   enemy_10018_sgrobh: () => [maxTargets(2)],                         // “独轮车玩具” · attacks 2 targets
   enemy_2001_duckmi: (ab) => [unblockable(), runWhenHit(T(ab, 'run.attack@move_speed') ?? 0)],   // 鸭爵 · unblockable, no attack; runs +400 % once hurt
   enemy_2001_duckmi_2: (ab) => [unblockable(), runWhenHit(T(ab, 'run.attack@move_speed') ?? 0)], // 鸭爵 (鸭爵 strategy) · same, +300 %
-  enemy_10159_mntrjn: () => [unblockable()],                         // 伊利昂的木驮兽 · unblockable (passengers n/a)
+  enemy_10159_mntrjn: (ab) => [unblockable(), passengerBus(ab, true)], // 伊利昂的木驮兽 · unblockable; bus.max_cnt / bus.move_speed
   enemy_2009_csaudc: kitEp('neural', 'combat.attack@ep_damage_ratio'), // 骇笑看客 · neural on hit
   enemy_2010_csdcr: (ab) => [ep('neural', T(ab, 'attack.attack@ep_damage_ratio') ?? 0), { // 绯红歌伶 · neural on hit; every 20 hits taken: global enemy ASPD up
     taken(c, b, e, a) {
@@ -404,7 +477,7 @@ export const SPECIAL_KITS = Object.freeze({
   },
   enemy_10118_ymgprc: (ab) => {                                      // 澪 · double hits; 寒晖: every 4th attack (spCost 3) is a ×1.5 double hit
     const scale = (ab.sk.PowerAttack && ab.sk.PowerAttack.bb.atk_scale) || 1;
-    const pw = nthAttackPower(nthOf(ab.sk.PowerAttack), scale);
+    const pw = nthAttackPower(nthOf(ab.sk.PowerAttack), scale, null, 0, ab.sk.PowerAttack);
     return [pw, { dealt(c, b, e) { hurt(b, e, c.target, e.s.atk * (pw.power ? scale : 1), 'phys', { isSkill: false }); } }];
   },
   enemy_10127_rkmbst_2: (ab) => [taunt(1), { spawn(b, e) {           // 异质裂兽·α · M0 shield (damage ×0.5, ASPD +100, barrier)

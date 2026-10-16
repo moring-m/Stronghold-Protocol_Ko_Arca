@@ -1,4 +1,4 @@
-import {ADDITIONAL_SKILL_RANGE_PROFILES} from './skillRangeStyles.generated.js';
+import { ADDITIONAL_SKILL_RANGE_PROFILES } from './skillRangeStyles.generated.js';
 // Confirmed base-skin skill VFX, not colours inferred from operator portraits.
 // Evidence: docs/LOCAL-SKILL-RANGE-VISUAL-AUDIT.md. Unconfirmed skills deliberately
 // return null so the renderer uses the operator's representative colour.

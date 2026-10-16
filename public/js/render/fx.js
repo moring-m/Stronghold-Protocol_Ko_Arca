@@ -1,9 +1,9 @@
 import { damageNumberMode, showDamageNumber, roundedDamageNumber } from '../../../shared/damageDisplay.js';
 import { skillRangeStyle, loadRangeArtColor } from './units.js';
-import {DEDICATED_TEXTURES,dedicatedProjectile} from './dedicatedEffects.js';
-import {assets} from '../assets.js';
-import {projectileMaterial} from './effectArt.js';
-import {projectileStyle,meleeStyle} from './projectileStyle.js';
+import { DEDICATED_TEXTURES, dedicatedProjectile } from './dedicatedEffects.js';
+import { assets } from '../assets.js';
+import { projectileMaterial } from './effectArt.js';
+import { projectileStyle, meleeStyle } from './projectileStyle.js';
 export function wideAttackFamily(info, active) {
   if (['spreadshooter','reaperrange'].includes(info?.subProf) || info?.charId === 'char_279_excu') return 'cone';
   if (!active) return null;
@@ -276,6 +276,10 @@ export function fxSpec(kind, extra = {}) {
   if (extra && (extra.dmgType === 'arts' || /arts|magic/i.test(String(extra.kind || ''))) && spec.a === 'blast') spec = { ...spec, c: 0xc77dff };
   return spec;
 }
+
+/** Gameplay notices and animation commands remain visible with official combat art. */
+const UTILITY_FX=new Set(['sp','dp','coin','lp','down','telegraph','mark','reticle']);
+export function utilityFx(kind,extra){return kind==='enemySkill'||UTILITY_FX.has(fxSpec(kind,extra).a);}
 
 /** Tiles covered by a blast / telegraph: `tiles` = [[r,c]…] or 'box' (Chebyshev ⌊r⌋ around the centre) or 'disc'. */
 export function tilesAround(x, y, r, tiles) {

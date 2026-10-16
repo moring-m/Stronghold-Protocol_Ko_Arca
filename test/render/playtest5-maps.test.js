@@ -77,7 +77,8 @@ describe('#6 act2 m01 blowers in every view', () => {
   });
 
   test('the blower machines stand on the separator blocks; the row-13 ones blow onto the field below them', () => {
-    const b = buildBoard(M01, { area: boardArea('prep') });
+    // the battle view's area: the field alone (the prep view adds the pen block, see the repro above)
+    const b = buildBoard(M01, { area: boardArea('normal') });
     for (const d of b.devices.filter((x) => x.kind === 'blower')) {
       const t = b.grid[d.r][d.c];
       assert.equal(t.glyph, 'X');
@@ -87,7 +88,7 @@ describe('#6 act2 m01 blowers in every view', () => {
       const onto = d.rangeTiles.slice(1).map(([r, c]) => !!b.grid[r][c].content);
       assert.deepEqual(onto, d.r === 13 && d.c<=10 ? [true, true, true] : [false, false, false], `${d.r},${d.c}`);
     }
-    // the separator row is built along the field's top edge (the pen rows 14–18 are still not)
+    // the separator row is built along the field's top edge (the pen rows 14–18 are not, in battle)
     const rows = new Set(b.grid.flat().filter((t) => t.drawn).map((t) => t.r));
     assert.ok(rows.has(13) && rows.has(14) && !rows.has(5), [...rows].join());
   });

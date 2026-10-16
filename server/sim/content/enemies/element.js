@@ -2,9 +2,7 @@
 // KITS (split from content/enemies.js).
 
 import { periodicDamage } from '../../damage.js';
-import {
-  stOf, T, elem, hurt, targetsNear, areaAllies, areaAlliesInTiles, targetAndArea, byPriority, setForm, onTerrain,
-} from './helpers.js';
+import { stOf, T, elem, hurt, targetsNear, areaAllies, areaAlliesInTiles, targetAndArea, byPriority, setForm, onTerrain } from './helpers.js';
 import { taunt, ep, deathSpawn, deathBoom, setFloat, float, skill, kitEp, kitStun3 } from './archetypes.js';
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -64,7 +62,7 @@ function kitSyufo(ab) {
   return [float(), ep('erosion', T(ab, 'EpDamage.attack@ep_damage_ratio') ?? 0), {
     spawn(b, e) { e.profile.canTarget = (u) => !u.isFlying; },
     status(c, b, e, a) {
-      if (a.crawl || !(c.status === 'stun' || c.status === 'freeze' || c.status === 'sleep' || c.status === 'groundbind')) return;
+      if (a.crawl || !(c.status === 'stun' || c.status === 'freeze' || c.status === 'sleep')) return;
       a.crawl = true;
       setFloat(b, e, false);
       e.profile.melee = true;

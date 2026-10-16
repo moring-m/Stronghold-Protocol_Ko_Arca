@@ -1,7 +1,7 @@
-import {useState} from '../../vendor/hooks.module.js';
-import {html,Button,Modal} from './components.js';
-import {toast} from './toasts.js';
-import {copyText} from './clipboard.js';
+import { useState } from '../../vendor/hooks.module.js';
+import { html, Button, Modal } from './components.js';
+import { toast } from './toasts.js';
+import { copyText } from './clipboard.js';
 export function presetPayload(kind,state){return {kind,v:1,presets:state.presets,active:state.active};}
 const PREFIX={'stronghold.favorites':'SHF1','stronghold.recruit-presets':'SHR1'};
 export function presetCode(kind,state){

@@ -2,10 +2,10 @@
 import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
-import { pipeline } from "node:stream";
-import { authorized, json, body } from "./runtime.js";
-import {RELEASE_RETENTION_MS} from "../../shared/releaseRetirement.js";
-import { transform } from "./transform.js";
+import { pipeline } from 'node:stream';
+import { authorized, json, body } from './runtime.js';
+import { RELEASE_RETENTION_MS } from '../../shared/releaseRetirement.js';
+import { transform } from './transform.js';
 export async function startGateway({
   port = 3000,
   host = "127.0.0.1",
@@ -336,7 +336,7 @@ export async function startGateway({
       // Tab-local version selection preserves reloads without a release in the visible URL.
       // Room invites explicitly choose their owner; a retired version falls back to current.
       const available=Object.keys(state.releases).filter(id=>!expired(id)),invited=/^[A-Z]{4}$/.test(code);
-      const html=`<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>위수 프로토콜</title></head><body><p>서버에 연결 중입니다.</p><script>(()=>{const releases=${JSON.stringify(available)},current=${JSON.stringify(id)},invited=${invited};let remembered;try{remembered=sessionStorage.getItem('sp.activeRelease');}catch{}const navigation=performance.getEntriesByType('navigation')[0]?.type,resuming=navigation==='reload'||navigation==='back_forward';const release=!invited&&resuming&&releases.includes(remembered)?remembered:current;const url=new URL(location.href);url.pathname='/r/'+release+'/';url.searchParams.delete('release');location.replace(url.pathname+url.search+url.hash);})();</script></body></html>`;
+      const html=`<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>위수 프로토콜</title><style>html,body{margin:0;background:#0c0f0e;color-scheme:dark}</style><script>(()=>{const releases=${JSON.stringify(available)},current=${JSON.stringify(id)},invited=${invited};let remembered;try{remembered=sessionStorage.getItem('sp.activeRelease');}catch{}const navigation=performance.getEntriesByType('navigation')[0]?.type,resuming=navigation==='reload'||navigation==='back_forward';const release=!invited&&resuming&&releases.includes(remembered)?remembered:current;const url=new URL(location.href);url.pathname='/r/'+release+'/';url.searchParams.delete('release');location.replace(url.pathname+url.search+url.hash);})();</script></head><body></body></html>`;
       res.writeHead(200,{'content-type':'text/html; charset=utf-8','cache-control':'no-store'});
       res.end(req.method==='HEAD'?undefined:html);
       return;

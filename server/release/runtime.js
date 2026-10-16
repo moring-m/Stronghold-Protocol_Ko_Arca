@@ -1,7 +1,7 @@
 // Protected worker controls. Kept separate from public game protocol.
-import {sendSession} from "../net.js";
-import {createRetirement} from "./retirement.js";
-import { timingSafeEqual } from "node:crypto";
+import { sendSession } from '../net.js';
+import { createRetirement } from './retirement.js';
+import { timingSafeEqual } from 'node:crypto';
 export function authorized(req, token) {
   const value = req.headers.authorization || "",
     expected = `Bearer ${token}`;

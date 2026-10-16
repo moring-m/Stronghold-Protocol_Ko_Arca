@@ -2,9 +2,7 @@
 // Conventions of the tier-6 kits: ../shared/tier6.js; kit contract and rules: ../README.md.
 
 import { COLS } from '../../../constants.js';
-import {
-  num, bv, tbb, live, onDefaultSkill, instantKind, ABNORMAL, hasAbnormal, cleanseAbnormal,
-} from '../shared/tier6.js';
+import { num, bv, tbb, live, onDefaultSkill, instantKind, ABNORMAL, hasAbnormal, cleanseAbnormal } from '../shared/tier6.js';
 
 // ------------------------------------------------------------------------------------------------------------------
 // 流明 chess_char_6_14 (疗养师) — S3 灯火不灭; 凡人之愿; 应急处理; module 纯铜单筒望远镜
@@ -104,7 +102,7 @@ function lumen(bb, chess, def) {
         battle.on('statusApplied', (ctx) => {
           const t = ctx.target;
           if (!live(unit) || !t || t.side !== 'ally' || !ABNORMAL.has(ctx.status) || battle.time < ready || !(sc > 0)) return;
-          if (!unit.rangeKeySet?.has(t.tileR * COLS + t.tileC)) return;
+          if (!unit.rangeKeySet?.has(t.tileR * (battle.grid?.cols ?? COLS) + t.tileC)) return;
           ready = battle.time + cd;
           battle.heal(unit, t, unit.s.atk * sc);
           battle.fx('emergency', { x: t.x, y: t.y, id: t.id, src: unit.id });

@@ -160,7 +160,8 @@ if (!process.env.NODE_TEST_CONTEXT) {
     }
   }
 
-  const srv = await startServer({ port: Number(process.env.PORT) || 0, host: process.env.HOST || '127.0.0.1', quiet: true, MatchClass: FastMatch });
+  const srv = await startServer({ port: Number(process.env.PORT) || 0, host: process.env.HOST || '127.0.0.1', quiet: true, MatchClass: FastMatch,
+    ...(process.env.SP_PLUGINS_DIR ? { pluginsDir: process.env.SP_PLUGINS_DIR } : {}) });
   console.log(`fast server on ${srv.url} (timers ×${timerScale}, combat ${combatSpeed}×${startAt ? `, first round ${startAt}` : ''})`);
   const stop = () => { srv.close().finally(() => process.exit(0)); };
   process.on('SIGTERM', stop);

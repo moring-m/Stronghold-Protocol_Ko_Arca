@@ -116,14 +116,16 @@ test('submerged ground bodies sink and recover without lowering airborne or plat
 });
 
 
-test('stationary boss footprint sorts behind surrounding operators in every boss framing', async()=>{
+test('stationary boss sorts between the rear two rows and front two rows in every boss framing', async()=>{
  const {unitDepthKey}=await import('../../public/js/render/units.js');
  const area={w:4.95,h:2.95,dx:0,dy:1};
  for(const [side,half]of [['L',true],['R',true],['L',false]]){
   const camera=presetCamera('boss',{width:1440,height:900,side,half});
   const boss=unitDepthKey(camera,10,1,0,false,area);
-  for(const [x,y]of [[7,1],[13,1],[7,2],[13,3],[10,0]])assert.ok(unitDepthKey(camera,x,y)>boss);
-  assert.ok(unitDepthKey(camera,10,5)<boss,'units behind the whole footprint retain natural depth');
+  for(const x of [7,10,13]){
+   for(const y of [4,3])assert.ok(unitDepthKey(camera,x,y)<boss,'rear rows are behind the boss');
+   for(const y of [1,0])assert.ok(unitDepthKey(camera,x,y)>boss,'front rows cover the boss');
+  }
   assert.equal(unitDepthKey(camera,10,1,0,true,area),unitDepthKey(camera,10,1,0,true),'airborne and moving units are unchanged');
  }
 });

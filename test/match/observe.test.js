@@ -44,6 +44,13 @@ test('cameraLayers: ‹ LEFT / 全景 / RIGHT › with "你自己" / name / "无
   assert.deepEqual(cameraLayers({ kind: 'boss', players: ['a'], sides: { a: 'L' } }, pub, 'a'), [], 'a solo boss field has no halves');
   assert.deepEqual(layerCamera(unite, 'R', 'R'), { rect: unite.rect, side: 'R', half: true });
   assert.deepEqual(layerCamera(unite, 'ALL', 'R'), { rect: unite.rect, side: 'R' });
+  // a lone helper's 联防 starts on its half; 全景 stays the whole field (GitHub #635, PR #637)
+  assert.equal(loneHalf(single), 'L');
+  assert.equal(loneHalf({ ...unite, players: ['b'], sides: { b: 'R' } }), 'R');
+  assert.equal(loneHalf(unite), null, 'two helpers start on 全景');
+  assert.equal(loneHalf({ kind: 'boss', players: ['a'], sides: { a: 'L' } }), null, 'boss fields keep their own rule');
+  assert.equal(loneHalf(null), null);
+  assert.deepEqual(layerCamera(single, 'ALL', 'L'), { rect: unite.rect, side: 'L' });
 });
 
 test('resumedWatch: a reload while watching a teammate\'s battle adopts the resent field once per battle (review, DESIGN §20.15)', () => {

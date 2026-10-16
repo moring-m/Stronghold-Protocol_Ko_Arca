@@ -3,10 +3,7 @@
 
 import { COLS } from '../../../constants.js';
 import { bodyOnTile } from '../../../body.js';
-import {
-  num, defOf, talentBb, moduleTalentBb, selectedId, altSkills, alive, gridKeys, fx, copyGrid, textNum, freeTile,
-  groundTile, enemiesOn,
-} from '../shared/tier3.js';
+import { num, defOf, talentBb, moduleTalentBb, selectedId, altSkills, alive, gridKeys, fx, copyGrid, textNum, freeTile, groundTile, enemiesOn } from '../shared/tier3.js';
 import { powi } from '../../../detmath.js';
 import { champagneHold, CHAMPAGNE_TRIGGER } from '../../tokens.js';
 import { canTargetEnemy } from '../../../targeting.js';

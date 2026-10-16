@@ -138,7 +138,7 @@ export default {
           if (ctx.unit !== unit) return;
           let low = 0;
           for (const k of unit.baseRangeKeys || []) {
-            const r = (k / COLS) | 0, c = k % COLS;
+            const r = (k / (battle.grid?.cols ?? COLS)) | 0, c = k % (battle.grid?.cols ?? COLS);
             if (battle.grid.inRect(r, c) && battle.grid.isLow(r, c)) low++;
           }
           const atk = low >= num(t0.cnt, 2) ? num(t0['kjera_t_1[high].atk'], num(t0.atk)) : num(t0.atk);

@@ -74,3 +74,10 @@ test('legacy enemy strike metadata supplies wind-up, including Big Bob',()=>{
  h.run(.1);assert.equal(u.hp,before,'no damage before the strike frame');
  h.run(.2);assert.ok(u.hp<before,'strike lands after the wind-up');
 });
+
+test('an enemy completes its committed strike after its living target leaves range',()=>{
+ const h=scenario('enemy');h.step();const e=h.enemies()[0],u=h.unit('timed');
+ assert.ok(e.mem.attackWindup);u.x=10;u.y=18;const before=u.hp;h.run(.6);
+ assert.equal(e.stats.attacks,1);assert.equal(e.mem.attackWindup,undefined);
+ h.run(5);assert.ok(u.hp<before);assert.equal(h.b.errorCount,0);
+});

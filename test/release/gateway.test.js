@@ -129,6 +129,12 @@ test("rollover retains rooms and websocket reconnects; only new rooms move to th
   assert.ok(room.match);
   assert.equal(old.lobby.draining, true);
   assert.equal(next.lobby.draining, false);
+  const entryHtml=await(await fetch(url+'/')).text();
+  assert.ok(!entryHtml.includes('서버에 연결 중입니다.'));
+  assert.match(entryHtml,/<body><\/body>/);
+  assert.match(entryHtml,/sessionStorage.getItem/);
+  assert.match(entryHtml,/location.replace/);
+  assert.match(entryHtml,/background:#0c0f0e/);
   const statusResponse = await fetch(url + '/__roll/status.json');
   assert.equal(statusResponse.status,200);
   assert.equal(statusResponse.headers.get('cache-control'),'no-store');

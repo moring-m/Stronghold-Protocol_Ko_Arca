@@ -1,12 +1,14 @@
+import {standInForText} from "./gameLogic.js";
+import {hotkeyLabelOf} from "./settings.js";
 import { LaboratoryBar } from './laboratory.js';
-import {useSettings} from './settings.js';
-import {hotkeyLabel} from './gameLogic/shortcuts.js';
+import { useSettings } from './settings.js';
+import { hotkeyLabel } from './gameLogic/shortcuts.js';
 
 
 
 import { t } from '../../../shared/i18n.js';
-import {favoritesStore,isFavorite,FavoritesButton} from './favorites.js';
-import {useStore} from '../store.js';
+import { favoritesStore, isFavorite, FavoritesButton } from './favorites.js';
+import { useStore } from '../store.js';
 import { PROF_NAME } from './loadoutModel.js';
 import { store } from '../store.js';
 // Bottom shop bar (research 06 §11.2 / D3): LEVEL card (upgrade price hex, 升级), 3–5 operator cards
@@ -24,8 +26,9 @@ import { store } from '../store.js';
 // D / R / F keys stay one-press shortcuts — a 刷新 whose request is still on the wire dims the button and swallows
 // further taps and the R key until the reply lands (GitHub #501; the single-flight lives in ui/gameActions.js
 // onRefreshBusy, ui/shopBar.js only draws it). There is no drag-to-sell zone: selling is the 出售 +N button of a tapped
-// unit's underframe (ui/underframe.js). After a promotion the operator cards are replaced by
-// the 晋升奖励 cards (3 free operators, pick 1 — also two taps) until picked or put off (稍后 → rewardOverlay.js pill);
+// unit's underframe (ui/underframe.js). After a promotion the shop's cards — operators and the equipment slot alike
+// (GitHub #617) — are replaced by the 晋升奖励 cards (3 free operators, pick 1 — also two taps) until picked or put off
+// (稍后 → the normal shop again + rewardOverlay.js pill);
 // a special refresh (凯瑟琳 定向投放's 3 items, 娜仁图亚, 寻呼模块, 信标, 松果) takes the same place under its own name, an
 // item slot drawn as an item card (player report #6 after 0.1.0).
 // Every operator card shows the skill it will fight with — the player's 干员调配 loadout (m.private.loadout, DESIGN
@@ -82,8 +85,12 @@ function ArmedTag({ reason, free }) {
  * @param {{ slot:any, idx:number, priv:any, frozen?:boolean, reason?:string|null, free?:boolean, armed?:boolean,
  *   onTap?:(idx:number)=>void, onBuy:Function, onDetail:Function }} props
  */
-export function ChessCard({ slot, idx, priv, frozen = false, reason = null, free = false, hidePrice = false, showFavorite = true, armed = false, onTap = null, onBuy, onDetail, offBonds = null }) {
+export function ChessCard(props) {
   useStore(x=>x,Object.is,favoritesStore);
+  return ChessCardView(props);
+}
+
+export function ChessCardView({ slot, idx, priv, frozen = false, reason = null, free = false, hidePrice = false, showFavorite = true, armed = false, onTap = null, onBuy, onDetail, offBonds = null }) {
   const c = data.lookup('chess', slot.id);
   const m = data.get('assets');
   const tier = c?.tier ?? 1;
@@ -97,7 +104,10 @@ export function ChessCard({ slot, idx, priv, frozen = false, reason = null, free
   const lo = c ? chessLoadout(c, priv?.loadout, LOOKUPS.getChess, {ops:priv?.ops ?? null,effects:data.get('effects')}) : null;
   const mod=lo?.module && !lo.module.none ? lo.module : null;
   const tap = () => { if (onTap) onTap(idx); else if (!disabled) onBuy(idx); else onDetail(slot.id, 'chess', hint); };
+  const name = c?.name || t('干员');
   const card = html`<button type="button" class=${cx('scard', `scard--t${tier}`, favorite && 'is-favorite', recruit && 'is-recruit', frozen && 'is-frozen', disabled && 'is-disabled', willMerge && 'is-merge', armed && 'is-armed')}
+      data-shop-slot=${free ? undefined : idx} aria-keyshortcuts=${free ? undefined : hotkeyLabelOf('buy')}
+      title=${free || reason ? undefined : t('购买鼠标指向的商品 · {key}', { key: hotkeyLabelOf('buy') })}
       onClick=${tap} onContextMenu=${(e) => { e.preventDefault(); onDetail(slot.id, 'chess', hint); }}
       aria-label=${`${c?.name || '干员'}${hidePrice ? '' : `，价格 ${slot.price}`}${armed ? (disabled ? '，无法购买' : '，再次点击确认') : ''}`} aria-pressed=${onTap ? String(!!armed) : undefined}>
     <span class="scard__bg" aria-hidden="true"></span>
@@ -136,13 +146,19 @@ export function ChessCard({ slot, idx, priv, frozen = false, reason = null, free
  * @param {{ slot:any, idx:number, frozen?:boolean, reason?:string|null, armed?:boolean, onTap?:(idx:number)=>void,
  *   onBuy:Function, onDetail:Function }} props
  */
-export function ItemCard({ slot, idx, frozen = false, reason = null, free = false, hidePrice = false, armed = false, onTap = null, onBuy, onDetail }) {
+export function ItemCard(props) {
   useStore(x=>x,Object.is,favoritesStore);
+  return ItemCardView(props);
+}
+
+export function ItemCardView({ slot, idx, frozen = false, reason = null, free = false, hidePrice = false, armed = false, onTap = null, onBuy, onDetail }) {
   const it = data.lookup('items', slot.id);
   const m = data.get('assets');
   const disabled = !!reason;
   const tap = () => { if (onTap) onTap(idx); else if (!disabled) onBuy(idx); else onDetail(slot.id, 'item'); };
   const card = html`<button type="button" class=${cx('scard', 'scard--item', isFavorite('item',slot.id) && 'is-favorite', frozen && 'is-frozen', disabled && 'is-disabled', armed && 'is-armed')}
+      data-shop-slot=${free ? undefined : idx} aria-keyshortcuts=${free ? undefined : hotkeyLabelOf('buy')}
+      title=${free || reason ? undefined : t('购买鼠标指向的商品 · {key}', { key: hotkeyLabelOf('buy') })}
       onClick=${tap} onContextMenu=${(e) => { e.preventDefault(); onDetail(slot.id, 'item'); }}
       aria-label=${`${it?.name || '装备'}${hidePrice ? '' : `，价格 ${slot.price}`}${armed ? (disabled ? '，无法购买' : '，再次点击确认') : ''}`}
       aria-pressed=${onTap ? String(!!armed) : undefined}>
@@ -304,8 +320,9 @@ function RegularShopBar({ priv, editable, collapsed, refreshBusy = false, onColl
   const keys = new Set();
   if (!collapsed) {
     if (!lvReason) keys.add(levelKey);
-    slots.forEach((s, i) => { if (s && !s.sold) keys.add(armKey(s.kind === 'item' ? 'i' : 'c', i, s)); });
+    // a reward offer hides the shop's cards (operators and the equipment slot, #617): only its own cards arm
     if (showReward) reward.slots.forEach((s, i) => { if (s && !s.sold) keys.add(armKey('r', i, s)); });
+    else slots.forEach((s, i) => { if (s && !s.sold) keys.add(armKey(s.kind === 'item' ? 'i' : 'c', i, s)); });
   }
   const [armed, setArmed] = useTwoTap({ editable, keys });
   // the armed card's slot (game.js lights the tile a merge's elite will take — gameLogic.mergeTarget); kept before the
@@ -365,7 +382,7 @@ function RegularShopBar({ priv, editable, collapsed, refreshBusy = false, onColl
               reason=${reason} armed=${armed === armKey('c', i, s)} onTap=${editable ? (idx) => tapCard('c', idx, s, 'chess', reason, onBuy) : null} />`;
         })}
       </div>`}
-      <div class="shopbar__item">
+      ${showReward ? null : html`<div class="shopbar__item">
         ${itemSlots.length
           ? itemSlots.map(({ s, i }) => {
             if (s.sold) return html`<${SoldCard} key=${`is${i}`} item=${true} />`;
@@ -374,7 +391,7 @@ function RegularShopBar({ priv, editable, collapsed, refreshBusy = false, onColl
               armed=${armed === armKey('i', i, s)} onTap=${editable ? (idx) => tapCard('i', idx, s, 'item', reason, onBuy) : null} />`;
           })
           : html`<${SoldCard} item=${true} />`}
-      </div>
+      </div>`}
       <div class="funds">
         <div class="funds__hex">
           <${CoinGlyph} class="funds__coin" />

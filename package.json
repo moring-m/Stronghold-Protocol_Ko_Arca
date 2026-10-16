@@ -1,6 +1,6 @@
 {
   "license": "GPL-3.0-or-later",
-  "version": "0.2.6",
+  "version": "0.3.0",
   "main": "server/index.js",
   "description": "明日方舟「卫戍协议：盟约」非官方同人联机网页复刻（1–4 人合作，Node.js 服务器 + 浏览器客户端）",
   "bugs": {
@@ -12,34 +12,42 @@
     "url": "git+https://github.com/sganggs/Stronghold-Protocol.git"
   },
   "scripts": {
-    "assets:battle": "node tools/setup-battle-assets.mjs",
-    "vendor": "node tools/vendor.mjs",
-    "assets:ursus": "node tools/fetch-ursus-assets.mjs",
-    "setup": "node tools/setup.mjs",
-    "assets": "node tools/vendor.mjs && node tools/fetch-assets.mjs",
-    "golden:update": "node tools/golden.mjs --update",
-    "golden": "node tools/golden.mjs",
-    "build-data": "node tools/build-data.mjs",
-    "assets:voices": "node tools/build-battle-voices.mjs --refresh",
-    "launch": "node scripts/launch.mjs",
-    "dev:ursus": "node scripts/start-ursus.mjs",
-    "postinstall": "node tools/vendor.mjs",
-    "test": "node tools/run-tests.mjs",
-    "dev": "node --watch server/index.js",
-    "doctor": "node tools/doctor.mjs",
     "start": "node server/index.js",
+    "dev": "node --watch server/index.js",
+    "test": "node tools/run-tests.mjs",
+    "golden": "node tools/golden.mjs",
+    "golden:update": "node tools/golden.mjs --update",
+    "vendor": "node tools/vendor.mjs",
+    "build-data": "node tools/build-data.mjs",
+    "assets": "node tools/vendor.mjs && node tools/fetch-assets.mjs",
+    "postinstall": "node tools/vendor.mjs",
+    "setup": "node tools/setup.mjs",
+    "doctor": "node tools/doctor.mjs",
+    "launch": "node scripts/launch.mjs",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit --checkJs -p jsconfig.json",
+    "check:imports": "node tools/check-imports.mjs",
+    "ci": "node tools/ci.mjs",
+    "package": "node tools/package.mjs",
+    "package:lite": "node tools/package.mjs --lite",
+    "assets:battle": "node tools/setup-battle-assets.mjs",
+    "assets:ursus": "node tools/fetch-ursus-assets.mjs",
+    "assets:voices": "node tools/build-battle-voices.mjs --refresh",
+    "dev:ursus": "node scripts/start-ursus.mjs",
     "dev:recruits": "node scripts/start-recruits-test.mjs",
     "assets:augments": "node tools/fetch-augment-icons.mjs",
     "build:augments": "python tools/build-augments.py"
   },
   "dependencies": {
-    "es-module-lexer": "^3.0.3",
     "htm": "^3.1.1",
     "pixi-spine": "^4.0.6",
     "pixi.js": "^7.4.2",
     "preact": "^10.29.8",
+    "ses": "2.3.0",
     "three": "^0.186.1",
-    "ws": "^8.22.0"
+    "ws": "^8.22.0",
+    "acorn": "8.18.0",
+    "es-module-lexer": "^3.0.3"
   },
   "homepage": "https://github.com/sganggs/Stronghold-Protocol#readme",
   "keywords": [
@@ -52,7 +60,11 @@
   ],
   "name": "stronghold-protocol-alliance",
   "devDependencies": {
-    "puppeteer-core": "^25.12.0"
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.12.0",
+    "globals": "^17.13.0",
+    "puppeteer-core": "^25.12.0",
+    "typescript": "^5.9.2"
   },
   "type": "module",
   "engines": {

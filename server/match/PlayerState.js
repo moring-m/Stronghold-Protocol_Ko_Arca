@@ -1,3 +1,12 @@
+
+import {PlayerBasics as MergePlayer0} from './player/basics.js';
+import {PlayerDiy as MergePlayer1} from './player/diy.js';
+import {PlayerItems as MergePlayer2} from './player/items.js';
+import {PlayerPieces as MergePlayer3} from './player/pieces.js';
+import {PlayerPlacement as MergePlayer4} from './player/placement.js';
+import {PlayerRound as MergePlayer5} from './player/round.js';
+import {msg,dn} from './../../shared/i18n.js';
+import {checkNotOwned,charPotentialChanges} from './../../shared/protocol.js';
 import {augmentEffectEntries} from '../../shared/augments.js';
 import {onMerge} from './botEmotes.js';
 
@@ -224,6 +233,7 @@ export class PlayerState {
       bossDamage: 0, lpLost: 0, buys: 0, sells: 0, perfectRounds: 0, fundsGained: 0, healing: 0,
     };
     this.eliminatedRound = null;
+    this.creditedKills = 0;
     this.lpAtFinal = null;
     /** last combat result for this player (unite carry state, bounties) */
     this.lastResult = null;
@@ -294,7 +304,7 @@ export class PlayerState {
         }
       }
       const ids = opsCharIds(this.gd.raw);
-      opsRes = checkLoadoutOps(raw, (id) => ids.has(id));
+      opsRes = checkLoadoutOps(raw, (id) => ids.has(id), (id) => charPotentialChanges(this.gd.raw, id));
       if (!opsRes || !opsRes.ok) {
         this.m.log?.warn?.(`[match ${this.m.roomCode}] operator settings of ${this.playerId} ignored: ${opsRes && opsRes.detail}`);
         return false;
@@ -483,9 +493,11 @@ export class PlayerState {
       if (i >= 0) { this.hand[i] = piece; return 'hand'; }
       if (!allowTemp) return null;
     }
-    const j = freeSlot(this.temp);
-    if (j >= 0) { this._putTemp(j, piece); return 'temp'; }
-    return null;
+    // Five visible slots are a window, not a capacity limit. Once resources are queued, append
+    // new gains behind them; recompute fills visible holes without changing an in-progress merge's indices.
+    const j = this.temp.length > TEMP_SIZE ? -1 : freeSlot(this.temp);
+    this._putTemp(j >= 0 ? j : this.temp.length, piece);
+    return 'temp';
   }
 
   /**
@@ -534,7 +546,8 @@ export class PlayerState {
     for (const [k, p] of [...this.board]) {
       if (p.kind !== 'token' || p.ownerUid !== ownerUid || p === keep) continue;
       this.board.delete(k);
-      if (!this._returnToken(p, null, { allowTemp: true })) this.board.set(k, p); // nowhere to go: it stays put
+      // allowTemp always queues past the visible row; put the summon back only if stow itself refused.
+      if (!this._returnToken(p, null, { allowTemp: true })) this.board.set(k, p);
     }
   }
 
@@ -610,12 +623,7 @@ export class PlayerState {
       owned = this._mergeChess(base, piece);
       if (!owned) return null;
     } else {
-      const where = this.stow(piece, { allowTemp: true, toTemp });
-      if (!where) {
-        this.returnCopies(piece);
-        this.m.toast(this, 'warn', '整备区已满，获得的干员已返还');
-        return null;
-      }
+      this.stow(piece, { allowTemp: true, toTemp });
     }
     this.recompute();
     if (!silent) this.m.dispatch(this, 'onGain', { piece: owned, kind: 'chess', source });
@@ -665,30 +673,17 @@ export class PlayerState {
       const rc = l.piece.meta && l.piece.meta.round;
       if (rc && rc.r === this.m.round) for (const [k, v] of Object.entries(rc.n)) this.bumpPieceRoundCount(elite, k, Math.max(0, v - this.pieceRoundCount(elite, k)));
     }
+    // the copies are gone; a refresh dispatch that saw them still runs their 刷新时 特质 (effectsMeta.js _garrisons, #627)
+    for (const l of consumed) if (l.area !== 'new') l.piece.mergedInto = elite.uid;
     const deployed = consumed.filter((l) => l.key && !this.board.has(l.key)).map((l) => ({ key: l.key, dir: pieceDir(l.piece) }));
     const toTile = (t) => { elite.placementOrder = consumed.find(l => l.key === t.key)?.piece.placementOrder ?? ++this._placementSeq; elite.dir = parseDir(t.dir) || 'RIGHT'; this.board.set(t.key, elite); return 'board'; };
     const tile = mergeTile(deployed, (r, c) => this._legal(elite, r, c));
-    let where = tile ? toTile(tile) : this.stow(elite, { allowTemp: true });
-    // hand and temp full and no deployed tile legal for it (a terrain change not re-checked yet): it stays on the first
-    // deployed copy's tile rather than being lost, like a piece _evictIllegal finds no room for
-    if (!where && deployed.length) where = toTile(mergeTile(deployed));
-    for (const it of items) {
-      if (this.stow(it, { allowTemp: true })) continue;
-      if (where && elite.items.length < this.gd.equipPerChess) { elite.items.push(it); continue; }
-      this.m.log.warn?.(`[match ${this.m.roomCode}] ${this.playerId}: returned item ${it.id} destroyed (no space)`);
-    }
+    const where = tile ? toTile(tile) : this.stow(elite, { allowTemp: true });
+    for (const it of items) this.stow(it, { allowTemp: true });
     // the returned equipment follows the auto-merge rule like any other gain ("已拥有2件同一初始装备时…自动合并")
     this.checkItemMerges();
-    // deployed like any operator placed by hand: its manually deployable summons join the hand (after the returned
-    // equipment, which would be lost in temp — a summon stack removed there comes back at the next round start)
+    // A deployed elite receives its summon stacks after the returned equipment.
     if (where === 'board') this.grantTokensFor(elite);
-    if (!where) {
-      this.pool.give(baseId, copies);
-      this.m.toast(this, 'warn', '整备区已满，晋升的精锐干员无法放入');
-      this.m.log.warn?.(`[match ${this.m.roomCode}] ${this.playerId}: merge result dropped (hand+temp full)`);
-      this.recompute();
-      return null;
-    }
     this.stats.merges++;
     this.pushRewardOffer('merge');
     const rec = this.gd.chess(goldenId);
@@ -732,23 +727,17 @@ export class PlayerState {
   transformChess(piece, newId) {
     const loc = this.find(piece.uid);
     if (!loc || loc.piece.kind !== 'chess' || !this.gd.chess(newId)) return null;
-    // 原干员销毁: off its tile / slot, its summons removed, its copies back to the pool
+    // Remove the original carrier, its summons, and its pool occupation.
     this._detach(loc);
     this.removeTokensOf(piece.uid);
     const items = piece.items || [];
     piece.items = [];
     this.returnCopies(piece);
     // its equipment comes off first (the returned pair auto-merges, which may free a slot for the gain)
-    const left = items.filter((it) => !this.stow(it, { allowTemp: true }));
+    for (const it of items) this.stow(it, { allowTemp: true });
     this.checkItemMerges();
-    // 获得一名…干员: gained like any other gained operator
+    // The replacement follows the ordinary acquisition path.
     const np = this.acquireChess(newId, { source: 'transform' });
-    for (const it of left) {
-      if (this.stow(it, { allowTemp: true })) continue;
-      if (np && this.find(np.uid) && np.items.length < this.gd.equipPerChess) { np.items.push(it); continue; }
-      this.m.log.warn?.(`[match ${this.m.roomCode}] ${this.playerId}: returned item ${it.id} destroyed (no space)`);
-    }
-    if (left.length) this.checkItemMerges();
     this.recompute();
     return np;
   }
@@ -843,10 +832,11 @@ export class PlayerState {
    * already equipped is taken off for the fight about to start. Hand and temp both full keeps the 「整备区已满，获得的装备已销毁」
    * outcome. [ASSUMED] every item granted at 休整期结束, not only 维多利亚's 战栗维式重锤 (owner's decision 2026-10-04).
    */
-  acquireItem(itemId, { source = 'grant', toTemp = false, silent = false, deferMerge = false, fromPool = true } = {}) {
+  acquireItem(itemId, { source = 'grant', toTemp = false, silent = false, deferMerge = false, fromPool = true, displayed = false } = {}) {
     const rec = this.gd.item(itemId);
     if (!rec) return null;
-    if (fromPool && !this.m.itemPool.canGain(itemId)) {
+    const pool=this.m.itemPool,leftBefore=pool.left(itemId),need=pool.need(itemId),unlimitedGift=!fromPool;
+    if (fromPool && !displayed && !pool.canGain(itemId)) {
       this.m.toast(this, 'warn', '장비 재고가 부족하여 장비를 획득하지 못했습니다');
       return null;
     }
@@ -857,9 +847,12 @@ export class PlayerState {
     if (!deferMerge && this.completesItemMerge(itemId)) {
       piece = this._mergeItem(itemId, piece);
       if (!piece) return null;
-    } else if (!this.stow(piece, { allowTemp: true, toTemp })) {
-      this.m.toast(this, 'warn', '整备区已满，获得的装备已销毁');
-      return null;
+    } else {
+      this.stow(piece, { allowTemp: true, toTemp });
+    }
+    if (displayed && !unlimitedGift) {
+      const shortfall = leftBefore === Infinity ? 0 : Math.max(0, need - leftBefore);
+      if (shortfall > 0) pool.owe(itemId, shortfall);
     }
     this.recompute();
     if (!silent) this.m.dispatch(this, 'onGain', { piece, kind: 'item', source });
@@ -873,19 +866,10 @@ export class PlayerState {
     const consumed = incoming ? [{ piece: incoming, area: 'new' }] : [];
     for (const l of locs) { if (consumed.length >= need) break; consumed.push(l); }
     if (consumed.length < need) return null;
-    // remember where equipped twins sat: with a full hand AND a full temp the golden item takes the first one's slot
-    const slotOf = consumed.filter((l) => l.area === 'equipped').map((l) => ({ holder: l.holder, idx: l.holder.items.indexOf(l.piece) }));
     for (const l of consumed) if (l.area !== 'new') this._detach(l);
     const stockCopies = consumed.reduce((n, l) => n + (l.piece.stockCopies ?? this.m.itemPool.need(l.piece.id)), 0);
     const golden = this.newPiece('item', rec.upgradeChessId || rec.goldenId, { stockCopies });
-    if (!this.stow(golden, { allowTemp: true })) {
-      const at = slotOf[0];
-      if (!at || !this.find(at.holder.uid)) {
-        this.m.toast(this, 'warn', '整备区已满，合成的装备已销毁');
-        return null;
-      }
-      at.holder.items.splice(Math.max(0, Math.min(at.idx, at.holder.items.length)), 0, golden);
-    }
+    this.stow(golden,{allowTemp:true});
     this.stats.itemMerges++;
     this.m.dispatch(this, 'onMerge', { kind: 'item', piece: golden, itemId, consumed: consumed.map((l) => l.piece.uid) });
     return golden;
@@ -893,7 +877,10 @@ export class PlayerState {
 
   /** Merge every identical normal item pair currently owned (after equips / returns). */
   checkItemMerges() {
-    for (let guard = 0; guard < 20; guard++) {
+    // Bound the work by the actual inventory, including hidden overflow and equipped items.
+    // A fixed twenty-merge limit left large batches of deferred prep-end rewards unmerged.
+    const limit = this.hand.length + this.temp.length + this.allChess().reduce((n, p) => n + (p.items || []).length, 0);
+    for (let guard = 0; guard < limit; guard++) {
       const counts = new Map();
       const scan = (p) => { if (p && p.kind === 'item' && this._itemMergeable(p.id)) counts.set(p.id, (counts.get(p.id) || 0) + 1); };
       for (const p of this.hand) scan(p);
@@ -1053,11 +1040,12 @@ export class PlayerState {
       piece = this.acquireChess(slot.id, { source: 'buy' });
     } else {
       if (!this.gd.item(slot.id)) return fail(ERR.BAD_TARGET);
-      if (!this.m.itemPool.canGain(slot.id)) return fail(ERR.SOLD_OUT);
+      // Already displayed equipment stays purchasable after stock runs out (#624, maintainer 2026-10-14).
+      // acquireItem records the debt. Future rolls still exclude empty stock. SOLD_OUT is only this slot, already sold.
       if (handFull) return fail(ERR.HAND_FULL);
       this.spend(price);
       slot.sold = true;
-      piece = this.acquireItem(slot.id, { source: 'buy' });
+      piece = this.acquireItem(slot.id, { source: 'buy', displayed: true });
     }
     return this.completePurchase(piece, slot, price);
   }
@@ -1078,6 +1066,9 @@ export class PlayerState {
     if (!free && this.funds < price) return fail(ERR.NO_FUNDS);
     if (free) this.shop.freeRefreshes--;
     else this.spend(price);
+    // A manual refresh cancels the freeze: the new cards are not frozen (official, the owner's play of 2026-10-14;
+    // GitHub #584, DESIGN §32.14.7). A refresh that fails (funds, phase) returns above and leaves the freeze on.
+    this.shop.frozen = false;
     this.rollShop({ keepFrozen: false });
     this.stats.refreshes++;
     this.round.refreshes++;
@@ -1117,16 +1108,10 @@ export class PlayerState {
     if (!loc) return fail(ERR.BAD_TARGET);
     if (loc.piece.kind !== 'chess') return fail(ERR.BAD_TARGET, loc.piece.kind === 'item' ? 'items cannot be sold' : 'tokens cannot be sold');
     const piece = loc.piece;
-    // its equipment returns to the hand (overflow temp): refuse rather than destroy it when there is no room
-    // Removing the owner's summon stacks frees one slot per stack, regardless of its summon count.
-    const freed = (x) => x == null || (x.kind === 'token' && x.ownerUid === piece.uid);
-    const room = this.hand.filter(freed).length + this.temp.filter(freed).length + (loc.area === 'hand' || loc.area === 'temp' ? 1 : 0);
-    if ((piece.items || []).length > room) return fail(ERR.HAND_FULL, 'no room for the equipment');
+    // Returned equipment can always wait in the overflow queue, even when all fifteen visible slots are occupied.
     this._detach(loc);
     this.removeTokensOf(piece.uid);
-    for (const it of piece.items || []) {
-      if (!this.stow(it, { allowTemp: true })) this.m.log.warn?.(`[match ${this.m.roomCode}] ${this.playerId}: item ${it.id} lost on sell (no space)`);
-    }
+    for (const it of piece.items || []) this.stow(it, { allowTemp: true });
     piece.items = [];
     this.returnCopies(piece);
     const ev = { piece, gain: this.gd.sellPrice(piece.id) };
@@ -1463,7 +1448,10 @@ export class PlayerState {
         if (off) target.items.splice(Math.min(off.idx, target.items.length), 0, off.piece);
         return fail(ERR[ev.error] ? ev.error : ERR.BAD_TARGET, typeof ev.detail === 'string' ? ev.detail : undefined);
       }
-      if (off) this.m.dispatchItem(this, off.piece, target, 'onDestroy', { item: off.piece, holder: target, reason: 'replace' });
+      if (off) {
+        this.m.dispatchItem(this, off.piece, target, 'onDestroy', { item: off.piece, holder: target, reason: 'replace' });
+        this.releaseItemStock(off.piece);
+      }
       // the handler may have destroyed the target (信标) — resolve the item again
       const again = this.find(item.uid);
       if (again && again.area !== 'equipped') this._detach(again);
@@ -1471,6 +1459,8 @@ export class PlayerState {
         const holder = this.find(target.uid);
         if (holder && holder.piece.kind === 'chess') this._attach(holder.piece, item);
       }
+      // !ev.keep, or the carrier is gone: the consumed item left play. A kept item is on the carrier.
+      if (!this.find(item.uid)) this.releaseItemStock(item);
       this.stats.itemsEquipped++;
       this.checkItemMerges();
       this.recompute();
@@ -1497,11 +1487,12 @@ export class PlayerState {
    */
   _attach(target, item, replaceUid = null) {
     target.items = target.items || [];
-    while (target.items.length >= this.gd.equipPerChess) {
+    while (target.items.length >= this.gd.equipPerChess) { // loop-cap: splices one item each pass
       const i = replaceUid != null ? target.items.findIndex((x) => x.uid === replaceUid) : -1;
       const [old] = target.items.splice(i >= 0 ? i : 0, 1);
       replaceUid = null;
       this.m.dispatchItem(this, old, target, 'onDestroy', { item: old, holder: target, reason: 'replace' });
+      this.releaseItemStock(old);
     }
     target.items.push(item);
   }
@@ -1541,6 +1532,7 @@ export class PlayerState {
     if (ev.used !== false) {
       const again = this.find(itemUid);
       if (again) this._detach(again);
+      this.releaseItemStock(loc.piece);
       this.round.arts++;
     }
     this.recompute();
@@ -1557,6 +1549,7 @@ export class PlayerState {
     if (!loc || loc.piece.kind !== 'item') return fail(ERR.BAD_TARGET, 'only items can be destroyed');
     if (loc.area === 'equipped') return fail(ERR.BAD_TARGET, 'equipped items are locked');
     this._detach(loc);
+    this.releaseItemStock(loc.piece);
     this.m.dispatchItem(this, loc.piece, loc.holder || null, 'onDestroy', { item: loc.piece, holder: loc.holder || null, reason: 'player' });
     this.recompute();
     return OK;
@@ -1572,14 +1565,13 @@ export class PlayerState {
     const handFull = freeSlot(this.hand) < 0;
     if (slot.kind === 'item') {
       if (!this.gd.item(slot.id)) return fail(ERR.BAD_TARGET);
-      if (!this.m.itemPool.canGain(slot.id)) return fail(ERR.SOLD_OUT);
-      if (handFull && freeSlot(this.temp) < 0 && !this.completesItemMerge(slot.id)) return fail(ERR.HAND_FULL);
+      // Already displayed equipment rewards survive stock exhaustion (#624, maintainer 2026-10-14).
+      if(handFull && freeSlot(this.temp)<0 && !this.completesItemMerge(slot.id))return fail(ERR.HAND_FULL);
     } else if (slot.kind === 'chess') {
       const rec = this.gd.chess(slot.id);
       if (!rec) return fail(ERR.BAD_TARGET);
-      const base = this.gd.baseIdOf(slot.id);
-      const need = rec.isGolden ? this.gd.goldenCopies : 1;
-      // Already displayed operator offers remain available; acquisition records the stock deficit.
+      // Owner decision 2026-10-11 (#498): already displayed operator rewards survive stock exhaustion.
+      // acquireChess records the deficit. Displayed item rewards do the same (acquireItem displayed).
       if (handFull) return fail(ERR.HAND_FULL);
     } else return fail(ERR.BAD_TARGET);
     const price = Number.isFinite(slot.price) && slot.price > 0 ? Math.trunc(slot.price) : 0;
@@ -1587,7 +1579,7 @@ export class PlayerState {
     slot.sold = true;
     this.offers.shift();
     if (price > 0) this.spend(price);
-    if (slot.kind === 'item') this.acquireItem(slot.id, { source: 'reward' });
+    if (slot.kind === 'item') this.acquireItem(slot.id, { source: 'reward', displayed: true });
     else this.acquireChess(slot.id, { source: 'reward' });
     this._afterSpend(price, 'reward');
     this.recompute();
@@ -1637,7 +1629,7 @@ export class PlayerState {
           if(this.temp.includes(item))this._tempDue.set(item.uid,this.prepsEnded+1);
         }
         p.items=[];
-      }
+      } else if (p.kind === 'item') this.releaseItemStock(p);
     }
     if (changed) this.recompute();
   }
@@ -1657,8 +1649,9 @@ export class PlayerState {
     this.addFunds(nonNeg(ev.income) + nonNeg(ev.pending)+(this.m.augments?.income(this)||0), { reason: 'income' });
     // temp is NOT wiped here: the last prep's deadline resolved what the player could act on (endPrep); what overflowed
     // after it (battle-result grants, SETTLE merges, returned equipment) is shown and usable in this prep (tempDue).
-    // Likewise reward offers of the last prep already expired at its end; what is still queued was earned after it —
-    // a merge completed during SETTLE / the Final Assault (突变细胞, battle-result grants) — and is shown in this prep
+    // Queued reward offers (a promotion's pick, a strategy's special refresh, an item offer) are kept until picked —
+    // they do not lapse at the prep deadline (PRTS 卫戍协议/帮助: the temporary shop leaves its state when one is bought;
+    // community report relayed by the maintainer on 2026-10-15) — so an offer left with 稍后 is shown again in this prep
     this.ready = false;
     // summon stacks removed from temp at the last prep deadline come back (PRTS 卫戍协议/帮助 §手牌区); full hand ⇒ temp
     for (const p of [...this.board.values()]) if (p.kind === 'chess') this.grantTokensFor(p);
@@ -1676,7 +1669,7 @@ export class PlayerState {
     this.resolveTemp();
     this.prepsEnded++;
     for (const uid of [...this._tempDue.keys()]) if (!this.temp.some((p) => p && p.uid === uid)) this._tempDue.delete(uid);
-    this.offers = [];
+    // (queued reward offers stay: they last until picked, startRound)
     this.clearUnfrozenShop();
     if (!this.gd.keepsFunds(this.bandId)) this.funds = 0;
     this.ready = true;
@@ -1693,7 +1686,11 @@ export class PlayerState {
     for (const p of this.board.values()) all.push(p);
     for (const p of this.hand) if (p) all.push(p);
     for (const p of this.temp) if (p) all.push(p);
-    for (const p of all) this.returnCopies(p);
+    for (const p of all) {
+      this.returnCopies(p);
+      if (p.kind === 'item') this.releaseItemStock(p);
+      for (const it of p.items || []) this.releaseItemStock(it);
+    }
     this.board.clear();
     this.hand.fill(null);
     this.temp.fill(null);
@@ -1709,7 +1706,9 @@ export class PlayerState {
 
   _fillHandFromTemp() {
     let moved = 0;
-    for (let j = this.temp.length - 1; j >= 0; j--) {
+    const indices = Array.from({ length: TEMP_SIZE }, (_, i) => TEMP_SIZE - 1 - i)
+      .concat(Array.from({ length: Math.max(0, this.temp.length - TEMP_SIZE) }, (_, i) => TEMP_SIZE + i));
+    for (const j of indices) {
       const p = this.temp[j];
       if (!p) continue;
       const i = freeSlot(this.hand);
@@ -1717,6 +1716,13 @@ export class PlayerState {
       this._detach({ piece: p, area: 'temp', idx: j });
       this.hand[i] = p;
       moved++;
+    }
+    if (this.temp.length > TEMP_SIZE) {
+      // Keep the oldest five visible and refill them after sales, deployments, equipment use or merges.
+      // Moving within temp preserves each UID's existing prep deadline.
+      const pending = this.tempPieces();
+      this.temp = new Array(TEMP_SIZE).fill(null);
+      pending.forEach((p, i) => { this.temp[i < TEMP_SIZE ? TEMP_SIZE - 1 - i : i] = p; });
     }
     return moved;
   }
@@ -1726,8 +1732,13 @@ export class PlayerState {
     this.deployMap(); // a change of the deploy field (a boss round's prep) marks the legality stale
     if (this._legalityStale) this._evictIllegal();
     this._liftOutOfRange();
+    // a free regular hand slot pulls a temp piece in (PRTS 卫戍协议/帮助 §手牌区 "常规手牌区出现空位时自动移入")
+    this._fillHandFromTemp();
+    // the states the last recompute stored: the change since then is reported once (_reportActiveBonds)
+    const before = this.bonds;
     this.bonds = computeBonds(this.gd, this);
     this.dirty();
+    this._reportActiveBonds(before, this.bonds);
   }
 
   activatedLayers() { return activatedLayers(this.bonds); }
@@ -1890,3 +1901,5 @@ export class PlayerState {
 }
 
 export { FIELD };
+
+for(const methods of [MergePlayer0,MergePlayer1,MergePlayer2,MergePlayer3,MergePlayer4,MergePlayer5])for(const key of Reflect.ownKeys(methods.prototype)){if(key!=='constructor'&&!Object.hasOwn(PlayerState.prototype,key))Object.defineProperty(PlayerState.prototype,key,Object.getOwnPropertyDescriptor(methods.prototype,key));}

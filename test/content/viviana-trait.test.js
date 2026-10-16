@@ -11,11 +11,11 @@ for(const elite of [false,true])for(const active of [false,true])test(`Viviana d
  for(let i=0;i<7;i++)hit();assert.equal(ps.bonds.kazimierzShip.layers,base.kazimierzShip);
  h.b.dealDamage(u,e,{amount:0,type:'true'});assert.equal(ps.bonds.kazimierzShip.layers,base.kazimierzShip);hit();
  const mul=elite?2:1;assert.equal(ps.bonds.kazimierzShip.layers-base.kazimierzShip,2*mul);assert.equal(ps.bonds.skillfulShip.layers-base.skillfulShip,1*mul);assert.equal(ps.bonds.leithanienShip.layers-base.leithanienShip,active?2*mul:0);
- for(let i=0;i<80;i++)hit();assert.equal(ps.bonds.kazimierzShip.layers-base.kazimierzShip,22*mul);assert.equal(ps.bonds.skillfulShip.layers-base.skillfulShip,11*mul);
+ for(let i=0;i<80;i++)hit();assert.equal(ps.bonds.kazimierzShip.layers-base.kazimierzShip,20*mul);assert.equal(ps.bonds.skillfulShip.layers-base.skillfulShip,10*mul);
  assert.match(data.garrisons[u.def.raw.garrisonIds[0]].desc,/대미지를 8회.*카시미어/);assert.equal(h.b.errorCount,0);
 });
 
-test('Viviana uncapped damage-trigger gains are accepted by client result layer budgets',()=>{
+test('Viviana ten-trigger damage trait has a bounded client result allowance',()=>{
  const gd=new GameData(data,'mode_multi_hard');const spec={kind:'normal',round:1,spawns:[],players:[{playerId:'p1',units:[{uid:1,kind:'chess',chessId:'chess_custom_leithanien_viviana_a'}],bonds:{leithanienShip:{layers:0},kazimierzShip:{layers:0},skillfulShip:{layers:0}}}]};
- const bounds=specBounds(spec,gd);for(const id of ['leithanienShip','kazimierzShip','skillfulShip'])assert.equal(bounds.players.get('p1').layerAllow.get(id),Infinity);
+ const bounds=specBounds(spec,gd);for(const id of ['leithanienShip','kazimierzShip','skillfulShip'])assert.equal(bounds.players.get('p1').layerAllow.get(id),id==='skillfulShip'?10:20);
 });

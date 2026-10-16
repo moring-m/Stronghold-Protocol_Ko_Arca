@@ -1,9 +1,9 @@
-import {makeCtx} from './effectsMeta.js';
-import {triggerGainEffects} from '../sim/content/garrisons/meta.js';
-import {createRng,deriveSeed} from '../sim/rng.js';
-import {normalizeRuleValues} from '../../shared/customExtensions.js';
-import {PHASE,ERR} from '../../shared/constants.js';
-import {AUGMENT_ROUNDS,createAugmentCatalog,rollAugmentGrade,drawAugmentCard,augmentView} from '../../shared/augments.js';
+import { makeCtx } from './effectsMeta.js';
+import { triggerGainEffects } from '../sim/content/garrisons/meta.js';
+import { createRng, deriveSeed } from '../sim/rng.js';
+import { normalizeRuleValues } from '../../shared/customExtensions.js';
+import { PHASE, ERR } from '../../shared/constants.js';
+import { AUGMENT_ROUNDS, createAugmentCatalog, rollAugmentGrade, drawAugmentCard, augmentView } from '../../shared/augments.js';
 const ok={ok:true},fail=(error,detail)=>detail?({error,detail}):({error});
 export class AugmentMode {
  constructor(match){this.m=match;this.settings=normalizeRuleValues(match.customExtensions.ruleValues);this.enabled=match.customExtensions.rules?.includes('augments')===true;this.rng=createRng(deriveSeed(match.seed,'augments'));this.history=[];this.completed=new Set();this.seen=new Map();this.enemySeen=new Set();this.allies=new Map();this.enemies=[];this.roundLog=[];this.current=null;this.pending=new Map();this.delivering=false;}

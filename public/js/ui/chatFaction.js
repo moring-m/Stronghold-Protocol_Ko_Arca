@@ -1,8 +1,8 @@
-import {html} from './components.js';
-import {data, useData} from '../data.js';
-import {useStore} from '../store.js';
-import {chatFaction} from '../../../shared/chat.js';
-import {bondIconUrl} from './assetUrls.js';
+import { html } from './components.js';
+import { data, useData } from '../data.js';
+import { useStore } from '../store.js';
+import { chatFaction } from '../../../shared/chat.js';
+import { bondIconUrl } from './assetUrls.js';
 
 export function FactionBadge({playerId, faction = null}) {
   useData('assets');

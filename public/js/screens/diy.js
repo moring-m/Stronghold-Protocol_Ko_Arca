@@ -1,5 +1,5 @@
-import {tr} from '../i18n/i18n.js';
-import {matchesKoreanSearch} from '../../../shared/search.js';
+import { tr } from '../i18n/i18n.js';
+import { matchesKoreanSearch } from '../../../shared/search.js';
 // 自选编队 (0.2.0 DIY; research 0.2.0 §2, the owner's decisions of 2026-10-05): the third tab of the 干员调配 overlay
 // (screens/loadout.js). Four slots — 5阶 ×2, 6阶 ×2 — each filled with an operator: a 6★ the player owns outside the
 // chess pool (any of its three skills, any module of its elite form but a 集成战略 one) or a prototype (原型干员, its skill

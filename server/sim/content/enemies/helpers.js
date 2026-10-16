@@ -1,3 +1,5 @@
+import {FORMS} from '../../../../shared/animationForms.js';
+import {offspringMods} from '../../../../shared/enemyRewards.js';
 // server/sim/content/enemies/helpers.js — shared helpers of the enemy kits (split from content/enemies.js; the module
 // map is in its header): the constants several families use, the per-battle state, the ability bookkeeping (abOf /
 // attach / dispatch, T, canCast …) and the selection and damage helpers (elem, hurt, areaAllies & friends, zone,
@@ -71,8 +73,8 @@ export const nthOf = (s) => (s && s.sp > 0 ? s.sp + 1 : NTH_ATTACK);
 const STATE = new WeakMap();
 
 function stOf(b) {
-  let st = STATE.get(b);
-  if (!st) { st = { lpLoss: 0, freedAll: false, deathWatch: new Set() }; STATE.set(b, st); }
+  let st = b[STATE];
+  if (!st) { st = { lpLoss: 0, freedAll: false, deathWatch: new Set() }; b[STATE] = st; }
   return st;
 }
 
@@ -88,12 +90,29 @@ export function abOf(b, e) {
   const t = { ...((e.def && e.def.talent) || {}), ...((ov && ov.talents && ov.talents.bb) || {}) };
   const tS = { ...((raw.talents && raw.talents.bbStr) || {}), ...((ov && ov.talents && ov.talents.bbStr) || {}) };
   const sk = {};
-  for (const s of (ov && Array.isArray(ov.skills) ? ov.skills : (e.def && e.def.skills) || [])) {
-    if (!s || s.prefabKey == null) continue;
-    sk[s.prefabKey] = { cd: num(s.cooldown, 0), icd: num(s.initCooldown, 0), sp: num(s.spCost, 0), bb: s.bb || {}, bs: s.bbStr || {} };
-  }
+  // `slot`: the skill's index in its data record's skills[] (data/enemies.json — the order the client resolves a
+  // ['cast', id, slot] event's prefabKey by: castSlot); an override's skill keeps the slot of its prefabKey there
+  const base = (e.def && Array.isArray(e.def.skills)) ? e.def.skills : [];
+  const list = ov && Array.isArray(ov.skills) ? ov.skills : base;
+  list.forEach((s, i) => {
+    if (!s || s.prefabKey == null) return;
+    const at = base.findIndex((x) => x && x.prefabKey === s.prefabKey);
+    sk[s.prefabKey] = { prefabKey:s.prefabKey, animation:e.def.raw?.abilityAnimations?.[s.prefabKey], cd: num(s.cooldown, 0), icd: num(s.initCooldown, 0), sp: num(s.spCost, 0), bb: s.bb || {}, bs: s.bbStr || {}, slot: at >= 0 ? at : i };
+  });
   e.mem.ab = { key, t, tS, sk, list: [], times: null, hitShield: 0, atkType: null, immune: null, origMaxHp: e.base.maxHp };
   return e.mem.ab;
+}
+
+/**
+ * A display-only client event: enemy `e` uses its skill `s` (an `ab.sk` entry) — ['cast', id, slot] with the slot of
+ * its data record's skills[] (`s.slot`) and, when the skill's blackboard has one, its `duration` (render/app.js: the
+ * slot's skill clip, render/vfx/skillfx.js: that skill's official effects for the window). No gameplay effect: no state,
+ * no random draw (DESIGN §8.2; golden counts the event, nothing else moves).
+ */
+export function castSlot(b, e, s) {
+  if (!b || !e || !s || !Number.isInteger(s.slot)) return;
+  const d = s.bb && typeof s.bb.duration === 'number' && s.bb.duration > 0 ? Math.round(s.bb.duration * 100) / 100 : 0;
+  b._ev(d > 0 ? ['cast', e.id, s.slot, d] : ['cast', e.id, s.slot]);
 }
 
 /** Attach abilities to an enemy (calls their spawn()). */
@@ -234,7 +253,7 @@ export function zone(b, { x, y, r, life, iv = 1, kind = 'zone', tick, pick = nul
   b.fx('zone', { x, y, r, dur: life, kind });
   let left = life;
   const h = b.every(iv, () => {
-    tick(pick ? pick(x, y, r) : b.alliesInRadius(x, y, r));
+    tick((pick ? pick(x, y, r) : b.alliesInRadius(x, y, r)).filter(u => !u.isFlying && !u.s.flags.liftoff));
     left -= iv;
     if (left <= 1e-6) h.cancel();
   });
@@ -286,13 +305,16 @@ function modsWithoutBounty(mods) {
 export function spawnChildren(b, parent, key, n, opts = {}) {
   const out = [];
   const route = opts.route ?? remainingRoute(parent);
+  const mods = offspringMods(opts.mods ?? parent.mods);
+  // A death spawn during 联防 is not another bounty phase and cannot bill the original leaker's LP.
+  const bountyDeath = !parent.alive && (parent.bounty || parent.mods?.bountyId || parent.mods?.bountyCoins);
+  const countInTotal = opts.countInTotal ?? (b.kind === 'unite' && (bountyDeath || parent.counted === false) ? false : undefined);
   const cnt = Math.max(0, Math.min(20, Math.floor(n)));
-  const mods = modsWithoutBounty(opts.mods ?? parent.mods ?? null);
   for (let i = 0; i < cnt; i++) {
     const off = cnt > 1 ? (i - (cnt - 1) / 2) * 0.2 : 0;
     const pos = opts.pos ?? [parent.y, parent.x + off];
     const c = b.spawnEnemy(key, {
-      pos, route, mods, tag: opts.tag ?? null, countInTotal: opts.countInTotal,
+      pos, route, mods, tag: opts.tag ?? null, countInTotal,
       ownerPlayerId: parent.ownerId ?? null, sourcePlayerId: parent.sourcePlayerId ?? null,
     });
     if (c) out.push(c);
@@ -340,6 +362,8 @@ export const isHitCount = (e) => !!e.findBuff(HIT_COUNT_KEY);
  */
 export function setForm(b, e, form, fxKind = 'phase', params = null) {
   e.form = form;
+  const spec=FORMS[e.def.spine || e.defId]?.[form], duration=e.def.raw?.animationDurations?.[spec?.change];
+  if(duration>0 && e.alive)e.mem.abilityAnimUntil=Math.max(e.mem.abilityAnimUntil || 0,b.time+duration);
   b.fx(fxKind, fxKind === 'phase' ? { ...params, x: e.x, y: e.y, id: e.id, kind: form, form } : { ...params, x: e.x, y: e.y, id: e.id, form });
 }
 

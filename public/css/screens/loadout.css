@@ -48,8 +48,6 @@
 .lo-top__title { display: flex; align-items: center; gap: .12rem; margin: 0; font-size: max(.32rem, 16px); font-weight: 900; letter-spacing: .14em; line-height: 1.15; }
 .lo-top__icon { width: max(.3rem, 16px); height: max(.3rem, 16px); object-fit: contain; color: var(--mint-500); }
 .lo-top__right { justify-self: end; display: flex; align-items: center; gap: .16rem; min-width: 0; }
-.lo-count { font-size: max(.16rem, 11px); color: var(--text-lo); white-space: nowrap; }
-.lo-count b { color: var(--mint-400); font-size: max(.22rem, 13px); margin: 0 .02rem 0 .06rem; }
 /* co-op briefing: time left before the match locks the loadout (the overlay covers the briefing's own countdown) */
 .lo-deadline { --cd-h: max(.44rem, 20px); flex: none; }
 .lo-deadline .countdown__label { font-size: max(.11rem, 8px); }
@@ -58,16 +56,6 @@
 .lo-sync.is-busy { color: var(--text-md); }
 .lo-sync.is-warn { color: var(--amber); border-color: rgba(246, 163, 41, .45); }
 .lo-sync.is-bad { color: var(--red-premium); border-color: rgba(255, 84, 84, .45); }
-
-.lo-note {
-  flex: none; display: flex; align-items: center; gap: .08rem; margin: 0; padding: .07rem .36rem;
-  font-size: max(.15rem, 10px); color: var(--text-lo);
-  background: linear-gradient(90deg, rgba(78, 216, 175, .08), transparent 70%);
-  border-bottom: 1px solid rgba(47, 58, 53, .6);
-}
-.lo-note .icon { width: max(.16rem, 11px); height: max(.16rem, 11px); color: var(--mint-500); flex: none; }
-.lo-note.is-locked { color: var(--amber); background: linear-gradient(90deg, rgba(246, 163, 41, .12), transparent 70%); }
-.lo-note.is-locked .icon { color: var(--amber); }
 
 .lo-loading { flex: 1; display: flex; align-items: center; justify-content: center; gap: .14rem; color: var(--text-lo); font-size: max(.18rem, 12px); }
 
@@ -330,12 +318,6 @@
 .lo-locknote .icon { width: .16rem; height: .16rem; }
 
 /* ---- entry button (lobby / room / briefing) --------------------------------------------------------------------------- */
-.lo-entry { position: relative; gap: .08rem; }
-.lo-entry__icon { width: 1.25em; height: 1.25em; object-fit: contain; flex: none; }
-.lo-entry__n {
-  display: inline-grid; place-items: center; min-width: 1.5em; height: 1.5em; padding: 0 .3em; margin-left: .02rem;
-  font-size: .8em; font-weight: 700; color: var(--text-on-mint); background: var(--mint-500); border-radius: 1em;
-}
 
 /* Untimed phases (user playtest #11 / #4 item 3: the official 独立模拟 shows no countdown outside combat — the server
    sends deadline 0 for them, Match.soloUntimed): ui/components.js Countdown now renders nothing without a deadline;
@@ -353,7 +335,6 @@
 /* phones (the root scale is clamped at 40 px: less than ~14 rem of width): the detail slides over the roster */
 @media (max-width: 760px) {
   .lo-top { padding: 0 .16rem; }
-  .lo-count, .lo-sync { display: none; }
   .lo-body { grid-template-columns: minmax(0, 1fr); }
   .lo-detail-wrap { display: none; }
   .lo-body.is-detail .lo-roster { display: none; }
@@ -365,7 +346,6 @@
   .lo-detail-back .icon { width: .2rem; height: .2rem; }
 }
 @media (max-height: 520px) {
-  .lo-note { display: none; }
   .lo-dhead { grid-template-columns: max(1rem, 48px) minmax(0, 1fr); padding: .1rem .14rem; }
   .lo-dhead__en { display: none; }
   .lo-grid { grid-template-columns: repeat(auto-fill, minmax(max(1rem, 58px), 1fr)); }
@@ -460,6 +440,12 @@
 
 /* Preset actions share the same dimensions, including the mobile layout. */
 .lo-toolbar .lo-preset-actions .btn { height:max(.42rem,32px); min-width:max(1.5rem,112px); padding:0 .16rem; font-size:max(.16rem,12px); white-space:nowrap; margin-left:0; }
+/* Per-operator voice, a browser-local preference in roster and DIY details. */
+.lo-voice { display: flex; flex-wrap: wrap; align-items: center; gap: .12rem; padding: .14rem 0; font-size: calc(.18 * var(--t)); }
+.lo-voice > small { flex-basis: 100%; color: var(--text-dim); font-size: calc(.15 * var(--t)); }
+.lo-voice .lo-select { min-width: 1.6rem; max-width: 100%; }
+.lo-voice__preview { height: max(.4rem, 24px); padding: 0 .12rem; font: inherit; font-size: max(.15rem, 11px); color: var(--mint-400); background: transparent; border: 1px solid var(--line-2); cursor: pointer; }
+.lo-voice__preview:hover, .lo-voice__preview:focus-visible { border-color: var(--mint-700); }
 
 /* DIY uses the same aligned rows and detail sections as operator loadout. */
 .diy-pick__list .diy-opt { min-height: 64px; padding: .1rem; }
@@ -563,10 +549,3 @@
 .lo-tier-empty{min-width:0;width:var(--tier-h);height:var(--tier-h);background:none;clip-path:none;font-size:12px}.lo-tier-empty::before{content:none}
 .lo-filter-presets{display:flex;align-items:center;margin-left:auto;flex:none}.lo-filter-presets .btn{height:max(.5rem,36px);padding:0 .12rem;white-space:nowrap;font-size:max(.15rem,12px)}.lo-frow:first-child .lo-search{margin-left:0}
 @media(max-width:760px){.lo-filter-presets{margin-left:0}}
-.preset-files{flex-wrap:wrap}.preset-files__text{display:block;width:100%;min-height:2rem;margin-top:.14rem;padding:.12rem;background:var(--bg-1);color:var(--text-hi);border:1px solid var(--line-2);font:inherit;resize:vertical}
-
-.preset-code { width:100%; min-width:0; padding:.12rem; height:.48rem; border:1px solid var(--line-2); color:var(--text); background:var(--bg-1); font-family:var(--font-mono); font-size:max(.14rem,12px); }
-.extension-operators { display:flex; flex-direction:column; min-height:0; flex:1; }
-.extension-operators .lo-filters { flex:none; }
-.extension-operators .lo-grid { max-height:54vh; }
-.extension-operators .lo-card:disabled { opacity:.45; cursor:default; transform:none; }

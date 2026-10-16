@@ -1,5 +1,5 @@
-import {loadPref,savePref} from '../store.js';
-import {EXTENSION_CATEGORIES,extensionSelectionShape} from '../../../shared/customExtensions.js';
+import { loadPref, savePref } from '../store.js';
+import { EXTENSION_CATEGORIES, extensionSelectionShape } from '../../../shared/customExtensions.js';
 const KEY='customExtensionPresets';
 export function copyExtensionSelection(selection={}) {
   if(selection.rules?.includes('unlimitedStock'))selection={...selection,rules:selection.rules.filter(id=>id!=='unlimitedStock'),ruleValues:{...selection.ruleValues,stockPlayers:-1}};

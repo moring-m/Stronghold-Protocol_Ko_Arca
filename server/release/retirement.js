@@ -1,4 +1,4 @@
-import {RELEASE_REMINDERS_MS,retirementText} from '../../shared/releaseRetirement.js';
+import { RELEASE_REMINDERS_MS, retirementText } from '../../shared/releaseRetirement.js';
 export function createRetirement({now=Date.now,setTimeout:setT=setTimeout,clearTimeout:clearT=clearTimeout,notify,expire}){
  let deadline=null,timers=[];
  const stop=()=>{for(const timer of timers)clearT(timer);timers=[];deadline=null;};

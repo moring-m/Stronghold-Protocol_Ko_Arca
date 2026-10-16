@@ -1,3 +1,16 @@
+
+import {MatchRehearsal as MergeMatch0} from './match/rehearsal.js';
+import {MatchSetupVote as MergeMatch1} from './match/setupVote.js';
+import {MatchViews as MergeMatch2} from './match/views.js';
+import {MatchWatch as MergeMatch3} from './match/watch.js';
+import {creditedKillsOf} from './../sim/spec.js';
+import {previewPlayer} from './preview.js';
+import {wireMessage} from './../../shared/i18n.js';
+import {createDelegatedRehearsalJob} from './bot.js';
+import {bossFieldPlacement} from './finalAssault.js';
+import {isContentHash} from '../../shared/plugins/identity.js';
+import {MatchRehearsal,REHEARSAL_ANSWER_MS} from './match/rehearsal.js';
+const envBotRehearsal = () => String(env('SP_BOT_REHEARSAL') || '').trim().toLowerCase() === 'host';
 import {AugmentMode} from './augments.js';
 import {RANDOM_BAND_ID} from '../../shared/randomBand.js';
 import {EIGHT_UNITE_RECT,eightUniteStageId} from '../../shared/cooperativeEight.js';
@@ -280,6 +293,12 @@ export class Match {
     this.data = applyCustomExtensions(this.data, this.customExtensions);
     this.excludedChessIds=new Set(Object.keys(unfilteredChess).filter(id=>!this.data.chess?.[id]));
     if(this.mode==='coop8')this.data={...this.data,config:{...this.data.config,coop8:true}};
+    /** the room's content hash (opts.cs, DESIGN §32): every BattleSpec carries it */
+    this.cs = isContentHash(opts.cs) ? opts.cs : null;
+    /** the room's visual set (opts.vs, DESIGN §32.6): every BattleSpec names it */
+    this.vs = isContentHash(opts.vs) ? opts.vs : null;
+    /** a room with gameplay plugins (opts.requireCs): a client result must name this match's cs (reports.js) */
+    this.requireCs = opts.requireCs === true && !!this.cs;
     this.gd = new GameData(this.data, this.modeId);
     if (!this.difficulty) this.difficulty = this.gd.difficulty;
     this.isSolo = this.mode === 'solo' || this.gd.isSolo;
@@ -296,6 +315,20 @@ export class Match {
     this.botRehearsal = Number.isInteger(opts.botRehearsal) && opts.botRehearsal >= 0 ? Math.min(opts.botRehearsal, 8) : BOT_REHEARSAL_DEFAULT;
     /** wall-clock budget of one rehearsal slice (scheduleBotPrep) */
     this.botSliceMs = Number.isFinite(opts.botSliceMs) && opts.botSliceMs > 0 ? opts.botSliceMs : this.sched.virtual ? Infinity : BOT_SLICE_MS;
+    /**
+     * Offer a bot's layout rehearsal to the current host's browser (DESIGN §14): `opts.botRehearsalDelegate`, default
+     * off, env SP_BOT_REHEARSAL=host. The server simulates a rehearsal the host did not answer (see MatchRehearsal).
+     */
+    this.botRehearsalDelegate = opts.botRehearsalDelegate != null ? !!opts.botRehearsalDelegate : envBotRehearsal();
+    /** wall-clock ms the host has to answer a delegated rehearsal (engine option: tests shorten it) */
+    this.botRehearsalDelegateMs = Number.isFinite(opts.botRehearsalDelegateMs) && opts.botRehearsalDelegateMs > 0 ? opts.botRehearsalDelegateMs : REHEARSAL_ANSWER_MS;
+    /** the room's current host (opts.hostId; server/lobby.js room.hostId — setHost follows a migration) */
+    this.hostId = typeof opts.hostId === 'string' ? opts.hostId : null;
+    /** @type {Map<string, { id: string, job: any, executor: string, timer: any }>} delegated rehearsals in flight */
+    this._rehearsalTasks = new Map();
+    this._rehearsalSeq = 0;
+    /** how this match's delegated rehearsals ended (the log lines above; the tests read it) */
+    this.rehearsalStats = { delegated: 0, answered: 0, takeovers: 0 };
     this.ds = dataSourceFor(this.data);
     /** client-side combat (DESIGN §14) — see the header */
     this.clientCombat = opts.clientCombat != null ? !!opts.clientCombat : envClientCombat();
@@ -462,8 +495,9 @@ export class Match {
     // a spectator seat only watches (the platform routes nothing else of it)
     if (ps.spectator && (!msg || msg.t !== 'g.watch')) return fail(ERR.SPECTATOR);
     if (this.disposed || this.ended) {
-      // a battle report that crossed the match end (the last b.progress of a field) is stale: ignored, never an error
-      // (DESIGN §14 — an error frame without a rid would surface as a toast in the browser)
+      // A report that crossed the match end (the last b.progress of a field, a delegated rehearsal's answer) is stale:
+      // ignored, never an error (DESIGN §14 — an error frame without a rid would surface as a toast in the browser).
+      if (msg && msg.t === 'b.rehearsalResult') return OK;
       return this.clientCombat && msg && (msg.t === 'b.progress' || msg.t === 'b.result') ? OK : fail(ERR.WRONG_PHASE);
     }
     if (!msg || typeof msg !== 'object' || typeof msg.t !== 'string' || !GAME_TYPES.has(msg.t)) return fail(ERR.BAD_MSG);
@@ -509,6 +543,8 @@ export class Match {
       // a paused solo battle resumes (the server takes the field over; nobody is left to resume it)
       this._resume();
       if (this.clientCombat) this._authorityLost(ps, 'disconnect');
+      // a rehearsal this host was running falls back to the server (DESIGN §14; a no-op without tasks)
+      this._rehearsalHostChanged();
       this.markPublic();
     });
   }
@@ -604,6 +640,8 @@ export class Match {
       if (this.ended) return;
       this._resume();
       if (this.clientCombat) this._authorityLost(ps, 'left');
+      // a rehearsal the departed seat was running falls back to the server (DESIGN §14; a no-op without tasks)
+      this._rehearsalHostChanged();
       this.markPublic();
       if (!this.order.some((p) => !p.isBot && !p.left)) {
         this.finish({ victory: false, reason: 'abandoned' });
@@ -674,6 +712,7 @@ export class Match {
     this.disposed = true;
     if (this.runner) { try { this.runner.stop(); } catch { /* ignore */ } }
     this._stopClientCombat();
+    this._cancelRehearsal();
     for (const h of this._timers) { try { this.sched.clearTimeout(h); } catch { /* ignore */ } }
     this._timers.clear();
     if (this._pubTimer) { try { this.sched.clearTimeout(this._pubTimer); } catch { /* ignore */ } this._pubTimer = null; }
@@ -893,7 +932,8 @@ export class Match {
     const json = JSON.stringify(rest);
     if (!force && json === this._lastPubJson) return;
     this._lastPubJson = json;
-    this._lastPubAt = now;
+    // Snapshot building / serialization can take time; throttle from the actual broadcast, not its start.
+    this._lastPubAt = this.sched.now();
     this.broadcast(view);
   }
 
@@ -1073,7 +1113,7 @@ export class Match {
       const assets = (rec && rec.assets) || {};
       const [row, col] = fieldTile(bossPrep ? (group.side === 'R' ? 'bossR' : 'bossL') : 'normal', r, c);
       units.push({
-        id: piece.uid, uid: piece.uid, kind: piece.kind === 'token' ? 'token' : 'op', side: 'ally', ownerId: ps.playerId, defId: piece.id,
+        id: piece.uid, uid: piece.uid, kind: piece.kind === 'token' ? 'token' : 'op', side: 'ally', ownerId: ps.playerId, defId: piece.id, area: 'board',
         name: rec ? rec.name : piece.id, tier: rec && Number.isInteger(rec.tier) ? rec.tier : 1, golden: !!(rec && rec.isGolden),
         spine: assets.spine || (rec && rec.charId) || piece.id, avatar: assets.avatar || (rec && rec.charId) || piece.id,
         x: col, y: row, dir: bossPrep && group.side === 'R' ? ({RIGHT:'LEFT',LEFT:'RIGHT',UP:'UP',DOWN:'DOWN'}[pieceDir(piece)]) : pieceDir(piece), facing: (bossPrep && group.side === 'R' ? pieceDir(piece) === 'RIGHT' : pieceDir(piece) === 'LEFT') ? -1 : 1, maxHp: rec && rec.stats && Number.isFinite(rec.stats.maxHp) ? rec.stats.maxHp : 1,
@@ -1090,7 +1130,7 @@ export class Match {
     // items included (the client draws their floating plates). PRTS 帮助 counts the temp area with the hand (review of
     // PR #129). Part of the meta for every watcher alike — the spectator seat's copy equals a teammate's
     // (test/match/spectator.test.js). User playtest #2 item 1 (GitHub #44).
-    const benchUnit = (piece, i, y) => {
+    const benchUnit = (piece, i, y, area) => {
       let rec = piece.kind === 'item' ? this.gd.item(piece.id) : piece.kind === 'token' ? this.gd.token(piece.id) : this.gd.chess(piece.id);
       const lo = piece.kind === 'chess' && rec ? ps.loadoutFor(rec) : null;
       if (rec && piece.kind === 'chess') rec = loadoutRecord(rec, resolveRecordLoadout(rec, lo));
@@ -1098,7 +1138,7 @@ export class Match {
       const [row, col] = fieldTile(bossPrep ? (group.side === 'R' ? 'bossR' : 'bossL') : 'normal', y, i);
       units.push({
         id: piece.uid, uid: piece.uid, kind: piece.kind === 'token' ? 'token' : piece.kind === 'item' ? 'item' : 'op',
-        side: 'ally', ownerId: ps.playerId, defId: piece.id,
+        side: 'ally', ownerId: ps.playerId, defId: piece.id, area,
         name: rec ? rec.name : piece.id, tier: rec && Number.isInteger(rec.tier) ? rec.tier : 1, golden: !!(rec && rec.isGolden),
         spine: assets.spine || (rec && rec.charId) || piece.id, avatar: assets.avatar || (rec && rec.charId) || piece.id,
         x: col, y: row, facing: bossPrep && group.side === 'R' ? -1 : 1, maxHp: rec && rec.stats && Number.isFinite(rec.stats.maxHp) ? rec.stats.maxHp : 1,
@@ -1112,7 +1152,7 @@ export class Match {
     for (let i = 0; i < ps.hand.length; i++) {
       if (ps.hand[i]) benchUnit(ps.hand[i], i, GEO.HAND_ROW, 'hand');
     }
-    for (let i = 0; i < ps.temp.length; i++) {
+    for (let i = 0; i < Math.min(ps.temp.length, GEO.TEMP_SIZE); i++) {
       if (ps.temp[i]) benchUnit(ps.temp[i], GEO.TEMP_C0 + i, GEO.TEMP_ROW, 'temp');
     }
     // `nextEnemies`: the scouted player's coming enemies — their preview pen shows on the scouting board too (research 09
@@ -1233,6 +1273,9 @@ export class Match {
       case 'g.leave': this.onLeave(ps.playerId); return OK;
       case 'b.progress': return this._onProgress(ps, msg);
       case 'b.result': return this._onResult(ps, msg);
+      // the host's answer to a delegated bot layout rehearsal (DESIGN §14): a report, never an error — an unknown,
+      // expired or foreign task is ignored (MatchRehearsal._onRehearsalResult)
+      case 'b.rehearsalResult': this._onRehearsalResult(ps, msg); return OK;
       default: return fail(ERR.BAD_MSG);
     }
   }
@@ -1576,7 +1619,7 @@ export class Match {
     const d = this.draft;
     this.cancel(this._turnTimer);
     this._turnTimer = null;
-    while (d.idx < d.order.length && d.picks[d.order[d.idx]]) d.idx++;
+    while (d.idx < d.order.length && d.picks[d.order[d.idx]]) d.idx++; // loop-cap: draft order
     if (d.idx >= d.order.length) {
       d.turnDeadline = 0;
       this.deadline = 0;
@@ -1852,7 +1895,7 @@ export class Match {
     const s = this.sp;
     this.cancel(this._turnTimer);
     this._turnTimer = null;
-    while (s.idx < s.order.length) {
+    while (s.idx < s.order.length) { // loop-cap: draft order
       const ps = this.players.get(s.order[s.idx]);
       if (ps && ps.alive && s.picks[ps.playerId] == null) break;
       s.idx++;
@@ -1944,25 +1987,27 @@ export class Match {
     const p = typeof pool === 'string' && Object.hasOwn(pools, pool) ? pools[pool] : null;
     const rng = this.rngMeta;
     const tierList = (lo, hi) => { const out = []; for (let t = lo; t <= hi; t++) for (const id of this.gd.shopItemsByTier[t] || []) out.push(id); return out; };
+    const also = p && Array.isArray(p.also) ? p.also.filter((id) => typeof id === 'string' && this.gd.item(id)) : [];
+    const withAlso = (list) => {
+      const out = list.slice();
+      for (const id of also) if (!out.includes(id)) out.push(id);
+      return out;
+    };
     if (p && p.kind === 'equip') {
       if (Array.isArray(p.weighted) && p.weighted.length) {
         const pairs = p.weighted.filter((x) => Array.isArray(x) && this.gd.item(x[0]) && this.itemPool.canGain(x[0]));
-        let total = 0;
-        for (const [, w] of pairs) total += Math.max(0, Number(w) || 0);
-        let r = rng() * total;
-        for (const [id, w] of pairs) { r -= Math.max(0, Number(w) || 0); if (r < 0) return id; }
-        return pairs.length ? pairs[pairs.length - 1][0] : null;
+        for (const id of also) if (!pairs.some((x) => x[0] === id)) pairs.push([id, 1]);
+        return this.itemPool.pick(rng, pairs.map(x => x[0]), new Map(pairs));
       }
       if (Array.isArray(p.items) && p.items.length) {
-        const items = p.items.filter((id) => this.gd.item(id) && this.itemPool.canGain(id));
-        return items.length ? items[Math.floor(rng() * items.length)] : null;
+        const items = p.items.filter((id) => this.gd.item(id));
+        return this.itemPool.pick(rng, withAlso(items));
       }
       let list;
       if (Array.isArray(p.tiers) && p.tiers.length) list = p.tiers.flatMap((t) => this.gd.shopItemsByTier[t] || []);
       else list = tierList(1, p.maxTier === 'shopLevel' ? Math.max(1, Math.min(6, shopLevel)) : 6);
       if (Array.isArray(p.excluded)) list = list.filter(id => !p.excluded.includes(id));
-      list = list.filter(id => this.itemPool.canGain(id));
-      return list.length ? list[Math.floor(rng() * list.length)] : null;
+      return this.itemPool.pick(rng, withAlso(list));
     }
     const list = Number.isInteger(tier) ? tierList(tier, tier) : tierList(1, Math.max(1, Math.min(6, maxTier)));
     return this.itemPool.pick(rng, list);
@@ -2063,7 +2108,7 @@ export class Match {
       const t0 = now();
       let r = null;
       try {
-        do r = gen.next(); while (!r.done && !(bounded && now() - t0 >= this.botSliceMs));
+        do r = gen.next(); while (!r.done && !(bounded && now() - t0 >= this.botSliceMs)); // loop-cap: generator and the bot time slice
       } catch (e) {
         this.reportError(`bot ${ps.playerId}${label}`, e);
         then(null);
@@ -2085,20 +2130,47 @@ export class Match {
       if (!gen) { ready(); return; }
       drive(gen, '', ready);
     };
+    /** The layout the finished job chose is applied in a callback of its own (bounded slices end one stage per call). */
+    const finish = (job) => {
+      if (bounded) this.later(0, () => { if (valid()) end(job); });
+      else end(job);
+    };
+    /** The rehearsal's slices, once the job simulates locally (nobody answered, or the server took it over). */
+    const runJob = (job) => {
+      const slice = () => {
+        if (!valid()) return;
+        let done = true;
+        try { done = job.run(this.botSliceMs); } catch (e) { this.reportError(`bot ${ps.playerId} rehearsal`, e); }
+        if (done) finish(job);
+        else this.later(0, slice);
+      };
+      // bounded slices start in a callback of their own (the economy + default layout above already used this one)
+      if (bounded) this.later(0, slice);
+      else slice();
+    };
     this.later(this.scaled(DELAYS.BOT_ACTION + i * DELAYS.BOT_STAGGER), () => {
       if (!valid()) return;
-      drive(botPrepBeginSteps(this, ps), '', (job) => {
+      drive(botPrepBeginSteps(this, ps, { delegate: this.botRehearsalDelegate }), '', (job) => {
         if (!job) { end(null); return; }
-        const slice = () => {
-          if (!valid()) return;
-          let done = true;
-          try { done = job.run(this.botSliceMs); } catch (e) { this.reportError(`bot ${ps.playerId} rehearsal`, e); }
-          if (done) { if (bounded) this.later(0, () => { if (valid()) end(job); }); else end(job); }
-          else this.later(0, slice);
-        };
-        // bounded slices start in a callback of their own (the economy + default layout above already used this one)
-        if (bounded) this.later(0, slice);
-        else slice();
+        // A job is finished when it has nothing left to simulate: the server's own run over the candidates, or — with a
+        // delegated one — the host's pick, which MatchRehearsal accepts as soon as it arrives, possibly while the
+        // generator above was still placing the default layout (its `done` is already true here). Either way the layout
+        // is ready: it is applied, never simulated again, and a later local run cannot overwrite the accepted pick.
+        if (job.done) { finish(job); return; }
+        // delegated and unanswered: MatchRehearsal calls back here — `done`, the pick already in `job.best`, nothing
+        // left to simulate — or after the server took the job over, whose own slices follow; never once the prep ended.
+        // The continuation is installed here rather than when the frame went out: the generator that offered the task
+        // still places the default layout after the delegation returns (`applyPlanSteps`), so an outcome applied earlier
+        // would set the seat Ready and drop those steps — an answer that arrived in the meantime is the `done` above.
+        if (job.pending) {
+          job.onSettled = () => {
+            if (!valid()) return;
+            if (job.done) finish(job);
+            else { job.takeOver(); runJob(job); }
+          };
+          return;
+        }
+        runJob(job);
       });
     });
   }
@@ -2136,6 +2208,9 @@ export class Match {
 
   endPrep() {
     if (this.phase !== PHASE.PREP) return;
+    // rehearsals still waiting for a host's answer die with the prep: their bots place the default layout, a late answer
+    // is ignored (Match._takeOverRehearsal / MatchRehearsal) and nothing of them runs after the phase ended
+    this._cancelRehearsal();
     this.setDeadline(0);
     const alive = this.alivePlayers();
     for (const ps of alive) this.dispatch(ps, 'onPrepEnd', { round: this.round });
@@ -2155,12 +2230,12 @@ export class Match {
   // battles
 
   /** Construct a battle; a constructor failure yields a finished stand-in (clean result) and is logged. */
-  newBattle(opts) {
-    const full = { data: this.ds, content: this.battleContent, logger: this.log, ...opts,flags:{...opts.flags,...(this.augments.enabled?{augments:this.augments.battleState()}: {})} };
+  newBattle(opts,{preview=false}={}) {
+    const full = { data: this.ds, content: this.battleContent, logger: preview?{}:this.log,quiet:preview, ...opts,flags:{...opts.flags,...(this.augments.enabled?{augments:this.augments.battleState()}: {})} };
     try {
       return new this.BattleClass(full);
     } catch (e) {
-      this.reportError(`battle ${opts.fieldId} construct`, e);
+      if (!preview) this.reportError(`battle ${opts.fieldId} construct`, e);
       return new DeadBattle(full, 'forced');
     }
   }
@@ -2185,13 +2260,16 @@ export class Match {
   _normalBattle(ps) { return this.newBattle(this._normalOpts(ps)); }
 
   /** Battle options of a player's normal field (after the onBattleStart handlers). */
-  _normalOpts(ps) {
-    const wave = this.wave;
+  _normalOpts(ps, { preview = false, board = ps.board } = {}) {
+    const wave = preview ? structuredClone(this.wave) : this.wave;
+    if (preview) ps = previewPlayer(ps, board);
     const input = ps.battleInput({ side: 'L', colOffset: 0 });
     // the client's list: bounty units inserted among their host action's own units, which are re-timed around them
     const spawns = withBounties(this.gd, this.round, wave, ps.bounties, ps.playerId).map((s) => ({ ...s, ownerPlayerId: ps.playerId }));
-    const ev = { input, kind: 'normal', round: this.round, spawns };
-    this.dispatch(ps, 'onBattleStart', ev);
+    const ev = { input, kind: 'normal', round: this.round, spawns, ...(preview ? { preview: true } : {}) };
+    // Preview construction failures go to the rehearsal's discard path, never Match.dispatch's live error sink.
+    if (preview) this.dispatcher.dispatch(ps, 'onBattleStart', ev);
+    else this.dispatch(ps, 'onBattleStart', ev);
     return {
       seed: deriveSeed(this.seed, `n:${this.round}:${ps.seat}`),
       kind: 'normal',
@@ -2370,7 +2448,7 @@ export class Match {
     const seq = `${this.battlePrefix}.${this.round}.${++this._battleSeq}`;
     // protocol ids are ≤ 64 chars (shared/protocol.js isId): the field id is informational, the sequence is unique
     const battleId = seq.length + 1 + String(fieldId).length <= 64 ? `${seq}.${fieldId}` : seq;
-    const spec = buildBattleSpec({ ...opts, flags: {...opts.flags, ...(this.augments.enabled?{augments:this.augments.battleState()}:{}), customFactions:this.customFactions,customExtensions:this.customExtensions}, battleId, fieldId, kind, content: this.battleContent, boss });
+    const spec = buildBattleSpec({ ...opts, flags: {...opts.flags, ...(this.augments.enabled?{augments:this.augments.battleState()}:{}), customFactions:this.customFactions,customExtensions:this.customExtensions}, battleId, fieldId, kind, content: this.battleContent, boss, cs:this.cs, vs:this.vs });
     let total = 0;
     for (const x of spec.spawns) if (x && x.tag !== 'boss' && x.tag !== 'part' && x.countInTotal !== false) total += Math.max(1, Math.floor(Number(x.count) || 1));
     return {
@@ -2829,7 +2907,12 @@ export class Match {
     const f = this._fieldByBattle(msg.battleId);
     if (!f || f.done || f.heldResult || f.verifyJob || f.mode !== 'client' || f.authority !== ps.playerId) return OK;
     const bossLike = f.kind === 'boss' || f.kind === 'hidden';
-    const v = validateClientResult(f.spec, msg.result, { gd: this.gd });
+    // a room with gameplay plugins (opts.requireCs, DESIGN §32.6): the result must name the content set the battle runs
+    // on — one without `cs`, or with another, came from a page that did not run this content: refused like an
+    // implausible result (the server simulates the battle)
+    const v = this.requireCs && msg.cs !== this.cs
+      ? { ok: false, reason: `its content ${typeof msg.cs === 'string' ? msg.cs.slice(0, 8) : 'is not named'} is not the room's ${this.cs.slice(0, 8)}` }
+      : validateClientResult(f.spec, msg.result, { gd: this.gd });
     if (!v.ok) {
       this.verifyStats.rejected++;
       this.log.warn?.(`[match ${this.roomCode}] ${f.fieldId}: rejected client result from ${ps.playerId} (${v.reason}) — server re-simulation`);
@@ -3277,6 +3360,7 @@ export class Match {
         ps.stats.dmgDealt += Number(up.damageDealt) || 0;
         ps.stats.kills += Number(up.killed) || 0;
       }
+      ps.creditedKills += creditedKillsOf(r) + creditedKillsOf(up);
       // perfect-payout bounties (战术特训): own phase perfect
       for (const b of ps.bounties) if (b.card.payout === 'perfect' && counted === 0 && r.perfect !== false) coins += b.card.coin;
       if (coins > 0) { ps.pendingFunds += coins; ps.stats.fundsGained += coins; }
@@ -3545,6 +3629,7 @@ export class Match {
         if (pp && ps) {
           ps.stats.dmgDealt += Number(pp.damageDealt) || 0;
           ps.stats.kills += Number(pp.killed) || 0;
+          ps.creditedKills += creditedKillsOf(pp);
           ps.dirty(); // m.private.stats
           this._charDamageTickers(ps, pp);
         }
@@ -3674,3 +3759,5 @@ export class Match {
 }
 
 for(const key of Reflect.ownKeys(MatchSetupVote.prototype)){if(key!=='constructor')Object.defineProperty(Match.prototype,key,Object.getOwnPropertyDescriptor(MatchSetupVote.prototype,key));}
+
+for(const methods of [MergeMatch0,MergeMatch1,MergeMatch2,MergeMatch3])for(const key of Reflect.ownKeys(methods.prototype)){if(key!=='constructor'&&!Object.hasOwn(Match.prototype,key))Object.defineProperty(Match.prototype,key,Object.getOwnPropertyDescriptor(methods.prototype,key));}

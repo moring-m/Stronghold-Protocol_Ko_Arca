@@ -1,4 +1,4 @@
-import {num,talentBb,traitBb} from './shared/tier1.js';
+import { num, talentBb, traitBb } from './shared/tier1.js';
 import * as S from '../support/index.js';
 const sk=(c,i)=>c.skills?.find(s=>s.index===i);
 const burst=t=>!!t?.findBuff('necrosisBurst');

@@ -2,10 +2,8 @@
 // Conventions of the tier-6 kits: ../shared/tier6.js; kit contract and rules: ../README.md.
 
 import { canTargetEnemy } from '../../../targeting.js';
-import { bodyDist, bodyInKeys } from '../../../body.js';
-import {
-  num, bv, tbb, moduleBb, live, ANY, enemiesIn, onDefaultSkill, selectedSkill, batOf, pullToward, aura,
-} from '../shared/tier6.js';
+import { bodyDist, bodyInRange } from '../../../body.js';
+import { num, bv, tbb, moduleBb, live, ANY, enemiesIn, onDefaultSkill, selectedSkill, batOf, pullToward, aura } from '../shared/tier6.js';
 
 // ------------------------------------------------------------------------------------------------------------------
 // 溯光星源 chess_char_6_16 (凝滞师) — S3 并流连锁; 数据建模; 能源解析
@@ -91,7 +89,7 @@ function halo2(bb, chess, def) {
         if (!isDef) return;
         battle.on('beforeAttack', (ctx) => {
           if (ctx.attacker !== unit || !unit.skill?.active) return;
-          const valid = (e) => e && e.alive && canTargetEnemy(unit, e, ANY) && bodyInKeys(e, unit.rangeKeySet);
+          const valid = (e) => e && e.alive && canTargetEnemy(unit, e, ANY) && bodyInRange(e, unit.rangeKeySet);
           const keep = (unit.mem.haloLocks || []).filter(valid);
           for (const e of ctx.targets) if (keep.length < n && !keep.includes(e)) keep.push(e);
           ctx.targets = keep.slice(0, n);

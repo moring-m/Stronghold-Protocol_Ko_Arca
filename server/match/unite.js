@@ -1,4 +1,4 @@
-import {eightUniteRoutes} from '../../shared/cooperativeEight.js';
+import { eightUniteRoutes } from '../../shared/cooperativeEight.js';
 // server/match/unite.js — 联防 (Unite) planning and LP attribution (DESIGN §6.1, research 06 §5, research 08 §5).
 //
 // Trigger (co-op only): after the normal combats, ≥ 1 alive player leaked (a counted leak ⇒ not perfect) and

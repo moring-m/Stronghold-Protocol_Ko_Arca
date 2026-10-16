@@ -247,7 +247,7 @@ function installDom() {
 async function fetchDictionary(url) {
   for (let attempt = 0; attempt < 2; attempt++) {
     try {
-      const response = await fetch(url, {cache:'no-store'});
+      const response = await fetch(url, {cache:'no-cache',signal:AbortSignal.timeout(8000)});
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       return await response.json();
     } catch (error) { if (attempt === 1) console.warn('[i18n] Dictionary unavailable:', url, error); }
@@ -256,13 +256,22 @@ async function fetchDictionary(url) {
 }
 
 async function load() {
+  // The release build resolves overlay precedence and compiles patterns ahead of time.
+  // This resource is display-only; combat keeps the original source tables.
+  try {
+    const response=await fetch('/i18n/ko/compiled.json',{cache:'no-cache',signal:AbortSignal.timeout(8000)});
+    if(response.ok){const compiled=await response.json();if(compiled.version===1&&compiled.messages&&Array.isArray(compiled.patterns)){
+      const readyPatterns=compiled.patterns.map(p=>({...p,re:new RegExp(p.re)}));
+      for(const [source,text]of Object.entries(compiled.messages))dict.set(source,text);
+      patterns.push(...readyPatterns);active=dict.size>0;addMessages('ko',compiled.messages);setSharedLang(lang);return;
+    }}
+  }catch(error){console.warn('[i18n] Compiled Korean UI unavailable; using source dictionaries',error);}
   const base = '/i18n/ko/';
-  const upstream = await fetchDictionary('/i18n/ko.json');
+  const [upstream,...res] = await Promise.all([fetchDictionary('/i18n/ko.json'),...FILES.map(f=>fetchDictionary(`${base}${f}.json`))]);
   for (const [zh, ko] of Object.entries(upstream)) {
     if (!zh.startsWith('_') && typeof ko === 'string') { dict.set(zh, ko); if (/\{\d+\}/.test(zh)) addPattern(zh, ko); }
   }
   addMessages('ko', upstream);
-  const res = await Promise.all(FILES.map((f) => fetchDictionary(`${base}${f}.json`)));
   res.forEach((obj, k) => {
     for (const [zh, ko] of Object.entries(obj || {})) {
       if (typeof ko !== 'string' || (!ko && FILES[k] !== 'ui') || zh.startsWith('//')) continue;

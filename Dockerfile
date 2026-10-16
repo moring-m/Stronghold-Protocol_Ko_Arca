@@ -9,7 +9,7 @@
 #        docker build -t stronghold-protocol .
 #        docker run -d --name stronghold -p 3000:3000 --restart unless-stopped \
 #          -v "$PWD/public/assets:/app/public/assets:ro" stronghold-protocol
-#      (public/fonts, data/assets.json and data/local-assets.json are copied from the build context when present)
+#      (public/fonts, data/assets.json, data/local-assets.json and data/local-fx.json are copied from the build context when present)
 # Without any art the game still runs with placeholder visuals.
 #
 # Run:  docker run -d --name stronghold -p 3000:3000 --restart unless-stopped stronghold-protocol
@@ -38,12 +38,18 @@ COPY tools ./tools
 COPY content ./content
 COPY data ./data
 COPY public ./public
+COPY plugins ./plugin-resources
+COPY schemas ./schemas
+COPY test/helpers/battleHarness.js ./test/helpers/battleHarness.js
+COPY docs/PLUGIN*.md docs/plugin-catalog.example.json ./docs/
 COPY docs/research ./docs/research
 RUN --mount=type=secret,id=build_ca \
     if [ -f /run/secrets/build_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/build_ca; fi; \
     export NODE_USE_ENV_PROXY=1; \
     node tools/vendor.mjs \
  && node tools/apply-production.mjs \
+ && node tools/import-official-v030.mjs --download \
+ && node tools/build-korean-ui.mjs \
  && if [ "$BROWSER_RESOURCES" = "1" ]; then if [ ! -f content/production/resources.json ]; then node tools/build-browser-resources.mjs; fi; fi \
  && if [ "$FETCH_ASSETS" = "1" ]; then \
       node tools/fetch-assets.mjs || echo "WARNING: art download incomplete; the image falls back to placeholder art"; \
@@ -54,7 +60,8 @@ RUN --mount=type=secret,id=build_ca \
 FROM ${NODE_IMAGE}
 ENV NODE_ENV=production \
     PORT=3000 \
-    HOST=0.0.0.0
+    HOST=0.0.0.0 \
+    SP_PLUGIN_RESOURCES=/app/plugin-resources
 WORKDIR /app
 COPY --chown=node:node --from=deps /app/package.json ./package.json
 COPY --chown=node:node --from=deps /app/node_modules ./node_modules
@@ -63,8 +70,20 @@ COPY --chown=node:node --from=build /app/shared ./shared
 COPY --chown=node:node --from=build /app/server ./server
 COPY --chown=node:node --from=build /app/data ./data
 COPY --chown=node:node --from=build /app/public ./public
+# the Spine and atlas parsers the plugin packer and the plugin studio use (server/plugins/pack.js, server/studio/)
+COPY --from=build /app/tools/assets ./tools/assets
+COPY --from=build /app/tools/plugin.mjs ./tools/plugin.mjs
+COPY --from=build /app/test/helpers/battleHarness.js ./test/helpers/battleHarness.js
+COPY --from=build /app/schemas ./schemas
+COPY --from=build /app/docs/PLUGIN*.md /app/docs/plugin-catalog.example.json ./docs/
+# Root-owned templates and author guides remain visible when /app/plugins is a bind mount or named volume.
+COPY --from=build /app/plugin-resources ./plugin-resources
+RUN mkdir -p /app/plugins && chown node:node /app/plugins
+# Source checkouts may use a restrictive umask; templates stay root-owned but readable by the runtime user.
 # research tables: read by server/sim/nodeData.js as a fallback
 COPY --chown=node:node --from=build /app/docs/research ./docs/research
+
+RUN chmod -R a+rX /app/tools /app/schemas /app/docs /app/plugin-resources
 
 USER node
 EXPOSE 3000

@@ -27,8 +27,9 @@ Unknown options or a missing option value are errors (exit code 2); `--refresh` 
   Integrity errors (see §17) make the exit code 1 **and leave the previous output untouched** (unless `--force`);
   warnings never do. Each output file is written atomically (temp file + rename).
 - **Determinism.** Same inputs ⇒ byte-identical outputs (stable key order, no timestamps, no randomness).
-- **Size.** ≈3.5 MB total (limit 6 MB; `chess.json` ≈1.65 MB with the loadout choices), compact JSON (no indentation).
-- **Derived paths.** `stages.json groundPaths*` come from the sim's own `server/sim/grid.js` pathing: a change there
+- **Size.** ≈3.7 MB total (limit 6 MB; `chess.json` ≈1.69 MB with the loadout choices, `backups.json` ≈0.17 MB), compact JSON (no indentation).
+- **Plugin compositions (0.3.0).** Generated files stay official and unchanged. P1b applies patches and compact records to immutable in-memory copies (PLUGINS.md §10); `shared/plugins/validate.js` checks their references without the official quantity assertions. New modes inherit an official base; mode-level economy, DP, timers and other global keys override those defaults. Plugin translations retain the existing i18n overlay format and receive source hashes (`_h`) from the final merged records. A content selection's `cs` also includes the sha256 of each served `i18n/<lang>.json`; the vanilla P0 hash still excludes `data/i18n/`.
+- **Derived paths.** `stages.json groundPaths*` come from `server/sim/groundPaths.js`, using the sim's own `server/sim/grid.js` pathing: a change there
   needs a rebuild (the offline-rebuild test catches a stale `data/`).
 
 ## 0. Conventions used by every file
@@ -105,7 +106,8 @@ Top level: `{ season, seasonName, modes, economy, lpCapPerRound, bossOvertimeAft
 | `itemSellable`, `itemDestroyRefund` | `false`, `0` | items can only be destroyed |
 | `benchSize`, `tempSize`, `deployCap`, `storeCntMax` | `10`, `5`, `8`, `6` | |
 | `equipPerChess`, `maxArtsPerRound` | `2`, `2` | |
-| `poolCopies[tier]` + `poolCopiesOverrides` | `{"1":12,"2":14,"3":18,"4":16,"5":8,"6":5}`, `{"chess_char_6_11_a":4}` (缪尔赛思) | shared pool copies per base chess |
+| `poolCopies[tier]` + `poolCopiesOverrides` | 12/14/18/16/8/5 plus measured low-tier identity exceptions (DESIGN §29.8) | single-player copies; `coopPoolMultiplier: 2` doubles them in co-op: the shared operators and each player's private 自选 stock alike (the maintainer's decision of 2026-10-15, GitHub #650, DESIGN §32.14.31; before 0.3.0 the 自选 stock stayed 8 / 5) |
+| `itemPoolCopies[tier]` + `itemPoolCopiesOverrides` | 4/6/7/8/7/3 plus eight measured exceptions (DESIGN §29.8) | shared shop-equipment ownership: normal 1, upgraded 2; non-shop effect-only equipment unlimited |
 | `goldenCopies`, `mergeCount`, `mergeCountOverrides`, `itemMergeCount` | `3`, `3`, `{"chess_char_2_11_a":2}` (风丸), `2` | |
 | `rewardOffer` | `{"count":3,"tierOffset":1,"maxTier":6,"price":0,…}` | merge reward: 3 **different** free chess of tier `min(shopLevel+1,6)` (a short tier tops up from the tier below; the player's stocked 自选 of that tier joins the roll, DESIGN §30.23; `PlayerState.pushRewardOffer`, user playtest #6 item 19) |
 | `handFillOrder` | `"rightToLeft"` | |
@@ -118,8 +120,8 @@ Top level: `{ season, seasonName, modes, economy, lpCapPerRound, bossOvertimeAft
 |---|---|---|
 | `lpCapPerRound` | `10` | max LP lost per player per normal round |
 | `bossOvertimeAfter`, `bossOvertimeDrainPerSec` | `150`, `1` | official `bossTurnHpReduceTime`: from 150 **real** s of a boss round the merged team LP loses 1 per whole real second (`gamedata.js bossOvertimeDue`; first point at 151 s) |
-| `bossHpScale` | `{"formula":"co-op: bloodPoint[difficulty] — one pool for every field …","coop":1,"solo":0.25,"soloAssumed":true,"aliveScaling":false,"aliveFull":4,"aliveAssumed":true,…}` | global form of the mode rule |
-| `hiddenCore` | `{"single":350,"multi":1200,"minTeamLpExclusive":1,"difficulties":["NORMAL","HARD","ABYSS"],"checkedAfterRound":14}` | Σ activated layers must be **>** threshold and LP **>** 1 |
+| `bossHpScale` | `{"formula":"one pool for every boss field …","perPlayer":true,"coop":1,"solo":1,"aliveFull":4,"aliveScaling":false,"aliveAssumed":true,…}` | the leader pool (one for every boss field) = `bosses[id].bloodPoint[difficulty]` × share: `perPlayer` true (the owner's decision of 2026-10-06, adopting PR #209 — it replaces the fixed pool of 「保持固定血量」) — co-op share = `coop` × the players alive when the fight starts (bots and AI 托管 seats count, eliminated and departed seats do not; at most `aliveFull`), solo share = `solo` (1). `perPlayer: false` with `solo: 0.25` restores the fixed pool of 0.1.x (co-op × `coop` whatever the count; `aliveScaling: true` would make it × alive / `aliveFull`, the proportion [ASSUMED, flagged `aliveAssumed`]). `GameData.bossPoolHp(bossId, aliveCount)` / `bossPoolShare` implement it (DESIGN §20.10, §25.13.4) |
+| `hiddenCore` | `{"single":350,"multi":1200,"minTeamLpExclusive":1,"difficulties":["NORMAL","HARD","ABYSS"],"checkedAfterRound":14}` | Σ activated layers must be **>** threshold and LP **>** 1 (PRTS; the community's measurement 路标月报#2, GitHub #645) |
 | `dp` | `{"init":10,"perSec":1,"max":99}` | |
 | `unite` | `{"maxHelpers":2,"helperOrder":"unitsOnField>activeBond>undownedUnits; pair: unitsOnField>activeBond>activeLayers>undownedUnits, first = right field (PRTS 帮助)","layerGainsEnabled":false,"templates":{"1":"act1autochess_escaped_single","2":"act1autochess_escaped_multi"},…}` | 联防; `helperOrder` documents the rule `server/match/unite.js helperOrder` implements (research 08 §5; ties → seat) |
 | `finalAssault` | `{"pairing":"seatOrderPairs","oddPlayerAlone":true,"movableBossPerAlivePlayerSide":true,"layerGainsEnabled":false}` | |
@@ -332,7 +334,7 @@ Types: `BAND_INITIAL` 41, `BOND` 23, `EQUIP` 115, `ENEMY_GAIN` 129 (悬赏), `BU
 | `schedule[modeId]` | `{"spRounds":[3,6,9],"rounds":{"3":{"families":[{"family":"bounty","weight":50},…],"cards":6,"supplyTiers":[1,4],"bountyDraft":"initial","events":{"bounty":[…],"supply":[…],"shop":[…],"tactic":[…]},"assumed":true}}}` | research 01 A4 defaults: pick a family by weight; `supplyTiers` = item tier window for 道具补给; 机密商店 draws `shopDraft` at its `rounds` (R11), else any normal shop item of tiers I–VI per card (duplicates allowed); `bountyDraft` = the `bountyDrafts` kind of the round's 悬赏决策 (R3 / 险境 R6 `initial`, R9 `boss`, R11 `hunter`); 绝境 / 终极 R11 = 悬赏决策 14 / 机密商店 4 / 战术决策 4 (the official co-op R11s of 22 matches, no 道具补给; weights = those counts [ASSUMED]; solo takes the same weights [ASSUMED: no solo screenshot — extrapolated from co-op, the data has solo R11 悬赏决策 events `bounty_hunter_*_s`]); `events` = the official event ids of that kind (`enemy_initial_*`, `bossInitial_*`, `bounty_hunter_*`), usable as the phase header |
 | `shopDraft` | `{"rounds":[11],"slots":[{"6":1},{"6":1},{"5":1},{"coin":1},{"3":1,"4":2,"5":3,"coin":2},{"3":1,"4":2,"5":3,"coin":2}],"coin":"chess_item_1_03_e_a","itemWeights":{"chess_item_6_09_e_a":5,…},"seen":[2,4,5,8],"count":6}` | the official 机密商店 (R11 of matches 2, 4, 5, 8; build-data `SHOP_DRAFT`; the user: "机密商店按官方改成可以重复吧"): six slots, each drawn on its own — with replacement, so an item can come twice (official: 盟约之币 ×2, 变形同构体 ×2) — a tier (or `coin` = 盟约之币) by the slot's weights, then an item of that tier by `itemWeights` (1 + the official cards it showed on; unlisted 1). Every official shop: exactly two tier VI, ≥ 1 V, ≥ 1 盟约之币, no other tier I / II; the slot split and the weights [ASSUMED]; solo 3 of the 6 [ASSUMED]; only at `rounds` (R11 = 绝境 / 终极, the rounds of the screenshots) — the earlier 机密商店 of 标准 R3 / R9 and 险境 R3 / R6 / R9 (no screenshot; the data's shop events sit in three blocks) keep the previous draw, any normal shop item of tiers I–VI per card, with replacement [ASSUMED]; free (price 0) |
 | `tacticDraft` | `{"rounds":[11],"kinds":["ally"],"weights":{"allybuff_select_4":4,…},"seen":[7,9,18,20],"count":6}` | the official 战术决策 (R11 of matches 7, 9, 18, 20; build-data `TACTIC_DRAFT`; the user: "战术决策也按官方改成可以重复吧"): six cards, each drawn on its own — with replacement, so a card can come twice (official: 补给 ×2 in match 7; the other three drafts show six different cards). All 24 official cards are `ally` cards (no 排斥 / 责罚 / 裁决, no 模拟战场演变; four drafts without a debuff: about 0.04 % for the previous draw, 6 different cards of the 26 ally + 9 debuff cards), and 列装 / 财富 / 补给 / 整备 / 升华 made 12 of them (uniform: about 4.6), so at `rounds` (R11 = 绝境 / 终极, the round of the screenshots) only the cards of `kinds`, each by `weights` (1 + the official cards it showed on; unlisted 1) [ASSUMED: the weights; no terrain card at R11 — the maps of the 4 matches are unknown]; each card independent, no slots like `shopDraft` [ASSUMED, open: all 4 drafts hold a 驰援, a 盟誓 and two of 列装 / 财富 / 补给 / 整备 / 升华 — about 3 % under independent draws, a pattern spotted after the fact]; solo 3 [ASSUMED]; other rounds (标准 R3 / R9, 险境 R3 / R6 / R9, 险境 solo R9; no screenshot) every card uniform, terrain cards only for the match stage, with replacement too [ASSUMED]. A card acting only on dead bonds is never offered (`Match.bondLive`). `assumed` lists the assumed parts |
-| `pools[poolId]` | `{"kind":"equip","items":[…]}` / `{"kind":"chess","tier":2,"rule":"shopEligible"}` | server-side reward pools referenced by effects (`pool_equip_*`, `pool_chess_shop_N_reward`, `pool_char_later`, …), all [ASSUMED]; `rule:"shopEligible"` = visible/non-hidden entries, `maxTier:"shopLevel"` = ≤ current shop level, `weighted` = `[[id, weight]]`. `pool_equip_vict` (维多利亚, every 25 layers: "获得一件带有随机特殊效果的维式重锤") and `pool_equip_rockr` (洛洛's 定制品; user playtest #4 — the research 04 §8 guess 有限加速器 / 激光发射器 / 护盾无人机 / 双模机械臂 / 蜂鸣器 is superseded) = the 4 special 维式重锤, uniform |
+| `pools[poolId]` | `{"kind":"equip","items":[…]}` / `{"kind":"chess","tier":2,"rule":"shopEligible"}` | server-side reward pools referenced by effects (`pool_equip_*`, `pool_chess_shop_N_reward`, `pool_char_later`, …), all [ASSUMED]; `rule:"shopEligible"` = visible/non-hidden entries, `maxTier:"shopLevel"` = ≤ current shop level, `weighted` = `[[id, weight]]`. `pool_equip_vict` (维多利亚, every 25 layers: "获得一件带有随机特殊效果的维式重锤") and `pool_equip_rockr` (洛洛's 定制品; user playtest #4 — the research 04 §8 guess 有限加速器 / 激光发射器 / 护盾无人机 / 双模机械臂 / 蜂鸣器 is superseded) = the 4 special 维式重锤, uniform. `pool_equip_kathe` and `pool_equip_narant` omit `maxTier` (every shop-eligible tier, uniform [ASSUMED]; 见者有份 §32.14.8). `pool_equip_kathe.also` is 突变细胞 (`chess_item_5_08_e_a`), appended by `Match.rollItemId` at the same uniform weight [ASSUMED] and at any 调度中心 level (#631, §32.14.24); the shop item slot does not read `also`, so 突变细胞 stays `shopExcluded` |
 
 ## 9. `enemies.json` — `{ [enemyKey]: Enemy }` (249 keys that can appear)
 
@@ -550,6 +552,14 @@ Glyph legend (`rows`):
 
 ## 17. Integrity guarantees (checked by the builder and `test/data.test.js`)
 
+The reusable reference pass is `shared/plugins/validate.js validateReferences`; official counts and source-specific assertions remain in `tools/build-data.mjs validateAll`. P1b `validateData` additionally checks the shape and behavior references of merged plugin data.
+
+Every PRESET chess is its own backup and the stand-in builder gives it back field for field (§18); every NORMAL chess
+(both forms) composes into its stand-in with an unlocked backup skill and, on the elite form, its module at that level;
+every DIY prototype pick has a form for both slot statuses and its locked skill / module there; every owned pick has
+both slot forms with its three skills, every module of the character at the elite's stage and a `tokens` variant per
+summon; derived DIY bonds exist; no 自选 summon id is a tokens.json record (`test/backups.test.js` also re-derives the
+backup fields, the stand-in numbers, the owned pool and the faction ids from the raw tables).
 Chess bonds/garrisons/tokens/base/golden ids resolve; talent tokens are in `chess.tokens`; every non-DIY chess has
 `skills[]` with exactly one default equal to `skill` (and every skill token listed in `chess.tokens`); golden module
 choices are consistent (one default iff `module.active`, base fields present; composing the default reproduces the
@@ -568,3 +578,120 @@ generator and preview zones on the raw level files for every mode × round × te
 included) × allowed entry, and `test/sim/pathing-crosscheck.test.js` re-implements the client SPFA + smoothing over the
 whole map for every walkable tile of the normal / 联防 / boss fields of the 8 stages (extended by the road-over-floor
 preference; against the pure official algorithm: identical route lengths, never more non-blockable tiles crossed).
+
+## 18. `backups.json` — 补位 stand-ins and 自选 (DIY) data — `{ units, tokens, diy }`
+
+The data of two official features: **补位** — a NORMAL chess whose operator the player does not own is fielded as its
+official stand-in (原型干员); played since 0.2.0: the player marks operators as not owned on the 干员持有 tab
+(`room.ownership { notOwned }`, DESIGN §25.3, docs/PLAYING.md §3), the match fields those chess with
+`standIn: true` — and **自选编队** — two tier-5 and two tier-6 DIY slots, each filled with a 6★ the player owns or a
+prototype. Built by `tools/build-data.mjs buildBackups`; `shared/standIn.js` composes it into chess-shaped records,
+`shared/diy.js` adds the 自选 rules on top. The sim fields both (docs/SIM.md §12). Played since 0.2.0: the player fills
+the four slots on the 自选编队 tab (`room.diy { picks }`, docs/PLAYING.md §3; shared/protocol.js checkDiyPicks keeps the
+legal picks), the match takes the picks the seat had at its start (`PlayerState.diy`), and each slotted piece is sold in
+that player's shop only — its own stock (the tier's pool copies, 8 / 5 [ASSUMED], twice that in co-op like the shared
+pool — DESIGN §32.14.31). The ordinary shop draws it from the 调度中心 level `shopLevel`; the promotion reward draws 自选
+of the reward tier, one shop level earlier (DESIGN §30.23).
+It has no stock when every bond of it is banned this match, and it is the operator for every rule of that player (its data view:
+server/match/player/diy.js, docs/META.md §3). The rules in the data (activity_table act2autochess `charShopChessDatas`; PRTS 卫戍协议, 卫戍协议：盟约
+下半/PRTS盟约记录):
+
+- PRESET (74, 特许干员) always fields the real operator (`backup.charId` = itself); NORMAL (55) names one of 17 stand-ins —
+  the 4★ 预备干员 `char_600–607`, the 6★ `char_608–615` and 领主·Sharp `char_617` (the "其它分支"); DIY (4) has none.
+- A stand-in keeps the chess's bonds, 特质, tier, price, merge and status (the elite form uses the same backup at the
+  elite row) and fights as `backup.charId` at that status with skill `backup.skillIndex` (fixed by the chess: the same
+  character takes S2 on one chess and S3 on another), module `backup.uniEquipId` (null at tiers 3–4 and for every 4★, so
+  even their elite form has none) and the row's potential (`potRank` 0 on all 55) — moot: the 17 原型干员 have no
+  potential ranks, and a stand-in takes neither the player's potential nor the 自持有 练度 (0.2.2).
+
+`units[charId]` — first the 17 stand-ins, then the 72 owned-6★ 自选 picks (`diy.ownedPool`); no unit for a PRESET or DIY
+chess:
+
+| Field | Example (`char_611_acnipe`) | Meaning |
+|---|---|---|
+| `charId`, `name`, `appellation`, `rarity`, `profession`, `subProfessionId`, `subProfessionName`, `position`, `nationId`, `isNotObtainable` | `"char_611_acnipe"`, `"Stormeye"`, `"Stormeye"`, `6`, `"SNIPER"`, `"fastshot"`, `"速射手"`, `"RANGED"`, `null`, `true` | as on a chess record (`isNotObtainable` false for the owned picks) |
+| `assets` | `{"avatar":"char_611_acnipe","avatarGolden":"char_611_acnipe","portrait":"char_611_acnipe_1","portraitGolden":"char_611_acnipe_1","spine":"char_611_acnipe","subProfIcon":"sub_fastshot_icon"}` | art ids (URLs in `data/assets.json`, which carries all 89 — the owned picks since 0.2.0, ASSETS.md); the elite form takes the E2 art when it exists — of the stand-ins only 领主·Sharp has it, every owned pick does |
+| `moduleNames` | `{"uniequip_001_acnipe":{"name":"Stormeye证章","typeName":"ORIGINAL"},"uniequip_002_acnipe":{"name":"Stormeye证章","typeName":"MAR-X"}}` | every module of the character (a composed record names its module on the normal form too) |
+| `standsIn[]` | `["chess_char_3_21_a","chess_char_4_02_a","chess_char_5_18_a","chess_char_5_22_a","chess_char_6_01_a","chess_char_6_05_a"]` | the NORMAL base chess it replaces (`[]` for an owned pick) |
+| `forms[statusKey]` | keys `"2/1/4/0"`, `"2/60/7/1"`, `"2/60/7/3"` | the character at every status it fights at — of the chess it stands in for and of the DIY slots it may fill (`statusKey(status)` = `phase/level/skillLevel/equipLevel`): 3 forms per 6★ (an owned pick: exactly the three DIY slot statuses — E2 Lv1 skill rank 4 without a module, E2 Lv60 rank 7 with every module at stage 1 and at stage 3), 2 per 4★ |
+
+A **form** holds the operator fields of a chess record with **nothing selected**: `status`; `stats`, `trait`, `talents`
+**without** a module, at full potential as on a chess (`potDown` / chained talents for the lower ones, §2.3); `immunities`, `rangeId`, `rangeGrid`, `dmgType`, `attackKind`, `projectile`, `canHitFly`,
+`targetPriority`; `skills[]` — every skill unlocked at the status, at its skill level, `trigger` resolved per skill, no
+`isDefault`; `displayTokens` / `tokens` (summons — none of the 17 stand-ins has one; 27 of the owned picks do, their
+records in `tokens` below); at `equipLevel > 0` `modules[]` (§2.2 shape without `isDefault`). `buildUnitForm` uses buildChess's helpers and rules, and the build fails when `buildUnitForm` +
+`composeUnitRecord` do not give back every PRESET chess field for field (each is its own backup), so a later change to
+buildChess that the stand-ins would miss stops the build. The chess trigger deviations (§2.2, DESIGN §21.29) name chess
+and never apply to a form; the 重装 stand-ins have their own, by charId (`tools/build-data.mjs STANDIN_TRIGGER_DEVIATIONS`,
+the owner's decision of 2026-10-05 in the approved 补位 plan): every skill of 预备干员-重装 and Mechanist is `DEFAULT` —
+cast with an enemy in range — with `rawRule` the official `TAKE_DAMAGE`, on every form.
+
+**Composition** (`shared/standIn.js`, pure ESM for the server, the sim and the client): `standInRecord(chess, backups)` is
+the NORMAL chess as its stand-in — `IDENTITY_FIELDS` (ids, tier, `isHidden` / `visible`, `chessType`, `backup`, `bonds`,
+`garrisonIds`, prices, merge, `status`) from the chess, every other field from the unit's form at the chess's status
+with `backup.skillIndex` / `backup.uniEquipId` as the defaults, plus `standInFor` (the replaced charId: the official 补位
+mark on the avatar). The result is shaped exactly like a chess record (`skill` = the `isDefault` entry of `skills[]`;
+elite `statsBase` / `traitBase` / `talentsBase` / `modules[]`), so `normalizeChess`, `resolveLoadout` (no loadout ⇒ the
+backup selection) and `loadoutRecord` read it unchanged; null for a PRESET or DIY chess. `isDroppableChess(chess)` says
+which chess a player may mark as not owned (the 55 NORMAL base chess; `shared/protocol.js checkNotOwned` keeps those of a
+`room.ownership` list). **In the match** (`server/match/player/basics.js`: `PlayerState.standIns`, `fieldsStandIn`,
+`fieldRecord` = `gd.standIn(id)`) the player's piece keeps the chess's identity for every meta rule (price, bonds,
+特质, merges, pools) and is deployed as the stand-in (placement class, summon / bot ranges; no summons — none of the 17
+has one); what shows the piece shows the stand-in (the prep scouting art of board and bench pieces, the m.result
+lineup's `standInFor`, the elite and gift tickers' names — the owner's recall of the official mode, 2026-10-06). **In battle** a PlayerBattleInput entry with `standIn: true` (PlayerState.battleInput:
+the player's own field, 联防 and the boss fields alike) is fielded as `getChess(chessId, { standIn: true })` (docs/SIM.md
+§12: this record, normalised), and its kit is found by its `charId` (`server/sim/content/index.js kitOf`;
+kits/README.md "Stand-in kits") — never by the chess id it keeps, which names the replaced operator's kit. The client
+composes the same record (`public/js/ui/gameLogic/standIn.js standInOf`, the renderer's `data.standIn`) to show the
+stand-in on the shop / reward cards, the own pieces' models (hand, 临时整备区, board), the detail card, bond popups and the
+result lineup, with a small 「替补」 mark.
+A 自选 piece is composed by `shared/diy.js`:
+`checkDiyPick(slotId, pick, data)` checks one pick `{ charId, skillIndex?, uniEquipId? }` against a slot (a pick of the
+slot's tier; a prototype takes its `diy.locked` selection, another skill is refused; an owned pick names one of its three
+skills and optionally a module of its elite form at the slot's stage), `diySlot(id, data)` names a slot's tier, elite
+twin and `shopLevel`, `diyRecord(slotId, pick, { elite, data })` /
+`diyRecordOf(slot, pick, data)` give the record — the slot's identity (tier, price, merge, status; no 特质), the pick's
+derived bonds, the operator's form at the slot's status with that skill and module (active on the elite only), plus
+`diyFor` = the slot's base id —, `diyPool(tier, { data, kitted })` the legal picks of a tier (prototypes, then the owned
+pool; with `kitted`, only operators with a kit: server/sim/content/kits/index.js `KITTED_CHARS`) and
+`validateDiyPicks(picks, { data, kitted })` a roster (a prototype may fill a tier-5 and a tier-6 slot, an owned operator
+one slot, the picks of a tier differ, no module of another game mode — `isDiyModule` / `DIY_EXCLUDED_MODULE_TYPE`: the
+集成战略 modules ISW-A (凯尔希, 傀影, 菲亚梅塔, 提丰, 艾丽妮, 霍尔海雅) and SO-A / SO-B (电弧, 机械师 — "在【岁的界园志异】中",
+"在【沉沦者的黑流树海】中") and the 生息演算 module RA-A (森蚺) are never a player's choice [ASSUMED], the owner's decision of
+2026-10-05 for ISW-A and the same reason for SO / RA, while the record and the sim still compose them for the kits' tests). **In battle** a PlayerBattleInput entry of a DIY slot carries `diy` (the pick) and
+is fielded as `getChess(slotId, { diy })` (docs/SIM.md §12); its kit is `KITS[charId]` (kits/README.md "How to add an
+operator (自选)").
+
+`diy`:
+
+| Field | Example | Meaning |
+|---|---|---|
+| `slots[slotId]` | `{"tier":5,"goldenId":"chess_char_5_diy1_b","shopLevel":5,"requirement":"TIER_6"}` | the four DIY chess `chess_char_5_diy1/2_a`, `chess_char_6_diy1/2_a` (chess.json: price 4, sell 1, `diyRequirement`, empty `bonds` / `garrisonIds`); `shopLevel` = the 调度中心 level whose `shopLevelDisplayDataDict.charChessDiySlotIdList` lists the slot |
+| `prototypes[tier]` | `{"5":[…15],"6":[…9]}` | the legal prototype picks: the nine 6★ at both tiers, at tier 5 also the six 4★ that are not 先锋 / 特种 ("第5阶可额外从6名四星原型干员（先锋、特种职业除外）中选取"; `DIY_EXTRA_PROTOTYPES`). A prototype may fill a tier-5 and a tier-6 slot ("原型干员可于5、6阶之间重复选取") |
+| `locked[tier][charId]` | `{"skillIndex":2,"uniEquipId":"uniequip_002_acguad","from":["chess_char_5_06_a","chess_char_5_13_a"]}` | the skill and module a prototype carries in a slot of that tier — "技能携带规则与系统补位时一致" (PRTS 卫戍协议), read as [ASSUMED] (the owner's decision of 2026-10-05) the selection of its 补位 rows at that tier (`from`): the eight 6★ elites S3 with their own module, 领主·Sharp S1, the reserves S3 without a module; 预备干员-医疗 has no tier-5 row: S3 by analogy (`from` `[]`, `DIY_PROTOTYPE_FALLBACK_SKILL`) |
+| `ownedPool[]` | 72 charIds | the owned 6★ a player may slot: obtainable, rarity = the requirement, and no chess names it — hidden chess included ("不可甄选加入已在名单中的固定干员"); each at most once per roster ("玩家已拥有干员不可重复选取"). Not the collab operators (`excluded`) |
+| `excluded[]` | `["char_456_ash","char_1029_yato2","char_1048_orchd2","char_4123_ela","char_4141_marcil","char_4182_oblvns","char_4217_makoto"]` | the 7 obtainable 6★ outside the pool that come from a 联动寻访 — a collab team in `mainPower` / `subPower` (`DIY_EXCLUDED_TEAMS`: rainbow, action4, mujica, sees, laios — 灰烬, 麒麟R夜刀, 艾拉, 玛露西尔, 丰川祥子, 结城理) or a collab series in `displayNumber` (`DIY_EXCLUDED_NUMBER_PREFIXES` MH / RS / AM / PS / DD — also 焰狐龙梓兰 MH05, whose team reserve6 names no collab): left out of the data and the pool by the owner's decision of 2026-10-05 (copyright); the excel does not exclude them |
+| `operators[charId]` | `{"name":"煌","rarity":6,"profession":"WARRIOR","subProfessionId":"centurion","obtainable":true,"powers":["rhodes","elite","yan","victoria"],"bonds":["yanShip","victoriaShip"]}` | every pick (owned pool + prototypes): `powers` = the `nationId` / `groupId` / `teamId` of `mainPower` and of every `subPower` (隐藏势力); `bonds` = the core bonds whose `powerIdList` meets them — one or several — else `economy.fallbackBondId` 协防干员 ("甄选加入的干员会根据其实际阵营所属分配核心盟约，若没有可匹配的则改为分配协防干员盟约"); every prototype gets `["emptyShip"]` |
+
+`tokens[tokenId]` — the summons of the owned picks (38 tokens of 27 operators): a tokens.json record (§14: name, text,
+`placeable`, `ownerRange`, `abnormal`, `assets`) whose `variants` are keyed by the owner FORM `<charId>@<statusKey>`
+(`owners` = those keys; shared/diy.js `diyTokenOwner`) instead of a chess id — a DIY piece is a slot, and two players may
+fill one slot with different operators. A variant is the token at the owner's status for its first skill and no module,
+`bySkill[i]` the token skill / count / sources under each other skill, `byModule[id]` each module's token attributes,
+trait and talents (`tools/build-data.mjs buildDiyTokens`); simdata `getToken` merges them with the pick as the owner's
+loadout. No id is also a tokens.json record.
+
+Not in this data: a player's ownership roster and 自选 picks (browser settings sent with `room.ownership` / `room.diy`),
+the DIY stock (per player in the match, `PlayerState.diyStock`: `config.economy.poolCopies` of the slot's tier, doubled in
+co-op — no excel field), 助战 borrows (`borrowCount` 20), and a player's potential / 练度 per operator (the 干员调配 settings sent with
+`room.loadout`; the forms are built at full potential and carry the lower ranks, §2.3; 练度 = effects.json
+`aceffect_char_1…4`).
+
+### Acquisition subsets corrected in 0.2.5 (§30.2)
+
+`tools/build-data.mjs` owns the measured Rockrock/Flametail subset weights from
+[路标月报#2](https://www.bilibili.com/video/BV1eLXXBqEgF/). Rockrock: ordinary hammer 10; tremble, undying, haste,
+burn hammers 2 each; limited accelerator 1; shield drone and laser emitter 4 each. Flametail: Wild Mane 10,
+Ashlock 10, Fartooth 3. Rebuild `choices.json` offline; these weights do not exempt draws from shared availability.
+The runtime derives unlimited fixed-gift families from `SERVER_GAIN_EQUIP`; this is a grant-source exemption,
+not a zero-occupancy flag or a manually maintained second list in generated data.

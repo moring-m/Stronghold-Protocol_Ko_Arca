@@ -2,7 +2,7 @@
 // compact icon column at the right edge, rich-text tooltip per effect. `counterText` (a 悬赏's "还剩 N 场作战", user
 // playtest #6 item 4) replaces the bare counter in the tooltip's kind line.
 
-import {AUGMENT_GRADES,augmentEffectEntries} from '../../../shared/augments.js';
+import { AUGMENT_GRADES, augmentEffectEntries } from '../../../shared/augments.js';
 import { html, Tooltip } from './components.js';
 import { Img, RichText, GIcon } from './gameComponents.js';
 import { effectIconUrl, bondIconUrl } from './assetUrls.js';

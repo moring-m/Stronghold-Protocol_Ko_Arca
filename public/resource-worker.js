@@ -1,9 +1,10 @@
+import {normalizeResourceSelection,selectedResources} from '../shared/resourceSelection.js';
 import { normalizeAtlas } from './vendor/resource-atlas.mjs';
 
 const PREFIX = 'stronghold-resources-';
 let indexPromise;
 let preparing;
-let generation=0;
+let generation=0,selection=normalizeResourceSelection(null);
 const downloads = new Map();
 const listeners = new Set();
 const contentType = path => path.endsWith('.png') ? 'image/png' : path.endsWith('.atlas') ? 'text/plain' :
@@ -20,18 +21,14 @@ async function index() {
 }
 const send = message => { for (const port of listeners) port.postMessage(message); };
 async function complete(cache, resources) {
-  const keys = new Set((await cache.keys()).map(key => new URL(key.url).pathname));
-  const marked = keys.has('/fonts/fonts.css') && keys.has('/__resources_ready__');
-  if (!marked) return false;
-  for (const name of await caches.keys()) {
-    if (!name.startsWith(PREFIX) || name === PREFIX + resources.version) continue;
-    for (const key of await (await caches.open(name)).keys()) keys.add(new URL(key.url).pathname);
-  }
-  return resources.files.every(file => keys.has(file.path));
+  // Written only after every download succeeds. Avoid enumerating thousands of
+  // cache keys before showing the page on every visit; missing files heal on demand.
+  const [marker,fonts]=await Promise.all([cache.match('/__resources_ready__'),cache.match('/fonts/fonts.css')]);
+  return !!fonts && !!marker && await marker.text()===resources.version;
 }
 
 function download(file, cache, resources) {
-  const key = resources.version + ':' + file.path;
+  const key = (resources.sourceVersion||resources.version) + ':' + file.path;
   if (downloads.has(key)) return downloads.get(key);
   const job = downloadOne(file, cache, resources).finally(() => {if(downloads.get(key)===job)downloads.delete(key);});
   downloads.set(key, job);
@@ -92,7 +89,7 @@ async function downloadOne(file, cache, resources) {
 // multi-minute waitUntil. The page requests the next slice and can resume after restart.
 async function prepare(background = false, resume = {}) {
   const startedGeneration=generation;
-  const resources = await index();
+  const resources = selectedResources(await index(),selection);
   if(startedGeneration!==generation)throw new Error('리소스 재다운로드로 작업이 초기화되었습니다.');
   const cache = await caches.open(PREFIX + resources.version);
   const valid = resume.version === resources.version;
@@ -101,11 +98,16 @@ async function prepare(background = false, resume = {}) {
   let failed = valid ? resume.failed || [] : [];
   let retryFiles = valid ? resume.retryFiles || null : null;
   let done = valid ? resume.done || 0 : 0;
+  let bytesDone = valid ? resume.bytesDone || 0 : 0;
+  const bytesTotal=resources.estimatedBytes||resources.files.reduce((n,f)=>n+(f.bytes||0),0);
   if (!background && !valid) await cache.delete('/__resources_ready__');
   await cache.put('/fonts/fonts.css', new Response(resources.fontCss, {headers:{'Content-Type':'text/css'}}));
   const started = Date.now(), byPath = new Map(resources.files.map(file => [file.path, file]));
+  // Build once per slice, rather than rebuilding a 30,000-file list for every
+  // completed cache lookup. Retry queues still replace it when a pass finishes.
+  const allPaths = resources.files.map(file => file.path);
   const active = new Map();
-  const limit = background ? 4 : 6;
+  const limit = 6;
   let processed = 0, timer;
   const deadline = new Promise(resolve => { timer = setTimeout(() => resolve(null), 5000); });
   const launch = path => {
@@ -116,12 +118,12 @@ async function prepare(background = false, resume = {}) {
   // Detached slow requests remain part of the resume token. A subsequent message
   // rejoins their download promises, or reuses the cache after a worker restart.
   for (const path of valid ? resume.pending || [] : []) if (byPath.has(path)) launch(path);
-  const continuation = () => ({type:'continue', done, total:resources.files.length,
-    resume:{version:resources.version, cursor, attempt, failed, retryFiles, done, pending:[...active.keys()]}});
+  const continuation = () => ({type:'continue', done, total:resources.files.length,bytesDone,bytesTotal,
+    resume:{version:resources.version, cursor, attempt, failed, retryFiles, done,bytesDone, pending:[...active.keys()]}});
   try {
     while (true) {
       if(startedGeneration!==generation)throw new Error('리소스 재다운로드로 작업이 초기화되었습니다.');
-      const queue = retryFiles || resources.files.map(file => file.path);
+      const queue = retryFiles || allPaths;
       while (active.size < limit && cursor < queue.length && processed < 64 && Date.now() - started < 5000) launch(queue[cursor++]);
       if (active.size) {
         const result = await Promise.race([...active.values(), deadline]);
@@ -129,8 +131,9 @@ async function prepare(background = false, resume = {}) {
         active.delete(result.path); processed++;
         if (result.storageFull) throw new Error(result.error);
         if (result.error) failed.push({path:result.path, message:result.error});
+        else bytesDone+=byPath.get(result.path)?.bytes||0;
         if (!retryFiles) done++;
-        send({type:'progress', done, total:resources.files.length, phase:attempt ? 'retry' : 'download', attempt, path:result.error ? null : result.path});
+        send({type:'progress', done, total:resources.files.length,bytesDone,bytesTotal, phase:attempt ? 'retry' : 'download', attempt, path:result.error ? null : result.path});
         if (processed >= 64 || Date.now() - started >= 5000) return continuation();
         continue;
       }
@@ -154,13 +157,15 @@ self.addEventListener('message', event => {
   if (!port) return;
   event.waitUntil((async () => {
     try {
+      const next=event.data.selection?normalizeResourceSelection(event.data.selection):selection;
+      if(JSON.stringify(next)!==JSON.stringify(selection)){generation++;selection=next;preparing=undefined;downloads.clear();}
       if(event.data.type==='resetResources'){
         generation++;downloads.clear();preparing=undefined;indexPromise=undefined;
         for(const name of await caches.keys())if(name.startsWith(PREFIX)||name.startsWith('stronghold-ursus-preview-assets-'))await caches.delete(name);
         port.postMessage({type:'reset'});
       } else if (event.data.type === 'status') {
         indexPromise = undefined;
-        const resources = await index();
+        const resources = selectedResources(await index(),selection);
         const cache = await caches.open(PREFIX + resources.version);
         const current=await complete(cache,resources);
         let reusable=false;
@@ -179,9 +184,32 @@ self.addEventListener('message', event => {
 
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
-  if (url.origin !== self.location.origin || event.request.method !== 'GET' ||
-      (!/^\/(assets|fonts|media|data|i18n)\//.test(url.pathname) && url.pathname !== '/vendor/browser-resources.json')) return;
+  if (url.origin !== self.location.origin || event.request.method !== 'GET') return;
+  // Version-pinned modules cannot change during a release. Reuse their bytes
+  // directly, without a network round trip for every import on every visit.
+  const release=url.searchParams.get('release');
+  if(/^\/(js|shared|sim|vendor|css|data|i18n)\//.test(url.pathname)&&/^[a-f0-9]{12,40}$/.test(release||'')){
+    event.respondWith((async()=>{
+      const cache=await caches.open('stronghold-release-code-v1'),key=url.pathname+url.search;
+      const saved=await cache.match(key);if(saved)return saved;
+      const response=await fetch(event.request);if(response.ok){const save=cache.put(key,response.clone()).catch(()=>{});event.waitUntil?.(save);}return response;
+    })());return;
+  }
+  if(!/^\/(assets|fonts|media|data|i18n)\//.test(url.pathname)&&url.pathname!=='/vendor/browser-resources.json')return;
+  // Display metadata must not wait for the multi-megabyte art manifest or its
+  // cache. Keep release-qualified keys and refresh from the network as before.
+  if(/^\/(data|i18n)\//.test(url.pathname)||url.pathname==='/vendor/browser-resources.json'){
+    event.respondWith((async()=>{
+      try{const response=await fetch(event.request);if(response.ok){const copy=response.clone(),save=caches.open(PREFIX+'metadata').then(cache=>cache.put(url.pathname+url.search,copy)).catch(()=>{});event.waitUntil?.(save);}return response;}
+      catch(error){const saved=await caches.match(url.pathname+url.search);if(saved)return saved;throw error;}
+    })());return;
+  }
   event.respondWith((async () => {
+    // Imported art wins when present; a miss must still use the regular cache/mirror path.
+    if(/^\/(?:assets|fonts|media)\/~[0-9a-f]{16}\//.test(url.pathname)&&!event.request.headers.has('range')){
+      const imported=await caches.open('sp-imported-assets-v1');
+      const hit=await imported.match(url.origin+url.pathname);if(hit)return hit;
+    }
     const resources = await index();
     const cache = await caches.open(PREFIX + resources.version);
     const assetPath = url.pathname.replace(/^\/(assets|fonts|media)\/~[a-f0-9]+\//, '/$1/');
@@ -190,11 +218,6 @@ self.addEventListener('fetch', event => {
     // Reuse manifest cache keys instead of downloading a copy for every release.
     assetQuery.delete('release');
     let path = assetPath + (assetQuery.toString() ? '?'+assetQuery.toString() : '');
-    if(/^\/(data|i18n)\//.test(url.pathname)||url.pathname==='/vendor/browser-resources.json'){
-      const metadataKey=url.pathname+url.search;
-      try{const response=await fetch(event.request);if(response.ok)await cache.put(metadataKey,response.clone());return response;}
-      catch(error){const old=await cache.match(url.pathname+url.search);if(old)return old;throw error;}
-    }
     if (path === '/fonts/fonts.css') { const response = new Response(resources.fontCss,{headers:{'Content-Type':'text/css'}}); await cache.put(path,response.clone()); return response; }
     if (path.startsWith('/media/')) {
       const stem = '/assets/audio/' + path.slice('/media/'.length);

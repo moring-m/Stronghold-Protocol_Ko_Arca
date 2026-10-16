@@ -1248,7 +1248,9 @@ test('every tier-3 variant (normal + 精锐) fights and casts in a real battle w
     for (let t = 0; t < 20; t++) { h.run(1); if (t % 5 === 1 && u.alive && u.skill.kind !== 'passive') u.skill.gainSp(u.skill.spCost, 'test'); }
     if (u.skill.kind === 'passive') assert.ok(u.skill.active, `${id} passive on`);
     else assert.ok(u.skill.activations >= 1, `${id} cast (${u.skill.activations})`);
-    assert.ok(u.stats.dmg > 0 || u.skill.spec.attack?.noAttack, `${id} dealt damage`);
+    // Enforcer's S2 is pure displacement/control; a successful push can keep every enemy out of normal attack range.
+    const controlled = /^chess_char_3_07_[ab]$/.test(id) && h.eventsOf('fx').some(e => e[1] === 'push' && e[4]?.id === u.id && e[4]?.n > 0);
+    assert.ok(u.stats.dmg > 0 || u.skill.spec.attack?.noAttack || controlled, `${id} dealt damage or applied its control skill`);
     done(h);
   }
 });

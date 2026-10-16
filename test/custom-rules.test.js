@@ -78,3 +78,12 @@ test('the rule auditor validates shared losses rather than personal HP shares',a
  h.m.lastResults=new Map([[a.playerId,{leaked:Array.from({length:10},()=>({counted:true})),perfect:false,layerGains:{}}],[b.playerId,{leaked:[],perfect:true,layerGains:{}}]]);h.m.settle(null,null);
  assert.deepEqual(audit.violations,[]);assert.ok(audit.checks>0);
 });
+
+test('disabled augment settings do not count as changed settings, but saved values remain intact',async()=>{
+ const {extensionSelectionCount}=await import('../shared/customExtensions.js');
+ const selection={bonds:[],stages:[],ruleValues:{augmentSilver:9,augmentEnemyVote:1,augmentEnemyRerolls:4,allyAtk:150}};
+ assert.equal(extensionSelectionCount(selection),1);
+ assert.equal(extensionSelectionCount({...selection,rules:['augments']}),5);
+ assert.equal(extensionSelectionCount({...selection,ruleValues:{augmentSilver:9}}),0);
+ assert.equal(recordCustomExtensions(selection).ruleValues.augmentSilver,9);
+});

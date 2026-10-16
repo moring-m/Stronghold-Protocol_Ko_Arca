@@ -1,7 +1,7 @@
-import {useEffect,useState} from '../../vendor/hooks.module.js';
-import {html,Button,Modal,MicroLabel} from './components.js';
-import {APP_VERSION} from '../../../shared/constants.js';
-import {PATCH_NOTES} from '../../../shared/patchNotes.js';
+import { useEffect, useState } from '../../vendor/hooks.module.js';
+import { html, Button, Modal, MicroLabel } from './components.js';
+import { APP_VERSION } from '../../../shared/constants.js';
+import { PATCH_NOTES } from '../../../shared/patchNotes.js';
 
 const SEEN_KEY='sp.patchNotes.seenVersion';
 const openedThisSession=new Set();

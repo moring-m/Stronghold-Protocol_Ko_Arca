@@ -165,7 +165,7 @@ for(const players of [1,4])test(`Jesselton dummy ${players}-person reference has
  const scheduler=new VirtualScheduler(),m=new LaboratoryMatch({data:raw,laboratory:{stageId:'act1autochess_m01',bossId:LAB_DUMMY_BOSS,bandId:'band_pith',kind:'boss',players},difficulty:'NORMAL',seed:29,scheduler,seats:[{seat:0,playerId:'local',name:'박사'}],send:()=>true,broadcast:()=>true,onEnd:()=>{}});t.after(()=>m.dispose());
  const defaults={...m.dummyDefaults};assert.ok(defaults.maxHp>0);assert.equal(defaults.def,raw.enemies.enemy_9013_acstmk.stats.def);m.start();scheduler.advance(3000);m.endPrep();
  const spec=m.fields[0].spec;assert.equal(spec.spawns.length,1);assert.equal(spec.spawns[0].enemyKey,LAB_DUMMY_ENEMY);assert.equal(m.bossPool.maxHp,defaults.maxHp);
- const b=createBattleFromSpec(spec,new DataSource(m.data),{quiet:true});b.step();const e=b.enemies[0],xy=[e.x,e.y];assert.deepEqual(e.def.hitArea,raw.enemies.enemy_9013_acstmk.hitArea);assert.equal(e.def.spine,'enemy_1516_jakill');assert.equal(e.def.raw.modelScale,raw.enemies.enemy_1516_jakill.modelScale*3);
+ const b=createBattleFromSpec(spec,new DataSource(m.data),{quiet:true});b.step();const e=b.enemies[0],xy=[e.x,e.y];assert.deepEqual(e.def.hitArea,raw.enemies.enemy_9013_acstmk.hitArea);assert.equal(e.def.spine,'enemy_1516_jakill');assert.equal(e.def.raw.modelScale,raw.enemies.enemy_1516_jakill.modelScale*2.5);
  b.runToEnd(20);assert.deepEqual([e.x,e.y],xy);assert.equal(e.stats.attacks,0);assert.equal(b.enemies.length,1);assert.equal(b.errorCount,0);const lp=m.teamLp;m._applyOvertime(1e6);assert.equal(m.teamLp,lp);
 });
 

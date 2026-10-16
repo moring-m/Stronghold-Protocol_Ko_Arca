@@ -4,10 +4,7 @@
 import { COLS } from '../../../constants.js';
 import { canTargetEnemy } from '../../../targeting.js';
 import { aggregateMods } from '../../../buffs.js';
-import {
-  AURA, AURA_DUR, num, tbb, moduleBb, grid, enemyHasTag, whileDeployed, toggleBuff, skillActive, isSel, alt,
-  withDefaults,
-} from '../shared/tier4.js';
+import { AURA, AURA_DUR, num, tbb, moduleBb, grid, enemyHasTag, whileDeployed, toggleBuff, skillActive, isSel, alt, withDefaults } from '../shared/tier4.js';
 
 /**
  * 鼓舞 (ba.inspire "获得额外附加的基础属性加成（同类属性取最高）"): +`val` ATK (or max HP) on top of the target's own
@@ -142,7 +139,7 @@ export default withDefaults({
         if (!a) return;
         whileDeployed(battle, unit, AURA, () => {
           const set = new Set(unit.baseRangeKeys || []);
-          const n = battle.allies(unit.ownerId).filter((o) => o !== unit && o.kind === 'op' && set.has(o.tileR * COLS + o.tileC)).length;
+          const n = battle.allies(unit.ownerId).filter((o) => o !== unit && o.kind === 'op' && set.has(o.tileR * (battle.grid?.cols ?? COLS) + o.tileC)).length;
           toggleBuff(battle, unit, 'cetsyr:module', n >= cnt, { atkPct: a });
         });
       },

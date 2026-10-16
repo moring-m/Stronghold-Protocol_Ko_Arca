@@ -222,3 +222,13 @@ test('our light repeats the same gain trait as Suzuran and stacks with her strat
  const p=ps.newPiece('chess',candidate[0]);ps.board.set('0,0',p);let calls=0;const orig=m.dispatcher.triggerGarrisons.bind(m.dispatcher);m.dispatcher.triggerGarrisons=(...args)=>{calls++;return orig(...args);};
  ps.bandId='band_lisa';m.startRound(5);assert.equal(calls,2);
 });
+
+test('Du Yaoye shop guarantee still finds allowed Yan operators when Yan is banned, without granting banned operators',t=>{
+ const {m,ps}=fixture(t);m.round=3;ps.bandId='band_duyaoy';ps.shop.level=6;ps.round.refreshes=1;
+ if(!m.disabledBonds.includes('yanShip'))m.disabledBonds.push('yanShip');assert.equal(m.bondLive('yanShip'),false);
+ const allowed=Object.keys(data.chess).filter(id=>{const c=data.chess[id];return !c.isGolden&&!c.optionalRecruit&&c.bonds?.includes('yanShip')&&m.pool.has(id)&&!m.bannedChess.includes(id);});assert.ok(allowed.length>=2);
+ m.bannedChess.push(allowed[0]);const other=Object.keys(data.chess).find(id=>{const c=data.chess[id];return !c.isGolden&&!c.optionalRecruit&&!c.bonds?.includes('yanShip')&&m.pool.has(id)&&!m.bannedChess.includes(id);});
+ for(const refresh of [1,2]){ps.round.refreshes=refresh;ps.shop.slots=Array.from({length:4},()=>({kind:'chess',id:other,basePrice:1,sold:false}));m.dispatch(ps,'onRefresh',{free:false});assert.ok(ps.shop.slots.some(s=>data.chess[s.id].bonds.includes('yanShip')));assert.ok(ps.shop.slots.every(s=>!m.bannedChess.includes(s.id)));}
+ ps.round.refreshes=3;ps.shop.slots=Array.from({length:4},()=>({kind:'chess',id:other,basePrice:1,sold:false}));m.dispatch(ps,'onRefresh',{free:false});assert.ok(ps.shop.slots.every(s=>s.id===other));
+ m.bannedChess.push(...allowed.slice(1));ps.round.refreshes=1;m.dispatch(ps,'onRefresh',{free:false});assert.ok(ps.shop.slots.every(s=>s.id===other),'no eligible Yan: keep the normal shop instead of showing banned operators');
+});

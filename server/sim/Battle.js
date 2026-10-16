@@ -1,3 +1,8 @@
+import {BattleQueries as MergeBattle0} from './battle/queries.js';
+import {ammoView,mysticView,layerView,chargeView} from './snapshot.js';
+import {noteAttackCommit} from './ai.js';
+import {ENEMY_COLLIDER_RADIUS} from './constants.js';
+import {bodyInRange} from './body.js';
 import {combatMetrics} from '../../shared/combatStats.js';
 import { FIELD_EDGE_INSET, PUSH_UNBALANCE, PULL_UNBALANCE, PULL_UNBALANCE_WEAK, UNBALANCE_MIN } from './constants.js';
 import { hypot, roundHalfEven } from './detmath.js';
@@ -162,6 +167,9 @@ export class Battle {
     this._eb = new Array(this.grid.rows * this.grid.cols);
     for (let i = 0; i < this._eb.length; i++) this._eb[i] = [];
     this._ebUsed = [];
+    this._et = new Array(this.grid.rows * this.grid.cols);   // tile buckets (格子判定: the position's tile, a huge enemy's rectangle tiles)
+    for (let i = 0; i < this._et.length; i++) this._et[i] = [];
+    this._etUsed = [];
     this._idSeq = 0;
     this._damageDisplaySeq = 0;
     this._attackSeq = 0;   // DamageInfo.attackId of normal attacks (one id per attack, all its damage instances)
@@ -192,9 +200,24 @@ export class Battle {
 
     // ---- content
     this.contentMode = opts.content ?? 'full';
-    this._safe(() => installContent(this, { mode: this.contentMode, extra: opts.extraContent }), 'installContent');
-    for (const u of this.allyUnits) if (!u.kit) this._setupUnit(u);
-    if (typeof opts.setup === 'function') this._safe(() => opts.setup(this), 'opts.setup');
+    try {
+      installContent(this, { mode: this.contentMode, extra: opts.extraContent });
+    } catch (e) {
+      if (!this.contentFault) this._handlerError('installContent', null, e);
+    }
+    if (this.contentFault) {
+      // [ASSUMED] A DSL kit that still throws after the set was built means the content set is corrupt.
+      // Do not call forceEnd: that would start() and deploy. The player sees the ordinary forced result;
+      // battle.errors carries content:dsl and the code (DESIGN §32.7). Host and page share this constructor.
+      this.finished = true;
+      this.started = true;
+      this.reason = 'forced';
+      try { this._result = this._buildResult(); }
+      catch { this._result = { time: this.time, reason: 'forced', perPlayer: {}, killed: this.killed, total: this.total, resolved: this.resolved, errors: this.errorCount }; }
+    } else {
+      for (const u of this.allyUnits) if (!u.kit) this._setupUnit(u);
+      if (typeof opts.setup === 'function') this._safe(() => opts.setup(this), 'opts.setup');
+    }
   }
 
   // =============================================================================================================
@@ -378,7 +401,11 @@ export class Battle {
   /** Resolve kit/profile/skill for a unit (called by content/index.js; safe to call again). */
   _setupUnit(u, kit = null) {
     if (!kit) {
-      try { kit = setupUnitKit(this, u, this.contentMode); } catch (e) { this._internalError('setupUnitKit', e); kit = null; }
+      try { kit = setupUnitKit(this, u, this.contentMode); } catch (e) {
+        if (e?.contentFault || this.contentFault) throw e;
+        this._internalError('setupUnitKit', e);
+        kit = null;
+      }
     }
     u.kit = kit || {};
     u.profile = resolveProfile(u.def, u.kit.trait || null);
@@ -503,6 +530,8 @@ export class Battle {
         for (const ps of this.players) ps.dp = Math.min(this.flags.dpMax, ps.dp + this.flags.dpPerSec * dt);
       });
       this._phase('buffs', () => this._tickBuffs(dt));
+      // Allies whose attack comes off cooldown this tick keep the target they have now, before enemies move.
+      this._phase('attackCommit', () => noteAttackCommit(this, dt));
       this._phase('enemies', () => {
         // enemies spawned by hooks during this loop start moving next tick (a leak hook that spawns an enemy which
         // leaks at once would otherwise loop forever inside a single tick)
@@ -560,7 +589,7 @@ export class Battle {
   /** Run until finished or `maxSeconds` of game time elapsed. Returns the result when finished. */
   runToEnd(maxSeconds = MAX_BATTLE_TIME) {
     const limit = this.time + maxSeconds;
-    while (!this.finished && this.time < limit) this.step();
+    while (!this.finished && this.time < limit) this.step(); // loop-cap: battle time limit
     return this.finished ? this.result() : null;
   }
 
@@ -663,6 +692,9 @@ export class Battle {
       // the HUD capsule's numerator of this field (DESIGN §14): this player's own scheduled enemies resolved — knocked
       // down or leaked (`counted` keeps the LP / 完美作战 reading, runtime splits and summons included)
       pp.resolved = Math.min(pp.total, pp.killedInTotal + pp.leakedInTotal);
+      // Actual enemy deaths credited to this player's operators / summons, independent of the enemy's wave owner.
+      // Sum the full unit list before compactBattleResult caps unitStats (long fights may spawn many summons).
+      pp.creditedKills = ps.units.reduce((n, u) => n + u.stats.kills, 0);
       // the operators and the board's summon pieces (a board uid): 联防 carries an operator's HP ratio and SP, a summon's
       // SP only (match/unite.js). `sp` is the official 技力 — stored charges included (PRTS 技能 "可充能X次…当前技力上限等于该
       // 技能技力需求的X倍"); a running skill spent its SP at activation, so it reports what was left (0 for one charge).
@@ -707,7 +739,7 @@ export class Battle {
     const h = { name, fn, priority: Number(opts.priority) || 0, owner: opts.owner ?? null, seq: ++hookSeq, removed: false, once: !!opts.once };
     const list = this._hooks[name] ?? (this._hooks[name] = []);
     let i = list.length;
-    while (i > 0 && list[i - 1].priority < h.priority) i--;
+    while (i > 0 && list[i - 1].priority < h.priority) i--; // loop-cap: hook list length
     list.splice(i, 0, h);
     return h;
   }
@@ -822,7 +854,7 @@ export class Battle {
       if (s.cancelled) continue;
       if (s.interval > 0) {
         let n = 0;
-        while (s.due <= now && !s.cancelled && n++ < 8) {
+        while (s.due <= now && !s.cancelled && n++ < 8) { // loop-cap: battle.every at most 8 per tick
           s.count++;
           this._safe(() => s.fn(this, s), 'every', s.owner);
           s.due += s.interval;
@@ -870,7 +902,7 @@ export class Battle {
   _processSpawns() {
     if (this._initialDeploymentPending) return;
     const now = this.time + 1e-9;
-    while (this._pending.length && this._pending[0].time <= now) {
+    while (this._pending.length && this._pending[0].time <= now) { // loop-cap: pending spawn queue
       const p = this._pending.shift();
       this._safe(() => this.spawnEnemy(p.enemyKey, { ...p, _precounted: p.precounted }), 'spawnEnemy');
     }
@@ -1490,7 +1522,7 @@ export class Battle {
             if (b.interval > 0) {
               b._acc += dt;
               let n = 0;
-              while (b._acc >= b.interval - 1e-9 && n++ < 8) {
+              while (b._acc >= b.interval - 1e-9 && n++ < 8) { // loop-cap: at most 8 interval ticks
                 b._acc -= b.interval;
                 this._safe(() => b.onTick({ battle: this, unit: u, buff: b, dt: b.interval }), 'buff.onTick', u);
               }
@@ -1663,7 +1695,7 @@ export class Battle {
     const strength = (v, s = null) => Math.abs(Number.isFinite(s) ? s : Number.isFinite(v) ? v : tpl.valued);
     const entry = (v, s, extra) => (Number.isFinite(s) ? { value: v, stackAs: s, ...extra } : { value: v, ...extra });
     const after = (tail, until) => {
-      while (tail && tail.until <= until) tail = tail.tail;
+      while (tail && tail.until <= until) tail = tail.tail; // loop-cap: buff chain
       return tail || null;
     };
     const insertTail = (tail, incoming) => {
@@ -1775,12 +1807,21 @@ export class Battle {
 
   /** Targetable enemies whose body is on any of `keys` (absolute tile keys; a huge enemy is listed once). */
   enemiesInKeys(keys, attacker, profile) {
+    if (attacker && attacker.profile && attacker.profile.rangeTiles) return this.enemiesOnTiles(keys, attacker, profile);
     const out = [];
     if (!keys) return out;
+    let seen = null;   // the enemies listed on more than one tile (`_ebMulti`) already looked at in this call
     for (let i = 0; i < keys.length; i++) {
       const b = this._eb[keys[i]];
       if (!b || !b.length) continue;
-      for (const e of b) if (e.alive && (!e.hitArea || !out.includes(e)) && canTargetEnemy(attacker, e, profile)) out.push(e);
+      for (const e of b) {
+        if (e._ebMulti) {
+          if (seen === null) seen = new Set();
+          else if (seen.has(e)) continue;
+          seen.add(e);
+        }
+        if (e.alive && canTargetEnemy(attacker, e, profile)) out.push(e);
+      }
     }
     return out;
   }
@@ -1789,10 +1830,11 @@ export class Battle {
    * A living enemy whose body is on any of `keys` — targetable or not (stealthed, untargetable, asleep, flying): the
    * 技能范围 trigger "技能范围内存在敌人（无视其不可选中）" (skills.js SKILL_RANGE).
    */
-  anyEnemyInKeys(keys) {
+  anyEnemyInKeys(keys, unit = null) {
     if (!keys) return false;
+    const idx = unit && unit.profile && unit.profile.rangeTiles ? this._et : this._eb;
     for (let i = 0; i < keys.length; i++) {
-      const b = this._eb[keys[i]];
+      const b = idx[keys[i]];
       if (b && b.length) for (const e of b) if (e.alive && e.deployed) return true;
     }
     return false;
@@ -1828,9 +1870,10 @@ export class Battle {
     const set = new Set(keys);
     const out = [];
     const list = want === 'enemy' ? this.enemies : this.allyUnits;
+    const tiles = !!(unit.profile && unit.profile.rangeTiles);
     for (const x of list) {
       if (!x.alive || !x.deployed || x.hidden) continue;
-      if (bodyInKeys(x, set)) out.push(x);
+      if (tiles ? bodyInKeys(x, set) : bodyInRange(x, set)) out.push(x);
     }
     return out;
   }
@@ -2197,7 +2240,7 @@ export class Battle {
    * client action can pass `keepFacing: false`. Pulls use the same display rule; raw displacements remain unmarked.
    * Returns the tiles moved.
    */
-  push(e, force, { from = null, dir = null, fixed = false, fixedAngle = false, inward = false, effect = false, keepFacing = true } = {}) {
+  push(e, force, { from = null, dir = null, fixed = false, fixedAngle = false, inward = false, effect = false, keepFacing = true, keepDir = false } = {}) {
     if (!this._displaceable(e)) { this._staticForce(e, force, false); return 0; }
     let level = this.forceLevel(e, force);
     const fx0 = fin(from?.x, e.x), fy0 = fin(from?.y, e.y);
@@ -2209,7 +2252,10 @@ export class Battle {
       ux = dirX / dl; uy = dirY / dl;
       if (from && !fixed && (d < PUSH_DIRECTIONAL_MIN_DIST || (!fixedAngle && vx * ux + vy * uy < d * Math.SQRT1_2))) {
         level -= 2;
-        if (d > 1e-6) { ux = vx / d; uy = vy / d; }
+        // behind the pusher (dot < 0): 野鬃 keeps the attack direction (keepDir). Everyone else, and her
+        // forward-hemisphere / too-close targets, become radial.
+        const behind = vx * ux + vy * uy < 0;
+        if (!(keepDir && behind) && d > 1e-6) { ux = vx / d; uy = vy / d; }
       }
     } else if (d > 1e-6) { ux = vx / d; uy = vy / d; }
     else if (!inward && from && Array.isArray(from.fwd)) { ux = from.fwd[1]; uy = from.fwd[0]; }
@@ -2304,7 +2350,7 @@ export class Battle {
     const fromX = e.x, fromY = e.y;
     let moved = 0;
     const stepLen = 0.1;
-    while (moved + 1e-9 < eff) {
+    while (moved + 1e-9 < eff) { // loop-cap: distance capped at 2*COLS, step 0.1
       const s = Math.min(stepLen, eff - moved); // (the last step is a partial one: 0.12 tiles moves 0.12, not 0.2)
       const nx = e.x + ux * s, ny = e.y + uy * s;
       const r = Math.round(ny), c = Math.round(nx);
@@ -2595,7 +2641,6 @@ export class Battle {
       units: snapshotUnits(this.units, this.time),
       ...(this.flags.augments?{corrosionStacks:Object.fromEntries(this.enemies.filter(u=>u.alive&&u.deployed&&!u.hidden&&u.mem.augmentCorrosion>0).map(u=>[u.id,u.mem.augmentCorrosion]))}:{}),
       noteStacks: Object.fromEntries(this.enemies.filter(u=>u.alive&&u.deployed&&!u.hidden&&u.mem.leithanienStacks>0).map(u=>[u.id,u.mem.leithanienStacks])),
-      energy: Object.fromEntries(this.allyUnits.filter(u=>u.alive&&u.deployed&&u.profile?.storeEnergy).map(u=>[u.id,storedEnergy(u)])),
       dp: this.players.length ? Math.floor(this.players[0].dp) : 0,
       killed: this.killed,
       total: this.total,
@@ -2615,7 +2660,7 @@ export class Battle {
       (down || (down = [])).push([u.id, r2(u.respawnAt), r2(Math.max(0, u.respawnAt - u.deathAt)), this._downState(u), ...this.restTile(u)]);
     }
     if (down) snap.down = down;
-    let elem = null, ammo = null, wolves = null, neg = null, stand = null, standCut = null;
+    let elem = null, ammo = null, wolves = null, neg = null, energy = null, stand = null, standCut = null;
     let listed = null;   // the ids in snap.units, built for the first enemy with a cut to report
     for (const u of this.units) {
       if (u.side === 'enemy' && u.atkStandCutAt >= 0) {
@@ -2631,6 +2676,8 @@ export class Battle {
       if (v) (elem || (elem = [])).push([u.id, v[0], v[1], v[2], v[3], r2(u.elem[v[0]] || 0)]);
     }
     if (elem) snap.elem = elem;
+    const energies=this.allyUnits.filter(u=>u.alive&&u.deployed&&!u.hidden).map(u=>{const count=mysticView(u) || (u.profile?.storeEnergy && u.profile?.energyCount ? [storedEnergy(u),u.profile.storeMax??3] : null);return count ? [u.id,...count] : null;}).filter(Boolean);
+    if(energies.length)snap.energy=energies;
     const ammoList = this.units.filter(u => u.alive && u.deployed && !u.hidden && u.skill?.active && u.skill.kind === 'ammo')
       .map(u => [u.id, Math.max(0, u.skill.ammoLeft), Math.max(1, u.skill.ammoMax || u.skill.ammo || 0, u.skill.ammoLeft)]);
     if (ammoList.length) snap.ammo = ammoList;
@@ -2663,6 +2710,7 @@ export class Battle {
     if(negList.length)snap.neg=negList;
     const coinList = this.units.filter(u => u.alive && u.deployed && !u.hidden).map(u => [u.id, coinView(u)]).filter(([,c]) => c).map(([id,c]) => [id,...c]);
     if (coinList.length) snap.coins = coinList;
+    for(const u of this.units){if(!u.alive||!u.deployed||u.hidden)continue;const ly=layerView(u);if(ly)(snap.layers||(snap.layers=[])).push([u.id,ly]);const ch=chargeView(u);if(ch)(snap.charges||(snap.charges=[])).push([u.id,...ch]);}
     return snap;
   }
 
@@ -2793,20 +2841,44 @@ export class Battle {
   }
 
   _buildEnemyIndex() {
-    for (const k of this._ebUsed) this._eb[k].length = 0;
-    this._ebUsed.length = 0;
+    const eb = this._eb, et = this._et, ebUsed = this._ebUsed, etUsed = this._etUsed;
+    for (const k of ebUsed) eb[k].length = 0;
+    ebUsed.length = 0;
+    for (const k of etUsed) et[k].length = 0;
+    etUsed.length = 0;
+    const rho = ENEMY_COLLIDER_RADIUS, rho2 = rho * rho;
     for (const e of this.enemies) {
       if (!e.alive || e.hidden) continue;
       if (e.hitArea) {
-        for (const k of bodyKeys(e)) { const b = this._eb[k]; if (!b.length) this._ebUsed.push(k); b.push(e); }
+        const keys = bodyKeys(e);
+        e._ebMulti = keys.length > 1;
+        for (const k of keys) {
+          if (!eb[k].length) ebUsed.push(k);
+          eb[k].push(e);
+          if (!et[k].length) etUsed.push(k);
+          et[k].push(e);
+        }
         continue;
       }
-      const r = roundHalfEven(e.y), c = roundHalfEven(e.x);
-      if (r < 0 || r >= this.grid.rows || c < 0 || c >= this.grid.cols) continue;
-      const k = r * this.grid.cols + c;
-      const b = this._eb[k];
-      if (!b.length) this._ebUsed.push(k);
-      b.push(e);
+      // every tick for every enemy: colliderKeys / bodyKeys inlined without their arrays (the same tiles, same order)
+      const x = e.x, y = e.y;
+      const tr = roundHalfEven(y), tc = roundHalfEven(x);
+      if (tr >= 0 && tr < this.grid.rows && tc >= 0 && tc < this.grid.cols) { const k = tr * this.grid.cols + tc; if (!et[k].length) etUsed.push(k); et[k].push(e); }
+      const r0 = Math.max(0, Math.floor(y - rho + 0.5 + 1e-9)), r1 = Math.min(this.grid.rows - 1, Math.ceil(y + rho - 0.5 - 1e-9));
+      const c0 = Math.max(0, Math.floor(x - rho + 0.5 + 1e-9)), c1 = Math.min(this.grid.cols - 1, Math.ceil(x + rho - 0.5 - 1e-9));
+      let n = 0;
+      for (let r = r0; r <= r1; r++) {
+        const dy = y < r - 0.5 ? r - 0.5 - y : y > r + 0.5 ? y - r - 0.5 : 0;
+        for (let c = c0; c <= c1; c++) {
+          const dx = x < c - 0.5 ? c - 0.5 - x : x > c + 0.5 ? x - c - 0.5 : 0;
+          if (dx > 0 && dy > 0 && dx * dx + dy * dy >= rho2) continue;
+          const k = r * this.grid.cols + c;
+          if (!eb[k].length) ebUsed.push(k);
+          eb[k].push(e);
+          n++;
+        }
+      }
+      e._ebMulti = n > 1;
     }
   }
   _staticForce(e, force, pull = false) {
@@ -2840,3 +2912,5 @@ export class Battle {
 }
 
 export default Battle;
+
+for(const methods of [MergeBattle0])for(const key of Reflect.ownKeys(methods.prototype)){if(key!=='constructor'&&!Object.hasOwn(Battle.prototype,key))Object.defineProperty(Battle.prototype,key,Object.getOwnPropertyDescriptor(methods.prototype,key));}

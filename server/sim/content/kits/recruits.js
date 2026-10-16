@@ -1,9 +1,9 @@
 import { hypot, sin, cos, atan2 } from '../../detmath.js';
 // Opt-in recruits. Skill, talent and module numbers are read from the selected official record.
-import {num,talentBb,traitBb,moduleBb,batMod} from './tier1.js';
-import {COLS} from '../../constants.js';
-import {canTargetEnemy} from '../../targeting.js';
-import {weaknessRetype} from '../items/battle.js';
+import { num, talentBb, traitBb, moduleBb, batMod } from './tier1.js';
+import { COLS } from '../../constants.js';
+import { canTargetEnemy } from '../../targeting.js';
+import { weaknessRetype } from '../items/battle.js';
 import * as S from '../support/index.js';
 const up=u=>u?.alive&&u.deployed&&!u.hidden;
 const foes=(b,u)=>b.enemiesInKeys(u.rangeKeys,u,u.profile);

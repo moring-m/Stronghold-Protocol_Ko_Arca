@@ -2,9 +2,7 @@
 // Conventions of the tier-5 kits: ../shared/tier5.js; kit contract and rules: ../README.md.
 
 import { bodyInRadius } from '../../../body.js';
-import {
-  AURA_IV, AURA_DUR, num, talent, traitBb, batPct, mods, isOp, selectedId, lazySkills, instantKind, whileOn,
-} from '../shared/tier5.js';
+import { AURA_IV, AURA_DUR, num, talent, traitBb, batPct, mods, isOp, selectedId, lazySkills, instantKind, whileOn } from '../shared/tier5.js';
 
 /** 号角 S2 过载: the second half of the ammo (PRTS 备注 of S3 "技能进行到一半时"; S2 counts shots). [ASSUMED] */
 const HORN_S2_OVERLOAD_AT = 0.5;
@@ -69,7 +67,7 @@ export default {
           }
           if (!unit.mem.overload || !(ovPeak > 0)) return;
           unit.mem.hornAcc += dt;
-          while (unit.mem.hornAcc >= ovIv && unit.alive) {
+          while (unit.mem.hornAcc >= ovIv && unit.alive) { // loop-cap: interval floored before the loop
             unit.mem.hornAcc -= ovIv;
             const rate = ovPeak * Math.min(1, (unit.mem.hornT - main) / ovRamp);
             if (rate > 0) battle.loseHp(unit, unit.s.maxHp * rate * ovIv, { source: unit, silent: true });

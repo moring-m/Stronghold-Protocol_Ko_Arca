@@ -1,9 +1,9 @@
-import {RANDOM_BAND_ID} from '../../shared/randomBand.js';
-import {withLaboratoryDummy,LAB_DUMMY_BOSS,LAB_DUMMY_ENEMY,LAB_DUMMY_FIELDS,validDummyStats} from '../../shared/laboratoryDummy.js';
-import {bossPoolHp} from './finalAssault.js';
+import { RANDOM_BAND_ID } from '../../shared/randomBand.js';
+import { withLaboratoryDummy, LAB_DUMMY_BOSS, LAB_DUMMY_ENEMY, LAB_DUMMY_FIELDS, validDummyStats } from '../../shared/laboratoryDummy.js';
+import { bossPoolHp } from './finalAssault.js';
 // Local-only single-round mode. This class is never constructed by the lobby.
-import {laboratoryEquipment} from '../../shared/search.js';
-import {GameData} from './gamedata.js';
+import { laboratoryEquipment } from '../../shared/search.js';
+import { GameData } from './gamedata.js';
 import { Match } from './Match.js';
 import { SharedPool } from './pool.js';
 import { PHASE, ERR, BOND_LAYER_CAP } from '../../shared/constants.js';

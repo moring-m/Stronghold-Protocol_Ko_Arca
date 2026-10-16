@@ -1,5 +1,5 @@
-import { init, parse } from "es-module-lexer";
-import { bootstrap } from "./bootstrap.js";
+import { init, parse } from 'es-module-lexer';
+import { bootstrap } from './bootstrap.js';
 export function pinPath(path, release) {
   if (!path.startsWith("/") || path.startsWith("//")) return path;
   const u = new URL(path, "http://release");

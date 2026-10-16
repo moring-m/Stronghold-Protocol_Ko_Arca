@@ -1,6 +1,7 @@
+import { useDocClass } from '../ui/device.js';
 import { statsPreview, LoadoutStats } from '../ui/loadoutStats.js';
 import { OperatorVoice } from '../ui/operatorVoice.js';
-import {RecruitPresetButton,RecruitPresetsHost} from '../ui/recruitPresets.js';
+import { RecruitPresetButton, RecruitPresetsHost } from '../ui/recruitPresets.js';
 
 
 
@@ -14,13 +15,13 @@ import {RecruitPresetButton,RecruitPresetsHost} from '../ui/recruitPresets.js';
 
 import { t, N_ } from '../../../shared/i18n.js';
 import { tr } from '../i18n/i18n.js';
-import {CultivationSection} from './cultivation.js';
-import {setOpsMap} from '../ui/loadoutSync.js';
-import {setOps} from '../ui/loadoutModel.js';
-import {FavoritesHost,FavoritesButton} from '../ui/favorites.js';
-import {loadoutRecord,resolveRecordLoadout} from '../../../shared/loadoutRecord.js';
-import {audio} from '../audio.js';
-import {checkLoadout} from '../../../shared/protocol.js';
+import { CultivationSection } from './cultivation.js';
+import { setOpsMap } from '../ui/loadoutSync.js';
+import { setOps } from '../ui/loadoutModel.js';
+import { FavoritesHost, FavoritesButton } from '../ui/favorites.js';
+import { loadoutRecord, resolveRecordLoadout } from '../../../shared/loadoutRecord.js';
+import { audio } from '../audio.js';
+import { checkLoadout } from '../../../shared/protocol.js';
 // 干员调配 (Operator loadout, DESIGN §16): choose the equipped skill of every chess and the module of its elite before a
 // match (official rule: "开始游戏前无法调整干员的等级，但可调整其所携带的技能和模组"). A full-screen overlay opened
 // from the lobby, the room and the briefing (INFO_CHECK) — `openLoadout(from)` / <LoadoutButton/>; <LoadoutHost/> is
@@ -46,11 +47,31 @@ import { chessLoadout } from '../ui/gameLogic.js';
 import { data, useData, localAsset, DATA_FILES } from '../data.js';
 import { useStore, loadPref, savePref } from '../store.js';
 import { PHASE } from '../../../shared/constants.js';
-import {
-  garrisonTexts, MODULE_NONE, PROF_ORDER, PROF_NAME, rosterOf, filterRoster, recordsOf, chessOptions, effectiveChoice, setChoice, resetChoice,
-  changedCount, skillLabel, moduleBadge, attrRows, skillTags, serializeExport, parseImport, LOADOUT_IMPORT_MAX_BYTES, sanitizeEntries, setRecruitSelection,
-} from '../ui/loadoutModel.js';
-import { loadoutStore, openLoadout, closeLoadout, setEntries, applyLoadoutEntries } from '../ui/loadoutSync.js';
+import { garrisonTexts, MODULE_NONE, PROF_ORDER, PROF_NAME, rosterOf, filterRoster, recordsOf, chessOptions, effectiveChoice, setChoice, resetChoice, changedCount, skillLabel, moduleBadge, attrRows, skillTags, serializeExport, parseImport, LOADOUT_IMPORT_MAX_BYTES, sanitizeEntries, setRecruitSelection } from '../ui/loadoutModel.js';
+import { loadoutStore, openLoadout, closeLoadout, setEntries, applyLoadoutEntries, setNotOwned, applyOwnershipImport, setDiyPicks, applyDiyImport } from '../ui/loadoutSync.js';
+
+import { CultivationSelects, cultivationView, potentialEditable } from './cultivation.js';
+import { cultivationCharIds } from '../../../shared/protocol.js';
+import { atPotential } from '../../../shared/potential.js';
+import { setOwned, notOwnedCount, serializeOwnership, parseOwnershipImport, OWNERSHIP_IMPORT_MAX_BYTES } from '../ui/ownershipModel.js';
+import { OwnershipPanel, useOwnershipRoster } from './ownership.js';
+import { DiyPanel, diyData } from './diy.js';
+
+import { diyCount, sanitizeDiyPicks, setPick, serializeDiy, parseDiyImport, DIY_IMPORT_MAX_BYTES } from '../ui/diyModel.js';
+import { tParts } from '../../../shared/i18n.js';
+
+
+
+
+
+
+
+
+
+
+export { LoadoutStats, statsPreview } from '../ui/loadoutStats.js';
+
+
 import { copyText } from '../ui/clipboard.js';
 import { toast } from '../ui/toasts.js';
 
@@ -273,7 +294,7 @@ const getChessRec = (id) => data.lookup('chess', id);
  * @param {(id: string) => any} getChess
  * @returns {{ elite: boolean, chess: any, lo: any, record: any, trait: string, talents: any[] } | null} null without a record
  */
-export { statsPreview, LoadoutStats } from '../ui/loadoutStats.js';
+
 function Detail({ m, chess, golden, entries, ops, onChange, onReset, locked }) {
   const getBond = id=>data.lookup('bonds',id);
   const [level, setLevel] = useState('normal');
@@ -284,6 +305,8 @@ function Detail({ m, chess, golden, entries, ops, onChange, onReset, locked }) {
   const opt = chessOptions(chess, golden);
   const choice = effectiveChoice(entries, chess, golden);
   const traitTexts=garrisonTexts(statLevel==='elite'&&golden?golden:chess,id=>data.lookup('garrisons',id));
+  const cv = cultivationView(chess.charId, ops);
+  const changed = choice.changed || cv.changed;
   const modOpt = opt.moduleOptions.find((x) => x.id === choice.module) || null;
   const lv = (c) => c?.status?.skillLevel ?? '—';
   return html`<aside class="lo-detail" aria-label=${`${chess.name} 调配`}>
@@ -665,10 +688,7 @@ export function LoadoutHost() {
     if (shouldAutoClose(st, phase, inMatch, wasInMatch.current)) closeLoadout();
     wasInMatch.current = inMatch;
   }, [phase, inMatch, st.open]);
-  useEffect(() => {
-    if (st.open) document.documentElement.classList.add('sp-loadout-open');
-    else document.documentElement.classList.remove('sp-loadout-open');
-  }, [st.open]);
+  useDocClass('sp-loadout-open', st.open);
   return html`<${Fragment}>${st.open ? html`<${LoadoutScreen} st=${st} />` : null}<${FavoritesHost}/><${RecruitPresetsHost}/><//>`;
 }
 
@@ -678,22 +698,10 @@ export function LoadoutHost() {
  * download). Review fix: it counted stale entries the screen does not.
  * @param {Record<string, any>} entries @param {((id: string) => any) | null} getChess null while chess.json is not loaded
  */
-export function badgeCount(entries, getChess) {
-  return getChess ? changedCount(entries, getChess) : Object.keys(entries || {}).length;
-}
+export {badgeCount} from '../ui/loadoutEntry.js';
 
 /**
  * Entry button (lobby / room / briefing).
  * @param {{ from: 'lobby'|'room'|'briefing', size?: string, variant?: string, class?: string, label?: string }} props
  */
-export function LoadoutButton({ from, size = 'md', variant = 'secondary', class: cls, label = '干员调配', disabled = false }) {
-  useData('local', 'chess'); // the official preset icon (re-render once the local-art manifest arrives)
-  const entries = useStore((s) => s.entries, Object.is, loadoutStore);
-  const n = badgeCount(entries, data.status('chess') === 'ready' ? (id) => data.lookup('chess', id) : null);
-  return html`<button type="button" class=${cx('btn', `btn--${variant}`, `btn--${size}`, 'lo-entry', cls)} data-testid="loadout-open" disabled=${disabled}
-      onClick=${() => openLoadout(from)} title="调整干员携带的技能与模组">
-    <${Img} src=${localAsset('ui/outer', 'operator_preset')} class="lo-entry__icon" fallback=${html`<${Icon} name="edit" class="btn__icon" />`} />
-    <span class="btn__label">${label}</span>
-    ${n ? html`<span class="lo-entry__n num" aria-label=${`${n} 名干员已调整`}>${n}</span>` : null}
-  </button>`;
-}
+export {LoadoutButton} from '../ui/loadoutEntry.js';

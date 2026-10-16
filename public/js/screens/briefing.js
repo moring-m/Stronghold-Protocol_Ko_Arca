@@ -1,3 +1,5 @@
+import {UnofficialMark} from "../ui/pluginTag.js";
+import {t} from "../../../shared/i18n.js";
 import { ChatPanel } from '../ui/chat.js';
 // Briefing — INFO_CHECK "1/2 确认本局信息" (research 06 §4.1, D1): enemy leader (silhouette, name,
 // abilities), stage (+ its pool: 战场固定 / 战场随机（共N张）), 特训敌人 factions (icon, name, description), the difficulty
@@ -10,7 +12,7 @@ import { html, Button, Icon, MicroLabel } from '../ui/components.js';
 import { useGameData, Img, RichText } from '../ui/gameComponents.js';
 import { StepHeader, ExitModal } from '../ui/matchChrome.js';
 import { MatchInfo, matchInfoModel } from '../ui/matchInfo.js';
-import { LoadoutButton } from './loadout.js';
+import { LoadoutButton } from '../ui/loadoutEntry.js';
 import { SetupReroll } from '../ui/setupReroll.js';
 import { actions } from '../ui/gameActions.js';
 import { factionTypes, sortedPlayers, phaseTotalSeconds } from '../ui/gameLogic.js';
@@ -23,8 +25,10 @@ const cx = (...p) => p.flat().filter(Boolean).join(' ');
 export function BriefingScreen() {
   const pub = useStore((s) => s.match.public);
   const myId = useStore((s) => s.me.playerId);
-  const room = useStore((s) => s.room);
+
   const solo = useStore((s) => s.room?.mode === 'solo') || String(pub?.modeId || '').includes('single');
+  // gameplay plugins (DESIGN §32.6): the briefing says the match is unofficial
+  const room = useStore((s) => s.room);
   const gd = useGameData();
   const [exit, setExit] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -56,6 +60,7 @@ export function BriefingScreen() {
     <div class="brief__bg" aria-hidden="true"></div>
     <${StepHeader} step=${1} of=${2} title="确认本局信息" micro="BRIEFING // INFO CHECK" pub=${pub}
       total=${phaseTotalSeconds(pub, gd.config)} onExit=${() => setExit(true)} />
+    <${UnofficialMark} room=${room} class="brief__modmark" />
     <main class="brief__main">
       <section class="brief__left">
         <div class="brief-boss brackets">

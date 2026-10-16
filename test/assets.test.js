@@ -16,7 +16,8 @@ import { resolveRoles, roleAnimationNames } from '../tools/assets/anim-roles.mjs
 import { normalizeAtlas, atlasInfo, parseAtlas } from '../tools/assets/atlas.mjs';
 import { pngSize, isCompletePng, isMp3, validate } from '../tools/assets/formats.mjs';
 import { encodeWoff2, decodeWoff2Tables, readSfnt, uintBase128 } from '../tools/assets/woff2.mjs';
-import { assetToPath, pickUnitSfx, indexAudio } from '../tools/assets/audio.mjs';
+import { assetToPath, pickUnitSfx, indexAudio, nativeVoiceDirs } from '../tools/assets/audio.mjs';
+import { tidyVoiceTrees } from '../tools/fetch-assets.mjs';
 import { mirrorUrl, safeName, encodePath } from '../tools/assets/sources.mjs';
 import { collectEnemyIds, skillIndicesByChar, buildPlan, GUIDE_PAGES, UI_EXTRAS } from '../tools/assets/plan.mjs';
 import { resolveTemplate, collectLeaves } from '../tools/assets/manifest.mjs';

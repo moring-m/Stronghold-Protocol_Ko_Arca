@@ -1,7 +1,7 @@
 import { hypot } from '../../detmath.js';
 // Ursus operators: explicit specs for every selectable skill; values come from each loadout's official record.
-import {num,talentBb,traitBb,batMod} from './tier1.js';
-import {performAttack,effectiveProfile,acquireTargets} from '../../ai.js';
+import { num, talentBb, traitBb, batMod } from './tier1.js';
+import { performAttack, effectiveProfile, acquireTargets } from '../../ai.js';
 
 import * as S from '../support/index.js';
 const STUDENTS=new Set(['char_196_sunbr','char_195_glassb','char_197_poca','char_194_leto','char_115_headbr','char_1051_headb2']);

@@ -39,10 +39,7 @@
 // m = own copies of that hammer + (1 if 蒸汽之心 applies and the type is on the field): burn ×m of arts damage,
 // undying duration ×m, ASPD ×m, tremble chance ×m. Granted hammers without an own copy use 蒸汽之心's blackboard.
 
-import {
-  num, itemRecord, itemKeyOf, buffsOf, isOp, onField, unitBonds, isMember, bondActive, isGroundOp, frontTile,
-  alliesAround, passiveBuff, fxOn, battleStore, contentInfo, itemsOf, directMods,
-} from '../support/index.js';
+import { num, itemRecord, itemKeyOf, buffsOf, isOp, onField, unitBonds, isMember, bondActive, isGroundOp, frontTile, alliesAround, passiveBuff, fxOn, battleStore, contentInfo, itemsOf, directMods } from '../support/index.js';
 import { mitigate, hasHp, periodicDamage, isHpLoss } from '../../damage.js';
 import { hypot } from '../../detmath.js';
 

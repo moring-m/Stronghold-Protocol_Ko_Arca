@@ -109,6 +109,8 @@ describe('Final Assault / Hidden Core fields in the browser sim', { skip }, () =
     // (a failed request is reported by the response handler with its URL; the favicon 404 is not a problem)
     page.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) problems.push(`console: ${m.text()}`); });
     page.on('response', (r) => { if (r.status() >= 400 && !/favicon/.test(r.url())) problems.push(`HTTP ${r.status()} ${r.url()}`); });
+    // the test rebuilds runField from its source inside the page (new Function); the site's CSP (0.3.0) allows no eval
+    await page.setBypassCSP(true);
     await page.goto(`http://127.0.0.1:${srv.port}/sim/spec.js`);
     const chrome = await page.evaluate(async (all, src, maxSeconds) => {
       const { loadBrowserSim } = await import('/js/battle/runner.js');

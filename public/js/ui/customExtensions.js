@@ -1,12 +1,12 @@
-import {matchesKoreanSearch} from '../../../shared/search.js';
-import {tr} from '../i18n/i18n.js';
-import {MAP_PREVIEWS} from './mapPreviews.js';
-import {bondIconUrl,bandIconUrl,enemyIconUrl} from './assetUrls.js';
-import {loadExtensionPresets,saveExtensionPresets,copyExtensionSelection,resolveExtensionPreset} from './customExtensionPresets.js';
-import {data} from '../data.js';
+import { matchesKoreanSearch } from '../../../shared/search.js';
+import { tr } from '../i18n/i18n.js';
+import { MAP_PREVIEWS } from './mapPreviews.js';
+import { bondIconUrl, bandIconUrl, enemyIconUrl } from './assetUrls.js';
+import { loadExtensionPresets, saveExtensionPresets, copyExtensionSelection, resolveExtensionPreset } from './customExtensionPresets.js';
+import { data } from '../data.js';
 import { useEffect, useState } from '../../vendor/hooks.module.js';
 import { html, Button, Modal, Fragment, Icon } from './components.js';
-import { extensionSelectionCount,RULE_VALUES,normalizeRuleValues,EXTENSION_CATEGORIES,validateExtensionMinimums,modeExtensionSelection, customExtensionCatalog, isCustomStage } from '../../../shared/customExtensions.js';
+import { extensionSelectionCount, RULE_VALUES, normalizeRuleValues, EXTENSION_CATEGORIES, validateExtensionMinimums, modeExtensionSelection, customExtensionCatalog, isCustomStage } from '../../../shared/customExtensions.js';
 
 
 export function stageDifficultyLabels(stage) {
@@ -40,7 +40,7 @@ export function CustomExtensionsDialog({ open, room, isHost, disabled, onClose, 
   const [tables,setTables]=useState(null),[loadError,setLoadError]=useState('');
   useEffect(()=>{if(!open)return;let live=true;setTables(null);setLoadError('');const names=['chess','bonds','items','bands','bosses','stages','config','enemies','assets'];Promise.all(names.map(k=>data.load(k))).then(()=>{if(live)setTables(Object.fromEntries(names.map(k=>[k,data.get(k)])));}).catch(()=>{if(live)setLoadError('목록을 불러오지 못했습니다. 창을 다시 열어주세요.');});return()=>{live=false;};},[open]);
   const [draft,setDraft] = useState({ bonds: [], stages: [] });
-  const numericCount=category=>extensionSelectionCount({ruleValues:Object.fromEntries(RULE_VALUES.filter(r=>(r.category||'rules')===(category==='augmentSettings'?'augments':category)).map(r=>[r.id,normalizeRuleValues(draft.ruleValues)[r.id]]))});
+  const numericCount=category=>category==='augmentSettings'&&!draft.rules?.includes('augments')?0:RULE_VALUES.filter(r=>(r.category||'rules')===(category==='augmentSettings'?'augments':category)&&normalizeRuleValues(draft.ruleValues)[r.id]!==r.default).length;
   const banTab=tab==='forcedBonds'||tab==='forcedAuxBonds', protectKey=tab==='forcedAuxBonds'?'protectedAuxBonds':'protectedBonds';
   const errors=tables&&!additionsOnly?validateExtensionMinimums(tables,draft,{mode:room.mode,difficulty:room.difficulty}):[];
   useEffect(() => {
@@ -66,17 +66,18 @@ export function CustomExtensionsDialog({ open, room, isHost, disabled, onClose, 
   const reason=next=>tables?(additionsOnly?'':validateExtensionMinimums(tables,next,context).join(' ')):'목록을 불러오는 중입니다.';
   const applyDraft=value=>{const next=modeExtensionSelection(value,room.mode);const blocked=reason(next);if(blocked){setNotice(blocked);return;}setNotice('');setDraft(next);};
   const toggle=id=>applyDraft(nextToggle(id));
+  const resetSettings=()=>{applyDraft({bonds:[],stages:[]});setQuery('');setPresetId('');setPresetName('');};
   const lockedReasons = tables && tab!=='augmentSettings' ? [...new Set((catalog[tab]||[]).filter(e=>typeof e.id==='string').flatMap(e =>
     banTab ? ['random','forced','protected'].map(policy=>reason(setBondBanPolicy(draft,e.id,policy,tab==='forcedAuxBonds'))) : [reason(nextToggle(e.id))]
   ).filter(Boolean))] : [];
   const lockWarning = !isHost ? '방장만 설정을 수정할 수 있습니다.' : disabled ? '현재는 설정을 수정할 수 없습니다.' : lockedReasons.length ? '현재 구성·난이도 제한으로 일부 선택을 수정할 수 없습니다.' : '';
   useEffect(()=>setNotice(''),[tab,draft,disabled,isHost,room.difficulty]);
   return html`<${Modal} open=${open} title="커스텀 설정" micro="CUSTOM EXTENSIONS" class="custom-ext ui-editor" width="min(15rem,96vw)" onClose=${onClose}
-    actions=${html`<span class="editor-status" aria-live="polite">${notice || (errors.length?errors.join(' '):loadError||(!tables?'목록 불러오는 중…':(additionsOnly?'실험실에 추가할 커스텀 콘텐츠를 선택하세요.':'최소 구성 조건 충족')))}</span><${Button} variant="secondary" onClick=${onClose} disabled=${disabled}>${isHost ? '취소' : '닫기'}<//>
+    actions=${html`<span class="editor-status" aria-live="polite">${notice || (errors.length?errors.join(' '):loadError||(!tables?'목록 불러오는 중…':(additionsOnly?'실험실에 추가할 커스텀 콘텐츠를 선택하세요.':'최소 구성 조건 충족')))}</span>${isHost?html`<${Button} variant="ghost" disabled=${disabled||!tables} onClick=${resetSettings}>설정 초기화<//>`:null}<${Button} variant="secondary" onClick=${onClose} disabled=${disabled}>${isHost ? '취소' : '닫기'}<//>
       ${isHost ? html`<${Button} variant="primary" disabled=${disabled || !tables || errors.length>0} onClick=${()=>onSave(additionsOnly?{bonds:draft.bonds,stages:draft.stages,rules:draft.rules||[],commonBands:draft.commonBands||[],...(draft.ruleValues?{ruleValues:draft.ruleValues}:{})}:draft)}>적용<//>` : null}`}>
-    <p class="lo-note">${additionsOnly?'선택한 커스텀 콘텐츠를 실험실에 추가합니다. 전장·전략 목록과 전투에 함께 적용됩니다.':isHost?'설정은 방 전체에 적용됩니다.':'방장이 선택한 구성이 방 전체에 적용됩니다.'}</p>
+    <p class="lo-note">${additionsOnly?'선택한 커스텀 콘텐츠를 실험실에 추가합니다. 전장·전략 목록과 전투에 함께 적용됩니다.':isHost?'설정은 방 전체에 적용됩니다. 초기화 후 적용을 누르면 기본 설정으로 변경됩니다.':'방장이 선택한 구성이 방 전체에 적용됩니다.'}</p>
     <div class="extensions-layout"><nav class="extensions-nav" aria-label="설정 분류"><div class="extensions-menu"><h3>규칙</h3>
-      ${EXTENSION_CATEGORIES.filter(c=>additionsOnly?['rules','allies','bossStats','commonBands','bonds','stages'].includes(c.id):!['protectedBonds','protectedAuxBonds',...(room.mode==='coop8'?['forcedBonds','forcedAuxBonds','disabledBonds']:[])].includes(c.id)).map((c,i)=>html`<${Fragment}>${c.id==='bonds'?html`<h3>추가 확장</h3>`:c.id==='forcedBonds'?html`<h3>금지 단계</h3>`:c.id==='disabledBonds'?html`<h3>콘텐츠 비활성화</h3>`:null}<button type="button" id=${'ext-tab-'+c.id} aria-controls=${'ext-panel-'+c.id} aria-pressed=${tab===c.id} class=${tab===c.id?'is-on':''} onClick=${()=>{setTab(c.id);setQuery('');}}><${Icon} name=${CATEGORY_ICONS[c.id]} /><span class="extensions-nav__label">${c.name}</span><span class="num">${(['rules','allies','bossStats','augmentSettings'].includes(c.id)?extensionSelectionCount({...(c.id==='rules'?{rules:draft.rules}:{}),ruleValues:Object.fromEntries(RULE_VALUES.filter(r=>(r.category||'rules')===(c.id==='augmentSettings'?'augments':c.id)).map(r=>[r.id,normalizeRuleValues(draft.ruleValues)[r.id]]))}):(draft[c.id]||[]).length)+(c.id==='forcedBonds'?(draft.protectedBonds||[]).length:c.id==='forcedAuxBonds'?(draft.protectedAuxBonds||[]).length:0)}</span></button><//>`)}
+      ${EXTENSION_CATEGORIES.filter(c=>additionsOnly?['rules','allies','bossStats','commonBands','bonds','stages'].includes(c.id):!['protectedBonds','protectedAuxBonds',...(room.mode==='coop8'?['forcedBonds','forcedAuxBonds','disabledBonds']:[])].includes(c.id)).map((c,i)=>html`<${Fragment}>${c.id==='bonds'?html`<h3>추가 확장</h3>`:c.id==='forcedBonds'?html`<h3>금지 단계</h3>`:c.id==='disabledBonds'?html`<h3>콘텐츠 비활성화</h3>`:null}<button type="button" id=${'ext-tab-'+c.id} aria-controls=${'ext-panel-'+c.id} aria-pressed=${tab===c.id} class=${tab===c.id?'is-on':''} onClick=${()=>{setTab(c.id);setQuery('');}}><${Icon} name=${CATEGORY_ICONS[c.id]} /><span class="extensions-nav__label">${c.name}</span><span class="num">${(['rules','allies','bossStats','augmentSettings'].includes(c.id)?numericCount(c.id)+(c.id==='rules'?(draft.rules||[]).length:0):(draft[c.id]||[]).length)+(c.id==='forcedBonds'?(draft.protectedBonds||[]).length:c.id==='forcedAuxBonds'?(draft.protectedAuxBonds||[]).length:0)}</span></button><//>`)}
       </div>
       ${isHost&&!additionsOnly?html`<div class="extension-presets"><h3>프리셋</h3><select aria-label="확장 프리셋" value=${presetId} onChange=${e=>{const id=e.target.value;setPresetId(id);setPresetName(presets.find(p=>p.id===id)?.name||'');}}><option value="">새 프리셋</option>${presets.map(p=>html`<option value=${p.id}>${p.name}</option>`)}</select><input aria-label="확장 프리셋 이름" placeholder="프리셋 이름" maxlength="40" value=${presetName} onInput=${e=>setPresetName(e.target.value)}/><div class="extension-presets__actions"><${Button} variant="secondary" disabled=${disabled||!presetName.trim()||(!selectedPreset&&presets.length>=30)} onClick=${savePreset}>저장<//><${Button} variant="secondary" disabled=${disabled||!selectedPreset||!tables} onClick=${()=>applyDraft(resolveExtensionPreset(selectedPreset,catalog))}>불러오기<//><${Button} variant="ghost" disabled=${disabled||!selectedPreset} onClick=${()=>{setPresets(saveExtensionPresets(presets.filter(p=>p.id!==presetId)));setPresetId('');setPresetName('');}}>삭제<//></div></div>`:null}
     </nav><section class="extensions-editor" id=${'ext-panel-'+tab} aria-labelledby=${'ext-tab-'+tab}>

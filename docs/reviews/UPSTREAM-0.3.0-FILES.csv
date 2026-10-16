@@ -1,0 +1,808 @@
+﻿경로,최초 병합 분류,비고
+.dockerignore,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+.github/ISSUE_TEMPLATE/BugReport.yml,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+.github/workflows/pr-labeler.yml,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+.gitignore,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+CHANGELOG.md,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+Dockerfile,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+NOTICE.md,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+README.md,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+THIRD-PARTY-NOTICES.md,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+data/assets.json,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+data/choices.json,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+docs/ARCHITECTURE.md,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+docs/ASSETS.md,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+docs/DATA.md,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+docs/DEPLOY.md,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+docs/DESIGN.md,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+docs/I18N.md,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+docs/META.md,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+docs/PACKS.md,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+docs/PLAYING.md,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+docs/PLUGIN-API.md,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+docs/PLUGIN-DSL.md,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+docs/PLUGIN-GUIDE.md,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+docs/PLUGINS.md,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+docs/SIM.md,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+docs/WINDOWS.md,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+docs/design/client.md,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+docs/design/engine.md,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+docs/design/geometry-time.md,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+docs/design/match.md,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+docs/design/network.md,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+docs/design/overview.md,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+docs/design/vfx-format.md,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+docs/history/0.2.4.md,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+docs/history/0.3.0.md,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+docs/history/v2.5-playtest6.md,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+docs/img/asset-download-complete.png,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+docs/img/asset-download-title.png,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+docs/img/bench-overflow.png,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+docs/img/hover-hotkeys.png,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+docs/plugin-catalog.example.json,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+docs/research/01-core-rules.md,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+docs/research/04-items.md,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+eslint.config.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+package-lock.json,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+package.json,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+plugins/AGENTS.md,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+plugins/README.md,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+plugins/_template/content/README.md,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+plugins/_template/content/data/bond.json,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+plugins/_template/content/dsl/income.json,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+plugins/_template/content/operators/caster.json,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+plugins/_template/content/operators/guard.json,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+plugins/_template/content/plugin.json,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+plugins/_template/cosmetic/README.md,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+plugins/_template/cosmetic/plugin.json,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+plugins/_template/script/README.md,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+plugins/_template/script/guard.json,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+plugins/_template/script/plugin.json,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+plugins/_template/script/sim/index.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+plugins/_template/script/test/guard.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+plugins/_template/ui/plugin.json,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+plugins/_template/ui/ui/index.html,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/css/components.css,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+public/css/screens/briefing.css,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+public/css/screens/game.css,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+public/css/screens/loadout.css,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+public/css/screens/result.css,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+public/css/screens/room.css,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+public/css/screens/stats.css,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+public/css/screens/title.css,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+public/dev/battle-perf.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/dev/fx-viewer.html,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/dev/fx-viewer.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/dev/render-demo.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+public/dev/uikit.html,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/dev/uikit.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/i18n/en.json,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/i18n/ja.json,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/i18n/ko.json,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/i18n/zh-TW.json,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/index.html,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/assetCache.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/assetDownload.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/assetPack.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/assets.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/audio.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/battle/metrics.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/battle/observe.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/battle/rehearsal.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/battle/rehearsalWorker.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/battle/runner.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/battle/simHost.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/battle/simLoader.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/battle/simWorker.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/battle/simWorkerRuntime.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/boot.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/bootLegacy.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/content.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/cosmetics.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/data.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/diag.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/main.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/media.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/pwa.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/render/app.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/render/app/pixi.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/render/app/pixiNoEval.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/render/app/tune.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/render/app/view.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/render/board3d/layout.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/render/board3d/load.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/render/board3d/materials.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/render/board3d/scene.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/render/drag.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/render/fx/numbers.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/render/interp.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/render/spine.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/render/style.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/render/tiles.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/render/units.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/render/vfx/available.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/render/vfx/clips.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/render/vfx/curves.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/render/vfx/effect.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/render/vfx/flight.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/render/vfx/funnelfx.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/render/vfx/funnels.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/render/vfx/geom.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/render/vfx/gl.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/render/vfx/glsl.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/render/vfx/library.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/render/vfx/materials.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/render/vfx/math.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/render/vfx/mounts.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/render/vfx/psys.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/render/vfx/rng.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/render/vfx/shapes.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/render/vfx/skillfx.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/render/vfx/skills.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/render/vfx/system.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/render/vfx/talentfx.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/render/vfx/talents.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/render/vfx/tier.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/render/vfx/wiring.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/screens/briefing.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/screens/cultivation.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/screens/game.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/screens/loadout.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/screens/result.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/screens/room.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/screens/stats.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/screens/title.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/store.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/ui/assetDownload.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/ui/assetImport.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/ui/buildGuard.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/ui/combatMetrics.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/ui/combatMetricsLayout.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/ui/fallbackField.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/ui/fieldHost.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/ui/gameLogic.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/ui/gameLogic/camera.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/ui/gameLogic/settings.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/ui/gameLogic/shortcuts.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/ui/hud.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/ui/loadoutModel.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/ui/loadoutSync.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/ui/numberInput.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/ui/operatorVoice.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/ui/playerName.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/ui/pluginFrame.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/ui/pluginPanel.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/ui/pluginSettings.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/ui/pluginTag.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/ui/settings.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/ui/shopBar.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/ui/stats.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/ui/titleHexagon.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/ui/uiPlugins.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/voicePrefs.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+public/js/webFonts.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/studio/index.html,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/studio/js/api.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/studio/js/authoring.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/studio/js/catalog.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/studio/js/create.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/studio/js/editors/art.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/studio/js/editors/audio.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/studio/js/editors/controls.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/studio/js/editors/dsl.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/studio/js/editors/dslForm.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/studio/js/editors/index.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/studio/js/editors/meta.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/studio/js/editors/mode.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/studio/js/editors/numbers.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/studio/js/editors/operator.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/studio/js/editors/script.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/studio/js/editors/spine.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/studio/js/editors/ui.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/studio/js/editors/voice.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/studio/js/forge.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/studio/js/info.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/studio/js/issues.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/studio/js/labels.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/studio/js/main.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/studio/js/picker.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/studio/js/preview/cards.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/studio/js/preview/field.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/studio/js/preview/layers.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/studio/js/preview/replay.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/studio/js/preview/sound.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/studio/js/remove.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/studio/js/slots.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/studio/js/trial.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/studio/js/validateDraft.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/studio/studio.css,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+public/sw.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+schemas/catalog.schema.json,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+schemas/dsl.schema.json,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+schemas/overlay.schema.json,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+schemas/plugin.schema.json,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+schemas/records.schema.json,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+schemas/ui.schema.json,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+scripts/launch.mjs,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+scripts/make-windows-bundle.mjs,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+scripts/start-windows-sandbox.bat,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/data.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/http/assetViews.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/http/boot.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/http/config.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/http/csp.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/http/files.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/http/routes.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/http/static.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/http/websocket.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/index.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/lobby.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/Match.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/PlayerState.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/audit.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/bot.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/choices.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/dslMeta.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/effectsMeta.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/fields.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/finalAssault.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/gamedata.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/host/childHost.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/host/entry.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/host/index.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/host/ipc.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/host/proxy.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/invariants.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/match/bossRounds.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/match/clientCombat.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/match/combat.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/match/infra.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/match/intents.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/match/messaging.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/match/phases.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/match/platform.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/match/prep.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/match/rehearsal.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/match/reports.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/match/settle.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/match/spDraft.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/match/views.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/player/acquire.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/player/basics.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/player/diy.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/player/economy.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/player/items.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/player/pieces.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/player/placement.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/player/prep.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/player/round.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/pool.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/preview.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/results.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/scheduler.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/match/waves.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/net.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/packs.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/plugins/contentData.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/plugins/contentSet.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/plugins/contentSets.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/plugins/forgeImport.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/plugins/forgeKits.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/plugins/identity.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/plugins/install.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/plugins/pack.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/plugins/policy.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/plugins/registry.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/plugins/roomSets.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/plugins/scriptPreflight.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/plugins/scriptProbe.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/plugins/scriptTestSetup.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/plugins/trusted.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/plugins/trustedApi.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/plugins/trustedEntry.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/plugins/trustedRuntime.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/plugins/visualSet.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/plugins/zip.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/Battle.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/ai.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/battle/blocking.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/battle/displacement.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/battle/events.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/battle/hooks.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/battle/lifecycle.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/battle/players.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/battle/queries.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/battle/spawns.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/battle/status.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/body.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/constants.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/bands/battle.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/bands/meta.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/bonds/addon/battle.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/bonds/addon/meta.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/bonds/core.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/bosses.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/choices.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/dsl/bounds.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/dsl/budget.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/dsl/compile.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/dsl/validate.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/dsl/vocab.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/enemies.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/enemies/archetypes.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/enemies/dot.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/enemies/fly.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/enemies/helpers.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/enemies/invisible.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/enemies/leaders.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/enemies/passengers.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/enemies/reflection.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/enemies/special.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/extensions.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/garrisons/meta.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/index.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/chess_char_1_07-prove.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/chess_char_1_12-estell.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/chess_char_1_17-indigo.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/chess_char_1_19-wildmn.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/chess_char_2_06-papyrs.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/chess_char_2_08-bubble.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/chess_char_2_11-kazema.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/chess_char_3_11-snhunt.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/chess_char_3_12-blemsh.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/chess_char_3_13-malist.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/chess_char_3_17-shotst.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/chess_char_3_19-vigil.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/chess_char_4_02-mostma.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/chess_char_4_10-aroma.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/chess_char_4_19-flamtl.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/chess_char_4_20-fartth.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/chess_char_4_24-billro.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/chess_char_4_26-bldsk.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/chess_char_5_03-blaze2.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/chess_char_5_05-ulpia.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/chess_char_5_06-etlchi.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/chess_char_5_07-surtr.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/chess_char_5_08-horn.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/chess_char_5_14-svash2.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/chess_char_6_01-lemuen.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/chess_char_6_05-pasngr.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/chess_char_6_09-cello.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/chess_char_6_10-nymph.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/chess_char_6_11-mlyss.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/chess_char_6_15-qiubai.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/chess_char_6_16-halo2.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/chess_char_6_17-nearl2.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/chess_char_6_18-whitw2.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/chess_char_6_19-blkkgt.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/chess_char_6_20-agoat2.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/op-aglna2.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/op-amgoat.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/op-aphris.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/op-ascln.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/op-bgsnow.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/op-chen.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/op-chen3.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/op-clemnt.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/op-closur.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/op-cqbw.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/op-crosly.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/op-demetr.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/op-doroth.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/op-haak.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/op-headb2.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/op-heyak.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/op-hsgma2.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/op-huang.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/op-ifrit.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/op-irene.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/op-judge.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/op-lin.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/op-lmlee.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/op-mantra.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/op-mcnist.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/op-monstr.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/op-narant.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/op-nasti.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/op-necras.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/op-phatm2.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/op-ray.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/op-saga.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/op-siege.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/op-sleach.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/op-thumpy.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/op-typhon.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/op-wang.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/op-weedy.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/op-wisdel.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/op-zuole.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/standin-acfend.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/standin-acpion.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/standin-acspec.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/ops/standin-acsupo.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/shared/tier1.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/shared/tier3.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/shared/tier4.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/shared/tier5.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/kits/shared/tier6.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/support/index.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/tokens.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/content/traitMods.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/detmath.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/grid.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/groundPaths.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/professions.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/rehearsal.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/rng.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/simdata.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/skills.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/snapshot.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/spec.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/targeting.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/sim/units.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+server/studio/authoring.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/studio/dslExamples.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/studio/edit.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/studio/files.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/studio/gameData.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/studio/gate.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/studio/index.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/studio/key.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/studio/paths.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/studio/preview.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/studio/targets.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/studio/templates/art.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/studio/templates/audio.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/studio/templates/dsl.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/studio/templates/index.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/studio/templates/meta.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/studio/templates/mode.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/studio/templates/numbers.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/studio/templates/operator.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/studio/templates/readme.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/studio/templates/script.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/studio/templates/spine.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/studio/templates/ui.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/studio/templates/voice.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/studio/trial.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/studio/trialChild.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/studio/trialDraft.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/studio/trialOptions.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/studio/trialRunner.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/studio/trialScenario.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/studio/watch.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+server/update.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+shared/assetPaths.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+shared/constants.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+shared/packs.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+shared/plugins/catalog.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+shared/plugins/dataUtils.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+shared/plugins/errors.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+shared/plugins/identity.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+shared/plugins/limits.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+shared/plugins/manifest.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+shared/plugins/officialBounds.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+shared/plugins/order.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+shared/plugins/patch.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+shared/plugins/records.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+shared/plugins/recordsSchema.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+shared/plugins/sandbox.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+shared/plugins/scriptCheck.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+shared/plugins/scriptLoad.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+shared/plugins/sdk.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+shared/plugins/skillSpec.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+shared/plugins/steps.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+shared/plugins/surface.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+shared/plugins/textNumber.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+shared/plugins/textPatterns.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+shared/plugins/ui.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+shared/plugins/validate.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+shared/plugins/visual.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+shared/potential.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+shared/protocol.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+shared/sha256.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+shared/standIn.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+test/asset-index.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/asset-paths.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/assets-env-proxy.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/assets-source-verification.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/assets.test.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+test/client-static.test.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+test/content/bands.test.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+test/content/community-round30.test.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+test/content/dsl.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/content/enemies_bosses.test.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+test/content/enemy_passengers.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/content/kits_t1t2.test.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+test/content/kits_t6.test.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+test/content/op_aphris.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/content/op_clemnt.test.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+test/content/op_logos.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/content/r40a-blemsh-s2.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/content/r40a-wang-dp.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/diag.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/docs-consistency.test.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+test/docs-paths.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/e2e/client-wait.test.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+test/e2e/client.mjs,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+test/e2e/coop.e2e.mjs,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+test/e2e/fastServer.mjs,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+test/feedback7-voices.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/fetch-assets-shrink.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/fixtures/forge/mixed-pack/bonds.json,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/fixtures/forge/mixed-pack/chars/rose.png,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/fixtures/forge/mixed-pack/extra/note.png,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/fixtures/forge/mixed-pack/i18n/en.json,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/fixtures/forge/mixed-pack/kits/boom.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/fixtures/forge/mixed-pack/pack.json,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/fixtures/forge/mixed-pack/panels/hud.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/fixtures/forge/mixed-pack/panels/over.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/fixtures/forge/mixed-pack/server/pre.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/fixtures/forge/numbers-pack/bonds.json,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/fixtures/forge/numbers-pack/enemies.json,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/fixtures/forge/numbers-pack/kits/guard.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/fixtures/forge/numbers-pack/pack.json,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/fixtures/forge/numbers-pack/units.json,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/fixtures/forge/skin-pack/chars/texas/avatar.png,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/fixtures/forge/skin-pack/pack.json,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/fixtures/forge/skin-pack/voice/select.mp3,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/gitignore.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/golden-diy.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/golden-standins.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/golden/README.md,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+test/golden/bonds.json,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+test/golden/diy.json,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/golden/fields.json,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+test/golden/matches.json,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+test/golden/roster.json,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+test/golden/standins.json,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/helpers/contentFixtures.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/helpers/jsonSchema.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/helpers/pluginFixtures.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/helpers/sandboxCases.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/helpers/sandboxProbe.mjs,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/helpers/scriptFixtures.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/helpers/simChildNode.mjs,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/helpers/simHostFixture.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/helpers/simSandboxFixture.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/helpers/simWorkerBrowser.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/helpers/simWorkerNode.mjs,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/i18n.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/launch-scripts.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/lobby-plugins.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/lobby.test.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+test/local-extract-fx.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/local-extract.test.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+test/match/bench-overflow.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/match/bond-light-up.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/match/bot-smarter.test.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+test/match/bot.test.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+test/match/combat-metrics.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/match/connection.test.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+test/match/diy-shop.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/match/dsl-host.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/match/dsl-meta.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/match/economy.test.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+test/match/fakeBattle.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/match/feedback1-meta.test.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+test/match/feedback1-placement.test.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+test/match/feedback3-prep-end-item.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/match/feedback5-cathy-pool.test.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+test/match/feedback5-we2-diy-grants.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/match/finalAssault.test.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+test/match/fixtures/hostMatch.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/match/funnel-redeploy.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/match/hardening.test.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+test/match/harness.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+test/match/match-kills.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/match/merge.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/match/observe.test.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+test/match/playtest6-elite-to-board.test.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+test/match/plugin-host.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/match/pool.test.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+test/match/potential.test.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+test/match/r40a-invest-ongain.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/match/r40a-narant-pool.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/match/r40a-scroll-morph.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/match/rehearsal-client.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/match/rehearsal-delegate.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/match/runner.test.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+test/match/scroll-copy-merge.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/match/sell-capacity.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/match/shared-stock.test.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+test/match/sim-host.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/match/simClient.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+test/match/waves-plugin-bounds.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/media-url.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/package.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/plugin-package.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/plugins/catalog.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/plugins/contentBattle.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/plugins/contentSet.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/plugins/contentSets.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/plugins/csp.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/plugins/dsl-data.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/plugins/errors.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/plugins/fixtures/scriptBattleMatch.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/plugins/forgeImport.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/plugins/host-ipc.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/plugins/identity.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/plugins/install.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/plugins/loopCaps.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/plugins/manifest.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/plugins/order.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/plugins/patch.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/plugins/records.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/plugins/registry.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/plugins/reviewLimits.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/plugins/sandbox-escape.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/plugins/sandbox-host.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/plugins/schema.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/plugins/script-consent.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/plugins/script-integration.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/plugins/script-review.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/plugins/script-routes-review.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/plugins/script-sandbox-integration.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/plugins/script.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/plugins/surface.stable.json,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/plugins/surface.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/plugins/tool.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/plugins/ui.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/plugins/visual.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/plugins/visualSet.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/potential.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/pr-labeler.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/render/board3d-extract.test.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+test/render/board3d-scene.test.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+test/render/board3d.browser.test.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+test/render/board3d.test.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+test/render/browser.test.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+test/render/cosmetic-refresh.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/render/drag.test.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+test/render/eyemask.browser.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/render/eyemask.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/render/fieldview.browser.test.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+test/render/forms.test.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+test/render/hud-readouts.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/render/models.browser.test.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+test/render/playtest5-maps.test.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+test/render/recovery.browser.test.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+test/render/unitview.test.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+test/render/vfx-buff-layers.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/render/vfx-curves.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/render/vfx-effect.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/render/vfx-follow.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/render/vfx-frame.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/render/vfx-funnels.browser.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/render/vfx-funnels.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/render/vfx-hits.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/render/vfx-index2.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/render/vfx-origins.browser.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/render/vfx-origins.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/render/vfx-procedural.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/render/vfx-psys.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/render/vfx-skill-casts.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/render/vfx-skill-fixes.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/render/vfx-skillfx.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/render/vfx-skills.browser.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/render/vfx-skills.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/render/vfx-talents.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/render/vfx.browser.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/scene-assets.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/sim/bossfield.browser.test.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+test/sim/collider-range.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/sim/core.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/sim/enemy-cast-slot.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/sim/feedback1-tank-triggers.test.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+test/sim/feedback1d-push.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/sim/feedback1e-skillrange.test.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+test/sim/feedback3-ulpia-move.test.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+test/sim/feedback5-lemuen-s3-wait.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/sim/hit-tile-round.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/sim/hud-readouts.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/sim/kill-credit.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/sim/playtest5_blocking.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/sim/playtest6-combat.test.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+test/sim/raid-body-window.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/sim/rehearsal-worker.browser.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/sim/rehearsal.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/sim/round40-attack-commit.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/sim/round40-catapult.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/sim/round40-gnosis-block.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/sim/simcheck.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/sim/unbalance.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/static-local-art.test.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+test/stats-template-assets.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/studio/catalog.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/studio/forge.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/studio/gameplay.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/studio/hotreload.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/studio/remove.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/studio/review.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/studio/room-settings.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/studio/studio.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/studio/trial.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/ammo-count.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/asset-download.browser.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/asset-download.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/asset-import.browser.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/asset-import.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/audio.test.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/bench-overflow.e2e.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/bond-achievement-stats.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/bond-members-stats.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/build-runtime.browser.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/buildGuard.test.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/cosmetics-lazy.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/feedback1-offers.test.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/feedback1-placement.e2e.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/feedback5-hotkeys.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/followup-023.e2e.test.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/forge-import.e2e.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/gameLogic.test.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/hotkeys.e2e.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/hover-hotkeys.e2e.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/issue5-fold-camera.test.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/issue602-deploy-fold.e2e.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/issue602-deploy-fold.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/leftovers.e2e.test.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/loadout-rows.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/match-records-stats.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/mock.e2e.test.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/mystic-energy.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/official-damage-numbers.test.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/operator-voice.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/playtest2.e2e.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/playtest2.real.e2e.test.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/playtest2.test.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/plugins-audio.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/plugins-client.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/plugins-content.e2e.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/plugins-content.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/plugins-sandbox.e2e.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/plugins-script.e2e.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/plugins-settings.e2e.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/plugins.e2e.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/potential-ui.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/real.e2e.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/sandbox.e2e.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/stats.e2e.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/stats.test.js,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/strategy-badges-stats.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/studio-catalog.e2e.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/studio-gameplay.e2e.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/studio.e2e.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/ui-plugins-nav.e2e.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/ui-plugins.e2e.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/ui/voice-prefs-023.test.js,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+test/update-boot.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/update-package.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+test/windows-bundle.test.js,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+tools/assets/audio.mjs,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+tools/assets/cache.mjs,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+tools/assets/downloader.mjs,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+tools/assets/fonts.mjs,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+tools/assets/formats.mjs,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+tools/assets/manifest.mjs,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+tools/assets/network.mjs,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+tools/assets/plan.mjs,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+tools/assets/skel.mjs,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+tools/assets/source-verifier.mjs,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+tools/assets/spine.mjs,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+tools/assets/stats-template.mjs,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+tools/build-data.mjs,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+tools/fetch-assets.mjs,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+tools/fetch-stats-assets.mjs,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+tools/golden.mjs,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+tools/i18n.mjs,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+tools/local-extract/extract.py,자동 병합,최종 적용 선택과 이유는 병합 보고서 참조
+tools/local-extract/fx.py,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+tools/local-extract/scenes.py,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+tools/package.mjs,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+tools/packs.mjs,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+tools/perfbench.mjs,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+tools/plugin.mjs,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+tools/records-schema.mjs,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+tools/setup.mjs,충돌 검토,최종 적용 선택과 이유는 병합 보고서 참조
+tools/vendor.mjs,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조
+tools/vfx-skill-coverage.mjs,원본 변경 반영,최종 적용 선택과 이유는 병합 보고서 참조

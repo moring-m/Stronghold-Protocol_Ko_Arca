@@ -1,10 +1,7 @@
 // server/sim/content/kits/ops/chess_char_6_11-mlyss.js — 缪尔赛思 (char_249_mlyss) kit, tier 6.
 // Conventions of the tier-6 kits: ../shared/tier6.js; kit contract and rules: ../README.md.
 
-import {
-  num, bv, tbb, tdesc, moduleBb, parseN, live, isTok, onDefaultSkill, selectedSkill, AROUND8, N4, bstate, bestTile,
-  pullToward,
-} from '../shared/tier6.js';
+import { num, bv, tbb, tdesc, moduleBb, parseN, live, isTok, onDefaultSkill, selectedSkill, AROUND8, N4, bstate, bestTile, pullToward } from '../shared/tier6.js';
 import { holdProtect } from '../shared/tier1.js';
 
 /** 莱茵生命 (character_table groupId "rhine") members of this season's pool (checked against the official table). */
@@ -104,7 +101,7 @@ function mlyss(bb, chess, def) {
         if (!m) return;
         const iv = Math.max(0.1, bv(bb, 'interval', 1.364)), total = Math.floor(num(bb.fake_cost, 11)), per = bv(bb, 'cost', 1);
         m.acc += dt;
-        while (m.acc + 1e-9 >= iv && m.got < total) { m.acc -= iv; m.got++; battle.addDp(unit.ownerId, per); }
+        while (m.acc + 1e-9 >= iv && m.got < total) { m.acc -= iv; m.got++; battle.addDp(unit.ownerId, per); } // loop-cap: interval floored and a DP total
       },
       onEnd({ battle, unit, reason }) {
         const m = unit.mem.mlyDp;

@@ -1,5 +1,5 @@
 import { t as tr } from '../../../shared/i18n.js';
-import {RANDOM_BAND_ID} from '../../../shared/randomBand.js';
+import { RANDOM_BAND_ID } from '../../../shared/randomBand.js';
 // Shared in-match building blocks (Preact + htm): data hook, images with fallbacks, rich text,
 // unit thumbnails, LP tower, coin badge, official UI sprites. Styles: css/screens/game*.css.
 
@@ -8,9 +8,7 @@ import { useState, useMemo, useEffect } from '../../vendor/hooks.module.js';
 import { html, Icon, TierChip, Tooltip } from './components.js';
 import { data, matchData, useData, localAsset } from '../data.js';
 import { parseRichText, rtClassName } from './richText.js';
-import {
-  uiUrl, chessAvatarUrl, chessPortraitUrl, itemIconUrl, tokenAvatarUrl, enemyIconUrl, bondIconUrl, bandIconUrl,
-} from './assetUrls.js';
+import { uiUrl, chessAvatarUrl, chessPortraitUrl, itemIconUrl, tokenAvatarUrl, enemyIconUrl, bondIconUrl, bandIconUrl } from './assetUrls.js';
 
 const cx = (...p) => p.flat().filter(Boolean).join(' ');
 

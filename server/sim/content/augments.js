@@ -1,5 +1,5 @@
-import {attackClipTiming} from '../../../shared/attackTiming.js';
-import {weaknessRetype} from './items/battle.js';
+import { attackClipTiming } from '../../../shared/attackTiming.js';
+import { weaknessRetype } from './items/battle.js';
 export function install(b){
  const state=b.flags.augments;if(!state)return;
  const empty=[],allied=Object.fromEntries(Object.entries(state.allies||{}).map(([id,cards])=>[id,cards.map(a=>a.effect)])),enemyEffects=(state.enemies||[]).map(a=>a.effect);

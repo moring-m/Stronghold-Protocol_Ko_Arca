@@ -1,5 +1,5 @@
-import {skillImpactTiming} from '../../shared/attackTiming.js';
-import {showsSkillArea,skillAreaKeys} from './skillArea.js';
+import { skillImpactTiming } from '../../shared/attackTiming.js';
+import { showsSkillArea, skillAreaKeys } from './skillArea.js';
 // server/sim/skills.js — skill runtime: SP, charges, trigger rules, kinds, SkillSpec interpretation (DESIGN §5.6).
 //
 // SP types: 'time' (+spRecovery/s), 'attack' (+1 per attack), 'hurt' (+1 per hit taken), 'none'.
@@ -56,6 +56,8 @@ import {showsSkillArea,skillAreaKeys} from './skillArea.js';
 
 import { absoluteRangeKeys, canTargetEnemy } from './targeting.js';
 import { AUTO_OP_COOLDOWN, COLS, ROWS } from './constants.js';
+import { boundedCount } from '../../shared/plugins/limits.js';
+import { fieldCap } from '../../shared/plugins/officialBounds.js';
 
 const TICK_RULES = new Set(['SP_FULL', 'SEARCH', 'ACTIVE_RANGE', 'CUSTOM_RANGE', 'SKILL_RANGE', 'GDGLOW_SKILL_2']);
 /** True when a SkillSpec `targeting` changes the unit's range while the skill runs (Battle._refreshRange). */
@@ -104,7 +106,7 @@ export class SkillRuntime {
       if(this.baseSpCost>0)this.baseSpCost=Math.max(1,this.baseSpCost*(Number.isFinite(rules.allySpCost)?rules.allySpCost/100:1));
       this.initSp*=Number.isFinite(rules.allyInitSp)?rules.allyInitSp/100:1;
     }
-    this.maxCharges = Math.max(1, Math.floor(s.charges ?? d.maxCharges ?? 1));
+    this.maxCharges = Math.max(1, Math.floor(boundedCount(s.charges ?? d.maxCharges ?? 1, fieldCap('skill.maxCharges'), 1)));
     this.spType = s.spType ?? d.spType ?? 'time';
     const trig = typeof s.trigger === 'string' ? { rule: s.trigger } : (s.trigger || d.trigger || {});
     this.rule = String(trig.rule ?? 'DEFAULT').toUpperCase();
@@ -365,7 +367,7 @@ export class SkillRuntime {
     this.sp += amt;
     // within 1e-9 of the cost is the cost (the timer tolerance of `timeLeft` below; PR #402): 300 time gains of 1/30 SP
     // add up to 9.999999999999975 in floating point, which held a 10-SP charge one tick
-    while (this.sp > cost - 1e-9 && this.charges < this.maxCharges) {
+    while (this.sp > cost - 1e-9 && this.charges < this.maxCharges) { // loop-cap: fieldCap skill.maxCharges
       this.charges++;
       if (this.charges < this.maxCharges) this.sp = Math.max(0, this.sp - cost);
       else this.sp = cost;
@@ -383,7 +385,7 @@ export class SkillRuntime {
     if (this.noSkill || this.kind === 'passive') return;
     const cost = this.spCost;
     if (cost <= 0) { if (this.sp > 0) { this.sp = 0; this.charges = this.maxCharges; } return; } // became free
-    while (this.sp > cost - 1e-9 && this.charges < this.maxCharges) {   // (the 1e-9 of gainSp)
+    while (this.sp > cost - 1e-9 && this.charges < this.maxCharges) {   // loop-cap: fieldCap skill.maxCharges (the 1e-9 of gainSp)
       this.charges++;
       this.sp = this.charges < this.maxCharges ? Math.max(0, this.sp - cost) : cost;
     }
@@ -489,7 +491,7 @@ export class SkillRuntime {
     if (this.rule === 'SKILL_RANGE') {
       if (this.triggerAllies) return this._allyTriggerSatisfied();
       if (!this.triggerGrid) return this._defaultCondition();
-      return b.anyEnemyInKeys(this._triggerKeys()) || this._allyTargetIn(this._trigSet);
+      return b.anyEnemyInKeys(this._triggerKeys(), u) || this._allyTargetIn(this._trigSet);
     }
     if (this.rule === 'ACTIVE_RANGE') return this._defaultCondition(this.triggerGrid ? this._triggerKeys() : null);
     // GDGLOW_SKILL_2 "全场存在可选目标时释放技能": a targetable enemy anywhere (heal skill: an ally that needs healing)

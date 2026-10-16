@@ -1,14 +1,14 @@
-import {tr} from '../i18n/i18n.js';
-import {matchesKoreanSearch} from '../../../shared/search.js';
-import {PresetFiles} from './presetFiles.js';
-import {CHAT_FACTIONS,chatFaction} from '../../../shared/chat.js';
-import {bindPresetFaction,normalizePresetFactions} from './factionPresetModel.js';
-import {useEffect,useState} from '../../vendor/hooks.module.js';
-import {html,Modal,Button,Icon} from './components.js';
-import {createStore,loadPref,savePref,useStore,store} from '../store.js';
-import {data} from '../data.js';
-import {Img} from './gameComponents.js';
-import {chessPortraitUrl,itemIconUrl,bondIconUrl} from './assetUrls.js';
+import { tr } from '../i18n/i18n.js';
+import { matchesKoreanSearch } from '../../../shared/search.js';
+import { PresetFiles } from './presetFiles.js';
+import { CHAT_FACTIONS, chatFaction } from '../../../shared/chat.js';
+import { bindPresetFaction, normalizePresetFactions } from './factionPresetModel.js';
+import { useEffect, useState } from '../../vendor/hooks.module.js';
+import { html, Modal, Button, Icon } from './components.js';
+import { createStore, loadPref, savePref, useStore, store } from '../store.js';
+import { data } from '../data.js';
+import { Img } from './gameComponents.js';
+import { chessPortraitUrl, itemIconUrl, bondIconUrl } from './assetUrls.js';
 const KEY='sp.pref.favorites';
 export function normalizeFavorites(raw){
  const presets=normalizePresetFactions((Array.isArray(raw?.presets)?raw.presets:[]).filter(p=>typeof p?.id==='string').slice(0,30).map(p=>({id:p.id,name:String(p.name||'프리셋').slice(0,40),operators:[...new Set((Array.isArray(p.operators)?p.operators:[]).filter(x=>typeof x==='string'))],faction:p.faction,items:[...new Set((Array.isArray(p.items)?p.items:[]).filter(x=>typeof x==='string'))]})));

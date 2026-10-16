@@ -1,5 +1,5 @@
-import {settingsStore} from './settings.js';
-import {facingSwallows} from './gameLogic/shortcuts.js';
+import { settingsStore } from './settings.js';
+import { facingSwallows } from './gameLogic/shortcuts.js';
 
 
 import { t } from '../../../shared/i18n.js';

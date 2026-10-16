@@ -1,3 +1,4 @@
+import {isShopItem} from '../../server/sim/simdata.js';
 // Player feedback after 0.1.0, report #6 (workstream WB): "凯瑟琳策略升级刷新的三个装备显示异常". The strategy 凯瑟琳
 // (【定向投放】"每次升级调度中心时，在调度中心刷新随机3件装备，可以选择并获得其中1件") queues a free pick-one offer of three
 // items; the shop bar drew every offer slot as an operator card (ChessCard on an item id: no art, the raw id as the name,
@@ -27,7 +28,7 @@ globalThis.fetch = async (url) => {
 };
 
 const { offerHeader } = await import('../../public/js/ui/gameLogic.js');
-const { RewardCards, ItemCard, ChessCard } = await import('../../public/js/ui/shopBar.js');
+const { RewardCards, ItemCard, ChessCard, ItemCardView } = await import('../../public/js/ui/shopBar.js');
 const { RewardOverlay } = await import('../../public/js/ui/rewardOverlay.js');
 const { data } = await import('../../public/js/data.js');
 const { DATA, makeMatch, give, giveItem, chessOfTier, legalTileFor } = await import('../match/harness.js');
@@ -76,7 +77,7 @@ describe('#6 the server names its offers (m.private shop.rewardOffer source / la
     for (const s of offer.slots) {
       assert.equal(s.kind, 'item');
       assert.equal(s.price, 0);
-      assert.ok(DATA.items[s.id] && DATA.items[s.id].itemType === 'EQUIP' && DATA.items[s.id].tier <= ps.shop.level, s.id);
+      assert.ok(DATA.items[s.id] && DATA.items[s.id].itemType === 'EQUIP' && (isShopItem(DATA.items[s.id]) || DATA.choices.pools.pool_equip_kathe.also?.includes(s.id)), s.id);
     }
     const want = offer.slots[1].id;
     const funds = ps.funds;
@@ -197,7 +198,7 @@ describe('#6 the shop bar draws the offer by its slots and names it', () => {
     const title = nodes.find((n) => typeof n.props?.class === 'string' && n.props.class.includes('rwtag__title'));
     assert.equal(String(title.props.children), '定向投放');
     // the item card itself: icon, name, description, FREE (no price hex)
-    const card = ItemCard({ ...cards[0].props });
+    const card = ItemCardView({ ...cards[0].props });
     const inner = [...walk(card.type === 'button' || card.props?.class?.includes?.('scard') ? card : card.props.children)];
     const texts = inner.flatMap((n) => (typeof n.props?.children === 'string' ? [n.props.children] : []));
     assert.ok(texts.includes(DATA.items[ITEMS[0]].name), `the name (${texts.join(' | ')})`);
@@ -221,4 +222,10 @@ describe('#6 the shop bar draws the offer by its slots and names it', () => {
     const mp = RewardOverlay({ priv: { shop: { rewardOffer: merge } }, minimized: true, onMinimize() {} });
     assert.ok([...walk(mp)].flatMap((n) => (typeof n.props?.children === 'string' ? [n.props.children] : [])).includes('晋升奖励待选择'));
   });
+});
+
+test('#617: a reward offer replaces the whole shop row — the equipment slot hides too, and only the offer\'s cards arm', () => {
+  const src = readFileSync(path.join(ROOT, 'public/js/ui/shopBar.js'), 'utf8');
+  assert.match(src, /\$\{showReward \? null : html`<div class="shopbar__item">/, 'the equipment column is not drawn under a reward offer');
+  assert.match(src, /if \(showReward\) reward\.slots\.forEach\([^\n]*\n\s*else slots\.forEach/, 'the shop slots are not armable meanwhile');
 });

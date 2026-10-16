@@ -3,10 +3,7 @@
 
 import { isHpLoss } from '../../../damage.js';
 import { holdsUndying } from '../../items/battle.js';
-import {
-  AURA, num, tbb, grid, nationOf, enemiesOnRange, targetsInRange, whileDeployed, reveal, skillActive, isSel, alt,
-  instantKind, withDefaults,
-} from '../shared/tier4.js';
+import { AURA, num, tbb, grid, nationOf, enemiesOnRange, targetsInRange, whileDeployed, reveal, skillActive, isSel, alt, instantKind, withDefaults } from '../shared/tier4.js';
 
 /** Is module `id` the active one? (elites; `'none'` / normal chess ⇒ false) */
 const moduleIs = (def, id) => !!(def?.raw?.module?.active && def.raw.module.id === id);

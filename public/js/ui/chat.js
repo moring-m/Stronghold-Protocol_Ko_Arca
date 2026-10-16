@@ -1,6 +1,6 @@
-import {applyFavoriteFaction} from './favorites.js';
-import {applyRecruitFaction} from './recruitPresets.js';
-import {toast} from './toasts.js';
+import { applyFavoriteFaction } from './favorites.js';
+import { applyRecruitFaction } from './recruitPresets.js';
+import { toast } from './toasts.js';
 import { useEffect, useLayoutEffect, useRef, useState } from '../../vendor/hooks.module.js';
 import { data, useData } from '../data.js';
 import { bondIconUrl } from './assetUrls.js';

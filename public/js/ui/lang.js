@@ -14,10 +14,7 @@
 // stored or requested pack still loads by its code, and the menu offers it beside Chinese.
 
 import { useEffect, useState } from '../../vendor/hooks.module.js';
-import {
-  DEFAULT_LANG, normalizeLang, getLang, setLang, onLangChange, addMessages, setNameResolver, tName, format, translateWire, t, N_,
-  registerLangs, getLangs, langInfo, langChain, onLangsChange, setI18nWarn,
-} from '../../../shared/i18n.js';
+import { DEFAULT_LANG, normalizeLang, getLang, setLang, onLangChange, addMessages, setNameResolver, tName, format, translateWire, t, N_, registerLangs, getLangs, langInfo, langChain, onLangsChange, setI18nWarn } from '../../../shared/i18n.js';
 import { canonicalLang, computeChain, scriptOf } from '../../../shared/i18nPacks.js';
 import { PACKS_URL, PACK_INDEX_FILE, readPackIndex, langMetaOf } from '../../../shared/packs.js';
 import { DEV_BUILD } from '../../../shared/constants.js';

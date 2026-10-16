@@ -26,7 +26,11 @@ export function recordCustomExtensions(value) {
  if(Object.keys(changed).length)out.ruleValues=changed;
  return Object.keys(out).length?out:null;
 }
-export function extensionSelectionCount(selection){const saved=recordCustomExtensions(selection);return saved?Object.values(saved).reduce((n,v)=>n+(Array.isArray(v)?v.length:Object.keys(v).length),0):0;}
+export function extensionSelectionCount(selection){
+ const saved=recordCustomExtensions(selection);if(!saved)return 0;
+ const augmentsEnabled=selection?.rules?.includes('augments');
+ return Object.entries(saved).reduce((n,[key,value])=>n+(Array.isArray(value)?value.length:Object.keys(value).filter(id=>augmentsEnabled||RULE_VALUES.find(r=>r.id===id)?.category!=='augments').length),0);
+}
 export const EXTENSION_CATEGORIES = Object.freeze([
   {id:'rules',name:'게임 규칙'}, {id:'augmentSettings',name:'증강 설정'}, {id:'commonBands',name:'공통 적용 전략'}, {id:'allies',name:'아군 스펙 조정'}, {id:'bossStats',name:'보스 스펙 조정'},
   { id: 'bonds', name: '맹약 추가' }, { id: 'stages', name: '전장 추가' },

@@ -39,7 +39,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Grid, DEPLOY_REFUSED_TILES } from '../server/sim/grid.js';
 import { bandBondIds } from '../shared/bandBonds.js';
-import { statusKey, composeUnitRecord, standInRecord, unitForm } from '../shared/standIn.js';
+import { statusKey, composeUnitRecord } from '../shared/standIn.js';
 import { extendedGrid } from '../shared/loadoutRecord.js';
 import { FULL_RANK, atRank, stripPotential } from '../shared/potential.js';
 
@@ -2643,23 +2643,6 @@ function tileGlyph(t) {
   }
 }
 
-/**
- * Official ground route (research 08 §3.4, the same code the sim runs: server/sim/grid.js flow field — 4-direction
- * SPFA from the goal, crates cost 1000, Bresenham line-of-sight smoothing) as the tiles an enemy crosses, start and goal
- * included. The whole 19×21 map is walkable like in the client.
- * @param {object} stage { rows, legend }
- * @param {Array<{pos:number[], role:string}>} devices active devices to apply (crates = cost 1000, platforms/mounds = blocked)
- */
-function officialPath(stage, devices, start, end) {
-  const g = new Grid(stage, { r0: 0, r1: 18, c0: 0, c1: 20 });
-  for (const d of devices) {
-    if (!d.pos) continue;
-    if (d.role === 'crate') g.setObstacle(d.pos[0], d.pos[1], true, 'crate');
-    else g.setObstacle(d.pos[0], d.pos[1], true);
-  }
-  return g.findPath(start[0], start[1], end[0], end[1]);
-}
-
 /** Gameplay role of known stage devices. */
 const DEVICE_ROLES = {
   trap_1105_accrate: 'crate', trap_1106_achplat: 'platform', trap_032_mound: 'mound', trap_013_blower: 'blower',
@@ -3585,6 +3568,8 @@ function buildConfig(ctx, waves, stages, bands) {
       formula: 'Solo: bloodPoint[difficulty]; co-op: bloodPoint[difficulty] × alive participants at boss-round start (1–4). One shared HP pool; user-defined balance rule; excludes enemyScale.',
       coop: 4, solo: 1, soloAssumed: false, aliveScaling: true, aliveFull: 4, aliveAssumed: false, unaffectedByEnemyScale: true,
     },
+    // minTeamLpExclusive 1 = LP > 1 (at least 2 left): PRTS's user-contributed text, which the community's measurement
+    // (Bilibili 路标月报#2, cited on GitHub #645) matches — kept by the owner on 2026-10-15
     hiddenCore: { single: 350, multi: 1200, minTeamLpExclusive: 1, difficulties: ['NORMAL', 'HARD', 'ABYSS'], checkedAfterRound: 14 },
     dp: { init: 10, perSec: 1, max: 99 },
     unite: { maxHelpers: 2, helperOrder: 'unitsOnField>activeBond>undownedUnits; pair: unitsOnField>activeBond>activeLayers>undownedUnits, first = right field (PRTS 帮助)', layerGainsEnabled: false, keepsHpSpPositions: true, leakedEnemyFullHp: true,
@@ -3742,18 +3727,6 @@ function attachPotential(passes) {
 
 // ===== validation ===============================================================================
 
-/** Recursively find non-finite numbers (NaN/Infinity would silently become null in JSON). */
-function findNonFinite(obj, path, out) {
-  if (typeof obj === 'number') { if (!Number.isFinite(obj)) out.push(path); return; }
-  if (!obj || typeof obj !== 'object') return;
-  if (Array.isArray(obj)) { obj.forEach((v, i) => findNonFinite(v, `${path}[${i}]`, out)); return; }
-  for (const [k, v] of Object.entries(obj)) findNonFinite(v, `${path}.${k}`, out);
-}
-
-/**
- * Cross-file referential integrity checks. Returns a list of error strings (empty = OK).
- * The same invariants are asserted by test/data.test.js.
- */
 function validateAll(f) {
   const errors = [];
   const err = (m) => errors.push(m);
@@ -3767,23 +3740,6 @@ function validateAll(f) {
   if (Object.keys(bonds).length !== 23) err(`expected 23 bonds, got ${Object.keys(bonds).length}`);
   if (Object.keys(bands).length !== 40) err(`expected 40 bands, got ${Object.keys(bands).length}`);
   if (visible.length !== 112) err(`expected 112 visible non-DIY chess, got ${visible.length}`);
-  for (const c of Object.values(chess)) {
-    if (!chess[c.baseId]) err(`chess ${c.chessId}: baseId missing`);
-    if (c.goldenId && !chess[c.goldenId]) err(`chess ${c.chessId}: goldenId missing`);
-    for (const b of c.bonds) if (!bonds[b]) err(`chess ${c.chessId}: bond ${b} missing`);
-    for (const g of c.garrisonIds) if (!garrisons[g]) err(`chess ${c.chessId}: garrison ${g} missing`);
-    for (const t of c.tokens) if (!tokens[t]) err(`chess ${c.chessId}: token ${t} missing`);
-    for (const t of c.talents || []) if (t.tokenKey && !c.tokens.includes(t.tokenKey)) err(`chess ${c.chessId}: talent token ${t.tokenKey} not in tokens`);
-    if (c.isDiy) continue;
-    if (!c.stats) err(`chess ${c.chessId}: no stats`);
-    if (!c.skill) err(`chess ${c.chessId}: no resolvable skill`);
-    if (!Array.isArray(c.rangeGrid)) err(`chess ${c.chessId}: no range grid`);
-    // DESIGN §16 loadout choices
-    if (!Array.isArray(c.skills) || c.skills.filter((s) => s.isDefault).length !== 1 || c.skills.find((s) => s.isDefault)?.skillId !== c.skill?.skillId) err(`chess ${c.chessId}: skills[] without exactly one default = skill`);
-    if (c.modules && (c.modules.filter((m) => m.isDefault).length !== (c.module?.active ? 1 : 0) || !c.statsBase || !c.traitBase || !c.talentsBase)) err(`chess ${c.chessId}: inconsistent module choices`);
-    // 高台 legality is read from the trait text at place time (shared/highGround.js), never a field on the record
-    if (c.placement !== undefined) err(`chess ${c.chessId}: placement is not a data field`);
-  }
   // the deliberate trigger deviations (DESIGN §21.29, §22.10) still override an official TAKE_DAMAGE row, on the normal
   // chess and its elite alike
   for (const [baseId, skillsOf] of Object.entries(TRIGGER_DEVIATIONS)) {
@@ -3956,3 +3912,20 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   console.error('build-data failed:', e && e.stack ? e.stack : e);
   process.exitCode = 1;
 });
+
+function officialPath(stage, devices, start, end) {
+  const g = new Grid(stage, { r0: 0, r1: 18, c0: 0, c1: 20 });
+  for (const d of devices) {
+    if (!d.pos) continue;
+    if (d.role === 'crate') g.setObstacle(d.pos[0], d.pos[1], true, 'crate');
+    else g.setObstacle(d.pos[0], d.pos[1], true);
+  }
+  return g.findPath(start[0], start[1], end[0], end[1]);
+}
+
+function findNonFinite(obj, path, out) {
+  if (typeof obj === 'number') { if (!Number.isFinite(obj)) out.push(path); return; }
+  if (!obj || typeof obj !== 'object') return;
+  if (Array.isArray(obj)) { obj.forEach((v, i) => findNonFinite(v, `${path}[${i}]`, out)); return; }
+  for (const [k, v] of Object.entries(obj)) findNonFinite(v, `${path}.${k}`, out);
+}

@@ -2,9 +2,7 @@
 // Conventions of the tier-4 kits: ../shared/tier4.js; kit contract and rules: ../README.md.
 
 import { COLS } from '../../../constants.js';
-import {
-  num, tbb, grid, targetsInRange, targetsInGrid, toggleBuff, skillActive, withDefaults,
-} from '../shared/tier4.js';
+import { num, tbb, grid, targetsInRange, targetsInGrid, toggleBuff, skillActive, withDefaults } from '../shared/tier4.js';
 import { hypot } from '../../../detmath.js';
 
 /**

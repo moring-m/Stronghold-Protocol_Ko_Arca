@@ -1,5 +1,5 @@
-import {EnemyAugments} from './enemyAugments.js';
-import {CustomSettingsInfo} from './customSettingsInfo.js';
+import { EnemyAugments } from './enemyAugments.js';
+import { CustomSettingsInfo } from './customSettingsInfo.js';
 // 本局信息 dialog under the top bar (opened by the left 🔍, official btn_check_player / autochess_hud_player_info_dialog,
 // research 09 §2.1) with two tabs:
 //   本局信息 — own strategy, stage, disabled bonds with banned-member counts and the banned operator list (default) —

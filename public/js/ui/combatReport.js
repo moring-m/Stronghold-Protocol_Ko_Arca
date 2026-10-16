@@ -1,9 +1,9 @@
-import {DAMAGE_TYPES} from '../../../shared/damageTypes.js';
-import {useState} from '../../vendor/hooks.module.js';
-import {html} from './components.js';
-import {UnitThumb,useGameData} from './gameComponents.js';
-import {fmtNum} from './gameLogic.js';
-import {combatMetrics,sumCombatMetrics} from '../../../shared/combatStats.js';
+import { DAMAGE_TYPES } from '../../../shared/damageTypes.js';
+import { useState } from '../../vendor/hooks.module.js';
+import { html } from './components.js';
+import { UnitThumb, useGameData } from './gameComponents.js';
+import { fmtNum } from './gameLogic.js';
+import { combatMetrics, sumCombatMetrics } from '../../../shared/combatStats.js';
 
 export const COMBAT_COLUMNS=[['dmg','총 피해'],...DAMAGE_TYPES.slice(0,-1).map(t=>[t.key,t.label]),['heal','회복'],['taken','받은 피해'],['takenPhysical','받은 물리 피해'],['takenArts','받은 마법 피해'],['takenTrue','받은 고정 피해'],['takenElemental','받은 원소 피해'],['shieldAbsorbed','보호막 흡수'],['kills','처치'],['attacks','공격'],['skillUses','스킬 사용'],['redeploys','재배치'],['deaths','전투불능'],['activeTime','전투 시간(초)']];
 const DAMAGE_COLORS=Object.fromEntries(DAMAGE_TYPES.slice(0,-1).map(t=>[t.key,t.className]));

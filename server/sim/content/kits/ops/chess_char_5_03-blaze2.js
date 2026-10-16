@@ -3,10 +3,7 @@
 
 import { COLS } from '../../../constants.js';
 import { bodyInKeys } from '../../../body.js';
-import {
-  AURA_IV, AURA_DUR, num, on, talent, traitBb, skillGrid, batPct, mods, isOp, selectedId, lazySkills, instantKind,
-  skillRange, burstSpUp, elementHit, whileOn, burstDamageUp,
-} from '../shared/tier5.js';
+import { AURA_IV, AURA_DUR, num, on, talent, traitBb, skillGrid, batPct, mods, isOp, selectedId, lazySkills, instantKind, skillRange, burstSpUp, elementHit, whileOn, burstDamageUp } from '../shared/tier5.js';
 
 /** 烛煌 绝处重燃 "使附近的敌人晕眩" radius (tiles). PRTS 备注: 1.7. */
 const NEARBY_RADIUS = 1.7;
@@ -74,8 +71,8 @@ export default {
           mods: mods({ atkPct: num(bb.atk), batPct: batPct(bb.base_attack_time, chess) }),
           targeting: skillRange(chess, def, { maxTargets: Math.max(1, num(bb['attack@max_target'], 3)) }),
           attack: {
-            onEachHit({ unit, target }) {
-              if (target && target.side === 'enemy') unit.mem.blazeTiles?.add(Math.round(target.y) * COLS + Math.round(target.x));
+            onEachHit({ battle, unit, target }) {
+              if (target && target.side === 'enemy') unit.mem.blazeTiles?.add(Math.round(target.y) * (battle.grid?.cols ?? COLS) + Math.round(target.x));
             },
           },
           onStart({ unit }) { unit.mem.blazeTiles = new Set(); unit.mem.blazeAcc2 = 0; },
@@ -99,7 +96,7 @@ export default {
         onTick({ battle, unit, dt }) {
           if (!(lose > 0)) return;
           unit.mem.blazeAcc = (unit.mem.blazeAcc ?? 0) + dt;
-          while (unit.mem.blazeAcc >= 1 && unit.alive) {
+          while (unit.mem.blazeAcc >= 1 && unit.alive) { // loop-cap: one-second step
             unit.mem.blazeAcc -= 1;
             battle.loseHp(unit, unit.s.maxHp * lose, { source: unit });
           }

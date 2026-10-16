@@ -1,11 +1,11 @@
 import { hypot } from '../detmath.js';
 // Local experiment: inert unless the explicitly selected data directory contains the drone token.
 import * as S from './support/index.js';
-import {attackClipTiming} from '../../../shared/attackTiming.js';
-import {tileFree} from './tokens.js';
-import {MOVE_SCALE,COLS,ROWS} from '../constants.js';
-import {canTargetEnemy} from '../targeting.js';
-import {bodyDist} from '../body.js';
+import { attackClipTiming } from '../../../shared/attackTiming.js';
+import { tileFree } from './tokens.js';
+import { MOVE_SCALE, COLS, ROWS } from '../constants.js';
+import { canTargetEnemy } from '../targeting.js';
+import { bodyDist } from '../body.js';
 export const DRONE_ID='token_custom_ursus_drone';
 export const DRONE_RANGE=2,DRONE_FLIGHT=3,DRONE_BLAST=1.2;
 export function droneCenter(battle,pid){

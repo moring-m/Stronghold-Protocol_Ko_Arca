@@ -43,3 +43,17 @@ test('four-field rear preview props are hidden rather than mistaken for scenery 
  const g={position:[25,15,0,26,15,0,25,16,0,40,15,0,41,15,0,40,16,0],index:[0,1,2,3,4,5]};
  assert.deepEqual(sceneryForArea(g,[{r0:6,r1:13,c0:0,c1:36}],{cols:37}).index,[3,4,5]);
 });
+
+import {loadData} from '../../server/data.js';
+import {buildBoard} from '../../public/js/render/board3d/layout.js';
+import {eightUniteRoutes} from '../../shared/cooperativeEight.js';
+test('every production four-field map shows entry gates for all four fields without changing enemy routes',()=>{
+ const data=loadData('content/production/data');let count=0;
+ for(const stage of Object.values(data.stages)){
+  if(!stage.rows?.some((row,r)=>r>=9&&r<=12&&row[18]==='S'))continue;
+  const expanded=eightUniteStage(stage),board=buildBoard(expanded);
+  for(const col of [10,18,26,34])for(const row of [9,12])assert.ok(board.gates.some(g=>g.kind==='start'&&g.r===row&&g.c===col),`${stage.id}: entry ${row},${col}`);
+  const routes=eightUniteRoutes([{start:[9,18],end:[9,2],checkpoints:[]}]);assert.deepEqual(routes[0].start,[9,34]);assert.deepEqual(routes[0].end,[9,2]);count++;
+ }
+ assert.equal(count,13);
+});

@@ -40,11 +40,20 @@ function parseArgs(argv) {
     else if (k === '--host') o.host = val() || o.host;
     else if (a === '--no-open') o.open = false;
     else if (a === '--no-setup') o.setup = false;
+    else if (k === '--scripts') o.scripts = val() ?? '';
     else if (a === '-h' || a === '--help') o.help = true;
     else if (a === '--game') o.setupArgs.push(a, argv[++i] ?? '');
     else o.setupArgs.push(a);
   }
   return o;
+}
+
+/** The server's environment: PORT / HOST, and SP_PLUGIN_SCRIPTS from --scripts (off removes an inherited one). */
+export function serverEnv(o, base = process.env) {
+  const env = { ...base, PORT: String(o.port), HOST: o.host };
+  if (o.scripts === 'off') delete env.SP_PLUGIN_SCRIPTS;
+  else if (o.scripts) env.SP_PLUGIN_SCRIPTS = o.scripts;
+  return env;
 }
 
 function openBrowser(url) {
@@ -84,6 +93,10 @@ async function main() {
     console.log(src.slice(1, 13).map((l) => l.replace(/^\/\/ ?/, '')).join('\n'));
     return 0;
   }
+  if (o.scripts !== undefined && !SCRIPT_MODES.includes(o.scripts)) {
+    console.error(`${mark.err} --scripts 只接受 ${SCRIPT_MODES.join(' / ')}（插件脚本模式，docs/PLUGINS.md §13） · --scripts takes ${SCRIPT_MODES.join(' / ')}`);
+    return 2;
+  }
   const localUrl = `http://localhost:${o.port}`;
 
   const before = await probePort(o.port, o.host);
@@ -104,7 +117,7 @@ async function main() {
     if (r.status !== 0) { console.error(`${mark.err} 准备步骤失败（见上方）。`); return r.status || 1; }
   }
 
-  const env = { ...process.env, PORT: String(o.port), HOST: o.host };
+  const env = serverEnv(o);
   const child = spawn(process.execPath, [path.join(ROOT, 'server', 'index.js')], { cwd: ROOT, env, stdio: 'inherit' });
   const forward = (sig) => { if (child.exitCode === null) { try { child.kill(sig); } catch { /* gone */ } } };
   // SIGINT reaches the server straight from the terminal (same process group / console); forwarding it too would make

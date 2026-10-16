@@ -1,7 +1,7 @@
-import {useEffect,useRef,useState} from '../../vendor/hooks.module.js';
-import {html,Icon} from './components.js';
-import {tr} from '../i18n/i18n.js';
-import {DAMAGE_TYPES} from '../../../shared/damageTypes.js';
+import { useEffect, useRef, useState } from '../../vendor/hooks.module.js';
+import { html, Icon } from './components.js';
+import { tr } from '../i18n/i18n.js';
+import { DAMAGE_TYPES } from '../../../shared/damageTypes.js';
 const TYPES=DAMAGE_TYPES.map(({label,color})=>[label,color]);
 const sum=v=>v.reduce((a,b)=>a+b,0);
 const number=n=>Math.round(n).toLocaleString('ko-KR');

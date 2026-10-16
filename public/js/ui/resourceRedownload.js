@@ -1,6 +1,6 @@
-import {useState} from '../../vendor/hooks.module.js';
-import {html,Button,Modal} from './components.js';
-import {toastError} from './toasts.js';
+import { useState } from '../../vendor/hooks.module.js';
+import { html, Button, Modal } from './components.js';
+import { toastError } from './toasts.js';
 
 export async function redownloadResources() {
   const worker=navigator.serviceWorker?.controller;
@@ -14,6 +14,8 @@ export async function redownloadResources() {
   }else if(globalThis.caches){
     for(const name of await caches.keys())if(name.startsWith('stronghold-resources-')||name.startsWith('stronghold-ursus-preview-assets-'))await caches.delete(name);
   }
+  // Explicit re-download must show the download notice again after reload.
+  try { localStorage.removeItem('sp.resources.officialFxReady');localStorage.removeItem('sp.resources.downloadConsent'); localStorage.setItem('sp.resources.redownloadPending','1'); } catch {}
   location.reload();
 }
 
