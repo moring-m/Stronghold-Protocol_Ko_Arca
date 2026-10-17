@@ -19,6 +19,8 @@ if [[ ! -f "$root/state/token" ]];then openssl rand -hex 32 > "$root/state/token
 for file in rolling-update.sh rolling-maintain.sh rolling-retire-old.sh;do docker run --rm --entrypoint cat "$image" "/app/deploy/ec2/$file" > "$root/${file#rolling-}";chmod 700 "$root/${file#rolling-}";done
 docker run --rm --entrypoint cat "$image" /app/deploy/ec2/ssh-deploy-command.sh > /usr/local/bin/stronghold-deploy-ssh
 chmod 755 /usr/local/bin/stronghold-deploy-ssh
+docker run --rm --entrypoint cat "$image" /app/deploy/ec2/rolling-deploy.sh > "$root/deploy.sh"
+chmod 700 "$root/deploy.sh"
 # Use Caddy's adapted config for temporary maintenance; leave its source file and cert volumes intact.
 docker exec stronghold-https caddy adapt --config /etc/caddy/Caddyfile --adapter caddyfile > "$root/caddy-original.json"
 python3 - "$root" <<'PY'

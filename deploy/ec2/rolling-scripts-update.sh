@@ -8,6 +8,10 @@ source_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 for file in rolling-update.sh rolling-maintain.sh rolling-retire-old.sh; do
  bash -n "$source_dir/$file"
 done
+if [[ -f "$source_dir/rolling-deploy.sh" && -f "$source_dir/ssh-deploy-command.sh" ]]; then
+ bash -n "$source_dir/rolling-deploy.sh"
+ bash -n "$source_dir/ssh-deploy-command.sh"
+fi
 # An already running old maintenance script may have selected a stale release
 # before waiting for the lock. Let it finish before installing either new file.
 timer_active=0
@@ -34,4 +38,13 @@ for file in rolling-update.sh rolling-maintain.sh rolling-retire-old.sh; do
 done
 # New updater accepts both old explicit calls and new --maintain calls.
 for file in update.sh maintain.sh retire-old.sh; do mv "$root/$file.next" "$root/$file"; done
+# Install the restricted SSH entrypoint only when the reviewed bundle includes it.
+if [[ -f "$source_dir/rolling-deploy.sh" && -f "$source_dir/ssh-deploy-command.sh" ]]; then
+ bash -n "$source_dir/rolling-deploy.sh"
+ bash -n "$source_dir/ssh-deploy-command.sh"
+ install -m 700 "$source_dir/rolling-deploy.sh" "$root/deploy.sh.next"
+ install -m 755 "$source_dir/ssh-deploy-command.sh" /usr/local/bin/stronghold-deploy-ssh.next
+ mv "$root/deploy.sh.next" "$root/deploy.sh"
+ mv /usr/local/bin/stronghold-deploy-ssh.next /usr/local/bin/stronghold-deploy-ssh
+fi
 echo 'Deployment scripts updated. Router, workers and rooms were retained.'

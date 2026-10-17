@@ -10,4 +10,4 @@ assert re.fullmatch('[a-f0-9]{40}',release) and image=='ghcr.io/moring-m/strongh
 print(release,image)
 PY
 )
-exec sudo -n /bin/bash /opt/stronghold/rolling/update.sh "$release" "$image"
+exec sudo -n /bin/bash /opt/stronghold/rolling/deploy.sh "$release" "$image"

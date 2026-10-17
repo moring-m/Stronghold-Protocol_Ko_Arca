@@ -198,3 +198,15 @@ even if abandoned rooms or games remain. The current worker is always excluded.
 Missing socket counts and failed status requests never count as zero. Older workers
 are checked through healthz. The maintenance timer applies this check about once a
 minute; install both the updated router and host update script for this policy.
+
+### Existing installations: restricted SSH script refresh
+
+The Actions key continues to permit only `sudo -n bash /opt/stronghold/rolling/update.sh FULL_SHA IMAGE`.
+The forced-command wrapper validates that exact command and delegates to `deploy.sh`, which fetches the
+reviewed scripts at that immutable repository commit, installs them without restarting router/workers,
+and invokes the rolling updater. Do not remove the `restrict,command=...` public-key restriction or enable SCP.
+
+Install the new wrapper/bootstrap once from a trusted console on existing hosts. Download
+`rolling-scripts-update.sh`, `rolling-update.sh`, `rolling-maintain.sh`, `rolling-retire-old.sh`,
+`rolling-deploy.sh`, and `ssh-deploy-command.sh` from the same full commit into a temporary directory,
+then run `sudo bash DIR/rolling-scripts-update.sh`. Future Actions deployments refresh scripts automatically.

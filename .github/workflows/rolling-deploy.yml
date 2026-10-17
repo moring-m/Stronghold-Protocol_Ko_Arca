@@ -105,14 +105,5 @@ jobs:
             exit 0
           fi
           [[ "$EC2_HOST" =~ ^[a-zA-Z0-9.-]+$ && "$EC2_USER" =~ ^[a-z_][a-z0-9_-]*$ ]]
-          # Install the reviewed scripts before using the updater; game processes stay running.
-          stage_dir="/tmp/stronghold-scripts-$RELEASE"
-          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15 \
-            "$EC2_USER@$EC2_HOST" "mkdir -p '$stage_dir'"
-          scp -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15 \
-            deploy/ec2/rolling-{scripts-update,update,maintain,retire-old}.sh \
-            "$EC2_USER@$EC2_HOST:$stage_dir/"
-          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15 \
-            "$EC2_USER@$EC2_HOST" "sudo -n bash '$stage_dir/rolling-scripts-update.sh'"
           ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15 \
             "$EC2_USER@$EC2_HOST" "sudo -n bash /opt/stronghold/rolling/update.sh '$RELEASE' '$IMAGE'"
