@@ -160,35 +160,6 @@
 .bossbar__fill { position: absolute; inset: 0 auto 0 0; background: linear-gradient(90deg, #b8340d, var(--orange-hi)); box-shadow: 0 0 .1rem rgba(255, 110, 40, .8); transition: width 300ms var(--ease-out); }
 .bossbar__txt { position: absolute; inset: 0; display: grid; place-items: center; font-size: .14rem; font-weight: 700; color: #fff; text-shadow: 0 1px 2px #000; }
 
-/* LP tower */
-.lp { display: inline-flex; align-items: center; gap: .05rem; color: var(--mint-400); white-space: nowrap; }
-.lp__icon { width: 1.1em; height: 1.1em; object-fit: contain; flex: none; }
-.lp b { font-weight: 700; line-height: 1; }
-.lp--sm { font-size: .19rem; }
-.lp--md { font-size: .24rem; }
-.lp--lg { font-size: .34rem; }
-.lp--lg .lp__icon { width: .42rem; height: .42rem; }
-.lp--danger { color: var(--red-premium); }
-.lp--danger .lp__icon { filter: hue-rotate(-140deg) saturate(2.4) brightness(.95); }
-.lp--team { color: var(--mint-glow); }
-/* the running battle's pending loss (LpTower `pending`, user playtest #3 item 2): the number turns red, a −N plate
-   pops again on every new leak (keyed), 联防中 while teammates may still save part of it */
-.lp.is-pending .lp__val { color: var(--red-premium); text-shadow: 0 0 .08rem rgba(255, 60, 60, .45); }
-.lp__pend {
-  align-self: center; margin-left: .02em; padding: .06em .24em; font-size: .56em; font-weight: 700; line-height: 1.1;
-  color: #fff; background: #d8262a; box-shadow: 0 0 .1rem rgba(255, 50, 50, .55);
-  clip-path: polygon(.12em 0, 100% 0, 100% calc(100% - .12em), calc(100% - .12em) 100%, 0 100%, 0 .12em);
-  animation: lp-pend 520ms var(--ease-out);
-}
-.lp__note {
-  align-self: center; padding: .08em .3em; font-size: .4em; font-weight: 700; letter-spacing: .08em; line-height: 1.2;
-  color: #1a0800; background: var(--orange);
-}
-.lp--sm .lp__note { font-size: .6em; }
-@keyframes lp-pend { 0% { opacity: 0; transform: scale(1.9); } 45% { opacity: 1; transform: scale(.92); } 100% { transform: scale(1); } }
-@media (prefers-reduced-motion: reduce) { .lp__pend { animation: none; } }
-.sp-reduced-motion .lp__pend { animation: none; }
-
 /* enemy preview button: amber [🔍▶▶] → the pen (research 09 §2); grey [🔍] in the pen view and outside 休整期 */
 .enemybtn {
   display: flex; align-items: center; justify-content: center; gap: .06rem; min-width: .46rem; height: .46rem; padding: 0 .14rem;
@@ -329,22 +300,6 @@
 .team__ob, .team__back { align-self: flex-start; margin-top: .04rem; min-width: 1.1rem; animation: pop-in var(--t-fast) var(--ease-out); }
 .team__ob .btn__label, .team__back .btn__label { letter-spacing: .12em; }
 .team__back { border-color: rgba(255, 255, 255, .7); color: #fff; }
-
-/* player avatar (band icon / glyph) */
-.pavatar {
-  --pa: .8rem;
-  position: relative; display: block; width: var(--pa); height: var(--pa); flex: none;
-  background: linear-gradient(135deg, hsl(var(--seat-hue) 40% 22%), hsl(var(--seat-hue) 30% 10%));
-  border: 1px solid var(--line-2);
-}
-.pavatar--sm { --pa: .42rem; }
-.pavatar__img { position: absolute; inset: 0; overflow: hidden; display: grid; place-items: center; }
-.pavatar__img img { width: 100%; height: 100%; object-fit: cover; }
-.pavatar__glyph { font-weight: 900; font-size: calc(var(--pa) * .5); color: hsl(var(--seat-hue) 70% 72%); }
-.pavatar__bot { width: 56%; height: 56%; color: #a9c3d8; }
-.pavatar.is-dead .pavatar__img, .pavatar.is-left .pavatar__img, .pavatar.is-offline .pavatar__img { filter: grayscale(1) brightness(.4); }
-.pavatar__x, .pavatar__door { position: absolute; inset: 0; display: grid; place-items: center; color: var(--red-premium); }
-.pavatar__x .icon, .pavatar__door .icon { width: 60%; height: 60%; filter: drop-shadow(0 0 4px #000); }
 
 /* ---- effects ---------------------------------------------------------------------------------------------- */
 .gm__effects { position: absolute; right: .3rem; top: 2.4rem; }

@@ -2020,7 +2020,7 @@ export class Match {
    * pool filtered by `tier` / `minTier` / `maxTier` (number or 'shopLevel') / `bond`; `golden: true` yields the elite id.
    * @returns {{ kind: 'item'|'chess', id: string, golden?: boolean } | null}
    */
-  rollPool(poolId, { shopLevel = 6, playerId = null } = {}) {
+  rollPool(poolId, { shopLevel = 6, playerId = null, allowInactiveBond = false } = {}) {
     const pools = this.gd.choices.pools && typeof this.gd.choices.pools === 'object' ? this.gd.choices.pools : {};
     const p = typeof poolId === 'string' && Object.hasOwn(pools, poolId) ? pools[poolId] : null;
     if (!p || typeof p !== 'object') return null;
@@ -2030,7 +2030,7 @@ export class Match {
       return id ? { kind: 'item', id } : null;
     }
     if (p.kind !== 'chess') return null;
-    if (typeof p.bond === 'string' && !this.bondLive(p.bond)) return null;
+    if (typeof p.bond === 'string' && !this.bondLive(p.bond) && !allowInactiveBond) return null;
     const rng = this.rngMeta;
     const owner = this.players.get(playerId);
     const pool = owner?.pool ?? this.pool;

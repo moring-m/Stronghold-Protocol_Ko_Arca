@@ -631,9 +631,9 @@ export function makeCtx(m, ps, source, hook, ev = null, preview = null) {
     },
     /** Random chess id from the shared pool (copy-weighted). opts: { maxTier, tier, bond, filter(id) } */
     rollChess: (opts = {}) => {
-      // A shop guarantee may target surviving dual-bond operators even when that bond is inactive.
-      const shopGuarantee = opts.shopGuarantee === true && source.kind === 'band' && hook === 'onRefresh';
-      if (opts.bond && !m.bondLive(opts.bond) && !shopGuarantee) return null;
+      // A strategy can target surviving dual-bond operators even when their faction is inactive.
+      // Recruitment and bannedChess filters below still exclude every banned operator.
+      if (opts.bond && !m.bondLive(opts.bond) && source.kind !== 'band') return null;
       const f = (id) => {
         if (!ps.canRecruit(id) || m.bannedChess.includes(gd.baseIdOf(id))) return false;
         if (opts.bond) { const c = gd.chess(id); if (!c || !Array.isArray(c.bonds) || !c.bonds.includes(opts.bond)) return false; }
@@ -651,7 +651,7 @@ export function makeCtx(m, ps, source, hook, ev = null, preview = null) {
       shopLevel: ps.shop.level,
       // a shared-pool draw also takes the player's 自选 stock, its bonds read through the player's view (rollChess)
       extra: typeof ps.diyStockEntries === 'function' ? ps.diyStockEntries() : null, chessOf: (id) => gd.chess(id),
-      ...opts, playerId: ps.playerId,
+      ...opts, playerId: ps.playerId, allowInactiveBond: source.kind === 'band',
     }),
     /**
      * Run another owned chess's 特质 of `eventType` now (SERVER_GAIN / SERVER_PREP_START / SERVER_PREP_FIN /

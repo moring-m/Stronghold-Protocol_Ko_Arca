@@ -1096,3 +1096,97 @@
 .resource-consent .micro { font-size: 10px; }
 .resource-consent .set-row__label { font-size: inherit; }
 .resource-consent .btn { font-size: 13px; }
+
+/* Shared bond/strategy icons also appear before the battle screen loads (statistics, lobby). */
+.bglyph { display: inline-grid; place-items: center; width: .24rem; height: .24rem; flex: none; }
+.bglyph img { width: 100%; height: 100%; object-fit: contain; filter: brightness(0) invert(.86) sepia(.4) hue-rotate(110deg) saturate(2.5); }
+.bglyph__txt { font-weight: 900; font-size: calc(.15 * var(--t)); color: var(--mint-400); }
+.bandicon { --bi: .6rem; display: inline-grid; place-items: center; width: var(--bi); height: var(--bi); flex: none; overflow: hidden; background: #111513; }
+.bandicon img { display: block; width: 100%; height: 100%; min-width: 0; min-height: 0; object-fit: cover; }
+.bandicon__txt { font-weight: 900; font-size: calc(var(--bi) * .44); color: var(--mint-400); }
+.bandicon--xs { --bi: .26rem; } .bandicon--sm { --bi: .42rem; } .bandicon--lg { --bi: 1.14rem; } .bandicon--xl { --bi: 2.2rem; }
+
+/* Shared rich text and unit thumbnails used by statistics and result details. */
+/* ---- rich text (official markup, js/ui/richText.js) ---- */
+.rt { white-space: normal; }
+.rt-vup { color: #3fb6ff; }
+.rt-vdown { color: #ff6a4a; }
+.rt-rem { color: #f49800; }
+.rt-note { color: var(--text-lo); }
+.rt-kw { color: #2fd0ff; }
+.rt-mint { color: var(--mint-400); }
+.rt-hl { color: var(--gold-2); }
+.rt-term { color: #9fd4ff; border-bottom: 1px dotted rgba(159, 212, 255, .6); }
+
+/* ---- unit thumbnail ---- */
+.uthumb {
+  --ut: .72rem; --tc: var(--tier-1);
+  position: relative; display: inline-block; width: var(--ut); height: var(--ut); flex: none;
+}
+.uthumb--xs { --ut: .34rem; } .uthumb--sm { --ut: .54rem; } .uthumb--lg { --ut: 1.1rem; }
+.uthumb--t1 { --tc: var(--tier-1); } .uthumb--t2 { --tc: var(--tier-2); } .uthumb--t3 { --tc: var(--tier-3); }
+.uthumb--t4 { --tc: var(--tier-4); } .uthumb--t5 { --tc: var(--tier-5); } .uthumb--t6 { --tc: var(--tier-6); }
+.uthumb__art {
+  position: absolute; inset: 0; overflow: hidden; display: grid; place-items: center;
+  background: linear-gradient(160deg, #1a201d, #111513); background: linear-gradient(160deg, color-mix(in srgb, var(--tc) 30%, #1a201d), #111513);
+  border: 1px solid var(--tc); border: 1px solid color-mix(in srgb, var(--tc) 60%, var(--line-2));
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--ut) * .16), calc(100% - var(--ut) * .16) 100%, 0 100%);
+}
+.uthumb__art img { display: block; width: 100%; height: 100%; min-width: 0; min-height: 0; object-fit: cover; }
+.uthumb--item .uthumb__art img { object-fit: contain; width: 84%; height: 84%; }
+.uthumb--enemy .uthumb__art { background: linear-gradient(160deg, #3a1c18, #140d0c); border-color: rgba(255, 90, 74, .45); }
+.uthumb__glyph { font-weight: 900; font-size: calc(var(--ut) * .44); color: var(--text-md); }
+.uthumb__tier { position: absolute; left: -.03rem; top: -.03rem; transform: scale(.82); transform-origin: top left; }
+.uthumb--xs .uthumb__tier, .uthumb--sm .uthumb__tier { transform: scale(.66); }
+.uthumb.is-golden .uthumb__art { border-color: var(--gold); box-shadow: inset 0 0 calc(var(--ut) * .18) rgba(255, 198, 0, .45); }
+.uthumb.is-golden::after { content: ''; position: absolute; inset: -2px; border: 1px solid rgba(255, 198, 0, .7); pointer-events: none; clip-path: inherit; }
+.uthumb.is-dim .uthumb__art img { filter: grayscale(.85) brightness(.55); }
+.uthumb__tag { position: absolute; right: 0; bottom: 0; font-size: calc(var(--ut) * .17); line-height: 1.2; padding: 0 .03rem; background: #a9c3d8; color: #0b1520; font-weight: 700; }
+
+/* Shared result-summary avatars, LP towers and sprite sizing. */
+/* player avatar (band icon / glyph) */
+.pavatar {
+  --pa: .8rem;
+  position: relative; display: block; width: var(--pa); height: var(--pa); flex: none;
+  background: linear-gradient(135deg, hsl(var(--seat-hue) 40% 22%), hsl(var(--seat-hue) 30% 10%));
+  border: 1px solid var(--line-2);
+}
+.pavatar--sm { --pa: .42rem; }
+.pavatar__img { position: absolute; inset: 0; overflow: hidden; display: grid; place-items: center; }
+.pavatar__img img { display: block; width: 100%; height: 100%; min-width: 0; min-height: 0; object-fit: cover; }
+.pavatar__glyph { font-weight: 900; font-size: calc(var(--pa) * .5); color: hsl(var(--seat-hue) 70% 72%); }
+.pavatar__bot { width: 56%; height: 56%; color: #a9c3d8; }
+.pavatar.is-dead .pavatar__img, .pavatar.is-left .pavatar__img, .pavatar.is-offline .pavatar__img { filter: grayscale(1) brightness(.4); }
+.pavatar__x, .pavatar__door { position: absolute; inset: 0; display: grid; place-items: center; color: var(--red-premium); }
+.pavatar__x .icon, .pavatar__door .icon { width: 60%; height: 60%; filter: drop-shadow(0 0 4px #000); }
+
+/* LP tower */
+.lp { display: inline-flex; align-items: center; gap: .05rem; color: var(--mint-400); white-space: nowrap; }
+.lp__icon { width: 1.1em; height: 1.1em; object-fit: contain; flex: none; }
+.lp b { font-weight: 700; line-height: 1; }
+.lp--sm { font-size: .19rem; }
+.lp--md { font-size: .24rem; }
+.lp--lg { font-size: .34rem; }
+.lp--lg .lp__icon { width: .42rem; height: .42rem; }
+.lp--danger { color: var(--red-premium); }
+.lp--danger .lp__icon { filter: hue-rotate(-140deg) saturate(2.4) brightness(.95); }
+.lp--team { color: var(--mint-glow); }
+/* the running battle's pending loss (LpTower `pending`, user playtest #3 item 2): the number turns red, a −N plate
+   pops again on every new leak (keyed), 联防中 while teammates may still save part of it */
+.lp.is-pending .lp__val { color: var(--red-premium); text-shadow: 0 0 .08rem rgba(255, 60, 60, .45); }
+.lp__pend {
+  align-self: center; margin-left: .02em; padding: .06em .24em; font-size: .56em; font-weight: 700; line-height: 1.1;
+  color: #fff; background: #d8262a; box-shadow: 0 0 .1rem rgba(255, 50, 50, .55);
+  clip-path: polygon(.12em 0, 100% 0, 100% calc(100% - .12em), calc(100% - .12em) 100%, 0 100%, 0 .12em);
+  animation: lp-pend 520ms var(--ease-out);
+}
+.lp__note {
+  align-self: center; padding: .08em .3em; font-size: .4em; font-weight: 700; letter-spacing: .08em; line-height: 1.2;
+  color: #1a0800; background: var(--orange);
+}
+.lp--sm .lp__note { font-size: .6em; }
+@keyframes lp-pend { 0% { opacity: 0; transform: scale(1.9); } 45% { opacity: 1; transform: scale(.92); } 100% { transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { .lp__pend { animation: none; } }
+.sp-reduced-motion .lp__pend { animation: none; }
+
+.sprite { object-fit: contain; }
