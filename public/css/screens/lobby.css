@@ -316,10 +316,26 @@
 .lab-player-count{display:flex;align-items:center;justify-content:space-between;gap:12px;flex:none;margin:0 0 12px;padding:10px 12px;border:1px solid #4ed8af35;background:#0d1c17;font-size:14px;color:var(--text-md)}
 .lab-player-count>div{display:flex;gap:0}.lab-player-count button{height:32px;min-width:44px;border:1px solid #40594f;background:#101e19;color:var(--text-lo);font:inherit;cursor:pointer}.lab-player-count button+button{border-left:0}.lab-player-count button[aria-pressed="true"]{background:#4ed8af20;color:var(--mint-400);box-shadow:inset 0 -2px var(--mint-400)}
 
-.mode-card__sizes{display:flex;gap:.08rem;position:relative;margin-top:.12rem;z-index:2;}
+.mode-card__sizes{display:flex;gap:.08rem;position:relative;z-index:2;flex:none;}
 .mode-card__sizes button{min-width:.72rem;padding:.07rem .16rem;border:1px solid var(--line-3);background:#14221f;color:var(--text-lo);font:inherit;cursor:pointer;}
 .mode-card__sizes button[aria-pressed="true"]{border-color:var(--mint-400);background:var(--mint-500);color:var(--text-on-mint);font-weight:700;}
 
-/* Keep the spectator toggle inside the co-op card, clear of the size buttons. */
-.mode-card:has(.mode-card__spectate) { padding-bottom: .85rem; }
-.mode-card__spectate { position: absolute; right: .24rem; bottom: .22rem; z-index: 2; }
+/* Co-op size and spectator permission share one bottom row. */
+.mode-card__controls { display:flex;align-items:center;justify-content:space-between;gap:.1rem;width:100%;margin-top:auto;padding-top:.12rem; }
+.mode-card__spectate { margin-left:auto;flex:none;white-space:nowrap;z-index:2; }
+
+/* Laboratory and practice split the former full-width laboratory row. */
+.mode-card--lab { grid-column:auto; }
+
+.practice-screen .lab-screen__body{overflow:hidden;}
+.practice-screen .practice-setup{height:100%;min-height:0;grid-template-rows:minmax(0,2fr) minmax(140px,1fr) auto;}
+.practice-screen .practice-options{height:100%;min-height:0;}
+.practice-screen .practice-options:nth-last-of-type(1){grid-column:span 2;}
+.practice-field{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;}
+.practice-field select{max-width:70%;background:#10221e;color:var(--text-hi);border:1px solid var(--line);padding:8px;font:inherit;}
+.practice-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;overflow:auto;min-height:0;align-content:flex-start;}
+.practice-chips button{border:1px solid var(--line);background:#10221e;color:var(--text-md);padding:8px 12px;font:inherit;cursor:pointer;}
+.practice-chips button.is-on{border-color:var(--mint-400);color:var(--mint-300);background:#234b3e;}
+.practice-chips button:disabled{opacity:.45;cursor:default;}
+@media(max-width:1000px) and (min-width:601px){.practice-screen .practice-setup{grid-template-columns:repeat(3,minmax(0,1fr));}.practice-screen .lab-panel:last-of-type{grid-column:span 2;}}
+@media(max-width:600px){.practice-screen .lab-screen__body{overflow:auto}.practice-screen .practice-setup{height:auto;display:flex;flex-direction:column}.practice-screen .lab-panel{min-height:220px}.practice-screen .practice-options{min-height:auto}.practice-screen .lab-start{position:sticky;bottom:0}}

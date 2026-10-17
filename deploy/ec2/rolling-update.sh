@@ -5,7 +5,23 @@ set -Eeuo pipefail
 root=/opt/stronghold/rolling
 exec 9>/var/lock/stronghold-rolling.lock
 flock -w 30 9 || { echo 'Another deployment is running.' >&2; exit 1; }
-release=${1:-};image=${2:-}
+if [[ ${1:-} == --maintain ]]; then
+ # The deployment lock is already held. Never carry a stale release choice
+ # across a concurrent deployment or retirement.
+ read -r release image < <(python3 - "$root" <<'PYSTATE'
+import json,sys
+from pathlib import Path
+root=Path(sys.argv[1]); pending=root/'pending.json'
+if pending.exists():
+ s=json.loads(pending.read_text()); print(s['release'],s['image'])
+else:
+ r=json.loads((root/'state/state.json').read_text())['current']
+ print(r,'ghcr.io/moring-m/stronghold-protocol_ko_arca:'+r)
+PYSTATE
+ )
+else
+ release=${1:-};image=${2:-}
+fi
 [[ $release =~ ^[a-f0-9]{40}$ && $image == "ghcr.io/moring-m/stronghold-protocol_ko_arca:$release" ]] || { echo 'Expected immutable repository image and full commit ID.' >&2; exit 1; }
 api() { curl --fail-with-body -sS --max-time 10 -H "Authorization: Bearer $(cat "$root/state/token")" -H 'Content-Type: application/json' "http://127.0.0.1:3000/__roll/admin/$1" "${@:2}"; }
 status=$(api status)

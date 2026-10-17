@@ -147,9 +147,10 @@ const keepEarly = (e) => Array.isArray(e) && (STATE_EV.has(e[0]) || fxForm(e) !=
 // 作战统计 is opt-in (settings `combatMetrics`, default off). The runner does not import the settings store;
 // this screen pushes the switch. Outside a browser battleRunner is null, so this is a no-op.
 if (battleRunner) {
-  const applyCombatMetrics = (s) => battleRunner.setCombatMetrics(s?.combatMetrics === true);
+  const applyCombatMetrics = (s) => battleRunner.setCombatMetrics(s?.combatMetrics === true||!!store.get().room?.practice);
   applyCombatMetrics(settingsStore.get());
   settingsStore.subscribe(applyCombatMetrics);
+  store.subscribe(()=>applyCombatMetrics(settingsStore.get()));
 }
 
 /** Router for the in-match screens. */
@@ -223,7 +224,8 @@ function MatchScreen() {
   const roomSolo = useStore((s) => s.room?.mode === 'solo');
   const spectator = useStore((s) => isSpectating(s.room, s.me.playerId));
   const userSettings = useSettings();
-  const metricsSetting = userSettings.combatMetrics === true;
+  const practice=useStore(s=>!!s.room?.practice);
+  const metricsSetting = userSettings.combatMetrics === true||practice;
   const deployCameraZoom = userSettings.deployCameraZoom !== false;
   // gameplay plugins (DESIGN §32.6): the HUD corner's MOD mark — re-rendered only when the room's content changes
   const modRoom = useStore((s) => (s.room?.content?.vanilla === false ? s.room : null), (a, b) => (a?.content ?? null) === (b?.content ?? null));
@@ -858,7 +860,7 @@ function MatchScreen() {
   const toggleReady = useCallback(async (r) => {
     const L = live.current;
     const me = Array.isArray(L.pub?.players) ? L.pub.players.find((p) => p && p.playerId === L.myId) : null;
-    const ask = !r ? null : L.pub?.laboratory ? {
+    const ask = !r || L.pub?.practice ? null : L.pub?.laboratory ? {
       title: '준비 완료 확인', micro: 'BATTLE READY', okText: '전투 시작', cancelText: '계속 준비',
       text: '현재 배치와 설정으로 전투를 시작하시겠습니까?',
     } : readyFundsPrompt(L.priv, { keptBands: (data.get('config')?.commonBands||[]).some(id=>data.get('config')?.economy?.leftoverFundsKeptByBands?.includes(id)) ? [L.priv.bandId] : data.get('config')?.economy?.leftoverFundsKeptByBands, autoplay: !!me?.autoplay });
@@ -1676,13 +1678,13 @@ function MatchScreen() {
       <div class="ui-slot gm__ui-slot" data-ui-slot="hud.right" aria-label=${t('界面插件')} dangerouslySetInnerHTML=${{ __html: '' }}></div>
 
       <div class="gm__corner">
-      ${pub?.laboratory && combat ? html`<${LaboratoryDamage} runner=${battleRunner} fieldId=${field?.fieldId}/>` : null}
+      ${((pub?.laboratory && combat)||pub?.practice) ? html`<${LaboratoryDamage} runner=${battleRunner} fieldId=${field?.fieldId} practice=${!!pub?.practice} preparing=${['ROUND_START','SP_DRAFT','PREP'].includes(pub?.phase)}/>` : null}
         ${solo || pub?.laboratory ? null : html`<${ChatPanel} />`}
         ${spectator || solo || pub?.laboratory ? null : html`<${EmoteWheel} open=${emoteOpen} onToggle=${setEmoteOpen} onSend=${(id) => actions.emote(id)} disabled=${conn.status !== 'online'} />`}
         ${pub?.laboratory?.bossId==='boss_laboratory_jesselton'?html`<${LaboratoryTargetButton}/>`:null}
         <button type="button" class="gm__gear" aria-label="设置" title="设置" onClick=${() => setSettingsOpen(true)}><${GIcon} name="gear" /></button>
         <button type="button" class="gm__gear gm__guide" aria-label="玩法说明" title="玩法说明" onClick=${() => openGuide(0)}><${Icon} name="book" /></button>
-        ${showMetrics && metricsOpen ? html`<${CombatMetricsPanel} myId=${myId} onClose=${() => setMetricsOpen(false)} />` : null}
+        ${showMetrics && metricsOpen ? html`<${CombatMetricsPanel} myId=${myId} practice=${!!pub?.practice} preparing=${['ROUND_START','SP_DRAFT','PREP'].includes(pub?.phase)} round=${pub?.round} onClose=${() => setMetricsOpen(false)} />` : null}
         <${FullscreenButton} class="gm__gear gm__fs" />
       </div>
 

@@ -234,7 +234,7 @@ export function normalizeRecord(raw) {
     teamLp: num(r.teamLp),
     customExtensions:recordCustomExtensions(r.customExtensions),
     ...(r.augments?{augments:recordAugments(r.augments)}:{}),
-    roomMode: r.roomMode === 'solo' || r.roomMode === 'coop' || r.roomMode === 'coop8' || r.roomMode === 'laboratory' ? r.roomMode : null,
+    roomMode: r.roomMode === 'solo' || r.roomMode === 'coop' || r.roomMode === 'coop8' || r.roomMode === 'laboratory' || r.roomMode === 'practice' ? r.roomMode : null,
     selfId: str(r.selfId),
     // the room's cosmetic plugins (see the header): its visual set, null without any (or a record from before 0.3.0)
     vs: vsOf(r.vs),
@@ -414,7 +414,7 @@ export function saveStats(stats) {
  * @returns {'solo'|'coop'|null}
  */
 export function roomModeOf(modeId, roomMode) {
-  if (roomMode === 'laboratory') return 'laboratory';
+  if (roomMode === 'laboratory' || roomMode === 'practice') return roomMode;
   if (roomMode === 'solo' || roomMode === 'coop' || roomMode === 'coop8') return roomMode;
   if (typeof modeId !== 'string') return null;
   if (modeId.includes('_single_')) return 'solo';
@@ -459,7 +459,7 @@ export function buildRecord(res, ctx = {}) {
     teamLp: num(r.teamLp),
     customExtensions:r.customExtensions,
     ...(r.augments?{augments:recordAugments(r.augments)}:{}),
-    roomMode: ctx.laboratory ? 'laboratory' : roomModeOf(str(r.modeId), ctx.roomMode||r.roomMode),
+    roomMode: ctx.practice ? 'practice' : ctx.laboratory ? 'laboratory' : roomModeOf(str(r.modeId), ctx.roomMode||r.roomMode),
     selfId: myId,
     vs: vsOf(ctx.vs),
     content: contentOf(ctx.content),
@@ -584,6 +584,7 @@ export function recordToResult(rec) {
   if (!r || r.end === 'quit' || r.compact) return null;
   const res = {
     laboratory: r.roomMode === 'laboratory',
+    practice:r.roomMode==='practice',
     customExtensions:r.customExtensions,
     ...(r.augments?{augments:recordAugments(r.augments)}:{}),
     victory: r.victory,
@@ -755,7 +756,7 @@ export function roundsOf(rec) {
  * @returns {boolean}
  */
 export function countsTowardStats(rec) {
-  if (!isObj(rec) || rec.roomMode === 'laboratory') return false;
+  if (!isObj(rec) || ['laboratory','practice'].includes(rec.roomMode)) return false;
   if (rec.end !== 'quit') return true;
   const self = selfRowOf(rec);
   if (!self) return false;

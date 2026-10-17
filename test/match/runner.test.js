@@ -567,3 +567,18 @@ test('cold browser simulation data injects the laboratory dummy model and fixed 
  const info=r.feed.evs.flatMap(p=>p.ev||[]).find(ev=>ev[0]==='spawn'&&ev[1]?.defId==='enemy_laboratory_jesselton')?.[1];
  assert.ok(info);assert.equal(info.name,'제셀톤 윌리엄스');assert.equal(info.spine,'enemy_1516_jakill');assert.ok(info.modelScale>2);assert.equal(info.hitArea.w,4.95);r.runner.destroy?.();
 });
+test('practice retains previous-round metrics/chart during prep and keeps new prep gains separate',async()=>{
+ const start=realStart(7391),r=rig(),ownerId=start.spec.players[0].playerId;
+ const prepRow={key:'prep',ownerId,kind:'op',name:'맹약·기타',layers:7,layerBonds:{test:7}};
+ r.store.patch('match',{public:{phase:PHASE.COMBAT,round:2,practice:{}},private:{playerId:ownerId,prepLayerMetrics:[{round:2,rows:[prepRow]}]}});
+ r.net.emit('b.start',start);await r.settle();r.advance(1000);const before=r.runner.combatMetrics({scope:'battle',round:2,ownerId});
+ assert.equal(before.layers,7);const sample=r.runner.damageSample();assert.ok(sample.layers.some(row=>row.layers===7));
+ r.store.patch('match',{public:{phase:PHASE.PREP,round:3,practice:{}},private:{playerId:ownerId,prepLayerMetrics:[{round:2,rows:[prepRow]},{round:3,rows:[{...prepRow,layers:4,layerBonds:{test:4}}]}]}});
+ assert.equal(r.runner.combatMetrics({scope:'battle',round:2,ownerId}).layers,7);
+ assert.equal(r.runner.combatMetrics({scope:'battle',round:3,ownerId}).layers,4);
+ assert.equal(r.runner.damageSample({previous:true}).battleId,'practice-round:2');
+ assert.equal(r.runner.damageSample({previous:true}).layers.reduce((n,row)=>n+row.layers,0),7);
+ assert.equal(r.runner.damageSample().layers.reduce((n,row)=>n+row.layers,0),4);
+ assert.equal(r.runner.combatMetrics({ownerId}).layers,11);
+ r.runner.dispose();
+});

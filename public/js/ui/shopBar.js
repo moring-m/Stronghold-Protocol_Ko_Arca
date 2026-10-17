@@ -348,7 +348,7 @@ function RegularShopBar({ priv, editable, collapsed, refreshBusy = false, onColl
 
   if (collapsed) {
     return html`<div class="shopbar-tab" ref=${barRef}>
-      <div class="shopbar-tab__funds"><${CoinGlyph} /><b class="num">${funds}</b></div>
+      <div class="shopbar-tab__funds"><${CoinGlyph} /><b class="num">${store.get().match.public?.practice?'∞':funds}</b></div>
       <button type="button" class="shopbar-tab__btn" onClick=${() => onCollapse(false)}><${Icon} name="chevronLeft" />展开商店 <kbd>${keyLabel('collapseShop')}</kbd></button>
     </div>`;
   }
@@ -395,7 +395,7 @@ function RegularShopBar({ priv, editable, collapsed, refreshBusy = false, onColl
       <div class="funds">
         <div class="funds__hex">
           <${CoinGlyph} class="funds__coin" />
-          <b class="funds__num num">${funds}</b>
+          <b class="funds__num num">${store.get().match.public?.practice?'∞':funds}</b>
         </div>
         <span class="funds__label">目前资金</span>
         <button type="button" class="funds__collapse" onClick=${() => onCollapse(true)}><${Icon} name="chevronLeft" />접기 <kbd>${keyLabel('collapseShop')}</kbd></button>

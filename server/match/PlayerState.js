@@ -929,7 +929,7 @@ export class PlayerState {
    * Bond layer gain (prep-side). `requireActive` = "使已激活的【X】层数+N". Returns layers added: at most the room left
    * under BOND_LAYER_CAP (999, shared/constants.js) — a gain at the cap adds 0 and dispatches nothing.
    */
-  addLayers(bondId, n, { requireActive = false, reason = '' } = {}) {
+  addLayers(bondId, n, { requireActive = false, reason = '', source = null } = {}) {
     if (this.m.laboratory) return 0;
     if (!this.gd.bond(bondId) || !Number.isFinite(n) || n <= 0) return 0;
     if (requireActive && !(this.bonds[bondId] && this.bonds[bondId].active)) return 0;
@@ -937,6 +937,19 @@ export class PlayerState {
     const add = layerGainRoom(before, Math.floor(n), this.gd.config.customRules?.unlimitedLayers?Infinity:undefined);
     if (add <= 0) return 0;
     this.layers[bondId] = before + add;
+    if (this.m.practice) {
+      // Count effective non-combat gains once, independently of view deltas / result backfill.
+      const round = Math.max(1, this.m.round || 1);
+      const rounds = this.prepLayerMetrics ||= {};
+      const rows = rounds[round] ||= {};
+      const def = source?.kind === 'chess' ? this.gd.chess(source.id) : null;
+      const name = def?.name || '맹약·기타';
+      const key = JSON.stringify([this.playerId, 'op', name]);
+      const row = rows[key] ||= { key, ownerId:this.playerId, uid:source?.uid ?? null,
+        defId:def?.chessId || (def ? source.id : null), name, kind:'op', layers:0, layerBonds:{} };
+      row.layers += add;
+      row.layerBonds[bondId] = (row.layerBonds[bondId] || 0) + add;
+    }
     this.recompute();
     if ([PHASE.ROUND_START,PHASE.SP_DRAFT,PHASE.PREP].includes(this.m.phase)) this.m.sendTo(this.playerId,{t:'m.layer',playerId:this.playerId,bondId,add});
     this.m.dispatch(this, 'onLayers', { bondId, from: before, to: before + add, reason });
@@ -1848,6 +1861,7 @@ export class PlayerState {
     for (const { r, c, piece } of boardOrder(this.board)) board.push(this.pieceView(piece, [r, c]));
     return {
       t: 'm.private',
+      ...(this.m.practice ? {prepLayerMetrics:Object.entries(this.prepLayerMetrics || {}).map(([round, rows]) => ({round:Number(round), rows:Object.values(rows).map(r=>({...r,layerBonds:{...r.layerBonds}}))}))} : {}),
       playerId: this.playerId,
       seat: this.seat,
       alive: this.alive,

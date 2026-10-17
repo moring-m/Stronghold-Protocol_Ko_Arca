@@ -90,7 +90,7 @@ import { spectateEffects } from './observe.js';
 import { recordError, setBattleSource } from '../diag.js';
 import { loadBrowserSim } from './simLoader.js';
 import { InPageSimHost, WorkerSimHost } from './simHost.js';
-import { trackCombat, combineCombat } from './metrics.js';
+import { trackCombat, combineCombat, prepLayerRecords } from './metrics.js';
 import { t } from '../../../shared/i18n.js';
 export { loadBrowserSim, SIM_DATA_FILES } from './simLoader.js';
 
@@ -197,9 +197,26 @@ export function createBattleRunner(deps) {
   /** compact combat snapshots of locally simulated battles (battle/metrics.js) for the panel's match totals; `clear`
    *  drops them when the match really restarts */
   const combatHistory = new Map();
+  const practiceEpochs = new Map();
+  function practiceTime(round) { if(!practiceEpochs.has(round))practiceEpochs.set(round,clock());return (clock()-practiceEpochs.get(round))/1000; }
+  function sampleOf(e) {
+    const rows=new Map();
+    for(const u of e.battle.allyUnits||[]){
+      const owner=u.kind==='op'?u:u.ownerUnit;
+      if(!owner||owner.kind!=='op')continue;
+      let row=rows.get(owner.id);
+      if(!row){row={id:owner.id,defId:owner.defId,name:owner.def?.name||owner.defId,values:[0,0,0,0,0,0]};rows.set(owner.id,row);}
+      damageValues(u.stats).forEach((v,i)=>row.values[i]+=v);
+    }
+    const state=store?.get?.(),practice=state?.match?.public?.practice;
+    return {battleId:practice?'practice-round:'+e.round:e.battleId,time:practice?practiceTime(e.round):e.battle.time,
+      rows:[...rows.values()],layers:combineCombat([...(practice?prepLayerRecords(state?.match?.private,e.round):[]),...(e.combatMetrics?[e.combatMetrics()]:[])]).rows};
+  }
+
   const rememberCombat = (e) => {
     if (!e.combatMetrics) return;
-    const record = e.combatMetrics();
+    const record = { ...e.combatMetrics(), round:e.round };
+    if (e.battle && !e.host?.remote) record.sample = sampleOf(e);
     if (!(combatHistory.get(e.battleId)?.seconds > record.seconds)) combatHistory.set(e.battleId, record);
   };
   // Opt-in (设置「作战统计」, default off). A boolean deps.combatMetrics pins a test and ignores setCombatMetrics.
@@ -743,7 +760,7 @@ export function createBattleRunner(deps) {
       return;
     }
     const e = {
-      battleId: msg.battleId, fieldId: msg.fieldId || msg.spec.fieldId, kind: msg.kind || msg.spec.kind, spec: msg.spec,
+      battleId: msg.battleId, fieldId: msg.fieldId || msg.spec.fieldId, kind: msg.kind || msg.spec.kind, spec: msg.spec, round:store?.get?.()?.match?.public?.round,
       // built by prepare(); `seq` = its latest b.start, `elapsed` = the field clock to start from, `endReason` = the first
       // forced / timeout b.end (applied once the Battle exists), `ready` = the preparation (a promise)
       sim: null, battle: null, meter: null, seq, elapsed: Number(msg.elapsed) || 0, endReason: null, ready: null,
@@ -915,7 +932,7 @@ export function createBattleRunner(deps) {
     for (const e of [...entries.values(), ...pending.values()]) e.host?.stop();
     pending.clear();
     entries.clear();
-    if (!keepMetrics) combatHistory.clear();
+    if (!keepMetrics) {combatHistory.clear();practiceEpochs.clear();}
     cur = null;
     lastPool = null;
     if (rafH != null) { caf(rafH); rafH = null; }
@@ -941,7 +958,7 @@ export function createBattleRunner(deps) {
       // a fresh match (m.public gone), a rewound round or a return to a lobby-like phase resets the combat totals
       const resetMetrics = (!pub && lastPhase != null) || round < lastRound
         || (pub?.phase !== lastPhase && ['LOBBY', 'INFO_CHECK', 'BAND_DRAFT', 'BATTLE_CHECK'].includes(pub?.phase));
-      if (resetMetrics) combatHistory.clear();
+      if (resetMetrics) {combatHistory.clear();practiceEpochs.clear();}
       lastRound = round;
       // solo pause (DESIGN §14): the local battle clocks follow m.public.paused
       setPaused(!!(pub && pub.paused));
@@ -981,20 +998,27 @@ export function createBattleRunner(deps) {
      * Read on demand by the panel — never sent to the server.
      * @param {{ scope?: 'battle'|'match', ownerId?: string|null }} [opts]
      */
-    combatMetrics({ scope = 'match', ownerId = null } = {}) {
+    combatMetrics({ scope = 'match', ownerId = null, round = null } = {}) {
+      const state = store?.get?.();
+      const prep = state?.match?.public?.practice ? prepLayerRecords(state?.match?.private, scope === 'battle' ? round ?? state?.match?.public?.round : null) : [];
       const localEntries = [...entries.values(), ...pending.values()];
+      if (scope === 'battle' && round != null) {
+        const records = new Map(combatHistory);
+        for (const e of localEntries) if(e.combatMetrics) records.set(e.battleId,{...e.combatMetrics(),round:e.round});
+        return combineCombat([...prep,...[...records.values()].filter(r=>r.round===round)],ownerId);
+      }
       if (scope === 'battle') {
         // scouting another field must not replace the player's own current battle statistics
         const e = ownerId == null ? cur : localEntries.filter((entry) => entry.members.includes(ownerId))
           .sort((a, b) => b.seq - a.seq)[0];
-        return combineCombat(e?.combatMetrics ? [e.combatMetrics()] : [], ownerId);
+        return combineCombat([...prep, ...(e?.combatMetrics ? [e.combatMetrics()] : [])], ownerId);
       }
       const records = new Map(combatHistory);
       for (const e of localEntries) if (e.combatMetrics) {
-        const record = e.combatMetrics();
+        const record = { ...e.combatMetrics(), round:e.round };
         if (!(records.get(e.battleId)?.seconds > record.seconds)) records.set(e.battleId, record);
       }
-      return combineCombat(records.values(), ownerId);
+      return combineCombat([...prep, ...records.values()], ownerId);
     },
     /**
      * The battle on screen as a report attaches it (diag.js): its b.start fields and its game time; null without one.
@@ -1006,18 +1030,16 @@ export function createBattleRunner(deps) {
       const time = e.battle && Number.isFinite(e.battle.time) ? e.battle.time : null;
       return { battleId: e.battleId, fieldId: e.fieldId, kind: e.kind, spec: e.spec, time };
     },
-    damageSample() {
-      const e = cur;
-      if (!e?.battle) return null;
-      const b = e.battle, rows = new Map();
-      for (const u of b.allyUnits) {
-        const owner = u.kind === 'op' ? u : u.ownerUnit;
-        if (!owner || owner.kind !== 'op') continue;
-        let row = rows.get(owner.id);
-        if (!row) { row = {id:owner.id,defId:owner.defId,name:owner.def?.name||owner.defId,values:[0,0,0,0,0,0]};rows.set(owner.id,row); }
-        damageValues(u.stats).forEach((value,i)=>{row.values[i]+=value;});
+    damageSample({ previous = false } = {}) {
+      const state=store?.get?.(),pub=state?.match?.public,practice=pub?.practice;
+      if(practice&&previous){
+        const record=[...combatHistory.values()].filter(r=>r.round===pub.round-1&&r.sample).at(-1);
+        if(record)return record.sample;
+        return null;
       }
-      return {battleId:e.battleId,time:b.time,rows:[...rows.values()]};
+      const e=cur;
+      if(e?.battle)return sampleOf(e);
+      return practice?{battleId:'practice-round:'+pub.round,time:practiceTime(pub.round),rows:[],layers:combineCombat(prepLayerRecords(state?.match?.private,pub.round)).rows}:null;
     },
     stats() {
       return { ...stats, avgTickMs: stats.ticks ? stats.stepMs / stats.ticks : 0, entries: entries.size, loadingSim: !!simP };

@@ -160,3 +160,24 @@ test('same-name copies combine damage types, healing and rates in both battle an
   assert.equal(match.rows[0].hps, 24);
   assert.equal(battle.rows[0].damage, 400, 'grouping never changes individual snapshots');
 });
+
+test('layer meter counts actual capped gains and credits summons to their operator',()=>{
+ const {b,u,read}=rig();b.flags.layerGainsEnabled=true;const ps=b.getPlayer(u.ownerId);ps.bonds.testBond={layers:998};
+ const token=new Unit({id:901,kind:'token',side:'ally',ownerId:u.ownerId,ownerUnit:u,defId:'test_token'});
+ assert.equal(b.addLayers(u.ownerId,'testBond',10,'test',{source:token}),1);
+ assert.equal(b.addLayers(u.ownerId,'testBond',10,'test',{source:u}),0);
+ assert.equal(read().rows[0].layers,1);assert.deepEqual(read().rows[0].layerBonds,{testBond:1});
+ const combined=combineCombat([read()],u.ownerId);assert.equal(combined.layers,1);assert.equal(combined.rows[0].layers,1);
+ const wrapped=b.addLayers;read.stop();assert.notEqual(b.addLayers,wrapped);assert.equal(Object.hasOwn(b,'addLayers'),false);
+});
+test('prep counters combine with combat once and filter by round without inferring bond deltas',async()=>{
+ const {prepLayerRecords}=await import('../../public/js/battle/metrics.js');
+ const row={key:'prep',ownerId:'p',kind:'op',name:'테스트',defId:'test',layers:7,layerBonds:{test:7}};
+ const priv={playerId:'p',prepLayerMetrics:[{round:1,rows:[{...row,layers:3,layerBonds:{test:3}}]},{round:2,rows:[row]}]};
+ const fight={seconds:10,owners:['p'],rows:[{...row,layers:5,layerBonds:{test:5},damage:20,healing:0,types:{phys:20}}]};
+ const current=()=>combineCombat([...prepLayerRecords(priv,2),fight],'p');
+ assert.equal(current().layers,12);assert.equal(current().rows.length,1);assert.equal(current().damage,20);
+ assert.equal(current().layers,12,'re-reading a private snapshot cannot double count');
+ assert.equal(combineCombat([...prepLayerRecords(priv),fight],'p').layers,15);
+ assert.equal(combineCombat(prepLayerRecords(priv,3),'p').layers,0);
+});

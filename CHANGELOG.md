@@ -1,11 +1,12 @@
 # 패치노트
 
-## 0.3.0b1 — 2026-10-17
+## 0.3.0c — 2026-10-17
 
-- Preserve custom native map shaders when upstream scene packs arrive later.
-- Prevent static terrain masks from hiding patterned floor textures.
-- Suppress rotation prompts on touch-enabled PCs with mouse or hover support.
-- Keep official battle effects independent of map quality, including minimal 2D maps.
+- 연습실을 추가했습니다. 시작 라운드, 전장, 보스, 전략, 적 특훈, 맹약 밴을 선택하고 무제한 자금·일반 상점으로 진행합니다.
+- 연습실에서 휴식 중 획득분을 포함한 라운드별 중첩 통계와 오퍼레이터별 실시간 그래프를 제공합니다. 휴식 중에는 직전 라운드 기록과 이번 라운드를 전환할 수 있습니다.
+- 연습실 기록을 일반 통계와 구분하고, 연습 중 표시·시뮬레이션 표기·관전 허용 설정 배치를 정리했습니다.
+- 자동 유지 관리가 과거 버전을 재활성화하는 경쟁 조건을 수정하고, 배포 전에 스크립트를 자동 갱신합니다. 스크립트 갱신만으로 게임·라우터를 재시작하지 않습니다.
+- b1 수정사항을 이 버전에 통합했습니다: 커스텀 맵 셰이더 우선 적용, 정적 바닥 무늬 복구, 터치 PC 회전 안내 수정, 맵 품질과 공식 이펙트 설정 분리.
 
 ## 0.3.0b — 2026-10-17
 

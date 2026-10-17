@@ -129,6 +129,7 @@ export function ResultView({ res, pub = null, myId = null, backLabel, onBack, qu
       <section class="result__hero">
         <div class="result__summary">
         <div class="result__logo"><${Sprite} k="entry/season_logo_settle" class="result__logoimg" fallback=${html`<${MicroLabel} tone="mint">STRONGHOLD PROTOCOL</${MicroLabel}>`} /></div>
+        ${pub?.practice||res?.practice?html`<span class="result__laboratory"><${Icon} name="flask"/>연습실</span>`:null}
         ${pub?.laboratory || res?.laboratory ? html`<span class="result__laboratory"><${Icon} name="flask"/>실험실</span>` : null}
         ${r.difficulty ? html`<${DifficultyTag} difficulty=${r.difficulty} size="lg" />` : null}
         <h1 class="result__headline">${r.victory ? t('模拟完成') : t('模拟失败')}</h1>

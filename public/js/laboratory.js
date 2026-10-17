@@ -27,7 +27,7 @@ export async function startLaboratory(setup) {
   let raw = Object.fromEntries([...GAME_FILES, 'waves', 'backups'].map(k => [k, data.get(k)]));
   if (['config','chess','items','bands','stages','bosses','waves'].some(k => !raw[k])) throw new Error('실험실에 필요한 게임 데이터를 불러오지 못했습니다.');
   raw=withLaboratoryDummy(raw);
-  const { LaboratoryMatch } = await import('/match/LaboratoryMatch.js');
+  const MatchClass=setup.practice ? (await import('/match/PracticeMatch.js')).PracticeMatch : (await import('/match/LaboratoryMatch.js')).LaboratoryMatch;
   const { setSimData } = await import('/sim/simdata.js');
   for (const key of ['chess','enemies','tokens','backups']) if (raw[key]) raw[key]=structuredClone(raw[key]);
   attachAttackTimings(raw, raw.assets);
@@ -40,12 +40,12 @@ export async function startLaboratory(setup) {
   const catalog = customExtensionCatalog(raw);
   const customExtensions = normalizeCustomExtensions(setup.customExtensions===undefined?{bonds:catalog.bonds.map(x=>x.id),stages:catalog.stages.map(x=>x.id)}:{bonds:setup.customExtensions.bonds||[],stages:setup.customExtensions.stages||[],rules:setup.customExtensions.rules||[],commonBands:setup.customExtensions.commonBands||[],ruleValues:setup.customExtensions.ruleValues},raw);
   const configured=applyCustomExtensions(raw,customExtensions);
-  configured.config.customRules={...configured.config.customRules,deployCap:15};
+  if(!setup.practice)configured.config.customRules={...configured.config.customRules,deployCap:15};
   setSimData(configured);
   support.setGameData(configured);
   const push = msg => { net._emit(msg.t, msg); net._emit('*', msg); };
-  const match = new LaboratoryMatch({
-    laboratory: setup, difficulty: setup.difficulty, roomCode: 'LAB', seed: crypto.getRandomValues(new Uint32Array(1))[0], data: raw,
+  const match = new MatchClass({
+    laboratory: setup, practice:setup, difficulty: setup.difficulty, roomCode: setup.practice?'PRACTICE':'LAB', seed: crypto.getRandomValues(new Uint32Array(1))[0], data: raw,
     customExtensions, seats: [{ seat: 0, playerId, name, isBot: false, connected: true, loadout: lo.entries, ops: lo.ops }],
     send: (_, msg) => { push(msg); return true; }, broadcast: push,
     onEnd: () => store.set({ room: { ...store.get().room, inMatch: false } }),
@@ -71,7 +71,7 @@ export async function startLaboratory(setup) {
   net.status = 'online';
   net._emit('status', net.snapshot());
   store.set({ me: { ...previous.me, playerId, name }, match: emptyMatch(),
-    room: { code: 'LAB', mode: 'solo', laboratory: true, difficulty: setup.difficulty, hostId: playerId, inMatch: true, spectators: [],
+    room: { code: setup.practice?'PRACTICE':'LAB', mode: setup.practice?'practice':'solo', laboratory: !setup.practice, practice:!!setup.practice, difficulty: setup.difficulty, hostId: playerId, inMatch: true, spectators: [],
       seats: [{ seat: 0, playerId, name, isBot: false, connected: true }], customExtensions },
     clock: { offset: 0, rtt: 0, synced: true }, chat: [], ticker: [], emotes: [] });
   store.patch('ui', { laboratorySetup: null });

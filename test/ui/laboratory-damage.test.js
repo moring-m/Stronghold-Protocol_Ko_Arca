@@ -21,3 +21,7 @@ test('both charts distinguish elemental, notes, true and unclassified damage in 
  assert.deepEqual(damageValues({dmg:100}),[0,0,0,0,0,100]);
  const next=appendDamageSample(appendDamageSample(null,sample(0,[0,0,0,0,0,0])),sample(2,values));assert.deepEqual(next.points.at(-1).values,[5,10,7.5,12.5,2.5,12.5]);
 });
+test('practice layer chart retains per-operator cumulative and real-time actual gains',()=>{
+ const s=(time,a,b)=>({...sample(time,[0,0,0,0]),layers:[{key:'a',name:'A',layers:a},{key:'b',name:'B',layers:b}]});
+ let state=appendDamageSample(null,s(0,0,0));state=appendDamageSample(state,s(1,2,3));assert.deepEqual(state.layerPoints.at(-1).rows,{a:2,b:3});state=appendDamageSample(state,s(3,8,5));assert.deepEqual(state.layerPoints.at(-1).rows,{a:3,b:1});assert.equal(state.layerRows[0].layers,8);assert.equal(appendDamageSample(state,s(3,8,5)),state);
+});

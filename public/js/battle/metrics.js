@@ -21,8 +21,8 @@ export function trackCombat(battle) {
     if (!u) return null;
     const key = JSON.stringify([u.ownerId, u.uid != null ? `uid:${u.uid}` : `unit:${u.id}:${u.defId}`]);
     if (!rows.has(key)) rows.set(key, {
-      key, ownerId: u.ownerId, uid: u.uid, defId: u.defId, name: u.name, kind: u.kind,
-      damage: 0, healing: 0, types: Object.fromEntries(DAMAGE_TYPES.map((t) => [t, 0])),
+      key, id:u.id, ownerId: u.ownerId, uid: u.uid, defId: u.defId, name: u.name, kind: u.kind,
+      damage: 0, healing: 0, layers:0, layerBonds:{}, types: Object.fromEntries(DAMAGE_TYPES.map((t) => [t, 0])),
     });
     return rows.get(key);
   }
@@ -52,17 +52,29 @@ export function trackCombat(battle) {
     return actual;
   }
   battle.heal = wrappedHeal;
+  const addLayers=battle.addLayers;
+  function wrappedLayers(playerId,bondId,n,reason,opts){
+    const actual=addLayers.call(this,playerId,bondId,n,reason,opts);
+    if(positive(actual)){
+      const source=operatorOf(opts?.source)||{id:'layers:'+playerId,ownerId:playerId,side:'ally',kind:'op',name:'맹약·기타',defId:null};
+      const row=rowOf(source);if(row){row.layers+=actual;row.layerBonds[bondId]=(row.layerBonds[bondId]||0)+actual;}
+    }
+    return actual;
+  }
+  if(typeof addLayers==='function')battle.addLayers=wrappedLayers;
+
   let stopped = false;
   const read = () => ({
     seconds: positive(battle.time),
     owners: (battle.players || []).map((p) => p.playerId),
-    rows: [...rows.values()].map((r) => ({ ...r, types: { ...r.types } })),
+    rows: [...rows.values()].map((r) => ({ ...r, types: { ...r.types },layerBonds:{...r.layerBonds} })),
   });
   // The settings switch turns the meter off mid-battle. Later damage is not counted; rows already taken stay readable.
   read.stop = () => {
     if (stopped) return;
     stopped = true;
     if (typeof battle.off === 'function') battle.off(damagedHook);
+    if(battle.addLayers===wrappedLayers){const proto=Object.getPrototypeOf(battle);if(proto?.addLayers===addLayers)delete battle.addLayers;else battle.addLayers=addLayers;}
     if (battle.heal !== wrappedHeal) return;
     const proto = Object.getPrototypeOf(battle);
     if (proto && proto.heal === heal) delete battle.heal;
@@ -85,20 +97,29 @@ export function combineCombat(records, ownerId = null) {
       const key = JSON.stringify([r.ownerId, r.kind, r.name || r.defId]);
       let row = rows.get(key);
       if (!row) {
-        row = { ...r, key, damage: 0, healing: 0, types: Object.fromEntries(DAMAGE_TYPES.map((t) => [t, 0])) };
+        row = { ...r, key, damage: 0, healing: 0, layers:0, layerBonds:{}, types: Object.fromEntries(DAMAGE_TYPES.map((t) => [t, 0])) };
         rows.set(key, row);
       }
       // Use the latest encountered definition for the combined row's portrait.
       Object.assign(row, { defId: r.defId, name: r.name, kind: r.kind });
       row.damage += r.damage;
       row.healing += r.healing;
+      row.layers += positive(r.layers);for(const [id,n]of Object.entries(r.layerBonds||{}))row.layerBonds[id]=(row.layerBonds[id]||0)+positive(n);
       for (const t of DAMAGE_TYPES) row.types[t] += r.types[t] || 0;
     }
     for (const owner of owners) elapsed.set(owner, (elapsed.get(owner) || 0) + positive(record.seconds));
   }
   const list = [...rows.values()].map((r) => {
     const seconds = elapsed.get(r.ownerId) || 0;
-    return { ...r, seconds, dps: seconds > 0 ? r.damage / seconds : 0, hps: seconds > 0 ? r.healing / seconds : 0 };
+    return { ...r, seconds, dps: seconds > 0 ? r.damage / seconds : 0, hps: seconds > 0 ? r.healing / seconds : 0, lps:seconds>0?r.layers/seconds:0 };
   }).sort((a, b) => b.damage - a.damage || b.healing - a.healing || a.key.localeCompare(b.key));
-  return { rows: list, damage: list.reduce((n, r) => n + r.damage, 0), healing: list.reduce((n, r) => n + r.healing, 0) };
+  return { rows: list, damage: list.reduce((n, r) => n + r.damage, 0), healing: list.reduce((n, r) => n + r.healing, 0),layers:list.reduce((n,r)=>n+r.layers,0) };
+}
+
+/** Absolute server counters survive resync; never infer gains from changing bond totals. */
+export function prepLayerRecords(priv, round = null) {
+  return (priv?.prepLayerMetrics || []).filter(r=>round==null || r.round===round).map(r=>({
+    seconds:0, owners:[priv.playerId], rows:r.rows.map(row=>({...row, damage:0, healing:0,
+      types:Object.fromEntries(DAMAGE_TYPES.map(t=>[t,0]))})),
+  }));
 }

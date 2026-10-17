@@ -397,15 +397,18 @@ export function TopBar({ battleEnd = null, pub, priv, conn, hud, total, drawer, 
   const onRight = () => (pen ? onPen(false) : penAvail ? onPen(true) : null);
   return html`<header class=${cx('gtop', pen && 'is-pen')}>
     <div class="gtop__left">
+      <div class="gtop__left-row">
       <${Button} variant="danger" size="lg" square=${true} icon="exit" onClick=${onExit} aria-label="离开" title="离开 / 暂离" class="gtop__exit tapx" />
       <div class="gtop__meta">
         <div class="gtop__net">
           <${PingPill} ms=${conn?.ping} online=${conn?.status === 'online'} />
           <${SpectatorPill} spectators=${spectators} myId=${myId} isHost=${isHost} onRemove=${onRemoveSpectator} />
         </div>
-        ${pub?.laboratory?html`<span class="t-mint">실험실</span>`:pub?.difficulty ? html`<${DifficultyTag} difficulty=${pub.difficulty} size="sm" />` : null}
-        <${UnofficialMark} room=${room} compact=${true} class="gtop__mod" />
+        <div class="gtop__mode">${pub?.laboratory?html`<span class="t-mint">실험실</span>`:pub?.difficulty ? html`<${DifficultyTag} difficulty=${pub.difficulty} size="sm" />` : null}
+        <${UnofficialMark} room=${room} compact=${true} class="gtop__mod" /></div>
       </div>
+      </div>
+      ${pub?.practice?html`<div class="gtop__practice-row"><span class="gtop__practice">연습 중</span></div>`:null}
     </div>
 
     <div class="gtop__center brackets">

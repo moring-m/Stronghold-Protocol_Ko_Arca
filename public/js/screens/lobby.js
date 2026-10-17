@@ -83,6 +83,7 @@ const MODE_CARDS = [
     points: [`1–${4} 名博士 · 可由 AI 队友补位`, '联防阶段 · 最终攻势合并生命值'],
   },
   { id: 'laboratory', name: '실험실', en: 'LABORATORY', icon: 'flask', desc: '맵·보스·전략을 직접 고르고 원하는 조합을 시험합니다.', points: ['솔로 플레이 · 밴 없음', '한 라운드 전투 · 결과 통계 기록'] },
+  { id:'practice',name:'연습실',en:'PRACTICE',icon:'flask',desc:'원하는 라운드부터 일반 게임처럼 연습합니다.',points:['솔로 플레이 · 무제한 자금','라운드·적 특훈·맹약 밴 선택'] },
 ];
 
 /**
@@ -217,7 +218,7 @@ function TipsPanel() {
 
 function ModeCard({ card, selected, onSelect, coopSize=4, onCoopSize, spectateOn, onSpectateChange }) {
   if(card.id==='coop'&&coopSize===8)card={...card,desc:'최대 8명의 박사가 오퍼레이터 풀을 공유하며 함께 전투합니다.',points:['박사 1–8명 · 빈자리는 AI 팀원으로','협력방어 최대 4명']};
-  return html`<div role="button" tabindex="0" class=${`mode-card brackets${card.id==='laboratory'?' mode-card--lab':''}${selected ? ' is-selected' : ''}`} onClick=${() => onSelect(card.id==='coop'&&coopSize===8?'coop8':card.id)} onKeyDown=${e=>{if(e.target===e.currentTarget&&['Enter',' '].includes(e.key)){e.preventDefault();onSelect(card.id==='coop'&&coopSize===8?'coop8':card.id);}}}
+  return html`<div role="button" tabindex="0" class=${`mode-card brackets${['laboratory','practice'].includes(card.id)?' mode-card--lab':''}${selected ? ' is-selected' : ''}`} onClick=${() => onSelect(card.id==='coop'&&coopSize===8?'coop8':card.id)} onKeyDown=${e=>{if(e.target===e.currentTarget&&['Enter',' '].includes(e.key)){e.preventDefault();onSelect(card.id==='coop'&&coopSize===8?'coop8':card.id);}}}
       aria-pressed=${selected ? 'true' : 'false'}>
     <span class="mode-card__bg" aria-hidden="true"></span>
     <span class="mode-card__icon"><${Icon} name=${card.icon} /></span>
@@ -228,16 +229,18 @@ function ModeCard({ card, selected, onSelect, coopSize=4, onCoopSize, spectateOn
       <span class="mode-card__points">${card.points.map((p) => html`<span key=${p}>${p}</span>`)}</span>
     </span>
     <span class="mode-card__check" aria-hidden="true"><${Icon} name="check" />已选定</span>
-    ${card.id==='coop'?html`<label class="mode-card__spectate create-box__check" onClick=${e=>e.stopPropagation()} onKeyDown=${e=>e.stopPropagation()}>
-      <input type="checkbox" checked=${spectateOn} onChange=${e=>onSpectateChange(!!e.currentTarget.checked)} />
-      <${Icon} name="eye" /><span>관전 허용</span>
-    </label>`:null}
-    ${card.id==='coop'?html`<span class="mode-card__sizes" role="group" aria-label="협동 인원">${[4,8].map(n=>html`<button type="button" aria-pressed=${coopSize===n} onClick=${e=>{e.stopPropagation();onCoopSize(n);}}>${n}인</button>`)}</span>`:null}
+    ${card.id==='coop'?html`<div class="mode-card__controls">
+      <span class="mode-card__sizes" role="group" aria-label="협동 인원">${[4,8].map(n=>html`<button type="button" aria-pressed=${coopSize===n} onClick=${e=>{e.stopPropagation();onCoopSize(n);}}>${n}인</button>`)}</span>
+      <label class="mode-card__spectate create-box__check" onClick=${e=>e.stopPropagation()} onKeyDown=${e=>e.stopPropagation()}>
+        <input type="checkbox" checked=${spectateOn} onChange=${e=>onSpectateChange(!!e.currentTarget.checked)} />
+        <${Icon} name="eye" /><span>관전 허용</span>
+      </label>
+    </div>`:null}
   </div>`;
 }
 
 function DifficultyCard({ roomMode, difficulty, selected, onSelect }) {
-  const info = difficultyInfo(roomMode==='laboratory'?'solo':roomMode, difficulty);
+  const info = difficultyInfo(['laboratory','practice'].includes(roomMode)?'solo':roomMode, difficulty);
   return html`<button type="button" class=${`diff-card${selected ? ' is-selected' : ''}`}
       style=${`--d-color:${DIFFICULTY_COLORS[difficulty]}`} onClick=${() => onSelect(difficulty)} aria-pressed=${selected ? 'true' : 'false'}>
     <span class="diff-card__bar" aria-hidden="true"></span>
@@ -261,7 +264,7 @@ export function LobbyScreen() {
   const conn = useStore((s) => s.connection, shallowEqual);
   useData('config');
   const [coopSize,setCoopSize]=useState(()=>loadPref('lobby.mode','coop')==='coop8'?8:4);
-  const [roomMode, setRoomMode] = useState(() => (['solo','coop','coop8','laboratory'].includes(loadPref('lobby.mode','coop'))?loadPref('lobby.mode','coop'):'coop'));
+  const [roomMode, setRoomMode] = useState(() => (['solo','coop','coop8','laboratory','practice'].includes(loadPref('lobby.mode','coop'))?loadPref('lobby.mode','coop'):'coop'));
   const [difficulty, setDifficulty] = useState(() => {
     const d = loadPref('lobby.difficulty', 'FUNNY');
     return DIFFICULTIES.includes(d) ? d : 'FUNNY';
@@ -294,7 +297,7 @@ export function LobbyScreen() {
       if (alive.current) setBusy(null);
     }
   };
-  const create = () => roomMode === 'laboratory' ? store.patch('ui', { laboratorySetup: { difficulty } }) : run('create', () => net.request('room.create', {
+  const create = () => ['laboratory','practice'].includes(roomMode) ? store.patch('ui', { laboratorySetup: { difficulty,practice:roomMode==='practice' } }) : run('create', () => net.request('room.create', {
     mode: roomMode,
     difficulty,
     customExtensions: loadCustomExtensionPrefs(),
@@ -396,13 +399,13 @@ export function LobbyScreen() {
           ${DIFFICULTIES.map((d) => html`<${DifficultyCard} key=${d} roomMode=${roomMode} difficulty=${d} selected=${difficulty === d} onSelect=${pickDifficulty} />`)}
         </div>
         <div class="create-box">
-          <${Tooltip} block=${true} text=${online || roomMode==='laboratory' ? null : '正在连接服务器…'}>
-            <${Button} variant="primary" size="xl" block=${true} iconRight="chevrons" loading=${busy === 'create'} disabled=${roomMode!=='laboratory'&&!online} onClick=${create}>
-              ${roomMode==='laboratory'?'실험실 진입':roomMode === 'solo' ? '开始独立模拟' : '创建同盟'}
+          <${Tooltip} block=${true} text=${online || ['laboratory','practice'].includes(roomMode) ? null : '正在连接服务器…'}>
+            <${Button} variant="primary" size="xl" block=${true} iconRight="chevrons" loading=${busy === 'create'} disabled=${!['laboratory','practice'].includes(roomMode)&&!online} onClick=${create}>
+              ${roomMode==='practice'?'연습실 진입':roomMode==='laboratory'?'실험실 진입':roomMode === 'solo' ? '开始独立模拟' : '创建同盟'}
             <//>
           <//>
           <div class="create-box__hint">
-            ${roomMode==='laboratory'?html`<span>진입 후 맵·보스·전략을 선택합니다.</span>`:online
+            ${['laboratory','practice'].includes(roomMode)?html`<span>${roomMode==='practice'?'진입 후 라운드·전장·전략·적 특훈·맹약 밴을 선택합니다.':'진입 후 맵·보스·전략을 선택합니다.'}</span>`:online
               ? html`<span>${roomMode === 'solo' ? '创建后即可开始模拟' : '创建后可邀请好友或添加 AI 队友'}</span>`
               : html`<${Spinner} size="sm" label="CONNECTING" />`}
           </div>

@@ -272,7 +272,7 @@ function wireNet() {
     store.patch('match', { result: res });
     // 本机统计 (PR #323): every arrival, including the lobby's result replay after a reconnect / reload —
     // replays dedupe by content id inside recordResult (spectator seats' copies build no record at all)
-    recordResult(res, { laboratory:!!store.get().room?.laboratory, myId: store.get().me.playerId, roomMode: store.get().room?.mode ?? null, vs:store.get().room?.content?.vs??null, content:store.get().room?.content??null, now: Date.now() });
+    recordResult(res, { practice:!!store.get().room?.practice, laboratory:!!store.get().room?.laboratory, myId: store.get().me.playerId, roomMode: store.get().room?.mode ?? null, vs:store.get().room?.content?.vs??null, content:store.get().room?.content??null, now: Date.now() });
   });
   net.on('room.commended',msg=>{
     const result=store.get().match.result;

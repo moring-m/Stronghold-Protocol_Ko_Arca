@@ -829,3 +829,10 @@
  .dpbox b { font-size: 26px; }
  .dpbox .micro { font-size: 9px; }
 }
+
+.gtop__meta{flex-direction:column;align-items:flex-start;flex-wrap:nowrap;}
+.gtop__mode{display:flex;flex-wrap:wrap;align-items:center;gap:.06rem .14rem;}
+.gtop__left{flex-direction:column;align-items:flex-start;gap:.08rem;}
+.gtop__left-row{display:flex;align-items:center;gap:.16rem;}
+.gtop__practice-row{display:flex;align-self:flex-start;}
+.gtop__practice{white-space:nowrap;font-size:.2rem;font-weight:700;color:var(--mint,#64e6bd);border:1px solid currentColor;background:rgba(6,29,25,.9);padding:.05rem .12rem;line-height:1.3;}

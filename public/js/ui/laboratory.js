@@ -1,3 +1,4 @@
+import {PracticeSetup} from './practice.js';
 import { withLaboratoryDummy, LAB_DUMMY_BOSS, LAB_DUMMY_FIELDS } from '../../../shared/laboratoryDummy.js';
 import { useEffect, useMemo, useState } from '../../vendor/hooks.module.js';
 import { matchesKoreanSearch, laboratoryEquipment } from '../../../shared/search.js';
@@ -26,7 +27,7 @@ const sortedBonds = () => [...matchData.list('bonds')].sort((a,b)=>Number(!!b.is
 
 export function LaboratoryScreen() {
   const entry = useStore(s=>s.ui.laboratorySetup);
-  return html`<div class="screen lab-screen"><header class="topbar"><div class="topbar__left"><${Button} variant="ghost" icon="chevronLeft" disabled=${!!entry?.busy} onClick=${()=>store.patch('ui',{laboratorySetup:null})}>돌아가기<//></div><div class="topbar__center"><${MicroLabel} tone="mint">LABORATORY SETUP<//><h1 class="topbar__title">실험실 설정</h1></div><div class="topbar__right"><${SettingsButton}/></div></header><main class="screen__scroll lab-screen__body"><${LaboratorySetup} difficulty=${entry?.difficulty||'NORMAL'}/></main></div>`;
+  return html`<div class=${'screen lab-screen'+(entry?.practice?' practice-screen':'')}><header class="topbar"><div class="topbar__left"><${Button} variant="ghost" icon="chevronLeft" disabled=${!!entry?.busy} onClick=${()=>store.patch('ui',{laboratorySetup:null})}>돌아가기<//></div><div class="topbar__center"><${MicroLabel} tone="mint">${entry?.practice?'PRACTICE SETUP':'LABORATORY SETUP'}<//><h1 class="topbar__title">${entry?.practice?'연습실 설정':'실험실 설정'}</h1></div><div class="topbar__right"><${SettingsButton}/></div></header><main class="screen__scroll lab-screen__body"><${entry?.practice?PracticeSetup:LaboratorySetup} difficulty=${entry?.difficulty||'NORMAL'}/></main></div>`;
 }
 
 export function LaboratorySetup({difficulty}) {

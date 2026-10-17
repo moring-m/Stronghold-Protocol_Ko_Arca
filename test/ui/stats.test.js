@@ -855,3 +855,7 @@ test('laboratory settlements remain in history but contribute no aggregate stati
   assert.deepEqual(aggregate.bands,{});
  });
 });
+
+test('practice settlements retain their history label and do not affect normal aggregates',()=>{
+ withStorage(()=>{const rec=recordResult(baseResult(),{myId:'p1',practice:true,roomMode:'practice'});assert.equal(rec.roomMode,'practice');const saved=loadStats().records[0];assert.equal(saved.roomMode,'practice');assert.equal(countsTowardStats(saved),false);assert.equal(aggregateStats([saved]).count,0);assert.equal(recordToResult(saved).practice,true);});
+});
