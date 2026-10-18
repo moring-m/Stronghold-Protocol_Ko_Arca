@@ -60,7 +60,7 @@ import { store, useStore, emptyMatch, selectRoute, sessionResetNotice, isSpectat
 import { data } from './data.js';
 import { GAME_FILES } from './ui/gameComponents.js';
 import { TitleScreen, sanitizeName } from './screens/title.js';
-import { LobbyScreen, rememberRoom, parseRoomParam } from './screens/lobby.js';
+import { LobbyScreen, rememberRoom, parseRoomParam, joinKnown } from './screens/lobby.js';
 import { RoomScreen, TrustedNotice } from './screens/room.js';
 const GameScreen=lazyComponent(()=>Promise.all([import('./screens/game.js'),loadScreenStyles(['game','game-shop','game-panels','briefing','draft','result'].map(name=>'/css/screens/'+name+'.css'))]).then(([module])=>module),'GameScreen');
 import { audio, installAudio } from './audio.js';
@@ -68,7 +68,7 @@ import { settingsStore } from './ui/settings.js';
 import { GuideHost } from './ui/guide.js';
 import { installDeviceSupport } from './ui/device.js';
 const LoadoutHost=lazyComponent(()=>Promise.all([import('./screens/loadout.js'),loadScreenStyles(['/css/screens/loadout.css'])]).then(([module])=>module),'LoadoutHost');
-import { installLoadoutSync } from './ui/loadoutSync.js';
+import { installLoadoutSync, installOwnershipSync, installDiySync, installSkinsSync } from './ui/loadoutSync.js';
 import { CHAT_HISTORY_LIMIT } from '../../shared/chat.js';
 import { startBuildGuard } from './ui/buildGuard.js';
 import { registerImportedAssetWorker } from './assetCache.js';
@@ -131,7 +131,7 @@ function schedulePendingJoin() {
     }
     joinInFlight = true;
     try {
-      await net.request('room.join', { code });
+      await joinKnown('room.join', code);
     } catch (err) {
       toastError(err);
     } finally {
@@ -183,6 +183,8 @@ function onWelcome(msg) {
     content: msg.content && typeof msg.content.vanilla === 'string' ? { vanilla: msg.content.vanilla } : null,
     // how many unofficial plugins it has (P1a — absent: none; content.js fetches the catalogue only when there are some)
     installedPlugins: pluginCount(msg.content),
+    installedNotices: msg.content?.notices === true,
+    testMode: msg.testMode === true,
   });
   welcomeAt = Date.now();
 
@@ -226,7 +228,7 @@ function onRoomState(msg) {
   store.set({ room });
   identity.rememberMatch(room.inMatch && seats.some((seat) => seat?.playerId === myId)
     ? { name: store.get().me.name, code: room.code || '' } : null);
-  if (['coop','coop8'].includes(room.mode) && typeof room.code === 'string') rememberRoom(room.code);
+  if (['coop','coop8'].includes(room.mode) && typeof room.code === 'string') rememberRoom(room.code, room.test === true);
   maybeFinishRestore();
 }
 
@@ -422,6 +424,9 @@ async function boot() {
   wireNet();
   installStatsRecorder(store); // follows the match on screen, so a 放弃模拟 can be recorded (ui/stats.js)
   installLoadoutSync({ net });
+  installOwnershipSync({ net });
+  installDiySync({ net });
+  installSkinsSync({ net });
   // the room's cosmetic plugins and the player's own over the art manifest (content.js; nothing is fetched without them)
   installContent({ toast });
   // a room with gameplay plugins: its content set downloaded, checked and shown (content.js — DESIGN §32.6)
@@ -481,7 +486,10 @@ async function boot() {
       onStale: ({ waiting, build }) => { if (waiting) store.patch('ui', { buildStale: true, buildStaleTarget: build }); },
       onCurrent: () => store.patch('ui', { buildStale: false, buildStaleTarget: null }),
       // the same /healthz names how many plugins the server has: the title screen shows it before any hello
-      onHealth: (h) => { const n = pluginCount(h.content); if (n !== store.get().installedPlugins) store.set({ installedPlugins: n }); },
+      onHealth: (h) => {
+        const n = pluginCount(h.content), notices = h.content?.notices === true;
+        if (n !== store.get().installedPlugins || notices !== store.get().installedNotices) store.set({ installedPlugins: n, installedNotices: notices });
+      },
     });
   } catch (err) {
     console.warn('[app] build guard failed to start', err);

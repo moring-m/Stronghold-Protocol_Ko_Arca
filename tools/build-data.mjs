@@ -40,8 +40,8 @@ import { fileURLToPath } from 'node:url';
 import { Grid, DEPLOY_REFUSED_TILES } from '../server/sim/grid.js';
 import { bandBondIds } from '../shared/bandBonds.js';
 import { statusKey, composeUnitRecord } from '../shared/standIn.js';
-import { extendedGrid } from '../shared/loadoutRecord.js';
 import { FULL_RANK, atRank, stripPotential } from '../shared/potential.js';
+import { createOfficialUnitBuilders } from '../server/plugins/officialUnitBuilder.js';
 
 // ===== CLI & IO ==================================================================================
 
@@ -98,6 +98,8 @@ function warn(msg) {
   warned.add(msg);
   warnings.push(msg);
 }
+
+const { STANDIN_TRIGGER_DEVIATIONS, strictlyContains, ACTIVE_RANGE_OVER, rarityOf, statusCmp, buildUnitHead, buildUnitForm, placeOnRangedOf } = createOfficialUnitBuilders(warn);
 
 /**
  * Make sure an official gamedata file exists in the cache; download it when missing.
@@ -874,9 +876,7 @@ export function buildChess(ctx) {
     rec.subProfessionName = uniequip.subProfDict?.[char.subProfessionId]?.subProfessionName || null;
     rec.position = char.position;
     rec.nationId = char.nationId || null;
-    // 高台 is not a data flag: a MELEE chess whose trait (no module: `traitBase` / `trait`) reads 「可以放置于远程位」
-    // — the 钩索师 / 推击手 branch trait — may stand there, read at place time (shared/highGround.js; the owner's
-    // decision of 2026-10-05, following PRTS).
+    // 高台 is `placeOnRanged`, set below from the Chinese trait without a module (not from a character id).
 
     // Module (only active on golden chess: equipLevel > 0).
     const modId = shop.defaultUniEquipId || null;
@@ -978,6 +978,13 @@ export function buildChess(ctx) {
       }
       if (modId) moduleAlts.push({ id: 'none', modulePhase: null, moduleTokenParts: [] });
     }
+
+    // GitHub #676: the client places from the localized record, whose trait text is no longer this Simplified line
+    // (en / ja / ko, and zh-TW writes 於). The boolean is that line on the trait without a module (`traitBase`, else
+    // `trait`) — the 钩索师 / 推击手 branch trait, any module or none (the owner's decision of 2026-10-05). Absent
+    // when it does not apply. A record without the flag still matches the line at place time (shared/highGround.js),
+    // which is how a plugin's Chinese trait keeps the 高台. No character id is named.
+    if (placeOnRangedOf(rec.position, rec.traitBase || rec.trait)) rec.placeOnRanged = true;
 
     // Tokens / summons: displayTokenDict + default-skill overrideTokenKey + talent tokenKey.
     // A talent tokenKey missing from character_table is a container id (凛御银灰's
@@ -1089,106 +1096,6 @@ const DIY_EXCLUDED_NUMBER_PREFIXES = Object.freeze(['MH', 'RS', 'AM', 'PS', 'DD'
  * tier-5 row — with no module.
  */
 const DIY_PROTOTYPE_FALLBACK_SKILL = 2;
-
-const rarityOf = (char) => Number(String(char?.rarity).replace('TIER_', '')) || null;
-const statusCmp = (a, b) => a.phase - b.phase || a.level - b.level || a.skillLevel - b.skillLevel || a.equipLevel - b.equipLevel;
-
-/**
- * The character part of a data/backups.json unit (DATA.md §18): who it is, its art ids (the elite form uses the E2 art
- * when it exists, as a chess does) and its module names (a composed record's `module` names the module on the normal
- * form too, where no module phase is built).
- */
-function buildUnitHead(ctx, charId) {
-  const { charTable, uniequip } = ctx;
-  const char = charTable[charId];
-  const moduleNames = {};
-  for (const id of uniequip.charEquip?.[charId] || []) {
-    const meta = uniequip.equipDict?.[id];
-    if (meta) moduleNames[id] = { name: meta.uniEquipName || null, typeName: `${meta.typeName1 || ''}${meta.typeName2 ? '-' + meta.typeName2 : ''}` };
-  }
-  return {
-    charId, name: char.name, appellation: char.appellation, rarity: rarityOf(char), profession: char.profession,
-    subProfessionId: char.subProfessionId, subProfessionName: uniequip.subProfDict?.[char.subProfessionId]?.subProfessionName || null,
-    position: char.position, nationId: char.nationId || null, isNotObtainable: !!char.isNotObtainable,
-    assets: {
-      avatar: charId, avatarGolden: hasE2Art(ctx, charId, 'avatar') ? `${charId}_2` : charId,
-      portrait: `${charId}_1`, portraitGolden: `${charId}_${hasE2Art(ctx, charId, 'portrait') ? 2 : 1}`,
-      spine: charId, subProfIcon: `sub_${char.subProfessionId}_icon`,
-    },
-    moduleNames,
-  };
-}
-
-/**
- * A unit form (DATA.md §18): the character at one training status with nothing selected — the operator fields of a
- * chess record: stats / trait / talents without a module, every skill unlocked at the status at its skill level (the
- * trigger resolved per skill as for a chess), its summons, and at `equipLevel > 0` every ADVANCED module of that level.
- * The helpers and rules of buildChess; checkUnitFormParity proves the two agree on every PRESET chess.
- * @param {{ chessId?: string|null, skillIndex?: number|null }} [opts] `chessId`: the NORMAL chess id of a
- *   TRIGGER_DEVIATIONS entry (parity check only — a stand-in's form belongs to no chess: its deviations are the
- *   unit's, STANDIN_TRIGGER_DEVIATIONS by charId); `skillIndex`: a skill listed even when locked (buildChess always
- *   lists the default)
- */
-function buildUnitForm(ctx, charId, status, { chessId = null, skillIndex = null } = {}) {
-  const { charTable, uniequip, battleEquip } = ctx;
-  const char = charTable[charId];
-  const { phase, level, skillLevel, equipLevel } = status;
-  const label = chessId ? `chess ${chessId}` : `unit ${charId}@${statusKey(status)}`;
-  const attrs = withPotential(char, interpolateAttrs(char, phase, level), ctx.potRank, label);
-  if (!attrs) warn(`${label}: cannot interpolate attributes`);
-  const stats = statsFrom(attrs, {});
-  const rangeId = char.phases?.[phase]?.rangeId || null;
-  const base = traitRecord(ctx, char, phase, level, [], chessId || charId, ctx.potRank);
-  const skills = [];
-  (char.skills || []).forEach((se, i) => {
-    if (!se?.skillId || (i !== skillIndex && !unlocked(se.unlockCond, phase, level))) return;
-    const s = buildSkill(ctx, se.skillId, skillLevel, null, label);
-    if (!s) return;
-    s.trigger = resolveTrigger(ctx, char, charId, i, s, { operator: true, chessId, unitCharId: chessId ? null : charId, baseGrid: rangeGrid(ctx, rangeId) });
-    s.index = i;
-    s.overrideTokenKey = se.overrideTokenKey || null;
-    skills.push(s);
-  });
-  const talents = mergeTalentChanges(baseTalentList(ctx, char, phase, level, label, ctx.potRank), []);
-  const modules = [];
-  if (equipLevel > 0) {
-    for (const id of uniequip.charEquip?.[charId] || []) {
-      const meta = uniequip.equipDict?.[id];
-      if (!meta || meta.type === 'INITIAL') continue;
-      const ph = battleEquip[id]?.phases?.find((p) => p.equipLevel === equipLevel) || null;
-      if (!ph) { warn(`${label}: module ${id} has no level ${equipLevel} (not selectable)`); continue; }
-      const parts = splitModuleParts(ph);
-      const hasTraitPart = parts.op.some((pt) => bestCandidate(pt.overrideTraitDataBundle?.candidates, phase, level, ctx.potRank));
-      const tr = hasTraitPart ? traitRecord(ctx, char, phase, level, parts.op, chessId || charId, ctx.potRank) : null;
-      if (tr && JSON.stringify(tr.classify) !== JSON.stringify(base.classify)) warn(`${label}: module ${id} changes the combat classification (not applied by loadouts)`);
-      modules.push({
-        uniEquipId: id, name: meta.uniEquipName || null,
-        typeName: `${meta.typeName1 || ''}${meta.typeName2 ? '-' + meta.typeName2 : ''}`,
-        typeIcon: meta.typeIcon || null, icon: meta.uniEquipIcon || id, level: equipLevel,
-        attr: moduleAttr(ph),
-        traitOverride: tr ? tr.trait : null,
-        talentChanges: moduleTalentChanges(ctx, parts.op, phase, level, label, ctx.potRank),
-      });
-    }
-  }
-  // summons: every id the character lists or a skill / talent / module talent names that character_table has — the
-  // composed record keeps the ones its selection produces (shared/standIn.js composeUnitRecord)
-  const displayTokens = Object.keys(char.displayTokenDict || {});
-  const tokenIds = [...displayTokens, ...skills.map((s) => s.overrideTokenKey), ...talents.map((t) => t.tokenKey),
-    ...modules.flatMap((m) => m.talentChanges.map((t) => t.tokenKey))];
-  const form = {
-    status: { phase, level, skillLevel, equipLevel },
-    stats, immunities: stats ? immunitiesOf(attrs) : null,
-    rangeId, rangeGrid: rangeGrid(ctx, rangeId),
-    ...base.classify,
-    trait: base.trait,
-    skills, talents,
-    displayTokens,
-    tokens: [...new Set(tokenIds.filter((id) => id && charTable[id]))].sort(naturalCmp),
-  };
-  if (equipLevel > 0) form.modules = modules;
-  return form;
-}
 
 /**
  * data/backups.json (DATA.md §18; DESIGN 0.2.0 draft): the data of 补位 and 自选.
@@ -2856,6 +2763,38 @@ function buildStages(ctx, modesById) {
  * weighted entry per round, per-ACTION replacement counts computed at runtime by server/match/waves.js from
  * enemies.json `attrPower` / `beFactor`.
  */
+/** enemy_handbook_table `levelInfoList` stat → the enemies.json vocabulary (attackSpeed is the attack interval in s). */
+const HANDBOOK_STATS = Object.freeze({
+  maxHP: 'maxHp', attack: 'atk', def: 'def', magicRes: 'res', moveSpeed: 'moveSpeed', attackSpeed: 'interval',
+  enemyRes: 'elementRes', enemyDamageRes: 'elementDmgRes',
+});
+
+/**
+ * The enemy handbook's letter grades (enemy_handbook_table `levelInfoList`: ten grades E … SS) → factions.json
+ * `handbookLevels`, weakest first: per grade the official [min, max) of each stat (max null: open-ended). `interval`
+ * runs the other way (a shorter attack interval is the higher grade). The 敌方图鉴 (screens/sweep.js enemyGrade) grades
+ * a stat by the band its value falls in.
+ * @returns {{ level: string, [stat: string]: any }[]}
+ */
+function buildHandbookLevels(ctx) {
+  const list = ctx.handbook?.levelInfoList;
+  if (!Array.isArray(list) || !list.length) {
+    warn('enemy_handbook_table has no levelInfoList: factions.json handbookLevels is empty');
+    return [];
+  }
+  const out = list.map((l) => {
+    const rec = { level: l.classLevel };
+    for (const [src, key] of Object.entries(HANDBOOK_STATS)) {
+      const r = l[src];
+      if (!r || !Number.isFinite(r.min) || !Number.isFinite(r.max)) { warn(`enemy_handbook_table level ${l.classLevel}: no ${src} range`); continue; }
+      rec[key] = [r.min, r.max < 0 ? null : r.max];
+    }
+    return rec;
+  });
+  // the table lists SS first; ascending by the HP band's lower bound
+  return out.sort((a, b) => (a.maxHp?.[0] ?? 0) - (b.maxHp?.[0] ?? 0));
+}
+
 function buildFactions(ctx, enemies) {
   const { ac, act } = ctx;
   const c = ac.constData;
@@ -2907,6 +2846,7 @@ function buildFactions(ctx, enemies) {
   return {
     templateSlots: slotKey,
     types, entries,
+    handbookLevels: buildHandbookLevels(ctx),
     generation: {
       source: 'official client RandomEnemyGenerater (research 08 §2, decoded from the client; normative)',
       specialEnemyNum: c.specialEnemyNum ?? 3,
@@ -3440,6 +3380,21 @@ function enemyScaleFor(table, type, difficulty, round, isHidden) {
 }
 
 /**
+ * 每日防卫目标 (act2autochess constData dailyMission*): earn `need` 卫戍认证 in a day and the settlement adds `bonus`
+ * more, once a day; the day turns over at `resetHour`. The bonus and the hour are only in the rule text
+ * (「…即可在结算时领取【卫戍认证】x300的额外奖励。*奖励每日一次，每天04:00重置」), so they are read from it.
+ * @param {any} c constData @returns {{name:string, need:number, bonus:number, resetHour:number, rule:string}|null}
+ */
+function dailyMission(c) {
+  if (!c?.dailyMissionParam) return null;
+  const rule = stripRich(c.dailyMissionRule || '');
+  const awards = [...String(c.dailyMissionRule || '').matchAll(/<@acdm\.award>(\d+)<\/>/g)].map((m) => Number(m[1]));
+  const reset = /(\d{1,2}):\d{2}\s*重置/.exec(rule);
+  if (awards.length < 2 || !reset) warn('config: dailyMissionRule no longer names the bonus / the reset hour');
+  return { name: c.dailyMissionName || null, need: c.dailyMissionParam, bonus: awards[1] ?? 0, resetHour: reset ? Number(reset[1]) : 4, rule };
+}
+
+/**
  * Build data/config.json: modes (rounds, timers, shop, enemy scaling), economy, bans, timers,
  * titles, tips, broadcasts, trophies and other global tunables.
  */
@@ -3613,6 +3568,10 @@ function buildConfig(ctx, waves, stages, bands) {
       baseByRoundsPassed: (Array.isArray(act.baseRewardDataList) ? act.baseRewardDataList : Object.values(act.baseRewardDataList || {})).map((r) => ({ round: r.round, count: r.item?.count ?? 0, dailyPoint: r.dailyMissionPoint ?? 0 })),
       formula: 'baseByRoundsPassed[roundsPassed].count * difficultyFactor[difficulty] * modeFactor[type]',
       difficultyFactor: act.difficultyFactorInfo, modeFactor: act.modeFactorInfo,
+      // the 功勋 levels: the 卫戍认证 earned in all, level by level (milestoneList tokenNum, cumulative)
+      milestones: (Array.isArray(act.milestoneList) ? act.milestoneList : Object.values(act.milestoneList || {}))
+        .map((m) => ({ level: m.milestoneLvl, tokens: m.tokenNum })).sort((a, b) => a.level - b.level),
+      daily: dailyMission(act.constData),
     },
     constants: {
       maxLevelCnt: ac.constData?.maxLevelCnt ?? 15, bossTrailerStartRound: ac.constData?.bossTrailerStartRound ?? 3,

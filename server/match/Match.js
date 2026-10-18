@@ -1,3 +1,34 @@
+import { ruleOption } from '../../shared/plugins/rules.js';
+import { MatchOffers as UpstreamFallback18 } from './match/offers.js';
+import { MatchTestCommands as UpstreamFallback17 } from './match/testCommands.js';
+import { MatchSettle as UpstreamFallback16 } from './match/settle.js';
+import { MatchBoss as UpstreamFallback15 } from './match/bossRounds.js';
+import { MatchUnite as UpstreamFallback14 } from './match/unitePhase.js';
+import { MatchReports as UpstreamFallback13 } from './match/reports.js';
+import { MatchClientCombat as UpstreamFallback12 } from './match/clientCombat.js';
+import { MatchCombat as UpstreamFallback11 } from './match/combat.js';
+import { MatchPrep as UpstreamFallback10 } from './match/prep.js';
+import { MatchSpDraft as UpstreamFallback9 } from './match/spDraft.js';
+import { MatchSetupVote as UpstreamFallback8 } from './match/setupVote.js';
+import { MatchPhases as UpstreamFallback7 } from './match/phases.js';
+import { MatchPause as UpstreamFallback6 } from './match/pause.js';
+import { MatchIntents as UpstreamFallback5 } from './match/intents.js';
+import { MatchWatch as UpstreamFallback4 } from './match/watch.js';
+import { MatchViews as UpstreamFallback3 } from './match/views.js';
+import { MatchMessaging as UpstreamFallback2 } from './match/messaging.js';
+import { MatchInfra as UpstreamFallback1 } from './match/infra.js';
+import { MatchPlatform as UpstreamFallback0 } from './match/platform.js';
+function auditClock(at, startedAt) {
+  const stamp = Number(at);
+  const start = Number(startedAt);
+  if (!Number.isFinite(stamp) || !Number.isFinite(start)) return 0;
+  return Math.max(0, stamp - start);
+}
+import { TEST_PUBLIC_LOG } from '../../shared/testMode.js';
+import { requiresTraitLayerAuthority } from './operatorTraits.js';
+import {MatchOffers} from './match/offers.js';
+import {MatchTestCommands} from './match/testCommands.js';
+import {testSlice,installTestTrace} from './testTrace.js';
 
 import {MatchRehearsal as MergeMatch0} from './match/rehearsal.js';
 import {MatchSetupVote as MergeMatch1} from './match/setupVote.js';
@@ -299,6 +330,27 @@ export class Match {
     this.vs = isContentHash(opts.vs) ? opts.vs : null;
     /** a room with gameplay plugins (opts.requireCs): a client result must name this match's cs (reports.js) */
     this.requireCs = opts.requireCs === true && !!this.cs;
+    // [ASSUMED] Only an array is a content list. Omitting the key (every vanilla match) leaves setDiy on KITTED_CHARS.
+    // A copy so a caller's freeze or later mutation cannot change the check, and so the key stays off public views.
+    if (Array.isArray(opts.kitted)) this.diyKitted = Object.freeze(opts.kitted.filter((id) => typeof id === 'string'));
+    // The room's rule switches (DESIGN §34.15). Omitted on a vanilla match, so its own keys stay the same.
+    if (opts.rules && typeof opts.rules === 'object' && !Array.isArray(opts.rules)) this.rules = Object.freeze({ ...opts.rules });
+    /**
+     * The interaction windows this match's content set declares (PLUGIN API v2, docs/PLUGINS.md §10b): the normalized
+     * `offers` of the plugins the host installed, handed in as `opts.offers` before construction so test journals
+     * and both host transports capture the same declaration snapshot. `[]` for every match whose set declares none, and then
+     * no window code ever runs (MatchOffers.openOfferWindow returns before it touches the phase).
+     * @type {object[]}
+     */
+    this.offers = Array.isArray(opts.offers) ? opts.offers : [];
+    /** @type {any[]} the windows open right now (MatchOffers) */
+    this.offerWin = [];
+    /** @type {Map<object, any>} window → its deadline timer (tracked so dispose cancels it) */
+    this._offerTimers = new Map();
+    /** what runs once the last open window closes (a held-back round start / prep) */
+    this._offerResume = null;
+    /** window sequence (diagnostics and messages) */
+    this.offerSeq = 0;
     this.gd = new GameData(this.data, this.modeId);
     if (!this.difficulty) this.difficulty = this.gd.difficulty;
     this.isSolo = this.mode === 'solo' || this.gd.isSolo;
@@ -324,6 +376,33 @@ export class Match {
     this.botRehearsalDelegateMs = Number.isFinite(opts.botRehearsalDelegateMs) && opts.botRehearsalDelegateMs > 0 ? opts.botRehearsalDelegateMs : REHEARSAL_ANSWER_MS;
     /** the room's current host (opts.hostId; server/lobby.js room.hostId — setHost follows a migration) */
     this.hostId = typeof opts.hostId === 'string' ? opts.hostId : null;
+    /**
+     * Match test mode (DESIGN §34.8 phase 2). opts.test is only forwarded for a room created with the flag.
+     * The extra state exists only then, and public / result views omit the keys while this is false, so a
+     * normal match stays byte-identical.
+     */
+    this.test = opts.test === true;
+    if (this.test) {
+      /** phase deadlines are armed. false holds the callback (g.test timers) instead of scaling time to 0. */
+      this.testTimers = true;
+      /** successful g.test commands this match (m.result.testActions) */
+      this.testActions = 0;
+      /** @type {{ seq: number, playerId: string, cmd: string, args: object, at: number, ok: boolean, code?: string }[]} */
+      this.testLog = [];
+      /** @type {Map<string, number[]>} command → scheduler timestamps inside the rate window */
+      this._testRate = new Map();
+      this._testSeq = 0;
+      /** the phase callback held while testTimers is false */
+      this._testHeld = null;
+      /** the last callback setDeadline armed, so timers can be turned off mid-phase */
+      this._testArmed = null;
+      /** false once the input journal stops logging (the replay decoder's line cap) */
+      this.testReplayable = true;
+      /** replay: stop a sliced callback after this many steps; null while recording */
+      this._testSliceBudget = null;
+      /** steps taken by the timer callback now running (the journal's `steps`) */
+      this._testSliceCount = 0;
+    }
     /** @type {Map<string, { id: string, job: any, executor: string, timer: any }>} delegated rehearsals in flight */
     this._rehearsalTasks = new Map();
     this._rehearsalSeq = 0;
@@ -405,6 +484,8 @@ export class Match {
     this.bannedChess = bans.banned;
     this.pool = new SharedPool(this.gd, { banned: bans.banned });
     this.itemPool = new SharedItemPool(this.gd, () => this.order);
+    const off = new Set([...bans.drawn, ...bans.staticOff]);
+    for (const ps of this.order) ps.initDiyStock(off);
 
     this.phase = PHASE.LOBBY;
     this.round = 0;
@@ -464,6 +545,10 @@ export class Match {
     this.hiddenReached = false;
     this.outcome = null;
     this._turnToken = 0;
+    // [ASSUMED] A real scheduler keeps the 8 ms bot and headless slices, including a test match,
+    // so one callback cannot run to HARD_CAP_SECONDS. Virtual time stays unbounded (the defaults
+    // above). The input journal records the steps that callback took; replay stops there.
+    if (this.test && opts.journal !== false) installTestTrace(this, opts);
   }
 
   // ===================================================================================================
@@ -493,7 +578,7 @@ export class Match {
     const ps = this.players.get(playerId) || this.spectators.get(playerId);
     if (!ps || ps.isBot || ps.left) return fail(ERR.NOT_IN_ROOM);
     // a spectator seat only watches (the platform routes nothing else of it)
-    if (ps.spectator && (!msg || msg.t !== 'g.watch')) return fail(ERR.SPECTATOR);
+    if (ps.spectator && (!msg || (msg.t !== 'g.watch' && !(this.test && msg.t === 'g.test')))) return fail(ERR.SPECTATOR);
     if (this.disposed || this.ended) {
       // A report that crossed the match end (the last b.progress of a field, a delegated rehearsal's answer) is stale:
       // ignored, never an error (DESIGN §14 — an error frame without a rid would surface as a toast in the browser).
@@ -524,11 +609,21 @@ export class Match {
   setLoadout(playerId, loadout, ops = undefined) {
     const ps = this.players.get(playerId);
     if (!ps || ps.isBot || ps.left) return fail(ERR.NOT_IN_ROOM);
-    if (this.disposed || this.ended || ![PHASE.INFO_CHECK,PHASE.BAND_DRAFT].includes(this.phase)) return fail(ERR.WRONG_PHASE, 'loadout locked for this match');
+    const prep = this.phase === PHASE.PREP && ruleOption(this.rules, 'prepLoadout') === 'prep';
+    if (prep && ps.ready) return fail(ERR.WRONG_PHASE, 'loadout locked for this match');
+    if (this.disposed || this.ended || (!prep && ![PHASE.INFO_CHECK,PHASE.BAND_DRAFT].includes(this.phase))) return fail(ERR.WRONG_PHASE, 'loadout locked for this match');
     let res = OK;
     this.guard(() => {
-      if (!ps.setLoadout(loadout, ops)) { res = fail(ERR.BAD_TARGET, 'loadout does not match the game data'); return; }
+      const before = prep ? ps.allChess().map(owner => ({ owner, loadout: ps.loadoutFor(ps.gd.chess(owner.id)) })) : [];
+      if (!ps.setLoadout(loadout, ops, prep ? { merge: true } : undefined)) { res = fail(ERR.BAD_TARGET, 'loadout does not match the game data'); return; }
       this.markPrivate(ps);
+      if (prep) {
+        for (const { owner, loadout: previous } of before) {
+          const next = ps.loadoutFor(ps.gd.chess(owner.id));
+          if (['skillIndex','moduleId','potential','cultivate'].some(key => previous[key] !== next[key])) ps._reconcileTokensFor(owner);
+        }
+        ps.recompute();
+      }
       this.markPublic(); // selected recruits are also part of the public roster
     });
     return res;
@@ -689,6 +784,7 @@ export class Match {
     }
     ps.lp = 0;
     ps.eliminate(passedRound);
+    this.offersChanged();
     this.tickerText(`${ps.name}博士中途退出了模拟`, FLOW_TICKER_PRIORITY);
     if (this.bossWaves && (phase === PHASE.ROUND_START || phase === PHASE.SP_DRAFT || phase === PHASE.PREP)) {
       // before the boss fight: pair the players left again (the prep preview shows the new partner / template); a
@@ -764,10 +860,27 @@ export class Match {
   setDeadline(seconds, fn, { silent = false } = {}) {
     this.cancel(this._phaseTimer);
     this._phaseTimer = null;
-    if (!(seconds > 0) || typeof fn !== 'function') { this.deadline = 0; return; }
+    if (this.test === true) { this._testHeld = null; this._testArmed = null; }
+    // Test matches can hold the callback (g.test timers off). A normal match never enters this branch:
+    // scaling the delay to 0 would fire it at once, and cancelling it without keeping fn would stick
+    // a phase whose only advance is this timer (BATTLE_CHECK → startRound). [ASSUMED] re-arm uses the
+    // original duration, not the leftover.
+    if (this.test === true && this.testTimers === false && seconds > 0 && typeof fn === 'function') {
+      this.deadline = 0;
+      const held = { seconds, fn, silent: !!silent };
+      this._testHeld = held;
+      this._testArmed = held;
+      return;
+    }
+    if (!(seconds > 0) || typeof fn !== 'function') {
+      this.deadline = 0;
+      if (this.test === true) { this._testHeld = null; this._testArmed = null; }
+      return;
+    }
     const ms = this.scaled(seconds * 1000);
     this.deadline = silent ? 0 : this.sched.now() + ms;
-    this._phaseTimer = this.later(ms, () => { this._phaseTimer = null; fn(); });
+    this._phaseTimer = this.later(ms, () => { this._phaseTimer = null; if (this.test === true) { this._testArmed = null; this._testHeld = null; } fn(); });
+    if (this.test === true) this._testArmed = { seconds, fn, silent: !!silent };
   }
 
   /**
@@ -972,6 +1085,7 @@ export class Match {
   publicView() {
     const v = {
       t: 'm.public',
+      gameSpeed: this.gameSpeed,
       phase: this.phase,
       round: this.round,
       lastRound: this.gd.lastRound,
@@ -1029,7 +1143,7 @@ export class Match {
         const v = { fieldId: f.fieldId, kind: f.kind, players: f.players.slice(), live: !!f.live, endVotes:[...(f.endVotes || this._endBattleVotes || [])] };
         const pr = this._fieldProgress(f);
         if (pr) v.progress = pr;
-        return v;
+    return v;
       }),
     };
     if (this.teamLp != null) v.teamLp = Math.max(0, Math.round(this.teamLp));
@@ -1051,6 +1165,7 @@ export class Match {
         turnSeconds: d.untimed ? 0 : this.bandTurnMs() / 1000, untimed: !!d.untimed,
       };
     }
+    if (this.offers.length) v.offers = this.offerViews();
     if(this.augments.enabled)v.augments=this.augments.publicView();
     if (this.phase === PHASE.SP_DRAFT && this.sp) {
       const s = this.sp;
@@ -1060,6 +1175,20 @@ export class Match {
       };
     }
     if (this.phase === PHASE.UNITE && this.unitePlan) v.unite = { helpers: this.unitePlan.helpers.map((p) => p.playerId), leakers: this.unitePlan.leakers.map((p) => p.playerId) };
+if (this.test === true) {
+      v.test = true;
+      v.testActions = this.testActions | 0;
+      v.testTimers = this.testTimers !== false;
+      const log = Array.isArray(this.testLog) ? this.testLog : [];
+      v.testLog = log.slice(-TEST_PUBLIC_LOG).map((e) => ({
+        seq: e.seq, playerId: e.playerId, cmd: e.cmd, args: e.args,
+        // The stored row keeps the scheduler epoch. The dock clock is time since this match started.
+        at: auditClock(e.at, this.startedAt),
+        ok: e.ok === true,
+        ...(e.code ? { code: e.code } : {}),
+        ...(e.detail ? { detail: e.detail } : {}),
+      }));
+    }
     return v;
   }
 
@@ -1247,6 +1376,10 @@ export class Match {
       case 'g.bandSkip': return this.skipBand(ps);
       // the strategy highlighted in the draft screen (what a timed-out turn takes, timeoutBand)
       case 'g.bandFocus': return this.bandFocus(ps, msg.bandId ?? null);
+      case 'g.test': return this.applyTestCommand(ps, msg);
+      case 'g.offer': return this.requestOffer(ps,msg.offerId,msg.idx,msg);
+      case 'g.offerRefresh': return this.requestOfferRefresh(ps,msg.offerId,msg.idx,msg);
+      case 'g.unequip': return ps.unequip(msg.itemUid);
       case 'g.buy': return ps.buy(msg.slot);
       case 'g.refresh': return ps.refresh();
       case 'g.freeze': return ps.freeze();
@@ -1430,6 +1563,7 @@ export class Match {
   setAutoplay(ps, on) {
     if (ps.autoplay === on) return OK;
     ps.autoplay = on;
+    this.offersChanged();
     this.markPublic();
     if (on) this.kickBot(ps);
     return OK;
@@ -1620,6 +1754,7 @@ export class Match {
     const d = this.draft;
     this.cancel(this._turnTimer);
     this._turnTimer = null;
+    if (this.test) this.setDeadline(0);
     while (d.idx < d.order.length && d.picks[d.order[d.idx]]) d.idx++; // loop-cap: draft order
     if (d.idx >= d.order.length) {
       d.turnDeadline = 0;
@@ -1633,11 +1768,13 @@ export class Match {
       d.turnDeadline = this.sched.now() + ms;
       // the step's countdown IS the turn's (one number everywhere)
       this.deadline = d.turnDeadline;
-      this._turnTimer = this.later(ms, () => {
+      const expire = () => {
         if (this.phase !== PHASE.BAND_DRAFT || token !== this._turnToken) return;
         const pid = this.draftTurn();
         if (pid) this._applyBand(this.players.get(pid), this.timeoutBand(pid));
-      });
+      };
+      if (this.test) { this.setDeadline(ms / 1000 / (this.timerScale || 1), expire); d.turnDeadline = this.deadline; }
+      else this._turnTimer = this.later(ms, expire);
     } else {
       d.turnDeadline = 0;
       this.deadline = 0;
@@ -1797,7 +1934,7 @@ export class Match {
     this.markPublic();
   }
 
-  startRound(r) {
+  _startRoundAfterOffers(r) {
     if(this.gd.config.customRules?.sharedHp && this.teamLp==null){
       const players=this.alivePlayers();this.teamLp=players.reduce((n,p)=>n+Math.max(0,p.lp),0);
       for(const ps of players)ps.lpAtFinal=Math.max(0,ps.lp);
@@ -1858,7 +1995,7 @@ export class Match {
   afterRoundStart() {
     if(this.augments.enter())return;
     if (this.gd.spRounds().includes(this.round)) this.enterSpDraft();
-    else this.enterPrep();
+    else this.beforePrepOffers();
   }
 
   // ===================================================================================================
@@ -1867,7 +2004,7 @@ export class Match {
   enterSpDraft() {
     const draft = generateDraft(this.gd, this.rngDraft, this.round, { stageId: this.stageId, bondAvailable: (bondId) => this.bondLive(bondId), itemAvailable: id => this.itemPool.canGain(id) });
     const alive = this.alivePlayers();
-    if (!draft || !alive.length) { this.enterPrep(); return; }
+    if (!draft || !alive.length) { this.beforePrepOffers(); return; }
     this.phase = PHASE.SP_DRAFT;
     let order = alive.map((p) => p.playerId);
     if (!this.isSolo) this.rngDraft.shuffle(order);
@@ -1965,7 +2102,7 @@ export class Match {
     if (this.phase !== PHASE.SP_DRAFT) return;
     this.cancel(this._turnTimer);
     this._turnTimer = null;
-    this.enterPrep();
+    this.beforePrepOffers();
   }
 
   addBounty(ps, card) {
@@ -1983,10 +2120,12 @@ export class Match {
   }
 
   /** Random item id: a choices.json server pool ({ pool }), a tier, or ≤ maxTier shop-eligible items. */
-  rollItemId({ pool = null, tier = null, maxTier = 6, shopLevel = 6 } = {}) {
+  rollItemId({ pool = null, tier = null, maxTier = 6, shopLevel = 6, exclude = [] } = {}) {
     const pools = this.gd.choices.pools && typeof this.gd.choices.pools === 'object' ? this.gd.choices.pools : {};
     const p = typeof pool === 'string' && Object.hasOwn(pools, pool) ? pools[pool] : null;
     const rng = this.rngMeta;
+    const excluded = new Set([...exclude, ...(Array.isArray(p?.excluded) ? p.excluded : [])]);
+    const pick = (ids, weights = null) => this.itemPool.pick(rng, ids.filter(id => !excluded.has(id)), weights);
     const tierList = (lo, hi) => { const out = []; for (let t = lo; t <= hi; t++) for (const id of this.gd.shopItemsByTier[t] || []) out.push(id); return out; };
     const also = p && Array.isArray(p.also) ? p.also.filter((id) => typeof id === 'string' && this.gd.item(id)) : [];
     const withAlso = (list) => {
@@ -1998,20 +2137,19 @@ export class Match {
       if (Array.isArray(p.weighted) && p.weighted.length) {
         const pairs = p.weighted.filter((x) => Array.isArray(x) && this.gd.item(x[0]) && this.itemPool.canGain(x[0]));
         for (const id of also) if (!pairs.some((x) => x[0] === id)) pairs.push([id, 1]);
-        return this.itemPool.pick(rng, pairs.map(x => x[0]), new Map(pairs));
+        return pick(pairs.map(x => x[0]), new Map(pairs));
       }
       if (Array.isArray(p.items) && p.items.length) {
         const items = p.items.filter((id) => this.gd.item(id));
-        return this.itemPool.pick(rng, withAlso(items));
+        return pick(withAlso(items));
       }
       let list;
       if (Array.isArray(p.tiers) && p.tiers.length) list = p.tiers.flatMap((t) => this.gd.shopItemsByTier[t] || []);
       else list = tierList(1, p.maxTier === 'shopLevel' ? Math.max(1, Math.min(6, shopLevel)) : 6);
-      if (Array.isArray(p.excluded)) list = list.filter(id => !p.excluded.includes(id));
-      return this.itemPool.pick(rng, withAlso(list));
+      return pick(withAlso(list));
     }
     const list = Number.isInteger(tier) ? tierList(tier, tier) : tierList(1, Math.max(1, Math.min(6, maxTier)));
-    return this.itemPool.pick(rng, list);
+    return pick(list);
   }
 
   /**
@@ -2020,13 +2158,13 @@ export class Match {
    * pool filtered by `tier` / `minTier` / `maxTier` (number or 'shopLevel') / `bond`; `golden: true` yields the elite id.
    * @returns {{ kind: 'item'|'chess', id: string, golden?: boolean } | null}
    */
-  rollPool(poolId, { shopLevel = 6, playerId = null, allowInactiveBond = false } = {}) {
+  rollPool(poolId, { shopLevel = 6, playerId = null, allowInactiveBond = false, extra = null, chessOf = null, exclude = [] } = {}) {
     const pools = this.gd.choices.pools && typeof this.gd.choices.pools === 'object' ? this.gd.choices.pools : {};
     const p = typeof poolId === 'string' && Object.hasOwn(pools, poolId) ? pools[poolId] : null;
     if (!p || typeof p !== 'object') return null;
     const lvl = Math.max(1, Math.min(6, Number.isInteger(shopLevel) ? shopLevel : 6));
     if (p.kind === 'equip') {
-      const id = this.rollItemId({ pool: poolId, shopLevel: lvl });
+      const id = this.rollItemId({ pool: poolId, shopLevel: lvl, exclude });
       return id ? { kind: 'item', id } : null;
     }
     if (p.kind !== 'chess') return null;
@@ -2034,6 +2172,7 @@ export class Match {
     const rng = this.rngMeta;
     const owner = this.players.get(playerId);
     const pool = owner?.pool ?? this.pool;
+    const recOf = typeof chessOf === 'function' ? chessOf : (id) => owner?.gd.chess(id) ?? this.gd.chess(id);
     const free = (id) => {
       if (typeof id !== 'string' || !this.gd.chess(id)) return false;
       if (this.gd.chess(id).optionalRecruit && !this.players.get(playerId)?.canRecruit(id)) return false;
@@ -2055,7 +2194,8 @@ export class Match {
       id = (owner?.pool ?? this.pool).roll(rng, {
         tier: Number.isInteger(p.tier) ? p.tier : null,
         maxTier,
-        filter: (cid, e) => free(cid) && e.tier >= minTier && (!bond || (Array.isArray(this.gd.chess(cid)?.bonds) && this.gd.chess(cid).bonds.includes(bond))),
+        filter: (cid, e) => free(cid) && e.tier >= minTier && (!bond || (Array.isArray(recOf(cid)?.bonds) && recOf(cid).bonds.includes(bond))),
+        extra,
       });
     }
     if (!id) return null;
@@ -2104,12 +2244,17 @@ export class Match {
     const valid = () => this.phase === PHASE.PREP && this.round === round && ps.alive && !ps.ready && ps.botControlled && ps._botPrepToken === token;
     const bounded = Number.isFinite(this.botSliceMs);
     const now = () => (typeof performance !== 'undefined' ? performance.now() : Date.now());
+    // Test replay ignores the wall clock and stops after the journalled step count (testSlice).
+    const sliceCtl = testSlice(this);
     /** Step a generator until done or the slice budget is used; `then(value)` once it is done (null on an error). */
     const drive = (gen, label, then) => {
       const t0 = now();
       let r = null;
       try {
-        do r = gen.next(); while (!r.done && !(bounded && now() - t0 >= this.botSliceMs)); // loop-cap: generator and the bot time slice
+        do {
+          r = gen.next();
+          if (sliceCtl) sliceCtl.note(1);
+        } while (!r.done && !(sliceCtl ? sliceCtl.wall(now() - t0, this.botSliceMs) : (bounded && now() - t0 >= this.botSliceMs))); // loop-cap: generator and the bot time slice
       } catch (e) {
         this.reportError(`bot ${ps.playerId}${label}`, e);
         then(null);
@@ -2141,7 +2286,7 @@ export class Match {
       const slice = () => {
         if (!valid()) return;
         let done = true;
-        try { done = job.run(this.botSliceMs); } catch (e) { this.reportError(`bot ${ps.playerId} rehearsal`, e); }
+        try { done = job.run(this.botSliceMs, sliceCtl); } catch (e) { this.reportError(`bot ${ps.playerId} rehearsal`, e); }
         if (done) finish(job);
         else this.later(0, slice);
       };
@@ -2375,7 +2520,7 @@ export class Match {
     if (this.clientCombat) { this._startUniteClient(plan); return; }
     this.phase = PHASE.UNITE;
     this.unitePlan = plan;
-    const limit = (this.wave ? this.wave.timeLimit : 60) * (this.mode === 'coop8' ? 4 : 1);
+    const limit = (this.wave ? this.wave.timeLimit : 60) * (this.mode === 'coop8' && !this.gd.config.customRules?.normalBattleTime ? 4 : 1);
     const battle = this.newBattle(this._uniteOpts(plan, limit));
     this.fields = [{ fieldId: 'u', kind: 'unite', players: plan.helpers.map((p) => p.playerId), battle, live: true }];
     this.deadline = this.sched.instant ? 0 : this.sched.now() + Math.round((limit / this.gameSpeed) * 1000);
@@ -2449,7 +2594,7 @@ export class Match {
     const seq = `${this.battlePrefix}.${this.round}.${++this._battleSeq}`;
     // protocol ids are ≤ 64 chars (shared/protocol.js isId): the field id is informational, the sequence is unique
     const battleId = seq.length + 1 + String(fieldId).length <= 64 ? `${seq}.${fieldId}` : seq;
-    const spec = buildBattleSpec({ ...opts, flags: {...opts.flags, ...(this.augments.enabled?{augments:this.augments.battleState()}:{}), customFactions:this.customFactions,customExtensions:this.customExtensions}, battleId, fieldId, kind, content: this.battleContent, boss, cs:this.cs, vs:this.vs });
+    const spec = buildBattleSpec({ ...opts, flags: {...opts.flags, ...(this.augments.enabled?{augments:this.augments.battleState()}:{}), customFactions:this.customFactions,customExtensions:this.customExtensions}, battleId, fieldId, kind, content: this.battleContent, boss, morphPairing: ruleOption(this.rules, 'morphPairing'), cs:this.cs, vs:this.vs });
     let total = 0;
     for (const x of spec.spawns) if (x && x.tag !== 'boss' && x.tag !== 'part' && x.countInTotal !== false) total += Math.max(1, Math.floor(Number(x.count) || 1));
     return {
@@ -2609,6 +2754,7 @@ export class Match {
 
   /** The connected human who simulates a field: lowest seat among its players (normal: the owner). */
   _authorityFor(f, exclude = null) {
+    if (requiresTraitLayerAuthority(f.spec, this.gd)) return null;
     let best = null;
     for (const pid of f.players) {
       if (pid === exclude || (f.demoted && f.demoted.has(pid))) continue;
@@ -2741,8 +2887,9 @@ export class Match {
       f.endGt = Number(run.battle.time) || 0;
       this._armRelease(f);
     };
+    const sliceCtl = testSlice(this);
     if (!Number.isFinite(this.headlessSliceMs)) {
-      job.run(Infinity);
+      job.run(Infinity, undefined, sliceCtl);
       complete();
     } else {
       // a real host: wall-clock-bounded slices in callbacks of their own (3 bot fields at combat start would otherwise
@@ -2750,7 +2897,7 @@ export class Match {
       const slice = () => {
         f.sliceTimer = null;
         if (f.job !== job || f.done) return;
-        if (job.run(this.headlessSliceMs)) complete();
+        if (job.run(this.headlessSliceMs, undefined, sliceCtl)) complete();
         else f.sliceTimer = this.later(0, slice);
       };
       f.sliceTimer = this.later(0, slice);
@@ -2835,7 +2982,7 @@ export class Match {
   _startUniteClient(plan) {
     this.phase = PHASE.UNITE;
     this.unitePlan = plan;
-    const limit = (this.wave ? this.wave.timeLimit : 60) * (this.mode === 'coop8' ? 4 : 1);
+    const limit = (this.wave ? this.wave.timeLimit : 60) * (this.mode === 'coop8' && !this.gd.config.customRules?.normalBattleTime ? 4 : 1);
     const f = this._ccField({ fieldId: 'u', kind: 'unite', players: plan.helpers.map((p) => p.playerId), opts: this._uniteOpts(plan, limit) });
     this.deadline = this.sched.instant ? 0 : this.sched.now() + Math.round((limit / this.gameSpeed) * 1000);
     this.watchers.clear();
@@ -3498,7 +3645,7 @@ export class Match {
     this.overtimeApplied = 0;
     // HUD: the boss level's countdown (maxPlayTime, 120 real s — the battle goes on past it) and the moment the
     // overtime drain starts (150 real s), both on the field clock
-    const onClock = (realS) => this.sched.now() + Math.round(((realS * this.gd.bossTimeScale) / this.gameSpeed) * 1000);
+    const onClock = (realS) => this.sched.now() + Math.round((realS / this.gameSpeed) * 1000);
     const levelTime = this.gd.bossLevelTime(this.round);
     const team = this.order.filter(p => !p.left);
     this.bossOvertimeStartReal = team.length > 1 && team.some(p => p.isBot)
@@ -3671,6 +3818,8 @@ export class Match {
   // RESULT
 
   finish({ victory, hiddenCleared = false, reason = 'defeat' }) {
+    if (this.test && this._testApplying) { this._testOutcome = { victory, hiddenCleared, reason }; return; }
+    this.offersDispose();
     if (this.ended || this.disposed) return;
     this.ended = true;
     if (this.runner) { try { this.runner.stop(); } catch { /* ignore */ } this.runner = null; }
@@ -3761,4 +3910,6 @@ export class Match {
 
 for(const key of Reflect.ownKeys(MatchSetupVote.prototype)){if(key!=='constructor')Object.defineProperty(Match.prototype,key,Object.getOwnPropertyDescriptor(MatchSetupVote.prototype,key));}
 
-for(const methods of [MergeMatch0,MergeMatch1,MergeMatch2,MergeMatch3])for(const key of Reflect.ownKeys(methods.prototype)){if(key!=='constructor'&&!Object.hasOwn(Match.prototype,key))Object.defineProperty(Match.prototype,key,Object.getOwnPropertyDescriptor(methods.prototype,key));}
+for(const methods of [MergeMatch0,MergeMatch1,MergeMatch2,MergeMatch3,MatchOffers,MatchTestCommands])for(const key of Reflect.ownKeys(methods.prototype)){if(key!=='constructor'&&!Object.hasOwn(Match.prototype,key))Object.defineProperty(Match.prototype,key,Object.getOwnPropertyDescriptor(methods.prototype,key));}
+
+for(const methods of [UpstreamFallback0,UpstreamFallback1,UpstreamFallback2,UpstreamFallback3,UpstreamFallback4,UpstreamFallback5,UpstreamFallback6,UpstreamFallback7,UpstreamFallback8,UpstreamFallback9,UpstreamFallback10,UpstreamFallback11,UpstreamFallback12,UpstreamFallback13,UpstreamFallback14,UpstreamFallback15,UpstreamFallback16,UpstreamFallback17,UpstreamFallback18])for(const key of Reflect.ownKeys(methods.prototype)){if(key!=='constructor'&&!Object.hasOwn(Match.prototype,key))Object.defineProperty(Match.prototype,key,Object.getOwnPropertyDescriptor(methods.prototype,key));}

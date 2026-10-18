@@ -47,7 +47,7 @@ export function installDroneBombardment(battle,u){
    const off=battle.on('tick',update);
    battle.after(flight,()=>{
     update();battle.off(off);
-    battle.fx('bombard',{x:aim.x,y:aim.y,id:u.id,r:DRONE_BLAST,kind:'emppnt'});
+    battle.fx('bombard',{x:aim.x,y:aim.y,id:u.id,shot,r:DRONE_BLAST,kind:'emppnt'});
     for(const e of battle.foesInRadius(aim.x,aim.y,DRONE_BLAST))if(e.alive&&!e.s.flags.untargetable&&!e.s.flags.sleep)battle.dealDamage(u,e,{amount:atk,type:'phys',isAttack:true,isSkill:false,isSplash:true,sourceless:true,tags:['ursus-shell']});
    });
   }

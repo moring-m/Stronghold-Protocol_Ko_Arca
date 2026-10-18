@@ -1,3 +1,4 @@
+import { bombardAnchor } from './bombardAnchor.js';
 // render/vfx/wiring.js — the battle's events → official effects, generated from index.json (DESIGN §33.12): every
 // unit's normal attack (its mode `Default`, or the mode its skill switches to while the skill is on — the skill plan's
 // `modeName`, else `S<n>` for skill n; a mode's facing variant for the unit's facing) casts its `cast` effects at their
@@ -39,12 +40,13 @@
 // 领主's ranged-kind 'atk' on the enemy it blocks is its Combat blow (`_combatKind`); a sim-melee attack whose official
 // ability shoots flies its projectile for show (蒂比: `attack`); a chain's line stays CHAIN_LINE_S (`chain`).
 
-import { spawnPoint, mountPoint, unitPoint, spawnKind, mountKind, spawnRotationKind, mountRotation } from './mounts.js';
+import { spawnPoint, mountPoint, unitPoint, spawnKind, mountKind, spawnRotation, mountRotation, graphicRotation } from './mounts.js';
 import { projectileParts, paracurve, arcHeight, wobble } from './flight.js';
 import { GROUND_SPAWNS } from './effect.js';
 import { SkillFx, fitsAttack, pickGroup, formMode } from './skillfx.js';
 import { TalentFx } from './talentfx.js';
 import { FunnelFx } from './funnelfx.js';
+import { YuWall, YU_WALL_SOURCE } from './yuwall.js';
 import { formModes } from './talents.js';
 import { shotOf } from './skills.js';
 import { UF } from '../../../../shared/constants.js';
@@ -83,6 +85,8 @@ const CHAIN_WINDOW = 0.5;
 const BLOCK_REACH = 0.75, BLOCK_REACH_AIR = 0.95;
 /** 'dmg' types of HP damage (shared/protocol.js; an element gauge fill names its element instead). */
 const HP_TYPES = new Set(['phys', 'arts', 'true']);
+/** The identity rotation: the root of a projectile's flying effect (the client parents it to the projectile's body). */
+const ID_ROT = Object.freeze([0, 0, 0, 1]);
 
 const lc = (k) => (typeof k === 'string' && k ? k.toLowerCase() : null);
 /** Torappu.SharedConsts.Direction order (a directional emitter row's `slots`). */
@@ -106,6 +110,31 @@ const BLOCKED_NODE = /(?:^|\/)Blocked[A-Z]\w*$/;
  * 'S2(LR)', 号角's 'S3(D)'): [1] the base name, [2] / [3] the facing.
  */
 const MODE_VARIANT = /^(.*?)(?:\[(down|d|up|u|lr)\]|\((down|d|up|u|lr)\))$/i;
+
+/**
+ * The 狼群's buffs its VigilWolfEffectEmitter rows are bound to (`buffKey`), by the pack's wolves as the snapshot gives
+ * them (b.snap `wolves` [left, max]: the view's `wolves`). The client plays such a row only while the owner holds that
+ * buff (VigilWolfCastEffectOptions.PlayEffect calls Entity.ContainsBuff — GameAssembly.dll of 2026-09-13). The
+ * 狼群领袖 talent's buffs (config/buff_template_holder.ab): every 狼影 beyond the pack itself is a
+ * `vigil_wolf_t_1_enhance[holder]` whose derived `…[damage]` adds the attack's extra hit (`…[born]` makes one at the
+ * deploy), and `…[trigger_override]` is created when the holders reach max_stack_cnt (2) and finished as soon as one is
+ * lost — the pack at its most. So `…[damage]` while 2 wolves or more stand (vigil_token_sub_attack_1), `…[trigger_override]`
+ * while all of them do (vigil_token_sub_attack_2) [ASSUMED: the sim's count is the pack's wolves, the client's holders
+ * plus one — its initial 2 is `[born]`'s holder, its 至多3只 max_stack_cnt 2 + 1].
+ */
+export const WOLF_BUFFS = Object.freeze({
+  'vigil_wolf_t_1_enhance[damage]': (left) => left >= 2,
+  'vigil_wolf_t_1_enhance[trigger_override]': (left, max) => left >= 2 && left >= max,
+});
+
+/** Whether a 狼群 view holds a buff of WOLF_BUFFS now (its `wolves` [left, max]); false for any other buff or view. */
+export function wolfHolds(v, buffKey) {
+  const f = WOLF_BUFFS[buffKey];
+  const w = v?.wolves;
+  if (!f || !Array.isArray(w) || w.length < 2) return false;
+  const left = Number(w[0]), max = Number(w[1]);
+  return Number.isFinite(left) && Number.isFinite(max) && f(left, max);
+}
 
 /** A deterministic 32-bit seed of a unit and its attack count (random picks of groups and sub-abilities: replayable). */
 export function seedOf(id, n) {
@@ -212,7 +241,9 @@ export class FxWiring {
     this.ofx = ofx;
     this.opts = opts;
     this.idx = null;
+    this.bombardAims = new Map();
     this.flights = new Set();     // projectile flights in the air
+    this.walls = new Set();       // skill-held Yu S3 controller handles
     this.loops = new Map();       // `${unitId}|${status}` → handle
     this.statusSeen = new Map();  // snapshot-driven status loops, including flag-only shields
     this.melee = new Map();       // target id → the waiting blow { hits, modeGroups?, groups?, buffs?, src, t, n, hitT, window, seed }
@@ -227,6 +258,7 @@ export class FxWiring {
     this.chains = new Map();      // target id → the chain an official shot opened on it { proj, rows, src, line, at, until }
     this.keyCache = new Map();    // unit id → index unit key | null
     this.attackN = new Map();     // unit id → attacks so far (onlyOnce / hookEffectAfterFirstAttack rows)
+    this.startedAttacks = new Map(); // explicit sim wind-ups whose cast FX already began
     this.castFrame = new Map();   // unit id → the frame of its last attack (several targets of one attack cast once)
     this.skills = new SkillFx(this);
     this.talents = new TalentFx(this);
@@ -234,6 +266,8 @@ export class FxWiring {
   }
 
   get index() { return this.idx; }
+
+  hasOfficialUnit(v) { return !!(this.idx && v && this.unitKeyOf(v)); }
 
   /** index.json, once. */
   async ready() {
@@ -250,6 +284,13 @@ export class FxWiring {
       k = null;
       // (a point on the ground — a kit fx's tile, SkillFx — has no info and no unit)
       const cands = this.opts.unitKey && v.info ? [].concat(this.opts.unitKey(v.info) || []) : [];
+      const rec = v.info ? this.opts.record?.(v.info) : null;
+      if (this.idx.pluginUnits?.[rec?.charId]) cands.unshift(this.idx.pluginUnits[rec.charId]);
+      if (rec?.fx?.unit) {
+        this.ofx.lib.notePluginUnit?.(rec.fx.unit);
+        // Explicit fx.unit uses exact keys only; the fallback art candidates below still accept suffixes.
+        if (Object.hasOwn(this.idx.units || {}, rec.fx.unit)) cands.unshift(rec.fx.unit);
+      }
       cands.push(v.info?.spine, v.info?.defId);
       for (const c of cands) {
         if (!c) continue;
@@ -489,6 +530,11 @@ export class FxWiring {
     if (v?.prep) return null;
     let k = lc(key);
     if (!k || !this.ofx.lib.has(k)) return null;
+    if (k === YU_WALL_SOURCE) {
+      const wall = new YuWall(this, v);
+      this.walls.add(wall);
+      return wall;
+    }
     let def = this.ofx.lib.def(k);
     if (def && def.switchable) {
       const alt = lc(this._variant(def.switchable, v, this.pose(v)));
@@ -500,22 +546,30 @@ export class FxWiring {
     const pose = this.pose(v);
     pose.strike = !!o.strike;
     let P = this._placing(def, def ? null : this.idx?.prefabs?.[k] || null, o);
+    // (a point on the ground — a kit fx's tile, a projectile's target tile — is a map position, no unit: the client's
+    // Effect._InitLocation sets no rotation, the prefab root keeps its own)
+    if (!v.info) P.loaded = false;
     const pos = P.fmp ? mountPoint(skin, P.fmp.mount, pose) : spawnPoint(skin, P.spawn, pose);
     // Aroma's directional streams are authored one tile behind their forward
     // range. Align their origin with the deployed facing; hit/buff points stay put.
     const originOffset = aromaOriginOffset(k, this._facing(v));
     pos[0]+=originOffset[0];pos[1]+=originOffset[1];
+    // Correct only the oversized slash artwork. start_02 contains range_line
+    // and the ground tiles: its footprint must retain the authored size.
+    const areaScale=/^blkkgt_skill_03_(?:start_01|end)$/.test(k)?0.5:1;
+    const effectScale=typeof o.scale==='function'?()=>o.scale()*areaScale:o.scale!=null?o.scale*areaScale:areaScale!==1?areaScale:undefined;
     const ground = (v.z || 0);
     if (P.onGround) pos[2] = -ground;
-    const place = { pos, groundZ: -ground, yaw: 0, mirror: false, flipY: false, mountRot: P.rotKind ? mountRotation(skin, P.rotKind, pose) : null };
+    const place = { pos, scale: typeof effectScale === 'function' ? effectScale() : effectScale, groundZ: -ground, yaw: 0, mirror: false, flipY: false, mountRot: null, rootRot: null };
+    this._rotate(P, place, skin, pose);
     this._orient(def, place, pose, o, v);
-    const opts = { track: o.track || null, data: o.data ?? null, loop: !!o.loop, important: !!o.important, skip: o.skip > 0 ? o.skip : 0, owner: v };
+    const opts = { track: o.track || null, data: o.data ?? null, loop: !!o.loop, important: !!o.important, skip: o.skip > 0 ? o.skip : 0, speed: o.speed, owner: v };
     // the owner each frame: FollowMountPoint keeps the effect on the unit's point (and its rotation), a held effect
     // moves with the unit (`keep`), FollowDirection turns it with the unit, PauseEffectIf hides it while the unit shows
     // a condition; a prefab with chained effects (OnPlayEmitter: system.js FxHandle._start hands them this track) has
     // one for them
     const stick = !!o.stick;
-    if (!o.track && (P.follow || P.keep || stick || !def || def.direction || def.pause || def.onPlay?.length)) {
+    if (!o.track && (typeof effectScale === 'function' || P.follow || P.keep || stick || !def || def.direction || def.pause || def.onPlay?.length)) {
       let d = def;
       const at0 = [pose.x, pose.y, pose.z], kept = new WeakMap(), chained = new Map();
       opts.track = (fx) => {
@@ -526,24 +580,35 @@ export class FxWiring {
             // loaded now: its own placement (a FollowOwner, `_keepOriginRotation`), and once the rotation and the
             // direction it takes at its spawn (a mount point's, FLIP_TWO_SIDE, towards the target)
             P = this._placing(d, null, o);
-            const pl = { yaw: fx.yaw, mirror: fx.mirror, flipY: fx.flipY, mountRot: P.rotKind ? mountRotation(skin, P.rotKind, pose) : null };
+            if (!v.info) P.loaded = false;
+            const pl = { yaw: fx.yaw, mirror: fx.mirror, flipY: fx.flipY, mountRot: null, rootRot: null };
+            this._rotate(P, pl, skin, pose);
             this._orient(d, pl, pose, o, v);
-            fx.yaw = pl.yaw; fx.mirror = pl.mirror; fx.flipY = pl.flipY; fx.mountRot = pl.mountRot;
+            fx.yaw = pl.yaw; fx.mirror = pl.mirror; fx.flipY = pl.flipY; fx.mountRot = pl.mountRot; fx.rootRot = pl.rootRot;
           }
         }
+        if(typeof effectScale === 'function'){const scale=effectScale();if(Number.isFinite(scale)&&scale>0)fx.rootScale=scale;}
         const p = this.pose(v);
         // a chained effect by its own prefab: its FollowMountPoint keeps it on its point, its `_holdByOwner` with the unit
         let Q = P;
         if (d && fx.def && fx.def !== d) {
           Q = chained.get(fx.def);
-          if (!Q) chained.set(fx.def, Q = this._placing(fx.def, null, {}));
+          if (!Q) {
+            chained.set(fx.def, Q = this._placing(fx.def, null, {}));
+            if (!v.info) Q.loaded = false;
+            // its rotation is its own spawn location's (the client plays it on the unit as any other effect), not its
+            // parent's
+            const pl = { mountRot: null, rootRot: null };
+            this._rotate(Q, pl, skin, p);
+            fx.mountRot = pl.mountRot; fx.rootRot = pl.rootRot;
+          }
         }
         const G = Q.fmp ? Q : P;
         if (G.follow) {
           mountPoint(skin, G.follow.mount, p, fx.anchor);
           if (G.onGround) fx.anchor[2] = -(v.z || 0);
           fx.groundZ = -(v.z || 0);
-          if (G.fmp && G.rotKind) fx.mountRot = mountRotation(skin, G.rotKind, p, fx.mountRot || [0, 0, 0, 1]);
+          if (Q.rotFollow && Q.loaded) fx.mountRot = mountRotation(skin, Q.rotKind, p, fx.mountRot || [0, 0, 0, 1]);
         } else if (stick && v.alive !== false) {
           const sp = spawnPoint(skin, P.spawn, p);
           fx.anchor[0] = sp[0]; fx.anchor[1] = sp[1]; fx.anchor[2] = P.onGround ? -(v.z || 0) : sp[2];
@@ -575,18 +640,41 @@ export class FxWiring {
    * Where an effect sits on its unit, from its descriptor or — not loaded yet — index.json's summary `sum` (`spawn`,
    * `follow`: a FollowMountPoint's MountPointType): `spawn` its spawn location (HIT without either); `fmp` its
    * FollowMountPoint, followed from the first frame; `follow` the point it keeps to — the FollowMountPoint's, else for a
-   * held loop (o.follow) a FollowOwner's / FollowTileHeight's (the feet); `rotKind` the point whose rotation it takes (a
-   * FollowMountPoint without `_keepOriginRotation`, a MUZZLE_POINT or Special-point spawn; a summary's: none until the
-   * descriptor says); `onGround` a ground spawn; `keep` no point to keep to, but the unit holds it — a held effect
-   * (o.follow), a `_holdByOwner` prefab —: it moves with the unit.
+   * held loop (o.follow) a FollowOwner's / FollowTileHeight's (the feet); `rotKind` the rotation it takes (_rotate): a
+   * FollowMountPoint without `_keepOriginRotation` its point's every frame (`rotFollow`; FOOT: 'foot', the face's
+   * skeleton root), else its spawn location's once (mounts.js spawnRotation: 'graphic' — FOOT / HIT / HEAD, the
+   * unit's Graphic tilt —, MUZZLE_POINT's or a Special point's, else none: the identity), which a FollowMountPoint with
+   * `_keepOriginRotation` keeps; `loaded` false for a summary (no rotation until the descriptor says); `onGround` a
+   * ground spawn; `keep` no point to keep to, but the unit holds it — a held effect (o.follow), a `_holdByOwner`
+   * prefab —: it moves with the unit.
    */
   _placing(def, sum, o) {
     const spawn = def ? def.spawn : Number.isInteger(sum?.spawn) ? sum.spawn : 2;
     const fmp = def ? (def.follow && !def.follow.owner ? def.follow : null) : Number.isInteger(sum?.follow) ? { mount: sum.follow } : null;
     const follow = fmp || (o.follow && def?.follow) || null;
-    const rotKind = !def ? null : fmp ? (fmp.keepRot ? null : mountKind(fmp.mount)) : spawnRotationKind(spawn);
+    let rotKind = null, rotFollow = false;
+    if (def) {
+      if (fmp && !fmp.keepRot) { rotKind = fmp.mount === 0 ? 'foot' : mountKind(fmp.mount); rotFollow = !!rotKind; }
+      else rotKind = spawnRotation(spawn);
+    }
     const keep = !follow && (!!o.follow || !!def?.holdByOwner);
-    return { spawn, fmp, follow, rotKind, onGround: GROUND_SPAWNS.has(spawn) && !fmp, keep };
+    return { spawn, fmp, follow, rotKind, rotFollow, loaded: !!def, onGround: GROUND_SPAWNS.has(spawn) && !fmp, keep };
+  }
+
+  /**
+   * The rotation of an effect on a unit (_placing): a point's world rotation — the Graphic tilt, the facing turn, the
+   * bone's angle — as `mountRot` (it faces with the unit: FLIP_TWO_SIDE adds no flip, _orient), else the spawn
+   * location's as `rootRot`: the unit's Graphic tilt for FOOT / HIT / HEAD — no facing turn: FLIP_TWO_SIDE still flips
+   * it — and the identity for the others (both replace the prefab root's own rotation, as the client's
+   * Effect._InitLocationFromEntity does). Before 0.3.1 (history §34.6) FOOT / HIT / HEAD effects took no tilt: an effect
+   * authored standing lay on the board (荒芜拉普兰德 S3's seal, 能天使 S3's light bars, 灰毫 S2's smoke over her legs).
+   */
+  _rotate(P, place, skin, pose) {
+    place.mountRot = null; place.rootRot = null;
+    if (!P.loaded) return;
+    if (P.rotKind === 'graphic') place.rootRot = graphicRotation(skin);
+    else if (P.rotKind) place.mountRot = mountRotation(skin, P.rotKind, pose);
+    else place.rootRot = ID_ROT;
   }
 
   /**
@@ -608,7 +696,7 @@ export class FxWiring {
       if (def.rotY >= 0) place.flipY = flip; else place.mirror = flip;
     } else if (rt === 2 || rt === 4) {
       let a;
-      if (def.useBodyRotation || o.useFourDirectionalFace || !o.toward) a = bodyYaw(v, pose);
+      if (def.useBodyRotation || o.useFourDirectionalFace || o.fourFace || !o.toward) a = bodyYaw(v, pose);
       else {
         const dx = o.toward.x - pose.x, dy = o.toward.y - pose.y;
         a = Math.abs(dx) + Math.abs(dy) > 1e-4 ? Math.atan2(dy, dx) : bodyYaw(v, pose);
@@ -667,8 +755,8 @@ export class FxWiring {
         for (const k of this._rowKeys(e, src, nth)) {
           // the rows of the strike sit where its attack clip poses the unit's points at the strike frame
           const h = onTarget
-            ? this.playOn(k, tgt, { toward: beyond(src, tgt), flipFrom: src, skip })
-            : this.playOn(k, src, { toward: tgt, skip, strike: phase !== 'start', useFourDirectionalFace: !!e.useFourDirectionalFace });
+            ? this.playOn(k, tgt, { toward: beyond(src, tgt), flipFrom: src, skip, speed: info.speed })
+            : this.playOn(k, src, { toward: tgt, skip, speed: info.speed, strike: phase !== 'start', useFourDirectionalFace: !!e.useFourDirectionalFace });
           // a looping row stops at its end event (the cast's end); so does a looping prefab on a one-shot row, which
           // would otherwise never end (known once loaded: decided when the time comes)
           if (h) {
@@ -731,11 +819,12 @@ export class FxWiring {
    * attack plays its animation — the group animations replace `sourceAnimKey` in turn by the unit's attack count for
    * `loopType` 0 (LOOP), at random for 1 (RANDOM: index v3's `loopTypeName`; a seeded pick by unit id × attack count, the
    * same in a replay); an InCertainMode emitter's in its mode (`activeMode`: the mode's index); a VigilWolf row bound to
-   * a buff of its owner (`buffKey`) never (no view shows it).
+   * a buff of its owner (`buffKey`) while the 狼群 holds that buff by its 狼影 count (wolfHolds); a row bound to a buff no
+   * view shows never.
    */
   _rowOk(r, em, src, nth, modeIdx) {
     if (!r) return false;
-    if (r.buffKey) return false;
+    if (r.buffKey) return em?.class === 'VigilWolfEffectEmitter' && wolfHolds(src, r.buffKey);
     if (em?.class === 'UberEffectEmitterInCertainMode' && Number.isInteger(em.activeMode) && modeIdx >= 0 && em.activeMode !== modeIdx) return false;
     if (r.anim && em?.class === 'UberAnimationEffectEmitter') {
       const anims = Array.isArray(em.replaceAnims) ? em.replaceAnims : [];
@@ -753,6 +842,23 @@ export class FxWiring {
    * 'skill' event queued before the 'atk') }. While the skill is on, its own attack's rows replace the mode's
    * (SkillFx.attackFx).
    */
+  /** Explicit sim wind-ups start the same cast rows as the legacy look-ahead. */
+  attackStart(src, tgt, kind, info = {}) {
+    if (!src || !this.ofx.active) return false;
+    const id = src.id ?? src.info?.id;
+    this.startedAttacks.set(id, this.ofx.time + Math.max(0, info.lead || 0) + 0.5);
+    return this.castStart(src, tgt, kind, info);
+  }
+
+  hasAttackStart(src) {
+    const id = src?.id ?? src?.info?.id, until = this.startedAttacks.get(id);
+    if (until == null) return false;
+    if (this.ofx.time > until) { this.startedAttacks.delete(id); return false; }
+    return true;
+  }
+
+  cancelAttack(src) { this.startedAttacks.delete(src?.id ?? src?.info?.id); }
+
   castStart(src, tgt, kind, info = {}) {
     if (!this.ofx.active || !src || !this.idx || CHAIN.has(kind)) return false;
     kind = this._combatKind(src, tgt, kind, info.skillOn);
@@ -796,6 +902,8 @@ export class FxWiring {
     if (tgt) this.lastTargets.set(id, tgt);
     // the 驭械术士's floating units (render/vfx/funnelfx.js): they leave home and hit with the attack, or fly the funnel
     // shot from their point; the body shot of another target of the same attack is not flown (`skipBody`)
+    wound ||= this.hasAttackStart(src);
+    this.cancelAttack(src);
     const fun = this.funnels.attack(src, tgt, kind, time, again, wound);
     if (!a && !sk) return !!fun;
     this.castFrame.set(id, this.skills.frame);
@@ -991,51 +1099,43 @@ export class FxWiring {
     const rows = Array.isArray(o.hits) && o.hits.length ? o.hits : null;
     if (tgt && !o.followUp) this._expect(tgt, hitAt);
     if (!mainKey && !ropeKey) { this._arrive(proj, tgt, to0, t0 + hitAt, rows, src); return hitAt; }
-    const comesBack = !!mv.comeBack && !!mainKey;
-    const backScale = Number(mv.comeBackSpeedScale) > 0 ? Number(mv.comeBackSpeedScale) : 1;
-    const returnDelay = comesBack ? Math.max(0, Number(mv.delayAfterReached) || 0) : 0;
-    const returnDuration = comesBack ? dur / backScale : 0;
-    const totalDuration = dur + returnDelay + returnDuration;
     const flight = { t: -1, dur, from, to: to0.slice(), pos: from.slice(), next: from.slice(), done: false, rope: null };
     // the flight at t battle s: the head and a point a little further on (its direction), homing on the target's point
     const step = (t) => {
       if (t === flight.t) return;
-      if (!o.groundTarget && tgt && !tgt.destroyed && tgt.alive !== false) unitPoint(tSkin, 'hit', this.pose(tgt), flight.to);
+      if (tgt && !tgt.destroyed && tgt.alive !== false) {
+        if(o.groundTarget){flight.to[0]=tgt.x-10;flight.to[1]=tgt.y-9;flight.to[2]=-(tgt.z||0);}
+        else unitPoint(tSkin, 'hit', this.pose(tgt), flight.to);
+      }
       flight.t = t;
       const k = Math.min(1, t / flight.dur);
       this._flightPoint(flight, arc, wob, k, t, flight.pos);
       this._flightPoint(flight, arc, wob, Math.min(1, k + 0.02), t + 0.02 * flight.dur, flight.next);
     };
-    let arrived = false, returnFrom = null;
-    const arrive = () => {
-      if (arrived) return;
-      arrived = true;
-      returnFrom = flight.pos.slice();
-      this._arrive(proj, tgt, flight.to, hitAt > dur ? t0 + hitAt : null, rows, src);
-    };
+    // a 回环射手's boomerang (the movement's `comeBack`): the hit, then the way back to the thrower (comeBack())
+    const back = this._comeBack(proj, kind);
     const finish = (fx) => {
+      if (back && !flight.back) {
+        // the end of its way out: its hit, then (a flying effect, the thrower still there) the way back
+        this._arrive(proj, tgt, flight.to, hitAt > dur ? t0 + hitAt : null, rows, src);
+        if (flight.rope !== fx && this._turnBack(flight, fx, back, src, sSkin, mv, seed)) return;
+      }
       flight.done = true;
-      fx.stop({ hit: true });
+      // caught: the client clears a projectile's main effect as it stops (Projectile.ClearMainEffectIfNot → Effect.FinishMe),
+      // and one without a `_delayToFinish` is recycled there and then — the boomerang does not fade on in the thrower's hands
+      if (flight.back && !(fx.def?.delayToFinish > 0) && typeof fx.kill === 'function') fx.kill();
+      else fx.stop(back ? {} : { hit: true });
       if (flight.rope && flight.rope !== fx) flight.rope.stop();
       this.flights.delete(flight);
-      arrive();
+      if (!back) this._arrive(proj, tgt, flight.to, hitAt > dur ? t0 + hitAt : null, rows, src);
     };
     const def = mainKey ? this.ofx.lib.def(mainKey) : null;
     const flipIfLeft = def ? def.flipIfLeft : false;
-    const handle = mainKey ? this.ofx.spawn(mainKey, { pos: from.slice(), groundZ: -(src.z || 0) }, {
+    const handle = mainKey ? this.ofx.spawn(mainKey, { pos: from.slice(), groundZ: -(src.z || 0), rootRot: ID_ROT }, {
       important: true,
       track: (fx) => {
         if (flight.done) return;
-        if (comesBack && fx.time >= dur) {
-          if (!arrived) { step(dur); arrive(); }
-          if (src.destroyed || src.alive === false) { finish(fx); return; }
-          const home = startAt([0,0,0]);
-          const k = Math.max(0, Math.min(1, (fx.time - dur - returnDelay) / returnDuration));
-          for (let i=0;i<3;i++) {
-            flight.pos[i] = returnFrom[i] + (home[i] - returnFrom[i]) * k;
-            flight.next[i] = returnFrom[i] + (home[i] - returnFrom[i]) * Math.min(1,k+.02);
-          }
-        } else step(Math.min(flight.dur, fx.time));
+        if (flight.back) { if (!this._stepBack(flight, fx.time, src, sSkin)) { finish(fx); return; } } else step(Math.min(flight.dur, fx.time));
         // direction of travel (Unity frame): yaw in the board plane, pitch with the climb
         const p = flight.pos, q = flight.next;
         const dx = q[0] - p[0], dy = q[1] - p[1], dz = q[2] - p[2];
@@ -1044,14 +1144,14 @@ export class FxWiring {
         if (flipIfLeft && dx < 0) { fx.mirror = true; fx.yaw = Math.atan2(dy, -dx); } // mirrored art: +x after the mirror
         else { fx.mirror = false; fx.yaw = Math.atan2(dy, dx); }
         fx.pitch = horiz > 1e-5 || Math.abs(dz) > 1e-5 ? Math.atan2(-dz, horiz) : 0;
-        if (fx.time >= totalDuration) finish(fx);
+        if (flight.back ? flight.back.done : fx.time >= flight.dur) finish(fx);
       },
     }) : null;
     if (ropeKey) {
       // the rope: its LineRenderers from the shooter's mount point now to the head (effect.js linkLines; a world-space
       // line draws nothing before); without a head it flies the shot itself
       const drive = !handle;
-      flight.rope = this.ofx.spawn(ropeKey, { pos: from.slice(), groundZ: -(src.z || 0) }, {
+      flight.rope = this.ofx.spawn(ropeKey, { pos: from.slice(), groundZ: -(src.z || 0), rootRot: ID_ROT }, {
         important: true,
         track: (fx) => {
           if (flight.done) return;
@@ -1091,6 +1191,99 @@ export class FxWiring {
   }
 
   /**
+   * The way back of a projectile whose movement comes back (index.json movement `comeBack` — the 回环射手 跃跃 and
+   * 娜仁图亚: AdvancedMovement / ParacurveMovement.Comeback, GameAssembly of 2026-09-13): after its hit the client gives the
+   * movement a new leg from where it is to the thrower's HitPoint (the source's hitMountPoint, followed) at its speed ×
+   * `comeBackSpeedScale` (0.25: 15 → 3.75 tiles/s — PRTS 跃跃 "返回时飞行速度3.75", the sim's BOOMERANG_RETURN_SPEED), a
+   * ParacurveMovement's again along its arc, and the flying effect plays on until the thrower catches it (before 0.3.1 it
+   * stopped at the hit). The leg steps at that speed toward her HitPoint as it is now — a duration locked at the turn
+   * reaches a thrower who has moved on the original ETA, faster than the come-back speed. Returns { speed } (tiles per
+   * battle s: the sim's return speed for its boomerang kind) or null.
+   * The client's pause at the hit is not 1 s. On a ParacurveMovement / NarantS3Movement `delayAfterReached` is only 0
+   * or 1 (a flag, the same pair as AttachToTarget's `_delayAfterReached`) and `delayTime` is the seconds — 0.01 for
+   * projectile_chr_caper_s2 / _s2_1 and projectile_chr_narant_s3 / _s3_1 / _s3_2. An AdvancedMovement has no
+   * `delayTime`; its `delayAfterReached` is the seconds (0.01 for the come-back ones; 0 for narant_s2, whose onward
+   * dash is `moveAheadTime`). amUpdateAfterReach waits the fixed-point at +0x110; pmUpdateAfterReach waits the raw
+   * float at +0xec [ASSUMED: that float is `delayTime`]. 0.01 s is under one sim tick (1/30): the return projectile is
+   * added in the hit's onHit and first moves on the next tick. 跃跃 S2 fires an extra projectile and 娜仁图亚 S3's blast
+   * is the catch — neither skill hovers — so a drawn pause would put the effect behind the sim's catch. The visual
+   * turns back on the hit, on the sim's timing. A 娜仁图亚 S1 bounce / S2 dash comes straight back from its first target.
+   */
+  _comeBack(proj, kind) {
+    const mv = proj?.movement;
+    if (!mv || !(Number(mv.comeBack) > 0)) return null;
+    const sim = kind === 'boomerang' && this.opts.speed ? Number(this.opts.speed('boomerangReturn')) : NaN;
+    const own = Number(mv.speed) * (Number.isFinite(Number(mv.comeBackSpeedScale)) ? Number(mv.comeBackSpeedScale) : 1);
+    const speed = sim > 0 ? sim : own > 0 ? own : 3.75;
+    return { speed };
+  }
+
+  /**
+   * Turn a come-back flight around at its hit (comeBack): its new leg from the hit point toward the thrower's HitPoint
+   * at `back.speed` every frame (not a duration locked here); false when the thrower is gone (the client stops a
+   * boomerang with no source: it is not drawn back).
+   */
+  _turnBack(flight, fx, back, src, sSkin, mv, seed) {
+    if (!src || src.destroyed || src.alive === false) return false;
+    flight.back = {
+      last: fx.time, speed: back.speed, from: flight.pos.slice(), to: unitPoint(sSkin, 'hit', this.pose(src)),
+      mv, seed: seed ^ 0x3c6ef372, arc: null, travelled: 0, done: false,
+    };
+    this._stepBack(flight, fx.time, src, sSkin);
+    return true;
+  }
+
+  /** Rebuild a Paracurve come-back's arc when its start height, end height or ground distance has changed. */
+  _syncArc(b) {
+    if (!b.mv || b.mv.class !== 'ParacurveMovement') { b.arc = null; return; }
+    const dist = Math.hypot(b.to[0] - b.from[0], b.to[1] - b.from[1]);
+    const hs = -b.from[2], ht = -b.to[2];
+    if (b.arc && b.hs === hs && b.ht === ht && b.dist === dist) return;
+    b.hs = hs; b.ht = ht; b.dist = dist;
+    b.arc = paracurve(b.mv, hs, ht, dist, b.seed);
+  }
+
+  /**
+   * A come-back flight's way back at t (its effect's clock): step `speed · dt` toward the thrower's HitPoint now, and
+   * stop on reaching it (`done`). A Paracurve one keeps its arc over the ground still left; false once she is gone.
+   */
+  _stepBack(flight, t, src, sSkin) {
+    const b = flight.back;
+    if (!src || src.destroyed || src.alive === false) return false;
+    unitPoint(sSkin, 'hit', this.pose(src), b.to);
+    const dt = Math.max(0, t - b.last);
+    b.last = t;
+    const dx = b.to[0] - flight.pos[0], dy = b.to[1] - flight.pos[1];
+    const dist = Math.hypot(dx, dy);
+    const step = b.speed * dt;
+    if (!(dist > 1e-4) || (dt > 0 && step >= dist)) {
+      flight.pos[0] = b.to[0]; flight.pos[1] = b.to[1]; flight.pos[2] = b.to[2];
+      flight.next[0] = b.to[0]; flight.next[1] = b.to[1]; flight.next[2] = b.to[2];
+      b.done = true;
+      return true;
+    }
+    const ux = dx / dist, uy = dy / dist;
+    const moved = dt > 0 ? step : 0;
+    flight.pos[0] += ux * moved; flight.pos[1] += uy * moved;
+    b.travelled += moved;
+    const left = dist - moved;
+    const ahead = Math.min(0.02 * b.speed, Math.max(left, 1e-4));
+    flight.next[0] = flight.pos[0] + ux * ahead; flight.next[1] = flight.pos[1] + uy * ahead;
+    if (b.mv && b.mv.class === 'ParacurveMovement') {
+      this._syncArc(b);
+      const total = b.travelled + left;
+      const k = total > 1e-6 ? b.travelled / total : 1;
+      flight.pos[2] = b.arc ? -arcHeight(b.arc, k, -b.to[2]) : flight.pos[2];
+      const kn = Math.min(1, k + (total > 1e-6 ? ahead / total : 0));
+      flight.next[2] = b.arc ? -arcHeight(b.arc, kn, -b.to[2]) : flight.pos[2];
+    } else {
+      if (moved > 0) flight.pos[2] += (b.to[2] - flight.pos[2]) * (moved / dist);
+      flight.next[2] = flight.pos[2] + (b.to[2] - flight.pos[2]) * (ahead / left);
+    }
+    return true;
+  }
+
+  /**
    * A projectile's start on its target: `toTargetOnStart` on the target (FLIP_TWO_SIDE by the side the shot comes from,
    * a directional effect along it; it stays on the target while it lives: `_holdByOwner`), `toTileOnStart` on the
    * target's tile. Returns whether anything played.
@@ -1125,6 +1318,9 @@ export class FxWiring {
         this.arrived.set(id, now);
         if ((proj.onHit || []).some((k) => /heal/.test(k))) this.healed.set(id, now);
       }
+      // a skill binding places these where the kit's area fx says, for the area's time (SkillFx.bindsReached: 锡人's
+      // flask, 波登可's spores …) — not a second copy at the flight's end (0.3.1)
+      if (src && this.skills.bindsReached(src, proj)) return;
       for (const k of proj.onReached || []) {
         const kk = lc(k);
         if (kk && this.ofx.lib.has(kk)) this.ofx.spawn(kk, { pos: at.slice(), groundZ: at[2] }, {});
@@ -1195,6 +1391,7 @@ export class FxWiring {
     // taken in the skills' sense (the sim's TAKE_DAMAGE skips it too)
     const hpHit = type == null || HP_TYPES.has(type);
     if (hpHit) this.skills.trigger(v);
+    if (src && !this.hasOfficialUnit(src)) return false;
     const id = v.id ?? v.info?.id;
     const m = this._pending(id, time);
     // an attached floating unit's hit lands with its damage (荒芜拉普兰德's wolves: render/vfx/funnelfx.js)
@@ -1204,6 +1401,8 @@ export class FxWiring {
     const flying = this._inAir(id, time, hpHit);
     // a skill's kit hit (SkillFx.seen: no attack owns it — the frame's order names the skill): its hit stands for the spark
     if (hpHit && this.skills.seen(v, false, !!(m || src || fun || flying))) return true;
+    // an enemy aura's tick on it (SkillFx.auraHit: 深溟巢涌者's pulse, 鼎沸's boil — the aura's buff effect on the unit)
+    if (hpHit && this.skills.auraHit(v, !!(m || src || fun || flying))) return true;
     if (flying) return true;
     const arr = this.arrived.get(id);
     if (arr != null && this.ofx.time - arr < ARRIVAL_WINDOW) return true;
@@ -1241,7 +1440,7 @@ export class FxWiring {
    * a skill heal's group); covered by an official heal on its way (_expect) or just arrived, else the generic heal hit.
    */
   heal(v, time) {
-    if (!this.ofx.active || !v || !this.idx) return false;
+    if (!this.ofx.active || !v || !this.idx || !this.hasOfficialUnit(v)) return false;
     const id = v.id ?? v.info?.id;
     const m = Number.isFinite(time) ? this._pending(id, time) : null;
     if (m && this._landed(m, v, time, 'heal')) return true;
@@ -1303,6 +1502,7 @@ export class FxWiring {
    * same key hands over to it: SkillFx.status).
    */
   status(v, name, on) {
+    if (v?.info && !this.hasOfficialUnit(v)) return false;
     if (!v || v.prep || !this.idx) return false;
     const id = v.id ?? v.info?.id;
     name = name==='invuln'?'invulnerable':name;
@@ -1369,7 +1569,7 @@ export class FxWiring {
     const all = Array.isArray(views) ? views : [...views];
     // Observed preparation fields also use the snapshot view, but are not combat.
     for (const v of all) if (v.prep) this.release(v);
-    const list = all.filter(v => !v.prep);
+    const list = all.filter(v => !v.prep && this.hasOfficialUnit(v));
     for(const v of list)this.syncStatuses(v);
     this.skills.sync(list);
     this.talents.sync(list);
@@ -1383,6 +1583,8 @@ export class FxWiring {
    */
   simFx(kind, x, y, extra) {
     if (!this.idx) return false;
+    const owner = this.view(extra?.src ?? extra?.id);
+    if (owner?.info && !this.hasOfficialUnit(owner)) return false;
     if (kind === 'zone' && this.ofx.active) {
       const zone = ENEMY_ZONES[extra?.sourceDef];
       if (zone && extra.kind === zone[0] && Number(extra.dur) > 0) {
@@ -1400,18 +1602,25 @@ export class FxWiring {
         if (drawn) return true;
       }
     }
+    if (kind === 'bombardAim') {
+      const key = `${extra?.id}|${extra?.shot}`;
+      const aim = this.bombardAims.get(key);
+      if (aim) { aim.update({...extra,x,y}); return true; }
+    }
     if (kind === 'bombardShell') {
       const src = this.view(extra?.id);
       if (src && /enemy_1112_emppnt/.test(src.info?.spine || src.info?.defId || '')) {
         const proj = this.idx.projectiles?.projectile_enemy_emppnt;
         if (proj && Number(extra.t) > 0) {
-          const target = {x,y,z:0,alive:true,isEnemy:false};
+          const key = `${extra.id}|${extra.shot}`;
+          const target = bombardAnchor(x,y,extra.target,id=>this.view(id),()=>this.ofx.time,this.ofx.time+Math.max(0,Number(extra.t)-Number(extra.fall||0)));
+          this.bombardAims.set(key,target);
           this._fly(proj,src,target,'mortar',this.ofx.time,{dur:Number(extra.t),groundTarget:true});
           return true;
         }
       }
     }
-    if (kind === 'bombard' && extra?.kind === 'emppnt') return true;
+    if (kind === 'bombard' && extra?.kind === 'emppnt') { this.bombardAims.delete(`${extra.id}|${extra.shot}`); return true; }
     const t = this.talents.fx(kind, extra);
     // the floating units stand for the kit's 'drone' / 'drones' / 'droneLock' / 'overload' (render/vfx/funnelfx.js)
     const f = this.funnels.simFx(kind, x, y, extra);
@@ -1422,7 +1631,7 @@ export class FxWiring {
   death(v) {
     if (!v) return false;
     this.release(v);
-    if (!this.ofx.active || !this.idx) return false;
+    if (!this.ofx.active || !this.idx || !this.hasOfficialUnit(v)) return false;
     const u = this.unitOf(v);
     const m = u ? this.mode(u, v) : null;
     const g = this.idx.generic?.die || {};
@@ -1430,12 +1639,19 @@ export class FxWiring {
     return !!(key && this.playOn(key, v, {}));
   }
 
-  /** b.ev 'deploy': the unit's own start effect or the generic deploy (operators and summons). */
+  /**
+   * b.ev 'deploy': the unit's start effect (the client's Character.GetStartEffect: its skill's own — an AppearSkill's
+   * `_overrideStartEffect`, SkillFx.birthOf —, else its mode's override, its own, else the generic deploy) — operators
+   * and summons. A passive skill's start one-shots play the skill's own (SkillFx.deployed) and nothing else does
+   * (0.3.1, audit R21: 缄默德克萨斯 S1–S3 and 斯卡蒂 S2 showed the generic pillar too).
+   */
   deploy(v) {
-    if (!v || v.prep || !this.idx) return false;
+    if (!v || v.prep || !this.idx || !this.hasOfficialUnit(v)) return false;
     this.skills.deployed(v);   // a passive's loops and start one-shots (it is drawn whatever the deploy effect is)
     this.talents.deployed(v);  // the deploy talents' one-shots (耀骑士临光's birth), once per life
     if (!this.ofx.active || v.isEnemy) return false;
+    const b = this.skills.birthOf(v);
+    if (b && b.drawn) return b.own || b.empty ? true : !!this.playOn(b.key, v, {});
     const u = this.unitOf(v);
     const m = u ? this.mode(u, v) : null;
     const key = lc(m?.overrideStartEffect) || lc(u?.startEffect) || this.idx.generic?.birth?.char;
@@ -1453,7 +1669,10 @@ export class FxWiring {
 
   /** Battle reset. */
   clear() {
+    for (const wall of this.walls) wall.kill();
+    this.walls.clear();
     this.flights.clear();
+    this.bombardAims.clear();
     this.loops.clear();
     this.statusSeen.clear();
     this.melee.clear();
@@ -1465,6 +1684,7 @@ export class FxWiring {
     this.keyCache.clear();
     this.attackN.clear();
     this.castFrame.clear();
+    this.startedAttacks.clear();
     this.skills.clear();
     this.talents.clear();
     this.funnels.clear();
@@ -1477,6 +1697,7 @@ export class FxWiring {
   /** Called once per frame: delayed actions on the battle clock (and the frame count the skills' same-frame rules use). */
   tick() {
     this.skills.frame++;
+    for (const wall of this.walls) { wall.update(); if (!wall.alive) this.walls.delete(wall); }
     const T = this.ofx.timers;
     if (!T || !T.length) return;
     const now = this.ofx.time;

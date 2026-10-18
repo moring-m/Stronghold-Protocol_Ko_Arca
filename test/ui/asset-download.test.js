@@ -172,3 +172,13 @@ test('the official battle effects manifest (/data/local-fx.json, DESIGN §33) is
   assert.ok(got.includes('/assets/~fedcba0987654321/local/fx/prefabs/common_hit_01.json'));
   assert.ok(got.includes('/assets/~1234567890abcdef/a.png'));
 });
+
+test('production fonts download source faces without requesting optional absent WOFF2 conversions',()=>{
+ const faces={
+  light:{family:'Bender',original:'/fonts/bender-light.ttf',woff2:'/fonts/bender-light.woff2'},
+  regular:{family:'Bender',original:'/fonts/bender-regular.otf',woff2:'/fonts/bender-regular.woff2'},
+  display:{family:'Novecento Wide',original:'/fonts/novecento-wide-normal.otf',woff2:'/fonts/novecento-wide-normal.woff2'},
+ };
+ assert.deepEqual(collectAssetUrls({fonts:{faces}}),['/fonts/bender-light.ttf','/fonts/bender-regular.otf','/fonts/novecento-wide-normal.otf']);
+ assert.deepEqual(collectAssetUrls({fonts:{faces:{onlyWoff:{family:'Other',woff2:'/fonts/only.woff2'}}}}),['/fonts/only.woff2']);
+});

@@ -30,7 +30,8 @@
  * @returns {{ drawn: string[], staticOff: string[], banned: string[] }}
  */
 export function drawDisabledBonds(gd, rng, policy = {}) {
-  if(policy.mode==='coop8')return {drawn:[],staticOff:[],banned:[]};
+  const explicitBans = new Set((policy.bannedOperators || []).map(id=>gd.baseIdOf(id)).filter(id=>gd.chess(id)));
+  if(policy.mode==='coop8')return {drawn:[],staticOff:[],banned:[...explicitBans].sort()};
   const { core: nCore, addon: nAddon } = gd.bans(gd.difficulty);
   const staticOff = [...gd.modeInactiveBonds].filter((b) => gd.bond(b)).sort();
   const eligible = gd.bondIds.filter((b) => {
@@ -52,14 +53,14 @@ export function drawDisabledBonds(gd, rng, policy = {}) {
   const auxDraw=[...forcedAux,...sample(addon.filter(id=>!forcedAux.includes(id)&&!protectedAux.has(id)),Math.max(0,auxQuota-forcedAux.length),rng)];
   drawn.push(...auxDraw);drawn.sort();
   const off = new Set([...drawn, ...staticOff]);
-  const banned = [];
+  const banned = [...explicitBans];
   for (const id of gd.visibleChess) {
     const c = gd.chess(id);
     const allBonds = Array.isArray(c.bonds) ? c.bonds : [];
     // Personal recruitment does not bypass core bans; auxiliary bonds cannot rescue a banned single-core recruit.
     const cores = c.optionalRecruit ? allBonds.filter(b => gd.bond(b)?.isCore) : [];
     const bonds = cores.length ? cores : allBonds;
-    if (bonds.length > 0 && bonds.every((b) => off.has(b))) banned.push(id);
+    if (!explicitBans.has(id) && bonds.length > 0 && bonds.every((b) => off.has(b))) banned.push(id);
   }
   return { drawn, staticOff, banned };
 }
@@ -77,7 +78,7 @@ export class SharedPool {
    */
   constructor(gd, { banned = [] } = {}) {
     this.gd = gd;
-    this.unlimited=!!gd.config.customRules?.unlimitedStock;
+    this.unlimited=!!gd.config?.customRules?.unlimitedStock;
     const ban = new Set(banned);
     /** @type {Map<string, { cap: number, left: number, tier: number }>} */
     this.entries = new Map();
@@ -158,8 +159,11 @@ export class SharedPool {
   /**
    * Item roll for the shop's item slot: tier by the chess tier shares at this level, uniform item within the tier,
    * falling back to lower tiers when a tier has no item. Returns an item id or null.
+   * `bias` (shopBias bondBias): a Set of active bond ids. A tier is drawn from items whose giveBondId is in that set
+   * when any remain after the stock gate; an empty filtered tier falls back to the official list of that tier.
+   * null or an empty Set keeps today's rng (one draw for the tier, one for the pick). Bias never grants an item.
    */
-  rollItem(rng, maxTier, stock = null) {
+  rollItem(rng, maxTier, stock = null, bias = null) {
     const shares = this.tierShares(maxTier);
     const tiers = Object.keys(shares).map(Number).sort((a, b) => a - b);
     let tier = null;
@@ -170,13 +174,26 @@ export class SharedPool {
     } else {
       tier = 1 + Math.floor(rng() * Math.max(1, maxTier));
     }
+    const useBias = bias instanceof Set && bias.size > 0;
+    const gated = (t) => (this.gd.shopItemsByTier[t] || []).filter((id) => !stock || stock.canGain(id));
+    const pick = (list) => (stock ? stock.pick(rng, list) : list[Math.floor(rng() * list.length)]);
+    const choose = (t) => {
+      const list = gated(t);
+      if (!list.length) return null;
+      if (!useBias) return pick(list);
+      const biased = list.filter((id) => {
+        const rec = this.gd.item(id);
+        return !!(rec && typeof rec.giveBondId === 'string' && bias.has(rec.giveBondId));
+      });
+      return pick(biased.length ? biased : list);
+    };
     for (let t = tier; t >= 1; t--) {
-      const list = (this.gd.shopItemsByTier[t] || []).filter(id => !stock || stock.canGain(id));
-      if (list.length) return stock ? stock.pick(rng, list) : list[Math.floor(rng() * list.length)];
+      const id = choose(t);
+      if (id) return id;
     }
     for (let t = tier + 1; t <= 6; t++) {
-      const list = (this.gd.shopItemsByTier[t] || []).filter(id => !stock || stock.canGain(id));
-      if (list.length) return stock ? stock.pick(rng, list) : list[Math.floor(rng() * list.length)];
+      const id = choose(t);
+      if (id) return id;
     }
     return null;
   }
@@ -223,7 +240,7 @@ export class RecruitPool extends SharedPool {
 export class SharedItemPool {
   constructor(gd, players) {
     this.gd = gd;
-    this.unlimited=!!gd.config.customRules?.unlimitedStock;
+    this.unlimited=!!gd.config?.customRules?.unlimitedStock;
     this.players = players;
     /** @type {Map<string, number>} base id → copies taken past the cap by an already-displayed card */
     this.debt = new Map();

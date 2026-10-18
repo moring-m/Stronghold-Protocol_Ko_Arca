@@ -26,7 +26,12 @@ export function chessAvatarUrl(m, chess) {
     const base = chars[id.slice(0, -2)];
     return str(base?.avatarE2) || str(base?.avatar);
   }
-  return str(chars[id]?.avatar) || (chess?.charId ? str(chars[chess.charId]?.avatar) : null);
+  // A golden piece whose avatar id is the character key uses that entry's E2 art when it has one.
+  // Official ids are `charId` or `charId_2` (the suffix branch above). Model and voice have no E2
+  // field on the character entry: the composed `spine` / `voice` id is already the form's.
+  const entry = chars[id];
+  if (entry && chess?.isGolden && str(entry.avatarE2)) return str(entry.avatarE2);
+  return str(entry?.avatar) || (chess?.charId ? str(chars[chess.charId]?.avatar) : null);
 }
 
 /**
@@ -40,7 +45,7 @@ export function chessPortraitUrl(m, chess) {
   const id = str(chess?.assets?.portrait);
   if (!chars) return null;
   if (id) {
-    if(chars[id]?.portrait)return str(chars[id].portrait);
+    if(chars[id]?.portrait)return (chess?.isGolden ? str(chars[id].portraitE2) : null) || str(chars[id].portrait);
     if (id.endsWith('_2')) {
       const base = chars[id.slice(0, -2)];
       if (base) return str(base.portraitE2) || str(base.portrait);

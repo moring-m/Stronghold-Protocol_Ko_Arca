@@ -1,10 +1,12 @@
+import { confirmDialog } from "../ui/components.js";
 import { openStats } from '../ui/statsEntry.js';
 
 import { t } from '../../../shared/i18n.js';
 // Lobby screen: pick 独立模拟 / 同盟模拟 and a difficulty (标准/险境/绝境/终极), create a room,
 // or join one with a 同盟密钥 (recent codes remembered) — as a player (加入同盟) or in one of its MAX_SPECTATORS
 // spectator seats (观战: room.spectate, also while its match runs; community report #26, a remake feature — the
-// official room has none). Shows connection status + ping.
+// official room has none). Shows connection status + ping. The top bar opens the read-only S.W.E.E.P.报告
+// (screens/sweep.js: 盟约 / 策略 / 敌方资料 and the enemy codex).
 //
 // Difficulty descriptions come from data/config.json `modes[modeId]` when present, else from the
 // official act2autochess `modeDataDict` texts embedded below (desc + effectDescList), so the
@@ -12,6 +14,7 @@ import { t } from '../../../shared/i18n.js';
 // hidden core on 险境+), per research 00-INDEX §2. Battlefield pool (`modes[].stages`): 标准 always
 // plays 战场#01, 险境 draws one of 8, 绝境 / 终极 one of 7 (m01 excluded).
 
+import { TestMark } from '../ui/testConsole.js';
 import { ResumeMatchButton } from '../ui/resumeMatch.js';
 import { useEffect, useRef, useState } from '../../vendor/hooks.module.js';
 import { DIFFICULTIES, DIFFICULTY_NAMES, DIFFICULTY_COLORS, ROOM_CODE_LEN, MAX_SEATS, MAX_SPECTATORS, MAX_SPECTATOR_SEATS, ERR, modeIdFor } from '../../../shared/constants.js';
@@ -177,9 +180,24 @@ export function recentRooms() {
 }
 
 /** @param {string} code */
-export function rememberRoom(code) {
+export function rememberRoom(code, test = false) {
   if (!CODE_RE.test(code)) return;
-  savePref('recentRooms', [code, ...recentRooms().filter((c) => c !== code)].slice(0, 4));
+  const recent = [code, ...recentRooms().filter((c) => c !== code)].slice(0, 4);
+  const marks = loadPref('recentTestRooms', []);
+  savePref('recentTestRooms', recent.filter(c => c === code ? test : Array.isArray(marks) && marks.includes(c)));
+  savePref('recentRooms', recent);
+}
+
+export async function joinKnown(type, key) {
+  try { return await net.request(type, { code: key }); } catch (err) {
+    if (err?.code !== ERR.TEST_CONFIRM) throw err;
+    const text = type === 'room.spectate'
+      ? t('这是测试房间，不计入任何记录。确认观战？')
+      : t('这是测试房间，不计入任何记录。确认加入？');
+    if (await confirmDialog({ title: t('测试'), text })) {
+      return net.request(type, { code: key, testAck: true });
+    }
+  }
 }
 
 const FALLBACK_TIPS = [
@@ -277,6 +295,8 @@ export function LobbyScreen() {
   /** Set when an 加入同盟 was refused with ROOM_FULL: `{ code }` opens the "enter as a spectator?" prompt. */
   const [fullAsk, setFullAsk] = useState(null);
   const [recent] = useState(recentRooms);
+  const marks = loadPref('recentTestRooms', []);
+  const [sweepOpen, setSweepOpen] = useState(false);
   const alive = useRef(true);
   const inFlight = useRef(false); // synchronous guard against double clicks (state updates are async)
   useEffect(() => () => { alive.current = false; }, []);

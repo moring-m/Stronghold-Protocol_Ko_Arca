@@ -1,3 +1,14 @@
+const cx = (...parts) => parts.flat().filter(Boolean).join(' ');
+import { confirmDialog } from "./components.js";
+import { isPersonalCosmetic } from "../content.js";
+import { resolveThemeVars } from "../../../shared/plugins/theme.js";
+import { themeVarsOf } from "../../../shared/plugins/theme.js";
+import { hasAnySkinChoices } from "./skins.js";
+import { askPersistStorage } from "../assetCache.js";
+import { importSupport } from "../assetCache.js";
+import { storagePersisted } from "../assetCache.js";
+import { assetImport } from "../assetPack.js";
+import { pruneImportedAssets } from "../assetPack.js";
 import { ResourceRedownloadButton } from './resourceRedownload.js';
 import {officialFxDownloaded,voiceDownloaded} from '../../../shared/resourceSelection.js';
 import {useEffect} from "../../vendor/hooks.module.js";
@@ -22,7 +33,7 @@ import { HOTKEY_ACTIONS, hotkeyLabel, captureHotkey, rebindHotkey, DEFAULT_HOTKE
 import { RestartVoteControls } from './restartVote.js';
 
 
-import { t } from '../../../shared/i18n.js';
+import { t, N_ } from '../../../shared/i18n.js';
 // Player settings (BGM/SFX/voice volume, mute, damage numbers, render quality): a tiny observable store
 // persisted in localStorage (`sp.pref.settings`), applied to the audio manager on every change, plus
 // the settings modal.
@@ -120,18 +131,39 @@ function CosmeticSection() {
   const cat = useStore((s) => s, Object.is, catalog);
   const ids = useStore((s) => s.ids, Object.is, personal);
   const installed = useStore(installedCount);
+  const s = useSettings();
   useEffect(() => { if (installed) loadCatalog({ force: true }); }, [installed]);
-  const list = installed ? cosmeticPlugins(cat.plugins, 'personal') : [];
-  if (!list.length) return null;
-  const set = personalSet(ids, list.filter((p) => typeof p.vs === 'string'));
+  const entries = installed ? cosmeticPlugins(cat.plugins, 'personal') : [];
+  const list = entries.filter(isPersonalCosmetic);
+  // The 显示其他玩家的皮肤 switch is on screen with or without a PERSONAL plugin — an appearance can also come from a
+  // set the player is not in (a watched match's cosmetics are the watcher's own layers), and a switch that appears only
+  // when the catalogue happens to have loaded would look like a bug. It follows the same GLOBAL rule the 皮肤 section
+  // does (ui/skins.js hasAnySkinChoices: at least one operator of the composed manifest has a wear-able skin), so a
+  // session with no such appearance draws nothing here — an installation without a cosmetic layer keeps exactly the
+  // settings it had before this feature, the switch included (test/ui/plugins.e2e.test.js asserts the section is absent
+  // on a server without plugins). The list below is NOT gated: it is where a switched-off plugin is switched back on.
+  if (!list.length) {
+    if (!hasAnySkinChoices()) return null;
+    return html`<section class="set-plugins" aria-labelledby="set-skins-title" data-testid="personal-plugins">
+      <div class="set-keys__head"><span class="set-row__label" id="set-skins-title">${t('外观插件')}<${MicroLabel}>COSMETIC PLUGINS<//></span></div>
+      <${OtherSkinsRow} value=${s.otherSkins !== false} onSet=${(v) => updateSettings({ otherSkins: v })} />
+    </section>`;
+  }
+  const set = personalSet(ids, entries);
   const applied = new Set(set.order);
   const auto = new Set(set.auto);
+  const winners = resolveThemeVars(set.order.map((id) => {
+    const p = entries.find((x) => x.id === id);
+    return { id, vars: themeVarsOf(p) };
+  }));
   const flip = (id, on) => { const r = setPersonalPlugin(id, on); if ('error' in r) toast(describeError(r.error), 'warn'); };
   return html`<section class="set-plugins" aria-labelledby="set-plugins-title" data-testid="personal-plugins">
     <div class="set-keys__head">
       <span class="set-row__label" id="set-plugins-title">${t('外观插件')}<${MicroLabel}>COSMETIC PLUGINS<//></span>
     </div>
     <p class="set-hint">${t('只改变你自己看到的画面和声音，不影响其他博士，也不影响战斗；插件为非官方制作。')}</p>
+    <${OtherSkinsRow} value=${s.otherSkins !== false} onSet=${(v) => updateSettings({ otherSkins: v })} />
+    ${winners.map((w) => html`<p key=${w.name} class="set-hint set-theme-win">${t('{token} 由「{name}」生效', { token: w.name, name: pluginName(list.find((p) => p.id === w.pluginId) || { id: w.pluginId }) })}</p>`)}
     ${list.map((p) => {
       // on: applied (chosen, or 「自动」: another one needs it) — or chosen but left out now (a conflict): switch it off
       const skipped = set.skipped.includes(p.id);
@@ -145,6 +177,21 @@ function CosmeticSection() {
       </div>`;
     })}
   </section>`;
+}
+
+/**
+ * 设置「显示其他玩家的皮肤」 (docs/SKINS.md): whether this browser draws the appearance another player chose
+ * (`UnitInfo.skin`, published by the match — `Match.publicView().players[].skins`).
+ *
+ * Pure client preference, never sent: turning it off makes every OTHER seat's piece draw the operator's own model,
+ * 干员调配 its own choice alone. The asymmetry is deliberate and documented — their screen keeps showing their skin, so
+ * a co-op's players may see different models for the same piece. On by default: the appearance is what its owner chose
+ * it for, and this is the switch for a player who prefers the official model of everyone else.
+ * @param {{ value: boolean, onSet: (v: boolean) => void }} props
+ */
+function OtherSkinsRow({ value, onSet }) {
+  return html`<${Toggle} label=${t('显示其他玩家的皮肤')} micro="OTHER SKINS"
+    value=${value} onChange=${(v) => onSet(v)} />`;
 }
 
 /**
@@ -185,6 +232,77 @@ function UiPluginSection() {
  * Settings modal.
  * @param {{ open: boolean, onClose: Function }} props
  */
+/**
+ * 素材存储: the 导入素材包 dialog asks for persistent storage once, as an import ends (ui/assetImport.js); this button asks
+ * again whenever the player wants, and the line under it says what the browser answers now (navigator.storage.persisted).
+ * Chrome and Edge decide silently from their own signals, Firefox asks the player; neither answer outlives a manual clear
+ * of the site's data. StorageManager exists only in a secure context: on plain http to a LAN IP the line says so and
+ * there is no button. Laid out like 问题反馈 below it.
+ */
+const PERSIST_NOTES = {
+  on: N_('已持久保存：存储空间不足时，浏览器不会自动清掉导入的素材。'),
+  off: N_('未持久保存：存储空间不足时，浏览器可能清掉导入的素材。'),
+  refused: N_('浏览器没有同意。Chrome 和 Edge 会根据本站的使用情况自行决定，常用或安装为应用后更容易同意，可以之后再试。'),
+  insecure: N_('需要通过 https 或 localhost 打开本站，才能申请持久保存。'),
+  unsupported: N_('这个浏览器不支持持久保存。'),
+};
+/** The result line of 清理旧版本素材 (msgids: translated when shown). */
+const PRUNE_NOTES = {
+  done: N_('已清理 {n} 个旧版本文件。'),
+  none: N_('没有需要清理的旧版本文件。'),
+  failed: N_('读不到服务器的素材清单，没有删除任何文件。'),
+};
+
+function StorageSection() {
+  const [state, setState] = useState(null);  // a PERSIST_NOTES key, null while the browser is asked
+  const [busy, setBusy] = useState(false);
+  useEffect(() => {
+    let live = true;
+    const unknown = () => (globalThis.isSecureContext ? 'unsupported' : 'insecure');
+    storagePersisted().then((kept) => { if (live) setState(kept === null ? unknown() : kept ? 'on' : 'off'); });
+    return () => { live = false; };
+  }, []);
+  const ask = async () => {
+    setBusy(true);
+    const kept = await askPersistStorage();
+    setBusy(false);
+    setState(kept === null ? 'unsupported' : kept ? 'on' : 'refused');
+  };
+  const askable = state === 'on' || state === 'off' || state === 'refused';
+  // 清理旧版本素材: only where an import can exist (a secure context with Cache Storage), never while one runs
+  const [importing, setImporting] = useState(() => ['reading', 'importing'].includes(assetImport.get().phase));
+  useEffect(() => assetImport.subscribe((s) => setImporting(['reading', 'importing'].includes(s.phase))), []);
+  const [pruning, setPruning] = useState(false);
+  const [pruned, setPruned] = useState(null); // { kind: 'done' | 'none' | 'failed', n }
+  const prune = async () => {
+    const ok = await confirmDialog({ title: t('清理旧版本素材'), text: t('删除这台浏览器里、当前服务器版本已经用不到的导入素材；仍在使用的会保留。'), okText: t('清理') });
+    if (!ok) return;
+    setPruning(true);
+    try {
+      const r = await pruneImportedAssets();
+      setPruned(r.removedFiles > 0 ? { kind: 'done', n: r.removedFiles } : { kind: 'none' });
+    } catch {
+      setPruned({ kind: 'failed' });
+    } finally { setPruning(false); }
+  };
+  return html`<section class="set-storage" aria-labelledby="set-storage-title" data-testid="storage-section">
+    <div class="set-keys__head">
+      <span class="set-row__label" id="set-storage-title">${t('素材存储')}<${MicroLabel}>STORAGE<//></span>
+      <span class="set-storage__actions">
+        ${importSupport().ok ? html`<${Button} variant="ghost" size="sm" icon="refresh" data-testid="storage-prune" disabled=${pruning || importing}
+          loading=${pruning} onClick=${prune}>${t('清理旧版本素材')}<//>` : null}
+        ${askable ? html`<${Button} variant="ghost" size="sm" icon="shield" data-testid="storage-persist" disabled=${state === 'on' || busy}
+          loading=${busy} onClick=${ask}>${state === 'on' ? t('已持久保存') : t('申请持久保存')}<//>` : null}
+      </span>
+    </div>
+    <p class="set-hint">${t('导入的素材包保存在这个浏览器里。手动清除网站数据会删除它们；Safari 约 7 天没打开本站也可能清除。')}</p>
+    ${state ? html`<p class=${cx('set-keys__note', state !== 'on' && state !== 'off' && 'is-warn')} role="status" aria-live="polite"
+      data-testid="storage-note">${t(PERSIST_NOTES[state])}</p>` : null}
+    ${pruned ? html`<p class=${cx('set-keys__note', pruned.kind === 'failed' && 'is-warn')} role="status" aria-live="polite"
+      data-testid="storage-prune-note">${t(PRUNE_NOTES[pruned.kind], { n: pruned.n })}</p>` : null}
+  </section>`;
+}
+
 export function SettingsModal({ open, onClose }) {
   const s = useSettings();
   const [binding,setBinding] = useState(null);

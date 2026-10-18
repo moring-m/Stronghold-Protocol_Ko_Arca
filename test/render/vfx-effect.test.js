@@ -177,6 +177,19 @@ describe('placement and direction', () => {
     assert.ok(Math.abs(fx.world[2][12] + 1) < 1e-6 && Math.abs(fx.world[2][14] + 0.5) < 1e-6);
   });
 
+  test('runtime area scale reduces rendered Local and Hierarchy particles exactly once',()=>{
+    for(const mode of [0,1]){
+      const widths=[];
+      for(const scale of [1,.5]){
+        const r=root([pe({})]);r.scale=[3,3,3];const n=psNode(1,0);n.particleSystem.scalingMode=mode;
+        const fx=new Effect(compileEffect(desc([r,n])),{seed:1}).place({scale});fx.update(1/30);const fd=new FrameData();
+        fx.collect(cameraBasis(30,[0,-5,-8],720,.7),fd,()=>{},1);assert.ok(fd.nq>0);widths.push(Math.hypot(fd.quad[3],fd.quad[4],fd.quad[5]));
+      }
+      assert.ok(Math.abs(widths[1]/widths[0]-.5)<1e-6,`mode ${mode}: visible particle width halves once`);
+      if(mode===1)assert.equal(widths[0],1,'authored parent scale still does not enlarge Local particles');
+    }
+  });
+
   test('collect: one quad item per visible system with its material and sort keys', () => {
     const fx = new Effect(compileEffect(desc([root([pe({})]), psNode(1, 0, { order: 7 })])), { seed: 1 });
     fx.update(1 / 30);
@@ -294,6 +307,33 @@ describe('wiring', () => {
     return { ofx, spawned, handles };
   }
   const view = (id, key, x, enemy = false) => ({ id, x, y: 10, z: 0, visFacing: enemy ? -1 : 1, isEnemy: enemy, alive: true, flags: 0, info: { id, spine: key, defId: key, side: enemy ? 'enemy' : 'ally', kind: enemy ? 'enemy' : 'op', skillIndex: 1 } });
+
+  test('Degenbrecher S3 shrinks slash art while retaining ground range, target hits and weapon glows',async()=>{
+    const {ofx,handles}=fakeOfx();const w=new FxWiring(ofx);await w.ready();const v=view(1,'char_x',5);
+    for(const k of ['blkkgt_skill_03_start_01','blkkgt_skill_03_end'])w.playOn(k,v);
+    for(const h of handles)assert.equal(h.place.scale,0.5,h.key);
+    for(const k of ['blkkgt_skill_03_start_02','blkkgt_skill_03_hit_1','blkkgt_skill_03_hit_2','blkkgt_skill_03_start_03','blkkgt_skill_03_start_04','x_start']){w.playOn(k,v);assert.equal(handles.at(-1).place.scale,undefined,k);}
+    w.playOn('blkkgt_skill_03_end',v,{scale:2});assert.equal(handles.at(-1).place.scale,1,'explicit runtime scaling composes with the area correction');
+    w.clear();
+  });
+
+  test('explicit wind-ups start every cast before its strike, without replaying the cast at impact', async () => {
+    const {ofx,handles,spawned}=fakeOfx();const w=new FxWiring(ofx);await w.ready();
+    const src=view(1,'char_x',5),tgt=view(2,'enemy_y',6,true);
+    for(let n=0;n<4;n++){
+      ofx.time=n*1.2;w.tick();
+      assert.equal(w.attackStart(src,tgt,'none',{lead:.4,left:1,speed:1.5}),true);
+      assert.equal(w.hasAttackStart(src),true);
+      assert.equal(spawned.filter(k=>k==='x_start').length,n+1,'cast begins at each explicit start');
+      assert.equal(handles.at(-1).opts.speed,1.5);
+      ofx.time+=.4;w.attack(src,tgt,'none',ofx.time);
+      assert.equal(spawned.filter(k=>k==='x_start').length,n+1,'impact does not restart wind-up effects');
+      assert.equal(w.hasAttackStart(src),false);
+    }
+    w.attackStart(src,tgt,'none',{lead:.4});w.cancelAttack(src);assert.equal(w.hasAttackStart(src),false);
+    w.attackStart(src,tgt,'none',{lead:.4});ofx.time+=1;assert.equal(w.hasAttackStart(src),false,'a missed strike cannot suppress a later attack');
+    w.clear();
+  });
 
   test('a melee attack casts at the attacker and plays its hits when the damage lands', async () => {
     const { ofx, spawned } = fakeOfx();
@@ -438,4 +478,55 @@ describe('wiring', () => {
 test('a −30° Graphic tilt and the +30° effect tilt cancel (the pre-tilted content of §33.2)', () => {
   const v = quatRotate([0.258819, 0, 0, 0.965926], quatRotate([-0.258819, 0, 0, 0.965926], [0, 1, 0]));
   assert.ok(Math.abs(v[1] - 1) < 1e-5);
+});
+
+test('late prefab loading catches up to attack time, including wind-up and OnPlay children', async () => {
+  const child = compileEffect(desc([root([pe({})]), psNode(1, 0, { life: 2 })], { key: 'child' }));
+  const parent = compileEffect(desc([root([pe({ _delayToPlay: 0.2 }), { class: 'OnPlayEmitter', enabled: true, fields: { _effects: ['child'], _preDelay: 0 } }]), psNode(1, 0, { life: 2 })], { key: 'parent' }));
+  const defs = new Map([['child', child]]);
+  let resolve;
+  const lib = { available: true, defs, has: () => true, def: k => defs.get(k), load: () => new Promise(r => { resolve = r; }) };
+  const ofx = new OfficialFx({ P: { Container: class {} }, renderer: null, cam: () => null, lib, tier: 'full' });
+  const handle = ofx.spawn('parent', { pos: [0, 0, 0], scale: 0.5 }, { skip: 0.1 });
+  ofx.update(0.15); ofx.update(0.15);
+  defs.set('parent', parent); resolve(parent); await Promise.resolve();
+  assert.ok(Math.abs(handle.effect.time - 0.4) < 1e-8);
+  assert.ok(handle.effect.sys[1].count > 0, 'authored wind-up is already past, rather than starting after the load');
+  assert.ok(Math.abs(handle.children[0].effect.time - 0.4) < 1e-8, 'chained effect shares the original attack clock');
+  assert.equal(handle.children[0].effect.rootScale, 0.5);
+});
+
+test('asset load time while battle is paused adds no animation delay', async () => {
+  const def = compileEffect(desc([root([pe({})]), psNode(1, 0)], { key: 'paused' }));
+  let resolve;
+  const lib = { available: true, defs: new Map(), has: () => true, def: () => undefined, load: () => new Promise(r => { resolve = r; }) };
+  const ofx = new OfficialFx({ P: { Container: class {} }, renderer: null, cam: () => null, lib, tier: 'full' });
+  const h = ofx.spawn('paused', { pos: [0, 0, 0] });
+  ofx.update(0); resolve(def); await Promise.resolve();
+  assert.equal(h.effect.time, 0);
+});
+
+test('OnFinish children retain the runtime area scale', () => {
+  const end = compileEffect(desc([root([pe({})]), psNode(1, 0)], { key: 'end' }));
+  const parent = compileEffect(desc([root([pe({})]), psNode(1, 0)], { key: 'parent' }));
+  parent.onFinish = ['end'];
+  const defs = new Map([['parent', parent], ['end', end]]);
+  const lib = { available: true, defs, has: k => defs.has(k), def: k => defs.get(k) };
+  const ofx = new OfficialFx({ P: { Container: class {} }, renderer: null, cam: () => null, lib, tier: 'full' });
+  let endScale;
+  const spawn = ofx.spawn.bind(ofx);
+  ofx.spawn = (key, place, opts) => { const h = spawn(key, place, opts); if (key === 'end') endScale = h.effect.rootScale; return h; };
+  ofx.spawn('parent', { pos: [0, 0, 0], scale: 0.5 });
+  for (let i = 0; i < 60; i++) ofx.update(1 / 30);
+  assert.equal(endScale, 0.5);
+});
+
+test('cast playback uses attack rate and preserves authored opt-out and limit', () => {
+  for(const [fields,expected] of [[{_usePlaybackSpeed:1,_limitedPlaybackSpeed:2},2],[{_usePlaybackSpeed:0},1]]){
+    const def=compileEffect(desc([root([pe(fields)]),psNode(1,0)],{key:'cast'}));
+    const lib={available:true,defs:new Map(),has:()=>true,def:()=>def};
+    const ofx=new OfficialFx({P:{Container:class{}},renderer:null,cam:()=>null,lib,tier:'full'});
+    const h=ofx.spawn('cast',{pos:[0,0,0]},{speed:3});assert.equal(h.effect.speed,expected);
+    ofx.update(.1);assert.ok(Math.abs(h.effect.time-.1*expected)<1e-8);
+  }
 });

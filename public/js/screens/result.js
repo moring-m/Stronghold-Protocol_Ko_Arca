@@ -1,3 +1,5 @@
+import { useStore, store, emptyMatch } from '../store.js';
+import { TestMark } from "../ui/testConsole.js";
 import { AUGMENT_GRADES } from '../../../shared/augments.js';
 import { LaboratoryRestartButton } from '../ui/laboratory.js';
 import { EXTENSION_CATEGORIES, RULE_VALUES, customExtensionCatalog, recordCustomExtensions } from '../../../shared/customExtensions.js';
@@ -26,7 +28,6 @@ import { html, Button, Icon, MicroLabel, DifficultyTag } from '../ui/components.
 import { useGameData, Img, UnitThumb, BandIcon, PlayerAvatar, BondGlyph, LpTower, Sprite } from '../ui/gameComponents.js';
 import { normalizeResult, fmtNum } from '../ui/gameLogic.js';
 import { enemyIconUrl, titleIconUrl, uiUrl } from '../ui/assetUrls.js';
-import { store, useStore, emptyMatch } from '../store.js';
 import { audio } from '../audio.js';
 import { sentText } from '../ui/lang.js';
 import { UnofficialMark } from '../ui/pluginTag.js';
@@ -97,11 +98,11 @@ export function ResultScreen() {
 }
 
 /**
- * The settlement view of one m.result payload — the live screen above, and the stats page's re-view of a stored match
- * (screens/stats.js, which hands it the payload recordToResult rebuilt; `quiet`: no settlement jingle).
- * `content`: the room's content (room.state.content, or a stats record's) — gameplay plugins mark the result unofficial
- * (DESIGN §32.6).
- * @param {{ res: any, pub?: any, myId?: string|null, backLabel: string, onBack: () => void, quiet?: boolean, content?: any }} props
+ * The settlement view of one m.result payload — the live flow's 数据详情 (screens/settle.js), and the stats page's
+ * re-view of a stored match (screens/stats.js, which hands it the payload recordToResult rebuilt; `quiet`: no settlement
+ * jingle). `content`: the room's content (room.state.content, or a stats record's) — gameplay plugins mark the result
+ * unofficial (DESIGN §32.6). `slot`: the 结算 tab plugin slot (result.tab) — false where the page under it has one.
+ * @param {{ res: any, pub?: any, myId?: string|null, backLabel: string, onBack: () => void, quiet?: boolean, content?: any, slot?: boolean }} props
  */
 export function ResultView({ res, pub = null, myId = null, backLabel, onBack, quiet = false, chat = false, content = null }) {
   const gd = useGameData();
@@ -134,6 +135,8 @@ export function ResultView({ res, pub = null, myId = null, backLabel, onBack, qu
         ${r.difficulty ? html`<${DifficultyTag} difficulty=${r.difficulty} size="lg" />` : null}
         <h1 class="result__headline">${r.victory ? t('模拟完成') : t('模拟失败')}</h1>
         <${UnofficialMark} room=${content ? { content } : null} class="result__modmark" />
+        ${res?.test === true ? html`<p class="result__test" data-testid="result-test"><${TestMark} /> ${t('测试对局')}${Number.isInteger(res.testActions) ? html` · ${t('测试指令 {n} 次', { n: res.testActions })}` : null}</p>
+          <p class="t-dim">${t('本局为测试对局，不计入统计、成就、称号、徽章与卫戍认证。')}</p>` : null}
         <p class="result__sub">${r.victory ? t('成功卫戍 · 敌方领袖已被击败') : t('防线已被突破')}</p>
         <div class="result__rounds">
           <span class="result__rlabel">通过回合</span>
@@ -168,3 +171,10 @@ export function ResultView({ res, pub = null, myId = null, backLabel, onBack, qu
   </div>`;
 }
 
+
+export function resultBonds(bonds, bondRec = () => null) {
+  const list = (Array.isArray(bonds) ? bonds : []).filter((b) => b && typeof b.bondId === 'string')
+    .map((b) => (bondRec(b.bondId)?.noStack ? { ...b, hideLayers: true } : b));
+  const shown = (b) => (b.hideLayers ? 0 : b.layers || 0);
+  return list.filter((b) => b.active || shown(b) > 0).sort((a, b) => shown(b) - shown(a)).slice(0, 6);
+}

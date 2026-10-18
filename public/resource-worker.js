@@ -210,6 +210,12 @@ self.addEventListener('fetch', event => {
       const imported=await caches.open('sp-imported-assets-v1');
       const hit=await imported.match(url.origin+url.pathname);if(hit)return hit;
     }
+    // Cached files must not wait for the multi-megabyte download catalogue.
+    // Keep the same normalized path used by the regular manifest lookup below.
+    const earlyQuery=new URL(url.href).searchParams;earlyQuery.delete('release');
+    const earlyPath=url.pathname.replace(/^\/(assets|fonts|media)\/~[a-f0-9]+\//,'/$1/')+(earlyQuery.toString()?'?'+earlyQuery.toString():'');
+    const existing=await caches.match(earlyPath);
+    if(existing)return existing;
     const resources = await index();
     const cache = await caches.open(PREFIX + resources.version);
     const assetPath = url.pathname.replace(/^\/(assets|fonts|media)\/~[a-f0-9]+\//, '/$1/');

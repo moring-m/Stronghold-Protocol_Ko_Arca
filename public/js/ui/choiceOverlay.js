@@ -1,3 +1,4 @@
+import { MicroLabel } from './components.js';
 import { t } from '../../../shared/i18n.js';
 
 // 机变 draft overlay (research 06 §4.4 / §11.5): family title | description, "倒计时结束后仍未选定将自动分配",
@@ -11,15 +12,15 @@ import { t } from '../../../shared/i18n.js';
 // playtest #6 item 6: at 756×366 it used to sit below a large centred icon, clipped away). Picking takes two taps, like
 // buying in the shop (user playtest #4 item 2 — extra enemies, items and tactics were picked by a slip of the finger;
 // research 09 §5 EventOnFirstClick → EventOnConfirm): the first tap on an available card selects it (it lifts with a
-// gold frame and a 确认选择 · 再次点击 strip; the header shows 确认选择), a second tap on the same card — or 确认选择 —
+// white frame and a ☑ 确认选择 · 再次点击 strip; the header shows 确认选择), a second tap on the same card — or 确认选择 —
 // sends g.choice; a tap on another card moves the selection, a tap elsewhere or Esc drops it. Cards are buttons (Tab /
 // Enter work the same way). While the pick is in flight the card shows a "选择中" strip with a sweeping bar (never a
 // spinner over its text — user playtest #3 item 9), dropped as soon as the pick shows in m.public (spBusy itself resets
 // when the request settles, ≤ 8 s, or the phase moves on). Untimed drafts (solo, a single-human match: sp.untimed) show
-// no countdown and say so.
+// no countdown and say so. The selected card's frame and its ☑ 确认选择 strip are white, as in the event's video (10:16).
 
 import { useEffect, useState } from '../../vendor/hooks.module.js';
-import { html, Icon, TierChip, Countdown, MicroLabel, Button } from './components.js';
+import { html, Icon, TierChip, Countdown, Button } from './components.js';
 import { Img, RichText, PlayerAvatar, GIcon } from './gameComponents.js';
 import { itemIconUrl, enemyIconUrl, uiUrl } from './assetUrls.js';
 import { richTextPlain } from './richText.js';
@@ -147,6 +148,22 @@ export function ChoiceOverlay(props) {
   };
   return html`<${ChoiceView} ...${props} armed=${armed} onTap=${tap}
     onConfirm=${() => { if (armed != null) tap(armed); }} onDisarm=${() => setSel(null)} />`;
+}
+
+/**
+ * The pick order as the team panel shows it during a shared draft (the official 悬赏决策: ✓ beside who has picked, •••
+ * beside who is deciding): playerId → 'done' | 'turn'. Empty for solo and personal picks.
+ * @param {any} sp normalizeSp(...) @param {{ solo: boolean }} o
+ * @returns {Map<string, 'done'|'turn'>}
+ */
+export function spMarks(sp, { solo }) {
+  const out = new Map();
+  if (!sp || solo || !Array.isArray(sp.order)) return out;
+  for (const pid of sp.order) {
+    if (sp.pickOf.has(pid)) out.set(pid, 'done');
+    else if (sp.turnPid === pid) out.set(pid, 'turn');
+  }
+  return out;
 }
 
 /**

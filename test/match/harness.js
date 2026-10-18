@@ -25,6 +25,7 @@ import { FakeBattle } from './fakeBattle.js';
 import { GEO } from '../../shared/constants.js';
 import { collectViolations } from '../../server/match/invariants.js';
 import { attachSimClients } from './simClient.js';
+import { morphSlotPolicy, ruleOption } from '../../shared/plugins/rules.js';
 
 export const DATA = getData({ log: { warn() {}, error() {}, info() {} } });
 
@@ -41,7 +42,7 @@ export function makeMatch(o = {}) {
   }
   const sched = new VirtualScheduler({ instantCombat: o.instant !== false });
   const logs = { error: [], warn: [] };
-  const log = { info() {}, debug() {}, warn: (...a) => logs.warn.push(a.map(String).join(' ')), error: (...a) => logs.error.push(a.map(String).join(' ')) };
+  const log = { info: (...a) => o.log?.info?.(...a), debug() {}, warn: (...a) => logs.warn.push(a.map(String).join(' ')), error: (...a) => logs.error.push(a.map(String).join(' ')) };
   const h = { sent: [], bc: [], ended: null, endedCount: 0, logs, sched, frames: 0, badFrames: [], onSend: [], onBroadcast: [], clients: null };
   const captureFrames = o.captureFrames !== false;
   const checkFrame = (msg) => {
@@ -55,7 +56,7 @@ export function makeMatch(o = {}) {
     if (o.script) FakeBattle.script = o.script;
   }
   h.m = new Match({
-    roomCode: 'TEST', aiPicksLast: o.aiPicksLast, customFactions:o.customFactions, customExtensions:o.customExtensions, mode, difficulty, seats, spectators: o.spectators, seed: o.seed ?? 1, matchNo: o.matchNo, data: o.data ?? DATA, log,
+    roomCode: 'TEST', kitted:o.kitted, test:o.test, journal:o.journal, testModeGate:o.testModeGate, rules:o.rules, aiPicksLast: o.aiPicksLast, customFactions:o.customFactions, customExtensions:o.customExtensions, mode, difficulty, seats, spectators: o.spectators, seed: o.seed ?? 1, matchNo: o.matchNo, data: o.data ?? DATA, log,
     send: (id, msg) => {
       for (const fn of h.onSend) fn(id, msg);
       if (msg.t === 'b.snap' || msg.t === 'b.ev') { h.frames++; if (!captureFrames) return true; }
@@ -67,6 +68,7 @@ export function makeMatch(o = {}) {
     onEnd: (s) => { h.ended = s; h.endedCount++; },
     scheduler: sched,
     registry: o.registry,
+    offers: o.offers,
     BattleClass: o.fake ? FakeBattle : undefined,
     battleContent: o.battleContent,
     timerScale: o.timerScale,
@@ -74,7 +76,7 @@ export function makeMatch(o = {}) {
     // simulation work of full-match suites; test/match/bot.test.js covers it
     botRehearsal: o.botRehearsal ?? 0,
     botSliceMs: o.botSliceMs,
-    hostId: o.hostId,
+    hostId: Object.hasOwn(o, 'hostId') ? o.hostId : seats.find(s=>!s.isBot)?.playerId,
     botRehearsalDelegate: o.botRehearsalDelegate,
     botRehearsalDelegateMs: o.botRehearsalDelegateMs,
     cs: o.cs, vs: o.vs, requireCs: o.requireCs,
@@ -195,7 +197,8 @@ function legacyInvariants(m) {
       if (p.kind === 'chess') {
         const rec = m.gd.chess(p.id);
         assert.ok(rec, `unknown chess ${p.id}`);
-        assert.ok(Array.isArray(p.items) && p.items.length <= m.gd.equipPerChess, `${p.id} carries ${p.items && p.items.length} items`);
+        const slots = morphSlotPolicy(ruleOption(m.rules, 'morphPairing'), (it) => !!ps.gd.item(it?.id)?.canGiveBond);
+        assert.ok(Array.isArray(p.items) && slots.slotsUsed(p.items) <= slots.slotCap(m.gd.equipPerChess), `${p.id} carries ${p.items && p.items.length} items`);
         for (const it of p.items) { note(it); assert.equal(it.kind, 'item'); assert.ok(m.gd.item(it.id), `unknown item ${it.id}`); }
         assert.ok(Number.isInteger(p.poolCopies) && p.poolCopies >= 0);
         const base = m.gd.baseIdOf(p.id);

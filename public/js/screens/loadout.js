@@ -670,11 +670,13 @@ function LoadoutScreen({ st }) {
  * Whether the overlay must close because its context moved on: opened from the briefing and the match left INFO_CHECK
  * (the strategy draft needs the player), or opened from the lobby / room and a match started (its briefing takes over).
  * @param {{ open: boolean, from: string|null }} st @param {string|null} phase @param {boolean} inMatch @param {boolean} wasInMatch
+ * @param {boolean} [ready] this seat has pressed 准备 (closes a panel opened from prep)
  */
-export function shouldAutoClose(st, phase, inMatch, wasInMatch) {
+export function shouldAutoClose(st, phase, inMatch, wasInMatch, ready = false) {
   if (!st || !st.open) return false;
   if(st.from==='bandDraft')return !!phase && phase!==PHASE.BAND_DRAFT;
   if (st.from === 'briefing') return !!phase && phase !== PHASE.INFO_CHECK;
+  if (st.from === 'prep') return phase !== PHASE.PREP || !!ready;
   return inMatch && !wasInMatch;
 }
 
@@ -683,9 +685,10 @@ export function LoadoutHost() {
   const st = useStore((s) => s, Object.is, loadoutStore);
   const phase = useStore((s) => s.match?.public?.phase || null);
   const inMatch = useStore((s) => !!s.room?.inMatch);
+  const ready = useStore((s) => !!s.match?.private?.ready);
   const wasInMatch = useRef(inMatch);
   useEffect(() => {
-    if (shouldAutoClose(st, phase, inMatch, wasInMatch.current)) closeLoadout();
+    if (shouldAutoClose(st, phase, inMatch, wasInMatch.current, ready)) closeLoadout();
     wasInMatch.current = inMatch;
   }, [phase, inMatch, st.open]);
   useDocClass('sp-loadout-open', st.open);
@@ -702,6 +705,6 @@ export {badgeCount} from '../ui/loadoutEntry.js';
 
 /**
  * Entry button (lobby / room / briefing).
- * @param {{ from: 'lobby'|'room'|'briefing', size?: string, variant?: string, class?: string, label?: string }} props
+ * @param {{ from: 'lobby'|'room'|'briefing'|'prep', size?: string, variant?: string, class?: string, label?: string }} props
  */
 export {LoadoutButton} from '../ui/loadoutEntry.js';

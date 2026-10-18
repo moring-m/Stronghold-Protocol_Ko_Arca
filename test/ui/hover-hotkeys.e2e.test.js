@@ -121,7 +121,7 @@ describe('hovered operator shortcuts', { skip: !ENABLED && 'set SP_E2E=1 and CHR
       await inert('a touch pointer cannot supply a hover target');
 
       await page.click('.gm__gear');
-      await page.waitForSelector('.modal .set-keys');
+      await page.waitForSelector('.modal .set-category');
       await page.mouse.move(selectedPoint.x, selectedPoint.y);
       await inert('a dialog blocks hovered shortcuts');
       await page.keyboard.press('Escape');

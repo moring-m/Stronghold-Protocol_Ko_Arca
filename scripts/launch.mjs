@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+import { parseTestModeEnv, testModeGate, unrecognizedTestMode } from '../server/testMode.js';
+export const TEST_MODE_FLAGS = Object.freeze(['off', '1', 'force']);
+export const SCRIPT_MODES = Object.freeze(['off', 'sandbox', 'trusted', 'trusted-force']);
 // scripts/launch.mjs — cross-platform "prepare + start + open the browser", used by scripts/start-windows.bat,
 // scripts/start-windows.ps1 and scripts/start.sh (docs/DEPLOY.md).
 //
@@ -30,7 +33,7 @@ if (Number(process.versions.node.split('.')[0]) < 22) {
 const { c, mark } = await import('../tools/setup.mjs');
 const { probePort, classifyAddresses, KIND_LABEL } = await import('../tools/doctor.mjs');
 
-function parseArgs(argv) {
+export function parseArgs(argv) {
   const o = { port: Number(process.env.PORT) || 3000, host: process.env.HOST || '0.0.0.0', open: !/^(1|true|yes)$/i.test(process.env.SP_NO_BROWSER || ''), setup: true, setupArgs: [], help: false };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
@@ -41,6 +44,7 @@ function parseArgs(argv) {
     else if (a === '--no-open') o.open = false;
     else if (a === '--no-setup') o.setup = false;
     else if (k === '--scripts') o.scripts = val() ?? '';
+    else if (k === '--test-mode') o.testMode = v !== undefined ? v : argv[i + 1] && !argv[i + 1].startsWith('-') ? argv[++i] : '1';
     else if (a === '-h' || a === '--help') o.help = true;
     else if (a === '--game') o.setupArgs.push(a, argv[++i] ?? '');
     else o.setupArgs.push(a);
@@ -48,16 +52,33 @@ function parseArgs(argv) {
   return o;
 }
 
-/** The server's environment: PORT / HOST, and SP_PLUGIN_SCRIPTS from --scripts (off removes an inherited one). */
+/** The server's environment: PORT / HOST, SP_PLUGIN_SCRIPTS from --scripts, SP_TEST_MODE from --test-mode (off removes an inherited one). */
 export function serverEnv(o, base = process.env) {
   const env = { ...base, PORT: String(o.port), HOST: o.host };
   if (o.scripts === 'off') delete env.SP_PLUGIN_SCRIPTS;
   else if (o.scripts) env.SP_PLUGIN_SCRIPTS = o.scripts;
+  if (o.testMode === 'off') delete env.SP_TEST_MODE;
+  else if (o.testMode) env.SP_TEST_MODE = o.testMode;
   return env;
 }
 
 function openBrowser(url) {
   return openInBrowser(url) !== null;
+}
+
+/**
+ * Chinese startup hint for a refused `1` or an unrecognised SP_TEST_MODE. `interfaces` is a test snapshot.
+ * @param {{ host?: string }} o @param {NodeJS.ProcessEnv} env @param {{ warn?: (s: string) => void }} [log]
+ * @param {object} [interfaces]
+ */
+export function warnTestMode(o, env, log = console, interfaces) {
+  const raw = env && env.SP_TEST_MODE;
+  const unknown = unrecognizedTestMode(raw);
+  if (unknown) { log.warn?.(unknown); return; }
+  const mode = parseTestModeEnv(raw);
+  if (mode === 'off') return;
+  const gate = testModeGate(mode, o && o.host, interfaces);
+  if (gate.warn && mode === 'local') log.warn?.(gate.warn);
 }
 
 function printShare(port) {
@@ -97,6 +118,10 @@ async function main() {
     console.error(`${mark.err} --scripts 只接受 ${SCRIPT_MODES.join(' / ')}（插件脚本模式，docs/PLUGINS.md §13） · --scripts takes ${SCRIPT_MODES.join(' / ')}`);
     return 2;
   }
+  if (o.testMode !== undefined && !TEST_MODE_FLAGS.includes(o.testMode)) {
+    console.error(`${mark.err} --test-mode 只接受 ${TEST_MODE_FLAGS.join(' / ')}（测试房间，docs/DEPLOY.md） · --test-mode takes ${TEST_MODE_FLAGS.join(' / ')}`);
+    return 2;
+  }
   const localUrl = `http://localhost:${o.port}`;
 
   const before = await probePort(o.port, o.host);
@@ -118,6 +143,7 @@ async function main() {
   }
 
   const env = serverEnv(o);
+  warnTestMode(o, env);
   const child = spawn(process.execPath, [path.join(ROOT, 'server', 'index.js')], { cwd: ROOT, env, stdio: 'inherit' });
   const forward = (sig) => { if (child.exitCode === null) { try { child.kill(sig); } catch { /* gone */ } } };
   // SIGINT reaches the server straight from the terminal (same process group / console); forwarding it too would make

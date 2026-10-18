@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { charModesFromIndex } from "./assets/plan.mjs";
 import {VOICE_OPTIONAL_TREES} from "./assets/plan.mjs";
 import { restartForEnvProxy } from './assets/env-proxy.mjs';
 // Downloads, post-processes and indexes every art/audio/font asset the game
@@ -349,6 +350,17 @@ async function main() {
   const network = { source, proxyPrefix, mirrorPolicy, verifier };
   const { audioData, modelsData, charword } = await loadIndexes(ROOT, { refresh: opts.refreshIndex && !opts.offline, offline: opts.offline, log, ...network });
   const audio = indexAudio(audioData);
+  // Skill attack slots follow each operator's mode list when the local fx index is on disk (#679). It is a client
+  // extract (public/assets is not in git); without it the plan keeps the filename-letter fallback.
+  const fxIndexPath = join(ROOT, 'public', 'assets', 'local', 'fx', 'index.json');
+  let charModes = null;
+  if (existsSync(fxIndexPath)) {
+    const fxIndex = JSON.parse(await readFile(fxIndexPath, 'utf8'));
+    charModes = charModesFromIndex(fxIndex);
+    log(`[fx] skill modes for ${charModes.size} operators`);
+  } else {
+    log('[fx] no local fx index — skill attack slots stay on the filename letter');
+  }
   // The game data built by tools/build-data.mjs (when present) may reference more
   // spawnable enemies/tokens than research lists (e.g. 机变 enemy swaps): cover them too.
   const [dataEnemies, dataTokens, dataBosses] = await Promise.all(

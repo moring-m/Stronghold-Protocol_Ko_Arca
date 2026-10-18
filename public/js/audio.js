@@ -35,9 +35,11 @@ import {reportResourceProgress} from './resourceProgress.js';
 //   한국어 `audio.voiceKr` and the operator's own-language dub `audio.voiceNative` (settings 语音语言, the 本土语言
 //   switch and the per-operator override; not tied to the interface language). A line the chosen tree or the host
 //   lacks falls back to the Chinese file of the same name (voiceLine).
-// - Battle SFX from `b.ev` tuples (`handleBattleEvents`): at most MAX_VOICES concurrent unit sounds, at most
-//   MAX_PER_URL overlapping copies of one sound (the official banks' maxSoundAllowed 2), a per-unit cooldown and a
-//   per-URL minimum gap (SfxLimiter), so a 60-unit fight stays listenable. A `['skill', id, 1]` that arrives before its
+// - Battle SFX from `b.ev` tuples (`handleBattleEvents`): attack / hit use their official bank's maxSoundAllowed,
+//   popOldest, and the played file's minPitch / maxPitch / delay (audio_data.json, #680). Aliases share a pool; distinct
+//   banks sharing a file do not. [ASSUMED] The remake's MAX_VOICES ceiling, 160 ms per-unit cooldown and 45 ms per-URL
+//   gap remain on top to guard high game speeds; sounds without pool metadata keep the legacy two-copy cap.
+//   A `['skill', id, 1]` that arrives before its
 //   unit is known is held and played once the unit is tracked (`pendingSkill`): a unit that casts inside its own deploy
 //   tick emits that first cue before its `['spawn', unitInfo]`, and dropping it left the one cast silent while every
 //   later one played (GitHub PR #292 by @LimitlessHPPK).
@@ -88,9 +90,14 @@ import { chatNotificationSound, defaultChatCooldown } from './chatNotificationSo
 import { unhashedUrl } from '../../shared/assetPaths.js';
 
 const MAX_VOICES = 8;
+// [ASSUMED] Remake anti-spam intervals, retained at high game speeds; not official audio pool parameters (#680).
 const UNIT_COOLDOWN_MS = 160;
 const URL_GAP_MS = 45;
 const MAX_PER_URL = 2;
+// [ASSUMED] Bound decoding/delayed attack requests independently of playing voices (#680 review). Stalled URLs
+// keep one decode subscriber across field changes; only the latest request per bank/unit waits for that decode.
+const POOL_PENDING_MAX = 64;
+const POOL_DECODE_MAX_MS = 2500; // [ASSUMED] Older undecoded attacks are obsolete, like the impact attribution window.
 /**
  * 漏怪: the original Arknights exit alarm (`sfx.battle.leak`, `battle/b_ui/b_ui_alarmenter`) runs **1.44 s**, and the
  * official bank is a one-shot: `battle.ON_ENEMY_REACHED_EXIT` carries `maxSoundAllowed: 1` with `popOldest: true` on the
@@ -322,7 +329,7 @@ export function voiceLine(audio, charId, slot, lang = 'kr', random = Math.random
   const lines = line => (Array.isArray(line) ? line : [line]).filter(u => typeof u === 'string' && u && !/\/voice\/(cn|voice_cn)\//.test(u));
   const draw = list => list.length ? list[Math.min(list.length - 1, Math.floor(random() * list.length))] : null;
   const base = audio?.voice || {};
-  const jp = lines((base.jp || audio?.voiceJp)?.[charId]?.[slot]);
+  const jp = lines((base.jp || audio?.voiceJp || base)?.[charId]?.[slot]);
   const selected = draw(lang === 'jp' ? jp : lines((base.kr || audio?.voiceKr)?.[charId]?.[slot]));
   if (selected) {
     const file = u => u.slice(u.lastIndexOf('/') + 1);
@@ -408,8 +415,7 @@ export class SfxLimiter {
     this.maxVoices = o.maxVoices ?? MAX_VOICES;
     this.unitCooldownMs = o.unitCooldownMs ?? UNIT_COOLDOWN_MS;
     this.urlGapMs = o.urlGapMs ?? URL_GAP_MS;
-    // the official battle banks (attack, impact, heal, born, dead…) allow at most 2 overlapping copies of a sound
-    // (audio_data maxSoundAllowed 2): a heal / impact heard on every tick of a crowd never piles up
+    // [ASSUMED] Legacy fallback for sounds without official pool metadata (and prep landing voices).
     this.maxPerUrl = o.maxPerUrl ?? MAX_PER_URL;
     this.active = 0;
     this.lastByUnit = new Map();
@@ -423,21 +429,27 @@ export class SfxLimiter {
    * @param {string|number|null} unitKey e.g. `${unitId}:atk`
    * @param {string} url
    */
-  tryAcquire(now, unitKey, url) {
+  tryAcquire(now, unitKey, url, maxPerUrl = this.maxPerUrl) {
     if (this.active >= this.maxVoices) return false;
-    if ((this.activeByUrl.get(url) || 0) >= this.maxPerUrl) return false;
-    if (unitKey != null) {
-      const t = this.lastByUnit.get(unitKey);
-      if (t != null && now - t < this.unitCooldownMs) return false;
-    }
-    const u = this.lastByUrl.get(url);
-    if (u != null && now - u < this.urlGapMs) return false;
+    if ((this.activeByUrl.get(url) || 0) >= maxPerUrl) return false;
+    if (!this.gapsAllow(now, unitKey, url)) return false;
     if (unitKey != null) this.lastByUnit.set(unitKey, now);
     this.lastByUrl.set(url, now);
     if (this.lastByUnit.size > 600) this.lastByUnit.clear();
     if (this.lastByUrl.size > 400) this.lastByUrl.clear();
     this.active += 1;
     this.activeByUrl.set(url, (this.activeByUrl.get(url) || 0) + 1);
+    return true;
+  }
+
+  /** Read-only gap check before a pool takes over its oldest instance. */
+  gapsAllow(now, unitKey, url) {
+    if (unitKey != null) {
+      const t = this.lastByUnit.get(unitKey);
+      if (t != null && now - t < this.unitCooldownMs) return false;
+    }
+    const u = this.lastByUrl.get(url);
+    if (u != null && now - u < this.urlGapMs) return false;
     return true;
   }
 
@@ -574,6 +586,10 @@ export class AudioManager {
     this.bufBytes = new Map(); // url → decoded PCM bytes (the byte budget of the LRU, see _buffer)
     this.warned = new Set();
     this.limiter = new SfxLimiter();
+    this.poolVoices = new Map(); // official bank id → playing instances in start order
+    this.poolRequests = new Set(); // decoding / delayed requests; no playing slots reserved
+    this.poolLoads = new Map(); // url → coalesced decode requests (one subscriber per URL, even across fields)
+    this.poolFieldToken = 0;
     // prep landings (deployCue): their own voices — a full pool hands the oldest one's voice to the newest (_playLanding);
     // no per-file gap (one landing per piece, the cap bounds the overlap), the per-piece cooldown of the battle sounds
     this.landLimiter = new SfxLimiter({ maxVoices: LAND_VOICES, maxPerUrl: LAND_VOICES, urlGapMs: 0 });
@@ -757,7 +773,7 @@ export class AudioManager {
     this.chatSound = v?.chatSound ?? this.chatSound ?? 'emote';
     this.warmChatNotification();
     this._applyVolumes();
-    this.warmVoices([...this.units.values()].filter(u=>u.kind==='op').map(u=>u.def));
+    this.warmVoices([...this.units.values()].filter(u=>u.kind==='op').map(u=>u.voice));
     if (this.volumes.muted || this.volumes.sfx <= 0) this.stopBondCue();
     // the music became audible again: download and start the track the screen wants now (none was fetched meanwhile)
     if (wasSilent && !this.bgmSilent && this.ctx && this.wantBgm) { const k = this.wantBgm; this.wantBgm = null; this.playBgm(k); }
@@ -1205,12 +1221,13 @@ export class AudioManager {
 
   /**
    * @param {string} url
-   * @param {{ volume?: number, rate?: number, limited?: boolean, unitKey?: string | null, again?: (() => unknown) | null }} [o]
+   * @param {{ volume?: number, rate?: number, limited?: boolean, unitKey?: string | null, again?: (() => unknown) | null, pool?: any }} [o]
    *   again: the sound's URL picked from the manifest again — played instead once when this one was a cosmetic plugin's
    *   file that would not load (its entry fell back: see the header)
    */
-  _play(url, { volume = 1, rate = 1, limited = false, unitKey = null, again = null, maxDuration = null } = {}) {
+  _play(url, { volume = 1, rate = 1, limited = false, unitKey = null, again = null, maxDuration = null, pool = null } = {}) {
     if (!this.ctx || !url || this.volumes.muted || this.volumes.sfx <= 0) return;
+    if (limited && pool) { this._playPool(url, { volume, unitKey, again, pool }); return; }
     const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
     if (limited) { if (!this.limiter.tryAcquire(now, unitKey, url)) return; }
     else if (this.uiVoices >= 12) return;
@@ -1240,6 +1257,121 @@ export class AudioManager {
         if (deadline !== null) s.stop(deadline);
       } catch { release(); }
     }, release);
+  }
+
+  /**
+   * Official attack/hit pool (#680, audio_data.json soundFXBanks). Decode and delay are bounded separately from
+   * playing voices: admission/takeover happens only when playback is due, so a sustained stream cannot keep
+   * replacing sources before any start. [ASSUMED] Pending caps/coalescing/expiry, audio-clock due admission and
+   * field-owned cancellation are web-client scheduling guards (review #680).
+   */
+  _playPool(url, { volume, unitKey, again, pool }) {
+    const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+    let load = this.poolLoads.get(url);
+    const key = `${pool.id}:${unitKey ?? ''}`;
+    const previous = load?.get(key);
+    if (previous) { this._dropPoolRequest(previous); load.delete(key); }
+    if (this.poolRequests.size >= POOL_PENDING_MAX || (!load && this.poolLoads.size >= POOL_PENDING_MAX)) return;
+    const req = { url, volume, unitKey, again, pool, ctx: this.ctx, token: this.poolFieldToken, at: now, timer: null };
+    this.poolRequests.add(req);
+    if (load) { load.set(key, req); return; }
+    load = new Map([[key, req]]);
+    this.poolLoads.set(url, load);
+    try {
+      this._buffer(url).then(buf => this._poolDecoded(url, load, buf), () => this._poolDecoded(url, load, null));
+    } catch { this._poolDecoded(url, load, null); }
+  }
+
+  _poolRequestCurrent(req) {
+    return this.poolRequests.has(req) && req.token === this.poolFieldToken && req.ctx === this.ctx
+      && !this.volumes.muted && this.volumes.sfx > 0;
+  }
+
+  _dropPoolRequest(req) {
+    clearTimeout(req.timer);
+    this.poolRequests.delete(req);
+  }
+
+  _poolDecoded(url, load, buf) {
+    this.poolLoads.delete(url);
+    const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+    for (const req of load.values()) {
+      if (!this._poolRequestCurrent(req) || now - req.at > POOL_DECODE_MAX_MS) { this._dropPoolRequest(req); continue; }
+      if (!buf) {
+        this._dropPoolRequest(req);
+        const next = req.again && this.fellBack.has(url) ? req.again() : null;
+        if (typeof next === 'string' && next !== url) this._play(next, { volume: req.volume, limited: true, unitKey: req.unitKey, pool: req.pool });
+        continue;
+      }
+      const path = unhashedUrl(url).replace(/^\/assets\/audio\/sfx\//, '');
+      const sound = req.pool.sounds?.[path];
+      const delay = Math.max(0, sound?.delay || 0);
+      const due = req.ctx.currentTime + delay;
+      const ready = () => {
+        if (!this._poolRequestCurrent(req)) { this._dropPoolRequest(req); return; }
+        // Wall timers also run while AudioContext is suspended. Keep the file's delay on the audio clock.
+        const remaining = due - req.ctx.currentTime;
+        if (remaining > 1e-6) {
+          req.timer = setTimeout(ready, Math.max(10, remaining * 1000));
+          return;
+        }
+        this._dropPoolRequest(req);
+        this._startPool(req, buf, sound);
+      };
+      ready();
+    }
+    load.clear();
+  }
+
+  /** Admit only playing instances. A zero official cap is unlimited within the remake's global budget. */
+  _startPool({ ctx, url, volume, unitKey, pool }, buf, sound) {
+    const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+    if (!this.limiter.gapsAllow(now, unitKey, url)) return;
+    const voices = this.poolVoices.get(pool.id) || [];
+    const limit = pool.maxSoundAllowed > 0 ? pool.maxSoundAllowed : Infinity;
+    const oldest = voices.length >= limit ? voices[0] : null;
+    if (oldest && !pool.popOldest) return;
+    if (!oldest && this.limiter.active >= this.limiter.maxVoices) return;
+    const lo = sound?.minPitch > 0 ? sound.minPitch : 1;
+    const hi = sound?.maxPitch >= lo ? sound.maxPitch : lo;
+    // [ASSUMED] Uniform draw within the played file's official range; absent cosmetic files use pitch 1 / delay 0.
+    const rate = lo + (hi - lo) * Math.max(0, Math.min(1, this.random()));
+    let src, gain, timer, acquired = false, done = false;
+    const end = () => {
+      if (done) return;
+      done = true;
+      clearTimeout(timer);
+      if (acquired) {
+        this.limiter.release(url);
+        const index = voices.indexOf(voice);
+        if (index >= 0) voices.splice(index, 1);
+        if (!voices.length) this.poolVoices.delete(pool.id);
+      }
+      try { src?.disconnect(); gain?.disconnect(); } catch { /* ignore */ }
+    };
+    const voice = { stop: () => { try { src?.stop(); } catch { /* already ended */ } end(); } };
+    try {
+      src = ctx.createBufferSource(); gain = ctx.createGain();
+      src.buffer = buf; src.playbackRate.value = rate;
+      gain.gain.value = Math.max(0, Math.min(1.5, volume));
+      src.connect(gain); gain.connect(this.sfxGain);
+      if (oldest) oldest.stop();
+      acquired = this.limiter.tryAcquire(now, unitKey, url, Infinity);
+      if (!acquired) { end(); return; }
+      voices.push(voice); this.poolVoices.set(pool.id, voices);
+      src.onended = end;
+      src.start(ctx.currentTime);
+      timer = setTimeout(end, buf.duration / rate * 1000 + 250);
+    } catch { end(); }
+  }
+
+  /** Field replacement, battle exit and screen cleanup invalidate downloads/delays and stop every playing pool source. */
+  stopPoolSounds() {
+    this.poolFieldToken++;
+    for (const req of this.poolRequests) this._dropPoolRequest(req);
+    // Keep empty loads subscribed: clearing this map would attach more handlers to the same stalled promise next field.
+    for (const load of this.poolLoads.values()) load.clear();
+    for (const voices of this.poolVoices.values()) for (const voice of [...voices]) voice.stop();
   }
 
   /**
@@ -1298,7 +1430,11 @@ export class AudioManager {
       // the official bank's mix (header): a silent roll still counts as the unit's own sound (no generic fallback)
       const mix = kind === 'skill' ? null : combat?.[kind] ? combat.mix?.[kind] : typeof mode==='string'?(kind==='attack'?u?.attackMix:u?.hitMix)?.[skillIndex]:u?.mix?.[kind];
       if (!unitSoundPlays(mix, this.random())) return true;
-      this._play(url, { volume: unitGain(kind === 'attack' || kind === 'hit' ? 0.55 : 0.8, mix), limited: true, unitKey: `${unitId}:${kind}`, again: () => pick().url });
+      const poolId = typeof mode === 'string'
+        ? (kind === 'attack' ? u?.attackPools : u?.hitPools)?.[skillIndex] : u?.pools?.[kind];
+      const params = this.getManifest()?.audio?.sfx?.pools?.[poolId];
+      const pool = params ? { ...params, id: poolId } : null;
+      this._play(url, { volume: unitGain(kind === 'attack' || kind === 'hit' ? 0.55 : 0.8, mix), limited: true, unitKey: `${unitId}:${kind}`, again: () => pick().url, pool });
       return true;
     } catch { return false; }
   }
@@ -1451,6 +1587,7 @@ export class AudioManager {
 
   /** Reset the unit map for a new field (m.field.units = UnitInfo[]). */
   setFieldUnits(units) {
+    this.stopPoolSounds();
     this.stopBondCue();
     this.units.clear();
     // unit ids belong to one battle: a cast still held for a unit of the field left must not sound for a unit of the new
@@ -1464,15 +1601,15 @@ export class AudioManager {
     for (const u of Array.isArray(units) ? units : []) this._track(u);
     if (this.ctx) for (const u of this.units.values()) { const url=deploySfxUrl(this.getManifest(),u); if(url)this._buffer(url).catch(()=>{}); }
     if (this.effectsWarmRequested) this.warmEffects([...this.units.values()].map(u => u.def));
-    this.startVoicePool = [...this.units.values()].filter(u => u.side !== 'enemy' && unitSoundClass(u) === 'char').map(u => u.def);
-    this.warmVoices([...this.units.values()].filter(u=>u.kind==='op').map(u=>u.def));
+    this.startVoicePool = [...this.units.values()].filter(u => u.side !== 'enemy' && unitSoundClass(u) === 'char').map(u => u.voice);
+    this.warmVoices([...this.units.values()].filter(u=>u.kind==='op').map(u=>u.voice));
   }
 
   _track(u) {
     if (!u || typeof u !== 'object' || u.id == null) return;
     // UnitInfo.spine is the model id (charId / tokenId / enemyId) — the key of sfx.units; kind/defId pick the
     // official class sounds (operator vs summon vs device)
-    this.units.set(u.id, { def: u.charId || u.spine || u.defId, defId: u.defId ?? null, kind: u.kind ?? null, side: u.side, boss: !!u.boss,
+    this.units.set(u.id, { def: u.charId || u.spine || u.defId, voice: u.voice || u.charId || u.spine || u.defId, defId: u.defId ?? null, kind: u.kind ?? null, side: u.side, boss: !!u.boss,
       skillIndex: Number.isInteger(u.skillIndex) ? u.skillIndex : null, skillActive: !!u.skillActive });
     const held=this.pendingSkill.get(u.id);
     if(held){this.pendingSkill.delete(u.id);this.handleBattleEvents([held]);}
@@ -1620,11 +1757,11 @@ export class AudioManager {
             // 作战中N: the equipped skill's own slot (0-based; 作战中4 is the fallback of a 4th slot)
             if (unitSoundClass(u) === 'char') {
               const banks=this.getManifest()?.audio?.voice;
-              const bank=banks?.[this.volumes.voiceLanguage]?.[u.def] || banks?.jp?.[u.def] || this.getManifest()?.audio?.voiceJp?.[u.def];
+              const bank=banks?.[this.volumes.voiceLanguage]?.[u.voice] || banks?.jp?.[u.voice] || this.getManifest()?.audio?.voiceJp?.[u.voice] || banks?.[u.voice];
               const slots=['skill1','skill2','skill3','skill4'].filter(k=>bank?.[k]?.length);
               const n=Number(slots[Math.floor(Math.random()*slots.length)]?.slice(-1)) || 1;
               const condition=this.getManifest()?.audio?.voiceConditions?.[u.def]?.[u.skillIndex];
-              this.voice(u.def, `skill${n}`, { unitKey: e[1], gateSlot: condition?.passive ? (condition.spCost>=10?'passiveImp':'passiveNor') : undefined });
+              this.voice(u.voice, `skill${n}`, { unitKey: e[1], gateSlot: condition?.passive ? (condition.spCost>=10?'passiveImp':'passiveNor') : undefined });
             }
           } else {
             // The unit is not tracked yet. The sim emits the cast of a deployment that fires inside its own first tick
@@ -1643,7 +1780,7 @@ export class AudioManager {
         } else if (kind === 'engage') {
           // 行动开始: the first attack a unit makes on an enemy (the sim's ENGAGE, official ENCOUNTER_ENEMY, 3 s apart)
           const u = this.units.get(e[1]);
-          if (u && unitSoundClass(u) === 'char') this.voice(u.def, 'faceEnemy', { unitKey: e[1] });
+          if (u && unitSoundClass(u) === 'char') this.voice(u.voice, 'faceEnemy', { unitKey: e[1] });
         } else if (kind === 'die') {
           const u = this.units.get(e[1]);
           if (!u) continue;
@@ -1678,8 +1815,8 @@ export class AudioManager {
               this.startVoiceDone = true;
               const pool = this.startVoicePool?.length ? this.startVoicePool : [u.def];
               const speaker = pool[Math.min(pool.length - 1, Math.floor(this.random() * pool.length))];
-              if (!this.voice(speaker, 'start')) this.voice(u.def, 'place', { unitKey: e[1] });
-            } else this.voice(u.def, 'place', { unitKey: e[1] });
+              if (!this.voice(speaker, 'start')) this.voice(u.voice, 'place', { unitKey: e[1] });
+            } else this.voice(u.voice, 'place', { unitKey: e[1] });
           }
 
           if (!url) continue;

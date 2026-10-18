@@ -1530,7 +1530,7 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "ally",
-  "description": "오퍼레이터가 공격할 때마다 HP 30 회복",
+  "description": "오퍼레이터가 공격할 때마다 HP 40 회복",
   "notes": ""
  },
  {
@@ -1544,7 +1544,7 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "ally",
-  "description": "오퍼레이터가 공격할 때마다 HP 50 회복",
+  "description": "오퍼레이터가 공격할 때마다 HP 70 회복",
   "notes": ""
  },
  {
@@ -1558,7 +1558,7 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "ally",
-  "description": "오퍼레이터가 공격할 때마다 HP 80 회복",
+  "description": "오퍼레이터가 공격할 때마다 HP 100 회복",
   "notes": ""
  },
  {
@@ -2078,7 +2078,7 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "ally",
-  "description": "전장과 대기석의 모든 오퍼레이터를 판매하고 모든 장비 파기. 무작위 정예화 오퍼레이터 10명 획득",
+  "description": "전장과 대기석의 모든 오퍼레이터를 판매하고 모든 장비 파기. 무작위 정예화 오퍼레이터 12명 획득",
   "notes": "상점 등급에 관계없이 완전 무작위로 획득"
  },
  {
@@ -2184,5 +2184,47 @@ export const AUGMENT_SOURCES = [
   "side": "ally",
   "description": "목표 HP +31",
   "notes": "공유 HP일 경우 공유 HP에 합산"
+ },
+ {
+  "source": 163,
+  "identity": 163,
+  "grade": "silver",
+  "name": "문명의 존속 I",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "ally",
+  "description": "모든 아군 유닛이 입히는 트루 대미지 +30%",
+  "notes": "선택 시 다른 문명의 존속은 등장하지 않음"
+ },
+ {
+  "source": 164,
+  "identity": 164,
+  "grade": "gold",
+  "name": "문명의 존속 II",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "ally",
+  "description": "모든 아군 유닛이 입히는 트루 대미지 +60%",
+  "notes": "선택 시 다른 문명의 존속은 등장하지 않음"
+ },
+ {
+  "source": 165,
+  "identity": 165,
+  "grade": "prism",
+  "name": "문명의 존속 III",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "ally",
+  "description": "모든 아군 유닛이 입히는 트루 대미지 +100%",
+  "notes": "선택 시 다른 문명의 존속은 등장하지 않음"
  }
 ];

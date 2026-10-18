@@ -281,7 +281,7 @@ export class FunnelFx {
     let n = 0;
     for (const e of g?.cast || []) {
       if (phase !== 'all' && e.phase !== phase) continue;
-      const h = this.w.playOn(e.key, U.v, { follow: true, skip: phase === 'start' ? info.skip : 0, useFourDirectionalFace: !!e.useFourDirectionalFace });
+      const h = this.w.playOn(e.key, U.v, { follow: true, skip: phase === 'start' ? info.skip : 0, speed: info.speed, useFourDirectionalFace: !!e.useFourDirectionalFace });
       if (!h) continue;
       n++;
       if (e.loop) later(this.w.ofx, phase === 'start' && info.left > 0 ? Math.min(3, info.left) : 0.6, () => h.stop());
@@ -468,7 +468,7 @@ export class FunnelFx {
     if (!this._has(key)) return null;
     const def = this.w.ofx.lib.def(key);
     const pos = this._flyPos(dr);
-    return this.w.ofx.spawn(key, { pos, groundZ: pos[2] }, {
+    return this.w.ofx.spawn(key, { pos, groundZ: pos[2], rootRot: [0, 0, 0, 1] }, {
       loop: true, important: true,
       track: (fx) => {
         const p = this._flyPos(dr);

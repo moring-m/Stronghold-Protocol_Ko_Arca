@@ -1,0 +1,538 @@
+path,merge_kind,decision,reason
+.github/ISSUE_TEMPLATE/BugReport.yml,review-policy,기존 설정 유지,사용자 운영/검증 설정을 상류 기본값으로 덮어쓰지 않음
+.github/ISSUE_TEMPLATE/FeatureRequest.yml,review-policy,기존 설정 유지,사용자 운영/검증 설정을 상류 기본값으로 덮어쓰지 않음
+.github/workflows/ci.yml,review-policy,기존 설정 유지,사용자 운영/검증 설정을 상류 기본값으로 덮어쓰지 않음
+AGENTS.md,review-policy,기존 설정 유지,사용자 운영/검증 설정을 상류 기본값으로 덮어쓰지 않음
+CHANGELOG.md,review-policy,기존 설정 유지,사용자 운영/검증 설정을 상류 기본값으로 덮어쓰지 않음
+CONTRIBUTING.md,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+README.md,review-policy,기존 설정 유지,사용자 운영/검증 설정을 상류 기본값으로 덮어쓰지 않음
+data/assets.json,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+data/backups.json,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+data/chess.json,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+data/config.json,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+data/factions.json,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+docs/ARCHITECTURE.md,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+docs/ASSETS.md,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+docs/DATA.md,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+docs/DEPLOY.md,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+docs/DESIGN.md,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+docs/I18N.md,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+docs/META.md,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+docs/PACKS.md,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+docs/PLAYING.md,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+docs/PLUGIN-API.md,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+docs/PLUGIN-DSL.md,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+docs/PLUGIN-GUIDE.md,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+docs/PLUGINS.md,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+docs/SIM.md,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+docs/SKINS.md,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+docs/design/client.md,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+docs/design/engine.md,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+docs/design/geometry-time.md,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+docs/design/match.md,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+docs/design/network.md,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+docs/design/overview.md,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+docs/design/vfx-format.md,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+docs/examples/offers-demo/cards.json,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+docs/examples/offers-demo/offers.json,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+docs/examples/offers-demo/plugin.json,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+docs/history/0.3.1.md,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+package-lock.json,review-policy,기존 설정 유지,사용자 운영/검증 설정을 상류 기본값으로 덮어쓰지 않음
+package.json,review-policy,기존 설정 유지,사용자 운영/검증 설정을 상류 기본값으로 덮어쓰지 않음
+plugins/README.md,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+plugins/_template/cosmetic/README.md,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+plugins/_template/cosmetic/media/sample.ogg,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+plugins/_template/cosmetic/media/sample.png,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+plugins/_template/cosmetic/plugin.json,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+plugins/_template/ui/ui/index.html,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/css/components.css,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+public/css/devices.css,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/css/screens/boss-plates.css,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/css/screens/game-panels.css,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+public/css/screens/game.css,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+public/css/screens/loadout.css,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+public/css/screens/lobby.css,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+public/css/screens/match-popups.css,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/css/screens/protocol-boot.css,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/css/screens/result.css,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+public/css/screens/settle.css,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/css/screens/sweep.css,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/css/screens/title.css,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+public/dev/fx-viewer.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/dev/game-mock.html,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+public/dev/game-mock.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+public/i18n/en.json,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/i18n/ja.json,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/i18n/ko.json,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/i18n/zh-TW.json,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/index.html,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+public/js/assetCache.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+public/js/assetPack.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/assets.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+public/js/audio.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+public/js/battle/operatorTraits.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/battle/simHost.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/battle/simLoader.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+public/js/content.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/cosmetics.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/data.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+public/js/diag.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/main.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+public/js/render/app.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+public/js/render/app/host.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/render/app/info.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+public/js/render/app/playback.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/render/app/view.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/render/board3d/layout.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+public/js/render/board3d/load.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+public/js/render/board3d/materials.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+public/js/render/board3d/scene.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+public/js/render/fx/simfx.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+public/js/render/fx/zones.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/render/manifold.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/render/skillAttack.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/render/spine.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+public/js/render/units.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+public/js/render/vfx/effect.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+public/js/render/vfx/funnelfx.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+public/js/render/vfx/geom.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/render/vfx/library.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/render/vfx/mounts.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/render/vfx/pluginFormat.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/render/vfx/pluginLibrary.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/render/vfx/pluginPlayer.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/render/vfx/pluginValidate.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/render/vfx/psys.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/render/vfx/skillfx.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+public/js/render/vfx/skills.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+public/js/render/vfx/system.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+public/js/render/vfx/talents.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/render/vfx/wiring.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+public/js/render/vfx/yuwall.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/screens/bandDraft.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+public/js/screens/diy.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+public/js/screens/game.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+public/js/screens/loadout.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+public/js/screens/lobby.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+public/js/screens/result.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+public/js/screens/room.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+public/js/screens/settle.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/screens/stats.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+public/js/screens/sweep.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/screens/title.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+public/js/store.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+public/js/themeVars.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/ui/assetUrls.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+public/js/ui/bondStrip.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+public/js/ui/bossPlates.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/ui/choiceOverlay.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+public/js/ui/components.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+public/js/ui/detailPanel.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+public/js/ui/downedPlate.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/ui/equipReplace.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+public/js/ui/facing.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+public/js/ui/fallbackField.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+public/js/ui/fieldHost.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+public/js/ui/gameActions.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+public/js/ui/gameLogic.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+public/js/ui/gameLogic/bonds.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/ui/gameLogic/camera.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/ui/gameLogic/placement.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/ui/gameLogic/settings.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+public/js/ui/gameLogic/shop.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/ui/hud.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+public/js/ui/lang.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+public/js/ui/loadoutSync.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+public/js/ui/matchChrome.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+public/js/ui/matchPopups.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/ui/notices.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/ui/offerOverlay.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/ui/pluginFrame.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+public/js/ui/pluginPanel.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/ui/pluginTag.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/ui/protocolBoot.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/ui/screenFit.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/ui/settings.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+public/js/ui/skinPicker.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/ui/skins.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/ui/stats.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+public/js/ui/teamPanel.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+public/js/ui/testAudit.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/ui/testConsole.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/ui/testDock.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/ui/toasts.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+public/js/ui/turnBanner.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/js/ui/turnPopup.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/studio/console.css,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/studio/console.html,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/studio/js/authoring.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/studio/js/console/editor.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/studio/js/console/labels.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/studio/js/console/main.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/studio/js/console/problems.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/studio/js/console/runtime.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/studio/js/console/view.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/studio/js/create.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/studio/js/editors/bond.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/studio/js/editors/dslForm.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/studio/js/editors/fx.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/studio/js/editors/gameplayControls.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/studio/js/editors/index.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/studio/js/editors/item.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/studio/js/editors/notices.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/studio/js/editors/offers.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/studio/js/editors/presentationControls.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/studio/js/editors/rules.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/studio/js/editors/skins.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/studio/js/editors/theme.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/studio/js/editors/trait.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/studio/js/forge.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/studio/js/gameplayModel.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/studio/js/gameplayTrial.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/studio/js/labels.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/studio/js/main.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+public/studio/js/picker.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/studio/js/pluginId.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/studio/js/presentation.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/studio/js/preview/replay.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/studio/js/trial.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/studio/js/validateDraft.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+public/studio/studio.css,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+schemas/operator-trait.schema.json,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+schemas/overlay.schema.json,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+schemas/plugin.schema.json,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+schemas/records.schema.json,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+scripts/launch.mjs,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+server/http/assetViews.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/http/csp.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+server/http/routes.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+server/index.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+server/lobby.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+server/match/Match.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+server/match/PlayerState.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+server/match/audit.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+server/match/bondsMeta.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+server/match/bot.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+server/match/effectsMeta.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+server/match/fields.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+server/match/host/entry.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/match/host/index.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/match/host/proxy.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/match/invariants.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+server/match/match/bossRounds.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/match/match/clientCombat.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/match/match/combat.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/match/match/infra.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+server/match/match/intents.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/match/match/offers.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/match/match/phases.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+server/match/match/platform.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/match/match/prep.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/match/match/rehearsal.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/match/match/reports.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/match/match/settle.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+server/match/match/spDraft.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+server/match/match/testCommands.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/match/match/unitePhase.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/match/match/views.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+server/match/operatorTraits.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/match/player/acquire.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/match/player/basics.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/match/player/economy.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/match/player/items.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/match/player/pieces.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/match/player/placement.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/match/player/prep.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/match/player/round.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/match/player/views.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/match/pool.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+server/match/results.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+server/match/testReplay.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/match/testTrace.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/match/unite.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+server/net.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+server/plugins/artReferences.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/plugins/contentData.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/plugins/contentSet.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/plugins/contentSets.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/plugins/forgeImport.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/plugins/forgeKits.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/plugins/forgePanels.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/plugins/forgeRecords.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/plugins/fxAssets.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/plugins/fxRecords.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/plugins/fxReferences.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/plugins/gameplayRecords.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/plugins/offerData.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/plugins/officialUnitBuilder.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/plugins/officialUnits.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/plugins/operatorTraits.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/plugins/pack.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/plugins/registry.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+server/plugins/roomSets.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/plugins/stageWarnings.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/plugins/traitSchema.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/sim/Battle.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+server/sim/battle/deploy.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/sim/battle/lifecycle.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/sim/battle/players.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/sim/battle/spawns.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/sim/content/bands/meta.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+server/sim/content/enemies/archetypes.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+server/sim/content/enemies/helpers.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+server/sim/content/generic.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/sim/content/kits/ops/chess_char_3_04-swire2.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+server/sim/content/support/index.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+server/sim/content/support/meta.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+server/sim/rehearsal.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/sim/simdata.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+server/sim/snapshot.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+server/sim/spec.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+server/sim/units.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+server/studio/authorMerge.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/studio/authorOptions.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/studio/authoring.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/studio/candidate.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/studio/check.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/studio/checkChild.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/studio/console.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/studio/edit.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/studio/files.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/studio/fxReplay.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/studio/gameData.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/studio/gameplayCheck.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/studio/gameplayTrial.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/studio/index.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/studio/mediaDraft.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/studio/mediaValidation.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/studio/presentationData.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/studio/preview.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/studio/rulesTrial.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/studio/templates/bond.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/studio/templates/fx.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/studio/templates/index.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/studio/templates/item.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/studio/templates/notices.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/studio/templates/offers.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/studio/templates/rules.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/studio/templates/skins.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/studio/templates/theme.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/studio/templates/trait.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/studio/trialChild.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/studio/trialDraft.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/studio/trialRunner.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+server/testMode.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+shared/constants.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+shared/highGround.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+shared/i18nPacks.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+shared/loadoutRecord.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+shared/packs.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+shared/plugins/errors.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+shared/plugins/forgePanel.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+shared/plugins/identity.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+shared/plugins/limits.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+shared/plugins/manifest.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+shared/plugins/notices.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+shared/plugins/offers.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+shared/plugins/records.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+shared/plugins/recordsSchema.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+shared/plugins/rules.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+shared/plugins/sdk.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+shared/plugins/skillSpec.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+shared/plugins/surface.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+shared/plugins/theme.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+shared/plugins/ui.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+shared/plugins/validate.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+shared/plugins/visual.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+shared/protocol.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+shared/standIn.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+shared/studio/scenario.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+shared/testMode.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/assets-env-proxy.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/audio-pools-data.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/ci.test.js,delete-conflict,기존 파일 유지,사용자 운영/검증 설정을 상류 기본값으로 덮어쓰지 않음
+test/client-static.test.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+test/content/enemies_bosses.test.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+test/content/kits_alt_t3.test.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+test/content/op_weedy.test.js,delete-conflict,기존 파일 유지,사용자 운영/검증 설정을 상류 기본값으로 덮어쓰지 않음
+test/content/r40a-blemsh-s2.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/docs-consistency.test.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+test/e2e/client.mjs,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+test/e2e/coop.e2e.mjs,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+test/e2e/fastServer.mjs,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+test/feedback6-leizi2-attack-sfx.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/feedback7-chen3-s3-sfx.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/golden/roster.json,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+test/helpers/fxFixtures.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/helpers/officialTables.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/helpers/pluginFixtures.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/issue-templates.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/launch-scripts.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/lobby-skins.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/lobby.test.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+test/local-extract-operators.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/local-extract-scenes.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/local-extract.test.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+test/match/board.test.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+test/match/catherine-cell.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/match/clientCombat-review.test.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+test/match/content-diy.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/match/feedback1-placement.test.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+test/match/fuzz.test.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+test/match/harness.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+test/match/high-ground-locale.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/match/playtest6-matchflow.test.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+test/match/plugin-host.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/match/plugin-offers.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/match/range-locale.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/match/rules.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/official-tables.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/package-player.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/plugin-package.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/plugins/boss-centre.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/plugins/check-status.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/plugins/contentBattle.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/plugins/csp.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/plugins/dsl-data.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/plugins/errors.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/plugins/fixtures/offerMatch.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/plugins/forge-records.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/plugins/forgeImport.test.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+test/plugins/forgePanel.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/plugins/forgePanelHost.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/plugins/fx.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/plugins/gameplay-records.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/plugins/langOverlay.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/plugins/manifest.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/plugins/offers-pilot.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/plugins/offers.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/plugins/official-art.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/plugins/operator-traits.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/plugins/records.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/plugins/recordsMetadata.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/plugins/registry.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/plugins/rules.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/plugins/schema.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/plugins/script-integration.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/plugins/script-review.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/plugins/sdkGeometry.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/plugins/surface.stable.json,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/plugins/surface.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/plugins/theme-notices.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/plugins/tool.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/plugins/ui.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/plugins/visual.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/render/board3d-crate.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/render/board3d-extract.test.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+test/render/board3d-scene.test.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+test/render/board3d.test.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+test/render/feedback1d-bombd.test.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+test/render/feedback3-skill-idle.test.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+test/render/forms.test.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+test/render/hud-readouts.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/render/loadout-skill.test.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+test/render/plugin-fx.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/render/plugin-official-art.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/render/skill-attack-mode.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/render/skill-loop-hold.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/render/skin-presentation.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/render/unitview.test.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+test/render/vfx-areas.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/render/vfx-audit031.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/render/vfx-orient.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/render/vfx-procedural.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/render/vfx-psys.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/render/vfx-reported031.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/scene-assets.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/setup-local-freshness.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/setup-plugin-art.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/setup-plugin-fx.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/sim/feedback1-followups.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/sim/feedback1b-displacement.test.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+test/sim/feedback1d-push.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/sim/feedback3-swire-s3.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/sim/hud-capsule-resolved.test.js,delete-conflict,기존 파일 유지,사용자 운영/검증 설정을 상류 기본값으로 덮어쓰지 않음
+test/sim/playtest5-targeting.test.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+test/sim/playtest6-enemies.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/skill-mode-map.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/skins.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/static-local-art.test.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+test/studio/console.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/studio/fx-replay.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/studio/gameplay-review.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/studio/gameplay-templates.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/studio/gameplay.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/studio/plugin-id.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/studio/presentation.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/studio/presentationReview.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/studio/presentationRework.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/studio/presentationThirdReview.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/studio/review.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/studio/studio.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/studio/trial.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/test-mode.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/ui/ammo-count.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/ui/asset-import.test.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+test/ui/assetUrls.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/ui/audio-pools.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/ui/audio.test.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+test/ui/boss-plates.e2e.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/ui/boss-plates.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/ui/build-runtime.browser.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/ui/buildGuard.test.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+test/ui/capsule-motion.e2e.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/ui/capsule-motion.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/ui/downed-plate.e2e.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/ui/downed-plate.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/ui/fieldHost-skins.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/ui/gameLogic.test.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+test/ui/issue5-fold-camera.test.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+test/ui/issue602-deploy-fold.test.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+test/ui/loadout.test.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+test/ui/match-popups.e2e.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/ui/match-popups.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/ui/mock.e2e.test.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+test/ui/mystic-energy.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/ui/playtest-item-detail.test.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+test/ui/plugin-offers.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/ui/plugin-rules.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/ui/plugins-client.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/ui/plugins-content.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/ui/protocol-boot.e2e.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/ui/protocol-boot.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/ui/screen-fit.e2e.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/ui/screen-fit.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/ui/settings-storage.e2e.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/ui/settle.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/ui/skin-picker.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/ui/sp-draft-look.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/ui/standin-ui.test.js,delete-conflict,기존 파일 유지,사용자 운영/검증 설정을 상류 기본값으로 덮어쓰지 않음
+test/ui/standin.e2e.test.js,delete-conflict,기존 파일 유지,사용자 운영/검증 설정을 상류 기본값으로 덮어쓰지 않음
+test/ui/stats.test.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+test/ui/sweep.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/ui/text-scale.test.js,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+test/ui/theme-notices.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/ui/turn-popup.e2e.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/ui/turn-popup.test.js,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+test/ui/watch-bonds.e2e.test.js,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+tools/assets/audio.mjs,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+tools/assets/cache.mjs,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+tools/assets/network.mjs,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+tools/assets/official-tables.mjs,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+tools/assets/plan.mjs,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+tools/assets/skel.mjs,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+tools/build-data.mjs,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+tools/ci.mjs,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+tools/doctor.mjs,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+tools/fetch-assets.mjs,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토
+tools/local-extract/expected.mjs,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+tools/local-extract/extract.py,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+tools/local-extract/fx.py,auto,3방향 자동 통합,기존 변경과 상류 변경을 함께 보존
+tools/local-extract/operators.py,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+tools/local-extract/plugin-art.mjs,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+tools/local-extract/plugin-fx.mjs,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+tools/local-extract/scenes.py,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+tools/package.mjs,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+tools/plugin.mjs,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+tools/records-schema.mjs,direct,상류 변경 반영,상류 0.3.0 대비 0.3.1의 독립 변경
+tools/setup.mjs,conflict,커스텀 보존 후 수동 통합,기존 한국어·커스텀·운영 동작 보존; 충돌 구간은 개별 검토

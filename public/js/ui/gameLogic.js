@@ -1,3 +1,4 @@
+import { grantedBondsByMorph } from '../../../shared/plugins/rules.js';
 import {chessLoadout} from './gameLogic/loadout.js';
 function prepPair(pub, myId) {
   const alive = (Array.isArray(pub?.players) ? pub.players : []).filter(p => isObj(p) && p.alive !== false);
@@ -470,14 +471,11 @@ export function nextThreshold(count, thresholds) {
  * @param {(id:string)=>any} [getItem] items.json lookup
  * @returns {string[]}
  */
-export function grantedBonds(items, getItem = () => null) {
-  const list = Array.isArray(items) ? items : [];
-  if (list.length < 2) return [];
-  const recs = list.map((it) => getItem(typeof it === 'string' ? it : it?.id)).filter(isObj);
-  if (!recs.some((r) => r.canGiveBond)) return [];
-  const out = [];
-  for (const r of recs) if (!r.canGiveBond && typeof r.giveBondId === 'string' && r.giveBondId && !out.includes(r.giveBondId)) out.push(r.giveBondId);
-  return out;
+export function grantedBonds(items, getItem = () => null, mode = 'official') {
+  return grantedBondsByMorph(items, (id) => {
+    const rec = getItem(id);
+    return isObj(rec) ? rec : null;
+  }, { mode });
 }
 
 /**
@@ -485,9 +483,9 @@ export function grantedBonds(items, getItem = () => null) {
  * @param {any} chess chess.json record @param {Array<string|{id:string}>|null|undefined} items @param {(id:string)=>any} [getItem]
  * @returns {string[]}
  */
-export function pieceBondIds(chess, items, getItem = () => null) {
+export function pieceBondIds(chess, items, getItem = () => null, mode = 'official') {
   const out = (Array.isArray(chess?.bonds) ? chess.bonds : []).filter((b) => typeof b === 'string');
-  for (const b of grantedBonds(items, getItem)) if (!out.includes(b)) out.push(b);
+  for (const b of grantedBonds(items, getItem, mode)) if (!out.includes(b)) out.push(b);
   return out;
 }
 
@@ -504,11 +502,11 @@ export function pieceBondIds(chess, items, getItem = () => null) {
  * @param {{ off?: Set<string>|null, carried?: Array<string|{id:string}>|null }} [opts]
  * @returns {Array<{ bondId: string, name: string, off: boolean, worn: boolean, items: Array<{ id: string, name: string, worn: boolean }> }>}
  */
-export function morphPairings(itemRecs, bondRecs, { off = null, carried = null } = {}) {
+export function morphPairings(itemRecs, bondRecs, { off = null, carried = null, mode = 'official' } = {}) {
   const recs = [...(itemRecs || [])].filter(isObj);
   const byId = new Map(recs.map((r) => [r.id, r]));
   const getItem = (id) => byId.get(id) || null;
-  const worn = new Set(grantedBonds(carried, getItem));
+  const worn = new Set(grantedBonds(carried, getItem, mode));
   const carriedIds = new Set((Array.isArray(carried) ? carried : []).map((it) => (typeof it === 'string' ? it : it?.id)).filter((x) => typeof x === 'string'));
   const famOf = (r) => (typeof r.baseId === 'string' && r.baseId ? r.baseId : r.id);
   /** bondId → family id → { id, name, tier, order, ids } */
@@ -1187,7 +1185,7 @@ export function indexPieces(priv) {
  * @param {{ priv:any, stage:any, editable:boolean, field?:'normal'|'bossL'|'bossR', getChess?:(id:string)=>any,
  *   getToken?:(id:string)=>any, getItem?:(id:string)=>any, getEffect?:(id:string)=>any }} o
  */
-export function placementContext({ priv, stage, editable, field = 'normal', getChess = () => null, getToken = () => null, getItem = () => null, getEffect = () => null }) {
+export function placementContext({ priv, stage, editable, field = 'normal', getChess = () => null, getToken = () => null, getItem = () => null, getEffect = () => null, backups = null, morphMode = 'official' }) {
   const pieces = indexPieces(priv);
   const boardAt = new Map();
   for (const e of pieces.values()) if (e.area === 'board') boardAt.set(tileKey(e.row, e.col), e);
@@ -1203,7 +1201,7 @@ export function placementContext({ priv, stage, editable, field = 'normal', getC
   const deploy = field === 'bossL' || field === 'bossR'
     ? deploySets(stage, field, ov)
     : deploySets(effectiveStage(stage, ov));
-  return { priv, pieces, boardAt, handAt, deploy, cap, count, field, editable: !!editable, getChess, getToken, getItem };
+  return { priv, pieces, boardAt, handAt, deploy, cap, count, field, editable: !!editable, getChess, getToken, getItem, backups, morphMode: morphMode === 'plus' ? 'plus' : 'official' };
 }
 
 /**
@@ -1979,3 +1977,5 @@ export {summonExcluded,equipReplaces} from './gameLogic/placement.js';
 export {HOTKEY_ACTIONS,DEFAULT_HOTKEYS,isBindableCode,hotkeyLabel,sanitizeHotkeys,rebindHotkey,isDefaultHotkeys,hotkeyOf,actionForKey,captureHotkey,facingSwallows,facingEnter} from './gameLogic/shortcuts.js';
 export {standInIds,fieldsStandIn,cardStandIn,memberStandIn,standInGetter,deployedModuleId,standInLabel,standInForText,standInTip} from './gameLogic/standIn.js';
 export {diyPicks,diyRecordFor,unitPick,diyGetter,pickGetter,isDiyRecord,diyBannedPieces} from './gameLogic/diy.js';
+
+export {deployZoomStep,deployZoomRemember,prepDeployCamera} from './gameLogic/camera.js';

@@ -237,3 +237,18 @@ test('hashed imported-art cache misses retain the mirror pipeline and canonical 
  stores.get('sp-imported-assets-v1').set('https://example.test/assets/~0123456789abcdef/spine/test.skel',new Response('imported-model'));
  const before=calls.length;assert.equal(await get(),'imported-model');assert.equal(calls.length,before);
 });
+
+test('cached production art is served before any catalogue request, including release-pinned paths',async()=>{
+ const handlers={};let requests=0;
+ runInNewContext(readFileSync(new URL('../../public/resource-worker.js',import.meta.url),'utf8').replace(/^import[^\n]+\n/gm,''),{
+  normalizeResourceSelection,selectedResources,URL,Response,
+  self:{location:{origin:'https://example.test'},addEventListener:(type,fn)=>handlers[type]=fn},
+  caches:{open:async()=>({match:async()=>null}),match:async path=>path==='/assets/unit.png'?new Response('cached art'):null},
+  fetch:async()=>{requests++;throw Error('Catalogue must not be needed for cached art');}
+ });
+ for(const path of ['/assets/unit.png','/assets/~1234567890abcdef/unit.png?release=1234567890abcdef']){
+  let response;handlers.fetch({request:{url:'https://example.test'+path,method:'GET',headers:new Headers()},respondWith:p=>response=p});
+  assert.equal(await(await response).text(),'cached art');
+ }
+ assert.equal(requests,0);
+});

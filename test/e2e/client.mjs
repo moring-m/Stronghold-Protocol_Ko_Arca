@@ -165,6 +165,7 @@ export async function startRealServer(opts = {}) {
     if (opts.fast.botChess?.length) env.SP_BOT_CHESS = opts.fast.botChess.join(',');
     if (opts.fast.autoPlace) env.SP_AUTO_PLACE = '1';
     if (opts.fast.eliminate?.length) env.SP_ELIMINATE = opts.fast.eliminate.join(',');
+    if (opts.fast.seatPairs) env.SP_SEAT_PAIRS = '1';
     if (opts.fast.stage) env.SP_STAGE = String(opts.fast.stage);
   }
   const child = spawn(process.execPath, [entry], { cwd: ROOT, env, stdio: ['ignore', 'pipe', 'pipe'] });

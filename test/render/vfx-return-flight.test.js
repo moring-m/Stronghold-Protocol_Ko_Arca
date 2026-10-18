@@ -1,10 +1,10 @@
 import{test}from'node:test';import assert from'node:assert/strict';import{FxWiring}from'../../public/js/render/vfx/wiring.js';
 function fixture(movement){let spawned;const ofx={time:0,lib:{has:()=>true,def:()=>null},spawn:(key,place,opts)=>{spawned={key,opts,fx:{time:0,anchor:place.pos.slice(),stop(){this.stopped=true;}}};return spawned;}};const w=new FxWiring(ofx);w.idx={units:{},skins:{}};let hits=0;w._arrive=()=>hits++;const src={id:1,x:10,y:9,z:0,alive:true},tgt={id:2,x:14,y:9,z:0,alive:true};w._fly({main:'disc',movement},src,tgt,'boomerang',0,{dur:1});return {w,src,tgt,get hits(){return hits;},step:t=>{spawned.fx.time=t;spawned.opts.track(spawned.fx);return spawned.fx;}};}
 test('official loop shooter hits once, waits, returns visibly to a moving owner and then stops',()=>{
- const h=fixture({comeBack:1,comeBackSpeedScale:.25,delayAfterReached:.01});
+ const h=fixture({speed:4,comeBack:1,comeBackSpeedScale:.25,delayAfterReached:.01});
  const at=h.step(1).anchor[0];assert.equal(h.hits,1);assert.equal(h.step(1).stopped,undefined);
  h.tgt.x=30;h.src.x=9;const back=h.step(3);assert.ok(back.anchor[0]<at&&back.anchor[0]>-1);assert.equal(h.hits,1);
- const end=h.step(5.01);assert.ok(end.stopped);assert.ok(Math.abs(end.anchor[0]+1)<1e-6);assert.equal(h.hits,1);assert.equal(h.w.flights.size,0);
+ const end=h.step(6.01);assert.ok(end.stopped);assert.ok(Math.abs(end.anchor[0]+1)<1e-6);assert.equal(h.hits,1);assert.equal(h.w.flights.size,0);
 });
 test('ordinary official projectiles still disappear at the outward hit',()=>{const h=fixture({});assert.ok(h.step(1).stopped);assert.equal(h.hits,1);});
 test('returning disc is removed safely if its owner leaves',()=>{const h=fixture({comeBack:1,comeBackSpeedScale:.25});h.step(1);h.src.destroyed=true;assert.ok(h.step(2).stopped);assert.equal(h.hits,1);});

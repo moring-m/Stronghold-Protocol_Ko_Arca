@@ -364,10 +364,10 @@ export function secondsLeft(deadline) {
  *   size?: 'sm'|'md'|'lg', gauge?: boolean, onExpire?: Function, class?: string }} props
  *   deadline: server epoch ms (live); seconds: static value (overrides deadline); total: seconds for the gauge.
  */
-export function Countdown({ deadline, seconds, total, warnAt = 10, label = 'COUNTDOWN', size = 'md', gauge = true, elapsed = false, onExpire, class: cls }) {
+export function Countdown({ deadline, seconds, total, warnAt = 10, label = 'COUNTDOWN', size = 'md', gauge = true, elapsed = false, timeScale = 1, onExpire, class: cls }) {
   const live = seconds == null && hasDeadline(deadline);
   useTicker(live ? 200 : 0);
-  const remain = seconds != null && Number.isFinite(Number(seconds)) ? Math.max(0, Math.floor(Number(seconds))) : live ? secondsLeft(deadline) : null;
+  const remain = seconds != null && Number.isFinite(Number(seconds)) ? Math.max(0, Math.floor(Number(seconds))) : live ? Math.ceil(Math.max(0,(deadline-serverNow())/1000)*timeScale) : null;
   const warn = !elapsed && remain != null && remain <= warnAt;
   const text = remain == null ? '--' : elapsed?`${Math.floor(remain/60).toString().padStart(2,'0')}:${(remain%60).toString().padStart(2,'0')}`:String(Math.min(999, remain)).padStart(2, '0');
   const bars = 5;
@@ -402,9 +402,10 @@ const modalStack = []; // open modals, topmost last: only the topmost handles ke
 /**
  * Modal dialog (declarative). Esc / backdrop click call onClose.
  * @param {{ open: boolean, title?: any, micro?: string, tone?: string, onClose?: Function, actions?: any,
- *   width?: string, closeOnBackdrop?: boolean, class?: string, children?: any }} props
+ *   width?: string, closeOnBackdrop?: boolean, class?: string, veilClass?: string, children?: any }} props
+ * `veilClass` styles the backdrop itself (e.g. a dialog that dims the field without blurring it).
  */
-export function Modal({ open, title, micro, tone = 'mint', onClose, actions, width, closeOnBackdrop = true, class: cls, children }) {
+export function Modal({ open, title, micro, tone = 'mint', onClose, actions, width, closeOnBackdrop = true, class: cls, veilClass, children }) {
   const boxRef = useRef(null);
   const closeRef = useRef(onClose);
   closeRef.current = onClose;
@@ -455,7 +456,7 @@ export function Modal({ open, title, micro, tone = 'mint', onClose, actions, wid
     };
   }, [open]);
   if (!open) return null;
-  return html`<div class="modal" role="presentation"
+  return html`<div class=${cx('modal', veilClass)} role="presentation"
       onMouseDown=${(e) => { if (closeOnBackdrop && e.target === e.currentTarget && onClose) onClose(); }}>
     <div ref=${boxRef} class=${cx('modal__box', 'brackets', `modal__box--${tone}`, cls)} role="dialog" aria-modal="true" tabindex="-1"
          style=${width ? `width:${width}` : undefined}>

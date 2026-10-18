@@ -31,6 +31,9 @@ import { actions, act } from '../ui/gameActions.js';
 import { normalizeDraft, sortedPlayers } from '../ui/gameLogic.js';
 import { useStore } from '../store.js';
 import { audio } from '../audio.js';
+import { TurnBanner } from '../ui/turnBanner.js';
+import { bootArtReady } from '../ui/protocolBoot.js';
+import { reducedMotion } from '../ui/device.js';
 import { modeOffBonds, bandOffBonds, bandOffLine } from '../ui/gameLogic.js';
 
 const cx = (...p) => p.flat().filter(Boolean).join(' ');
@@ -206,6 +209,8 @@ export function BandDraftScreen() {
   }, [selection, sel]);
   // "your turn" cue
   useEffect(() => { if (myTurn && !solo) audio.sfx('yourTurn'); }, [myTurn]);
+  const [turnBanner, setTurnBanner] = useState(0);
+  useEffect(() => { if(myTurn && !solo && bootArtReady() && !reducedMotion()) setTurnBanner(n => n + 1); }, [myTurn]);
   // the 本局信息 dialog never outlives the turn it was opened in: a turn change (a pick, a skip, a turn that ran out, an
   // AI pick) or my pick closes it, so whoever's turn begins sees the draft
   const turnKey = `${draft.turnPid || ''}|${myPick || ''}`;
@@ -333,5 +338,6 @@ export function BandDraftScreen() {
       status=${infoStatus ? html`<span class=${cx('minfo-dlg__turn', `is-${infoStatus.tone}`)}>
         <${Icon} name=${infoStatus.tone === 'mint' ? 'check' : 'hourglass'} />${infoStatus.text}${infoStatus.secs != null ? html`<b class="num">${infoStatus.secs}s</b>` : null}
       </span>` : null} />
+    ${turnBanner ? html`<${TurnBanner} key=${turnBanner} onDone=${() => setTurnBanner(0)} />` : null}
   </div>`;
 }

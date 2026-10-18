@@ -380,3 +380,8 @@
 .extension-operators .lo-grid { max-height:54vh; }
 .extension-operators .lo-card:disabled { opacity:.45; cursor:default; transform:none; }
 @keyframes set-key-wait { to { box-shadow: 0 0 .12rem rgba(246, 163, 41, .45); } }
+
+.custom-ext .extension-rule-time{display:grid;grid-template-columns:minmax(0,1fr) 72px auto;align-items:center;gap:8px;min-width:0}
+.custom-ext .extension-rule-time>span:first-child{display:flex;align-items:center;gap:6px;font-size:12px;white-space:normal}
+.custom-ext .extension-rule-time input[type="number"]{width:72px;height:36px;padding:0 6px;background:#0b1511;border:1px solid #49665c;color:#e1eee8;font:inherit;text-align:right;box-sizing:border-box;min-width:0}
+.custom-ext .extension-rule-time input:disabled{opacity:.5}

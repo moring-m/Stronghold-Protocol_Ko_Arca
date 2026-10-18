@@ -1,3 +1,8 @@
+import { ruleOption } from '../../shared/plugins/rules.js';
+import { DiyStock } from './player/diy.js';
+import { PlayerAcquire } from './player/acquire.js';
+import { PlayerEconomy } from './player/economy.js';
+import { hasTraitFor } from './operatorTraits.js';
 
 import {PlayerBasics as MergePlayer0} from './player/basics.js';
 import {PlayerDiy as MergePlayer1} from './player/diy.js';
@@ -163,7 +168,7 @@ const fail = (error, detail) => (detail ? { error, detail } : { error });
 export class PlayerState {
   /**
    * @param {import('./Match.js').Match} m owning match
-   * @param {{ seat: number, playerId: string, name: string, isBot: boolean, connected: boolean }} seat
+   * @param {{ seat: number, playerId: string, name: string, isBot: boolean, connected: boolean, loadout?: any, notOwned?: any, diy?: any, skins?: any }} seat
    */
   constructor(m, seat) {
     this.m = m;
@@ -189,8 +194,18 @@ export class PlayerState {
     /** operator loadout (DESIGN §16): frozen { [baseChessId]: { skill, module } }, {} = every chess on its defaults */
     this.loadout = Object.freeze({});
     this.ops = Object.freeze({});
+    this.skins = Object.freeze({});
+    if (!this.isBot && seat.skins) this.setSkins(seat.skins);
     this.personalChoice = null;
     if (!this.isBot && (seat.loadout || seat.ops)) this.setLoadout(seat.loadout ?? null, seat.ops ?? null);
+    this.standIns = Object.freeze([]);
+    this._standInSet = new Set();
+    if (!this.isBot && seat.notOwned) this.setNotOwned(seat.notOwned);
+    this.diy = Object.freeze({});
+    this._diyRecords = new Map();
+    this.diyStock = new DiyStock();
+    this.diyBanned = Object.freeze([]);
+    if (!this.isBot && seat.diy) this.setDiy(seat.diy, this.m.diyKitted ? {kitted:this.m.diyKitted} : undefined);
     this.shop = { level: 1, upgradePrice: this.gd.upgradeBase(1) ?? 0, slots: [], frozen: false, freeRefreshes: 0 };
     /** reward offers queue (merge rewards, special refreshes): { tier, source, label, slots: [{ kind, id, price, sold }] } */
     this.offers = [];
@@ -289,7 +304,7 @@ export class PlayerState {
    * @param {any} loadout
    * @returns {boolean}
    */
-  setLoadout(loadout, ops = undefined) {
+  setLoadout(loadout, ops = undefined, opts = undefined) {
     if (this.isBot) return false;
     let opsRes = null;
     if (ops !== undefined) {
@@ -331,11 +346,14 @@ export class PlayerState {
       this.m.log?.warn?.(`[match ${this.m.roomCode}] loadout of ${this.playerId} ignored: ${res && res.detail}`);
       return false;
     }
-    const out = {};
+    const merge = !!opts?.merge;
+    const out = merge ? { ...this.loadout } : {};
+    if (merge) for (const id of Object.keys(entries)) delete out[id];
     for (const [id, e] of Object.entries(res.loadout)) out[id] = Object.freeze({ skill: e.skill, module: e.module ?? null, ...(e.selected ? {selected:true} : {}), ...(e.skin ? {skin:e.skin} : {}) });
     this.loadout = Object.freeze(out);
     if (opsRes) {
-      const o = {};
+      const o = merge ? { ...this.ops } : {};
+      if (merge) for (const id of Object.keys(ops || {})) delete o[id];
       for (const [id, e] of Object.entries(opsRes.ops)) o[id] = Object.freeze({ potential: e.potential, cultivate: e.cultivate });
       this.ops = Object.freeze(o);
     }
@@ -356,12 +374,17 @@ export class PlayerState {
   canRecruit(id) {
     const c = this.gd.chess(id);
     const base=c?.baseId || c?.chessId;
-    return !!c && (!c.optionalRecruit || (!this.m.bannedChess?.includes(base) && this.loadout?.[base]?.selected === true));
+    return !!c && !this.m.customExtensions?.bannedOperators?.includes(base) && (!c.optionalRecruit || (!this.m.bannedChess?.includes(base) && this.loadout?.[base]?.selected === true));
   }
 
   loadoutFor(chessRecord) {
+    if (this.fieldsStandIn(chessRecord)) {
+      return { ...resolveLoadout(null, this.gd.standIn(chessRecord.chessId), (id) => this.gd.standIn(id) || this.gd.chess(id)), potential: null, cultivate: null };
+    }
+    const rec = chessRecord && chessRecord.isDiy && typeof chessRecord.chessId === 'string' ? this.gd.chess(chessRecord.chessId) || chessRecord : chessRecord;
+    // 0.2.2: with the operator's potential / 练度 (null for a prototype 自选 pick) — the 自选 summons' hand count reads it
     const cv = this.cultivationFor(chessRecord);
-    return { ...resolveLoadout(this.loadout, chessRecord, (id) => this.gd.chess(id)), potential: cv?.potential ?? null, cultivate: cv?.cultivate ?? null };
+    return { ...resolveLoadout(this.loadout, rec, (id) => this.gd.chess(id)), potential: cv ? cv.potential : null, cultivate: cv ? cv.cultivate : null };
   }
 
   /**
@@ -524,7 +547,7 @@ export class PlayerState {
   /** Return a piece's pool copies (and its equipped items are handled by the caller). */
   returnCopies(piece) {
     if (piece && piece.kind === 'chess' && piece.poolCopies > 0) {
-      this.pool.give(this.gd.baseIdOf(piece.id), piece.poolCopies);
+      this.poolOf(this.gd.baseIdOf(piece.id)).give(this.gd.baseIdOf(piece.id), piece.poolCopies);
       piece.poolCopies = 0;
     }
   }
@@ -615,7 +638,7 @@ export class PlayerState {
     if (!rec || !this.canRecruit(chessId)) return null;
     const base = this.gd.baseIdOf(chessId);
     const need = rec.isGolden ? this.gd.goldenCopies : 1;
-    const taken = fromPool ? this.pool.take(base, need, { overdraw: true }) : 0;
+    const taken = fromPool ? this.poolOf(base).take(base, need, { overdraw: true }) : 0;
     const piece = this.newPiece('chess', chessId, { poolCopies: taken, poolExempt: !fromPool });
     this.round.gainedChess++;
     let owned = piece;
@@ -626,6 +649,7 @@ export class PlayerState {
       this.stow(piece, { allowTemp: true, toTemp });
     }
     this.recompute();
+    if (hasTraitFor(this.gd, rec.charId)) this.m.dispatch(this, 'onTraitGain', { piece, kind: 'chess', source });
     if (!silent) this.m.dispatch(this, 'onGain', { piece: owned, kind: 'chess', source });
     if (!this.m.laboratory) this.recompute(); // No acquisition handlers run in the laboratory.
     return owned;
@@ -666,7 +690,7 @@ export class PlayerState {
       for (const it of l.piece.items || []) items.push(it);
       l.piece.items = [];
     }
-    if (!consumed.some(l => l.piece.poolExempt)) copies += this.pool.take(baseId, Math.max(0, this.gd.goldenCopies - copies), { overdraw: true });
+    if (!consumed.some(l => l.piece.poolExempt)) copies += this.poolOf(baseId).take(baseId, Math.max(0, this.gd.goldenCopies - copies), { overdraw: true });
     const elite = this.newPiece('chess', goldenId, { poolCopies: copies });
     // Preserve other round state; 拉普兰德's elite refresh trait uses a different key from her normal trait.
     for (const l of consumed) {
@@ -700,7 +724,7 @@ export class PlayerState {
     if (!goldenId) return false;
     const base = this.gd.baseIdOf(piece.id);
     const extra = piece.poolExempt ? 0 : Math.max(0, this.gd.goldenCopies - (piece.poolCopies || 0));
-    piece.poolCopies = (piece.poolCopies || 0) + this.pool.take(base, extra, { overdraw: true });
+    piece.poolCopies = (piece.poolCopies || 0) + this.poolOf(base).take(base, extra, { overdraw: true });
     piece.id = goldenId;
     this.recompute();
     this.m.dispatch(this, 'onMerge', { kind: 'chess', piece, baseId: base, consumed: [], source: 'promote' });
@@ -832,7 +856,8 @@ export class PlayerState {
    * already equipped is taken off for the fight about to start. Hand and temp both full keeps the 「整备区已满，获得的装备已销毁」
    * outcome. [ASSUMED] every item granted at 休整期结束, not only 维多利亚's 战栗维式重锤 (owner's decision 2026-10-04).
    */
-  acquireItem(itemId, { source = 'grant', toTemp = false, silent = false, deferMerge = false, fromPool = true, displayed = false } = {}) {
+  acquireItem(itemId, { source = 'grant', toTemp = false, silent = false, deferMerge = false, fromPool = true, requirePool, displayed = false } = {}) {
+    fromPool = requirePool === undefined ? fromPool : requirePool !== false;
     const rec = this.gd.item(itemId);
     if (!rec) return null;
     const pool=this.m.itemPool,leftBefore=pool.left(itemId),need=pool.need(itemId),unlimitedGift=!fromPool;
@@ -969,12 +994,21 @@ export class PlayerState {
   }
 
   _rollChessSlot() {
-    const id = this.pool.roll(this.m.rngShop, { maxTier: this.shop.level, filter: (id) => this.canRecruit(id) });
+    const id = this.pool.roll(this.m.rngShop, { maxTier: this.shop.level, filter: (id) => this.canRecruit(id), extra: this.diyRollEntries() });
     return id ? { kind: 'chess', id, basePrice: this.gd.chessPrice(id), frozen: false, sold: false } : null;
   }
 
   _rollItemSlot() {
-    const id = this.pool.rollItem(this.m.rngShop, this.shop.level, this.m.itemPool);
+    // startRound rolls the shop before recompute, so the cached this.bonds can be one round behind.
+    // bondBias therefore calls computeBonds at the roll (no rng). The official rule passes null and
+    // does not call it, so the shop's rng stays today's two draws.
+    let bias = null;
+    if (ruleOption(this.m?.rules, 'shopBias') === 'bondBias') {
+      const bonds = computeBonds(this.gd, this);
+      bias = new Set();
+      for (const [id, st] of Object.entries(bonds)) if (st && st.active) bias.add(id);
+    }
+    const id = this.m.pool.rollItem(this.m.rngShop, this.shop.level, this.m.itemPool, bias);
     return id ? { kind: 'item', id, basePrice: this.gd.itemPrice(id), frozen: false, sold: false } : null;
   }
 
@@ -983,6 +1017,7 @@ export class PlayerState {
    * (manual refresh). Slot counts follow the current level.
    */
   rollShop({ keepFrozen = false } = {}) {
+    if (this._consumeTestShop()) return;
     const { chess: nChess, item: nItem } = this.gd.shopSlots(this.shop.level);
     const old = this.shop.slots;
     const layout = this.shop.layout || { chess: old.length, item: 0 };
@@ -1100,6 +1135,7 @@ export class PlayerState {
   }
 
   levelUp() {
+    if (this.m.test === true && this._testShopNext) return fail(ERR.WRONG_PHASE);
     const g = this._gate(); if (g) return g;
     if (this.shop.level >= this.gd.maxShopLevel) return fail(ERR.MAX_LEVEL);
     const price = Math.max(0, this.shop.upgradePrice);
@@ -1287,6 +1323,7 @@ export class PlayerState {
     this.board.set(key, piece);
     this.grantTokensFor(piece);
     this.recompute();
+    if (hasTraitFor(this.gd, this.gd.chess(piece.id)?.charId)) this.m.dispatch(this, 'onTraitDeploy', { piece });
     return OK;
   }
 
@@ -1449,12 +1486,13 @@ export class PlayerState {
     const item = iloc.piece;
     const target = tloc.piece;
     if (replaceUid != null && !(Number.isInteger(replaceUid) && (target.items || []).some((x) => x.uid === replaceUid))) return fail(ERR.BAD_TARGET, 'replace: not equipped on the target');
+    if (!this._slotPolicy().accepts(target.items || [], rec)) return fail(ERR.BAD_TARGET, 'morph already equipped');
     const consume = typeof rec.kind === 'string' && rec.kind.startsWith('consume_on_equip');
     if (consume) {
       const key = 'item:' + itemKey(item.id);
       if (!this.m.registry.has(key)) return fail(ERR.BAD_TARGET, 'effect not available');
       // Consumables obey the same two-slot replacement rule. Restore on refusal; destroy only after success.
-      const off = this._takeReplaced(target, replaceUid);
+      const off = this._takeReplaced(target, replaceUid, rec);
       const ev = { item, target, golden: !!rec.isGolden, keep: false, error: null, consumed: true };
       this.m.dispatchItem(this, item, target, 'onEquip', ev);
       if (ev.error) {
@@ -1500,9 +1538,14 @@ export class PlayerState {
    */
   _attach(target, item, replaceUid = null) {
     target.items = target.items || [];
-    while (target.items.length >= this.gd.equipPerChess) { // loop-cap: splices one item each pass
-      const i = replaceUid != null ? target.items.findIndex((x) => x.uid === replaceUid) : -1;
-      const [old] = target.items.splice(i >= 0 ? i : 0, 1);
+    const policy = this._slotPolicy();
+    const rec = this.gd.item(item.id);
+    const cap = policy.slotCap(this.gd.equipPerChess);
+    // A plus morph does not occupy a slot, so this while does not run for it. Official occupies() is always true
+    // and slotsUsed is items.length, so the comparison and the splice index stay today's.
+    while (policy.occupies(rec) && policy.slotsUsed(target.items) >= cap) { // loop-cap: splices one item each pass
+      const i = policy.replacedIndex(target.items, replaceUid);
+      const [old] = target.items.splice(i, 1);
       replaceUid = null;
       this.m.dispatchItem(this, old, target, 'onDestroy', { item: old, holder: target, reason: 'replace' });
       this.releaseItemStock(old);
@@ -1510,11 +1553,13 @@ export class PlayerState {
     target.items.push(item);
   }
 
-  _takeReplaced(target, replaceUid = null) {
+  _takeReplaced(target, replaceUid = null, incoming = null) {
     target.items = target.items || [];
-    if (target.items.length < this.gd.equipPerChess) return null;
-    const i = replaceUid != null ? target.items.findIndex((x) => x.uid === replaceUid) : -1;
-    const idx = i >= 0 ? i : 0;
+    const policy = this._slotPolicy();
+    // A plus morph does not replace anyone. Official occupies() is always true.
+    if (incoming && !policy.occupies(incoming)) return null;
+    if (policy.slotsUsed(target.items) < policy.slotCap(this.gd.equipPerChess)) return null;
+    const idx = policy.replacedIndex(target.items, replaceUid);
     const [piece] = target.items.splice(idx, 1);
     return { piece, idx };
   }
@@ -1592,8 +1637,19 @@ export class PlayerState {
     slot.sold = true;
     this.offers.shift();
     if (price > 0) this.spend(price);
-    if (slot.kind === 'item') this.acquireItem(slot.id, { source: 'reward', displayed: true });
-    else this.acquireChess(slot.id, { source: 'reward' });
+    if (slot.kind === 'item') {
+      const gained = this.acquireItem(slot.id, { source: 'reward', displayed: true });
+      // #677: maintainer decision 2026-10-17 (official play memory): one Cathy cell per player/match.
+      // [ASSUMED] Only a successful pick from this source counts; Quintus's grant is independent.
+      if (gained && offer.source === 'band:band_cathy' && slot.id === 'chess_item_5_08_e_a') {
+        this.counters['band:cathy:cellTaken'] = 1;
+        // [ASSUMED] Remove the cell from queued Cathy offers too, retaining their other choices without rerolling.
+        for (const pending of this.offers) if (pending.source === 'band:band_cathy') {
+          pending.slots = pending.slots.filter((s) => s.id !== slot.id);
+        }
+        this.offers = this.offers.filter((pending) => pending.slots.length);
+      }
+    } else this.acquireChess(slot.id, { source: 'reward' });
     this._afterSpend(price, 'reward');
     this.recompute();
     return OK;
@@ -1779,13 +1835,19 @@ export class PlayerState {
     for (const { r, c, piece } of boardOrder(this.board)) {
       if (piece.kind === 'chess') {
         const u = { uid: piece.uid, kind: 'chess', chessId: piece.id, placementOrder: piece.placementOrder, row: r, col: c, dir: pieceDir(piece), items: (piece.items || []).map((i) => i.id) };
-        // DESIGN §16: the equipped skill / module (elite only) from the loadout (defaults when absent)
-        const lo = this.loadoutFor(this.gd.chess(piece.id));
-        u.skillIndex = lo.skillIndex;
-        u.moduleId = lo.moduleId;
-        if(lo.skinId)u.skinId=lo.skinId;
-        const cv = this.cultivationFor(this.gd.chess(piece.id));
-        if (cv) {u.potential=cv.potential;u.cultivate=cv.cultivate;}
+        const pick = this.diyPickOf(piece.id);
+        if (pick) u.diy = { ...pick };
+        else if (this.fieldsStandIn(piece.id)) u.standIn = true;
+        else {
+          const lo = this.loadoutFor(this.gd.chess(piece.id));
+          u.skillIndex = lo.skillIndex;
+          u.moduleId = lo.moduleId;
+          if (lo.skinId) u.skinId = lo.skinId;
+        }
+        const cv = u.standIn ? null : this.cultivationFor(this.gd.chess(piece.id));
+        if (cv) { u.potential = cv.potential; u.cultivate = cv.cultivate; }
+        const skinId = this.skinFor(this.gd.chess(piece.id), pick?.charId ?? null);
+        if (skinId) u.skin = skinId;
         if (carry && carry.has(piece.uid)) u.carryState = carry.get(piece.uid);
         units.push(u);
       } else if (piece.kind === 'token') {
@@ -1814,6 +1876,8 @@ export class PlayerState {
 
   pieceView(p, rc = null) {
     const rec = p.kind === 'item' ? this.gd.item(p.id) : p.kind === 'token' ? this.gd.token(p.id) : this.gd.chess(p.id);
+    // 皮肤 (docs/SKINS.md): skinFor resolves the effective body, including stand-ins and 自选 picks, on every surface.
+    const skinId = p.kind === 'chess' ? this.skinFor(rec) : null;
     const v = {
       uid: p.uid,
       kind: p.kind,
@@ -1823,6 +1887,9 @@ export class PlayerState {
       items: p.kind === 'chess' ? (p.items || []).map((it) => ({ uid: it.uid, id: it.id })) : [],
       count: p.kind === 'token' ? (p.count || 1) : 1,
       ownerUid: p.kind === 'token' ? p.ownerUid ?? null : null,
+      // 皮肤: the prep board / hand / temp views carry it too, so a piece shows its appearance before it is deployed and
+      // the deploy wheel's preview matches the model that will actually fight
+      ...(skinId ? { skin: skinId } : {}),
     };
     if (rc) { v.row = rc[0]; v.col = rc[1]; v.dir = pieceDir(p); }
     return v;
@@ -1857,6 +1924,7 @@ export class PlayerState {
     const slots = this.shop.slots.map((s) => (s ? { kind: s.kind, id: s.id, price: this.priceOf(s), basePrice: s.basePrice, sold: !!s.sold, frozen: !!s.frozen } : null));
     const offer = this.offers[0] || null;
     const free = this.shop.freeRefreshes > 0;
+    const bossMate = this.m.bossMateView?.(this);
     const board = [];
     for (const { r, c, piece } of boardOrder(this.board)) board.push(this.pieceView(piece, [r, c]));
     return {
@@ -1901,6 +1969,10 @@ export class PlayerState {
       // DESIGN §16: the effective operator loadout ({ [baseChessId]: { skill, module } }; chess not listed use defaults)
       loadout: this.loadout,
       ops: this.ops,
+      standIns: this.standIns,
+      diy: this.diy,
+      diyBanned: this.diyBanned,
+      ...(bossMate ? { bossMate } : {}),
       stats: {
         dmgDealt: Math.round(this.stats.dmgDealt), kills: this.stats.kills, leaks: this.stats.leaks, gold: this.stats.gold,
         refreshes: this.stats.refreshes, merges: this.stats.merges,
@@ -1917,3 +1989,5 @@ export class PlayerState {
 export { FIELD };
 
 for(const methods of [MergePlayer0,MergePlayer1,MergePlayer2,MergePlayer3,MergePlayer4,MergePlayer5])for(const key of Reflect.ownKeys(methods.prototype)){if(key!=='constructor'&&!Object.hasOwn(PlayerState.prototype,key))Object.defineProperty(PlayerState.prototype,key,Object.getOwnPropertyDescriptor(methods.prototype,key));}
+
+for(const methods of [PlayerAcquire,PlayerEconomy])for(const key of Reflect.ownKeys(methods.prototype)){if(key!=='constructor'&&!Object.hasOwn(PlayerState.prototype,key))Object.defineProperty(PlayerState.prototype,key,Object.getOwnPropertyDescriptor(methods.prototype,key));}

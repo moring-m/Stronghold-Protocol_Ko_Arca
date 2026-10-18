@@ -1,3 +1,4 @@
+import { advanceEffectClock } from "./app/playback.js";
 import {officialFxDownloaded} from '../../../shared/resourceSelection.js';
 import {createRosterWarmer} from './rosterWarm.js';
 import {installPixiNoEval} from './app/pixiNoEval.js';
@@ -14,6 +15,7 @@ import { loadoutRecord, resolveRecordLoadout } from '../../../shared/loadoutReco
 // from /vendor when the page did not include them as classic <script> tags.
 //
 //   const view = await createFieldView(host, { data, assets, audio, settings, padding, hud })
+//   Optional playbackTime: () => gameSeconds drives animations from an external simulation clock (studio stepping).
 //   view.setStage(stage)                        procedural tiles + devices (data/stages.json entry)
 //   view.setCamera(kind, { rect, side, padding, instant, shop })   'prep'|'normal'|'unite'|'boss'('hidden'); animated
 //                                               — the prep cameras (own board / Final Assault half) keep the bench
@@ -76,9 +78,9 @@ import { loadoutRecord, resolveRecordLoadout } from '../../../shared/loadoutReco
 //   view.holdPiece(uid, {row,col} | null)       keep a dropped prep piece standing on a tile while its direction is
 //                                               chosen / the move is in flight (null releases; setPrep then settles it)
 //   view.setPieceDir(uid, dir)                  show a prep piece facing UP|RIGHT|DOWN|LEFT (wheel preview / stored dir)
-//   view.setSettings({ damageNumbers, officialDamageNumbers, ammoCount, mysticEnergy, officialFx, quality: 'high'|'medium'|'low' }) ; view.resize() ; view.destroy()
-//                                               (ammoCount: 设置「弹药数量」, the count under an ammo skill's bar — PR #552;
-//                                                mysticEnergy: 设置「秘术师能量」, a 秘术师's stored/cap — PR #636;
+//   view.setSettings({ damageNumbers, officialDamageNumbers, ammoEnergyCount, officialFx, quality: 'high'|'medium'|'low' }) ; view.resize() ; view.destroy()
+//                                               (ammoEnergyCount: 设置「显示弹药与能量数量」, the count under an ammo skill's
+//                                                bar and a 秘术师's stored/cap — PR #552 / PR #636, one switch since 0.3.1;
 //                                                officialFx: 设置「官方特效」 'auto'|'off'|'lite'|'full', the official battle
 //                                                effects on the 3D board — render/vfx, DESIGN §9 "Official battle effects")
 //   view.stats() → { fps, frameMs, cpuMs, renderMs, units, particles, impostor, impostorAtlas, boardArt, pen, penHidden, … }
@@ -152,6 +154,7 @@ import { UnitView, ItemView, DeviceView, FORMS, syncView } from './units.js';
 import { FxSystem, ensureDamageFonts, projSpeed, utilityFx } from './fx.js';
 import { OfficialFx } from './vfx/system.js';
 import { FxWiring } from './vfx/wiring.js';
+import { PluginFxPlayer } from './vfx/pluginPlayer.js';
 import { resolveOfficialFx } from './vfx/tier.js';
 import { createDragController, pieceTile, dragStandTile } from './drag.js';
 import { backdropTextures, shadowTexture, refreshTierChips, refreshDownLabels, silhouetteTexture } from './textures.js';
@@ -472,9 +475,12 @@ export function releaseGl(renderer) {
 /**
  * Create the battlefield view inside `host` (an element sized by CSS; the canvas fills it).
  * @param {HTMLElement} host
- * @param {{ data?: any, assets?: any, audio?: any, settings?: { damageNumbers?: boolean, officialDamageNumbers?: boolean, ammoCount?: boolean, mysticEnergy?: boolean, quality?: string }, signal?: AbortSignal,
+ * @param {{ data?: any, assets?: any, audio?: any, settings?: { damageNumbers?: boolean, officialDamageNumbers?: boolean, ammoEnergyCount?: boolean, otherSkins?: boolean, quality?: string }, signal?: AbortSignal,
  *           padding?: object|((kind:string, size:{width:number,height:number}) => object),
  *           hud?: {top:number,bottom:number}|((kind:'prep'|'bossPrep', size:{width:number,height:number}, o:{shop:boolean}) => {top:number,bottom:number}|null) }} [opts]
+ *   settings.otherSkins (docs/SKINS.md, default on): draw the appearance another player chose. The player the view
+ *   belongs to says who is "other" — `view.setMe(store.get().me.playerId)`, ui/fieldHost.js mounts it before the first
+ *   board arrives.
  */
 export async function createFieldView(host, options = {}) {
   if (!host || typeof host.appendChild !== 'function') throw new TypeError('createFieldView: host element required');
@@ -485,7 +491,10 @@ export async function createFieldView(host, options = {}) {
   signal?.throwIfAborted();
   const assets = resolveAssets(opts.assets);
   const data = makeData(opts.data);
-  const settings = { damageNumbers: true, officialDamageNumbers: false, ammoCount: false, mysticEnergy: false, quality: 'high', officialFx: 'auto', ...(opts.settings || {}) };
+  const settings = { damageNumbers: true, officialDamageNumbers: false, ammoEnergyCount: false, quality: 'high', officialFx: 'auto', ...(opts.settings || {}) };
+  // 设置「显示其他玩家的皮肤」 (docs/SKINS.md), on unless the caller said off: kept out of the literal above so the shape
+  // the other settings the units read every frame are pinned by stays one line (test/ui/ammo-count.test.js)
+  settings.otherSkins = settings.otherSkins !== false;
   // the 3D board (three.js + the official art) loads in parallel with everything else
   const boardPref = boardPreference(opts.board);
   const want3d = settings.mapQuality !== 'minimal' && boardPref !== '2d' && webgl2Available(boardPref === '3d');
@@ -688,6 +697,9 @@ export async function createFieldView(host, options = {}) {
   setupCleanup.push(() => ofx.destroy());
   layers.vfxGround.addChild(ofx.ground);
   layers.vfxOver.addChild(ofx.over);
+  const pluginFx = new PluginFxPlayer({ P, layer: layers.vfxOver, assets, cam: () => cam, enabled: () => settings.officialFx !== 'off',
+    record: info => info ? ctx.lookupDef(info) : null, speed: projSpeed, ofx });
+  setupCleanup.push(() => pluginFx.destroy());
   const wiring = new FxWiring(ofx, {
     speed: projSpeed,
     // the index unit of a battle unit: the drawn operator (a stand-in's, a 自选 pick's), the chess' operator, the enemy / token
@@ -702,6 +714,7 @@ export async function createFieldView(host, options = {}) {
     view: (id) => views.get(id) || null,
   });
   ctx.ofx = ofx;
+  ctx.officialFor = v => ofx.active && wiring.hasOfficialUnit(v);
   ctx.officialStatusKey = name=>wiring.statusKey(name);
   let ofxPrevT = null;        // renderT of the last effects step (the battle clock)
   /** Battle effects follow their own setting, including on a lightweight 2D map. */
@@ -1371,8 +1384,15 @@ export async function createFieldView(host, options = {}) {
     for (const u of units) {
       const info = u && Number.isInteger(u.uid) ? renderInfo({ ...u, id: `m:${u.uid}` }) : null;
       if (!info) continue;
+      // 设置「显示其他玩家的皮肤」 (docs/SKINS.md): these are another seat's pieces (a boss pair's partner half) or this
+      // player's own reserve medic, so the switch clears the skin of the ones this page does not own — the same rule
+      // applyInfo applies to a battle unit, and without it the partner's pieces kept their appearance while the switch
+      // was off. `skin` is part of the signature for the same reason it is in setPrep's: a view already up draws the
+      // model its info named when it was built (render/units.js `_modelEntry` reads it once). Unlike that one this
+      // signature is not pinned by a test, so the skin sits inside the template.
+      info.skin = shownSkin(info);
       keep.add(info.id);
-      const sig = `${info.defId}|${info.golden ? 1 : 0}|${info.spine || ''}|${info.x},${info.y}|${info.dir || ''}|${(info.items || []).join(',')}`;
+      const sig = `${info.defId}|${info.golden ? 1 : 0}|${info.spine || ''}|${info.skin || ''}|${info.x},${info.y}|${info.dir || ''}|${(info.items || []).join(',')}`;
       let v = views.get(info.id);
       if (v && v._sig !== sig) { dropView(info.id); v = null; }
       if (v) continue;
@@ -1416,7 +1436,7 @@ export async function createFieldView(host, options = {}) {
     battleMeta = null;
     interp.reset();
     fx.clear();
-    ofx.clear(); wiring.clear(); ofxPrevT = null;
+    ofx.clear(); wiring.clear(); pluginFx.clear(); ofxPrevT = null;
     meleePending.clear();
     consumedIds.clear();
     tiles.setBattleRect(null);
@@ -1873,7 +1893,7 @@ export async function createFieldView(host, options = {}) {
     gone.clear();
     interp.reset();
     fx.clear();
-    ofx.clear(); wiring.clear(); ofxPrevT = null;
+    ofx.clear(); wiring.clear(); pluginFx.clear(); ofxPrevT = null;
     meleePending.clear();
     consumedIds.clear();
     clearHl();
@@ -1893,7 +1913,7 @@ export async function createFieldView(host, options = {}) {
     // A scouted prep snapshot contains operators, not simulated stage devices.
     tiles.setBattleRect(battleMeta.prep ? null : rect);
     board3d?.setBattleRect(battleMeta.prep ? null : rect);
-    for (const u of Array.isArray(meta.units) ? meta.units : []) addInfo(u);
+    for (const u of Array.isArray(meta.units) ? meta.units : []) applyInfo(u);
     // the official effects of this battle's units load now (the prep → battle switch), the board's heights for their
     // depth-tested materials
     if (ofx.active && !battleMeta.prep) {
@@ -1903,10 +1923,73 @@ export async function createFieldView(host, options = {}) {
     return true;
   }
 
-  function addInfo(u) {
+  /**
+   * The appearance a view of this unit draws (docs/SKINS.md), from a given preference.
+   *
+   * 设置「显示其他玩家的皮肤」 (off = this client draws every other player's piece on the operator's own model): a unit
+   * another seat owns loses its skin — `ownerId` is on every UnitInfo, and a unit of no owner (a stage device, an
+   * enemy) has none to lose. The asymmetry is deliberate: what you draw is your choice, what others draw is theirs, so
+   * turning it off hides THEIR appearance from YOU and never changes what they see.
+   */
+  const skinOf = (info, myId, otherSkins) => {
+    // Keep the received choice intact across settings changes. A running battle's metadata may predate room.skins;
+    // [ASSUMED] the latest public choice wins for operator bodies (including stand-ins / DIY), purely in this view.
+    let skin = info.sourceSkin === undefined ? info.skin : info.sourceSkin;
+    if (info.kind === 'op' && playerSkins.has(info.ownerId)) {
+      skin = playerSkins.get(info.ownerId)[info.diy?.charId || info.spine] || null;
+    }
+    if (!skin) return null;
+    if (info.ownerId == null || !myId || info.ownerId === myId) return skin;
+    return otherSkins ? skin : null;
+  };
+  const playerSkins = new Map();
+  let skinSelectionKey = null;
+  const shownSkin = (info) => skinOf(info, ctx.myPlayerId, settings.otherSkins);
+
+  /**
+   * Register a battle unit's info (a 'spawn' event, `m.field` / fieldMeta units) and keep its view honest: a changed
+   * appearance (the owner switched skin mid-match, or the preference above was toggled) drops the view, so the next
+   * battleView builds it on the model the info now names — the skin is part of a view's model, its picture and its
+   * Front/Back pair, none of which changes under a view that is already up (render/units.js `_wantsBack` /
+   * `_pictureUrl` read `info` once per view).
+   */
+  function applyInfo(u) {
     const info = renderInfo(u);
-    if (info) infos.set(info.id, info);
+    if (!info) return null;
+    info.sourceSkin = u.sourceSkin === undefined ? info.skin : u.sourceSkin;
+    const skin = shownSkin(info);
+    const prev = infos.get(info.id);
+    if (prev && prev.skin !== skin) dropView(info.id);
+    info.skin = skin;
+    infos.set(info.id, info);
     return info;
+  }
+
+  /** The player whose pieces are this page's own (docs/SKINS.md): late (the view may be built before `welcome`). */
+  function setMe(playerId) {
+    const id = typeof playerId === 'string' && playerId ? playerId : null;
+    if (ctx.myPlayerId === id) return;
+    ctx.myPlayerId = id;
+    refreshSkins();
+  }
+
+  /** Apply public choices to existing and future units without changing the battle or restarting its playback. */
+  function setSkins(players) {
+    const key = JSON.stringify((players || []).map((p) => [p.playerId, p.skins || {}]));
+    if (key === skinSelectionKey) return;
+    skinSelectionKey = key;
+    playerSkins.clear();
+    for (const p of players || []) if (p?.playerId) playerSkins.set(p.playerId, p.skins || {});
+    refreshSkins();
+  }
+
+  function refreshSkins() {
+    for (const [id, info] of infos) {
+      const next = shownSkin(info);
+      if (next !== info.skin) { dropView(id); info.skin = next; }
+    }
+    // Boss partners use read-only prep views rather than infos. Reapply their signatures immediately too.
+    if (mode === 'prep' && lastPrep) setPrep(lastPrep.ps, lastPrep.o);
   }
 
   // a hand item on a scouted prep board (UnitInfo kind 'item'): the plate's icon and colour resolve client-side,
@@ -1968,7 +2051,7 @@ export async function createFieldView(host, options = {}) {
     let fresh = null;
     for (const e of list) {
       if (!Array.isArray(e) || e[0] !== 'spawn') continue;
-      const info = addInfo(e[1]);
+      const info = applyInfo(e[1]);
       if (info && views.get(info.id)?._unknown) dropView(info.id);
       if (info && ofx.active) (fresh || (fresh = [])).push({ id: info.id, info });
     }
@@ -1992,13 +2075,13 @@ export async function createFieldView(host, options = {}) {
     if (e[0] === 'skill') { upSkill.set(e[1], !!e[2]); return; }
     if (e[0] !== 'atk' || woundUp.has(e) || CHAIN_KINDS.has(e[3])) return;
     const v = views.get(e[1]);
-    if (!v || !v.windUp) return;
+    if (!v || !v.windUp || wiring.hasAttackStart(v)) return;
     if (v.windUp(t - upcomingT, e[3])) {
       woundUp.add(e);
       // the official cast effects that start with the cast play with the clip (render/vfx/wiring.js castStart)
       const a = v.actor;
       const skillOn = upSkill.has(e[1]) ? upSkill.get(e[1]) : undefined;
-      wiring.castStart(v, views.get(e[2]), e[3], a ? { skip: a.windSkip || 0, left: a.windCastLeft || 0, skillOn } : { skillOn });
+      wiring.castStart(v, views.get(e[2]), e[3], a ? { skip: a.windSkip || 0, left: a.windCastLeft || 0, speed: a.windFxSpeed || 1, skillOn } : { skillOn });
     }
   }
 
@@ -2019,7 +2102,7 @@ export async function createFieldView(host, options = {}) {
   function handleEvent(e, now) {
     switch (e[0]) {
       case 'spawn': {
-        const info = addInfo(e[1]);
+        const info = applyInfo(e[1]);
         if (!info) break;
         gone.delete(info.id);
         bossDeaths.spawn(info.id);
@@ -2039,6 +2122,10 @@ export async function createFieldView(host, options = {}) {
         const src = views.get(e[1]) || battleView(e[1]);
         const tgt = views.get(e[2]) || battleView(e[2]);
         src?.onAttackStart?.(tgt, e[3], e[4], e[5], e[6]);
+        // New sim events carry the exact shot kind. Older replays retain look-ahead.
+        if (typeof e[7] === 'string') wiring.attackStart(src, tgt, e[7], {
+          lead: e[3], left: src?.actor?.windCastLeft || e[3], speed: src?.actor?.windFxSpeed || 1,
+        });
         break;
       }
       case 'atkRetarget': {
@@ -2047,7 +2134,7 @@ export async function createFieldView(host, options = {}) {
         if (!e[3]) src?.faceTarget?.(tgt);
         break;
       }
-      case 'atkCancel': { views.get(e[1])?.onAttackCancel?.(); break; }
+      case 'atkCancel': { const src=views.get(e[1]);src?.onAttackCancel?.();wiring.cancelAttack(src);break; }
       case 'atk': {
         const src = views.get(e[1]) || battleView(e[1]);
         const tgt = views.get(e[2]) || battleView(e[2]);
@@ -2056,8 +2143,9 @@ export async function createFieldView(host, options = {}) {
         if (e[3] === 'none' || !e[3]) { if (tgt && src) meleePending.set(tgt.id, { src, t: now }); }
         // the unit's official attack (casts, projectile, melee hits — render/vfx/wiring.js) or a chain's bounce (the line of
         // the official shot that opened the chain: wiring.chain), else the procedural one
-        const drew = !!src && (CHAIN_KINDS.has(e[3]) ? wiring.chain(src, tgt, e[3], now) : wiring.attack(src, tgt, e[3], now, woundUp.has(e)));
-        if (!drew && !ofx.active) fx.attack(src, tgt, e[3]);
+        const custom = !CHAIN_KINDS.has(e[3]) && pluginFx.attack(src,tgt,e[3]);
+        const drew = custom || !!src && (CHAIN_KINDS.has(e[3]) ? wiring.chain(src, tgt, e[3], now) : wiring.attack(src, tgt, e[3], now, woundUp.has(e)));
+        if (!drew && !ctx.officialFor(src)) fx.attack(src, tgt, e[3]);
         break;
       }
       case 'dmg': {
@@ -2068,16 +2156,16 @@ export async function createFieldView(host, options = {}) {
         let src = e[4]?.sourceId != null ? views.get(e[4].sourceId) || null : null;
         if (m && now - m.t < 0.35 && (!src || src===m.src)) { src = m.src; meleePending.delete(v.id); fx._slashAt = src.id; }
         // an official hit drawn for this damage replaces the procedural spark / slash (the numbers stay)
-        const official = wiring.damage(v, e[3], src, now);
-        fx.damage(v, amt, e[3], src, e[4], (official || ofx.active) ? NO_SPARK : undefined);
+        const official = pluginFx.hit(src,v) || wiring.damage(v, e[3], src, now);
+        fx.damage(v, amt, e[3], src, e[4], (official || ctx.officialFor(src || v)) ? NO_SPARK : undefined);
         break;
       }
-      case 'heal': { const v = views.get(e[1]); if (v) fx.heal(v, Number(e[2]) || 0, (wiring.heal(v, now)||ofx.active) ? NO_SPARK : undefined); break; }
+      case 'heal': { const v = views.get(e[1]); if (v) fx.heal(v, Number(e[2]) || 0, (wiring.heal(v, now)||ctx.officialFor(v)) ? NO_SPARK : undefined); break; }
       // the skill's official effects (render/vfx/skillfx.js: start / range / loop on, end off) stand for the procedural
       // activation burst and aura when the official layer shows the skill
       case 'skill': {
         const v = views.get(e[1]);
-        if (v) { v.setSkill?.(!!e[2]); const official=wiring.skill(v, !!e[2]);if(!e[2] || (!ofx.active&&!official))fx.skill(v,!!e[2]); }
+        if (v) { v.setSkill?.(!!e[2]); const official=pluginFx.skill(v,!!e[2]) || wiring.skill(v, !!e[2]);if(!e[2] || (!ctx.officialFor(v)&&!official))fx.skill(v,!!e[2]); }
         break;
       }
       // the skill slot an enemy ability casts (PR #275): the view swaps to that slot's clip (a multi-skill boss's Skill_01..04)
@@ -2105,6 +2193,10 @@ export async function createFieldView(host, options = {}) {
       }
       case 'status': { const v = views.get(e[1]); if (v) { v.onStatus?.(e[2], !!e[3]); wiring.status(v, e[2], !!e[3]); } break; }
       case 'fx': {
+        if (e[1] === 'copy' && e[4]?.id != null && e[4]?.src != null) {
+          const src = infos.get(e[4].src);
+          if (src) (views.get(e[4].id) || battleView(e[4].id))?.copyFrom?.(ctx.lookupDef(src));
+        }
         if (e[4] && typeof e[4] === 'object' && e[4].consumed && e[4].id != null) {
           consumedIds.add(e[4].id);
           if (consumedIds.size > 200) consumedIds.delete(consumedIds.values().next().value);
@@ -2139,8 +2231,11 @@ export async function createFieldView(host, options = {}) {
           if (fv) officialForm = wiring.form(fv, form, x);
         }
         // a kit fx the official skill / talent effects stand for (render/vfx/skillfx.js, talentfx.js) is not drawn procedurally
+        const custom = !(late > 0) && pluginFx.simFx(e[1], Number(e[2]), Number(e[3]), e[4]);
         const official = !(late > 0) && wiring.simFx(e[1], Number(e[2]), Number(e[3]), e[4]);
-        if (!(late > 0) && !official && !officialForm && (!ofx.active||utilityFx(e[1],e[4]))) fx.simFx(e[1], Number(e[2]), Number(e[3]), e[4]);
+        const fxOwner=views.get(e[4]?.src ?? e[4]?.id);
+        const simpleOwner=!!fxOwner && !ctx.officialFor(fxOwner);
+        if (!(late > 0) && !custom && !official && !officialForm && (!ofx.active||simpleOwner||utilityFx(e[1],e[4]))) fx.simFx(e[1], Number(e[2]), Number(e[3]), e[4]);
         break;
       }
       case 'layer': {
@@ -2253,7 +2348,7 @@ export async function createFieldView(host, options = {}) {
 
   function createUnknown(id, s) {
     if (infos.has(id)) return null;
-    addInfo({ id, kind: 'enemy', side: 'enemy', defId: null, x: s.x, y: s.y, maxHp: s.maxHp });
+    applyInfo({ id, kind: 'enemy', side: 'enemy', defId: null, x: s.x, y: s.y, maxHp: s.maxHp });
     infos.get(id)._unknown = true;
     const v = battleView(id);
     if (v) v._unknown = true;
@@ -2355,10 +2450,15 @@ export async function createFieldView(host, options = {}) {
           windUpAttacks(renderT);
           // the official effects run on the battle clock (render time of the snapshots: 1× / 2×, still while paused); the
           // skill effects' per-frame part reads the views' fresh sample (render/vfx/skillfx.js sync)
-          const gdt = ofxPrevT == null ? 0 : Math.min(0.25, Math.max(0, renderT - ofxPrevT));
+          const gdt = ofxPrevT == null ? 0 : Math.min(opts.playbackTime ? Infinity : 0.25, Math.max(0, renderT - ofxPrevT));
           ofxPrevT = renderT;
+          pluginFx.update(gdt);
+          pluginFx.sync(views.values());
           wiring.sync(views.values());
-          if (ofx.active) { wiring.tick(); ofx.update(gdt); }
+          if (ofx.active) {
+            wiring.tick();
+            if (opts.playbackTime) advanceEffectClock(ofx, gdt); else ofx.update(gdt);
+          }
         }
       } else if (mode === 'prep') {
         for (const [key, pd] of pending) {
@@ -2446,6 +2546,11 @@ export async function createFieldView(host, options = {}) {
     retryBoard();
     loadShadow();
     loadMountains();
+    if (pluginFx.source !== assets.manifest?.fx) {
+      pluginFx.refresh(); ofx.clear(); wiring.clear(); wiring.idx = null;
+      ofx.pool.clear(); ofx.warmQueue.length = 0; ofx.glr?.dropTextures();
+      ofx.lib.reloadPlugins().then(() => { if (!destroyed) { syncOfficialFx(); wiring.ready(); } });
+    }
     if (mode === 'prep' && lastPrep) setPrep(lastPrep.ps, lastPrep.o);
     for (const v of views.values()) v.retryAssets?.();
     for (const v of penViews.values()) v.retryAssets?.();
@@ -2470,6 +2575,10 @@ export async function createFieldView(host, options = {}) {
   view = {
     rendersAudio: !!options.audio,
     setStage,
+    /** 设置「显示其他玩家的皮肤」 (docs/SKINS.md): whose pieces are this page's own — the rest lose their skin when
+     * that switch is off. ui/fieldHost.js calls it with `store.get().me.playerId` on mount. */
+    setMe,
+    setSkins,
     setCamera,
     setPrep,
     setObservedBench,
@@ -2493,6 +2602,7 @@ export async function createFieldView(host, options = {}) {
       return true;
     },
     highlightTiles(tilesList, style) {
+      if (destroyed) return false;
       if (tilesList == null || (Array.isArray(tilesList) && !tilesList.length && style == null)) { clearHl(); return true; }
       const st = style ?? 'range';
       const key = hlKey(st);
@@ -2514,7 +2624,17 @@ export async function createFieldView(host, options = {}) {
         || !Number.isFinite(clientX) || !Number.isFinite(clientY)
         || document.elementFromPoint(clientX, clientY) !== canvas) return null;
       const p = canvasPoint({ clientX, clientY });
-      return pieceAt(p.x, p.y)?.uid ?? null;
+      // Shortcuts target the visible figure under the pointer; its head can
+      // extend over the tile behind it. Pointer-click placement keeps tile picking.
+      let hit = null, depth = -Infinity;
+      for(const e of prepPieces){
+        const v=views.get(e.key);if(!v||v.destroyed||!v.placed)continue;
+        const b=v.bounds();
+        if(p.x<b.x||p.x>b.x+b.width||p.y<b.y||p.y>b.y+b.height)continue;
+        const z=Number(v.root?.zIndex)||Number(v.screen?.y)||0;
+        if(z>=depth){hit=e;depth=z;}
+      }
+      return hit?.uid ?? pieceAt(p.x, p.y)?.uid ?? null;
     },
     pieceScreenRect(uid) {
       let v = views.get('p:' + uid);
@@ -2637,6 +2757,7 @@ export async function createFieldView(host, options = {}) {
       holdScene(false); // no scene any more: the quiet budget may free the skeletons (lobby / room / result)
       try { fx.destroy(); } catch { /* ignore */ }
       try { ofx.destroy(); } catch { /* ignore */ }
+      pluginFx.destroy();
       try { tiles.destroy(); } catch { /* ignore */ }
       try { impostors.destroy(); } catch { /* ignore */ }
       listeners.clear();

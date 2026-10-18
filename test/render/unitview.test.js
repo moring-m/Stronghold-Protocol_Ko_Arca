@@ -37,6 +37,17 @@ function view(info, opts = {}, assets = store()) {
   return new UnitView(ctx, { id: 1, side: 'ally', kind: 'chess', defId: 'char_x', tier: 3, x: 5, y: 12, maxHp: 1000, ...info }, opts);
 }
 
+test('prep pips retain both equipment slots and a zero-slot morph, then remove only unequipped pips', () => {
+  const v = view({}, { prep: true });
+  v.setItems(['one', 'two', 'morph']);
+  assert.deepEqual(v.itemPips.map((p) => p._url), ['one', 'two', 'morph']);
+  v.setItems(['one', 'two']);
+  assert.deepEqual(v.itemPips.map((p) => p._url), ['one', 'two']);
+  v.setItems([]);
+  assert.equal(v.itemPips.length, 0);
+  v.destroy();
+});
+
 describe('tier chips', () => {
   test('optional recruit never adds a battlefield label in prep or battle', () => {
     for (const prep of [true, false]) {

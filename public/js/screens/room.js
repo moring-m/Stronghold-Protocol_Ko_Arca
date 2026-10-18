@@ -1,3 +1,4 @@
+import { TestMark } from "../ui/testConsole.js";
 import { extensionSelectionCount } from '../../../shared/customExtensions.js';
 import { t } from '../../../shared/i18n.js';
 import { openStats } from '../ui/statsEntry.js';
@@ -380,7 +381,7 @@ export function RoomScreen() {
       </div>
       <div class="topbar__center">
         <${MicroLabel} tone="mint">${coop ? 'ALLIANCE LOBBY' : 'SOLO SIMULATION'}<//>
-        <h1 class="topbar__title">${coop ? t('同盟模拟') : t('独立模拟')}<span class="topbar__sep"></span><${DifficultyTag} difficulty=${room.difficulty} size="lg" />
+        <h1 class="topbar__title">${coop ? t('同盟模拟') : t('独立模拟')}${room.test ? html` <${TestMark} />` : null}<span class="topbar__sep"></span><${DifficultyTag} difficulty=${room.difficulty} size="lg" />
           ${room.content?.modeId ? html`<span class="room-mode" data-testid="room-mode">${(room.content.modes || []).find((m) => m.id === room.content.modeId)?.name || room.content.modeId}</span>` : null}</h1>
         <${PluginTag} room=${room} myId=${me.playerId} />
       </div>

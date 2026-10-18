@@ -247,6 +247,7 @@ export class Battle {
       units: [],
       input: p,
     };
+    if (this.opts.morphPairing === 'plus') ps.morphPairing = 'plus';
     this.players.push(ps);
     this._perPlayer[ps.playerId] = {
       // `killed` / `total` / `leaked` / `perfect` keep the official `counted` reading (DESIGN §5.1); `killedInTotal` /
@@ -1796,7 +1797,7 @@ export class Battle {
     if (!t || !t.length) return false;
     if(attackInterval>0){
       const clip=attackClipTiming(u),lead=clip?.dur>0?attackInterval*Math.max(0,Math.min(1,clip.hit/clip.dur)):attackInterval/2,seq=u.deploySeq;
-      this._ev(['atkStart',u.id,t[0].id,lead,attackInterval,!!prof.allInRange,prof._fortressMelee?'melee':'ranged']);
+      this._ev(['atkStart',u.id,t[0].id,lead,attackInterval,!!prof.allInRange,prof._fortressMelee?'melee':'ranged',prof._fortressMelee?'none':(prof.visualProjectile||prof.projectile||'none')]);
       this.after(Math.max(this.dt||.05,lead),()=>{if(u.alive&&u.deployed&&u.deploySeq===seq&&u.canAct){const profile=effectiveProfile(u),targets=acquireTargets(this,u,profile);if(targets.length){performAttack(this,u,profile,targets,{noAmmo,attackInterval});}}},{owner:u});
       return true;
     }

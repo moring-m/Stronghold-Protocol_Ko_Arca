@@ -95,7 +95,7 @@ test('regeneration augments stop when an enemy becomes hit-count after deploymen
 });
 
 for(const [name,chance]of [['회피 I',.25],['회피 II',.35],['회피 III',.5]])test(`${name} grants the stated physical and magical dodge`,()=>{const {u}=fixture({allies:[find(name)]});close(u.s.dodgePhys,chance);close(u.s.dodgeArts,chance);});
-for(const [name,amount]of [['무사 I',30],['무사 II',50],['무사 III',80]])test(`${name} heals the operator once per attack`,()=>{const {h,u}=fixture({allies:[find(name)]});u.hp=500;h.b.forceAttack(u);close(u.hp,500+amount);});
+for(const [name,amount]of [['무사 I',40],['무사 II',70],['무사 III',100]])test(`${name} heals the operator once per attack`,()=>{const {h,u}=fixture({allies:[find(name)]});u.hp=500;h.b.forceAttack(u);close(u.hp,500+amount);});
 test('Siracusa augment grants stealth to operators and Karlans eye reveals only the personal field',async()=>{
  const {enemyStealthed}=await import('../../server/sim/targeting.js');const {u}=fixture({allies:[find('시라쿠사')]});assert.equal(u.s.flags.stealth,true);
  for(const kind of ['normal','unite','boss','hidden']){const {h,e}=fixture({kind,allies:[find('카란의 눈')]});h.b.addBuff(e,{key:'late-stealth',flags:{stealth:true}});assert.equal(enemyStealthed(e),kind!=='normal');}
@@ -153,4 +153,12 @@ test('Leithanien augment gives any operator ten independent ticks unaffected by 
  for(const layers of[0,1000]){
   const h=makeBattle({data:raw,units:[{chessId:'note-op',row:10,col:3}],enemies:[{key:'enemy_note',pos:[10,8]}],bonds:{leithanienShip:{active:true,count:6,tier:2,layers}},flags:{augments:{allies:{p1:[item(find('라이타니엔'))]},enemies:[]}},captureNoisy:true,autoFinish:false});h.run(.1);const u=h.unit('note-op'),e=h.enemy();h.b.dealDamage(u,e,{amount:1,type:'arts'});h.b.dealDamage(u,e,{amount:1,type:'arts'});assert.equal(h.b.leithanien.applications,1);h.run(10.1);const ticks=h.hooksOf('damaged').filter(c=>c.dmg.tags?.includes('leithanien:note'));assert.equal(ticks.length,10);assert.ok(ticks.every(c=>c.source===u&&Math.abs(c.amount-81)<1e-6));assert.equal(h.b.leithanien.liveStacks,0);assert.equal(h.b.errorCount,0);
  }setGameData(null);
+});
+
+for(const [suffix,multiplier]of [['I',1.3],['II',1.6],['III',2]])test(`civilization ${suffix}: only allied true damage is increased`,()=>{
+ const {h,u,e}=fixture({allies:[find('문명의 존속 '+suffix)]});
+ close(h.b.dealDamage(u,e,{amount:100,type:'true'}),100*multiplier);
+ close(h.b.dealDamage(u,e,{amount:100,type:'arts'}),80);
+ close(h.b.dealDamage(u,e,{amount:100,type:'phys'}),5);
+ close(h.b.dealDamage(e,u,{amount:100,type:'true'}),100);
 });

@@ -81,3 +81,13 @@ test('an enemy completes its committed strike after its living target leaves ran
  assert.equal(e.stats.attacks,1);assert.equal(e.mem.attackWindup,undefined);
  h.run(5);assert.ok(u.hp<before);assert.equal(h.b.errorCount,0);
 });
+
+test('explicit wind-up carries the same visual attack kind as its strike',()=>{
+  for(const side of ['ally','enemy']){
+    const h=scenario(side);h.run(.8);
+    const source=side==='ally'?h.unit('timed'):h.enemies()[0];
+    const start=h.eventsOf('atkStart').find(e=>e[1]===source.id);
+    const strike=h.eventsOf('atk').find(e=>e[1]===source.id);
+    assert.ok(start&&strike,side);assert.equal(start[7],strike[3],side);
+  }
+});

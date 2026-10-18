@@ -168,7 +168,7 @@ export function updateAlly(b, u, dt) {
   const wind = attackWindup(u);
   if (wind > 0) {
     u.mem.attackWindup = { until: b.time + wind, targets, profile: prof, seq: u.deploySeq, skillActive: !!sk?.active };
-    b._ev(['atkStart', u.id, targets[0]?.id ?? u.id, wind, u.s.interval, !!prof.allInRange || !targets.length, prof._fortressMelee ? 'melee' : 'ranged']);
+    b._ev(['atkStart', u.id, targets[0]?.id ?? u.id, wind, u.s.interval, !!prof.allInRange || !targets.length, prof._fortressMelee ? 'melee' : 'ranged', prof._fortressMelee ? 'none' : (prof.visualProjectile || prof.projectile || 'none')]);
   } else performAttack(b, u, prof, targets);
   u.atkCd = Math.max(u.atkCd, u.s.interval);
 }
@@ -1028,7 +1028,7 @@ function enemyAttack(b, e) {
     if (wind > 0) {
       e.mem.attackWindup = { until: b.time + wind, targets };
       e.atkCd = e.s.interval;
-      b._ev(['atkStart', e.id, targets[0].id, wind, e.s.interval]);
+      b._ev(['atkStart', e.id, targets[0].id, wind, e.s.interval, false, undefined, e.profile?.deferHit ? (e.profile.shot || 'none') : radius > 0 && !(e.blockedBy && targets[0] === e.blockedBy && radius < 1) ? 'enemy' : 'none']);
       return true;
     }
   }

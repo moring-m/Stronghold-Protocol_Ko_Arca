@@ -63,6 +63,7 @@ export function install(b){
  b.on('hit',c=>{
   if(c.source?.side==='ally'&&c.source.kind==='op'&&c.target?.side==='enemy'&&(c.target.s.flags.cold||c.target.s.flags.freeze)){const e=forUnit(c.source).find(e=>e.kind==='kjerag');if(e){const base=c.dmg.kjeragScale||1;c.dmg.mul*=(base+e.bonus)/base;}}
   if(c.source?.side==='ally'&&forUnit(c.source).some(e=>e.kind==='weakness'))weaknessRetype(c.dmg,c.source,c.target);
+  if(c.source?.side==='ally'&&c.dmg.type==='true')for(const e of forUnit(c.source))if(e.kind==='trueDamage')c.dmg.mul*=e.multiplier;
   if(c.source?.side==='enemy')for(const e of enemyEffects)if(e.kind==='elemental'&&(c.dmg.type==='element'||c.dmg.type==='elemental'))c.dmg.amount*=e.multiplier;
  });
  // Element buildup exits the HP damage pipeline before hit; scale it at creation too (damage.js invokes this).

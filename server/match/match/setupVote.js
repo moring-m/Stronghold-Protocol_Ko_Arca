@@ -87,14 +87,15 @@ export class MatchSetupVote {
       if (!pool.entries.size) throw new Error('rerolled chess pool is empty');
       const off = new Set([...bans.drawn, ...bans.staticOff]);
       const stocks = this.order.map(ps=>ps.buildRecruitStock(pool,bans.banned));
-      prepared = { setup, stage, bans, pool, stocks };
+      const diyStocks = this.order.map(ps => ps.buildDiyStock(off));
+      prepared = { setup, stage, bans, pool, stocks, diyStocks };
     } catch (e) {
       this.reportError('reroll setup', e);
       this.cancelSetupVote();
       return fail(ERR.INTERNAL);
     }
     // All data-dependent work succeeds before any opening or player state changes.
-    const { setup, stage, bans, pool, stocks } = prepared;
+    const { setup, stage, bans, pool, stocks, diyStocks } = prepared;
     this.stageId = setup.stageId;
     this.stage = stage;
     this.factions = setup.factions;
@@ -106,6 +107,7 @@ export class MatchSetupVote {
     this.pool = pool;
     this._botPath = null;
     for (const [i, ps] of this.order.entries()) {
+      ps.diyStock = diyStocks[i].stock; ps.diyBanned = diyStocks[i].banned;
       ps._recruitPool = stocks[i];ps._recruitPool.player=ps;
       ps.recompute();
       ps.invalidateDeployMap();

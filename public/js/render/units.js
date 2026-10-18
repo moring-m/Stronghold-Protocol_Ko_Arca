@@ -1,3 +1,6 @@
+import {skillAttackMode} from './skillAttack.js';
+import {MANIFOLD,isManifold,manifoldCopyForm,manifoldAttackForm} from './manifold.js';
+const loop=(name)=>({begin:null,loop:name,end:null});
 import { rangeTileInside, clipRangeSegment } from './rangeClip.js';
 
 import { unlimitedSkillRange } from '../../../shared/skillRangeDisplay.js';
@@ -587,7 +590,7 @@ function bar(P, parent, color, alpha = 1) {
  * Shared context handed to every view by app.js (`audio`: the audio manager of public/js/audio.js — prep landings, land()).
  * @typedef {{ P: any, layers: { shadow: any, units: any, bars: any, groundFx: any },
  *   assets: any, audio?: any, cam: () => any, heightAt: (r:number,c:number)=>number, fx: any, time: () => number,
- *   settings: { damageNumbers: boolean, quality: string, ammoCount?: boolean, mysticEnergy?: boolean } }} ViewCtx
+ *   settings: { damageNumbers: boolean, quality: string, ammoEnergyCount?: boolean } }} ViewCtx
  */
 
 /** Scratch skeletons per skeleton data (bonePose): one pose is computed and read at a time. */
@@ -802,10 +805,13 @@ export class UnitView {
   // an image-less placeholder that the avatar replaces a moment later (the placeholder only shows when the avatar
   // is missing or still loading after PIC_WAIT_MS).
   /** The picture the manifest names for this unit now (an ICE_TOKENS unit takes none: the token fallback would be its
-   *  owner's face — assets.js tokenAvatarUrl). */
+   *  owner's face — assets.js tokenAvatarUrl). `info.skin` (docs/SKINS.md): an appearance of the operator that ships its
+   *  own avatar; the retry path compares the URL, so a switch to another skin re-resolves the diamond (a view stays up
+   *  only while its info does not change — render/app.js applyInfo). */
   _pictureUrl() {
     const a = this.ctx.assets;
-    return ICE_TOKENS.has(this.info.defId) ? null : a && (a.picture ? a.picture(this.info.avatar) || a.picture(this.info.defId) || a.picture(this.info.spine) : null) || null;
+    const o = this.info.skin ? { skin: this.info.skin } : undefined;
+    return ICE_TOKENS.has(this.info.defId) ? null : a && (a.picture ? a.picture(this.info.avatar, o) || a.picture(this.info.defId, o) || a.picture(this.info.spine, o) : null) || null;
   }
 
   /** @param {boolean} [replace] another picture replaces a shown one: the old one stays on the diamond until it is there */
@@ -813,7 +819,8 @@ export class UnitView {
     const a = this.ctx.assets;
     const url = this._pictureUrl();
     const old = replace && this._pic && this._pic.state === 'img' ? this._pic : null;
-    this._pic = { key: String(this.info.avatar || this.info.defId || 'unknown'), color: this._frameColor(), img: null, state: 'none', shown: null, t0: nowMs(), url, prev: !!old };
+    // the key carries the skinId too (docs/SKINS.md): a switch otherwise keeps the previous appearance's portrait
+    this._pic = { key: String(this.info.avatar || this.info.defId || 'unknown') + (this.info.skin ? `|${this.info.skin}` : ''), color: this._frameColor(), img: null, state: 'none', shown: null, t0: nowMs(), url, prev: !!old };
     if (!url || !a.image) return;
     const cached = typeof a.imageNow === 'function' ? a.imageNow(url) : null;
     if (cached) { this._pic.img = cached; this._pic.state = 'img'; return; }
@@ -876,7 +883,9 @@ export class UnitView {
   _modelEntry(back = this._wantsBack()) {
     const a = this.ctx.assets;
     const id = this.info.spine || this.info.defId;
-    return a && a.spineEntry && id ? a.spineEntry(id, { back }) || null : null;
+    // 皮肤 (docs/SKINS.md): `info.skin` is the owner's chosen appearance; sparkineEntry falls back to the operator's own
+    // model when the manifest holds no such skin (or no model for it), so a view always resolves something to draw
+    return a && a.spineEntry && id ? a.spineEntry(id, this.info.skin ? { back, skin: this.info.skin } : { back }) || null : null;
   }
 
   /** @param {boolean} [retry] load again even after a remembered failure (assets.js acquire `{ retry }`) */
@@ -1014,7 +1023,27 @@ export class UnitView {
   }
 
   _formSpec() {
-    return this.form ? (FORMS[this.info.spine || this.info.defId] || FORMS[this.info.charId])?.[this.form] || null : null;
+    const form = this.form || (isManifold(this.info) ? 'Default' : null);
+    const f = form ? (FORMS[this.info.spine || this.info.defId] || FORMS[this.info.charId])?.[form] || null : null;
+    if (f?.combat && this._manifoldCombat) return { ...f, roles: { ...f.roles, attack: loop(f.combat), skill: { ...f.roles.skill, loop: f.combat } } };
+    return f;
+  }
+
+  /** Existing 'copy' fx: select one official form, before its next attack (both board renderers). */
+  copyFrom(rec) {
+    if (!isManifold(this.info)) return;
+    const form = manifoldCopyForm(rec);
+    if (form) this.setForm(form);
+  }
+
+  _attackForm(kind) {
+    if (!isManifold(this.info)) return;
+    const form = manifoldAttackForm(kind);
+    const combat = kind === 'none' && !!(this.flags & UF.BLOCKED), changed = combat !== this._manifoldCombat;
+    this._manifoldCombat = combat;
+    // A late join / split clone has no copy event. Do not replay a transformation over its attack.
+    if (form && form !== this.form) this.setForm(form, { late: Infinity });
+    else if (changed && this.actor) this.actor.setForm(this._formSpec()?.roles || null);
   }
 
   /**
@@ -1136,8 +1165,9 @@ export class UnitView {
   /** Equipped item pips (prep): list of item icon URLs. */
   setItems(urls) {
     const P = this.P;
-    const list = Array.isArray(urls) ? urls.slice(0, 2) : [];
-    while (this.itemPips.length > list.length) this.itemPips.pop().destroy();
+    // morphPairing plus can carry two ordinary items and one zero-slot morph (DESIGN §34.15).
+    const list = Array.isArray(urls) ? urls.slice(0, 3) : [];
+    while (this.itemPips.length > list.length) this.itemPips.pop().destroy(); // loop-cap: at most three item pips
     list.forEach((u, i) => {
       let s = this.itemPips[i];
       if (!s) { s = new P.Sprite(P.Texture.EMPTY); s.anchor.set(0.5); this.hud.addChild(s); this.itemPips[i] = s; }
@@ -1395,6 +1425,7 @@ export class UnitView {
   /** An attack was made (b.ev 'atk'). `target` = view or null. */
   onAttack(target, now, kind, allInRange=false, attackInterval=null) {
     if (!this.alive) return;
+    this._attackForm(kind);
     this._pendingDeployElapsed = null;
     // a one-off cast (PROJ[kind].once: 暴鸰's bomb drop) is no attack rhythm: its clip plays once at its own speed
     const once = !!PROJ[kind]?.once;
@@ -1423,7 +1454,8 @@ export class UnitView {
    * 'atk' projKind (a one-off cast winds up at the clip's own speed).
    */
   windUp(lead, kind) {
-    if (!this.alive || !this.actor || !this.spineReady || this.hasAttackInterval) return false;
+    if (!this.alive || !this.actor || !this.spineReady) return false;
+    this._attackForm(kind);
     const ok = this.actor.windUp(this.atkInterval, lead, !!PROJ[kind]?.once);
     if (ok && this.imp) this.imp.dirty = true;
     return ok;
@@ -1454,7 +1486,7 @@ export class UnitView {
       this.energyText.anchor.set(.5);this.hud.addChild(this.energyText);
     }
     this.energyText.text='●'.repeat(this.energyCount)+'○'.repeat(Math.max(0,(this.info.energyMax||3)-this.energyCount));
-    this.energyText.visible=this.alive&&!this.prep&&!this.ctx.ofx?.active;
+    this.energyText.visible=this.alive&&!this.prep&&!(this.ctx.officialFor?.(this) ?? this.ctx.ofx?.active);
   }
 
   onHit() { this.flash = 1; }
@@ -1684,7 +1716,7 @@ export class UnitView {
     if (this.alive && !this.down && visualStates.length) {
       const colors = {stun:0xf1ce76,sleep:0xbab7e8,invuln:0xf7dfab,freeze:0x74cfff,cold:0xcfe6ff,burn:0xff8e51,poison:0xb899d7,shield:0x80d9c4,refraction:0x7820cc,stealth:0xaaaaaa,rage:0xff5941,bind:0xccaa72,slow:0x709bd1,silence:0xd7bf90,fear:0x925ca8,fragile:0xe9bd83,weaken:0xb39baa,healFree:0xd57777,neural:0xdcba55,necrosis:0x9562bd,mirrorCrack1:0xb9d8eb,mirrorCrack2:0xe1eefa};
       for (const state of visualStates) {
-        if(this.ctx.ofx?.active)continue; // official status art only; Notes/corrosion live separately
+        if((this.ctx.officialFor?.(this) ?? this.ctx.ofx?.active))continue; // official status art only; Notes/corrosion live separately
         if (state !== 'stealth' && (this.actor?.authoredVisualStates?.has(state) || (authoredState && !this.actor?.authoredVisualStates))) continue;
         this.stateFx.lineStyle(Math.max(1.2,s*.018),colors[state],.64);
         if (state === 'freeze') {
@@ -1765,7 +1797,7 @@ export class UnitView {
     this.alpha = alpha;
 
     const previewAuthoredStealth = this.info.preview && (this.actor?.authoredVisualStates?.has('stealth') || STEALTH_FORMS[this.info.spine || this.info.defId]);
-    const mistOn = this.alive && !this.down && !!(this.flags & UF.STEALTH) && !previewAuthoredStealth && !this.ctx.ofx?.active;
+    const mistOn = this.alive && !this.down && !!(this.flags & UF.STEALTH) && !previewAuthoredStealth && !(this.ctx.officialFor?.(this) ?? this.ctx.ofx?.active);
     const mistTexture = mistOn ? stealthMistTexture(this.ctx.assets) : null;
     if (mistTexture && !this.stealthMist) {
       this.stealthMist = Array.from({length:4}, () => {
@@ -1820,7 +1852,7 @@ export class UnitView {
       }
     }
     if(this.skillZone){
-      const g=this.skillZone;g.clear();g.visible=!this.ctx.ofx?.active && this.ctx.settings?.skillRanges !== false && this.alive&&!this.down&&!this.info.skillUnlimitedRange&&(this.statuses.has('skill')||!!this.skillTiles?.length);
+      const g=this.skillZone;g.clear();g.visible=!(this.ctx.officialFor?.(this) ?? this.ctx.ofx?.active) && this.ctx.settings?.skillRanges !== false && this.alive&&!this.down&&!this.info.skillUnlimitedRange&&(this.statuses.has('skill')||!!this.skillTiles?.length);
       for(const extra of this.skillZoneExtra.values()){extra.clear();extra.visible=false;}
       if(g.visible){
         placeOnGround(this.ctx,g,this.ctx.layers.groundFx,this.y,0);
@@ -1877,7 +1909,7 @@ export class UnitView {
       }
     }
     if(this.attackRange){
-      const g=this.attackRange,r=Number(this.info.rangeRadius);g.clear();g.visible=this.ctx.settings?.unitRanges !== false && this.alive&&!this.down && !(this.ctx.ofx?.active && /emppnt/.test(this.info.spine||this.info.defId||''));
+      const g=this.attackRange,r=Number(this.info.rangeRadius);g.clear();g.visible=this.ctx.settings?.unitRanges !== false && this.alive&&!this.down && !((this.ctx.officialFor?.(this) ?? this.ctx.ofx?.active) && /emppnt/.test(this.info.spine||this.info.defId||''));
       if(g.visible){
         placeOnGround(this.ctx,g,this.ctx.layers.groundFx,this.y,this.z);
         const segment=(x0,y0,x1,y1)=>{
@@ -2153,7 +2185,7 @@ export class UnitView {
     const gaugeTop = rowsTop + ammoH;
     let energyH = 0;
     if (this.energyText) {
-      this.energyText.visible = showBars && !this.ctx.ofx?.active;
+      this.energyText.visible = showBars && !(this.ctx.officialFor?.(this) ?? this.ctx.ofx?.active);
       this.energyText.scale.set(clamp(s / 90, .55, .85));
       if (this.energyText.width > bw) this.energyText.scale.set(this.energyText.scale.x * bw / this.energyText.width);
       // Left aligned with the wolf-life row, below SP; reserve room for other gauges.
@@ -2295,7 +2327,7 @@ export class UnitView {
    * the energies as an effect on the operator (the maintainer's decision of 2026-10-15, GitHub #633).
    */
   _updateEnergy(show, x, top, s) {
-    show = show && !this.ctx.ofx?.active;
+    show = show && !(this.ctx.officialFor?.(this) ?? this.ctx.ofx?.active);
     let r = this.energyHud;
     if (!show) { if (r) r.root.visible = false; return 0; }
     if (!r) {
@@ -2816,7 +2848,7 @@ export class ItemView {
 
 /**
  * Battle device unit (kind 'device': crates, “双眼皮” turrets, unknown stage devices): a textured 3D box (the tile
- * atlas, render/tiles.js BoxMesh — the real crate / device plates when the board art is installed), a turret head
+ * atlas, render/tiles.js BoxMesh; 阻隔工事 uses its own client model on the 3D board when installed), a turret head
  * that turns to its target and flashes on attack, HP bar once damaged, and a break-apart on death.
  */
 const GENERIC_DEVICE = Object.freeze({ size: 0.7, height: 0.36, top: 'platformTop', side: 'forbidSide' });
@@ -2837,7 +2869,7 @@ export class DeviceView {
     this.screen = { x: 0, y: 0, s: 1, top: 0 };
     this.placed = false;
     this._headTiles = this.spec.height + 0.2;
-    this.box = ctx.createBox ? ctx.createBox() : null;
+    this.box = ctx.createBox ? ctx.createBox(this.spec) : null;
     this.gfx = new P.Graphics();       // fallback body (no tile field) and the turret head
     ctx.layers.units.addChild(this.gfx);
     this.hud = new P.Container();
@@ -2872,7 +2904,9 @@ export class DeviceView {
     const k = this.dying > 0 ? Math.max(0, this.dying / 0.45) : 1;
     if (this.dying > 0) { this.dying -= dt; if (this.dying <= 0) this.remove = true; }
     const zKey = rowDepthKey(cam, Math.round(this.y)) + ROW_KEY.devices;
-    const size = this.spec.size * (0.6 + 0.4 * k), height = this.spec.height * k;
+    const spec = this.box?.spec || this.spec;
+    this._headTiles = spec.height + 0.2;
+    const size = spec.size * (0.6 + 0.4 * k), height = spec.height * k;
     const g = this.gfx;
     if (this.box) {
       this.box.update(cam, { x: this.x + shake, y: this.y, z: this.z, size, height, nativeScale: this.spec === DEVICE_BOX.crate ? k : null, top: this.spec.top, side: this.spec.side, alpha: k });
@@ -2891,7 +2925,7 @@ export class DeviceView {
     }
     g.zIndex = zKey + 0.001;
     g.alpha = k;
-    const p = cam.project(this.x, this.y, this.z + this.spec.height + 0.35, this.screen);
+    const p = cam.project(this.x, this.y, this.z + spec.height + 0.35, this.screen);
     this.placed = true;
     const show = this.alive && this.hp < this.maxHp - 0.5;
     this.hud.visible = show;

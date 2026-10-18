@@ -23,7 +23,7 @@ function effectOf(source,dataForStarter={}){
  if(base.startsWith('아군 ')){const label=base.slice(3),value=Math.abs(n),keys={'공격력 감소':'atkPct','HP 감소':'hpPct','방어력 감소':'defPct','마법 저항 감소':'resFlat','공격 속도 감소':'aspd'};if(label==='지속 피해')return {kind:'alliedDrain',amount:value};const key=keys[label];if(key)return {kind:'alliedDebuff',mods:{[key]:-value/(key.endsWith('Pct')?100:1)}};}
  const key={'공격력 증가':'atkPct','HP 증가':'hpPct','방어력 증가':'defPct','마법 저항 증가':'resFlat','공격 속도 증가':'aspd','SP 회복 증가':'spRecoveryFlat','이동 속도 증가':'moveMul'}[base];
  if(key)return {kind:'stats',mods:{[key]:key.endsWith('Pct')?n/100:key==='moveMul'?1+n/100:n}};
- if(base==='야수의 심장')return {kind:'beastHeart',count:10};
+ if(base==='야수의 심장')return {kind:'beastHeart',count:12};
  if(base==='우리들의 빛')return {kind:'gainTrait'};
  if(base==='레벨 업')return {kind:'freeUpgrade',amount:3};
  if(base==='캐서린의 지원')return {kind:'hammerGrant',count:{silver:2,gold:4,prism:7}[source.grade],items:Object.keys(AUGMENT_ITEM_NAMES).filter(id=>id.endsWith('_a')&&id!=='chess_item_1_01_e_a'&&AUGMENT_ITEM_NAMES[id].endsWith('빅토리아 해머')&&dataForStarter.items?.[id])};
@@ -39,6 +39,7 @@ function effectOf(source,dataForStarter={}){
  if(base==='대격변')return {kind:'recast'};
  if(base==='빅토리아')return {kind:'equipmentAtk',amount:Number(description.match(/([\d.]+)%/)?.[1]||0)/100};
  if(base==='피해 증가')return {kind:'stats',mods:{dmgDealtMul:n/100}};
+ if(base==='문명의 존속')return {kind:'trueDamage',multiplier:1+n/100};
  if(base==='무사')return {kind:'attackHeal',amount:n};
  if(base==='스타터 팩'){const maxTier=Math.max(...[...description.matchAll(/\d+/g)].map(m=>Number(m[0])));return {kind:'starterPack',maxTier,families:starterFamilies(dataForStarter,maxTier)};}
  if(ITEM_GRANTS[base])return {kind:'items',items:ITEM_GRANTS[base],count:base==='도박'?{silver:1,gold:2,prism:4}[source.grade]:{'페가수스':2,'이샤믈라의 축복':2,'신병':1,'뮤엘시스의 지원':2,'박사의 머리':3,'인력사무소':4,'대발견':5,'부재중 전화':8}[base]};
@@ -80,7 +81,7 @@ export function drawAugmentCard(candidates,seen,current,rng){const held=new Set(
 export function augmentIcon(a){
  const e=a.effect||{},key=Object.keys(e.mods||{})[0];
  const stats={atkPct:a.side==='enemy'?'g_enemy_atk_1':'g_char_atk_p1',hpPct:a.side==='enemy'?'g_enemy_hp_1':'g_char_hp_1',defPct:a.side==='enemy'?'g_enemy_def_1':'g_char_def_1',resFlat:'g_enemy_magical_reduction_1',aspd:a.side==='enemy'?'g_enemy_attackspeed_1':'g_char_atkspeed_p1',dmgDealtMul:'g_char_magicdamage_1',spRecoveryFlat:'g_char_sp_reduce_1',moveMul:'g_enemy_movespeed_1',defIgnorePct:'g_enemy_def_1',dodgePhys:'g_tsz_hp_immune_1'};
- const kinds={beastHeart:'g_char_tile_summon_1',gainTrait:'g_global_costrecovery_1',freeUpgrade:'g_global_costrecovery_1',hammerGrant:'g_char_atk_p1',playerHp:'g_char_hp_1',skillAtk:'g_char_atk_p1',items:'g_extra_cost_1',chess:'g_char_tile_summon_1',refresh:'g_global_costrecovery_1',normalEnemy:key==='moveMul'?'g_enemy_movespeed_1':'g_enemy_atk_1',skillSp:'g_char_sp_reduce_1',deployAspd:'g_char_deploy_attribute_add_1',weakness:'g_char_magicdamage_1',spCost:'g_char_sp_reduce_1',extraAttack:'g_char_atk_p1',income:'g_extra_cost_1',starterPack:'g_char_tile_summon_1',layers:'g_global_costrecovery_1',attackHeal:'g_zom_hprec_1',stealth:'g_tsz_hp_immune_1',harmony:'g_global_costrecovery_1',alliedDebuff:key==='resFlat'?'g_enemy_magical_reduction_1':key==='aspd'?'g_char_atkspeed_p1':key==='hpPct'?'g_enemy_hp_1':key==='defPct'?'g_char_def_1':'g_char_atk_p1',alliedDrain:'g_zom_hprec_1',recast:'g_char_tile_summon_1',equipmentAtk:'g_char_atk_p1',price:'g_char_cost_pioneer_1',skillAspd:'g_gx_char_attackspeed_1',corrosion:'g_ly_defres_1',elemental:'g_enemy_element_res_1',shields:'g_enemy_block_dmgreduce_1',statusDuration:'g_char_deploy_stun_1',regen:'g_zom_hprec_1',silenceImmune:'g_tsz_hp_immune_1',leak:'g_lyfrog_hplife_1'};
+ const kinds={trueDamage:'g_char_magicdamage_1',beastHeart:'g_char_tile_summon_1',gainTrait:'g_global_costrecovery_1',freeUpgrade:'g_global_costrecovery_1',hammerGrant:'g_char_atk_p1',playerHp:'g_char_hp_1',skillAtk:'g_char_atk_p1',items:'g_extra_cost_1',chess:'g_char_tile_summon_1',refresh:'g_global_costrecovery_1',normalEnemy:key==='moveMul'?'g_enemy_movespeed_1':'g_enemy_atk_1',skillSp:'g_char_sp_reduce_1',deployAspd:'g_char_deploy_attribute_add_1',weakness:'g_char_magicdamage_1',spCost:'g_char_sp_reduce_1',extraAttack:'g_char_atk_p1',income:'g_extra_cost_1',starterPack:'g_char_tile_summon_1',layers:'g_global_costrecovery_1',attackHeal:'g_zom_hprec_1',stealth:'g_tsz_hp_immune_1',harmony:'g_global_costrecovery_1',alliedDebuff:key==='resFlat'?'g_enemy_magical_reduction_1':key==='aspd'?'g_char_atkspeed_p1':key==='hpPct'?'g_enemy_hp_1':key==='defPct'?'g_char_def_1':'g_char_atk_p1',alliedDrain:'g_zom_hprec_1',recast:'g_char_tile_summon_1',equipmentAtk:'g_char_atk_p1',price:'g_char_cost_pioneer_1',skillAspd:'g_gx_char_attackspeed_1',corrosion:'g_ly_defres_1',elemental:'g_enemy_element_res_1',shields:'g_enemy_block_dmgreduce_1',statusDuration:'g_char_deploy_stun_1',regen:'g_zom_hprec_1',silenceImmune:'g_tsz_hp_immune_1',leak:'g_lyfrog_hplife_1'};
  return '/assets/custom/augments/'+(e.kind==='stats'?stats[key]:kinds[e.kind]||'g_extra_cost_1')+'.png';
 }
 

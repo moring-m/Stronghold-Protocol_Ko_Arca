@@ -12,8 +12,8 @@ import {
   addImportedPaths, countImportedFiles, importSupport, listImportedPaths, shouldServeImportedAsset, registerImportedAssetWorker,
 } from '../../public/js/assetCache.js';
 import {
-  cacheUrlsFor, crc32, createAssetImport, detectAssetPrefix, modelHashOf, normalizePackPath,
-  openZip, plainRel, planFromManifests, sha256Hex16,
+  cacheUrlsFor, crc32, createAssetImport, detectAssetPrefix, importedKeepSet, modelHashOf, normalizePackPath,
+  openZip, plainRel, planFromManifests, pruneImportedAssets, sha256Hex16,
 } from '../../public/js/assetPack.js';
 
 const enc = new TextEncoder();
@@ -132,6 +132,7 @@ function memoryCache({ keysLimit = Infinity } = {}) {
           if (store.size > keysLimit) throw new DOMException("Failed to execute 'keys' on 'Cache': Operation too large.", 'AbortError');
           return [...store.keys()].map((url) => ({ url }));
         },
+        async delete(url) { return store.delete(String(url)); },
       };
     },
     async keys() { return [IMPORTED_ASSET_CACHE]; },

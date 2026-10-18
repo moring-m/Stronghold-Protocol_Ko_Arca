@@ -17,6 +17,10 @@ export function collectAssetUrls(...manifests) {
     if (typeof value === 'string') {
       if (/^\/(?:assets|fonts)\/[^/]/.test(value) && !/[?#\\]/.test(value)) urls.add(mediaUrl(value));
     } else if (value && typeof value === 'object') {
+      // Production browser downloads ship the source TTF/OTF, while a full
+      // local asset build may also advertise an optional WOFF2 conversion.
+      // One supported face suffices; do not request a conversion absent on the host.
+      if (typeof value.original === 'string' && /^\/fonts\//.test(value.original) && typeof value.family === 'string') { visit(value.original); return; }
       for (const child of Object.values(value)) visit(child);
     }
   };

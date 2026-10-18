@@ -6,6 +6,9 @@ import { customFactionData, filterCustomFaction } from './customFactions.js';
 export const RULE_VALUES = Object.freeze([
  {id:"augmentEnemyVote",name:"적 증강 선택 방식",category:"augments",default:0,min:0,max:1,step:1,unit:"",options:[{value:0,label:"방장 선택"},{value:1,label:"참가자 투표"}]},
  ...[["augmentSilver","실버 가중치",1,1000],["augmentGold","골드 가중치",2,1000],["augmentPrism","프리즘 가중치",1,1000],["augmentAllyRerolls","아군 리롤",1,10],["augmentEnemyRerolls","적 리롤",1,10]].map(([id,name,value,max])=>({id,name,category:"augments",default:value,min:0,max,step:1,unit:id.includes("Rerolls")?"회":""})),
+ {id:'normalBattleTime',name:'일반 라운드 전투 시간',default:0,min:0,max:1800,step:1,unit:'초'},
+ {id:'bossBattleTime',name:'보스 라운드 전투 시간',default:120,min:1,max:3600,step:1,unit:'초'},
+ {id:'bossBattleSpeed',name:'보스전 진행 속도',default:1,min:1,max:2,step:1,unit:'',options:[{value:1,label:'1배속'},{value:2,label:'2배속 (시간 포함)'}]},
  {id:'maxDamage',name:'보스 단일 피해 상한',default:300000,min:0,step:10000,unit:''},
  {id:'stockPlayers',name:'상점 재고',default:0,min:-1,max:8,step:1,unit:'',options:[{value:0,label:'자동 (최대 4인 기준)'},...Array.from({length:8},(_,i)=>({value:i+1,label:`${i+1}인 기준`})),{value:-1,label:'무제한'}]},
  ...[['allyHp','최대 HP'],['allyAtk','공격력'],['allyDef','방어력'],['allyRes','마법 저항'],['allyAspd','공격 속도'],['allyBat','공격 간격'],['allyBlock','저지 수'],['allyCost','배치 비용'],['allyRedeploy','재배치 시간'],['allySpCost','최대 SP'],['allyInitSp','초기 SP'],['allySpRecovery','SP 회복 속도']].map(([id,name])=>({id,name,category:'allies',default:100,min:['allyHp','allyAspd','allyBat','allySpCost'].includes(id)?1:0,step:1,unit:'%'})),
@@ -36,7 +39,7 @@ export const EXTENSION_CATEGORIES = Object.freeze([
   { id: 'bonds', name: '맹약 추가' }, { id: 'stages', name: '전장 추가' },
   {id:'forcedBonds',name:'맹약 금지'}, {id:'protectedBonds',name:'맹약 밴 제외'},
   {id:'forcedAuxBonds',name:'보조맹약 금지'}, {id:'protectedAuxBonds',name:'보조맹약 밴 제외'},
-  {id:'disabledBonds',name:'맹약 비활성화'}, {id:'disabledStages',name:'맵 비활성화'},
+  {id:'bannedOperators',name:'오퍼레이터 밴'}, {id:'disabledBonds',name:'맹약 비활성화'}, {id:'disabledStages',name:'맵 비활성화'},
   {id:'disabledBosses',name:'보스 비활성화'}, {id:'disabledBands',name:'전략 비활성화'},
 ]);
 export function isCustomStage(id, stage) {
@@ -46,6 +49,7 @@ export function customExtensionCatalog(raw = {}) {
   const banCatalog=Object.entries(raw.bonds||{}).filter(([,b])=>b.isCore&&Number(b.weight)>0).map(([id,b])=>({id,name:b.name||id}));
   const auxCatalog=Object.entries(raw.bonds||{}).filter(([,b])=>!b.isCore&&Number(b.weight)>0).map(([id,b])=>({id,name:b.name||id}));
   return {
+    bannedOperators:Object.entries(raw.chess||{}).filter(([,c])=>c.visible&&!c.isGolden&&!c.isHidden&&!c.isDiy).map(([id,c])=>({id,name:c.name||id,description:'이번 게임의 상점과 오퍼레이터 획득 대상에서 제외합니다.'})),
     augmentSettings:[],allies:[],bossStats:[],commonBands:Object.entries(raw.bands||{}).filter(([id])=>id!==RANDOM_BAND_ID).map(([id,b])=>({id,name:b.name||id,description:b.desc||''})),
     rules:[{id:'augments',name:'증강 모드',description:'4·7·10라운드에 아군·적 증강을 선택합니다.'},{id:'unlimitedHpLoss',name:'HP 감소 상한 해제',description:'한 라운드에 감소하는 HP의 10 상한을 해제합니다.'},{id:'sharedHp',name:'아군 HP 공유',description:'모든 참가자의 HP를 합산해 공유합니다. 전투 종료 시 감소 예정 HP를 합산해 차감합니다.'},{id:'scarecrow',name:'허수아비 모드',description:'일반 보스와 히든 보스를 공격하지 않는 제셀톤 윌리엄스로 교체합니다.'},{id:'unlimitedLayers',name:'중첩 상한선 해제',description:'맹약의 999중첩 상한선을 해제합니다.'},{id:'defaultHarmony',name:'조화 기본 활성화',description:'조화 오퍼레이터가 없어도 조화 맹약을 활성화합니다.'},{id:'duplicateBands',name:'전략 중복 선택 허용',description:'여러 참가자가 같은 전략을 선택할 수 있습니다.'}],
     forcedAuxBonds:auxCatalog,protectedAuxBonds:auxCatalog,
@@ -139,7 +143,7 @@ export function validateExtensionMinimums(raw,selection,{mode='coop',difficulty=
  return [...new Set(errors)];
 }
 
-/** Eight-player mode has no bans. Strip stale preset policies too. */
+/** Eight-player mode skips bond bans, while explicit operator bans remain available. */
 export function modeExtensionSelection(selection,mode){
  if(mode!=='coop8')return selection;
  const result={...selection};for(const key of ['forcedBonds','protectedBonds','forcedAuxBonds','protectedAuxBonds','disabledBonds','protectedOperators'])delete result[key];return result;

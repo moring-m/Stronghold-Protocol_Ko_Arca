@@ -16,3 +16,15 @@ test('shop models and images use the renderer cache before purchase, deduplicate
  warm.update([{spine:'char_shop',avatar:'char_shop'}]);assert.equal(scheduled.length,0,'unchanged prep state cannot restart the warm queue');
  warm.destroy();assert.equal(holds,0);
 });
+
+test('rerolls prepare only unseen figures and retry figures whose image preparation failed',async()=>{
+ const scheduled=[],seen=[];let fail=true;
+ const assets={avatar:id=>`/${id}.png`,image:async url=>{seen.push(url);if(url==='/a.png'&&fail)throw Error('offline');},spineEntry:()=>null};
+ const warm=createRosterWarmer(assets,{schedule:fn=>{scheduled.push(fn);return fn;},cancel:()=>{}});
+ warm.update([{spine:'a'}]);await scheduled.shift()();
+ fail=false;warm.update([{spine:'b'}]);await scheduled.shift()();
+ warm.update([{spine:'a'},{spine:'b'}]);await scheduled.shift()();
+ assert.deepEqual(seen,['/a.png','/b.png','/a.png']);
+ warm.update([{spine:'a'},{spine:'b'}]);assert.equal(scheduled.length,0);
+ warm.destroy();
+});

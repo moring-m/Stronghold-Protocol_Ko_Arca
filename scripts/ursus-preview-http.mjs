@@ -4,7 +4,7 @@ import {randomUUID} from 'node:crypto';
 import {readFile,writeFile,mkdir,access,statfs} from 'node:fs/promises';
 import {join,dirname} from 'node:path';
 import {normalizeAtlas} from '../tools/assets/atlas.mjs';
-export async function previewHandler(root,port){
+export async function previewHandler(root,port,{warmResources=true}={}){
  let closed=false;
  const sessions=new Map(),pending=new Map();const resources=JSON.parse(await readFile(join(root,'public/vendor/browser-resources.json'),'utf8'));const voices=JSON.parse(await readFile(join(root,'.cache/ursus-voice-resources.json'),'utf8').catch(()=>'{"files":[]}'));resources.files.push(...voices.files);const skins=JSON.parse(await readFile(join(root,'.cache/skin-resources.json'),'utf8').catch(()=>'{"files":[]}'));resources.files.push(...skins.files);const skillSounds=JSON.parse(await readFile(join(root,'.cache/skill-sound-resources.json'),'utf8').catch(()=>'{"files":[]}'));resources.files.push(...skillSounds.files);const bands=JSON.parse(await readFile(join(root,'.cache/ursus-band-resources.json'),'utf8').catch(()=>' {"files":[]}'));resources.files.push(...bands.files);const localArt=JSON.parse(await readFile(join(root,'.cache/ursus-local-assets.json'),'utf8').catch(()=>'{"groups":{}}'));for(const group of Object.values(localArt.groups || {}))for(const entry of Object.values(group))if(entry?.path)resources.files.push({path:entry.path,local:true,sources:[]});const recruits=JSON.parse(await readFile(join(root,'.cache/upstream-recruit-resources.json'),'utf8').catch(()=>'{"files":[]}'));const files=new Map([...recruits.files,...resources.files].map(f=>[f.path,f]));
  const timer=setInterval(()=>{for(const [id,s]of sessions)if(Date.now()-s.seen>90000){s.ws.close();sessions.delete(id)}},10000);timer.unref();
@@ -50,6 +50,6 @@ export async function previewHandler(root,port){
  };
  const background=[...files.keys()].sort((a,b)=>Number(b.includes('/illustrations/'))-Number(a.includes('/illustrations/')));
  async function warm(){while(!closed && background.length){const path=background.shift();try{await access(join(root,'public',path));continue}catch{}try{await access(join(root,'.cache/ursus-preview-resources',path.slice(1)));continue}catch{}try{await asset(path)}catch{ /* Foreground requests retry missing upstream assets. */ }}}
- Promise.all([warm(),warm()]).then(()=>{if(!closed)console.log('Background resource synchronization complete');});
+ if(warmResources)Promise.all([warm(),warm()]).then(()=>{if(!closed)console.log('Background resource synchronization complete');});
  return{handle,close(){closed=true;clearInterval(timer);for(const s of sessions.values())s.ws.close();sessions.clear()}};
 }

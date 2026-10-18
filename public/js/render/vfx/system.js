@@ -112,7 +112,7 @@ function byUnityOrder(a, b) {
 export class OfficialFx {
   /**
    * @param {{ P: any, renderer: any, assets?: any, cam: () => any, heightAt?: (r: number, c: number) => number,
-   *           lib?: FxLibrary, tier?: string }} ctx
+   *           fieldRect?: () => any, lib?: FxLibrary, tier?: string }} ctx
    */
   constructor(ctx) {
     this.ctx = ctx;
@@ -182,6 +182,8 @@ export class OfficialFx {
     if (!this.lib.has(k)) return null;
     const lim = MAX_EFFECTS[this.tier] || 200;
     const important = !!opts.loop || !!opts.important;
+    // [ASSUMED] Author loops never bypass tier budgets; pending plugin loads also count toward 128 instances.
+    if (k.startsWith('plugin:') && (this.effects.length + this.pending.length >= Math.min(128, lim) || this.particles >= (MAX_PARTICLES[this.tier] || 5000))) { this.dropped++; return null; }
     if (!important && (this.effects.length >= lim || this.particles >= (MAX_PARTICLES[this.tier] || 5000))) { this.dropped++; return null; }
     const handle = new FxHandle(this, k, place, opts);
     const def = this.lib.def(k);
@@ -196,7 +198,7 @@ export class OfficialFx {
         this.pending.splice(i, 1);
         if (!d || handle.cancelled || !this.active) return;
         if (!important && this.time - handle.t0 > LATE_START) return;
-        handle._start(d);
+        handle._start(d, Math.max(0, this.time - handle.t0));
       }, () => {});
     }
     return handle;
@@ -438,11 +440,17 @@ export class FxHandle {
     this.t0 = 0;
   }
 
-  _start(def) {
+  _start(def, loadedLate = 0) {
     const s = this.sys;
     const seed = this.opts.seed ?? ((s.seed = (s.seed * 1103515245 + 12345) >>> 0) || 1);
     const fx = s._take(def, seed) || new Effect(def, { lite: s.lite, lib: s.lib, seed });
     fx.place(this.placeArgs);
+    // Casts share the attack clip's rate; flights keep their own battle clock.
+    const rate = Number(this.opts.speed);
+    if (rate > 0 && def.pe?._usePlaybackSpeed !== 0 && def.pe?._usePlaybackSpeed !== false) {
+      const limit = Number(def.pe?._limitedPlaybackSpeed);
+      fx.speed = Math.min(rate, limit > 0 ? limit : rate);
+    }
     fx.track = this.opts.track || null;
     fx.owner = this.opts.owner ?? null;
     fx.handle = this;
@@ -457,17 +465,25 @@ export class FxHandle {
     // a chained effect of the prefab itself (OnPlayEmitter) starts with the same placement and owner; a looping one
     // stops with it (OnFinishEmitter's start where it finished)
     this.children = [];
-    const own = { track: this.opts.track, data: this.opts.data, loop: this.opts.loop, important: this.opts.important, owner: this.opts.owner };
+    const skip = Math.max(0, Number(this.opts.skip) || 0) + loadedLate;
+    const own = { track: this.opts.track, data: this.opts.data, loop: this.opts.loop, important: this.opts.important, owner: this.opts.owner, skip, speed: this.opts.speed };
     for (const e of def.onPlay) for (const k of e.keys) if (k !== def.key) { const c = s.spawn(k, this.placeArgs, own); if (c) this.children.push(c); }
     const prev = fx.onFinish;
     fx.onFinish = (f) => {
       prev?.(f);
       this._stopChildren();
-      for (const k of def.onFinish) if (k !== def.key) s.spawn(k, { pos: f.anchor.slice(), yaw: f.yaw, mirror: f.mirror, groundZ: f.groundZ }, { track: this.opts.track, owner: this.opts.owner });
+      for (const k of def.onFinish) if (k !== def.key) s.spawn(k, { pos: f.anchor.slice(), yaw: f.yaw, mirror: f.mirror, groundZ: f.groundZ, scale: f.rootScale }, { track: this.opts.track, owner: this.opts.owner });
     };
     this.effect = fx;
-    // started late (a cast whose wind-up began past the clip's start): advanced to where it would be
-    if (this.opts.skip > 0) fx.update(Math.min(1, this.opts.skip));
+    // Loading must not restart the attack clock. Step through elapsed battle time
+    // so emission, delays and chained OnPlay effects catch up as well as the clip.
+    // Bound work after a long asset stall; an unowned one-shot expires by this age.
+    let remaining = Math.min(ONE_SHOT_TTL * 2, skip);
+    while (remaining > 1e-9 && !fx.done) {
+      const dt = Math.min(1 / 30, remaining);
+      fx.update(dt);
+      remaining -= dt;
+    }
     if (this.stopped) fx.stop(this.stopped);
     s._add(fx);
     return fx;

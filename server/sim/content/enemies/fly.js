@@ -198,7 +198,7 @@ function kitBombd(ab) {
       e.pauseUntil = Math.max(e.pauseUntil, b.time + BOMBD_RELEASE + 10 + BOMBD_POST_DELAY);
       let landed = false, waited = false;
       const done = () => { if (landed && waited) finish(b, e); };
-      b._ev(['atkStart', e.id, t.id, BOMBD_RELEASE, e.s.interval]);
+      b._ev(['atkStart', e.id, t.id, BOMBD_RELEASE, e.s.interval, false, undefined, 'droneBomb']);
       pending = { a, rel: null };
       pending.rel = b.after(BOMBD_RELEASE, () => {
         if (pending && e.alive && e.s.flags.stun) { interrupt(b, e); return; }  // stunned after this tick's ability pass

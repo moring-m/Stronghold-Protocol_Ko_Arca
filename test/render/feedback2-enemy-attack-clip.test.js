@@ -248,3 +248,16 @@ test('an ability gesture does not release an existing freeze',()=>{
  const a=actor('enemy_10087_hlchgr',true);a.frozen=true;assert.equal(a.playAbility('Skill',1),true);const time=track(a).trackTime;run(a,.5);assert.equal(a.frozen,true);assert.equal(track(a).trackTime,time);
  a.frozen=false;run(a,1.1);assert.equal(a.current,a.roles.move.loop||a.roles.move);
 });
+
+test('every explicit wind-up publishes matching cast duration and playback rate', () => {
+  const a=actor(JSHOOT,true);
+  for(const interval of [2.7,.5,1,2.7]){
+    const lead=.533*Math.min(1,interval);
+    assert.equal(a.beginAttack(interval,lead),true);
+    assert.equal(a.windSkip,0);
+    assert.ok(Math.abs(a.windFxSpeed-track(a).timeScale)<1e-8);
+    assert.ok(Math.abs(a.windCastLeft-1/a.windFxSpeed)<1e-8);
+    run(a,lead);a.attack(interval);run(a,interval);
+  }
+  a.destroy();
+});

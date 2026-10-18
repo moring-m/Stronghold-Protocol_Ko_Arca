@@ -55,12 +55,12 @@ export function overtimeState(pub, now, { perSec = 1, warnBefore = OVERTIME_WARN
   const at = Number(pub.overtimeAt);
   if (!(Number.isFinite(at) && at > 0)) return null;
   if (now < at) {
-    const secs = Math.ceil((at - now) / 1000);
+    const secs = Math.ceil((at - now) / 1000 * (pub.gameSpeed || 1));
     const levelOver = Number.isFinite(pub.deadline) && pub.deadline > 0 && now >= pub.deadline;
     if (!levelOver && secs > warnBefore) return null;
     return { state: 'pending', secs };
   }
-  const secs = Math.floor((now - at) / 1000);
+  const secs = Math.floor((now - at) / 1000 * (pub.gameSpeed || 1));
   const rate = Number.isFinite(perSec) && perSec >= 0 ? perSec : 1;
   return { state: 'drain', secs, lost: secs * rate, perSec: rate };
 }

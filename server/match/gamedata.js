@@ -364,6 +364,8 @@ export class GameData {
 
   /** The round level's `maxPlayTime` (config rounds[r].combatTimeLimit) as data gives it — REAL seconds. */
   combatTimeLimitReal(r) {
+    const custom=this.config.customRules?.normalBattleTime;
+    if(Number.isInteger(custom)&&custom>0)return custom;
     const rc = this.roundCfg(r);
     const v = rc ? rc.combatTimeLimit : undefined;
     if (typeof v === 'number' && Number.isFinite(v) && v > 0) return v;
@@ -394,6 +396,8 @@ export class GameData {
    * when the data has none.
    */
   bossLevelTime(r) {
+    const custom=this.config.customRules?.bossBattleTime;
+    if(Number.isInteger(custom)&&custom>0&&custom!==120)return custom;
     const rc = this.roundCfg(r);
     const v = rc ? rc.levelMaxPlayTime : undefined;
     return typeof v === 'number' && Number.isFinite(v) && v > 0 ? v : null;
@@ -434,21 +438,21 @@ export class GameData {
    * drains 1 per real second from the 150 s mark (research 01 §10, 06 §11.7). Read as game seconds the drain would
    * start at 75 real s (45 s before the countdown ends) at 2 LP per real second.
    */
-  get bossOvertimeAfterReal() { return Math.max(0, numOr(this.config.bossOvertimeAfter, DEFAULTS.bossOvertimeAfter)); }
+  get bossOvertimeAfterReal() { return Math.max(0, numOr(this.config.bossOvertimeAfter, DEFAULTS.bossOvertimeAfter)+(this.config.customRules?.bossBattleTime||120)-120); }
   /** Team LP drained per REAL second of overtime. */
   get bossOvertimeDrainReal() { return Math.max(0, numOr(this.config.bossOvertimeDrainPerSec, DEFAULTS.bossOvertimeDrainPerSec)); }
   /** Original boss phases run at 1×, independently of normal combat. */
-  get bossTimeScale() { return 1; }
+  get bossTimeScale() { return this.config.customRules?.bossBattleSpeed === 2 ? 2 : 1; }
   /** Overtime start in GAME seconds of a boss field clock (150 real s at 1× = 150). */
-  get bossOvertimeAfter() { return this.bossOvertimeAfterReal * this.bossTimeScale; }
+  get bossOvertimeAfter() { return this.bossOvertimeAfterReal; }
   /** Team LP drained per GAME second of overtime (1 per real second = 1 per game second). */
-  get bossOvertimeDrain() { return this.bossOvertimeDrainReal / this.bossTimeScale; }
+  get bossOvertimeDrain() { return this.bossOvertimeDrainReal; }
   /**
    * Team LP the overtime drain has taken when a boss field clock reads `gt` game seconds: bossOvertimeDrainReal per
    * whole REAL second past bossOvertimeAfterReal (the first point at 151 real s).
    */
   bossOvertimeDue(gt, afterReal = this.bossOvertimeAfterReal) {
-    const over = (Number(gt) || 0) / this.bossTimeScale - afterReal;
+    const over = (Number(gt) || 0) - afterReal;
     return over >= 1 ? Math.floor(over) * this.bossOvertimeDrainReal : 0;
   }
   get dp() {
@@ -508,7 +512,9 @@ export class GameData {
 
   startLp(bandId) {
     const b = this.band(bandId);
-    return b && Number.isInteger(b.totalHp) && b.totalHp > 0 ? b.totalHp : this.defaultStartLp;
+    const hp = b && Number.isInteger(b.totalHp) && b.totalHp > 0 ? b.totalHp : this.defaultStartLp;
+    const extra = (this.config.commonBands || []).reduce((n,id)=>{const h=this.band(id)?.totalHp;return n+(Number.isInteger(h)&&h>0?h-this.defaultStartLp:0);},0);
+    return Math.max(1,hp+extra);
   }
 
   /**

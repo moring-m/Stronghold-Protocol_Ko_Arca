@@ -32,6 +32,12 @@ const PRISONER = prisoner('2', '');
 const PRISONER_COLOURED = prisoner('_orange', '_red');
 
 export const FORMS = Object.freeze({
+  ['token_10030_mlyss_wtrman']: Object.freeze({
+    Default: Object.freeze({ roles: { ...clipSet('Idle_1', null, 'Stun', 'Attack'), deploy: 'Start', stun: loop('Stun') } }),
+    Melee: Object.freeze({ change: 'Change_A', combat: 'A_Combat', roles: { ...clipSet('A_Idle', null, 'Die', 'A_Attack'), deploy: 'A_Start', stun: loop('A_Stun'), attackDown: null } }),
+    Range: Object.freeze({ change: 'Change_B', combat: 'B_Combat', roles: { ...clipSet('B_Idle', null, 'B_Die', 'B_Attack'), deploy: 'B_Start', stun: loop('B_Stun'), attackDown: null } }),
+  }),
+
   enemy_10116_ymgtop:Object.freeze({spin:Object.freeze({change:"Skill_Begin",leave:"Skill_End",roles:clipSet("Skill_Loop","Skill_Loop","Die")})}),
   enemy_10044_wintun: Object.freeze({
     emptied: Object.freeze({change:null,roles:clipSet('B_Idle','B_Move','B_Die','B_Attack')}),

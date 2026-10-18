@@ -180,10 +180,10 @@ const isOffIn = (off, bondId) => !!(off && typeof off.has === 'function' && off.
  * and the items that pair with it; a bond the mode never activates (`off`, gameLogic modeOffBonds) struck through with
  * 本局禁用. `carried` (the wearer's items — the card shows the item on an operator): the pairing it wears is highlighted
  * (生效中; 已搭配 when that bond is off), and a wearer without one reads 暂未生效.
- * @param {{ off?: Set<string>|null, carried?: Array<string|{id:string}>|null }} props
+ * @param {{ off?: Set<string>|null, carried?: Array<string|{id:string}>|null, mode?: 'official'|'plus' }} props
  */
-export function MorphPairings({ off = null, carried = null }) {
-  const rows = morphPairings(data.list('items'), data.list('bonds'), { off, carried });
+export function MorphPairings({ off = null, carried = null, mode = 'official' }) {
+  const rows = morphPairings(data.list('items'), data.list('bonds'), { off, carried, mode });
   if (!rows.length) return null;
   const wearer = Array.isArray(carried);
   return html`<div class=${cx('dmorph', wearer && 'is-wearer')}>
@@ -203,15 +203,15 @@ export function MorphPairings({ off = null, carried = null }) {
 /**
  * A bond item's own line (items.json `giveBondId`): "与变形同构体一同装备时，携带者视为【X】成员" — 本局禁用 when the mode never
  * activates X; on a wearer that also carries a 变形同构体 (`carried`) it is in effect (生效中).
- * @param {{ item: any, off?: Set<string>|null, carried?: Array<string|{id:string}>|null }} props
+ * @param {{ item: any, off?: Set<string>|null, carried?: Array<string|{id:string}>|null, mode?: 'official'|'plus' }} props
  */
-export function MorphGrantLine({ item, off = null, carried = null }) {
+export function MorphGrantLine({ item, off = null, carried = null, mode = 'official' }) {
   const bond = item && !item.canGiveBond && typeof item.giveBondId === 'string' ? data.lookup('bonds', item.giveBondId) : null;
   if (!bond) return null;
   const morph = data.list('items').find((r) => r && r.canGiveBond);
   if (!morph) return null;
   const isOff = isOffIn(off, item.giveBondId);
-  const worn = grantedBonds(carried, (id) => data.lookup('items', id)).includes(item.giveBondId);
+  const worn = grantedBonds(carried, (id) => data.lookup('items', id), mode).includes(item.giveBondId);
   return html`<p class=${cx('dhint', 'dhint--morph', worn && 'is-worn', isOff && 'is-off')} data-bond=${item.giveBondId}>
     <${Icon} name="info" /><span>与${morph.name}一同装备时，携带者视为【${bond.name}】成员${isOff ? html`<span class="dmorph__tag is-off">本局禁用</span>` : null}${worn
       ? html`<span class="dmorph__tag is-on">${isOff ? '已搭配' : '生效中'}</span>` : null}</span>
@@ -219,12 +219,14 @@ export function MorphGrantLine({ item, off = null, carried = null }) {
 }
 
 /** An equipped item of the card: icon, name, effect — and for 变形同构体 / a bond item its pairing (`carried`: the wearer's items). */
-function ItemRow({ itemId, carried = null, off = null }) {
+function ItemRow({ itemId, carried = null, off = null, mode = 'official', onUnequip = null, uid = null }) {
   const it = data.lookup('items', itemId);
+  const free = mode === 'plus' && !!it?.canGiveBond;
   return html`<div class="ditem">
     <${UnitThumb} kind="item" id=${itemId} size="sm" />
-    <div class="ditem__text"><b>${it?.name || itemId}</b><${RichText} text=${it?.descRaw || it?.desc || ''} class="ditem__desc" />
-      ${it?.canGiveBond ? html`<${MorphPairings} off=${off} carried=${carried || []} />` : it?.giveBondId ? html`<${MorphGrantLine} item=${it} off=${off} carried=${carried} />` : null}</div>
+    <div class="ditem__text"><b>${it?.name || itemId}</b>${free ? html`<span class="dtag" data-testid="morph-free">${t('不占装备格')}</span>` : null}<${RichText} text=${it?.descRaw || it?.desc || ''} class="ditem__desc" />
+      ${it?.canGiveBond ? html`<${MorphPairings} off=${off} carried=${carried || []} mode=${mode} />` : it?.giveBondId ? html`<${MorphGrantLine} item=${it} off=${off} carried=${carried} mode=${mode} />` : null}
+      ${onUnequip && Number.isInteger(uid) ? html`<${Button} variant="secondary" size="sm" data-testid="unequip" onClick=${() => onUnequip(uid)}>${t('卸下')}<//>` : null}</div>
   </div>`;
 }
 
@@ -381,8 +383,9 @@ export function ChessDetail({ chess, piece, unit, snapHp, editable, onSell, bond
   // a chosen skill the manifest has no icon for (only the default skills' icons are fetched): its slot letter
   const skIcon = sk && lo && !lo.defaultSkill ? skillRecordIconUrl(m, sk, { empty: false }) : skillIconUrl(m, c);
   const skSlot = sk && Number.isInteger(sk.index) ? `S${sk.index + 1}` : null;
-  const firstGarrison = Array.isArray(c.garrisonIds) && c.garrisonIds[0] ? data.lookup('garrisons', c.garrisonIds[0]) : null;
-  const garrisonDescription=garrisonTexts(c,id=>data.lookup('garrisons',id)).join('\n');
+  const firstGarrison = (c.garrisonIds || []).map(id=>data.lookup('garrisons',id)).find(g=>g&&!g.operatorTrait) || null;
+  const customTraits = Object.values(data.get('garrisons')||{}).filter(g=>g.operatorTrait?.charId === fr.charId && g.operatorTrait.elite === golden);
+  const garrisonDescription=garrisonTexts(c,id=>{const g=data.lookup('garrisons',id);return g?.operatorTrait?null:g;}).join('\n');
   const garrison=firstGarrison ? (garrisonDescription === (firstGarrison.descRaw || firstGarrison.desc) ? firstGarrison : {...firstGarrison,desc:garrisonDescription,descRaw:garrisonDescription}) : null;
   const items = Array.isArray(piece?.items) ? piece.items : [];
   // the bonds the unit counts for: its own + a 变形同构体 pairing's (its piece's items; without one: `unitItems` — a
@@ -420,7 +423,7 @@ export function ChessDetail({ chess, piece, unit, snapHp, editable, onSell, bond
         <${BondChips} bondIds=${bondIds} bonds=${bonds} off=${offBonds} onBond=${onBond} granted=${grantedIds} />
       </div>
     </div>`;
-  blocks.garrison = garrison ? html`<${GarrisonBlock} key="garrison" garrison=${garrison} m=${m} />` : null;
+  blocks.garrison = [garrison,...customTraits].filter(Boolean).map((g,i)=>html`<${GarrisonBlock} key=${`garrison-${i}`} garrison=${g} m=${m} />`);
   blocks.trait = c.trait?.desc ? html`<p key="trait" class="dtrait"><${Icon} name="info" /><${RichText} text=${traitText(c, golden, lo)} /></p>` : null;
   blocks.stats = chessStatsBlock({ rec: fr, chess: c, live });
   blocks.skill = sk ? html`<${Section} key="skill" title="技能" micro="SKILL" class="dsec--skill">
@@ -476,7 +479,7 @@ export function ChessDetail({ chess, piece, unit, snapHp, editable, onSell, bond
  * 变形同构体 lists its pairings (its 天赋栏: MorphPairings, `offBonds` marks 本局禁用); a bond item says which bond it gives
  * a 变形同构体 wearer (MorphGrantLine). (An equipped item is shown on its wearer's card: ChessDetail's 装备 rows.)
  */
-export function ItemDetail({ item, piece, editable, onDestroy, offBonds = null }) {
+export function ItemDetail({ item, piece, editable, onDestroy, offBonds = null, morphMode = 'official', unequipAllowed = false }) {
   const m = data.get('assets');
   return html`
     <div class="dhead dhead--item">
@@ -718,7 +721,7 @@ export function selectVoiceKey(detail) {
  *   a second (the battle's own sim, battle/runner.js unitStats); null ⇒ the record's numbers
  *   voice: retained for caller compatibility; this panel does not initiate playback. Shop portrait taps open details only.
  */
-export function DetailPanel({ detail, editable, snapHp, onClose, onSell, onDestroy, bonds = [], offBonds = null, loadout = null, ops = null, onBond = null, side = 'left', shopOpen = false, live = null, voice = false }) {
+export function DetailPanel({ detail, editable, snapHp, onClose, onSell, onDestroy, bonds = [], offBonds = null, loadout = null, ops = null, onBond = null, side = 'left', shopOpen = false, live = null, voice = false, morphMode = 'official', onUnequip = null, unequipAllowed = false }) {
   const getter = typeof live === 'function' ? live : null;
   useTicker(detail && getter ? 250 : 0);
   // Selection voices belong to direct click handlers, never panel refreshes.

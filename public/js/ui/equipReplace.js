@@ -1,3 +1,4 @@
+import { morphSlotPolicy } from '../../../shared/plugins/rules.js';
 import { t } from '../../../shared/i18n.js';
 // Equip-replace dialog (research 04 §"Replacement" / 09 §1.2 UseEquipUp { charChessInstId, equipChessInstId,
 // isChangeEquip, unloadInstId }; PRTS 帮助 "达到上限强行佩戴会改为替换装备"): an item dropped on an operator whose two
@@ -34,15 +35,25 @@ export function replaceRequest(ctx, intent, getChess = () => null, getItem = () 
   const item = ctx?.pieces?.get(intent.fields.itemUid)?.piece;
   if (!isObj(target) || target.kind !== 'chess' || !isObj(item) || item.kind !== 'item') return null;
   const equipped = (Array.isArray(target.items) ? target.items : []).filter((it) => isObj(it) && Number.isInteger(it.uid));
-  if (equipped.length < 2) return null;
   const rec = (id) => getItem(id) || null;
+  let options = equipped;
+  if (ctx?.morphMode === 'plus') {
+    const policy = morphSlotPolicy('plus', (it) => !!rec(typeof it === 'string' ? it : it?.id)?.canGiveBond);
+    if (!policy.occupies(rec(item.id))) return null;
+    if (policy.slotsUsed(equipped) < policy.slotCap(2)) return null;
+    options = equipped.filter((it) => policy.occupies(rec(it.id)));
+    if (!options.length) return null;
+  } else if (equipped.length < 2) return null;
+  const shown = getChess(target.id) || null;
   return {
     targetUid: target.uid,
     targetId: target.id,
-    targetName: getChess(target.id)?.name || '该干员',
+    targetName: shown?.name || t('该干员'),
+    // the record the avatar draws (a 补位 stand-in's or a 自选 operator's composed record; the data's for any other chess)
+    targetRec: shown && (shown.standInFor || shown.diyFor) ? shown : null,
     golden: !!target.golden,
-    item: { uid: item.uid, id: item.id, name: rec(item.id)?.name || '装备' },
-    options: equipped.map((it) => ({ uid: it.uid, id: it.id, name: rec(it.id)?.name || it.id })),
+    item: { uid: item.uid, id: item.id, name: rec(item.id)?.name || t('装备') },
+    options: options.map((it) => ({ uid: it.uid, id: it.id, name: rec(it.id)?.name || it.id })),
   };
 }
 

@@ -207,14 +207,14 @@ test('level up grants three funds, waives only next upgrade, hides at max shop l
  assert.equal(ps.funds,before+3);assert.equal(ps.shop.upgradePrice,0);const level=ps.shop.level;ps.levelUp();assert.equal(ps.shop.level,level+1);assert.equal(ps.shop.upgradePrice,m.gd.upgradeBase(ps.shop.level));
  ps.shop.level=m.gd.maxShopLevel;assert.ok(!m.augments.catalog('ally',ps).some(a=>a.name==='레벨 업'));
 });
-test('beast heart sells board/bench operators, destroys equipment and queues ten ban-safe elites',t=>{
+test('beast heart sells board/bench operators, destroys equipment and queues twelve ban-safe elites',t=>{
  const {m,ps}=fixture(t);m.round=10;const ids=Object.keys(data.chess).filter(id=>!data.chess[id].isGolden&&!data.chess[id].optionalRecruit&&data.chess[id].visible!==false);
  const p=ps.acquireChess(ids[0],{fromPool:false});const item=ps.newPiece('item','chess_item_1_01_e_a');p.items.push(item);
  const q=ps.acquireChess(ids[1],{fromPool:false});ps._detach(ps.find(q.uid));ps.board.set('0,0',q);
  const banned=ids[2];m.bannedChess.push(banned);const before=ps.funds;const card=createAugmentCatalog(data,10).find(a=>a.name==='야수의 심장');
  const grants=[];ps.acquireChess=(id,opts)=>{grants.push({id,opts});return null;};m.augments.grant(ps,card);
  assert.ok(!ps.find(p.uid));assert.ok(!ps.find(q.uid));assert.ok(!ps.find(item.uid));assert.ok(ps.funds>=before+m.gd.sellPrice(p.id)+m.gd.sellPrice(q.id));
- const queued=m.augments.pending.get(ps.playerId);assert.equal(queued.length,10);assert.ok(queued.every(g=>data.chess[g.id].isGolden&&m.gd.baseIdOf(g.id)!==banned));assert.ok(grants.every(g=>g.opts.fromPool===false));
+ const queued=m.augments.pending.get(ps.playerId);assert.equal(queued.length,12);assert.ok(queued.every(g=>data.chess[g.id].isGolden&&m.gd.baseIdOf(g.id)!==banned));assert.ok(grants.every(g=>g.opts.fromPool===false));
 });
 test('our light repeats the same gain trait as Suzuran and stacks with her strategy',t=>{
  const {m,ps}=fixture(t);const card=createAugmentCatalog(data,4).find(a=>a.name==='우리들의 빛');m.augments.allies.set(ps.playerId,[card]);
@@ -231,4 +231,15 @@ test('Du Yaoye shop guarantee still finds allowed Yan operators when Yan is bann
  for(const refresh of [1,2]){ps.round.refreshes=refresh;ps.shop.slots=Array.from({length:4},()=>({kind:'chess',id:other,basePrice:1,sold:false}));m.dispatch(ps,'onRefresh',{free:false});assert.ok(ps.shop.slots.some(s=>data.chess[s.id].bonds.includes('yanShip')));assert.ok(ps.shop.slots.every(s=>!m.bannedChess.includes(s.id)));}
  ps.round.refreshes=3;ps.shop.slots=Array.from({length:4},()=>({kind:'chess',id:other,basePrice:1,sold:false}));m.dispatch(ps,'onRefresh',{free:false});assert.ok(ps.shop.slots.every(s=>s.id===other));
  m.bannedChess.push(...allowed.slice(1));ps.round.refreshes=1;m.dispatch(ps,'onRefresh',{free:false});assert.ok(ps.shop.slots.every(s=>s.id===other),'no eligible Yan: keep the normal shop instead of showing banned operators');
+});
+
+test('new true-damage family is mutually exclusive across all grades',t=>{
+ const {m,ps}=fixture(t);m.round=4;
+ const chosen=createAugmentCatalog(data,4).find(c=>c.name==='문명의 존속 I');
+ assert.ok(chosen);m.augments.allies.set(ps.playerId,[chosen]);
+ for(const grade of ['silver','gold','prism']){m.augments.current={grade};assert.ok(m.augments.catalog('ally',ps).every(c=>c.effect.kind!=='trueDamage'));}
+});
+test('beast heart grants twelve promoted operators',t=>{
+ const {m,ps}=fixture(t);const card=createAugmentCatalog(data,10).find(c=>c.name==='야수의 심장');
+ assert.equal(card.effect.count,12);const before=ps.round.gainedChess;m.augments.grant(ps,card);assert.equal(ps.round.gainedChess-before,12);
 });

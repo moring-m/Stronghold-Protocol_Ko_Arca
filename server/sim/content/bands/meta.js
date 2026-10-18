@@ -35,7 +35,7 @@
 import { GEO } from '../../../../shared/constants.js';
 import { bbCap } from '../../../../shared/plugins/officialBounds.js';
 import { burstLimit } from '../../../../shared/plugins/steps.js';
-import { buffsOf, num, bandRecord, gameData } from '../support/index.js';
+import { buffsOf, num, bandRecord, bandEffectId, gameData } from '../support/index.js';
 import { metaBonds } from '../support/meta.js';
 import * as garrisons from '../garrisons.js';
 
@@ -64,8 +64,18 @@ function grant(ctx, id, opts = {}) {
 const chessSlots = (ctx) => ctx.shopSlots().map((s, i) => (s && s.kind === 'chess' && !s.sold ? i : -1)).filter((i) => i >= 0);
 
 /** Up to `n` distinct item ids of an equip pool. */
-function rollItems(ctx, poolId, n) {
+function rollItems(ctx, poolId, n, exclude = []) {
   const out = [];
+  if (exclude.length) {
+    // [ASSUMED] After Cathy's allowance is used, sample eligible items without replacement, up to count (official
+    // aceffect_band_26). Filter before drawing so forbidden/repeated ids cannot underfill a fresh offer.
+    for (let k = 0; k < n; k++) {
+      const r = ctx.rollPool(poolId, { exclude: [...exclude, ...out] });
+      if (!r || r.kind !== 'item') break;
+      out.push(r.id);
+    }
+    return out;
+  }
   for (let k = 0; k < n * 6 && out.length < n; k++) {
     const r = ctx.rollPool(poolId);
     if (!r || r.kind !== 'item') break;
@@ -279,11 +289,17 @@ K.round_start_bond_check_gain_layer = (ps) => ({
   },
 });
 
-K.up_shop_add_special_goods = (ps) => ({
+// Official activity_table aceffect_band_26: count 3, choice 1, pool_equip_kathe; no cell limit is exposed.
+// #677: maintainer decision 2026-10-17 (official play memory): Cathy gives the cell at most once per player/match.
+// [ASSUMED] "given" means successfully taken, not shown; Quintus's independent grant does not use this allowance.
+K.up_shop_add_special_goods = (ps, bandId) => ({
   onLevelUp(ctx) {
     const p = ps[0];
-    const ids = rollItems(ctx, p.pool, timesOf(p.count, 3));
-    if (ids.length) ctx.offerItems(ids, { source: 'band' });
+    // effectRef inherits the behaviour (DESIGN §32.5); concrete parameters still come from this band's buffs.
+    const cathy = bandEffectId(bandId) === 'band_cathy';
+    const exclude = cathy && ctx.counter('band:cathy:cellTaken') ? ['chess_item_5_08_e_a'] : [];
+    const ids = rollItems(ctx, p.pool, timesOf(p.count, 3), exclude);
+    if (ids.length) ctx.offerItems(ids, { source: cathy ? 'band:band_cathy' : 'band' });
   },
 });
 
@@ -484,13 +500,14 @@ export function duckReplace(ctx, spawns, p, ownerPlayerId, { routes = null, side
 const duckGlobal = {
   onBattleStart(ctx, ev) {
     if (!ev || !DUCK_KINDS.has(ev.kind) || !Array.isArray(ev.spawns)) return;
-    const holder = [ctx, ...ctx.teammates()].find(t => (t.gd.band(t.bandId())?.effectRef ?? t.bandId()) === DUCK_BAND);
-    if (!holder) return;
-    const p = duckParams(holder.bandId());
-    if (!p || ctx.round < int(p.round, 1)) return;
-    const held = ctx.gd.config.commonBands?.includes(DUCK_BAND) || ctx.bandId() === DUCK_BAND || ctx.teammates().some((t) => t.bandId() === DUCK_BAND);
-    if (!held) return;
-    duckReplace(ctx, ev.spawns, p, ctx.playerId, { routes: ev.routes, side: ev.side });
+    // Team effects must include common sources even when nobody personally picked the band.
+    const sources = [ctx.bandId(), ...ctx.teammates().map(t=>t.bandId()), ...(ctx.gd.config.commonBands || [])];
+    for (const id of sources) {
+      if ((ctx.gd.band(id)?.effectRef ?? id) !== DUCK_BAND) continue;
+      const p = duckParams(id);
+      if (!p || ctx.round < int(p.round, 1)) continue;
+      duckReplace(ctx, ev.spawns, p, ctx.playerId, { routes: ev.routes, side: ev.side });
+    }
   },
 };
 

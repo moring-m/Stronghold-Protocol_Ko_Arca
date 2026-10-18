@@ -109,7 +109,8 @@ export class TalentFx {
     const k = this._key(e, v);
     if (!k) return null;
     const loop = !!o.loop;
-    const h = this.w.playOn(k, v, { follow: loop || e.hold === 'cast', loop, important: loop || e.hold === 'cast', toward: o.toward, flipFrom: o.flipFrom, useFourDirectionalFace: !!e.useFourDirectionalFace });
+    const scale = /^enemy_emppnt_scanning_buff(?:_02)?$/.test(k) ? () => Math.max(0.01,Number(v.info?.rangeRadius)||2)/2 : undefined;
+    const h = this.w.playOn(k, v, { scale, follow: loop || e.hold === 'cast', loop, important: loop || e.hold === 'cast', toward: o.toward, flipFrom: o.flipFrom, useFourDirectionalFace: !!e.useFourDirectionalFace });
     if (h && !loop && (e.hold === 'cast' || e.loop)) this._later(o.holdS ?? TALENT_CAST_S, () => h.stop());
     return h;
   }
