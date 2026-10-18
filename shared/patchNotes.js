@@ -1,6 +1,30 @@
 // Player-facing history. Letters a/b were assigned retroactively to the two deployed update batches.
 export const PATCH_NOTES = [
 {
+  "version": "0.3.1a1",
+  "date": "2026-10-18",
+  "status": "released",
+  "title": "결과창 표시 및 조작 · 오퍼레이터 밴 목록 수정",
+  "sections": [
+    {
+      "title": "결과 및 전투 화면",
+      "items": [
+        "실제 게임 진입 경로에서 결과창 전용 스타일을 불러오지 않아 화면이 비거나 조작할 수 없던 문제를 수정했습니다.",
+        "전투 전환·보스 안내의 누락된 스타일 연결을 복구했습니다.",
+        "새 결과창의 미번역 문구를 한국어로 수정했습니다.",
+        "8인 결과 화면의 참가자 카드를 두 줄로 배치해 화면 밖으로 벗어나지 않도록 수정했습니다."
+      ]
+    },
+    {
+      "title": "오퍼레이터 밴",
+      "items": [
+        "밴 목록에서 선발 오퍼레이터를 제외했습니다.",
+        "오퍼레이터 설정과 같은 초상화 격자로 정리하고 등급순 정렬, 이름 검색, 밴 선택 표시를 적용했습니다."
+      ]
+    }
+  ]
+},
+{
   "version": "0.3.1a",
   "date": "2026-10-18",
   "status": "released",

@@ -371,3 +371,21 @@ span.settle__nexticon .icon { width: .3rem; height: .3rem; }
   .settle *, .settle *::before, .settle *::after { animation: none; }
   .sintro { display: none; }
 }
+
+/* Keep all eight alliance members inside the stage; four-player cards retain their full-height layout. */
+.steam__cards--many { left:1rem; right:1rem; bottom:2.4rem; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); grid-template-rows:repeat(2,minmax(0,1fr)); gap:.28rem .7rem; }
+.steam__cards--many .tcard { width:auto; min-width:0; min-height:0; display:grid; grid-template-rows:.35rem minmax(0,1fr) .7rem .4rem; gap:.06rem; }
+.steam__cards--many .tcard__head { margin-top:0; height:auto; }
+.steam__cards--many .tcard__art { height:auto; min-height:0; }
+.steam__cards--many .tcard__art::after { height:1.1rem; }
+.steam__cards--many .tcard__glyph { padding-bottom:0; }
+.steam__cards--many .tcard__title { top:auto; bottom:.58rem; }
+.steam__cards--many .tcard__title b { font-size:calc(.24 * var(--t)); }
+.steam__cards--many .tcard__ticon { width:.32rem; height:.32rem; }
+.steam__cards--many .tcard__rounds { top:auto; bottom:.08rem; height:.4rem; left:.2rem; right:.2rem; }
+.steam__cards--many .tcard__rounds b { font-size:calc(.3 * var(--t)); }
+.steam__cards--many .tcard__cut { top:.1rem; }
+.steam__cards--many .tcard__plate { height:auto; margin-top:0; }
+.steam__cards--many .tcard__plate .pavatar.tcard__ava { --pa:.6rem; }
+.steam__cards--many .tcard__chips { height:auto; margin-top:0; }
+.steam__cards--many .tchip { height:.36rem; }

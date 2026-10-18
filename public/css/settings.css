@@ -385,3 +385,10 @@
 .custom-ext .extension-rule-time>span:first-child{display:flex;align-items:center;gap:6px;font-size:12px;white-space:normal}
 .custom-ext .extension-rule-time input[type="number"]{width:72px;height:36px;padding:0 6px;background:#0b1511;border:1px solid #49665c;color:#e1eee8;font:inherit;text-align:right;box-sizing:border-box;min-width:0}
 .custom-ext .extension-rule-time input:disabled{opacity:.5}
+
+/* Operator bans share the loadout portrait grid, without skill/module controls. */
+.custom-ext .extension-operators .lo-grid { max-height:none; overflow:visible; }
+.extension-operators .lo-card__name { position:relative; inset:auto; padding:6px; min-height:1.2em; }
+.extension-operators .lo-card.is-banned { border-color:var(--danger,#ed817a); box-shadow:inset 0 -2px 0 var(--tc),0 0 0 1px var(--danger,#ed817a); }
+.extension-operator-ban { position:absolute; top:4px; right:4px; width:22px; height:22px; display:grid; place-items:center; background:#9b3535; color:#fff; border:1px solid #efb1ac; }
+.extension-operator-ban .icon { width:16px; height:16px; }

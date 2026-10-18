@@ -62,7 +62,7 @@ import { GAME_FILES } from './ui/gameComponents.js';
 import { TitleScreen, sanitizeName } from './screens/title.js';
 import { LobbyScreen, rememberRoom, parseRoomParam, joinKnown } from './screens/lobby.js';
 import { RoomScreen, TrustedNotice } from './screens/room.js';
-const GameScreen=lazyComponent(()=>Promise.all([import('./screens/game.js'),loadScreenStyles(['game','game-shop','game-panels','briefing','draft','result'].map(name=>'/css/screens/'+name+'.css'))]).then(([module])=>module),'GameScreen');
+const GameScreen=lazyComponent(()=>Promise.all([import('./screens/game.js'),loadScreenStyles(['game','match-popups','protocol-boot','boss-plates','game-shop','game-panels','briefing','draft','result','settle'].map(name=>'/css/screens/'+name+'.css'))]).then(([module])=>module),'GameScreen');
 import { audio, installAudio } from './audio.js';
 import { settingsStore } from './ui/settings.js';
 import { GuideHost } from './ui/guide.js';

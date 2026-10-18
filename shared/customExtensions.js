@@ -45,11 +45,12 @@ export const EXTENSION_CATEGORIES = Object.freeze([
 export function isCustomStage(id, stage) {
   return id.startsWith('custom_') || stage?.customExtension === true || stage?.customExtension?.category === 'stages';
 }
+export const isBannableOperator = c => !!c && !!c.visible && !c.isGolden && !c.isHidden && !c.isDiy && !c.optionalRecruit && c.globalReleased !== false;
 export function customExtensionCatalog(raw = {}) {
   const banCatalog=Object.entries(raw.bonds||{}).filter(([,b])=>b.isCore&&Number(b.weight)>0).map(([id,b])=>({id,name:b.name||id}));
   const auxCatalog=Object.entries(raw.bonds||{}).filter(([,b])=>!b.isCore&&Number(b.weight)>0).map(([id,b])=>({id,name:b.name||id}));
   return {
-    bannedOperators:Object.entries(raw.chess||{}).filter(([,c])=>c.visible&&!c.isGolden&&!c.isHidden&&!c.isDiy).map(([id,c])=>({id,name:c.name||id,description:'이번 게임의 상점과 오퍼레이터 획득 대상에서 제외합니다.'})),
+    bannedOperators:Object.entries(raw.chess||{}).filter(([,c])=>isBannableOperator(c)).sort(([a,x],[b,y])=>(x.tier||0)-(y.tier||0)||(x.shopSortId||0)-(y.shopSortId||0)||a.localeCompare(b)).map(([id,c])=>({id,name:c.name||id,description:'이번 게임의 상점과 오퍼레이터 획득 대상에서 제외합니다.'})),
     augmentSettings:[],allies:[],bossStats:[],commonBands:Object.entries(raw.bands||{}).filter(([id])=>id!==RANDOM_BAND_ID).map(([id,b])=>({id,name:b.name||id,description:b.desc||''})),
     rules:[{id:'augments',name:'증강 모드',description:'4·7·10라운드에 아군·적 증강을 선택합니다.'},{id:'unlimitedHpLoss',name:'HP 감소 상한 해제',description:'한 라운드에 감소하는 HP의 10 상한을 해제합니다.'},{id:'sharedHp',name:'아군 HP 공유',description:'모든 참가자의 HP를 합산해 공유합니다. 전투 종료 시 감소 예정 HP를 합산해 차감합니다.'},{id:'scarecrow',name:'허수아비 모드',description:'일반 보스와 히든 보스를 공격하지 않는 제셀톤 윌리엄스로 교체합니다.'},{id:'unlimitedLayers',name:'중첩 상한선 해제',description:'맹약의 999중첩 상한선을 해제합니다.'},{id:'defaultHarmony',name:'조화 기본 활성화',description:'조화 오퍼레이터가 없어도 조화 맹약을 활성화합니다.'},{id:'duplicateBands',name:'전략 중복 선택 허용',description:'여러 참가자가 같은 전략을 선택할 수 있습니다.'}],
     forcedAuxBonds:auxCatalog,protectedAuxBonds:auxCatalog,
