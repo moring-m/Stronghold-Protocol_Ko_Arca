@@ -1,4 +1,3 @@
-import { MicroLabel } from './components.js';
 import { t } from '../../../shared/i18n.js';
 
 // 机变 draft overlay (research 06 §4.4 / §11.5): family title | description, "倒计时结束后仍未选定将自动分配",
@@ -179,7 +178,6 @@ export function ChoiceView({ pub, sp, myId, solo, personal = false, busyIdx = nu
   const mine = sp.pickOf.get(myId);
   const turnName = players.get(sp.turnPid)?.name || '队友';
   const special = /_s$/.test(String(sp.family || ''));
-  const order = personal || solo ? [] : sp.order;
   const settling = !personal && !!pub?.sp?.settling;
   const timed = settling || (personal ? pub?.deadline > 0 : !solo && !sp.untimed);
   const armedCardRec = armed != null ? sp.cards.find((c) => c && c.idx === armed) : null;
@@ -196,33 +194,19 @@ export function ChoiceView({ pub, sp, myId, solo, personal = false, busyIdx = nu
     <div class="spov__inner">
       <header class="spov__head">
         <div class="spov__titles">
-          <${MicroLabel} tone="mint">CONTINGENCY // 机变阶段</${MicroLabel}>
-          <h2 class=${cx('spov__title', special && 'is-special')}>${sp.name || fam?.name || '机变'}<span class="spov__bar">|</span><span class="spov__desc"><${RichText} text=${sp.desc || fam?.desc || '选择一项'} /></span></h2>
+          <span class="spov__deco" aria-hidden="true"></span>
+          <h2 class=${cx('spov__title', special && 'is-special')}><span class="spov__name">${sp.name || fam?.name || '机变'}</span><span class="spov__bar">|</span><span class="spov__desc"><${RichText} text=${sp.desc || fam?.desc || '选择一项'} /></span></h2>
           <p class="spov__sub">${settling ? html`<span data-i18n-skip>선택 완료 · 잠시 후 다음 단계로 넘어갑니다.</span>` : timed ? '倒计时结束后仍未选定将自动分配' : '选择一项（无时间限制）'}${mine == null && myTurn ? ' · 点击卡牌选中，再次点击确认' : ''}</p>
         </div>
         <div class="spov__turn">
           ${mine != null ? html`<span class="spov__turntxt is-done"><${Icon} name="check" />已完成选择</span>`
             : myTurn ? html`<span class="spov__turntxt is-mine">当前轮到你决策</span>`
-            : html`<span class="spov__turntxt">${turnName} 正在决策…<${Icon} name="hourglass" /></span>`}
+            : html`<span class="spov__turntxt is-other"><span class="spov__tw"><b>${turnName}</b><small>正在决策…</small></span><${Icon} name="hourglass" /></span>`}
           ${armed != null ? html`<${Button} variant="primary" size="lg" icon="check" class="spov__confirm" data-testid="sp-confirm"
               title=${armedName ? `确认选择「${armedName}」（再次点击卡牌亦可）` : '确认选择'} onClick=${onConfirm}>确认选择<//>` : null}
           ${timed ? html`<${Countdown} deadline=${pub?.deadline} total=${settling ? 3 : total ?? undefined} size="sm" />` : null}
         </div>
       </header>
-      ${order.length ? html`<div class="spov__order" aria-label="决策顺序">
-        ${order.map((pid, i) => {
-          const p = players.get(pid);
-          const picked = sp.pickOf.has(pid);
-          const cur = sp.turnPid === pid && !picked;
-          const left = p?.status === 'left';
-          return html`<div key=${pid} class=${cx('spov__who', cur && 'is-cur', picked && 'is-done', pid === myId && 'is-self')}>
-            <span class="spov__idx num">${i + 1}</span>
-            <${PlayerAvatar} player=${p || { name: '?' }} size="sm" self=${pid === myId} />
-            <span class="spov__wname">${p?.name || '博士'}</span>
-            <span class="spov__wstate">${left ? html`<${Icon} name="exit" />` : picked ? html`<${Icon} name="check" />` : cur ? html`<${Icon} name="hourglass" />` : html`<${Icon} name="dots" />`}</span>
-          </div>`;
-        })}
-      </div>` : null}
       <div class=${cx('spov__grid', sp.cards.length <= 3 && 'spov__grid--3', sp.cards.length === 9 && 'spov__grid--9')}>
         ${sp.cards.map((card) => {
           const r = resolveSpCard(card, sp.family);
@@ -248,7 +232,7 @@ export function ChoiceView({ pub, sp, myId, solo, personal = false, busyIdx = nu
             <${RichText} text=${r.desc} class="spcard__desc" />
             ${r.tier ? html`<${TierChip} tier=${r.tier} size="md" class="spcard__tier" />` : null}
             ${taker ? html`<span class="spcard__taker" title=${`${taker.name} 已选择`}><${PlayerAvatar} player=${taker} size="sm" /></span>` : null}
-            ${isArmed ? html`<span class="spcard__confirm" role="status"><b>确认选择</b><small>再次点击</small></span>` : null}
+            ${isArmed ? html`<span class="spcard__confirm" role="status"><span class="spcard__cbox" aria-hidden="true"><${Icon} name="check" /></span><b>确认选择</b><small>再次点击</small></span>` : null}
             ${busy ? html`<span class="spcard__busy" role="status">选择中</span>` : null}
           </button>`;
         })}
