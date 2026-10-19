@@ -140,3 +140,13 @@ test('the stylesheet keeps to the project\'s rules', () => {
   assert.equal(js.match(/data-ui-slot="result\.tab"/g)?.length, 1, 'one 结算 tab plugin slot (the team page); the detail view drops its own');
   assert.match(js, /slot=\$\{false\}/);
 });
+
+
+test('team recommendations are restricted to live human teammates', async () => {
+  const {canCommend} = await import('../../public/js/screens/settle.js');
+  const r={matchNo:1,players:[{playerId:'me'},{playerId:'peer'},{playerId:'bot',isBot:true}]};
+  assert.equal(canCommend(r,'me','peer',true),true);
+  for(const [sender,target,live] of [['me','me',true],['me','bot',true],['viewer','peer',true],['bot','peer',true],['me','peer',false]])
+    assert.equal(canCommend(r,sender,target,live),false);
+  assert.equal(canCommend({...r,matchNo:null},'me','peer',true),false);
+});

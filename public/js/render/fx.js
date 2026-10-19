@@ -1359,6 +1359,7 @@ export class FxSystem {
       }
     }
     view.onHit?.();
+    if (meta?.blocked === 'invulnerable') return;
     if(this.ctx.settings?.officialDamageNumbers){if(this.ctx.settings.damageNumbers!==false&&(meta==='r'||meta?.officialMark==='r'))this.officialNumber(view,amount,'crit');return;}
     if (showDamageNumber(this.ctx.settings,meta)) {
       if (damageNumberMode(this.ctx.settings)==='basic' && meta?.blocked==='shield') this.numberAt(p.x,p.y,'BLOCK',0xffd65a);

@@ -252,3 +252,17 @@ test('cached production art is served before any catalogue request, including re
  }
  assert.equal(requests,0);
 });
+
+test('encoded gate texture URLs resolve to the original manifest path on demand',async()=>{
+ const handlers={},saved=new Map(),asked=[];
+ const path='/assets/local/map/fx/[opt]merged_textures.png';
+ const png=new Uint8Array(24);new DataView(png.buffer).setUint32(0,0x89504e47);
+ const cache={match:async k=>saved.get(k)?.clone(),put:async(k,r)=>saved.set(k,r.clone())};
+ runInNewContext(readFileSync(new URL('../../public/resource-worker.js',import.meta.url),'utf8').replace(/^import[^\n]+\n/gm,''),{
+  normalizeResourceSelection,selectedResources,URL,Response,TextDecoder,DataView,AbortSignal,setTimeout,clearTimeout,
+  caches:{open:async()=>cache,match:cache.match},self:{location:{origin:'https://example.test'},addEventListener:(k,fn)=>handlers[k]=fn},
+  fetch:async u=>{asked.push(u);if(u==='/vendor/browser-resources.json')return Response.json({version:'gate',files:[{path,local:true,sources:[path]}]});assert.equal(u,path);return new Response(png);}
+ });
+ let result;handlers.fetch({request:{url:'https://example.test'+encodeURI(path),method:'GET',headers:new Headers()},respondWith:p=>result=p});
+ assert.equal((await result).status,200);assert.ok(asked.includes(path));assert.ok(saved.has(path));
+});

@@ -1,0 +1,8 @@
+{
+  "path": "/assets/custom/ui/sweep-report-button.png",
+  "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/activity/%5Buc%5Dact2autochess/prefabs/act2autochess_activity_stage/btn_team_info.png",
+  "gitBlob": "e2e51938b28c43f4f4bbdc8010b12fab9d6d746a",
+  "sha256": "a5e8561b007a4db0678e5ca2ab9c533444ecf245e241fea0aaad57aa3c90a15c",
+  "bytes": 18058,
+  "description": "Original S.W.E.E.P. report button; icon displayed using SVG viewport, without the original Chinese label."
+}

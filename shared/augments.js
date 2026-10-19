@@ -1,5 +1,6 @@
 import {AUGMENT_ITEM_NAMES} from './augmentItemNames.js';
 import {AUGMENT_SOURCES} from './augmentSources.js';
+import {AUGMENT_ICON_ASSIGNMENTS} from './augmentIcons.js';
 import {CHAT_FACTIONS} from './chat.js';
 export const AUGMENT_ROUNDS=Object.freeze([4,7,10]);
 export const AUGMENT_GRADES=Object.freeze({silver:{name:'실버',probability:.25,color:'#b9c8cd'},gold:{name:'골드',probability:.5,color:'#efc866'},prism:{name:'프리즘',probability:.25,color:'#bf9bf4'}});
@@ -77,8 +78,11 @@ export function augmentView(a){return {id:a.id,name:a.name,grade:a.grade,side:a.
 /** Exclude shown cards for this player/team; exhaustion resets only eligible history, never permits duplicate slots. */
 export function drawAugmentCard(candidates,seen,current,rng){const held=new Set(current.filter(Boolean).map(a=>a.id));let pool=candidates.filter(a=>!held.has(a.id)&&!seen.has(a.id));if(!pool.length){for(const a of candidates)if(!held.has(a.id))seen.delete(a.id);pool=candidates.filter(a=>!held.has(a.id));}if(!pool.length)return null;const card=pool[Math.min(pool.length-1,Math.floor(rng()*pool.length))];seen.add(card.id);return card;}
 
-/** Original Contingency Contract rune glyphs, selected by the actual augment effect. */
+/** Reviewed artwork for named families; retain CC attribute glyphs and the legacy fallback paths. */
 export function augmentIcon(a){
+ const family=String(a.name||'').replace(/ (?:I|II|III)$/,'');
+ const selected=!a.iconBond&&AUGMENT_ICON_ASSIGNMENTS[a.side]?.[family];
+ if(selected)return '/assets/custom/augments/'+selected+'.png';
  const e=a.effect||{},key=Object.keys(e.mods||{})[0];
  const stats={atkPct:a.side==='enemy'?'g_enemy_atk_1':'g_char_atk_p1',hpPct:a.side==='enemy'?'g_enemy_hp_1':'g_char_hp_1',defPct:a.side==='enemy'?'g_enemy_def_1':'g_char_def_1',resFlat:'g_enemy_magical_reduction_1',aspd:a.side==='enemy'?'g_enemy_attackspeed_1':'g_char_atkspeed_p1',dmgDealtMul:'g_char_magicdamage_1',spRecoveryFlat:'g_char_sp_reduce_1',moveMul:'g_enemy_movespeed_1',defIgnorePct:'g_enemy_def_1',dodgePhys:'g_tsz_hp_immune_1'};
  const kinds={trueDamage:'g_char_magicdamage_1',beastHeart:'g_char_tile_summon_1',gainTrait:'g_global_costrecovery_1',freeUpgrade:'g_global_costrecovery_1',hammerGrant:'g_char_atk_p1',playerHp:'g_char_hp_1',skillAtk:'g_char_atk_p1',items:'g_extra_cost_1',chess:'g_char_tile_summon_1',refresh:'g_global_costrecovery_1',normalEnemy:key==='moveMul'?'g_enemy_movespeed_1':'g_enemy_atk_1',skillSp:'g_char_sp_reduce_1',deployAspd:'g_char_deploy_attribute_add_1',weakness:'g_char_magicdamage_1',spCost:'g_char_sp_reduce_1',extraAttack:'g_char_atk_p1',income:'g_extra_cost_1',starterPack:'g_char_tile_summon_1',layers:'g_global_costrecovery_1',attackHeal:'g_zom_hprec_1',stealth:'g_tsz_hp_immune_1',harmony:'g_global_costrecovery_1',alliedDebuff:key==='resFlat'?'g_enemy_magical_reduction_1':key==='aspd'?'g_char_atkspeed_p1':key==='hpPct'?'g_enemy_hp_1':key==='defPct'?'g_char_def_1':'g_char_atk_p1',alliedDrain:'g_zom_hprec_1',recast:'g_char_tile_summon_1',equipmentAtk:'g_char_atk_p1',price:'g_char_cost_pioneer_1',skillAspd:'g_gx_char_attackspeed_1',corrosion:'g_ly_defres_1',elemental:'g_enemy_element_res_1',shields:'g_enemy_block_dmgreduce_1',statusDuration:'g_char_deploy_stun_1',regen:'g_zom_hprec_1',silenceImmune:'g_tsz_hp_immune_1',leak:'g_lyfrog_hplife_1'};

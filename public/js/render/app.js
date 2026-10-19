@@ -2165,9 +2165,10 @@ export async function createFieldView(host, options = {}) {
       // activation burst and aura when the official layer shows the skill
       case 'skill': {
         const v = views.get(e[1]);
-        if (v) { v.setSkill?.(!!e[2]); const official=pluginFx.skill(v,!!e[2]) || wiring.skill(v, !!e[2]);if(!e[2] || (!ctx.officialFor(v)&&!official))fx.skill(v,!!e[2]); }
+        if (v) { v.setSkill?.(!!e[2]); const official=pluginFx.skill(v,!!e[2]) || wiring.skill(v, !!e[2], e[3]);if(!e[2] || (!ctx.officialFor(v)&&!official))fx.skill(v,!!e[2]); }
         break;
       }
+      case 'skillImpact': { const v = views.get(e[1]); if (v) wiring.skillImpact(v); break; }
       // the skill slot an enemy ability casts (PR #275): the view swaps to that slot's clip (a multi-skill boss's Skill_01..04)
       // (and its official skill effects: render/vfx/skillfx.js cast — index v2 has the enemies' skills)
       case 'cast': { const v = views.get(e[1]); if (v) { v.setSkillSlot?.(e[2] | 0); wiring.enemyCast(v, e[2] | 0, Number(e[3]) || 0); } break; }

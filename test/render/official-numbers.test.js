@@ -77,3 +77,15 @@ test('a dodge marked num:m shows MISS only while official numbers are on', () =>
   assert.equal(miss.length, 1);
   assert.equal(miss[0].text.text, 'MISS');
 });
+
+
+test('invulnerable hits keep their hit feedback but display no zero in any number mode', () => {
+  const v=unit(9,4,9);let hits=0;v.onHit=()=>hits++;
+  const {fx,settings}=makeFx([v]);
+  for(const officialDamageNumbers of [false,true])for(const damageNumberMode of ['sum','all','basic','none']) {
+    Object.assign(settings,{officialDamageNumbers,damageNumberMode});
+    fx.damage(v,0,'phys',null,{critical:true,expected:0,value:0,officialMark:'r',blocked:'invulnerable'});
+    assert.equal(fx.nums.length,0);
+  }
+  assert.equal(hits,8,'hit feedback is preserved');
+});

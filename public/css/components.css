@@ -1210,3 +1210,8 @@
 .sp-reduced-motion .lp__pend { animation: none; }
 
 .sprite { object-fit: contain; }
+
+/* Tall original recruitment symbols fill the square augment icon slot in every view. */
+img[src*="/assets/custom/augments/is_choice_new_recruit.png"][src],
+img[src*="/assets/custom/augments/is_choice_recruit.png"][src],
+img[src*="/assets/custom/augments/is_choice_personnel_office.png"][src] { object-fit: fill; }

@@ -23,6 +23,9 @@ import { data } from '../data.js';
 import { chessPortraitUrl, chessAvatarUrl, itemIconUrl, enemyIconUrl, titleIconUrl } from '../ui/assetUrls.js';
 import { store, useStore, emptyMatch } from '../store.js';
 import { audio } from '../audio.js';
+import { net } from '../net.js';
+import { ChatPanel } from '../ui/chat.js';
+import { toastError } from '../ui/toasts.js';
 import { sentText } from '../ui/lang.js';
 import { reducedMotion } from '../ui/device.js';
 import { recordId, selfRowOf, loadStats, isModdedRecord } from '../ui/stats.js';
@@ -464,7 +467,7 @@ function SelfPage({ r, res, raw, self, gd, prog, content, onNext }) {
       <div class="settle__barbg" aria-hidden="true"><${Sprite} k="settle/bottom_bg" /></div>
       ${Array.isArray(milestones) && milestones.length ? html`<${LevelStrip} prog=${prog} milestones=${milestones} />` : null}
       <button type="button" ref=${nextRef} class="settle__next" onClick=${next}>
-        <${Sprite} k="settle/btn_next_bg" class="settle__btnbg" />
+        <span class="settle__btnbg" aria-hidden="true"></span>
         <${Sprite} k="settle/next_icon" class="settle__nexticon" fallback=${html`<span class="settle__nexticon"><${Icon} name="chevronRight" /></span>`} /><span>${t('下一步')}</span>
       </button>
     </div>
@@ -491,7 +494,18 @@ function titleView(p, gd) {
   };
 }
 
-function TeamCard({ p, i, gd, self, victory, raw }) {
+export function canCommend(r, myId, targetId, live) {
+  return !!(live && r.matchNo && r.players.some(p => p.playerId === myId && !p.isBot)
+    && r.players.some(p => p.playerId === targetId && !p.isBot && p.playerId !== myId));
+}
+
+function TeamCard({ p, i, gd, self, victory, raw, recommend = null, recommended = false }) {
+  const [sending, setSending] = useState(false);
+  const send = async () => {
+    if (sending || recommended || !recommend) return;
+    setSending(true);
+    try { await recommend(p.playerId); } catch (err) { toastError(err); } finally { setSending(false); }
+  };
   const ace = aceOf(p.lineup);
   const v = ace ? unitView(ace, gd) : null;
   const title = titleView(p, gd);
@@ -515,12 +529,14 @@ function TeamCard({ p, i, gd, self, victory, raw }) {
       </span>
     </div>
     <div class="tcard__chips">
+      ${!p.isBot ? html`<span class="tchip tchip--commend" title="받은 추천">👍 <b class="num">${p.commendations || 0}</b></span>` : null}
+      ${recommend ? html`<button type="button" class="tchip tchip--recommend" disabled=${recommended || sending} onClick=${send} aria-label=${`${p.name} 팀원 추천`}>${recommended ? '추천 완료' : sending ? '전송 중…' : '👍 추천'}</button>` : null}
       <span class="tchip tchip--cup" title=${t('获得奖杯')}><${Sprite} k="settle/id_info_cup_icon" class="tchip__cup" fallback=${html`<${Icon} name="crown" />`} /><b class="num">+${p.trophies}</b></span>
     </div>
   </article>`;
 }
 
-function TeamPage({ r, res, gd, myId, at: when, content, backLabel, onBack, onDetail }) {
+function TeamPage({ r, res, gd, myId, at: when, content, backLabel, onBack, onDetail, live }) {
   const rounds = useCountUp(r.roundsPassed, { ms: 900, delay: 450 });
   const backRef = useRef(null);
   const rawOf = (pid) => (Array.isArray(res?.players) ? res.players.find((x) => x && x.playerId === pid) : null) || null;
@@ -536,7 +552,7 @@ function TeamPage({ r, res, gd, myId, at: when, content, backLabel, onBack, onDe
     <div class="settle__stage">
       <${Logo} />
       <div class=${cx('steam__cards', r.players.length>4 && 'steam__cards--many')} style=${`--n:${r.players.length}`}>
-        ${r.players.length ? r.players.map((p, i) => html`<${TeamCard} key=${p.playerId} p=${p} i=${i} gd=${gd} self=${p.playerId === myId} victory=${r.victory} raw=${rawOf(p.playerId)} />`)
+        ${r.players.length ? r.players.map((p, i) => html`<${TeamCard} key=${p.playerId} p=${p} i=${i} gd=${gd} self=${p.playerId === myId} victory=${r.victory} raw=${rawOf(p.playerId)} recommend=${canCommend(r, myId, p.playerId, live) ? id => net.request('room.commend', {playerId: id, matchNo: r.matchNo}) : null} recommended=${(r.commendationsGiven[myId] || []).includes(p.playerId)} />`)
           : html`<p class="steam__none">${t('暂无结算数据')}</p>`}
       </div>
       <div class="settle__barbg steam__barbg" aria-hidden="true"><${Sprite} k="settle/bottom_bg" /></div>
@@ -550,9 +566,9 @@ function TeamPage({ r, res, gd, myId, at: when, content, backLabel, onBack, onDe
         <span class="steam__row"><${Sprite} k="settle/date_time_bg" class="steam__rowbg" /><${Sprite} k="settle/date_icon" class="steam__ico" />${fmtDate(when)}</span>
       </div>
       <button type="button" class="sbtn sbtn--ghost steam__detail" onClick=${onDetail}>
-        <${Sprite} k="settle/btn_bg_02" class="settle__btnbg" /><${Icon} name="chart" /><span>${t('数据详情')}</span></button>
+        <span class="settle__btnbg" aria-hidden="true"></span><${Icon} name="chart" /><span>${t('数据详情')}</span></button>
       <button type="button" ref=${backRef} class="sbtn sbtn--primary settle__back" onClick=${onBack}>
-        <${Sprite} k="settle/btn_next_bg" class="settle__btnbg" />
+        <span class="settle__btnbg" aria-hidden="true"></span>
         <${Sprite} k="settle/btn_back_icon_01" class="sbtn__mark" fallback=${html`<${Icon} name="chevronLeft" />`} /><span>${backLabel}</span></button>
       <div class="ui-slot steam__slot" data-ui-slot="result.tab" aria-label=${t('界面插件')} dangerouslySetInnerHTML=${{ __html: '' }}></div>
     </div>
@@ -566,7 +582,7 @@ function TeamPage({ r, res, gd, myId, at: when, content, backLabel, onBack, onDe
  * `content`: the room's content (room.state.content) — gameplay plugins mark the match unofficial (DESIGN §32.6).
  * @param {{ res: any, pub?: any, myId?: string|null, content?: any, backLabel: string, onBack: () => void }} props
  */
-export function SettleFlow({ res, pub = null, myId = null, content = null, backLabel, onBack }) {
+export function SettleFlow({ res, pub = null, myId = null, content = null, backLabel, onBack, live = false }) {
   const gd = useGameData();
   const r = normalizeResult(res, pub);
   const self = r.players.find((p) => p.playerId === myId) || null;
@@ -592,7 +608,8 @@ export function SettleFlow({ res, pub = null, myId = null, content = null, backL
   return html`<div ref=${rootRef} class=${cx('screen', 'result', 'settle', `settle--${page}`)} data-testid="settle">
     ${page === 'intro' ? html`<${SettleIntro} players=${r.players} myId=${myId} lose=${lose} onDone=${() => setPage('self')} />` : null}
     ${page === 'self' ? html`<${SelfPage} r=${r} res=${res} raw=${rawSelf} self=${self} gd=${gd} prog=${prog} content=${content} onNext=${() => setPage('team')} />` : null}
-    ${page === 'team' ? html`<${TeamPage} r=${r} res=${res} gd=${gd} myId=${myId} at=${ctx.at} content=${content} backLabel=${backLabel} onBack=${onBack} onDetail=${() => setDetail(true)} />` : null}
+    ${page === 'team' ? html`<${TeamPage} r=${r} res=${res} gd=${gd} myId=${myId} at=${ctx.at} content=${content} backLabel=${backLabel} onBack=${onBack} onDetail=${() => setDetail(true)} live=${live} />` : null}
+    ${live && r.players.length > 1 ? html`<${ChatPanel} />` : null}
     ${detail ? html`<div class="settle__detail" data-testid="settle-detail">
       <${ResultView} res=${res} pub=${pub} myId=${myId} quiet=${true} slot=${false} content=${content} backLabel=${t('返回')} onBack=${() => setDetail(false)} /></div>` : null}
   </div>`;
@@ -611,5 +628,5 @@ export function ResultScreen() {
   const content = useStore((s) => s.room?.content ?? null);
   const back = () => store.set({ match: emptyMatch() });
   if (!res) return html`<div class="screen result settle" data-testid="settle-wait"><${Spinner} size="lg" /></div>`;
-  return html`<${SettleFlow} res=${res} pub=${pub} myId=${myId} content=${content} backLabel=${hasRoom ? t('返回同盟') : t('返回大厅')} onBack=${back} />`;
+  return html`<${SettleFlow} res=${res} pub=${pub} myId=${myId} content=${content} live=${hasRoom} backLabel=${hasRoom ? t('返回同盟') : t('返回大厅')} onBack=${back} />`;
 }

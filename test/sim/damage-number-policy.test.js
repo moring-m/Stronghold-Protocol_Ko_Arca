@@ -15,7 +15,7 @@ test('original damage display uses expected mitigated damage, ties-to-even and l
  assert.ok(showDamageNumber({damageNumberMode:'basic'},null,true));
  assert.equal(showDamageNumber({damageNumberMode:'none'},{critical:true},true),false);
 });
-test('penetration counts toward critical text without changing damage; invulnerability displays zero',()=>{
+test('penetration counts toward critical text without changing damage; invulnerability suppresses its zero',()=>{
  const h=makeBattle({content:'none',autoFinish:false,defs:{enemies:{enemy_dummy:enemyRec({key:'enemy_dummy',hp:10000,def:200,speed:0})}},enemies:[{key:'enemy_dummy',pos:[10,4]}]});h.step();
  const e=h.enemy('enemy_dummy');
  h.b.dealDamage(null,e,{amount:300,type:'phys',canDodge:false});
@@ -24,7 +24,7 @@ test('penetration counts toward critical text without changing damage; invulnera
  ev=h.eventsOf('dmg').at(-1);assert.equal(ev[2],200);assert.equal(ev[4].expected,100);assert.equal(ev[4].critical,true);
  const hp=e.hp;h.b.addBuff(e,{key:'test-invulnerable',duration:2,flags:{invulnerable:true}});
  h.b.dealDamage(null,e,{amount:300,type:'phys'});ev=h.eventsOf('dmg').at(-1);
- assert.equal(e.hp,hp);assert.equal(ev[2],0);assert.equal(ev[4].critical,true);
+ assert.equal(e.hp,hp);assert.equal(ev[2],0);assert.equal(ev[4].critical,true);assert.equal(ev[4].blocked,'invulnerable');assert.equal(showDamageNumber({damageNumberMode:'all'},ev[4]),false);
 });
 test('native PATROL checkpoints loop before the next tick can advance to the exit',()=>{
  const route={motion:'FLY',start:[10,5],end:[10,2],checkpoints:[{type:'MOVE',pos:[10,6]},{type:'PATROL',pos:[10,7]},{type:'PATROL',pos:[10,8]}]};

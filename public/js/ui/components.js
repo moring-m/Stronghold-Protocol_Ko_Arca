@@ -61,6 +61,7 @@ export const ICONS = {
   rook: { d: 'M5 3h3v2h2V3h4v2h2V3h3v5l-2 2v7l2 2v2H5v-2l2-2v-7L5 8z' },
   signal: { d: 'M2 17h3v4H2zm6-4h3v8H8zm6-4h3v12h-3zm6-4h3v16h-3z' },
   // 统计 (the stats page's entry): three columns on a baseline — apart from `signal`, the ping bars
+  report: { image: '/assets/custom/ui/sweep-report-button.png', viewBox: '34 8 36 43' },
   chart: { d: 'M4 12h4v7H4zm6-6h4v13h-4zm6 3h4v10h-4zM3 20h18v2H3z' },
   refresh: { d: 'M12 4a8 8 0 0 1 7.4 5H17v2h6V5h-2v2.3A10 10 0 0 0 2 12h2a8 8 0 0 1 8-8zm0 16a8 8 0 0 1-7.4-5H7v-2H1v6h2v-2.3A10 10 0 0 0 22 12h-2a8 8 0 0 1-8 8z' },
   snow: { d: 'M11 2h2v4.2l2.3-2.3 1.4 1.4-3.7 3.7v2h2l3.7-3.7 1.4 1.4-2.3 2.3H22v2h-4.2l2.3 2.3-1.4 1.4-3.7-3.7h-2v2l3.7 3.7-1.4 1.4-2.3-2.3V22h-2v-4.2l-2.3 2.3-1.4-1.4 3.7-3.7v-2H9l-3.7 3.7-1.4-1.4L6.2 13H2v-2h4.2L3.9 8.7l1.4-1.4L9 11h2V9L7.3 5.3l1.4-1.4L11 6.2z' },
@@ -98,10 +99,10 @@ export const ICONS = {
 export function Icon({ name, size, class: cls, title }) {
   const ic = ICONS[name];
   if (!ic) return null;
-  return html`<svg class=${cx('icon', cls)} viewBox="0 0 24 24" width=${size || '1em'} height=${size || '1em'}
+  return html`<svg class=${cx('icon', cls)} viewBox=${ic.viewBox || '0 0 24 24'} width=${size || '1em'} height=${size || '1em'}
     aria-hidden=${title ? undefined : 'true'} role=${title ? 'img' : undefined} focusable="false">
     ${title ? html`<title>${title}</title>` : null}
-    <path d=${ic.d} fill-rule=${ic.eo ? 'evenodd' : undefined} />
+    ${ic.image ? html`<image href=${ic.image} width="252" height="75" />` : html`<path d=${ic.d} fill-rule=${ic.eo ? 'evenodd' : undefined} />`}
   </svg>`;
 }
 

@@ -231,8 +231,8 @@ self.addEventListener('fetch', event => {
     }
     const cached = await cache.match(path) || await caches.match(path) || await caches.match(url.pathname);
     if(cached)return cached;
-    const file = resources.files.find(f => f.path === path);
-    if (file) { await download(file, cache, resources); return await cache.match(path) || caches.match(path); }
+    const file = resources.files.find(f => f.path === path || encodeURI(f.path) === path);
+    if (file) { await download(file, cache, resources); return await cache.match(file.path) || caches.match(file.path); }
     const response=await fetch(event.request);
     if(response.ok)await cache.put(path,response.clone());
     return response;

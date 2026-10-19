@@ -13,7 +13,10 @@
 .settle__barbg { position: absolute; left: -10rem; right: -10rem; top: 9rem; bottom: -6rem; background: linear-gradient(180deg, #0d1010, #070909 40%); border-top: 1px solid rgba(200, 214, 210, .1); }
 .settle__barbg .sprite { position: absolute; left: 0; top: 0; width: 100%; height: 1.8rem; object-fit: fill; }
 .settle__detail { position: absolute; inset: 0; z-index: 5; background: #070909; }
-.settle__btnbg { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; object-fit: fill; pointer-events: none; }
+/* The source sprites contain a grey frame and bottom padding. Draw the button surface without stretching that frame. */
+.settle__btnbg { position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: repeating-linear-gradient(135deg, transparent 0 6px, rgba(255,255,255,.035) 6px 7px);
+  box-shadow: inset 0 0 0 1px rgba(220,240,232,.25), inset 0 -3px rgba(0,0,0,.14); }
 @keyframes settle-fade { from { opacity: 0; } }
 
 /* logo (top left) */
@@ -340,17 +343,17 @@ span.settle__nexticon .icon { width: .3rem; height: .3rem; }
 
 .steam__barbg { top: 9.15rem; }
 .steam__barbg .sprite { height: 1.65rem; }
-.steam__outcome { position: absolute; left: .42rem; top: 9.24rem; display: flex; flex-direction: column; align-items: flex-start; gap: .04rem; }
+.steam__outcome { position: absolute; left: .42rem; top: 9.24rem; width: 4.3rem; display: flex; flex-direction: column; align-items: flex-start; gap: .04rem; }
 .steam__tags { display: flex; align-items: center; gap: .1rem; }
 /* the 测试 mark of a 「测试」 match (0.3.1), beside the mode pill on both pages */
 .settle__test { display: inline-flex; align-items: center; gap: .06rem; color: #e8b84a; font-size: calc(.15 * var(--t)); white-space: nowrap; }
-.steam__title { font-size: calc(.66 * var(--t)); font-weight: 900; letter-spacing: .03em; line-height: 1.15; color: #f4f7f6; white-space: nowrap; }
-.steam__rounds { position: absolute; left: 3.45rem; top: 9.24rem; width: 2.7rem; height: 1.36rem; display: flex; flex-direction: column; align-items: center; justify-content: center;
+.steam__title { font-size: calc(.58 * var(--t)); font-weight: 900; letter-spacing: .03em; line-height: 1.15; color: #f4f7f6; white-space: nowrap; }
+.steam__rounds { position: absolute; left: 4.9rem; top: 9.24rem; width: 2.6rem; height: 1.36rem; display: flex; flex-direction: column; align-items: center; justify-content: center;
   border-left: 2px solid rgba(200, 214, 210, .14); border-right: 2px solid rgba(200, 214, 210, .14); }
 .steam__rounds span { font-size: calc(.27 * var(--t)); color: #a9b3b0; white-space: nowrap; }
 .steam__rounds b { position: relative; font-family: var(--font-display); font-size: calc(.8 * var(--t)); font-weight: 600; line-height: 1; color: #4af2c4; text-shadow: 0 0 .16rem rgba(30, 240, 180, .45); }
 .steam.is-lose .steam__rounds b { color: #ff574a; text-shadow: 0 0 .16rem rgba(255, 60, 50, .4); }
-.steam__when { position: absolute; left: 6.5rem; top: 9.36rem; width: 4.9rem; display: flex; flex-direction: column; gap: .16rem; }
+.steam__when { position: absolute; left: 7.7rem; top: 9.36rem; width: 4rem; display: flex; flex-direction: column; gap: .16rem; }
 .steam__row { position: relative; isolation: isolate; height: .48rem; display: flex; align-items: center; gap: .14rem; padding: 0 .16rem; border-radius: .24rem;
   background: linear-gradient(90deg, rgba(220, 230, 226, .1), rgba(220, 230, 226, .02)); font-size: calc(.25 * var(--t)); color: #dfe6e3; white-space: nowrap; }
 .steam__rowbg { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; object-fit: fill; }
@@ -389,3 +392,15 @@ span.settle__nexticon .icon { width: .3rem; height: .3rem; }
 .steam__cards--many .tcard__plate .pavatar.tcard__ava { --pa:.6rem; }
 .steam__cards--many .tcard__chips { height:auto; margin-top:0; }
 .steam__cards--many .tchip { height:.36rem; }
+
+/* Settlement chat unfolds down from the top right, clear of the result footer. */
+.settle > .game-chat { left: auto; right: var(--chat-corner-inset); top: var(--chat-corner-inset); bottom: auto;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 6px; z-index: 10; }
+.settle > .game-chat .game-chat__toggle { order: -1; }
+.settle > .game-chat .game-chat__panel { margin-bottom: 0; }
+.settle > .game-chat .game-chat__messages { max-height: min(230px, 35vh); }
+.tchip--commend, .tchip--recommend { font-size: calc(.18 * var(--t)); white-space: nowrap; }
+button.tchip--recommend { cursor: pointer; color: var(--mint-400); background: #10251e; border: 1px solid var(--mint-700); padding: .02rem .12rem; }
+button.tchip--recommend:hover, button.tchip--recommend:focus-visible { border-color: var(--mint-400); background: #18372c; }
+button.tchip--recommend:disabled { cursor: default; opacity: .6; }
+.tcard__chips { gap: .12rem; flex-wrap: wrap; }

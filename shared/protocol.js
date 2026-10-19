@@ -690,11 +690,13 @@ export function validateC2S(msg) {
 
 // atkStart: [kind, id, targetId, lead, interval, allInRange?, attackMode?, visualProjectile?].
 // The optional visual kind lets official cast FX start with the same attack as the animation.
+// skill: ['skill', id, on, {cast:true}?] marks an independent, delayed-impact cast.
+// skillImpact: ['skillImpact', id] comes just before that cast's damage/heal (display only).
 // Event tuple kinds inside `b.ev` (DESIGN §8.2). 'cast' ['cast', id, slot, dur?] is display only: an enemy uses the skill
 // of that slot of its data record's skills[] (server/sim/content/enemies/helpers.js castSlot; the client's skill clip
 // and official skill effects — render/app.js).
 export const EV = Object.freeze({
-  SPAWN: 'spawn', ATK_START: 'atkStart', ATK_RETARGET: 'atkRetarget', ATK_CANCEL: 'atkCancel', ATK: 'atk', DMG: 'dmg', HEAL: 'heal', SKILL: 'skill', ENGAGE: 'engage', DIE: 'die', LEAK: 'leak',
+  SPAWN: 'spawn', ATK_START: 'atkStart', ATK_RETARGET: 'atkRetarget', ATK_CANCEL: 'atkCancel', ATK: 'atk', DMG: 'dmg', HEAL: 'heal', SKILL: 'skill', SKILL_IMPACT: 'skillImpact', ENGAGE: 'engage', DIE: 'die', LEAK: 'leak',
   STATUS: 'status', FX: 'fx', LAYER: 'layer', BOUNTY: 'bounty', DEPLOY: 'deploy', CAST: 'cast',
 });
 

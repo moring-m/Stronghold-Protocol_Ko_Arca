@@ -89,7 +89,45 @@ test('the report is read-only and a full-screen Modal; the lobby opens it (sourc
   assert.doesNotMatch(src, /openLoadout|savePref\((?!TAB_PREF)|net\.|room\./, 'nothing but the remembered tab is written');
   assert.doesNotMatch(src, /name="box"|name="dice"/, 'only icons of the project\'s set');
   const lobby = read('public/js/screens/lobby.js');
-  assert.match(lobby, /import \{ SweepReport \} from '\.\/sweep\.js';/);
+  assert.match(lobby, /import\('\.\/sweep\.js'\)/);
+  assert.match(lobby, /loadScreenStyles\(\['\/css\/screens\/sweep\.css'\]\)/);
   assert.match(lobby, /\$\{sweepOpen \? html`<\$\{SweepReport\} onClose=\$\{\(\) => setSweepOpen\(false\)\} \/>` : null\}/);
-  assert.match(read('public/index.html'), /<link rel="stylesheet" href="\/css\/screens\/sweep\.css" \/>/);
+  assert.match(read('public/index.html'), /<meta data-screen-style="\/css\/screens\/sweep\.css" \/>/);
+});
+
+
+test('report catalogue includes every augment from every round once, including both custom bonds', async () => {
+  const { reportAugments, bondReportEquipment, bondReportDescription } = await import('../../public/js/screens/sweep.js');
+  const { createAugmentCatalog, AUGMENT_ROUNDS } = await import('../../shared/augments.js');
+  const production = Object.fromEntries(['chess','bonds','items','bands'].map((key) => [key, JSON.parse(read(`content/production/data/${key}.json`))]));
+  const catalog = reportAugments(production);
+  const byRound = new Map(AUGMENT_ROUNDS.map((r) => [r, new Set(createAugmentCatalog(production, r).map((a) => a.id))]));
+  const expected = new Set([...byRound.values()].flatMap((ids) => [...ids]));
+  assert.deepEqual(new Set(catalog.map((a) => a.id)), expected);
+  assert.equal(catalog.length, expected.size, 'no duplicate rows for augments offered in multiple rounds');
+  for (const a of catalog) {
+    const rounds = AUGMENT_ROUNDS.filter((r) => byRound.get(r).has(a.id));
+    assert.deepEqual(a.rounds, rounds, a.id);
+  }
+  assert.ok(catalog.some((a) => a.side === 'enemy'));
+  for (const [bondId, bandId, advanced] of [['ursusShip','band_custom_ursus_kaschey','chess_item_custom_ursus_favor'],['leithanienShip','band_custom_leithanien_witchking','chess_item_custom_leithanien_score']]) {
+    const bond = production.bonds[bondId];
+    assert.ok(bond?.isCore);
+    const description = bondReportDescription(bond);
+    assert.ok(!description.includes('3</>명'), 'report omits the three-operator prefix');
+    assert.ok(!description.includes('%p') && !description.includes('⌊'), 'matches the original handbook without stack formulas');
+    assert.ok(description.includes('(중첩 수에 따라 변경)'));
+
+    assert.equal(bond.visibleMembers.length, 10);
+    assert.ok(bond.visibleMembers.every((id) => production.chess[id]), 'all custom members resolve');
+    assert.ok(production.bands[bandId].bondIds.includes(bondId));
+    const items = bondReportEquipment(bondId, Object.values(production.items));
+    assert.equal(items.length, 2, 'bond-granting equipment only, ordinary and promoted');
+    assert.ok(!items.some((i) => i.id === advanced + '_a'));
+    assert.ok(!items.some((i) => i.id === advanced + '_b'));
+    for (const grade of ['silver','gold','prism']) {
+      assert.ok(catalog.some((a) => a.iconBond === bondId && a.grade === grade && a.name.includes('장비 지원')));
+      assert.ok(catalog.some((a) => a.iconBond === bondId && a.grade === grade && a.name.includes('지원') && !a.name.includes('장비')));
+    }
+  }
 });

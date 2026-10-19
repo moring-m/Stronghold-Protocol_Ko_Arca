@@ -1,6 +1,6 @@
 // S.W.E.E.P.报告: the event's report screen (laid out after the event video 2:17 – 3:03; the backdrop is drawn in CSS,
 // every picture is the game's own icon or art), opened from the lobby's top bar. Read-only: it shows the season's data
-// and changes nothing. Three tabs —
+// and changes nothing. The original three tabs, followed by the custom augment catalogue —
 //   盟约报告 — 核心盟约 / 附加盟约 tiles (bonds.json isCore); the left panel: the glyph, the name, 激活所需人数 and the
 //              thresholds, the description, 对应干员 (visibleMembers by tier; 替补 on an operator marked 未持有 in 干员持有);
 //   策略报告 — the strategies (bands.json) as tiles; the left: icon, name, 初始生命值, the effect, the modes it is offered
@@ -9,6 +9,8 @@
 //              name, text and the leader with its escorts / the type's enemies; 查看 opens the enemy codex (全部 / 普通 /
 //              精英 / 领袖, a search; per stat the official handbook's letter grade — factions.json handbookLevels, from
 //              enemy_handbook_table levelInfoList: E … SS — with the enemy's own number beside it).
+//   증강 보고 — the full runtime catalogue (all rounds, allies/enemies, grades), searchable and read-only.
+// Custom bonds include their operators, equipment, strategies, augments and summon descriptions.
 // ⓘ opens 玩法说明 at its 进阶图鉴 chapter. The report and the codex are full-screen Modals (focus trap; Esc closes the
 // codex first, then the report; the focus returns to the lobby's button). The tab is remembered (sp.pref).
 // Styles: css/screens/sweep.css (sw-*).
@@ -16,7 +18,9 @@
 import { useMemo, useState } from '../../vendor/hooks.module.js';
 import { html, Icon, Modal, roman } from '../ui/components.js';
 import { Img, RichText, GIcon } from '../ui/gameComponents.js';
-import { bondIconUrl, bandIconUrl, enemyIconUrl, factionIconUrl, chessAvatarUrl } from '../ui/assetUrls.js';
+import { bondIconUrl, bandIconUrl, enemyIconUrl, factionIconUrl, chessAvatarUrl, itemIconUrl, tokenAvatarUrl } from '../ui/assetUrls.js';
+import { AUGMENT_ROUNDS, AUGMENT_GRADES, createAugmentCatalog, augmentView } from '../../../shared/augments.js';
+import { tr } from '../i18n/i18n.js';
 import { attackInterval, fmtNum } from '../ui/gameLogic.js';
 import { abilityRows } from '../ui/abilityLines.js';
 import { data, useData } from '../data.js';
@@ -31,11 +35,38 @@ const TABS = [
   { id: 'bonds', name: N_('盟约报告'), icon: () => html`<${Icon} name="link" />` },
   { id: 'bands', name: N_('策略报告'), icon: () => html`<${Icon} name="rook" />` },
   { id: 'enemies', name: N_('敌方资料'), icon: () => html`<${GIcon} name="target" />` },
+  { id: 'augments', name: '증강 보고', icon: () => html`<${GIcon} name="bolt" />` },
 ];
 const MODE_NAME = { SINGLE: N_('独立模拟'), MULTI: N_('同盟模拟') };
 const RANK = { NORMAL: N_('普通'), ELITE: N_('精英'), BOSS: N_('领袖') };
 const APPLY = { MELEE: N_('近战'), RANGED: N_('远程'), ALL: N_('近战 / 远程'), NONE: N_('不攻击') };
 const DMG = { phys: N_('物理'), arts: N_('法术'), heal: N_('治疗') };
+
+/** The complete catalogue, independent of this match's bans/round or the player's ownership. */
+export function reportAugments(gameData) {
+  const byId = new Map();
+  for (const round of AUGMENT_ROUNDS) for (const a of createAugmentCatalog(gameData, round)) {
+    const existing = byId.get(a.id);
+    if (existing) existing.rounds.push(round);
+    else byId.set(a.id, { ...augmentView(a), rounds: [round] });
+  }
+  return [...byId.values()];
+}
+
+/** Report only bond-granting equipment; advanced favor/score items are omitted. */
+export function bondReportEquipment(bondId, items) {
+  return (items || []).filter((i) => i.giveBondId === bondId);
+}
+
+function RelatedEquipment({ items, m }) {
+  if (!items.length) return null;
+  return html`<details class="sw-related sw-related--equipment"><summary>관련 장비 <span class="num">${items.length}</span></summary>
+    <div class="sw-related__items">${items.map((item) => html`<div key=${item.id} class="sw-equipment">
+      <${Img} src=${itemIconUrl(m, item)} fallback=${html`<${Icon} name="shield" />`} />
+      <div><b>${item.name}${item.isGolden ? ' · 승급' : ''}</b><${RichText} as="p" text=${item.descRaw || item.desc || ''} /></div>
+    </div>`)}</div>
+  </details>`;
+}
 
 // ---- enemy grades ------------------------------------------------------------------------------------------------------
 
@@ -101,15 +132,15 @@ function Hero({ src, glyph = false, art = false, name, sub = null, fallback }) {
 }
 
 /** One tile of the right grid. */
-function Tile({ on, onClick, title, kind, children, badge = null }) {
-  return html`<button type="button" class=${cx('sw-tile', `sw-tile--${kind}`, on && 'is-on')} onClick=${onClick} title=${title} aria-pressed=${on ? 'true' : 'false'}>
+function Tile({ on, onClick, title, kind, children, badge = null, style }) {
+  return html`<button type="button" class=${cx('sw-tile', `sw-tile--${kind}`, on && 'is-on')} style=${style} onClick=${onClick} title=${title} aria-pressed=${on ? 'true' : 'false'}>
     <span class="sw-tile__in">${children}</span>${badge}
   </button>`;
 }
 
 /** A section of the right grid: a glyph above `[ name ]`, then its tiles. */
-function Section({ name, glyph, children, count = null }) {
-  return html`<section class="sw-sec">
+function Section({ name, glyph, children, count = null, style }) {
+  return html`<section class="sw-sec" style=${style}>
     <header class="sw-sec__head">
       <span class="sw-sec__glyph">${glyph}</span>
       <span class="sw-sec__name"><i>[</i>${name}${count != null ? html`<small class="num">${count}</small>` : null}<i>]</i></span>
@@ -130,22 +161,36 @@ function EnemyThumb({ e, m, on = false, onClick = null, size = 'sm' }) {
 
 // ---- 盟约报告 ----------------------------------------------------------------------------------------------------------
 
-function BondPanel({ bond, m, notOwned }) {
+/** Match the original handbook: describe scaling without exposing per-stack formulas. */
+export function bondReportDescription(bond) {
+  const up = (text) => `<@ba.vup>${text}</>`;
+  const scaling = '<@autochess.gray>(중첩 수에 따라 변경)</>';
+  const tier = (n) => `<전장에 서로 다른 [${bond.name}] 오퍼레이터 <@autochess.dgreen>${n}</>명>`;
+  if (bond.bondId === 'ursusShip') return `전투 시작 시 ${up('제국 드론')} 소환. 제국 드론과 [우르수스] 오퍼레이터의 ${up('공격력·최대 HP 증가')}${scaling}. 제국 드론의 이동 속도 ${up('+50%')}\n${tier(6)} 제국 드론의 공격 속도 ${up('+50')}. 제국 드론의 공격 범위 내 적의 은신 무효화. 배치된 [우르수스] 오퍼레이터의 총 공격력의 ${up('일정 비율')}을 제국 드론의 기본 공격력에 가산${scaling}`;
+  if (bond.bondId === 'leithanienShip') return `[라이타니엔] 오퍼레이터가 피해를 입힐 때마다 목표에게 ${up('5초')}간 '${up('속세의 음')}' 부여 (동일 오퍼레이터가 동일 목표에게 부여 시 재발동 대기 시간 0.1초)\n'${up('속세의 음')}': 매초 ${up('80')} + 시전자 공격력의 ${up('일정 비율')}에 해당하는 마법 대미지${scaling} (무한 중첩 가능, 지속시간 개별 적용)\n${tier(6)} '${up('속세의 음')}'이 적용된 적이 입히는 대미지 ${up('-25%')}, 이동 속도 ${up('-25%')}, '${up('속세의 음')}' ${up('지속시간 증가')}${scaling}`;
+  return bond.descRaw || bond.desc || '';
+}
+
+function BondPanel({ bond, m, notOwned, augments, onBand, onAugment }) {
   const off = new Set(Array.isArray(notOwned) ? notOwned : []);
   const ids = Array.isArray(bond.visibleMembers) && bond.visibleMembers.length ? bond.visibleMembers : (bond.members || []);
-  const members = ids.map((id) => data.lookup('chess', id)).filter(Boolean)
+  const members = ids.map((id) => data.lookup('chess', id)).filter((c) => c && !c.optionalRecruit)
     .sort((a, b) => (b.tier - a.tier) || ((a.shopSortId ?? 0) - (b.shopSortId ?? 0)));
   const anyOff = members.some((c) => off.has(c.chessId));
   const steps = Array.isArray(bond.thresholds) ? bond.thresholds.filter((n) => Number.isFinite(n)) : [];
+  const equipment = bondReportEquipment(bond.bondId, data.list('items'));
+  const strategies = data.list('bands').filter((b) => b.bondIds?.includes(bond.bondId));
+  const relatedAugments = augments.filter((a) => a.iconBond === bond.bondId);
+  const summon = bond.bondId === 'ursusShip' ? data.lookup('tokens', 'token_custom_ursus_drone') : null;
   return html`<div class="sw-detail">
     <${Hero} src=${bondIconUrl(m, bond.bondId)} glyph=${true} name=${bond.name}
-      fallback=${html`<span class="sw-hero__txt">${[...(bond.name || '?')][0]}</span>`} />
+      fallback=${html`<span class="sw-hero__txt">${[...tr(bond.name || '?')][0]}</span>`} />
     <div class="sw-facts">
       <span class="sw-pill">${t('激活所需人数')}<b class="num">${bond.activeCount ?? steps[0] ?? '—'}</b></span>
       ${steps.length > 1 ? html`<span class="sw-pill sw-pill--ghost" title=${t('达到这些人数时效果增强')}>${t('档位')}<b class="num">${steps.join(' / ')}</b></span>` : null}
       <span class="sw-kind">${bond.isCore ? t('核心盟约') : t('附加盟约')}</span>
     </div>
-    <div class="sw-text"><${RichText} as="p" text=${bond.descRaw || bond.desc || ''} /></div>
+    <div class="sw-text"><${RichText} as="p" text=${bondReportDescription(bond)} /></div>
     ${members.length ? html`<div class="sw-box">
       <div class="sw-box__head">
         <span class="sw-box__k"><${Icon} name="user" />${t('对应干员')}<small class="num">${members.length}</small></span>
@@ -153,11 +198,24 @@ function BondPanel({ bond, m, notOwned }) {
       </div>
       <div class="sw-ops">${members.map((c) => html`<span key=${c.chessId} class=${cx('sw-op', `sw-op--t${c.tier}`, off.has(c.chessId) && 'is-standin')}
           title=${c.name}>
-        <${Img} src=${chessAvatarUrl(m, c)} fallback=${html`<span class="sw-op__txt">${[...(c.name || '?')][0]}</span>`} />
+        <${Img} src=${chessAvatarUrl(m, c)} fallback=${html`<span class="sw-op__txt">${[...tr(c.name || '?')][0]}</span>`} />
         <span class="sw-op__tier">${roman(c.tier)}</span>
         ${off.has(c.chessId) ? html`<span class="sw-op__sub">${t('替补')}</span>` : null}
       </span>`)}</div>
     </div>` : null}
+    <div class="sw-relations">
+      ${summon ? html`<details class="sw-related"><summary>소환물 · ${summon.name}</summary><div class="sw-related__items"><div class="sw-equipment">
+        <${Img} src=${tokenAvatarUrl(m, summon.tokenId)} fallback=${html`<${Icon} name="robot" />`} />
+        <div><b>${summon.name}</b><${RichText} as="p" text=${summon.descRaw || summon.desc || ''} /></div>
+      </div></div></details>` : null}
+      <${RelatedEquipment} items=${equipment} m=${m} />
+      ${strategies.length ? html`<details class="sw-related"><summary>관련 전략 <span class="num">${strategies.length}</span></summary>
+        <div class="sw-related__links">${strategies.map((b) => html`<button key=${b.bandId} type="button" onClick=${() => onBand(b.bandId)}><${Img} src=${bandIconUrl(m, b.bandId)} />${b.name}<${Icon} name="chevronRight" /></button>`)}</div>
+      </details>` : null}
+      ${relatedAugments.length ? html`<details class="sw-related"><summary>관련 증강 <span class="num">${relatedAugments.length}</span></summary>
+        <div class="sw-related__links">${relatedAugments.map((a) => html`<button key=${a.id} type="button" onClick=${() => onAugment(a.id)}>${a.name}<${Icon} name="chevronRight" /></button>`)}</div>
+      </details>` : null}
+    </div>
   </div>`;
 }
 
@@ -169,7 +227,7 @@ function BondsTab({ m, sel, onSel }) {
   ];
   return sections.map((s) => s.items.length ? html`<${Section} key=${s.id} name=${s.name} glyph=${s.glyph} count=${s.items.length}>
     ${s.items.map((b) => html`<${Tile} key=${b.bondId} kind="bond" on=${sel === b.bondId} onClick=${() => onSel(b.bondId)} title=${b.name}>
-      <span class="sw-disc"><${Img} src=${bondIconUrl(m, b.bondId)} fallback=${html`<span class="sw-disc__txt">${[...(b.name || '?')][0]}</span>`} /></span>
+      <span class="sw-disc"><${Img} src=${bondIconUrl(m, b.bondId)} fallback=${html`<span class="sw-disc__txt">${[...tr(b.name || '?')][0]}</span>`} /></span>
       <span class="sw-tile__cap">${b.name}</span>
     <//>`)}
   <//>` : null);
@@ -182,7 +240,7 @@ function BandPanel({ band, m }) {
   const bonds = (Array.isArray(band.bondIds) ? band.bondIds : []).map((id) => data.lookup('bonds', id)).filter(Boolean);
   return html`<div class="sw-detail">
     <${Hero} src=${bandIconUrl(m, band.bandId)} art=${true} name=${band.name}
-      fallback=${html`<span class="sw-hero__txt">${[...(band.name || '?')][0]}</span>`} />
+      fallback=${html`<span class="sw-hero__txt">${[...tr(band.name || '?')][0]}</span>`} />
     <div class="sw-facts">
       <span class="sw-pill">${t('初始生命值')}<b class="num">${band.totalHp ?? '—'}</b></span>
       ${modes.map((k) => html`<span key=${k} class="sw-pill sw-pill--ghost">${t(MODE_NAME[k])}</span>`)}
@@ -200,11 +258,49 @@ function BandsTab({ m, sel, onSel }) {
   const all = (data.list('bands') || []).filter((b) => b && b.bandId).sort((a, b) => (a.sortId ?? 99) - (b.sortId ?? 99));
   return html`<${Section} name=${t('策略')} glyph=${html`<${Icon} name="rook" />`} count=${all.length}>
     ${all.map((b) => html`<${Tile} key=${b.bandId} kind="band" on=${sel === b.bandId} onClick=${() => onSel(b.bandId)} title=${b.name}>
-      <span class="sw-face"><${Img} src=${bandIconUrl(m, b.bandId)} fallback=${html`<span class="sw-face__txt">${[...(b.name || '?')][0]}</span>`} /></span>
+      <span class="sw-face"><${Img} src=${bandIconUrl(m, b.bandId)} fallback=${html`<span class="sw-face__txt">${[...tr(b.name || '?')][0]}</span>`} /></span>
       <span class="sw-tile__cap">${b.name}</span>
       <span class="sw-tile__hp num" title=${t('初始生命值')}>${b.totalHp}</span>
     <//>`)}
   <//>`;
+}
+
+// ---- augments (custom game content, not part of the official report) ----------------------------------------------------
+
+function AugmentPanel({ augment: a, m }) {
+  const grade = AUGMENT_GRADES[a.grade];
+  return html`<div class="sw-detail sw-augment-detail" style=${{ '--augment-color': grade.color }}>
+    <${Hero} src=${a.iconBond ? bondIconUrl(m, a.iconBond) : a.icon} glyph=${true} name=${a.name}
+      fallback=${html`<${GIcon} name=${a.side === 'ally' ? 'bolt' : 'shield'} />`} />
+    <div class="sw-facts"><span class="sw-pill sw-augment-grade">${grade.name}</span>
+      <span class="sw-pill sw-pill--ghost">${a.side === 'ally' ? '아군 증강' : '적 증강'}</span>
+      <span class="sw-pill sw-pill--ghost">등장 라운드 <b class="num">${a.rounds.join(' / ')}</b></span>
+    </div>
+    <div class="sw-text"><${RichText} as="p" text=${a.description} /></div>
+    <p class="sw-augment-note">${a.side === 'enemy' ? '선택 시 모든 적에게 적용됩니다.' : '선택한 참가자에게 적용됩니다.'}</p>
+  </div>`;
+}
+
+function AugmentsTab({ catalog, m, sel, onSel }) {
+  const [query, setQuery] = useState('');
+  const needle = query.trim().toLocaleLowerCase('ko');
+  const filtered = catalog.filter((a) => !needle || tr(`${a.name} ${a.description}`).toLocaleLowerCase('ko').includes(needle));
+  return html`<div class="sw-augments">
+    <div class="sw-filter">
+      <label class="sw-augment-search"><${Icon} name="search" /><input type="search" aria-label="증강 검색" placeholder="증강 이름·효과 검색" value=${query} onInput=${(e) => setQuery(e.currentTarget.value)} /></label>
+
+    </div>
+    ${['ally', 'enemy'].flatMap((side) => Object.entries(AUGMENT_GRADES).map(([grade, g]) => {
+      const items = filtered.filter((a) => a.side === side && a.grade === grade);
+      return items.length ? html`<${Section} key=${side + grade} style=${{ '--augment-color': g.color }} name=${`${side === 'ally' ? '아군' : '적'} · ${g.name}`} count=${items.length} glyph=${html`<${GIcon} name=${side === 'ally' ? 'bolt' : 'shield'} />`}>
+        ${items.map((a) => html`<${Tile} key=${a.id} kind="augment" style=${{ '--augment-color': g.color }} title=${a.name} on=${a.id === sel} onClick=${() => onSel(a.id)}>
+          <span class="sw-disc" style=${{ '--augment-color': g.color }}><${Img} src=${a.iconBond ? bondIconUrl(m, a.iconBond) : a.icon} fallback=${html`<${GIcon} name=${side === 'ally' ? 'bolt' : 'shield'} />`} /></span>
+          <span class="sw-tile__cap">${a.name}</span>
+        <//>`)}
+      <//>` : null;
+    }))}
+    ${filtered.length ? null : html`<p class="sw-empty" role="status">조건에 맞는 증강이 없습니다.</p>`}
+  </div>`;
 }
 
 // ---- 敌方资料 ----------------------------------------------------------------------------------------------------------
@@ -393,7 +489,7 @@ function handbookPage() {
  * The report overlay. @param {{ onClose: () => void }} props
  */
 export function SweepReport({ onClose }) {
-  const ready = useData('bonds', 'bands', 'bosses', 'factions', 'enemies', 'chess', 'assets');
+  const ready = useData('bonds', 'bands', 'bosses', 'factions', 'enemies', 'chess', 'items', 'tokens', 'assets');
   useData('local');
   const m = data.get('assets');
   const notOwned = useStore((s) => s.notOwned, Object.is, loadoutStore);
@@ -402,7 +498,11 @@ export function SweepReport({ onClose }) {
   const [bondSel, setBondSel] = useState(null);
   const [bandSel, setBandSel] = useState(null);
   const [enemySel, setEnemySel] = useState(null);
+  const [augmentSel, setAugmentSel] = useState(null);
   const [codex, setCodex] = useState(null);
+  const bondData = data.get('bonds'), chessData = data.get('chess'), itemData = data.get('items');
+  const augments = useMemo(() => ready ? reportAugments({ bonds: bondData || {}, chess: chessData || {}, items: itemData || {} }) : [], [ready, bondData, chessData, itemData]);
+  const augment = augments.find((a) => a.id === augmentSel) || augments[0];
 
   // defaults once the data is there: the first tile of each tab
   const bonds = ready ? (data.list('bonds') || []).filter((b) => b && b.bondId).sort((a, b) => (a.identifier ?? 99) - (b.identifier ?? 99)) : [];
@@ -411,17 +511,22 @@ export function SweepReport({ onClose }) {
   const band = data.lookup('bands', bandSel) || bands[0] || null;
   const firstBoss = ready ? bossList()[0] : null;
   const eSel = enemySel || (firstBoss ? { kind: 'boss', id: firstBoss.bossId } : null);
+  const detailKey = tab === 'bonds' ? bond?.bondId : tab === 'bands' ? band?.bandId : tab === 'augments' ? augment?.id : `${eSel?.kind}:${eSel?.id}`;
 
   let left = null;
   let right;
   if (!ready) {
     right = html`<p class="sw-loading">${t('正在读取报告…')}</p>`;
   } else if (tab === 'bonds') {
-    left = bond ? html`<${BondPanel} key=${bond.bondId} bond=${bond} m=${m} notOwned=${notOwned} />` : null;
+    left = bond ? html`<${BondPanel} key=${bond.bondId} bond=${bond} m=${m} notOwned=${notOwned} augments=${augments}
+      onBand=${(id) => { setBandSel(id); setTab('bands'); }} onAugment=${(id) => { setAugmentSel(id); setTab('augments'); }} />` : null;
     right = html`<${BondsTab} m=${m} sel=${bond?.bondId} onSel=${setBondSel} />`;
   } else if (tab === 'bands') {
     left = band ? html`<${BandPanel} key=${band.bandId} band=${band} m=${m} />` : null;
     right = html`<${BandsTab} m=${m} sel=${band?.bandId} onSel=${setBandSel} />`;
+  } else if (tab === 'augments') {
+    left = augment ? html`<${AugmentPanel} key=${augment.id} augment=${augment} m=${m} />` : null;
+    right = html`<${AugmentsTab} catalog=${augments} m=${m} sel=${augment?.id} onSel=${setAugmentSel} />`;
   } else {
     left = eSel ? html`<${EnemyPanel} key=${`${eSel.kind}:${eSel.id}`} sel=${eSel} m=${m} onCodex=${setCodex} />` : null;
     right = html`<${EnemiesTab} m=${m} sel=${eSel || {}} onSel=${setEnemySel} onCodex=${setCodex} />`;
@@ -444,8 +549,8 @@ export function SweepReport({ onClose }) {
       </nav>
     </header>
     <main class="sw-body" data-tab=${tab}>
-      <aside class="sw-left">${left}</aside>
-      <div class="sw-right">${right}</div>
+      <aside key=${`${tab}:${detailKey}`} class="sw-left">${left}</aside>
+      <div key=${tab} class="sw-right">${right}</div>
     </main>
   <//>
   ${codex ? html`<${EnemyCodex} key=${`${codex.title}|${codex.key}`} open=${codex} m=${m} onClose=${() => setCodex(null)} />` : null}`;

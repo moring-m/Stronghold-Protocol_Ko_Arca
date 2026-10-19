@@ -70,6 +70,7 @@ export function fallbackTileClass(stage, row, col) {
  */
 export function fallbackFloat(e, settings) {
   if (!settings?.damageNumbers || !Array.isArray(e)) return null;
+  if (e[0] === 'dmg' && e[4]?.blocked === 'invulnerable') return null;
   if (settings.officialDamageNumbers === true) {
     if (e[0] === 'fx' && e[1] === 'dodge' && e[4] && e[4].num === 'm') return { id: e[4].id, text: 'MISS', type: 'miss' };
     if (e[0] !== 'dmg' || (e[4] !== 'r' && e[4]?.officialMark !== 'r')) return null;

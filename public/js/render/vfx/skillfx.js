@@ -5,7 +5,8 @@
 //   const s = new SkillFx(wiring)
 //   s.of(v)                      the battle unit's record (plan, charge plan, state), resolved once per battle id
 //   s.state(v, skillOn?)         { U, on, plan } — on: the look-ahead's value, else the last 'skill' event, else UF.SKILL
-//   s.skill(v, on)               b.ev ['skill', id, on] — true when the official layer shows this skill (render/app.js
+//   s.impact(v)                  b.ev ['skillImpact', id]: an independent cast's impact, before its kit hits.
+//   s.skill(v, on, cast?)               b.ev ['skill', id, on] — true when the official layer shows this skill (render/app.js
 //                                then skips the procedural activation burst and aura) — or when its official plan has
 //                                no cast rows and the unit's effects are installed: the client shows no burst there
 //   s.attackFx(v, tgt, kind, skillOn) → the skill's part of one attack of the owner (FxWiring.attack / castStart), or null
@@ -264,7 +265,7 @@ export class SkillFx {
     return {
       id, v: null, key: r.unitKey, skillId: r.skillId, plan, charge: r.charge, srec: r.srec,
       buffS: buffDuration(r.srec), tHit: plan ? targetsOf(idx, plan).hit : [], drawsStart: draws,
-      on: null, startFrame: -1, offAt: -Infinity, atkN: 0, attacked: false, byFlag: false, loopsOn: false,
+      on: null, independentCast: false, castPending: false, impactFrame: -1, startFrame: -1, offAt: -Infinity, atkN: 0, attacked: false, byFlag: false, loopsOn: false,
       loops: [], ready: [], readyOn: false, passiveOn: false, passiveShots: false, passiveDraws: false, passiveDone: false, timed: false,
       energy: 0, slotLoops: [], guardUntil: -Infinity, quiet: false, trigFrame: -1, seen: 0,
       // an enemy's skills by slot (index v2), how many its data record has, its skill window, plans of other modes
@@ -377,7 +378,7 @@ export class SkillFx {
   // ---- the skill events -------------------------------------------------------------------------------------------
 
   /** b.ev ['skill', id, on] (module header). Returns true when the official layer shows this skill. */
-  skill(v, on) {
+  skill(v, on, cast = null) {
     const U = this.of(v);
     if (!U || !U.plan) return false;
     const live = this.active();
@@ -398,6 +399,9 @@ export class SkillFx {
     }
     if (on) {
       U.on = true;
+      U.independentCast = cast?.cast === true;
+      U.castPending = U.independentCast;
+      U.impactFrame = -1;
       U.startFrame = this.frame;
       U.atkN = 0;
       U.attacked = false;
@@ -406,25 +410,27 @@ export class SkillFx {
       this._stopLoops(U);          // a cast while on (onEnd re-cast) starts afresh
       let drew = false;
       for (const e of uniq([...U.plan.start, ...U.plan.range, ...U.plan.loop])) {
-        if (e.birth) continue;     // the deploy's (birthOf: FxWiring.deploy plays it)
+        if (U.independentCast || e.birth) continue;     // independent casts are played by phase below; birth is the deploy's (birthOf: FxWiring.deploy plays it)
         const h = this._play(e, v);
         if (h) { drew = true; this._keep(U, e, h); }
       }
       // the skill's own cast at its start (tagCasts 'start'): its rows now, its hits on the damage that follows
-      if (this._castOnce(U, v, 'start')) drew = true;
+      if (U.independentCast) { if (this._instCast(U, v, undefined, 'start')) drew = true; }
+      else if (this._castOnce(U, v, 'start')) drew = true;
       // an instant skill: what its kit hits in this frame without an attack are its attack's hits (kit hits)
-      if (U.plan.kind === 'instant' && perAttack(U.plan).attacks.length) this._open(U, null, true);
+      if (!U.independentCast && U.plan.kind === 'instant' && perAttack(U.plan).attacks.length) this._open(U, null, true);
       U.loopsOn = true;
       return drew || U.drawsStart || this._noBurst(U);
     }
     const was = U.on === true;
     U.on = false;
+    U.castPending = false;
     U.offAt = this.w.ofx.time;
     if (!live) return false;
     // an instant skill whose kit made no attack between 1 and 0: its own attack's cast plays once (skills.js: one cast)
     // and its hits on what the kit hit in between (kit hits); a ReplacementSkill's replaced attack may still follow the
     // 0 in this frame — the fallback waits for the frame's end (instPending)
-    if (was && !U.attacked && U.startFrame === this.frame && perAttack(U.plan).attacks.length) {
+    if (was && !U.independentCast && !U.attacked && U.startFrame === this.frame && perAttack(U.plan).attacks.length) {
       if (/^ReplacementSkill/.test(U.plan.rootClass || '')) U.instPending = this.frame;
       else { this._instCast(U, v); this.windows = this.windows.filter((w) => !(w.inst && w.U === U)); }
     }
@@ -436,6 +442,18 @@ export class SkillFx {
   }
 
   // ---- the skill's own casts and the kit's hits (history §32.14.43) ------------------------------------------------
+
+  /** The sim names the impact of an independent cast before its damage/heal, even across render frames. */
+  impact(v) {
+    const U = this.of(v);
+    if (!U?.castPending || !U.on || !U.plan) return false;
+    U.castPending = false;
+    U.impactFrame = this.frame;
+    if (!this.active()) return false;
+    this._open(U, null, true);
+    this._instCast(U, v, undefined, 'strike');
+    return U.drawsStart;
+  }
 
   /** The next mark of the frame's event order (a new frame empties the hit log and closes the kit-hit windows). */
   _mark() {
@@ -531,14 +549,22 @@ export class SkillFx {
   }
 
   /**
-   * An instant activation without an attack: the attack that fits what its kit hit (a heal ability for heals, another for
+   * An instant activation without an attack (optionally one phase of an explicit independent cast): the attack that fits what its kit hit (a heal ability for heals, another for
    * damage, else the first) casts its rows on the owner; the hits played as they came (seen).
    */
-  _instCast(U, v, win = this.windows.find((w) => w.inst && w.U === U)) {
+  _instCast(U, v, win = this.windows.find((w) => w.inst && w.U === U), phase = null) {
     const att = perAttack(U.plan).attacks;
-    if (!att.length) return;
     const a = (win?.sawDmg ? this._instAttack(U, false) : win?.sawHeal ? this._instAttack(U, true) : null) || att[0];
-    for (const e of uniq([...a.cast, ...a.range])) this._keep(U, e, this._play(e, v));
+    // A key can be reached both through a buff and through its attack emitter (Tin Man S2). Play it once.
+    const rows = phase ? [...U.plan.start, ...U.plan.range, ...U.plan.loop, ...(a?.cast || []), ...(a?.range || [])]
+      : [...(a?.cast || []), ...(a?.range || [])];
+    let drew = false;
+    for (const e of uniq(rows)) {
+      if (e.birth || (phase && castPhase(e) !== phase)) continue;
+      const h = this._play(e, v);
+      if (h) { drew = true; this._keep(U, e, h); }
+    }
+    return drew;
   }
 
   /**
@@ -708,6 +734,7 @@ export class SkillFx {
     U.passiveShots = false;
     U.passiveDone = false;
     U.on = null;
+    U.castPending = false;
   }
 
   /** The status wiring draws `key` on v from now on: a skill's target loop of the same key hands over (never twice). */
@@ -728,7 +755,7 @@ export class SkillFx {
     const U = st.U;
     // the frame of an instant skill's activation: a ReplacementSkill's replaced attack may come right after its 0 (the
     // activation's fallback waits for it: instPending)
-    const inst = !!U && !U.ewin && U.plan?.kind === 'instant' && U.startFrame === this.frame;
+    const inst = !!U && !U.ewin && U.plan?.kind === 'instant' && (U.startFrame === this.frame || (U.independentCast && U.impactFrame === this.frame));
     if (!st.on && inst && !U.attacked && U.instPending === this.frame) st = { ...st, on: true };
     if (!st.on || !st.plan) return null;
     const ranged = !!kind && kind !== 'none';
@@ -758,7 +785,7 @@ export class SkillFx {
     // a skill attack known only at the strike (attackFx `late`): the wind-up played the mode's rows, the strike all of its
     if (sk.late && phase === 'strike') phase = 'all';
     for (const [rows, onTarget] of [[sk.fx.cast, false], [sk.fx.range, false], [sk.fx.aim, true]]) {
-      if (!onTarget && info.owner === false) continue;
+      if (!onTarget && (info.owner === false || (sk.U.independentCast && sk.U.impactFrame === this.frame))) continue;
       for (const e of uniq(rows)) {
         const first = castPhase(e) === 'start';
         if ((phase === 'start' && !first) || (phase === 'strike' && first) || (onTarget && !tgt)) continue;

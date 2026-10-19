@@ -1,5 +1,7 @@
 import { confirmDialog } from "../ui/components.js";
 import { openStats } from '../ui/statsEntry.js';
+import { lazyComponent, loadScreenStyles } from '../ui/lazyComponent.js';
+const SweepReport = lazyComponent(() => Promise.all([import('./sweep.js'), loadScreenStyles(['/css/screens/sweep.css'])]).then(([module]) => module), 'SweepReport');
 
 import { t } from '../../../shared/i18n.js';
 // Lobby screen: pick 独立模拟 / 同盟模拟 and a difficulty (标准/险境/绝境/终极), create a room,
@@ -367,7 +369,7 @@ export function LobbyScreen() {
         <${Button} variant="ghost" size="sm" icon="chevronLeft" onClick=${backToTitle} title="返回标题">返回<//>
         <${PingPill} ms=${conn.ping} online=${online} />
         <${PatchNotesButton} autoOpen=${true} />
-        <${Button} variant="secondary" size="sm" onClick=${openStats}>통계<//>
+        <${Button} variant="secondary" size="sm" icon="report" class="lobby-sweep" onClick=${() => setSweepOpen(true)}>S.W.E.E.P. 리포트<//>
       </div>
       <div class="topbar__center">
         <${MicroLabel} tone="mint">SIMULATION PROTOCOL SELECT<//>
@@ -377,13 +379,14 @@ export function LobbyScreen() {
         <${ResumeMatchButton} /><${SettingsButton} />
         <${GuideButton} class="lobby-guide" variant="secondary" square=${true} />
         <${LoadoutButton} from="lobby" size="sm" class="lobby-loadout" />
-        <div class="me-chip">
+        <button type="button" class="me-chip me-chip--btn" onClick=${openStats} title="통계" aria-label="내 전투 통계 열기">
           <${AvatarFrame} size="sm" name=${me.name} seat=${0} self=${true} />
           <div class="me-chip__text">
             <span class="me-chip__name">${me.name || '博士'}</span>
             <${MicroLabel}>${me.playerId != null ? `DOCTOR #${doctorNo(me.playerId)}` : 'DOCTOR'}<//>
           </div>
-        </div>
+          <${Icon} name="chart" class="me-chip__stats" />
+        </button>
       </div>
     </header>
 
@@ -433,6 +436,7 @@ export function LobbyScreen() {
       </section>
     </div>
   </div>
+  ${sweepOpen ? html`<${SweepReport} onClose=${() => setSweepOpen(false)} />` : null}
   ${fullAsk ? html`<${Modal}
     open=${true}
     tone="amber"

@@ -9,6 +9,7 @@ export function criticalDamage(final, expected, forced = false) {
   return !!forced || (Number.isFinite(final) && Number.isFinite(expected) && final >= expected * 1.5 - 1e-9);
 }
 export function showDamageNumber(settings, meta, heal = false) {
+  if (!heal && meta?.blocked === 'invulnerable') return false;
   const mode = damageNumberMode(settings);
   return mode !== 'none' && (mode !== 'basic' || heal || !!meta?.critical || !!meta?.blocked);
 }

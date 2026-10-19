@@ -159,5 +159,334 @@
     "gitBlob": "f61db1d36ceb0916e89969992fa828f0c8669c54",
     "sha256": "29eae88514c11d1473fa2096290715866b282c102122da62fe2ab91eaf6ebbbf",
     "bytes": 1836
+  },
+  {
+    "path": "/assets/custom/augments/is2_dice.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_2_grow_icon_dice.png",
+    "gitBlob": "694ade38123860701a9ecff57a013453a97602fa",
+    "sha256": "3f9fe070c7ae1d73dbb3f9e7734f48b394bda66c4d4e6a4c966ca99932d3913d",
+    "bytes": 2771,
+    "collection": "통합전략 · 주사위",
+    "originalPath": "assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_2_grow_icon_dice.png"
+  },
+  {
+    "path": "/assets/custom/augments/is3_shop_refresh.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_3_grow_icon_shoprefresh.png",
+    "gitBlob": "6a9569abb6592ef63fdcecfdd6e1678fcabc4bd4",
+    "sha256": "3e8f18478b39162674364c7eac81eec1583cc783092d81425754082c99af5fb6",
+    "bytes": 2395,
+    "collection": "통합전략 · 상점 새로고침",
+    "originalPath": "assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_3_grow_icon_shoprefresh.png"
+  },
+  {
+    "path": "/assets/custom/augments/is_choice_target.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/rogueliketopic/choicepic/teleport.png",
+    "gitBlob": "e3dfa745c4488c03266fbbdd60fc0213f1b6c20a",
+    "sha256": "5fb2ae2e7ff8f3be833bed7e54ceb3999eee572de6d917cb1ca500a92f026791",
+    "bytes": 9041,
+    "collection": "통합전략 · 동심원 표식",
+    "originalPath": "assets/dyn/arts/ui/rogueliketopic/choicepic/teleport.png"
+  },
+  {
+    "path": "/assets/custom/augments/is3_arts.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_3_grow_icon_mystery.png",
+    "gitBlob": "335b06eadeb49da09f69363de5b408cf9e7960b2",
+    "sha256": "b597c107b66dd0a19b732b57521744b35d2f8da21ca6b0366ba37f8203e0db65",
+    "bytes": 2765,
+    "collection": "통합전략 · 신비 문양",
+    "originalPath": "assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_3_grow_icon_mystery.png"
+  },
+  {
+    "path": "/assets/custom/augments/is2_crossed_swords.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_2_grow_icon_atk.png",
+    "gitBlob": "048ee9a65a84351587bccbdecfd408dca48341e5",
+    "sha256": "af10b2b5a57441e1795dd68e91c98f021f040093adeae5d9986b7c9644454e28",
+    "bytes": 2486,
+    "collection": "통합전략 · 교차 검",
+    "originalPath": "assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_2_grow_icon_atk.png"
+  },
+  {
+    "path": "/assets/custom/augments/is2_income.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_2_grow_icon_gold.png",
+    "gitBlob": "9a1fab1e1e457f8c83894940a7b48c29dad81973",
+    "sha256": "9f4f811408c2092361bb247c3148527ef628917a80091f9dec0ae5cb75d43aa9",
+    "bytes": 2617,
+    "collection": "통합전략 · 오리지늄각뿔",
+    "originalPath": "assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_2_grow_icon_gold.png"
+  },
+  {
+    "path": "/assets/custom/augments/is3_vision.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_3_grow_icon_vision.png",
+    "gitBlob": "056c5174eea18fb8bbbc320eb5f9b2a00616635b",
+    "sha256": "2395eb4150c082b5b508b5e6c197c119c3313ae084492242e01d5f4ad08efcb8",
+    "bytes": 1592,
+    "collection": "통합전략 · 시야",
+    "originalPath": "assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_3_grow_icon_vision.png"
+  },
+  {
+    "path": "/assets/custom/augments/is2_supply_pack.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_2_grow_icon_shopsell.png",
+    "gitBlob": "c73c1569e0633153ec000daa860bd9233726a67a",
+    "sha256": "27132491848493a94acaff3f06ff71f5ddc10e85991601412128ca7a3926f49a",
+    "bytes": 3345,
+    "collection": "통합전략 · 보급 상자",
+    "originalPath": "assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_2_grow_icon_shopsell.png"
+  },
+  {
+    "path": "/assets/custom/augments/is3_stacks.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_3_grow_icon_totem.png",
+    "gitBlob": "956b6d4560b6e3611af9f2dfb1466a8948c7055b",
+    "sha256": "4843a5351855bb8726a97b63c746455bbb30c848f2b62c732c8ce6ed1d9fe6ea",
+    "bytes": 3665,
+    "collection": "통합전략 · 중첩된 육각 문양",
+    "originalPath": "assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_3_grow_icon_totem.png"
+  },
+  {
+    "path": "/assets/custom/augments/is1_attack_heal.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_1_grow_icon_hp.png",
+    "gitBlob": "ded810fbe09d252ca6501b740fbf8de84bf017bf",
+    "sha256": "5bd78b4d4708d01dd7ac773f980ccff07bd05da09cd5bee559f97b9903dbf031",
+    "bytes": 3316,
+    "collection": "통합전략 · 심전도 십자",
+    "originalPath": "assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_1_grow_icon_hp.png"
+  },
+  {
+    "path": "/assets/custom/augments/is2_recast.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_2_grow_icon_exchange.png",
+    "gitBlob": "6e79c50a6573a45650d3b6a645c42ce9dc1f9ad9",
+    "sha256": "93e0312a39e62204410f613abb2839ca5245f044a2b37d7367a1ef5f82e660de",
+    "bytes": 5202,
+    "collection": "통합전략 · 교환 순환",
+    "originalPath": "assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_2_grow_icon_exchange.png"
+  },
+  {
+    "path": "/assets/custom/augments/is_choice_damage.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/rogueliketopic/choicepic/battle.png",
+    "gitBlob": "9781f9202f9d536d1cd149fecb72e0178835380e",
+    "sha256": "40af888a9ca177b7b5e17254ade751316ec77b3f8910c64be061c39855850d96",
+    "bytes": 5515,
+    "collection": "통합전략 · 전투",
+    "originalPath": "assets/dyn/arts/ui/rogueliketopic/choicepic/battle.png"
+  },
+  {
+    "path": "/assets/custom/augments/is3_strike.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_3_grow_icon_atk.png",
+    "gitBlob": "b2694b66db517ed7abe7755a877f6c63f4e7bc3e",
+    "sha256": "56ecd99ea9e13671beda5e95518421380df4dc6b3ee90dc3429160f493d92bfa",
+    "bytes": 881,
+    "collection": "통합전략 · 검",
+    "originalPath": "assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_3_grow_icon_atk.png"
+  },
+  {
+    "path": "/assets/custom/augments/is1_talent.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_1_grow_icon_mixed.png",
+    "gitBlob": "bbf59eecee1dc1c5dce3a839095433acd7cb7106",
+    "sha256": "ff6e9bff181af2520570035c6a26415e026f6e1c9879cf17282676d934e7f62b",
+    "bytes": 9072,
+    "collection": "통합전략 · 재능 강화",
+    "originalPath": "assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_1_grow_icon_mixed.png"
+  },
+  {
+    "path": "/assets/custom/augments/is2_target_hp.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_2_grow_icon_life.png",
+    "gitBlob": "993c7e94e577fc11a9ccc251e9fd4cff9ae3a24c",
+    "sha256": "422f7ced26dadecb0e866d99ed537deab140933fc089ac4735940e5bf1c3a3e0",
+    "bytes": 1870,
+    "collection": "통합전략 · 목표 HP 증가",
+    "originalPath": "assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_2_grow_icon_life.png"
+  },
+  {
+    "path": "/assets/custom/augments/is_choice_civilization.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/rogueliketopic/choicepic/zone_end.png",
+    "gitBlob": "ed620716f7c760a56bb0feaa5bdac0ff47bf4d2d",
+    "sha256": "77f21c13b1cf3b95be827cbce0c78f2b6dbca0339e8742ef8886c8e0ee5328da",
+    "bytes": 8409,
+    "collection": "통합전략 · 도시·성벽",
+    "originalPath": "assets/dyn/arts/ui/rogueliketopic/choicepic/zone_end.png"
+  },
+  {
+    "path": "/assets/custom/augments/is2_level_up.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_2_grow_icon_exp.png",
+    "gitBlob": "57eee506c5a62cc926f6da3c7c20fb81624f52d7",
+    "sha256": "adb1f8eeb94b1424378a677beb51babd40b6cb6a8612cda39977091846ca79f9",
+    "bytes": 2364,
+    "collection": "통합전략 · 성장",
+    "originalPath": "assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_2_grow_icon_exp.png"
+  },
+  {
+    "path": "/assets/custom/augments/is_choice_recruit.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/rogueliketopic/choicepic/recruit.png",
+    "gitBlob": "dedf22f3cd7eb1a3a9f8d967e5acdfa3fb16d35f",
+    "sha256": "27ce5e39f7f989256006d4148502b3ab74730c3903cb1c0e333d1538764d161c",
+    "bytes": 1716,
+    "collection": "통합전략 · 모집권",
+    "originalPath": "assets/dyn/arts/ui/rogueliketopic/choicepic/recruit.png"
+  },
+  {
+    "path": "/assets/custom/augments/is3_beast_heart.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_3_grow_icon_difficult9.png",
+    "gitBlob": "a9809daeb58654233e26affcefca0feb03c32e7e",
+    "sha256": "cf4c238db932117c3712133ac0ace556d09e2a5e31254d459a02f4b9b679326e",
+    "bytes": 3776,
+    "collection": "통합전략 · 야수 문양",
+    "originalPath": "assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_3_grow_icon_difficult9.png"
+  },
+  {
+    "path": "/assets/custom/augments/is3_elemental.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_3_grow_icon_difficult6.png",
+    "gitBlob": "a884225ef4aebd8edab1c543f6fd3ed80180a396",
+    "sha256": "b106448d3644068715a01c4e176bad0c7265f653e1ccf61109ee1b06ba4004e1",
+    "bytes": 3741,
+    "collection": "통합전략 · 원소 문양",
+    "originalPath": "assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_3_grow_icon_difficult6.png"
+  },
+  {
+    "path": "/assets/custom/augments/is_choice_shield.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/rogueliketopic/choicepic/shield.png",
+    "gitBlob": "717e24bf1f46f0dcfa850714dedfb05b6e4f1a3e",
+    "sha256": "ddba2e755cf7a8b5fc579b47a4b6e34fd8eec213647ada518b014012d549c56f",
+    "bytes": 2805,
+    "collection": "통합전략 · 방패",
+    "originalPath": "assets/dyn/arts/ui/rogueliketopic/choicepic/shield.png"
+  },
+  {
+    "path": "/assets/custom/augments/training_status_time.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/trainingcamp/stageicon/icon_mechanism_3.png",
+    "gitBlob": "061bc8f02bca8d2f293723516fee01b30dcfdcc0",
+    "sha256": "9687b294e3d5db167ff0221069860df7c622342d27c735819a34ac10c188b4cb",
+    "bytes": 1031,
+    "collection": "훈련장 · 검과 시계",
+    "originalPath": "assets/dyn/arts/ui/trainingcamp/stageicon/icon_mechanism_3.png"
+  },
+  {
+    "path": "/assets/custom/augments/is3_regeneration.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_3_grow_icon_perfect.png",
+    "gitBlob": "c12a82d4029e7471c690cac8c461a514cd4639b3",
+    "sha256": "9c25298056cbf26cd5b49b657ed4cbd2eddff6cdf987b9263d59243f0e6b3401",
+    "bytes": 1019,
+    "collection": "통합전략 · 생명 맥동",
+    "originalPath": "assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_3_grow_icon_perfect.png"
+  },
+  {
+    "path": "/assets/custom/augments/is3_status_resist.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_3_grow_icon_exorcism.png",
+    "gitBlob": "dbc5aa154faf5ada0afaf7a1f85c5d2d168dd255",
+    "sha256": "c5f7979920b88284b3066acc154f945e291ee5111856b5b73f826e507ac2732b",
+    "bytes": 3506,
+    "collection": "통합전략 · 액막이",
+    "originalPath": "assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_3_grow_icon_exorcism.png"
+  },
+  {
+    "path": "/assets/custom/augments/is_choice_breakthrough.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/rogueliketopic/choicepic/leave.png",
+    "gitBlob": "da2a6a0b04343c187156a48f6b49265ef1e55962",
+    "sha256": "458a5ba8de0011114e565ace45207c54cec31a82f8925400152ef1eb83701e66",
+    "bytes": 2798,
+    "collection": "통합전략 · 이탈",
+    "originalPath": "assets/dyn/arts/ui/rogueliketopic/choicepic/leave.png"
+  },
+  {
+    "path": "/assets/custom/augments/training_ally_hazard.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/trainingcamp/stageicon/icon_mechanism_4.png",
+    "gitBlob": "473189bc998c061136d4beb2fe5fca68e84427fb",
+    "sha256": "445be99647ba07f929a044b2dd64c46b254b75500eaaec7ebd821dced56cca07",
+    "bytes": 1171,
+    "collection": "훈련장 · 인체 경고",
+    "originalPath": "assets/dyn/arts/ui/trainingcamp/stageicon/icon_mechanism_4.png"
+  },
+  {
+    "path": "/assets/custom/augments/g_char_hp_1.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/%5Buc%5Dcrisisv2/runeicon/g_char_hp_1.png",
+    "gitBlob": "24e63056452042fe3cb8f77dcbf39eef5f5b814a",
+    "sha256": "3a849fbb99c60bb066cc949b6fa43658eef068d8ba7317962d030e34ccd6d574",
+    "bytes": 487
+  },
+  {
+    "path": "/assets/custom/augments/g_char_def_1.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/%5Buc%5Dcrisisv2/runeicon/g_char_def_1.png",
+    "gitBlob": "b1f34c288cc4c6bbacb214fc18b1ce8829c94beb",
+    "sha256": "e481f681bb06ef12678290d2a279e8812f02b3eda0bbbf2f979df7213223cb66",
+    "bytes": 1295
+  },
+  {
+    "path": "/assets/custom/augments/is2_abyssal_blessing.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_2_grow_icon_abyssal.png",
+    "gitBlob": "bb1568daa0c884ac36871dd7f8e3e0b14d1d1245",
+    "sha256": "540f60d3c66b2a0928060800a7ec8a6d6b550d7267413663b2e216c9b7eed9b3",
+    "bytes": 4888,
+    "collection": "통합전략 · 심해 문양",
+    "originalPath": "assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_2_grow_icon_abyssal.png"
+  },
+  {
+    "path": "/assets/custom/augments/is_choice_morph.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/rogueliketopic/choicepic/fragment.png",
+    "gitBlob": "036e11014a7b11918e59ef79488da36db971b51e",
+    "sha256": "9c503644667b22e41c84588d14cb2aec069cd3faa070166fb27d8da9cc5bb623",
+    "bytes": 3285,
+    "collection": "통합전략 · 퍼즐 조각",
+    "originalPath": "assets/dyn/arts/ui/rogueliketopic/choicepic/fragment.png"
+  },
+  {
+    "path": "/assets/custom/augments/is2_doctor_command.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_2_grow_icon_rhodes.png",
+    "gitBlob": "96867f9392150cceebba17865439215842c87c4d",
+    "sha256": "09d7bae540c8a8dbfa40d2eb8a4981ff2770b64fbcb1c73c805856cc52275613",
+    "bytes": 4521,
+    "collection": "통합전략 · 로도스 지휘 문양",
+    "originalPath": "assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_2_grow_icon_rhodes.png"
+  },
+  {
+    "path": "/assets/custom/augments/is3_discovery.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_3_grow_icon_scout.png",
+    "gitBlob": "f40dcf36721cca2677b1d925b12252a44828b286",
+    "sha256": "9d2b2553f3a3a63f5cced8cd94a88d95176dd7d3cf8455d2c79cca93bea83c8a",
+    "bytes": 1744,
+    "collection": "통합전략 · 탐색",
+    "originalPath": "assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_3_grow_icon_scout.png"
+  },
+  {
+    "path": "/assets/custom/augments/is2_communications.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_2_grow_icon_bp.png",
+    "gitBlob": "edec9a612f5c8da14231903847f9f8adcb23b491",
+    "sha256": "fed0d9bf086a49604851b25218ac5fb6f14c3cb151e76dc64cbe5f7c056feece",
+    "bytes": 6161,
+    "collection": "통합전략 · 연결망",
+    "originalPath": "assets/dyn/arts/ui/rogueliketopic/outerbufficon/rogue_2_grow_icon_bp.png"
+  },
+  {
+    "path": "/assets/custom/augments/is_choice_equipment_support.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/rogueliketopic/choicepic/relic.png",
+    "gitBlob": "bfed9fce329f06508e12b7a0059552c94097cc6e",
+    "sha256": "44c2d9a4e81b94a2ee87d8810f3c1b9a59dd01707a5ec5500a236e8146427ee6",
+    "bytes": 14009,
+    "collection": "통합전략 · 보상 문양",
+    "originalPath": "assets/dyn/arts/ui/rogueliketopic/choicepic/relic.png"
+  },
+  {
+    "path": "/assets/custom/augments/is_choice_new_recruit.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/rogueliketopic/choicepic/employ.png",
+    "gitBlob": "e70021c440208f6b7cbdc6caceda64d4229303ac",
+    "sha256": "f6d17a430f8a57b39e288c2b6ce9c5f53ba918fb5565a10362d1093684d161f5",
+    "bytes": 5832,
+    "collection": "통합전략 · 신규 인원",
+    "originalPath": "assets/dyn/arts/ui/rogueliketopic/choicepic/employ.png"
+  },
+  {
+    "path": "/assets/custom/augments/is_choice_personnel_office.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/rogueliketopic/choicepic/stashed_recruit.png",
+    "gitBlob": "69589cb2a013dbaaf0f8c07f7a7678757ca75d43",
+    "sha256": "4f2b6856f17a321f4553cccda27026b92beb0b563905f2655f0c04738517ef2c",
+    "bytes": 5457,
+    "collection": "통합전략 · 인력 모집",
+    "originalPath": "assets/dyn/arts/ui/rogueliketopic/choicepic/stashed_recruit.png"
+  },
+  {
+    "path": "/assets/custom/augments/battle_pegasus_wings.png",
+    "source": "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/44b3d7b3fad6f50ca505bc41414a2fea8eaa0c48/assets/dyn/arts/ui/%5Buc%5Dbattlecommon/ui_battle_new/battlecard/icon_evolve_2.png",
+    "gitBlob": "04bb8b9bd3290ad21ef934ba1e65374c2c2f9340",
+    "sha256": "df1d901a0674922eab66eadb1b7f8089ffb31d5a4f8fb9261930185924312034",
+    "bytes": 2915,
+    "collection": "전투 UI · 날개 문양",
+    "originalPath": "assets/dyn/arts/ui/[uc]battlecommon/ui_battle_new/battlecard/icon_evolve_2.png"
   }
 ]

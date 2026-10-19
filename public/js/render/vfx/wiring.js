@@ -225,9 +225,24 @@ export function modeVariant(modes, name, facing, variantsOnly = false) {
   return plain || null;
 }
 
-export function aromaOriginOffset(key,direction){
- if(!/^aroma_(?:attack_start|skill_01_start|skill_02_(?:start|range))/.test(key))return [0,0];
- return direction==='UP'?[0,1]:direction==='DOWN'?[0,-1]:direction==='LEFT'?[-1,0]:[1,0];
+/** GROUND_CENTER_WITH_ZERO_HEIGHT is the board plane, not the caster's raised deployment tile.
+ * Aroma's ground streams likewise travel along the lane; her FOOT_POINT hand/buff effects keep their own height. */
+export function effectGroundHeight(spawn, view, key = '') {
+  if (spawn === 7 || (spawn === 5 && /^aroma_(?:attack_start|skill_01_start|skill_02_(?:start|range))/.test(key))) return 0;
+  return Number(view?.z) || 0;
+}
+
+export function aromaOriginOffset(key, direction, spawn = 5) {
+  if (spawn !== 5) return [0, 0];
+  // Plane001 is centred on its long axis (−0.635..0.635). These two
+  // streams scale that axis by 3.1 / 3.7, so place their rear edge at the
+  // caster, rather than moving every Aroma effect forward by one tile.
+  // S2 already authors its forward offset; FOOT_POINT flashes stay on her.
+  const distance = /^aroma_attack_start(?:_up|_down)?_01$/.test(key) ? 0.635 * 3.1
+    : /^aroma_skill_01_start(?:_up|_down)?_01$/.test(key) ? 0.635 * 3.7 : 0;
+  if (!distance) return [0, 0];
+  return direction === 'UP' ? [0, distance] : direction === 'DOWN' ? [0, -distance]
+    : direction === 'LEFT' ? [-distance, 0] : [distance, 0];
 }
 
 export class FxWiring {
@@ -550,15 +565,15 @@ export class FxWiring {
     // Effect._InitLocation sets no rotation, the prefab root keeps its own)
     if (!v.info) P.loaded = false;
     const pos = P.fmp ? mountPoint(skin, P.fmp.mount, pose) : spawnPoint(skin, P.spawn, pose);
-    // Aroma's directional streams are authored one tile behind their forward
-    // range. Align their origin with the deployed facing; hit/buff points stay put.
-    const originOffset = aromaOriginOffset(k, this._facing(v));
+    // Align centred Aroma streams by their rear edge; separately authored
+    // range and body effects retain their own origins.
+    const originOffset = aromaOriginOffset(k, this._facing(v), P.spawn);
     pos[0]+=originOffset[0];pos[1]+=originOffset[1];
     // Correct only the oversized slash artwork. start_02 contains range_line
     // and the ground tiles: its footprint must retain the authored size.
     const areaScale=/^blkkgt_skill_03_(?:start_01|end)$/.test(k)?0.5:1;
     const effectScale=typeof o.scale==='function'?()=>o.scale()*areaScale:o.scale!=null?o.scale*areaScale:areaScale!==1?areaScale:undefined;
-    const ground = (v.z || 0);
+    const ground = P.onGround ? effectGroundHeight(P.spawn, v, k) : (v.z || 0);
     if (P.onGround) pos[2] = -ground;
     const place = { pos, scale: typeof effectScale === 'function' ? effectScale() : effectScale, groundZ: -ground, yaw: 0, mirror: false, flipY: false, mountRot: null, rootRot: null };
     this._rotate(P, place, skin, pose);
@@ -601,28 +616,36 @@ export class FxWiring {
             const pl = { mountRot: null, rootRot: null };
             this._rotate(Q, pl, skin, p);
             fx.mountRot = pl.mountRot; fx.rootRot = pl.rootRot;
+            // A child ground effect must not inherit a parent's hit/muzzle position or its platform height.
+            if (Q.onGround) {
+              const at = spawnPoint(skin, Q.spawn, p);
+              fx.anchor[0] = at[0]; fx.anchor[1] = at[1];
+              fx.anchor[2] = -effectGroundHeight(Q.spawn, v, fx.def.key);
+              kept.set(fx, [p.x, p.y, p.z]);
+            }
           }
         }
-        const G = Q.fmp ? Q : P;
+        const G = Q;
+        const ground = G.onGround ? effectGroundHeight(G.spawn, v, fx.def?.key || k) : (v.z || 0);
         if (G.follow) {
           mountPoint(skin, G.follow.mount, p, fx.anchor);
-          if (G.onGround) fx.anchor[2] = -(v.z || 0);
-          fx.groundZ = -(v.z || 0);
+          if (G.onGround) fx.anchor[2] = -ground;
+          fx.groundZ = -ground;
           if (Q.rotFollow && Q.loaded) fx.mountRot = mountRotation(skin, Q.rotKind, p, fx.mountRot || [0, 0, 0, 1]);
         } else if (stick && v.alive !== false) {
-          const sp = spawnPoint(skin, P.spawn, p);
-          fx.anchor[0] = sp[0]; fx.anchor[1] = sp[1]; fx.anchor[2] = P.onGround ? -(v.z || 0) : sp[2];
-          const offset=aromaOriginOffset(k,this._facing(v));fx.anchor[0]+=offset[0];fx.anchor[1]+=offset[1];
-          fx.groundZ = -(v.z || 0);
+          const sp = spawnPoint(skin, G.spawn, p);
+          fx.anchor[0] = sp[0]; fx.anchor[1] = sp[1]; fx.anchor[2] = G.onGround ? -ground : sp[2];
+          const offset=aromaOriginOffset(fx.def?.key || k,this._facing(v), G.spawn);fx.anchor[0]+=offset[0];fx.anchor[1]+=offset[1];
+          fx.groundZ = -ground;
         } else if ((P.keep || Q.keep) && v.alive !== false) {
           // held by the unit: it moves with the unit, its offset from the feet as it started (the client holds such an
           // effect on its owner: `_holdByOwner`) [ASSUMED]
           let at = kept.get(fx);
           if (!at) kept.set(fx, at = at0.slice());
           fx.anchor[0] += p.x - at[0]; fx.anchor[1] += p.y - at[1];
-          fx.anchor[2] = P.onGround ? -(v.z || 0) : fx.anchor[2] - (p.z - at[2]);
+          fx.anchor[2] = G.onGround ? -ground : fx.anchor[2] - (p.z - at[2]);
           at[0] = p.x; at[1] = p.y; at[2] = p.z;
-          fx.groundZ = -(v.z || 0);
+          fx.groundZ = -ground;
         }
         const ownDef = fx.def || d;
         if (ownDef && (ownDef.direction || ((P.keep || P.follow || Q.keep || Q.follow || stick) && (ownDef.useBodyRotation || o.useFourDirectionalFace)))) {
@@ -1548,12 +1571,18 @@ export class FxWiring {
   }
 
   /** b.ev ['skill', id, on] (SkillFx.skill): true when the official layer shows the skill (no procedural burst / aura). */
-  skill(v, on) {
+  skill(v, on, cast = null) {
     if (!v || v.prep || !this.idx) return false;
-    const drew = this.skills.skill(v, !!on);
+    const drew = this.skills.skill(v, !!on, cast);
     this.talents.skill(v, !!on);   // the talents a skill start casts (ON_SKILL_START)
     this.funnels.skill(v, !!on);   // the floating units of the skill's mode (render/vfx/funnelfx.js)
     return drew;
+  }
+
+  /** Independent skill impact, emitted before its kit damage or healing. */
+  skillImpact(v) {
+    if (!v || v.prep || !this.idx) return false;
+    return this.skills.impact(v);
   }
 
   /** b.ev ['cast', id, slot, dur?] (an enemy's skill slot, SkillFx.cast): that skill's window. */

@@ -333,14 +333,14 @@ export function dealDamage(battle, source, target, dmgIn) {
   // gets the stats and the kill (PRTS 伤害分类 无来源 ③)
   const hs = dmg.sourceless ? null : source;
   let ts = target.s;
-  if (ts.flags.invulnerable) { if(!dmg.silent)battle._ev(['dmg',target.id,0,dmg.type,{critical:true,expected:0,value:0,officialMark:'r'}]); return 0; }
+  if (ts.flags.invulnerable) { if(!dmg.silent)battle._ev(['dmg',target.id,0,dmg.type,{critical:true,expected:0,value:0,officialMark:'r',blocked:'invulnerable'}]); return 0; }
   if (sleepBlocks(target, hs, dmg) || liftoffEvades(target, hs, dmg)) return 0;
   if (battle._hooks.hit) {
     battle.emit('hit', { source: hs, target, dmg, credit: source });
     if (dmg.cancel || !target.alive || !target.deployed) return 0;
     if (dmg.type === 'element') return applyElement(battle, source, target, dmg);
     ts = target.s; // handlers may have changed the target's buffs (fragile, invulnerable, dodge…): never use stale stats
-    if (ts.flags.invulnerable) { if(!dmg.silent)battle._ev(['dmg',target.id,0,dmg.type,{critical:true,expected:0,value:0,officialMark:'r'}]); return 0; }
+    if (ts.flags.invulnerable) { if(!dmg.silent)battle._ev(['dmg',target.id,0,dmg.type,{critical:true,expected:0,value:0,officialMark:'r',blocked:'invulnerable'}]); return 0; }
     if (sleepBlocks(target, hs, dmg)) return 0;
   }
   const type = dmg.type;

@@ -600,9 +600,9 @@ export class SkillRuntime {
       // (a targeting-only instant skill must still switch to its skill range for the pending attack)
       if (this.spec.mods || this.spec.flags || this.spec.targeting) this._applyMods();
     }
-    b._ev(['skill', u.id, 1]);
-    u.skillAnimUntil = b.time + SKILL_ANIM_WINDOW;
     const cast = !this.isTimed ? skillImpactTiming(u) : null;
+    b._ev(cast ? ['skill', u.id, 1, { cast: true }] : ['skill', u.id, 1]);
+    u.skillAnimUntil = b.time + SKILL_ANIM_WINDOW;
     const finishStart = () => {
       this._call('onStart', { reason });
       if (!this.isTimed && !this.pending) {
@@ -621,6 +621,8 @@ export class SkillRuntime {
       b.after(cast.hit,()=>{
         if(!u.alive || !u.deployed || u.deploySeq!==seq || this.activations!==activation || !this.active)return;
         if(u.s.flags.stun || u.s.flags.frozen || u.s.flags.sleep){delete u.mem.skillCastUntil;this.end('interrupted');return;}
+        // The visual cast and its impact can be in different render frames. Name the impact before its damage.
+        b._ev(['skillImpact', u.id]);
         finishStart();
       },{owner:u});
     } else this._call('onStart', { reason });

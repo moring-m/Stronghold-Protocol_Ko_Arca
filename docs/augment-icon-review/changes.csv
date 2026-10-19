@@ -1,0 +1,72 @@
+﻿적용 대상,증강명,이전 아이콘,변경 아이콘,원본 콘텐츠,선정 이유
+아군,도박 I,/assets/custom/augments/g_extra_cost_1.png,/assets/custom/augments/is2_dice.png,통합전략 · 주사위,주사위로 도박이라는 이름과 위험을 감수하는 선택을 표현
+아군,도박 II,/assets/custom/augments/g_extra_cost_1.png,/assets/custom/augments/is2_dice.png,통합전략 · 주사위,주사위로 도박이라는 이름과 위험을 감수하는 선택을 표현
+아군,도박 III,/assets/custom/augments/g_extra_cost_1.png,/assets/custom/augments/is2_dice.png,통합전략 · 주사위,주사위로 도박이라는 이름과 위험을 감수하는 선택을 표현
+아군,새로고침 지원 I,/assets/custom/augments/g_global_costrecovery_1.png,/assets/custom/augments/is3_shop_refresh.png,통합전략 · 상점 새로고침,상자와 순환 화살표로 무료 상점 새로고침 표현
+아군,새로고침 지원 II,/assets/custom/augments/g_global_costrecovery_1.png,/assets/custom/augments/is3_shop_refresh.png,통합전략 · 상점 새로고침,상자와 순환 화살표로 무료 상점 새로고침 표현
+아군,새로고침 지원 III,/assets/custom/augments/g_global_costrecovery_1.png,/assets/custom/augments/is3_shop_refresh.png,통합전략 · 상점 새로고침,상자와 순환 화살표로 무료 상점 새로고침 표현
+아군,약점 공격,/assets/custom/augments/g_char_magicdamage_1.png,/assets/custom/augments/is_choice_target.png,통합전략 · 동심원 표식,표적 중심을 겨누는 문양으로 약점 공격 표현
+아군,아츠 마스터 I,/assets/custom/augments/g_char_sp_reduce_1.png,/assets/custom/augments/is3_arts.png,통합전략 · 신비 문양,일반 공격력 아이콘과 구분되는 아츠 문양으로 스킬 관련 효과 표현
+아군,아츠 마스터 II,/assets/custom/augments/g_char_sp_reduce_1.png,/assets/custom/augments/is3_arts.png,통합전략 · 신비 문양,일반 공격력 아이콘과 구분되는 아츠 문양으로 스킬 관련 효과 표현
+아군,아츠 마스터 III,/assets/custom/augments/g_char_sp_reduce_1.png,/assets/custom/augments/is3_arts.png,통합전략 · 신비 문양,일반 공격력 아이콘과 구분되는 아츠 문양으로 스킬 관련 효과 표현
+아군,소드마스터 I,/assets/custom/augments/g_char_atk_p1.png,/assets/custom/augments/is2_crossed_swords.png,통합전략 · 교차 검,두 개의 검으로 검술과 추가 공격 표현
+아군,소드마스터 II,/assets/custom/augments/g_char_atk_p1.png,/assets/custom/augments/is2_crossed_swords.png,통합전략 · 교차 검,두 개의 검으로 검술과 추가 공격 표현
+아군,소드마스터 III,/assets/custom/augments/g_char_atk_p1.png,/assets/custom/augments/is2_crossed_swords.png,통합전략 · 교차 검,두 개의 검으로 검술과 추가 공격 표현
+아군,이샤믈라의 축복,/assets/custom/augments/g_extra_cost_1.png,/assets/custom/augments/is2_abyssal_blessing.png,통합전략 · 심해 문양,심해를 연상시키는 순환 문양으로 이샤믈라의 축복 표현
+아군,뮤엘시스의 지원,/assets/custom/augments/g_extra_cost_1.png,/assets/custom/augments/is_choice_morph.png,통합전략 · 퍼즐 조각,형태를 맞추고 바꾸는 퍼즐 문양으로 복제·변형 지원 표현
+아군,박사의 머리,/assets/custom/augments/g_extra_cost_1.png,/assets/custom/augments/is2_doctor_command.png,통합전략 · 로도스 지휘 문양,박사의 판단과 지휘를 상징하는 문양으로 효과 표현
+아군,대발견,/assets/custom/augments/g_extra_cost_1.png,/assets/custom/augments/is3_discovery.png,통합전략 · 탐색,탐색·개척 문양으로 새로운 보상을 발견하는 효과 표현
+아군,알뜰살뜰 I,/assets/custom/augments/g_extra_cost_1.png,/assets/custom/augments/is2_income.png,통합전략 · 오리지늄각뿔,매 라운드 추가 자금을 주는 경제 효과 표현
+아군,알뜰살뜰 II,/assets/custom/augments/g_extra_cost_1.png,/assets/custom/augments/is2_income.png,통합전략 · 오리지늄각뿔,매 라운드 추가 자금을 주는 경제 효과 표현
+아군,알뜰살뜰 III,/assets/custom/augments/g_extra_cost_1.png,/assets/custom/augments/is2_income.png,통합전략 · 오리지늄각뿔,매 라운드 추가 자금을 주는 경제 효과 표현
+아군,카란의 눈,/assets/custom/augments/g_enemy_atk_1.png,/assets/custom/augments/is3_vision.png,통합전략 · 시야,시야·탐지 나침반으로 적 은신 무효화 표현
+아군,스타터 팩,/assets/custom/augments/g_char_tile_summon_1.png,/assets/custom/augments/is2_supply_pack.png,통합전략 · 보급 상자,초기 오퍼레이터 묶음을 받는 패키지 표현
+아군,중첩 I,/assets/custom/augments/g_global_costrecovery_1.png,/assets/custom/augments/is3_stacks.png,통합전략 · 중첩된 육각 문양,여러 문양이 쌓이는 형태로 맹약 중첩 획득 표현
+아군,중첩 II,/assets/custom/augments/g_global_costrecovery_1.png,/assets/custom/augments/is3_stacks.png,통합전략 · 중첩된 육각 문양,여러 문양이 쌓이는 형태로 맹약 중첩 획득 표현
+아군,중첩 III,/assets/custom/augments/g_global_costrecovery_1.png,/assets/custom/augments/is3_stacks.png,통합전략 · 중첩된 육각 문양,여러 문양이 쌓이는 형태로 맹약 중첩 획득 표현
+아군,무사 I,/assets/custom/augments/g_zom_hprec_1.png,/assets/custom/augments/is1_attack_heal.png,통합전략 · 심전도 십자,공격 시 HP 회복 효과를 의료·심전도 문양으로 표현
+아군,무사 II,/assets/custom/augments/g_zom_hprec_1.png,/assets/custom/augments/is1_attack_heal.png,통합전략 · 심전도 십자,공격 시 HP 회복 효과를 의료·심전도 문양으로 표현
+아군,무사 III,/assets/custom/augments/g_zom_hprec_1.png,/assets/custom/augments/is1_attack_heal.png,통합전략 · 심전도 십자,공격 시 HP 회복 효과를 의료·심전도 문양으로 표현
+아군,대격변,/assets/custom/augments/g_char_tile_summon_1.png,/assets/custom/augments/is2_recast.png,통합전략 · 교환 순환,순환 화살표와 변형되는 다면체로 오퍼레이터 교체 표현
+아군,부재중 전화,/assets/custom/augments/g_extra_cost_1.png,/assets/custom/augments/is2_communications.png,통합전략 · 연결망,서로 연결된 점과 선으로 통신·연락 효과 표현
+아군,피해 증가 I,/assets/custom/augments/g_char_magicdamage_1.png,/assets/custom/augments/is_choice_damage.png,통합전략 · 전투,교차 무기와 공격 표식으로 일반 공격력 증가와 구분되는 피해 증폭 표현
+아군,피해 증가 II,/assets/custom/augments/g_char_magicdamage_1.png,/assets/custom/augments/is_choice_damage.png,통합전략 · 전투,교차 무기와 공격 표식으로 일반 공격력 증가와 구분되는 피해 증폭 표현
+아군,피해 증가 III,/assets/custom/augments/g_char_magicdamage_1.png,/assets/custom/augments/is_choice_damage.png,통합전략 · 전투,교차 무기와 공격 표식으로 일반 공격력 증가와 구분되는 피해 증폭 표현
+아군,강타 I,/assets/custom/augments/g_char_atk_p1.png,/assets/custom/augments/is3_strike.png,통합전략 · 검,한 자루의 검으로 스킬 발동 후 강해지는 공격 표현
+아군,강타 II,/assets/custom/augments/g_char_atk_p1.png,/assets/custom/augments/is3_strike.png,통합전략 · 검,한 자루의 검으로 스킬 발동 후 강해지는 공격 표현
+아군,강타 III,/assets/custom/augments/g_char_atk_p1.png,/assets/custom/augments/is3_strike.png,통합전략 · 검,한 자루의 검으로 스킬 발동 후 강해지는 공격 표현
+아군,우리들의 빛,/assets/custom/augments/g_global_costrecovery_1.png,/assets/custom/augments/is1_talent.png,통합전략 · 재능 강화,재능 문양으로 라운드 시작 시 획득 특질 재발동 표현
+아군,캐서린의 지원 I,/assets/custom/augments/g_char_atk_p1.png,/assets/custom/augments/is_choice_equipment_support.png,통합전략 · 보상 문양,다면체 보상 문양으로 무작위 장비 지원 표현
+아군,캐서린의 지원 II,/assets/custom/augments/g_char_atk_p1.png,/assets/custom/augments/is_choice_equipment_support.png,통합전략 · 보상 문양,다면체 보상 문양으로 무작위 장비 지원 표현
+아군,캐서린의 지원 III,/assets/custom/augments/g_char_atk_p1.png,/assets/custom/augments/is_choice_equipment_support.png,통합전략 · 보상 문양,다면체 보상 문양으로 무작위 장비 지원 표현
+아군,골리앗 I,/assets/custom/augments/g_char_hp_1.png,/assets/custom/augments/is2_target_hp.png,통합전략 · 목표 HP 증가,룩과 상승 화살표로 유닛 최대 HP가 아닌 목표 HP 증가 표현
+아군,골리앗 II,/assets/custom/augments/g_char_hp_1.png,/assets/custom/augments/is2_target_hp.png,통합전략 · 목표 HP 증가,룩과 상승 화살표로 유닛 최대 HP가 아닌 목표 HP 증가 표현
+아군,골리앗 III,/assets/custom/augments/g_char_hp_1.png,/assets/custom/augments/is2_target_hp.png,통합전략 · 목표 HP 증가,룩과 상승 화살표로 유닛 최대 HP가 아닌 목표 HP 증가 표현
+아군,문명의 존속 I,/assets/custom/augments/g_char_magicdamage_1.png,/assets/custom/augments/is_choice_civilization.png,통합전략 · 도시·성벽,도시와 방호 성벽 문양으로 문명의 존속이라는 이름 표현
+아군,문명의 존속 II,/assets/custom/augments/g_char_magicdamage_1.png,/assets/custom/augments/is_choice_civilization.png,통합전략 · 도시·성벽,도시와 방호 성벽 문양으로 문명의 존속이라는 이름 표현
+아군,문명의 존속 III,/assets/custom/augments/g_char_magicdamage_1.png,/assets/custom/augments/is_choice_civilization.png,통합전략 · 도시·성벽,도시와 방호 성벽 문양으로 문명의 존속이라는 이름 표현
+아군,신병,/assets/custom/augments/g_extra_cost_1.png,/assets/custom/augments/is_choice_new_recruit.png,통합전략 · 신규 인원,새로 나타나는 사람의 실루엣으로 신병 지원 표현
+아군,인력사무소,/assets/custom/augments/g_extra_cost_1.png,/assets/custom/augments/is_choice_personnel_office.png,통합전략 · 인력 모집,인력 모집 문양으로 인력사무소의 지원 효과 표현
+아군,레벨 업,/assets/custom/augments/g_global_costrecovery_1.png,/assets/custom/augments/is2_level_up.png,통합전략 · 성장,룩을 감싸는 성장 문양으로 상점 승급 표현
+아군,페가수스,/assets/custom/augments/g_extra_cost_1.png,/assets/custom/augments/battle_pegasus_wings.png,전투 UI · 날개 문양,펼친 날개 형태로 페가수스의 이름 표현
+아군,헤드헌팅 I,/assets/custom/augments/g_char_tile_summon_1.png,/assets/custom/augments/is_choice_recruit.png,통합전략 · 모집권,모집권 문양으로 고등급 오퍼레이터 획득 표현
+아군,헤드헌팅 II,/assets/custom/augments/g_char_tile_summon_1.png,/assets/custom/augments/is_choice_recruit.png,통합전략 · 모집권,모집권 문양으로 고등급 오퍼레이터 획득 표현
+아군,헤드헌팅 III,/assets/custom/augments/g_char_tile_summon_1.png,/assets/custom/augments/is_choice_recruit.png,통합전략 · 모집권,모집권 문양으로 고등급 오퍼레이터 획득 표현
+아군,야수의 심장,/assets/custom/augments/g_char_tile_summon_1.png,/assets/custom/augments/is3_beast_heart.png,통합전략 · 야수 문양,뿔과 중심의 보석을 가진 야수 문양으로 이름 표현
+적,원소 피해 증가 I,/assets/custom/augments/g_enemy_element_res_1.png,/assets/custom/augments/is3_elemental.png,통합전략 · 원소 문양,물방울·불꽃 형태의 원소 문양으로 원소 피해 표현
+적,원소 피해 증가 II,/assets/custom/augments/g_enemy_element_res_1.png,/assets/custom/augments/is3_elemental.png,통합전략 · 원소 문양,물방울·불꽃 형태의 원소 문양으로 원소 피해 표현
+적,원소 피해 증가 III,/assets/custom/augments/g_enemy_element_res_1.png,/assets/custom/augments/is3_elemental.png,통합전략 · 원소 문양,물방울·불꽃 형태의 원소 문양으로 원소 피해 표현
+적,실드 I,/assets/custom/augments/g_enemy_block_dmgreduce_1.png,/assets/custom/augments/is_choice_shield.png,통합전략 · 방패,직관적인 방패로 적 실드 횟수 증가 표현
+적,실드 II,/assets/custom/augments/g_enemy_block_dmgreduce_1.png,/assets/custom/augments/is_choice_shield.png,통합전략 · 방패,직관적인 방패로 적 실드 횟수 증가 표현
+적,실드 III,/assets/custom/augments/g_enemy_block_dmgreduce_1.png,/assets/custom/augments/is_choice_shield.png,통합전략 · 방패,직관적인 방패로 적 실드 횟수 증가 표현
+적,상태이상 증가 I,/assets/custom/augments/g_char_deploy_stun_1.png,/assets/custom/augments/training_status_time.png,훈련장 · 검과 시계,검과 시계로 적이 가하는 상태이상 지속시간 증가 표현
+적,상태이상 증가 II,/assets/custom/augments/g_char_deploy_stun_1.png,/assets/custom/augments/training_status_time.png,훈련장 · 검과 시계,검과 시계로 적이 가하는 상태이상 지속시간 증가 표현
+적,상태이상 증가 III,/assets/custom/augments/g_char_deploy_stun_1.png,/assets/custom/augments/training_status_time.png,훈련장 · 검과 시계,검과 시계로 적이 가하는 상태이상 지속시간 증가 표현
+적,재생 I,/assets/custom/augments/g_zom_hprec_1.png,/assets/custom/augments/is3_regeneration.png,통합전략 · 생명 맥동,맥박을 감싼 문양으로 적의 지속 HP 재생 표현
+적,재생 II,/assets/custom/augments/g_zom_hprec_1.png,/assets/custom/augments/is3_regeneration.png,통합전략 · 생명 맥동,맥박을 감싼 문양으로 적의 지속 HP 재생 표현
+적,재생 III,/assets/custom/augments/g_zom_hprec_1.png,/assets/custom/augments/is3_regeneration.png,통합전략 · 생명 맥동,맥박을 감싼 문양으로 적의 지속 HP 재생 표현
+적,극복,/assets/custom/augments/g_tsz_hp_immune_1.png,/assets/custom/augments/is3_status_resist.png,통합전략 · 액막이,액막이 문양으로 적의 침묵 면역 표현
+적,돌파,/assets/custom/augments/g_lyfrog_hplife_1.png,/assets/custom/augments/is_choice_breakthrough.png,통합전략 · 이탈,출구를 향하는 사람으로 적의 방어 포인트 진입 표현
+적,아군 지속 피해 I,/assets/custom/augments/g_zom_hprec_1.png,/assets/custom/augments/training_ally_hazard.png,훈련장 · 인체 경고,인체와 경고 표식으로 적 강화가 아닌 아군의 지속 HP 감소 표현
+적,아군 지속 피해 II,/assets/custom/augments/g_zom_hprec_1.png,/assets/custom/augments/training_ally_hazard.png,훈련장 · 인체 경고,인체와 경고 표식으로 적 강화가 아닌 아군의 지속 HP 감소 표현
+적,아군 지속 피해 III,/assets/custom/augments/g_zom_hprec_1.png,/assets/custom/augments/training_ally_hazard.png,훈련장 · 인체 경고,인체와 경고 표식으로 적 강화가 아닌 아군의 지속 HP 감소 표현

@@ -28,6 +28,18 @@ test('production game entry loads settlement styles and permits navigating back'
   if(count===8){await page.waitForFunction(()=>[...document.querySelectorAll('.tcard')].every(e=>e.getAnimations().every(a=>a.playState==='finished')));await page.screenshot({path:'/tmp/result-team-8-fixed.png'});const cards=await page.$$eval('.tcard',nodes=>nodes.map(e=>{const r=e.getBoundingClientRect();return {x:r.x,right:r.right,y:r.y,bottom:r.bottom}}));assert.equal(cards.length,8);for(const r of cards)assert.ok(r.x>=0&&r.right<=1281&&r.y>=0&&r.bottom<=801,JSON.stringify(r));}
   assert.match(await page.$eval('.steam__title',e=>e.textContent),/시뮬레이션 중단/);
   assert.match(await page.$eval('.steam__detail',e=>e.textContent),/상세 통계/);
+  for(const victory of [false,true]) {
+   await page.evaluate(victory=>__SP__.store.patch('match',{result:{...__SP__.store.get().match.result,victory}}),victory);
+   await page.waitForFunction(expected=>document.querySelector('.steam__title')?.textContent.includes(expected),{},victory?'완료':'중단');
+   for(const [width,height] of [[1280,800],[756,366]]) {
+    await page.setViewport({width,height});
+    const boxes=await page.$$eval('.steam__title,.steam__rounds,.steam__when,.steam__detail',nodes=>nodes.map(e=>{const r=e.getBoundingClientRect();return {left:r.left,right:r.right,bottom:r.bottom}}));
+    for(let i=1;i<boxes.length;i++)assert.ok(boxes[i-1].right<boxes[i].left,JSON.stringify({width,height,victory,boxes}));
+    assert.ok(boxes.every(r=>r.left>=0&&r.right<=width+1&&r.bottom<=height+1));
+   }
+  }
+  await page.setViewport({width:1280,height:800});
+
   const footer=await page.$$eval('.steam__outcome,.steam__rounds,.steam__when',nodes=>nodes.map(e=>e.textContent).join(' '));assert.doesNotMatch(footer,/[\u3400-\u9fff]/);
   await page.click('.steam__detail');await page.waitForSelector('[data-testid=settle-detail]');
   await page.click('[data-testid=settle-detail] .result__foot button');

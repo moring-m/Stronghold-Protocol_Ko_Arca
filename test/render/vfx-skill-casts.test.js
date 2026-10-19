@@ -11,7 +11,7 @@ import { skillPlan, dirFamilies, planKeys } from '../../public/js/render/vfx/ski
 
 const KEYS = ['wind', 'wind_up', 'wind_down', 'wind_left', 'aura_back', 'aura_front', 'other_buff', 'appear_dome', 'appear_dome_02',
   's2_mode_cast', 's2_mode_hit', 'def_cast', 'def_hit', 'nova_cast', 'nova_hit', 'mend_cast', 'mend_hit', 'fin_cast', 'fin_hit', 'beam_cast',
-  'beam_aim', 'beam_hit', 'rep_cast', 'rep_hit', 'slash_cast', 'end_cast', 'end_hit', 'g_hit', 'g_heal', 'g_enemy'];
+  'beam_aim', 'beam_hit', 'rep_cast', 'rep_hit', 'slash_cast', 'end_cast', 'end_hit', 'g_hit', 'g_heal', 'g_enemy', 'nova_range'];
 const LOOPING = new Set(['wind', 'wind_up', 'wind_down', 'wind_left', 'other_buff']);
 const blow = (k, ev = 2) => ({ effects: [k], oneshot: 1, startEvent: ev, endEvent: 3, directionType: 0 });
 const cast = (k, node, ability, extra = {}) => ({ role: 'start', keys: [k], from: 'UberEffectEmitter._castEffects', node, ability, startEvent: 'ON_CAST_START', endEvent: 'ON_CAST_END', oneshot: true, list: 'cast', ...extra });
@@ -29,7 +29,7 @@ function makeIndex() {
     skchr_appear_2: { mode: 1, rootClass: 'MultiAppearSkill', rootAbility: 'AbilitySequenceGroup', projectiles: [], uses: [
       cast('appear_dome', 'Damage', 'MeleeAttack'), cast('appear_dome_02', 'Damage', 'MeleeAttack')] },
     // an instant CastSkill whose kit deals the damage (no 'atk'): a melee ability's cast and hit
-    skchr_nova_1: { mode: null, rootClass: 'CastSkill', rootAbility: 'MeleeAttack', projectiles: [], uses: [cast('nova_cast', 'sk', 'MeleeAttack'), hit('nova_hit', 'sk', 'MeleeAttack')] },
+    skchr_nova_1: { mode: null, rootClass: 'CastSkill', rootAbility: 'MeleeAttack', projectiles: [], uses: [cast('nova_cast', 'sk', 'MeleeAttack'), cast('nova_range', 'sk', 'MeleeAttack', {role:'range', startEvent:'ON_SPELL_ON'}), hit('nova_hit', 'sk', 'MeleeAttack')] },
     // an instant CastSkill heal of the kit's
     skchr_mend_2: { mode: null, rootClass: 'CastSkill', rootAbility: 'Heal', projectiles: [], uses: [cast('mend_cast', 'sk', 'Heal'), hit('mend_hit', 'sk', 'Heal')] },
     // a lasting skill with a final attack at its end
@@ -272,5 +272,44 @@ describe('kit hits of a skill without an attack event (R13)', () => {
     w.skill(u, false);
     assert.equal(count(spawned, 'end_cast'), 1);
     assert.equal(count(spawned, 'end_hit'), 1);
+  });
+});
+
+
+describe('independent casts whose impact arrives in a later render frame', () => {
+  test('cast start and impact rows each play once; only the impact frame owns kit hits', async () => {
+    const {w,spawned,view,frame}=await setup();
+    const u=view(1,'char_3_nova',5), t=view(2,'enemy_1',6);
+    frame();w.skill(u,true,{cast:true});
+    assert.equal(count(spawned,'nova_cast'),1);
+    assert.equal(count(spawned,'nova_range'),0);
+    frame();w.damage(t,'arts',null,1);
+    assert.equal(count(spawned,'nova_hit'),0,'unrelated damage during the wind-up is not its hit');
+    frame();w.skillImpact(u);w.damage(t,'arts',null,2);w.skill(u,false);
+    assert.equal(count(spawned,'nova_range'),1);
+    assert.equal(count(spawned,'nova_hit'),1);
+    w.skillImpact(u);frame();
+    assert.equal(count(spawned,'nova_cast'),1);assert.equal(count(spawned,'nova_range'),1);
+    w.skill(u,true,{cast:true});frame();w.skillImpact(u);w.skill(u,false);frame();
+    assert.equal(count(spawned,'nova_cast'),2);assert.equal(count(spawned,'nova_range'),2,'each charged cast can play again');
+  });
+  test('an explicit attack emitted at impact keeps its hits without replaying the owner cast', async () => {
+    const {w,spawned,view,frame}=await setup();
+    const u=view(1,'char_3_nova',5),t=view(2,'enemy_1',6);
+    frame();w.skill(u,true,{cast:true});frame();w.skillImpact(u);
+    w.attack(u,t,'beam',1);w.damage(t,'arts',u,1);w.skill(u,false);frame();
+    assert.equal(count(spawned,'nova_cast'),1);assert.equal(count(spawned,'nova_range'),1);
+    assert.equal(count(spawned,'nova_hit'),1);
+  });
+  test('a delayed kit heal keeps its official hit, and interruption/death cannot produce a later blast', async () => {
+    const {w,spawned,view,frame}=await setup();
+    const u=view(1,'char_4_mend',5),t=view(2,'char_2_appear',6);
+    frame();w.skill(u,true,{cast:true});frame();w.skillImpact(u);w.heal(t,1);w.skill(u,false);
+    assert.equal(count(spawned,'mend_cast'),1);assert.equal(count(spawned,'mend_hit'),1);
+    const nova=view(3,'char_3_nova',7);
+    w.skill(nova,true,{cast:true});frame();w.skill(nova,false);w.skillImpact(nova);
+    assert.equal(count(spawned,'nova_range'),0);
+    w.skill(nova,true,{cast:true});w.death(nova);frame();w.skillImpact(nova);
+    assert.equal(count(spawned,'nova_range'),0);
   });
 });

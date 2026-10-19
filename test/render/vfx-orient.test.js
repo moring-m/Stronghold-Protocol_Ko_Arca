@@ -14,7 +14,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { compileEffect, Effect } from '../../public/js/render/vfx/effect.js';
-import { FxWiring } from '../../public/js/render/vfx/wiring.js';
+import { FxWiring, aromaOriginOffset, effectGroundHeight } from '../../public/js/render/vfx/wiring.js';
 import { spawnRotation, graphicRotation } from '../../public/js/render/vfx/mounts.js';
 import { quatRotate } from '../../public/js/render/vfx/math.js';
 import { FrameData, cameraBasis } from '../../public/js/render/vfx/geom.js';
@@ -436,5 +436,39 @@ describe('a projectile whose movement comes back', () => {
     for (let i = 1; i < 40; i++) { run(h, 0.2 + (0.8 * i) / 40, ofx); top = Math.max(top, -h.fx.anchor[2]); }
     const start = 0.3 * Math.sin(Math.PI / 6);   // the target's HitPoint height
     assert.ok(top > start + 0.25, `rises on its way back too (top ${top.toFixed(3)})`);
+  });
+});
+
+
+describe('ground range anchors and Aroma stream origins', () => {
+  test('Aroma centred streams begin at the caster in all four facings; S2 and body flashes keep authored origins', () => {
+    for (const [direction, axis, sign, suffix] of [['RIGHT',0,1,''],['LEFT',0,-1,''],['UP',1,1,'_up'],['DOWN',1,-1,'_down']]) {
+      for (const [prefix, scale] of [['aroma_attack_start',3.1],['aroma_skill_01_start',3.7]]) {
+        const offset = aromaOriginOffset(`${prefix}${suffix}_01`, direction, 5);
+        near(offset[axis] * sign - 0.635 * scale, 0, 1e-9, 'rear edge stays at caster');
+        assert.equal(offset[1-axis], 0);
+      }
+      for (const key of ['aroma_skill_02_start_01','aroma_skill_02_range_01','aroma_skill_02_range_02','aroma_attack_start_02']) {
+        assert.deepEqual(aromaOriginOffset(key, direction, 5), [0,0], key);
+      }
+      assert.deepEqual(aromaOriginOffset('aroma_attack_start_01', direction, 1), [0,0]);
+    }
+  });
+
+  test('zero-height range stays on the board when an elevated caster moves; ordinary mounts retain height', async () => {
+    const def = compileEffect(standing({ _spawnLocation: 7, _holdByOwner: 1 }));
+    const { w, spawned, view } = await wired({ range: def });
+    const v = view({ z: 1.4 });
+    w.playOn('range', v, { stick: true });
+    const h = spawned[0];
+    assert.equal(Math.abs(h.place.pos[2]), 0);
+    const fx = drawn(def, h);
+    v.x += 2; v.z = 2;
+    h.opts.track(fx);
+    assert.equal(Math.abs(fx.anchor[2]), 0);
+    assert.equal(Math.abs(fx.groundZ), 0);
+    assert.equal(effectGroundHeight(1, v), 2);
+    assert.equal(effectGroundHeight(26, v), 2);
+    assert.equal(effectGroundHeight(5, v, 'ordinary_ground'), 2);
   });
 });

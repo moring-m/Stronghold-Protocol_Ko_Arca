@@ -63,7 +63,8 @@ const server=await startServer({dataDir,host:process.env.HOST||'127.0.0.1',port,
   res.setHeader('Content-Type',path.endsWith('.json')?'application/json':'text/css');res.setHeader('Cache-Control','no-cache');
   res.end(req.method==='HEAD'?undefined:path.endsWith('.json')?resourceBody:resources.fontCss);return true;
  }
- const file=localResources.get(path);if(!file)return false;
+ let resourcePath;try{resourcePath=decodeURIComponent(path);}catch{return false;}
+ const file=localResources.get(resourcePath);if(!file)return false;
  const ext=path.split('.').at(-1);const mime={png:'image/png',webp:'image/webp',jpg:'image/jpeg',mp3:'audio/mpeg',ogg:'audio/ogg',json:'application/json',atlas:'text/plain',woff2:'font/woff2',ttf:'font/ttf',otf:'font/otf'};
  res.setHeader('Content-Type',mime[ext]||'application/octet-stream');res.setHeader('Cache-Control','public,max-age=31536000,immutable');
  if(req.method==='HEAD')res.end();else await pipeline(createReadStream(file),res);return true;

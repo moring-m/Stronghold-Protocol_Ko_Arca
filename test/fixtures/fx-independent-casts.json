@@ -1,0 +1,1763 @@
+{
+  "note": "Metadata-only regression sample from the installed official fx index: Leonhardt/Gnosis S2, Lumen S2, Pinecone S1 and Tin Man S2. No textures or game binaries.",
+  "version": 3,
+  "units": {
+    "char_4151_tinman": {
+      "kind": "char",
+      "skin": "char_4151_tinman",
+      "modes": [
+        {
+          "name": "Default",
+          "overrideStartEffect": null,
+          "overrideDeadEffect": null,
+          "attack": {
+            "class": "RangedAttack",
+            "animKey": "Attack",
+            "attackType": 1,
+            "damageType": 1,
+            "projectileKey": "projectile_chr_tinman",
+            "extraProjectileKeys": [],
+            "projectileDestination": 0,
+            "mount": "MUZZLE",
+            "node": "Modes/Default/Body/Attack",
+            "cast": [
+              {
+                "directionType": 0,
+                "effects": [
+                  "tinman_attack_start_01"
+                ],
+                "oneshot": 0,
+                "startEvent": 2,
+                "endEvent": 3,
+                "onlyOnce": 0,
+                "useFourDirectionalFace": 0,
+                "delayIfFirstAttack": 0.0,
+                "hookEffectAfterFirstAttack": ""
+              }
+            ]
+          }
+        }
+      ],
+      "skills": {
+        "skchr_tinman_2": {
+          "rootClass": "CastSkill",
+          "rootAbility": "AbilitySelectableGroup",
+          "effects": [
+            "tinman_skill_02_heal_01",
+            "tinman_skill_02_hit_01",
+            "tinman_skill_02_start_03",
+            "tinman_skill_02_start_04"
+          ],
+          "projectiles": [
+            "projectile_chr_tinman_s2"
+          ],
+          "mode": null,
+          "uses": [
+            {
+              "role": "trigger",
+              "keys": [
+                "tinman_skill_02_hit_01"
+              ],
+              "from": "ProjectileToTileAbility._activeBuffs → template tinman_s_2[buff]",
+              "event": "ON_BUFF_TRIGGER",
+              "action": "CreateEffectHookProjectileEffect",
+              "on": "targets",
+              "buff": "tinman_s_2[buff]",
+              "node": "HitTile",
+              "life": {
+                "type": "INFINITY",
+                "tick": 1
+              }
+            },
+            {
+              "role": "loop",
+              "keys": [
+                "tinman_skill_02_heal_01"
+              ],
+              "from": "ProjectileToTileAbility._activeBuffs → template tinman_s_2[buff]",
+              "event": "ON_BUFF_START",
+              "action": "CreateBuff",
+              "on": "targets",
+              "buff": "tinman_s_2[buff]",
+              "node": "HitTile",
+              "life": {
+                "type": "INFINITY",
+                "tick": 1
+              }
+            },
+            {
+              "role": "loop",
+              "keys": [
+                "tinman_skill_02_start_03"
+              ],
+              "from": "UberEffectEmitter._castEffects",
+              "node": "HitTile",
+              "ability": "ProjectileToTileAbility",
+              "startEvent": "ON_CAST_START",
+              "endEvent": "ON_CAST_END",
+              "oneshot": false,
+              "list": "cast",
+              "projectileKey": "projectile_chr_tinman_s2"
+            },
+            {
+              "role": "loop",
+              "keys": [
+                "tinman_skill_02_start_04"
+              ],
+              "from": "UberEffectEmitter._castEffects",
+              "node": "HitTile",
+              "ability": "ProjectileToTileAbility",
+              "startEvent": "ON_CAST_START",
+              "endEvent": "ON_CAST_END",
+              "oneshot": false,
+              "list": "cast",
+              "projectileKey": "projectile_chr_tinman_s2"
+            },
+            {
+              "role": "trigger",
+              "keys": [
+                "tinman_skill_02_hit_01"
+              ],
+              "from": "RangedAttack._activeBuffs → template tinman_s_2[buff]",
+              "event": "ON_BUFF_TRIGGER",
+              "action": "CreateEffectHookProjectileEffect",
+              "on": "targets",
+              "buff": "tinman_s_2[buff]",
+              "node": "HitEnemy",
+              "life": {
+                "type": "INFINITY",
+                "tick": 1
+              }
+            },
+            {
+              "role": "loop",
+              "keys": [
+                "tinman_skill_02_heal_01"
+              ],
+              "from": "RangedAttack._activeBuffs → template tinman_s_2[buff]",
+              "event": "ON_BUFF_START",
+              "action": "CreateBuff",
+              "on": "targets",
+              "buff": "tinman_s_2[buff]",
+              "node": "HitEnemy",
+              "life": {
+                "type": "INFINITY",
+                "tick": 1
+              }
+            },
+            {
+              "role": "loop",
+              "keys": [
+                "tinman_skill_02_start_03"
+              ],
+              "from": "UberEffectEmitter._castEffects",
+              "node": "HitEnemy",
+              "ability": "RangedAttack",
+              "startEvent": "ON_CAST_START",
+              "endEvent": "ON_CAST_END",
+              "oneshot": false,
+              "list": "cast",
+              "projectileKey": "projectile_chr_tinman_s2"
+            },
+            {
+              "role": "loop",
+              "keys": [
+                "tinman_skill_02_start_04"
+              ],
+              "from": "UberEffectEmitter._castEffects",
+              "node": "HitEnemy",
+              "ability": "RangedAttack",
+              "startEvent": "ON_CAST_START",
+              "endEvent": "ON_CAST_END",
+              "oneshot": false,
+              "list": "cast",
+              "projectileKey": "projectile_chr_tinman_s2"
+            }
+          ],
+          "roles": {
+            "loop": [
+              "tinman_skill_02_heal_01",
+              "tinman_skill_02_start_03",
+              "tinman_skill_02_start_04"
+            ],
+            "trigger": [
+              "tinman_skill_02_hit_01"
+            ]
+          },
+          "unclassified": [],
+          "abilities": [
+            {
+              "node": "skchr_tinman_2",
+              "class": "AbilitySelectableGroup",
+              "select": {
+                "method": "trigger"
+              }
+            },
+            {
+              "node": "HitTile",
+              "class": "ProjectileToTileAbility",
+              "animKey": "Skill_2",
+              "attackType": 1,
+              "damageType": 1,
+              "projectileKey": "projectile_chr_tinman_s2",
+              "mount": "MUZZLE"
+            },
+            {
+              "node": "HitEnemy",
+              "class": "RangedAttack",
+              "animKey": "Skill_2",
+              "attackType": 1,
+              "damageType": 1,
+              "projectileKey": "projectile_chr_tinman_s2",
+              "extraProjectileKeys": [],
+              "projectileDestination": 4,
+              "mount": "MUZZLE"
+            }
+          ]
+        }
+      }
+    },
+    "char_440_pinecn": {
+      "kind": "char",
+      "skin": "char_440_pinecn",
+      "modes": [
+        {
+          "name": "Default",
+          "overrideStartEffect": null,
+          "overrideDeadEffect": null,
+          "attack": {
+            "class": "MeleeAttack",
+            "animKey": "Attack",
+            "attackType": 1,
+            "damageType": 1,
+            "node": "Modes/Default/Body/Attack",
+            "hit": [
+              {
+                "directionType": 0,
+                "effects": [
+                  "pinecn_attack_01_hit"
+                ],
+                "oneshot": 1,
+                "endEvent": 3,
+                "onlyOnce": 0,
+                "useFourDirectionalFace": 0,
+                "useOwnerToTargetDirection": 0,
+                "playIfNotInputTarget": 0,
+                "playOnlyIfInputTarget": 0
+              },
+              {
+                "directionType": 0,
+                "effects": [
+                  "pinecn_attack_01_hit_02"
+                ],
+                "oneshot": 1,
+                "endEvent": 3,
+                "onlyOnce": 0,
+                "useFourDirectionalFace": 0,
+                "useOwnerToTargetDirection": 0,
+                "playIfNotInputTarget": 0,
+                "playOnlyIfInputTarget": 0
+              }
+            ],
+            "cast": [
+              {
+                "directionType": 0,
+                "effects": [
+                  "pinecn_attack_01_start"
+                ],
+                "oneshot": 0,
+                "startEvent": 2,
+                "endEvent": 3,
+                "onlyOnce": 0,
+                "useFourDirectionalFace": 0,
+                "delayIfFirstAttack": 0.0,
+                "hookEffectAfterFirstAttack": ""
+              }
+            ]
+          }
+        }
+      ],
+      "skills": {
+        "skchr_pinecn_1": {
+          "rootClass": "CastSkill",
+          "rootAbility": "MeleeAttack",
+          "effects": [
+            "pinecn_skill_01_start",
+            "pinecn_skill_01_start_01"
+          ],
+          "projectiles": [],
+          "mode": null,
+          "uses": [
+            {
+              "role": "start",
+              "keys": [
+                "pinecn_skill_01_start_01"
+              ],
+              "from": "UberEffectEmitter._castEffects",
+              "node": "skchr_pinecn_1",
+              "ability": "MeleeAttack",
+              "startEvent": "ON_CAST_START",
+              "endEvent": "ON_CAST_END",
+              "oneshot": true,
+              "list": "cast"
+            },
+            {
+              "role": "start",
+              "keys": [
+                "pinecn_skill_01_start"
+              ],
+              "from": "UberEffectEmitter._castEffects",
+              "node": "skchr_pinecn_1",
+              "ability": "MeleeAttack",
+              "startEvent": "ON_CAST_START",
+              "endEvent": "ON_CAST_END",
+              "oneshot": true,
+              "list": "cast"
+            }
+          ],
+          "roles": {
+            "start": [
+              "pinecn_skill_01_start_01",
+              "pinecn_skill_01_start"
+            ]
+          },
+          "unclassified": [],
+          "abilities": [
+            {
+              "node": "skchr_pinecn_1",
+              "class": "MeleeAttack",
+              "animKey": "Skill_1",
+              "attackType": 1,
+              "damageType": 1
+            }
+          ]
+        }
+      }
+    },
+    "char_206_gnosis": {
+      "kind": "char",
+      "skin": "char_206_gnosis",
+      "modes": [
+        {
+          "name": "Default",
+          "overrideStartEffect": null,
+          "overrideDeadEffect": null,
+          "attack": {
+            "class": "RangedAttack",
+            "animKey": "Attack",
+            "attackType": 1,
+            "damageType": 2,
+            "projectileKey": "projectile_chr_gnosis",
+            "extraProjectileKeys": [],
+            "projectileDestination": 0,
+            "mount": "MUZZLE",
+            "node": "Modes/Default/Body/Attack",
+            "cast": [
+              {
+                "directionType": 0,
+                "effects": [
+                  "gnosis_attack_start"
+                ],
+                "oneshot": 0,
+                "startEvent": 2,
+                "endEvent": 3,
+                "onlyOnce": 0,
+                "useFourDirectionalFace": 0,
+                "delayIfFirstAttack": 0.0,
+                "hookEffectAfterFirstAttack": ""
+              }
+            ]
+          }
+        }
+      ],
+      "skills": {
+        "skchr_gnosis_2": {
+          "rootClass": "CastSkill",
+          "rootAbility": "MeleeAttack",
+          "effects": [
+            "gnosis_skill_02_buff_01",
+            "gnosis_skill_02_buff_02",
+            "gnosis_skill_02_range_01",
+            "gnosis_skill_02_range_02",
+            "gnosis_skill_02_start"
+          ],
+          "projectiles": [],
+          "mode": 1,
+          "uses": [
+            {
+              "role": "loop",
+              "keys": [
+                "gnosis_skill_02_start"
+              ],
+              "from": "UberEffectEmitter._castEffects",
+              "node": "skchr_gnosis_2",
+              "ability": "MeleeAttack",
+              "startEvent": "ON_CAST_START",
+              "endEvent": "ON_CAST_END",
+              "oneshot": false,
+              "list": "cast"
+            },
+            {
+              "role": "start",
+              "keys": [
+                "gnosis_skill_02_range_02"
+              ],
+              "from": "BuffDuringSkill._buffs → template gnosis_s_2_enhance_judge",
+              "event": "ON_BUFF_START",
+              "action": "CreateEffect",
+              "on": "owner",
+              "buff": "gnosis_s_2_enhance_judge",
+              "node": "skchr_gnosis_2",
+              "life": {
+                "type": "INFINITY",
+                "tick": 0.1
+              }
+            },
+            {
+              "role": "start",
+              "keys": [
+                "gnosis_skill_02_range_01"
+              ],
+              "from": "BuffDuringSkill._buffs → template gnosis_s_2_enhance_judge",
+              "event": "ON_BUFF_START",
+              "action": "CreateEffect",
+              "on": "owner",
+              "buff": "gnosis_s_2_enhance_judge",
+              "node": "skchr_gnosis_2",
+              "life": {
+                "type": "INFINITY",
+                "tick": 0.1
+              }
+            },
+            {
+              "role": "loop",
+              "keys": [
+                "gnosis_skill_02_buff_01"
+              ],
+              "from": "PassiveBuffAbility._buffs → template gnosis_s_2[eff_cond]",
+              "event": "ON_BUFF_TRIGGER",
+              "action": "CreateBuff",
+              "on": "owner",
+              "buff": "gnosis_s_2[eff_cond]",
+              "node": "EffCond",
+              "life": {
+                "type": "INFINITY",
+                "tick": 0.1
+              }
+            },
+            {
+              "role": "loop",
+              "keys": [
+                "gnosis_skill_02_buff_02"
+              ],
+              "from": "PassiveBuffAbility._buffs → template gnosis_s_2[eff_cond]",
+              "event": "ON_BUFF_TRIGGER",
+              "action": "CreateBuff",
+              "on": "owner",
+              "buff": "gnosis_s_2[eff_cond]",
+              "node": "EffCond",
+              "life": {
+                "type": "INFINITY",
+                "tick": 0.1
+              }
+            }
+          ],
+          "roles": {
+            "start": [
+              "gnosis_skill_02_range_02",
+              "gnosis_skill_02_range_01"
+            ],
+            "loop": [
+              "gnosis_skill_02_start",
+              "gnosis_skill_02_buff_01",
+              "gnosis_skill_02_buff_02"
+            ]
+          },
+          "unclassified": [],
+          "abilities": [
+            {
+              "node": "skchr_gnosis_2",
+              "class": "MeleeAttack",
+              "animKey": "Skill_2",
+              "attackType": 1,
+              "damageType": 2
+            }
+          ],
+          "modeBy": "name"
+        }
+      }
+    },
+    "char_373_lionhd": {
+      "kind": "char",
+      "skin": "char_373_lionhd",
+      "modes": [
+        {
+          "name": "Default",
+          "overrideStartEffect": null,
+          "overrideDeadEffect": null,
+          "attack": {
+            "class": "MeleeAttack",
+            "animKey": "Attack",
+            "attackType": 1,
+            "damageType": 2,
+            "node": "Modes/Default/Body/Attack",
+            "cast": [
+              {
+                "directionType": 0,
+                "effects": [
+                  "lionhd_attack_01_start"
+                ],
+                "oneshot": 1,
+                "startEvent": 2,
+                "endEvent": 3,
+                "onlyOnce": 0,
+                "useFourDirectionalFace": 0,
+                "delayIfFirstAttack": 0.0,
+                "hookEffectAfterFirstAttack": ""
+              }
+            ],
+            "inputTarget": [
+              {
+                "directionType": 0,
+                "effects": [
+                  "lionhd_attack_01_hit"
+                ],
+                "oneshot": 1,
+                "startEvent": 4,
+                "endEvent": 3,
+                "onlyOnce": 1,
+                "useFourDirectionalFace": 0,
+                "delayIfFirstAttack": 0.0,
+                "hookEffectAfterFirstAttack": "",
+                "useInputPos": 1
+              }
+            ]
+          }
+        }
+      ],
+      "skills": {
+        "skchr_lionhd_2": {
+          "rootClass": "CastSkill",
+          "rootAbility": "MeleeAttack",
+          "effects": [
+            "lionhd_skill_02_range",
+            "lionhd_skill_02_start"
+          ],
+          "projectiles": [],
+          "mode": null,
+          "uses": [
+            {
+              "role": "start",
+              "keys": [
+                "lionhd_skill_02_start"
+              ],
+              "from": "UberEffectEmitter._castEffects",
+              "node": "skchr_lionhd_2",
+              "ability": "MeleeAttack",
+              "startEvent": "ON_CAST_START",
+              "endEvent": "ON_CAST_END",
+              "oneshot": true,
+              "list": "cast"
+            },
+            {
+              "role": "range",
+              "keys": [
+                "lionhd_skill_02_range"
+              ],
+              "from": "UberEffectEmitter._castEffects",
+              "node": "skchr_lionhd_2",
+              "ability": "MeleeAttack",
+              "startEvent": "ON_SPELL_ON",
+              "endEvent": "ON_CAST_END",
+              "oneshot": true,
+              "list": "cast"
+            }
+          ],
+          "roles": {
+            "start": [
+              "lionhd_skill_02_start"
+            ],
+            "range": [
+              "lionhd_skill_02_range"
+            ]
+          },
+          "unclassified": [],
+          "abilities": [
+            {
+              "node": "skchr_lionhd_2",
+              "class": "MeleeAttack",
+              "animKey": "Skill",
+              "attackType": 1,
+              "damageType": 2
+            }
+          ]
+        }
+      }
+    },
+    "char_4042_lumen": {
+      "kind": "char",
+      "skin": "char_4042_lumen",
+      "modes": [
+        {
+          "name": "Default",
+          "overrideStartEffect": null,
+          "overrideDeadEffect": null,
+          "attack": {
+            "class": "RangedHeal",
+            "animKey": "Attack",
+            "projectileKey": "projectile_chr_lumen",
+            "mount": "MUZZLE",
+            "node": "Modes/Default/Body/Attack",
+            "cast": [
+              {
+                "directionType": 0,
+                "effects": [
+                  "lumen_attack_01_start"
+                ],
+                "oneshot": 0,
+                "startEvent": 2,
+                "endEvent": 3,
+                "onlyOnce": 0,
+                "useFourDirectionalFace": 0,
+                "delayIfFirstAttack": 0.0,
+                "hookEffectAfterFirstAttack": ""
+              }
+            ]
+          }
+        }
+      ],
+      "skills": {
+        "skchr_lumen_2": {
+          "rootClass": "CastSkill",
+          "rootAbility": "Heal",
+          "effects": [
+            "lumen_skill_02_buff",
+            "lumen_skill_02_buff_02",
+            "lumen_skill_02_hit",
+            "lumen_skill_02_start",
+            "lumen_skill_02_start_02"
+          ],
+          "projectiles": [],
+          "mode": null,
+          "uses": [
+            {
+              "role": "hit",
+              "keys": [
+                "lumen_skill_02_hit"
+              ],
+              "from": "UberEffectEmitter._hitEffects",
+              "node": "skchr_lumen_2",
+              "ability": "Heal",
+              "endEvent": "ON_CAST_END",
+              "oneshot": true,
+              "list": "hit"
+            },
+            {
+              "role": "loop",
+              "keys": [
+                "lumen_skill_02_start_02"
+              ],
+              "from": "UberEffectEmitter._castEffects",
+              "node": "skchr_lumen_2",
+              "ability": "Heal",
+              "startEvent": "ON_CAST_START",
+              "endEvent": "ON_CAST_END",
+              "oneshot": false,
+              "list": "cast"
+            },
+            {
+              "role": "loop",
+              "keys": [
+                "lumen_skill_02_start"
+              ],
+              "from": "UberEffectEmitter._castEffects",
+              "node": "skchr_lumen_2",
+              "ability": "Heal",
+              "startEvent": "ON_CAST_START",
+              "endEvent": "ON_CAST_END",
+              "oneshot": false,
+              "list": "cast"
+            },
+            {
+              "role": "loop",
+              "keys": [
+                "lumen_skill_02_buff"
+              ],
+              "from": "PassiveBuffAbility._buffs → template lumen_s_2[eff_cond]",
+              "event": "ON_BUFF_TRIGGER",
+              "action": "CreateBuff",
+              "on": "owner",
+              "buff": "lumen_s_2[eff_cond]",
+              "node": "skchr_lumen_2",
+              "life": {
+                "type": "INFINITY",
+                "tick": 0.1
+              }
+            },
+            {
+              "role": "loop",
+              "keys": [
+                "lumen_skill_02_buff_02"
+              ],
+              "from": "PassiveBuffAbility._buffs → template lumen_s_2[eff_cond]",
+              "event": "ON_BUFF_TRIGGER",
+              "action": "CreateBuff",
+              "on": "owner",
+              "buff": "lumen_s_2[eff_cond]",
+              "node": "skchr_lumen_2",
+              "life": {
+                "type": "INFINITY",
+                "tick": 0.1
+              }
+            }
+          ],
+          "roles": {
+            "loop": [
+              "lumen_skill_02_start_02",
+              "lumen_skill_02_start",
+              "lumen_skill_02_buff",
+              "lumen_skill_02_buff_02"
+            ],
+            "hit": [
+              "lumen_skill_02_hit"
+            ]
+          },
+          "unclassified": [],
+          "abilities": [
+            {
+              "node": "skchr_lumen_2",
+              "class": "Heal",
+              "animKey": "Skill_2"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "skills": {
+    "skchr_tinman_2": {
+      "rootClass": "CastSkill",
+      "rootAbility": "AbilitySelectableGroup",
+      "effects": [
+        "tinman_skill_02_heal_01",
+        "tinman_skill_02_hit_01",
+        "tinman_skill_02_start_03",
+        "tinman_skill_02_start_04"
+      ],
+      "projectiles": [
+        "projectile_chr_tinman_s2"
+      ],
+      "mode": null,
+      "uses": [
+        {
+          "role": "trigger",
+          "keys": [
+            "tinman_skill_02_hit_01"
+          ],
+          "from": "ProjectileToTileAbility._activeBuffs → template tinman_s_2[buff]",
+          "event": "ON_BUFF_TRIGGER",
+          "action": "CreateEffectHookProjectileEffect",
+          "on": "targets",
+          "buff": "tinman_s_2[buff]",
+          "node": "HitTile",
+          "life": {
+            "type": "INFINITY",
+            "tick": 1
+          }
+        },
+        {
+          "role": "loop",
+          "keys": [
+            "tinman_skill_02_heal_01"
+          ],
+          "from": "ProjectileToTileAbility._activeBuffs → template tinman_s_2[buff]",
+          "event": "ON_BUFF_START",
+          "action": "CreateBuff",
+          "on": "targets",
+          "buff": "tinman_s_2[buff]",
+          "node": "HitTile",
+          "life": {
+            "type": "INFINITY",
+            "tick": 1
+          }
+        },
+        {
+          "role": "loop",
+          "keys": [
+            "tinman_skill_02_start_03"
+          ],
+          "from": "UberEffectEmitter._castEffects",
+          "node": "HitTile",
+          "ability": "ProjectileToTileAbility",
+          "startEvent": "ON_CAST_START",
+          "endEvent": "ON_CAST_END",
+          "oneshot": false,
+          "list": "cast",
+          "projectileKey": "projectile_chr_tinman_s2"
+        },
+        {
+          "role": "loop",
+          "keys": [
+            "tinman_skill_02_start_04"
+          ],
+          "from": "UberEffectEmitter._castEffects",
+          "node": "HitTile",
+          "ability": "ProjectileToTileAbility",
+          "startEvent": "ON_CAST_START",
+          "endEvent": "ON_CAST_END",
+          "oneshot": false,
+          "list": "cast",
+          "projectileKey": "projectile_chr_tinman_s2"
+        },
+        {
+          "role": "trigger",
+          "keys": [
+            "tinman_skill_02_hit_01"
+          ],
+          "from": "RangedAttack._activeBuffs → template tinman_s_2[buff]",
+          "event": "ON_BUFF_TRIGGER",
+          "action": "CreateEffectHookProjectileEffect",
+          "on": "targets",
+          "buff": "tinman_s_2[buff]",
+          "node": "HitEnemy",
+          "life": {
+            "type": "INFINITY",
+            "tick": 1
+          }
+        },
+        {
+          "role": "loop",
+          "keys": [
+            "tinman_skill_02_heal_01"
+          ],
+          "from": "RangedAttack._activeBuffs → template tinman_s_2[buff]",
+          "event": "ON_BUFF_START",
+          "action": "CreateBuff",
+          "on": "targets",
+          "buff": "tinman_s_2[buff]",
+          "node": "HitEnemy",
+          "life": {
+            "type": "INFINITY",
+            "tick": 1
+          }
+        },
+        {
+          "role": "loop",
+          "keys": [
+            "tinman_skill_02_start_03"
+          ],
+          "from": "UberEffectEmitter._castEffects",
+          "node": "HitEnemy",
+          "ability": "RangedAttack",
+          "startEvent": "ON_CAST_START",
+          "endEvent": "ON_CAST_END",
+          "oneshot": false,
+          "list": "cast",
+          "projectileKey": "projectile_chr_tinman_s2"
+        },
+        {
+          "role": "loop",
+          "keys": [
+            "tinman_skill_02_start_04"
+          ],
+          "from": "UberEffectEmitter._castEffects",
+          "node": "HitEnemy",
+          "ability": "RangedAttack",
+          "startEvent": "ON_CAST_START",
+          "endEvent": "ON_CAST_END",
+          "oneshot": false,
+          "list": "cast",
+          "projectileKey": "projectile_chr_tinman_s2"
+        }
+      ],
+      "roles": {
+        "loop": [
+          "tinman_skill_02_heal_01",
+          "tinman_skill_02_start_03",
+          "tinman_skill_02_start_04"
+        ],
+        "trigger": [
+          "tinman_skill_02_hit_01"
+        ]
+      },
+      "unclassified": [],
+      "abilities": [
+        {
+          "node": "skchr_tinman_2",
+          "class": "AbilitySelectableGroup",
+          "select": {
+            "method": "trigger"
+          }
+        },
+        {
+          "node": "HitTile",
+          "class": "ProjectileToTileAbility",
+          "animKey": "Skill_2",
+          "attackType": 1,
+          "damageType": 1,
+          "projectileKey": "projectile_chr_tinman_s2",
+          "mount": "MUZZLE"
+        },
+        {
+          "node": "HitEnemy",
+          "class": "RangedAttack",
+          "animKey": "Skill_2",
+          "attackType": 1,
+          "damageType": 1,
+          "projectileKey": "projectile_chr_tinman_s2",
+          "extraProjectileKeys": [],
+          "projectileDestination": 4,
+          "mount": "MUZZLE"
+        }
+      ]
+    },
+    "skchr_pinecn_1": {
+      "rootClass": "CastSkill",
+      "rootAbility": "MeleeAttack",
+      "effects": [
+        "pinecn_skill_01_start",
+        "pinecn_skill_01_start_01"
+      ],
+      "projectiles": [],
+      "mode": null,
+      "uses": [
+        {
+          "role": "start",
+          "keys": [
+            "pinecn_skill_01_start_01"
+          ],
+          "from": "UberEffectEmitter._castEffects",
+          "node": "skchr_pinecn_1",
+          "ability": "MeleeAttack",
+          "startEvent": "ON_CAST_START",
+          "endEvent": "ON_CAST_END",
+          "oneshot": true,
+          "list": "cast"
+        },
+        {
+          "role": "start",
+          "keys": [
+            "pinecn_skill_01_start"
+          ],
+          "from": "UberEffectEmitter._castEffects",
+          "node": "skchr_pinecn_1",
+          "ability": "MeleeAttack",
+          "startEvent": "ON_CAST_START",
+          "endEvent": "ON_CAST_END",
+          "oneshot": true,
+          "list": "cast"
+        }
+      ],
+      "roles": {
+        "start": [
+          "pinecn_skill_01_start_01",
+          "pinecn_skill_01_start"
+        ]
+      },
+      "unclassified": [],
+      "abilities": [
+        {
+          "node": "skchr_pinecn_1",
+          "class": "MeleeAttack",
+          "animKey": "Skill_1",
+          "attackType": 1,
+          "damageType": 1
+        }
+      ]
+    },
+    "skchr_gnosis_2": {
+      "rootClass": "CastSkill",
+      "rootAbility": "MeleeAttack",
+      "effects": [
+        "gnosis_skill_02_buff_01",
+        "gnosis_skill_02_buff_02",
+        "gnosis_skill_02_range_01",
+        "gnosis_skill_02_range_02",
+        "gnosis_skill_02_start"
+      ],
+      "projectiles": [],
+      "mode": 1,
+      "uses": [
+        {
+          "role": "loop",
+          "keys": [
+            "gnosis_skill_02_start"
+          ],
+          "from": "UberEffectEmitter._castEffects",
+          "node": "skchr_gnosis_2",
+          "ability": "MeleeAttack",
+          "startEvent": "ON_CAST_START",
+          "endEvent": "ON_CAST_END",
+          "oneshot": false,
+          "list": "cast"
+        },
+        {
+          "role": "start",
+          "keys": [
+            "gnosis_skill_02_range_02"
+          ],
+          "from": "BuffDuringSkill._buffs → template gnosis_s_2_enhance_judge",
+          "event": "ON_BUFF_START",
+          "action": "CreateEffect",
+          "on": "owner",
+          "buff": "gnosis_s_2_enhance_judge",
+          "node": "skchr_gnosis_2",
+          "life": {
+            "type": "INFINITY",
+            "tick": 0.1
+          }
+        },
+        {
+          "role": "start",
+          "keys": [
+            "gnosis_skill_02_range_01"
+          ],
+          "from": "BuffDuringSkill._buffs → template gnosis_s_2_enhance_judge",
+          "event": "ON_BUFF_START",
+          "action": "CreateEffect",
+          "on": "owner",
+          "buff": "gnosis_s_2_enhance_judge",
+          "node": "skchr_gnosis_2",
+          "life": {
+            "type": "INFINITY",
+            "tick": 0.1
+          }
+        },
+        {
+          "role": "loop",
+          "keys": [
+            "gnosis_skill_02_buff_01"
+          ],
+          "from": "PassiveBuffAbility._buffs → template gnosis_s_2[eff_cond]",
+          "event": "ON_BUFF_TRIGGER",
+          "action": "CreateBuff",
+          "on": "owner",
+          "buff": "gnosis_s_2[eff_cond]",
+          "node": "EffCond",
+          "life": {
+            "type": "INFINITY",
+            "tick": 0.1
+          }
+        },
+        {
+          "role": "loop",
+          "keys": [
+            "gnosis_skill_02_buff_02"
+          ],
+          "from": "PassiveBuffAbility._buffs → template gnosis_s_2[eff_cond]",
+          "event": "ON_BUFF_TRIGGER",
+          "action": "CreateBuff",
+          "on": "owner",
+          "buff": "gnosis_s_2[eff_cond]",
+          "node": "EffCond",
+          "life": {
+            "type": "INFINITY",
+            "tick": 0.1
+          }
+        }
+      ],
+      "roles": {
+        "start": [
+          "gnosis_skill_02_range_02",
+          "gnosis_skill_02_range_01"
+        ],
+        "loop": [
+          "gnosis_skill_02_start",
+          "gnosis_skill_02_buff_01",
+          "gnosis_skill_02_buff_02"
+        ]
+      },
+      "unclassified": [],
+      "abilities": [
+        {
+          "node": "skchr_gnosis_2",
+          "class": "MeleeAttack",
+          "animKey": "Skill_2",
+          "attackType": 1,
+          "damageType": 2
+        }
+      ],
+      "modeBy": "name"
+    },
+    "skchr_lionhd_2": {
+      "rootClass": "CastSkill",
+      "rootAbility": "MeleeAttack",
+      "effects": [
+        "lionhd_skill_02_range",
+        "lionhd_skill_02_start"
+      ],
+      "projectiles": [],
+      "mode": null,
+      "uses": [
+        {
+          "role": "start",
+          "keys": [
+            "lionhd_skill_02_start"
+          ],
+          "from": "UberEffectEmitter._castEffects",
+          "node": "skchr_lionhd_2",
+          "ability": "MeleeAttack",
+          "startEvent": "ON_CAST_START",
+          "endEvent": "ON_CAST_END",
+          "oneshot": true,
+          "list": "cast"
+        },
+        {
+          "role": "range",
+          "keys": [
+            "lionhd_skill_02_range"
+          ],
+          "from": "UberEffectEmitter._castEffects",
+          "node": "skchr_lionhd_2",
+          "ability": "MeleeAttack",
+          "startEvent": "ON_SPELL_ON",
+          "endEvent": "ON_CAST_END",
+          "oneshot": true,
+          "list": "cast"
+        }
+      ],
+      "roles": {
+        "start": [
+          "lionhd_skill_02_start"
+        ],
+        "range": [
+          "lionhd_skill_02_range"
+        ]
+      },
+      "unclassified": [],
+      "abilities": [
+        {
+          "node": "skchr_lionhd_2",
+          "class": "MeleeAttack",
+          "animKey": "Skill",
+          "attackType": 1,
+          "damageType": 2
+        }
+      ]
+    },
+    "skchr_lumen_2": {
+      "rootClass": "CastSkill",
+      "rootAbility": "Heal",
+      "effects": [
+        "lumen_skill_02_buff",
+        "lumen_skill_02_buff_02",
+        "lumen_skill_02_hit",
+        "lumen_skill_02_start",
+        "lumen_skill_02_start_02"
+      ],
+      "projectiles": [],
+      "mode": null,
+      "uses": [
+        {
+          "role": "hit",
+          "keys": [
+            "lumen_skill_02_hit"
+          ],
+          "from": "UberEffectEmitter._hitEffects",
+          "node": "skchr_lumen_2",
+          "ability": "Heal",
+          "endEvent": "ON_CAST_END",
+          "oneshot": true,
+          "list": "hit"
+        },
+        {
+          "role": "loop",
+          "keys": [
+            "lumen_skill_02_start_02"
+          ],
+          "from": "UberEffectEmitter._castEffects",
+          "node": "skchr_lumen_2",
+          "ability": "Heal",
+          "startEvent": "ON_CAST_START",
+          "endEvent": "ON_CAST_END",
+          "oneshot": false,
+          "list": "cast"
+        },
+        {
+          "role": "loop",
+          "keys": [
+            "lumen_skill_02_start"
+          ],
+          "from": "UberEffectEmitter._castEffects",
+          "node": "skchr_lumen_2",
+          "ability": "Heal",
+          "startEvent": "ON_CAST_START",
+          "endEvent": "ON_CAST_END",
+          "oneshot": false,
+          "list": "cast"
+        },
+        {
+          "role": "loop",
+          "keys": [
+            "lumen_skill_02_buff"
+          ],
+          "from": "PassiveBuffAbility._buffs → template lumen_s_2[eff_cond]",
+          "event": "ON_BUFF_TRIGGER",
+          "action": "CreateBuff",
+          "on": "owner",
+          "buff": "lumen_s_2[eff_cond]",
+          "node": "skchr_lumen_2",
+          "life": {
+            "type": "INFINITY",
+            "tick": 0.1
+          }
+        },
+        {
+          "role": "loop",
+          "keys": [
+            "lumen_skill_02_buff_02"
+          ],
+          "from": "PassiveBuffAbility._buffs → template lumen_s_2[eff_cond]",
+          "event": "ON_BUFF_TRIGGER",
+          "action": "CreateBuff",
+          "on": "owner",
+          "buff": "lumen_s_2[eff_cond]",
+          "node": "skchr_lumen_2",
+          "life": {
+            "type": "INFINITY",
+            "tick": 0.1
+          }
+        }
+      ],
+      "roles": {
+        "loop": [
+          "lumen_skill_02_start_02",
+          "lumen_skill_02_start",
+          "lumen_skill_02_buff",
+          "lumen_skill_02_buff_02"
+        ],
+        "hit": [
+          "lumen_skill_02_hit"
+        ]
+      },
+      "unclassified": [],
+      "abilities": [
+        {
+          "node": "skchr_lumen_2",
+          "class": "Heal",
+          "animKey": "Skill_2"
+        }
+      ]
+    }
+  },
+  "prefabs": {
+    "gnosis_skill_02_buff_01": {
+      "file": "prefabs/gnosis_skill_02_buff_01.json",
+      "bundle": "battle/prefabs/effects/gnosis.ab",
+      "nodes": 6,
+      "particleSystems": 3,
+      "liveParticles": 14,
+      "duration": null,
+      "looping": true,
+      "refs": [],
+      "spawn": 1
+    },
+    "gnosis_skill_02_buff_02": {
+      "file": "prefabs/gnosis_skill_02_buff_02.json",
+      "bundle": "battle/prefabs/effects/gnosis.ab",
+      "nodes": 19,
+      "particleSystems": 8,
+      "liveParticles": 32,
+      "duration": null,
+      "looping": true,
+      "refs": [],
+      "spawn": 1
+    },
+    "gnosis_skill_02_range_01": {
+      "file": "prefabs/gnosis_skill_02_range_01.json",
+      "bundle": "battle/prefabs/effects/gnosis.ab",
+      "nodes": 10,
+      "particleSystems": 3,
+      "liveParticles": 20,
+      "duration": 6.5,
+      "looping": false,
+      "refs": [],
+      "spawn": 5
+    },
+    "gnosis_skill_02_range_02": {
+      "file": "prefabs/gnosis_skill_02_range_02.json",
+      "bundle": "battle/prefabs/effects/gnosis.ab",
+      "nodes": 15,
+      "particleSystems": 8,
+      "liveParticles": 90,
+      "duration": 6.5,
+      "looping": false,
+      "refs": [],
+      "spawn": 5
+    },
+    "gnosis_skill_02_start": {
+      "file": "prefabs/gnosis_skill_02_start.json",
+      "bundle": "battle/prefabs/effects/gnosis.ab",
+      "nodes": 9,
+      "particleSystems": 4,
+      "liveParticles": 28,
+      "duration": 1.6,
+      "looping": false,
+      "refs": [],
+      "spawn": 1
+    },
+    "lionhd_skill_02_range": {
+      "file": "prefabs/lionhd_skill_02_range.json",
+      "bundle": "battle/prefabs/effects/lionhd.ab",
+      "nodes": 19,
+      "particleSystems": 17,
+      "liveParticles": 36,
+      "duration": 7,
+      "looping": false,
+      "refs": [],
+      "spawn": 5
+    },
+    "lionhd_skill_02_start": {
+      "file": "prefabs/lionhd_skill_02_start.json",
+      "bundle": "battle/prefabs/effects/lionhd.ab",
+      "nodes": 7,
+      "particleSystems": 2,
+      "liveParticles": 30,
+      "duration": 7,
+      "looping": false,
+      "refs": [],
+      "spawn": 1
+    },
+    "lumen_skill_02_buff": {
+      "file": "prefabs/lumen_skill_02_buff.json",
+      "bundle": "battle/prefabs/effects/lumen.ab",
+      "nodes": 18,
+      "particleSystems": 9,
+      "liveParticles": 81,
+      "duration": null,
+      "looping": true,
+      "refs": [],
+      "spawn": 1
+    },
+    "lumen_skill_02_buff_02": {
+      "file": "prefabs/lumen_skill_02_buff_02.json",
+      "bundle": "battle/prefabs/effects/lumen.ab",
+      "nodes": 20,
+      "particleSystems": 11,
+      "liveParticles": 114,
+      "duration": null,
+      "looping": true,
+      "refs": [],
+      "spawn": 1
+    },
+    "lumen_skill_02_hit": {
+      "file": "prefabs/lumen_skill_02_hit.json",
+      "bundle": "battle/prefabs/effects/lumen.ab",
+      "nodes": 21,
+      "particleSystems": 11,
+      "liveParticles": 148,
+      "duration": 7,
+      "looping": false,
+      "refs": [],
+      "spawn": 2
+    },
+    "lumen_skill_02_start": {
+      "file": "prefabs/lumen_skill_02_start.json",
+      "bundle": "battle/prefabs/effects/lumen.ab",
+      "nodes": 7,
+      "particleSystems": 4,
+      "liveParticles": 17,
+      "duration": 6.5,
+      "looping": false,
+      "refs": [],
+      "spawn": 1
+    },
+    "lumen_skill_02_start_02": {
+      "file": "prefabs/lumen_skill_02_start_02.json",
+      "bundle": "battle/prefabs/effects/lumen.ab",
+      "nodes": 10,
+      "particleSystems": 7,
+      "liveParticles": 58,
+      "duration": 7,
+      "looping": false,
+      "refs": [],
+      "spawn": 1,
+      "follow": 5
+    },
+    "pinecn_skill_01_start": {
+      "file": "prefabs/pinecn_skill_01_start.json",
+      "bundle": "battle/prefabs/effects/pinecn.ab",
+      "nodes": 11,
+      "particleSystems": 9,
+      "liveParticles": 29,
+      "duration": 6,
+      "looping": false,
+      "refs": [],
+      "spawn": 0,
+      "follow": 2
+    },
+    "pinecn_skill_01_start_01": {
+      "file": "prefabs/pinecn_skill_01_start_01.json",
+      "bundle": "battle/prefabs/effects/pinecn.ab",
+      "nodes": 5,
+      "particleSystems": 3,
+      "liveParticles": 2,
+      "duration": 6,
+      "looping": false,
+      "refs": [],
+      "spawn": 0,
+      "follow": 5
+    },
+    "tinman_skill_02_heal_01": {
+      "file": "prefabs/tinman_skill_02_heal_01.json",
+      "bundle": "battle/prefabs/effects/tinman.ab",
+      "nodes": 7,
+      "particleSystems": 5,
+      "liveParticles": 15,
+      "duration": null,
+      "looping": true,
+      "refs": [],
+      "spawn": 2
+    },
+    "tinman_skill_02_hit_01": {
+      "file": "prefabs/tinman_skill_02_hit_01.json",
+      "bundle": "battle/prefabs/effects/tinman.ab",
+      "nodes": 15,
+      "particleSystems": 13,
+      "liveParticles": 54,
+      "duration": 10,
+      "looping": false,
+      "refs": [],
+      "spawn": 2
+    },
+    "tinman_skill_02_range_01": {
+      "file": "prefabs/tinman_skill_02_range_01.json",
+      "bundle": "battle/prefabs/effects/tinman.ab",
+      "nodes": 13,
+      "particleSystems": 9,
+      "liveParticles": 46,
+      "duration": null,
+      "looping": true,
+      "refs": [
+        "tinman_skill_02_end_01"
+      ],
+      "spawn": 5
+    },
+    "tinman_skill_02_start_01": {
+      "file": "prefabs/tinman_skill_02_start_01.json",
+      "bundle": "battle/prefabs/effects/tinman.ab",
+      "nodes": 5,
+      "particleSystems": 3,
+      "liveParticles": 22,
+      "duration": 7,
+      "looping": false,
+      "refs": [],
+      "spawn": 1
+    },
+    "tinman_skill_02_start_02": {
+      "file": "prefabs/tinman_skill_02_start_02.json",
+      "bundle": "battle/prefabs/effects/tinman.ab",
+      "nodes": 9,
+      "particleSystems": 7,
+      "liveParticles": 29,
+      "duration": 7,
+      "looping": false,
+      "refs": [],
+      "spawn": 5
+    },
+    "tinman_skill_02_start_03": {
+      "file": "prefabs/tinman_skill_02_start_03.json",
+      "bundle": "battle/prefabs/effects/tinman.ab",
+      "nodes": 5,
+      "particleSystems": 3,
+      "liveParticles": 14,
+      "duration": 7,
+      "looping": false,
+      "refs": [],
+      "spawn": 1
+    },
+    "tinman_skill_02_start_04": {
+      "file": "prefabs/tinman_skill_02_start_04.json",
+      "bundle": "battle/prefabs/effects/tinman.ab",
+      "nodes": 10,
+      "particleSystems": 8,
+      "liveParticles": 29,
+      "duration": 10,
+      "looping": false,
+      "refs": [],
+      "spawn": 1
+    },
+    "tinman_skill_02_token_01": {
+      "file": "prefabs/tinman_skill_02_token_01.json",
+      "bundle": "battle/prefabs/effects/tinman.ab",
+      "nodes": 6,
+      "particleSystems": 4,
+      "liveParticles": 3,
+      "duration": null,
+      "looping": true,
+      "refs": [],
+      "spawn": 1
+    },
+    "tinman_skill_02_trail_02": {
+      "file": "prefabs/tinman_skill_02_trail_02.json",
+      "bundle": "battle/prefabs/effects/tinman.ab",
+      "nodes": 10,
+      "particleSystems": 4,
+      "liveParticles": 1,
+      "duration": null,
+      "looping": true,
+      "refs": []
+    }
+  },
+  "projectiles": {
+    "projectile_chr_tinman_s2": {
+      "main": "tinman_skill_02_trail_02",
+      "lifeTime": 100,
+      "movement": {
+        "class": "ParacurveMovement",
+        "rotateToTarget": 1,
+        "forceReachedWhenTimeup": 1,
+        "useSourceDirection": 0,
+        "useTargetDirection": 0,
+        "useStartToTarget": 0,
+        "awayFromSourceAsDirection": 0,
+        "flyToTargetLocationOnly": 0,
+        "useSourceDirectionRandomArcAngleStart": 0,
+        "useSourceToTargetRandomArcAngleStart": 0,
+        "useSourceDirectionArcAngleWithRatio": 0,
+        "useSourceToTargetArcAngleWithRatio": 0,
+        "sourceDirectionArcAngleRatio": 0,
+        "sourceToTargetArcAngle": 0,
+        "adjustSourceToTargetArcAngleBySourceFace": 0,
+        "flyToPredefinedLocation": 0,
+        "predefinedLocation": 0,
+        "freezeRotationZ": 0,
+        "freezeRotationXY": 0,
+        "exactMatchCameraForward": 0,
+        "resetToTargetPosWhenReached": 0,
+        "resetToTracetargetMapPosV3": 0,
+        "handleWithIBuildableTarget": 0,
+        "forceResetToTargetPosWhenReached": 0,
+        "fixProjectileZWhenReached": 0,
+        "fixOnProjectileReached": 0,
+        "onlyReachedInTime": 0,
+        "speed": 3,
+        "raiseHeight": 0.5,
+        "delayAfterReached": 1,
+        "delayTime": 10,
+        "updateDelayTimeOnlyOnce": 1,
+        "noRaiseHeightThreshold": 1.3,
+        "comeBack": 0,
+        "comeBackSpeedScale": 0.25,
+        "inverseParacurve": 0,
+        "useRandomHeight": 0,
+        "randomHeightRange": [
+          0,
+          0
+        ],
+        "randomInverseParacurve": 0
+      },
+      "behaviours": [
+        {
+          "class": "SimpleProjectile",
+          "node": "projectile_chr_tinman_s2",
+          "fields": {
+            "_randomDelayToBorn": 0,
+            "_keepAlreadyHitTime": -1,
+            "_mainEffect": "tinman_skill_02_trail_02",
+            "_clearMainEffectWhenReached": 1,
+            "_actionController": {
+              "_detachBuffsWhenTargetLeave": 1,
+              "_detachAllBuffsWhenStopped": 1,
+              "_onlyAddBuffsToTraceTarget": 0,
+              "_onlyAddBuffsToTargetOnce": 0,
+              "_dontAddBuffs": 0,
+              "_excludeAttachments": 0,
+              "_useSelfBlackboard": 0,
+              "_extraBuffsInTheEnd": [],
+              "_useExtraBuffsWhenStopHit": 0,
+              "_addExtraBuffsWhenReached": 0,
+              "_detachAllExtraBuffsWhenStopped": 0
+            },
+            "_fixDealHitTargetLeft": 1,
+            "_stopGraphicProjectileWhenClearMainEffect": 0,
+            "_overrideAudioSignal": "",
+            "_fireProjectileReachedEvent": 0,
+            "_eliminatableStatus": 0,
+            "_movementAdjustableStatus": 0,
+            "_managedBySource": 0,
+            "_projectileType": 1,
+            "_containsChildrenBehaviours": 0,
+            "_canHitSameTargetMultipleTimes": 0,
+            "_lifeTimeType": 1,
+            "_lifeTime": 100,
+            "_getLifeTimeFromBB": 0,
+            "_hitNumType": 2,
+            "_maxHitNum": 1,
+            "_getMaxHitNumFromBB": 0,
+            "_maxHitNumBBKey": "",
+            "_stopAfterMaxHit": 0,
+            "_stopAfterFirstHit": 0,
+            "_stopWhenSourceInvalid": 0,
+            "_alwaysHitTraceTargetInTheEnd": 0,
+            "_alwaysHitTraceTargetWhenReached": 0,
+            "_alwaysReachInTheEnd": 0,
+            "_limitedMaxHitNumToSourceBlockedCnt": 0,
+            "_allowZeroBlockCntLimit": 0
+          }
+        },
+        {
+          "class": "ParacurveMovement",
+          "node": "projectile_chr_tinman_s2",
+          "fields": {
+            "_rotateToTarget": 1,
+            "_forceReachedWhenTimeup": 1,
+            "_useSourceDirection": 0,
+            "_useTargetDirection": 0,
+            "_useStartToTarget": 0,
+            "_awayFromSourceAsDirection": 0,
+            "_flyToTargetLocationOnly": 0,
+            "_useSourceDirectionRandomArcAngleStart": 0,
+            "_useSourceToTargetRandomArcAngleStart": 0,
+            "_useSourceDirectionArcAngleWithRatio": 0,
+            "_useSourceToTargetArcAngleWithRatio": 0,
+            "_sourceDirectionArcAngleRatio": 0,
+            "_sourceToTargetArcAngle": 0,
+            "_adjustSourceToTargetArcAngleBySourceFace": 0,
+            "_flyToPredefinedLocation": 0,
+            "_predefinedLocation": 0,
+            "_freezeRotationZ": 0,
+            "_freezeRotationXY": 0,
+            "_exactMatchCameraForward": 0,
+            "_resetToTargetPosWhenReached": 0,
+            "_resetToTracetargetMapPosV3": 0,
+            "_handleWithIBuildableTarget": 0,
+            "_forceResetToTargetPosWhenReached": 0,
+            "_fixProjectileZWhenReached": 0,
+            "_fixOnProjectileReached": 0,
+            "_onlyReachedInTime": 0,
+            "_speed": 3,
+            "_raiseHeight": 0.5,
+            "_delayAfterReached": 1,
+            "_delayTime": 10,
+            "_updateDelayTimeOnlyOnce": 1,
+            "_noRaiseHeightThreshold": 1.3,
+            "_comeBack": 0,
+            "_comeBackSpeedScale": 0.25,
+            "_inverseParacurve": 0,
+            "_useRandomHeight": 0,
+            "_randomHeightRange": [
+              0,
+              0
+            ],
+            "_randomInverseParacurve": 0
+          }
+        },
+        {
+          "class": "AuraHitBehaviour",
+          "node": "projectile_chr_tinman_s2",
+          "fields": {
+            "_targetOptions": {
+              "targetSide": 3,
+              "targetMotion": 1,
+              "targetCategory": 1,
+              "enableAdvancedOptions": 1,
+              "ignoreTargetFree": 0,
+              "ignoreAllyTargetFree": 0,
+              "ignoreHealFree": 0,
+              "ignoreMotionMode": 0,
+              "ignoreTargetSide": 0,
+              "excludeSomeAbnormalFlags": 0,
+              "containSomeAbnormalFlags": 0,
+              "excludeAbnormalFlag": 0,
+              "containAbnormalFlag": 0,
+              "purposeMask": 0,
+              "professionMask": 0,
+              "checkUnitType": 0,
+              "unitTypeMask": 0,
+              "onlyIgnoreSomeOfTargetFreeCase": 0,
+              "abnormalFlag": 0,
+              "abnormalCombo": 0
+            },
+            "_buffs": [],
+            "_onlyCheckHitWhenReachTarget": 1,
+            "_hitTargetNoDamage": 0,
+            "_manuallyTickInterval": 0,
+            "_tickInterval": 10,
+            "_checkVerifyTargetOnTick": 0,
+            "_trackSourceByCardUid": 0
+          }
+        },
+        {
+          "class": "CircleRange",
+          "node": "projectile_chr_tinman_s2",
+          "fields": {
+            "_useBlackboardRangeId": 0,
+            "_extendable": 0,
+            "_scaleble": 0
+          }
+        },
+        {
+          "class": "EffectBehaviour",
+          "node": "projectile_chr_tinman_s2",
+          "fields": {
+            "_effectsWhenStart": [],
+            "_effectsWhenReached": [
+              "tinman_skill_02_range_01",
+              "tinman_skill_02_start_01",
+              "tinman_skill_02_token_01",
+              "tinman_skill_02_start_02"
+            ],
+            "_effectsWhenHit": [],
+            "_effectsToTargetWhenStart": [],
+            "_effectsToTileWhenStart": [],
+            "_effectsWhenStop": [],
+            "_effectOnTrigger": [],
+            "_replaceHitEffectAfterFirstHit": 0,
+            "_repalceEffectsWhenHit": [],
+            "_onlyPlayHitEffectOnTraceTarget": 0,
+            "_onlyPlayHitEffectOnNotTraceTarget": 0,
+            "_onlyPlayHitEffectOnce": 0,
+            "_clearHitEffectOnStop": 0,
+            "_clearPlayEffectOnStop": 0,
+            "_clearEffectsOnTileOnStop": 0,
+            "_clearReachedEffectWhenStop": 1,
+            "_alwaysPlayStartEffects": 0,
+            "_playStartEffectOnlyOnProjectile": 0,
+            "_useSourceFaceVector": 0,
+            "_useSourceFaceVectorOnHit": 0,
+            "_useSourceFaceVectorOnStart": 0,
+            "_forceReachTargetGround": 0,
+            "_followTargetGround": 0,
+            "_replaceMainEffectWhenReach": 0,
+            "_mainEffectToReplace": "",
+            "_useTraceTargetWhenReach": 0,
+            "_setReachEffectOnProjectile": 0,
+            "_syncEffectScaleViaProjectile": 0
+          }
+        },
+        {
+          "class": "CacheAtkToBBBehaviour",
+          "node": "projectile_chr_tinman_s2",
+          "fields": {
+            "_increaseByTime": 0,
+            "_onlyIncreaseReached": 0,
+            "_interval": 0,
+            "_firstIntervalOffset": 0,
+            "_intervalKey": "interval",
+            "_increaseValue": 0,
+            "_increaseValueKey": "value",
+            "_maxIncreaseValue": 0,
+            "_maxIncreaseValueKey": "value"
+          }
+        }
+      ],
+      "onReached": [
+        "tinman_skill_02_range_01",
+        "tinman_skill_02_start_01",
+        "tinman_skill_02_token_01",
+        "tinman_skill_02_start_02"
+      ],
+      "effects": [
+        "tinman_skill_02_range_01",
+        "tinman_skill_02_start_01",
+        "tinman_skill_02_start_02",
+        "tinman_skill_02_token_01",
+        "tinman_skill_02_trail_02"
+      ],
+      "projectiles": []
+    }
+  },
+  "skins": {},
+  "generic": {}
+}

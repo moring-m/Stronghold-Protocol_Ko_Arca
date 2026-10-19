@@ -1,11 +1,4 @@
-// The shared 机变 draft in the official 悬赏决策 look (the event's video 9:59 – 10:16; ui/choiceOverlay.js,
-// ui/teamPanel.js, css/screens/game-panels.css):
-//   - the pick order is no list in the overlay: the team panel's portraits carry it — ✓ who has picked, ••• who is
-//     deciding (spMarks); solo and the personal 教鞭 pick have none
-//   - the header names the player deciding over 正在决策… (or 当前轮到你决策 / 已完成选择) beside the countdown
-//   - the armed card's strip is ☑ 确认选择 · 再次点击
-//   - the match's top bar stays on screen during the draft (round, funds and timer stay readable)
-
+// Shared choices retain the pre-0.3.1 order strip and two-click confirmation.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -58,37 +51,37 @@ test('spMarks: ✓ for who has picked, ••• for who is deciding, nothing fo
   assert.equal(spMarks(null, { solo: false }).size, 0);
 });
 
-test('ChoiceView: no order list in the overlay; the player deciding is named over 正在决策…', () => {
+test('ChoiceView: the pre-0.3.1 order strip names each player and the current turn', () => {
   const v = ChoiceView({ pub: { players, deadline: Date.now() + 9000 }, sp: sp({ turnPid: 'p3', pickOf: new Map([['p1', 0], ['me', 1]]) }),
     myId: 'p3x', solo: false });
   const nodes = [...walk(v)];
-  assert.ok(!nodes.some((n) => hasClass(n, 'spov__order')), 'the order lives on the team panel');
-  const who = nodes.find((n) => hasClass(n, 'spov__tw'));
+  assert.ok(nodes.some((n) => hasClass(n, 'spov__order')), 'the order lives in the overlay');
+  assert.equal(nodes.filter(n => hasClass(n, 'spov__who')).length, 3);
+  const who = nodes.find((n) => hasClass(n, 'spov__turntxt'));
   assert.ok(who, 'the deciding player beside the countdown');
-  assert.equal(textOf(who), 'Kal\'tsit正在决策…');
+  assert.equal(textOf(who), 'Kal\'tsit 正在决策…');
   assert.ok(nodes.some((n) => n.type?.name === 'Countdown'));
-  assert.doesNotMatch(textOf(v), /CONTINGENCY/);
+  assert.match(textOf(v), /CONTINGENCY/);
   const mine = ChoiceView({ pub: { players, deadline: 0 }, sp: sp(), myId: 'me', solo: false });
   assert.match(textOf(mine), /当前轮到你决策/);
   const done = ChoiceView({ pub: { players, deadline: 0 }, sp: sp({ turnPid: 'p3', pickOf: new Map([['p1', 0], ['me', 1]]) }), myId: 'me', solo: false });
   assert.match(textOf(done), /已完成选择/);
 });
 
-test('the armed card\'s strip is ☑ 确认选择 · 再次点击', () => {
+test('the armed card retains the two-click confirmation strip', () => {
   const v = ChoiceView({ pub: { players, deadline: 0 }, sp: sp(), myId: 'me', solo: false, armed: 1 });
   const strip = [...walk(v)].find((n) => hasClass(n, 'spcard__confirm'));
   assert.ok(strip);
-  assert.ok([...walk(strip)].some((n) => hasClass(n, 'spcard__cbox')), 'the check box');
+  assert.ok([...walk(strip)].some(n => n.type === 'b'), 'the confirmation caption');
   assert.equal(textOf(strip), '确认选择再次点击');
 });
 
-test('the team panel draws the marks; the match screen passes them only for the shared draft (source contract)', () => {
-  const panel = read('public/js/ui/teamPanel.js');
-  assert.match(panel, /spMarks\?\.get\(p\.playerId\) === 'done' \? html`<span class="team__spmark is-done"/);
-  assert.match(panel, /spMarks\?\.get\(p\.playerId\) === 'turn' \? html`<span class="team__spmark is-turn"/);
-  const game = read('public/js/screens/game.js');
-  assert.match(game, /spMarks=\$\{sp \? spMarks\(sp, \{ solo \}\) : null\}/);
-  assert.match(read('public/css/screens/game.css'), /\.team__spmark\.is-turn i \{/);
+test('the old order strip is omitted for solo and personal choices; the game uses that layout', () => {
+  for (const opts of [{solo:true}, {solo:false,personal:true}]) {
+    const v=ChoiceView({pub:{players},sp:sp(),myId:'me',...opts});
+    assert.ok(![...walk(v)].some(n=>hasClass(n,'spov__order')));
+  }
+  assert.doesNotMatch(read('public/js/screens/game.js'), /has-spdraft|spMarks=\$\{/);
 });
 
 test('the top bar stays on screen during the shared draft', () => {
