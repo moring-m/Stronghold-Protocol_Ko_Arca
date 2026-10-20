@@ -2625,17 +2625,10 @@ export async function createFieldView(host, options = {}) {
         || !Number.isFinite(clientX) || !Number.isFinite(clientY)
         || document.elementFromPoint(clientX, clientY) !== canvas) return null;
       const p = canvasPoint({ clientX, clientY });
-      // Shortcuts target the visible figure under the pointer; its head can
-      // extend over the tile behind it. Pointer-click placement keeps tile picking.
-      let hit = null, depth = -Infinity;
-      for(const e of prepPieces){
-        const v=views.get(e.key);if(!v||v.destroyed||!v.placed)continue;
-        const b=v.bounds();
-        if(p.x<b.x||p.x>b.x+b.width||p.y<b.y||p.y>b.y+b.height)continue;
-        const z=Number(v.root?.zIndex)||Number(v.screen?.y)||0;
-        if(z>=depth){hit=e;depth=z;}
-      }
-      return hit?.uid ?? pieceAt(p.x, p.y)?.uid ?? null;
+      // Use the same tile hit-test as hover/click selection. Projected body bounds
+      // overlap neighbouring tiles (and newly bought bench units), so they can
+      // redirect a destructive shortcut to a different operator.
+      return pieceAt(p.x, p.y)?.uid ?? null;
     },
     pieceScreenRect(uid) {
       let v = views.get('p:' + uid);

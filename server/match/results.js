@@ -130,6 +130,7 @@ export function buildResult(m, outcome) {
   });
   const out = {
     t: 'm.result',
+    gameplayMode:m.gameplayMode,
     customExtensions: structuredClone(m.customExtensions),
     victory,
     roundsPassed: teamRounds,

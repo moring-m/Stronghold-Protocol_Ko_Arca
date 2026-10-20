@@ -1,0 +1,26 @@
+import {t} from '../../../shared/i18n.js';
+import {html,Button,MicroLabel} from '../ui/components.js';
+import {useState,useEffect} from '../../vendor/hooks.module.js';
+import {net} from '../net.js';
+import {DIFFICULTY_NAMES,DIFFICULTY_COLORS} from '../../../shared/constants.js';
+import {GAMEPLAY_MODE_NAMES} from '../../../shared/gameplayModes.js';
+export function PublicRoomsScreen({headerLeft,headerRight,onJoin,onSpectate}){
+ const[rooms,setRooms]=useState([]),[loading,setLoading]=useState(false),[error,setError]=useState('');
+ const[mode,setMode]=useState(''),[size,setSize]=useState(''),[difficulty,setDifficulty]=useState(''),[running,setRunning]=useState(false);
+ useEffect(()=>{
+  let active=true,inFlight=false;
+  const refresh=async()=>{
+   if(inFlight)return;inFlight=true;setLoading(true);
+   try{const r=await net.request('room.list');if(active){setRooms(r.rooms||[]);setError('');}}
+   catch(e){if(active)setError('방 목록을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.');}
+   finally{inFlight=false;if(active)setLoading(false);}
+  };
+  refresh();const timer=setInterval(refresh,10000);
+  return()=>{active=false;clearInterval(timer);};
+ },[]);
+ const canJoin=r=>!r.started&&r.mode!=='solo'&&r.players+r.bots<r.capacity;
+ const filtered=rooms.filter(r=>(running||!r.started)&&(!mode||r.gameplayMode===mode)&&(!size||r.mode===size)&&(!difficulty||r.difficulty===difficulty));
+ return html`<div class="screen public-rooms-screen"><header class="topbar app-topbar">${headerLeft}<div class="topbar__center"><${MicroLabel} tone="mint">PUBLIC ROOMS<//><h1 class="topbar__title">공개 방 목록</h1></div>${headerRight}</header><main class="screen__scroll public-rooms-page"><div class="public-rooms-page__content">
+ <div class="public-rooms__toolbar"><div class="public-rooms__counts" aria-live="polite"><span>참가 가능 <b>${rooms.filter(canJoin).length}</b></span><span>전체 <b>${rooms.length}</b></span></div><div class="public-rooms__filters"><select aria-label="게임 모드 필터" value=${mode} onChange=${e=>setMode(e.target.value)}><option value="">모든 모드</option><option value="classic">클래식</option><option value="augment">증강</option></select><select aria-label="인원 필터" value=${size} onChange=${e=>setSize(e.target.value)}><option value="">모든 인원</option><option value="coop">4인</option><option value="coop8">8인</option></select><select aria-label="난이도 필터" value=${difficulty} onChange=${e=>setDifficulty(e.target.value)}><option value="">모든 난이도</option>${Object.entries(DIFFICULTY_NAMES).map(([id,name])=>html`<option value=${id}>${name}</option>`)}</select><label><input type="checkbox" checked=${running} onChange=${e=>setRunning(e.target.checked)}/>진행 중 포함</label></div></div>
+ <div class="public-rooms__error" role="alert">${error}</div><div class="public-rooms public-rooms--cards">${!filtered.length?html`<p class="public-rooms__empty">${loading?'공개 방을 불러오는 중입니다.':'조건에 맞는 공개 방이 없습니다.'}</p>`:filtered.map(r=>html`<article class="public-room panel brackets"><div class="public-room__host"><strong>${r.hostName}</strong><small>${r.code}</small></div><dl class="public-room__details"><div><dt>모드</dt><dd data-mode=${r.gameplayMode}>${GAMEPLAY_MODE_NAMES[r.gameplayMode]}</dd></div><div><dt>난이도</dt><dd style=${`color:${DIFFICULTY_COLORS[r.difficulty]}`} data-difficulty=${r.difficulty}>${t(DIFFICULTY_NAMES[r.difficulty]||'').replace(/\s*시뮬레이션$/,'')}</dd></div><div><dt>${r.mode==='solo'?'단독':'연합'} · 인원</dt><dd>${r.players+r.bots}<small> / ${r.capacity}명</small></dd>${r.bots?html`<span class="public-room__bots">AI ${r.bots}</span>`:null}</div><div><dt>진행 상태</dt><dd data-state=${r.started?'running':'waiting'}>${r.started?'진행 중':'대기 중'}</dd></div></dl><div class="public-room__actions"><${Button} size="sm" disabled=${!canJoin(r)} onClick=${()=>onJoin(r.code)}>참가<//><${Button} size="sm" variant="secondary" icon="eye" disabled=${r.mode==='solo'||r.spectatorCap<=r.spectators} title=${r.spectatorCap?'관전하기':'관전이 허용되지 않은 방입니다.'} onClick=${()=>onSpectate(r.code)}>관전<//></div></article>`)}</div></div></main></div>`;
+}

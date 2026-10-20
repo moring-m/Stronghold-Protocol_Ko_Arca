@@ -1,3 +1,4 @@
+import {isGameplayMode} from './gameplayModes.js';
 import {COMBAT_METRICS} from './combatStats.js';
 import {isDiyModule} from './diy.js';
 // Normative message catalogue (DESIGN §8). Used by server (validation) and client (building requests).
@@ -509,12 +510,15 @@ export const C2S = {
   hello: { name: (v) => isStr(v, NAME_MAX_LEN) && v.trim().length > 0, token: (v) => v == null || isStr(v, 64), version: (v) => v == null || isInt(v, 0, 1e6),
     noReplace: isBool, claimAt: (v) => isNum(v, 0, Number.MAX_SAFE_INTEGER), $optional: ['token', 'version', 'noReplace', 'claimAt'] },
   ping: { c: (v) => typeof v === 'number' && Number.isFinite(v) },
-  'room.create': { mode: (v) => v === 'solo' || v === 'coop' || v === 'coop8', difficulty: (v) => DIFFICULTIES.includes(v), spectators: isSpectatorCap, customExtensions: extensionSelectionShape, test: (v) => v === true, $optional: ['spectators','customExtensions','test'] },
+  'room.create': { gameplayMode:isGameplayMode, mode: (v) => v === 'solo' || v === 'coop' || v === 'coop8', difficulty: (v) => DIFFICULTIES.includes(v), spectators: isSpectatorCap, customExtensions: extensionSelectionShape, test: (v) => v === true, $optional: ['spectators','customExtensions','test','gameplayMode'] },
   'room.join': { testAck: (v) => v === true, $optional: ['testAck'], code: (v) => isStr(v, ROOM_CODE_LEN + 2) && /^[A-Za-z0-9]+$/.test(v) },
   'room.leave': {},
   'room.commend': {playerId:isId,matchNo:(v)=>isInt(v,1,2**31)},
   'room.ready': { ready: isBool },
   'room.setCustomFactions': { enabled: isBool },
+  'room.list': {},
+  'room.publish': {},
+  'room.setGameplayMode': { gameplayMode:isGameplayMode },
   'room.setCustomExtensions': { selection: extensionSelectionShape },
   'room.setDifficulty': { difficulty: (v) => DIFFICULTIES.includes(v) },
   // the co-op room option 「AI 队友最后选择」 (GitHub #338; host, before the match): the strategy and 机变 drafts order every

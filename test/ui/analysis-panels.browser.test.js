@@ -21,7 +21,7 @@ test('analysis panels: fixed settings, disclosure, grouped charts and simple/det
  await page.select('[aria-label="통계 그래프 종류"]','table');await page.waitForSelector('.combat-report table');assert.equal(await page.$$('.combat-report thead th').then(x=>x.length),20);
  await page.evaluate(()=>window.drawSettings());await page.waitForSelector('#ext-tab-rules');await page.click('#ext-tab-rules');await page.waitForSelector('.extension-grid--rules .custom-ext__card');
  const heights=await page.$$eval('.extension-grid--rules .custom-ext__card',es=>es.map(e=>e.getBoundingClientRect().height));assert.ok(heights.every(h=>Math.abs(h-112)<1),heights.join(','));
- const check=await page.$eval('.extension-grid--rules .custom-ext__card',e=>e.querySelector('input').checked);await page.click('.extension-grid--rules .extension-description-toggle');await page.waitForSelector('.extension-description.is-open');assert.equal(await page.$eval('.extension-grid--rules .custom-ext__card',e=>e.querySelector('input').checked),check);await page.screenshot({path:'/tmp/analysis-panels/settings.png'});
+ assert.equal(await page.$('.extension-description-toggle'),null);assert.ok(await page.$eval('.extension-grid--rules .extension-description small',e=>getComputedStyle(e).display!=='none'&&e.getBoundingClientRect().height>0));await page.screenshot({path:'/tmp/analysis-panels/settings.png'});
  await page.click('#ext-tab-bossStats');await page.waitForSelector('.extension-rule-value');assert.equal(await page.$eval('.extension-rule-value',e=>e.getBoundingClientRect().height),112);
  await page.setViewport({width:390,height:844});await page.screenshot({path:'/tmp/analysis-panels/settings-mobile.png'});
  assert.ok(await page.$eval('.custom-ext',e=>e.scrollWidth<=e.clientWidth+1));

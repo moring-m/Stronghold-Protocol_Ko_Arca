@@ -367,3 +367,4 @@
 /* Keep the statistics overview aligned with the shared neutral/mint controls. */
 .st :is(select,input[type="search"]) { background:var(--bg-1); color:var(--text-hi); border-color:var(--line-2); }
 .st button:focus-visible { outline:2px solid var(--mint-400); outline-offset:2px; }
+.st-gameplay-mode { display:block; margin-top:4px; color:var(--mint-400); font-size:11px; white-space:nowrap; }

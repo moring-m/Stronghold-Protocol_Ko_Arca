@@ -1,3 +1,4 @@
+import {isGameplayMode,normalizeGameplayMode,gameplayExtensions} from '../shared/gameplayModes.js';
 import {KITTED_CHARS} from './sim/content/kits/index.js';
 
 // server/lobby.js — rooms, seats, host, AI seats, ready/start, reconnect, and room → Match wiring
@@ -301,6 +302,7 @@ export class Room {
      * 0 = spectating is off for this room (every room.spectate is refused with ROOM_FULL).
      */
     this.spectatorCap = spectatorCap;
+    this.isPublic = false;
     /** @type {{ playerId: string, name: string, connected: boolean }[]} spectator seats, ≤ this.spectatorCap (header) */
     this.spectators = [];
     /** @type {any} running Match instance */
@@ -313,6 +315,8 @@ export class Room {
     this.chatMembers = new Map();
     this.customFactions = false;
     this.customExtensions = { bonds: [], stages: [] };
+    this.savedCustomExtensions = { bonds: [], stages: [] };
+    this.gameplayMode = 'custom';
     this.customExtensionCatalog = { bonds: [], stages: [] };
     /** @type {any} summary passed to onEnd by the last match */
     this.lastSummary = null;
@@ -374,6 +378,8 @@ export class Room {
       rerollLimit: this.rerollLimit,
       rerollsUsed: this.rerollsUsed,
       matchNo: this.matchCount,
+      gameplayMode: this.gameplayMode,
+      isPublic: this.isPublic,
       customFactions: this.customFactions,
       customExtensions: structuredClone(this.customExtensions),
       customExtensionCatalog: this.customExtensionCatalog,
@@ -676,12 +682,15 @@ export class Lobby {
   handleMessage(session, msg, ctx = null) {
     switch (msg.t) {
       case 'g.chat': case 'g.chatFaction': return this.chat(session, msg);
+      case 'room.list': return this.listPublicRooms();
+      case 'room.publish': return this.publishRoom(session);
       case 'room.create': return this.create(session, msg);
       case 'room.join': return this.join(session, msg);
       case 'room.leave': return this.leave(session);
       case 'room.ready': return this.ready(session, msg);
       case 'room.commend': return this.commend(session,msg);
       case 'room.setCustomFactions': return this.setCustomFactions(session, msg);
+      case 'room.setGameplayMode': return this.setGameplayMode(session,msg);
       case 'room.setCustomExtensions': return this.setCustomExtensions(session, msg);
       case 'room.setDifficulty': return this.setDifficulty(session, msg);
       case 'room.setAiPicksLast': return this.setAiPicksLast(session, msg);
@@ -770,7 +779,8 @@ export class Lobby {
   // room.* handlers
   // ---------------------------------------------------------------------------------------------------
 
-  create(session, { mode, difficulty, spectators, customExtensions, test } = {}) {
+  create(session, { mode, difficulty, spectators, customExtensions, test, gameplayMode } = {}) {
+    if(gameplayMode!==undefined&&!isGameplayMode(gameplayMode))return fail(ERR.BAD_MSG);
     if(this.draining)return fail(ERR.INTERNAL,'업데이트가 적용되었습니다. 메인화면을 새로고침한 뒤 새 방을 만들어주세요.');
     const cur = this.roomOf(session);
     if (cur && cur.match) return fail(ERR.ROOM_STARTED, 'leave your running match first');
@@ -786,7 +796,7 @@ export class Lobby {
     }
     const code = this.genCode();
     if (!code) return fail(ERR.INTERNAL, 'no room code available');
-    const initialSelection=modeExtensionSelection(normalizeCustomExtensions(customExtensions,this.safeData()),mode);
+    const initialSelection=gameplayExtensions(customExtensions,this.safeData(),mode,gameplayMode);
     const minimumErrors=validateExtensionMinimums(this.safeData(),initialSelection,{mode,difficulty});
     if(minimumErrors.length)return fail(ERR.BAD_MSG,minimumErrors.join(' '));
     if (cur) this.removeMember(cur, session.playerId);
@@ -797,7 +807,9 @@ export class Lobby {
     if(test===true&&!this.testEnabled)return fail(ERR.TEST_DISABLED);
     room.test=test===true;
     room.customExtensionCatalog = customExtensionCatalog(this.safeData());
-    room.customExtensions = modeExtensionSelection(normalizeCustomExtensions(customExtensions, this.safeData()),mode);
+    room.gameplayMode=normalizeGameplayMode(gameplayMode);
+    room.savedCustomExtensions=modeExtensionSelection(normalizeCustomExtensions(customExtensions,this.safeData()),mode);
+    room.customExtensions = initialSelection;
     room.customFactions = room.customExtensions.bonds.includes('ursus') && !(room.customExtensions.disabledBonds||[]).includes('ursusShip');
     room.content = this.vanilla;
     // the server owner's default plugins (plugins/config.json `default`; header "Gameplay plugins"): none — the original game
@@ -940,11 +952,54 @@ export class Lobby {
     return this.setCustomExtensions(session, { selection: { ...room?.customExtensions, bonds: enabled ? ['ursus'] : [] } });
   }
 
+  listPublicRooms() {
+    return { rooms: [...this.rooms.values()].filter(r=>r.isPublic&&r.mode!=='solo').slice(0,200).map(r=>({
+      code:r.code,mode:r.mode,difficulty:r.difficulty,gameplayMode:r.gameplayMode,
+      hostName:r.seats.find(s=>s?.playerId===r.hostId)?.name||'방장',
+      players:r.seats.filter(s=>s&&!s.isBot&&!s.left).length,
+      capacity:r.seats.length,bots:r.seats.filter(s=>s?.isBot).length,
+      started:!!r.match,spectators:r.spectators.length,spectatorCap:r.spectatorCap,
+    })) };
+  }
+
+  publishRoom(session) {
+    const room=this.roomOf(session);
+    if(!room)return fail(ERR.NOT_IN_ROOM);
+    if(room.hostId!==session.playerId)return fail(ERR.NOT_HOST);
+    if(room.match)return fail(ERR.ROOM_STARTED);
+    if(room.mode==='solo')return fail(ERR.BAD_MSG,'단독 방은 공개할 수 없습니다.');
+    if(room.gameplayMode==='custom')return fail(ERR.BAD_MSG,'클래식·증강 모드에서만 공개할 수 있습니다.');
+    room.isPublic=true;
+    this.broadcastState(room);
+    return OK;
+  }
+
+  setGameplayMode(session, {gameplayMode}) {
+    const room=this.roomOf(session);
+    if(!room)return fail(ERR.NOT_IN_ROOM);
+    if(room.hostId!==session.playerId)return fail(ERR.NOT_HOST);
+    if(room.match)return fail(ERR.ROOM_STARTED);
+    if(!isGameplayMode(gameplayMode))return fail(ERR.BAD_MSG);
+    if(room.isPublic&&gameplayMode==='custom')return fail(ERR.BAD_MSG,'공개 방은 커스텀 모드를 선택할 수 없습니다.');
+    const selected=gameplayExtensions(room.savedCustomExtensions,this.safeData(),room.mode,gameplayMode);
+    const errors=validateExtensionMinimums(this.safeData(),selected,{mode:room.mode,difficulty:room.difficulty});
+    if(errors.length)return fail(ERR.BAD_MSG,errors.join(' '));
+    this.dropReplay(room,session.playerId);
+    room.gameplayMode=gameplayMode;room.customExtensions=selected;
+    room.customFactions=selected.bonds.includes('ursus')&&!(selected.disabledBonds||[]).includes('ursusShip');
+    for(const member of room.chatMembers.values())if((member.faction==='라이타니엔'&&!selected.bonds.includes('leithanien'))||(member.faction==='우르수스'&&!room.customFactions))member.faction=null;
+    for(const seat of room.seats)if(seat&&!seat.isBot&&seat.playerId!==room.hostId)seat.ready=false;
+    this.broadcastState(room);
+    this.broadcastRoom(room,{t:'m.chatHistory',messages:room.chatHistory,factions:Object.fromEntries([...room.chatMembers].map(([id,m])=>[id,m.faction]))});
+    return OK;
+  }
+
   setCustomExtensions(session, { selection }) {
     const room = this.roomOf(session);
     if (!room) return fail(ERR.NOT_IN_ROOM);
     if (room.hostId !== session.playerId) return fail(ERR.NOT_HOST);
     if (room.match) return fail(ERR.ROOM_STARTED);
+    if(room.gameplayMode!=='custom')return fail(ERR.BAD_MSG,'커스텀 모드에서만 설정을 변경할 수 있습니다.');
     if (!extensionSelectionShape(selection)) return fail(ERR.BAD_MSG);
     let selected = normalizeCustomExtensions(selection, this.safeData());
     if (Object.keys(selection).some(k => Array.isArray(selection[k])&&selection[k].some(id => !selected[k]?.includes(id)))) return fail(ERR.BAD_MSG);
@@ -952,6 +1007,7 @@ export class Lobby {
     const errors=validateExtensionMinimums(this.safeData(),selected,{mode:room.mode,difficulty:room.difficulty});
     if(errors.length)return fail(ERR.BAD_MSG,errors.join(' '));
     this.dropReplay(room, session.playerId);
+    room.savedCustomExtensions=structuredClone(selected);
     room.customExtensions = modeExtensionSelection(selected,room.mode);
     room.customFactions = selected.bonds.includes('ursus') && !(selected.disabledBonds||[]).includes('ursusShip');
     if (!room.customExtensions.bonds.includes('leithanien')) for (const member of room.chatMembers.values()) if (member.faction === '라이타니엔') member.faction = null;
@@ -1518,6 +1574,7 @@ export class Lobby {
         mode: room.mode,
         difficulty: room.difficulty,
         customFactions: room.customFactions,
+        gameplayMode: room.gameplayMode,
         customExtensions: structuredClone(room.customExtensions),
         // a plugin mode the host chose (header "Gameplay plugins"), else the official mode of the difficulty
         modeId: room.content?.modeId || modeIdFor(room.mode, room.difficulty),

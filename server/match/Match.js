@@ -1,3 +1,4 @@
+import {normalizeGameplayMode,gameplayExtensions} from '../../shared/gameplayModes.js';
 import { ruleOption } from '../../shared/plugins/rules.js';
 import { MatchOffers as UpstreamFallback18 } from './match/offers.js';
 import { MatchTestCommands as UpstreamFallback17 } from './match/testCommands.js';
@@ -318,7 +319,8 @@ export class Match {
     this.broadcastFn = opts.broadcast;
     this.onEndFn = opts.onEnd;
     this.data = opts.data && typeof opts.data === 'object' ? opts.data : {};
-    this.customExtensions = modeExtensionSelection(normalizeCustomExtensions(opts.customExtensions, this.data, opts.customFactions === true),this.mode);
+    this.gameplayMode=normalizeGameplayMode(opts.gameplayMode);
+    this.customExtensions = gameplayExtensions(opts.customExtensions,this.data,this.mode,this.gameplayMode,opts.customFactions===true);
     this.customFactions = this.customExtensions.bonds.includes('ursus') && !(this.customExtensions.disabledBonds||[]).includes('ursusShip');
     const unfilteredChess=this.data.chess||{};
     this.data = applyCustomExtensions(this.data, this.customExtensions);
@@ -1095,6 +1097,7 @@ export class Match {
       mode: this.mode,
       difficulty: this.difficulty,
       customFactions: this.customFactions,
+      gameplayMode:this.gameplayMode,
       customExtensions: structuredClone(this.customExtensions),
       stageId: this.stageId,
       setupRevision:this.setupRevision,

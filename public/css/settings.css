@@ -398,17 +398,13 @@
 .custom-ext .extensions-nav { background:var(--bg-1); }
 .custom-ext .extensions-editor { background:var(--bg-0,#0b1411); }
 .custom-ext .extension-grid { grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr)); align-items:stretch; grid-auto-rows:max-content; gap:10px; }
-.custom-ext .extension-grid .custom-ext__card { position:relative; height:112px; min-height:112px; border:1px solid var(--line-2); background:var(--ext-surface); padding:12px; box-shadow:none; overflow:hidden; align-items:center; }
+.custom-ext .extension-grid .custom-ext__card { position:relative; height:112px; min-height:112px; border:1px solid var(--line-2); background:var(--ext-surface); padding:12px; box-shadow:none; overflow:visible; align-items:center; }
 .custom-ext .extension-grid .custom-ext__card:has(input:checked) { border-color:var(--mint-400); background:color-mix(in srgb,var(--mint-400) 7%,var(--ext-surface)); }
 .custom-ext .extension-grid .extension-rule-value { grid-template-columns:minmax(0,1fr) 76px auto; }
 .custom-ext .extension-grid .extension-rule-select { grid-template-columns:minmax(0,1fr) minmax(100px,42%); }
 .custom-ext .extension-card__text { flex:1; min-width:0; overflow:hidden; }
 .custom-ext .extension-grid .extension-card__text strong { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; line-height:1.45; font-size:14px; font-weight:600; }
-.custom-ext .extension-grid .extension-card__text small { display:none; font-size:12px; line-height:1.6; color:var(--text-md); }
-.custom-ext .extension-description-toggle { display:inline-flex; padding:2px 0; min-height:24px; border:0; background:none; color:var(--mint-400); font:inherit; font-size:12px; cursor:pointer; }
-.custom-ext .extension-grid .custom-ext__card:has(.extension-description.is-open) { height:auto; min-height:112px; align-items:start; }
-.custom-ext .extension-description.is-open small { display:block; white-space:normal; overflow-wrap:anywhere; }
-.custom-ext .custom-ext__card:has(.extension-description.is-open) .extension-card__text strong { display:block; }
+.custom-ext .extension-grid .extension-card__text small { display:block; white-space:normal; overflow-wrap:anywhere; font-size:12px; line-height:1.6; color:var(--text-md); }
 .custom-ext .extension-grid .extension-rule-time { grid-column:1/-1; }
 .custom-ext .extension-grid .extension-rule-select:has(.extension-rule-time) { height:148px; grid-template-columns:minmax(0,1fr); }
 .custom-ext .extension-grid .extension-card--ban { height:136px; grid-template-rows:56px 36px; }

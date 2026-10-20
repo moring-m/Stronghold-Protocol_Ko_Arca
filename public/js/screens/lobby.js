@@ -1,3 +1,4 @@
+import {PublicRoomsScreen} from './publicRooms.js';
 import { confirmDialog } from "../ui/components.js";
 import { openStats } from '../ui/statsEntry.js';
 import { lazyComponent, loadScreenStyles } from '../ui/lazyComponent.js';
@@ -84,7 +85,7 @@ const MODE_CARDS = [
   },
   {
     id: 'coop', name: '同盟模拟', en: 'ALLIANCE SIMULATION', icon: 'users',
-    desc: `与至多 ${3} 名博士组成同盟，共享干员池，联防协作抵御敌潮。`,
+    desc: '최대 4명의 박사가 오퍼레이터 풀을 공유하며 함께 전투합니다.',
     points: [`1–${4} 名博士 · 可由 AI 队友补位`, '联防阶段 · 最终攻势合并生命值'],
   },
   { id: 'laboratory', name: '실험실', en: 'LABORATORY', icon: 'flask', desc: '맵·보스·전략을 직접 고르고 원하는 조합을 시험합니다.', points: ['솔로 플레이 · 밴 없음', '한 라운드 전투 · 결과 통계 기록'] },
@@ -238,7 +239,7 @@ function TipsPanel() {
 
 function ModeCard({ card, selected, onSelect, coopSize=4, onCoopSize, spectateOn, onSpectateChange }) {
   if(card.id==='coop'&&coopSize===8)card={...card,desc:'최대 8명의 박사가 오퍼레이터 풀을 공유하며 함께 전투합니다.',points:['박사 1–8명 · 빈자리는 AI 팀원으로','협력방어 최대 4명']};
-  return html`<div role="button" tabindex="0" class=${`mode-card brackets${['laboratory','practice'].includes(card.id)?' mode-card--lab':''}${selected ? ' is-selected' : ''}`} onClick=${() => onSelect(card.id==='coop'&&coopSize===8?'coop8':card.id)} onKeyDown=${e=>{if(e.target===e.currentTarget&&['Enter',' '].includes(e.key)){e.preventDefault();onSelect(card.id==='coop'&&coopSize===8?'coop8':card.id);}}}
+  return html`<div class="mode-card-tip"><div role="button" tabindex="0" class=${`mode-card brackets${['laboratory','practice'].includes(card.id)?' mode-card--lab':''}${selected ? ' is-selected' : ''}`} onClick=${() => onSelect(card.id==='coop'&&coopSize===8?'coop8':card.id)} onKeyDown=${e=>{if(e.target===e.currentTarget&&['Enter',' '].includes(e.key)){e.preventDefault();onSelect(card.id==='coop'&&coopSize===8?'coop8':card.id);}}}
       aria-pressed=${selected ? 'true' : 'false'}>
     <span class="mode-card__bg" aria-hidden="true"></span>
     <span class="mode-card__icon"><${Icon} name=${card.icon} /></span>
@@ -256,7 +257,7 @@ function ModeCard({ card, selected, onSelect, coopSize=4, onCoopSize, spectateOn
         <${Icon} name="eye" /><span>관전 허용</span>
       </label>
     </div>`:null}
-  </div>`;
+  </div></div>`;
 }
 
 function DifficultyCard({ roomMode, difficulty, selected, onSelect }) {
@@ -299,6 +300,14 @@ export function LobbyScreen() {
   const [recent] = useState(recentRooms);
   const marks = loadPref('recentTestRooms', []);
   const [sweepOpen, setSweepOpen] = useState(false);
+  const [publicOpen,setPublicOpen]=useState(false);
+  const [publicRoomCount,setPublicRoomCount]=useState(null);
+  useEffect(()=>{
+    if(publicOpen||conn.status!=='online')return;
+    let active=true,pending=false;
+    const refresh=async()=>{if(pending)return;pending=true;try{const response=await net.request('room.list');if(active)setPublicRoomCount(response.rooms.length);}catch{if(active)setPublicRoomCount(null);}finally{pending=false;}};
+    refresh();const timer=setInterval(refresh,10000);return()=>{active=false;clearInterval(timer);};
+  },[publicOpen,conn.status]);
   const alive = useRef(true);
   const inFlight = useRef(false); // synchronous guard against double clicks (state updates are async)
   useEffect(() => () => { alive.current = false; }, []);
@@ -322,6 +331,7 @@ export function LobbyScreen() {
   const create = () => ['laboratory','practice'].includes(roomMode) ? store.patch('ui', { laboratorySetup: { difficulty,practice:roomMode==='practice' } }) : run('create', () => net.request('room.create', {
     mode: roomMode,
     difficulty,
+    gameplayMode: 'custom',
     customExtensions: loadCustomExtensionPrefs(),
     // only a co-op room carries the host's spectator cap (0 when the box is unticked)
     ...(['coop','coop8'].includes(roomMode) ? { spectators: spectateOn ? MAX_SPECTATOR_SEATS : 0 } : {}),
@@ -334,7 +344,7 @@ export function LobbyScreen() {
     run('join', () => net.request('room.join', { code: k }).catch((err) => {
       // The room is full: ask before taking one of its spectator seats (only when the host left one free — the server
       // answers ROOM_FULL for both "no player seat" and "no spectator seat"). The prompt remembers the code it asked for.
-      if (err?.code === ERR.ROOM_FULL) { setFullAsk({ code: k }); return; }
+      if (err?.code === ERR.ROOM_FULL) { setPublicOpen(false); setFullAsk({ code: k }); return; }
       throw err;
     }));
   };
@@ -367,19 +377,14 @@ export function LobbyScreen() {
     store.set((s) => ({ session: { ...s.session, entered: false } }));
   };
 
-  return html`<div class="screen lobby-screen">
-    <header class="topbar app-topbar">
-      <div class="topbar__left">
-        <${Button} variant="ghost" size="sm" icon="chevronLeft" class="nav-back" onClick=${backToTitle} title="返回标题">返回<//>
+  const headerLeft=onBack=>html`      <div class="topbar__left">
+        <${Button} variant="ghost" size="sm" icon="chevronLeft" class="nav-back" onClick=${onBack} title="返回标题">返回<//>
         <${PingPill} ms=${conn.ping} online=${online} />
         <${PatchNotesButton} autoOpen=${true} />
         <${Button} variant="secondary" size="sm" icon="report" class="lobby-sweep" onClick=${() => setSweepOpen(true)}>S.W.E.E.P. 리포트<//>
       </div>
-      <div class="topbar__center">
-        <${MicroLabel} tone="mint">SIMULATION PROTOCOL SELECT<//>
-        <h1 class="topbar__title">选择模拟协议</h1>
-      </div>
-      <div class="topbar__right">
+`;
+  const headerRight=html`      <div class="topbar__right">
         <${ResumeMatchButton} /><${SettingsButton} />
         <${GuideButton} class="lobby-guide" variant="secondary" square=${true} />
         <${LoadoutButton} from="lobby" size="sm" class="lobby-loadout" />
@@ -392,6 +397,16 @@ export function LobbyScreen() {
           <${Icon} name="chart" class="me-chip__stats" />
         </button>
       </div>
+`;
+  if(publicOpen)return html`<${PublicRoomsScreen} headerLeft=${headerLeft(()=>setPublicOpen(false))} headerRight=${headerRight} onJoin=${join} onSpectate=${spectate}/>${sweepOpen?html`<${SweepReport} onClose=${()=>setSweepOpen(false)}/>`:null}`;
+  return html`<div class="screen lobby-screen">
+    <header class="topbar app-topbar">
+      ${headerLeft(backToTitle)}
+      <div class="topbar__center">
+        <${MicroLabel} tone="mint">SIMULATION PROTOCOL SELECT<//>
+        <h1 class="topbar__title">选择模拟协议</h1>
+      </div>
+      ${headerRight}
     </header>
 
     <div class="lobby-body screen__scroll">
@@ -399,6 +414,7 @@ export function LobbyScreen() {
         <div class="section-label"><span class="section-label__idx num">01</span>模拟方式<${MicroLabel}>MODE<//></div>
         <div class="mode-cards">
           ${MODE_CARDS.map((c) => html`<${ModeCard} key=${c.id} card=${c} selected=${roomMode === c.id || c.id==='coop'&&roomMode==='coop8'} onSelect=${pickMode} coopSize=${coopSize} onCoopSize=${n=>{setCoopSize(n);pickMode(n===8?'coop8':'coop');}} spectateOn=${spectateOn} onSpectateChange=${on=>{setSpectateOn(on);savePref('lobby.spectateOn',on);}} />`)}
+          <button type="button" class="public-rooms-entry mode-card brackets" onClick=${()=>setPublicOpen(true)}><span class="mode-card__bg" aria-hidden="true"></span><span class="mode-card__icon"><${Icon} name="users"/></span><span class="mode-card__text"><${MicroLabel}>PUBLIC ROOMS<//><span class="mode-card__name">공개 방 목록</span><span class="mode-card__desc">공개된 연합 방에 참가하거나 관전합니다.</span></span><span class="public-rooms-entry__total"><span class="public-rooms-entry__count num" aria-label="공개 방 수">${conn.status==='online'&&publicRoomCount!==null?publicRoomCount:'—'}</span><span>개</span></span></button>
         </div>
 
         <div class="section-label"><span class="section-label__idx num">03</span>加入同盟<${MicroLabel}>JOIN WITH ALLIANCE KEY<//></div>

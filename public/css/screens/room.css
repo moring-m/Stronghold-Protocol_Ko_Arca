@@ -378,3 +378,25 @@ html body .room-screen header.app-topbar .invite__btns .btn { height:24px; min-h
 .room-screen .room-bar__left .dpick { display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); width:3.8rem; box-sizing:border-box; }
 .room-screen .room-bar__left .rpick { grid-template-columns:repeat(5,minmax(0,1fr)); }
 .room-screen .room-bar__left .dpick__opt { justify-content:center; min-width:0; padding:0 .06rem; }
+
+.room-gameplay-modes { display:flex; flex:none; border:1px solid var(--line-2); background:var(--bg-panel); }
+.room-gameplay-modes button { --mode-color:var(--mint-400); --mode-background:rgba(78,216,175,.12); min-height:36px; min-width:48px; padding:0 8px; font:inherit; font-size:12px; color:var(--text-lo); border:0; border-right:1px solid var(--line-2); background:transparent; cursor:pointer; white-space:nowrap; }
+.room-gameplay-modes button[data-gameplay-mode="augment"] { --mode-color:#bf9bf4; --mode-background:linear-gradient(110deg,rgba(108,220,224,.16),rgba(191,155,244,.2),rgba(244,166,209,.16)); color:var(--mode-color); }
+.room-gameplay-modes button[data-gameplay-mode="custom"] { --mode-color:var(--gold); --mode-background:rgba(255,198,0,.12); color:var(--mode-color); }
+.room-gameplay-modes button:last-child { border-right:0; }
+.room-gameplay-modes button[aria-checked="true"] { color:var(--mode-color); background:var(--mode-background); box-shadow:inset 0 -2px var(--mode-color); }
+.room-gameplay-modes button:disabled { cursor:default; }
+.room-gameplay-modes button:focus-visible { outline:2px solid var(--mode-color);outline-offset:-2px; }
+.room-gameplay-modes > .tt-anchor { display:flex; }
+.room-gameplay-modes > .tt-anchor:not(:last-child) button { border-right:1px solid var(--line-2); }
+.room-publish { display:flex;align-items:center;gap:6px;min-height:36px;padding:0 10px;border:1px solid var(--line-2);background:var(--bg-panel);color:var(--text-md);font:inherit;font-size:12px;white-space:nowrap;cursor:pointer; }
+.room-publish:disabled { cursor:default;opacity:.65; }
+.room-publish .icon { width:15px;height:15px; }
+.room-gameplay-modes button:disabled { color:var(--text-lo);background:rgba(0,0,0,.18);box-shadow:none;opacity:.35; }
+.room-publish { min-height:36px;height:36px;box-sizing:border-box;border-color:var(--mint-500);color:var(--mint-300);background:rgba(78,216,175,.14);font-weight:700; }
+.room-publish:not(:disabled):hover { border-color:var(--mint-300);background:rgba(78,216,175,.24); }
+.room-publish:disabled { opacity:.5; }
+.gameplay-mode-tip { max-width:440px;line-height:1.6; }
+.gameplay-mode-tip p { margin:0 0 8px; }
+.gameplay-mode-tip ul { margin:0;padding-left:18px; }
+.gameplay-mode-tip li + li { margin-top:5px; }

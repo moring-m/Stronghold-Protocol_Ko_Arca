@@ -1,3 +1,4 @@
+import {isGameplayMode} from '../../../shared/gameplayModes.js';
 import { recordAugments } from '../../../shared/augments.js';
 import { recordCustomExtensions } from '../../../shared/customExtensions.js';
 import { combatRound } from '../../../shared/combatStats.js';
@@ -239,6 +240,7 @@ export function normalizeRecord(raw) {
     seed: num(r.seed),
     durationMs: num(r.durationMs),
     teamLp: num(r.teamLp),
+    gameplayMode:isGameplayMode(r.gameplayMode)?r.gameplayMode:null,
     customExtensions:recordCustomExtensions(r.customExtensions),
     ...(r.augments?{augments:recordAugments(r.augments)}:{}),
     roomMode: r.roomMode === 'solo' || r.roomMode === 'coop' || r.roomMode === 'coop8' || r.roomMode === 'laboratory' || r.roomMode === 'practice' ? r.roomMode : null,
@@ -338,7 +340,7 @@ export function loadStats() {
 // ---- compaction + the storage budget ---------------------------------------------------------------------------
 
 const COMPACT_FRAME = ['id', 'v', 't', 'end', 'victory', 'roundsPassed', 'lastRound', 'hiddenReached', 'hiddenCleared', 'reason', 'modeId',
-  'difficulty', 'roomMode', 'test', 'testActions', 'durationMs', 'selfId', 'customExtensions','augments', 'vs', 'content'];
+  'difficulty', 'roomMode', 'gameplayMode', 'test', 'testActions', 'durationMs', 'selfId', 'customExtensions','augments', 'vs', 'content'];
 
 /**
  * The compact form of a record: the frame and the player's OWN row without lineup, bonds and name — everything the
@@ -469,6 +471,7 @@ export function buildRecord(res, ctx = {}) {
     seed: num(r.seed),
     durationMs: num(r.durationMs),
     teamLp: num(r.teamLp),
+    gameplayMode:r.gameplayMode,
     customExtensions:r.customExtensions,
     ...(r.augments?{augments:recordAugments(r.augments)}:{}),
     roomMode: ctx.practice ? 'practice' : ctx.laboratory ? 'laboratory' : roomModeOf(str(r.modeId), ctx.roomMode||r.roomMode),
@@ -576,6 +579,7 @@ export function buildQuitRecord(state, ctx = {}) {
     seed: null,
     durationMs: live.sawStart ? Math.max(0, now - live.startedAt) : null,
     teamLp: num(pub.teamLp),
+    gameplayMode:pub.gameplayMode,
     customExtensions:pub.customExtensions,
     roomMode: roomModeOf(str(pub.modeId), state.room?.mode),
     selfId: myId,
@@ -604,6 +608,7 @@ export function recordToResult(rec) {
     ...(r.test === true ? {test:true,testActions:r.testActions||0} : {}),
     laboratory: r.roomMode === 'laboratory',
     practice:r.roomMode==='practice',
+    gameplayMode:r.gameplayMode,
     customExtensions:r.customExtensions,
     ...(r.augments?{augments:recordAugments(r.augments)}:{}),
     victory: r.victory,

@@ -1,3 +1,5 @@
+import {AUGMENT_ROUNDS} from '../../../shared/augments.js';
+import {GAMEPLAY_MODES,GAMEPLAY_MODE_NAMES,normalizeGameplayMode} from '../../../shared/gameplayModes.js';
 import { TestMark } from "../ui/testConsole.js";
 import { extensionSelectionCount } from '../../../shared/customExtensions.js';
 import { t } from '../../../shared/i18n.js';
@@ -386,6 +388,8 @@ export function RoomScreen() {
 
       </div>
       <div class="topbar__right">
+        ${coop?html`<${Tooltip} placement="bottom" text=${room.isPublic?'공개 방 목록에 표시됩니다. 비공개·커스텀으로 변경할 수 없습니다.':'클래식·증강 모드에서 방을 공개할 수 있습니다.'}><button class="room-publish" disabled=${room.isPublic||room.gameplayMode==='custom'||!facts.isHost||!!busy||!online} onClick=${async()=>{if(await confirmDialog({title:'공개 방으로 전환',text:'공개 방 목록에 방이 표시됩니다. 전환 후에는 비공개로 되돌리거나 커스텀 모드를 선택할 수 없습니다.',okText:'공개로 전환',cancelText:'취소'}))run('publish',()=>net.request('room.publish',{}));}}><${Icon} name="users" />${room.isPublic?'공개 방':'공개 전환'}</button><//>`:null}
+        <div class="room-gameplay-modes" role="radiogroup" aria-label="게임 모드">${GAMEPLAY_MODES.map(mode=>html`<${Tooltip} placement="bottom" text=${({classic:"기본 규칙으로 진행합니다. 커스텀 설정과 증강은 적용하지 않습니다.",augment:html`<div class="gameplay-mode-tip"><p>증강으로 조합을 강화하고, 더 강한 적에 도전합니다.</p><ul><li>${AUGMENT_ROUNDS.join('·')}라운드에 아군 증강 → 적 증강 선택·투표 (보스전 이전까지)</li><li>일반 적: HP 140% · 공격력/방어력 120% · 마법 저항 150%</li><li>보스: HP 400% · 공격력/방어력 120% · 마법 저항 150%</li><li>실버/골드/프리즘 가중치 2/5/3 · 커스텀 변경 불가</li></ul></div>`,custom:"저장한 커스텀 설정으로 진행합니다. 규칙을 자유롭게 변경할 수 있습니다."})[mode]}><button type="button" role="radio" data-gameplay-mode=${mode} aria-checked=${normalizeGameplayMode(room.gameplayMode)===mode} disabled=${!facts.isHost||!!busy||!online||(room.isPublic&&mode==='custom')} onClick=${()=>run('gameplayMode',async()=>{await net.request('room.setGameplayMode',{gameplayMode:mode});setExtensionsOpen(false);})}>${GAMEPLAY_MODE_NAMES[mode]}</button><//>`)}</div>
         ${coop ? html`<${InviteBox} code=${room.code} name=${me.name} difficulty=${room.difficulty} />` : html`<div class="solo-note"><${MicroLabel}>SINGLE OPERATOR<//><span>仅限 1 名博士</span></div>`}
       </div>
     </header>
@@ -406,7 +410,7 @@ export function RoomScreen() {
     </main>
     <${SpectatorBar} facts=${facts} myId=${me.playerId} busy=${busy} onRemove=${removeSpectator} onSit=${sit} onSpectate=${spectate} roleCooling=${roleCooling} />
 
-    <${CustomExtensionsDialog} open=${extensionsOpen} room=${room} isHost=${facts.isHost} disabled=${!!busy || !online} onClose=${()=>setExtensionsOpen(false)}
+    <${CustomExtensionsDialog} open=${extensionsOpen} room=${room} isHost=${facts.isHost} disabled=${!!busy || !online || normalizeGameplayMode(room.gameplayMode)!=='custom'} onClose=${()=>setExtensionsOpen(false)}
       onSave=${selection=>run('extensions',async()=>{await net.request('room.setCustomExtensions',{selection});saveCustomExtensionPrefs(selection);setExtensionsOpen(false);})} />
     <footer class="room-bar" ref=${footerRef}>
       <div class="room-bar__left">
@@ -444,7 +448,7 @@ export function RoomScreen() {
       <div class="room-bar__right">
         <div class="room-bar__settings">
           <${LoadoutButton} from="room" size="lg" class="room-loadout" />
-          <${Button} variant="secondary" size="lg" icon="settings" class="room-custom-extensions" disabled=${!!busy || !online} onClick=${()=>setExtensionsOpen(true)}>커스텀 설정 <span class="lo-entry__n num">${extensionSelectionCount(room.customExtensions || {bonds:room.customFactions?['ursus']:[]})}</span><//>
+          <${Button} variant="secondary" size="lg" icon="settings" class="room-custom-extensions" disabled=${!!busy || !online || normalizeGameplayMode(room.gameplayMode)!=='custom'} title=${normalizeGameplayMode(room.gameplayMode)!=='custom'?'커스텀 모드에서만 변경할 수 있습니다.':'커스텀 설정'} onClick=${()=>setExtensionsOpen(true)}>커스텀 설정 <span class="lo-entry__n num">${extensionSelectionCount(room.customExtensions || {bonds:room.customFactions?['ursus']:[]})}</span><//>
         </div>
         ${facts.isHost
           ? html`<${Tooltip} text=${facts.canStart ? null : !facts.contentReady ? t('仍有博士未载入房间的插件内容') : t('仍有博士未准备就绪')}>

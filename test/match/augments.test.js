@@ -5,7 +5,7 @@ const data=loadData('content/production/data');
 function fixture(t,{n=1,enabled=true,host='p0',seed=1,ruleValues={},rules=[],protectedBonds=[],protectedAuxBonds=[]}={}){const sched=new VirtualScheduler();const m=new Match({data,mode:n===8?'coop8':n===1?'solo':'coop',difficulty:'NORMAL',seed,customExtensions:{rules:enabled?['augments',...rules]:[],ruleValues,protectedBonds,protectedAuxBonds},seats:Array.from({length:n},(_,i)=>({seat:i,playerId:'p'+i,name:'P'+i,connected:true})),getHostId:()=>host,scheduler:sched,send:()=>true,broadcast:()=>{},onEnd:()=>{}});t.after(()=>m.dispose());return {m,sched,ps:m.players.get('p0')};}
 function request(m,ps,idx=0,reroll=false){const s=m.augments.current,slot=s.side==='ally'?s.slots.get(ps.playerId):s.boss;return m.handle(ps.playerId,{t:reroll?'g.augmentReroll':'g.augmentPick',eventId:s.id,side:s.side,idx,cardId:slot.cards[idx].id});}
 test('grade probability boundaries and three consecutive silver prevention preserve gold/prism ratio',()=>{
- assert.deepEqual([0,.249,.25,.749,.75,.999].map(x=>rollAugmentGrade(()=>x)),['silver','silver','gold','gold','prism','prism']);
+ assert.deepEqual([0,.199,.2,.699,.7,.999].map(x=>rollAugmentGrade(()=>x)),['silver','silver','gold','gold','prism','prism']);
  assert.equal(rollAugmentGrade(()=>.1,['silver']),'silver');assert.equal(rollAugmentGrade(()=>.1,['silver','silver']),'gold');assert.equal(rollAugmentGrade(()=>.8,['silver','silver']),'prism');
 });
 test('catalog expands valid bond/tier grants and enforces allowed rounds and enemy tiers',()=>{
