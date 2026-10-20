@@ -319,9 +319,24 @@ export function setChoice(entries, base, golden, patch) {
   return out;
 }
 
+/** Recruit variants share equipment choices, but keep their own selection flags and legal options. */
+export function setRecruitChoice(entries, base, patch, getChess) {
+  if (!base?.optionalRecruit) return setChoice(entries, base, getChess(base?.goldenId), patch);
+  let next = entries;
+  for (const tier of [5, 6]) {
+    const peer = getChess(base.chessId.replace(/_[56]_a$/, `_${tier}_a`));
+    if (peer?.optionalRecruit && peer.charId === base.charId) {
+      next = setChoice(next, peer, peer.goldenId ? getChess(peer.goldenId) : null, patch);
+    }
+  }
+  return next;
+}
+
 /** Selecting an active tier toggles it off; clearing keeps skill/module/skin choices. */
 export function setRecruitSelection(entries, chess, tier, getChess) {
-  const next = sanitizeEntries(entries, getChess);
+  let next = sanitizeEntries(entries, getChess);
+  const choice = effectiveChoice(next, chess, chess.goldenId ? getChess(chess.goldenId) : null);
+  next = setRecruitChoice(next, chess, {skill:choice.skill,module:choice.module,skin:choice.skin || 'default'}, getChess);
   const key = chess.chessId.replace(/_[56]_a$/, '');
   const id = `${key}_${tier || 5}_a`;
   const wasSelected = !!next[id]?.selected;

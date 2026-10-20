@@ -47,7 +47,7 @@ import { chessLoadout } from '../ui/gameLogic.js';
 import { data, useData, localAsset, DATA_FILES } from '../data.js';
 import { useStore, loadPref, savePref } from '../store.js';
 import { PHASE } from '../../../shared/constants.js';
-import { garrisonTexts, MODULE_NONE, PROF_ORDER, PROF_NAME, rosterOf, filterRoster, recordsOf, chessOptions, effectiveChoice, setChoice, resetChoice, changedCount, skillLabel, moduleBadge, attrRows, skillTags, serializeExport, parseImport, LOADOUT_IMPORT_MAX_BYTES, sanitizeEntries, setRecruitSelection } from '../ui/loadoutModel.js';
+import { garrisonTexts, MODULE_NONE, PROF_ORDER, PROF_NAME, rosterOf, filterRoster, recordsOf, chessOptions, effectiveChoice, setChoice, resetChoice, changedCount, skillLabel, moduleBadge, attrRows, skillTags, serializeExport, parseImport, LOADOUT_IMPORT_MAX_BYTES, sanitizeEntries, setRecruitChoice, setRecruitSelection } from '../ui/loadoutModel.js';
 import { loadoutStore, openLoadout, closeLoadout, setEntries, applyLoadoutEntries, setNotOwned, applyOwnershipImport, setDiyPicks, applyDiyImport } from '../ui/loadoutSync.js';
 
 import { CultivationSelects, cultivationView, potentialEditable } from './cultivation.js';
@@ -499,6 +499,8 @@ function LoadoutScreen({ st }) {
       .sort((a, b) => (b.isCore ? 1 : 0) - (a.isCore ? 1 : 0) || (a.bondOrder ?? 0) - (b.bondOrder ?? 0) || String(a.name).localeCompare(String(b.name), 'zh'));
   }, [ready, roster]);
   const [tab, setTab] = useState('standard');
+  const [recruitPicker,setRecruitPicker]=useState(null);
+  const [recruitQuery,setRecruitQuery]=useState('');
   const [listView,setListView]=useState(()=>loadPref('loadout.listView',false)===true);
   const leithanienChars = new Set(roster.filter(c=>c.chessId?.startsWith('chess_custom_leithanien_')).map(c=>c.charId));
   const candidates = roster.filter(c => c.optionalRecruit && c.tier === 5 && !leithanienChars.has(c.charId));
@@ -509,7 +511,6 @@ function LoadoutScreen({ st }) {
     ? candidates.map(c => getChess(c.chessId.replace(/_5_a$/, `_${displayTier(c)}_a`)))
     : roster.filter(c => !c.optionalRecruit);
   const list = filterRoster(visibleRoster, st.filters, st.entries, getChess, getBond);
-  if (tab === 'recruits') list.sort((a, b) => Number(!!selectedTier(b)) - Number(!!selectedTier(a)));
   const selId = st.sel && list.some((c) => c.chessId === st.sel) ? st.sel : list[0]?.chessId || roster[0]?.chessId || null;
   const { base, golden } = selId ? recordsOf(selId, getChess) : { base: null, golden: null };
   const nChanged = changedCount(st.entries, getChess);
@@ -530,10 +531,20 @@ function LoadoutScreen({ st }) {
       return;
     }
     setEntries(next); loadoutStore.set({ sel: id });
+    return true;
   };
   const recruitControls=c=>html`<div class="lo-seg lo-recruit-choice" aria-label=${c.name+' 선발 단계'}>${[0,5,6].map(t=>html`<button type="button" disabled=${locked||(t===6&&c.recruitReserve)} aria-pressed=${t?selectedAt(c,t):!selectedTier(c)} class=${cx((t?selectedAt(c,t):!selectedTier(c))&&'is-on')} onClick=${()=>recruit(c,t)}>${t?html`<${TierChip} tier=${t} size="sm"/>`:'-'}</button>`)}</div>`;
-  const change = (patch) => { if (base) setEntries(setChoice(loadoutStore.get().entries, base, golden, patch)); };
-  const resetOne = () => { if (base) setEntries(resetChoice(loadoutStore.get().entries, base.chessId)); };
+  const change = (patch) => { if (base) setEntries(setRecruitChoice(loadoutStore.get().entries, base, patch, getChess)); };
+  const resetOne = () => {
+    if (!base) return;
+    if (!base.optionalRecruit) { setEntries(resetChoice(loadoutStore.get().entries, base.chessId)); return; }
+    let next = {...loadoutStore.get().entries};
+    for (const tier of [5,6]) {
+      const id=base.chessId.replace(/_[56]_a$/,`_${tier}_a`);
+      if(next[id]?.selected) next[id]={selected:true}; else delete next[id];
+    }
+    setEntries(next);
+  };
   const resetAll = async () => {
     if (!nChanged) return;
     const ok = await confirmDialog({ title: '全部恢复默认', text: `将 ${nChanged} 名干员的技能与模组恢复为默认配置？`, okText: '恢复默认', danger: true });
@@ -611,9 +622,9 @@ function LoadoutScreen({ st }) {
   return html`<${Fragment}>
   <div class="lo" role="dialog" aria-modal="true" aria-label="干员调配">
     <div class="lo__bg" aria-hidden="true"></div>
-    <header class="lo-top">
+    <header class="lo-top app-topbar">
       <div class="lo-top__left">
-        <${Button} variant="ghost" size="md" icon="chevronLeft" class="lo-back" onClick=${closeLoadout} aria-label="返回" title="返回 (Esc)">返回<//>
+        <${Button} variant="ghost" size="md" icon="chevronLeft" class="lo-back nav-back" onClick=${closeLoadout} aria-label="返回" title="返回 (Esc)">返回<//>
       </div>
       <div class="lo-top__center">
         <${MicroLabel} tone="mint">OPERATOR LOADOUT<//>
@@ -631,11 +642,16 @@ function LoadoutScreen({ st }) {
     <p class=${cx('lo-note', locked && 'is-locked')}><${Icon} name="info" />${locked ? '本局的调配已锁定（确认本局信息后无法修改），修改将在下一局生效' : fromText}</p>
     ${!ready ? html`<div class="lo-loading"><${Spinner} size="sm" />正在载入干员数据（打开页面后仅载入一次）…</div>` : html`<main class=${cx('lo-body', listView&&'lo-body--list',narrowDetail && 'is-detail')}>
       <section class="lo-roster" style=${`--lo-name-length:${nameLength}`} id="lo-roster-panel" role="tabpanel" aria-labelledby=${`lo-tab-${tab}`}>
-        ${html`<${Filters} m=${m} filters=${st.filters} bonds=${bonds} presetAction=${tab==='recruits'?html`<${RecruitPresetButton}/>`:html`<${FavoritesButton} view="editor"/>`} listView=${listView} onView=${()=>{savePref("loadout.listView",!listView);setListView(!listView);setNarrowDetail(false);}} onFilters=${(filters) => loadoutStore.set({ filters })} />`}${tab === 'recruits' ? html`<div class="lo-recruit-note"><div>${[5,6].map(t => html`<span>${t}단계 <b class="num">${candidates.filter(c => selectedAt(c,t)).length}/2</b></span>`)}</div><p>선발한 오퍼레이터만 본인의 모집·보상에 등장합니다. 특질은 없습니다. 원형 오퍼레이터는 각 단계에 한 번씩 선발할 수 있습니다.</p></div>` : null}
+        ${html`<${Filters} m=${m} filters=${st.filters} bonds=${bonds} presetAction=${tab==='recruits'?html`<${RecruitPresetButton}/>`:html`<${FavoritesButton} view="editor"/>`} listView=${listView} onView=${()=>{savePref("loadout.listView",!listView);setListView(!listView);setNarrowDetail(false);}} onFilters=${(filters) => loadoutStore.set({ filters })} />`}${tab === 'recruits' ? html`<div class="lo-recruit-note">
+          <div class="lo-recruit-selected">${[5,6].map(t=>html`<section class=${`lo-recruit-selected__tier lo-recruit-selected__tier--${t}`} aria-label=${t+'단계 선발'}><h2>${t}단계 <b class="num">${candidates.filter(c=>selectedAt(c,t)).length}/2</b></h2>${[0,1].map(i=>{
+            const c=candidates.filter(c=>selectedAt(c,t))[i];
+            const selected=c&&getChess(c.chessId.replace(/_[56]_a$/,`_${t}_a`));
+            return selected?html`<${RosterRow} m=${m} chess=${selected} golden=${selected.goldenId?getChess(selected.goldenId):null} entries=${st.entries} selected=${selected.chessId===selId} onPick=${pick} tier=${t} locked=${locked} getBond=${getBond} recruitControl=${html`<button class="lo-recruit-remove" type="button" disabled=${locked} title="선발 해제" aria-label=${selected.name+' '+t+'단계 선발 해제'} onClick=${()=>recruit(selected,t)}><${Icon} name="close"/></button>`} onChange=${patch=>setEntries(setRecruitChoice(loadoutStore.get().entries,selected,patch,getChess))}/>`:html`<button type="button" class="lo-recruit-selected__empty" disabled=${locked} aria-label=${t+'단계 선발 '+(i+1)+' 선택'} onClick=${()=>{setRecruitQuery('');setRecruitPicker(t);}}><${Icon} name="plus"/><span>선발 ${i+1}</span></button>`;
+          })}</section>`)}</div><p>선발한 오퍼레이터만 본인의 모집·보상에 등장합니다. 특질은 없습니다. 원형 오퍼레이터는 각 단계에 한 번씩 선발할 수 있습니다.</p></div>` : null}
         ${listView?html`<div class="lo-list-header" ref=${listHeaderRef}><div class="lo-list-heading" aria-hidden="true"><span>오퍼레이터</span><span>직군</span><span>맹약</span><span>스킬</span><span>모듈</span>${tab==='recruits'?html`<span>선발</span>`:null}</div></div>`:null}
         <div class=${cx('lo-grid', tab === 'recruits' && 'lo-grid--recruits',listView&&'lo-grid--list')} role="listbox" aria-label="干员列表" ref=${gridRef} onScroll=${e=>{if(listHeaderRef.current)listHeaderRef.current.scrollLeft=e.currentTarget.scrollLeft;}}>
           ${list.length ? list.map((c) => html`<div class=${cx('lo-roster-entry',tab === 'recruits' && 'lo-recruit-card')} key=${c.chessId}>
-            ${listView ? html`<${RosterRow} m=${m} chess=${c} golden=${c.goldenId?getChess(c.goldenId):null} entries=${st.entries} selected=${c.chessId===selId} onPick=${pick} tier=${tab==='recruits'?(selectedAt(c,c.tier)?c.tier:selectedTier(c)):c.tier} locked=${locked} getBond=${getBond} recruitMode=${tab==='recruits'} recruitControl=${tab==='recruits'?recruitControls(c):null} onChange=${patch=>setEntries(setChoice(loadoutStore.get().entries,c,c.goldenId?getChess(c.goldenId):null,patch))}/>` : html`<${RosterCard} recruitMode=${tab==='recruits'} m=${m} chess=${c} golden=${c.goldenId?getChess(c.goldenId):null} entries=${st.entries} selected=${c.chessId===selId} onPick=${pick} tier=${tab==='recruits'?(selectedAt(c,c.tier)?c.tier:selectedTier(c)):c.tier}/>`}
+            ${listView ? html`<${RosterRow} m=${m} chess=${c} golden=${c.goldenId?getChess(c.goldenId):null} entries=${st.entries} selected=${c.chessId===selId} onPick=${pick} tier=${tab==='recruits'?(selectedAt(c,c.tier)?c.tier:selectedTier(c)):c.tier} locked=${locked} getBond=${getBond} recruitMode=${tab==='recruits'} recruitControl=${tab==='recruits'?recruitControls(c):null} onChange=${patch=>setEntries(setRecruitChoice(loadoutStore.get().entries,c,patch,getChess))}/>` : html`<${RosterCard} recruitMode=${tab==='recruits'} m=${m} chess=${c} golden=${c.goldenId?getChess(c.goldenId):null} entries=${st.entries} selected=${c.chessId===selId} onPick=${pick} tier=${tab==='recruits'?(selectedAt(c,c.tier)?c.tier:selectedTier(c)):c.tier}/>`}
             ${!listView&&tab==='recruits'?recruitControls(c):null}
           </div>`) : html`<p class="lo-empty t-dim">没有符合条件的干员</p>`}
         </div>
@@ -646,6 +662,13 @@ function LoadoutScreen({ st }) {
       </div>
     </main>`}
   </div>
+  ${recruitPicker ? html`<${Modal} open=${true} class="lo-recruit-picker" title=${recruitPicker+'단계 선발 선택'} micro="RECRUIT SELECTION" onClose=${()=>setRecruitPicker(null)}>
+    <${TextField} size="sm" icon="search" value=${recruitQuery} placeholder="오퍼레이터 검색" class="lo-recruit-picker__search" onInput=${v=>setRecruitQuery(String(v).slice(0,40))}/>
+    <div class="lo-recruit-picker__list" role="listbox" aria-label=${recruitPicker+'단계 선발 오퍼레이터'}>
+      ${filterRoster(candidates.filter(c=>!(recruitPicker===6&&c.recruitReserve)&&!selectedAt(c,recruitPicker)).map(c=>getChess(c.chessId.replace(/_[56]_a$/,`_${recruitPicker}_a`))).filter(Boolean),{query:recruitQuery},st.entries,getChess,getBond).map(c=>html`<${RosterCard} key=${c.chessId} m=${m} chess=${c} golden=${c.goldenId?getChess(c.goldenId):null} entries=${st.entries} tier=${recruitPicker} disabled=${locked} onPick=${()=>{if(recruit(c,recruitPicker))setRecruitPicker(null);}}/>`)}
+    </div>
+    <p class="t-dim lo-recruit-picker__hint">초상화를 누르면 해당 단계에 선발합니다.</p>
+  <//>` : null}
   ${io ? html`<${Modal} open=${true} onClose=${() => setIo(null)}
       title=${io.mode === 'export' ? '导出干员调配' : '导入干员调配'} micro="OPERATOR LOADOUT"
       actions=${io.mode === 'export'

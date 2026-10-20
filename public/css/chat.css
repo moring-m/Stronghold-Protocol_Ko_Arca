@@ -74,9 +74,8 @@
 .game-chat__factions button, .game-chat__faction-toggle { display: inline-flex; align-items: center; gap: 4px; }
 .game-chat__faction-icon { width: 18px; height: 18px; object-fit: contain; flex: none; }
 
-/* Waiting-room chat unfolds below a fixed header rather than above a floating corner button. */
+/* Waiting-room chat uses the participant card area instead of a floating corner button. */
 .game-chat--room { justify-content: flex-start; gap: 6px; }
-.game-chat__room-header { display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: max(.36rem, 30px); color: var(--mint-400); border-bottom: 1px solid var(--line-2); padding-bottom: 6px; pointer-events: auto; }
 .game-chat--room button.game-chat__toggle { width: max(.36rem, 30px); height: max(.36rem, 30px); margin-top: 0; }
 .game-chat--room .game-chat__panel { margin-bottom: 0; }
 .game-chat--room .game-chat__panel header strong[hidden] { display: none; }
@@ -84,7 +83,6 @@
 /* Waiting-room chat is a permanent panel; only the in-game preview uses message boxes. */
 .game-chat--room .game-chat__messages p { background: none; border: 0; padding: 0; }
 .game-chat--room .game-chat__panel { flex: 1; min-height: 0; }
-.game-chat--room .game-chat__room-header { min-height: max(.36rem,30px); }
 
 /* Follow the measured action bar so room controls never overlap the chat panel. */
 .game-chat--room { bottom: calc(var(--room-bar-height, 1.5rem) + .24rem); }
@@ -116,3 +114,9 @@
 
 /* Align the entire waiting-room chat with the actual participant card bounds. */
 .room-screen .game-chat--room { top:var(--room-seat-top,1.6rem); height:var(--room-seat-height,auto); bottom:auto; }
+
+/* Room title and faction controls share one row; messages fill the remaining card height. */
+.game-chat--room .game-chat__panel > header { flex-wrap:nowrap; min-width:0; }
+.game-chat--room .game-chat__panel > header strong { flex-shrink:0; font-size:12px; }
+.game-chat--room .game-chat__faction-toggle { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:12px; }
+.game-chat--room .game-chat__panel { box-sizing:border-box; }

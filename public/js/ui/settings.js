@@ -333,7 +333,7 @@ export function SettingsModal({ open, onClose }) {
     actions=${html`<${ResourceRedownloadButton} /><${RestartVoteControls} voteVisible=${false} onRequested=${onClose} label="리방 투표" /><${Button} variant="secondary" icon="book" class="set-guide" onClick=${() => openGuide(0)}>玩法说明<//>
       <${Button} variant="primary" icon="check" onClick=${onClose}>完成<//>`}>
     <nav class="set-categories" aria-label="설정 종류" data-i18n-skip>
-      ${[['graphics','그래픽'],['audio','소리'],['chat','채팅'],['controls','조작·단축키'],['plugins','플러그인']].map(([id,label])=>html`<button type="button" class=${category===id?'is-on':''} aria-pressed=${category===id} onClick=${()=>setCategory(id)}>${label}</button>`)}
+      ${[['graphics','그래픽'],['audio','소리'],['chat','채팅'],['controls','조작·단축키']].map(([id,label])=>html`<button type="button" class=${category===id?'is-on':''} aria-pressed=${category===id} onClick=${()=>setCategory(id)}>${label}</button>`)}
     </nav>
     <div class="set-list">
     <section hidden=${category!=='audio'} class="set-category" data-category="audio">
@@ -402,9 +402,6 @@ export function SettingsModal({ open, onClose }) {
       </div>`)}
       <${Button} variant="secondary" size="sm" onClick=${()=>{updateSettings({keys:DEFAULT_HOTKEYS});setBinding(null);}}>단축키 기본값 복원<//>
 
-    </section><section hidden=${category!=='plugins'} class="set-category" data-category="plugins">
-      <${CosmeticSection} /><${UiPluginSection} />
-      <p class="set-hint">설치된 외형·UI 플러그인은 이곳에서 개인별로 설정할 수 있습니다.</p>
     </section></div>
   <//>`;
 }

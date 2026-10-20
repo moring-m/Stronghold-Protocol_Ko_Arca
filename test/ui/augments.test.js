@@ -45,3 +45,12 @@ test('every offered augment has an indexed or local icon, including newly added 
 test('named faction augments always carry their matching bond icon',()=>{
  const names={빅토리아:'victoriaShip',쉐라그:'kjeragShip',라이타니엔:'leithanienShip'};for(const [name,bond]of Object.entries(names)){const a=createAugmentCatalog(data,10).find(a=>a.name===name);assert.ok(a);assert.equal(a.iconBond,bond);}
 });
+
+test('Victoria equipment support grants Steam Heart as its advanced equipment',()=>{
+ for(const [name,count] of [['빅토리아 장비 지원 II',1],['빅토리아 장비 지원 III',1]]){
+  const a=createAugmentCatalog(data,10).find(a=>a.name===name);
+  assert.ok(a);assert.equal(a.effect.items[0],'chess_item_6_05_e_a');assert.equal(a.effect.counts[0],count);
+  assert.match(a.description,/증기의 마음 1개/);assert.ok(!a.effect.items.includes('chess_item_4_09_e_a'));
+  if(name.endsWith('III'))assert.equal(a.effect.counts[1],2);
+ }
+});

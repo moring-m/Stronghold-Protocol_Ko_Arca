@@ -1,0 +1,43 @@
+/* Preserve each page's composition and artwork; share only navigation sizing and control metrics. */
+:root { --ui-control-height:36px; --ui-control-font:13px; --ui-title-font:22px; }
+html body header.app-topbar:is(.topbar,.lo-top,.st-top) { box-sizing:border-box; height:88px; min-height:88px; padding:0 24px; }
+html body header.app-topbar:is(.topbar,.lo-top,.st-top)>:is(.topbar__left,.lo-top__left,.st-top__left,.topbar__right,.lo-top__right,.st-top__right) { align-items:center; gap:10px; min-width:0; }
+html body header.app-topbar:is(.topbar,.lo-top,.st-top)>:is(.topbar__center,.lo-top__center,.st-top__center) { gap:4px; min-width:0; }
+html body header.app-topbar:is(.topbar,.lo-top,.st-top) :is(.topbar__title,.lo-top__title) { margin:0; font-size:var(--ui-title-font); font-weight:700; line-height:1.25; letter-spacing:.06em; }
+html body header.app-topbar:is(.topbar,.lo-top,.st-top) .micro { font-size:10px; line-height:1.2; letter-spacing:.13em; }
+html body header.app-topbar:is(.topbar,.lo-top,.st-top) :is(.lo-count,.lo-sync,.solo-note,.room-mode) { font-size:12px; }
+@media(max-width:1400px) {
+ html body header.app-topbar:is(.topbar,.lo-top,.st-top) { height:104px; min-height:104px; padding:8px 18px; }
+}
+@media(max-width:760px) {
+ :root { --ui-title-font:18px; --ui-control-font:12px; }
+ html body header.app-topbar:is(.topbar,.lo-top,.st-top) { padding:8px 12px; }
+}
+@media(pointer:coarse) { :root { --ui-control-height:40px; } }
+html body :is(.modal__box.settings-modal,.modal__box.ui-editor,.modal__box.patch-modal) .modal__head { box-sizing:border-box; padding:18px 20px 12px; min-height:72px; gap:5px; border-bottom:1px solid var(--line); }
+html body :is(.modal__box.settings-modal,.modal__box.ui-editor,.modal__box.patch-modal) .modal__title { margin:0; font-size:20px; line-height:1.3; letter-spacing:.03em; }
+html body :is(.settings-modal,.ui-editor) .modal__head .micro { font-size:10px; letter-spacing:.13em; }
+html body :is(.settings-modal,.ui-editor) :is(select,input[type="number"],input[type="text"],input[type="search"]) { box-sizing:border-box; min-height:var(--ui-control-height); font:inherit; font-size:var(--ui-control-font); border:1px solid var(--line-2); border-radius:0; color:var(--text-hi); background:var(--bg-0); }
+html body :is(.settings-modal,.ui-editor,.app-topbar) :is(button,input,select):focus-visible { outline:2px solid var(--mint-400); outline-offset:2px; }
+/* Keep the existing compact-screen title/toolbar treatment without changing desktop composition. */
+@media(max-width:760px) {
+ html body header.app-topbar:is(.topbar,.lo-top,.st-top) { height:112px; min-height:112px; grid-template-columns:minmax(0,1fr) minmax(0,1fr); grid-template-rows:48px 40px; gap:8px; padding:8px 12px; }
+ html body header.app-topbar:is(.topbar,.lo-top,.st-top)>:is(.topbar__center,.lo-top__center,.st-top__center) { grid-column:1/-1; grid-row:1; gap:2px; }
+ html body header.app-topbar:is(.topbar,.lo-top,.st-top)>:is(.topbar__left,.lo-top__left,.st-top__left) { grid-column:1; grid-row:2; }
+ html body header.app-topbar:is(.topbar,.lo-top,.st-top)>:is(.topbar__right,.lo-top__right,.st-top__right) { grid-column:2; grid-row:2; }
+ html body header.app-topbar:is(.topbar,.lo-top,.st-top)>:is(.topbar__left,.lo-top__left,.st-top__left,.topbar__right,.lo-top__right,.st-top__right) { width:100%; min-width:0; max-width:100%; overflow-x:auto; overflow-y:hidden; flex-wrap:nowrap; padding:2px; box-sizing:border-box; }
+ html body header.app-topbar:is(.topbar,.lo-top,.st-top)>:is(.topbar__center,.lo-top__center,.st-top__center)>.micro { display:none; }
+ html body header.app-topbar:is(.topbar,.lo-top,.st-top) .settings-entry,html body header.app-topbar:is(.topbar,.lo-top,.st-top) .patch-entry { flex:none; }
+}
+html body header.app-topbar:is(.topbar,.lo-top,.st-top) :is(.btn,.room-ping,.ping,.settings-entry,.patch-entry) { flex-shrink:0; }
+
+/* Navigation tabs act as page headings: use the exact same type metrics as h1 titles. */
+html body header.app-topbar:is(.topbar,.lo-top,.st-top) :is(.topbar__title,.lo-top__title,.lo-title-tabs button,.st-tab) {
+ font-family:var(--font-ui,sans-serif); font-size:var(--ui-title-font); font-weight:700; line-height:1.25; letter-spacing:.06em;
+}
+/* Special large/danger buttons retain their original sizes. Only ordinary button height is shared; original padding, fonts, borders, textures and hover treatments stay in place. */
+html body header.app-topbar:is(.topbar,.lo-top,.st-top) .btn:where(:not(.btn--danger):not(.btn--lg):not(.btn--xl)) { min-height:var(--ui-control-height); height:var(--ui-control-height); }
+html body header.app-topbar:is(.topbar,.lo-top,.st-top) .btn--square:where(:not(.btn--danger):not(.btn--lg):not(.btn--xl)) { --sq:var(--ui-control-height); }
+/* The loadout subtitle belongs to its heading, rather than to the top edge of the bar. */
+html body header.app-topbar.lo-top > .lo-top__center { gap:2px; }
+html body header.app-topbar.lo-top .lo-title-tabs button { padding-top:0; padding-bottom:0; }

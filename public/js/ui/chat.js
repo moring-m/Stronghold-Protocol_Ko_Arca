@@ -128,9 +128,8 @@ export function ChatPanel({room = false, docked = false}) {
     </button>`;
   return [html`<aside class=${room ? 'game-chat game-chat--room' : docked ? 'game-chat game-chat--docked' : 'game-chat'} aria-label="게임 채팅" onKeyDown=${keyboard} onPointerDown=${(e) => e.stopPropagation()}>
     <${RestartVoteControls} requestVisible=${false} />
-    ${room ? html`<header class="game-chat__room-header"><strong>대기실 채팅</strong></header>` : null}
     ${open ? html`<section class="game-chat__panel" id="game-chat-panel" aria-label="게임 채팅창">
-      <header><strong hidden=${room}>게임 채팅</strong><button type="button" class="game-chat__faction-toggle"
+      <header><strong>${room ? '대기실 채팅' : '게임 채팅'}</strong><button type="button" class="game-chat__faction-toggle"
         aria-expanded=${choosingFaction} aria-controls="game-chat-factions" disabled=${!online || sending}
         style=${faction ? { color: chatFaction(faction)?.color } : null} onClick=${() => setChoosingFaction(!choosingFaction)}>${faction ? html`<img src=${bondIconUrl(m,chatFaction(faction)?.bondId)} class="game-chat__faction-icon" />${faction}` : '진영 선택'}</button>
         ${!room ? html`<button type="button" class="game-chat__visibility" aria-label=${previewVisible ? '채팅 완전히 숨기기' : '최근 채팅 표시'} title=${previewVisible ? '채팅 완전히 숨기기' : '최근 채팅 표시'} aria-pressed=${!previewVisible} onClick=${() => { const next = !previewVisible; setPreviewVisible(next); savePref('chatPreview', next); if (!next) setOpen(false); }}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>${previewVisible ? html`<path d="M3 3l18 18"/>` : null}</svg></button>` : null}

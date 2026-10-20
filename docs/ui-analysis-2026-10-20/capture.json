@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-20",
+  "timezone": "Asia/Seoul",
+  "baseline": "a10932dcafc96a0148b4bf24acbc3c6b4d43e8f0",
+  "browser": "Chromium",
+  "desktop": [
+    1440,
+    1000
+  ],
+  "mobile": [
+    390,
+    844
+  ],
+  "data": "Identical verification fixture using real production catalogue; not live production player records",
+  "files": [
+    "after/live-mobile.png",
+    "after/live-pc.png",
+    "after/report-detailed-pc.png",
+    "after/report-mobile.png",
+    "after/report-pc.png",
+    "after/report-share-pc.png",
+    "after/settings-mobile.png",
+    "after/settings-pc.png",
+    "before/live-mobile.png",
+    "before/live-pc.png",
+    "before/report-mobile.png",
+    "before/report-pc.png",
+    "before/settings-mobile.png",
+    "before/settings-pc.png"
+  ]
+}

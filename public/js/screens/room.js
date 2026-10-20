@@ -35,7 +35,7 @@ import { SettingsButton } from '../ui/settings.js';
 import { LoadoutButton } from '../ui/loadoutEntry.js';
 import { CustomExtensionsDialog } from '../ui/customExtensions.js';
 import { saveCustomExtensionPrefs } from '../ui/customExtensionPrefs.js';
-import { PluginTag, isModdedRoom } from '../ui/pluginTag.js';
+import { isModdedRoom } from '../ui/pluginTag.js';
 import { hasScriptConsent, rememberScriptConsent } from '../content.js';
 import { net } from '../net.js';
 import { store, useStore, shallowEqual, emptyMatch, isSpectating } from '../store.js';
@@ -367,7 +367,7 @@ export function RoomScreen() {
         : html`<span class="t-lo">准备就绪后，创建者即可开始模拟</span>`;
 
   return html`<div class="screen room-screen">
-    <header class="topbar">
+    <header class="topbar app-topbar">
       <div class="topbar__left">
         <${Tooltip} text="离开同盟" placement="bottom">
           <${Button} variant="danger" size="lg" square=${true} icon="exit" loading=${busy === 'leave'} onClick=${leave} aria-label="离开同盟" />
@@ -383,7 +383,7 @@ export function RoomScreen() {
         <${MicroLabel} tone="mint">${coop ? 'ALLIANCE LOBBY' : 'SOLO SIMULATION'}<//>
         <h1 class="topbar__title">${coop ? t('同盟模拟') : t('独立模拟')}${room.test ? html` <${TestMark} />` : null}<span class="topbar__sep"></span><${DifficultyTag} difficulty=${room.difficulty} size="lg" />
           ${room.content?.modeId ? html`<span class="room-mode" data-testid="room-mode">${(room.content.modes || []).find((m) => m.id === room.content.modeId)?.name || room.content.modeId}</span>` : null}</h1>
-        <${PluginTag} room=${room} myId=${me.playerId} />
+
       </div>
       <div class="topbar__right">
         ${coop ? html`<${InviteBox} code=${room.code} name=${me.name} difficulty=${room.difficulty} />` : html`<div class="solo-note"><${MicroLabel}>SINGLE OPERATOR<//><span>仅限 1 名博士</span></div>`}

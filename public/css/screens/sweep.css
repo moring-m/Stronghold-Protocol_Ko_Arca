@@ -106,8 +106,8 @@
 
 .sw-augment-grade { color: var(--augment-color); }
 .sw-augment-note { flex: none; margin: 0; padding: .16rem; color: #dfe5e3; background: rgba(20, 25, 24, .8); font-size: max(calc(.18 * var(--t)), 12px); }
-.sw-tile--augment .sw-disc { background: radial-gradient(circle, color-mix(in srgb, var(--augment-color) 18%, #1a2220), #101715); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--augment-color) 65%, transparent); }
-.sw-tile--augment .sw-disc img { width: 80%; height: 80%; filter: none; opacity: 1; }
+.sw-tile--augment .sw-disc { grid-template: minmax(0, 1fr) / minmax(0, 1fr); overflow: hidden; min-width: 0; min-height: 0; background: radial-gradient(circle, color-mix(in srgb, var(--augment-color) 18%, #1a2220), #101715); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--augment-color) 65%, transparent); }
+.sw-tile--augment .sw-disc img { width: 80%; height: 80%; min-width: 0; min-height: 0; object-fit: contain; filter: none; opacity: 1; }
 .sw-tile--augment .sw-tile__cap { white-space: normal; overflow-wrap: anywhere; }
 .sw-augments .sw-sec__head { background: linear-gradient(90deg, color-mix(in srgb, var(--augment-color) 25%, #19221f), #19221f); border-bottom: 1px solid var(--augment-color); }
 .sw-augments .sw-sec__name, .sw-augments .sw-sec__glyph { color: var(--augment-color); }

@@ -545,9 +545,9 @@ function StatsScreen({ tab }) {
   const empty = !stats.records.length;
   return html`<div class="st" role="dialog" aria-modal="true" aria-label=${t('统计数据')} tabindex="-1" ref=${boxRef}>
     <div class="st__bg" aria-hidden="true"></div>
-    <header class="st-top">
+    <header class="st-top app-topbar">
       <div class="st-top__left">
-        <${Button} variant="ghost" size="md" icon="chevronLeft" class="st-back" onClick=${closeStats} aria-label=${t('返回')} title=${t('返回 (Esc)')}>${t('返回')}<//>
+        <${Button} variant="ghost" size="md" icon="chevronLeft" class="st-back nav-back" onClick=${closeStats} aria-label=${t('返回')} title=${t('返回 (Esc)')}>${t('返回')}<//>
       </div>
       <div class="st-top__center">
         <${MicroLabel} tone="mint">STATISTICS // ${tabInfo.micro}<//>

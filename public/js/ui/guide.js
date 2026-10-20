@@ -92,7 +92,7 @@ export function openGuide(page = 0) {
 export const closeGuide = () => guideStore.set({ open: false });
 
 /** Standard 玩法说明 trigger button. */
-export function GuideButton({ class: cls, size = 'sm', variant = 'ghost', label = '玩法说明', square = false }) {
+export function GuideButton({ class: cls, size = 'sm', variant = 'ghost', label = '玩法说明', square = true }) {
   return html`<${Button} variant=${variant} size=${size} icon="book" square=${square} class=${cx('guide-btn', cls)}
     onClick=${() => openGuide(0)} title="玩法说明" aria-label="玩法说明">${square ? null : label}<//>`;
 }

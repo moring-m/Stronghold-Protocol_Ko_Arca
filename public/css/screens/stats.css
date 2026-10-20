@@ -363,3 +363,7 @@
 .st-custom{display:inline-block;margin-left:.08rem;font-size:.11rem}.st-custom summary{color:var(--mint);cursor:pointer}.st-custom>div{position:relative;min-width:2.5rem;z-index:10;background:#101c19;border:1px solid #41695c;padding:.15rem;max-width:5rem;white-space:normal}.st-custom p{margin:.06rem 0}
 
 .combat-chart .is-note{background:#b49bd8;}
+
+/* Keep the statistics overview aligned with the shared neutral/mint controls. */
+.st :is(select,input[type="search"]) { background:var(--bg-1); color:var(--text-hi); border-color:var(--line-2); }
+.st button:focus-visible { outline:2px solid var(--mint-400); outline-offset:2px; }

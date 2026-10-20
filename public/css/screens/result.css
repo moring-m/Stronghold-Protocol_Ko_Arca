@@ -165,3 +165,47 @@
 /* a match with gameplay plugins (DESIGN §32.6): the unofficial mark under the headline */
 .result__modmark { align-self: flex-start; margin-top: .06rem; }
 .result__test { display: flex; align-items: center; gap: .08rem; margin: .08rem 0 0; color: #e8b84a; }
+
+/* Analysis panels use the same surfaces, typography and mint focus as settings. */
+.combat-report { width:100%; min-width:0; gap:16px; padding:20px; box-sizing:border-box; color:var(--text-hi); font-size:14px; background:var(--bg-0,#0a1411); border:1px solid var(--line-2); }
+.combat-report__heading { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.combat-report h2 { margin:4px 0 0; font-size:22px; }
+.combat-report__heading .micro { color:var(--mint-400); font-size:10px; letter-spacing:.18em; }
+.combat-report button { min-height:32px; padding:6px 12px; font:inherit; font-size:12px; border:1px solid var(--line-2); background:var(--bg-1); color:var(--text-md); cursor:pointer; }
+.combat-report button[aria-pressed="true"] { background:color-mix(in srgb,var(--mint-400) 10%,var(--bg-1)); border-color:var(--mint-400); color:var(--mint-400); }
+.combat-report__controls { display:flex; flex-wrap:wrap; align-items:end; gap:12px; padding:14px; background:var(--bg-1); border:1px solid var(--line); }
+.combat-report__controls label { display:flex; flex:1 1 145px; flex-direction:column; gap:6px; min-width:0; font-size:11px; color:var(--text-lo); }
+.combat-report select { width:100%; max-width:100%; min-width:0; height:34px; border:1px solid var(--line-2); background:var(--bg-0); color:var(--text-hi); font:inherit; font-size:13px; padding:0 8px; }
+.combat-report__summary { grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:8px; }
+.combat-report__summary>div { padding:12px; gap:8px; background:var(--bg-1); border-color:var(--line); }
+.combat-report__summary span { font-size:11px; color:var(--text-lo); }
+.combat-report__summary b { font-size:22px; font-family:var(--font-num); }
+.combat-charts { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr)); gap:12px; min-width:0; }
+.combat-chart { min-width:0; background:var(--bg-1); border:1px solid var(--line); padding:16px; }
+.combat-chart h3 { display:flex; justify-content:space-between; gap:8px; margin:0 0 18px; font-size:14px; }
+.combat-chart h3 small { font-size:11px; font-weight:400; color:var(--text-lo); }
+.combat-chart__row { display:grid; grid-template-columns:minmax(90px,1fr) minmax(60px,2fr) 64px; gap:10px; min-height:44px; margin:0; padding:6px 0; border-bottom:1px solid var(--line); font-size:12px; }
+.combat-chart__name { min-width:0; display:flex; align-items:center; gap:8px; }
+.combat-chart__name>span { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.combat-chart__name .uthumb { --ut:30px; flex:none; }
+.combat-chart__name>.icon { width:22px; height:22px; flex:none; color:var(--text-lo); }
+.combat-chart__track { height:8px; border-radius:0; background:var(--line); }
+.combat-chart__bar { height:100%; display:flex; }
+.combat-chart__bar>i { background:var(--mint-400); }
+.combat-chart__row>b { text-align:right; align-self:center; font-size:13px; }
+.combat-report__note,.combat-report__empty { margin:0; font-size:12px; line-height:1.7; color:var(--text-lo); }
+.combat-report table { font-size:12px; }
+.combat-report th,.combat-report td { padding:10px 12px; }
+.combat-report thead { background:var(--bg-1); }
+.combat-report__total { color:var(--mint-400); }
+.combat-share { display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:24px; }
+.combat-share__ring { width:160px; height:160px; border-radius:50%; display:grid; place-items:center; flex:none; }
+.combat-share__ring>span { width:112px; height:112px; background:var(--bg-1); border-radius:50%; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:8px; color:var(--text-lo); font-size:11px; }
+.combat-share__ring b { font-size:20px; color:var(--text-hi); }
+.combat-share__legend { flex:1; min-width:150px; list-style:none; margin:0; padding:0; }
+.combat-share__legend li { display:flex; gap:8px; align-items:center; padding:7px 0; font-size:12px; }
+.combat-share__legend i { width:8px; height:8px; flex:none; }.combat-share__legend span { flex:1; min-width:0; overflow-wrap:anywhere; }
+.combat-trend svg { width:100%; height:auto; display:block; stroke:var(--mint-400); stroke-width:2; }.combat-trend circle { fill:var(--mint-400); }.combat-trend__axis { stroke:var(--line-2); }
+.combat-trend__labels { display:flex; gap:12px; overflow:auto; justify-content:space-between; }.combat-trend__labels span { font-size:11px; color:var(--text-lo); }.combat-trend__labels b { display:block; color:var(--text-hi); margin-top:4px; font-size:12px; }
+.combat-report :is(button,select):focus-visible { outline:2px solid var(--mint-400); outline-offset:2px; }
+@media(max-width:600px) { .combat-report { padding:12px; gap:12px; }.combat-report__summary { grid-template-columns:repeat(2,minmax(0,1fr)); }.combat-chart { padding:12px; }.combat-chart__row { grid-template-columns:minmax(70px,1fr) minmax(40px,1fr) 56px; gap:6px; }.combat-report h2 { font-size:18px; } }

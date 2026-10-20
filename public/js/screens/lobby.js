@@ -345,6 +345,10 @@ export function LobbyScreen() {
     if (!k) { toast(`同盟密钥为 ${ROOM_CODE_LEN} 位字母或数字`, 'warn'); return; }
     setFullAsk(null);
     run('spectate', () => net.request('room.spectate', { code: k }).catch((err) => {
+      if (err?.code === ERR.ROOM_FULL && ['spectating off for this room','solo room'].includes(err.detail)) {
+        toast('관전이 허용되지 않은 방입니다.', 'warn');
+        return;
+      }
       // Clearer than the bare ERR_TEXT: the usual cause is a code that is not the host's (a remembered one from an
       // earlier room, or another machine's) — the server can only answer "no such room".
       if (err?.code === ERR.ROOM_NOT_FOUND) {
@@ -364,9 +368,9 @@ export function LobbyScreen() {
   };
 
   return html`<div class="screen lobby-screen">
-    <header class="topbar">
+    <header class="topbar app-topbar">
       <div class="topbar__left">
-        <${Button} variant="ghost" size="sm" icon="chevronLeft" onClick=${backToTitle} title="返回标题">返回<//>
+        <${Button} variant="ghost" size="sm" icon="chevronLeft" class="nav-back" onClick=${backToTitle} title="返回标题">返回<//>
         <${PingPill} ms=${conn.ping} online=${online} />
         <${PatchNotesButton} autoOpen=${true} />
         <${Button} variant="secondary" size="sm" icon="report" class="lobby-sweep" onClick=${() => setSweepOpen(true)}>S.W.E.E.P. 리포트<//>

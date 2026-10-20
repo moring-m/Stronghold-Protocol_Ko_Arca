@@ -80,6 +80,17 @@ test('lobby report, custom bond references, augment search and profile statistic
     const catalog = reportAugments(game);
     assert.equal(await page.$$('.sw-tile').then((x) => x.length), catalog.length);
     await capture('augments');
+    for (const name of ['신병','헤드헌팅']) {
+      await page.$eval('[aria-label="증강 검색"]', (e) => { e.value = ''; e.dispatchEvent(new Event('input', { bubbles: true })); });
+      await page.type('[aria-label="증강 검색"]', name);
+      await page.waitForFunction((name) => !!document.querySelector(`.sw-tile[title="${name}"]`), {}, name==='헤드헌팅'?'헤드헌팅 I':name);
+      await page.click(`.sw-tile[title="${name==='헤드헌팅'?'헤드헌팅 I':name}"]`);
+      await page.waitForFunction(() => { const img = document.querySelector('.sw-disc img'); return img?.complete && img.naturalWidth > 0; });
+      const fitting = await page.$eval('.sw-disc', (e) => { const r=e.getBoundingClientRect(),img=e.querySelector('img'),a=img.getBoundingClientRect();return {circleWidth:r.width,circleHeight:r.height,inside:a.left>=r.left&&a.top>=r.top&&a.right<=r.right&&a.bottom<=r.bottom,fit:getComputedStyle(img).objectFit}; });
+      assert.ok(Math.abs(fitting.circleWidth-fitting.circleHeight)<1,JSON.stringify(fitting));assert.ok(fitting.inside);assert.equal(fitting.fit,'contain');
+      await capture(name==='신병'?'augment-new-recruit':'augment-headhunting');
+    }
+    await page.$eval('[aria-label="증강 검색"]', (e) => { e.value = ''; e.dispatchEvent(new Event('input', { bubbles: true })); });
     await page.type('[aria-label="증강 검색"]', '뮤엘시스의 지원');
     await page.waitForFunction(() => document.querySelectorAll('.sw-tile').length === 1);
     await page.click('.sw-tile');
