@@ -3,9 +3,15 @@ import {RANDOM_BAND_ID,withRandomBands} from './randomBand.js';
 import {eightUniteStage} from './cooperativeEight.js';
 import { customFactionData, filterCustomFaction } from './customFactions.js';
 
+export const AUGMENT_STAT_BASES=Object.freeze({enemyHp:100,bossHp:100,enemyAtk:100,enemyDef:100,enemyRes:0});
+export const isAugmentStatActive=(selection,id)=>selection.rules?.includes('augments')&&selection.ruleValues?.[id+'ByAugment']===1;
+
 export const RULE_VALUES = Object.freeze([
- {id:"augmentEnemyVote",name:"적 증강 선택 방식",category:"augments",default:0,min:0,max:1,step:1,unit:"",options:[{value:0,label:"방장 선택"},{value:1,label:"참가자 투표"}]},
+ {id:"augmentEnemyVote",name:"적 증강 선택 방식",category:"augments",default:0,min:0,max:2,step:1,unit:"",options:[{value:0,label:"방장 선택"},{value:1,label:"참가자 투표"},{value:2,label:"가중치 투표"}]},
  ...[["augmentSilver","실버 가중치",2,1000],["augmentGold","골드 가중치",5,1000],["augmentPrism","프리즘 가중치",3,1000],["augmentAllyRerolls","아군 리롤",1,10],["augmentEnemyRerolls","적 리롤",1,10]].map(([id,name,value,max])=>({id,name,category:"augments",default:value,min:0,max,step:1,unit:id.includes("Rerolls")?"회":""})),
+ {id:'enemyHpByAugment',name:'일반 적 HP 증가 방식',category:'enemyStats',default:0,min:0,max:1,step:1,unit:'',options:[{value:0,label:'고정 배율'},{value:1,label:'증강 등급 누적'}]},
+ {id:'bossHpByAugment',name:'보스 HP 증가 방식',category:'bossStats',default:0,min:0,max:1,step:1,unit:'',options:[{value:0,label:'고정 배율'},{value:1,label:'증강 등급 누적'}]},
+ ...[['enemyAtk','일반 적 공격력 증가 방식'],['enemyDef','일반 적 방어력 증가 방식'],['enemyRes','일반 적 마법 저항 증가 방식']].map(([id,name])=>({id:id+'ByAugment',name,category:'enemyStats',default:0,min:0,max:1,step:1,unit:'',options:[{value:0,label:'고정 배율'},{value:1,label:'증강 등급 누적'}]})),
  {id:'normalBattleTime',name:'일반 라운드 전투 시간',default:0,min:0,max:1800,step:1,unit:'초'},
  {id:'bossBattleTime',name:'보스 라운드 전투 시간',default:120,min:1,max:3600,step:1,unit:'초'},
  {id:'bossBattleSpeed',name:'보스전 진행 속도',default:1,min:1,max:2,step:1,unit:'',options:[{value:1,label:'1배속'},{value:2,label:'2배속 (시간 포함)'}]},
@@ -116,7 +122,7 @@ export function applyCustomExtensions(raw, selection) {
     Object.assign(m,{rounds,enemyScale,roundSource,bossRound:roundCount+1,lastRound:roundCount+1,hiddenRound:original.hiddenRound?roundCount+2:null,spRounds:(original.spRounds||[]).filter(r=>r<=roundCount)});
   }
   const battleStages={...stages,...Object.fromEntries(Object.values(stages).filter(s=>!s.coopEightStage).map(s=>{const four=eightUniteStage(s);return [four.id,four];}))};
-  return { ...data, stages:battleStages, config: { ...raw.config, modes, deployCap:normalizeRuleValues(selection.ruleValues).deployCap, commonBandRecords,commonBands:Object.keys(commonBandRecords),lpCapPerRound:selection.rules?.includes('unlimitedHpLoss')?Number.MAX_SAFE_INTEGER:raw.config?.lpCapPerRound,customRules:{...normalizeRuleValues(selection.ruleValues),unlimitedStock:normalizeRuleValues(selection.ruleValues).stockPlayers===-1,...Object.fromEntries((selection.rules||[]).map(id=>[id,true]))} } };
+  return { ...data, stages:battleStages, config: { ...raw.config, modes, deployCap:normalizeRuleValues(selection.ruleValues).deployCap, commonBandRecords,commonBands:Object.keys(commonBandRecords),lpCapPerRound:selection.rules?.includes('unlimitedHpLoss')?Number.MAX_SAFE_INTEGER:raw.config?.lpCapPerRound,customRules:{...normalizeRuleValues(selection.ruleValues),...Object.fromEntries(Object.entries(AUGMENT_STAT_BASES).filter(([id])=>isAugmentStatActive(selection,id))),unlimitedStock:normalizeRuleValues(selection.ruleValues).stockPlayers===-1,...Object.fromEntries((selection.rules||[]).map(id=>[id,true]))} } };
 }
 /** Validate before creating/starting a match, with the same filtered tables used by combat. */
 export function validateExtensionMinimums(raw,selection,{mode='coop',difficulty='NORMAL'}={}){

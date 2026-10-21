@@ -218,6 +218,7 @@ function fixText(node) {
 }
 
 function fixAttrs(el) {
+  if(el.hasAttribute?.('data-room-title'))return;
   for (const a of ATTRS) {
     const v = el.getAttribute(a);
     if (v && TRIGGER.test(v)) {

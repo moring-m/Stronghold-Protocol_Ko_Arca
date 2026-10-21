@@ -400,3 +400,9 @@ html body .room-screen header.app-topbar .invite__btns .btn { height:24px; min-h
 .gameplay-mode-tip p { margin:0 0 8px; }
 .gameplay-mode-tip ul { margin:0;padding-left:18px; }
 .gameplay-mode-tip li + li { margin-top:5px; }
+
+.room-title-editor{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px;width:100%;margin-bottom:12px}.room-title-editor label{font-size:12px;color:var(--text-lo)}.room-title-editor input{min-width:0;width:100%;box-sizing:border-box;background:var(--panel);color:var(--text-hi);border:1px solid var(--line-2);padding:8px 10px;font:inherit}.room-title-editor .btn{white-space:nowrap}
+
+.room-screen>.room-title-editor{flex:none;width:calc(100% - 40px);margin:10px 20px 0;box-sizing:border-box}
+
+.room-title-editor{display:flex;justify-content:center;align-items:center;gap:8px;min-height:40px}.room-title-editor>strong{font-size:18px;line-height:1.3;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:calc(100% - 44px);color:var(--text-hi)}.room-title-editor input{width:min(360px,70vw);flex:0 1 360px;height:34px}.room-title-editor .btn{width:28px;min-width:28px;height:28px;padding:0}

@@ -48,7 +48,7 @@ test('skill SP recovery works while duration skills are active, and Sargon stack
  h.run(5);h.b.emit('skillStart',{unit:u});h.run(.05);close(u.s.aspd,124);h.run(10);close(u.s.aspd,112);h.run(5);close(u.s.aspd,100);
 });
 test('surrendered unspawned enemies retain normal settlement HP without a breakthrough surcharge',()=>{
- const h=makeBattle({defs:{enemies:{enemy_test:enemyRec({key:'enemy_test',hp:100,lpr:1})}},content:'none',extraContent:[{install}],enemies:[{key:'enemy_test',time:50}],flags:{augments:{allies:{},enemies:[item(find('돌파','enemy'))]}},autoFinish:false});h.run(.1);h.b.forceEnd('surrender');const leaks=h.b.result().perPlayer.p1.leaked;assert.equal(leaks.length,1);assert.equal(leaks[0].lpr,1);
+ const h=makeBattle({defs:{enemies:{enemy_test:enemyRec({key:'enemy_test',hp:100,lpr:1})}},content:'none',extraContent:[{install}],enemies:[{key:'enemy_test',time:50}],flags:{augments:{allies:{},enemies:[item(createAugmentCatalog(data,7).find(a=>a.name==='돌파'&&a.side==='enemy'))]}},autoFinish:false});h.run(.1);h.b.forceEnd('surrender');const leaks=h.b.result().perPlayer.p1.leaked;assert.equal(leaks.length,1);assert.equal(leaks[0].lpr,1);
 });
 
 test('enemy elemental buildup uses the same once-only multiplier as elemental damage',()=>{
@@ -98,7 +98,7 @@ for(const [name,chance]of [['회피 I',.25],['회피 II',.35],['회피 III',.5]]
 for(const [name,amount]of [['무사 I',40],['무사 II',70],['무사 III',100]])test(`${name} heals the operator once per attack`,()=>{const {h,u}=fixture({allies:[find(name)]});u.hp=500;h.b.forceAttack(u);close(u.hp,500+amount);});
 test('Siracusa augment grants stealth to operators and Karlans eye reveals only the personal field',async()=>{
  const {enemyStealthed}=await import('../../server/sim/targeting.js');const {u}=fixture({allies:[find('시라쿠사')]});assert.equal(u.s.flags.stealth,true);
- for(const kind of ['normal','unite','boss','hidden']){const {h,e}=fixture({kind,allies:[find('카란의 눈')]});h.b.addBuff(e,{key:'late-stealth',flags:{stealth:true}});assert.equal(enemyStealthed(e),kind!=='normal');}
+ for(const kind of ['normal','unite','boss','hidden']){const {h,e}=fixture({kind,allies:[find('카란의 눈')]});h.b.addBuff(e,{key:'late-stealth',flags:{stealth:true}});assert.equal(enemyStealthed(e),!['normal','unite'].includes(kind));}
 });
 
 for(const [tier,pct,res,aspd]of [['I',10,8,10],['II',20,15,20],['III',30,30,30]])test(`enemy allied reductions ${tier} apply to allies rather than enemies`,()=>{
@@ -170,6 +170,35 @@ for(const [tier,multiplier]of [['I',1.1],['II',1.2],['III',1.3]])test(`enemy art
  const physical=u.hp;h.b.dealDamage(e,u,{amount:200,type:'phys'});close(physical-u.hp,100);
 });
 test('enemy balance descriptions and executable effects use the requested grade values',()=>{
- const values={'재생':[100,170,250],'상태이상 증가':[50,70,100],'원소 피해 증가':[50,80,120],'이동 속도 증가':[15,25,35],'아군 방어력 감소':[15,30,50],'아군 지속 피해':[40,70,100]};
+ const values={'재생':[100,200,300],'상태이상 증가':[50,70,100],'원소 피해 증가':[50,80,120],'이동 속도 증가':[15,25,35],'아군 방어력 감소':[15,30,50],'아군 지속 피해':[40,70,100]};
  for(const [name,amounts]of Object.entries(values))for(const [i,tier]of ['I','II','III'].entries()){const card=find(`${name} ${tier}`,'enemy');assert.ok(card);assert.match(card.description,new RegExp(String(amounts[i])));}
+});
+
+test('grade HP multiplies non-boss enemy health once, including new summons and unite entries',()=>{
+ for(const kind of ['normal','unite','boss']){
+  const h=makeBattle({kind,defs:{enemies:{probe:enemyRec({key:'probe',hp:1000,speed:0})}},content:'none',extraContent:[{install}],flags:{augments:{allies:{},enemies:[{id:'hp',effect:{kind:'stats',mods:{hpPct:.25}}}],enemyHpMultiplier:1.1*1.15*1.2}},autoFinish:false});h.run(.1);const e=h.spawn('probe',{pos:[2,5]});assert.ok(e,kind);close(e.s.maxHp,1000*1.1*1.15*1.2*1.25);close(e.hp,e.s.maxHp);
+  h.b.emit('deploy',{unit:e});close(e.s.maxHp,1000*1.1*1.15*1.2*1.25);
+  const extra=h.spawn('probe',{pos:[kind==='boss'?2:10,6]});close(extra.s.maxHp,e.s.maxHp);
+ }
+});
+
+test('augment defense starts at original DEF and zero RES, then adds eight percent ATK/DEF and four RES per selection',()=>{
+ for(const steps of [0,1,3]){
+  const h=makeBattle({defs:{enemies:{probe:enemyRec({key:'probe',hp:1000,atk:100,def:200,res:40,speed:0})}},content:'none',extraContent:[{install}],flags:{augments:{allies:{},enemies:[],enemyAtkMultiplier:1+steps*.08,enemyDefMultiplier:1+steps*.08,enemyResOverride:steps*4}},autoFinish:false});h.run(.1);
+  const e=h.spawn('probe',{pos:[2,5]});close(e.s.atk,100*(1+.08*steps));close(e.s.def,200*(1+.08*steps));close(e.s.res,4*steps);
+  h.b.emit('deploy',{unit:e});close(e.s.atk,100*(1+.08*steps));close(e.s.def,200*(1+.08*steps));close(e.s.res,4*steps);
+  const boss=h.spawn('probe',{pos:[2,6],tag:'boss'});close(boss.s.atk,100);close(boss.s.def,200);close(boss.s.res,40);
+ }
+});
+
+test('Karlans eye reveals enemies only while inside its owners unite board, irrespective of source owner',async()=>{
+ const {enemyStealthed}=await import('../../server/sim/targeting.js');
+ const h=makeBattle({kind:'unite',players:[{playerId:'p1',seat:0,side:'L',colOffset:0,units:[]},{playerId:'p2',seat:1,side:'R',colOffset:8,units:[]}],defs:{enemies:{probe:enemyRec({key:'probe',hp:1000,speed:0})}},content:'none',extraContent:[{install}],flags:{augments:{allies:{p1:[item(find('카란의 눈'))]},enemies:[]}},autoFinish:false});h.run(.1);
+ const e=h.spawn('probe',{pos:[10,14],sourcePlayerId:'p1'});h.b.addBuff(e,{key:'test:stealth',flags:{stealth:true}});assert.equal(enemyStealthed(e),true,'source player alone does not grant reveal');
+ e.x=6;e.y=10;h.run(.1);assert.equal(enemyStealthed(e),false,'inside owner board');
+ e.x=14;h.run(.1);assert.equal(enemyStealthed(e),true,'leaving removes reveal');
+ e.x=6;h.run(.1);assert.equal(enemyStealthed(e),false,'reenter restores reveal');
+ h.b.addBuff(e,{key:'other:reveal',flags:{reveal:true}});e.x=14;h.run(.1);assert.equal(e.findBuff('augment:boardReveal'),null);assert.equal(enemyStealthed(e),false,'other reveal sources remain intact');
+ const fresh=h.spawn('probe',{pos:[10,5],sourcePlayerId:'p2'});h.b.addBuff(fresh,{key:'fresh:stealth',flags:{stealth:true}});assert.equal(enemyStealthed(fresh),false,'new enemy from another player is revealed at spawn');
+ fresh.y=8;h.b.emit('tick',{dt:0});assert.equal(enemyStealthed(fresh),true,'outside board rows is not revealed');
 });

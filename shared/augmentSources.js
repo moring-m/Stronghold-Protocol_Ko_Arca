@@ -1135,7 +1135,7 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "enemy",
-  "description": "모든 적이 초당 170의 HP 재생",
+  "description": "모든 적이 초당 200의 HP 재생",
   "notes": "타수몹은 해당 업음"
  },
  {
@@ -1275,7 +1275,7 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "enemy",
-  "description": "모든 적이 초당 250의 HP 재생",
+  "description": "모든 적이 초당 300의 HP 재생",
   "notes": "타수몹은 해당 업음"
  },
  {
@@ -1285,11 +1285,10 @@ export const AUGMENT_SOURCES = [
   "name": "돌파",
   "rounds": [
    4,
-   7,
-   10
+   7
   ],
   "side": "enemy",
-  "description": "일반 전투·협력방어에서 적이 방어 포인트에 진입할 때마다 HP 1 즉시 감소",
+  "description": "일반 전투에서 적이 방어 포인트에 진입할 때마다 HP 1 즉시 감소",
   "notes": "라운드 종료 HP 정산과 별개로 적용"
  },
  {
@@ -1317,7 +1316,7 @@ export const AUGMENT_SOURCES = [
   ],
   "side": "ally",
   "description": "모든 적의 은신 무효화",
-  "notes": "자신의 전투에만 적용, 연합방어와 보스전에는 적용되지 않음"
+  "notes": "자신의 전장에 있는 적에게 적용, 연합방어에서도 자신의 전장 안에서만 적용되며 보스전에는 적용되지 않음"
  },
  {
   "source": 98,

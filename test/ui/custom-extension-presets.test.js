@@ -12,3 +12,10 @@ test('loading extension presets filters stale IDs without changing stored values
  const next=resolveExtensionPreset(p,{bonds:[{id:'ursus'}],disabledBonds:[{id:'yanShip'}]});
  assert.deepEqual(next.bonds,['ursus']);assert.deepEqual(next.disabledBonds,['yanShip']);assert.deepEqual(p.selection.bonds,['ursus','removed']);
 });
+
+test('built-in augment preset is copied, cannot be overwritten, and cannot be deleted',async()=>{
+ const {builtinExtensionPresets,saveExtensionPresets,BUILTIN_AUGMENT_PRESET_ID}=await import('../../public/js/ui/customExtensionPresets.js');
+ const preset=builtinExtensionPresets()[0];assert.equal(preset.builtIn,true);assert.equal(preset.selection.ruleValues.enemyHp,100);assert.equal(preset.selection.ruleValues.enemyHpByAugment,1);assert.equal(preset.selection.ruleValues.bossHpByAugment,1);
+ preset.selection.ruleValues.enemyAtk=999;const saved=saveExtensionPresets([preset]);assert.equal(saved.find(p=>p.id===BUILTIN_AUGMENT_PRESET_ID).selection.ruleValues.enemyAtk,100);
+ assert.ok(saveExtensionPresets([]).some(p=>p.id===BUILTIN_AUGMENT_PRESET_ID));assert.equal(normalizeExtensionPresets([preset]).length,0);
+});

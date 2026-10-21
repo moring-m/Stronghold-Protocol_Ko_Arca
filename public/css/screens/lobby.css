@@ -410,3 +410,9 @@ html:not([lang="ko"]) .mode-card__controls{gap:4px;flex-wrap:wrap;}
 html:not([lang="ko"]) .mode-card__spectate{font-size:.14rem;gap:.05rem;min-width:0;}
 html:not([lang="ko"]) .mode-card__sizes button{min-width:.55rem;padding-inline:.07rem;}
 html:not([lang="ko"]) .mode-cards .mode-card--lab .mode-card__name{font-size:.24rem;}
+
+.public-room__settings{grid-column:1/-1}.public-room__details dd[data-mode="custom"]{color:var(--gold)}
+.public-room__host strong{flex:1;min-width:0}.room-settings-view__title{font-size:16px;color:var(--mint-400);margin:0 0 16px;overflow-wrap:anywhere}
+.room-settings-view__groups{display:grid;align-items:start;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.room-settings-group{min-width:0;border:1px solid var(--line-2);background:var(--panel);padding:14px}.room-settings-group h3{margin:0 0 10px;padding-bottom:9px;border-bottom:1px solid var(--line-2);font-size:14px;color:var(--mint-400)}.room-settings-group dl{margin:0;display:grid;gap:0}.room-settings-group dl>div{display:grid;grid-template-columns:minmax(0,1fr) minmax(90px,.8fr);gap:12px;padding:8px 0;border-bottom:1px solid var(--line)}.room-settings-group dl>div:last-child{border:0}.room-settings-group dt{font-size:12px;line-height:1.5;color:var(--text-md);overflow-wrap:anywhere}.room-settings-group dd{margin:0;text-align:right;font-size:13px;line-height:1.5;color:var(--text-hi);overflow-wrap:anywhere;font-variant-numeric:tabular-nums}@media(max-width:700px){.room-settings-view__groups{grid-template-columns:1fr}}
+
+.public-room__mode dd{display:flex;align-items:center;justify-content:space-between;gap:6px;min-height:28px}.public-room__mode .public-room__settings{flex:none;width:28px;min-width:28px;height:28px;padding:0;display:inline-flex;align-items:center;justify-content:center}

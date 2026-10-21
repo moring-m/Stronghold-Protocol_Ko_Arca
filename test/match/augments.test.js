@@ -244,3 +244,23 @@ test('beast heart grants twelve promoted operators',t=>{
  const {m,ps}=fixture(t);const card=createAugmentCatalog(data,10).find(c=>c.name==='야수의 심장');
  assert.equal(card.effect.count,12);const before=ps.round.gainedChess;m.augments.grant(ps,card);assert.equal(ps.round.gainedChess-before,12);
 });
+
+test('strict majority shortens only ordinary votes to 10 seconds without extending a shorter deadline',t=>{
+ for(const method of [1,2]){
+  const {m,sched}=fixture(t,{n:4,ruleValues:{augmentEnemyVote:method}});m.round=4;m.augments.enter();m.augments.enterEnemy();const a=m.augments,s=a.current;
+  for(const ps of m.order.slice(0,2))a.vote(ps,{idx:0,cardId:s.boss.cards[0].id});assert.equal(m.deadline-sched.now(),120000);
+  a.vote(m.order[2],{idx:0,cardId:s.boss.cards[0].id});assert.equal(m.deadline-sched.now(),method===1?10000:120000);
+  sched.advance(5000);a.shortenVoteDeadline();assert.equal(m.deadline-sched.now(),method===1?5000:115000);
+ }
+});
+test('weighted votes use all received votes, include reroll and give zero votes zero probability',t=>{
+ const {m}=fixture(t,{n:4,ruleValues:{augmentEnemyVote:2}});m.round=4;m.augments.enter();m.augments.enterEnemy();const a=m.augments,s=a.current;
+ for(const [pid,idx]of [['p0',0],['p1',0],['p2',0],['p3',1]])s.votes.set(pid,idx);
+ for(const [roll,expected]of [[0,0],[.749,0],[.75,1],[.999,1]]){delete s.voteResultIdx;a.rng=()=>roll;a.resolveVote({defer:true});assert.equal(s.voteResultIdx,expected);}
+ delete s.voteResultIdx;s.votes=new Map([['p0',0],['p1',0],['p2',3],['p3',3]]);a.rng=()=>.75;a.resolveVote({defer:true});assert.equal(s.voteResultIdx,3);a.resolveVote();assert.equal(s.rerollsLeft,0);assert.equal(s.votes.size,0);assert.equal(s.settling,false);
+});
+
+test('weighted timeout keeps actual votes and does not create weights for abstentions',t=>{
+ const {m}=fixture(t,{n:4,ruleValues:{augmentEnemyVote:2}});m.round=4;m.augments.enter();m.augments.enterEnemy();const a=m.augments,s=a.current;
+ a.vote(m.order[0],{idx:1,cardId:s.boss.cards[1].id});a.timeout();assert.equal(s.votes.size,1);assert.equal(s.voteResultIdx,1);
+});

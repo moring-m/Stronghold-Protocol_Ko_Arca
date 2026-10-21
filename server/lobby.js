@@ -1,4 +1,5 @@
-import {isGameplayMode,normalizeGameplayMode,gameplayExtensions} from '../shared/gameplayModes.js';
+import {isRoomTitle,defaultRoomTitle} from '../shared/roomTitle.js';
+import {isGameplayMode,normalizeGameplayMode,gameplayExtensions,canSwitchPublicMode} from '../shared/gameplayModes.js';
 import {KITTED_CHARS} from './sim/content/kits/index.js';
 
 // server/lobby.js — rooms, seats, host, AI seats, ready/start, reconnect, and room → Match wiring
@@ -303,6 +304,7 @@ export class Room {
      */
     this.spectatorCap = spectatorCap;
     this.isPublic = false;
+    this.title = defaultRoomTitle(mode);
     /** @type {{ playerId: string, name: string, connected: boolean }[]} spectator seats, ≤ this.spectatorCap (header) */
     this.spectators = [];
     /** @type {any} running Match instance */
@@ -380,6 +382,7 @@ export class Room {
       matchNo: this.matchCount,
       gameplayMode: this.gameplayMode,
       isPublic: this.isPublic,
+      title:this.title,
       customFactions: this.customFactions,
       customExtensions: structuredClone(this.customExtensions),
       customExtensionCatalog: this.customExtensionCatalog,
@@ -684,6 +687,8 @@ export class Lobby {
       case 'g.chat': case 'g.chatFaction': return this.chat(session, msg);
       case 'room.list': return this.listPublicRooms();
       case 'room.publish': return this.publishRoom(session);
+      case 'room.setTitle': return this.setRoomTitle(session,msg);
+      case 'room.inspect': return this.inspectRoom(session,msg);
       case 'room.create': return this.create(session, msg);
       case 'room.join': return this.join(session, msg);
       case 'room.leave': return this.leave(session);
@@ -779,7 +784,8 @@ export class Lobby {
   // room.* handlers
   // ---------------------------------------------------------------------------------------------------
 
-  create(session, { mode, difficulty, spectators, customExtensions, test, gameplayMode } = {}) {
+  create(session, { mode, difficulty, spectators, customExtensions, test, gameplayMode, title } = {}) {
+    if(title!==undefined&&!isRoomTitle(title))return fail(ERR.BAD_MSG);
     if(gameplayMode!==undefined&&!isGameplayMode(gameplayMode))return fail(ERR.BAD_MSG);
     if(this.draining)return fail(ERR.INTERNAL,'업데이트가 적용되었습니다. 메인화면을 새로고침한 뒤 새 방을 만들어주세요.');
     const cur = this.roomOf(session);
@@ -808,6 +814,7 @@ export class Lobby {
     room.test=test===true;
     room.customExtensionCatalog = customExtensionCatalog(this.safeData());
     room.gameplayMode=normalizeGameplayMode(gameplayMode);
+    room.title=title?.trim()||defaultRoomTitle(mode,session.name);
     room.savedCustomExtensions=modeExtensionSelection(normalizeCustomExtensions(customExtensions,this.safeData()),mode);
     room.customExtensions = initialSelection;
     room.customFactions = room.customExtensions.bonds.includes('ursus') && !(room.customExtensions.disabledBonds||[]).includes('ursusShip');
@@ -954,7 +961,7 @@ export class Lobby {
 
   listPublicRooms() {
     return { rooms: [...this.rooms.values()].filter(r=>r.isPublic&&r.mode!=='solo').slice(0,200).map(r=>({
-      code:r.code,mode:r.mode,difficulty:r.difficulty,gameplayMode:r.gameplayMode,
+      code:r.code,title:r.title||defaultRoomTitle(r.mode),mode:r.mode,difficulty:r.difficulty,gameplayMode:r.gameplayMode,
       hostName:r.seats.find(s=>s?.playerId===r.hostId)?.name||'방장',
       players:r.seats.filter(s=>s&&!s.isBot&&!s.left).length,
       capacity:r.seats.length,bots:r.seats.filter(s=>s?.isBot).length,
@@ -962,13 +969,21 @@ export class Lobby {
     })) };
   }
 
+  setRoomTitle(session,{title}) {
+    const room=this.roomOf(session);if(!room)return fail(ERR.NOT_IN_ROOM);if(room.hostId!==session.playerId)return fail(ERR.NOT_HOST);if(room.match)return fail(ERR.ROOM_STARTED);if(!isRoomTitle(title))return fail(ERR.BAD_MSG);
+    room.title=title.trim()||defaultRoomTitle(room.mode,session.name);this.broadcastState(room);return OK;
+  }
+  inspectRoom(session,{code}) {
+    const room=this.rooms.get(code.toUpperCase());if(!room?.isPublic||room.mode==='solo')return fail(ERR.ROOM_NOT_FOUND);
+    return {room:{code:room.code,title:room.title,mode:room.mode,difficulty:room.difficulty,gameplayMode:room.gameplayMode,customExtensions:structuredClone(room.customExtensions)}};
+  }
   publishRoom(session) {
     const room=this.roomOf(session);
     if(!room)return fail(ERR.NOT_IN_ROOM);
     if(room.hostId!==session.playerId)return fail(ERR.NOT_HOST);
     if(room.match)return fail(ERR.ROOM_STARTED);
     if(room.mode==='solo')return fail(ERR.BAD_MSG,'단독 방은 공개할 수 없습니다.');
-    if(room.gameplayMode==='custom')return fail(ERR.BAD_MSG,'클래식·증강 모드에서만 공개할 수 있습니다.');
+
     room.isPublic=true;
     this.broadcastState(room);
     return OK;
@@ -980,7 +995,7 @@ export class Lobby {
     if(room.hostId!==session.playerId)return fail(ERR.NOT_HOST);
     if(room.match)return fail(ERR.ROOM_STARTED);
     if(!isGameplayMode(gameplayMode))return fail(ERR.BAD_MSG);
-    if(room.isPublic&&gameplayMode==='custom')return fail(ERR.BAD_MSG,'공개 방은 커스텀 모드를 선택할 수 없습니다.');
+    if(!canSwitchPublicMode(room.gameplayMode,gameplayMode,room.isPublic))return fail(ERR.BAD_MSG,'공개 후에는 게임 모드를 변경할 수 없습니다.');
     const selected=gameplayExtensions(room.savedCustomExtensions,this.safeData(),room.mode,gameplayMode);
     const errors=validateExtensionMinimums(this.safeData(),selected,{mode:room.mode,difficulty:room.difficulty});
     if(errors.length)return fail(ERR.BAD_MSG,errors.join(' '));

@@ -1,5 +1,5 @@
 import {AUGMENT_ROUNDS} from '../../../shared/augments.js';
-import {GAMEPLAY_MODES,GAMEPLAY_MODE_NAMES,normalizeGameplayMode} from '../../../shared/gameplayModes.js';
+import {GAMEPLAY_MODES,GAMEPLAY_MODE_NAMES,normalizeGameplayMode,canSwitchPublicMode} from '../../../shared/gameplayModes.js';
 import { TestMark } from "../ui/testConsole.js";
 import { extensionSelectionCount } from '../../../shared/customExtensions.js';
 import { t } from '../../../shared/i18n.js';
@@ -388,12 +388,13 @@ export function RoomScreen() {
 
       </div>
       <div class="topbar__right">
-        ${coop?html`<${Tooltip} placement="bottom" text=${room.isPublic?'공개 방 목록에 표시됩니다. 비공개·커스텀으로 변경할 수 없습니다.':'클래식·증강 모드에서 방을 공개할 수 있습니다.'}><button class="room-publish" disabled=${room.isPublic||room.gameplayMode==='custom'||!facts.isHost||!!busy||!online} onClick=${async()=>{if(await confirmDialog({title:'공개 방으로 전환',text:'공개 방 목록에 방이 표시됩니다. 전환 후에는 비공개로 되돌리거나 커스텀 모드를 선택할 수 없습니다.',okText:'공개로 전환',cancelText:'취소'}))run('publish',()=>net.request('room.publish',{}));}}><${Icon} name="users" />${room.isPublic?'공개 방':'공개 전환'}</button><//>`:null}
-        <div class="room-gameplay-modes" role="radiogroup" aria-label="게임 모드">${GAMEPLAY_MODES.map(mode=>html`<${Tooltip} placement="bottom" text=${({classic:"기본 규칙으로 진행합니다. 커스텀 설정과 증강은 적용하지 않습니다.",augment:html`<div class="gameplay-mode-tip"><p>증강으로 조합을 강화하고, 더 강한 적에 도전합니다.</p><ul><li>${AUGMENT_ROUNDS.join('·')}라운드에 아군 증강 → 적 증강 선택·투표 (보스전 이전까지)</li><li>일반 적: HP 140% · 공격력/방어력 120% · 마법 저항 150%</li><li>보스: 기본 HP 100% × 등장 등급 배율 (실버 1.3 · 골드 1.5 · 프리즘 1.7) · 공격력/방어력 120% · 마법 저항 150%</li><li>실버/골드/프리즘 가중치 2/5/3 · 커스텀 변경 불가</li></ul></div>`,custom:"저장한 커스텀 설정으로 진행합니다. 규칙을 자유롭게 변경할 수 있습니다."})[mode]}><button type="button" role="radio" data-gameplay-mode=${mode} aria-checked=${normalizeGameplayMode(room.gameplayMode)===mode} disabled=${!facts.isHost||!!busy||!online||(room.isPublic&&mode==='custom')} onClick=${()=>run('gameplayMode',async()=>{await net.request('room.setGameplayMode',{gameplayMode:mode});setExtensionsOpen(false);})}>${GAMEPLAY_MODE_NAMES[mode]}</button><//>`)}</div>
+        ${coop?html`<${Tooltip} placement="bottom" text=${room.isPublic?'공개 후에는 비공개로 되돌리거나 게임 모드를 변경할 수 없습니다.':'공개 방 목록에 표시합니다.'}><button class="room-publish" disabled=${room.isPublic||!facts.isHost||!!busy||!online} onClick=${async()=>{if(await confirmDialog({title:'공개 방으로 전환',text:'공개 방 목록에 방이 표시됩니다. 공개 후에는 비공개로 되돌리거나 게임 모드를 변경할 수 없습니다.',okText:'공개로 전환',cancelText:'취소'}))run('publish',()=>net.request('room.publish',{}));}}><${Icon} name="users" />${room.isPublic?'공개 방':'공개 전환'}</button><//>`:null}
+        <div class="room-gameplay-modes" role="radiogroup" aria-label="게임 모드">${GAMEPLAY_MODES.map(mode=>html`<${Tooltip} placement="bottom" text=${({classic:"기본 규칙으로 진행합니다. 커스텀 설정과 증강은 적용하지 않습니다.",augment:html`<div class="gameplay-mode-tip"><p>증강으로 조합을 강화하고, 더 강한 적에 도전합니다.</p><ul><li>${AUGMENT_ROUNDS.join('·')}라운드에 아군 증강 → 적 증강 선택·투표 (보스전 이전까지)</li><li>일반 적: 기본 HP 100% × 등장 등급 배율 (실버 1.1 · 골드 1.15 · 프리즘 1.2) · 공격력/방어력 기본 100%, 증강 선택마다 +8% · 마법 저항 기본 0, 증강 선택마다 +4</li><li>보스: 기본 HP 100% × 등장 등급 배율 (실버 1.3 · 골드 1.5 · 프리즘 1.7) · 공격력/방어력 120% · 마법 저항 150%</li><li>실버/골드/프리즘 가중치 2/5/3 · 커스텀 변경 불가</li></ul></div>`,custom:"저장한 커스텀 설정으로 진행합니다. 규칙을 자유롭게 변경할 수 있습니다."})[mode]}><button type="button" role="radio" data-gameplay-mode=${mode} aria-checked=${normalizeGameplayMode(room.gameplayMode)===mode} disabled=${!facts.isHost||!!busy||!online||!canSwitchPublicMode(room.gameplayMode,mode,room.isPublic)} onClick=${()=>run('gameplayMode',async()=>{await net.request('room.setGameplayMode',{gameplayMode:mode});setExtensionsOpen(false);})}>${GAMEPLAY_MODE_NAMES[mode]}</button><//>`)}</div>
         ${coop ? html`<${InviteBox} code=${room.code} name=${me.name} difficulty=${room.difficulty} />` : html`<div class="solo-note"><${MicroLabel}>SINGLE OPERATOR<//><span>仅限 1 名博士</span></div>`}
       </div>
     </header>
 
+    ${coop?html`<${RoomTitleEditor} title=${room.title||''} disabled=${!facts.isHost||!!busy||!online} onSave=${title=>run('title',()=>net.request('room.setTitle',{title}))}/>`:null}
     <main ref=${seatsRef} class=${`seats${coop ? room.mode==='coop8'?' seats--eight':'' : ' seats--solo'}`}>
       ${facts.seats.map((s, i) => html`<${SeatCard} key=${s ? `p${s.playerId}` : `e${i}`} seat=${s} index=${i} room=${room} facts=${facts}
         myId=${me.playerId} busy=${busy} onAddBot=${addBot} onRemoveBot=${removeBot} onKick=${kick} />`)}
@@ -507,4 +508,11 @@ export function TrustedNotice() {
         <p class="trusted-hash">SHA-256: ${p.hash}</p><p>${t('权限：{permissions}',{permissions:p.permissions.join(', ')})}</p></li>`)}</ul>
     <//>
   </aside>`;
+}
+
+function RoomTitleEditor({title,disabled,onSave}){
+ const [value,setValue]=useState(title),[editing,setEditing]=useState(false),previousTitle=useRef(title);useEffect(()=>{if(previousTitle.current!==title){previousTitle.current=title;setValue(title);setEditing(false);}},[title]);
+ return html`<form class="room-title-editor" onSubmit=${async e=>{e.preventDefault();if(!disabled&&value.trim()!==title)await onSave(value);setEditing(false);}}>
+ ${editing?html`<input aria-label="방 제목" maxlength="15" value=${value} autoFocus onInput=${e=>setValue(e.target.value)} onKeyDown=${e=>{if(e.key==='Escape'){setValue(title);setEditing(false);}}}/><${Button} type="submit" size="sm" variant="secondary" icon="check" aria-label="방 제목 저장" title="방 제목 저장"/>`:html`<strong data-room-title data-i18n-skip>${title}</strong><${Button} size="sm" variant="ghost" icon="edit" aria-label="방 제목 수정" title="방 제목 수정" disabled=${disabled} onClick=${e=>{e.preventDefault();setEditing(true);}}/>`}
+ </form>`;
 }

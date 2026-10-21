@@ -7,7 +7,7 @@ import {mkdirSync,existsSync,readFileSync} from 'node:fs';
 import assert from 'node:assert/strict';
 import {test} from 'node:test';
 test('public directory cards, counts, automatic refresh, filters and publishing work in the browser',{skip:process.env.SP_E2E!=='1'},async()=>{
-const out='docs/public-rooms-2026-10-20';mkdirSync(out,{recursive:true});
+const out=process.env.SP_SCREENSHOT_DIR||'docs/public-rooms-2026-10-20';mkdirSync(out,{recursive:true});
 const srv=await startServer({port:0,host:'127.0.0.1',quiet:true,dataDir:'content/production/data',MatchClass:StubMatch,assetIndex:false,handleRequest(req,res){const p=new URL(req.url,'http://localhost').pathname.replace(/^\/(assets|fonts)\/~[^/]+\//,'/$1/');if(p.startsWith('/assets/')||p.startsWith('/fonts/')){const f=['content/production'+p,'.cache/local-production/public'+p].find(existsSync);if(f){res.end(readFileSync(f));return true;}}return false;}});
 const clients=[];let browser;
 try{
@@ -31,7 +31,7 @@ try{
  await page.select('.public-rooms__filters select','augment');assert.equal((await page.$$('.public-room')).length,2);await page.select('.public-rooms__filters select','');
  await page.click('.public-room__actions button:nth-child(2)');await page.waitForSelector('.room-screen');assert.equal(await page.evaluate(()=>__SP__.store.get().room.spectators.some(s=>s.playerId===__SP__.store.get().me.playerId)),true);await page.evaluate(()=>__SP__.net.request('room.leave'));
 await page.evaluate(async()=>{await __SP__.net.request('room.create',{mode:'coop',difficulty:'NORMAL',gameplayMode:'classic'});});await page.waitForSelector('.room-publish');await page.hover('[data-gameplay-mode="augment"]');await page.waitForSelector('.tooltip');assert.match(await page.$eval('.tooltip',e=>e.textContent),/4·7·10/);await page.screenshot({path:out+'/mode-tooltip.png'});
- await page.click('.room-publish');await page.waitForFunction(()=>document.body.innerText.includes('전환 후에는 비공개로'));await page.screenshot({path:out+'/publish-confirmation.png'});await page.evaluate(()=>{const bs=[...document.querySelectorAll('button')];bs.find(b=>b.textContent.trim()==='공개로 전환')?.click();});await page.waitForFunction(()=>document.querySelector('.room-publish')?.textContent.includes('공개 방'));assert.equal(await page.$eval('[data-gameplay-mode="custom"]',e=>e.disabled),true);console.log('browser interactions and captures passed');
+ await page.click('.room-publish');await page.waitForFunction(()=>document.body.innerText.includes('공개 후에는 비공개로'));await page.screenshot({path:out+'/publish-confirmation.png'});await page.evaluate(()=>{const bs=[...document.querySelectorAll('button')];bs.find(b=>b.textContent.trim()==='공개로 전환')?.click();});await page.waitForFunction(()=>document.querySelector('.room-publish')?.textContent.includes('공개 방'));assert.equal(await page.$eval('[data-gameplay-mode="custom"]',e=>e.disabled),true);console.log('browser interactions and captures passed');
 }finally{for(const c of clients)c.terminate();await browser?.close();await srv.close();}
 
 });

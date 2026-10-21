@@ -1,3 +1,4 @@
+import {isRoomTitle} from './roomTitle.js';
 import {isGameplayMode} from './gameplayModes.js';
 import {COMBAT_METRICS} from './combatStats.js';
 import {isDiyModule} from './diy.js';
@@ -510,7 +511,7 @@ export const C2S = {
   hello: { name: (v) => isStr(v, NAME_MAX_LEN) && v.trim().length > 0, token: (v) => v == null || isStr(v, 64), version: (v) => v == null || isInt(v, 0, 1e6),
     noReplace: isBool, claimAt: (v) => isNum(v, 0, Number.MAX_SAFE_INTEGER), $optional: ['token', 'version', 'noReplace', 'claimAt'] },
   ping: { c: (v) => typeof v === 'number' && Number.isFinite(v) },
-  'room.create': { gameplayMode:isGameplayMode, mode: (v) => v === 'solo' || v === 'coop' || v === 'coop8', difficulty: (v) => DIFFICULTIES.includes(v), spectators: isSpectatorCap, customExtensions: extensionSelectionShape, test: (v) => v === true, $optional: ['spectators','customExtensions','test','gameplayMode'] },
+  'room.create': { title:isRoomTitle, gameplayMode:isGameplayMode, mode: (v) => v === 'solo' || v === 'coop' || v === 'coop8', difficulty: (v) => DIFFICULTIES.includes(v), spectators: isSpectatorCap, customExtensions: extensionSelectionShape, test: (v) => v === true, $optional: ['spectators','customExtensions','test','gameplayMode','title'] },
   'room.join': { testAck: (v) => v === true, $optional: ['testAck'], code: (v) => isStr(v, ROOM_CODE_LEN + 2) && /^[A-Za-z0-9]+$/.test(v) },
   'room.leave': {},
   'room.commend': {playerId:isId,matchNo:(v)=>isInt(v,1,2**31)},
@@ -518,6 +519,8 @@ export const C2S = {
   'room.setCustomFactions': { enabled: isBool },
   'room.list': {},
   'room.publish': {},
+  'room.setTitle': {title:isRoomTitle},
+  'room.inspect': {code:(v)=>isStr(v,ROOM_CODE_LEN+2)&&/^[A-Za-z0-9]+$/.test(v)},
   'room.setGameplayMode': { gameplayMode:isGameplayMode },
   'room.setCustomExtensions': { selection: extensionSelectionShape },
   'room.setDifficulty': { difficulty: (v) => DIFFICULTIES.includes(v) },

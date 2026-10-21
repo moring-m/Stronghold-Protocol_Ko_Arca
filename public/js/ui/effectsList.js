@@ -1,3 +1,4 @@
+import {tr} from '../i18n/i18n.js';
 import {formatAugmentDescription} from './augmentDescription.js';
 // Active effects list (m.private.effects: band / 机变 / team / item / garrison effects with counters):
 // compact icon column at the right edge, rich-text tooltip per effect. `counterText` (a 悬赏's "还剩 N 场作战", user
@@ -18,7 +19,7 @@ export function EffectsList({ effects,pub=null,ownerId=null,augmentsOnly=false }
   const m = data.get('assets');
   return html`<div class="effects" aria-label="生效中的效果">
     <div class="effects__icons" style=${{'--effect-rows':Math.min(6,list.length)}}>${list.map((e, i) => html`<${Tooltip} key=${e.id ?? i} placement="bottom" text=${html`<div class="efftip">
-        <b>${e.name || '效果'}</b><span class="efftip__kind">${e.grade?AUGMENT_GRADES[e.grade]?.name+' ':''}${KIND[e.iconKind] || ''}${e.counterText ? ` · ${e.counterText}` : e.counter != null ? ` · ${e.counter}` : ''}</span>
+        <b>${tr(e.name || '效果')}</b><span class="efftip__kind">${e.grade?tr(AUGMENT_GRADES[e.grade]?.name)+' ':''}${tr(KIND[e.iconKind] || '')}${e.counterText ? ` · ${tr(e.counterText)}` : e.counter != null ? ` · ${e.counter}` : ''}</span>
         <${RichText} as="p" text=${e.iconKind==='augment'?formatAugmentDescription(e.desc):e.desc||''} />
       </div>`}>
       <span class=${`effect effect--${e.iconKind || 'x'}`} style=${e.grade?{'--augment-color':AUGMENT_GRADES[e.grade]?.color}:null}>

@@ -1,34 +1,59 @@
 {
-  "total": 15877,
+  "total": 15910,
   "languages": {
     "ko": {
       "officialOrCurated": 9841,
       "supplement": 877,
-      "native": 5159,
+      "native": 5192,
       "missing": 0,
       "invalid": 0
     },
     "en": {
-      "officialOrCurated": 12602,
-      "supplement": 3275,
+      "officialOrCurated": 12641,
+      "supplement": 3268,
       "native": 0,
-      "missing": 0,
+      "missing": 1,
       "invalid": 0
     },
     "ja": {
-      "officialOrCurated": 12531,
-      "supplement": 3346,
+      "officialOrCurated": 12570,
+      "supplement": 3339,
       "native": 0,
-      "missing": 0,
+      "missing": 1,
       "invalid": 0
     },
     "zh": {
-      "officialOrCurated": 1517,
-      "supplement": 3642,
+      "officialOrCurated": 1556,
+      "supplement": 3635,
       "native": 10718,
-      "missing": 0,
+      "missing": 1,
       "invalid": 0
     }
   },
-  "unresolved": []
+  "unresolved": [
+    {
+      "lang": "en",
+      "source": "{0}박사님의 {1}인 시뮬레이션",
+      "at": [
+        "shared/roomTitle.js:3"
+      ],
+      "reason": "missing"
+    },
+    {
+      "lang": "ja",
+      "source": "{0}박사님의 {1}인 시뮬레이션",
+      "at": [
+        "shared/roomTitle.js:3"
+      ],
+      "reason": "missing"
+    },
+    {
+      "lang": "zh",
+      "source": "{0}박사님의 {1}인 시뮬레이션",
+      "at": [
+        "shared/roomTitle.js:3"
+      ],
+      "reason": "missing"
+    }
+  ]
 }
