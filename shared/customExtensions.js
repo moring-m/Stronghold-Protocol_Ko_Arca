@@ -3,7 +3,7 @@ import {RANDOM_BAND_ID,withRandomBands} from './randomBand.js';
 import {eightUniteStage} from './cooperativeEight.js';
 import { customFactionData, filterCustomFaction } from './customFactions.js';
 
-export const AUGMENT_STAT_BASES=Object.freeze({enemyHp:100,bossHp:100,enemyAtk:100,enemyDef:100,enemyRes:0});
+export const AUGMENT_STAT_BASES=Object.freeze({enemyHp:100,bossHp:100,enemyAtk:100,enemyDef:100,enemyRes:100});
 export const isAugmentStatActive=(selection,id)=>selection.rules?.includes('augments')&&selection.ruleValues?.[id+'ByAugment']===1;
 
 export const RULE_VALUES = Object.freeze([

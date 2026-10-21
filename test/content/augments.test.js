@@ -182,11 +182,11 @@ test('grade HP multiplies non-boss enemy health once, including new summons and 
  }
 });
 
-test('augment defense starts at original DEF and zero RES, then adds eight percent ATK/DEF and four RES per selection',()=>{
+test('augment defense starts at original DEF and original RES, then adds eight percent ATK/DEF and four RES per selection',()=>{
  for(const steps of [0,1,3]){
-  const h=makeBattle({defs:{enemies:{probe:enemyRec({key:'probe',hp:1000,atk:100,def:200,res:40,speed:0})}},content:'none',extraContent:[{install}],flags:{augments:{allies:{},enemies:[],enemyAtkMultiplier:1+steps*.08,enemyDefMultiplier:1+steps*.08,enemyResOverride:steps*4}},autoFinish:false});h.run(.1);
-  const e=h.spawn('probe',{pos:[2,5]});close(e.s.atk,100*(1+.08*steps));close(e.s.def,200*(1+.08*steps));close(e.s.res,4*steps);
-  h.b.emit('deploy',{unit:e});close(e.s.atk,100*(1+.08*steps));close(e.s.def,200*(1+.08*steps));close(e.s.res,4*steps);
+  const h=makeBattle({defs:{enemies:{probe:enemyRec({key:'probe',hp:1000,atk:100,def:200,res:40,speed:0})}},content:'none',extraContent:[{install}],flags:{augments:{allies:{},enemies:[],enemyAtkMultiplier:1+steps*.08,enemyDefMultiplier:1+steps*.08,enemyResBonus:steps*4}},autoFinish:false});h.run(.1);
+  const e=h.spawn('probe',{pos:[2,5]});close(e.s.atk,100*(1+.08*steps));close(e.s.def,200*(1+.08*steps));close(e.s.res,40+4*steps);
+  h.b.emit('deploy',{unit:e});close(e.s.atk,100*(1+.08*steps));close(e.s.def,200*(1+.08*steps));close(e.s.res,40+4*steps);
   const boss=h.spawn('probe',{pos:[2,6],tag:'boss'});close(boss.s.atk,100);close(boss.s.def,200);close(boss.s.res,40);
  }
 });

@@ -2885,5 +2885,12 @@
   "카란의 눈이 연합방어에서도 보유자의 전장 안에 있는 적의 은신을 무효화합니다. 전장을 벗어나면 효과가 해제됩니다.": "Karlan’s Eye now reveals enemies inside its owner’s board during Unite Phase. The effect ends when enemies leave that board.",
   "수배 적 툴팁의 한국어 표시를 수정했습니다.": "Fixed Korean text in wanted enemy tooltips.",
   "자신의 전장에 있는 적에게 적용, 연합방어에서도 자신의 전장 안에서만 적용되며 보스전에는 적용되지 않음": "Applies to enemies inside your own board, including Unite Phase; excludes boss battles",
-  "모든 적의 은신 무효화 (자신의 전장에 있는 적에게 적용, 연합방어에서도 자신의 전장 안에서만 적용되며 보스전에는 적용되지 않음)": "Reveal all enemies (Applies to enemies inside your own board, including Unite Phase; excludes boss battles)"
+  "모든 적의 은신 무효화 (자신의 전장에 있는 적에게 적용, 연합방어에서도 자신의 전장 안에서만 적용되며 보스전에는 적용되지 않음)": "Reveal all enemies (Applies to enemies inside your own board, including Unite Phase; excludes boss battles)",
+  "일반 적: 기본 HP 100% × 등장 등급 배율 (실버 1.1 · 골드 1.15 · 프리즘 1.2) · 공격력 120% · 방어력 기본 100%, 증강 선택마다 +8% · 원래 마법 저항에 증강 선택마다 +4 합산": "Normal enemies: base HP 100% × offered grade multipliers (Silver 1.1 · Gold 1.15 · Prismatic 1.2) · ATK 120% · base DEF 100%, +8% per augment selection · original RES +4 per augment selection",
+  "일반 적: 기본 HP 100% × 등장 등급 배율 (실버 1.1 · 골드 1.15 · 프리즘 1.2) · 공격력/방어력 기본 100%, 증강 선택마다 +8% · 원래 마법 저항에 증강 선택마다 +4 합산": "Normal enemies: base HP 100% × offered grade multipliers (Silver 1.1 · Gold 1.15 · Prismatic 1.2) · base ATK/DEF 100%, +8% per augment selection · original RES +4 per augment selection",
+  "증강 모드 일반 적 HP는 기본 100%에서 등장한 실버 ×1.1, 골드 ×1.15, 프리즘 ×1.2를 누적 적용합니다. 공격력·방어력은 기본 100%에서 증강 선택마다 +8%p, 마법 저항은 원래 수치에 +4씩 합산됩니다.": "In Augment Mode, normal enemy HP starts at 100% and scales cumulatively by offered grades: Silver ×1.1, Gold ×1.15, Prismatic ×1.2. ATK and DEF start at 100% and gain 8 percentage points per augment selection; RES gains 4 on top of its original value.",
+  "마법 저항 누적 방식 수정": "Fix cumulative RES scaling",
+  "핫픽스": "Hotfix",
+  "증강 모드와 커스텀 누적 옵션에서 일반 적의 원래 마법 저항을 유지하고, 증강 선택마다 +4를 합산하도록 수정했습니다.": "Augment Mode and custom cumulative scaling now preserve normal enemies’ original RES and add 4 per augment selection.",
+  "모드 안내와 내장 증강 프리셋에도 같은 규칙을 반영했습니다.": "Updated mode descriptions and the built-in Augment Mode preset to match."
 }

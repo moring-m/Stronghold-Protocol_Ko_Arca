@@ -4,8 +4,8 @@ export function install(b){
  const state=b.flags.augments;if(!state)return;
  const empty=[],allied=Object.fromEntries(Object.entries(state.allies||{}).map(([id,cards])=>[id,cards.map(a=>a.effect)])),enemyEffects=(state.enemies||[]).map(a=>a.effect);
  const gradeHp=Number.isFinite(state.enemyHpMultiplier)&&state.enemyHpMultiplier>0?state.enemyHpMultiplier:1;
- const atkMultiplier=Number.isFinite(state.enemyAtkMultiplier)&&state.enemyAtkMultiplier>0?state.enemyAtkMultiplier:1,defMultiplier=Number.isFinite(state.enemyDefMultiplier)&&state.enemyDefMultiplier>0?state.enemyDefMultiplier:1,resOverride=Number.isFinite(state.enemyResOverride)?state.enemyResOverride:null;
- if(atkMultiplier===1&&defMultiplier===1&&resOverride===null&&gradeHp===1&&!enemyEffects.length&&!Object.values(allied).some(list=>list.length))return;
+ const atkMultiplier=Number.isFinite(state.enemyAtkMultiplier)&&state.enemyAtkMultiplier>0?state.enemyAtkMultiplier:1,defMultiplier=Number.isFinite(state.enemyDefMultiplier)&&state.enemyDefMultiplier>0?state.enemyDefMultiplier:1,resBonus=Number.isFinite(state.enemyResBonus)?state.enemyResBonus:0;
+ if(atkMultiplier===1&&defMultiplier===1&&resBonus===0&&gradeHp===1&&!enemyEffects.length&&!Object.values(allied).some(list=>list.length))return;
  const normalOwner=b.kind==='normal'&&b.players.length===1?b.players[0].playerId:null;
  const revealBoards=b.kind==='unite'?b.players.filter(ps=>(allied[ps.playerId]||empty).some(e=>e.kind==='normalEnemy'&&e.flags?.reveal)):empty;
  const refreshBoardReveal=u=>{if(u.side!=='enemy'||!revealBoards.length)return;const active=revealBoards.some(ps=>b.onOwnBoard(ps,Math.round(u.y),Math.round(u.x)));if(active){if(!u.findBuff('augment:boardReveal'))add(u,'boardReveal',{},{flags:{reveal:true}});}else b.removeBuff(u,'augment:boardReveal');};
@@ -15,7 +15,7 @@ export function install(b){
   const oldMax=u.s.maxHp,ratio=oldMax>0?u.hp/oldMax:1;
   const effects=u.side==='enemy'?enemyEffects:forUnit(u);
   if(u.side==='enemy'&&!u.isBoss&&!u.bossPool&&gradeHp!==1&&!u.mem.augmentGradeHpApplied){u.base.maxHp*=gradeHp;u.mem.augmentGradeHpApplied=true;u.markDirty();}
-  if(u.side==='enemy'&&!u.isBoss&&!u.bossPool&&!u.mem.augmentDefenseApplied){u.base.atk*=atkMultiplier;u.base.def*=defMultiplier;if(resOverride!==null)u.base.res=resOverride;u.mem.augmentDefenseApplied=true;u.markDirty();}
+  if(u.side==='enemy'&&!u.isBoss&&!u.bossPool&&!u.mem.augmentDefenseApplied){u.base.atk*=atkMultiplier;u.base.def*=defMultiplier;u.base.res+=resBonus;u.mem.augmentDefenseApplied=true;u.markDirty();}
   if(u.s.flags.hitCount||u.s.flags.hitCountArts){const hpBonus=effects.reduce((n,e)=>n+(e.mods?.hpPct||0),0);if(hpBonus){u.mem.augmentFrequencyHpBase??=u.base.maxHp;u.base.maxHp=u.mem.augmentFrequencyHpBase*(1+hpBonus);u.markDirty();}}
   effects.forEach((e,i)=>{
    if(e.kind==='equipmentAtk'&&u.kind==='op')add(u,`${i}:equipment-atk`,{atkPct:e.amount*(u.items?.length||0)});

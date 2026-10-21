@@ -58,7 +58,7 @@ test('augment mode ratios reach real normal-enemy and boss battle stats independ
   const selected=gameplayExtensions(saved,raw,'solo',mode),tables=applyCustomExtensions(raw,selected);
   const h=makeBattle({data:tables,kind:boss?'boss':'normal',content:'generic',autoFinish:false});
   const enemy=h.spawn('enemy_mode_probe',{pos:[3,6],...(boss?{tag:'boss'}:{})});
-  const ratios=mode==='classic'?[1,1,1,1]:boss?[1,1.2,1.2,1.5]:[1,1,1,0];
+  const ratios=mode==='classic'?[1,1,1,1]:boss?[1,1.2,1.2,1.5]:[1,1,1,1];
   for(const[stat,base,ratio]of [['maxHp',1000,ratios[0]],['atk',100,ratios[1]],['def',100,ratios[2]],['res',20,ratios[3]]])assert.ok(Math.abs(enemy.s[stat]-base*ratio)<1e-6,`${mode} ${boss?'boss':'normal'} ${stat}`);
  }
 });
