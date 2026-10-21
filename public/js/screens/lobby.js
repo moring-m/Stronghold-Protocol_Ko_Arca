@@ -251,7 +251,7 @@ function ModeCard({ card, selected, onSelect, coopSize=4, onCoopSize, spectateOn
     </span>
     <span class="mode-card__check" aria-hidden="true"><${Icon} name="check" />已选定</span>
     ${card.id==='coop'?html`<div class="mode-card__controls">
-      <span class="mode-card__sizes" role="group" aria-label="협동 인원">${[4,8].map(n=>html`<button type="button" aria-pressed=${coopSize===n} onClick=${e=>{e.stopPropagation();onCoopSize(n);}}>${n}인</button>`)}</span>
+      <span class="mode-card__sizes" role="group" aria-label="협동 인원">${[4,8].map(n=>html`<button type="button" aria-pressed=${coopSize===n} onClick=${e=>{e.stopPropagation();onCoopSize(n);}}>${t('{0}인',[n])}</button>`)}</span>
       <label class="mode-card__spectate create-box__check" onClick=${e=>e.stopPropagation()} onKeyDown=${e=>e.stopPropagation()}>
         <input type="checkbox" checked=${spectateOn} onChange=${e=>onSpectateChange(!!e.currentTarget.checked)} />
         <${Icon} name="eye" /><span>관전 허용</span>
@@ -414,7 +414,7 @@ export function LobbyScreen() {
         <div class="section-label"><span class="section-label__idx num">01</span>模拟方式<${MicroLabel}>MODE<//></div>
         <div class="mode-cards">
           ${MODE_CARDS.map((c) => html`<${ModeCard} key=${c.id} card=${c} selected=${roomMode === c.id || c.id==='coop'&&roomMode==='coop8'} onSelect=${pickMode} coopSize=${coopSize} onCoopSize=${n=>{setCoopSize(n);pickMode(n===8?'coop8':'coop');}} spectateOn=${spectateOn} onSpectateChange=${on=>{setSpectateOn(on);savePref('lobby.spectateOn',on);}} />`)}
-          <button type="button" class="public-rooms-entry mode-card brackets" onClick=${()=>setPublicOpen(true)}><span class="mode-card__bg" aria-hidden="true"></span><span class="mode-card__icon"><${Icon} name="users"/></span><span class="mode-card__text"><${MicroLabel}>PUBLIC ROOMS<//><span class="mode-card__name">공개 방 목록</span><span class="mode-card__desc">공개된 연합 방에 참가하거나 관전합니다.</span></span><span class="public-rooms-entry__total"><span class="public-rooms-entry__count num" aria-label="공개 방 수">${conn.status==='online'&&publicRoomCount!==null?publicRoomCount:'—'}</span><span>개</span></span></button>
+          <button type="button" class="public-rooms-entry mode-card brackets" onClick=${()=>setPublicOpen(true)}><span class="mode-card__bg" aria-hidden="true"></span><span class="mode-card__icon"><${Icon} name="users"/></span><span class="mode-card__text"><${MicroLabel}>PUBLIC ROOMS<//><span class="mode-card__name">공개 방 목록</span><span class="mode-card__desc">공개된 연합 방에 참가하거나 관전합니다.</span></span><span class="public-rooms-entry__total"><span class="public-rooms-entry__count num" aria-label="공개 방 수">${conn.status==='online'&&publicRoomCount!==null?publicRoomCount:'—'}</span><span data-i18n-ctx="publicRooms">개</span></span></button>
         </div>
 
         <div class="section-label"><span class="section-label__idx num">03</span>加入同盟<${MicroLabel}>JOIN WITH ALLIANCE KEY<//></div>

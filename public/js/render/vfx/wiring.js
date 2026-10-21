@@ -912,10 +912,13 @@ export class FxWiring {
    */
   attack(src, tgt, kind, time, wound = false) {
     if (!this.ofx.active || !src || !this.idx) return false;
+    const id = src.id ?? src.info?.id;
+    const primaryOnly = /^enemy_116(?:1_tidmag(?:_2)?|2_magmot)$/.test(src.info?.defId || src.info?.spine || '');
+    // Cross-area damage is reported as one attack per affected unit. Its wave is one primary-target visual.
+    if (primaryOnly && this.castFrame.get(id) === this.skills.frame) return true;
     kind = this._combatKind(src, tgt, kind);
     const u = this.unitOf(src);
     const sk = this.skills.attackFx(src, tgt, kind);
-    const id = src.id ?? src.info?.id;
     // one attack on several targets is one 'atk' per target in one tick: the attacker casts once (its target rows play
     // on each target), and it counts as one attack [ASSUMED: the same frame = the same attack]
     const again = this.castFrame.get(id) === this.skills.frame;

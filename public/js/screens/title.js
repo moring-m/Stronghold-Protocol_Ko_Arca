@@ -1,3 +1,4 @@
+import {LangButton} from '../i18n/LangButton.js';
 import {useLang} from '../ui/lang.js';
 import { t } from '../../../shared/i18n.js';
 import { ResourceRedownloadButton } from '../ui/resourceRedownload.js';
@@ -209,7 +210,7 @@ export function TitleScreen() {
   // touch screens: no autofocus (it would pop the on-screen keyboard over a landscape phone's whole view)
   const touchUi = useMemo(() => detectFeatures().coarse, []);
   return html`<div class="screen title-screen">
-    <div class="title-tools"><${ResourceRedownloadButton} /><${Button} variant="secondary" size="sm" onClick=${openStats}>통계<//><${PatchNotesButton} /><${SettingsButton} /></div>
+    <div class="title-tools"><${LangButton} /><${ResourceRedownloadButton} /><${Button} variant="secondary" size="sm" onClick=${openStats}>통계<//><${PatchNotesButton} /><${SettingsButton} /></div>
     <div class=${`title-bg${bgLoaded ? ' has-art' : ''}${ridgesLoaded ? ' has-ridges' : ''}`} aria-hidden="true">
       ${backdrop ? html`<img class="title-bg__art" src=${backdrop} alt="" draggable=${false}
         onLoad=${() => setBgLoadedUrl(backdrop)} />` : null}
@@ -251,7 +252,7 @@ export function TitleScreen() {
           <span>收到同盟邀请</span><b class="num">${pendingJoin}</b><span class="t-lo">· 输入代号后将自动加入</span>
         </div>` : null}
         <${TextField} label="博士代号" micro="CALLSIGN" size="lg" icon="user" value=${name} maxLength=${NAME_MAX_LEN}
-          placeholder="输入你的代号（最多 ${NAME_MAX_LEN} 字）" autoFocus=${!touchUi}
+          placeholder=${t('输入你的代号（最多 {max} 字）',{max:NAME_MAX_LEN})} autoFocus=${!touchUi}
           onInput=${setName} onEnter=${start} />
         <${Button} variant="primary" size="xl" block=${true} iconRight="chevrons" disabled=${!valid} onClick=${start}>开始<//>
         <div class="title-conn">

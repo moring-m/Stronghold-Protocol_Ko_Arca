@@ -1,0 +1,16 @@
+{
+  "속세의 음": {
+    "ko": "속세의 음",
+    "zh": "尘世之音",
+    "en": "Voice of Mundane",
+    "ja": "塵界の音",
+    "source": "Official enemy_handbook_table.json: enemyData.enemy_1530_white.description (zh_CN/ko_KR/en_US/ja_JP)"
+  },
+  "제국 드론": {
+    "ko": "제국 드론",
+    "zh": "帝国炮火先兆者",
+    "en": "Imperial Artillery Targeteer",
+    "ja": "帝国砲撃誘導機",
+    "source": "Official enemy_handbook_table.json: enemyData.enemy_1112_emppnt.name; custom drone uses the corresponding enemy model"
+  }
+}

@@ -1,3 +1,4 @@
+import {languageFetch} from './i18n/languagePack.js';
 import {withRandomBands} from '../../shared/randomBand.js';
 import {withLaboratoryDummy} from '../../shared/laboratoryDummy.js';
 import {store} from './store.js';
@@ -328,7 +329,7 @@ export function createDataStore(opts = {}) {
       }
       for (let attempt = 0; ; attempt++) {
         try {
-          const res = await doFetch(url, { cache: 'no-cache' });
+          const res = await languageFetch(url, { cache: 'no-cache' }, doFetch);
           if (!res || !res.ok) throw Object.assign(new Error(`HTTP ${res ? res.status : '???'}`), { status: res ? res.status : null });
           const json = await res.json();
           if (!json || typeof json !== 'object' || !json.files) throw Object.assign(new Error('not an overlay'), { badJson: true });

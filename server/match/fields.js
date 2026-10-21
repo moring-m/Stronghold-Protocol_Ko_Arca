@@ -1,3 +1,4 @@
+import {battleProgress} from '../sim/spec.js';
 import {requiresTraitLayerAuthority} from './operatorTraits.js';
 import {diyTokenOwner,diyRecordOf} from '../../shared/diy.js';
 import { combatMetrics } from '../../shared/combatStats.js';
@@ -204,6 +205,7 @@ export class FieldRunner {
   forceAll(reason = 'forced') { this._forceAll(reason); this._checkDone(); }
 
   _emit(f) {
+    this.m.augments?.creditLeaks(f,battleProgress(f.battle).leaksCountBy);
     let ev = [];
     try { ev = f.battle.drainEvents() || []; } catch (e) { this.m.reportError(`field ${f.fieldId} drainEvents`, e); }
     if (!this.emit) return;
@@ -278,6 +280,7 @@ export function timelineSample(b) {
     try { left = uniteLeft(b); } catch { left = null; }
     if (left) s.push(left);
   }
+  const leaks=battleProgress(b).leaksCountBy;if(leaks){s[4]??=null;s[5]=leaks;}
   return s;
 }
 
@@ -855,6 +858,7 @@ export function validateClientResult(spec, raw, { gd = null } = {}) {
         } else if (sourcePlayerId !== pid && !B.players.has(sourcePlayerId)) sourcePlayerId = pid;
         const lpr = finiteIn(l.lpr, 0, 1000) ? l.lpr : 1;
         const e = { enemyKey: key, mods, lpr, sourcePlayerId, tag: src ? (src.tag ?? null) : (typeof l.tag === 'string' ? l.tag : null), counted, spawned: true };
+        if (typeof l.entered==='boolean')e.entered=l.entered;
         if (keepRuntime) e.uniteRuntime = true; // stored only after the derived take succeeded, and only for a 联防 spec
         if (l.boss) e.boss = true;
         leaked.push(e);

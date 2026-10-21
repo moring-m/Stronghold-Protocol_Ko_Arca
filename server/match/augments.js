@@ -1,3 +1,4 @@
+import {augmentBossHpMultiplier} from '../../shared/gameplayModes.js';
 import { makeCtx } from './effectsMeta.js';
 import { triggerGainEffects } from '../sim/content/garrisons/meta.js';
 import { createRng, deriveSeed } from '../sim/rng.js';
@@ -69,8 +70,21 @@ export class AugmentMode {
  income(ps){return this.allyCards(ps).reduce((n,a)=>n+(a.effect.kind==='income'?a.effect.amount:0),0);}
  price(ps,chess){return this.allyCards(ps).reduce((n,a)=>n+(a.effect.kind==='price'&&Number.isFinite(chess?.tier)&&chess.tier<=(a.effect.maxTier??Infinity)?a.effect.amount:0),0);}
  battleState(){if(!this.enabled)return null;return {allies:Object.fromEntries([...this.allies].map(([id,list])=>[id,list.map(a=>({id:a.id,effect:a.effect}))])),enemies:this.enemies.map(a=>({id:a.id,effect:a.effect}))};}
- leakHpCost(){return 1+this.enemies.reduce((n,a)=>n+(a.effect.kind==='leak'?a.effect.amount:0),0);}
- bossHpMultiplier(){return 1+this.enemies.reduce((n,a)=>n+(a.effect.mods?.hpPct||0),0);}
+ leakHpCost(){return 1;}
+ breakthroughCost(){return this.enabled?this.enemies.reduce((n,a)=>n+(a.effect.kind==='leak'?a.effect.amount:0),0):0;}
+ creditLeaks(field,counts){
+  const cost=this.breakthroughCost();if(!cost||!['normal','unite'].includes(field.kind)||!counts)return;
+  const paid=field.augmentLeaksBy||(field.augmentLeaksBy={});
+  const allowed=new Set([...(field.players||[]),...(field.spec?.spawns||[]).map(s=>s.ownerPlayerId??s.sourcePlayerId)]);
+  for(const [id,raw]of Object.entries(counts)){
+   const ps=this.m.players.get(id);if(!allowed.has(id)||!ps?.alive||!Number.isInteger(raw)||raw<0)continue;
+   const n=Math.min(100000,raw),delta=Math.max(0,n-(paid[id]||0));if(!delta)continue;
+   paid[id]=n;const loss=Math.min(Math.max(0,ps.lp),delta*cost);ps.lp-=loss;ps.stats.lpLost+=loss;ps.dirty();this.m.markPublic();
+  }
+ }
+ creditResult(field){if(field.result&&!field.result.synthetic)this.creditLeaks(field,Object.fromEntries(Object.entries(field.result.perPlayer||{}).map(([id,p])=>[id,(p.leaked||[]).filter(l=>l.entered===true).length])));}
+
+ bossHpMultiplier(){return (this.m.gameplayMode==='augment'?augmentBossHpMultiplier(this.history):1)*(1+this.enemies.reduce((n,a)=>n+(a.effect.mods?.hpPct||0),0));}
  publicView(){if(!this.enabled)return null;const s=this.current;return {leakHpCost:this.leakHpCost(),selectedEnemies:this.enemies.map(augmentView),selectedAllies:Object.fromEntries([...this.allies].map(([id,c])=>[id,c.map(augmentView)])),history:this.history.slice(),selection:s?{id:s.id,round:s.round,grade:s.grade,side:s.side,settling:s.settling,settleDeadline:s.settling?this.m.deadline:0,rerollLimit:s.side==='ally'?this.settings.augmentAllyRerolls:this.settings.augmentEnemyRerolls,vote:this.voting(),voteResultIdx:s.voteResultIdx??null,votes:this.voting()?Object.fromEntries(s.votes):null,rerollsLeft:s.rerollsLeft,hostId:this.host(),picked:Object.fromEntries([...s.slots].map(([id,slot])=>[id,slot.picked!=null])),bossPicked:s.boss?.picked!=null,bossPickedIdx:s.boss?.picked,cards:s.side==='enemy'?s.boss.cards.map(c=>c?augmentView(c):null):null,rerolls:s.side==='enemy'?s.boss.rerolls.slice():null}:null};}
  spectatorView(ps){const s=this.current;return {playerId:ps?this.m._watchTargetOf(ps):null,t:'m.augmentWatch',eventId:s?.id,choices:s?.side==='ally'?Object.fromEntries([...s.slots].map(([id,slot])=>[id,{cards:slot.cards.map(c=>c?augmentView(c):null),rerolls:slot.rerolls.slice(),picked:slot.picked}])):{}};}
  privateView(ps){if(!this.enabled)return null;const s=this.current,slot=s?.side==='ally'?s.slots.get(ps.playerId):null;return {selected:this.allyCards(ps).map(augmentView),pending:(this.pending.get(ps.playerId)||[]).length,selection:slot?{eventId:s.id,cards:slot.cards.map(c=>c?augmentView(c):null),rerolls:slot.rerolls.slice(),picked:slot.picked}:null};}

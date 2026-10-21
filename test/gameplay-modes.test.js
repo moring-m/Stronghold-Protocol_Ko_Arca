@@ -34,7 +34,7 @@ test('host switching preserves custom draft; fixed-mode edits and guest switchin
   const restored=await host.waitFor('room.state',r=>r.gameplayMode==='custom');assert.equal(restored.customExtensions.ruleValues.enemyHp,777);assert.ok(restored.customExtensions.bonds.includes('leithanien'));
   assert.equal((await guest.request({t:'room.ready',ready:true})).t,'ok');
   assert.equal((await host.request({t:'room.setGameplayMode',gameplayMode:'augment'})).t,'ok');
-  const fixed=await host.waitFor('room.state',r=>r.gameplayMode==='augment');assert.equal(fixed.seats.find(s=>s?.playerId!==fixed.hostId&&!s?.isBot)?.ready,false);assert.equal(fixed.customExtensions.ruleValues.bossHp,400);assert.ok(fixed.customExtensions.rules.includes('augments'));
+  const fixed=await host.waitFor('room.state',r=>r.gameplayMode==='augment');assert.equal(fixed.seats.find(s=>s?.playerId!==fixed.hostId&&!s?.isBot)?.ready,false);assert.equal(fixed.customExtensions.ruleValues.bossHp,100);assert.ok(fixed.customExtensions.rules.includes('augments'));
   assert.equal((await host.request({t:'room.setCustomExtensions',selection:saved})).t,'error');
   await guest.request({t:'room.ready',ready:true});assert.equal((await host.request({t:'room.start'})).t,'ok');assert.equal(Recording.opts.gameplayMode,'augment');assert.equal(Recording.opts.customExtensions.ruleValues.enemyHp,140);
   assert.equal((await host.request({t:'room.setGameplayMode',gameplayMode:'classic'})).code,'ROOM_STARTED');
@@ -58,7 +58,7 @@ test('augment mode ratios reach real normal-enemy and boss battle stats independ
   const selected=gameplayExtensions(saved,raw,'solo',mode),tables=applyCustomExtensions(raw,selected);
   const h=makeBattle({data:tables,kind:boss?'boss':'normal',content:'generic',autoFinish:false});
   const enemy=h.spawn('enemy_mode_probe',{pos:[3,6],...(boss?{tag:'boss'}:{})});
-  const ratios=mode==='classic'?[1,1,1,1]:boss?[4,1.2,1.2,1.5]:[1.4,1.2,1.2,1.5];
+  const ratios=mode==='classic'?[1,1,1,1]:boss?[1,1.2,1.2,1.5]:[1.4,1.2,1.2,1.5];
   for(const[stat,base,ratio]of [['maxHp',1000,ratios[0]],['atk',100,ratios[1]],['def',100,ratios[2]],['res',20,ratios[3]]])assert.ok(Math.abs(enemy.s[stat]-base*ratio)<1e-6,`${mode} ${boss?'boss':'normal'} ${stat}`);
  }
 });

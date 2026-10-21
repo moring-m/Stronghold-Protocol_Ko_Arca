@@ -1,3 +1,4 @@
+import {LangButton} from '../i18n/LangButton.js';
 const cx = (...parts) => parts.flat().filter(Boolean).join(' ');
 import { confirmDialog } from "./components.js";
 import { isPersonalCosmetic } from "../content.js";
@@ -335,7 +336,7 @@ export function SettingsModal({ open, onClose }) {
     <nav class="set-categories" aria-label="설정 종류" data-i18n-skip>
       ${[['graphics','그래픽'],['audio','소리'],['chat','채팅'],['controls','조작·단축키']].map(([id,label])=>html`<button type="button" class=${category===id?'is-on':''} aria-pressed=${category===id} onClick=${()=>setCategory(id)}>${label}</button>`)}
     </nav>
-    <div class="set-list">
+    <div class="set-list"><div class="set-row set-row--language"><span class="set-row__label">화면 언어</span><${LangButton} /></div>
     <section hidden=${category!=='audio'} class="set-category" data-category="audio">
       <${Slider} label="背景音乐" micro="BGM" icon="play" value=${s.bgm} onInput=${(v) => updateSettings({ bgm: v })} />
       <${Slider} label="오퍼레이터 음성" micro="VOICE" icon="signal" value=${s.voice} onInput=${v=>updateSettings({voice:v})} />

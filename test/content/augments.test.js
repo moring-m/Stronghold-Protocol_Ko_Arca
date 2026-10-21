@@ -17,7 +17,7 @@ test('personal slow/weak effects never enter cooperative or boss battles and sta
 });
 test('enemy shields, silence immunity, regeneration and status extension work with their stated scopes',()=>{
  const {h,u,e}=fixture({enemies:[find('실드 II','enemy'),find('극복','enemy'),find('재생 I','enemy'),find('상태이상 증가 II','enemy')]});
- assert.equal(h.b.applyStatus(e,'silence',{duration:3,source:u}),false);assert.ok(h.b.applyStatus(u,'stun',{duration:2,source:e}));close(u.findBuff('stun').duration,3);
+ assert.equal(h.b.applyStatus(e,'silence',{duration:3,source:u}),false);assert.ok(h.b.applyStatus(u,'stun',{duration:2,source:e}));close(u.findBuff('stun').duration,3.4);
  for(let i=0;i<3;i++)assert.equal(h.b.dealDamage(u,e,{amount:100,type:'true'}),0);assert.equal(h.b.dealDamage(u,e,{amount:100,type:'true'}),100);const before=e.hp;h.run(1);assert.ok(e.hp>=before+14);
 });
 test('frequency enemies receive no regeneration',()=>{
@@ -33,7 +33,7 @@ test('archmage SP cost rounds up after the forty-percent reduction and remains s
  const skill={skillId:'test',spCost:11,initSp:0,spType:'INCREASE_WITH_TIME',skillType:'MANUAL',duration:0};const {u}=fixture({allies:[find('아츠 마스터 III')],skill});assert.equal(u.skill.spCost,7);u.skill.spCostMul=.5;assert.equal(u.skill.spCost,3);
 });
 test('enemy elemental damage and elemental buildup scale once, not twice',()=>{
- const {h,u,e}=fixture({enemies:[find('원소 피해 증가 III','enemy')]});const before=u.hp;h.b.dealDamage(e,u,{amount:100,type:'elemental'});close(before-u.hp,150);
+ const {h,u,e}=fixture({enemies:[find('원소 피해 증가 III','enemy')]});const before=u.hp;h.b.dealDamage(e,u,{amount:100,type:'elemental'});close(before-u.hp,220);
 });
 for(const [name,aspd]of [['기습 I',140],['기습 II',180]])test(`${name} deployment attack speed lasts thirty seconds`,()=>{
  const {h,u}=fixture({allies:[find(name)]});close(u.s.aspd,aspd);h.run(29);close(u.s.aspd,aspd);h.run(1);close(u.s.aspd,100);
@@ -47,12 +47,12 @@ test('skill SP recovery works while duration skills are active, and Sargon stack
  const {h,u}=fixture({allies:[find('신속 I'),find('사르곤')],skill,content:'generic'});u.skill.gainSp(1000,'test');u.skill.activate('test');h.run(.05);assert.ok(u.skill.active);close(u.skill.sp,3);close(u.s.aspd,112);
  h.run(5);h.b.emit('skillStart',{unit:u});h.run(.05);close(u.s.aspd,124);h.run(10);close(u.s.aspd,112);h.run(5);close(u.s.aspd,100);
 });
-test('breakthrough includes enemies not yet spawned when the field is surrendered',()=>{
- const h=makeBattle({defs:{enemies:{enemy_test:enemyRec({key:'enemy_test',hp:100,lpr:1})}},content:'none',extraContent:[{install}],enemies:[{key:'enemy_test',time:50}],flags:{augments:{allies:{},enemies:[item(find('돌파','enemy'))]}},autoFinish:false});h.run(.1);h.b.forceEnd('surrender');const leaks=h.b.result().perPlayer.p1.leaked;assert.equal(leaks.length,1);assert.equal(leaks[0].lpr,2);
+test('surrendered unspawned enemies retain normal settlement HP without a breakthrough surcharge',()=>{
+ const h=makeBattle({defs:{enemies:{enemy_test:enemyRec({key:'enemy_test',hp:100,lpr:1})}},content:'none',extraContent:[{install}],enemies:[{key:'enemy_test',time:50}],flags:{augments:{allies:{},enemies:[item(find('돌파','enemy'))]}},autoFinish:false});h.run(.1);h.b.forceEnd('surrender');const leaks=h.b.result().perPlayer.p1.leaked;assert.equal(leaks.length,1);assert.equal(leaks[0].lpr,1);
 });
 
 test('enemy elemental buildup uses the same once-only multiplier as elemental damage',()=>{
- const {h,u,e}=fixture({enemies:[find('원소 피해 증가 III','enemy')]});h.b.dealDamage(e,u,{amount:100,type:'element',element:'apoptosis'});close(u.elem.apoptosis,150);
+ const {h,u,e}=fixture({enemies:[find('원소 피해 증가 III','enemy')]});h.b.dealDamage(e,u,{amount:100,type:'element',element:'apoptosis'});close(u.elem.apoptosis,220);
 });
 
 test('all-enemy HP augments also increase frequency HP without granting regeneration',()=>{
@@ -102,15 +102,15 @@ test('Siracusa augment grants stealth to operators and Karlans eye reveals only 
 });
 
 for(const [tier,pct,res,aspd]of [['I',10,8,10],['II',20,15,20],['III',30,30,30]])test(`enemy allied reductions ${tier} apply to allies rather than enemies`,()=>{
- const names=['공격력','HP','방어력','마법 저항','공격 속도'].map(n=>find(`아군 ${n} 감소 ${tier}`,'enemy'));const {u,e}=fixture({enemies:names});close(u.s.atk,100*(1-pct/100));close(u.s.maxHp,1000*(1-pct/100));close(u.s.def,100*(1-pct/100));close(u.s.res,Math.max(0,10-res));close(u.s.aspd,100-aspd);close(e.s.atk,100);close(e.s.maxHp,1e6);close(e.s.def,100);close(e.s.res,20);close(e.s.aspd,100);
+ const names=['공격력','HP','방어력','공격 속도'].map(n=>find(`아군 ${n} 감소 ${tier}`,'enemy'));const {u,e}=fixture({enemies:names});close(u.s.atk,100*(1-pct/100));close(u.s.maxHp,1000*(1-pct/100));close(u.s.def,100*(1-({I:15,II:30,III:50}[tier])/100));close(u.s.res,10);close(u.s.aspd,100-aspd);close(e.s.atk,100);close(e.s.maxHp,1e6);close(e.s.def,100);close(e.s.res,20);close(e.s.aspd,100);
 });
-for(const [tier,rate]of [['I',10],['II',20],['III',30]])test(`enemy allied drain ${tier} removes HP per second irrespective of defenses`,()=>{
+for(const [tier,rate]of [['I',40],['II',70],['III',100]])test(`enemy allied drain ${tier} removes HP per second irrespective of defenses`,()=>{
  const {h,u,e}=fixture({enemies:[find(`아군 지속 피해 ${tier}`,'enemy')]});h.b.addBuff(e,{key:'disarm-test',flags:{disarm:true}});h.b.addBuff(u,{key:'armor-test',mods:{defFlat:1e6,resFlat:90}});const before=u.hp;h.run(1);close(u.hp,before-rate);assert.ok(u.alive);
 });
 
 test('structural devices ignore enemy max HP reduction and continuous HP drain while operators retain them',()=>{
  const{h,u}=fixture({enemies:[find('아군 HP 감소 III','enemy'),find('아군 지속 피해 III','enemy')]});
- const device=h.b.spawnDevice('crate',9,3,{hp:100,obstacle:true});assert.ok(device);close(device.s.maxHp,100);const hp=device.hp,before=u.hp;h.run(1);close(device.hp,hp);close(u.hp,before-30);
+ const device=h.b.spawnDevice('crate',9,3,{hp:100,obstacle:true});assert.ok(device);close(device.s.maxHp,100);const hp=device.hp,before=u.hp;h.run(1);close(device.hp,hp);close(u.hp,before-100);
 });
 for(const [grade,percent]of [['I',15],['II',25],['III',35]])test(`Swordmaster ${grade} uses the requested probability`,()=>assert.equal(find(`소드마스터 ${grade}`).effect.probability,percent/100));
 for(const [grade,percent]of [['I',10],['II',20],['III',40]])test(`Arts master ${grade} reduces maximum SP with upward rounding`,()=>{
@@ -161,4 +161,15 @@ for(const [suffix,multiplier]of [['I',1.3],['II',1.6],['III',2]])test(`civilizat
  close(h.b.dealDamage(u,e,{amount:100,type:'arts'}),80);
  close(h.b.dealDamage(u,e,{amount:100,type:'phys'}),5);
  close(h.b.dealDamage(e,u,{amount:100,type:'true'}),100);
+});
+
+for(const [tier,multiplier]of [['I',1.1],['II',1.2],['III',1.3]])test(`enemy arts damage ${tier} replaces RES reduction and scales arts damage only`,()=>{
+ const card=find('마법 피해 증가 '+tier,'enemy');assert.ok(card);assert.equal(card.effect.kind,'artsDamage');assert.ok(!card.icon?.includes('magical_reduction'));
+ const {h,u,e}=fixture({enemies:[card]});assert.equal(u.s.res,10);
+ const before=u.hp;h.b.dealDamage(e,u,{amount:100,type:'arts'});close(before-u.hp,90*multiplier);
+ const physical=u.hp;h.b.dealDamage(e,u,{amount:200,type:'phys'});close(physical-u.hp,100);
+});
+test('enemy balance descriptions and executable effects use the requested grade values',()=>{
+ const values={'재생':[100,170,250],'상태이상 증가':[50,70,100],'원소 피해 증가':[50,80,120],'이동 속도 증가':[15,25,35],'아군 방어력 감소':[15,30,50],'아군 지속 피해':[40,70,100]};
+ for(const [name,amounts]of Object.entries(values))for(const [i,tier]of ['I','II','III'].entries()){const card=find(`${name} ${tier}`,'enemy');assert.ok(card);assert.match(card.description,new RegExp(String(amounts[i])));}
 });

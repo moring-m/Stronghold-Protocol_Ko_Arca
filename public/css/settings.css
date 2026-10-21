@@ -433,3 +433,12 @@
 .extension-band-card .lo-card__art img { object-fit:contain; }
 .extension-band-card .lo-card__kit { display:block; padding:4px; text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:10px; }
 .custom-ext .extension-presets__actions > .btn { padding:4px 2px; font-size:11px; letter-spacing:0; }
+.set-row--language .language-entry{grid-column:2 / 4;justify-self:end;width:2.6rem;max-width:100%;}
+.set-row--language .lang-toggle,.set-row--language select{width:100%;box-sizing:border-box;}
+.set-row--language .lang-toggle{border:0;}
+@media(max-width:600px) and (orientation:portrait){
+ .set-row--language{grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:8px;}
+ .set-row--language .set-row__label{font-size:13px;}
+ .set-row--language .language-entry{width:100%;}
+}
+.settings-modal .language-entry select{appearance:auto;background-image:none;padding:.05rem .08rem;}

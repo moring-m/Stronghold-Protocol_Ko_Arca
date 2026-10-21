@@ -169,6 +169,8 @@ const CJK = /[\u3400-\u9fff\uf900-\ufaff]/;
 /** Official rich-text markup (a styled / term tag or its close). */
 const RICH = /<[@$#][^<>]*>|<\/>/;
 const hasCjk = (s) => typeof s === 'string' && CJK.test(s);
+// A Korean custom record can reuse the corresponding official EN/JP client text too.
+const hasSourceText = (s) => typeof s === 'string' && /[\u3400-\u9fff\uf900-\ufaff가-힣]/.test(s);
 
 // ===== text helpers (kept identical to tools/build-data.mjs: the zh round trip in the report proves it) ============
 
@@ -352,7 +354,7 @@ class PairIndex {
     if (isKvList(zh)) zh = kvMap(zh);
     if (isKvList(en)) en = kvMap(en);
     if (typeof zh === 'string') {
-      if (typeof en === 'string' && hasCjk(zh)) this.add(zh, en, scope);
+      if (typeof en === 'string' && hasSourceText(zh)) this.add(zh, en, scope);
       return;
     }
     if (Array.isArray(zh)) {
@@ -589,7 +591,7 @@ function translateRecord(file, id, record, tr, stats, samples) {
       const v = node[k];
       const p = [...path, k];
       if (typeof v !== 'string') { if (v && typeof v === 'object') visit(v, p, near); continue; }
-      if (!hasCjk(v)) continue;
+      if (!hasSourceText(v)) continue;
       const kind = kindOf(file, p);
       if (isNotePath(p)) { stats.note(kind); continue; }
       let res = null;
@@ -619,7 +621,7 @@ function translateRecord(file, id, record, tr, stats, samples) {
 
 /** A record that is a plain string (config `seasonName`). */
 function translateScalar(file, id, text, tr, stats, samples) {
-  if (!hasCjk(text) || NOTE_KEYS.has(id)) return [];
+  if (!hasSourceText(text) || NOTE_KEYS.has(id)) return [];
   const kind = kindOf(file, [id]);
   const res = tr.translate(text, { near: new Set([id]), record: new Set([id, SEASON_SCOPE]), bb: null, bbStr: null });
   if (!res) {

@@ -43,6 +43,7 @@ export class MatchReports {
       return OK;
     }
     if (Number.isFinite(msg.leaks)) p.leaks = Math.max(p.leaks, msg.leaks);
+    this.augments.creditLeaks(f,msg.leaksCountBy);
     // 联防: the leakers' enemies still standing (the latest report; clamped where it is read, _uniteLeft)
     if (f.kind === 'unite' && msg.left && typeof msg.left === 'object') p.left = { ...msg.left };
     this.markPublic();

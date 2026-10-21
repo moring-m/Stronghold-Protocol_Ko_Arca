@@ -20,6 +20,7 @@ import { html, Icon, Modal, roman } from '../ui/components.js';
 import { Img, RichText, GIcon } from '../ui/gameComponents.js';
 import { bondIconUrl, bandIconUrl, enemyIconUrl, factionIconUrl, chessAvatarUrl, itemIconUrl, tokenAvatarUrl } from '../ui/assetUrls.js';
 import { AUGMENT_ROUNDS, AUGMENT_GRADES, createAugmentCatalog, augmentView } from '../../../shared/augments.js';
+import {formatAugmentDescription} from '../ui/augmentDescription.js';
 import { tr } from '../i18n/i18n.js';
 import { attackInterval, fmtNum } from '../ui/gameLogic.js';
 import { abilityRows } from '../ui/abilityLines.js';
@@ -272,11 +273,11 @@ function AugmentPanel({ augment: a, m }) {
   return html`<div class="sw-detail sw-augment-detail" style=${{ '--augment-color': grade.color }}>
     <${Hero} src=${a.iconBond ? bondIconUrl(m, a.iconBond) : a.icon} glyph=${true} name=${a.name}
       fallback=${html`<${GIcon} name=${a.side === 'ally' ? 'bolt' : 'shield'} />`} />
-    <div class="sw-facts"><span class="sw-pill sw-augment-grade">${grade.name}</span>
+    <div class="sw-facts"><span class="sw-pill sw-augment-grade">${tr(grade.name)}</span>
       <span class="sw-pill sw-pill--ghost">${a.side === 'ally' ? '아군 증강' : '적 증강'}</span>
       <span class="sw-pill sw-pill--ghost">등장 라운드 <b class="num">${a.rounds.join(' / ')}</b></span>
     </div>
-    <div class="sw-text"><${RichText} as="p" text=${a.description} /></div>
+    <div class="sw-text"><${RichText} as="p" text=${formatAugmentDescription(a.description)} /></div>
     <p class="sw-augment-note">${a.side === 'enemy' ? '선택 시 모든 적에게 적용됩니다.' : '선택한 참가자에게 적용됩니다.'}</p>
   </div>`;
 }
@@ -292,7 +293,7 @@ function AugmentsTab({ catalog, m, sel, onSel }) {
     </div>
     ${['ally', 'enemy'].flatMap((side) => Object.entries(AUGMENT_GRADES).map(([grade, g]) => {
       const items = filtered.filter((a) => a.side === side && a.grade === grade);
-      return items.length ? html`<${Section} key=${side + grade} style=${{ '--augment-color': g.color }} name=${`${side === 'ally' ? '아군' : '적'} · ${g.name}`} count=${items.length} glyph=${html`<${GIcon} name=${side === 'ally' ? 'bolt' : 'shield'} />`}>
+      return items.length ? html`<${Section} key=${side + grade} style=${{ '--augment-color': g.color }} name=${`${tr(side === 'ally' ? '아군' : '적')} · ${tr(g.name)}`} count=${items.length} glyph=${html`<${GIcon} name=${side === 'ally' ? 'bolt' : 'shield'} />`}>
         ${items.map((a) => html`<${Tile} key=${a.id} kind="augment" style=${{ '--augment-color': g.color }} title=${a.name} on=${a.id === sel} onClick=${() => onSel(a.id)}>
           <span class="sw-disc" style=${{ '--augment-color': g.color }}><${Img} src=${a.iconBond ? bondIconUrl(m, a.iconBond) : a.icon} fallback=${html`<${GIcon} name=${side === 'ally' ? 'bolt' : 'shield'} />`} /></span>
           <span class="sw-tile__cap">${a.name}</span>

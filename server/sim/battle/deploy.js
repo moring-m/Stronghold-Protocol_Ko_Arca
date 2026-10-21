@@ -263,7 +263,7 @@ export class BattleDeploy {
     const owner = timeout ? e.ownerId : this._ownerForTile([Math.round(e.y), Math.round(e.x)]) ?? e.ownerId;
     const pp = this._pp(owner) ?? this._pp(e.ownerId);
     if (pp) {
-      const entry = { enemyKey: e.defId, mods: e.mods ?? null, lpr: e.lpr ?? 1, sourcePlayerId: e.sourcePlayerId ?? e.ownerId, tag: e.tag ?? null, counted: !!e.counted || e.isBoss, boss: e.isBoss || undefined, spawned: true };
+      const entry = { enemyKey: e.defId, mods: e.mods ?? null, lpr: e.lpr ?? 1, sourcePlayerId: e.sourcePlayerId ?? e.ownerId, tag: e.tag ?? null, counted: !!e.counted || e.isBoss, boss: e.isBoss || undefined, spawned: true, entered: !timeout };
       // born while a 联防 field ran (spawns.js): the leaker never sent it in, so it costs nobody LP and raises no ×N —
       // unite.js uniteSurvivors / spec.js uniteLeft filter it; every other reading keeps counting it as usual
       if (e.uniteRuntime) entry.uniteRuntime = true;

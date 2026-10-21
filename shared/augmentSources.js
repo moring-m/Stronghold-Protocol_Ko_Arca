@@ -925,7 +925,7 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "enemy",
-  "description": "모든 적 유닛의 이동속도 +10%",
+  "description": "모든 적 유닛의 이동속도 +15%",
   "notes": ""
  },
  {
@@ -939,7 +939,7 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "enemy",
-  "description": "모든 적이 가하는 원소 피해 +15%",
+  "description": "모든 적이 가하는 원소 피해 +50%",
   "notes": "적:원소가 등장한 게임에만 등장"
  },
  {
@@ -967,7 +967,7 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "enemy",
-  "description": "모든 적이 부여하는 상태이상의 지속시간 +30%",
+  "description": "모든 적이 부여하는 상태이상의 지속시간 +50%",
   "notes": ""
  },
  {
@@ -981,7 +981,7 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "enemy",
-  "description": "모든 적이 초당 15의 HP 재생",
+  "description": "모든 적이 초당 100의 HP 재생",
   "notes": "타수몹은 해당 업음"
  },
  {
@@ -1079,7 +1079,7 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "enemy",
-  "description": "모든 적 유닛의 이동속도 +15%",
+  "description": "모든 적 유닛의 이동속도 +25%",
   "notes": ""
  },
  {
@@ -1093,7 +1093,7 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "enemy",
-  "description": "모든 적이 가하는 원소 피해 +30%",
+  "description": "모든 적이 가하는 원소 피해 +80%",
   "notes": "적:원소가 등장한 게임에만 등장"
  },
  {
@@ -1121,7 +1121,7 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "enemy",
-  "description": "모든 적이 부여하는 상태이상의 지속시간 +50%",
+  "description": "모든 적이 부여하는 상태이상의 지속시간 +70%",
   "notes": ""
  },
  {
@@ -1135,7 +1135,7 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "enemy",
-  "description": "모든 적이 초당 25의 HP 재생",
+  "description": "모든 적이 초당 170의 HP 재생",
   "notes": "타수몹은 해당 업음"
  },
  {
@@ -1219,7 +1219,7 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "enemy",
-  "description": "모든 적 유닛의 이동속도 +25%",
+  "description": "모든 적 유닛의 이동속도 +35%",
   "notes": ""
  },
  {
@@ -1233,7 +1233,7 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "enemy",
-  "description": "모든 적이 가하는 원소 피해 +50%",
+  "description": "모든 적이 가하는 원소 피해 +120%",
   "notes": "적:원소가 등장한 게임에만 등장"
  },
  {
@@ -1261,7 +1261,7 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "enemy",
-  "description": "모든 적이 부여하는 상태이상의 지속시간 +80%",
+  "description": "모든 적이 부여하는 상태이상의 지속시간 +100%",
   "notes": ""
  },
  {
@@ -1275,7 +1275,7 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "enemy",
-  "description": "모든 적이 초당 40의 HP 재생",
+  "description": "모든 적이 초당 250의 HP 재생",
   "notes": "타수몹은 해당 업음"
  },
  {
@@ -1289,8 +1289,8 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "enemy",
-  "description": "일반 전투·협력방어에서 적이 방어 포인트에 진입할 때마다 HP 2 감소",
-  "notes": "HP 감소 제한을 초과하지는 않음"
+  "description": "일반 전투·협력방어에서 적이 방어 포인트에 진입할 때마다 HP 1 즉시 감소",
+  "notes": "라운드 종료 HP 정산과 별개로 적용"
  },
  {
   "source": 96,
@@ -1612,21 +1612,21 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "enemy",
-  "description": "모든 아군 유닛의 방어력 -10%",
+  "description": "모든 아군 유닛의 방어력 -15%",
   "notes": ""
  },
  {
   "source": 121,
   "identity": 121,
   "grade": "silver",
-  "name": "아군 마법 저항 감소 I",
+  "name": "마법 피해 증가 I",
   "rounds": [
    4,
    7,
    10
   ],
   "side": "enemy",
-  "description": "모든 아군 유닛의 마법 저항 -8",
+  "description": "모든 적 유닛이 입히는 마법 대미지가 110%로 증가",
   "notes": ""
  },
  {
@@ -1654,7 +1654,7 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "enemy",
-  "description": "모든 아군 유닛이 초당 10의 HP 감소",
+  "description": "모든 아군 유닛이 초당 40의 HP 감소",
   "notes": ""
  },
  {
@@ -1696,21 +1696,21 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "enemy",
-  "description": "모든 아군 유닛의 방어력 -20%",
+  "description": "모든 아군 유닛의 방어력 -30%",
   "notes": ""
  },
  {
   "source": 127,
   "identity": 127,
   "grade": "gold",
-  "name": "아군 마법 저항 감소 II",
+  "name": "마법 피해 증가 II",
   "rounds": [
    4,
    7,
    10
   ],
   "side": "enemy",
-  "description": "모든 아군 유닛의 마법 저항 -15",
+  "description": "모든 적 유닛이 입히는 마법 대미지가 120%로 증가",
   "notes": ""
  },
  {
@@ -1738,7 +1738,7 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "enemy",
-  "description": "모든 아군 유닛이 초당 20의 HP 감소",
+  "description": "모든 아군 유닛이 초당 70의 HP 감소",
   "notes": ""
  },
  {
@@ -1780,21 +1780,21 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "enemy",
-  "description": "모든 아군 유닛의 방어력 -30%",
+  "description": "모든 아군 유닛의 방어력 -50%",
   "notes": ""
  },
  {
   "source": 133,
   "identity": 133,
   "grade": "prism",
-  "name": "아군 마법 저항 감소 III",
+  "name": "마법 피해 증가 III",
   "rounds": [
    4,
    7,
    10
   ],
   "side": "enemy",
-  "description": "모든 아군 유닛의 마법 저항 -30",
+  "description": "모든 적 유닛이 입히는 마법 대미지가 130%로 증가",
   "notes": ""
  },
  {
@@ -1822,7 +1822,7 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "enemy",
-  "description": "모든 아군 유닛이 초당 30의 HP 감소",
+  "description": "모든 아군 유닛이 초당 100의 HP 감소",
   "notes": ""
  },
  {

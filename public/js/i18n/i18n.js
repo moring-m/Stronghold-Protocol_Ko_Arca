@@ -1,3 +1,4 @@
+import {languageFetch} from './languagePack.js';
 import { addMessages, setLang as setSharedLang } from '../../../shared/i18n.js';
 // 한글 패치: 화면 표시용 번역 계층 (Korean patch — display-only translation layer).
 //
@@ -16,17 +17,17 @@ import { addMessages, setLang as setSharedLang } from '../../../shared/i18n.js';
 // A key "<ctx>|<text>" translates <text> only inside an element carrying data-i18n-ctx="<ctx>" (one Chinese word with
 // two Korean meanings: "toggle|关闭" is 꺼짐 on a switch, plain "关闭" is 닫기 on a close button).
 //
-// 한국어판은 저장된 이전 언어 설정과 관계없이 한국어로 시작한다.
+// 첫 방문은 한국어, 이후에는 사용자가 선택한 언어를 유지한다.
 // Node(단위 테스트)에서는 아무것도 하지 않는다: tr()은 입력을 그대로 돌려준다.
 
 const LANG_KEY = 'sp.pref.lang';
 const CJK = /[一-鿿]/;
 // 번역 대상 감지: 한자 또는 중국어 전각 문장부호 (「」【】는 한국어에서도 쓰므로 제외)
-const TRIGGER = /[一-鿿。，、；：？！（）]/;
+let TRIGGER = /[一-鿿。，、；：？！（）]/;
 const PUNCT = { '。': '. ', '，': ', ', '、': ', ', '；': '; ', '：': ': ', '？': '? ', '！': '! ', '（': '(', '）': ')' };
 /** 한자가 남지 않은 문장의 전각 문장부호를 한국어식으로. */
 const fixPunct = (s) => (CJK.test(s) ? s : s.replace(/[。，、；：？！（）]/g, (c) => PUNCT[c]).replace(/ {2,}/g, ' ').replace(/ ([)\]」』])/g, '$1'));
-const FILES = ['official', 'data', 'manual', 'ui', 'patterns'];
+const FILES = ['audit', 'official', 'data', 'manual', 'ui', 'patterns'];
 const ATTRS = ['title', 'placeholder', 'aria-label', 'alt'];
 const CACHE_MAX = 20000;
 
@@ -34,17 +35,25 @@ const hasDom = typeof document !== 'undefined' && typeof window !== 'undefined';
 
 function readLang() {
   if (!hasDom) return 'zh';
-  // This Korean edition starts in Korean even with an old Chinese preference.
-  try { localStorage.setItem(LANG_KEY, 'ko'); } catch { /* Storage may be unavailable. */ }
-  return 'ko';
+  try {
+    const requested = new URLSearchParams(location.search).get('lang');
+    const raw = localStorage.getItem(LANG_KEY);
+    let stored = raw;
+    try { stored = JSON.parse(raw); } catch {}
+    const saved = requested || stored;
+    const chosen = ['ko','zh','en','ja'].includes(saved) ? saved : 'ko';
+    localStorage.setItem(LANG_KEY, JSON.stringify(chosen));
+    return chosen;
+  } catch { return 'ko'; }
 }
 
 /** 현재 언어 ('ko' | 'zh'). */
 export const lang = readLang();
+if (lang !== 'ko') TRIGGER = /[一-鿿가-힣。，、；：？！（）]/;
 
 /** 언어를 바꾸고 새로고침한다 (번역은 첫 렌더 전에 적용해야 하므로). */
 export function setLang(next) {
-  try { localStorage.setItem(LANG_KEY, next === 'zh' ? 'zh' : 'ko'); } catch { /* 저장 불가: 그대로 */ }
+  try { localStorage.setItem(LANG_KEY, JSON.stringify(['ko','zh','en','ja'].includes(next) ? next : 'ko')); } catch { /* 저장 불가: 그대로 */ }
   if (hasDom) location.reload();
 }
 
@@ -104,7 +113,7 @@ function viaPieces(s) {
       if (p === '：') return ': ';
       return p;
     }
-    if (!CJK.test(p)) return p;
+    if (!TRIGGER.test(p)) return p;
     const t = translate(p, true);
     if (t !== p) changed = true;
     return t;
@@ -150,7 +159,7 @@ function translate(s, noPieces = false) {
   }
   if (out == null && /[【「]/.test(core)) out = viaBrackets(core);
   if (out == null && !noPieces) out = viaPieces(core);
-  let body = fixPunct(out == null ? core : out);
+  let body = lang === 'ko' ? fixPunct(out == null ? core : out) : (out == null ? core : out);
   if (!trail) body = body.replace(/\s+$/, '');
   const res = lead + body + trail;
   if (!noPieces && CJK.test(res) && missing.size < 2000) missing.add(core);
@@ -187,7 +196,7 @@ const SKIP_TAGS = new Set(['SCRIPT', 'STYLE', 'TEXTAREA', 'INPUT', 'CODE', 'PRE'
 
 function skipNode(el) {
   for (let e = el; e && e.nodeType === 1; e = e.parentNode) {
-    if (SKIP_TAGS.has(e.tagName) || (e.hasAttribute && e.hasAttribute('data-i18n-skip'))) return true;
+    if (e.matches?.('.me-chip__name') || SKIP_TAGS.has(e.tagName) || (e.hasAttribute && e.hasAttribute('data-i18n-skip') && !(lang !== 'ko' && e.closest?.('.settings-modal') && !e.closest('.language-entry')))) return true;
   }
   return false;
 }
@@ -247,7 +256,7 @@ function installDom() {
 async function fetchDictionary(url) {
   for (let attempt = 0; attempt < 2; attempt++) {
     try {
-      const response = await fetch(url, {cache:'no-cache',signal:AbortSignal.timeout(8000)});
+      const response = await languageFetch(url, {cache:'no-cache',signal:AbortSignal.timeout(8000)});
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       return await response.json();
     } catch (error) { if (attempt === 1) console.warn('[i18n] Dictionary unavailable:', url, error); }
@@ -256,6 +265,36 @@ async function fetchDictionary(url) {
 }
 
 async function load() {
+  if (lang !== 'ko') {
+    const [messages, korean, fork, official, audit] = await Promise.all([
+      lang === 'zh' ? Promise.resolve({}) : fetchDictionary(`/i18n/${lang}.json`),
+      fetchDictionary('/i18n/ko/compiled.json'),
+      fetchDictionary(`/i18n/${lang}/fork.json`),
+      lang === 'zh' ? Promise.resolve({}) : fetchDictionary(`/i18n/${lang}/data.json`),
+      fetchDictionary(`/i18n/${lang}/audit.json`),
+    ]);
+    for (const [source, text] of Object.entries(messages)) {
+      if (source.startsWith('_') || typeof text !== 'string') continue;
+      dict.set(source, text);
+      if (/\{\d+\}/.test(source)) addPattern(source, text);
+    }
+    // Fork UI uses Korean literals too; reuse their original msgids and the upstream packs.
+    for (const [source, ko] of Object.entries(korean.messages || {})) {
+      const text = lang === 'zh' ? source : (messages[source] || audit[source]);
+      if (ko && typeof text === 'string' && !dict.has(ko)) {
+        dict.set(ko, text);
+        if (/\{\d+\}/.test(ko)) addPattern(ko, text);
+      }
+    }
+    for (const [source,text] of Object.entries(audit)) {if(typeof text!=='string')continue;dict.set(source,text);if (/\{\d+\}/.test(source)) addPattern(source,text);}
+    for (const [source,text] of Object.entries(official.names || {})) dict.set(source,text);
+    for (const [source,text] of Object.entries(fork)) {dict.set(source,text);if (/\{\d+\}/.test(source)) addPattern(source,text);}
+    patterns.sort((a,b)=>b.n-a.n);
+    active = dict.size > 0;
+    addMessages(lang, {...messages,...audit,...fork});
+    setSharedLang(lang);
+    return;
+  }
   // The release build resolves overlay precedence and compiles patterns ahead of time.
   // This resource is display-only; combat keeps the original source tables.
   try {
@@ -286,16 +325,16 @@ async function load() {
   setSharedLang(lang);
 }
 
-if (hasDom && lang === 'ko') {
+if (hasDom) {
   try {
     await load();
     if (active) {
-      document.documentElement.lang = 'ko';
-      document.documentElement.classList.add('lang-ko');
+      document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang;
+      document.documentElement.classList.toggle('lang-ko', lang === 'ko');
       const css = document.createElement('link');
       css.rel = 'stylesheet';
       css.href = '/i18n/ko/ko.css';
-      document.head.appendChild(css);
+      if (lang === 'ko') document.head.appendChild(css);
       installDom();
     }
   } catch (e) {

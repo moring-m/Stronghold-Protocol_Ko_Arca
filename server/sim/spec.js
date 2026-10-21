@@ -324,6 +324,7 @@ export function battleProgress(battle) {
     bossDmg: pool && Number.isFinite(pool.cum) ? pool.cum : 0,
     done: !!(battle && battle.finished),
   };
+  if (battle && ['normal','unite'].includes(battle.kind) && battle.flags?.augments?.enemies?.some(a=>a.effect.kind==='leak'))out.leaksCountBy=Object.fromEntries(Object.entries(pp).map(([id,p])=>[id,(p.leaked||[]).filter(l=>l.entered===true).length]));
   if (battle && battle.kind === 'unite') {
     const left = uniteLeft(battle);
     if (left) out.left = left;
@@ -427,6 +428,7 @@ export function compactResult(res) {
       total,
       leaked: leakEntries(p).map((l) => {
         const o = { enemyKey: l.enemyKey, mods: compactMods(l.mods), lpr: leakLpr(l), sourcePlayerId: keyOr(l.sourcePlayerId), tag: typeof l.tag === 'string' && l.tag.length <= 16 ? l.tag : null, counted: l.counted !== false };
+        if (typeof l.entered==='boolean')o.entered=l.entered;
         if (l.uniteRuntime) o.uniteRuntime = true; // born on a 联防 field: the server must not bill it (unite.js uniteSurvivors)
         if (l.boss) o.boss = true;
         if (l.spawned) o.spawned = true;

@@ -45,6 +45,8 @@ export const EXTENSION_CATEGORIES = Object.freeze([
 export function isCustomStage(id, stage) {
   return id.startsWith('custom_') || stage?.customExtension === true || stage?.customExtension?.category === 'stages';
 }
+export const OPTIONAL_FIRST_STAGE = 'act1autochess_m01';
+export function additionalStagesForDifficulty(entries,difficulty){return entries.filter(entry=>difficulty!=='FUNNY'||entry.id!==OPTIONAL_FIRST_STAGE);}
 export const isBannableOperator = c => !!c && !!c.visible && !c.isGolden && !c.isHidden && !c.isDiy && !c.optionalRecruit && c.globalReleased !== false;
 export function customExtensionCatalog(raw = {}) {
   const banCatalog=Object.entries(raw.bonds||{}).filter(([,b])=>b.isCore&&Number(b.weight)>0).map(([id,b])=>({id,name:b.name||id}));
@@ -60,7 +62,7 @@ export function customExtensionCatalog(raw = {}) {
     disabledBosses:Object.entries(raw.bosses||{}).map(([id,b])=>({id,name:b.name||id,description:b.hidden?'히든 보스':'일반 보스'})),
     disabledBands:Object.entries(raw.bands||{}).filter(([id])=>id!==RANDOM_BAND_ID).map(([id,b])=>({id,name:b.name||id,description:'전략 선택에서 제외합니다.'})),
     bonds: [...(raw.bonds?.leithanienShip?[{id:'leithanien',name:'라이타니엔',description:'속세의 음 맹약과 오퍼레이터, 전용 장비, 위치킹 전략을 추가합니다.'}]:[]), { id: 'ursus', name: '우르수스', description: '우르수스 맹약과 오퍼레이터, 전용 장비, 카셰이 전략을 추가합니다.' }],
-    stages: Object.entries(raw.stages || {}).filter(([id,s]) => isCustomStage(id,s)).map(([id,s]) => ({
+    stages: Object.entries(raw.stages || {}).filter(([id,s]) => id===OPTIONAL_FIRST_STAGE||isCustomStage(id,s)).map(([id,s]) => ({
       id, name: s.name || id, description: s.customExtension?.description || '선택하면 이번 게임의 전장 추첨 목록에 추가됩니다.',
     })),
   };

@@ -635,7 +635,7 @@ export class Battle {
         const pp = this._pp(owner);
         const def = this.data.getEnemy(p.enemyKey);
         if (pp) {
-          pp.leaked.push({enemyKey:p.enemyKey,mods:p.mods ?? null,lpr:(def?.lpr ?? 1)+(this.flags.augments?.enemies||[]).reduce((n,a)=>n+(a.effect.kind==='leak'?a.effect.amount:0),0),sourcePlayerId:p.sourcePlayerId ?? owner,tag:p.tag ?? null,counted:!!p.counted,spawned:false});
+          pp.leaked.push({enemyKey:p.enemyKey,mods:p.mods ?? null,lpr:(def?.lpr ?? 1),sourcePlayerId:p.sourcePlayerId ?? owner,tag:p.tag ?? null,counted:!!p.counted,spawned:false});
           if (p.counted) pp.perfect=false;
           if (p.inTotal) pp.leakedInTotal++;
         }
@@ -1297,7 +1297,7 @@ export class Battle {
     const owner = timeout ? e.ownerId : this._ownerForTile([Math.round(e.y), Math.round(e.x)]) ?? e.ownerId;
     const pp = this._pp(owner) ?? this._pp(e.ownerId);
     if (pp) {
-      pp.leaked.push({ enemyKey: e.defId, mods: e.mods ?? null, lpr: e.lpr ?? 1, sourcePlayerId: e.sourcePlayerId ?? e.ownerId, tag: e.tag ?? null, counted: !!e.counted || e.isBoss, boss: e.isBoss || undefined, spawned: true });
+      pp.leaked.push({ enemyKey: e.defId, mods: e.mods ?? null, lpr: e.lpr ?? 1, sourcePlayerId: e.sourcePlayerId ?? e.ownerId, tag: e.tag ?? null, counted: !!e.counted || e.isBoss, boss: e.isBoss || undefined, spawned: true, entered: !timeout });
       if (e.counted || e.isBoss) pp.perfect = false;
     }
     if (e.counted) this.leakedCount++;

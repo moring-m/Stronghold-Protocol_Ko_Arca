@@ -23,7 +23,7 @@ export function PatchNotesButton({class:cls='',autoOpen=false}) {
    <nav class="patch-notes__versions" aria-label="패치 버전">
     ${PATCH_NOTES.map(n=>html`<button key=${n.version} type="button" class=${n.version===entry.version?'is-active':''} aria-pressed=${n.version===entry.version} onClick=${()=>setVersion(n.version)}>v${n.version}<small>${n.status==='testing'?'테스트 중':'운영 업데이트'}</small></button>`)}
    </nav>
-   <article class="patch-notes__entry" data-version=${entry.version} data-i18n-skip>
+   <article class="patch-notes__entry" data-version=${entry.version}>
     <header><${MicroLabel}>${entry.date}<//><h3>v${entry.version} · ${entry.title}</h3></header>
     ${entry.sections.map(section=>html`<section key=${section.title}><h4>${section.title}</h4><ul>${section.items.map(item=>html`<li key=${item}>${item}</li>`)}</ul></section>`)}
    </article>

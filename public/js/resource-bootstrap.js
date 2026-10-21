@@ -1,3 +1,6 @@
+import {RESOURCE_CONSENT_TEXT} from './i18n/resourceConsent.js';
+import {downloadLanguagePack} from './i18n/languagePack.js';
+import {LANGUAGE_PACKS} from '../../shared/languagePacks.js';
 import {readResourceSelection,selectedResources,RESOURCE_SELECTION_KEY,OFFICIAL_FX_READY_KEY,officialFxDownloaded,missingResourceBytes} from '../../shared/resourceSelection.js';
 import {reportResourceProgress} from './resourceProgress.js';
 const DOWNLOAD_SCOPE_KEY='sp.resources.downloadScope';
@@ -42,7 +45,7 @@ async function requestDownloadConsent(resources, forOfficial=false,voiceLanguage
     const scope=forOfficial?'officialFx':voiceLanguage?'voice-'+voiceLanguage:null;
     const panel = document.createElement('aside');
     panel.className='resource-consent panel panel--mint brackets';
-    panel.setAttribute('role','dialog');
+    panel.setAttribute('role','dialog');panel.setAttribute('data-i18n-skip','');
     panel.setAttribute('aria-label','게임 리소스 다운로드 안내');
     document.body.append(panel);
     const title = document.createElement('h2');title.className='panel__title'; title.textContent = forOfficial?'공식 전투 이펙트 다운로드':voiceLanguage?(voiceLanguage==='jp'?'일본어':'한국어')+' 음성 다운로드':'게임 리소스 다운로드';
@@ -51,9 +54,14 @@ async function requestDownloadConsent(resources, forOfficial=false,voiceLanguage
     const choice=readResourceSelection();if(forOfficial)choice.effects='official';
     const options=document.createElement('div');options.className='resource-consent__options';
     const select=(name,values,value)=>{const label=document.createElement('label');label.className='resource-consent__choice';const text=document.createElement('span');text.className='set-row__label';text.textContent=name;label.append(text);const input=document.createElement('select');input.setAttribute('aria-label',name);for(const [id,text]of values){const option=document.createElement('option');option.value=id;option.textContent=text;input.append(option);}input.value=value;label.append(input);options.append(label);return input;};
+    let savedLanguage='ko';try{const value=JSON.parse(localStorage.getItem('sp.pref.lang'));if(['ko','zh','en','ja'].includes(value))savedLanguage=value;}catch{}
+    const language=individual?{value:savedLanguage}:select('화면 언어',[['ko','한국어'],['zh','中文'],['en','English'],['ja','日本語']],savedLanguage);
+    if(!individual)language.dataset.testid='resource-language';
+    let copy=RESOURCE_CONSENT_TEXT[language.value];
     const voice=individual?{value:choice.voice}:select('음성',[['kr','한국어'],['jp','일본어']],choice.voice);
     const effects=individual?{value:choice.effects}:select('전투 이펙트',[['simple','간소'],['official','공식']],choice.effects);
-    const estimateSelection=()=>{const selected=selectedResources(resources,{voice:voice.value,effects:effects.value,...(scope?{scope}:{})});description.textContent=voiceLanguage?(voiceLanguage==='jp'?'일본어':'한국어')+' 음성 약 '+Math.ceil(selected.estimatedBytes/1048576)+'MB를 추가로 다운로드합니다. 이미지와 전투 이펙트는 이번 다운로드에 포함하지 않습니다.':forOfficial?'공식 전투 이펙트 약 '+Math.ceil(selected.estimatedBytes/1048576)+'MB를 추가로 다운로드합니다. 음성과 기본 리소스는 이번 다운로드에 포함하지 않습니다.':'선택한 이미지·모델·소리·폰트 약 '+Math.ceil(selected.estimatedBytes/1048576)+'MB를 다운로드합니다. 게임은 계속 이용할 수 있으며, 받은 파일은 다음 접속에 재사용합니다.';return selected;};
+    if(!individual)effects.dataset.resourceKind='effects';
+    const estimateSelection=()=>{const selected=selectedResources(resources,{voice:voice.value,effects:effects.value,...(scope?{scope}:{})});description.textContent=voiceLanguage?copy.voiceDescription(voiceLanguage==='jp'?copy.jp:copy.kr,Math.ceil(selected.estimatedBytes/1048576)):forOfficial?copy.fxDescription(Math.ceil(selected.estimatedBytes/1048576)):copy.description(Math.ceil((selected.estimatedBytes+(LANGUAGE_PACKS[language.value]||[]).reduce((sum,file)=>sum+file.bytes,0))/1048576));return selected;};
     voice.onchange=effects.onchange=estimateSelection;estimateSelection();
     const notice = document.createElement('p');
     notice.textContent = '비공식 팬 게임입니다. 게임 소재의 권리는 Hypergryph·Yostar 등 원 권리자에게 있으며, 개인적인 비상업적 이용만 가능합니다.';
@@ -67,24 +75,38 @@ async function requestDownloadConsent(resources, forOfficial=false,voiceLanguage
     const body=document.createElement('div');body.className='panel__body';body.append(description,options,notice,sources,status);
     const actions=document.createElement('div');actions.className='modal__actions';actions.append(button);
     panel.append(head,body,actions);
+    const updateLanguage=()=>{
+      copy=RESOURCE_CONSENT_TEXT[language.value];panel.lang=language.value;panel.setAttribute('aria-label',copy.title);title.textContent=forOfficial?copy.fxTitle:voiceLanguage?copy.voiceTitle(voiceLanguage==='jp'?copy.jp:copy.kr):copy.title;
+      if(!individual){for(const [input,label]of [[language,copy.language],[voice,copy.voice],[effects,copy.effects]]){input.previousElementSibling.textContent=label;input.setAttribute('aria-label',label);}
+      for(const option of voice.options)option.textContent=option.value==='kr'?copy.kr:copy.jp;
+      for(const option of effects.options)option.textContent=option.value==='simple'?copy.simple:copy.official;
+      }notice.textContent=copy.notice;sources.textContent=copy.sources;button.textContent=individual?copy.download:copy.start;estimateSelection();
+    };
+    language.onchange=updateLanguage;updateLanguage();
     return await new Promise(resolve => {
-      if(individual){const cancel=document.createElement('button');cancel.className='btn btn--ghost btn--sm';cancel.textContent='취소';cancel.onclick=()=>{panel.remove();resolve(false);};actions.prepend(cancel);}
+      if(individual){const cancel=document.createElement('button');cancel.className='btn btn--ghost btn--sm';cancel.textContent=copy.cancel;cancel.onclick=()=>{panel.remove();resolve(false);};actions.prepend(cancel);}
       button.onclick = async () => {
         button.disabled = true;
+        for(const input of [language,voice,effects])if(input instanceof HTMLSelectElement)input.disabled=true;
         try {
           const selected=estimateSelection();
           const estimate = await navigator.storage?.estimate();
           if(estimate?.quota&&estimate.quota-estimate.usage<selected.estimatedStorageBytes){
-            status.textContent='이미 받은 파일과 남은 저장 공간을 확인합니다…';
+            status.textContent=individual?'이미 받은 파일과 남은 저장 공간을 확인합니다…':copy.storage;
             const required=await missingResourceBytes(selected);
-            if(estimate.quota-estimate.usage<required*1.15)throw new Error('브라우저 저장 공간이 부족합니다. 공간을 확보한 뒤 다시 시도해 주세요.');
+            if(estimate.quota-estimate.usage<required*1.15)throw new Error(individual?'브라우저 저장 공간이 부족합니다. 공간을 확보한 뒤 다시 시도해 주세요.':copy.space);
           }
           await navigator.storage?.persist?.();
+          if(!individual&&LANGUAGE_PACKS[language.value]){
+            progress.style.width='100%';if(!progress.isConnected)body.append(progress);
+            await downloadLanguagePack(language.value,({loaded,total})=>{progress.max=total;progress.value=loaded;status.textContent=copy.languageProgress+' · '+(loaded/1048576).toFixed(1)+' / '+(total/1048576).toFixed(1)+' MB';});
+          }
           try { if(scope)localStorage.setItem(DOWNLOAD_SCOPE_KEY,scope);else localStorage.removeItem(DOWNLOAD_SCOPE_KEY);localStorage.setItem(RESOURCE_SELECTION_KEY,JSON.stringify({voice:voice.value,effects:effects.value}));localStorage.setItem('sp.resources.downloadConsent', '1'); localStorage.removeItem('sp.resources.redownloadPending'); localStorage.setItem('sp.resources.downloadActive','1'); } catch {}
           if(!individual)window.dispatchEvent(new CustomEvent('sp-resource-selection',{detail:{voice:voice.value,effects:effects.value}}));
           panel.remove();
+          if(!individual){localStorage.setItem('sp.pref.lang',JSON.stringify(language.value));if(language.value!==savedLanguage){location.reload();return;}}
           resolve(true);
-        } catch (error) { status.textContent = error.message; button.textContent = '다운로드 다시 시도'; button.disabled = false; }
+        } catch (error) { status.textContent = copy.error; button.textContent = copy.retry; button.disabled = false;for(const input of [language,voice,effects])if(input instanceof HTMLSelectElement)input.disabled=false; }
       };
     });
 }
@@ -204,7 +226,7 @@ async function boot() {
   window.addEventListener('sp-resource-download-finished',()=>setTimeout(flushVoiceQueue,0));
   window.addEventListener('sp-request-official-fx-download',()=>{
     if(requested||voiceRequest)return;
-    const current=document.querySelector('.resource-consent select[aria-label="전투 이펙트"]');
+    const current=document.querySelector('.resource-consent select[data-resource-kind="effects"]');
     if(current){current.value='official';current.dispatchEvent(new Event('change'));current.focus();return;}
     if(document.querySelector('.resource-consent'))return;
     requested=(async()=>{

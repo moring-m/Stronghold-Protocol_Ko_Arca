@@ -1,0 +1,34 @@
+{
+  "total": 15877,
+  "languages": {
+    "ko": {
+      "officialOrCurated": 9841,
+      "supplement": 877,
+      "native": 5159,
+      "missing": 0,
+      "invalid": 0
+    },
+    "en": {
+      "officialOrCurated": 12602,
+      "supplement": 3275,
+      "native": 0,
+      "missing": 0,
+      "invalid": 0
+    },
+    "ja": {
+      "officialOrCurated": 12531,
+      "supplement": 3346,
+      "native": 0,
+      "missing": 0,
+      "invalid": 0
+    },
+    "zh": {
+      "officialOrCurated": 1517,
+      "supplement": 3642,
+      "native": 10718,
+      "missing": 0,
+      "invalid": 0
+    }
+  },
+  "unresolved": []
+}

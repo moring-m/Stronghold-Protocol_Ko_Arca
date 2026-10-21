@@ -2914,6 +2914,7 @@ if (this.test === true) {
     const tick = () => {
       this._progressTimer = null;
       if (!this.fields.some((f) => f.cc && f.mode === 'server' && !f.done && f.timeline)) return;
+      for(const f of this.fields)if(f.kind==='normal'||f.kind==='unite'){const sample=timelineAt(f.timeline||[],this._fieldElapsed(f));this.augments.creditLeaks(f,sample?.[5]);}
       this.markPublic();
       this._progressTimer = this.later(1000, tick);
     };
@@ -2923,6 +2924,7 @@ if (this.test === true) {
   /** A field has its final result. */
   _fieldDone(f) {
     if (!f || f.done) return;
+    this.augments.creditResult(f);
     f.done = true;
     f.live = false;
     this._clearFieldTimers(f);
@@ -3046,6 +3048,7 @@ if (this.test === true) {
       return OK;
     }
     if (Number.isFinite(msg.leaks)) p.leaks = Math.max(p.leaks, msg.leaks);
+    this.augments.creditLeaks(f,msg.leaksCountBy);
     // 联防: the leakers' enemies still standing (the latest report; clamped where it is read, _uniteLeft)
     if (f.kind === 'unite' && msg.left && typeof msg.left === 'object') p.left = { ...msg.left };
     this.markPublic();

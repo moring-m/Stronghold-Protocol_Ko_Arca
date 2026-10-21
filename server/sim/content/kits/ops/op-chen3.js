@@ -318,6 +318,8 @@ export default {
           for (const e of battle.foesInRadius(w.x, w.y, WAVE_HIT_RADIUS)) {
             if (w.hit.has(e) || !canTargetEnemy(unit, e, AIR)) continue;
             w.hit.add(e);
+            // The wave's HP-based hit is void above 300,000, independently of the configurable boss ceiling.
+            if (ratio * e.hp > 300000) continue;
             const amount = Math.max(ratio * e.hp, minScale * unit.s.atk);
             battle.fx('slash', { x: e.x, y: e.y, id: unit.id, n: 1, skill: 'chen3:wave' });
             battle.dealDamage(unit, e, { amount, type: 'arts', isSkill: true, tags: ['skill', 'chen3:wave'] });

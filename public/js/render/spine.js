@@ -806,9 +806,16 @@ export class SpineActor {
   // Split attack models have an authored ready pose between shots. Keep it
   // for the expected next shot; never loop the firing clip to fill a cooldown.
   _normalAttackIdle(clip) {
-    if (!clip || !this.continuousAttacks || clip !== this.roles.attack) return null;
-    const idle = clip.idle || clip.loop.replace(/Loop$/i, 'Idle');
+    if (!clip || (!this.continuousAttacks && !this.authoredAttackReady) || clip !== this.roles.attack) return null;
+    const idle = clip.idle || (/Loop$/i.test(clip.loop) ? clip.loop.replace(/Loop$/i, 'Idle') : `${clip.loop}_Idle`);
     return idle !== clip.loop && this.has(idle) ? idle : null;
+  }
+
+  _normalAttackEnd(clip) {
+    const end = clip?.end || (this.authoredAttackReady && clip === this.roles.attack && this._normalAttackIdle(clip)
+      ? /Loop$/i.test(clip.loop) ? clip.loop.replace(/Loop$/i, 'End') : `${clip.loop}_End`
+      : null);
+    return this.has(end) ? end : null;
   }
 
   /**
@@ -1166,7 +1173,8 @@ export class SpineActor {
           this.mode = 'base';
           // a skill with its own idle: back to that idle (its end clip is for the end of the skill, setSkill(false))
           const toSkillIdle = clip === this.roles.skill && !!this._skillIdle();
-          if (clip && this.has(clip.end) && !toSkillIdle) { this._play(clip.end, false); this._queue(this._baseName(), true); }
+          const end = this._normalAttackEnd(clip);
+          if (end && !toSkillIdle) { this._play(end, false); this._queue(this._baseName(), true); }
           else this._play(this._baseName(), true, { mix: 0.15 });
         }
         break;
@@ -1175,7 +1183,8 @@ export class SpineActor {
         if (this.clock > this.attackPoseUntil || this.base === 'move') {
           this.mode = 'base';
           const clip = this.roles.attack;
-          if (this.has(clip?.end)) { this._play(clip.end, false); this._queue(this._baseName(), true); }
+          const end = this._normalAttackEnd(clip);
+          if (end) { this._play(end, false); this._queue(this._baseName(), true); }
           else this._play(this._baseName(), true, { mix: .15 });
         }
         break;

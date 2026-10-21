@@ -399,3 +399,14 @@
 @media(max-width:900px){.mode-cards .mode-card--lab .mode-card__desc{display:none}}
 
 .mode-card:not(.mode-card--lab) .mode-card__desc { display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;line-height:1.5; }
+/* Translated labels need word wrapping rather than the CJK title tracking. */
+html:not([lang="ko"]) .mode-card--lab .mode-card__text{min-width:0;grid-template-columns:minmax(0,1fr);gap:.08rem;}
+html:not([lang="ko"]) .mode-card--lab .mode-card__desc{font-size:.15rem;line-height:1.45;}
+html:not([lang="ko"]) .mode-card__points{min-width:0;overflow-wrap:normal;}
+html:not([lang="ko"]) .mode-card__name,html:not([lang="ko"]) .diff-card__name{min-width:0;max-width:100%;}
+html:not([lang="ko"]) .mode-cards .mode-card__name{font-size:.28rem;white-space:normal;overflow-wrap:normal;line-height:1.2;}
+html:not([lang="ko"]) .mode-cards .public-rooms-entry .mode-card__name{font-size:.24rem;}
+html:not([lang="ko"]) .mode-card__controls{gap:4px;flex-wrap:wrap;}
+html:not([lang="ko"]) .mode-card__spectate{font-size:.14rem;gap:.05rem;min-width:0;}
+html:not([lang="ko"]) .mode-card__sizes button{min-width:.55rem;padding-inline:.07rem;}
+html:not([lang="ko"]) .mode-cards .mode-card--lab .mode-card__name{font-size:.24rem;}

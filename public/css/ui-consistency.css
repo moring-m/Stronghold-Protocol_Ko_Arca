@@ -41,3 +41,39 @@ html body header.app-topbar:is(.topbar,.lo-top,.st-top) .btn--square:where(:not(
 /* The loadout subtitle belongs to its heading, rather than to the top edge of the bar. */
 html body header.app-topbar.lo-top > .lo-top__center { gap:2px; }
 html body header.app-topbar.lo-top .lo-title-tabs button { padding-top:0; padding-bottom:0; }
+
+/* Touch navigation keeps heading and tools in the same row, including zoomed-out layouts. */
+@media (pointer:coarse), (max-width:760px) {
+ html body header.app-topbar:is(.topbar,.lo-top,.st-top){--ui-control-height:32px;--ui-title-font:16px;height:56px;min-height:56px;padding:8px 12px;grid-template-columns:minmax(0,1fr) minmax(0,auto) minmax(0,1fr);grid-template-rows:40px;gap:8px;}
+ html body header.app-topbar:is(.topbar,.lo-top,.st-top)>:is(.topbar__center,.lo-top__center,.st-top__center){grid-column:2;grid-row:1;max-width:26vw;min-width:0;gap:0;}
+ html body header.app-topbar:is(.topbar,.lo-top,.st-top)>:is(.topbar__left,.lo-top__left,.st-top__left){grid-column:1;grid-row:1;}
+ html body header.app-topbar:is(.topbar,.lo-top,.st-top)>:is(.topbar__right,.lo-top__right,.st-top__right){grid-column:3;grid-row:1;justify-content:safe flex-end;}
+ html body header.app-topbar:is(.topbar,.lo-top,.st-top)>:is(.topbar__left,.lo-top__left,.st-top__left,.topbar__right,.lo-top__right,.st-top__right){max-width:100%;width:100%;min-width:0;gap:8px;overflow-x:auto;overflow-y:hidden;flex-wrap:nowrap;padding:2px;box-sizing:border-box;}
+ html body header.app-topbar:is(.topbar,.lo-top,.st-top)>:is(.topbar__center,.lo-top__center,.st-top__center)>.micro{display:none;}
+ html body header.app-topbar:is(.topbar,.lo-top,.st-top) :is(.topbar__title,.lo-top__title){display:block;max-width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+ html body header.app-topbar:is(.topbar,.lo-top,.st-top) .btn{font-size:12px;}
+ html body header.app-topbar:is(.topbar,.lo-top,.st-top) .btn__icon{width:16px;height:16px;}
+ html body header.app-topbar:is(.topbar,.lo-top,.st-top) .me-chip{box-sizing:border-box;height:32px;flex:none;padding:3px 8px 3px 3px;gap:6px;}
+ html body header.app-topbar:is(.topbar,.lo-top,.st-top) .me-chip .avatar{width:26px;height:26px;}
+ html body header.app-topbar:is(.topbar,.lo-top,.st-top) .me-chip__name{font-size:12px;}
+ html body header.app-topbar:is(.topbar,.lo-top,.st-top) .me-chip .micro{font-size:8px;}
+}
+
+/* Language controls use the same border, spacing and type as settings controls. */
+.language-entry{display:inline-flex;align-items:center;max-width:100%;}
+.language-entry .lang-toggle{display:inline-flex;max-width:100%;}
+.language-entry select,.resource-consent__choice select{
+ appearance:none;color:var(--text-hi,#e3efeb);background-color:var(--bg-0,#0c1713);
+ border:1px solid var(--line,rgba(156,196,180,.3));border-radius:0;
+ min-height:var(--ui-control-height,32px);padding:5px 30px 5px 12px;
+ font:inherit;font-size:12px;line-height:1.4;cursor:pointer;
+ background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%);
+ background-position:calc(100% - 13px) 50%,calc(100% - 9px) 50%;background-size:4px 4px;background-repeat:no-repeat;
+}
+.language-entry select:hover,.resource-consent__choice select:hover{border-color:var(--mint-400,#34e8c0);}
+.language-entry select:focus-visible,.resource-consent__choice select:focus-visible{outline:1px solid var(--mint-400,#34e8c0);outline-offset:2px;}
+.language-entry option,.resource-consent__choice option{background:#0c1713;color:#e3efeb;}
+.title-tools .language-entry select{
+ height:.36rem;min-height:0;padding:0 .32rem 0 .16rem;font-size:calc(.15 * var(--t));
+ background-position:calc(100% - .15rem) 50%,calc(100% - .11rem) 50%;background-size:.04rem .04rem;
+}

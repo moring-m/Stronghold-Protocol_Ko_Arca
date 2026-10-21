@@ -528,6 +528,7 @@ export function createBattleRunner(deps) {
       }
     } else {
       msg.leaks = Math.min(1e6, p.leaks);
+      if(p.leaksCountBy)msg.leaksCountBy=p.leaksCountBy;
       // 联防: the leakers' enemies still standing (shared/protocol.js b.progress `left`, ≤ 8 players)
       if (p.left) msg.left = Object.fromEntries(Object.entries(p.left).slice(0, 8));
     }

@@ -21,7 +21,7 @@ test('extension shape rejects unknown categories, duplicate entries and malforme
  for(const value of [null,[],{bonds:['ursus','ursus']},{stages:[1]},{evil:[]}])assert.equal(extensionSelectionShape(value),false);
  assert.equal(extensionSelectionShape({bonds:['ursus'],stages:['custom_map_b']}),true);
  assert.deepEqual(normalizeCustomExtensions(undefined,raw,true),{bonds:['ursus'],stages:[]});
- assert.deepEqual(customExtensionCatalog(raw).stages.map(x=>x.id),['custom_map_a','custom_map_b']);
+ assert.deepEqual(customExtensionCatalog(raw).stages.map(x=>x.id),['act1autochess_m01','custom_map_a','custom_map_b']);
 });
 
 test('multiple maps can coexist and switching extensions never mutates skill/skin preferences',()=>{

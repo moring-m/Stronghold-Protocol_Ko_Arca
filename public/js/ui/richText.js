@@ -17,6 +17,7 @@
 //   fillPlaceholders(src, values) → replace `{i:fmt}` / `{i}` by values[i] (unknown indexes kept)
 
 // 한글 패치: 태그로 나누기 전에 문장 전체를 번역한다 (Node 테스트에서는 원문 그대로).
+import {customBondEffectTemplate} from './bondDescriptions.js';
 import { tr } from '../i18n/i18n.js';
 
 /** Official style id → our CSS modifier (css/screens/game-panels.css `.rt-*`). */
@@ -168,7 +169,9 @@ export function fillPlaceholders(src, values, formats = []) {
  */
 export function formatBondEffect(bond, layers = 0, count = 0) {
   if (!bond || typeof bond !== 'object') return '';
-  const src = bond.effectDescRaw || bond.effectDesc || '';
+  const raw = customBondEffectTemplate(bond) || bond.effectDescRaw || bond.effectDesc || '';
+  // Translate the template before filling its numeric slots; filled sentences are not dictionary keys.
+  const src = tr(raw);
   const params = Array.isArray(bond.effectDescParams) ? bond.effectDescParams : [];
   const bb = bond.bb && typeof bond.bb === 'object' ? bond.bb : {};
   const L = Number.isFinite(Number(layers)) ? Math.max(0, Number(layers)) : 0;
@@ -185,5 +188,5 @@ export function formatBondEffect(bond, layers = 0, count = 0) {
     formats[p.index] = p.format || '0';
   }
   const text=fillPlaceholders(src, values, formats);
-  return bond.bondId==='leithanienShip'||bond.id==='leithanienShip'?text.replace('5초',`${count>=6?10+Math.floor(L/25):5}초`).replaceAll('{leithDurationBonus}',String(5+Math.floor(L/25))).replaceAll('{leithDurationStacks}',String(Math.floor(L/25))):text;
+  return bond.bondId==='leithanienShip'||bond.id==='leithanienShip'?text.replace(/5(?=(?:<\/>)?(?:초| seconds|秒))/,String(count>=6?10+Math.floor(L/25):5)).replaceAll('{leithApplyDuration}',String(count>=6?10+Math.floor(L/25):5)).replaceAll('{leithDurationBonus}',String(5+Math.floor(L/25))).replaceAll('{leithDurationStacks}',String(Math.floor(L/25))):text;
 }

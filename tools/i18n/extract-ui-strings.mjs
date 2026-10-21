@@ -37,7 +37,7 @@ const REGEX_PREV = new Set(['(', ',', '=', ':', '[', '!', '&', '|', '?', '{', '}
 const REGEX_KW = /(?:return|typeof|case|do|else|in|of|new|delete|void|throw|yield|await)$/;
 
 /** 문자열·템플릿 리터럴 토큰을 돌려준다. { kind: 'str'|'tpl', tag, parts: string[], line } */
-function lex(src) {
+export function lex(src) {
   const toks = [];
   let i = 0, line = 1, prev = '';
   const n = src.length;
@@ -131,10 +131,10 @@ function lex(src) {
 }
 
 /** htm 템플릿의 정적 조각에서 화면 텍스트와 속성값을 뽑는다. */
-function htmTexts(parts) {
+export function htmTexts(parts, trigger = CJK) {
   const out = [];
   let inTag = false, quote = null, buf = '';
-  const push = (s) => { const t = s.replace(/\s+/g, ' ').trim(); if (t && CJK.test(t)) out.push(t); };
+  const push = (s) => { const t = s.replace(/\s+/g, ' ').trim(); if (t && trigger.test(t)) out.push(t); };
   for (const part of parts) {
     for (let k = 0; k < part.length; k++) {
       const c = part[k];
@@ -192,4 +192,4 @@ async function main() {
   console.log(`ui strings: ${list.length} (str ${list.filter((e) => e.kind === 'str').length}, tpl ${list.filter((e) => e.kind === 'tpl').length}, frag ${list.filter((e) => e.kind === 'frag').length}); untranslated ${missing.length}`);
 }
 
-main().catch((e) => { console.error(e); process.exit(2); });
+if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url))main().catch((e) => { console.error(e); process.exit(2); });

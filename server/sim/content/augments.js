@@ -18,7 +18,6 @@ export function install(b){
     if(e.kind==='shields'&&!u.mem['augment:shields:'+i]){b.addBuff(u,{key:'augment:shields:'+i,shieldHits:e.count,visible:true,persist:true});u.mem['augment:shields:'+i]=true;}
     if(e.kind==='regen'&&!u.s.flags.hitCount&&!u.s.flags.hitCountArts)add(u,`${i}:regen`,{hpRegen:e.amount});
     if(e.kind==='silenceImmune')u.def={...u.def,immune:new Set([...(u.def.immune||[]),'silence'])};
-    if(e.kind==='leak'&&!u.mem['augment:leak:'+i]){u.lpr=(u.lpr??1)+e.amount;u.mem['augment:leak:'+i]=true;}
    }else{
     if(e.kind==='stealth'&&u.kind==='op')add(u,`${i}:stealth`,{},{flags:{stealth:true}});
     if(e.kind==='deployAspd'&&u.kind==='op')add(u,`${i}:deploy`,{aspd:e.amount},{duration:e.duration??30,persist:false});
@@ -64,6 +63,7 @@ export function install(b){
   if(c.source?.side==='ally'&&c.source.kind==='op'&&c.target?.side==='enemy'&&(c.target.s.flags.cold||c.target.s.flags.freeze)){const e=forUnit(c.source).find(e=>e.kind==='kjerag');if(e){const base=c.dmg.kjeragScale||1;c.dmg.mul*=(base+e.bonus)/base;}}
   if(c.source?.side==='ally'&&forUnit(c.source).some(e=>e.kind==='weakness'))weaknessRetype(c.dmg,c.source,c.target);
   if(c.source?.side==='ally'&&c.dmg.type==='true')for(const e of forUnit(c.source))if(e.kind==='trueDamage')c.dmg.mul*=e.multiplier;
+  if(c.source?.side==='enemy'&&c.dmg.type==='arts')for(const e of enemyEffects)if(e.kind==='artsDamage')c.dmg.mul*=e.multiplier;
   if(c.source?.side==='enemy')for(const e of enemyEffects)if(e.kind==='elemental'&&(c.dmg.type==='element'||c.dmg.type==='elemental'))c.dmg.amount*=e.multiplier;
  });
  // Element buildup exits the HP damage pipeline before hit; scale it at creation too (damage.js invokes this).

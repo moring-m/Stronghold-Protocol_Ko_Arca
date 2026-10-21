@@ -960,9 +960,10 @@ export class UnitView {
       try {
         actor = new SpineActor(data, entry);
         actor.setSkillIndex(this.info.skillIndex);
-        // enemies play their attack clip once per attack, then walk on (GitHub #58: the sim stands them for that clip)
+        // Play each attack once; enemies with an authored ready stance keep it between attacks.
         actor.clipPerAttack = true;
         actor.continuousAttacks = !this.isEnemy;
+        actor.authoredAttackReady = this.isEnemy;
       } catch (err) {
         console.warn('[render] spine build failed', id, err?.message || err);
         this._releaseEntry(entry);

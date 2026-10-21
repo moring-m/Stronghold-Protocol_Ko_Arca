@@ -49,7 +49,7 @@ import { recordError, installTrafficMeter } from './diag.js';
 
 import { installButtonFocusRelease } from './ui/buttonFocus.js';
 // 한글 패치: 첫 렌더 전에 한국어 사전을 불러오고 DOM 번역기를 건다 (top-level await).
-import './i18n/i18n.js';
+import {lang as displayLang} from './i18n/i18n.js';
 import { render } from '../vendor/preact.module.js';
 import { useErrorBoundary } from '../vendor/hooks.module.js';
 import { html, UiHosts, Button, MicroLabel, closeAllDialogs } from './ui/components.js';
@@ -400,6 +400,7 @@ function installGlobalErrorHandlers() {
 }
 
 async function boot() {
+  if (displayLang !== 'ko') await initLang();
   installGlobalErrorHandlers();
   // what this page downloads, by category, for the 问题反馈 report's traffic line (diag.js; nothing is sent anywhere)
   installTrafficMeter();

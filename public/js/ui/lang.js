@@ -1,3 +1,4 @@
+import {languageFetch} from '../i18n/languagePack.js';
 import { checkTranslation } from "../../../shared/i18n.js";
 // Language switch of the client (docs/I18N.md): lists the language packs — the "lang" entries of the pack index
 // /packs/index.json (shared/packs.js; the server's registry, server/packs.js, scans the language folders and the pack
@@ -80,7 +81,7 @@ export function loadUiMessages(lang, doFetch = defaultFetch) {
   const url = langInfo(lang)?.ui || `/i18n/${lang}.json`;
   const p = (async () => {
     try {
-      const res = await doFetch(url, { cache: 'no-cache' });
+      const res = await languageFetch(url, { cache: 'no-cache' }, doFetch);
       if (!res || !res.ok) throw new Error(`HTTP ${res ? res.status : '???'}`);
       addMessages(lang, await res.json());
       const overlay = langInfo(lang)?.uiOverlay;
@@ -127,7 +128,7 @@ export async function loadLangChain(lang, doFetch = defaultFetch) {
  * @param {string} lang
  * @returns {{ code: string, url?: string, overlayUrl?: string }[]}
  */
-export const dataChain = (lang) => langChain(lang).filter((c) => langInfo(c)?.data !== false).map((c) => ({ code: c, url: langInfo(c)?.dataUrl, ...(langInfo(c)?.dataOverlayUrl ? { overlayUrl: langInfo(c).dataOverlayUrl } : {}) }));
+export const dataChain = (lang) => langChain(lang).filter((c) => ['en','ja'].includes(c) || langInfo(c)?.data !== false).map((c) => ({ code: c, url: ['en','ja'].includes(c) ? `/i18n/${c}/data.json` : langInfo(c)?.dataUrl, ...(langInfo(c)?.dataOverlayUrl ? { overlayUrl: langInfo(c).dataOverlayUrl } : {}) }));
 
 /**
  * The language to start in: the URL's `?lang=`, then the stored choice, then Chinese. `tentative`: also a well-formed
@@ -144,7 +145,7 @@ export function initialLang(search = globalThis.location?.search || '', load = l
   if (fromUrl) return { lang: fromUrl, fromUrl: true };
   let stored = null;
   try { stored = pick(load(PREF_KEY, null)); } catch { /* ignore */ }
-  return { lang: stored || DEFAULT_LANG, fromUrl: false };
+  return { lang: stored || 'ko', fromUrl: false };
 }
 
 function stripLangParam() {
@@ -199,7 +200,7 @@ function wire() {
 function applyLang(lang) {
   setLang(lang);
   // This fork translates raw records through its Korean dictionary rather than data-store overlays.
-  data.setLocale?.(getLang(), dataChain(getLang()))?.catch(() => {});
+  data.setLocale?.(getLang() === 'ko' ? 'zh' : getLang(), getLang() === 'ko' ? [] : dataChain(getLang()))?.catch(() => {});
 }
 
 /**

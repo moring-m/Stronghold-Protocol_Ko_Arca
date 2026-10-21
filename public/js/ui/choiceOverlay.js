@@ -197,7 +197,7 @@ export function ChoiceView({ pub, sp, myId, solo, personal = false, busyIdx = nu
         <div class="spov__titles">
           <${MicroLabel} tone="mint">CONTINGENCY // 机变阶段</${MicroLabel}>
           <h2 class=${cx('spov__title', special && 'is-special')}>${sp.name || fam?.name || '机变'}<span class="spov__bar">|</span><span class="spov__desc"><${RichText} text=${sp.desc || fam?.desc || '选择一项'} /></span></h2>
-          <p class="spov__sub">${settling ? html`<span data-i18n-skip>선택 완료 · 잠시 후 다음 단계로 넘어갑니다.</span>` : timed ? '倒计时结束后仍未选定将自动分配' : '选择一项（无时间限制）'}${mine == null && myTurn ? ' · 点击卡牌选中，再次点击确认' : ''}</p>
+          <p class="spov__sub">${settling ? html`<span>선택 완료 · 잠시 후 다음 단계로 넘어갑니다.</span>` : timed ? '倒计时结束后仍未选定将自动分配' : '选择一项（无时间限制）'}${mine == null && myTurn ? ' · 点击卡牌选中，再次点击确认' : ''}</p>
         </div>
         <div class="spov__turn">
           ${mine != null ? html`<span class="spov__turntxt is-done"><${Icon} name="check" />已完成选择</span>`

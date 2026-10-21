@@ -48,7 +48,7 @@ function skill(raw,s){
   }});
   return duration(s,{triggerProfile:{canHitFly:true,groundOnly:false},targeting:{rangeGrid:s.rangeGrid,maxTargets:num(bb['attack@max_target'],3),canHitFly:false},attack:{hits:3,atkScale:num(bb['attack@atk_scale']),dmgType:'arts'},onStart({battle,unit}){
    battle.fx('chenDragonWave',{x:unit.x,y:unit.y,id:unit.id});
-   for(const e of battle.enemiesInKeys(unit.rangeKeys,unit,{...unit.profile,canHitFly:true,groundOnly:false}))battle.dealDamage(unit,e,{amount:Math.max(e.hp*num(bb.hp_ratio),unit.s.atk*num(bb.projectile_min_atk_scale)),type:'arts',isSkill:true,tags:['chen3-sword-wave']});
+   for(const e of battle.enemiesInKeys(unit.rangeKeys,unit,{...unit.profile,canHitFly:true,groundOnly:false}))if(e.hp*num(bb.hp_ratio)<=300000)battle.dealDamage(unit,e,{amount:Math.max(e.hp*num(bb.hp_ratio),unit.s.atk*num(bb.projectile_min_atk_scale)),type:'arts',isSkill:true,tags:['chen3-sword-wave']});
   }});
  }
  if(cid==='char_1035_wisdel'){

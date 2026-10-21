@@ -70,7 +70,7 @@ await check('.st-top');await shot('stats','.st-top');await page.click('.st-top__
     await selectMode('클래식');await page.waitForFunction(()=>__SP__.store.get().room.gameplayMode==='classic');
     assert.equal(await page.$eval('.room-custom-extensions',e=>e.disabled),true);assert.deepEqual(await page.evaluate(()=>__SP__.store.get().room.customExtensions.bonds),[]);
     await selectMode('증강');await page.waitForFunction(()=>__SP__.store.get().room.gameplayMode==='augment');
-    const fixed=await page.evaluate(()=>__SP__.store.get().room.customExtensions);assert.deepEqual(fixed.rules,['augments']);assert.deepEqual([fixed.ruleValues.enemyHp,fixed.ruleValues.enemyAtk,fixed.ruleValues.enemyDef,fixed.ruleValues.enemyRes],[140,120,120,150]);assert.deepEqual([fixed.ruleValues.bossHp,fixed.ruleValues.bossAtk,fixed.ruleValues.bossDef,fixed.ruleValues.bossRes],[400,120,120,150]);assert.deepEqual([fixed.ruleValues.augmentSilver,fixed.ruleValues.augmentGold,fixed.ruleValues.augmentPrism],[2,5,3]);
+    const fixed=await page.evaluate(()=>__SP__.store.get().room.customExtensions);assert.deepEqual(fixed.rules,['augments']);assert.deepEqual([fixed.ruleValues.enemyHp,fixed.ruleValues.enemyAtk,fixed.ruleValues.enemyDef,fixed.ruleValues.enemyRes],[140,120,120,150]);assert.deepEqual([fixed.ruleValues.bossHp,fixed.ruleValues.bossAtk,fixed.ruleValues.bossDef,fixed.ruleValues.bossRes],[100,120,120,150]);assert.deepEqual([fixed.ruleValues.augmentSilver,fixed.ruleValues.augmentGold,fixed.ruleValues.augmentPrism],[2,5,3]);
     assert.equal(await page.$eval('.room-custom-extensions',e=>e.disabled),true);
     if(compare||captureCurrent)await page.screenshot({path:output+'/after-augment-mode.png'});
     await selectMode('커스텀');await page.waitForFunction(()=>__SP__.store.get().room.gameplayMode==='custom');
@@ -93,7 +93,7 @@ await check('.st-top');await shot('stats','.st-top');await page.click('.st-top__
     const actions=await page.$$eval('.extension-presets__actions > .btn',es=>es.map(e=>{const r=e.getBoundingClientRect();return{y:r.y,width:r.width};}));assert.equal(actions.length,3);for(const a of actions){assert.equal(a.y,actions[0].y);assert.ok(Math.abs(a.width-actions[0].width)<1);}
     if(compare||captureCurrent)await page.screenshot({path:output+'/after-common-strategies.png'});
   }await page.keyboard.press('Escape');await page.waitForSelector('.custom-ext',{hidden:true});
-  await page.setViewport({width:390,height:844});if(phase==='after'){const h=await page.$eval('.room-screen .topbar',e=>({height:e.getBoundingClientRect().height,width:e.scrollWidth,client:e.clientWidth}));assert.equal(h.height,112);assert.ok(h.width<=h.client+1,JSON.stringify(h));}await shot('room-mobile','.room-screen .topbar');
+  await page.setViewport({width:390,height:844});if(phase==='after'){const h=await page.$eval('.room-screen .topbar',e=>({height:e.getBoundingClientRect().height,width:e.scrollWidth,client:e.clientWidth}));assert.equal(h.height,56);assert.ok(h.width<=h.client+1,JSON.stringify(h));}await shot('room-mobile','.room-screen .topbar');
   assert.deepEqual(errors,[]);
   }finally{await context.close();}
  }

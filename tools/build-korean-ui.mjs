@@ -1,5 +1,5 @@
 // Build display-only Korean resources. Never rewrite game data or executable effects.
-import {readFileSync,writeFileSync} from 'node:fs';
+import {readFileSync,writeFileSync,existsSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import {resolve,dirname} from 'node:path';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
@@ -18,7 +18,7 @@ export function compileKoreanUi(upstream,overlays){
 }
 export function buildKoreanUi(){
  const read=p=>JSON.parse(readFileSync(resolve(root,p),'utf8'));
- const compiled=compileKoreanUi(read('public/i18n/ko.json'),['official','data','manual','ui','patterns'].map(name=>[name,read(`public/i18n/ko/${name}.json`)]));
+ const compiled=compileKoreanUi(read('public/i18n/ko.json'),['audit','official','data','manual','ui','patterns'].map(name=>[name,name==='audit'&&!existsSync(resolve(root,`public/i18n/ko/${name}.json`))?{}:read(`public/i18n/ko/${name}.json`)]));
  writeFileSync(resolve(root,'public/i18n/ko/compiled.json'),JSON.stringify(compiled)+'\n');
  console.log(`Korean UI compiled: ${Object.keys(compiled.messages).length} messages, ${compiled.patterns.length} patterns`);
  return compiled;

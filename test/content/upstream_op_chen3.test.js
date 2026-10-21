@@ -324,12 +324,12 @@ test('S3: the sword wave leaves her tile forward at 1.5 tiles/s, hits each enemy
     const sk = skillOf(tier, elite, S3);
     const { h, u } = field({ tier, elite, skill: 2 });
     u.skill.gainSp(999);
-    const trigger = h.spawn('enemy_dummy', { pos: [10, 6] });
+    const trigger = h.spawn('enemy_big', { pos: [10, 6] });
     assert.ok(h.runUntil(() => u.skill.active, 2));
     const t0 = h.b.time;
     const mid = h.spawn('enemy_mid', { pos: [10, 8] }), big = h.spawn('enemy_big', { pos: [9, 8] });
     const fly = h.spawn('enemy_flymid', { pos: [11, 9] });
-    const corner = h.spawn('enemy_dummy', { pos: [10, 10] });
+    const corner = h.spawn('enemy_big', { pos: [10, 10] });
     const waveHits = (e) => from(h, u, (c) => tagged(c, 'chen3:wave') && c.target === e);
     h.run(3);
     const w = u.mem.chen3Wave;
@@ -356,6 +356,25 @@ test('S3: the sword wave leaves her tile forward at 1.5 tiles/s, hits each enemy
     const n = from(h, u, (c) => tagged(c, 'chen3:wave')).length;
     h.run(3);
     assert.equal(from(h, u, (c) => tagged(c, 'chen3:wave')).length, n, `T${tier}: no more wave hits`);
+    done(h);
+  }
+});
+
+
+test('S3 HP-based wave has a fixed 300,000 invalidation threshold independent of custom boss ceiling', () => {
+  for (const tier of [5, 6]) for (const ceiling of [0, 100000, 1000000]) for (const boss of [false,true]) for(const hp of [4999999,5000000,5000001]) {
+    const {h,u}=field({tier,skill:2});
+    h.b.flags.customExtensions={ruleValues:{maxDamage:ceiling}};
+    h.b.kind='boss';
+    u.skill.gainSp(999);
+    h.spawn('enemy_dummy',{pos:[10,6]});
+    assert.ok(h.runUntil(()=>u.skill.active,2));
+    // Flying target cannot receive her ground-only normal attacks before the wave arrives.
+    const enemy=h.spawn('enemy_flymid',{pos:[10,8]});
+    enemy.hp=hp; enemy.s.maxHp=10000000; enemy.isBoss=boss;
+    h.run(2);
+    const hits=from(h,u,c=>tagged(c,'chen3:wave')&&c.target===enemy);
+    assert.equal(hits.length,hp>5000000?0:1,`tier ${tier}, ceiling ${ceiling}, boss ${boss}, HP ${hp}`);
     done(h);
   }
 });

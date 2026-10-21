@@ -249,6 +249,14 @@ test('build-i18n ja: a text written like the Chinese is the client\'s own when e
   assert.equal(untranslatedTest('ko')('炎', '염'), false);
   assert.equal(untranslatedTest('zh-TW')('炎', '炎'), true);
   // the shipped ja overlay carries the bond names the JP client writes in kanji
-  const jaData = JSON.parse(readFileSync(path.join(ROOT, 'data/i18n/ja.json'), 'utf8'));
+  const jaData = JSON.parse(readFileSync(path.join(ROOT, 'public/i18n/ja/data.json'), 'utf8'));
   for (const n of ['炎', '不屈', '助力']) assert.equal(jaData.names[n], n, `${n} is Japanese as it stands`);
+});
+
+test('official overlays can match Korean custom source text without treating Korean target translations as Chinese',()=>{
+ const source=[{records:{x:{name:'공격력',desc:'공격력 +20%'}}}],target=[{records:{x:{name:'ATK',desc:'ATK +20%'}}}];
+ const data={chess:{x:{name:'공격력',desc:'공격력 +20%'}}};
+ const en=buildOverlay({zh:source,en:target,data,lang:'en'}).overlay;
+ assert.equal(en.names['공격력'],'ATK');
+ assert.equal(applyFileOverlay(data.chess,en.files.chess).value.x.desc,'ATK +20%');
 });
