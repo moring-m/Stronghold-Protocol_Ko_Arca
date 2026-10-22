@@ -47,6 +47,8 @@ test(
           res.end(JSON.stringify({ draining }));
           return;
         }
+        // Model a retained worker whose bootstrap differs from this router's.
+        if(path==='/') res.setHeader('content-security-policy',"default-src 'self'; script-src 'self' 'sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA='; style-src 'self' 'unsafe-inline'; img-src 'self'; worker-src 'self'; base-uri 'self'");
         const files = {
           "/": [
             "text/html",

@@ -1,5 +1,7 @@
 // Stable loopback gateway. Workers keep their own in-memory rooms until drained.
 import http from "node:http";
+import { createHash } from "node:crypto";
+import { bootstrap } from "./bootstrap.js";
 import fs from "node:fs";
 import path from "node:path";
 import { pipeline } from 'node:stream';
@@ -466,6 +468,12 @@ export async function startGateway({
           const content = Buffer.from(
             await transform(Buffer.concat(chunks).toString(), type, target.id, {cleanUrls:true}),
           );
+          // Workers and the retained router can run different bootstrap revisions.
+          // Authorize exactly the script this router injected, not the worker's version.
+          if (type.includes('text/html') && out['content-security-policy']) {
+            const hash = "'sha256-" + createHash('sha256').update(bootstrap(target.id,{cleanUrls:true})).digest('base64') + "'";
+            out['content-security-policy'] = out['content-security-policy'].replace(/(^|;\s*)script-src\s+([^;]*)/, (_,prefix,sources) => prefix+'script-src '+sources+' '+hash);
+          }
           delete out["content-encoding"];
           delete out["transfer-encoding"];
           delete out.etag;

@@ -53,7 +53,10 @@ export class Downloader {
    * @param {MirrorPolicy} [o.mirrorPolicy] invocation-wide policy and mirror circuit breaker
    * @param {import('./source-verifier.mjs').SourceVerifier} [o.verifier]
    */
-  constructor({ root, ledgerPath, concurrency = 16, retries = 3, timeoutMs = 120000, force = false, log = console.log, fetchImpl = globalThis.fetch, backoffMs = 400, source = 'direct', proxyPrefix, mirrorPolicy }) {
+  constructor({ root, ledgerPath, concurrency = 16, retries = 3, timeoutMs = 120000, force = false, log = console.log, fetchImpl = globalThis.fetch, backoffMs = 400, source = 'direct', proxyPrefix, mirrorPolicy, verifier }) {
+    this.verifier = verifier;
+    this.accepted = new Set();
+    this.preserved = new Set();
     this.root = root;
     this.ledgerPath = ledgerPath;
     this.concurrency = Math.max(1, Math.min(64, Number(concurrency) || 16));
@@ -184,7 +187,9 @@ export class Downloader {
           try { await unlink(tmp); } catch { /* ignore */ }
           return { status: 'error', bytes: 0, error: `write failed: ${e.message}` };
         }
-        this.ledger.files[job.rel] = { url: src, bytes: r.buf.length };
+        this.ledger.files[job.rel] = verifiedSource
+          ? { url, bytes: r.buf.length, blob: verifiedSource.blob, commit: verifiedSource.commit }
+          : { url: src, bytes: r.buf.length };
         this.dirty++;
         const sizeChanged = !!(job.bytes && job.bytes !== r.buf.length && !job.mutable);
         return { status: 'ok', bytes: r.buf.length, url: src, sizeChanged };
