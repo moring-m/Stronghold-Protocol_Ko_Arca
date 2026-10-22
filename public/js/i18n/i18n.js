@@ -290,9 +290,16 @@ async function load() {
     for (const [source,text] of Object.entries(audit)) {if(typeof text!=='string')continue;dict.set(source,text);if (/\{\d+\}/.test(source)) addPattern(source,text);}
     for (const [source,text] of Object.entries(official.names || {})) dict.set(source,text);
     for (const [source,text] of Object.entries(fork)) {dict.set(source,text);if (/\{\d+\}/.test(source)) addPattern(source,text);}
+    // Official names and their Korean aliases have priority over machine supplements and fork prose.
+    const officialAliases={};
+    for(const[source,text]of Object.entries(official.names||{})){
+      officialAliases[source]=text;const ko=korean.messages?.[source];
+      if(typeof ko==='string'&&ko)officialAliases[ko]=text;
+    }
+    for(const[source,text]of Object.entries(officialAliases))dict.set(source,text);
     patterns.sort((a,b)=>b.n-a.n);
     active = dict.size > 0;
-    addMessages(lang, {...messages,...audit,...fork});
+    addMessages(lang, {...messages,...audit,...fork,...officialAliases});
     setSharedLang(lang);
     return;
   }

@@ -40,7 +40,7 @@ import { saveCustomExtensionPrefs } from '../ui/customExtensionPrefs.js';
 import { isModdedRoom } from '../ui/pluginTag.js';
 import { hasScriptConsent, rememberScriptConsent } from '../content.js';
 import { net } from '../net.js';
-import { store, useStore, shallowEqual, emptyMatch, isSpectating } from '../store.js';
+import { store, useStore, shallowEqual, emptyMatch, isSpectating, savePref } from '../store.js';
 import { difficultyInfo } from './lobby.js';
 
 /**
@@ -388,7 +388,7 @@ export function RoomScreen() {
 
       </div>
       <div class="topbar__right">
-        ${coop?html`<${Tooltip} placement="bottom" text=${room.isPublic?'공개 후에는 비공개로 되돌리거나 게임 모드를 변경할 수 없습니다.':'공개 방 목록에 표시합니다.'}><button class="room-publish" disabled=${room.isPublic||!facts.isHost||!!busy||!online} onClick=${async()=>{if(await confirmDialog({title:'공개 방으로 전환',text:'공개 방 목록에 방이 표시됩니다. 공개 후에는 비공개로 되돌리거나 게임 모드를 변경할 수 없습니다.',okText:'공개로 전환',cancelText:'취소'}))run('publish',()=>net.request('room.publish',{}));}}><${Icon} name="users" />${room.isPublic?'공개 방':'공개 전환'}</button><//>`:null}
+        ${coop?html`<${Tooltip} placement="bottom" text=${room.isPublic?'비공개로 전환':'공개 방 목록에 표시합니다.'}><button class="room-publish" disabled=${!facts.isHost||!!busy||!online} onClick=${()=>run('publish',async()=>{const isPublic=!room.isPublic;await net.request('room.publish',{isPublic});savePref('lobby.publicOn',isPublic);})}><${Icon} name="users" />${room.isPublic?'공개 방':'비공개 방'}</button><//>`:null}
         <div class="room-gameplay-modes" role="radiogroup" aria-label="게임 모드">${GAMEPLAY_MODES.map(mode=>html`<${Tooltip} placement="bottom" text=${({classic:"기본 규칙으로 진행합니다. 커스텀 설정과 증강은 적용하지 않습니다.",augment:html`<div class="gameplay-mode-tip"><p>증강으로 조합을 강화하고, 더 강한 적에 도전합니다.</p><ul><li>${AUGMENT_ROUNDS.join('·')}라운드에 아군 증강 → 적 증강 선택·투표 (보스전 이전까지)</li><li>일반 적: 기본 HP 100% × 등장 등급 배율 (실버 1.1 · 골드 1.15 · 프리즘 1.2) · 공격력/방어력 기본 100%, 증강 선택마다 +8% · 원래 마법 저항에 증강 선택마다 +4 합산</li><li>보스: 기본 HP 100% × 등장 등급 배율 (실버 1.3 · 골드 1.5 · 프리즘 1.7) · 공격력/방어력 120% · 마법 저항 150%</li><li>실버/골드/프리즘 가중치 2/5/3 · 커스텀 변경 불가</li></ul></div>`,custom:"저장한 커스텀 설정으로 진행합니다. 규칙을 자유롭게 변경할 수 있습니다."})[mode]}><button type="button" role="radio" data-gameplay-mode=${mode} aria-checked=${normalizeGameplayMode(room.gameplayMode)===mode} disabled=${!facts.isHost||!!busy||!online||!canSwitchPublicMode(room.gameplayMode,mode,room.isPublic)} onClick=${()=>run('gameplayMode',async()=>{await net.request('room.setGameplayMode',{gameplayMode:mode});setExtensionsOpen(false);})}>${GAMEPLAY_MODE_NAMES[mode]}</button><//>`)}</div>
         ${coop ? html`<${InviteBox} code=${room.code} name=${me.name} difficulty=${room.difficulty} />` : html`<div class="solo-note"><${MicroLabel}>SINGLE OPERATOR<//><span>仅限 1 名博士</span></div>`}
       </div>

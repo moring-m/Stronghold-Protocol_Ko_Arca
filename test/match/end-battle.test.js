@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {makeMatch} from './harness.js';
-function combat(humans=1){const h=makeMatch({mode:humans>1?'coop':'solo',humans,seed:71,clientCombat:true,clients:false,instant:false}).start();h.toPrep(1);for(const p of h.m.alivePlayers())h.m.handle(p.playerId,{t:'g.ready',ready:true});h.runToPhase('COMBAT',1);return h;}
+function combat(humans=1,options={}){const h=makeMatch({mode:humans>1?'coop':'solo',humans,seed:71,clientCombat:true,clients:false,instant:false,...options}).start();h.toPrep(1);for(const p of h.m.alivePlayers())h.m.handle(p.playerId,{t:'g.ready',ready:true});h.runToPhase('COMBAT',1);return h;}
 test('end battle resolves the own field immediately and stale client reports cannot overwrite it',()=>{
  const h=combat();const f=h.m.fields.find(f=>f.players.includes('p_0'));
  assert.deepEqual(h.m.handle('p_0',{t:'g.endBattle',fieldId:f.fieldId}),{ok:true});
@@ -62,4 +62,18 @@ test('eight-player unite requires votes from all four human defenders, excludes 
  assert.ok(m.handle('p_4',{t:'g.endBattle',fieldId:f.fieldId}).error);
  for(let i=0;i<3;i++){assert.ok(m.handle('p_'+i,{t:'g.endBattle',fieldId:f.fieldId}).ok);assert.equal(f.done,false);assert.equal(f.endRequested,undefined);}
  assert.ok(m.handle('p_3',{t:'g.endBattle',fieldId:f.fieldId}).ok);h.run(()=>f.done,{maxSteps:10000});assert.equal(f.done,true);assert.equal(f.endVotes.size,4);assert.equal(f.endRequested,true);assert.equal(f.result.reason,'timeout');m.dispose();
+});
+
+for(const clientCombat of [true,false])test(`surrender charges breakthrough for pending enemies (${clientCombat?'client':'server'} combat)`,t=>{
+ const h=combat(1,{clientCombat,customExtensions:{rules:['augments']}});t.after(()=>h.m.dispose());
+ const m=h.m,f=m.fields[0],ps=m.players.get('p_0');
+ m.augments.enemies=[{effect:{kind:'leak',amount:1}}];
+ const scheduled=clientCombat?f.spec.spawns.reduce((n,s)=>n+(s.count||1),0):f.battle._pending.length+f.battle.enemies.filter(e=>e.alive).length;
+ assert.ok(scheduled>0);const hp=ps.lp;
+ m.handle('p_0',{t:'g.endBattle',fieldId:f.fieldId});
+ if(clientCombat)h.run(()=>f.done,{maxSteps:10000});
+ assert.equal(ps.lp,hp-Math.min(10,scheduled),'surrender immediately charges remaining enemies, including unspawned ones');
+ const result=clientCombat?f.result:f.battle.result();
+ m.augments.creditResult(f,result);assert.equal(ps.lp,hp-Math.min(10,scheduled),'repeated final reports do not charge twice');
+ h.runToPhase('PREP',2);assert.equal(ps.lp,hp-2*Math.min(10,scheduled),'ordinary settlement is still separate');
 });

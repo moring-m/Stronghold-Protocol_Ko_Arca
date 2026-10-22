@@ -5,7 +5,7 @@ export function bootstrap(release, { cleanUrls = false } = {}) {
  ${cleanUrls ? `
  const storedKey='sp.activeRelease';
  try{sessionStorage.setItem(storedKey,release);}catch{}
- globalThis.__SP_GO_LATEST=()=>{try{sessionStorage.removeItem(storedKey);}catch{}location.assign('/');};
+ globalThis.__SP_GO_LATEST=()=>{try{sessionStorage.removeItem(storedKey);sessionStorage.removeItem('sp.roomRelease');}catch{}location.assign('/');};
  const current=new URL(location.href),match=/^\\/r\\/[a-f0-9]{12,40}(\\/.*)$/.exec(current.pathname);
  if(match){
   const base=document.createElement('base');base.href=current.href;document.head.prepend(base);

@@ -657,7 +657,7 @@ export class Network {
       // surface as an error toast in the browser)
       if (msg.t === 'b.progress' && !validRid(rid)) return;
       this.reply(conn, errorMsg(isErrCode(res.error) ? res.error : ERR.INTERNAL, rid, res.detail));
-    } else if (validRid(rid)) this.reply(conn, { t: 'ok', rid, ...(msg.t==='room.list'&&Array.isArray(res?.rooms)?{rooms:res.rooms}:msg.t==='room.inspect'&&res?.room?{room:res.room}:{}) });
+    } else if (validRid(rid)) this.reply(conn, { t: 'ok', rid, ...(msg.t==='room.list'&&Array.isArray(res?.rooms)?{rooms:res.rooms,counts:res.counts}:msg.t==='room.inspect'&&res?.room?{room:res.room}:{}) });
   }
 
   /** @param {Connection} conn @param {any} msg @param {number} now */

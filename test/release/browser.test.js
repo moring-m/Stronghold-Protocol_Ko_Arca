@@ -136,10 +136,15 @@ test(
     );
     assert.ok(css.includes("release=" + old));
     assert.ok((await page.$eval('img',img=>img.src)).includes('release='+old));
+    await page.evaluate(id=>sessionStorage.setItem('sp.roomRelease',id),old);
     await page.reload();await page.waitForFunction(()=>!!window.workerVersion);
     assert.equal(new URL(page.url()).pathname,'/');
-    assert.equal(await page.evaluate(()=>value),old,'refresh resumes the same tab version');
+    assert.equal(await page.evaluate(()=>value),old,'refresh in a room resumes its version');
     assert.deepEqual(await page.evaluate(()=>workerVersion),[old,old]);
+
+    await page.evaluate(()=>sessionStorage.removeItem('sp.roomRelease'));
+    await page.reload();await page.waitForFunction(()=>!!window.workerVersion);
+    assert.equal(await page.evaluate(()=>value),next,'lobby reload selects the latest release');
 
     const second = await browser.newPage();
     await second.goto(base);

@@ -8,7 +8,7 @@ import {compileKoreanUi} from '../build-korean-ui.mjs';
 import {bountyText} from '../../server/match/choices.js';
 import {applyFileOverlay} from '../../shared/i18nData.js';
 const human=/[一-鿿가-힣]/,entries=new Map();
-function add(text,at){if(typeof text!=='string'||!human.test(text))return;const key=text.trim();if(!key||key.length>16000)return;const row=entries.get(key)||{source:key,at:[]};if(row.at.length<4)row.at.push(at);entries.set(key,row);}
+function add(text,at){if(typeof text!=='string'||text.startsWith('<!doctype html>')||!human.test(text))return;const key=text.trim();if(!key||key.length>16000)return;const row=entries.get(key)||{source:key,at:[]};if(row.at.length<4)row.at.push(at);entries.set(key,row);}
 async function walk(dir){let out=[];for(const f of await readdir(dir,{withFileTypes:true})){const p=dir+'/'+f.name;if(f.isDirectory())out.push(...await walk(p));else out.push(p);}return out;}
 for(const dir of ['public/js','shared','server'])for(const path of await walk(dir)){
  if(!path.endsWith('.js')||/public\/js\/i18n\/|server\/sim\//.test(path))continue;

@@ -14,7 +14,7 @@ export function gameplayExtensions(saved, raw, roomMode, gameplayMode, legacy=fa
  return modeExtensionSelection(normalizeCustomExtensions(selection,raw,mode==='custom'&&legacy),roomMode);
 }
 
-export function canSwitchPublicMode(current,next,isPublic){return !isPublic;}
+export function canSwitchPublicMode(current,next,isPublic){return isGameplayMode(next);}
 
 export const AUGMENT_ENEMY_HP_FACTORS=Object.freeze({silver:1.1,gold:1.15,prism:1.2});
 export function augmentEnemyHpMultiplier(history=[]){return history.reduce((n,g)=>n*(AUGMENT_ENEMY_HP_FACTORS[g]||1),1);}

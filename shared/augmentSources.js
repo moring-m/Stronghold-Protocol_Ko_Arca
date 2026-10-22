@@ -1289,7 +1289,7 @@ export const AUGMENT_SOURCES = [
   ],
   "side": "enemy",
   "description": "일반 전투에서 적이 방어 포인트에 진입할 때마다 HP 1 즉시 감소",
-  "notes": "라운드 종료 HP 정산과 별개로 적용"
+  "notes": "라운드당 최대 10 HP 감소. 전투 포기 시 남은 적에도 적용하며 라운드 종료 HP 정산과 별개"
  },
  {
   "source": 96,
@@ -1419,7 +1419,7 @@ export const AUGMENT_SOURCES = [
    4
   ],
   "side": "ally",
-  "description": "활성화된 모든 핵심 맹약 중첩 +8, 보조 맹약 중첩 +4",
+  "description": "활성화된 모든 핵심 맹약 중첩 +8, 부가 맹약 중첩 +4",
   "notes": "중첩을 쌓을 수 있는 맹약에만 적용"
  },
  {
@@ -1431,7 +1431,7 @@ export const AUGMENT_SOURCES = [
    7
   ],
   "side": "ally",
-  "description": "활성화된 모든 핵심 맹약 중첩 +16, 보조 맹약 중첩 +8",
+  "description": "활성화된 모든 핵심 맹약 중첩 +16, 부가 맹약 중첩 +8",
   "notes": "중첩을 쌓을 수 있는 맹약에만 적용"
  },
  {
@@ -1443,7 +1443,7 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "ally",
-  "description": "활성화된 모든 핵심 맹약 중첩 +24, 보조 맹약 중첩 +12",
+  "description": "활성화된 모든 핵심 맹약 중첩 +24, 부가 맹약 중첩 +12",
   "notes": "중첩을 쌓을 수 있는 맹약에만 적용"
  },
  {
@@ -1455,7 +1455,7 @@ export const AUGMENT_SOURCES = [
    4
   ],
   "side": "ally",
-  "description": "활성화된 모든 핵심 맹약 중첩 +12, 보조 맹약 중첩 +6",
+  "description": "활성화된 모든 핵심 맹약 중첩 +12, 부가 맹약 중첩 +6",
   "notes": "중첩을 쌓을 수 있는 맹약에만 적용"
  },
  {
@@ -1467,7 +1467,7 @@ export const AUGMENT_SOURCES = [
    7
   ],
   "side": "ally",
-  "description": "활성화된 모든 핵심 맹약 중첩 +20, 보조 맹약 중첩 +10",
+  "description": "활성화된 모든 핵심 맹약 중첩 +20, 부가 맹약 중첩 +10",
   "notes": "중첩을 쌓을 수 있는 맹약에만 적용"
  },
  {
@@ -1479,7 +1479,7 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "ally",
-  "description": "활성화된 모든 핵심 맹약 중첩 +30, 보조 맹약 중첩 +15",
+  "description": "활성화된 모든 핵심 맹약 중첩 +30, 부가 맹약 중첩 +15",
   "notes": "중첩을 쌓을 수 있는 맹약에만 적용"
  },
  {
@@ -1491,7 +1491,7 @@ export const AUGMENT_SOURCES = [
    4
   ],
   "side": "ally",
-  "description": "활성화된 모든 핵심 맹약 중첩 +20, 보조 맹약 중첩 +10",
+  "description": "활성화된 모든 핵심 맹약 중첩 +20, 부가 맹약 중첩 +10",
   "notes": "중첩을 쌓을 수 있는 맹약에만 적용"
  },
  {
@@ -1503,7 +1503,7 @@ export const AUGMENT_SOURCES = [
    7
   ],
   "side": "ally",
-  "description": "활성화된 모든 핵심 맹약 중첩 +32, 보조 맹약 중첩 +16",
+  "description": "활성화된 모든 핵심 맹약 중첩 +32, 부가 맹약 중첩 +16",
   "notes": "중첩을 쌓을 수 있는 맹약에만 적용"
  },
  {
@@ -1515,7 +1515,7 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "ally",
-  "description": "활성화된 모든 핵심 맹약 중첩 +48, 보조 맹약 중첩 +24",
+  "description": "활성화된 모든 핵심 맹약 중첩 +48, 부가 맹약 중첩 +24",
   "notes": "중첩을 쌓을 수 있는 맹약에만 적용"
  },
  {

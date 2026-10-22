@@ -47,7 +47,7 @@ test('skill SP recovery works while duration skills are active, and Sargon stack
  const {h,u}=fixture({allies:[find('신속 I'),find('사르곤')],skill,content:'generic'});u.skill.gainSp(1000,'test');u.skill.activate('test');h.run(.05);assert.ok(u.skill.active);close(u.skill.sp,3);close(u.s.aspd,112);
  h.run(5);h.b.emit('skillStart',{unit:u});h.run(.05);close(u.s.aspd,124);h.run(10);close(u.s.aspd,112);h.run(5);close(u.s.aspd,100);
 });
-test('surrendered unspawned enemies retain normal settlement HP without a breakthrough surcharge',()=>{
+test('surrendered unspawned enemies retain ordinary leak HP for separate settlement',()=>{
  const h=makeBattle({defs:{enemies:{enemy_test:enemyRec({key:'enemy_test',hp:100,lpr:1})}},content:'none',extraContent:[{install}],enemies:[{key:'enemy_test',time:50}],flags:{augments:{allies:{},enemies:[item(createAugmentCatalog(data,7).find(a=>a.name==='돌파'&&a.side==='enemy'))]}},autoFinish:false});h.run(.1);h.b.forceEnd('surrender');const leaks=h.b.result().perPlayer.p1.leaked;assert.equal(leaks.length,1);assert.equal(leaks[0].lpr,1);
 });
 

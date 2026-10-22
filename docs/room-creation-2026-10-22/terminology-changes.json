@@ -1,0 +1,1700 @@
+[
+  {
+    "file": "public/i18n/en.json",
+    "source": "CORE BOND // 核心盟约",
+    "before": "CORE Alliance // Core Alliance",
+    "after": "CORE ALLIANCE // Core Alliance"
+  },
+  {
+    "file": "public/i18n/en.json",
+    "source": "ADD-ON BOND // 附加盟约",
+    "before": "ADD-ON Alliance // Add-on Alliance",
+    "after": "ADD-ON ALLIANCE // Add-on Alliance"
+  },
+  {
+    "file": "public/i18n/en.json",
+    "source": "增加盟约层数",
+    "before": "Add covenant stacks",
+    "after": "Add Alliance stacks"
+  },
+  {
+    "file": "public/i18n/en.json",
+    "source": "盟约已激活",
+    "before": "Covenant active",
+    "after": "Alliance active"
+  },
+  {
+    "file": "public/i18n/en.json",
+    "source": "用 DSL 改变资金、盟约层数或获得道具。",
+    "before": "Use DSL to change funds, covenant stacks or grant items.",
+    "after": "Use DSL to change funds, Alliance stacks or grant items."
+  },
+  {
+    "file": "public/i18n/en.json",
+    "source": "商店装备偏向已激活盟约",
+    "before": "Shop equipment is biased toward active bonds",
+    "after": "Shop equipment is biased toward active Alliances"
+  },
+  {
+    "file": "public/i18n/en.json",
+    "source": "变形同构体不占格，仅配对最左盟约装备",
+    "before": "Morphs use no slot and pair only with the leftmost bond item",
+    "after": "Morphs use no slot and pair only with the leftmost Alliance item"
+  },
+  {
+    "file": "public/i18n/en.json",
+    "source": "新盟约",
+    "before": "New bond",
+    "after": "New Alliance"
+  },
+  {
+    "file": "public/i18n/en.json",
+    "source": "效果自动以本盟约激活为条件；试战使用所选层级。",
+    "before": "Effects require this bond to be active; trials use the selected tier.",
+    "after": "Effects require this Alliance to be active; trials use the selected tier."
+  },
+  {
+    "file": "public/i18n/en.json",
+    "source": "自身激活的盟约",
+    "before": "Holder's active bonds",
+    "after": "Holder's active Alliances"
+  },
+  {
+    "file": "public/i18n/en.json",
+    "source": "独立事件试验：盟约直接激活，准备钩子执行一次；完整经济流程请在房间测试。",
+    "before": "Isolated event exercise: bonds start active and one prep hook runs. Test the full economy in a room.",
+    "after": "Isolated event exercise: Alliances start active and one prep hook runs. Test the full economy in a room."
+  },
+  {
+    "file": "public/i18n/en.json",
+    "source": "本插件盟约",
+    "before": "This plugin’s bond",
+    "after": "This plugin’s Alliance"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "맹약·기타",
+    "before": "Oath/Others",
+    "after": "Alliance/Others"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "卫戍协议盟约",
+    "before": "Garrison Agreement Covenant",
+    "after": "Garrison Alliance Alliance"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "盟约，此策略效果可能无法发挥",
+    "before": "Covenant, this strategy may not be effective",
+    "after": "Alliance, this strategy may not be effective"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "맹약 목록 펼치기",
+    "before": "Expand list of pledges",
+    "after": "Expand list of Alliances"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "맹약 목록 접기",
+    "before": "Collapse the pledge list",
+    "after": "Collapse the Alliance list"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "진입 후 라운드·전장·전략·적 특훈·맹약 밴을 선택합니다.",
+    "before": "After entering, select the round, battlefield, strategy, enemy special training, and pledge van.",
+    "after": "After entering, select the round, battlefield, strategy, enemy special training, and Alliance ban."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "{0}邀请你加入卫戍协议：盟约【{1}】",
+    "before": "{0} invites you to join the Garrison Agreement: Covenant [{1}]",
+    "after": "{0} invites you to join the Garrison Alliance: Alliance [{1}]"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "{0} 尚未激活盟约",
+    "before": "{0} The covenant has not been activated yet",
+    "after": "{0} The Alliance has not been activated yet"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "{0} 的盟约",
+    "before": "Covenant of {0}",
+    "after": "Alliance of {0}"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "{0}：核心盟约激活人数 +{1}",
+    "before": "{0}: Number of people activated by core covenant +{1}",
+    "after": "{0}: Number of people activated by core Alliance +{1}"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "{0} 的盟约：{1}",
+    "before": "Covenant of {0}: {1}",
+    "after": "Alliance of {0}: {1}"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "盟约：{0}",
+    "before": "Covenant: {0}",
+    "after": "Alliance: {0}"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "CORE BOND // 核心盟约",
+    "before": "CORE Alliance // Core Alliance",
+    "after": "CORE ALLIANCE // Core Alliance"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "ADD-ON BOND // 附加盟约",
+    "before": "ADD-ON Alliance // Add-on Alliance",
+    "after": "ADD-ON ALLIANCE // Add-on Alliance"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "的盟约",
+    "before": "covenant",
+    "after": "Alliance"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "맹약 목록",
+    "before": "list of pledges",
+    "after": "list of Alliances"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "맹약 목록 · 드래그 또는 방향키로 이동",
+    "before": "Pledge list · Move by dragging or using the arrow keys",
+    "after": "Alliance list · Move by dragging or using the arrow keys"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "선택한 맹약과 소속 오퍼레이터를 제외합니다. 이중 맹약은 남은 맹약을 유지합니다.",
+    "before": "Excludes selected covenants and affiliated operators. A double oath preserves the remaining oath.",
+    "after": "Excludes selected Alliances and affiliated operators. A double Alliance preserves the remaining Alliance."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "맹약별 밴 규칙을 선택하세요. 무작위는 기존 규칙을 따릅니다.",
+    "before": "Choose a ban rule for each pledge. Random follows existing rules.",
+    "after": "Choose a ban rule for each Alliance. Random follows existing rules."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "핵심 맹약 5",
+    "before": "Core Pledge 5",
+    "after": "Core Alliance 5"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "{0}：本局禁用（该盟约不会激活）",
+    "before": "{0}: Disabled in this round (the covenant will not be activated)",
+    "after": "{0}: Disabled in this round (the Alliance will not be activated)"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "{0}：部分盟约所含干员阵容不完整{1}",
+    "before": "{0}: The operator lineup included in some covenants is incomplete{1}",
+    "after": "{0}: The operator lineup included in some Alliances is incomplete{1}"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "本局禁用{0}盟约，此策略效果可能无法发挥",
+    "before": "The {0} covenant is disabled in this game, and the effect of this strategy may not be effective.",
+    "after": "The {0} Alliance is disabled in this game, and the effect of this strategy may not be effective."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "맹약 중첩",
+    "before": "oath overlap",
+    "after": "Alliance stacks"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "맹약 밴 선택",
+    "before": "Choose a pledge van",
+    "after": "Choose a Alliance ban"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "선택한 맹약과 해당 오퍼레이터를 제외합니다. 미선택 시 무작위 밴은 없습니다.",
+    "before": "Excludes the selected covenant and its operator. There is no random ban if unselected.",
+    "after": "Excludes the selected Alliance and its operator. There is no random ban if unselected."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "(맹약 이름) 지원 I",
+    "before": "(Pledge Name) Support I",
+    "after": "(Alliance Name) Support I"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "무작위 3등급 [맹약] 오퍼레이터 획득",
+    "before": "Gain 1 random Tier 3 [Bond] Operator(s)",
+    "after": "Gain 1 random Tier 3 [Alliance] Operator(s)"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "맹약별로 있어야 하고, 3등급이 있는 맹약만 추가",
+    "before": "There must be each oath, and only oaths with level 3 are added.",
+    "after": "There must be each Alliance, and only Alliances with level 3 are added."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "무작위 4등급 [맹약] 오퍼레이터 획득",
+    "before": "Gain 1 random Tier 4 [Bond] Operator(s)",
+    "after": "Gain 1 random Tier 4 [Alliance] Operator(s)"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "맹약별로 있어야 하고, 4등급이 있는 맹약만 추가",
+    "before": "There must be each oath, and only oaths with level 4 are added.",
+    "after": "There must be each Alliance, and only Alliances with level 4 are added."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "무작위 5등급 [맹약] 오퍼레이터 획득",
+    "before": "Gain 1 random Tier 5 [Bond] Operator(s)",
+    "after": "Gain 1 random Tier 5 [Alliance] Operator(s)"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "맹약별로 있어야 하고, 5등급이 있는 맹약만 추가",
+    "before": "There must be each oath, and only oaths with level 5 are added.",
+    "after": "There must be each Alliance, and only Alliances with level 5 are added."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "(맹약 이름) 장비 지원 I",
+    "before": "(Pledge Name) Equipment Support I",
+    "after": "(Alliance Name) Equipment Support I"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "(맹약 기본 장비) 2개 획득",
+    "before": "Gain 2 basic Bond items",
+    "after": "Gain 2 basic Alliance items"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "맹약 전용 기본 장비가 있는 맹약별로 있어야 함",
+    "before": "Each oath must have its own basic equipment.",
+    "after": "Each Alliance must have its own basic equipment."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "(맹약 이름) 지원 II",
+    "before": "(Pledge Name) Support II",
+    "after": "(Alliance Name) Support II"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "무작위 6등급 [맹약] 오퍼레이터 획득",
+    "before": "Gain 1 random Tier 6 [Bond] Operator(s)",
+    "after": "Gain 1 random Tier 6 [Alliance] Operator(s)"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "맹약별로 있어야 하고, 6등급이 있는 맹약만 추가",
+    "before": "There must be each oath, and only oaths with level 6 are added.",
+    "after": "There must be each Alliance, and only Alliances with level 6 are added."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "(맹약 이름) 장비 지원 II",
+    "before": "(Pledge Name) Equipment Support II",
+    "after": "(Alliance Name) Equipment Support II"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "(맹약 상위 장비) 1개 획득",
+    "before": "Gain 1 advanced Bond item",
+    "after": "Gain 1 advanced Alliance item"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "맹약 전용 상위 장비가 있는 핵심 맹약별로 있어야 함",
+    "before": "There must be a core oath with each oath-specific high-level equipment.",
+    "after": "There must be a core Alliance with each Alliance-specific high-level equipment."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "(맹약 이름) 지원 III",
+    "before": "(Pledge Name) Support III",
+    "after": "(Alliance Name) Support III"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "무작위 4등급 [맹약] 오퍼레이터 2명 획득",
+    "before": "Gain 2 random Tier 4 [Bond] Operator(s)",
+    "after": "Gain 2 random Tier 4 [Alliance] Operator(s)"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "무작위 5등급 [맹약] 오퍼레이터 2명 획득",
+    "before": "Gain 2 random Tier 5 [Bond] Operator(s)",
+    "after": "Gain 2 random Tier 5 [Alliance] Operator(s)"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "무작위 6등급 [맹약] 오퍼레이터 2명 획득",
+    "before": "Gain 2 random Tier 6 [Bond] Operator(s)",
+    "after": "Gain 2 random Tier 6 [Alliance] Operator(s)"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "(맹약 이름) 장비 지원 III",
+    "before": "(Pledge Name) Equipment Support III",
+    "after": "(Alliance Name) Equipment Support III"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "(맹약 상위 장비) 1개와 (맹약 기본 장비) 2개 획득",
+    "before": "Gain 1 advanced and 2 basic Bond items",
+    "after": "Gain 1 advanced and 2 basic Alliance items"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "맹약 전용 상위 장비과 기본 장비가 있는 핵심 맹약별로 있어야 함",
+    "before": "Each core oath must have high-level oath-specific equipment and basic equipment.",
+    "after": "Each core Alliance must have high-level Alliance-specific equipment and basic equipment."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "무작위 맹약의 무작위 1, 2, 3, 4단계 오퍼레이터 획득",
+    "before": "Gain a random Tier 1, 2, 3, 4 Operator from a random Bond",
+    "after": "Gain a random Tier 1, 2, 3, 4 Operator from a random Alliance"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "1단계 1명, 2단계 1명....4단계 1명 이렇게 줘야 하고, 각 단계가 모두 있는 맹약만 선택될 수 있어야 함.",
+    "before": "One person at level 1, one person at level 2....one person at level 4 should be given, and only pledges that have all of the levels should be selected.",
+    "after": "One person at level 1, one person at level 2....one person at level 4 should be given, and only Alliances that have all of the levels should be selected."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "무작위 맹약의 무작위 1, 2, 3, 4, 5단계 오퍼레이터 획득",
+    "before": "Gain a random Tier 1, 2, 3, 4, 5 Operator from a random Bond",
+    "after": "Gain a random Tier 1, 2, 3, 4, 5 Operator from a random Alliance"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "1단계 1명, 2단계 1명....5단계 1명 이렇게 줘야 하고, 각 단계가 모두 있는 맹약만 선택될 수 있어야 함.",
+    "before": "One person at level 1, one person at level 2....one person at level 5 should be given, and only pledges that have all of the levels should be selected.",
+    "after": "One person at level 1, one person at level 2....one person at level 5 should be given, and only Alliances that have all of the levels should be selected."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "무작위 맹약의 무작위 1, 2, 3, 4, 5, 6단계 오퍼레이터 획득",
+    "before": "Gain a random Tier 1, 2, 3, 4, 5, 6 Operator from a random Bond",
+    "after": "Gain a random Tier 1, 2, 3, 4, 5, 6 Operator from a random Alliance"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "1단계 1명, 2단계 1명....6단계 1명 이렇게 줘야 하고, 각 단계가 모두 있는 맹약만 선택될 수 있어야 함.",
+    "before": "One person at level 1, one person at level 2....one person at level 6 should be given, and only pledges that have all of the levels should be selected.",
+    "after": "One person at level 1, one person at level 2....one person at level 6 should be given, and only Alliances that have all of the levels should be selected."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "활성화된 모든 핵심 맹약 중첩 +8, 부가 맹약 중첩 +4",
+    "before": "All active primary Alliances: +8 stacks; secondary Alliances: +4 stacks",
+    "after": "All active Core Alliances: +8 stacks; Add-on Alliances: +4 stacks"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "중첩을 쌓을 수 있는 맹약에만 적용",
+    "before": "Applies only to oaths that can stack",
+    "after": "Applies only to Alliances that can stack"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "활성화된 모든 핵심 맹약 중첩 +16, 부가 맹약 중첩 +8",
+    "before": "All active primary Alliances: +16 stacks; secondary Alliances: +8 stacks",
+    "after": "All active Core Alliances: +16 stacks; Add-on Alliances: +8 stacks"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "활성화된 모든 핵심 맹약 중첩 +24, 부가 맹약 중첩 +12",
+    "before": "All active primary Alliances: +24 stacks; secondary Alliances: +12 stacks",
+    "after": "All active Core Alliances: +24 stacks; Add-on Alliances: +12 stacks"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "활성화된 모든 핵심 맹약 중첩 +12, 부가 맹약 중첩 +6",
+    "before": "All active primary Alliances: +12 stacks; secondary Alliances: +6 stacks",
+    "after": "All active Core Alliances: +12 stacks; Add-on Alliances: +6 stacks"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "활성화된 모든 핵심 맹약 중첩 +20, 부가 맹약 중첩 +10",
+    "before": "All active primary Alliances: +20 stacks; secondary Alliances: +10 stacks",
+    "after": "All active Core Alliances: +20 stacks; Add-on Alliances: +10 stacks"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "활성화된 모든 핵심 맹약 중첩 +30, 부가 맹약 중첩 +15",
+    "before": "All active primary Alliances: +30 stacks; secondary Alliances: +15 stacks",
+    "after": "All active Core Alliances: +30 stacks; Add-on Alliances: +15 stacks"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "활성화된 모든 핵심 맹약 중첩 +32, 부가 맹약 중첩 +16",
+    "before": "All active primary Alliances: +32 stacks; secondary Alliances: +16 stacks",
+    "after": "All active Core Alliances: +32 stacks; Add-on Alliances: +16 stacks"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "활성화된 모든 핵심 맹약 중첩 +48, 부가 맹약 중첩 +24",
+    "before": "All active primary Alliances: +48 stacks; secondary Alliances: +24 stacks",
+    "after": "All active Core Alliances: +48 stacks; Add-on Alliances: +24 stacks"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "라이타니엔이 활성화된 게임에만 등장, 매커니즘은 라이타니엔과 동일하지만 라이타니엔 맹약 중첩에 영향받지 않음",
+    "before": "Appears only in games with Laitanien enabled. The mechanism is the same as Laitanien, but is not affected by Laitanien Covenant stacks.",
+    "after": "Appears only in games with Laitanien enabled. The mechanism is the same as Laitanien, but is not affected by Laitanien Alliance stacks."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "쉐라그 맹약의 대미지 증가량과 합산 (예: 맹약 활성화되어있며 250% 대미지고 쉐라그 증강을 얻었다면 대미지 증가량이 합산되어 총 330%)",
+    "before": "Combined with the damage increase from Sherag Pact (e.g., if the Pact is activated and you take 250% damage and get Sherag Augmentation, the damage increase is added up to a total of 330%)",
+    "after": "Combined with the damage increase from Sherag Alliance (e.g., if the Alliance is activated and you take 250% damage and get Sherag Augment, the damage increase is added up to a total of 330%)"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "(맹약 이름)",
+    "before": "(Pledge name)",
+    "after": "(Alliance name)"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "맹약 추가",
+    "before": "Add pledge",
+    "after": "Add Alliance"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "맹약 금지",
+    "before": "no oath",
+    "after": "no Alliance"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "맹약 밴 제외",
+    "before": "Excluding the pledge van",
+    "after": "Excluding the Alliance ban"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "보조맹약 금지",
+    "before": "No auxiliary oath",
+    "after": "No auxiliary Alliance"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "보조맹약 밴 제외",
+    "before": "Excluding auxiliary covenant van",
+    "after": "Excluding auxiliary Alliance ban"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "맹약 비활성화",
+    "before": "Disable Covenant",
+    "after": "Disable Alliance"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "맹약의 999중첩 상한선을 해제합니다.",
+    "before": "Removes the 999 stack limit for Covenant.",
+    "after": "Removes the 999 stack limit for Alliance."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "조화 오퍼레이터가 없어도 조화 맹약을 활성화합니다.",
+    "before": "Activates the Balance Covenant even without a Balance Operator.",
+    "after": "Activates the Balance Alliance even without a Balance Operator."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "추가 맹약",
+    "before": "Additional oath",
+    "after": "Additional Alliance"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "속세의 음 맹약과 오퍼레이터, 전용 장비, 위치킹 전략을 추가합니다.",
+    "before": "Added the Voice of Mundane Bond, Operators, exclusive equipment, and Witch King strategy.",
+    "after": "Added the Voice of Mundane Alliance, Operators, exclusive equipment, and Witch King strategy."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "우르수스 맹약과 오퍼레이터, 전용 장비, 카셰이 전략을 추가합니다.",
+    "before": "Adds Ursus Covenant, Operator, exclusive equipment, and Kashay strategy.",
+    "after": "Adds Ursus Alliance, Operator, exclusive equipment, and Kashay strategy."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "보조맹약 밴 설정은 활성화된 보조맹약에만 적용할 수 있습니다.",
+    "before": "Secondary covenant ban settings can only be applied to activated secondary covenants.",
+    "after": "Secondary Alliance ban settings can only be applied to activated secondary Alliances."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "같은 맹약에 항상 밴과 밴 제외를 함께 설정할 수 없습니다.",
+    "before": "Bans and exclusions cannot always be set together in the same covenant.",
+    "after": "Bans and exclusions cannot always be set together in the same Alliance."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "밴 설정은 해당 난이도에서 활성화된 핵심 맹약에만 적용할 수 있습니다.",
+    "before": "Ban settings can only be applied to Core Covenants that are active on that difficulty.",
+    "after": "Ban settings can only be applied to Core Alliances that are active on that difficulty."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "항상 밴 적용 후 핵심 맹약을 최소 5개 남겨야 합니다.",
+    "before": "You should always have at least 5 core covenants left after applying the ban.",
+    "after": "You should always have at least 5 core Alliances left after applying the ban."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "핵심 맹약을 최소 5개 남겨야 합니다.",
+    "before": "You must have at least 5 core covenants left.",
+    "after": "You must have at least 5 core Alliances left."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "공식 게임 번역을 바탕으로 오퍼레이터·맹약·증강·패치노트의 다국어 표시를 확장했습니다.",
+    "before": "Expanded translations for Operators, Bonds, augments, and patch notes using official game translations.",
+    "after": "Expanded translations for Operators, Alliances, augments, and patch notes using official game translations."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "라이타니엔·우르수스의 인게임 맹약 설명과 증강 효과 설명의 강조 표기를 통일했습니다.",
+    "before": "Standardized emphasis in in-game Leithanien/Ursus Bond descriptions and augment effect descriptions.",
+    "after": "Standardized emphasis in in-game Leithanien/Ursus Alliance descriptions and augment effect descriptions."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "맹약·전략·적 자료와 전체 증강 목록을 제공하며 우르수스·라이타니엔 정보를 포함했습니다. 맹약별 오퍼레이터 목록에서는 선발을 제외했습니다.",
+    "before": "It provides oath, strategy, enemy data and a complete list of reinforcements, and includes information on Ursus and Laitanien. Selections are excluded from the list of operators by oath.",
+    "after": "It provides Alliance, strategy, enemy data and a complete list of Augments, and includes information on Ursus and Laitanien. Selections are excluded from the list of operators by Alliance."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "우르수스·라이타니엔 설명을 기존 맹약 형식으로 정리하고 3명 배치 문구를 제거했습니다. 관련 장비에서는 은총·악보를 제외했습니다.",
+    "before": "The descriptions of Ursus and Laitanien have been organized into the existing covenant format, and the text for placing 3 people has been removed. Grace and sheet music were excluded from related equipment.",
+    "after": "The descriptions of Ursus and Laitanien have been organized into the existing Alliance format, and the text for placing 3 people has been removed. Grace and sheet music were excluded from related equipment."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "통계 이미지 크기 · 맹약 밴 상태의 전략 보상 수정",
+    "before": "Stats Image size/Covenant ban status strategy compensation modifications",
+    "after": "Stats Image size/Alliance ban status strategy compensation modifications"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "해럴드의 주기적 오퍼레이터 지급과 페페의 상점 보장도 맹약 밴 상태에서 남은 후보를 사용할 수 있도록 수정했습니다.",
+    "before": "Harold's periodic operator payment and Pepe's store guarantee have also been modified to allow the use of remaining candidates while in a covenant ban state.",
+    "after": "Harold's periodic operator payment and Pepe's store guarantee have also been modified to allow the use of remaining candidates while in a Alliance ban state."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "실험실 옆에 연습실을 추가했습니다. 전장·시작 라운드·인원 기준·일반 및 히든 보스·전략·적 특훈·맹약 밴을 선택할 수 있습니다.",
+    "before": "A practice room has been added next to the laboratory. You can choose the battlefield, starting round, number of people, normal and hidden boss, strategy, enemy special training, and covenant van.",
+    "after": "A practice room has been added next to the laboratory. You can choose the battlefield, starting round, number of people, normal and hidden boss, strategy, enemy special training, and Alliance ban."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "SP 회복과 맹약 중첩 증가 숫자 크기를 회복 표시와 통일했습니다.",
+    "before": "SP recovery and oath stack increase number sizes have been unified with the recovery display.",
+    "after": "SP recovery and Alliance stack increase number sizes have been unified with the recovery display."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "밴된 맹약과 오퍼레이터가 증강 및 무작위 지급 효과에 포함되지 않도록 수정했습니다.",
+    "before": "Fixed banned Covenants and Operators to not be included in augmentation and random payment effects.",
+    "after": "Fixed banned Alliances and Operators to not be included in Augment and random payment effects."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "맹약 이름이 들어간 증강에 해당 맹약 아이콘을 적용하고 효과에 맞지 않던 아이콘을 수정했습니다.",
+    "before": "The corresponding pledge icon was applied to the augmentation containing the pledge name, and the icon that did not match the effect was modified.",
+    "after": "The corresponding Alliance icon was applied to the Augment containing the Alliance name, and the icon that did not match the effect was modified."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "롤링 업데이트 환경에서 전투 데이터가 분리되어 맹약 등 전투 효과가 적용되지 않던 문제를 수정했습니다.",
+    "before": "Fixed an issue where combat data was separated in the rolling update environment and combat effects such as oaths were not applied.",
+    "after": "Fixed an issue where combat data was separated in the rolling update environment and combat effects such as Alliances were not applied."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "신규 아군·적 증강을 추가하고 효과에 맞는 위기협약 및 맹약 아이콘을 적용했습니다. 조화 증강은 조화를 활성화하며 기본 조화 규칙이 켜진 게임에서는 등장하지 않습니다.",
+    "before": "New ally and enemy reinforcements have been added, and crisis pact and oath icons have been applied to match the effect. Harmony Augments activate Harmony and do not appear in games with the default Harmony rules turned on.",
+    "after": "New ally and enemy Augments have been added, and crisis Alliance and Alliance icons have been applied to match the effect. Harmony Augments activate Harmony and do not appear in games with the default Harmony rules turned on."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "맹약 증강에 해당 맹약 아이콘을 적용하고 조화 지원 증강을 제외했습니다. 장비 지원 설명에 지급 장비 이름과 수량을 표시합니다. 영광스러운 진화와 대마법사를 각각 이샤믈라의 축복과 아츠 마스터로 변경했습니다.",
+    "before": "The corresponding covenant icon has been applied to the covenant augmentation, and the harmony support augmentation has been excluded. Display the name and quantity of the equipment issued in the equipment support description. Changed Glorious Evolution and Archmage to Blessing of Ishamla and Arts Master respectively.",
+    "after": "The corresponding Alliance icon has been applied to the Alliance Augment, and the harmony support Augment has been excluded. Display the name and quantity of the equipment issued in the equipment support description. Changed Glorious Evolution and Archmage to Blessing of Ishamla and Arts Master respectively."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "8인 협력방어 개별 관전 시 관전 대상의 맹약을 표시합니다.",
+    "before": "When spectating individually in 8-person cooperative defense, the oath of the spectating target is displayed.",
+    "after": "When spectating individually in 8-person cooperative defense, the Alliance of the spectating target is displayed."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "8인 모드는 맹약·오퍼레이터 밴이 없으며, 오퍼레이터 밴 제외 설정을 제거했습니다.",
+    "before": "There is no covenant/operator ban in 8-player mode, and the operator ban exclusion setting has been removed.",
+    "after": "There is no Alliance/operator ban in 8-player mode, and the operator ban exclusion setting has been removed."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "전투 중과 종료 안내에 재시작 버튼을 추가했습니다. 전투 시작 전 배치·장비·맹약 중첩으로 돌아가 다시 준비할 수 있습니다.",
+    "before": "A restart button has been added to notifications during and after battle. Before the battle begins, you can return to deployment, equipment, and covenant stacking to prepare again.",
+    "after": "A restart button has been added to notifications during and after battle. Before the battle begins, you can return to deployment, equipment, and Alliance stacking to prepare again."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "에벤홀츠 특질은 라이타니엔 3중첩당 공격력 일반 +2%·승급 +4%입니다. 비비아나는 5단계이며 카시미어 맹약을 추가했습니다. 디아만테의 이름을 정정하고 특질 발동 한도를 전투당 5회로 변경했습니다.",
+    "before": "Ebenholtz's trait is general attack power +2% and promotion +4% per 3 stacks of Laitanien. Bibiana is level 5 and has added the Casimir Covenant. Diamante's name has been corrected and the talent activation limit has been changed to 5 per battle.",
+    "after": "Ebenholtz's trait is general attack power +2% and promotion +4% per 3 stacks of Laitanien. Bibiana is level 5 and has added the Casimir Alliance. Diamante's name has been corrected and the talent activation limit has been changed to 5 per battle."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "속세의 음의 별도 피해 증가 효과를 제거하고 매초 피해를 시전자 공격력의 5% + 맹약 중첩당 0.015%로 변경했습니다.",
+    "before": "Removed the separate Voice of Mundane damage bonus. Damage per second is now 5% of the caster's ATK + 0.015% per Bond stack.",
+    "after": "Removed the separate Voice of Mundane damage bonus. Damage per second is now 5% of the caster's ATK + 0.015% per Alliance stack."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "변경된 맹약·특질·전략 설명을 기존 문체에 맞춰 정리했습니다.",
+    "before": "The changed oath, trait, and strategy descriptions have been organized to match the existing writing style.",
+    "after": "The changed Alliance, trait, and strategy descriptions have been organized to match the existing writing style."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "상점 재고·맹약 중첩 상한선 해제, 조화 기본 활성화, 아군 HP 공유 규칙을 추가했습니다.",
+    "before": "The store inventory/covenant stack cap has been lifted, basic harmony has been activated, and ally HP sharing rules have been added.",
+    "after": "The store inventory/Alliance stack cap has been lifted, basic harmony has been activated, and ally HP sharing rules have been added."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "커스텀 설정에서 선택할 때만 라이타니엔 맹약·오퍼레이터 8명·장비 2종·에벤홀츠의 맹세·위치킹 전략을 추가합니다. 카넬리안과 에이야퍄들라 더 크비트 아스카에도 맹약을 추가하며 커스텀 핵심 맹약당 밴 수 +1 규칙을 유지합니다.",
+    "before": "The Laitanien Oath, 8 operators, 2 types of equipment, Ebenholtz's Oath, and Witch King strategy are added only when selected in the custom settings. Covenants are also added to Carnelian and Eyjafjalla the Kvit Asuka, and the custom core covenant +1 ban rule is maintained.",
+    "after": "The Laitanien Alliance, 8 operators, 2 types of equipment, Ebenholtz's Alliance, and Witch King strategy are added only when selected in the custom settings. Alliances are also added to Carnelian and Eyjafjalla the Kvit Asuka, and the custom core Alliance +1 ban rule is maintained."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "에벤홀츠 특질은 3중첩당 공격력 일반 +1%·승급 +2%, 디아만테는 라이타니엔/아케인 맹약과 쇠약 손상 부여 시 중첩 획득, 에이야퍄들라는 라이타니엔/신속 일반 +3/+2·승급 +6/+4로 조정했습니다. 비비아나는 기존 중첩 획득 특질과 전투당 최대 10회 제한을 유지합니다. 비비아나는 6단계, 에벤홀츠는 5단계로 변경했습니다.",
+    "before": "Ebenholtz's trait was adjusted to general attack power +1% and promotion +2% per 3 stacks, Diamante gained stacks when applying Laitanien/Arcane oath and debilitating damage, and Eyjafjäldla to Laitanien/Swift general +3/+2 and promotion +6/+4. Viviana retains the existing stack gain trait and the maximum limit of 10 per battle. Bibiana was changed to level 6, and Ebenholtz was changed to level 5.",
+    "after": "Ebenholtz's trait was adjusted to general attack power +1% and promotion +2% per 3 stacks, Diamante gained stacks when applying Laitanien/Arcane Alliance and debilitating damage, and Eyjafjäldla to Laitanien/Swift general +3/+2 and promotion +6/+4. Viviana retains the existing stack gain trait and the maximum limit of 10 per battle. Bibiana was changed to level 6, and Ebenholtz was changed to level 5."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "체르니 보조맹약을 고수로 수정하고 신규 오퍼레이터의 전투 진입 소실을 수정했습니다. 추가한 오퍼레이터는 선발 목록에서 제외합니다.",
+    "before": "Changed Cherny's auxiliary oath to expert and fixed the loss of new operators entering battle. The added operator will be excluded from the selection list.",
+    "after": "Changed Cherny's auxiliary Alliance to expert and fixed the loss of new operators entering battle. The added operator will be excluded from the selection list."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "상점 위치에 7칸 페이지형 실험실 메뉴를 배치했습니다. 초성 검색과 탭별 필터 유지를 지원하며 가격, 전투 효과 없는 장비, 중첩 없는 맹약은 표시하지 않습니다.",
+    "before": "A 7-page laboratory menu has been placed in the store location. It supports initial consonant search and maintains filters by tab, and does not display prices, equipment without combat effects, or oaths without stacks.",
+    "after": "A 7-page laboratory menu has been placed in the store location. It supports initial consonant search and maintains filters by tab, and does not display prices, equipment without combat effects, or Alliances without stacks."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "전투 통계의 컨트롤·요약·그래프 배치를 정리하고, 캐서린 지원 장치를 마름모 프레임 없이 표시합니다. 맹약 중첩 숫자의 줄바꿈과 방 코드의 한글 키 입력을 수정했습니다.",
+    "before": "The control, summary, and graph layout of battle statistics has been organized, and Catherine's support devices are displayed without diamond frames. Fixed line breaks in oath stack numbers and Korean keystrokes in room codes.",
+    "after": "The control, summary, and graph layout of battle statistics has been organized, and Catherine's support devices are displayed without diamond frames. Fixed line breaks in Alliance stack numbers and Korean keystrokes in room codes."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "오퍼레이터·선발 설정에 세로 목록 보기를 추가했습니다. 한 줄에 단계·직군·맹약·스킬·모듈을 아이콘으로 표시하고, 스킬·모듈·선발 단계를 바로 설정할 수 있습니다.",
+    "before": "Vertical list view has been added to operator/selection settings. You can display stages, occupations, oaths, skills, and modules as icons in one line, and set the skills, modules, and selection stages right away.",
+    "after": "Vertical list view has been added to operator/selection settings. You can display stages, occupations, Alliances, skills, and modules as icons in one line, and set the skills, modules, and selection stages right away."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "관전 설정의 하단 안내를 제거하고 커스텀 확장 설정을 커스텀 설정으로 변경했습니다. 맹약·맵 목록에서 기존 콘텐츠와 커스텀 콘텐츠를 구분합니다.",
+    "before": "The bottom guidance in spectating settings has been removed and the custom expansion settings have been changed to custom settings. Distinguish between existing content and custom content in the covenant/map list.",
+    "after": "The bottom guidance in spectating settings has been removed and the custom expansion settings have been changed to custom settings. Distinguish between existing content and custom content in the Alliance/map list."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "우르수스의 체력 증가량을 중첩당 0.5%로 변경했습니다. 이스티나는 우르수스/정밀 맹약으로 변경하고 중첩을 일반 각각 +2·승급 각각 +4 획득합니다.",
+    "before": "Ursus' health increase has been changed to 0.5% per stack. Istina changes to Ursus/Precision Oath and gains +2 each normal and +4 each promoted.",
+    "after": "Ursus' health increase has been changed to 0.5% per stack. Istina changes to Ursus/Precision Alliance and gains +2 each normal and +4 each promoted."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "맹약 숨김 시 목록 전체를 숨깁니다. 펼치기 버튼은 유지합니다.",
+    "before": "When hiding an oath, the entire list is hidden. The expand button is retained.",
+    "after": "When hiding an Alliance, the entire list is hidden. The expand button is retained."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "맹약이 12개를 넘으면 11.5개를 표시하고 끝을 그라데이션 처리합니다. 스크롤바 없이 드래그할 수 있으며 숨김 버튼 높이를 줄였습니다.",
+    "before": "If there are more than 12 oaths, 11.5 are displayed and the ends are gradient-processed. You can now drag without a scroll bar, and the hidden button height has been reduced.",
+    "after": "If there are more than 12 Alliances, 11.5 are displayed and the ends are gradient-processed. You can now drag without a scroll bar, and the hidden button height has been reduced."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "전투 중 맹약 목록을 가로 스크롤·줄바꿈 없이 한 줄로 표시합니다. 중앙 아래 접기 버튼을 누르면 위로 올려 아래쪽 1/3만 투명도 그라데이션으로 남깁니다.",
+    "before": "During battle, the pledge list is displayed in one line without horizontal scrolling or line breaks. If you press the fold button below the center, it will move up, leaving only the bottom 1/3 as a transparency gradient.",
+    "after": "During battle, the Alliance list is displayed in one line without horizontal scrolling or line breaks. If you press the fold button below the center, it will move up, leaving only the bottom 1/3 as a transparency gradient."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "비헌터를 3단계·중첩 +5, 우쿠시크를 2단계·중첩 +3으로 변경했습니다. 보타니의 신속 맹약과 획득 중첩을 기적으로 변경했습니다.",
+    "before": "Changed Be-Hunter to level 3 and stacking +5, and Ukusik to level 2 and stacking +3. Changed Botani's Speed ​​Pact and gain stacks to Miracles.",
+    "after": "Changed Be-Hunter to level 3 and stacking +5, and Ukusik to level 2 and stacking +3. Changed Botani's Speed ​​Alliance and gain stacks to Miracles."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "선호 프리셋 목록을 분리하고 맹약·등급 필터를 추가했습니다.",
+    "before": "Separated the preferred presets list and added pledge/tier filters.",
+    "after": "Separated the preferred presets list and added Alliance/tier filters."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "커스텀 확장에서 핵심 맹약·맵·보스·전략을 금지할 수 있습니다. 게임에 필요한 최소 구성을 유지합니다.",
+    "before": "You can ban key oaths, maps, bosses, and strategies in custom expansions. Maintain the minimum configuration required for the game.",
+    "after": "You can ban key Alliances, maps, bosses, and strategies in custom expansions. Maintain the minimum configuration required for the game."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "전투 중 맹약 중첩 알림을 효과를 발동한 오퍼레이터 위에 표시합니다.",
+    "before": "During battle, an oath stack notification will be displayed above the operator who activated the effect.",
+    "after": "During battle, an Alliance stack notification will be displayed above the operator who activated the effect."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "헬라그 특질을 공격속도 증가로 변경하고 불굴 맹약을 추가했습니다.",
+    "before": "Changed Hellag's trait to increased attack speed and added Indomitable Pact.",
+    "after": "Changed Hellag's trait to increased attack speed and added Indomitable Alliance."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "안내 메시지를 맹약 목록 아래로 옮기고 활성화 단계 표시를 확대했습니다.",
+    "before": "We have moved the guidance message to the bottom of the pledge list and enlarged the display of activation levels.",
+    "after": "We have moved the guidance message to the bottom of the Alliance list and enlarged the display of activation levels."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "배치 인원이 없는 맹약을 숨기고 10개를 넘는 목록은 가로 스크롤로 표시합니다.",
+    "before": "Covenants without assigned personnel are hidden and lists of more than 10 are displayed with horizontal scrolling.",
+    "after": "Alliances without assigned personnel are hidden and lists of more than 10 are displayed with horizontal scrolling."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "맹약 목록의 접기 버튼과 중복 관전 표식을 제거했습니다.",
+    "before": "The collapse button and duplicate spectator symbols in the pledge list have been removed.",
+    "after": "The collapse button and duplicate spectator symbols in the Alliance list have been removed."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "이번 판 정보에 맹약별 밴 목록과 현재 대상의 전략을 표시합니다.",
+    "before": "This edition's information displays a list of bans for each oath and the current target's strategy.",
+    "after": "This edition's information displays a list of bans for each Alliance and the current target's strategy."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "커스텀 확장 설정에 맹약·전장 탭을 추가했습니다. 여러 확장을 함께 선택할 수 있고 버튼에 적용 개수를 표시합니다.",
+    "before": "The Oath/Battlefield tab has been added to custom expansion settings. You can select multiple extensions together and the button displays the number of applications.",
+    "after": "The Alliance/Battlefield tab has been added to custom expansion settings. You can select multiple extensions together and the button displays the number of applications."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "우르수스를 비활성화하면 관련 맹약·추가 오퍼레이터를 게임 정보에서 제외하고, 굼·베토치키의 기존 맹약만 표시합니다.",
+    "before": "If Ursus is disabled, related oaths and additional operators will be excluded from the game information, and only the existing oaths of Gum and Betochki will be displayed.",
+    "after": "If Ursus is disabled, related Alliances and additional operators will be excluded from the game information, and only the existing Alliances of Gum and Betochki will be displayed."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "커스텀 진영 활성화 시 핵심 맹약 밴 수를 늘려 사용 가능한 핵심 맹약이 5개가 되도록 조정했습니다.",
+    "before": "When activating a custom faction, the number of core covenant bans has been increased so that there are 5 core covenants available.",
+    "after": "When activating a custom faction, the number of core Alliance bans has been increased so that there are 5 core Alliances available."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "에기르·조화 맹약 효과를 순차 배치 완료 후 계산하도록 보완했습니다.",
+    "before": "The effects of Aegir and Harmony Pact have been supplemented to be calculated after sequential placement is completed.",
+    "after": "The effects of Aegir and Harmony Alliance have been supplemented to be calculated after sequential placement is completed."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "우르수스 커스텀 맹약과 오퍼레이터 8명, 제국 드론, 전용 장비와 카셰이 전략을 추가했습니다. 굼·베토치키도 우르수스에 포함됩니다.",
+    "before": "Added Ursus Custom Covenant, 8 Operators, Imperial Drone, exclusive equipment, and Kashay Strategy. Gum and Betochiki are also included in Ursus.",
+    "after": "Added Ursus Custom Alliance, 8 Operators, Imperial Drone, exclusive equipment, and Kashay Strategy. Gum and Betochiki are also included in Ursus."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "检查拼写：引用的盟约、敌人、干员、效果等 id 要在原版或这个插件里存在（大小写一致）。",
+    "before": "Check the spelling: the referenced IDs of covenants, enemies, operators, effects, etc. must exist in the original version or this plug-in (the case must be consistent).",
+    "after": "Check the spelling: the referenced IDs of Alliances, enemies, operators, effects, etc. must exist in the original version or this plug-in (the case must be consistent)."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "商店装备偏向已激活盟约",
+    "before": "Shop equipment is biased toward active bonds",
+    "after": "Shop equipment is biased toward active Alliances"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "变形同构体不占格，仅配对最左盟约装备",
+    "before": "Morphs use no slot and pair only with the leftmost bond item",
+    "after": "Morphs use no slot and pair only with the leftmost Alliance item"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "<!doctype html><html lang=\"zh-CN\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<title>{0} · 卫戍协议：盟约</title><style>\n:root{color-scheme:dark}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#111614;color:#d8e3de;font:16px/1.6 \"Noto Sans SC\",system-ui,sans-serif}\nmain{border:1px solid #2c3a35;padding:32px 40px;max-width:520px;text-align:center}h1{margin:0;color:#4ed8af;font-size:56px;letter-spacing:4px}\np{margin:8px 0}a{color:#4ed8af}</style></head><body><main><h1>{1}</h1><p>{2}</p>\n{3}<p><a href=\"/\">返回首页 · Back to home</a></p></main></body></html>",
+    "before": "<!doctype html><html lang=\"zh-CN\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<title>{0} · Garrison Agreement: Covenant</title><style>\n:root{color-scheme:dark}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#111614;color:#d8e3de;font:16px/1.6 \"Noto Sans SC\",system-ui,sans-serif}\nmain{border:1px solid #2c3a35;padding:32px 40px;max-width:520px;text-align:center}h1{margin:0;color:#4ed8af;font-size:56px;letter-spacing:4px}\np{margin:8px 0}a{color:#4ed8af}</style></head><body><main><h1>{1}</h1><p>{2}</p>\n{3}<p><a href=\"/\">Return to home page · Back to home</a></p></main></body></html>",
+    "after": "<!doctype html><html lang=\"zh-CN\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<title>{0} · Garrison Alliance: Alliance</title><style>\n:root{color-scheme:dark}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#111614;color:#d8e3de;font:16px/1.6 \"Noto Sans SC\",system-ui,sans-serif}\nmain{border:1px solid #2c3a35;padding:32px 40px;max-width:520px;text-align:center}h1{margin:0;color:#4ed8af;font-size:56px;letter-spacing:4px}\np{margin:8px 0}a{color:#4ed8af}</style></head><body><main><h1>{1}</h1><p>{2}</p>\n{3}<p><a href=\"/\">Return to home page · Back to home</a></p></main></body></html>"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "맹약 밴 설정이 올바르지 않습니다.",
+    "before": "The pledge ban settings are incorrect.",
+    "after": "The Alliance ban settings are incorrect."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "同一个盟约已经在 art.bonds 里，bondIcons 这一条没有再导入。",
+    "before": "The same covenant is already in art.bonds, and bondIcons is not imported again.",
+    "after": "The same Alliance is already in art.Alliances, and bondIcons is not imported again."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "「{0}」在本安装里没有这条盟约，没有写进 bonds。",
+    "before": "\"{0}\" does not have this covenant in this installation and is not written into bonds.",
+    "after": "\"{0}\" does not have this Alliance in this installation and is not written into Alliances."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "写入的 bonds 去掉了官方盟约「{0}」，已把 {1} 从这些盟约的 members 和 visibleMembers 里去掉。",
+    "before": "The bonds written have removed the official covenant \"{0}\", and {1} has been removed from the members and visibleMembers of these covenants.",
+    "after": "The Alliances written have removed the official Alliance \"{0}\", and {1} has been removed from the members and visibleMembers of these Alliances."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "写入的 bonds 加上了官方盟约「{0}」，已把 {1} 加进这些盟约的 members 和 visibleMembers。",
+    "before": "The bonds written have added the official covenant \"{0}\", and {1} has been added to the members and visibleMembers of these covenants.",
+    "after": "The Alliances written have added the official Alliance \"{0}\", and {1} has been added to the members and visibleMembers of these Alliances."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "「{0}」不是盟约 id，bbStr.{1} 的记号列表会因此改变，这个字段没有写入。",
+    "before": "\"{0}\" is not a covenant id. The token list of bbStr.{1} will be changed accordingly, and this field is not written.",
+    "after": "\"{0}\" is not a Alliance id. The token list of bbStr.{1} will be changed accordingly, and this field is not written."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "有的盟约在本安装里不存在，那些盟约没有写上。",
+    "before": "Some covenants do not exist in this installation, and those covenants are not written.",
+    "after": "Some Alliances do not exist in this installation, and those Alliances are not written."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "自选干员也要至少一个本安装里存在的盟约，没有导入这个干员。",
+    "before": "The self-selected operator must also have at least one covenant that exists in this installation. This operator has not been imported.",
+    "after": "The self-selected operator must also have at least one Alliance that exists in this installation. This operator has not been imported."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "棋子需要至少一个本安装里存在的盟约，没有导入这个干员。",
+    "before": "The chess piece requires at least one covenant that exists in this installation, and this operator is not imported.",
+    "after": "The chess piece requires at least one Alliance that exists in this installation, and this operator is not imported."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "没有盟约的棋子写上兜底盟约 {0}（协防干员），和工作台的干员模板一样。",
+    "before": "Chess pieces without a covenant are written with the back-up covenant {0} (assistant defense operator), which is the same as the operator template on the workbench.",
+    "after": "Chess pieces without a Alliance are written with the back-up Alliance {0} (assistant defense operator), which is the same as the operator template on the workbench."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "棋子需要至少一个本安装里存在的盟约，没有导入这个棋子。",
+    "before": "The chess piece requires at least one covenant that exists in this installation, and this chess piece is not imported.",
+    "after": "The chess piece requires at least one Alliance that exists in this installation, and this chess piece is not imported."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "Pair with high \"获得时 +N 自身所属盟约\" operators (忍冬 +6, 锏 +8, 星熊 +8, 雪猎 +5) - their layers double/triple.",
+    "before": "Pair with high \"+N own covenant when obtained\" operators (Honeysuckle +6, Mace +8, Star Bear +8, Snow Hunter +5) - their layers double/triple.",
+    "after": "Pair with high \"+N own Alliance when obtained\" operators (Honeysuckle +6, Mace +8, Star Bear +8, Snow Hunter +5) - their layers double/triple."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "缪尔赛思 (T6) and 盟约·辅助干员 (T1, hidden; given in round 1 by strategy Pith \"优等生\").",
+    "before": "Mulseth (T6) and Covenant Support Operator (T1, hidden; given in round 1 by strategy Pith \"The Top Student\").",
+    "after": "Mulseth (T6) and Alliance Support Operator (T1, hidden; given in round 1 by strategy Pith \"The Top Student\")."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "\"协防干员\" (assist operators) = fallback bond (constData.fallbackBondId). DIY/self-selected 6-star operators whose faction matches no core bond become 协防干员; some preset operators (调香师, 松果, 瑰盐, 魔王, 铃兰, 迷迭香, 盟约·辅助干员) are natively 协防.",
+    "before": "\"Assist operators\" (assist operators) = fallback bond (constData.fallbackBondId). DIY/self-selected 6-star operators whose faction matches no core bond become assist operators; some preset operators (perfumer, pine cone, rose salt, devil, lily of the valley, rosemary, covenant·auxiliary operator) are natively assist operators.",
+    "after": "\"Assist operators\" (assist operators) = fallback Alliance (constData.fallbackBondId). DIY/self-selected 6-star operators whose faction matches no core Alliance become assist operators; some preset operators (perfumer, pine cone, rose salt, devil, lily of the valley, rosemary, Alliance·auxiliary operator) are natively assist operators."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "at shopDraft.rounds (R11): six slots drawn with replacement (VI, VI, V, 盟约之币, 2 × V / IV / III / 盟约之币); other rounds: random normal EQUIP shop items of tiers I–VI (duplicates allowed) — the same item can come twice",
+    "before": "at shopDraft.rounds (R11): six slots drawn with replacement (VI, VI, V, Covenant Coin, 2 × V / IV / III / Covenant Coin); other rounds: random normal EQUIP shop items of tiers I–VI (duplicates allowed) — the same item can come twice",
+    "after": "at shopDraft.rounds (R11): six slots drawn with replacement (VI, VI, V, Alliance Coin, 2 × V / IV / III / Alliance Coin); other rounds: random normal EQUIP shop items of tiers I–VI (duplicates allowed) — the same item can come twice"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "자신의 우르수스, 기습, 불굴 맹약 중첩 +8. 다른 아군이 있으면 해당 아군도 획득.",
+    "before": "Your Ursus, Surprise, and Indomitable Oath stack +8. If there is another ally, that ally also acquires it.",
+    "after": "Your Ursus, Surprise, and Indomitable Alliance stack +8. If there is another ally, that ally also acquires it."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "우르수스 맹약의 무작위 오퍼레이터 1명 획득.",
+    "before": "Obtain a random Operator of the Ursus Covenant.",
+    "after": "Obtain a random Operator of the Ursus Alliance."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "[라이타니엔]/[신속]/[아케인] 맹약의 중첩 수 각각 +8/+8/+8\n다른 아군이 있으면 해당 아군도 획득",
+    "before": "[Laitanien]/[Swift]/[Arcane] Number of stacks of oath each +8/+8/+8\nIf there is another ally, the ally also acquires it",
+    "after": "[Laitanien]/[Swift]/[Arcane] Number of stacks of Alliance each +8/+8/+8\nIf there is another ally, the ally also acquires it"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "卫戍协议：盟约",
+    "before": "Garrison Agreement: Covenant",
+    "after": "Garrison Alliance: Alliance"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "激活的盟约层数总和最高",
+    "before": "The total number of activated covenant layers is the highest",
+    "after": "The total number of activated Alliance layers is the highest"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "[우르수스] 맹약이 3회 중첩할 때마다 공격 속도 +2",
+    "before": "[Ursus] Attack speed +2 for every 3 stacks of oath",
+    "after": "[Ursus] Attack speed +2 for every 3 stacks of Alliance"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "[우르수스] 맹약이 3회 중첩할 때마다 공격 속도 <@ba.vup>+2</>",
+    "before": "[Ursus] Attack speed <@ba.vup>+2</> for every 3 stacks of oath",
+    "after": "[Ursus] Attack speed <@ba.vup>+2</> for every 3 stacks of Alliance"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "[우르수스] 맹약이 3회 중첩할 때마다 공격 속도 +4",
+    "before": "[Ursus] Attack speed +4 for every 3 stacks of oath",
+    "after": "[Ursus] Attack speed +4 for every 3 stacks of Alliance"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "[우르수스] 맹약이 3회 중첩할 때마다 공격 속도 <@ba.vup>+4</>",
+    "before": "[Ursus] Attack speed <@ba.vup>+4</> for every 3 stacks of oath",
+    "after": "[Ursus] Attack speed <@ba.vup>+4</> for every 3 stacks of Alliance"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "<전투 중> 공격 범위 내 정지 상태의 적이 사망할 때마다 활성화된 [우르수스]/[정밀] 맹약의 중첩 수 각각 +4/+4 (전투당 최대 8회 발동)",
+    "before": "<In the battle.> Overlap of activated [Ursus]/[precise] antibodies each time the enemy is dead in a standstill within the attack range +4/+4 (maximum 8 launches per battle)",
+    "after": "<In the battle.> stacks of activated [Ursus]/[precise] antibodies each time the enemy is dead in a standstill within the attack range +4/+4 (maximum 8 launches per battle)"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "[우르수스]/[정밀] 맹약이 3회 중첩할 때마다 공격력 +1%",
+    "before": "[Ursus]/[Precision] Attack power +1% for every 3 stacks of oath",
+    "after": "[Ursus]/[Precision] Attack power +1% for every 3 stacks of Alliance"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "[우르수스]/[정밀] 맹약이 3회 중첩할 때마다 공격력 <@ba.vup>+1%</>",
+    "before": "[Ursus]/[Precision] Attack power <@ba.vup>+1%</> every time the oath stacks 3 times",
+    "after": "[Ursus]/[Precision] Attack power <@ba.vup>+1%</> every time the Alliance stacks 3 times"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "[우르수스]/[정밀] 맹약이 3회 중첩할 때마다 공격력 +2%",
+    "before": "[Ursus]/[Precision] Attack +2% for every 3 stacks of oath",
+    "after": "[Ursus]/[Precision] Attack +2% for every 3 stacks of Alliance"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "[우르수스]/[정밀] 맹약이 3회 중첩할 때마다 공격력 <@ba.vup>+2%</>",
+    "before": "[Ursus]/[Precision] Attack power <@ba.vup>+2%</> every time the oath stacks 3 times",
+    "after": "[Ursus]/[Precision] Attack power <@ba.vup>+2%</> every time the Alliance stacks 3 times"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "[라이타니엔] 맹약이 3회 중첩할 때마다 최대 HP +1%",
+    "before": "[Laitanien] Maximum HP +1% every time the oath stacks 3 times",
+    "after": "[Laitanien] Maximum HP +1% every time the Alliance stacks 3 times"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "[라이타니엔] 맹약이 3회 중첩할 때마다 최대 HP <@ba.vup>+1%</>",
+    "before": "[Laitanien] Maximum HP <@ba.vup>+1%</> every time the oath stacks 3 times",
+    "after": "[Laitanien] Maximum HP <@ba.vup>+1%</> every time the Alliance stacks 3 times"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "[라이타니엔] 맹약이 3회 중첩할 때마다 최대 HP +2%",
+    "before": "[Laitanien] Maximum HP +2% every time the oath overlaps 3 times",
+    "after": "[Laitanien] Maximum HP +2% every time the Alliance overlaps 3 times"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "[라이타니엔] 맹약이 3회 중첩할 때마다 최대 HP <@ba.vup>+2%</>",
+    "before": "[Laitanien] Maximum HP <@ba.vup>+2%</> every time the oath stacks 3 times",
+    "after": "[Laitanien] Maximum HP <@ba.vup>+2%</> every time the Alliance stacks 3 times"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "<전투 중> 공격 범위 내 적의 쇠약 손상이 부여될 때마다 활성화된 [라이타니엔]/[아케인] 맹약의 중첩 수 각각 +2/+1 (전투당 최대 5회)",
+    "before": "<In the battle.> The overlap number of activated [Lytanian]/[Aken] pills each +2/+1 (maximum 5 times per battle) is given whenever enemy debilitation damage is assigned within the range of attack.",
+    "after": "<In the battle.> The stacks number of activated [Lytanian]/[Aken] pills each +2/+1 (maximum 5 times per battle) is given whenever enemy debilitation damage is assigned within the range of attack."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "<전투 중> 공격 범위 내 적의 쇠약 손상이 부여될 때마다 활성화된 [라이타니엔]/[아케인] 맹약의 중첩 수 각각 +4/+2 (전투당 최대 5회)",
+    "before": "<In the battle.> The overlap number of activated [Lytanien]/[Aken] antibodies each time enemy damage is assigned within the range of attack is +4/+2 (maximum 5 times per battle).",
+    "after": "<In the battle.> The stacks number of activated [Lytanien]/[Aken] antibodies each time enemy damage is assigned within the range of attack is +4/+2 (maximum 5 times per battle)."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "<전투 중> 대미지를 8회 입힐 때마다 활성화된 [라이타니엔]/[카시미어] 맹약의 중첩 수 각각 <@ba.vup>+2</>, [기민] 맹약의 중첩 수 <@ba.vup>+1</> (전투당 최대 10회)",
+    "before": "<In the battle.> Each of the eight times that you insert a tampon, you have an overload of activated [Litanium]/[Casymeric] antibodies. <@ba.vup>+2</>The number of overlapping pledges. <@ba.vup>+1</> (Maximum 10 fights per game)",
+    "after": "<In the battle.> Each of the eight times that you insert a tampon, you have an overload of activated [Litanium]/[Casymeric] antibodies. <@ba.vup>+2</>The number of overlapping Alliances. <@ba.vup>+1</> (Maximum 10 fights per game)"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "<전투 중> 대미지를 8회 입힐 때마다 활성화된 [라이타니엔]/[카시미어] 맹약의 중첩 수 각각 <@ba.vup>+4</>, [기민] 맹약의 중첩 수 <@ba.vup>+2</> (전투당 최대 10회)",
+    "before": "<In the battle.> Each of the eight times that you insert a tampon, you have an overload of activated [Litanium]/[Casymeric] antibodies. <@ba.vup>+4</>The number of overlapping pledges. <@ba.vup>+2</> (Maximum 10 fights per game)",
+    "after": "<In the battle.> Each of the eight times that you insert a tampon, you have an overload of activated [Litanium]/[Casymeric] antibodies. <@ba.vup>+4</>The number of overlapping Alliances. <@ba.vup>+2</> (Maximum 10 fights per game)"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "[라이타니엔] 맹약이 3회 중첩할 때마다 공격력 +1%",
+    "before": "[Laitanien] Attack power +1% every time the oath stacks 3 times",
+    "after": "[Laitanien] Attack power +1% every time the Alliance stacks 3 times"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "[라이타니엔] 맹약이 3회 중첩할 때마다 공격력 <@ba.vup>+1%</>",
+    "before": "[Laitanien] Attack power <@ba.vup>+1%</> every time the oath overlaps 3 times",
+    "after": "[Laitanien] Attack power <@ba.vup>+1%</> every time the Alliance overlaps 3 times"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "[라이타니엔] 맹약이 3회 중첩할 때마다 공격력 +2%",
+    "before": "[Laitanien] Attack power +2% every time the oath stacks 3 times",
+    "after": "[Laitanien] Attack power +2% every time the Alliance stacks 3 times"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "[라이타니엔] 맹약이 3회 중첩할 때마다 공격력 <@ba.vup>+2%</>",
+    "before": "[Laitanien] Attack power <@ba.vup>+2%</> every time the oath overlaps 3 times",
+    "after": "[Laitanien] Attack power <@ba.vup>+2%</> every time the Alliance overlaps 3 times"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "维多利亚盟约每25层 / 洛洛的定制品",
+    "before": "Victoria Covenant Every 25th Floor / Lolo’s Customized Products",
+    "after": "Victoria Alliance Every 25th Floor / Lolo’s Customized Products"
+  },
+  {
+    "file": "public/i18n/en/fork.json",
+    "source": "무작위 3등급 [맹약] 오퍼레이터 획득",
+    "before": "Gain 1 random Tier 3 [Bond] Operator(s)",
+    "after": "Gain 1 random Tier 3 [Alliance] Operator(s)"
+  },
+  {
+    "file": "public/i18n/en/fork.json",
+    "source": "무작위 4등급 [맹약] 오퍼레이터 획득",
+    "before": "Gain 1 random Tier 4 [Bond] Operator(s)",
+    "after": "Gain 1 random Tier 4 [Alliance] Operator(s)"
+  },
+  {
+    "file": "public/i18n/en/fork.json",
+    "source": "무작위 5등급 [맹약] 오퍼레이터 획득",
+    "before": "Gain 1 random Tier 5 [Bond] Operator(s)",
+    "after": "Gain 1 random Tier 5 [Alliance] Operator(s)"
+  },
+  {
+    "file": "public/i18n/en/fork.json",
+    "source": "(맹약 기본 장비) 2개 획득",
+    "before": "Gain 2 basic Bond items",
+    "after": "Gain 2 basic Alliance items"
+  },
+  {
+    "file": "public/i18n/en/fork.json",
+    "source": "무작위 6등급 [맹약] 오퍼레이터 획득",
+    "before": "Gain 1 random Tier 6 [Bond] Operator(s)",
+    "after": "Gain 1 random Tier 6 [Alliance] Operator(s)"
+  },
+  {
+    "file": "public/i18n/en/fork.json",
+    "source": "(맹약 상위 장비) 1개 획득",
+    "before": "Gain 1 advanced Bond item",
+    "after": "Gain 1 advanced Alliance item"
+  },
+  {
+    "file": "public/i18n/en/fork.json",
+    "source": "무작위 4등급 [맹약] 오퍼레이터 2명 획득",
+    "before": "Gain 2 random Tier 4 [Bond] Operator(s)",
+    "after": "Gain 2 random Tier 4 [Alliance] Operator(s)"
+  },
+  {
+    "file": "public/i18n/en/fork.json",
+    "source": "무작위 5등급 [맹약] 오퍼레이터 2명 획득",
+    "before": "Gain 2 random Tier 5 [Bond] Operator(s)",
+    "after": "Gain 2 random Tier 5 [Alliance] Operator(s)"
+  },
+  {
+    "file": "public/i18n/en/fork.json",
+    "source": "무작위 6등급 [맹약] 오퍼레이터 2명 획득",
+    "before": "Gain 2 random Tier 6 [Bond] Operator(s)",
+    "after": "Gain 2 random Tier 6 [Alliance] Operator(s)"
+  },
+  {
+    "file": "public/i18n/en/fork.json",
+    "source": "(맹약 상위 장비) 1개와 (맹약 기본 장비) 2개 획득",
+    "before": "Gain 1 advanced and 2 basic Bond items",
+    "after": "Gain 1 advanced and 2 basic Alliance items"
+  },
+  {
+    "file": "public/i18n/en/fork.json",
+    "source": "무작위 맹약의 무작위 1, 2, 3, 4단계 오퍼레이터 획득",
+    "before": "Gain a random Tier 1, 2, 3, 4 Operator from a random Bond",
+    "after": "Gain a random Tier 1, 2, 3, 4 Operator from a random Alliance"
+  },
+  {
+    "file": "public/i18n/en/fork.json",
+    "source": "무작위 맹약의 무작위 1, 2, 3, 4, 5단계 오퍼레이터 획득",
+    "before": "Gain a random Tier 1, 2, 3, 4, 5 Operator from a random Bond",
+    "after": "Gain a random Tier 1, 2, 3, 4, 5 Operator from a random Alliance"
+  },
+  {
+    "file": "public/i18n/en/fork.json",
+    "source": "무작위 맹약의 무작위 1, 2, 3, 4, 5, 6단계 오퍼레이터 획득",
+    "before": "Gain a random Tier 1, 2, 3, 4, 5, 6 Operator from a random Bond",
+    "after": "Gain a random Tier 1, 2, 3, 4, 5, 6 Operator from a random Alliance"
+  },
+  {
+    "file": "public/i18n/en/fork.json",
+    "source": "활성화된 모든 핵심 맹약 중첩 +8, 부가 맹약 중첩 +4",
+    "before": "All active primary Alliances: +8 stacks; secondary Alliances: +4 stacks",
+    "after": "All active Core Alliances: +8 stacks; Add-on Alliances: +4 stacks"
+  },
+  {
+    "file": "public/i18n/en/fork.json",
+    "source": "활성화된 모든 핵심 맹약 중첩 +16, 부가 맹약 중첩 +8",
+    "before": "All active primary Alliances: +16 stacks; secondary Alliances: +8 stacks",
+    "after": "All active Core Alliances: +16 stacks; Add-on Alliances: +8 stacks"
+  },
+  {
+    "file": "public/i18n/en/fork.json",
+    "source": "활성화된 모든 핵심 맹약 중첩 +24, 부가 맹약 중첩 +12",
+    "before": "All active primary Alliances: +24 stacks; secondary Alliances: +12 stacks",
+    "after": "All active Core Alliances: +24 stacks; Add-on Alliances: +12 stacks"
+  },
+  {
+    "file": "public/i18n/en/fork.json",
+    "source": "활성화된 모든 핵심 맹약 중첩 +12, 부가 맹약 중첩 +6",
+    "before": "All active primary Alliances: +12 stacks; secondary Alliances: +6 stacks",
+    "after": "All active Core Alliances: +12 stacks; Add-on Alliances: +6 stacks"
+  },
+  {
+    "file": "public/i18n/en/fork.json",
+    "source": "활성화된 모든 핵심 맹약 중첩 +20, 부가 맹약 중첩 +10",
+    "before": "All active primary Alliances: +20 stacks; secondary Alliances: +10 stacks",
+    "after": "All active Core Alliances: +20 stacks; Add-on Alliances: +10 stacks"
+  },
+  {
+    "file": "public/i18n/en/fork.json",
+    "source": "활성화된 모든 핵심 맹약 중첩 +30, 부가 맹약 중첩 +15",
+    "before": "All active primary Alliances: +30 stacks; secondary Alliances: +15 stacks",
+    "after": "All active Core Alliances: +30 stacks; Add-on Alliances: +15 stacks"
+  },
+  {
+    "file": "public/i18n/en/fork.json",
+    "source": "활성화된 모든 핵심 맹약 중첩 +32, 부가 맹약 중첩 +16",
+    "before": "All active primary Alliances: +32 stacks; secondary Alliances: +16 stacks",
+    "after": "All active Core Alliances: +32 stacks; Add-on Alliances: +16 stacks"
+  },
+  {
+    "file": "public/i18n/en/fork.json",
+    "source": "활성화된 모든 핵심 맹약 중첩 +48, 부가 맹약 중첩 +24",
+    "before": "All active primary Alliances: +48 stacks; secondary Alliances: +24 stacks",
+    "after": "All active Core Alliances: +48 stacks; Add-on Alliances: +24 stacks"
+  },
+  {
+    "file": "public/i18n/en/fork.json",
+    "source": "속세의 음 맹약과 오퍼레이터, 전용 장비, 위치킹 전략을 추가합니다.",
+    "before": "Added the Voice of Mundane Bond, Operators, exclusive equipment, and Witch King strategy.",
+    "after": "Added the Voice of Mundane Alliance, Operators, exclusive equipment, and Witch King strategy."
+  },
+  {
+    "file": "public/i18n/en/fork.json",
+    "source": "속세의 음의 별도 피해 증가 효과를 제거하고 매초 피해를 시전자 공격력의 5% + 맹약 중첩당 0.015%로 변경했습니다.",
+    "before": "Removed the separate Voice of Mundane damage bonus. Damage per second is now 5% of the caster's ATK + 0.015% per Bond stack.",
+    "after": "Removed the separate Voice of Mundane damage bonus. Damage per second is now 5% of the caster's ATK + 0.015% per Alliance stack."
+  },
+  {
+    "file": "public/i18n/en/fork.json",
+    "source": "공식 게임 번역을 바탕으로 오퍼레이터·맹약·증강·패치노트의 다국어 표시를 확장했습니다.",
+    "before": "Expanded translations for Operators, Bonds, augments, and patch notes using official game translations.",
+    "after": "Expanded translations for Operators, Alliances, augments, and patch notes using official game translations."
+  },
+  {
+    "file": "public/i18n/en/fork.json",
+    "source": "라이타니엔·우르수스의 인게임 맹약 설명과 증강 효과 설명의 강조 표기를 통일했습니다.",
+    "before": "Standardized emphasis in in-game Leithanien/Ursus Bond descriptions and augment effect descriptions.",
+    "after": "Standardized emphasis in in-game Leithanien/Ursus Alliance descriptions and augment effect descriptions."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "같은 부가 맹약에 항상 밴과 밴 제외를 함께 설정할 수 없습니다.",
+    "before": "An auxiliary Alliance cannot be both always banned and excluded from bans.",
+    "after": "An Add-on Alliance cannot be both always banned and excluded from bans."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "부가 맹약 금지",
+    "before": "Auxiliary Alliance Bans",
+    "after": "Add-on Alliance Bans"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "부가 맹약 밴 제외",
+    "before": "Auxiliary Alliance Ban Exclusions",
+    "after": "Add-on Alliance Ban Exclusions"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "부가 맹약 밴 설정은 활성화된 부가 맹약에만 적용할 수 있습니다.",
+    "before": "Auxiliary Alliance ban settings apply only to enabled auxiliary Alliances.",
+    "after": "Add-on Alliance ban settings apply only to enabled Add-on Alliances."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "체르니 부가 맹약을 고수로 수정하고 신규 오퍼레이터의 전투 진입 소실을 수정했습니다. 추가한 오퍼레이터는 선발 목록에서 제외합니다.",
+    "before": "Corrected Czerny’s auxiliary Alliance and fixed new Operators disappearing at battle start. Added Operators are excluded from the starter roster.",
+    "after": "Corrected Czerny’s Add-on Alliance and fixed new Operators disappearing at battle start. Added Operators are excluded from the starter roster."
+  },
+  {
+    "file": "public/i18n/en/fork.json",
+    "source": "부가 맹약 금지",
+    "before": "Auxiliary Alliance Bans",
+    "after": "Add-on Alliance Bans"
+  },
+  {
+    "file": "public/i18n/en/fork.json",
+    "source": "부가 맹약 밴 제외",
+    "before": "Auxiliary Alliance Ban Exclusions",
+    "after": "Add-on Alliance Ban Exclusions"
+  },
+  {
+    "file": "public/i18n/en/fork.json",
+    "source": "같은 부가 맹약에 항상 밴과 밴 제외를 함께 설정할 수 없습니다.",
+    "before": "An auxiliary Alliance cannot be both always banned and excluded from bans.",
+    "after": "An Add-on Alliance cannot be both always banned and excluded from bans."
+  },
+  {
+    "file": "public/i18n/en/fork.json",
+    "source": "부가 맹약 밴 설정은 활성화된 부가 맹약에만 적용할 수 있습니다.",
+    "before": "Auxiliary Alliance ban settings apply only to enabled auxiliary Alliances.",
+    "after": "Add-on Alliance ban settings apply only to enabled Add-on Alliances."
+  },
+  {
+    "file": "public/i18n/en/fork.json",
+    "source": "체르니 부가 맹약을 고수로 수정하고 신규 오퍼레이터의 전투 진입 소실을 수정했습니다. 추가한 오퍼레이터는 선발 목록에서 제외합니다.",
+    "before": "Corrected Czerny’s auxiliary Alliance and fixed new Operators disappearing at battle start. Added Operators are excluded from the starter roster.",
+    "after": "Corrected Czerny’s Add-on Alliance and fixed new Operators disappearing at battle start. Added Operators are excluded from the starter roster."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "적 증강",
+    "before": "Enemy Augmentation",
+    "after": "Enemy Augment"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "아군 증강",
+    "before": "Reinforcement of allies",
+    "after": "Augment of allies"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "선택한 증강",
+    "before": "selected augmentation",
+    "after": "selected Augment"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "기본 규칙으로 진행합니다. 커스텀 설정과 증강은 적용하지 않습니다.",
+    "before": "Let's proceed with the basic rules. Custom settings and augmentations are not applied.",
+    "after": "Let's proceed with the basic rules. Custom settings and Augments are not applied."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "증강으로 조합을 강화하고, 더 강한 적에 도전합니다.",
+    "before": "Strengthen your combinations with augmentations and challenge stronger enemies.",
+    "after": "Strengthen your combinations with Augments and challenge stronger enemies."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "라운드에 아군 증강 → 적 증강 선택·투표 (보스전 이전까지)",
+    "before": "Reinforce allies in a round → Select and vote for enemy reinforcements (until boss battle)",
+    "after": "Reinforce allies in a round → Select and vote for enemy Augments (until boss battle)"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "관련 증강",
+    "before": "Related Augmentation",
+    "after": "Related Augment"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "조건에 맞는 증강이 없습니다.",
+    "before": "There are no augmentations that meet the conditions.",
+    "after": "There are no Augments that meet the conditions."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "증강 이름·효과 검색",
+    "before": "Augmentation name/effect search",
+    "after": "Augment name/effect search"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "아군 증강 선택",
+    "before": "Select ally reinforcements",
+    "after": "Select ally Augments"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "최다 득표한 증강이 모든 적에게 적용됩니다. 동률이면 무작위로 결정됩니다.",
+    "before": "The augmentation with the most votes will be applied to all enemies. If there is a tie, it will be decided at random.",
+    "after": "The Augment with the most votes will be applied to all enemies. If there is a tie, it will be decided at random."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "방장이 선택한 증강은 모든 적에게 적용됩니다.",
+    "before": "The augmentation chosen by the host will be applied to all enemies.",
+    "after": "The Augment chosen by the host will be applied to all enemies."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "님의 증강 선택을 관전 중입니다.",
+    "before": "I'm watching your augmentation choices.",
+    "after": "I'm watching your Augment choices."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "{0} 님이 적 증강을 선택하고 있습니다.",
+    "before": "{0} is selecting an enemy augmentation.",
+    "after": "{0} is selecting an enemy Augment."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "참가자의 증강 선택을 관전하고 있습니다.",
+    "before": "We are observing the participants' augmentation choices.",
+    "after": "We are observing the participants' Augment choices."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "적 증강 선택·리롤은 방장만 할 수 있습니다.",
+    "before": "Enemy reinforcement selection/reroll can only be done by the host.",
+    "after": "Enemy Augment selection/reroll can only be done by the host."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "이미 등장한 증강은 후보에서 제외됩니다.",
+    "before": "Augmentations that have already appeared are excluded from candidates.",
+    "after": "Augments that have already appeared are excluded from candidates."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "중첩 /초",
+    "before": "overlap /sec",
+    "after": "stacks /sec"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "오퍼레이터 중첩 획득 순위",
+    "before": "Operator overlap acquisition ranking",
+    "after": "Operator stacks acquisition ranking"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "· 밴 설정",
+    "before": "· Van settings",
+    "after": "· ban settings"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "4·7·10라운드에 아군·적 증강 선택",
+    "before": "Select reinforcement of allies and enemies in rounds 4, 7, and 10",
+    "after": "Select Augment of allies and enemies in rounds 4, 7, and 10"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "항상 밴",
+    "before": "always van",
+    "after": "always ban"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "밴 제외",
+    "before": "excluding vans",
+    "after": "excluding bans"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "증강 설정",
+    "before": "Augmentation Settings",
+    "after": "Augment Settings"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "아직 선택한 적 증강이 없습니다.",
+    "before": "There are no enemy augmentations selected yet.",
+    "after": "There are no enemy Augments selected yet."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "증강 선택 중",
+    "before": "Selecting Augmentation",
+    "after": "Selecting Augment"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "누적 중첩",
+    "before": "cumulative overlap",
+    "after": "cumulative stacks"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "적 증강 선택 방식",
+    "before": "Enemy reinforcement selection method",
+    "after": "Enemy Augment selection method"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "오퍼레이터 밴",
+    "before": "operator van",
+    "after": "operator ban"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "증강 등급 가중치를 최소 1개 설정해야 합니다.",
+    "before": "You must set at least 1 augmentation rating weight.",
+    "after": "You must set at least 1 Augment rating weight."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "클래식은 커스텀 설정을 적용하지 않습니다. 증강은 증강 기능과 고정된 적 강화 규칙을 적용합니다. 모드를 바꿔도 저장된 커스텀 설정은 보존됩니다.",
+    "before": "Classic does not apply custom settings. Augments apply augmentation features and fixed enemy augmentation rules. Even if you change modes, saved custom settings will be preserved.",
+    "after": "Classic does not apply custom settings. Augments apply Augment features and fixed enemy Augment rules. Even if you change modes, saved custom settings will be preserved."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "증강의 기본 등급 가중치를 실버·골드·프리즘 2/5/3으로 변경했습니다.",
+    "before": "The basic grade weight of augmentation has been changed to Silver, Gold, and Prism 2/5/3.",
+    "after": "The basic grade weight of Augment has been changed to Silver, Gold, and Prism 2/5/3."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "증강·번역",
+    "before": "Augmentation/Translation",
+    "after": "Augment/Translation"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "적 증강 투표가 끝나면 결과를 먼저 표시하고 3초 카운트다운 후 적용하도록 수정했습니다.",
+    "before": "When the enemy augmentation vote is over, the results are displayed first and applied after a 3-second countdown.",
+    "after": "When the enemy Augment vote is over, the results are displayed first and applied after a 3-second countdown."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "신병·헤드헌팅 등 증강 아이콘이 비율을 유지하면서 정해진 영역 안에 들어가도록 수정했습니다.",
+    "before": "Augmentation icons such as recruits and headhunting have been modified to fit within a defined area while maintaining the proportions.",
+    "after": "Augment icons such as recruits and headhunting have been modified to fit within a defined area while maintaining the proportions."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "결과창 표시 및 조작 · 오퍼레이터 밴 목록 수정",
+    "before": "Display and manipulate result window · Modify operator van list",
+    "after": "Display and manipulate result window · Modify operator ban list"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "밴 목록에서 선발 오퍼레이터를 제외했습니다.",
+    "before": "Removed starting operator from van list.",
+    "after": "Removed starting operator from ban list."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "증강을 추가했습니다.",
+    "before": "Added augmentation.",
+    "after": "Added Augment."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "연습실에서 오퍼레이터별 중첩 획득량 통계와 실시간 그래프를 제공합니다. 휴식 중 획득량도 해당 라운드에 합산하며, 휴식 중에는 직전 라운드 기록과 이번 라운드를 전환해 볼 수 있습니다.",
+    "before": "The practice room provides statistics on the amount of overlap earned by operator and real-time graphs. The amount earned while resting is also added to that round, and while resting, you can switch between the previous round record and the current round.",
+    "after": "The practice room provides statistics on the amount of stacks earned by operator and real-time graphs. The amount earned while resting is also added to that round, and while resting, you can switch between the previous round record and the current round."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "전투·증강 수정 및 서버 유지 관리 개선",
+    "before": "Combat/augmentation fixes and server maintenance improvements",
+    "after": "Combat/Augment fixes and server maintenance improvements"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "적 증강 실드 II·III의 실드 개수를 각각 3개·5개로 조정했습니다.",
+    "before": "The number of shields for Enemy Augmentation Shields II and III has been adjusted to 3 and 5, respectively.",
+    "after": "The number of shields for Enemy Augment Shields II and III has been adjusted to 3 and 5, respectively."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "커스텀 설정 및 증강",
+    "before": "Custom settings and augmentations",
+    "after": "Custom settings and Augments"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "증강 추가 · 관전 연동 · 롤링 운영 현황",
+    "before": "Addition of augmentation, spectator linkage, rolling operation status",
+    "after": "Addition of Augment, spectator linkage, rolling operation status"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "증강 및 관전",
+    "before": "Augmentation and Spectating",
+    "after": "Augment and Spectating"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "차단 공사 같은 구조물이 최대 HP 감소와 초당 HP 감소 증강의 영향을 받지 않도록 수정했습니다.",
+    "before": "Structures such as blocking construction have been modified so that they are not affected by maximum HP reduction and HP per second reduction augmentation.",
+    "after": "Structures such as blocking construction have been modified so that they are not affected by maximum HP reduction and HP per second reduction Augment."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "아군·적 증강 선택 시간을 각각 120초로 변경했습니다. 혼자 또는 AI와 플레이하면 시간제한이 없으며, 선택 완료 후 3초 카운트다운이 끝나면 효과가 적용됩니다.",
+    "before": "The reinforcement selection time for allies and enemies has been changed to 120 seconds each. There is no time limit when playing alone or against AI, and the effect takes effect after a 3-second countdown after completing the selection.",
+    "after": "The Augment selection time for allies and enemies has been changed to 120 seconds each. There is no time limit when playing alone or against AI, and the effect takes effect after a 3-second countdown after completing the selection."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "적 증강을 투표로 선택하는 커스텀 규칙을 추가했습니다. 세 증강과 전체 리롤에 투표하며, 최다 득표가 동률이면 무작위로 결정합니다. 전체 리롤 시 기회를 소모하고 투표를 초기화합니다.",
+    "before": "Added custom rule to vote on enemy augmentations. Vote on the three augments and all rerolls, and if there is a tie for the most votes, the decision is made at random. A full reroll consumes the chance and resets the vote.",
+    "after": "Added custom rule to vote on enemy Augments. Vote on the three augments and all rerolls, and if there is a tie for the most votes, the decision is made at random. A full reroll consumes the chance and resets the vote."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "이미 선택한 동일 증강은 다시 등장하지 않습니다. 다른 등급의 증강은 별개로 취급하고, 지나간 미선택 후보는 소진되면 초기화합니다.",
+    "before": "The same augmentation you have already selected will not appear again. Augmentations of different grades are treated separately, and past unselected candidates are reset when exhausted.",
+    "after": "The same Augment you have already selected will not appear again. Augments of different grades are treated separately, and past unselected candidates are reset when exhausted."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "관전자가 참가자별 아군 증강 선택지를 확인할 수 있으며, 선택한 카드에 선택 완료를 표시합니다. 아군·적 선택 제목은 각각 민트·빨강으로 표시합니다.",
+    "before": "Spectators can check the ally reinforcement options for each participant, and the selection completion is indicated on the selected card. The ally and enemy selection titles are displayed in mint and red, respectively.",
+    "after": "Spectators can check the ally Augment options for each participant, and the selection completion is indicated on the selected card. The ally and enemy selection titles are displayed in mint and red, respectively."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "타수형 적에게 적 증강의 HP 재생이 적용되지 않도록 수정했습니다.",
+    "before": "Fixed the enemy augmentation's HP regeneration not being applied to hit-type enemies.",
+    "after": "Fixed the enemy Augment's HP regeneration not being applied to hit-type enemies."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "적 증강 목록을 게임 정보 창 내부에 맞춰 축소하고 스크롤 영역을 수정했습니다. 모바일 배치 코스트 표시 크기를 줄였습니다.",
+    "before": "The enemy augmentation list has been reduced to fit inside the game information window and the scroll area has been modified. Reduced mobile deployment cost display size.",
+    "after": "The enemy Augment list has been reduced to fit inside the game information window and the scroll area has been modified. Reduced mobile deployment cost display size."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "게임 정보의 커스텀 설정·적 증강 탭 하단이 눌리지 않는 문제를 수정했습니다.",
+    "before": "Fixed an issue where the bottom of the Custom Settings/Enemy Augmentation tab in game information could not be clicked.",
+    "after": "Fixed an issue where the bottom of the Custom Settings/Enemy Augment tab in game information could not be clicked."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "커스텀 규칙에 증강 모드를 추가했습니다. 4·7·10라운드에 각자 세 가지 아군 증강 중 하나를 선택한 뒤 방장이 모든 적에게 적용할 증강을 선택합니다.",
+    "before": "Added augmented mode to custom rules. In rounds 4, 7, and 10, each player selects one of three ally augmentations, and then the leader selects the augmentation to apply to all enemies.",
+    "after": "Added augmented mode to custom rules. In rounds 4, 7, and 10, each player selects one of three ally Augments, and then the leader selects the Augment to apply to all enemies."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "아군·적 증강의 리롤 횟수를 따로 설정할 수 있으며 기본은 선택지당 1회입니다. 지나간 선택지는 후보가 소진될 때까지 다시 등장하지 않습니다.",
+    "before": "You can set the number of rerolls for ally and enemy reinforcement separately, and the default is 1 per option. Past options will not appear again until candidates are exhausted.",
+    "after": "You can set the number of rerolls for ally and enemy Augment separately, and the default is 1 per option. Past options will not appear again until candidates are exhausted."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "아군 증강은 효과 목록 왼쪽에 표시하고 적 증강은 게임 정보의 전용 탭에서 확인할 수 있습니다. 선택 내역을 판 기록에 저장합니다.",
+    "before": "Friendly reinforcements are displayed on the left of the effect list, and enemy reinforcements can be found in a dedicated tab in the game information. Saves your selections to your edition history.",
+    "after": "Friendly Augments are displayed on the left of the effect list, and enemy Augments can be found in a dedicated tab in the game information. Saves your selections to your edition history."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "배치 코스트 표시를 키워 오른쪽 아래에 배치하고 효과·증강 목록의 간격과 적 증강 정보의 크기를 정리했습니다.",
+    "before": "The deployment cost display has been enlarged and placed at the bottom right, and the spacing of the effect/augmentation list and the size of enemy augmentation information have been organized.",
+    "after": "The deployment cost display has been enlarged and placed at the bottom right, and the spacing of the effect/Augment list and the size of enemy Augment information have been organized."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "라이타니엔 밸런스 · 중첩 표시 · 진영 연동",
+    "before": "Laitanien Balance · Overlap Display · Faction Linkage",
+    "after": "Laitanien Balance · stacks Display · Faction Linkage"
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "밴 목록·전략 선택 단계의 채팅, 대기실 하단 배치와 번역 누락을 수정했습니다.",
+    "before": "Fixed chat, waiting room bottom placement, and missing translations in the van list/strategy selection stage.",
+    "after": "Fixed chat, waiting room bottom placement, and missing translations in the ban list/strategy selection stage."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "3명: 제국 드론·우르수스 오퍼레이터 공격력·HP +20%, 중첩당 +1%p.",
+    "before": "3 people: Imperial Drone·Ursus Operator Attack Power·HP +20%, +1%p per overlap.",
+    "after": "3 people: Imperial Drone·Ursus Operator Attack Power·HP +20%, +1%p per stacks."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "6명: 제국 드론 공격속도 +50%, 범위 내 은신 무효화. 배치된 우르수스 오퍼레이터 총 공격력의 5%를 기본 공격력으로 획득하며 중첩당 비율 +0.025%p.",
+    "before": "6 people: Imperial drone attack speed +50%, stealth within range is nullified. Acquires 5% of the total attack power of the deployed Ursus Operator as basic attack power, with a rate of +0.025%p per overlap.",
+    "after": "6 people: Imperial drone attack speed +50%, stealth within range is nullified. Acquires 5% of the total attack power of the deployed Ursus Operator as basic attack power, with a rate of +0.025%p per stacks."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "다른 증강이 없습니다.",
+    "before": "There are no other augmentations.",
+    "after": "There are no other Augments."
+  },
+  {
+    "file": "public/i18n/en/audit.json",
+    "source": "증강 보상을 보관 중입니다. 대기석의 빈 공간이 생기면 지급합니다.",
+    "before": "Augmentation rewards are being stored. Payment will be made when there is space in the waiting area.",
+    "after": "Augment rewards are being stored. Payment will be made when there is space in the waiting area."
+  }
+]

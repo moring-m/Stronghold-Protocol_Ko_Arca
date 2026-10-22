@@ -22,7 +22,7 @@ test('augment mode multiplies boss HP once per offered grade, starting at 100%; 
  m.augments.enemies=[{effect:{mods:{hpPct:.25}}}];assert.ok(Math.abs(m.augments.bossHpMultiplier()-3.825*1.25)<1e-12,'selected HP augments still have their own effect');
  const custom=match(t,'custom');custom.augments.history=['gold','gold','prism'];assert.equal(custom.customExtensions.ruleValues.bossHp,250);assert.equal(custom.augments.bossHpMultiplier(),1);
 });
-test('breakthrough is immediate and uncapped; duplicate cumulative reports and final result do not charge twice',t=>{
+test('breakthrough is immediate; duplicate cumulative reports and final result do not charge twice',t=>{
  const m=match(t),ps=m.players.get('p1');ps.lp=20;m.augments.enemies=[{effect:{kind:'leak',amount:1}}];
  const f={kind:'normal',players:['p1']};for(let n=1;n<=5;n++){m.augments.creditLeaks(f,{p1:n});assert.equal(ps.lp,20-n);}
  m.augments.creditLeaks(f,{p1:5});m.augments.creditLeaks(f,{p1:3});assert.equal(ps.lp,15);
@@ -71,7 +71,7 @@ test('shared breakthrough can exceed the leaking player’s displayed share and 
  const f1={kind:'normal',players:['p1']},f2={kind:'normal',players:['p2']};
  m.augments.creditLeaks(f1,{p1:10});assert.equal(m.teamLp,30);assert.equal(p1.lp+p2.lp,30);assert.equal(p1.stats.lpLost,10);
  m.augments.creditLeaks(f2,{p2:2});assert.equal(m.teamLp,28);assert.equal(p1.lp+p2.lp,28);assert.equal(p2.stats.lpLost,2);
- m.augments.creditLeaks(f1,{p1:10});assert.equal(m.teamLp,28);
+ m.augments.creditLeaks(f1,{p1:20});assert.equal(m.teamLp,28,'shared HP also respects the per-player round cap');
 });
 
 test('augment mode defaults to ordinary enemy voting; custom cumulative HP uses the same base and grade factors',t=>{
@@ -95,4 +95,29 @@ test('custom cumulative ATK DEF and RES can be enabled separately without losing
   const state=m.augments.battleState();assert.equal(state.enemyAtkMultiplier,stat==='enemyAtk'?1.16:1);assert.equal(state.enemyDefMultiplier,stat==='enemyDef'?1.16:1);assert.equal(state.enemyResBonus,stat==='enemyRes'?8:0);
   assert.equal(m.customExtensions.ruleValues[stat],{enemyAtk:177,enemyDef:188,enemyRes:155}[stat]);assert.equal(m.gd.config.customRules[stat],100);
  }
+});
+
+test('approved surrender charges only unpaid remaining leaks against shared HP and never repeats in unite',t=>{
+ const m=match(t,'custom'),ps=m.players.get('p1');
+ m.gd.config.customRules.sharedHp=true;m.teamLp=40;ps.lp=40;ps.lpAtFinal=40;
+ m.augments.enemies=[{effect:{kind:'leak',amount:1}}];
+ const field={kind:'normal',players:['p1']};
+ m.augments.creditLeaks(field,{p1:2});assert.equal(m.teamLp,38);
+ field.result={perPlayer:{p1:{leaked:[{entered:true},{entered:true},{entered:false},{spawned:false}]}}};
+ m.augments.creditResult(field);assert.equal(m.teamLp,38,'natural timeout does not charge enemies that never entered');
+ field.endRequested=true;m.augments.creditResult(field);assert.equal(m.teamLp,36);assert.equal(ps.lp,36);
+ m.augments.creditResult(field);assert.equal(m.teamLp,36,'previous goal entries and repeated results are deduplicated');
+ m.augments.creditResult({...field,kind:'unite',augmentLeaksBy:{}});assert.equal(m.teamLp,36,'unite surrender has no extra breakthrough loss');
+});
+
+
+test('breakthrough caps each player at ten per round across progress and surrender; next round resets',t=>{
+ const m=match(t),ps=m.players.get('p1');ps.lp=50;
+ m.augments.enemies=[{effect:{kind:'leak',amount:1}}];
+ const f={kind:'normal',players:['p1']};
+ m.augments.creditLeaks(f,{p1:7});assert.equal(ps.lp,43);
+ f.endRequested=true;f.result={perPlayer:{p1:{leaked:Array.from({length:25},()=>({spawned:false}))}}};
+ m.augments.creditResult(f);assert.equal(ps.lp,40);
+ m.augments.creditLeaks(f,{p1:30});m.augments.creditResult(f);assert.equal(ps.lp,40);
+ m.augments.creditLeaks({kind:'normal',players:['p1']},{p1:15});assert.equal(ps.lp,30,'new field has a fresh round allowance');
 });

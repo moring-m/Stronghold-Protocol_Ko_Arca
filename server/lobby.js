@@ -167,7 +167,7 @@ import { modeExtensionSelection, customExtensionCatalog, extensionSelectionShape
 //     a player seat (the seat is kept and given back on resume).
 
 import { randomBytes, randomInt } from 'node:crypto';
-import { ERR, MAX_SEATS, roomSeatCap, MAX_SPECTATORS, isSpectatorCap, ROOM_CODE_LEN, modeIdFor, DIFFICULTIES } from '../shared/constants.js';
+import { ERR, MAX_SEATS, roomSeatCap, MAX_SPECTATORS, MAX_SPECTATOR_SEATS, ROOM_CODE_LEN, modeIdFor, DIFFICULTIES } from '../shared/constants.js';
 import { normalizeChatText, chatFaction, CHAT_COOLDOWN_MS, CHAT_HISTORY_LIMIT } from '../shared/chat.js';
 import { checkLoadout, checkLoadoutOps, cultivationCharIds, checkNotOwned, checkDiyPicks, charPotentialChanges,checkSkinSelection,operatorCharIds } from '../shared/protocol.js';
 import { handleRestart, cancelVote, sendVotes, voteFrame } from './restartVote.js';
@@ -686,7 +686,7 @@ export class Lobby {
     switch (msg.t) {
       case 'g.chat': case 'g.chatFaction': return this.chat(session, msg);
       case 'room.list': return this.listPublicRooms();
-      case 'room.publish': return this.publishRoom(session);
+      case 'room.publish': return this.publishRoom(session,msg);
       case 'room.setTitle': return this.setRoomTitle(session,msg);
       case 'room.inspect': return this.inspectRoom(session,msg);
       case 'room.create': return this.create(session, msg);
@@ -784,7 +784,10 @@ export class Lobby {
   // room.* handlers
   // ---------------------------------------------------------------------------------------------------
 
-  create(session, { mode, difficulty, spectators, customExtensions, test, gameplayMode, title } = {}) {
+  create(session, { mode, difficulty, spectators, customExtensions, test, gameplayMode, title, titleLocale, isPublic } = {}) {
+    if(titleLocale!==undefined&&!['ko','en','ja','zh'].includes(titleLocale))return fail(ERR.BAD_MSG);
+    if(isPublic!==undefined&&typeof isPublic!=='boolean')return fail(ERR.BAD_MSG);
+    if(isPublic&&mode==='solo')return fail(ERR.BAD_MSG);
     if(title!==undefined&&!isRoomTitle(title))return fail(ERR.BAD_MSG);
     if(gameplayMode!==undefined&&!isGameplayMode(gameplayMode))return fail(ERR.BAD_MSG);
     if(this.draining)return fail(ERR.INTERNAL,'업데이트가 적용되었습니다. 메인화면을 새로고침한 뒤 새 방을 만들어주세요.');
@@ -806,15 +809,15 @@ export class Lobby {
     const minimumErrors=validateExtensionMinimums(this.safeData(),initialSelection,{mode,difficulty});
     if(minimumErrors.length)return fail(ERR.BAD_MSG,minimumErrors.join(' '));
     if (cur) this.removeMember(cur, session.playerId);
-    // The host's spectator cap (room.create {spectators}, optional): solo rooms never seat spectators, so only a co-op
-    // room keeps the choice — an absent / non-integer value falls back to the default MAX_SPECTATORS.
-    const cap = mode === 'solo' ? 0 : (isSpectatorCap(spectators) ? spectators : MAX_SPECTATORS);
+    // Cooperative rooms always offer eight spectator seats; the legacy request field cannot disable them.
+    // Solo rooms retain their existing single-player behavior.
+    const cap = mode === 'solo' ? 0 : MAX_SPECTATOR_SEATS;
     const room = new Room(code, mode, difficulty, this.now(), cap);
     if(test===true&&!this.testEnabled)return fail(ERR.TEST_DISABLED);
     room.test=test===true;
     room.customExtensionCatalog = customExtensionCatalog(this.safeData());
     room.gameplayMode=normalizeGameplayMode(gameplayMode);
-    room.title=title?.trim()||defaultRoomTitle(mode,session.name);
+    room.titleLocale=titleLocale||'ko';room.title=title?.trim()||defaultRoomTitle(mode,session.name,room.titleLocale);room.isPublic=isPublic===true;
     room.savedCustomExtensions=modeExtensionSelection(normalizeCustomExtensions(customExtensions,this.safeData()),mode);
     room.customExtensions = initialSelection;
     room.customFactions = room.customExtensions.bonds.includes('ursus') && !(room.customExtensions.disabledBonds||[]).includes('ursusShip');
@@ -960,7 +963,8 @@ export class Lobby {
   }
 
   listPublicRooms() {
-    return { rooms: [...this.rooms.values()].filter(r=>r.isPublic&&r.mode!=='solo').slice(0,200).map(r=>({
+    const all=[...this.rooms.values()];
+    return { counts:{total:all.length,joinable:all.filter(r=>r.isPublic&&!r.match&&r.seats.filter(Boolean).length<r.seats.length).length},rooms: [...this.rooms.values()].filter(r=>r.isPublic&&r.mode!=='solo').slice(0,200).map(r=>({
       code:r.code,title:r.title||defaultRoomTitle(r.mode),mode:r.mode,difficulty:r.difficulty,gameplayMode:r.gameplayMode,
       hostName:r.seats.find(s=>s?.playerId===r.hostId)?.name||'방장',
       players:r.seats.filter(s=>s&&!s.isBot&&!s.left).length,
@@ -971,20 +975,21 @@ export class Lobby {
 
   setRoomTitle(session,{title}) {
     const room=this.roomOf(session);if(!room)return fail(ERR.NOT_IN_ROOM);if(room.hostId!==session.playerId)return fail(ERR.NOT_HOST);if(room.match)return fail(ERR.ROOM_STARTED);if(!isRoomTitle(title))return fail(ERR.BAD_MSG);
-    room.title=title.trim()||defaultRoomTitle(room.mode,session.name);this.broadcastState(room);return OK;
+    room.title=title.trim()||defaultRoomTitle(room.mode,session.name,room.titleLocale);this.broadcastState(room);return OK;
   }
   inspectRoom(session,{code}) {
     const room=this.rooms.get(code.toUpperCase());if(!room?.isPublic||room.mode==='solo')return fail(ERR.ROOM_NOT_FOUND);
     return {room:{code:room.code,title:room.title,mode:room.mode,difficulty:room.difficulty,gameplayMode:room.gameplayMode,customExtensions:structuredClone(room.customExtensions)}};
   }
-  publishRoom(session) {
+  publishRoom(session,{isPublic=true}={}) {
+    if(typeof isPublic!=='boolean')return fail(ERR.BAD_MSG);
     const room=this.roomOf(session);
     if(!room)return fail(ERR.NOT_IN_ROOM);
     if(room.hostId!==session.playerId)return fail(ERR.NOT_HOST);
     if(room.match)return fail(ERR.ROOM_STARTED);
     if(room.mode==='solo')return fail(ERR.BAD_MSG,'단독 방은 공개할 수 없습니다.');
 
-    room.isPublic=true;
+    room.isPublic=isPublic;
     this.broadcastState(room);
     return OK;
   }

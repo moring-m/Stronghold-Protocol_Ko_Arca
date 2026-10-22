@@ -10,7 +10,7 @@ function translate(s,code){
  if(x){const n=x[2]||'1',bond=s.includes('[맹약]');return c(`Gain ${n} random Tier ${x[1]} ${bond?'[Bond] ':''}Operator(s)`,`ランダムな${bond?'[盟約]':''}ランク${x[1]}オペレーターを${n}名獲得`,`获得${n}名随机${x[1]}阶${bond?'[盟约]':''}干员`);}
  x=s.match(/^무료 새로고침 (\d+)개 획득$/);if(x)return c(`Gain ${x[1]} free rerolls`,`無料リロールを${x[1]}回獲得`,`获得${x[1]}次免费刷新`);
  x=s.match(/^모든 적 유닛의 (이동속도|공격력) -(\d+)% \(자신의 전투에만 적용, 연합방어와 보스전에는 적용되지 않음\)$/);if(x){const stat=x[1]==='공격력';return c(`All enemies: ${stat?'ATK':'Movement Speed'} -${x[2]}% (your own battles only; excludes Unite Phase and boss battles)`,`全敵ユニットの${stat?'攻撃力':'移動速度'}-${x[2]}%（自身の通常戦闘のみ。共同防衛・ボス戦には適用しない）`,`所有敌方单位${stat?'攻击力':'移动速度'}-${x[2]}%（仅限自己的普通战斗，不适用于联合防御和首领战）`);}
- x=s.match(/^활성화된 모든 핵심 맹약 중첩 \+(\d+), 보조 맹약 중첩 \+(\d+)$/);if(x)return c(`All active primary Bonds: +${x[1]} stacks; secondary Bonds: +${x[2]} stacks`,`発動中の全ての主盟約スタック+${x[1]}、補助盟約スタック+${x[2]}`,`所有已激活的核心盟约层数+${x[1]}，辅助盟约层数+${x[2]}`);
+ x=s.match(/^활성화된 모든 핵심 맹약 중첩 \+(\d+), 부가 맹약 중첩 \+(\d+)$/);if(x)return c(`All active primary Bonds: +${x[1]} stacks; secondary Bonds: +${x[2]} stacks`,`発動中の全ての主盟約スタック+${x[1]}、補助盟約スタック+${x[2]}`,`所有已激活的核心盟约层数+${x[1]}，辅助盟约层数+${x[2]}`);
  x=s.match(/^오퍼레이터가 공격할 때마다 HP (\d+) 회복$/);if(x)return c(`Operators recover ${x[1]} HP each time they attack`,`オペレーターが攻撃するたびHP${x[1]}回復`,`干员每次攻击回复${x[1]}点生命`);
  x=s.match(/^라운드마다 추가로 자금 (\d+) 획득$/);if(x)return c(`Gain ${x[1]} extra funds each round`,`毎ラウンド資金を追加で${x[1]}獲得`,`每回合额外获得${x[1]}资金`);
  x=s.match(/^오퍼레이터가 스킬 사용 시 (\d+)초간 공격력 \+(\d+)%$/);if(x)return c(`When an Operator uses a skill, gain +${x[2]}% ATK for ${x[1]} seconds`,`オペレーターがスキル使用時、${x[1]}秒間攻撃力+${x[2]}%`,`干员使用技能时，攻击力+${x[2]}%，持续${x[1]}秒`);

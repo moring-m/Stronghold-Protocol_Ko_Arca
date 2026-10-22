@@ -86,12 +86,16 @@ export class AugmentMode {
    const n=Math.min(100000,raw),delta=Math.max(0,n-(paid[id]||0));if(!delta)continue;
    paid[id]=n;
    const shared=this.m.gd.config.customRules?.sharedHp&&this.m.teamLp!=null;
-   const loss=Math.min(Math.max(0,shared?this.m.teamLp:ps.lp),delta*cost);
+   const losses=field.augmentHpLostBy||(field.augmentHpLostBy={});
+   const loss=Math.min(Math.max(0,shared?this.m.teamLp:ps.lp),Math.max(0,10-(losses[id]||0)),delta*cost);
+   losses[id]=(losses[id]||0)+loss;
    if(shared){this.m.teamLp-=loss;this.m._syncTeamLp();}else ps.lp-=loss;
    ps.stats.lpLost+=loss;ps.dirty();this.m.markPublic();
   }
  }
- creditResult(field){if(field.result&&!field.result.synthetic)this.creditLeaks(field,Object.fromEntries(Object.entries(field.result.perPlayer||{}).map(([id,p])=>[id,(p.leaked||[]).filter(l=>l.entered===true).length])));}
+ // Only the server-approved surrender flag converts remaining enemies into breakthrough leaks.
+ // Cumulative creditLeaks accounting also covers entries already charged during the fight.
+ creditResult(field,result=field.result){if(result&&!result.synthetic)this.creditLeaks(field,Object.fromEntries(Object.entries(result.perPlayer||{}).map(([id,p])=>[id,(p.leaked||[]).filter(l=>field.endRequested||l.entered===true).length])));}
 
  bossHpMultiplier(){return (this.m.gameplayMode==='augment'||this.enabled&&this.settings.bossHpByAugment===1?augmentBossHpMultiplier(this.history):1)*(1+this.enemies.reduce((n,a)=>n+(a.effect.mods?.hpPct||0),0));}
  publicView(){if(!this.enabled)return null;const s=this.current;return {leakHpCost:this.leakHpCost(),selectedEnemies:this.enemies.map(augmentView),selectedAllies:Object.fromEntries([...this.allies].map(([id,c])=>[id,c.map(augmentView)])),history:this.history.slice(),selection:s?{id:s.id,round:s.round,grade:s.grade,side:s.side,settling:s.settling,settleDeadline:s.settling?this.m.deadline:0,rerollLimit:s.side==='ally'?this.settings.augmentAllyRerolls:this.settings.augmentEnemyRerolls,vote:this.voting(),weightedVote:this.voting()&&this.settings.augmentEnemyVote===2,voteResultIdx:s.voteResultIdx??null,votes:this.voting()?Object.fromEntries(s.votes):null,rerollsLeft:s.rerollsLeft,hostId:this.host(),picked:Object.fromEntries([...s.slots].map(([id,slot])=>[id,slot.picked!=null])),bossPicked:s.boss?.picked!=null,bossPickedIdx:s.boss?.picked,cards:s.side==='enemy'?s.boss.cards.map(c=>c?augmentView(c):null):null,rerolls:s.side==='enemy'?s.boss.rerolls.slice():null}:null};}

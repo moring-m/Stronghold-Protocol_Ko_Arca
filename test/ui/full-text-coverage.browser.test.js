@@ -53,6 +53,10 @@ test('actual translator renders every bounty description and all release notes w
    await page.evaluateOnNewDocument(code=>{localStorage.setItem('sp.pref.lang',JSON.stringify(code));localStorage.setItem('sp.resources.downloadConsent','1');localStorage.setItem('sp.patchNotes.seenVersion','0.3.1e');},lang);
    await page.setRequestInterception(true);page.on('request',r=>new URL(r.url()).hostname!=='127.0.0.1'||r.url().endsWith('resource-worker.js')?r.abort():r.continue());
    await page.goto(srv.url,{waitUntil:'domcontentloaded'});await page.waitForFunction(()=>!!window.__SP__);
+   if(['en','ja'].includes(lang)){
+    const mismatches=await page.evaluate(async code=>{const{tr}=await import('/js/i18n/i18n.js');const[official,korean]=await Promise.all([fetch(`/i18n/${code}/data.json`).then(r=>r.json()),fetch('/i18n/ko/compiled.json').then(r=>r.json())]);const aliases=new Map();for(const[source,value]of Object.entries(official.names||{})){const alias=korean.messages?.[source];if(!alias)continue;if(!aliases.has(alias))aliases.set(alias,new Set());aliases.get(alias).add(value);}return [...aliases].filter(([alias,values])=>values.size===1&&tr(alias)!==[...values][0]).map(([alias,values])=>({alias,expected:[...values][0],actual:tr(alias)}));},lang);
+    assert.deepEqual(mismatches,[],`${lang} official Korean aliases override machine translations`);
+   }
    const sources=lang==='ko'?bounties:[...bounties,...notes,...augments];
    const rendered=await page.evaluate(async sources=>{const {tr}=await import('/js/i18n/i18n.js');return sources.map(s=>tr(s));},sources);
    const bad=rendered.flatMap((text,i)=>((lang==='ko'||lang==='en')?/[一-鿿]/.test(visible(text)):/[가-힣]/.test(text))?[{source:sources[i],text}]:[]);

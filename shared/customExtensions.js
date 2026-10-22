@@ -44,7 +44,7 @@ export const EXTENSION_CATEGORIES = Object.freeze([
   {id:'rules',name:'게임 규칙'}, {id:'augmentSettings',name:'증강 설정'}, {id:'commonBands',name:'공통 적용 전략'}, {id:'allies',name:'아군 스펙 조정'}, {id:'enemyStats',name:'일반 적 스펙 조정'}, {id:'bossStats',name:'보스 스펙 조정'},
   { id: 'bonds', name: '맹약 추가' }, { id: 'stages', name: '전장 추가' },
   {id:'forcedBonds',name:'맹약 금지'}, {id:'protectedBonds',name:'맹약 밴 제외'},
-  {id:'forcedAuxBonds',name:'보조맹약 금지'}, {id:'protectedAuxBonds',name:'보조맹약 밴 제외'},
+  {id:'forcedAuxBonds',name:'부가 맹약 금지'}, {id:'protectedAuxBonds',name:'부가 맹약 밴 제외'},
   {id:'bannedOperators',name:'오퍼레이터 밴'}, {id:'disabledBonds',name:'맹약 비활성화'}, {id:'disabledStages',name:'맵 비활성화'},
   {id:'disabledBosses',name:'보스 비활성화'}, {id:'disabledBands',name:'전략 비활성화'},
 ]);
@@ -137,8 +137,8 @@ export function validateExtensionMinimums(raw,selection,{mode='coop',difficulty=
   const eligibleCore=new Set(allowed.filter(([,b])=>b.isCore).map(([id])=>id));
   const aux=new Set(allowed.filter(([,b])=>!b.isCore).map(([id])=>id));
   const forcedAux=selection.forcedAuxBonds||[],protectedAux=selection.protectedAuxBonds||[];
-  if(forcedAux.some(id=>protectedAux.includes(id)))errors.push('같은 보조맹약에 항상 밴과 밴 제외를 함께 설정할 수 없습니다.');
-  if([...forcedAux,...protectedAux].some(id=>!aux.has(id)))errors.push('보조맹약 밴 설정은 활성화된 보조맹약에만 적용할 수 있습니다.');
+  if(forcedAux.some(id=>protectedAux.includes(id)))errors.push('같은 부가 맹약에 항상 밴과 밴 제외를 함께 설정할 수 없습니다.');
+  if([...forcedAux,...protectedAux].some(id=>!aux.has(id)))errors.push('부가 맹약 밴 설정은 활성화된 부가 맹약에만 적용할 수 있습니다.');
   if(forced.some(id=>protectedIds.includes(id)))errors.push('같은 맹약에 항상 밴과 밴 제외를 함께 설정할 수 없습니다.');
   if([...forced,...protectedIds].some(id=>!eligibleCore.has(id)))errors.push('밴 설정은 해당 난이도에서 활성화된 핵심 맹약에만 적용할 수 있습니다.');
   if(eligibleCore.size-forced.filter(id=>eligibleCore.has(id)).length<5)errors.push('항상 밴 적용 후 핵심 맹약을 최소 5개 남겨야 합니다.');

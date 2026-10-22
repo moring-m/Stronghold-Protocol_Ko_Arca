@@ -32,3 +32,6 @@ await mkdir('docs/languages-2026-10-21',{recursive:true});
 await writeFile('.cache/translation-coverage.json',JSON.stringify(report,null,2)+'\n');
 console.log(JSON.stringify({total:report.total,languages:report.languages,unresolved:report.unresolved.length},null,2));
 if(process.argv.includes('--check')&&report.unresolved.length)process.exitCode=1;
+
+// Curate game terminology after supplements so later regeneration cannot restore inconsistent machine terms.
+await import('./curate-terminology.mjs');

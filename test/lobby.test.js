@@ -835,47 +835,20 @@ describe('websocket lobby', () => {
     await expectError(s4, { t: 'room.spectate', code: loneSt.code }, ERR.ROOM_NOT_FOUND);
   });
 
-  // the host's own spectator cap (room.create {spectators}, community report #26 follow-up)
-  test('room.create {spectators}: the host picks the room cap (1…MAX_SPECTATOR_SEATS), 0 turns spectating off', async () => {
-    // 1) a co-op room with cap 1: one spectator fits, the second is refused
-    const host = await pool.player('CapHost');
-    const r1 = await host.request({ t: 'room.create', mode: 'coop', difficulty: 'NORMAL', spectators: 1 });
-    assert.equal(r1.t, 'ok', JSON.stringify(r1));
-    const st1 = await host.waitFor('room.state', (s) => s.spectatorCap === 1);
-    assert.equal(st1.spectators.length, 0);
-    const w1 = await pool.player('CapW1');
-    await expectOk(w1, { t: 'room.spectate', code: st1.code });
-    await host.waitFor('room.state', (s) => s.spectators.length === 1);
-    const w2 = await pool.player('CapW2');
-    await expectError(w2, { t: 'room.spectate', code: st1.code }, ERR.ROOM_FULL);
-    // 2) cap 0 = the room takes no spectator at all
-    const hostOff = await pool.player('CapHostOff');
-    const r2 = await hostOff.request({ t: 'room.create', mode: 'coop', difficulty: 'NORMAL', spectators: 0 });
-    assert.equal(r2.t, 'ok', JSON.stringify(r2));
-    const stOff = await hostOff.waitFor('room.state', (s) => s.spectatorCap === 0);
-    const noSeat = await pool.player('CapNoSeat');
-    await expectError(noSeat, { t: 'room.spectate', code: stOff.code }, ERR.ROOM_FULL);
-    // 3) out of range is a protocol error, not a silent clamp
-    await expectError(hostOff, { t: 'room.create', mode: 'coop', difficulty: 'NORMAL', spectators: MAX_SPECTATOR_SEATS + 1 }, ERR.BAD_MSG);
-    await expectError(hostOff, { t: 'room.create', mode: 'coop', difficulty: 'NORMAL', spectators: -1 }, ERR.BAD_MSG);
-    // 4) the ceiling the protocol accepts
-    const hostMax = await pool.player('CapHostMax');
-    const r3 = await hostMax.request({ t: 'room.create', mode: 'coop', difficulty: 'NORMAL', spectators: MAX_SPECTATOR_SEATS });
-    assert.equal(r3.t, 'ok', JSON.stringify(r3));
-    const stMax = await hostMax.waitFor('room.state', (s) => s.spectatorCap === MAX_SPECTATOR_SEATS);
-    for (let i = 0; i < MAX_SPECTATOR_SEATS; i++) {
-      const w = await pool.player(`CapMany${i}`);
-      await expectOk(w, { t: 'room.spectate', code: stMax.code });
+  test('cooperative rooms always allow eight spectators even when legacy requests ask to disable them', async () => {
+    for(const requested of [0,1,MAX_SPECTATOR_SEATS]){
+      const host=await pool.player(`PubHost${requested}`);
+      await expectOk(host,{t:'room.create',mode:'coop',difficulty:'NORMAL',spectators:requested});
+      const st=await host.waitFor('room.state',s=>s.spectatorCap===MAX_SPECTATOR_SEATS);
+      const watcher=await pool.player(`PubWatch${requested}`);
+      await expectOk(watcher,{t:'room.spectate',code:st.code});
+      await host.waitFor('room.state',s=>s.spectators.length===1);
+      await expectError(host,{t:'room.create',mode:'coop',difficulty:'NORMAL',spectators:MAX_SPECTATOR_SEATS+1},ERR.BAD_MSG);
     }
-    await hostMax.waitFor('room.state', (s) => s.spectators.length === MAX_SPECTATOR_SEATS);
-    const overflow = await pool.player('CapOverflow');
-    await expectError(overflow, { t: 'room.spectate', code: stMax.code }, ERR.ROOM_FULL);
-    // 5) solo rooms never seat spectators
-    const soloHost = await pool.player('CapSolo');
-    const soloSt = await createRoom(soloHost, 'solo', 'FUNNY');
-    assert.equal(soloSt.spectatorCap, 0);
-    const soloWatch = await pool.player('CapSoloWatch');
-    await expectError(soloWatch, { t: 'room.spectate', code: soloSt.code }, ERR.ROOM_FULL);
+    const host=await pool.player('EightHost');const st=await createRoom(host,'coop','NORMAL');
+    for(let i=0;i<MAX_SPECTATOR_SEATS;i++){const watcher=await pool.player(`Eight${i}`);await expectOk(watcher,{t:'room.spectate',code:st.code});}
+    const overflow=await pool.player('Overflow');await expectError(overflow,{t:'room.spectate',code:st.code},ERR.ROOM_FULL);
+    const solo=await pool.player('SoloWatcher'),soloState=await createRoom(solo,'solo','FUNNY');assert.equal(soloState.spectatorCap,0);
   });
 
   // a full roster with a free spectator seat: room.join answers ROOM_FULL, which is what makes the client

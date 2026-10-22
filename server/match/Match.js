@@ -1427,8 +1427,12 @@ if (this.test === true) {
     votes.add(ps.playerId); this.markPublic();
     if (!required.every(p=>votes.has(p.playerId))) return OK;
     if (boss) { if(this.clientCombat)this._endFinal('forced');else this.runner?.forceAll('forced'); return OK; }
-    if (!this.clientCombat) { f.battle?.forceEnd('surrender'); return OK; }
     f.endRequested=true;
+    if (!this.clientCombat) {
+      f.battle?.forceEnd('surrender');
+      if (f.battle?.finished) this.augments.creditResult(f, f.battle.result());
+      return OK;
+    }
     // Reconstruct only the elapsed fight on the authority; never grant future kills.
     const elapsed = Math.max(.01,this._fieldElapsed(f));
     const battle = this._specBattle(f.spec);

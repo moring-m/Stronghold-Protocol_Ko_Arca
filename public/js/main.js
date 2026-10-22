@@ -83,6 +83,22 @@ const JOIN_DELAY_MS = 350;
 const TICKER_KEEP = 20;
 const EMOTE_KEEP = 20;
 
+// Keep reload routing on this release only while participating in a room (including spectating).
+const rememberRoomRelease = room => {
+  if (!globalThis.__SP_RELEASE) return;
+  try {
+    if (room) sessionStorage.setItem('sp.roomRelease', globalThis.__SP_RELEASE);
+    else sessionStorage.removeItem('sp.roomRelease');
+  } catch {}
+};
+store.subscribe((state, previous) => {
+  if (state.room !== previous.room) rememberRoomRelease(state.room);
+});
+addEventListener('beforeunload', () => {
+  const state = store.get();
+  if (!state.ui.restoring) rememberRoomRelease(state.room);
+});
+
 const SCREENS = { laboratory: LaboratoryScreen, title: TitleScreen, lobby: LobbyScreen, room: RoomScreen, game: GameScreen };
 
 /** Copy of a server message without transport fields. */

@@ -333,10 +333,10 @@ export async function startGateway({
         json(res, 503, { error: "No release is available" });
         return;
       }
-      // Tab-local version selection preserves reloads without a release in the visible URL.
+      // Only tabs in a room resume their release; lobby reloads select the latest.
       // Room invites explicitly choose their owner; a retired version falls back to current.
       const available=Object.keys(state.releases).filter(id=>!expired(id)),invited=/^[A-Z]{4}$/.test(code);
-      const html=`<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>위수 프로토콜</title><style>html,body{margin:0;background:#0c0f0e;color-scheme:dark}</style><script>(()=>{const releases=${JSON.stringify(available)},current=${JSON.stringify(id)},invited=${invited};let remembered;try{remembered=sessionStorage.getItem('sp.activeRelease');}catch{}const navigation=performance.getEntriesByType('navigation')[0]?.type,resuming=navigation==='reload'||navigation==='back_forward';const release=!invited&&resuming&&releases.includes(remembered)?remembered:current;const url=new URL(location.href);url.pathname='/r/'+release+'/';url.searchParams.delete('release');location.replace(url.pathname+url.search+url.hash);})();</script></head><body></body></html>`;
+      const html=`<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>위수 프로토콜</title><style>html,body{margin:0;background:#0c0f0e;color-scheme:dark}</style><script>(()=>{const releases=${JSON.stringify(available)},current=${JSON.stringify(id)},invited=${invited};let remembered,inRoom=false;try{remembered=sessionStorage.getItem('sp.activeRelease');inRoom=sessionStorage.getItem('sp.roomRelease')===remembered;}catch{}const navigation=performance.getEntriesByType('navigation')[0]?.type,resuming=navigation==='reload'||navigation==='back_forward';const release=!invited&&resuming&&inRoom&&releases.includes(remembered)?remembered:current;const url=new URL(location.href);url.pathname='/r/'+release+'/';url.searchParams.delete('release');location.replace(url.pathname+url.search+url.hash);})();</script></head><body></body></html>`;
       res.writeHead(200,{'content-type':'text/html; charset=utf-8','cache-control':'no-store'});
       res.end(req.method==='HEAD'?undefined:html);
       return;
