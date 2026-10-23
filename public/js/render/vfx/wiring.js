@@ -42,6 +42,7 @@ import { bombardAnchor } from './bombardAnchor.js';
 
 import { spawnPoint, mountPoint, unitPoint, spawnKind, mountKind, spawnRotation, mountRotation, graphicRotation } from './mounts.js';
 import { projectileParts, paracurve, arcHeight, wobble } from './flight.js';
+import { costumeFor, costumeEffect, costumeProjectile, costumePreloadKeys } from './costumes.js';
 import { GROUND_SPAWNS } from './effect.js';
 import { SkillFx, fitsAttack, pickGroup, formMode } from './skillfx.js';
 import { TalentFx } from './talentfx.js';
@@ -256,6 +257,9 @@ export class FxWiring {
     this.ofx = ofx;
     this.opts = opts;
     this.idx = null;
+    this.costumeUnits = new WeakMap();
+    this.costumeShots = new WeakMap();
+    this.projectileKeys = new WeakMap();
     this.bombardAims = new Map();
     this.flights = new Set();     // projectile flights in the air
     this.walls = new Set();       // skill-held Yu S3 controller handles
@@ -286,7 +290,10 @@ export class FxWiring {
 
   /** index.json, once. */
   async ready() {
-    if (!this.idx) this.idx = await this.ofx.lib.index();
+    if (!this.idx) {
+      this.idx = await this.ofx.lib.index();
+      for (const [key,shot] of Object.entries(this.idx?.projectiles || {})) if (shot && typeof shot === 'object') this.projectileKeys.set(shot,key);
+    }
     return !!this.idx;
   }
 
@@ -320,8 +327,26 @@ export class FxWiring {
 
   /** The index unit of a view (by its info), cached per battle id. */
   unitOf(v) {
-    const k = this.unitKeyOf(v);
-    return k ? this.idx.units[k] : null;
+    const k = this.unitKeyOf(v), unit = k ? this.idx.units[k] : null;
+    const costume = costumeFor(this.idx,v,k);
+    if (!unit || !costume?.mount || !this.idx.skins?.[costume.mount]) return unit;
+    let cache = this.costumeUnits.get(unit);
+    if (!cache) { cache = new Map(); this.costumeUnits.set(unit,cache); }
+    if (!cache.has(costume)) cache.set(costume,{...unit,skin:costume.mount});
+    return cache.get(costume);
+  }
+
+  costumeOf(view) { return costumeFor(this.idx,view,this.unitKeyOf(view)); }
+  effectKey(key,view) { return costumeEffect(this.idx,this.costumeOf(view),key); }
+  projectileOf(projectile,view) {
+    const costume=this.costumeOf(view);
+    if (!costume || !projectile) return projectile;
+    let cache=this.costumeShots.get(projectile);
+    if (!cache) { cache=new Map();this.costumeShots.set(projectile,cache); }
+    let key=this.projectileKeys.get(projectile);
+    if (!key) { key=Object.keys(this.idx.projectiles || {}).find(k=>this.idx.projectiles[k]===projectile); if (key) this.projectileKeys.set(projectile,key); }
+    if (!cache.has(costume)) cache.set(costume,costumeProjectile(this.idx,costume,projectile,key));
+    return cache.get(costume);
   }
 
   /** A battle view by id (opts.view), or null. */
@@ -362,6 +387,7 @@ export class FxWiring {
 
   /** The battle's units' effect keys (for preloading; `generic` false: the units' own only). */
   keysFor(views, generic = true) {
+    views = Array.isArray(views) ? views : [...views];
     const keys = new Set();
     const g = generic ? this.idx?.generic : null;
     if (g) {
@@ -405,6 +431,7 @@ export class FxWiring {
     for (const k of this.skills.keys(views)) keys.add(k);
     for (const k of this.talents.keys(views)) keys.add(k);
     for (const k of this.funnels.keys(views)) keys.add(k);   // the 驭械术士's floating units (render/vfx/funnelfx.js)
+    for (const view of views) for (const key of costumePreloadKeys(this.idx,this.costumeOf(view))) keys.add(key);
     return [...keys].map(lc).filter((k) => k && this.ofx.lib.has(k));
   }
 
@@ -543,7 +570,7 @@ export class FxWiring {
    */
   playOn(key, v, o = {}) {
     if (v?.prep) return null;
-    let k = lc(key);
+    let k = this.effectKey(key,o.flipFrom || v);
     if (!k || !this.ofx.lib.has(k)) return null;
     if (k === YU_WALL_SOURCE) {
       const wall = new YuWall(this, v);
@@ -974,7 +1001,7 @@ export class FxWiring {
       this.skills.released(src, tgt, kind, time);
       if (grouped) { rec.hits = []; rec.window = (fo.dur || this._flightTime(src, tgt, kind)) + ARRIVAL_WINDOW; this.melee.set(tid, rec); }
       // a chain lightning's shot: its bounces (the sim's 'chain' / 'chainHeal' events) draw its line from here (chain())
-      const line = projectileParts(proj).chain;
+      const line = projectileParts(this.projectileOf(proj,src)).chain;
       if (line && tid != null) this.chains.set(tid, { proj, rows: fo.hits, src, line, at: this.ofx.time + hitAt, until: this.ofx.time + hitAt + CHAIN_WINDOW });
       return true;
     }
@@ -1091,6 +1118,8 @@ export class FxWiring {
    * time of its own (a shot flown for show, R16). Returns the battle seconds until the hit.
    */
   _fly(proj, src, tgt, kind, time, o = {}) {
+    proj = this.projectileOf(proj,src);
+    if (Number.isInteger(proj.costumeMount) && !Number.isInteger(o.mount)) o={...o,mount:proj.costumeMount};
     const su = this.unitOf(src), tu = this.unitOf(tgt);
     const sSkin = this.skinOf(su), tSkin = this.skinOf(tu);
     // the start: the mount point as the attack clip poses it at its strike frame (a follow-up shot: as it is drawn then);
@@ -1335,7 +1364,7 @@ export class FxWiring {
     const go = () => {
       const now = this.ofx.time;
       if (tgt && !tgt.destroyed) {
-        for (const k of proj.onHit || []) this.playOn(k, tgt, {});
+        for (const k of proj.onHit || []) this.playOn(k, tgt, {flipFrom:src});
         if (rows) {
           const own = new Set((proj.onHit || []).map(lc));
           for (const h of rows) if (!own.has(lc(h.k))) this.playOn(h.k, tgt, { flipFrom: src || undefined, toward: h.along && src ? beyond(src, tgt) : undefined });

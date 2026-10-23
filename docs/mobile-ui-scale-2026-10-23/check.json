@@ -1,0 +1,47 @@
+{
+  "results": [
+    {
+      "setting": 1,
+      "width": 844,
+      "scale": 1,
+      "visualWidth": 844,
+      "meta": "width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    },
+    {
+      "setting": 0.8,
+      "width": 1055,
+      "scale": 0.800000011920929,
+      "visualWidth": 1055,
+      "meta": "width=1055, initial-scale=0.8, minimum-scale=0.8, maximum-scale=0.8, user-scalable=no, viewport-fit=cover"
+    },
+    {
+      "setting": 1.25,
+      "width": 675,
+      "scale": 1.2503703832626343,
+      "visualWidth": 675,
+      "meta": "width=675, initial-scale=1.25, minimum-scale=1.25, maximum-scale=1.25, user-scalable=no, viewport-fit=cover"
+    },
+    {
+      "setting": 1,
+      "width": 844,
+      "scale": 1,
+      "visualWidth": 844,
+      "meta": "width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    },
+    {
+      "setting": "reload .8",
+      "width": 1055,
+      "scale": 0.800000011920929,
+      "visualWidth": 1055,
+      "meta": "width=1055, initial-scale=0.8, minimum-scale=0.8, maximum-scale=0.8, user-scalable=no, viewport-fit=cover"
+    },
+    {
+      "setting": "rotate .8",
+      "width": 488,
+      "scale": 0.800000011920929,
+      "visualWidth": 487.5,
+      "meta": "width=488, initial-scale=0.8, minimum-scale=0.8, maximum-scale=0.8, user-scalable=no, viewport-fit=cover"
+    }
+  ],
+  "errors": []
+}

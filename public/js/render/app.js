@@ -355,6 +355,7 @@ export function renderInfo(u) {
     // tap hands them to the detail card (a teammate's unit shows its owner's skill / module)
     skillIndex: Number.isInteger(u.skillIndex) ? u.skillIndex : undefined,
     skillId:u.skillId,skillName:u.skillName,skillDescription:u.skillDescription,skillDuration:u.skillDuration,skillNextAttack:!!u.skillNextAttack,rangeGrid:u.rangeGrid,skillZoneGrid:u.skillZoneGrid,omnidirectional:!!u.omnidirectional,fixedFacing:!!u.fixedFacing,
+    skin: typeof u.skin === 'string' && u.skin ? u.skin : null,
     skinId: u.skinId, charId: u.charId,
     profession:u.profession,subProf:u.subProf,attackType:u.attackType,
     optionalRecruit:!!u.optionalRecruit,energy:u.energy,energyMax:u.energyMax,

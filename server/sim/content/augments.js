@@ -23,6 +23,7 @@ export function install(b){
    if(u.side==='enemy'){
     if(e.kind==='shields'&&!u.mem['augment:shields:'+i]){b.addBuff(u,{key:'augment:shields:'+i,shieldHits:e.count,visible:true,persist:true});u.mem['augment:shields:'+i]=true;}
     if(e.kind==='regen'&&!u.s.flags.hitCount&&!u.s.flags.hitCountArts)add(u,`${i}:regen`,{hpRegen:e.amount});
+    if(e.kind==='enemyStealth'&&['normal','unite'].includes(b.kind)&&!u.isBoss&&!u.bossPool)add(u,`${i}:enemyStealth`,{},{flags:{stealth:true}});
     if(e.kind==='silenceImmune')u.def={...u.def,immune:new Set([...(u.def.immune||[]),'silence'])};
    }else{
     if(e.kind==='stealth'&&u.kind==='op')add(u,`${i}:stealth`,{},{flags:{stealth:true}});

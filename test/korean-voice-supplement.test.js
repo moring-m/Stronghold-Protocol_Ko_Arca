@@ -1,0 +1,20 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {supplementKoreanVoices} from '../tools/assets/koreanVoiceSupplement.mjs';
+test('supplement missing Korean lines without changing existing Korean, Japanese, or unsupported lines',()=>{
+ const jp='/assets/audio/voice/voice/probe/cn_023.mp3',kr='/assets/audio/voice/voice_kr/probe/cn_023.mp3';
+ const existing='/assets/audio/voice/voice_kr/probe/cn_025.mp3',absent='/assets/audio/voice/voice/probe/cn_026.mp3';
+ const manifest={audio:{voice:{kr:{probe:{place:[jp],skill1:[existing],skill2:[absent]}},jp:{probe:{place:[jp]}}}}};
+ const extra={path:kr,sources:['https://example.com/voice.mp3'],bytes:123};
+ const resources={files:[{path:jp,sources:['original']},{path:existing,sources:['original-kr']}]};
+ const supplement={lines:{'probe/cn_023.mp3':extra,'probe/cn_025.mp3':{path:existing,sources:['replacement']}}};
+ const changed=supplementKoreanVoices(manifest,resources,supplement);
+ assert.equal(changed.length,1);assert.equal(changed[0].lines.length,1);
+ assert.deepEqual(manifest.audio.voice.kr.probe,{place:[kr],skill1:[existing],skill2:[absent]});
+ assert.deepEqual(manifest.audio.voice.jp.probe.place,[jp]);
+ assert.deepEqual(manifest.audio.voiceAvailability.probe,{krLines:2,jpFallback:1});
+ assert.deepEqual(resources.files.find(file=>file.path===existing).sources,['original-kr']);
+ assert.deepEqual(resources.files.find(file=>file.path===kr),extra);
+ assert.equal(supplementKoreanVoices(manifest,resources,supplement).length,0);
+ assert.equal(resources.files.filter(file=>file.path===kr).length,1);
+});

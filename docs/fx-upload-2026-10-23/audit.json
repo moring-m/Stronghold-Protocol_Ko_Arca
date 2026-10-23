@@ -1,0 +1,1389 @@
+{
+  "archive": {
+    "parts": 3,
+    "crc": "passed",
+    "entries": 12302,
+    "uncompressedBytes": 188126803,
+    "files": 12293
+  },
+  "index": {
+    "format": "fx-index",
+    "version": 3,
+    "units": 517,
+    "skills": 598,
+    "projectiles": 555,
+    "mountRecords": 511,
+    "prefabs": 4500
+  },
+  "newUnits": [
+    {
+      "id": "char_137_brownb",
+      "name": "비헌터",
+      "modes": [
+        "Default",
+        "S2"
+      ],
+      "skills": [
+        "skchr_brownb_1",
+        "skchr_brownb_2"
+      ],
+      "effects": [
+        "brownb_attack_01_hit",
+        "brownb_skill_02_hit",
+        "brownb_skill_02_start",
+        "common_ignite_attack",
+        "common_next_atk_buff"
+      ]
+    },
+    {
+      "id": "char_4223_botany",
+      "name": "보타니",
+      "modes": [
+        "Default",
+        "S2"
+      ],
+      "skills": [
+        "skchr_botany_1",
+        "skchr_botany_2"
+      ],
+      "effects": [
+        "botany_attack_01_hit_01",
+        "botany_attack_01_start_01",
+        "botany_attack_01_start_02",
+        "botany_attack_01_trail_01",
+        "botany_skill_01_hit_01",
+        "botany_skill_01_hit_02",
+        "botany_skill_01_start_01",
+        "botany_skill_01_start_02",
+        "botany_skill_01_trail_01",
+        "botany_skill_02_buff_01",
+        "botany_skill_02_hit_01",
+        "botany_skill_02_range_01",
+        "botany_skill_02_start_01",
+        "botany_skill_02_start_02",
+        "botany_skill_02_trail_01"
+      ]
+    },
+    {
+      "id": "char_194_leto",
+      "name": "레토",
+      "modes": [
+        "Default",
+        "S2"
+      ],
+      "skills": [
+        "skchr_leto_2",
+        "skcom_quickattack"
+      ],
+      "effects": [
+        "common_ignite_attack",
+        "leto_attack_01_buff_01",
+        "leto_attack_01_hit_01",
+        "leto_attack_01_hit_02",
+        "leto_attack_01_start_01_down",
+        "leto_attack_01_start_01_f",
+        "leto_attack_01_start_02",
+        "leto_attack_01_trail_01",
+        "leto_skill_02_buff_01",
+        "leto_skill_02_hit_01",
+        "leto_skill_02_start_01_down_2",
+        "leto_skill_02_start_01_f",
+        "leto_skill_02_trail_01"
+      ]
+    },
+    {
+      "id": "char_4224_turdus",
+      "name": "우쿠시크",
+      "modes": [
+        "Default",
+        "S1"
+      ],
+      "skills": [
+        "skchr_turdus_1",
+        "skchr_turdus_2"
+      ],
+      "effects": [
+        "turdus_attack_01_hit_01",
+        "turdus_attack_01_start_01",
+        "turdus_attack_01_trail_01",
+        "turdus_heal_line_01",
+        "turdus_skill_01_buff_01",
+        "turdus_skill_02_buff_01",
+        "turdus_skill_02_hit_01",
+        "turdus_skill_02_start_01",
+        "turdus_skill_02_trail_01"
+      ]
+    },
+    {
+      "id": "char_195_glassb",
+      "name": "이스티나",
+      "modes": [
+        "Default",
+        "S2"
+      ],
+      "skills": [
+        "skchr_glassb_1",
+        "skchr_glassb_2"
+      ],
+      "effects": [
+        "common_ignite_attack",
+        "common_magic_trail_01",
+        "glassb_attack_01_hit",
+        "glassb_attack_01_start",
+        "glassb_skill_02_range",
+        "glassb_skill_02_start"
+      ]
+    },
+    {
+      "id": "char_4182_oblvns",
+      "name": "토가와 사키코",
+      "modes": [
+        "Default",
+        "S2_AttackSpeed",
+        "S2_Atk",
+        "S2_Fever",
+        "S3",
+        "S2_Fever_Mag"
+      ],
+      "skills": [
+        "skchr_oblvns_1",
+        "skchr_oblvns_2",
+        "skchr_oblvns_3"
+      ],
+      "effects": [
+        "oblvns_attack_01_hit",
+        "oblvns_attack_01_start",
+        "oblvns_attack_01_trail",
+        "oblvns_combat_01_start",
+        "oblvns_skill_01_hit",
+        "oblvns_skill_01_start",
+        "oblvns_skill_01_trail",
+        "oblvns_skill_01_trail_02",
+        "oblvns_skill_01_trail_03",
+        "oblvns_skill_01_trail_04",
+        "oblvns_skill_01_trail_05",
+        "oblvns_skill_01_trail_06",
+        "oblvns_skill_01_trail_07",
+        "oblvns_skill_01_trail_08",
+        "oblvns_skill_02_buff",
+        "oblvns_skill_02_buff_01",
+        "oblvns_skill_02_hit",
+        "oblvns_skill_02_hit_02",
+        "oblvns_skill_02_start_a",
+        "oblvns_skill_02_start_b",
+        "oblvns_skill_02_trail",
+        "oblvns_skill_02_trail_02",
+        "oblvns_skill_03_buff",
+        "oblvns_skill_03_hit",
+        "oblvns_skill_03_hit_02",
+        "oblvns_skill_03_range",
+        "oblvns_skill_03_start",
+        "oblvns_skill_03_trail",
+        "oblvns_skill_03_trail_02",
+        "oblvns_talent_trail"
+      ]
+    },
+    {
+      "id": "char_4047_pianst",
+      "name": "체르니",
+      "modes": [
+        "Default",
+        "S1",
+        "S2",
+        "Empty"
+      ],
+      "skills": [
+        "skchr_pianst_1",
+        "skchr_pianst_2"
+      ],
+      "effects": [
+        "pianst_attack_hit",
+        "pianst_attack_start",
+        "pianst_beidong_hit",
+        "pianst_skill_01_buff",
+        "pianst_skill_02_buff_01",
+        "pianst_skill_02_buff_02_01",
+        "pianst_skill_02_buff_02_02",
+        "pianst_skill_02_buff_02_03",
+        "pianst_skill_02_buff_03",
+        "pianst_skill_02_end",
+        "pianst_skill_02_end_hit",
+        "pianst_skill_02_end_range",
+        "pianst_skill_02_hit",
+        "pianst_skill_02_start"
+      ]
+    },
+    {
+      "id": "char_499_kaitou",
+      "name": "디아만테",
+      "modes": [
+        "Default",
+        "S1",
+        "S2"
+      ],
+      "skills": [
+        "skchr_kaitou_1",
+        "skchr_kaitou_2"
+      ],
+      "effects": [
+        "kaitou_attack_01_hit_01",
+        "kaitou_attack_01_start_01",
+        "kaitou_attack_01_trail_01",
+        "kaitou_skill_01_buff_01",
+        "kaitou_skill_01_hit_01",
+        "kaitou_skill_01_start_01",
+        "kaitou_skill_01_trail_01",
+        "kaitou_skill_02_buff_01",
+        "kaitou_skill_02_hit_01",
+        "kaitou_skill_02_start_01",
+        "kaitou_skill_02_start_02",
+        "kaitou_skill_02_trail_01"
+      ]
+    },
+    {
+      "id": "char_4109_baslin",
+      "name": "베이스라인",
+      "modes": [
+        "Default",
+        "S2"
+      ],
+      "skills": [
+        "skchr_baslin_1",
+        "skchr_baslin_2"
+      ],
+      "effects": [
+        "baslin_attack_hit",
+        "baslin_attack_start_01",
+        "baslin_skill_01_heal",
+        "baslin_skill_01_start",
+        "baslin_skill_02_buff",
+        "baslin_skill_02_heal",
+        "baslin_skill_02_start_01"
+      ]
+    }
+  ],
+  "newPrefabs": [
+    "baslin_attack_hit",
+    "baslin_attack_start_01",
+    "baslin_skill_01_heal",
+    "baslin_skill_01_start",
+    "baslin_skill_02_buff",
+    "baslin_skill_02_heal",
+    "baslin_skill_02_start_01",
+    "botany_attack_01_hit_01",
+    "botany_attack_01_start_01",
+    "botany_attack_01_start_02",
+    "botany_attack_01_trail_01",
+    "botany_skill_01_hit_01",
+    "botany_skill_01_hit_02",
+    "botany_skill_01_start_01",
+    "botany_skill_01_start_02",
+    "botany_skill_01_trail_01",
+    "botany_skill_02_buff_01",
+    "botany_skill_02_hit_01",
+    "botany_skill_02_range_01",
+    "botany_skill_02_start_01",
+    "botany_skill_02_start_02",
+    "botany_skill_02_trail_01",
+    "botany_skill_02_weapon_01",
+    "brownb_attack_01_hit",
+    "brownb_skill_02_hit",
+    "brownb_skill_02_start",
+    "common_next_atk_buff",
+    "glassb_skill_02_range",
+    "glassb_skill_02_start",
+    "kaitou_attack_01_hit_01",
+    "kaitou_attack_01_start_01",
+    "kaitou_attack_01_trail_01",
+    "kaitou_skill_01_buff_01",
+    "kaitou_skill_01_hit_01",
+    "kaitou_skill_01_start_01",
+    "kaitou_skill_01_trail_01",
+    "kaitou_skill_02_buff_01",
+    "kaitou_skill_02_hit_01",
+    "kaitou_skill_02_start_01",
+    "kaitou_skill_02_start_02",
+    "kaitou_skill_02_trail_01",
+    "leto_attack_01_buff_01",
+    "leto_attack_01_hit_01",
+    "leto_attack_01_hit_02",
+    "leto_attack_01_start_01_b",
+    "leto_attack_01_start_01_down",
+    "leto_attack_01_start_01_f",
+    "leto_attack_01_start_02",
+    "leto_attack_01_trail_01",
+    "leto_skill_02_buff_01",
+    "leto_skill_02_hit_01",
+    "leto_skill_02_start_01_down_2",
+    "leto_skill_02_start_01_f",
+    "leto_skill_02_trail_01",
+    "oblvns_attack_01_hit",
+    "oblvns_attack_01_start",
+    "oblvns_attack_01_trail",
+    "oblvns_combat_01_start",
+    "oblvns_skill_01_hit",
+    "oblvns_skill_01_start",
+    "oblvns_skill_01_trail",
+    "oblvns_skill_01_trail_02",
+    "oblvns_skill_01_trail_03",
+    "oblvns_skill_01_trail_04",
+    "oblvns_skill_01_trail_05",
+    "oblvns_skill_01_trail_06",
+    "oblvns_skill_01_trail_07",
+    "oblvns_skill_01_trail_08",
+    "oblvns_skill_02_buff",
+    "oblvns_skill_02_buff_01",
+    "oblvns_skill_02_hit",
+    "oblvns_skill_02_hit_02",
+    "oblvns_skill_02_start_a",
+    "oblvns_skill_02_start_b",
+    "oblvns_skill_02_trail",
+    "oblvns_skill_02_trail_02",
+    "oblvns_skill_03_buff",
+    "oblvns_skill_03_hit",
+    "oblvns_skill_03_hit_02",
+    "oblvns_skill_03_range",
+    "oblvns_skill_03_start",
+    "oblvns_skill_03_trail",
+    "oblvns_skill_03_trail_02",
+    "oblvns_talent_trail",
+    "phenxi_birth_01",
+    "phenxi_birth_02",
+    "pianst_attack_hit",
+    "pianst_attack_start",
+    "pianst_beidong_hit",
+    "pianst_skill_01_buff",
+    "pianst_skill_02_buff_01",
+    "pianst_skill_02_buff_02_01",
+    "pianst_skill_02_buff_02_02",
+    "pianst_skill_02_buff_02_03",
+    "pianst_skill_02_buff_03",
+    "pianst_skill_02_end",
+    "pianst_skill_02_end_hit",
+    "pianst_skill_02_end_range",
+    "pianst_skill_02_hit",
+    "pianst_skill_02_start",
+    "turdus_attack_01_hit_01",
+    "turdus_attack_01_start_01",
+    "turdus_attack_01_trail_01",
+    "turdus_heal_line_01",
+    "turdus_skill_01_buff_01",
+    "turdus_skill_02_buff_01",
+    "turdus_skill_02_hit_01",
+    "turdus_skill_02_start_01",
+    "turdus_skill_02_trail_01"
+  ],
+  "compile": {
+    "passed": 109,
+    "failed": []
+  },
+  "removedUnits": [
+    "char_1015_aglna2",
+    "char_4229_aphris",
+    "char_4230_mcnist",
+    "char_4231_clemnt",
+    "char_4235_thumpy",
+    "token_10069_mcnist_mcgraf",
+    "token_10070_aphris_pc",
+    "token_10071_aglna2_agairp"
+  ],
+  "removedPrefabs": [
+    "aglna2_attack_hit_01",
+    "aglna2_attack_start_01",
+    "aglna2_attack_trail_01",
+    "aglna2_birth_type_01_01",
+    "aglna2_birth_type_01_02",
+    "aglna2_birth_type_01_03",
+    "aglna2_birth_type_02_01",
+    "aglna2_skill_01_buff_01",
+    "aglna2_skill_01_hit_01",
+    "aglna2_skill_01_start_01",
+    "aglna2_skill_01_start_01_down_01",
+    "aglna2_skill_01_start_01_up_01",
+    "aglna2_skill_01_trail_01",
+    "aglna2_skill_02_buff_01",
+    "aglna2_skill_02_buff_weapon_01",
+    "aglna2_skill_02_buff_weapon_02",
+    "aglna2_skill_02_fly_end_01",
+    "aglna2_skill_02_fly_end_02",
+    "aglna2_skill_02_fly_end_03",
+    "aglna2_skill_02_hit_01",
+    "aglna2_skill_02_start_01",
+    "aglna2_skill_02_start_01_down_01",
+    "aglna2_skill_02_start_01_up_01",
+    "aglna2_skill_02_trail_01",
+    "aglna2_skill_03_buff_left_01",
+    "aglna2_skill_03_buff_right_01",
+    "aglna2_skill_03_buff_weapon_01",
+    "aglna2_skill_03_combat_start_01",
+    "aglna2_skill_03_fly_trail_01",
+    "aglna2_skill_03_hit_01",
+    "aglna2_skill_03_range_01",
+    "aglna2_skill_03_range_line_01",
+    "aglna2_skill_03_start_01",
+    "aglna2_skill_03_start_02",
+    "aglna2_skill_03_trail_01",
+    "aphris_attack_01_hit_01",
+    "aphris_attack_01_line_01",
+    "aphris_attack_01_start_01",
+    "aphris_attack_line_point_01",
+    "aphris_skill_01_buff_01",
+    "aphris_skill_02_hit_01",
+    "aphris_skill_02_line_01",
+    "aphris_skill_02_line_point_01",
+    "aphris_skill_02_start_01",
+    "aphris_skill_03_buff_01",
+    "aphris_skill_03_buff_02_back",
+    "aphris_skill_03_buff_02_front",
+    "aphris_skill_03_charge_01",
+    "aphris_skill_03_charge_01_end",
+    "aphris_skill_03_hit_01",
+    "aphris_skill_03_line_01",
+    "aphris_skill_03_line_point_01",
+    "aphris_skill_03_start_01",
+    "clemnt_attack_01_hit_01",
+    "clemnt_attack_01_start_01",
+    "clemnt_attack_01_start_01_down",
+    "clemnt_skill_01_hit_01",
+    "clemnt_skill_01_start_01",
+    "clemnt_skill_02_buff_01",
+    "clemnt_skill_02_hit_01",
+    "clemnt_skill_02_mark_01",
+    "clemnt_skill_02_start_01",
+    "clemnt_skill_02_start_01_down",
+    "clemnt_skill_02_start_01_up",
+    "clemnt_skill_03_buff_01_l",
+    "clemnt_skill_03_buff_01_r",
+    "clemnt_skill_03_buff_02",
+    "clemnt_skill_03_hit_01",
+    "clemnt_skill_03_mark_all_01",
+    "clemnt_skill_03_range",
+    "clemnt_skill_03_range_end",
+    "clemnt_skill_03_start_01",
+    "clemnt_skill_03_start_01_down",
+    "clemnt_skill_03_start_01_up",
+    "clemnt_talent_hit_01",
+    "common_char_birth_01_delay_01",
+    "common_ranger_hit_01",
+    "common_root_01",
+    "mcnist_attack_01_hit_01",
+    "mcnist_attack_01_start_01",
+    "mcnist_attack_01_start_01_down",
+    "mcnist_attack_01_start_01_up",
+    "mcnist_attack_01_trail_01",
+    "mcnist_skill_01_hit_01",
+    "mcnist_skill_01_start_01",
+    "mcnist_skill_01_start_01_down",
+    "mcnist_skill_01_start_01_up",
+    "mcnist_skill_01_start_02",
+    "mcnist_skill_01_start_02_down",
+    "mcnist_skill_01_start_02_up",
+    "mcnist_skill_02_buff_01",
+    "mcnist_skill_02_start_01",
+    "mcnist_skill_02_start_01_down",
+    "mcnist_skill_03_buff_01",
+    "mcnist_skill_03_hit_01",
+    "mcnist_skill_03_start_02",
+    "thumpy_attack_01_hit_01",
+    "thumpy_attack_01_start_01",
+    "thumpy_skill_01_buff_01",
+    "thumpy_skill_01_hit_01",
+    "thumpy_skill_01_start_01",
+    "thumpy_skill_02_buff_01",
+    "thumpy_skill_02_debuff_01",
+    "thumpy_skill_02_hit_01",
+    "thumpy_skill_02_start_01",
+    "thumpy_skill_02_start_02",
+    "thumpy_skill_02_trap_01",
+    "thumpy_skill_02_trap_01_end",
+    "thumpy_skill_02_trap_01_start",
+    "thumpy_skill_03_buff_01",
+    "thumpy_skill_03_buff_02",
+    "thumpy_skill_03_hit_01",
+    "thumpy_skill_03_range_01",
+    "thumpy_skill_03_range_01_end",
+    "thumpy_skill_03_start_01",
+    "thumpy_skill_03_start_02",
+    "tippi_skill_02_attack_02_hit",
+    "tippi_skill_02_attack_02_trail",
+    "tippi_skill_02_attack_03_hit",
+    "tippi_skill_02_attack_03_trail",
+    "token_aglna2_agairp_01",
+    "token_aphris_pc_attack_01_buff_01",
+    "token_aphris_pc_skill_02_buff_01",
+    "token_aphris_pc_skill_03_buff_01",
+    "token_mcnist_mcgraf_attack_01_hit_01",
+    "token_mcnist_mcgraf_attack_01_start_01",
+    "token_mcnist_mcgraf_skill_03_buff_01"
+  ],
+  "costumes": {
+    "separateCostumeUnits": [],
+    "separateCostumeMounts": [],
+    "characterMounts": [
+      {
+        "id": "char_147_shining",
+        "source": "chararts/char_147_shining.ab defaultskin"
+      },
+      {
+        "id": "char_1044_hsgma2",
+        "source": "chararts/char_1044_hsgma2.ab defaultskin"
+      },
+      {
+        "id": "char_180_amgoat",
+        "source": "chararts/char_180_amgoat.ab defaultskin"
+      },
+      {
+        "id": "char_4132_ascln",
+        "source": "chararts/char_4132_ascln.ab defaultskin"
+      },
+      {
+        "id": "char_4226_veen",
+        "source": "chararts/char_4226_veen.ab defaultskin"
+      },
+      {
+        "id": "char_381_bubble",
+        "source": "chararts/char_381_bubble.ab defaultskin"
+      },
+      {
+        "id": "char_103_angel",
+        "source": "chararts/char_103_angel.ab defaultskin"
+      },
+      {
+        "id": "char_4055_bgsnow",
+        "source": "chararts/char_4055_bgsnow.ab defaultskin"
+      },
+      {
+        "id": "char_609_acguad",
+        "source": "chararts/char_609_acguad.ab defaultskin"
+      },
+      {
+        "id": "char_4040_rockr",
+        "source": "chararts/char_4040_rockr.ab defaultskin"
+      },
+      {
+        "id": "char_1038_whitw2",
+        "source": "chararts/char_1038_whitw2.ab defaultskin"
+      },
+      {
+        "id": "char_4163_rosesa",
+        "source": "chararts/char_4163_rosesa.ab defaultskin"
+      },
+      {
+        "id": "char_604_ccast",
+        "source": "chararts/char_604_ccast.ab defaultskin"
+      },
+      {
+        "id": "char_4037_demetr",
+        "source": "chararts/char_4037_demetr.ab defaultskin"
+      },
+      {
+        "id": "char_4116_blkkgt",
+        "source": "chararts/char_4116_blkkgt.ab defaultskin"
+      },
+      {
+        "id": "char_340_shwaz",
+        "source": "chararts/char_340_shwaz.ab defaultskin"
+      },
+      {
+        "id": "char_173_slchan",
+        "source": "chararts/char_173_slchan.ab defaultskin"
+      },
+      {
+        "id": "char_400_weedy",
+        "source": "chararts/char_400_weedy.ab defaultskin"
+      },
+      {
+        "id": "char_4117_ray",
+        "source": "chararts/char_4117_ray.ab defaultskin"
+      },
+      {
+        "id": "char_4204_mantra",
+        "source": "chararts/char_4204_mantra.ab defaultskin"
+      },
+      {
+        "id": "char_2015_dusk",
+        "source": "chararts/char_2015_dusk.ab defaultskin"
+      },
+      {
+        "id": "char_610_acfend",
+        "source": "chararts/char_610_acfend.ab defaultskin"
+      },
+      {
+        "id": "char_126_shotst",
+        "source": "chararts/char_126_shotst.ab defaultskin"
+      },
+      {
+        "id": "char_612_accast",
+        "source": "chararts/char_612_accast.ab defaultskin"
+      },
+      {
+        "id": "char_4138_narant",
+        "source": "chararts/char_4138_narant.ab defaultskin"
+      },
+      {
+        "id": "char_608_acpion",
+        "source": "chararts/char_608_acpion.ab defaultskin"
+      },
+      {
+        "id": "char_4207_branch",
+        "source": "chararts/char_4207_branch.ab defaultskin"
+      },
+      {
+        "id": "char_1034_jesca2",
+        "source": "chararts/char_1034_jesca2.ab defaultskin"
+      },
+      {
+        "id": "char_474_glady",
+        "source": "chararts/char_474_glady.ab defaultskin"
+      },
+      {
+        "id": "char_4179_monstr",
+        "source": "chararts/char_4179_monstr.ab defaultskin"
+      },
+      {
+        "id": "char_300_phenxi",
+        "source": "chararts/char_300_phenxi.ab defaultskin"
+      },
+      {
+        "id": "char_4162_cathy",
+        "source": "chararts/char_4162_cathy.ab defaultskin"
+      },
+      {
+        "id": "char_4098_vvana",
+        "source": "chararts/char_4098_vvana.ab defaultskin"
+      },
+      {
+        "id": "char_427_vigil",
+        "source": "chararts/char_427_vigil.ab defaultskin"
+      },
+      {
+        "id": "char_446_aroma",
+        "source": "chararts/char_446_aroma.ab defaultskin"
+      },
+      {
+        "id": "char_143_ghost",
+        "source": "chararts/char_143_ghost.ab defaultskin"
+      },
+      {
+        "id": "char_137_brownb",
+        "source": "chararts/char_137_brownb.ab defaultskin"
+      },
+      {
+        "id": "char_431_ashlok",
+        "source": "chararts/char_431_ashlok.ab defaultskin"
+      },
+      {
+        "id": "char_010_chen",
+        "source": "chararts/char_010_chen.ab defaultskin"
+      },
+      {
+        "id": "char_2012_typhon",
+        "source": "chararts/char_2012_typhon.ab defaultskin"
+      },
+      {
+        "id": "char_602_cdfend",
+        "source": "chararts/char_602_cdfend.ab defaultskin"
+      },
+      {
+        "id": "char_4016_kazema",
+        "source": "chararts/char_4016_kazema.ab defaultskin"
+      },
+      {
+        "id": "char_4065_judge",
+        "source": "chararts/char_4065_judge.ab defaultskin"
+      },
+      {
+        "id": "char_4087_ines",
+        "source": "chararts/char_4087_ines.ab defaultskin"
+      },
+      {
+        "id": "char_388_mint",
+        "source": "chararts/char_388_mint.ab defaultskin"
+      },
+      {
+        "id": "char_102_texas",
+        "source": "chararts/char_102_texas.ab defaultskin"
+      },
+      {
+        "id": "char_1502_crosly",
+        "source": "chararts/char_1502_crosly.ab defaultskin"
+      },
+      {
+        "id": "char_291_aglina",
+        "source": "chararts/char_291_aglina.ab defaultskin"
+      },
+      {
+        "id": "char_1032_excu2",
+        "source": "chararts/char_1032_excu2.ab defaultskin"
+      },
+      {
+        "id": "char_498_inside",
+        "source": "chararts/char_498_inside.ab defaultskin"
+      },
+      {
+        "id": "char_1052_kalts2",
+        "source": "chararts/char_1052_kalts2.ab defaultskin"
+      },
+      {
+        "id": "char_108_silent",
+        "source": "chararts/char_108_silent.ab defaultskin"
+      },
+      {
+        "id": "char_4193_lemuen",
+        "source": "chararts/char_4193_lemuen.ab defaultskin"
+      },
+      {
+        "id": "char_4223_botany",
+        "source": "chararts/char_4223_botany.ab defaultskin"
+      },
+      {
+        "id": "char_113_cqbw",
+        "source": "chararts/char_113_cqbw.ab defaultskin"
+      },
+      {
+        "id": "char_4100_caper",
+        "source": "chararts/char_4100_caper.ab defaultskin"
+      },
+      {
+        "id": "char_450_necras",
+        "source": "chararts/char_450_necras.ab defaultskin"
+      },
+      {
+        "id": "char_017_huang",
+        "source": "chararts/char_017_huang.ab defaultskin"
+      },
+      {
+        "id": "char_4196_reckpr",
+        "source": "chararts/char_4196_reckpr.ab defaultskin"
+      },
+      {
+        "id": "char_344_beewax",
+        "source": "chararts/char_344_beewax.ab defaultskin"
+      },
+      {
+        "id": "char_613_acmedc",
+        "source": "chararts/char_613_acmedc.ab defaultskin"
+      },
+      {
+        "id": "char_4072_ironmn",
+        "source": "chararts/char_4072_ironmn.ab defaultskin"
+      },
+      {
+        "id": "char_127_estell",
+        "source": "chararts/char_127_estell.ab defaultskin"
+      },
+      {
+        "id": "char_179_cgbird",
+        "source": "chararts/char_179_cgbird.ab defaultskin"
+      },
+      {
+        "id": "char_2013_cerber",
+        "source": "chararts/char_2013_cerber.ab defaultskin"
+      },
+      {
+        "id": "char_337_utage",
+        "source": "chararts/char_337_utage.ab defaultskin"
+      },
+      {
+        "id": "char_183_skgoat",
+        "source": "chararts/char_183_skgoat.ab defaultskin"
+      },
+      {
+        "id": "char_611_acnipe",
+        "source": "chararts/char_611_acnipe.ab defaultskin"
+      },
+      {
+        "id": "char_4212_nasti",
+        "source": "chararts/char_4212_nasti.ab defaultskin"
+      },
+      {
+        "id": "char_4036_forcer",
+        "source": "chararts/char_4036_forcer.ab defaultskin"
+      },
+      {
+        "id": "char_250_phatom",
+        "source": "chararts/char_250_phatom.ab defaultskin"
+      },
+      {
+        "id": "char_134_ifrit",
+        "source": "chararts/char_134_ifrit.ab defaultskin"
+      },
+      {
+        "id": "char_2023_ling",
+        "source": "chararts/char_2023_ling.ab defaultskin"
+      },
+      {
+        "id": "char_107_liskam",
+        "source": "chararts/char_107_liskam.ab defaultskin"
+      },
+      {
+        "id": "char_4151_tinman",
+        "source": "chararts/char_4151_tinman.ab defaultskin"
+      },
+      {
+        "id": "char_4211_snhunt",
+        "source": "chararts/char_4211_snhunt.ab defaultskin"
+      },
+      {
+        "id": "char_4042_lumen",
+        "source": "chararts/char_4042_lumen.ab defaultskin"
+      },
+      {
+        "id": "char_1013_chen2",
+        "source": "chararts/char_1013_chen2.ab defaultskin"
+      },
+      {
+        "id": "char_1026_gvial2",
+        "source": "chararts/char_1026_gvial2.ab defaultskin"
+      },
+      {
+        "id": "char_1046_sbell2",
+        "source": "chararts/char_1046_sbell2.ab defaultskin"
+      },
+      {
+        "id": "char_4048_doroth",
+        "source": "chararts/char_4048_doroth.ab defaultskin"
+      },
+      {
+        "id": "char_1023_ghost2",
+        "source": "chararts/char_1023_ghost2.ab defaultskin"
+      },
+      {
+        "id": "char_391_rosmon",
+        "source": "chararts/char_391_rosmon.ab defaultskin"
+      },
+      {
+        "id": "char_437_mizuki",
+        "source": "chararts/char_437_mizuki.ab defaultskin"
+      },
+      {
+        "id": "char_174_slbell",
+        "source": "chararts/char_174_slbell.ab defaultskin"
+      },
+      {
+        "id": "char_479_sleach",
+        "source": "chararts/char_479_sleach.ab defaultskin"
+      },
+      {
+        "id": "char_617_sharp2",
+        "source": "chararts/char_617_sharp2.ab defaultskin"
+      },
+      {
+        "id": "char_225_haak",
+        "source": "chararts/char_225_haak.ab defaultskin"
+      },
+      {
+        "id": "char_430_fartth",
+        "source": "chararts/char_430_fartth.ab defaultskin"
+      },
+      {
+        "id": "char_140_whitew",
+        "source": "chararts/char_140_whitew.ab defaultskin"
+      },
+      {
+        "id": "char_4013_kjera",
+        "source": "chararts/char_4013_kjera.ab defaultskin"
+      },
+      {
+        "id": "char_197_poca",
+        "source": "chararts/char_197_poca.ab defaultskin"
+      },
+      {
+        "id": "char_1031_slent2",
+        "source": "chararts/char_1031_slent2.ab defaultskin"
+      },
+      {
+        "id": "char_1050_chen3",
+        "source": "chararts/char_1050_chen3.ab defaultskin"
+      },
+      {
+        "id": "char_4122_grabds",
+        "source": "chararts/char_4122_grabds.ab defaultskin"
+      },
+      {
+        "id": "char_1043_leizi2",
+        "source": "chararts/char_1043_leizi2.ab defaultskin"
+      },
+      {
+        "id": "char_373_lionhd",
+        "source": "chararts/char_373_lionhd.ab defaultskin"
+      },
+      {
+        "id": "char_494_vendla",
+        "source": "chararts/char_494_vendla.ab defaultskin"
+      },
+      {
+        "id": "char_4133_logos",
+        "source": "chararts/char_4133_logos.ab defaultskin"
+      },
+      {
+        "id": "char_194_leto",
+        "source": "chararts/char_194_leto.ab defaultskin"
+      },
+      {
+        "id": "char_4058_pepe",
+        "source": "chararts/char_4058_pepe.ab defaultskin"
+      },
+      {
+        "id": "char_4224_turdus",
+        "source": "chararts/char_4224_turdus.ab defaultskin"
+      },
+      {
+        "id": "char_4011_lessng",
+        "source": "chararts/char_4011_lessng.ab defaultskin"
+      },
+      {
+        "id": "char_491_humus",
+        "source": "chararts/char_491_humus.ab defaultskin"
+      },
+      {
+        "id": "char_1051_headb2",
+        "source": "chararts/char_1051_headb2.ab defaultskin"
+      },
+      {
+        "id": "char_213_mostma",
+        "source": "chararts/char_213_mostma.ab defaultskin"
+      },
+      {
+        "id": "char_199_yak",
+        "source": "chararts/char_199_yak.ab defaultskin"
+      },
+      {
+        "id": "char_4080_lin",
+        "source": "chararts/char_4080_lin.ab defaultskin"
+      },
+      {
+        "id": "char_290_vigna",
+        "source": "chararts/char_290_vigna.ab defaultskin"
+      },
+      {
+        "id": "char_377_gdglow",
+        "source": "chararts/char_377_gdglow.ab defaultskin"
+      },
+      {
+        "id": "char_601_cguard",
+        "source": "chararts/char_601_cguard.ab defaultskin"
+      },
+      {
+        "id": "char_4009_irene",
+        "source": "chararts/char_4009_irene.ab defaultskin"
+      },
+      {
+        "id": "char_195_glassb",
+        "source": "chararts/char_195_glassb.ab defaultskin"
+      },
+      {
+        "id": "char_4182_oblvns",
+        "source": "chararts/char_4182_oblvns.ab defaultskin"
+      },
+      {
+        "id": "char_606_csuppo",
+        "source": "chararts/char_606_csuppo.ab defaultskin"
+      },
+      {
+        "id": "char_311_mudrok",
+        "source": "chararts/char_311_mudrok.ab defaultskin"
+      },
+      {
+        "id": "char_416_zumama",
+        "source": "chararts/char_416_zumama.ab defaultskin"
+      },
+      {
+        "id": "char_1042_phatm2",
+        "source": "chararts/char_1042_phatm2.ab defaultskin"
+      },
+      {
+        "id": "char_341_sntlla",
+        "source": "chararts/char_341_sntlla.ab defaultskin"
+      },
+      {
+        "id": "char_1040_blaze2",
+        "source": "chararts/char_1040_blaze2.ab defaultskin"
+      },
+      {
+        "id": "char_4010_etlchi",
+        "source": "chararts/char_4010_etlchi.ab defaultskin"
+      },
+      {
+        "id": "char_2024_chyue",
+        "source": "chararts/char_2024_chyue.ab defaultskin"
+      },
+      {
+        "id": "char_112_siege",
+        "source": "chararts/char_112_siege.ab defaultskin"
+      },
+      {
+        "id": "char_423_blemsh",
+        "source": "chararts/char_423_blemsh.ab defaultskin"
+      },
+      {
+        "id": "char_4202_haruka",
+        "source": "chararts/char_4202_haruka.ab defaultskin"
+      },
+      {
+        "id": "char_1039_thorn2",
+        "source": "chararts/char_1039_thorn2.ab defaultskin"
+      },
+      {
+        "id": "char_1020_reed2",
+        "source": "chararts/char_1020_reed2.ab defaultskin"
+      },
+      {
+        "id": "char_426_billro",
+        "source": "chararts/char_426_billro.ab defaultskin"
+      },
+      {
+        "id": "char_4047_pianst",
+        "source": "chararts/char_4047_pianst.ab defaultskin"
+      },
+      {
+        "id": "char_293_thorns",
+        "source": "chararts/char_293_thorns.ab defaultskin"
+      },
+      {
+        "id": "char_264_f12yin",
+        "source": "chararts/char_264_f12yin.ab defaultskin"
+      },
+      {
+        "id": "char_308_swire",
+        "source": "chararts/char_308_swire.ab defaultskin"
+      },
+      {
+        "id": "char_188_helage",
+        "source": "chararts/char_188_helage.ab defaultskin"
+      },
+      {
+        "id": "char_4191_tippi",
+        "source": "chararts/char_4191_tippi.ab defaultskin"
+      },
+      {
+        "id": "char_499_kaitou",
+        "source": "chararts/char_499_kaitou.ab defaultskin"
+      },
+      {
+        "id": "char_496_wildmn",
+        "source": "chararts/char_496_wildmn.ab defaultskin"
+      },
+      {
+        "id": "char_248_mgllan",
+        "source": "chararts/char_248_mgllan.ab defaultskin"
+      },
+      {
+        "id": "char_4139_papyrs",
+        "source": "chararts/char_4139_papyrs.ab defaultskin"
+      },
+      {
+        "id": "char_237_gravel",
+        "source": "chararts/char_237_gravel.ab defaultskin"
+      },
+      {
+        "id": "char_2014_nian",
+        "source": "chararts/char_2014_nian.ab defaultskin"
+      },
+      {
+        "id": "char_1035_wisdel",
+        "source": "chararts/char_1035_wisdel.ab defaultskin"
+      },
+      {
+        "id": "char_4109_baslin",
+        "source": "chararts/char_4109_baslin.ab defaultskin"
+      },
+      {
+        "id": "char_472_pasngr",
+        "source": "chararts/char_472_pasngr.ab defaultskin"
+      },
+      {
+        "id": "char_4082_qiubai",
+        "source": "chararts/char_4082_qiubai.ab defaultskin"
+      },
+      {
+        "id": "char_222_bpipe",
+        "source": "chararts/char_222_bpipe.ab defaultskin"
+      },
+      {
+        "id": "char_4027_heyak",
+        "source": "chararts/char_4027_heyak.ab defaultskin"
+      },
+      {
+        "id": "char_485_pallas",
+        "source": "chararts/char_485_pallas.ab defaultskin"
+      },
+      {
+        "id": "char_2026_yu",
+        "source": "chararts/char_2026_yu.ab defaultskin"
+      },
+      {
+        "id": "char_1012_skadi2",
+        "source": "chararts/char_1012_skadi2.ab defaultskin"
+      },
+      {
+        "id": "char_614_acsupo",
+        "source": "chararts/char_614_acsupo.ab defaultskin"
+      },
+      {
+        "id": "char_171_bldsk",
+        "source": "chararts/char_171_bldsk.ab defaultskin"
+      },
+      {
+        "id": "char_003_kalts",
+        "source": "chararts/char_003_kalts.ab defaultskin"
+      },
+      {
+        "id": "char_4148_philae",
+        "source": "chararts/char_4148_philae.ab defaultskin"
+      },
+      {
+        "id": "char_4137_udflow",
+        "source": "chararts/char_4137_udflow.ab defaultskin"
+      },
+      {
+        "id": "char_2027_wang",
+        "source": "chararts/char_2027_wang.ab defaultskin"
+      },
+      {
+        "id": "char_605_cmedic",
+        "source": "chararts/char_605_cmedic.ab defaultskin"
+      },
+      {
+        "id": "char_350_surtr",
+        "source": "chararts/char_350_surtr.ab defaultskin"
+      },
+      {
+        "id": "char_4195_radian",
+        "source": "chararts/char_4195_radian.ab defaultskin"
+      },
+      {
+        "id": "char_4039_horn",
+        "source": "chararts/char_4039_horn.ab defaultskin"
+      },
+      {
+        "id": "char_4046_ebnhlz",
+        "source": "chararts/char_4046_ebnhlz.ab defaultskin"
+      },
+      {
+        "id": "char_1019_siege2",
+        "source": "chararts/char_1019_siege2.ab defaultskin"
+      },
+      {
+        "id": "char_181_flower",
+        "source": "chararts/char_181_flower.ab defaultskin"
+      },
+      {
+        "id": "char_4054_malist",
+        "source": "chararts/char_4054_malist.ab defaultskin"
+      },
+      {
+        "id": "char_362_saga",
+        "source": "chararts/char_362_saga.ab defaultskin"
+      },
+      {
+        "id": "char_196_sunbr",
+        "source": "chararts/char_196_sunbr.ab defaultskin"
+      },
+      {
+        "id": "char_4088_hodrer",
+        "source": "chararts/char_4088_hodrer.ab defaultskin"
+      },
+      {
+        "id": "char_249_mlyss",
+        "source": "chararts/char_249_mlyss.ab defaultskin"
+      },
+      {
+        "id": "char_294_ayer",
+        "source": "chararts/char_294_ayer.ab defaultskin"
+      },
+      {
+        "id": "char_128_plosis",
+        "source": "chararts/char_128_plosis.ab defaultskin"
+      },
+      {
+        "id": "char_279_excu",
+        "source": "chararts/char_279_excu.ab defaultskin"
+      },
+      {
+        "id": "char_306_leizi",
+        "source": "chararts/char_306_leizi.ab defaultskin"
+      },
+      {
+        "id": "char_4121_zuole",
+        "source": "chararts/char_4121_zuole.ab defaultskin"
+      },
+      {
+        "id": "char_263_skadi",
+        "source": "chararts/char_263_skadi.ab defaultskin"
+      },
+      {
+        "id": "char_4026_vulpis",
+        "source": "chararts/char_4026_vulpis.ab defaultskin"
+      },
+      {
+        "id": "char_440_pinecn",
+        "source": "chararts/char_440_pinecn.ab defaultskin"
+      },
+      {
+        "id": "char_4114_harold",
+        "source": "chararts/char_4114_harold.ab defaultskin"
+      },
+      {
+        "id": "char_2025_shu",
+        "source": "chararts/char_2025_shu.ab defaultskin"
+      },
+      {
+        "id": "char_136_hsguma",
+        "source": "chararts/char_136_hsguma.ab defaultskin"
+      },
+      {
+        "id": "char_603_csnipe",
+        "source": "chararts/char_603_csnipe.ab defaultskin"
+      },
+      {
+        "id": "char_322_lmlee",
+        "source": "chararts/char_322_lmlee.ab defaultskin"
+      },
+      {
+        "id": "char_1041_angel2",
+        "source": "chararts/char_1041_angel2.ab defaultskin"
+      },
+      {
+        "id": "char_150_snakek",
+        "source": "chararts/char_150_snakek.ab defaultskin"
+      },
+      {
+        "id": "char_1033_swire2",
+        "source": "chararts/char_1033_swire2.ab defaultskin"
+      },
+      {
+        "id": "char_1047_halo2",
+        "source": "chararts/char_1047_halo2.ab defaultskin"
+      },
+      {
+        "id": "char_4194_rmixer",
+        "source": "chararts/char_4194_rmixer.ab defaultskin"
+      },
+      {
+        "id": "char_4228_closur",
+        "source": "chararts/char_4228_closur.ab defaultskin"
+      },
+      {
+        "id": "char_358_lisa",
+        "source": "chararts/char_358_lisa.ab defaultskin"
+      },
+      {
+        "id": "char_258_podego",
+        "source": "chararts/char_258_podego.ab defaultskin"
+      },
+      {
+        "id": "char_4051_akkord",
+        "source": "chararts/char_4051_akkord.ab defaultskin"
+      },
+      {
+        "id": "char_1014_nearl2",
+        "source": "chararts/char_1014_nearl2.ab defaultskin"
+      },
+      {
+        "id": "char_245_cello",
+        "source": "chararts/char_245_cello.ab defaultskin"
+      },
+      {
+        "id": "char_172_svrash",
+        "source": "chararts/char_172_svrash.ab defaultskin"
+      },
+      {
+        "id": "char_4146_nymph",
+        "source": "chararts/char_4146_nymph.ab defaultskin"
+      },
+      {
+        "id": "char_4134_cetsyr",
+        "source": "chararts/char_4134_cetsyr.ab defaultskin"
+      },
+      {
+        "id": "char_1016_agoat2",
+        "source": "chararts/char_1016_agoat2.ab defaultskin"
+      },
+      {
+        "id": "char_206_gnosis",
+        "source": "chararts/char_206_gnosis.ab defaultskin"
+      },
+      {
+        "id": "char_420_flamtl",
+        "source": "chararts/char_420_flamtl.ab defaultskin"
+      },
+      {
+        "id": "char_332_archet",
+        "source": "chararts/char_332_archet.ab defaultskin"
+      },
+      {
+        "id": "char_254_vodfox",
+        "source": "chararts/char_254_vodfox.ab defaultskin"
+      },
+      {
+        "id": "char_615_acspec",
+        "source": "chararts/char_615_acspec.ab defaultskin"
+      },
+      {
+        "id": "char_1028_texas2",
+        "source": "chararts/char_1028_texas2.ab defaultskin"
+      },
+      {
+        "id": "char_202_demkni",
+        "source": "chararts/char_202_demkni.ab defaultskin"
+      },
+      {
+        "id": "char_4079_haini",
+        "source": "chararts/char_4079_haini.ab defaultskin"
+      },
+      {
+        "id": "char_616_pithst",
+        "source": "chararts/char_616_pithst.ab defaultskin"
+      },
+      {
+        "id": "char_1045_svash2",
+        "source": "chararts/char_1045_svash2.ab defaultskin"
+      },
+      {
+        "id": "char_1021_kroos2",
+        "source": "chararts/char_1021_kroos2.ab defaultskin"
+      },
+      {
+        "id": "char_145_prove",
+        "source": "chararts/char_145_prove.ab defaultskin"
+      },
+      {
+        "id": "char_253_greyy",
+        "source": "chararts/char_253_greyy.ab defaultskin"
+      },
+      {
+        "id": "char_469_indigo",
+        "source": "chararts/char_469_indigo.ab defaultskin"
+      },
+      {
+        "id": "char_4056_titi",
+        "source": "chararts/char_4056_titi.ab defaultskin"
+      },
+      {
+        "id": "char_4145_ulpia",
+        "source": "chararts/char_4145_ulpia.ab defaultskin"
+      },
+      {
+        "id": "char_4064_mlynar",
+        "source": "chararts/char_4064_mlynar.ab defaultskin"
+      },
+      {
+        "id": "char_600_cpione",
+        "source": "chararts/char_600_cpione.ab defaultskin"
+      },
+      {
+        "id": "char_607_cspec",
+        "source": "chararts/char_607_cspec.ab defaultskin"
+      }
+    ],
+    "extractorSelects": "chararts/<charId>.ab defaultskin; no costume enumeration",
+    "runtimeSelects": "unitKeyOf() selects units; skinOf() selects unit.skin mount records, not the chosen outfit"
+  },
+  "notes": [
+    "Static descriptor compilation is not an in-game visual comparison.",
+    "Keep old units/prefabs absent from the KR client export.",
+    "Supplement new base effects additively; do not replace the whole live index.",
+    "Costume effects need another extraction including costume bundles and explicit outfit override metadata."
+  ]
+}

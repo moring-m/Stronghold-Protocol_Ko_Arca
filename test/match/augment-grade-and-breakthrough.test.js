@@ -92,7 +92,7 @@ test('ordinary enemies scale from 100% by each offered grade and custom fixed va
 test('custom cumulative ATK DEF and RES can be enabled separately without losing fixed values',t=>{
  for(const stat of ['enemyAtk','enemyDef','enemyRes']){
   const m=match(t,'custom',{customExtensions:{rules:['augments'],ruleValues:{enemyAtk:177,enemyDef:188,enemyRes:155,[stat+'ByAugment']:1}}});m.augments.history=['gold','prism'];
-  const state=m.augments.battleState();assert.equal(state.enemyAtkMultiplier,stat==='enemyAtk'?1.16:1);assert.equal(state.enemyDefMultiplier,stat==='enemyDef'?1.16:1);assert.equal(state.enemyResBonus,stat==='enemyRes'?8:0);
+  const state=m.augments.battleState();assert.equal(state.enemyAtkMultiplier,stat==='enemyAtk'?1.1:1);assert.equal(state.enemyDefMultiplier,stat==='enemyDef'?1.1:1);assert.equal(state.enemyResBonus,stat==='enemyRes'?6:0);
   assert.equal(m.customExtensions.ruleValues[stat],{enemyAtk:177,enemyDef:188,enemyRes:155}[stat]);assert.equal(m.gd.config.customRules[stat],100);
  }
 });

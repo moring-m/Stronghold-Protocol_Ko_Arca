@@ -35,11 +35,14 @@ function download(file, cache, resources) {
   return job;
 }
 
+const mutableFxIndex = path => /^\/assets\/local\/fx\/(?:index|textures)\.json$/.test(path);
+const reusable = (response, file) => response && (!mutableFxIndex(file.path) || response.headers.get('X-SP-Resource-Hash') === file.sha256);
+
 async function downloadOne(file, cache, resources) {
   const startedGeneration=generation;
-  if (await cache.match(file.path)) return;
+  if (reusable(await cache.match(file.path), file)) return;
   const previous=await caches.match(file.path);
-  if(previous)return; // Reuse previous assets without duplicating gigabytes on every patch.
+  if(reusable(previous,file))return; // Reuse previous assets without duplicating gigabytes on every patch.
   let lastError;
   const sourceErrors = [];
   for (const source of file.sources) {
@@ -71,7 +74,7 @@ async function downloadOne(file, cache, resources) {
         payload = normalized.text;
       }
       if(startedGeneration!==generation)throw new Error('리소스 재다운로드로 작업이 초기화되었습니다.');
-      await cache.put(file.path, new Response(payload, { headers: { 'Content-Type': contentType(file.path) } }));
+      await cache.put(file.path, new Response(payload, { headers: { 'Content-Type': contentType(file.path), ...(file.sha256 ? {'X-SP-Resource-Hash':file.sha256} : {}) } }));
       return;
     } catch (error) {
       if(startedGeneration!==generation)throw error;
@@ -215,9 +218,9 @@ self.addEventListener('fetch', event => {
     const earlyQuery=new URL(url.href).searchParams;earlyQuery.delete('release');
     const earlyPath=url.pathname.replace(/^\/(assets|fonts|media)\/~[a-f0-9]+\//,'/$1/')+(earlyQuery.toString()?'?'+earlyQuery.toString():'');
     const existing=await caches.match(earlyPath);
-    if(existing)return existing;
+    if(existing && !mutableFxIndex(earlyPath))return existing;
     const resources = await index();
-    const cache = await caches.open(PREFIX + resources.version);
+    const cache = await caches.open(PREFIX + selectedResources(resources,selection).version);
     const assetPath = url.pathname.replace(/^\/(assets|fonts|media)\/~[a-f0-9]+\//, '/$1/');
     const assetQuery = new URL(url.href).searchParams;
     // Release pins isolate game code/data, but do not change downloaded art bytes.
@@ -230,7 +233,7 @@ self.addEventListener('fetch', event => {
       path = resources.files.find(f => ['.mp3', '.ogg', '.wav'].some(ext => f.path === stem + ext))?.path || path;
     }
     const cached = await cache.match(path) || await caches.match(path) || await caches.match(url.pathname);
-    if(cached)return cached;
+    if(cached && !mutableFxIndex(path))return cached;
     const file = resources.files.find(f => f.path === path || encodeURI(f.path) === path);
     if (file) { await download(file, cache, resources); return await cache.match(file.path) || caches.match(file.path); }
     const response=await fetch(event.request);

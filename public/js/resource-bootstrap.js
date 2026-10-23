@@ -59,7 +59,7 @@ async function requestDownloadConsent(resources, forOfficial=false,voiceLanguage
     if(!individual)language.dataset.testid='resource-language';
     let copy=RESOURCE_CONSENT_TEXT[language.value];
     const voice=individual?{value:choice.voice}:select('음성',[['kr','한국어'],['jp','일본어']],choice.voice);
-    const effects=individual?{value:choice.effects}:select('전투 이펙트',[['simple','간소'],['official','공식']],choice.effects);
+    const effects=individual?{value:choice.effects}:select('전투 이펙트',[['official','공식'],['simple','간소']],choice.effects);
     if(!individual)effects.dataset.resourceKind='effects';
     const estimateSelection=()=>{const selected=selectedResources(resources,{voice:voice.value,effects:effects.value,...(scope?{scope}:{})});description.textContent=voiceLanguage?copy.voiceDescription(voiceLanguage==='jp'?copy.jp:copy.kr,Math.ceil(selected.estimatedBytes/1048576)):forOfficial?copy.fxDescription(Math.ceil(selected.estimatedBytes/1048576)):copy.description(Math.ceil((selected.estimatedBytes+(LANGUAGE_PACKS[language.value]||[]).reduce((sum,file)=>sum+file.bytes,0))/1048576));return selected;};
     voice.onchange=effects.onchange=estimateSelection;estimateSelection();

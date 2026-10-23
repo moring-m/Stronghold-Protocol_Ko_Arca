@@ -1,0 +1,25 @@
+{
+  "repository": "https://github.com/moring-m/Stronghold-Protocol_Ko_Arca_assets",
+  "commit": "435a670251e89e3ec075819750c84beba8d175ad",
+  "approvedSkins": 19,
+  "withheld": [
+    "char_264_f12yin@marthe#13"
+  ],
+  "remoteVerification": [
+    {
+      "path": "/assets/local/fx/prefabs/acast_attack_01_trail.json",
+      "status": 200,
+      "sha256": "dc127dff3b5a2457c5c98ff86ceeb0f7960b8cfb99f1921da1eb0480be9c476e"
+    },
+    {
+      "path": "/assets/local/fx/mesh/001-3ce611bd.json",
+      "status": 200,
+      "sha256": "287d8836419724757b6b7e19e7d431f866f9c36e25cccb5150faee8fc6909c68"
+    },
+    {
+      "path": "/assets/local/fx/tex/AVG_flow_18-e19bafc6.webp",
+      "status": 200,
+      "sha256": "d50ee96085b4b84b0e3e6161285c619b9e64333a5de7be93c597e9e398f56c10"
+    }
+  ]
+}

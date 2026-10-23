@@ -3,21 +3,22 @@ import assert from 'node:assert/strict';
 import {selectedResources,normalizeResourceSelection,officialFxDownloaded} from '../../shared/resourceSelection.js';
 import {aromaOriginOffset} from '../../public/js/render/vfx/wiring.js';
 const files=['/assets/char/a.png','/assets/audio/voice/kr/a/x.mp3','/assets/audio/voice/jp/a/x.mp3','/assets/audio/sfx/a.mp3','/assets/local/fx/index.json','/assets/local/fx/prefabs/a.json'].map(path=>({path,bytes:10}));
-test('default download excludes official effects and Japanese voices but retains models and battle SFX',()=>{
+test('default download prefers official effects and Korean voices',()=>{
  const r=selectedResources({version:'test',files},null);
- assert.deepEqual(r.files.map(f=>f.path),[files[0].path,files[1].path,files[3].path]);assert.equal(r.estimatedBytes,30);
+ assert.deepEqual(r.files.map(f=>f.path),[files[0].path,files[1].path,files[3].path,files[4].path,files[5].path]);assert.equal(r.estimatedBytes,50);
 });
 test('Japanese official selection includes that pack and excludes Korean voices, with its own completion marker',()=>{
  const r=selectedResources({version:'test',files},{voice:'jp',effects:'official'});
  assert.equal(r.files.length,5);assert.equal(r.files.some(f=>f.path===files[1].path),false);assert.equal(r.estimatedBytes,50);
  assert.equal(r.sourceVersion,'test');assert.equal(selectedResources(r,{voice:'jp',effects:'official'}).version,r.version);
  assert.notEqual(r.version,selectedResources({version:'test',files},null).version);
- assert.deepEqual(normalizeResourceSelection({voice:'bad',effects:'bad'}),{voice:'kr',effects:'simple'});
+ assert.deepEqual(normalizeResourceSelection({voice:'bad',effects:'bad'}),{voice:'kr',effects:'official'});
  assert.equal(officialFxDownloaded({getItem:()=>null}),false);assert.equal(officialFxDownloaded({getItem:()=>'1'}),true);
 });
 test('Aroma directional stream origin moves forward in every deployment direction without shifting hit and buff effects',()=>{
  for(const [dir,offset]of Object.entries({RIGHT:[1,0],LEFT:[-1,0],UP:[0,1],DOWN:[0,-1]})){
-  for(const key of ['aroma_attack_start_01','aroma_skill_01_start_01','aroma_skill_02_range_02'])assert.deepEqual(aromaOriginOffset(key,dir),offset);
+  for(const [key,distance]of [['aroma_attack_start_01',1.9685],['aroma_skill_01_start_01',2.3495]]){const actual=aromaOriginOffset(key,dir);assert.ok(actual.every((v,i)=>Math.abs(v-offset[i]*distance)<1e-8));}
+  assert.deepEqual(aromaOriginOffset('aroma_skill_02_range_02',dir),[0,0]);
   for(const key of ['aroma_attack_hit_01','aroma_skill_02_buff_01','other_attack_start_01'])assert.deepEqual(aromaOriginOffset(key,dir),[0,0]);
  }
 });
@@ -30,9 +31,9 @@ test('Aroma origin correction is retained when a held stream follows a moving op
  for(const [dir,offset]of Object.entries({RIGHT:[1,0],LEFT:[-1,0],UP:[0,1],DOWN:[0,-1]})){
   const v={id:1,x:5,y:10,z:0,dir,alive:true,info:{spine:'char_446_aroma'}};
   wiring.playOn('aroma_attack_start_01',v,{stick:true});
-  assert.deepEqual(captured.place.pos,[-5+offset[0],1+offset[1],-0]);
+  assert.deepEqual(captured.place.pos,[-5+offset[0]*1.9685000000000001,1+offset[1]*1.9685000000000001,-0]);
   const fx={def,anchor:captured.place.pos.slice()};v.x+=2;captured.opts.track(fx);
-  assert.deepEqual(fx.anchor,[-3+offset[0],1+offset[1],-0]);
+  assert.deepEqual(fx.anchor,[-3+offset[0]*1.9685000000000001,1+offset[1]*1.9685000000000001,-0]);
  }
 });
 

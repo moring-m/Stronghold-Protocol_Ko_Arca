@@ -1103,7 +1103,7 @@ export class SkillFx {
     const at = bind.at === 'point' || !tv ? this._ground(x, y, tv) : tv;
     if (bind.oneshot) {
       let drew = false;
-      for (const k of keys) if (this.w.playOn(k, at, { important: true })) drew = true;
+      for (const k of keys) if (this.w.playOn(k, at, { important: true, flipFrom:U.v || undefined })) drew = true;
       return drew;
     }
     const bb = U.srec?.bb || {};
@@ -1112,7 +1112,7 @@ export class SkillFx {
       : Number(bb[bind.hold]) > 0 ? Number(bb[bind.hold]) : bind.holdS || SKILL_CAST_S;
     let drew = false;
     for (const k of keys) {
-      const h = this.w.playOn(k, at, { loop: true, important: true });
+      const h = this.w.playOn(k, at, { loop: true, important: true, flipFrom:U.v || undefined });
       if (!h) continue;
       drew = true;
       later(this.w.ofx, holdS, () => h.stop());

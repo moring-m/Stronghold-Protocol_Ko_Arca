@@ -49,11 +49,14 @@ RUN --mount=type=secret,id=build_ca \
     node tools/vendor.mjs \
  && node tools/apply-production.mjs \
  && node tools/import-official-v030.mjs --download \
+ && node tools/fx-supplement.mjs install \
+ && node tools/install-hosted-resources.mjs \
  && node tools/build-korean-ui.mjs \
  && if [ "$BROWSER_RESOURCES" = "1" ]; then if [ ! -f content/production/resources.json ]; then node tools/build-browser-resources.mjs; fi; fi \
  && if [ "$FETCH_ASSETS" = "1" ]; then \
       node tools/fetch-assets.mjs || echo "WARNING: art download incomplete; the image falls back to placeholder art"; \
     fi \
+ && node tools/resource-origin.mjs apply \
  && rm -rf .cache
 
 # ---- 3. runtime ---------------------------------------------------------------------------------------

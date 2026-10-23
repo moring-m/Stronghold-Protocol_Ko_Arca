@@ -55,6 +55,10 @@ function translate(s,code){
  m=s.match(/^오퍼레이터가 피해를 입히면 대상 적에게 ([\d.]+)초간 '속세의 음'을 적용하여, 매 초마다 ([\d.]+) \+ 공격력의 ([\d.]+)%에 해당하는 마법 대미지를 입힘 \(무한 중첩 가능\)$/);if(m)return choose(code,`When an Operator deals damage, inflict Voice of Mundane on the target for ${m[1]} seconds, dealing ${m[2]} + ${m[3]}% ATK as Arts damage per second (stacks without limit)`,`オペレーターがダメージを与えると、対象に${m[1]}秒間「塵界の音」を付与。毎秒${m[2]}+攻撃力の${m[3]}%の術ダメージを与える（スタック数の上限なし）`,`干员造成伤害时，对目标施加${m[1]}秒「尘世之音」，每秒造成${m[2]}+攻击力${m[3]}%的法术伤害（层数无上限）`);
  m=s.match(/^오퍼레이터가 피해를 입힐 때마다 대상 적의 방어력 및 마법 저항 -([\d.]+)% \(최대 -([\d.]+)%\)$/);if(m)return choose(code,`Each time an Operator deals damage, reduce the target's DEF and RES by ${m[1]}% (up to -${m[2]}%)`,`オペレーターがダメージを与えるたび、対象の防御力・術耐性-${m[1]}%（最大-${m[2]}%）`,`干员每次造成伤害使目标防御力与法术抗性-${m[1]}%（最多-${m[2]}%）`);
  m=s.match(/^모든 적의 실드 \+([\d.]+)$/);if(m)return choose(code,`All enemies gain ${m[1]} shield`,`全ての敵のシールド+${m[1]}`,`所有敌人护盾+${m[1]}`);
+ if(s==='모든 적 유닛이 은신 획득')return choose(code,'All enemies gain Invisible','全ての敵がステルスを獲得','所有敌人获得隐匿');
+ if(s==='개인 일반 전투의 모든 적 유닛이 은신 획득')return choose(code,'All enemies gain Invisible in your own normal battles','自身の通常戦闘で全ての敵がステルスを獲得','自己普通战斗中的所有敌人获得隐匿');
+ if(s==='보스전 및 보스 유닛에는 적용되지 않음')return choose(code,'Does not apply to boss battles or boss units','ボス戦およびボスユニットには適用しない','不适用于首领战及首领单位');
+ if(s==='연합방어 및 보스전에는 적용되지 않음')return choose(code,'Does not apply to Unite Phase or boss battles','共同防衛・ボス戦には適用しない','不适用于联合防御和首领战');
  if(s==='모든 적의 은신 무효화')return choose(code,'Reveal all Invisible enemies','全ての敵のステルスを無効化','所有敌人隐匿失效');
  if(s==='모든 적이 침묵 면역')return choose(code,'All enemies are immune to Silence','全ての敵が沈黙無効','所有敌人免疫沉默');
  if(s==='모든 오퍼레이터가 은신 획득')return choose(code,'All Operators gain Invisible','全オペレーターがステルスを獲得','所有干员获得隐匿');
@@ -65,6 +69,7 @@ function translate(s,code){
 for(const code of ['en','ja','zh']){
  const p=`public/i18n/${code}/fork.json`,dict=JSON.parse(await readFile(p,'utf8'));let count=0;
  dict['속세의 음']=choose(code,'Voice of Mundane','塵界の音','尘世之音');
- for(const row of AUGMENT_SOURCES){const value=translate(row.description,code);if(value){dict[row.description]=value;count++;}}
+ for(const row of AUGMENT_SOURCES){for(const text of [row.description,row.notes]){const value=translate(text,code);if(value){dict[text]=value;count++;}}}
+ dict['은신']=choose(code,'Invisible','ステルス','隐匿');
  await writeFile(p,JSON.stringify(dict,null,2)+'\n');console.log(code,count,'curated augment descriptions');
 }

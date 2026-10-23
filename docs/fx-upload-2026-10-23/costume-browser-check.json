@@ -1,0 +1,77 @@
+{
+  "results": [
+    {
+      "skin": "char_003_kalts@sale#14",
+      "char": "char_003_kalts",
+      "base": "kalts_attack_01_hit",
+      "selected": "kalts_attack_01_hit_sale#14",
+      "expected": "kalts_attack_01_hit_sale#14",
+      "handle": true,
+      "stats": {
+        "tier": "full",
+        "available": true,
+        "effects": 1,
+        "pending": 0,
+        "particles": 34,
+        "reused": 0,
+        "systems": 13,
+        "dropped": 0,
+        "draws": 16,
+        "programs": 3,
+        "textures": 11,
+        "texMB": 3
+      },
+      "graphic": 5,
+      "failed": []
+    },
+    {
+      "skin": "char_1016_agoat2@epoque#34",
+      "char": "char_1016_agoat2",
+      "base": "agoat2_attack_hit_01",
+      "selected": "agoat2_attack_hit_01_epoque#34",
+      "expected": "agoat2_attack_hit_01_epoque#34",
+      "handle": true,
+      "stats": {
+        "tier": "full",
+        "available": true,
+        "effects": 1,
+        "pending": 0,
+        "particles": 21,
+        "reused": 0,
+        "systems": 7,
+        "dropped": 0,
+        "draws": 23,
+        "programs": 3,
+        "textures": 16,
+        "texMB": 3
+      },
+      "graphic": 5,
+      "failed": []
+    },
+    {
+      "skin": "char_1020_reed2@summer#17",
+      "char": "char_1020_reed2",
+      "base": "reed2_attack_hit",
+      "selected": "reed2_attack_hit_summer#17",
+      "expected": "reed2_attack_hit_summer#17",
+      "handle": true,
+      "stats": {
+        "tier": "full",
+        "available": true,
+        "effects": 1,
+        "pending": 0,
+        "particles": 26,
+        "reused": 0,
+        "systems": 6,
+        "dropped": 0,
+        "draws": 29,
+        "programs": 4,
+        "textures": 23,
+        "texMB": 4
+      },
+      "graphic": 9,
+      "failed": []
+    }
+  ],
+  "errors": []
+}

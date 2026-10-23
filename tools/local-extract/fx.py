@@ -1403,9 +1403,30 @@ def save_webp(img, path):
 def write_atomic(path, data):
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    tmp = path.with_name(f'.{path.name}.{os.getpid()}.tmp')
-    tmp.write_bytes(data)
-    os.replace(tmp, path)
+    # Different bundles can export identical content-addressed textures concurrently.
+    # Windows may deny replacement while another worker or antivirus reads the target.
+    import tempfile
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(prefix=f'.{path.name}.', suffix='.tmp', dir=path.parent, delete=False) as stream:
+            temporary = Path(stream.name)
+            stream.write(data)
+        for attempt in range(6):
+            try:
+                os.replace(temporary, path)
+                return
+            except PermissionError:
+                try:
+                    if path.read_bytes() == data:
+                        return  # Another worker already wrote the exact same file.
+                except OSError:
+                    pass
+                if attempt == 5:
+                    raise
+                time.sleep(0.05 * (attempt + 1))
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
 
 
 # ---- container indexes ----------------------------------------------------------------------------------------------
@@ -2564,17 +2585,12 @@ def skill_entry(env, root, ek, pk, effect_refs, templates):
     return e
 
 
-def crawl_units(ab_root, cabs, unit_ids, gd, eff, enemy_idx, token_idx, log):
-    """index.json's units / projectiles / skills / skins for `unit_ids`, and every effect key they reference."""
-    units, projectiles, skills, skins, referenced = {}, {}, {}, {}, set()
-    shared = AssetEnv(ab_root, cabs)                           # [uc]projectiles.ab and [uc]skills.ab, loaded once
-    proj_roots = shared.prefabs(PROJECTILES)
-    skill_roots = shared.prefabs(SKILLS)
-    # effect / projectile / skill keys are case-insensitive: the client's references mix cases ('…_buff_02_B'), the
-    # bundles' containers (and so the files, the manifest and this index) use the lower-case names
-    effect_refs = lambda strings: sorted({x.lower() for x in strings if x.lower() in eff})  # noqa: E731
-    ek = lambda x: x.lower() if isinstance(x, str) and x.lower() in eff else x  # noqa: E731
-    pk = lambda x: x.lower() if isinstance(x, str) and x.lower() in proj_roots else None  # noqa: E731
+def projectile_entries(shared, proj_roots, eff, keys, out=None):
+    """Parse selected projectile movement/lifecycle records without crawling any base units."""
+    projectiles = {} if out is None else out
+    effect_refs = lambda strings: sorted({x.lower() for x in strings if x.lower() in eff})
+    ek = lambda x: x.lower() if isinstance(x, str) and x.lower() in eff else x
+    pk = lambda x: x.lower() if isinstance(x, str) and x.lower() in proj_roots else None
     lists = (('_effectsWhenStart', 'onStart'), ('_effectsWhenReached', 'onReached'), ('_effectsWhenHit', 'onHit'),
              ('_effectsWhenStop', 'onStop'), ('_effectsToTargetWhenStart', 'toTargetOnStart'),
              ('_effectsToTileWhenStart', 'toTileOnStart'), ('_effectOnTrigger', 'onTrigger'), ('_effectsWhenSelect', 'onSelect'))
@@ -2617,6 +2633,25 @@ def crawl_units(ab_root, cabs, unit_ids, gd, eff, enemy_idx, token_idx, log):
         entry['projectiles'] = sorted({pk(x) for x in strings if pk(x) and pk(x) != key})
         for p in entry['projectiles']:
             projectile(p, depth + 1)
+
+    for key in keys:
+        projectile(key)
+    return projectiles
+
+
+def crawl_units(ab_root, cabs, unit_ids, gd, eff, enemy_idx, token_idx, log):
+    """index.json's units / projectiles / skills / skins for `unit_ids`, and every effect key they reference."""
+    units, projectiles, skills, skins, referenced = {}, {}, {}, {}, set()
+    shared = AssetEnv(ab_root, cabs)                           # [uc]projectiles.ab and [uc]skills.ab, loaded once
+    proj_roots = shared.prefabs(PROJECTILES)
+    skill_roots = shared.prefabs(SKILLS)
+    # effect / projectile / skill keys are case-insensitive: the client's references mix cases ('…_buff_02_B'), the
+    # bundles' containers (and so the files, the manifest and this index) use the lower-case names
+    effect_refs = lambda strings: sorted({x.lower() for x in strings if x.lower() in eff})  # noqa: E731
+    ek = lambda x: x.lower() if isinstance(x, str) and x.lower() in eff else x  # noqa: E731
+    pk = lambda x: x.lower() if isinstance(x, str) and x.lower() in proj_roots else None  # noqa: E731
+    def projectile(key, depth=0):
+        projectile_entries(shared, proj_roots, eff, [key], out=projectiles)
 
     ekn = lambda x: x.lower() if isinstance(x, str) and x.lower() in eff else None  # noqa: E731
     templates = buff_templates(shared, ekn)

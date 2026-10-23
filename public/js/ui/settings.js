@@ -1,3 +1,4 @@
+import {installMobileUiScale,isMobileScaleTarget,MOBILE_UI_SCALES,mobileUiScaleText} from './mobileScale.js';
 import {LangButton} from '../i18n/LangButton.js';
 const cx = (...parts) => parts.flat().filter(Boolean).join(' ');
 import { confirmDialog } from "./components.js";
@@ -14,7 +15,7 @@ import { ResourceRedownloadButton } from './resourceRedownload.js';
 import {officialFxDownloaded,voiceDownloaded} from '../../../shared/resourceSelection.js';
 import {useEffect} from "../../vendor/hooks.module.js";
 import {store} from "../store.js";
-import {tc} from "../../../shared/i18n.js";
+import {tc,getLang} from "../../../shared/i18n.js";
 import {catalog} from "../content.js";
 import {loadCatalog} from "../content.js";
 import {cosmeticPlugins} from "../content.js";
@@ -75,6 +76,7 @@ audio.setVolumes(settingsStore.get());
 audio.setVoiceLang(settingsStore.get().voiceLanguage, settingsStore.get().voiceOverrides);
 // before the first render (main.js boot renders after its imports ran): the stored step is on screen without a flash
 applyTextSize(settingsStore.get().textSize);
+installMobileUiScale(settingsStore);
 
 /** @param {Partial<ReturnType<typeof sanitizeSettings>>} patch */
 export function updateSettings(patch,{skipDownloadPrompt=false}={}) {
@@ -334,9 +336,9 @@ export function SettingsModal({ open, onClose }) {
     actions=${html`<${ResourceRedownloadButton} /><${RestartVoteControls} voteVisible=${false} onRequested=${onClose} label="리방 투표" /><${Button} variant="secondary" icon="book" class="set-guide" onClick=${() => openGuide(0)}>玩法说明<//>
       <${Button} variant="primary" icon="check" onClick=${onClose}>完成<//>`}>
     <nav class="set-categories" aria-label="설정 종류" data-i18n-skip>
-      ${[['graphics','그래픽'],['audio','소리'],['chat','채팅'],['controls','조작·단축키']].map(([id,label])=>html`<button type="button" class=${category===id?'is-on':''} aria-pressed=${category===id} onClick=${()=>setCategory(id)}>${label}</button>`)}
+      ${[['graphics','그래픽'],['audio','소리'],['chat','채팅'],['controls','조작·단축키'],['accessibility','접근성']].map(([id,label])=>html`<button type="button" class=${category===id?'is-on':''} aria-pressed=${category===id} onClick=${()=>setCategory(id)}>${t(label)}</button>`)}
     </nav>
-    <div class="set-list"><div class="set-row set-row--language"><span class="set-row__label">화면 언어</span><${LangButton} /></div>
+    <div class="set-list">
     <section hidden=${category!=='audio'} class="set-category" data-category="audio">
       <${Slider} label="背景音乐" micro="BGM" icon="play" value=${s.bgm} onInput=${(v) => updateSettings({ bgm: v })} />
       <${Slider} label="오퍼레이터 음성" micro="VOICE" icon="signal" value=${s.voice} onInput=${v=>updateSettings({voice:v})} />
@@ -374,14 +376,27 @@ export function SettingsModal({ open, onClose }) {
       <${Choice} label="최대 프레임" value=${s.frameLimit} options=${[[30,'30 FPS'],[60,'60 FPS'],[120,'120 FPS']]} onChange=${v=>updateSettings({frameLimit:Number(v)})} />
       <${Choice} label="애니메이션 품질" value=${s.animationQuality} options=${[['high','높음'],['medium','중간'],['low','낮음']]} onChange=${v=>updateSettings({animationQuality:v})} />
       <${Choice} label="공식 전투 이펙트" value=${s.officialFx} options=${[['auto','자동'],['off','끄기'],['lite','간소'],['full','전체']]} onChange=${v=>updateSettings({officialFx:v})} />
+      <${Choice} label="이펙트 품질" value=${s.effectsQuality} options=${[['high','높음'],['medium','중간'],['low','낮음']]} onChange=${v=>updateSettings({effectsQuality:v})} />
+      <${Toggle} label="그림자" value=${s.shadows} onChange=${v=>updateSettings({shadows:v})} />
+      <${Toggle} label="자동 성능 조절" value=${s.adaptiveQuality} onChange=${v=>updateSettings({adaptiveQuality:v})} />
+    </section><section hidden=${category!=='controls'} class="set-category" data-category="controls">
+      <p class="set-hint">단축키 버튼을 누른 뒤 사용할 키를 입력하세요. 중복된 키는 서로 교환됩니다. Esc로 취소할 수 있습니다.</p>
+      ${HOTKEY_ACTIONS.map(action=>html`<div class="set-row" data-i18n-skip>
+        <span class="set-row__label">${({refresh:'상점 새로고침',freeze:'상점 동결',levelUp:'상점 레벨업',buy:'마우스 위치 상품 구매',retreat:'마우스 위치 오퍼레이터 퇴각',sell:'마우스 위치 오퍼레이터 판매',ready:'준비 완료 / 일시정지',collapseShop:'상점 접기 / 펼치기',enemyPreview:'적 미리보기 / 전장으로 돌아가기'})[action]}</span>
+        <button type="button" class="btn btn--secondary" data-hotkey-binding=${action} aria-label=${'단축키 변경: '+action} onClick=${()=>setBinding(action)}>
+          ${binding===action?'키 입력 대기…':hotkeyLabel(s.keys[action])}</button>
+      </div>`)}
+      <${Button} variant="secondary" size="sm" onClick=${()=>{updateSettings({keys:DEFAULT_HOTKEYS});setBinding(null);}}>단축키 기본값 복원<//>
+
+    </section><section hidden=${category!=='accessibility'} class="set-category" data-category="accessibility">
+      <div class="set-row set-row--language"><span class="set-row__label">화면 언어</span><${LangButton} /></div>
+      ${isMobileScaleTarget()?html`<${Choice} label=${mobileUiScaleText(getLang()).label} testId="mobile-ui-scale" value=${s.mobileUiScale} options=${MOBILE_UI_SCALES.map(v=>[v,Math.round(v*100)+'%'])} onChange=${v=>updateSettings({mobileUiScale:Number(v)})} /><p class="set-hint" data-i18n-skip>${mobileUiScaleText(getLang()).hint}</p>`:null}
       <${Toggle} label="배치 시 카메라 확대" value=${s.deployCameraZoom} onChange=${v=>updateSettings({deployCameraZoom:v})} />
       <${Toggle} label="전투 통계" value=${s.combatMetrics} onChange=${v=>updateSettings({combatMetrics:v})} />
       <${Toggle} label="차지 캐스터 에너지" value=${s.mysticEnergy} onChange=${v=>updateSettings({mysticEnergy:v})} />
-      <${Choice} label="이펙트 품질" value=${s.effectsQuality} options=${[['high','높음'],['medium','중간'],['low','낮음']]} onChange=${v=>updateSettings({effectsQuality:v})} />
-      <${Toggle} label="그림자" value=${s.shadows} onChange=${v=>updateSettings({shadows:v})} />
       <${Toggle} label="스킬 범위 표시" value=${s.skillRanges} onChange=${v=>updateSettings({skillRanges:v})} />
       <${Toggle} label="유닛 공격 범위 표시" value=${s.unitRanges} onChange=${v=>updateSettings({unitRanges:v})} />
-      <${Toggle} label="자동 성능 조절" value=${s.adaptiveQuality} onChange=${v=>updateSettings({adaptiveQuality:v})} />
+      <${Toggle} label="장비 칸 왼쪽 배치" micro="SHOP LAYOUT" value=${s.shopItemLeft} onChange=${v=>updateSettings({shopItemLeft:v})} />
       <div class="set-row" data-i18n-skip>
         <span class="set-row__label">대미지 표시<${MicroLabel}>DAMAGE NUMBERS<//></span>
         <div id="damage-number-mode" class="set-seg" role="radiogroup" aria-label="대미지 표시">
@@ -393,16 +408,6 @@ export function SettingsModal({ open, onClose }) {
       <p class="set-hint">${t('弹药类技能开启时，在弹药条下方显示剩余弹药 / 总弹药数（如 13/14）。官方界面没有这个数字。')}</p>
       <p class="set-hint" data-i18n-skip>합산: 연속 피해를 묶어 표시 · 모두: 타격마다 표시 · 기본: 명일방주의 붉은 대미지 표시 판정(예상 피해의 1.5배 이상)을 적용합니다.</p>
       <${Choice} testId="text-size" label="글자 크기" value=${s.textSize} options=${[['sm','작게'],['md','보통'],['lg','크게'],['xl','아주 크게']]} onChange=${v=>updateSettings({textSize:v})} />
-    </section><section hidden=${category!=='controls'} class="set-category" data-category="controls">
-      <${Toggle} label="장비 칸 왼쪽 배치" micro="SHOP LAYOUT" value=${s.shopItemLeft} onChange=${v=>updateSettings({shopItemLeft:v})} />
-      <p class="set-hint">단축키 버튼을 누른 뒤 사용할 키를 입력하세요. 중복된 키는 서로 교환됩니다. Esc로 취소할 수 있습니다.</p>
-      ${HOTKEY_ACTIONS.map(action=>html`<div class="set-row" data-i18n-skip>
-        <span class="set-row__label">${({refresh:'상점 새로고침',freeze:'상점 동결',levelUp:'상점 레벨업',buy:'마우스 위치 상품 구매',retreat:'마우스 위치 오퍼레이터 퇴각',sell:'마우스 위치 오퍼레이터 판매',ready:'준비 완료 / 일시정지',collapseShop:'상점 접기 / 펼치기',enemyPreview:'적 미리보기 / 전장으로 돌아가기'})[action]}</span>
-        <button type="button" class="btn btn--secondary" data-hotkey-binding=${action} aria-label=${'단축키 변경: '+action} onClick=${()=>setBinding(action)}>
-          ${binding===action?'키 입력 대기…':hotkeyLabel(s.keys[action])}</button>
-      </div>`)}
-      <${Button} variant="secondary" size="sm" onClick=${()=>{updateSettings({keys:DEFAULT_HOTKEYS});setBinding(null);}}>단축키 기본값 복원<//>
-
     </section></div>
   <//>`;
 }

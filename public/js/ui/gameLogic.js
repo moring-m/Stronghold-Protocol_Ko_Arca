@@ -1,3 +1,4 @@
+import {mobileUiScale} from './mobileScale.js';
 import { grantedBondsByMorph } from '../../../shared/plugins/rules.js';
 import {chessLoadout} from './gameLogic/loadout.js';
 function prepPair(pub, myId) {
@@ -1725,7 +1726,7 @@ export function shortcutBlocked(act, { modal = false, drawer = false } = {}) {
 
 // ---- settings ------------------------------------------------------------------------------------------------------
 
-export const DEFAULT_SETTINGS = Object.freeze({ keys: DEFAULT_HOTKEYS, shopItemLeft: false, bgm: 0.6, sfx: 0.8, voice: 0.6, voiceLanguage: 'kr', voiceOverrides: Object.freeze({}), textSize: 'sm', chatVolume: 0.5, chatSound: 'emote', chatSoundCustomized: false, chatFactionNotifications: false, chatCooldown: defaultChatCooldown('emote'), muted: false, damageNumbers: true, damageNumberMode: 'basic', officialDamageNumbers:false, ammoCount:false, combatMetrics:false, deployCameraZoom:true, mysticEnergy:false, officialFx:'auto', quality: 'high', mapQuality: 'high', renderScale: 1, effectsQuality: 'high', shadows: true, skillRanges: true, unitRanges: true, animationQuality: 'high', frameLimit: 60, adaptiveQuality: true });
+export const DEFAULT_SETTINGS = Object.freeze({ keys: DEFAULT_HOTKEYS, shopItemLeft: true, bgm: 0.6, sfx: 0.8, voice: 0.6, voiceLanguage: 'kr', voiceOverrides: Object.freeze({}), textSize: 'sm', chatVolume: 0.5, chatSound: 'emote', chatSoundCustomized: false, chatFactionNotifications: false, chatCooldown: defaultChatCooldown('emote'), muted: false, damageNumbers: true, damageNumberMode: 'basic', officialDamageNumbers:false, ammoCount:false, combatMetrics:false, deployCameraZoom:true, mysticEnergy:false, officialFx:'auto', quality: 'high', mapQuality: 'high', renderScale: 1, mobileUiScale: 1, effectsQuality: 'high', shadows: true, skillRanges: true, unitRanges: true, animationQuality: 'high', frameLimit: 60, adaptiveQuality: true });
 const QUALITIES = ['high', 'medium', 'low'];
 
 /**
@@ -1739,7 +1740,7 @@ export function sanitizeSettings(raw) {
   const chatSound = r.chatSound === 'off' || chatNotificationSound(r.chatSound) ? r.chatSound : DEFAULT_SETTINGS.chatSound;
   return {
     keys: sanitizeHotkeys(r.keys),
-    shopItemLeft: r.shopItemLeft === true,
+    shopItemLeft: typeof r.shopItemLeft === 'boolean' ? r.shopItemLeft : DEFAULT_SETTINGS.shopItemLeft,
     bgm: vol(r.bgm, DEFAULT_SETTINGS.bgm),
     sfx: vol(r.sfx, DEFAULT_SETTINGS.sfx),
     voice: vol(r.voice, DEFAULT_SETTINGS.voice),
@@ -1762,6 +1763,7 @@ export function sanitizeSettings(raw) {
     officialFx:['auto','off','lite','full'].includes(r.officialFx)?r.officialFx:'auto',
     quality: QUALITIES.includes(r.quality) ? r.quality : DEFAULT_SETTINGS.quality,
     mapQuality: ['high','medium','low','minimal'].includes(r.mapQuality) ? r.mapQuality : 'high',
+    mobileUiScale: mobileUiScale(r.mobileUiScale),
     renderScale: [.5,.75,1,1.25,1.5,2].includes(r.renderScale) ? r.renderScale : 1,
     effectsQuality: QUALITIES.includes(r.effectsQuality) ? r.effectsQuality : (QUALITIES.includes(r.quality) ? r.quality : 'high'),
     shadows: typeof r.shadows === 'boolean' ? r.shadows : r.quality !== 'low',

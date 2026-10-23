@@ -381,6 +381,8 @@
 .public-room__details dd[data-mode="classic"],.public-room__details dd[data-state="waiting"] { color:var(--mint-400); }
 .public-room__details dd[data-mode="augment"] { color:#bf9bf4; }
 .public-room__details dd[data-state="running"] { color:var(--gold); }
+.public-room__population { display:flex;align-items:baseline;justify-content:space-between;gap:8px; }
+.public-room__bots { flex:none;margin-left:auto; }
 .public-room__details dd small,.public-room__bots { font-size:12px;font-weight:400;color:var(--text-lo); }
 .public-rooms-entry__count { font-size:48px;font-weight:700;line-height:1;color:var(--mint-400);font-variant-numeric:tabular-nums; }
 .public-room__actions { display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;margin-top:auto; }
@@ -417,4 +419,4 @@ html:not([lang="ko"]) .mode-cards .mode-card--lab .mode-card__name{font-size:.24
 
 .public-room__mode dd{display:flex;align-items:center;justify-content:space-between;gap:6px;min-height:28px}.public-room__mode .public-room__settings{flex:none;width:28px;min-width:28px;height:28px;padding:0;display:inline-flex;align-items:center;justify-content:center}
 
-.public-rooms-entry__total{gap:3px}.public-rooms-entry__count,.public-rooms-entry__all{font-family:var(--font-display);font-size:clamp(24px,3vw,44px);font-weight:700;line-height:1;letter-spacing:.02em;white-space:nowrap}.public-rooms-entry__all{color:var(--text-lo)}
+.public-rooms-entry__total{gap:3px}.public-rooms-entry__count,.public-rooms-entry__all{font-family:Arial, sans-serif;font-size:clamp(24px,3vw,44px);font-weight:700;line-height:1;letter-spacing:.02em;white-space:nowrap}.public-rooms-entry__all{color:var(--text-lo)}

@@ -1,0 +1,9 @@
+{
+  "repository": "moring-m/Stronghold-Protocol_Ko_Arca_assets",
+  "commit": "98066f2fff77bb2476e8bc7a3e9483a3117f5cc8",
+  "baseUrls": [
+    "https://raw.githubusercontent.com/moring-m/Stronghold-Protocol_Ko_Arca_assets/98066f2fff77bb2476e8bc7a3e9483a3117f5cc8/public",
+    "https://cdn.jsdelivr.net/gh/moring-m/Stronghold-Protocol_Ko_Arca_assets@98066f2fff77bb2476e8bc7a3e9483a3117f5cc8/public"
+  ],
+  "fallbackToServer": false
+}

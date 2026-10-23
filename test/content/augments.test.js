@@ -8,7 +8,7 @@ function fixture({allies=[],enemies=[],kind='normal',skill=null,hp=1e6,hitCount=
 const close=(a,b)=>assert.ok(Math.abs(a-b)<1e-6,`${a} != ${b}`);
 test('ally/enemy stat augments apply immediately to the right camp, including spawned enemies',()=>{
  const {h,u,e}=fixture({allies:[find('공격력 증가 I'),find('HP 증가 I'),find('마법 저항 증가 I')],enemies:[find('공격력 증가 II','enemy'),find('HP 증가 II','enemy')]});
- close(u.s.atk,120);close(u.s.maxHp,1200);close(u.hp,1200);close(u.s.res,25);close(e.s.atk,125);close(e.s.maxHp,1.25e6);close(e.hp,e.s.maxHp);
+ close(u.s.atk,120);close(u.s.maxHp,1200);close(u.hp,1200);close(u.s.res,25);close(e.s.atk,125);close(e.s.maxHp,1.3e6);close(e.hp,e.s.maxHp);
  const spawn=h.spawn('enemy_test',{pos:[10,6]});close(spawn.s.atk,125);
 });
 test('personal slow/weak effects never enter cooperative or boss battles and stack independently',()=>{
@@ -201,4 +201,9 @@ test('Karlans eye reveals enemies only while inside its owners unite board, irre
  h.b.addBuff(e,{key:'other:reveal',flags:{reveal:true}});e.x=14;h.run(.1);assert.equal(e.findBuff('augment:boardReveal'),null);assert.equal(enemyStealthed(e),false,'other reveal sources remain intact');
  const fresh=h.spawn('probe',{pos:[10,5],sourcePlayerId:'p2'});h.b.addBuff(fresh,{key:'fresh:stealth',flags:{stealth:true}});assert.equal(enemyStealthed(fresh),false,'new enemy from another player is revealed at spawn');
  fresh.y=8;h.b.emit('tick',{dt:0});assert.equal(enemyStealthed(fresh),true,'outside board rows is not revealed');
+});
+
+test('enemy prism stealth affects all normal and cooperative fields but excludes boss battles',()=>{
+ const card=createAugmentCatalog(data,4).find(a=>a.name==='은신'&&a.side==='enemy');assert.ok(card);assert.equal(card.grade,'prism');assert.ok(createAugmentCatalog(data,7).some(a=>a.id===card.id));assert.ok(!createAugmentCatalog(data,10).some(a=>a.id===card.id));
+ for(const kind of ['normal','unite','boss']){const {h,e}=fixture({kind,enemies:[card]});assert.equal(!!e.s.flags.stealth,kind!=='boss');const spawned=h.spawn('enemy_test',{pos:[10,6]});assert.equal(!!spawned.s.flags.stealth,kind!=='boss');}
 });

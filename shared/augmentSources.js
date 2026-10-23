@@ -158,8 +158,8 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "ally",
-  "description": "모든 적 유닛의 이동속도 -15% (자신의 전투에만 적용, 연합방어와 보스전에는 적용되지 않음)",
-  "notes": "자신의 전투에만 적용, 연합방어와 보스전에는 적용되지 않음"
+  "description": "모든 적 유닛의 이동속도 -15% (자신의 전장에 있는 적에게 적용, 연합방어에서도 자신의 전장 안에서만 적용되며 보스전에는 적용되지 않음)",
+  "notes": "자신의 전장에 있는 적에게 적용, 연합방어에서도 자신의 전장 안에서만 적용되며 보스전에는 적용되지 않음"
  },
  {
   "source": 13,
@@ -172,8 +172,8 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "ally",
-  "description": "모든 적 유닛의 공격력 -15% (자신의 전투에만 적용, 연합방어와 보스전에는 적용되지 않음)",
-  "notes": "자신의 전투에만 적용, 연합방어와 보스전에는 적용되지 않음"
+  "description": "모든 적 유닛의 공격력 -15% (자신의 전장에 있는 적에게 적용, 연합방어에서도 자신의 전장 안에서만 적용되며 보스전에는 적용되지 않음)",
+  "notes": "자신의 전장에 있는 적에게 적용, 연합방어에서도 자신의 전장 안에서만 적용되며 보스전에는 적용되지 않음"
  },
  {
   "source": 14,
@@ -347,8 +347,8 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "ally",
-  "description": "모든 적 유닛의 이동속도 -25% (자신의 전투에만 적용, 연합방어와 보스전에는 적용되지 않음)",
-  "notes": "자신의 전투에만 적용, 연합방어와 보스전에는 적용되지 않음"
+  "description": "모든 적 유닛의 이동속도 -25% (자신의 전장에 있는 적에게 적용, 연합방어에서도 자신의 전장 안에서만 적용되며 보스전에는 적용되지 않음)",
+  "notes": "자신의 전장에 있는 적에게 적용, 연합방어에서도 자신의 전장 안에서만 적용되며 보스전에는 적용되지 않음"
  },
  {
   "source": 27,
@@ -361,8 +361,8 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "ally",
-  "description": "모든 적 유닛의 공격력 -25% (자신의 전투에만 적용, 연합방어와 보스전에는 적용되지 않음)",
-  "notes": "자신의 전투에만 적용, 연합방어와 보스전에는 적용되지 않음"
+  "description": "모든 적 유닛의 공격력 -25% (자신의 전장에 있는 적에게 적용, 연합방어에서도 자신의 전장 안에서만 적용되며 보스전에는 적용되지 않음)",
+  "notes": "자신의 전장에 있는 적에게 적용, 연합방어에서도 자신의 전장 안에서만 적용되며 보스전에는 적용되지 않음"
  },
  {
   "source": 28,
@@ -577,8 +577,8 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "ally",
-  "description": "모든 적 유닛의 이동속도 -35% (자신의 전투에만 적용, 연합방어와 보스전에는 적용되지 않음)",
-  "notes": "자신의 전투에만 적용, 연합방어와 보스전에는 적용되지 않음"
+  "description": "모든 적 유닛의 이동속도 -35% (자신의 전장에 있는 적에게 적용, 연합방어에서도 자신의 전장 안에서만 적용되며 보스전에는 적용되지 않음)",
+  "notes": "자신의 전장에 있는 적에게 적용, 연합방어에서도 자신의 전장 안에서만 적용되며 보스전에는 적용되지 않음"
  },
  {
   "source": 44,
@@ -591,8 +591,8 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "ally",
-  "description": "모든 적 유닛의 공격력 -35% (자신의 전투에만 적용, 연합방어와 보스전에는 적용되지 않음)",
-  "notes": "자신의 전투에만 적용, 연합방어와 보스전에는 적용되지 않음"
+  "description": "모든 적 유닛의 공격력 -35% (자신의 전장에 있는 적에게 적용, 연합방어에서도 자신의 전장 안에서만 적용되며 보스전에는 적용되지 않음)",
+  "notes": "자신의 전장에 있는 적에게 적용, 연합방어에서도 자신의 전장 안에서만 적용되며 보스전에는 적용되지 않음"
  },
  {
   "source": 45,
@@ -869,7 +869,7 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "enemy",
-  "description": "모든 적 유닛의 최대 HP +12%",
+  "description": "모든 적 유닛의 최대 HP +20%",
   "notes": ""
  },
  {
@@ -897,7 +897,7 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "enemy",
-  "description": "모든 적 유닛의 마법 저항 +10",
+  "description": "모든 적 유닛의 마법 저항 +8",
   "notes": ""
  },
  {
@@ -1023,7 +1023,7 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "enemy",
-  "description": "모든 적 유닛의 최대 HP +25%",
+  "description": "모든 적 유닛의 최대 HP +30%",
   "notes": ""
  },
  {
@@ -1163,7 +1163,7 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "enemy",
-  "description": "모든 적 유닛의 최대 HP +35%",
+  "description": "모든 적 유닛의 최대 HP +40%",
   "notes": ""
  },
  {
@@ -1205,7 +1205,7 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "enemy",
-  "description": "모든 적 유닛의 공격속도 +35",
+  "description": "모든 적 유닛의 공격속도 +30",
   "notes": ""
  },
  {
@@ -2225,5 +2225,18 @@ export const AUGMENT_SOURCES = [
   "side": "ally",
   "description": "모든 아군 유닛이 입히는 트루 대미지 +100%",
   "notes": "선택 시 다른 문명의 존속은 등장하지 않음"
+ },
+ {
+  "source": 166,
+  "identity": 166,
+  "grade": "prism",
+  "name": "은신",
+  "rounds": [
+   4,
+   7
+  ],
+  "side": "enemy",
+  "description": "모든 적 유닛이 은신 획득",
+  "notes": "보스전 및 보스 유닛에는 적용되지 않음"
  }
 ];

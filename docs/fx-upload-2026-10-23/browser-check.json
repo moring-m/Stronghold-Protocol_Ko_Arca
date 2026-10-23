@@ -1,0 +1,185 @@
+{
+  "results": [
+    {
+      "id": "char_137_brownb",
+      "key": "brownb_attack_01_hit",
+      "stats": {
+        "tier": "full",
+        "available": true,
+        "effects": 1,
+        "pending": 0,
+        "particles": 4,
+        "reused": 0,
+        "systems": 2,
+        "dropped": 0,
+        "draws": 6,
+        "programs": 1,
+        "textures": 5,
+        "texMB": 1
+      },
+      "hasUnit": true,
+      "failed": []
+    },
+    {
+      "id": "char_4223_botany",
+      "key": "botany_attack_01_hit_01",
+      "stats": {
+        "tier": "full",
+        "available": true,
+        "effects": 1,
+        "pending": 0,
+        "particles": 15,
+        "reused": 0,
+        "systems": 8,
+        "dropped": 0,
+        "draws": 13,
+        "programs": 3,
+        "textures": 14,
+        "texMB": 2
+      },
+      "hasUnit": true,
+      "failed": []
+    },
+    {
+      "id": "char_194_leto",
+      "key": "leto_attack_01_hit_01",
+      "stats": {
+        "tier": "full",
+        "available": true,
+        "effects": 1,
+        "pending": 0,
+        "particles": 7,
+        "reused": 0,
+        "systems": 4,
+        "dropped": 0,
+        "draws": 17,
+        "programs": 3,
+        "textures": 16,
+        "texMB": 2
+      },
+      "hasUnit": true,
+      "failed": []
+    },
+    {
+      "id": "char_4224_turdus",
+      "key": "turdus_attack_01_hit_01",
+      "stats": {
+        "tier": "full",
+        "available": true,
+        "effects": 1,
+        "pending": 0,
+        "particles": 30,
+        "reused": 0,
+        "systems": 9,
+        "dropped": 0,
+        "draws": 26,
+        "programs": 5,
+        "textures": 28,
+        "texMB": 5
+      },
+      "hasUnit": true,
+      "failed": []
+    },
+    {
+      "id": "char_195_glassb",
+      "key": "glassb_skill_02_range",
+      "stats": {
+        "tier": "full",
+        "available": true,
+        "effects": 1,
+        "pending": 0,
+        "particles": 4,
+        "reused": 0,
+        "systems": 2,
+        "dropped": 0,
+        "draws": 29,
+        "programs": 6,
+        "textures": 31,
+        "texMB": 6
+      },
+      "hasUnit": true,
+      "failed": []
+    },
+    {
+      "id": "char_4182_oblvns",
+      "key": "oblvns_attack_01_hit",
+      "stats": {
+        "tier": "full",
+        "available": true,
+        "effects": 1,
+        "pending": 0,
+        "particles": 6,
+        "reused": 0,
+        "systems": 5,
+        "dropped": 0,
+        "draws": 34,
+        "programs": 6,
+        "textures": 38,
+        "texMB": 7
+      },
+      "hasUnit": true,
+      "failed": []
+    },
+    {
+      "id": "char_4047_pianst",
+      "key": "pianst_attack_hit",
+      "stats": {
+        "tier": "full",
+        "available": true,
+        "effects": 1,
+        "pending": 0,
+        "particles": 3,
+        "reused": 0,
+        "systems": 1,
+        "dropped": 0,
+        "draws": 35,
+        "programs": 7,
+        "textures": 40,
+        "texMB": 7
+      },
+      "hasUnit": true,
+      "failed": []
+    },
+    {
+      "id": "char_499_kaitou",
+      "key": "kaitou_attack_01_hit_01",
+      "stats": {
+        "tier": "full",
+        "available": true,
+        "effects": 1,
+        "pending": 0,
+        "particles": 2,
+        "reused": 0,
+        "systems": 2,
+        "dropped": 0,
+        "draws": 37,
+        "programs": 7,
+        "textures": 40,
+        "texMB": 7
+      },
+      "hasUnit": true,
+      "failed": []
+    },
+    {
+      "id": "char_4109_baslin",
+      "key": "baslin_attack_hit",
+      "stats": {
+        "tier": "full",
+        "available": true,
+        "effects": 1,
+        "pending": 0,
+        "particles": 5,
+        "reused": 0,
+        "systems": 2,
+        "dropped": 0,
+        "draws": 39,
+        "programs": 7,
+        "textures": 41,
+        "texMB": 7
+      },
+      "hasUnit": true,
+      "failed": []
+    }
+  ],
+  "errors": []
+}

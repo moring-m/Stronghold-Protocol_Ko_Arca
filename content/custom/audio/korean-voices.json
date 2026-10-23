@@ -1,0 +1,791 @@
+{
+  "repository": "PuppiizSunniiz/Arknight-voices",
+  "revision": "2c0d42dda2aa4c245b590dc3acf01228b59a29ad",
+  "sourcePage": "https://puppiizsunniiz.github.io/AN-EN-Tags/akhrchars.html",
+  "lines": {
+    "char_1051_headb2/cn_019.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_1051_headb2/cn_019.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_1051_headb2/CN_019.mp3"
+      ],
+      "bytes": 19793,
+      "sha256": "9da0388ec2ed1a7a673ae7bf44800e1502f3bfdb2e85f274227441ea9056d49f"
+    },
+    "char_1051_headb2/cn_020.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_1051_headb2/cn_020.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_1051_headb2/CN_020.mp3"
+      ],
+      "bytes": 43303,
+      "sha256": "b15c2f0fee85b1e9a479116052cc766f52d833f72ec88d881102e5ea523b9e23"
+    },
+    "char_1051_headb2/cn_021.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_1051_headb2/cn_021.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_1051_headb2/CN_021.mp3"
+      ],
+      "bytes": 21987,
+      "sha256": "956e5a8333ab858c1db97dcc18cf8b3c26fcbdbe972bbad99df74eff4fe088f4"
+    },
+    "char_1051_headb2/cn_022.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_1051_headb2/cn_022.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_1051_headb2/CN_022.mp3"
+      ],
+      "bytes": 19793,
+      "sha256": "011a7a6740c9367c4c6372cc543c100c4303a6b4d3005f96d632d7ebb86c41dc"
+    },
+    "char_1051_headb2/cn_023.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_1051_headb2/cn_023.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_1051_headb2/CN_023.mp3"
+      ],
+      "bytes": 39855,
+      "sha256": "c4e7df4ebbc582e93c8007a115dd62b2bcdb2325dc444036d50cb466d35ba7af"
+    },
+    "char_1051_headb2/cn_024.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_1051_headb2/cn_024.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_1051_headb2/CN_024.mp3"
+      ],
+      "bytes": 17285,
+      "sha256": "4fed2a74418b6bbcd131a2121c0cf0afdf859dc5a2167f7ece89fea8205da399"
+    },
+    "char_1051_headb2/cn_025.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_1051_headb2/cn_025.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_1051_headb2/CN_025.mp3"
+      ],
+      "bytes": 26689,
+      "sha256": "6e356ac4faf2cc31a989e6eb1a2888d5570f3f882b293880689fb8c919583bad"
+    },
+    "char_1051_headb2/cn_026.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_1051_headb2/cn_026.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_1051_headb2/CN_026.mp3"
+      ],
+      "bytes": 19480,
+      "sha256": "a5ab296e2665f3e27889590ed697aa68061e8204142a07fb71eeb4b7ae88de6c"
+    },
+    "char_1051_headb2/cn_027.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_1051_headb2/cn_027.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_1051_headb2/CN_027.mp3"
+      ],
+      "bytes": 60858,
+      "sha256": "74554b1d0be7c44ac24828c881ed3de4d72ed82eb6b63bfe27247ab30e8363dd"
+    },
+    "char_1051_headb2/cn_028.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_1051_headb2/cn_028.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_1051_headb2/CN_028.mp3"
+      ],
+      "bytes": 19480,
+      "sha256": "2dcd3a606fc1a39f9d2e359e4c0ac1b20556ca2e5a07ca8d9269fdfff8ad2cf4"
+    },
+    "char_1051_headb2/cn_029.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_1051_headb2/cn_029.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_1051_headb2/CN_029.mp3"
+      ],
+      "bytes": 37034,
+      "sha256": "babd1070d461e343058fc34c7645eada6f2f7b8ddb11d18f47e6a0012a63f768"
+    },
+    "char_1051_headb2/cn_030.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_1051_headb2/cn_030.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_1051_headb2/CN_030.mp3"
+      ],
+      "bytes": 41109,
+      "sha256": "ab2dd52ce273edacc8e62cb7ebdfbef3b58d5e9ded38bd88a9bfbedcccf3d5df"
+    },
+    "char_1051_headb2/cn_031.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_1051_headb2/cn_031.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_1051_headb2/CN_031.mp3"
+      ],
+      "bytes": 25122,
+      "sha256": "3098c1f7736388a8f2d71fd8b3d53b161d97b6e44295fa1cf549ef5c7cc53825"
+    },
+    "char_1051_headb2/cn_032.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_1051_headb2/cn_032.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_1051_headb2/CN_032.mp3"
+      ],
+      "bytes": 60858,
+      "sha256": "f6a27370f2f0233f98126157a69f6006037febf749afbf5c33691157fe84579b"
+    },
+    "char_1052_kalts2/cn_019.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_1052_kalts2/cn_019.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_1052_kalts2/CN_019.mp3"
+      ],
+      "bytes": 72769,
+      "sha256": "3f5e1422b1645b1a3c540df1854f4feb4362742fc94b43f1113c464acb654f42"
+    },
+    "char_1052_kalts2/cn_020.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_1052_kalts2/cn_020.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_1052_kalts2/CN_020.mp3"
+      ],
+      "bytes": 69948,
+      "sha256": "627880ca2ff0d37c301e60570e7363f3c8cfd2ba3ef90d5c42211f40bc4e9b6c"
+    },
+    "char_1052_kalts2/cn_021.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_1052_kalts2/cn_021.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_1052_kalts2/CN_021.mp3"
+      ],
+      "bytes": 21674,
+      "sha256": "a560e67d9e5aa4127920bd003a1b467666d00c181d1c235f1e2d098b196e614a"
+    },
+    "char_1052_kalts2/cn_022.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_1052_kalts2/cn_022.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_1052_kalts2/CN_022.mp3"
+      ],
+      "bytes": 15091,
+      "sha256": "ddd11305f0f1c86cfa9ece58b7250bbeaf75bfc86d9b2b09facd4b3f240ce554"
+    },
+    "char_1052_kalts2/cn_023.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_1052_kalts2/cn_023.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_1052_kalts2/CN_023.mp3"
+      ],
+      "bytes": 27316,
+      "sha256": "d71e64e5d836d2e16e1ad6b44fc7de00259db24461ccc603eac462b86e33f03e"
+    },
+    "char_1052_kalts2/cn_024.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_1052_kalts2/cn_024.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_1052_kalts2/CN_024.mp3"
+      ],
+      "bytes": 61171,
+      "sha256": "a7f303bb3bdf98c31de0139a12c5abb6c97d84f472ad95ff36ad2329d46f0c46"
+    },
+    "char_1052_kalts2/cn_025.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_1052_kalts2/cn_025.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_1052_kalts2/CN_025.mp3"
+      ],
+      "bytes": 27943,
+      "sha256": "11e155076263a9eead4da3a81215e6649fdcdf8d098f8f1c9d94afdc7cdca152"
+    },
+    "char_1052_kalts2/cn_026.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_1052_kalts2/cn_026.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_1052_kalts2/CN_026.mp3"
+      ],
+      "bytes": 23241,
+      "sha256": "f5896b54af6a3d964804e4806adaa41a2396254573c4b5e659ddac4e3f898f54"
+    },
+    "char_1052_kalts2/cn_027.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_1052_kalts2/cn_027.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_1052_kalts2/CN_027.mp3"
+      ],
+      "bytes": 36407,
+      "sha256": "3e42784e1ff53ae63812af4cd4f97db9f06c665ecee343b54415d7d4dbb2701a"
+    },
+    "char_1052_kalts2/cn_028.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_1052_kalts2/cn_028.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_1052_kalts2/CN_028.mp3"
+      ],
+      "bytes": 48632,
+      "sha256": "cc7bc0ef442d2416e0f7eafaf91380f14719b543b58d26b923f2d393529b8da6"
+    },
+    "char_1052_kalts2/cn_029.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_1052_kalts2/cn_029.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_1052_kalts2/CN_029.mp3"
+      ],
+      "bytes": 54902,
+      "sha256": "dc26ec3503509ac6ca4cc94ba680cc64e37dcf210408e85c62263bd22280be05"
+    },
+    "char_1052_kalts2/cn_030.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_1052_kalts2/cn_030.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_1052_kalts2/CN_030.mp3"
+      ],
+      "bytes": 17599,
+      "sha256": "e3f6eab3e08ce62f4d43dc1c276f5cee89c77f0b1e57913b9b1f4067712132f2"
+    },
+    "char_1052_kalts2/cn_031.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_1052_kalts2/cn_031.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_1052_kalts2/CN_031.mp3"
+      ],
+      "bytes": 99414,
+      "sha256": "0941375e39610c683f9ffc418d421d19de720d91c615efd79c3ba58c30d395eb"
+    },
+    "char_1052_kalts2/cn_032.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_1052_kalts2/cn_032.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_1052_kalts2/CN_032.mp3"
+      ],
+      "bytes": 66814,
+      "sha256": "53e6065fa220815dafd6566dd1c97497b23b683c3c548692c0fbe56095947c66"
+    },
+    "char_4037_demetr/cn_019.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4037_demetr/cn_019.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4037_demetr/CN_019.mp3"
+      ],
+      "bytes": 65560,
+      "sha256": "59d439818b85ce5487d4ae9100aed9483d1a4a843cdb36f7bcf87c6e652e1cef"
+    },
+    "char_4037_demetr/cn_020.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4037_demetr/cn_020.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4037_demetr/CN_020.mp3"
+      ],
+      "bytes": 19480,
+      "sha256": "f89d14c28c7ae7038d3ad85d5b60525974ac0d7854e00aa0e7309df760803e6c"
+    },
+    "char_4037_demetr/cn_021.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4037_demetr/cn_021.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4037_demetr/CN_021.mp3"
+      ],
+      "bytes": 30451,
+      "sha256": "41a7f9d89f52126e961b41c8826ca70aa5e63587576216992c0ea109ad61ab5b"
+    },
+    "char_4037_demetr/cn_022.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4037_demetr/cn_022.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4037_demetr/CN_022.mp3"
+      ],
+      "bytes": 12897,
+      "sha256": "aa7aaa2f921c0df36ecfe5107475164e7db820f521ca94b67253c929ff67dbc3"
+    },
+    "char_4037_demetr/cn_023.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4037_demetr/cn_023.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4037_demetr/CN_023.mp3"
+      ],
+      "bytes": 9762,
+      "sha256": "803a2c25ea48fc3a252231d5e256f000ad30289ed1e158ae2667a89ddced0c70"
+    },
+    "char_4037_demetr/cn_024.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4037_demetr/cn_024.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4037_demetr/CN_024.mp3"
+      ],
+      "bytes": 13837,
+      "sha256": "8c54d160d35e6a4870b423d31ac7261fc74021da7ed040d2b22c4da3ed0d129d"
+    },
+    "char_4037_demetr/cn_025.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4037_demetr/cn_025.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4037_demetr/CN_025.mp3"
+      ],
+      "bytes": 27003,
+      "sha256": "cbd8233cd78f9029ef72e24f7aabb0914e51ec36554bb7f4b95e7c8bc2fc04a3"
+    },
+    "char_4037_demetr/cn_026.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4037_demetr/cn_026.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4037_demetr/CN_026.mp3"
+      ],
+      "bytes": 26376,
+      "sha256": "8cd74d404956018fd4e50c5b4b86e13896d4c39761303822f20f280538c65d29"
+    },
+    "char_4037_demetr/cn_027.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4037_demetr/cn_027.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4037_demetr/CN_027.mp3"
+      ],
+      "bytes": 30451,
+      "sha256": "faf15c638cc32a460f31c968cdb73d30ec6d60b0c57ae505b0460ab0a17953a7"
+    },
+    "char_4037_demetr/cn_028.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4037_demetr/cn_028.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4037_demetr/CN_028.mp3"
+      ],
+      "bytes": 47378,
+      "sha256": "656ee29c74c86b7746dd5539d0bcaff143f84c414d2ba3d02d95f37fe9b68650"
+    },
+    "char_4037_demetr/cn_029.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4037_demetr/cn_029.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4037_demetr/CN_029.mp3"
+      ],
+      "bytes": 84368,
+      "sha256": "f33ed41bc2c6e5b9888173ff442a7d24cbe33ae987084be7b12563c5a0613d8c"
+    },
+    "char_4037_demetr/cn_030.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4037_demetr/cn_030.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4037_demetr/CN_030.mp3"
+      ],
+      "bytes": 64933,
+      "sha256": "807a5ebc5c076f129f82282673ea4e9d8c84c746fcc041315b758af6ba0d9303"
+    },
+    "char_4037_demetr/cn_031.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4037_demetr/cn_031.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4037_demetr/CN_031.mp3"
+      ],
+      "bytes": 64619,
+      "sha256": "9af41f57d7812e97c18ed14508969485f18ffff7a59f774a776b6bcd63505b87"
+    },
+    "char_4037_demetr/cn_032.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4037_demetr/cn_032.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4037_demetr/CN_032.mp3"
+      ],
+      "bytes": 81233,
+      "sha256": "6b78730b58d2b957b65e01fc8ffba07ac4209e69bc82fa8a9304e8fc53a2264e"
+    },
+    "char_4226_veen/cn_019.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4226_veen/cn_019.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4226_veen/CN_019.mp3"
+      ],
+      "bytes": 51767,
+      "sha256": "1dace2fb04d0ad4fb9411567111e2c634266cee9a01c99519bd815b25a5c6dcc"
+    },
+    "char_4226_veen/cn_020.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4226_veen/cn_020.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4226_veen/CN_020.mp3"
+      ],
+      "bytes": 15718,
+      "sha256": "05b42e22e16145b988e54cff557753a51555a0d215e9f921dec5a8a573912e6f"
+    },
+    "char_4226_veen/cn_021.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4226_veen/cn_021.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4226_veen/CN_021.mp3"
+      ],
+      "bytes": 34213,
+      "sha256": "80844f0baac90925c01d217be6babb5a6d13d4bb3c1606a2f9512253642dcab3"
+    },
+    "char_4226_veen/cn_022.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4226_veen/cn_022.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4226_veen/CN_022.mp3"
+      ],
+      "bytes": 16972,
+      "sha256": "3b2e62f511b590d9f39f10ba2db479810fcb8a5c0b1bddc763717912e8cbcbbd"
+    },
+    "char_4226_veen/cn_023.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4226_veen/cn_023.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4226_veen/CN_023.mp3"
+      ],
+      "bytes": 32645,
+      "sha256": "903a4a0281e601e3b93fefe61e6396adce7717c36e3931b131b7a81a8a3e1eee"
+    },
+    "char_4226_veen/cn_024.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4226_veen/cn_024.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4226_veen/CN_024.mp3"
+      ],
+      "bytes": 16031,
+      "sha256": "f00eb06c745cb039f86e28b6c4161546491ed2c5e5e1306c2b613e64bd40318e"
+    },
+    "char_4226_veen/cn_025.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4226_veen/cn_025.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4226_veen/CN_025.mp3"
+      ],
+      "bytes": 35153,
+      "sha256": "40b13f33aecc24b77f9d1637f0bca8acad7c2359c88dfb87c06f4632a4f5d91a"
+    },
+    "char_4226_veen/cn_026.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4226_veen/cn_026.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4226_veen/CN_026.mp3"
+      ],
+      "bytes": 32018,
+      "sha256": "749cf7f74594d75141487b99bb3e83595d8ea53b427b052a8e237ea7e0a71478"
+    },
+    "char_4226_veen/cn_027.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4226_veen/cn_027.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4226_veen/CN_027.mp3"
+      ],
+      "bytes": 37347,
+      "sha256": "9dd0c7a1ee540c52e22d9b9454b96ed2ce9b6d6bf1ebbc0356c35f72df8b35c1"
+    },
+    "char_4226_veen/cn_028.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4226_veen/cn_028.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4226_veen/CN_028.mp3"
+      ],
+      "bytes": 38915,
+      "sha256": "5764d88a49f562fa7b673fca1813e1462df8ec9b35cc0565e7e77328e4170c1c"
+    },
+    "char_4226_veen/cn_029.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4226_veen/cn_029.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4226_veen/CN_029.mp3"
+      ],
+      "bytes": 69948,
+      "sha256": "22fe1d423633e2ed52455f249667f2df438d240cc71e25e60609653697efc18e"
+    },
+    "char_4226_veen/cn_030.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4226_veen/cn_030.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4226_veen/CN_030.mp3"
+      ],
+      "bytes": 67754,
+      "sha256": "f46ce2c230e7f16bb5845765daa17f36625ad1e0cdd4dedffc3ec0dedeffa644"
+    },
+    "char_4226_veen/cn_031.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4226_veen/cn_031.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4226_veen/CN_031.mp3"
+      ],
+      "bytes": 46125,
+      "sha256": "f319925e84f25a764e043f015b2991375004492c21b1a7b2508b2effce0f8581"
+    },
+    "char_4226_veen/cn_032.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4226_veen/cn_032.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4226_veen/CN_032.mp3"
+      ],
+      "bytes": 34526,
+      "sha256": "b036fc97063059379b77203faaf37b4a0060d57d7fdaffb7716ba68212e9d4d0"
+    },
+    "char_4228_closur/cn_019.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4228_closur/cn_019.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4228_closur/CN_019.mp3"
+      ],
+      "bytes": 58977,
+      "sha256": "3b9b0d6fcffac26540a909706e9c79bb302affb8c82cfcb93a0b5e2984e110fa"
+    },
+    "char_4228_closur/cn_020.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4228_closur/cn_020.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4228_closur/CN_020.mp3"
+      ],
+      "bytes": 83114,
+      "sha256": "46f08de577411079790499e0869da28da0ee5bd1e68f05e73b7f9d5665324056"
+    },
+    "char_4228_closur/cn_021.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4228_closur/cn_021.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4228_closur/CN_021.mp3"
+      ],
+      "bytes": 90637,
+      "sha256": "8961d37cee33e864362b1387893db28ced42ee22ab8042b4b423d9f07d5a7aba"
+    },
+    "char_4228_closur/cn_022.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4228_closur/cn_022.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4228_closur/CN_022.mp3"
+      ],
+      "bytes": 62425,
+      "sha256": "d4a8c80bb5c7300ba71840484e72892d154c93d433bedf610958dc9f4c682446"
+    },
+    "char_4228_closur/cn_023.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4228_closur/cn_023.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4228_closur/CN_023.mp3"
+      ],
+      "bytes": 43617,
+      "sha256": "d1ab603b3008aa55e9d9e7151df489c95b90491ec20513a17a0d103733ebfdc4"
+    },
+    "char_4228_closur/cn_024.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4228_closur/cn_024.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4228_closur/CN_024.mp3"
+      ],
+      "bytes": 71202,
+      "sha256": "77d6abd4d117f5ffe959c09c94077b2f6b6492a916f23041023a35afb82b99e7"
+    },
+    "char_4228_closur/cn_025.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4228_closur/cn_025.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4228_closur/CN_025.mp3"
+      ],
+      "bytes": 60544,
+      "sha256": "1909cd3407bd792668ddaf5e384d466cb6ba1bf7e11e12d70233867c389ca18a"
+    },
+    "char_4228_closur/cn_026.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4228_closur/cn_026.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4228_closur/CN_026.mp3"
+      ],
+      "bytes": 47378,
+      "sha256": "6c1a6e8f6dbd21d951538259658041536ddf9c43447352163a8d0e17cd228eb2"
+    },
+    "char_4228_closur/cn_027.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4228_closur/cn_027.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4228_closur/CN_027.mp3"
+      ],
+      "bytes": 80293,
+      "sha256": "6688b670e1c0583503cf70883f27656e33b7d2186bceaaaddd631bae5ddc3b8a"
+    },
+    "char_4228_closur/cn_028.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4228_closur/cn_028.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4228_closur/CN_028.mp3"
+      ],
+      "bytes": 88129,
+      "sha256": "b2c2f6d44ee2bccec9cb8794997b831323637b3d14acd83d381475c15a89d76b"
+    },
+    "char_4228_closur/cn_029.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4228_closur/cn_029.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4228_closur/CN_029.mp3"
+      ],
+      "bytes": 167751,
+      "sha256": "9a9fcab3b0986b393da34219f1ac2e94703bddf84fd646c1d06216402ddf10e9"
+    },
+    "char_4228_closur/cn_030.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4228_closur/cn_030.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4228_closur/CN_030.mp3"
+      ],
+      "bytes": 80920,
+      "sha256": "c5f3d5e028901edc2861fecebdcafd08e1b8b14a8eda4fff2a42d51ca19739d3"
+    },
+    "char_4228_closur/cn_031.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4228_closur/cn_031.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4228_closur/CN_031.mp3"
+      ],
+      "bytes": 90951,
+      "sha256": "a25f77cb55a0e68c36cb7587c6134275c9ece5265f6caa0d77876f7db76c8101"
+    },
+    "char_4228_closur/cn_032.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4228_closur/cn_032.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4228_closur/CN_032.mp3"
+      ],
+      "bytes": 94399,
+      "sha256": "ffebd0ceb3be385550c676e45c8797d4653c539312376b1b405fa3a047cf1931"
+    },
+    "char_4224_turdus/cn_019.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4224_turdus/cn_019.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4224_turdus/CN_019.mp3"
+      ],
+      "bytes": 221981,
+      "sha256": "d38e5932dfd33c387c6a506d260a11a4b63c35ba752aa2014e250ffd7e92e39b"
+    },
+    "char_4224_turdus/cn_020.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4224_turdus/cn_020.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4224_turdus/CN_020.mp3"
+      ],
+      "bytes": 114774,
+      "sha256": "ee02926fb778f04a5f725d0311c7224c6e111497c5a5268662a50a48bf3cc492"
+    },
+    "char_4224_turdus/cn_021.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4224_turdus/cn_021.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4224_turdus/CN_021.mp3"
+      ],
+      "bytes": 40169,
+      "sha256": "81bd9590a77544b501f5b6fe7f5c4096e4d0de898d9cb307e008c50ce36109eb"
+    },
+    "char_4224_turdus/cn_022.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4224_turdus/cn_022.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4224_turdus/CN_022.mp3"
+      ],
+      "bytes": 36094,
+      "sha256": "e13c62cf6b16c74718bb4b256341cd85c6410ccb9fa3a6f75efa3abde91d8ab8"
+    },
+    "char_4224_turdus/cn_023.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4224_turdus/cn_023.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4224_turdus/CN_023.mp3"
+      ],
+      "bytes": 14151,
+      "sha256": "b6124644a63d3d73c994fe5b5b926c3cc14d52188a2099fad30a217dc6cc7c70"
+    },
+    "char_4224_turdus/cn_024.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4224_turdus/cn_024.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4224_turdus/CN_024.mp3"
+      ],
+      "bytes": 18226,
+      "sha256": "a7d80444b707510bc18f6f0e16a24daf76fee30c9d8548aa444ba7f2221fabb0"
+    },
+    "char_4224_turdus/cn_025.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4224_turdus/cn_025.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4224_turdus/CN_025.mp3"
+      ],
+      "bytes": 79039,
+      "sha256": "30b796a5caa288250e844658b24c65281e179a872e4a88b67232772fc0e0f966"
+    },
+    "char_4224_turdus/cn_026.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4224_turdus/cn_026.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4224_turdus/CN_026.mp3"
+      ],
+      "bytes": 72143,
+      "sha256": "35e490c13bb4b87d93b08fba79a13fa5a5ad6edaa5db474e7e35e694f8c32196"
+    },
+    "char_4224_turdus/cn_027.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4224_turdus/cn_027.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4224_turdus/CN_027.mp3"
+      ],
+      "bytes": 52394,
+      "sha256": "80856057e0f939e0ebc361b5d89da8a90cdcc198becb383b4ea0587a29d1defc"
+    },
+    "char_4224_turdus/cn_028.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4224_turdus/cn_028.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4224_turdus/CN_028.mp3"
+      ],
+      "bytes": 69635,
+      "sha256": "0a0851d603587efe9ac91f71f14173faec8ef31c549ecfd113682dea43460e7c"
+    },
+    "char_4224_turdus/cn_029.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4224_turdus/cn_029.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4224_turdus/CN_029.mp3"
+      ],
+      "bytes": 43303,
+      "sha256": "e398961402eef09dbebf7f178fb0d76bb763c118efd2bf853b45eba24be03b31"
+    },
+    "char_4224_turdus/cn_030.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4224_turdus/cn_030.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4224_turdus/CN_030.mp3"
+      ],
+      "bytes": 68067,
+      "sha256": "f5cb2e8c7b4e6efeac544c4731d3467b9cc821f583129bbb50d7e05e78d15b10"
+    },
+    "char_4224_turdus/cn_031.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4224_turdus/cn_031.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4224_turdus/CN_031.mp3"
+      ],
+      "bytes": 134523,
+      "sha256": "63ac21239c8fd612c4d16c45a22bcfe99383d6ea1efe32f3168da43e81c4b093"
+    },
+    "char_4224_turdus/cn_032.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4224_turdus/cn_032.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4224_turdus/CN_032.mp3"
+      ],
+      "bytes": 128254,
+      "sha256": "b6194d54ecf1250ad37b9a36df1bf4720338b3355add90baebf14ff160f5c4da"
+    },
+    "char_4223_botany/cn_019.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4223_botany/cn_019.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4223_botany/CN_019.mp3"
+      ],
+      "bytes": 41109,
+      "sha256": "c2d6221fd8b4bcf25f37d522a24c36041cfa93d3e4eba0be1e8e0441cfe45b9c"
+    },
+    "char_4223_botany/cn_020.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4223_botany/cn_020.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4223_botany/CN_020.mp3"
+      ],
+      "bytes": 14778,
+      "sha256": "31ca8956abadc097e90dc399d95ccdabdacd90e599ad4516bc9a132d69be17f3"
+    },
+    "char_4223_botany/cn_021.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4223_botany/cn_021.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4223_botany/CN_021.mp3"
+      ],
+      "bytes": 12897,
+      "sha256": "6b57a4ee485ddf1920bce0384515e3fbbe3a446da512b2b5d41686671f37b831"
+    },
+    "char_4223_botany/cn_022.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4223_botany/cn_022.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4223_botany/CN_022.mp3"
+      ],
+      "bytes": 15405,
+      "sha256": "109a084d9594430dbc9a945891182707a53468e074dbf8986f8dc17f0dcc0692"
+    },
+    "char_4223_botany/cn_023.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4223_botany/cn_023.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4223_botany/CN_023.mp3"
+      ],
+      "bytes": 24809,
+      "sha256": "b9e7e5c626ab1880e64018f3bc752d8316eb8cf828c893630658c83bd92b297f"
+    },
+    "char_4223_botany/cn_024.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4223_botany/cn_024.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4223_botany/CN_024.mp3"
+      ],
+      "bytes": 24182,
+      "sha256": "7eb144ea979fa182fb0ed4ddd726f9a91acec8b449c4c5360aebc62d9cfa194c"
+    },
+    "char_4223_botany/cn_025.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4223_botany/cn_025.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4223_botany/CN_025.mp3"
+      ],
+      "bytes": 53334,
+      "sha256": "512cd3760356c9b72b55cb44a2b6eb640d19a8ced743885defa7f2ffa995b7d7"
+    },
+    "char_4223_botany/cn_026.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4223_botany/cn_026.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4223_botany/CN_026.mp3"
+      ],
+      "bytes": 44244,
+      "sha256": "12fb7ec65d3a68a08fba523909f1b2ddb344b87466592b2c81adc36e07f64a02"
+    },
+    "char_4223_botany/cn_027.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4223_botany/cn_027.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4223_botany/CN_027.mp3"
+      ],
+      "bytes": 41736,
+      "sha256": "0953c02807dc72600361cda4a66f04201ef7e61c5c6ace77cf0cf2fbc8651da5"
+    },
+    "char_4223_botany/cn_028.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4223_botany/cn_028.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4223_botany/CN_028.mp3"
+      ],
+      "bytes": 42990,
+      "sha256": "2cc19345790361a75d75d485cdf1ee7500e188655678b49c75303232e793e67e"
+    },
+    "char_4223_botany/cn_029.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4223_botany/cn_029.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4223_botany/CN_029.mp3"
+      ],
+      "bytes": 121044,
+      "sha256": "dab5f7790ed214d72bd71201965fe2ed08e8336fde0e8966522e3481778543ac"
+    },
+    "char_4223_botany/cn_030.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4223_botany/cn_030.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4223_botany/CN_030.mp3"
+      ],
+      "bytes": 48946,
+      "sha256": "0fbb1340f4a53a5c418e4e54927c0226310bb151886098707f0b400f5eb2a4cf"
+    },
+    "char_4223_botany/cn_031.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4223_botany/cn_031.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4223_botany/CN_031.mp3"
+      ],
+      "bytes": 19480,
+      "sha256": "5fbd250bcdbe161e2e45f2dc1c6e93c7ddce9528f96530ddd2eb2f31392fbac0"
+    },
+    "char_4223_botany/cn_032.mp3": {
+      "path": "/assets/audio/voice/voice_kr/char_4223_botany/cn_032.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4223_botany/CN_032.mp3"
+      ],
+      "bytes": 86562,
+      "sha256": "7bcfcd97cee428c783617082aed7634d69feb4c5e8b2ab5e6217f94116bdc1b1"
+    }
+  }
+}

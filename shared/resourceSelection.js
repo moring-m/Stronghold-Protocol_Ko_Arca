@@ -1,7 +1,7 @@
 // Download choices affect background asset storage only, never simulation data.
 export const RESOURCE_SELECTION_KEY='sp.resources.downloadSelection';
 export const OFFICIAL_FX_READY_KEY='sp.resources.officialFxReady';
-export function normalizeResourceSelection(value){return {voice:value?.voice==='jp'?'jp':'kr',effects:value?.effects==='official'?'official':'simple',...(['officialFx','voice-kr','voice-jp'].includes(value?.scope)?{scope:value.scope}:{})};}
+export function normalizeResourceSelection(value){return {voice:value?.voice==='jp'?'jp':'kr',effects:value?.effects==='simple'?'simple':'official',...(['officialFx','voice-kr','voice-jp'].includes(value?.scope)?{scope:value.scope}:{})};}
 export function readResourceSelection(storage=globalThis.localStorage){try{return normalizeResourceSelection(JSON.parse(storage?.getItem(RESOURCE_SELECTION_KEY)||'null'));}catch{return normalizeResourceSelection(null);}}
 export function resourceFileSelected(file,selection){
  const s=normalizeResourceSelection(selection),path=typeof file==='string'?file:file.path;

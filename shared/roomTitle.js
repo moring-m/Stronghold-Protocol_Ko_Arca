@@ -6,5 +6,5 @@ export function defaultRoomTitle(mode,name='',locale='ko'){
  if(locale==='en')return `${name||'Host'}'s ${n}-Player Simulation`;
  if(locale==='ja')return `${name||'ホスト'}ドクターの${n}人シミュレーション`;
  if(locale==='zh')return `${name||'房主'}博士的${n}人模拟`;
- return `${name||'방장'}박사님의 ${n}인 시뮬레이션`;
+ return `${name||'방장'} 박사님의 ${n}인 시뮬레이션`;
 }

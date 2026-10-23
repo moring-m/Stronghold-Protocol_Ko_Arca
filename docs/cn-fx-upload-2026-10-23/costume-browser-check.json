@@ -1,0 +1,76 @@
+{
+  "results": [
+    {
+      "skin": "char_1035_wisdel@game#9",
+      "char": "char_1035_wisdel",
+      "base": "wisdel_skill_03_buff_02_f",
+      "selected": "wisdel_skill_03_buff_02_f_game#9",
+      "expected": "wisdel_skill_03_buff_02_f_game#9",
+      "handle": true,
+      "stats": {
+        "tier": "full",
+        "available": true,
+        "effects": 1,
+        "pending": 0,
+        "particles": 239,
+        "reused": 0,
+        "systems": 12,
+        "dropped": 0,
+        "draws": 9,
+        "programs": 4,
+        "textures": 9,
+        "texMB": 1
+      },
+      "graphic": 6,
+      "failed": []
+    },
+    {
+      "skin": "char_4080_lin@littlePony#1",
+      "char": "char_4080_lin",
+      "base": "lin_block_01",
+      "selected": "lin_block_01_littlepony#1",
+      "expected": "lin_block_01_littlepony#1",
+      "handle": true,
+      "stats": {
+        "tier": "full",
+        "available": true,
+        "effects": 3,
+        "pending": 0,
+        "particles": 20,
+        "reused": 0,
+        "systems": 9,
+        "dropped": 0,
+        "draws": 20,
+        "programs": 11,
+        "textures": 23,
+        "texMB": 3
+      },
+      "failed": []
+    },
+    {
+      "skin": "char_4138_narant@littlePony#1",
+      "char": "char_4138_narant",
+      "base": "narant_attack_01_hit",
+      "selected": "narant_attack_01_hit_littlepony#1",
+      "expected": "narant_attack_01_hit_littlepony#1",
+      "handle": true,
+      "stats": {
+        "tier": "full",
+        "available": true,
+        "effects": 2,
+        "pending": 0,
+        "particles": 28,
+        "reused": 0,
+        "systems": 7,
+        "dropped": 0,
+        "draws": 25,
+        "programs": 13,
+        "textures": 32,
+        "texMB": 5
+      },
+      "graphic": 5,
+      "failed": []
+    }
+  ],
+  "errors": []
+}
