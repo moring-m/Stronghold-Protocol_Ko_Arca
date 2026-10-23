@@ -1,0 +1,127 @@
+{
+  "results": [
+    {
+      "id": "char_498_inside",
+      "name": "인사이더",
+      "mode": "skin",
+      "skin": {
+        "charId": "char_498_inside",
+        "skinId": "char_498_inside@summer#22",
+        "mount": "skin_char_498_inside_summer_22",
+        "effects": {},
+        "projectiles": {
+          "projectile_chr_inside": {
+            "graphic": "projectile_chr_inside_graphic",
+            "mount": 6
+          },
+          "projectile_chr_inside_s1": {
+            "graphic": "projectile_chr_inside_s1_graphic",
+            "mount": 6
+          },
+          "projectile_chr_inside_s2": {
+            "graphic": "projectile_chr_inside_s2_graphic",
+            "mount": 6
+          }
+        }
+      },
+      "label": "공식 · 悠然假日 HDm25",
+      "body": "skin_char_498_inside_summer_22",
+      "bodyIsBase": false,
+      "representativeKey": "inside_attack_01_hit",
+      "file": "shots/char_498_inside-skin.png",
+      "spineReady": true,
+      "spine": "skin_char_498_inside_summer_22",
+      "skinId": "skin_char_498_inside_summer_22",
+      "costume": "char_498_inside@summer#22",
+      "official": true,
+      "keys": [
+        "inside_attack_01_trail_front"
+      ],
+      "failed": [],
+      "stats": {
+        "fps": 3.4,
+        "frameMs": 294.86,
+        "cpuMs": 3.26,
+        "renderMs": 3.74,
+        "mode": "battle",
+        "units": 2,
+        "impostor": 0,
+        "impostorAtlas": {
+          "pages": 1,
+          "slots": 1,
+          "drawn": 0,
+          "full": 0
+        },
+        "boardArt": true,
+        "board3d": {
+          "on": true,
+          "calls": 12,
+          "triangles": 61626,
+          "textures": 28,
+          "geometries": 21,
+          "frames": 101,
+          "cpuMs": 0.48,
+          "lost": false,
+          "originalStage": "act2autochess_m01",
+          "cachedLayouts": 1,
+          "layoutCacheHits": 0,
+          "losses": 0
+        },
+        "pen": 0,
+        "penHidden": true,
+        "prepField": null,
+        "lod": 3,
+        "culled": 0,
+        "particles": 0,
+        "projectiles": 0,
+        "numbers": 0,
+        "rings": 0,
+        "auras": 0,
+        "locks": 0,
+        "flames": 0,
+        "promotions": 0,
+        "officialFx": {
+          "tier": "full",
+          "available": true,
+          "effects": 1,
+          "pending": 0,
+          "particles": 0,
+          "reused": 0,
+          "systems": 0,
+          "dropped": 0,
+          "draws": 4,
+          "programs": 3,
+          "textures": 4,
+          "texMB": 0
+        },
+        "spine": {
+          "size": 18,
+          "ready": 18,
+          "loading": 0,
+          "failed": 0,
+          "refs": 2,
+          "holds": 2,
+          "weight": 46205380,
+          "idleWeight": 39970272,
+          "active": 0,
+          "queued": 0,
+          "unloading": 0
+        },
+        "renderT": 0.7088294578045853,
+        "rate": 1.4901032148334625,
+        "buffered": 6,
+        "camera": {
+          "tx": 6,
+          "ty": 10.998841835002256,
+          "tz": 0,
+          "tilt": 30,
+          "dist": 10.731017003337843,
+          "scale": 76.80942314973585,
+          "cx": 480,
+          "cy": 300
+        }
+      }
+    }
+  ],
+  "errors": []
+}

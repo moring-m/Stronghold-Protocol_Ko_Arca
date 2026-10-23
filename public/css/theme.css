@@ -1,3 +1,5 @@
+/* The lobby counter is available before optional resource downloads. Same Bender face as the battle HUD. */
+@font-face { font-family: 'RoomCount'; font-weight: 400; font-style: normal; font-display: block; src: url('/ui-fonts/bender-regular.otf') format('opentype'); }
 /* ==========================================================================================
    theme.css — design tokens, fonts, root scale, base reset, shared backdrops & utilities.
    Look: research 06 §12 (near-black green-grey, mint accents, gold prices, bracket frames).

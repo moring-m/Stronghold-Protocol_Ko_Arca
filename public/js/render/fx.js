@@ -417,6 +417,7 @@ export class FxSystem {
   explosion(x,y,z,...args){return this._anchored(x,y,z,()=>this._explosion(x,y,z,...args))}
   _impact(pr,cam){return pr.tgt&&pr.spec.look!=='shell'?this._bodyAnchored(pr.tgt,SHOT_HEIGHT.aim,()=>this._impactAnchored(pr,cam)):this._anchored(pr.tx,pr.ty,pr.tz,()=>this._impactAnchored(pr,cam))}
   simFx(kind,x,y,extra){
+    if(kind==='tornado'&&extra?.phase==='end')return;
     if(kind==='dodge'&&extra?.num==='m'&&this.ctx.settings?.officialDamageNumbers&&this.ctx.settings.damageNumbers!==false)this.officialNumber(this.ctx.view?.(extra.id),0,'miss');
     if(kind==='bombardAim')return this._simFx(kind,x,y,extra);
     const ex=extra&&typeof extra==='object'?extra:{},spec=fxSpec(kind,ex);
@@ -1621,7 +1622,9 @@ export class FxSystem {
   /** Compact activation contact, then a rotating gold hex and the skill’s semantic material accent. */
   _skill(view, on) {
     if (!view) return;
-    if (!on) { this._aura(view, false); return; }
+    if (!on) { this._aura(view, false);
+      this.zones=this.zones.filter(zone=>{if(zone.key==='clemnt-cabin:'+view.id||zone.key==='clemnt-vortex:'+view.id){this._freeZone(zone);return false;}return true;});
+      return; }
     if(view.info?.skillDuration===0 && view.info.skillZoneGrid?.length){
       const tiles=view.info.skillZoneGrid.map(([dr,dc])=>{const [r,c]=view.dir==='UP'?[dc,-dr]:view.dir==='LEFT'?[-dr,-dc]:view.dir==='DOWN'?[-dc,dr]:[dr,dc];return [Math.round(view.y+r),Math.round(view.x+c)];});
       this.tileFlash(tiles,skillRangeStyle(view.info).color,.45);
@@ -1773,6 +1776,15 @@ export class FxSystem {
    * element, n, scale, kind, tiles.
    */
   _simFx(kind, x, y, extra) {
+    if(kind==='anchor'&&extra?.skill==='clemnt:cabin'){
+      const dur=Math.max(.01,Number(extra.dur)||.01)/this._ts(),sx=Number(extra.fromX),sy=Number(extra.fromY);
+      if(Number.isFinite(sx)&&Number.isFinite(sy))this.zone(sx,sy,0,.55,0x5fe0ff,dur,'soft',false,{key:'clemnt-cabin:'+extra.id,vx:(x-sx)/dur,vy:(y-sy)/dur});
+      return;
+    }
+    if(kind==='tide'&&extra?.skill==='clemnt:cabin'){
+      this.zone(x,y,this._groundZ(x,y),Number(extra.r)||1,0x5fe0ff,Math.max(.01,Number(extra.dur)||.01)/this._ts(),'soft',false,{key:'clemnt-vortex:'+extra.id});
+      return;
+    }
     if(kind==='chenDragonWave'){
       const src=this.ctx.view?.(extra?.id);
       const texture=this.weaponTextures.chenDragon;
@@ -2151,7 +2163,7 @@ export class FxSystem {
   numberAt(x, y, label, tint, life = 0.8, at = null, healSize = false) {
     const P = this.P;
     if (this.labels.length >= 24) { const o = this.labels.shift(); o.t.destroy(); }
-    const t = new P.BitmapText(String(label), { fontName: healSize ? DMG_STYLE.heal.font : DMG_STYLE.true.font, fontSize: healSize ? 24 : 26, align: 'center' });
+    const t = new P.BitmapText(String(label), { fontName: healSize ? DMG_STYLE.heal.font : DMG_STYLE.true.font, fontSize: 24, align: 'center' });
     t.anchor.set(0.5, 1);
     t.tint = tint;
     t.position.set(x, y);
@@ -2159,6 +2171,8 @@ export class FxSystem {
     const cam=this.ctx.cam(),anchor=at||this._particleAnchor;
     let world=null;
     if(anchor){const p=cam.project(anchor.x,anchor.y,anchor.z||0),height=-(y-p.y)/p.s;world={x:anchor.x+(x-p.x)/p.s,y:anchor.y+height*MODEL_UP.y,z:(anchor.z||0)+height*MODEL_UP.z};}
+    const projected=world?cam.project(world.x,world.y,world.z):null;
+    t.scale.set(numScale(projected?.s||100,false,'heal')*NUM_POP);
     this.labels.push({t,y0:y,world,life:0,max:life,healSize});
   }
 
@@ -2171,8 +2185,7 @@ export class FxSystem {
       if(l.world){const w=l.world,p=this.ctx.cam().project(w.x,w.y+.25*easeOut(k)*MODEL_UP.y,w.z+.25*easeOut(k)*MODEL_UP.z);l.t.position.set(p.x,p.y);}
       else l.t.position.y=l.y0-22*easeOut(k);
       l.t.alpha = k > 0.6 ? 1 - (k - 0.6) / 0.4 : 1;
-      l.t.scale.set(k < 0.12 ? 0.6 + (k / 0.12) * 0.5 : 1.1 - Math.min(0.1, k - 0.12));
-      if(l.healSize){const p=l.world?this.ctx.cam().project(l.world.x,l.world.y,l.world.z):null;l.t.scale.set(numScale(p?.s||100,false,'heal')*(1+Math.max(0,1-l.life*6)*(NUM_POP-1)));}
+      {const p=l.world?this.ctx.cam().project(l.world.x,l.world.y,l.world.z):null;l.t.scale.set(numScale(p?.s||100,false,'heal')*(1+Math.max(0,1-l.life*6)*(NUM_POP-1)));}
       this.labels[w++] = l;
     }
     this.labels.length = w;
@@ -2340,7 +2353,7 @@ export class FxSystem {
     }
     let labelText=null;
     if (label) {
-      const t = labelText = new P.BitmapText(label, { fontName: DMG_STYLE.heal.font, fontSize: healSize ? 24 : at ? 22 : 26 });
+      const t = labelText = new P.BitmapText(label, { fontName: DMG_STYLE.heal.font, fontSize: at||ownerId!=null ? 24 : 26 });
       t.anchor.set(0, 0.5);
       t.position.set(at ? 18 : 26, 0);
       if (tint === COLORS.gold) t.tint = 0xffe066;
@@ -2364,7 +2377,7 @@ export class FxSystem {
       p.c.alpha = k < 0.15 ? k / 0.15 : k > 0.7 ? 1 - (k - 0.7) / 0.3 : 1;
       const s = k < 0.15 ? 0.6 + (k / 0.15) * 0.5 : 1.1 - Math.min(0.1, (k - 0.15));
       p.c.scale.set(s);
-      if(p.healSize && p.labelText){const pos=owner|| (p.at?{x:p.at[0],y:p.at[1],z:0}:null);const a=pos?this._proj(pos.x,pos.y,pos.z||0):null;p.labelText.scale.set(numScale(a?.s||100,false,'heal')*(1+Math.max(0,1-p.t*6)*(NUM_POP-1))/s);}
+      if((p.healSize||p.at||p.ownerId!=null) && p.labelText){const pos=owner|| (p.at?{x:p.at[0],y:p.at[1],z:0}:null);const a=pos?this._proj(pos.x,pos.y,pos.z||0):null;p.labelText.scale.set(numScale(a?.s||100,false,'heal')*(1+Math.max(0,1-p.t*6)*(NUM_POP-1))/s);}
       this.pops[w++] = p;
     }
     this.pops.length = w;

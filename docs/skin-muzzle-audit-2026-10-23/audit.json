@@ -1,0 +1,265 @@
+{
+  "projectileMappings": 370,
+  "missingFacingBindingsBefore": 704,
+  "missingFacingBindingsAfter": 86,
+  "unresolved": [
+    {
+      "skin": "char_4196_reckpr@yun#12",
+      "projectile": "projectile_chr_reckpr",
+      "mount": 6,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_4196_reckpr@yun#12",
+      "projectile": "projectile_chr_reckpr_s1",
+      "mount": 6,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_4196_reckpr@yun#12",
+      "projectile": "projectile_chr_reckpr_s2",
+      "mount": 6,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_103_angel@sale#8",
+      "projectile": "projectile_angel",
+      "mount": 6,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_145_prove@wild#5",
+      "projectile": "projectile_prove",
+      "mount": 8,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_197_poca@epoque#12",
+      "projectile": "projectile_chr_poca",
+      "mount": 6,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_197_poca@epoque#12",
+      "projectile": "projectile_chr_poca_s2",
+      "mount": 6,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_197_poca@epoque#12",
+      "projectile": "projectile_chr_poca_s3",
+      "mount": 6,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_197_poca@rilakkuma#1",
+      "projectile": "projectile_chr_poca",
+      "mount": 6,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_197_poca@rilakkuma#1",
+      "projectile": "projectile_chr_poca_s2",
+      "mount": 6,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_197_poca@rilakkuma#1",
+      "projectile": "projectile_chr_poca_s3",
+      "mount": 6,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_258_podego@epoque#9",
+      "projectile": "projectile_chr_podego",
+      "mount": 8,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_258_podego@epoque#9",
+      "projectile": "projectile_chr_podego_s1",
+      "mount": 9,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_258_podego@epoque#9",
+      "projectile": "projectile_chr_podego_s2",
+      "mount": 9,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_291_aglina@summer#5",
+      "projectile": "projectile_aglina",
+      "mount": 6,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_291_aglina@summer#5",
+      "projectile": "projectile_aglina_s2",
+      "mount": 6,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_358_lisa@lxh#1",
+      "projectile": "projectile_chr_lisa",
+      "mount": 6,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_358_lisa@lxh#1",
+      "projectile": "projectile_chr_lisa_s2",
+      "mount": 6,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_377_gdglow@sanrio#1",
+      "projectile": "projectile_chr_gdglow",
+      "mount": 10,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_377_gdglow@sanrio#1",
+      "projectile": "projectile_chr_gdglow_funnel",
+      "mount": 11,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_377_gdglow@sanrio#1",
+      "projectile": "projectile_chr_gdglow_s1",
+      "mount": 10,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_377_gdglow@sanrio#1",
+      "projectile": "projectile_chr_gdglow_s2",
+      "mount": 10,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_377_gdglow@snow#5",
+      "projectile": "projectile_chr_gdglow",
+      "mount": 10,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_377_gdglow@snow#5",
+      "projectile": "projectile_chr_gdglow_funnel",
+      "mount": 11,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_377_gdglow@snow#5",
+      "projectile": "projectile_chr_gdglow_s1",
+      "mount": 10,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_377_gdglow@snow#5",
+      "projectile": "projectile_chr_gdglow_s2",
+      "mount": 10,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_377_gdglow@summer#12",
+      "projectile": "projectile_chr_gdglow",
+      "mount": 10,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_377_gdglow@summer#12",
+      "projectile": "projectile_chr_gdglow_funnel",
+      "mount": 11,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_377_gdglow@summer#12",
+      "projectile": "projectile_chr_gdglow_s1",
+      "mount": 10,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_377_gdglow@summer#12",
+      "projectile": "projectile_chr_gdglow_s2",
+      "mount": 10,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_4027_heyak@ambienceSynesthesia#4",
+      "projectile": "projectile_chr_heyak",
+      "mount": 11,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_4027_heyak@ambienceSynesthesia#4",
+      "projectile": "projectile_chr_heyak_s1",
+      "mount": 11,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_4027_heyak@ambienceSynesthesia#4",
+      "projectile": "projectile_chr_heyak_s2",
+      "mount": 11,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_4027_heyak@epoque#50",
+      "projectile": "projectile_chr_heyak",
+      "mount": 11,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_4027_heyak@epoque#50",
+      "projectile": "projectile_chr_heyak_s1",
+      "mount": 11,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_4027_heyak@epoque#50",
+      "projectile": "projectile_chr_heyak_s2",
+      "mount": 11,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_4040_rockr@lxh#1",
+      "projectile": "projectile_chr_rockr",
+      "mount": 9,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_4040_rockr@lxh#1",
+      "projectile": "projectile_chr_rockr_funnel",
+      "mount": 10,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_4040_rockr@lxh#1",
+      "projectile": "projectile_chr_rockr_s2",
+      "mount": 9,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_427_vigil@epoque#27",
+      "projectile": "projectile_chr_vigil",
+      "mount": 11,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_427_vigil@epoque#27",
+      "projectile": "projectile_chr_vigil_s3_1",
+      "mount": 11,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_427_vigil@epoque#27",
+      "projectile": "projectile_chr_vigil_s3_2",
+      "mount": 12,
+      "fallback": "skin muzzle"
+    },
+    {
+      "skin": "char_427_vigil@epoque#27",
+      "projectile": "projectile_chr_vigil_s3_3",
+      "mount": 13,
+      "fallback": "skin muzzle"
+    }
+  ]
+}

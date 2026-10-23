@@ -40,9 +40,11 @@ import { bombardAnchor } from './bombardAnchor.js';
 // 领主's ranged-kind 'atk' on the enemy it blocks is its Combat blow (`_combatKind`); a sim-melee attack whose official
 // ability shoots flies its projectile for show (蒂比: `attack`); a chain's line stays CHAIN_LINE_S (`chain`).
 
-import { spawnPoint, mountPoint, unitPoint, spawnKind, mountKind, spawnRotation, mountRotation, graphicRotation } from './mounts.js';
+import { spawnPoint, mountPoint, unitPoint, skinPoint, spawnKind, mountKind, spawnRotation, mountRotation, graphicRotation } from './mounts.js';
 import { projectileParts, paracurve, arcHeight, wobble } from './flight.js';
-import { costumeFor, costumeEffect, costumeProjectile, costumePreloadKeys } from './costumes.js';
+import { WindFx } from './windfx.js';
+import { effectArtScale } from './artScale.js';
+import { costumeFor, costumeSkin, costumeEffect, costumeProjectile, costumePreloadKeys } from './costumes.js';
 import { GROUND_SPAWNS } from './effect.js';
 import { SkillFx, fitsAttack, pickGroup, formMode } from './skillfx.js';
 import { TalentFx } from './talentfx.js';
@@ -258,9 +260,12 @@ export class FxWiring {
     this.opts = opts;
     this.idx = null;
     this.costumeUnits = new WeakMap();
+    this.costumeSkins = new WeakMap();
     this.costumeShots = new WeakMap();
     this.projectileKeys = new WeakMap();
     this.bombardAims = new Map();
+    this.chenWaves = new Map();
+    this.windFx = new WindFx(this);
     this.flights = new Set();     // projectile flights in the air
     this.walls = new Set();       // skill-held Yu S3 controller handles
     this.loops = new Map();       // `${unitId}|${status}` → handle
@@ -332,7 +337,7 @@ export class FxWiring {
     if (!unit || !costume?.mount || !this.idx.skins?.[costume.mount]) return unit;
     let cache = this.costumeUnits.get(unit);
     if (!cache) { cache = new Map(); this.costumeUnits.set(unit,cache); }
-    if (!cache.has(costume)) cache.set(costume,{...unit,skin:costume.mount});
+    if (!cache.has(costume)) {const dressed={...unit,skin:costume.mount};cache.set(costume,dressed);this.costumeSkins.set(dressed,costumeSkin(this.idx,costume));}
     return cache.get(costume);
   }
 
@@ -369,7 +374,7 @@ export class FxWiring {
     return false;
   }
 
-  skinOf(u) { return u && u.skin && this.idx ? this.idx.skins[u.skin] || null : null; }
+  skinOf(u) { return u && u.skin && this.idx ? this.costumeSkins.get(u)||this.idx.skins[u.skin]||null : null; }
 
   /**
    * Where a view stands, as mounts.js reads it: board feet + facing, the view itself (its model's bones: the
@@ -598,14 +603,14 @@ export class FxWiring {
     pos[0]+=originOffset[0];pos[1]+=originOffset[1];
     // Correct only the oversized slash artwork. start_02 contains range_line
     // and the ground tiles: its footprint must retain the authored size.
-    const areaScale=/^blkkgt_skill_03_(?:start_01|end)$/.test(k)?0.5:1;
+    const areaScale=effectArtScale(lc(key),k);
     const effectScale=typeof o.scale==='function'?()=>o.scale()*areaScale:o.scale!=null?o.scale*areaScale:areaScale!==1?areaScale:undefined;
     const ground = P.onGround ? effectGroundHeight(P.spawn, v, k) : (v.z || 0);
     if (P.onGround) pos[2] = -ground;
     const place = { pos, scale: typeof effectScale === 'function' ? effectScale() : effectScale, groundZ: -ground, yaw: 0, mirror: false, flipY: false, mountRot: null, rootRot: null };
     this._rotate(P, place, skin, pose);
     this._orient(def, place, pose, o, v);
-    const opts = { track: o.track || null, data: o.data ?? null, loop: !!o.loop, important: !!o.important, skip: o.skip > 0 ? o.skip : 0, speed: o.speed, owner: v };
+    const opts = { track: o.track || null, data: o.data ?? null, loop: !!o.loop, important: !!o.important, skip: o.skip > 0 ? o.skip : 0, speed: o.speed, owner: v, depthOwner:o.depthOwner ?? ((o.follow || o.stick || P.follow || P.keep) && v.root ? v : null) };
     // the owner each frame: FollowMountPoint keeps the effect on the unit's point (and its rotation), a held effect
     // moves with the unit (`keep`), FollowDirection turns it with the unit, PauseEffectIf hides it while the unit shows
     // a condition; a prefab with chained effects (OnPlayEmitter: system.js FxHandle._start hands them this track) has
@@ -1119,7 +1124,8 @@ export class FxWiring {
    */
   _fly(proj, src, tgt, kind, time, o = {}) {
     proj = this.projectileOf(proj,src);
-    if (Number.isInteger(proj.costumeMount) && !Number.isInteger(o.mount)) o={...o,mount:proj.costumeMount};
+    // The skin's graphic projectile has its own muzzle even when the logical ability specifies a mount.
+    const visualMount=Number.isInteger(proj.costumeMount)?proj.costumeMount:o.mount;
     const su = this.unitOf(src), tu = this.unitOf(tgt);
     const sSkin = this.skinOf(su), tSkin = this.skinOf(tu);
     // the start: the mount point as the attack clip poses it at its strike frame (a follow-up shot: as it is drawn then);
@@ -1127,7 +1133,9 @@ export class FxWiring {
     const startAt = (out, strike = false) => {
       const pose = this.pose(src);
       pose.strike = strike;
-      return Number.isInteger(o.mount) ? mountPoint(sSkin, o.mount, pose, out) : unitPoint(sSkin, 'muzzle', pose, out);
+      // Old extracts may omit an animator alias. Fall back to the skin's actual muzzle, not a body-height guess.
+      return Number.isInteger(visualMount)&&(!Number.isInteger(proj.costumeMount)||skinPoint(sSkin,mountKind(visualMount),pose.back))
+        ? mountPoint(sSkin,visualMount,pose,out):unitPoint(sSkin,'muzzle',pose,out);
     };
     const from = startAt([0, 0, 0], !o.later);
     const to0 = o.groundTarget ? [tgt.x-10,tgt.y-9,-(tgt.z||0)] : unitPoint(tSkin, 'hit', this.pose(tgt));
@@ -1569,7 +1577,7 @@ export class FxWiring {
     const key = this.statusKey(name);
     if (!key) return false;
     this.skills.status(v, lc(key));
-    const h = this.playOn(key, v, { follow: true, loop: true, important: true });
+    const h = this.playOn(key, v, { follow: true, loop: true, important: true, depthOwner:v });
     if (h) this.loops.set(slot, h);
     return !!h;
   }
@@ -1595,6 +1603,7 @@ export class FxWiring {
   /** Stop every loop of a unit (it died / left): its status loops, its skill / charge loops, the skills' loops on it. */
   release(v) {
     const id = v?.id ?? v?.info?.id;
+    this.chenWaves.get(id)?.handle.stop();this.chenWaves.delete(id);
     this.statusSeen.delete(id);
     for (const [slot, h] of this.loops) if (slot.startsWith(`${id}|`)) { h.stop(); this.loops.delete(slot); }
     this.skills.release(v);
@@ -1605,6 +1614,7 @@ export class FxWiring {
   /** b.ev ['skill', id, on] (SkillFx.skill): true when the official layer shows the skill (no procedural burst / aura). */
   skill(v, on, cast = null) {
     if (!v || v.prep || !this.idx) return false;
+    if(!on){const id=v.id??v.info?.id;this.chenWaves.get(id)?.handle.stop();this.chenWaves.delete(id);}
     const drew = this.skills.skill(v, !!on, cast);
     this.talents.skill(v, !!on);   // the talents a skill start casts (ON_SKILL_START)
     this.funnels.skill(v, !!on);   // the floating units of the skill's mode (render/vfx/funnelfx.js)
@@ -1637,6 +1647,14 @@ export class FxWiring {
     this.funnels.sync(list);
   }
 
+  // The extracted Clemen(tia) pack has body/attack art, but no independent cabin/vortex asset.
+  // Preserve only these missing visuals with their existing procedural fallback.
+  simpleEvent(kind,extra){
+    if(!['anchor','tide'].includes(kind))return false;
+    const owner=this.view(extra?.id);if(!owner||this.unitKeyOf(owner)!=='char_4231_clemnt')return false;
+    return extra?.skill==='clemnt:cabin'||this.skills.of(owner)?.skillId==='skchr_clemnt_2';
+  }
+
   /**
    * b.ev 'fx' of a kit: the talents' and abilities' nodes it casts (TalentFx.fx: a fatal blow's 替身 / 不死, a stand-in's
    * end, a talent's added attack) and the skills' bindings (SkillFx.simFx): true when the official layer stands for it
@@ -1646,6 +1664,26 @@ export class FxWiring {
     if (!this.idx) return false;
     const owner = this.view(extra?.src ?? extra?.id);
     if (owner?.info && !this.hasOfficialUnit(owner)) return false;
+    if(this.windFx.simFx(kind,x,y,extra,owner))return true;
+    if(kind==='chen3Wave'&&this.ofx.active&&owner){
+      const id=owner.id??owner.info?.id;let wave=this.chenWaves.get(id);
+      if(!wave){
+        const projectile=this.projectileOf(this.idx.projectiles?.projectile_chr_chen3_s3,owner);
+        const key=this.effectKey(projectileParts(projectile).main,owner);
+        if(!key||!this.ofx.lib.has(key))return false;
+        wave={x,y,dr:0,dc:0,at:this.ofx.time,speed:Number(projectile?.movement?.speed)||1.5};
+        const current=wave;
+        wave.handle=this.ofx.spawn(key,{pos:[x-10,y-9,0],groundZ:0,rootRot:ID_ROT},{loop:true,important:true,owner,track:fx=>{
+          // Events carry the real terrain turns. Extrapolate only one event period, never through a long gap.
+          const elapsed=Math.max(0,Math.min(.12,this.ofx.time-current.at));
+          fx.anchor[0]=current.x-10+current.dc*current.speed*elapsed;
+          fx.anchor[1]=current.y-9+current.dr*current.speed*elapsed;fx.anchor[2]=0;fx.groundZ=0;
+          fx.yaw=Math.atan2(current.dr,current.dc);fx.pitch=0;
+        }});
+        if(!wave.handle)return false;this.chenWaves.set(id,wave);
+      }
+      Object.assign(wave,{x,y,dr:Number(extra.dr)||0,dc:Number(extra.dc)||0,at:this.ofx.time});return true;
+    }
     if (kind === 'zone' && this.ofx.active) {
       const zone = ENEMY_ZONES[extra?.sourceDef];
       if (zone && extra.kind === zone[0] && Number(extra.dur) > 0) {
@@ -1734,6 +1772,8 @@ export class FxWiring {
     this.walls.clear();
     this.flights.clear();
     this.bombardAims.clear();
+    this.windFx.clear();
+    for(const wave of this.chenWaves.values())wave.handle.stop();this.chenWaves.clear();
     this.loops.clear();
     this.statusSeen.clear();
     this.melee.clear();
@@ -1758,6 +1798,8 @@ export class FxWiring {
   /** Called once per frame: delayed actions on the battle clock (and the frame count the skills' same-frame rules use). */
   tick() {
     this.skills.frame++;
+    this.windFx.tick();
+    for(const [id,wave]of this.chenWaves){const owner=this.view(id);if(!this.ofx.active||!owner||owner.alive===false||this.ofx.time-wave.at>.5){wave.handle.stop();this.chenWaves.delete(id);}}
     for (const wall of this.walls) { wall.update(); if (!wall.alive) this.walls.delete(wall); }
     const T = this.ofx.timers;
     if (!T || !T.length) return;

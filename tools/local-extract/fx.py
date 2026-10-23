@@ -2400,6 +2400,8 @@ def skin_points(env, rel, prefab, graphic, container=None):
         return None
     base = trs_matrix(graphic['pos'], graphic['rot'], graphic['scale']) if graphic else trs_matrix([0, 0, 0], [0, 0, 0, 1], [1, 1, 1])
     points = {}
+    slot_bindings = {}
+    bound_points = {}
 
     def walk(go, m, facing, path):
         gd = env.tt(go)
@@ -2408,20 +2410,40 @@ def skin_points(env, rel, prefab, graphic, container=None):
         m2 = m if trs is None else mat_mul(m, trs_matrix(*trs))
         f2 = 'front' if name == 'Front' else 'back' if name == 'Back' else facing
         bone, follow_rot = None, True
+        transform_identity = None
         for c in gd.get('m_Component', []):
             cf, co = env.resolve(go.assets_file, c.get('component'))
+            if co is not None and cf != 'builtin' and co.type.name == 'Transform':
+                transform_identity = (id(co.assets_file), co.path_id)
+            if co is not None and cf != 'builtin' and co.type.name == 'MonoBehaviour' and env.script(co)[1] == 'CharacterAnimator':
+                animator = env.tt(co)
+                for side, field in [('front', '_front'), ('back', '_back')]:
+                    for slot, ptr in (animator.get(field) or {}).items():
+                        canonical = {'muzzlaTransform': 'Muzzle', 'hitTransform': 'HitPoint', 'headTransform': 'HeadPoint'}.get(slot)
+                        if re.fullmatch(r'specialPoint\d+', slot):
+                            canonical = 'Special' + slot[len('specialPoint'):]
+                        if canonical and isinstance(ptr, dict):
+                            tf, target = env.resolve(co.assets_file, ptr)
+                            if target is not None and tf != 'builtin':
+                                slot_bindings.setdefault((id(target.assets_file), target.path_id), []).append((side, canonical))
             if co is not None and cf != 'builtin' and co.type.name == 'MonoBehaviour' and env.script(co)[1] == 'BoneFollower':
                 bf = env.tt(co)
                 bone = bf.get('boneName') or None
                 follow_rot = bool(bf.get('followBoneRotation', 1))   # spine-unity's default: true
-        if trs is not None and MOUNT_NAME.search(name):
+        aliases = slot_bindings.get(transform_identity, [])
+        if trs is not None and (MOUNT_NAME.search(name) or aliases):
             pt = {'pos': mat_point(m2), 'bone': bone, 'path': path + name, 'rot': [f6(x) for x in trs[1]]}
             if bone:
                 pt['followRot'] = follow_rot
-            points.setdefault(name, {})[f2 or 'all'] = pt
+            if MOUNT_NAME.search(name):
+                points.setdefault(name, {})[f2 or 'all'] = pt
+            for side, canonical in aliases:
+                bound_points.setdefault(canonical, {})[side] = pt
         for k in go_children(env, go):
             walk(k, m2, f2, '' if go is root else f'{path}{name}/')
     walk(root, base, None, '')
+    for name, facings in bound_points.items():
+        points.setdefault(name, {}).update(facings)
     return points
 
 

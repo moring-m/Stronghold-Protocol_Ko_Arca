@@ -2237,7 +2237,7 @@ export async function createFieldView(host, options = {}) {
         const official = !(late > 0) && wiring.simFx(e[1], Number(e[2]), Number(e[3]), e[4]);
         const fxOwner=views.get(e[4]?.src ?? e[4]?.id);
         const simpleOwner=!!fxOwner && !ctx.officialFor(fxOwner);
-        if (!(late > 0) && !custom && !official && !officialForm && (!ofx.active||simpleOwner||utilityFx(e[1],e[4]))) fx.simFx(e[1], Number(e[2]), Number(e[3]), e[4]);
+        if (!(late > 0) && !custom && !official && !officialForm && (!ofx.active||simpleOwner||wiring.simpleEvent?.(e[1],e[4])||utilityFx(e[1],e[4]))) fx.simFx(e[1], Number(e[2]), Number(e[3]), e[4]);
         break;
       }
       case 'layer': {

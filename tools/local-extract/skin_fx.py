@@ -56,6 +56,11 @@ def skin_components(env, root, known_effects):
                     return None
                 record = env.tt(target)
                 name = record.get('m_Name') or record.get('name')
+                # Transform records have no name; preserve the referenced GameObject's identity for animator slots.
+                if not name and target.type.name == 'Transform':
+                    go_file, go = env.resolve(target.assets_file, record.get('m_GameObject'))
+                    if go is not None and go_file != 'builtin':
+                        name = env.tt(go).get('m_Name')
                 if isinstance(name, str) and name.lower() in known_effects:
                     references.add(name.lower())
                 return {'reference': name, 'type': target.type.name}

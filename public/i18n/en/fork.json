@@ -2943,5 +2943,16 @@
   "은신": "Invisible",
   "모든 적 유닛이 은신 획득": "All enemies gain Invisible",
   "보스전 및 보스 유닛에는 적용되지 않음": "Does not apply to boss battles or boss units",
-  "접근성": "Accessibility"
+  "접근성": "Accessibility",
+  "전투 이펙트 및 다운로드 핫픽스": "Battle Effects and Download Hotfix",
+  "아스카론 스킨의 기본 공격 크기와 스킨 투사체의 발사 기준점을 보정했습니다. 데겐블레허 스킨에는 기본 이펙트의 크기 보정을 적용하지 않습니다.": "Corrected Ascalon’s skin basic attack size and skin projectile origins. The base effect size correction no longer affects Degenbrecher’s skins.",
+  "첸 더 던스트릭 3스킬의 검기와 오올헤약 3스킬의 이동하는 회전 바람에 공식 이펙트를 연결했습니다.": "Connected official effects for Ch’en the Dawnstreak’s Skill 3 sword wave and Ho’olheyak’s moving Skill 3 tornadoes.",
+  "클레멘티아 2스킬의 선실 이동·소용돌이는 전용 공식 리소스가 없는 부분에 한해 간소 표시를 사용합니다.": "Clementia’s Skill 2 moving cabin and vortex use simplified indicators only where dedicated official assets are unavailable.",
+  "빙결 등 유닛 부착 효과가 해당 유닛의 렌더 순서를 따르도록 수정했습니다. 바닥 효과와 원본 Overlay 지정은 유지합니다.": "Unit-attached effects such as Freeze now follow their unit’s draw order. Ground effects and explicitly authored Overlay materials retain their layers.",
+  "BLOCK을 비롯한 전투 문구의 크기와 카메라 배율을 회복·SP 표시와 통일했습니다.": "Combat notices, including BLOCK, now use the same size and camera scaling as healing and SP indicators.",
+  "데겐블레허 3스킬의 무적이 마지막 연속 참격 뒤 해제되도록 수정했습니다. 스킬을 연속 사용해도 종료 직전까지 무적이 이어지지 않습니다.": "Degenbrecher’s Skill 3 invulnerability now ends after the final repeated slash, leaving the intended vulnerable window before the skill ends even during consecutive casts.",
+  "언어팩 검증 정보를 갱신하고 일시적인 통신 오류와 다운로드 중 연결 끊김을 재시도하도록 보완했습니다.": "Updated language pack integrity metadata and added retries for temporary network errors and interrupted downloads.",
+  "UI 배율 옵션을 모든 기기의 접근성 탭에 표시하고 모바일의 데스크톱 사이트 모드에서도 배율을 적용합니다.": "UI scale is visible in Accessibility on every device and also applies when mobile browsers request the desktop site.",
+  "실험실·연습실의 설명 영역 높이를 줄여 낮은 화면에서도 선택 목록을 사용할 수 있도록 조정했습니다.": "Reduced Laboratory and Practice description heights to keep selection lists accessible on short screens.",
+  "방 개수에 Bender 폰트를 적용하고 최초 화면에서 미리 불러오도록 변경했습니다.": "Room counts now use Bender, preloaded on the initial screen."
 }

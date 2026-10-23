@@ -1,0 +1,2249 @@
+{
+  "costumes": 280,
+  "effectMappings": 4449,
+  "missingReferences": [],
+  "spawnChangesRequiringVisualReview": [
+    {
+      "skin": "char_1016_agoat2@epoque#57",
+      "base": "agoat2_attack_start_01",
+      "target": "agoat2_attack_start_01_epoque#57",
+      "baseSpawn": 8,
+      "skinSpawn": 3
+    },
+    {
+      "skin": "char_1016_agoat2@epoque#57",
+      "base": "agoat2_skill_01_start_01",
+      "target": "agoat2_skill_01_start_01_epoque#57",
+      "baseSpawn": 8,
+      "skinSpawn": 3
+    },
+    {
+      "skin": "char_1016_agoat2@epoque#57",
+      "base": "agoat2_skill_03_weapon_01",
+      "target": "agoat2_skill_03_weapon_01_epoque#57",
+      "baseSpawn": 10,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1016_agoat2@epoque#57",
+      "base": "agoat2_skill_03_weapon_02",
+      "target": "agoat2_skill_03_weapon_02_epoque#57",
+      "baseSpawn": 11,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1016_agoat2@epoque#57",
+      "base": "agoat2_skill_03_weapon_03",
+      "target": "agoat2_skill_03_weapon_03_epoque#57",
+      "baseSpawn": 13,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1016_agoat2@epoque#57",
+      "base": "agoat2_skill_03_weapon_04",
+      "target": "agoat2_skill_03_weapon_04_epoque#57",
+      "baseSpawn": 14,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1016_agoat2@epoque#57",
+      "base": "agoat2_skill_03_weapon_05",
+      "target": "agoat2_skill_03_weapon_05_epoque#57",
+      "baseSpawn": 8,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1035_wisdel@game#9",
+      "base": "wisdel_skill_03_buff_02_f",
+      "target": "wisdel_skill_03_buff_02_f_game#9",
+      "baseSpawn": 8,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1042_phatm2@sightseer#4",
+      "base": "phatm2_attack_start_01",
+      "target": "phatm2_attack_start_01_sightseer#4",
+      "baseSpawn": 1,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_1042_phatm2@sightseer#4",
+      "base": "phatm2_skill_02_start_01",
+      "target": "phatm2_skill_02_start_01_sightseer#4",
+      "baseSpawn": 8,
+      "skinSpawn": 3
+    },
+    {
+      "skin": "char_1046_sbell2@ambienceSynesthesia#8",
+      "base": "sbell2_skill_02_buff_03",
+      "target": "sbell2_skill_02_buff_03_ambiencesynesthesia#8",
+      "baseSpawn": 9,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1046_sbell2@ambienceSynesthesia#8",
+      "base": "sbell2_skill_02_buff_04",
+      "target": "sbell2_skill_02_buff_04_ambiencesynesthesia#8",
+      "baseSpawn": 10,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1046_sbell2@ambienceSynesthesia#8",
+      "base": "sbell2_skill_03_buff_02",
+      "target": "sbell2_skill_03_buff_02_ambiencesynesthesia#8",
+      "baseSpawn": 11,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_264_f12yin@marthe#13",
+      "base": "f12yin_skill_02_hit",
+      "target": "f12yin_skill_02_hit_marthe#13",
+      "baseSpawn": 2,
+      "skinSpawn": 5
+    },
+    {
+      "skin": "char_264_f12yin@marthe#13",
+      "base": "common_char_birth_01",
+      "target": "f12yin_birth_01_marthe#13",
+      "baseSpawn": 1,
+      "skinSpawn": 5
+    },
+    {
+      "skin": "char_4026_vulpis@epoque#55",
+      "base": "vulpis_skill_02_start_01",
+      "target": "vulpis_skill_02_start_01_epoque#55",
+      "baseSpawn": 5,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_4080_lin@littlePony#1",
+      "base": "lin_skill_03_range_01",
+      "target": "lin_skill_03_range_01_littlepony#1",
+      "baseSpawn": 5,
+      "skinSpawn": 7
+    },
+    {
+      "skin": "char_4080_lin@littlePony#1",
+      "base": "common_empty",
+      "target": "lin_skill_03_start_b_01_littlepony#1",
+      "baseSpawn": null,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_4117_ray@summer#22",
+      "base": "ray_skill_02_buff_01_b",
+      "target": "ray_skill_02_buff_01_b_summer#22",
+      "baseSpawn": 8,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_4117_ray@summer#22",
+      "base": "ray_skill_02_buff_01_f",
+      "target": "ray_skill_02_buff_01_f_summer#22",
+      "baseSpawn": 8,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_4191_tippi@epoque#57",
+      "base": "tippi_land_b",
+      "target": "tippi_land_b_epoque#57",
+      "baseSpawn": 2,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_4191_tippi@epoque#57",
+      "base": "tippi_land_f",
+      "target": "tippi_land_f_epoque#57",
+      "baseSpawn": 2,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_4191_tippi@epoque#57",
+      "base": "tippi_line_01_1",
+      "target": "tippi_line_01_epoque#57",
+      "baseSpawn": 9,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_4191_tippi@epoque#57",
+      "base": "tippi_takeoff_b",
+      "target": "tippi_takeoff_b_epoque#57",
+      "baseSpawn": 2,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_4191_tippi@epoque#57",
+      "base": "tippi_takeoff_f",
+      "target": "tippi_takeoff_f_epoque#57",
+      "baseSpawn": 2,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_4191_tippi@epoque#57",
+      "base": "tippi_attack_01_start",
+      "target": "tippi_attack_01_start_01_epoque#57",
+      "baseSpawn": 8,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_4191_tippi@epoque#57",
+      "base": "tippi_skill_01_attack_01_start",
+      "target": "tippi_skill_01_start_01_epoque#57",
+      "baseSpawn": 8,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_4191_tippi@epoque#57",
+      "base": "tippi_skill_02_attack_01_start",
+      "target": "tippi_skill_02_attack_01_start_epoque#57",
+      "baseSpawn": 8,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_4191_tippi@epoque#57",
+      "base": "tippi_line_01_2",
+      "target": "tippi_line_01_epoque#57",
+      "baseSpawn": 10,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_4194_rmixer@boc#12",
+      "base": "rmixer_skill_03_buff_02",
+      "target": "rmixer_skill_03_buff_02_boc#12",
+      "baseSpawn": 8,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_4194_rmixer@boc#12",
+      "base": "rmixer_skill_03_buff_02_back",
+      "target": "rmixer_skill_03_buff_02_back_boc#12",
+      "baseSpawn": 8,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_4196_reckpr@yun#12",
+      "base": "reckpr_attack_start",
+      "target": "reckpr_attack_start_yun#12",
+      "baseSpawn": 1,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_4196_reckpr@yun#12",
+      "base": "reckpr_skill1_start",
+      "target": "reckpr_skill1_start_yun#12",
+      "baseSpawn": 1,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_4204_mantra@sightseer#4",
+      "base": "mantra_attack_start_01",
+      "target": "mantra_attack_start_01_sightseer#4",
+      "baseSpawn": 3,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_4204_mantra@sightseer#4",
+      "base": "mantra_skill_01_start_01",
+      "target": "mantra_skill_01_start_01_sightseer#4",
+      "baseSpawn": 3,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_4204_mantra@sightseer#4",
+      "base": "mantra_skill_02_start_01",
+      "target": "mantra_skill_02_start_01_sightseer#4",
+      "baseSpawn": 3,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_4204_mantra@sightseer#4",
+      "base": "mantra_skill_03_buff_02",
+      "target": "mantra_skill_03_buff_02_sightseer#4",
+      "baseSpawn": 1,
+      "skinSpawn": null
+    },
+    {
+      "skin": "char_4204_mantra@sightseer#4",
+      "base": "mantra_skill_03_start_01",
+      "target": "mantra_skill_03_start_01_sightseer#4",
+      "baseSpawn": 3,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_423_blemsh@littlePony#1",
+      "base": "blemsh_attack_01_start",
+      "target": "blemsh_attack_01_start_littlepony#1",
+      "baseSpawn": 0,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_423_blemsh@littlePony#1",
+      "base": "blemsh_attack_01_start_b",
+      "target": "blemsh_attack_01_start_b_littlepony#1",
+      "baseSpawn": 0,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_423_blemsh@littlePony#1",
+      "base": "blemsh_skill_01_start",
+      "target": "blemsh_skill_01_start_littlepony#1",
+      "baseSpawn": 0,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_423_blemsh@littlePony#1",
+      "base": "blemsh_skill_01_start_b",
+      "target": "blemsh_skill_01_start_b_littlepony#1",
+      "baseSpawn": 0,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_423_blemsh@littlePony#1",
+      "base": "blemsh_skill_03_buff_02",
+      "target": "blemsh_skill_03_buff_02_littlepony#1",
+      "baseSpawn": 0,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_003_kalts@boc#6",
+      "base": "token_kalts_skill_02_buff",
+      "target": "token_kalts_skill_02_buff_boc#6",
+      "baseSpawn": 1,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_003_kalts@boc#6",
+      "base": "token_kalts_skill_03_buff",
+      "target": "token_kalts_skill_03_buff_boc#6",
+      "baseSpawn": 1,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_003_kalts@sale#14",
+      "base": "token_kalts_skill_01_buff",
+      "target": "token_kalts_skill_01_buff_sale#14",
+      "baseSpawn": 1,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_003_kalts@sale#14",
+      "base": "token_kalts_skill_02_buff",
+      "target": "token_kalts_skill_02_buff_sale#14",
+      "baseSpawn": 1,
+      "skinSpawn": 15
+    },
+    {
+      "skin": "char_003_kalts@sale#14",
+      "base": "token_kalts_skill_03_buff",
+      "target": "token_kalts_skill_03_buff_sale#14",
+      "baseSpawn": 1,
+      "skinSpawn": 15
+    },
+    {
+      "skin": "char_1012_skadi2@boc#4",
+      "base": "common_char_birth_01",
+      "target": "skadi2_birth_01_start_boc#4",
+      "baseSpawn": 1,
+      "skinSpawn": 5
+    },
+    {
+      "skin": "char_1012_skadi2@iteration#2",
+      "base": "skadi2_skill_02_begin_start",
+      "target": "skadi2_skill_02_begin_start_iteration#2",
+      "baseSpawn": 9,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1012_skadi2@iteration#2",
+      "base": "skadi2_birth_01_start",
+      "target": "skadi2_birth_01_start_iteration#2",
+      "baseSpawn": 5,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1013_chen2@boc#6",
+      "base": "chen2_attack_start_01",
+      "target": "chen2_attack_start_01_boc#6",
+      "baseSpawn": 8,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1013_chen2@boc#6",
+      "base": "chen2_skill_01_buff_02",
+      "target": "chen2_skill_01_buff_02_boc#6",
+      "baseSpawn": 9,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_1013_chen2@boc#6",
+      "base": "chen2_skill_01_buff_02_b",
+      "target": "chen2_skill_01_buff_02_b_boc#6",
+      "baseSpawn": 9,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_1013_chen2@boc#6",
+      "base": "chen2_skill_01_start_01",
+      "target": "chen2_skill_01_start_01_boc#6",
+      "baseSpawn": 9,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_1013_chen2@boc#6",
+      "base": "chen2_skill_01_start_01_b",
+      "target": "chen2_skill_01_start_01_b_boc#6",
+      "baseSpawn": 9,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_1013_chen2@boc#6",
+      "base": "chen2_skill_02_buff_02",
+      "target": "chen2_skill_02_buff_02_boc#6",
+      "baseSpawn": 9,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_1013_chen2@boc#6",
+      "base": "chen2_skill_02_buff_02_b",
+      "target": "chen2_skill_02_buff_02_b_boc#6",
+      "baseSpawn": 9,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_1013_chen2@boc#6",
+      "base": "chen2_skill_02_start_01",
+      "target": "chen2_skill_02_start_01_boc#6",
+      "baseSpawn": 9,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_1013_chen2@boc#6",
+      "base": "chen2_skill_02_start_01_b",
+      "target": "chen2_skill_02_start_01_b_boc#6",
+      "baseSpawn": 9,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_1013_chen2@boc#6",
+      "base": "chen2_skill_03_buff_02",
+      "target": "chen2_skill_03_buff_02_boc#6",
+      "baseSpawn": 10,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_1013_chen2@boc#6",
+      "base": "chen2_skill_03_buff_02_b",
+      "target": "chen2_skill_03_buff_02_b_boc#6",
+      "baseSpawn": 10,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_1013_chen2@boc#6",
+      "base": "chen2_skill_03_buff_03",
+      "target": "chen2_skill_03_buff_03_boc#6",
+      "baseSpawn": 9,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_1013_chen2@boc#6",
+      "base": "chen2_skill_03_buff_03_b",
+      "target": "chen2_skill_03_buff_03_b_boc#6",
+      "baseSpawn": 9,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_1013_chen2@boc#6",
+      "base": "chen2_skill_03_start_01",
+      "target": "chen2_skill_03_start_01_boc#6",
+      "baseSpawn": 10,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_1013_chen2@boc#6",
+      "base": "chen2_skill_03_start_01_b",
+      "target": "chen2_skill_03_start_01_b_boc#6",
+      "baseSpawn": 10,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_1013_chen2@boc#6",
+      "base": "chen2_skill_03_start_02",
+      "target": "chen2_skill_03_start_02_boc#6",
+      "baseSpawn": 9,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_1013_chen2@boc#6",
+      "base": "chen2_skill_03_start_02_b",
+      "target": "chen2_skill_03_start_02_b_boc#6",
+      "baseSpawn": 9,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_1013_chen2@summer#20",
+      "base": "chen2_skill_01_start_01",
+      "target": "chen2_skill_01_start_01_summer#20",
+      "baseSpawn": 9,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1013_chen2@summer#20",
+      "base": "chen2_skill_01_start_01_b",
+      "target": "chen2_skill_01_start_01_b_summer#20",
+      "baseSpawn": 9,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1013_chen2@summer#20",
+      "base": "chen2_skill_02_buff_01_02",
+      "target": "chen2_skill_02_buff_01_02_summer#20",
+      "baseSpawn": 1,
+      "skinSpawn": 9
+    },
+    {
+      "skin": "char_1013_chen2@summer#20",
+      "base": "chen2_skill_02_buff_02",
+      "target": "chen2_skill_02_buff_02_summer#20",
+      "baseSpawn": 9,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1013_chen2@summer#20",
+      "base": "chen2_skill_02_buff_02_b",
+      "target": "chen2_skill_02_buff_02_b_summer#20",
+      "baseSpawn": 9,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1013_chen2@summer#20",
+      "base": "chen2_skill_02_debuff",
+      "target": "chen2_skill_02_debuff_summer#20",
+      "baseSpawn": 2,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1013_chen2@summer#20",
+      "base": "chen2_skill_03_buff_02",
+      "target": "chen2_skill_03_buff_02_summer#20",
+      "baseSpawn": 10,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1013_chen2@summer#20",
+      "base": "chen2_skill_03_buff_02_b",
+      "target": "chen2_skill_03_buff_02_b_summer#20",
+      "baseSpawn": 10,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1013_chen2@summer#20",
+      "base": "chen2_skill_03_buff_03",
+      "target": "chen2_skill_03_buff_03_summer#20",
+      "baseSpawn": 9,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1013_chen2@summer#20",
+      "base": "chen2_skill_03_buff_03_b",
+      "target": "chen2_skill_03_buff_03_b_summer#20",
+      "baseSpawn": 9,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1013_chen2@summer#20",
+      "base": "chen2_skill_03_debuff",
+      "target": "chen2_skill_03_debuff_summer#20",
+      "baseSpawn": 2,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1013_chen2@summer#20",
+      "base": "chen2_skill_03_start_02",
+      "target": "chen2_skill_03_start_02_summer#20",
+      "baseSpawn": 9,
+      "skinSpawn": 10
+    },
+    {
+      "skin": "char_1013_chen2@summer#20",
+      "base": "chen2_skill_03_start_02_b",
+      "target": "chen2_skill_03_start_02_b_summer#20",
+      "baseSpawn": 9,
+      "skinSpawn": 10
+    },
+    {
+      "skin": "char_1013_chen2@summer#20",
+      "base": "common_char_birth_01",
+      "target": "chen2_birth_01_summer#20",
+      "baseSpawn": 1,
+      "skinSpawn": 11
+    },
+    {
+      "skin": "char_1016_agoat2@epoque#34",
+      "base": "agoat2_attack_start_01",
+      "target": "agoat2_attack_start_01_epoque#34",
+      "baseSpawn": 8,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1016_agoat2@epoque#34",
+      "base": "agoat2_skill_01_start_01",
+      "target": "agoat2_skill_01_start_01_epoque#34",
+      "baseSpawn": 8,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1016_agoat2@epoque#34",
+      "base": "agoat2_skill_02_start_01",
+      "target": "agoat2_skill_02_start_01_epoque#34",
+      "baseSpawn": 9,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1016_agoat2@epoque#34",
+      "base": "agoat2_skill_03_weapon_02",
+      "target": "agoat2_skill_03_weapon_02_epoque#34",
+      "baseSpawn": 11,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_1016_agoat2@epoque#34",
+      "base": "agoat2_skill_03_weapon_03",
+      "target": "agoat2_skill_03_weapon_03_epoque#34",
+      "baseSpawn": 13,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_1016_agoat2@epoque#34",
+      "base": "agoat2_skill_03_weapon_04",
+      "target": "agoat2_skill_03_weapon_04_epoque#34",
+      "baseSpawn": 14,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_1019_siege2@epoque#50",
+      "base": "siege2_skill_02_buff_02",
+      "target": "siege2_skill_02_buff_02_epoque#50",
+      "baseSpawn": 1,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_1020_reed2@epoque#30",
+      "base": "reed2_skill_03_start",
+      "target": "reed2_skill_03_start_epoque#30",
+      "baseSpawn": 8,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1020_reed2@snow#8",
+      "base": "reed2_skill_03_buff_04",
+      "target": "reed2_skill_03_buff_04_snow#8",
+      "baseSpawn": 10,
+      "skinSpawn": 11
+    },
+    {
+      "skin": "char_1020_reed2@snow#8",
+      "base": "reed2_skill_03_buff_back_04",
+      "target": "reed2_skill_03_buff_back_04_snow#8",
+      "baseSpawn": 10,
+      "skinSpawn": 13
+    },
+    {
+      "skin": "char_1020_reed2@snow#8",
+      "base": "reed2_treat_01",
+      "target": "reed2_treat_01_snow#8",
+      "baseSpawn": 2,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1020_reed2@summer#17",
+      "base": "reed2_skill_03_buff_03",
+      "target": "reed2_skill_03_buff_03_summer#17",
+      "baseSpawn": 2,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1020_reed2@summer#17",
+      "base": "reed2_skill_03_start",
+      "target": "reed2_skill_03_start_summer#17",
+      "baseSpawn": 8,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1021_kroos2@game#3",
+      "base": "kroos2_attack_start_01",
+      "target": "kroos2_attack_start_01_game#3",
+      "baseSpawn": 0,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_1021_kroos2@game#3",
+      "base": "kroos2_attack_start_02",
+      "target": "kroos2_attack_start_02_game#3",
+      "baseSpawn": 0,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_1021_kroos2@game#3",
+      "base": "kroos2_skill_02_start_01",
+      "target": "kroos2_skill_02_start_01_game#3",
+      "baseSpawn": 0,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_1021_kroos2@game#3",
+      "base": "kroos2_skill_02_start_02",
+      "target": "kroos2_skill_02_start_02_game#3",
+      "baseSpawn": 0,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_1021_kroos2@game#3",
+      "base": "kroos2_skill_01_start",
+      "target": "kroos2_skill_01_start_game#3",
+      "baseSpawn": 0,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_1023_ghost2@boc#6",
+      "base": "ghost2_birth_empty_02",
+      "target": "ghost2_birth_02_start_boc#6",
+      "baseSpawn": null,
+      "skinSpawn": 9
+    },
+    {
+      "skin": "char_1023_ghost2@boc#6",
+      "base": "ghost2_birth_empty_03",
+      "target": "ghost2_birth_03_start_boc#6",
+      "baseSpawn": null,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_1026_gvial2@summer#12",
+      "base": "gvial2_skill_1_start",
+      "target": "gvial2_skill_1_start_summer#12",
+      "baseSpawn": 0,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1028_texas2@epoque#36",
+      "base": "texas2_skill_03_hit_02",
+      "target": "texas2_skill_03_hit_02_epoque#36",
+      "baseSpawn": 5,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1028_texas2@iteration#1",
+      "base": "texas2_skill_03_range_start",
+      "target": "texas2_skill_03_range_start_iteration#1",
+      "baseSpawn": 5,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1031_slent2@epoque#32",
+      "base": "slent2_attack_01_start_01",
+      "target": "slent2_attack_01_start_01_epoque#32",
+      "baseSpawn": 1,
+      "skinSpawn": 3
+    },
+    {
+      "skin": "char_1031_slent2@epoque#32",
+      "base": "slent2_skill_01_hit_01",
+      "target": "slent2_skill_01_hit_01_epoque#32",
+      "baseSpawn": 2,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1031_slent2@epoque#32",
+      "base": "slent2_skill_01_start_01",
+      "target": "slent2_skill_01_start_01_epoque#32",
+      "baseSpawn": 1,
+      "skinSpawn": 3
+    },
+    {
+      "skin": "char_1031_slent2@epoque#32",
+      "base": "slent2_skill_02_hit_01",
+      "target": "slent2_skill_02_hit_01_epoque#32",
+      "baseSpawn": 2,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1031_slent2@epoque#32",
+      "base": "slent2_skill_02_start_01",
+      "target": "slent2_skill_02_start_01_epoque#32",
+      "baseSpawn": 1,
+      "skinSpawn": 3
+    },
+    {
+      "skin": "char_1031_slent2@epoque#32",
+      "base": "slent2_skill_03_hit_01",
+      "target": "slent2_skill_03_hit_01_epoque#32",
+      "baseSpawn": 2,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1031_slent2@epoque#32",
+      "base": "slent2_skill_03_start_01",
+      "target": "slent2_skill_03_start_01_epoque#32",
+      "baseSpawn": 1,
+      "skinSpawn": 3
+    },
+    {
+      "skin": "char_1032_excu2@sale#12",
+      "base": "excu2_cherub_buff_01",
+      "target": "excu2_cherub_empty_sale#12",
+      "baseSpawn": 8,
+      "skinSpawn": null
+    },
+    {
+      "skin": "char_1032_excu2@sale#12",
+      "base": "excu2_common_fx01",
+      "target": "excu2_cherub_buff_01_sale#12",
+      "baseSpawn": null,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_1032_excu2@sanrio#2",
+      "base": "excu2_skill_03_end_01",
+      "target": "excu2_skill_03_end_01_sanrio#2",
+      "baseSpawn": 8,
+      "skinSpawn": 9
+    },
+    {
+      "skin": "char_1033_swire2@ambienceSynesthesia#4",
+      "base": "swire2_skill_03_start",
+      "target": "swire2_skill_03_start_ambiencesynesthesia#4",
+      "baseSpawn": 1,
+      "skinSpawn": 9
+    },
+    {
+      "skin": "char_1035_wisdel@sale#14",
+      "base": "wisdel_skill_02_buff_02",
+      "target": "wisdel_skill_02_buff_02_sale#14",
+      "baseSpawn": 1,
+      "skinSpawn": 10
+    },
+    {
+      "skin": "char_1038_whitw2@sale#15",
+      "base": "whitw2_attack_01_start",
+      "target": "whitw2_attack_01_start_sale#15",
+      "baseSpawn": 3,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1038_whitw2@sale#15",
+      "base": "whitw2_skill_03_buff_start",
+      "target": "whitw2_skill_03_buff_start_sale#15",
+      "baseSpawn": 5,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1039_thorn2@marthe#9",
+      "base": "thorn2_skill_start_02",
+      "target": "thorn2_skill_start_02_marthe#9",
+      "baseSpawn": null,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_103_angel@sale#8",
+      "base": "angle_attack_01_start",
+      "target": "angle_attack_01_start_sale#8",
+      "baseSpawn": 3,
+      "skinSpawn": 10
+    },
+    {
+      "skin": "char_103_angel@sale#8",
+      "base": "angle_buff_00_start",
+      "target": "angle_buff_00_start_sale#8",
+      "baseSpawn": 5,
+      "skinSpawn": 2
+    },
+    {
+      "skin": "char_103_angel@sale#8",
+      "base": "angle_skill_01_start",
+      "target": "angle_skill_01_start_sale#8",
+      "baseSpawn": 3,
+      "skinSpawn": 10
+    },
+    {
+      "skin": "char_103_angel@sale#8",
+      "base": "angle_skill_02_buff_02",
+      "target": "angle_skill_02_buff_02_sale#8",
+      "baseSpawn": 0,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_103_angel@sale#8",
+      "base": "angle_skill_03_buff_02",
+      "target": "angle_skill_03_buff_02_sale#8",
+      "baseSpawn": 0,
+      "skinSpawn": 11
+    },
+    {
+      "skin": "char_1040_blaze2@winter#5",
+      "base": "blaze2_skill_02_buff_02",
+      "target": "blaze2_skill_02_buff_02_winter#5",
+      "baseSpawn": 8,
+      "skinSpawn": 3
+    },
+    {
+      "skin": "char_1040_blaze2@winter#5",
+      "base": "blaze2_skill_03_buff_02",
+      "target": "blaze2_skill_03_buff_02_winter#5",
+      "baseSpawn": 9,
+      "skinSpawn": 3
+    },
+    {
+      "skin": "char_1041_angel2@iteration#6",
+      "base": "angel2_attack_down_loop_start_01",
+      "target": "angel2_attack_down_loop_start_01_iteration#6",
+      "baseSpawn": 3,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1041_angel2@iteration#6",
+      "base": "angel2_attack_loop_start_01",
+      "target": "angel2_attack_loop_start_01_iteration#6",
+      "baseSpawn": 3,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1041_angel2@iteration#6",
+      "base": "angel2_attack_up_loop_start_01",
+      "target": "angel2_attack_up_loop_start_01_iteration#6",
+      "baseSpawn": 3,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1041_angel2@iteration#6",
+      "base": "angel2_skill_1_close_start_01",
+      "target": "angel2_skill_1_close_start_01_iteration#6",
+      "baseSpawn": 3,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1041_angel2@iteration#6",
+      "base": "angel2_skill_1_up_close_start_01",
+      "target": "angel2_skill_1_up_close_start_01_iteration#6",
+      "baseSpawn": 3,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1041_angel2@iteration#6",
+      "base": "angel2_skill_1_down_loop_start_01",
+      "target": "angel2_skill_1_down_loop_start_01_iteration#6",
+      "baseSpawn": 3,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1041_angel2@iteration#6",
+      "base": "angel2_skill_1_loop_start_01",
+      "target": "angel2_skill_1_loop_start_01_iteration#6",
+      "baseSpawn": 3,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1041_angel2@iteration#6",
+      "base": "angel2_skill_1_up_loop_start_01",
+      "target": "angel2_skill_1_up_loop_start_01_iteration#6",
+      "baseSpawn": 3,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1041_angel2@iteration#6",
+      "base": "angel2_skill_2_down_loop_start_01",
+      "target": "angel2_skill_2_down_loop_start_01_iteration#6",
+      "baseSpawn": 3,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1041_angel2@iteration#6",
+      "base": "angel2_skill_2_loop_start_01",
+      "target": "angel2_skill_2_loop_start_01_iteration#6",
+      "baseSpawn": 3,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1041_angel2@iteration#6",
+      "base": "angel2_skill_2_up_loop_start_01",
+      "target": "angel2_skill_2_up_loop_start_01_iteration#6",
+      "baseSpawn": 3,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1041_angel2@iteration#6",
+      "base": "angel2_skill_3_down_begin_start_01",
+      "target": "angel2_skill_3_down_begin_start_01_iteration#6",
+      "baseSpawn": 3,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1041_angel2@iteration#6",
+      "base": "angel2_skill_3_up_begin_start_01",
+      "target": "angel2_skill_3_up_begin_start_01_iteration#6",
+      "baseSpawn": 3,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1041_angel2@iteration#6",
+      "base": "angel2_skill_3_down_loop_start_01",
+      "target": "angel2_skill_3_down_loop_start_01_iteration#6",
+      "baseSpawn": 3,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1041_angel2@iteration#6",
+      "base": "angel2_skill_3_loop_start_01",
+      "target": "angel2_skill_3_loop_start_01_iteration#6",
+      "baseSpawn": 3,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1041_angel2@iteration#6",
+      "base": "angel2_skill_3_up_loop_start_01",
+      "target": "angel2_skill_3_up_loop_start_01_iteration#6",
+      "baseSpawn": 3,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_1043_leizi2@game#8",
+      "base": "leizi2_fengwei_buff_01",
+      "target": "leizi2_fengwei_buff_01_game#8",
+      "baseSpawn": null,
+      "skinSpawn": 9
+    },
+    {
+      "skin": "char_107_liskam@striker#1",
+      "base": "common_hit_01",
+      "target": "liskam_attack_01_hit_striker#1",
+      "baseSpawn": 2,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_128_plosis@yun#4",
+      "base": "plosis_attack_01_start",
+      "target": "plosis_skill2_buff_01_yun#4",
+      "baseSpawn": 5,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_134_ifrit@rilakkuma#1",
+      "base": "ifrit_attack_01_start",
+      "target": "ifrit_attack_01_start_rilakkuma#1",
+      "baseSpawn": 6,
+      "skinSpawn": 0
+    },
+    {
+      "skin": "char_134_ifrit@rilakkuma#1",
+      "base": "ifrit_skill_02_start",
+      "target": "ifrit_skill_02_start_rilakkuma#1",
+      "baseSpawn": 3,
+      "skinSpawn": 6
+    },
+    {
+      "skin": "char_134_ifrit@rilakkuma#1",
+      "base": "ifrit_skill_03_range",
+      "target": "common_empty",
+      "baseSpawn": 5,
+      "skinSpawn": null
+    },
+    {
+      "skin": "char_134_ifrit@rilakkuma#1",
+      "base": "ifrit_skill_03_start",
+      "target": "ifrit_skill_03_start_rilakkuma#1",
+      "baseSpawn": 6,
+      "skinSpawn": 0
+    },
+    {
+      "skin": "char_150_snakek@yun#7",
+      "base": "common_empty",
+      "target": "snakek_attack_01_start_yun#7",
+      "baseSpawn": null,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_150_snakek@yun#7",
+      "base": "common_ignite_defense",
+      "target": "snakek_skill_01_buff_01_yun#7",
+      "baseSpawn": 1,
+      "skinSpawn": 5
+    },
+    {
+      "skin": "char_172_svrash@ambienceSynesthesia#4",
+      "base": "svrash_skill_03_start_01",
+      "target": "svrash_skill_03_start_01_ambiencesynesthesia#4",
+      "baseSpawn": 0,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_180_amgoat@sanrio#2",
+      "base": "amgoat_attack_01_start",
+      "target": "amgoat_attack_01_start_sanrio#2",
+      "baseSpawn": 3,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_180_amgoat@sanrio#2",
+      "base": "amgoat_skill_02_start",
+      "target": "amgoat_attack_01_start_sanrio#2",
+      "baseSpawn": 3,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_180_amgoat@summer#5",
+      "base": "common_char_birth_01",
+      "target": "amgoat_birth_01_start_summer#5",
+      "baseSpawn": 1,
+      "skinSpawn": 5
+    },
+    {
+      "skin": "char_197_poca@rilakkuma#1",
+      "base": "poca_attack_01_hit_02",
+      "target": "poca_attack_01_hit_02_rilakkuma#1",
+      "baseSpawn": 5,
+      "skinSpawn": 2
+    },
+    {
+      "skin": "char_197_poca@rilakkuma#1",
+      "base": "poca_skill_02_hit_02",
+      "target": "poca_skill_02_hit_02_rilakkuma#1",
+      "baseSpawn": 5,
+      "skinSpawn": 2
+    },
+    {
+      "skin": "char_197_poca@rilakkuma#1",
+      "base": "poca_skill_03_hit",
+      "target": "common_empty",
+      "baseSpawn": 5,
+      "skinSpawn": null
+    },
+    {
+      "skin": "char_197_poca@rilakkuma#1",
+      "base": "common_char_birth_01",
+      "target": "poca_birth_01_rilakkuma#1",
+      "baseSpawn": 1,
+      "skinSpawn": 2
+    },
+    {
+      "skin": "char_197_poca@rilakkuma#1",
+      "base": "poca_skill_03_weapon_buff",
+      "target": "poca_skill_03_weapon_buff_rilakkuma#1",
+      "baseSpawn": null,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_2012_typhon@summer#17",
+      "base": "typhon_skill_03_start_01",
+      "target": "typhon_skill_03_start_01_summer#17",
+      "baseSpawn": 8,
+      "skinSpawn": 9
+    },
+    {
+      "skin": "char_2012_typhon@summer#17",
+      "base": "typhon_skill_03_start_03",
+      "target": "typhon_skill_03_start_03_summer#17",
+      "baseSpawn": 3,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_2012_typhon@summer#17",
+      "base": "typhon_skill_02_buff_02",
+      "target": "typhon_skill_02_buff_2_summer#17",
+      "baseSpawn": 1,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_2012_typhon@wild#9",
+      "base": "typhon_skill_03_start_02",
+      "target": "typhon_skill_03_start_02_wild#9",
+      "baseSpawn": 9,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_2012_typhon@wild#9",
+      "base": "typhon_skill_03_start_05",
+      "target": "typhon_skill_03_start_05_wild#9",
+      "baseSpawn": 9,
+      "skinSpawn": 11
+    },
+    {
+      "skin": "char_2014_nian@cfa#1",
+      "base": "common_char_birth_01",
+      "target": "nian_birth_cfa#1",
+      "baseSpawn": 1,
+      "skinSpawn": 2
+    },
+    {
+      "skin": "char_2015_dusk@nian#12",
+      "base": "dusk_attack_01_hit_02",
+      "target": "dusk_attack_01_hit_02_nian#12",
+      "baseSpawn": 5,
+      "skinSpawn": 2
+    },
+    {
+      "skin": "char_2015_dusk@nian#12",
+      "base": "dusk_birth_01_start",
+      "target": "dusk_birth_01_start_nian#12",
+      "baseSpawn": 10,
+      "skinSpawn": 9
+    },
+    {
+      "skin": "char_2015_dusk@nian#12",
+      "base": "dusk_birth_02_start",
+      "target": "dusk_birth_02_start_nian#12",
+      "baseSpawn": 9,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_2015_dusk@nian#12",
+      "base": "dusk_skill_01_hit_02",
+      "target": "dusk_skill_01_hit_02_nian#12",
+      "baseSpawn": 5,
+      "skinSpawn": 2
+    },
+    {
+      "skin": "char_2015_dusk@nian#7",
+      "base": "dusk_birth_01_start",
+      "target": "dusk_birth_01_start_nian#7",
+      "baseSpawn": 10,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_2023_ling@ncg#1",
+      "base": "ling_skill_02_start_01",
+      "target": "ling_skill_02_start_01_ncg#1",
+      "baseSpawn": 10,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_2023_ling@ncg#1",
+      "base": "ling_skill_03_start_01",
+      "target": "ling_skill_03_start_01_ncg#1",
+      "baseSpawn": 9,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_2023_ling@ncg#1",
+      "base": "common_char_birth_01",
+      "target": "ling_birth_02_ncg#1",
+      "baseSpawn": 1,
+      "skinSpawn": 10
+    },
+    {
+      "skin": "char_2023_ling@ncg#1",
+      "base": "token_soul_03_small_buff_eye_01",
+      "target": "token_soul_03_small_buff_eye_01_ncg#1",
+      "baseSpawn": 10,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_2023_ling@nian#12",
+      "base": "ling_buff_01",
+      "target": "ling_buff_01_nian#12",
+      "baseSpawn": 8,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_2023_ling@nian#12",
+      "base": "ling_buff_02",
+      "target": "ling_buff_02_nian#12",
+      "baseSpawn": 8,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_2023_ling@nian#12",
+      "base": "ling_skill_01_start_01",
+      "target": "ling_skill_01_start_01_nian#12",
+      "baseSpawn": 9,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_2023_ling@nian#12",
+      "base": "ling_skill_02_start_01",
+      "target": "ling_skill_02_start_01_nian#12",
+      "baseSpawn": 10,
+      "skinSpawn": 9
+    },
+    {
+      "skin": "char_2023_ling@nian#12",
+      "base": "ling_skill_03_start_01",
+      "target": "ling_skill_03_start_01_nian#12",
+      "baseSpawn": 9,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_2023_ling@nian#9",
+      "base": "ling_buff_01",
+      "target": "ling_buff_01_nian#9",
+      "baseSpawn": 8,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_2023_ling@nian#9",
+      "base": "ling_buff_02",
+      "target": "ling_buff_02_nian#9",
+      "baseSpawn": 8,
+      "skinSpawn": 13
+    },
+    {
+      "skin": "char_2023_ling@nian#9",
+      "base": "ling_skill_01_start_01",
+      "target": "ling_skill_01_start_01_nian#9",
+      "baseSpawn": 9,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_2023_ling@nian#9",
+      "base": "token_soul_01_buff_eye_01",
+      "target": "token_soul_01_buff_eye_01_nian#9",
+      "baseSpawn": 8,
+      "skinSpawn": 9
+    },
+    {
+      "skin": "char_2023_ling@nian#9",
+      "base": "token_soul_03_small_buff_eye_01",
+      "target": "token_soul_03_small_buff_eye_01_nian#9",
+      "baseSpawn": 10,
+      "skinSpawn": 14
+    },
+    {
+      "skin": "char_202_demkni@ambienceSynesthesia#7",
+      "base": "demkni_buff_02_self",
+      "target": "demkni_buff_02_self_ambiencesynesthesia#7",
+      "baseSpawn": 0,
+      "skinSpawn": 10
+    },
+    {
+      "skin": "char_202_demkni@ambienceSynesthesia#7",
+      "base": "demkni_skill_01_hit",
+      "target": "demkni_skill_01_hit_ambiencesynesthesia#7",
+      "baseSpawn": 2,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_202_demkni@ambienceSynesthesia#7",
+      "base": "common_heal_hit_01",
+      "target": "demkni_skill_01_hit_ambiencesynesthesia#7",
+      "baseSpawn": 2,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_206_gnosis@boc#4",
+      "base": "gnosis_skill_01_start",
+      "target": "gnosis_skill_01_start_boc#4",
+      "baseSpawn": 8,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_206_gnosis@boc#4",
+      "base": "gnosis_skill_03_buff_03",
+      "target": "gnosis_skill_03_buff_03_boc#4",
+      "baseSpawn": 9,
+      "skinSpawn": 10
+    },
+    {
+      "skin": "char_206_gnosis@boc#4",
+      "base": "gnosis_skill_03_start",
+      "target": "gnosis_skill_03_start_boc#4",
+      "baseSpawn": 8,
+      "skinSpawn": 10
+    },
+    {
+      "skin": "char_222_bpipe@epoque#28",
+      "base": "bpipe_attack_01_start",
+      "target": "bpipe_attack_01_start_epoque#28",
+      "baseSpawn": 0,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_222_bpipe@epoque#28",
+      "base": "bpipe_skill_02_start",
+      "target": "bpipe_skill_02_start_epoque#28",
+      "baseSpawn": 0,
+      "skinSpawn": 9
+    },
+    {
+      "skin": "char_222_bpipe@epoque#40",
+      "base": "bpipe_skill_03_start_02_left",
+      "target": "bpipe_skill_03_start_02_epoque#40",
+      "baseSpawn": 1,
+      "skinSpawn": 0
+    },
+    {
+      "skin": "char_222_bpipe@epoque#40",
+      "base": "bpipe_skill_03_start_02_right",
+      "target": "bpipe_skill_03_start_02_epoque#40",
+      "baseSpawn": 1,
+      "skinSpawn": 0
+    },
+    {
+      "skin": "char_245_cello@sale#12",
+      "base": "cello_common_fx01",
+      "target": "cello_halo_front_01_sale#12",
+      "baseSpawn": null,
+      "skinSpawn": 10
+    },
+    {
+      "skin": "char_245_cello@sale#12",
+      "base": "cello_common_fx03",
+      "target": "cello_l_wing_front_01_sale#12",
+      "baseSpawn": null,
+      "skinSpawn": 11
+    },
+    {
+      "skin": "char_245_cello@sale#12",
+      "base": "cello_common_fx05",
+      "target": "cello_r_wing_front_01_sale#12",
+      "baseSpawn": null,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_249_mlyss@ambienceSynesthesia#6",
+      "base": "mlyss_skill_02_buff_weapon_01",
+      "target": "mlyss_skill_02_buff_weapon_01_ambiencesynesthesia#6",
+      "baseSpawn": 1,
+      "skinSpawn": 10
+    },
+    {
+      "skin": "char_249_mlyss@ambienceSynesthesia#6",
+      "base": "mlyss_skill_03_buff_02",
+      "target": "mlyss_skill_03_buff_02_ambiencesynesthesia#6",
+      "baseSpawn": 1,
+      "skinSpawn": 9
+    },
+    {
+      "skin": "char_254_vodfox@yun#8",
+      "base": "vodfox_attack_01_start",
+      "target": "vodfox_attack_01_start_yun#8",
+      "baseSpawn": 1,
+      "skinSpawn": 3
+    },
+    {
+      "skin": "char_254_vodfox@yun#8",
+      "base": "vodfox_skill_01_buff",
+      "target": "vodfox_skill_01_buff_yun#8",
+      "baseSpawn": 0,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_264_f12yin@epoque#15",
+      "base": "f12yin_skill_02_buff_b_01",
+      "target": "f12yin_skill_02_buff_b_01_epoque#15",
+      "baseSpawn": 9,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_293_thorns@boc#8",
+      "base": "thorns_buff_01_start",
+      "target": "thorns_buff_01_start_boc#8",
+      "baseSpawn": 2,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_300_phenxi@witch#4",
+      "base": "phenxi_birth_02",
+      "target": "phenxi_birth_02_witch#4",
+      "baseSpawn": null,
+      "skinSpawn": 9
+    },
+    {
+      "skin": "char_306_leizi@game#3",
+      "base": "leizi_attack_01_start",
+      "target": "leizi_attack_01_start_game#3",
+      "baseSpawn": 0,
+      "skinSpawn": 3
+    },
+    {
+      "skin": "char_306_leizi@game#3",
+      "base": "leizi_skill_02_start",
+      "target": "leizi_skill_02_start_game#3",
+      "baseSpawn": 0,
+      "skinSpawn": 3
+    },
+    {
+      "skin": "char_311_mudrok@ambienceSynesthesia#2",
+      "base": "mudrok_skill_03_start",
+      "target": "mudrok_skill_03_start_ambiencesynesthesia#2",
+      "baseSpawn": 9,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_322_lmlee@sanrio#1",
+      "base": "lmlee_attack_01_start_02",
+      "target": "common_empty",
+      "baseSpawn": 0,
+      "skinSpawn": null
+    },
+    {
+      "skin": "char_322_lmlee@sanrio#1",
+      "base": "lmlee_skill_03_start_02",
+      "target": "common_empty",
+      "baseSpawn": 0,
+      "skinSpawn": null
+    },
+    {
+      "skin": "char_322_lmlee@sanrio#1",
+      "base": "common_char_birth_01",
+      "target": "lmlee_birth_01_sanrio#1",
+      "baseSpawn": 1,
+      "skinSpawn": 5
+    },
+    {
+      "skin": "char_322_lmlee@sanrio#1",
+      "base": "lmlee_skill_03_trail",
+      "target": "lmlee_skill_03_trail_01_sanrio#1",
+      "baseSpawn": null,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_332_archet@sale#14",
+      "base": "archet_attack_01_start",
+      "target": "archet_attack_01_start_sale#14",
+      "baseSpawn": 3,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_332_archet@sale#14",
+      "base": "archet_skill_01_start",
+      "target": "archet_skill_01_start_sale#14",
+      "baseSpawn": 3,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_332_archet@sale#14",
+      "base": "archet_skill_02_start",
+      "target": "archet_skill_02_start_sale#14",
+      "baseSpawn": 3,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_332_archet@sale#14",
+      "base": "archet_skill_02_start_02",
+      "target": "archet_skill_02_start_02_sale#14",
+      "baseSpawn": 8,
+      "skinSpawn": 11
+    },
+    {
+      "skin": "char_332_archet@sale#14",
+      "base": "archet_skill_03_buff",
+      "target": "archet_skill_03_buff_sale#14",
+      "baseSpawn": 9,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_332_archet@sale#14",
+      "base": "archet_skill_03_buff_b",
+      "target": "archet_skill_03_buff_b_sale#14",
+      "baseSpawn": 9,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_332_archet@sale#14",
+      "base": "archet_skill_03_start",
+      "target": "archet_skill_03_start_sale#14",
+      "baseSpawn": 3,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_341_sntlla@summer#15",
+      "base": "sntlla_attack_start_01",
+      "target": "sntlla_attack_start_01_summer#15",
+      "baseSpawn": 8,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_350_surtr@ambienceSynesthesia#6",
+      "base": "surtr_skill_03_range",
+      "target": "surtr_skill_03_range_ambiencesynesthesia#6",
+      "baseSpawn": 5,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_358_lisa@epoque#22",
+      "base": "lisa_attack_01_start",
+      "target": "lisa_attack_01_start_epoque#22",
+      "baseSpawn": 0,
+      "skinSpawn": 9
+    },
+    {
+      "skin": "char_358_lisa@epoque#22",
+      "base": "lisa_skill_02_start",
+      "target": "lisa_skill_02_start_epoque#22",
+      "baseSpawn": 0,
+      "skinSpawn": 9
+    },
+    {
+      "skin": "char_358_lisa@epoque#22",
+      "base": "lisa_skill_03_buff",
+      "target": "lisa_skill_03_buff_epoque#22",
+      "baseSpawn": 0,
+      "skinSpawn": 9
+    },
+    {
+      "skin": "char_358_lisa@lxh#1",
+      "base": "lisa_attack_01_start",
+      "target": "lisa_attack_01_start_lxh#1",
+      "baseSpawn": 0,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_358_lisa@lxh#1",
+      "base": "lisa_skill_02_start",
+      "target": "lisa_skill_02_start_lxh#1",
+      "baseSpawn": 0,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_362_saga@sale#9",
+      "base": "saga_skill_03_buff",
+      "target": "saga_skill_03_buff_sale#9",
+      "baseSpawn": 0,
+      "skinSpawn": 9
+    },
+    {
+      "skin": "char_4027_heyak@ambienceSynesthesia#4",
+      "base": "heyak_skill_01_start_01",
+      "target": "heyak_skill_01_start_01_ambiencesynesthesia#4",
+      "baseSpawn": 8,
+      "skinSpawn": 15
+    },
+    {
+      "skin": "char_4027_heyak@ambienceSynesthesia#4",
+      "base": "heyak_skill_02_start_01",
+      "target": "heyak_skill_02_start_01_ambiencesynesthesia#4",
+      "baseSpawn": 8,
+      "skinSpawn": 16
+    },
+    {
+      "skin": "char_4027_heyak@ambienceSynesthesia#4",
+      "base": "heyak_skill_02_start_02",
+      "target": "heyak_skill_02_start_02_ambiencesynesthesia#4",
+      "baseSpawn": 8,
+      "skinSpawn": 16
+    },
+    {
+      "skin": "char_4027_heyak@ambienceSynesthesia#4",
+      "base": "heyak_skill_03_start_01",
+      "target": "heyak_skill_03_start_01_ambiencesynesthesia#4",
+      "baseSpawn": 8,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_4027_heyak@epoque#50",
+      "base": "heyak_skill_02_start_01",
+      "target": "heyak_skill_02_start_01_epoque#50",
+      "baseSpawn": 8,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_4027_heyak@epoque#50",
+      "base": "heyak_skill_02_start_02",
+      "target": "heyak_skill_02_start_02_epoque#50",
+      "baseSpawn": 8,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_4027_heyak@epoque#50",
+      "base": "heyak_skill_03_start_02",
+      "target": "heyak_skill_03_start_02_epoque#50",
+      "baseSpawn": 9,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_4040_rockr@lxh#1",
+      "base": "rockr_stun_01",
+      "target": "rockr_stun_01_lxh#1",
+      "baseSpawn": 1,
+      "skinSpawn": 10
+    },
+    {
+      "skin": "char_4040_rockr@lxh#1",
+      "base": "rockr_stun_02",
+      "target": "rockr_stun_02_lxh#1",
+      "baseSpawn": 0,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_4042_lumen@ambienceSynesthesia#3",
+      "base": "lumen_attack_01_start",
+      "target": "lumen_attack_01_start_ambiencesynesthesia#3",
+      "baseSpawn": 1,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_4042_lumen@ambienceSynesthesia#3",
+      "base": "lumen_skill_02_start",
+      "target": "lumen_skill_02_start_ambiencesynesthesia#3",
+      "baseSpawn": 1,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_4042_lumen@sanrio#2",
+      "base": "lumen_attack_01_start",
+      "target": "lumen_attack_01_start_sanrio#2",
+      "baseSpawn": 1,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_4042_lumen@sanrio#2",
+      "base": "lumen_skill_02_start",
+      "target": "lumen_skill_02_start_sanrio#2",
+      "baseSpawn": 1,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_4042_lumen@sanrio#2",
+      "base": "lumen_skill_02_start_02",
+      "target": "lumen_skill_02_start_02_sanrio#2",
+      "baseSpawn": 1,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_4042_lumen@sanrio#2",
+      "base": "lumen_skill_03_buff",
+      "target": "lumen_skill_03_buff_sanrio#2",
+      "baseSpawn": 1,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_4055_bgsnow@yun#7",
+      "base": "bgsnow_birth_weapon_01",
+      "target": "bgsnow_birth_weapon_01_yun#7",
+      "baseSpawn": 8,
+      "skinSpawn": 9
+    },
+    {
+      "skin": "char_4055_bgsnow@yun#7",
+      "base": "bgsnow_skill_02_start_01",
+      "target": "bgsnow_skill_02_start_01_yun#7",
+      "baseSpawn": 10,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_4055_bgsnow@yun#7",
+      "base": "bgsnow_skill_03_buff_weapon_01",
+      "target": "bgsnow_skill_03_buff_weapon_01_yun#7",
+      "baseSpawn": 8,
+      "skinSpawn": 9
+    },
+    {
+      "skin": "char_4055_bgsnow@yun#7",
+      "base": "bgsnow_skill_03_start_weapon_01",
+      "target": "bgsnow_skill_03_start_weapon_01_yun#7",
+      "baseSpawn": 9,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_4058_pepe@sightseer#2",
+      "base": "pepe_buff_level_01",
+      "target": "pepe_buff_level_01_sightseer#2",
+      "baseSpawn": 8,
+      "skinSpawn": 9
+    },
+    {
+      "skin": "char_4058_pepe@sightseer#2",
+      "base": "pepe_buff_level_02",
+      "target": "pepe_buff_level_02_sightseer#2",
+      "baseSpawn": 8,
+      "skinSpawn": 9
+    },
+    {
+      "skin": "char_4058_pepe@sightseer#2",
+      "base": "pepe_buff_level_03",
+      "target": "pepe_buff_level_03_sightseer#2",
+      "baseSpawn": 8,
+      "skinSpawn": 9
+    },
+    {
+      "skin": "char_4058_pepe@sightseer#2",
+      "base": "pepe_skill_02_start_01",
+      "target": "pepe_skill_02_start_01_sightseer#2",
+      "baseSpawn": 1,
+      "skinSpawn": 10
+    },
+    {
+      "skin": "char_4064_mlynar@epoque#28",
+      "base": "common_char_birth_01",
+      "target": "mlynar_birth_01_epoque#28",
+      "baseSpawn": 1,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_4065_judge@epoque#33",
+      "base": "judge_skill_01_buff_02",
+      "target": "judge_skill_01_buff_02_f_epoque#33",
+      "baseSpawn": 1,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_4072_ironmn@ambienceSynesthesia#5",
+      "base": "ironmn_skill_03_buff_01",
+      "target": "ironmn_skill_03_buff_01_ambiencesynesthesia#5",
+      "baseSpawn": 1,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_4072_ironmn@ambienceSynesthesia#5",
+      "base": "token_ironmn_pile3_skill_03_buff_02_01",
+      "target": "token_ironmn_pile3_skill_03_buff_02_01_ambiencesynesthesia#5",
+      "baseSpawn": 1,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_4072_ironmn@ambienceSynesthesia#5",
+      "base": "ironmn_skill_01_start_02",
+      "target": "ironmn_skill_01_start_02_ambiencesynesthesia#5",
+      "baseSpawn": 1,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_4072_ironmn@ambienceSynesthesia#5",
+      "base": "ironmn_skill_02_start_02",
+      "target": "ironmn_skill_02_start_02_ambiencesynesthesia#5",
+      "baseSpawn": 1,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_4072_ironmn@summer#11",
+      "base": "ironmn_skill_03_buff_01",
+      "target": "ironmn_skill_03_buff_01_summer#11",
+      "baseSpawn": 1,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_4072_ironmn@summer#11",
+      "base": "token_ironmn_pile3_skill_03_buff_02_01",
+      "target": "token_ironmn_pile3_skill_03_buff_02_01_summer#11",
+      "baseSpawn": 1,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_4080_lin@nian#10",
+      "base": "common_empty",
+      "target": "lin_skill_03_start_b_01_nian#10",
+      "baseSpawn": null,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_4080_lin@summer#19",
+      "base": "lin_skill_02_buff_02",
+      "target": "lin_skill_02_buff_02_summer#19",
+      "baseSpawn": 1,
+      "skinSpawn": 10
+    },
+    {
+      "skin": "char_4080_lin@summer#19",
+      "base": "lin_skill_03_buff_01",
+      "target": "lin_skill_03_buff_01_summer#19",
+      "baseSpawn": 1,
+      "skinSpawn": 9
+    },
+    {
+      "skin": "char_4080_lin@summer#19",
+      "base": "lin_skill_03_start_a_01",
+      "target": "lin_skill_03_start_a_01_summer#19",
+      "baseSpawn": 1,
+      "skinSpawn": 9
+    },
+    {
+      "skin": "char_4080_lin@summer#19",
+      "base": "lin_skill_03_start_c_01",
+      "target": "lin_skill_03_start_c_01_summer#19",
+      "baseSpawn": 1,
+      "skinSpawn": 9
+    },
+    {
+      "skin": "char_4080_lin@summer#19",
+      "base": "common_empty",
+      "target": "lin_skill_03_start_b_01_summer#19",
+      "baseSpawn": null,
+      "skinSpawn": 9
+    },
+    {
+      "skin": "char_4082_qiubai@epoque#31",
+      "base": "qiubai_skill_01_buff",
+      "target": "qiubai_skill_01_buff_epoque#31",
+      "baseSpawn": 2,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_4082_qiubai@epoque#31",
+      "base": "qiubai_skill_03_buff_02",
+      "target": "qiubai_skill_03_buff_02_epoque#31",
+      "baseSpawn": 8,
+      "skinSpawn": 0
+    },
+    {
+      "skin": "char_4087_ines@ambienceSynesthesia#5",
+      "base": "ines_imprison_01",
+      "target": "ines_imprison_01_ambiencesynesthesia#5",
+      "baseSpawn": 2,
+      "skinSpawn": 5
+    },
+    {
+      "skin": "char_4087_ines@ambienceSynesthesia#5",
+      "base": "ines_label_start_01",
+      "target": "ines_label_start_01_ambiencesynesthesia#5",
+      "baseSpawn": 5,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_4087_ines@boc#8",
+      "base": "ines_imprison_01",
+      "target": "ines_imprison_01_boc#8",
+      "baseSpawn": 2,
+      "skinSpawn": 5
+    },
+    {
+      "skin": "char_4116_blkkgt@witch#5",
+      "base": "blkkgt_skill_01_start_03",
+      "target": "blkkgt_skill_01_start_03_witch#5",
+      "baseSpawn": 11,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_4116_blkkgt@witch#5",
+      "base": "blkkgt_skill_02_start_01",
+      "target": "blkkgt_skill_02_start_01_witch#5",
+      "baseSpawn": 8,
+      "skinSpawn": 10
+    },
+    {
+      "skin": "char_4116_blkkgt@witch#5",
+      "base": "blkkgt_skill_02_start_02",
+      "target": "blkkgt_skill_02_start_02_witch#5",
+      "baseSpawn": 9,
+      "skinSpawn": null
+    },
+    {
+      "skin": "char_4116_blkkgt@witch#5",
+      "base": "blkkgt_skill_02_start_03",
+      "target": "blkkgt_skill_02_start_03_witch#5",
+      "baseSpawn": 10,
+      "skinSpawn": null
+    },
+    {
+      "skin": "char_4116_blkkgt@witch#5",
+      "base": "blkkgt_skill_02_start_04_h",
+      "target": "blkkgt_skill_02_start_04_h_witch#5",
+      "baseSpawn": 1,
+      "skinSpawn": 5
+    },
+    {
+      "skin": "char_4116_blkkgt@witch#5",
+      "base": "blkkgt_skill_02_start_05",
+      "target": "blkkgt_skill_02_start_05_witch#5",
+      "baseSpawn": 5,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_4116_blkkgt@witch#5",
+      "base": "blkkgt_skill_02_start_06",
+      "target": "blkkgt_skill_02_start_06_witch#5",
+      "baseSpawn": 11,
+      "skinSpawn": 10
+    },
+    {
+      "skin": "char_4116_blkkgt@witch#5",
+      "base": "blkkgt_skill_03_start_04",
+      "target": "blkkgt_skill_03_start_04_witch#5",
+      "baseSpawn": 11,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_4116_blkkgt@witch#5",
+      "base": "common_char_birth_01",
+      "target": "blkkgt_birth_01_witch#5",
+      "baseSpawn": 1,
+      "skinSpawn": 9
+    },
+    {
+      "skin": "char_4121_zuole@nian#11",
+      "base": "zuole_skill_03_start_02_down_01",
+      "target": "zuole_skill_03_start_02_down_01_nian#11",
+      "baseSpawn": 1,
+      "skinSpawn": 5
+    },
+    {
+      "skin": "char_4121_zuole@nian#11",
+      "base": "zuole_skill_03_start_02_left_01",
+      "target": "zuole_skill_03_start_02_left_01_nian#11",
+      "baseSpawn": 1,
+      "skinSpawn": 5
+    },
+    {
+      "skin": "char_4121_zuole@nian#11",
+      "base": "zuole_skill_03_start_02_right_01",
+      "target": "zuole_skill_03_start_02_right_01_nian#11",
+      "baseSpawn": 1,
+      "skinSpawn": 5
+    },
+    {
+      "skin": "char_4121_zuole@nian#11",
+      "base": "zuole_skill_03_start_02_up_01",
+      "target": "zuole_skill_03_start_02_up_01_nian#11",
+      "baseSpawn": 1,
+      "skinSpawn": 5
+    },
+    {
+      "skin": "char_4122_grabds@yun#3",
+      "base": "grabds_attack_01_start",
+      "target": "grabds_attack_01_start_yun#3",
+      "baseSpawn": 3,
+      "skinSpawn": 10
+    },
+    {
+      "skin": "char_4122_grabds@yun#3",
+      "base": "grabds_skill_01_start",
+      "target": "grabds_skill_01_start_yun#3",
+      "baseSpawn": 3,
+      "skinSpawn": 9
+    },
+    {
+      "skin": "char_4122_grabds@yun#3",
+      "base": "grabds_skill_02_buff_02",
+      "target": "grabds_skill_02_buff_02_yun#3",
+      "baseSpawn": 3,
+      "skinSpawn": 9
+    },
+    {
+      "skin": "char_4122_grabds@yun#3",
+      "base": "grabds_skill_02_start",
+      "target": "grabds_skill_02_start_yun#3",
+      "baseSpawn": 3,
+      "skinSpawn": 9
+    },
+    {
+      "skin": "char_4132_ascln@iteration#4",
+      "base": "ascln_skill_01_buff_02",
+      "target": "common_empty",
+      "baseSpawn": 1,
+      "skinSpawn": null
+    },
+    {
+      "skin": "char_4133_logos@ambienceSynesthesia#6",
+      "base": "logos_skill2_buff_02",
+      "target": "logos_skill2_buff_02_ambiencesynesthesia#6",
+      "baseSpawn": 22,
+      "skinSpawn": 3
+    },
+    {
+      "skin": "char_4134_cetsyr@epoque#50",
+      "base": "cetsyr_skill_03_buff_range_01",
+      "target": "cetsyr_skill_03_buff_range_01_epoque#50",
+      "baseSpawn": 5,
+      "skinSpawn": 7
+    },
+    {
+      "skin": "char_4134_cetsyr@epoque#50",
+      "base": "cetsyr_skill_03_buff_range_01_end",
+      "target": "cetsyr_skill_03_buff_range_01_end_epoque#50",
+      "baseSpawn": 5,
+      "skinSpawn": 7
+    },
+    {
+      "skin": "char_4137_udflow@epoque#46",
+      "base": "udflow_skill_02_start_01",
+      "target": "udflow_skill_02_start_01_epoque#46",
+      "baseSpawn": 3,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_4137_udflow@epoque#46",
+      "base": "udflow_skill_02_start_01_down",
+      "target": "udflow_skill_02_start_01_down_epoque#46",
+      "baseSpawn": 3,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_4137_udflow@epoque#46",
+      "base": "udflow_skill_02_start_01_up",
+      "target": "udflow_skill_02_start_01_up_epoque#46",
+      "baseSpawn": 3,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_4138_narant@breaker#1",
+      "base": "narant_skill_02_start_01",
+      "target": "narant_skill_02_start_01_breaker#1",
+      "baseSpawn": 3,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_4138_narant@breaker#1",
+      "base": "narant_skill_03_start_01",
+      "target": "narant_skill_03_start_01_breaker#1",
+      "baseSpawn": 3,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_4138_narant@breaker#1",
+      "base": "narant_attack_01_start",
+      "target": "narant_attack_01_start_01_breaker#1",
+      "baseSpawn": 3,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_4139_papyrs@game#8",
+      "base": "papyrs_skill1_buff_01",
+      "target": "papyrs_skill1_buff_01_game#8",
+      "baseSpawn": 3,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_4139_papyrs@game#8",
+      "base": "papyrs_skill2_buff_01",
+      "target": "papyrs_skill2_buff_01_game#8",
+      "baseSpawn": 3,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_4148_philae@nian#12",
+      "base": "philae_skill_02_buff_02",
+      "target": "philae_skill_02_buff_02_nian#12",
+      "baseSpawn": 8,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_4179_monstr@boc#11",
+      "base": "monstr_attack_start_01",
+      "target": "monstr_attack_start_01_boc#11",
+      "baseSpawn": 1,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_4179_monstr@boc#11",
+      "base": "monstr_skill_01_start_01",
+      "target": "monstr_skill_01_start_01_boc#11",
+      "baseSpawn": 1,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_4179_monstr@boc#11",
+      "base": "monstr_skill_03_start_01",
+      "target": "monstr_skill_03_start_02_boc#11",
+      "baseSpawn": 1,
+      "skinSpawn": 20
+    },
+    {
+      "skin": "char_4195_radian@game#8",
+      "base": "raidian_attack_start_01",
+      "target": "radian_attack_start_01_game#8",
+      "baseSpawn": 3,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_4195_radian@game#8",
+      "base": "raidian_skill1_start_01",
+      "target": "radian_skill1_start_01_game#8",
+      "baseSpawn": 3,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_4195_radian@game#8",
+      "base": "raidian_skill3_start_01",
+      "target": "radian_skill3_start_01_game#8",
+      "baseSpawn": 3,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_437_mizuki@game#6",
+      "base": "mizuki_buff_01",
+      "target": "mizuki_buff_01_game#6",
+      "baseSpawn": 8,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_437_mizuki@game#6",
+      "base": "mizuki_skill_03_hit",
+      "target": "mizuki_skill_03_hit_game#6",
+      "baseSpawn": 1,
+      "skinSpawn": 2
+    },
+    {
+      "skin": "char_450_necras@ambienceSynesthesia#7",
+      "base": "necras_attack_start_01",
+      "target": "necras_attack_start_01_ambiencesynesthesia#7",
+      "baseSpawn": 1,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_450_necras@ambienceSynesthesia#7",
+      "base": "necras_buff_01",
+      "target": "necras_buff_01_ambiencesynesthesia#7",
+      "baseSpawn": 8,
+      "skinSpawn": 10
+    },
+    {
+      "skin": "char_450_necras@ambienceSynesthesia#7",
+      "base": "necras_skill_03_start_03",
+      "target": "necras_skill_03_start_03_ambiencesynesthesia#7",
+      "baseSpawn": 1,
+      "skinSpawn": 7
+    },
+    {
+      "skin": "char_450_necras@ambienceSynesthesia#7",
+      "base": "token_necras_skeltn1_attack_01",
+      "target": "token_necras_skeltn1_attack_01_ambiencesynesthesia#7",
+      "baseSpawn": 1,
+      "skinSpawn": 9
+    },
+    {
+      "skin": "char_450_necras@ambienceSynesthesia#7",
+      "base": "token_necras_skeltn2_attack_01",
+      "target": "token_necras_skeltn2_attack_01_ambiencesynesthesia#7",
+      "baseSpawn": 1,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_450_necras@ambienceSynesthesia#7",
+      "base": "token_necras_skeltn2_buff_02_02",
+      "target": "token_necras_skeltn2_buff_02_02_ambiencesynesthesia#7",
+      "baseSpawn": 1,
+      "skinSpawn": 10
+    },
+    {
+      "skin": "char_450_necras@summer#20",
+      "base": "token_necras_skeltn2_buff_02_02",
+      "target": "token_necras_skeltn2_buff_02_02_summer#20",
+      "baseSpawn": 1,
+      "skinSpawn": 14
+    },
+    {
+      "skin": "char_450_necras@summer#20",
+      "base": "token_necras_skeltn2_buff_01_02",
+      "target": "token_necras_skeltn2_buff_01_02_summer#20",
+      "baseSpawn": 8,
+      "skinSpawn": 13
+    },
+    {
+      "skin": "char_450_necras@summer#20",
+      "base": "token_necras_skeltn2_treat_01",
+      "target": "token_necras_skeltn2_treat_01_summer#20",
+      "baseSpawn": 2,
+      "skinSpawn": 1
+    },
+    {
+      "skin": "char_450_necras@summer#20",
+      "base": "token_necras_skeltn1_buff_01",
+      "target": "token_necras_skeltn1_buff_01_summer#20",
+      "baseSpawn": 1,
+      "skinSpawn": 8
+    },
+    {
+      "skin": "char_496_wildmn@epoque#16",
+      "base": "wildmn_skill_02_buff",
+      "target": "wildmn_skill_02_buff_epoque#16",
+      "baseSpawn": 1,
+      "skinSpawn": 10
+    },
+    {
+      "skin": "char_496_wildmn@epoque#16",
+      "base": "wildmn_skill_02_start",
+      "target": "wildmn_skill_02_start_epoque#16",
+      "baseSpawn": 5,
+      "skinSpawn": 0
+    }
+  ],
+  "largeMountOffsetsRequiringVisualReview": [],
+  "scope": "Static mapping and placement audit, not a visual verification of every skill. Authored differences are not automatically normalized."
+}

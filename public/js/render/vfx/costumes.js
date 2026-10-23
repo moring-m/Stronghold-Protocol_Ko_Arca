@@ -1,3 +1,4 @@
+import { COSTUME_MOUNT_BINDINGS } from './costumeMountBindings.js';
 // Official per-outfit replacement tables. Base unit identity/gameplay plans remain unchanged.
 const lc = value => typeof value === 'string' ? value.toLowerCase() : null;
 export function costumeFor(index, view, baseKey) {
@@ -31,4 +32,20 @@ export function costumePreloadKeys(index, costume) {
     for (const key of index.projectiles?.[entry.graphic]?.effects || []) keys.add(costumeEffect(index,costume,key));
   }
   return [...keys].filter(key=>index.prefabs?.[key]);
+}
+
+// Bind animator slot identities rather than assuming that Transform names match their slots.
+export function costumeSkin(index, costume) {
+  const skin=index?.skins?.[costume?.mount];if(!skin)return null;
+  const bindings=skin.mountBindings||COSTUME_MOUNT_BINDINGS[costume.mount];if(!bindings)return skin;
+  const points={...skin.points};
+  for(const [kind,faces]of Object.entries(bindings)){
+    if(!/^s\d+$/.test(kind))continue;
+    const n=kind.slice(1),names=['Special'+n,'SpecialPoint'+n,'Special_'+n];
+    for(const [face,name]of Object.entries(faces)){
+      const point=skin.points?.[name]?.[face]||skin.points?.[name]?.all;
+      if(point)points[names[0]]={...points[names[0]],[face]:point};
+    }
+  }
+  return {...skin,points};
 }

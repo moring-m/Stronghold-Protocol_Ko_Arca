@@ -419,4 +419,24 @@ html:not([lang="ko"]) .mode-cards .mode-card--lab .mode-card__name{font-size:.24
 
 .public-room__mode dd{display:flex;align-items:center;justify-content:space-between;gap:6px;min-height:28px}.public-room__mode .public-room__settings{flex:none;width:28px;min-width:28px;height:28px;padding:0;display:inline-flex;align-items:center;justify-content:center}
 
-.public-rooms-entry__total{gap:3px}.public-rooms-entry__count,.public-rooms-entry__all{font-family:Arial, sans-serif;font-size:clamp(24px,3vw,44px);font-weight:700;line-height:1;letter-spacing:.02em;white-space:nowrap}.public-rooms-entry__all{color:var(--text-lo)}
+.public-rooms-entry__total{gap:3px}.public-rooms-entry__count,.public-rooms-entry__all{font-family:"RoomCount", var(--font-num);font-size:clamp(24px,3vw,44px);font-weight:700;line-height:1;letter-spacing:.02em;white-space:nowrap}.public-rooms-entry__all{color:var(--text-lo)}
+
+/* Setup descriptions must never consume the selectable list on short viewports. */
+.lab-screen .lab-selection-detail { flex:0 1 72px;max-height:min(14dvh,72px);margin-top:8px;padding:8px;line-height:1.4; }
+.lab-screen .lab-choice-grid { flex:1 1 0;min-height:84px; }
+@media(max-height:600px) and (min-width:601px){
+ .lab-screen__body{padding:10px;overflow:auto;}
+ .lab-screen .lab-setup--cards{height:100%;min-height:0;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:minmax(220px,1fr) auto;gap:10px;}
+ .lab-screen .lab-panel{padding:10px;min-height:0;}
+ .lab-screen .lab-panel:last-of-type{grid-column:auto;}
+ .lab-screen .lab-selection-detail{flex-basis:44px;max-height:44px;margin-top:6px;padding:6px;font-size:12px;}
+ .lab-screen .lab-panel .section-label{margin-bottom:8px;}
+ .lab-screen .lab-kind{margin-bottom:6px;}.lab-screen .lab-kind button{padding:6px;}
+ .lab-screen .lab-player-count{padding:6px;margin-bottom:6px;}.lab-screen .lab-player-count button{height:26px;min-width:30px;}
+ .lab-screen .lab-choice{min-height:42px;padding:6px;}.lab-screen .lab-choice>img,.lab-screen .lab-choice .bandicon{width:30px;height:30px;}
+ .lab-screen .lab-strategies{grid-template-columns:repeat(2,minmax(0,1fr));}
+ .lab-screen .lab-choice>span:last-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+ .practice-screen .practice-setup{height:auto;grid-template-rows:minmax(240px,1fr) auto auto;}
+ .practice-screen .lab-panel{min-height:240px;}
+ .practice-screen .practice-options{min-height:140px;}.practice-screen .practice-options:last-of-type{grid-column:span 2;}
+}

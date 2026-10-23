@@ -55,7 +55,7 @@ export default {
       freePassengers(battle, unit);
       // PRTS: vortex at the cabin's actual stopping position, radius 1.5, can hit air.
       c.tick = 0;
-      battle.fx('tide', { x: c.x, y: c.y, r: VORTEX_RADIUS, dur: unit.skill.timeLeft, id: unit.id });
+      battle.fx('tide', { x: c.x, y: c.y, r: VORTEX_RADIUS, dur: unit.skill.timeLeft, id: unit.id, skill:'clemnt:cabin' });
     };
     const startCabin = (battle, unit) => {
       const [dr, dc] = dirVec(unit.dir), [r, col] = tile(unit);
@@ -70,7 +70,7 @@ export default {
       const c = unit.mem.clemntCabin = { x: col, y: r, ox: col, oy: r, dr, dc, distance, moved: 0,
         mass: num(b2['attack@max_passenger_mass'], 8), passengers: [], stopped: false, tick: 0 };
       battle.addBuff(unit, { key: CAST, duration: 10, flags: { disarm: true }, tags: ['skill'] });
-      battle.fx('anchor', { x: col + dc * distance, y: r + dr * distance, fromX: col, fromY: r, id: unit.id, dur: distance / SPEED });
+      battle.fx('anchor', { x: col + dc * distance, y: r + dr * distance, fromX: col, fromY: r, id: unit.id, dur: distance / SPEED, skill:'clemnt:cabin' });
       if (distance <= 1e-9) finishCabin(battle, unit, c);
     };
     const tickCabin = (battle, unit, dt) => {

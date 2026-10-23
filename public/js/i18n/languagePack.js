@@ -19,11 +19,31 @@ export async function downloadLanguagePack(code,onProgress=()=>{}){
  const cache=await caches.open(CACHE),total=files.reduce((sum,file)=>sum+file.bytes,0);let loaded=0;
  for(const file of files){
   if(await cache.match(key(file))){loaded+=file.bytes;onProgress({loaded,total});continue;}
-  const response=await fetch(file.path,{cache:'no-cache'});
-  if(!response.ok)throw new Error(`HTTP ${response.status}: ${file.path}`);
-  const reader=response.body?.getReader();let bytes;
-  if(reader){const chunks=[];let size=0;for(;;){const part=await reader.read();if(part.done)break;chunks.push(part.value);size+=part.value.length;onProgress({loaded:Math.min(loaded+size,total),total});}bytes=new Uint8Array(size);let offset=0;for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.length;}}
-  else bytes=new Uint8Array(await response.arrayBuffer());
+  let bytes;
+  for(let attempt=0;attempt<3;attempt++){
+   let response;
+   try{
+    response=await fetch(`${file.path}?languageHash=${file.hash}`,{cache:'reload',signal:AbortSignal.timeout(45000)});
+    if(!response.ok){
+     await response.body?.cancel();
+     const error=new Error(`HTTP ${response.status}: ${file.path}`);
+     error.permanent=response.status<500&&response.status!==429;
+     throw error;
+    }
+    const reader=response.body?.getReader();
+    if(reader){
+     const chunks=[];let size=0;
+     try{for(;;){const part=await reader.read();if(part.done)break;chunks.push(part.value);size+=part.value.length;onProgress({loaded:Math.min(loaded+size,total),total});}}
+     finally{reader.releaseLock();}
+     bytes=new Uint8Array(size);let offset=0;for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.length;}
+    }else bytes=new Uint8Array(await response.arrayBuffer());
+    break;
+   }catch(error){
+    await response?.body?.cancel().catch(()=>{});
+    if(error.permanent||attempt===2)throw error;
+    onProgress({loaded,total});
+   }
+  }
   const hash=[...new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))].map(x=>x.toString(16).padStart(2,'0')).join('');
   if(hash!==file.hash)throw new Error('Language pack changed. Reload and retry.');
   JSON.parse(new TextDecoder().decode(bytes));

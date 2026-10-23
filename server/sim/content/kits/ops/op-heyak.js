@@ -112,9 +112,9 @@ export default {
         battle.after(delay, () => {
           // a whirlwind not yet out when she left is never released [ASSUMED: "已存在的旋风" only fly on]
           if (!(unit.alive && unit.deployed && unit.deploySeq === seq)) return;
-          const w = { x: x0 + dc, y: y0 + dr, dx: fc, dy: fr, left: WIND_RANGE, age: 0, fxAge: 0, seq };
-          battle.fx('tornado', { x: w.x, y: w.y, id: unit.id, r: WIND_HALF, dur: WIND_FX_EVERY + 0.1 });
-          if (!windHit(battle, unit, w)) winds.push(w);
+          const w = { x: x0 + dc, y: y0 + dr, dx: fc, dy: fr, left: WIND_RANGE, age: 0, fxAge: 0, seq, visualId: unit.mem.heyakWindSeq = (unit.mem.heyakWindSeq || 0) + 1 };
+          battle.fx('tornado', { x: w.x, y: w.y, id: unit.id, r: WIND_HALF, dur: WIND_FX_EVERY + 0.1, windId:w.visualId, dc:w.dx, dr:w.dy, skill:'heyak:wind' });
+          if (!windHit(battle, unit, w)) winds.push(w);else battle.fx('tornado',{x:w.x,y:w.y,id:unit.id,windId:w.visualId,phase:'end',skill:'heyak:wind'});
         }, { owner: unit });
       }
     }
@@ -138,7 +138,7 @@ export default {
           ...(away ? { resIgnoreFlat: -pen, tags: [AWAY_TAG] } : null),
         });
       }
-      battle.fx('tornadoPulse', { x: w.x, y: w.y, id: unit.id, r: WIND_HALF });
+      battle.fx('tornadoPulse', { x: w.x, y: w.y, id: unit.id, r: WIND_HALF, target:best.id, windId:w.visualId, skill:'heyak:wind' });
       return true;
     }
 
@@ -261,11 +261,11 @@ export default {
               w.y += w.dy * step;
               w.left -= step;
               w.age += dt;
-              if (windHit(battle, unit, w) || w.left <= 1e-9) { winds.splice(i, 1); continue; }
+              if (windHit(battle, unit, w) || w.left <= 1e-9) { battle.fx('tornado',{x:w.x,y:w.y,id:unit.id,windId:w.visualId,phase:'end',skill:'heyak:wind'});winds.splice(i, 1); continue; }
               w.fxAge += dt;
               if (w.fxAge + 1e-9 >= WIND_FX_EVERY) {
                 w.fxAge = 0;
-                battle.fx('tornado', { x: w.x, y: w.y, id: unit.id, r: WIND_HALF, dur: WIND_FX_EVERY + 0.1 });
+                battle.fx('tornado', { x: w.x, y: w.y, id: unit.id, r: WIND_HALF, dur: WIND_FX_EVERY + 0.1, windId:w.visualId, dc:w.dx, dr:w.dy, skill:'heyak:wind' });
               }
             }
           }, { owner: unit });

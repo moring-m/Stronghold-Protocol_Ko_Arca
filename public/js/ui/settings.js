@@ -1,4 +1,4 @@
-import {installMobileUiScale,isMobileScaleTarget,MOBILE_UI_SCALES,mobileUiScaleText} from './mobileScale.js';
+import {installMobileUiScale,MOBILE_UI_SCALES,mobileUiScaleText} from './mobileScale.js';
 import {LangButton} from '../i18n/LangButton.js';
 const cx = (...parts) => parts.flat().filter(Boolean).join(' ');
 import { confirmDialog } from "./components.js";
@@ -390,7 +390,7 @@ export function SettingsModal({ open, onClose }) {
 
     </section><section hidden=${category!=='accessibility'} class="set-category" data-category="accessibility">
       <div class="set-row set-row--language"><span class="set-row__label">화면 언어</span><${LangButton} /></div>
-      ${isMobileScaleTarget()?html`<${Choice} label=${mobileUiScaleText(getLang()).label} testId="mobile-ui-scale" value=${s.mobileUiScale} options=${MOBILE_UI_SCALES.map(v=>[v,Math.round(v*100)+'%'])} onChange=${v=>updateSettings({mobileUiScale:Number(v)})} /><p class="set-hint" data-i18n-skip>${mobileUiScaleText(getLang()).hint}</p>`:null}
+      ${html`<${Choice} label=${mobileUiScaleText(getLang()).label} testId="mobile-ui-scale" value=${s.mobileUiScale} options=${MOBILE_UI_SCALES.map(v=>[v,Math.round(v*100)+'%'])} onChange=${v=>updateSettings({mobileUiScale:Number(v)})} /><p class="set-hint" data-i18n-skip>${mobileUiScaleText(getLang()).hint}</p>`}
       <${Toggle} label="배치 시 카메라 확대" value=${s.deployCameraZoom} onChange=${v=>updateSettings({deployCameraZoom:v})} />
       <${Toggle} label="전투 통계" value=${s.combatMetrics} onChange=${v=>updateSettings({combatMetrics:v})} />
       <${Toggle} label="차지 캐스터 에너지" value=${s.mysticEnergy} onChange=${v=>updateSettings({mysticEnergy:v})} />

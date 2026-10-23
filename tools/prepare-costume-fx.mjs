@@ -2,6 +2,7 @@
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
 import {resolve,dirname} from 'node:path';
 import {createHash} from 'node:crypto';
+import {costumeMountBindings} from './assets/costumeMounts.mjs';
 const read=async p=>JSON.parse(await readFile(p,'utf8'));
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
 const [baseRoot,skinRoot,followRoot,output]=process.argv.slice(2);
@@ -37,7 +38,7 @@ for(const row of raw.skins){
     }else warnings.push({skin:id,projectile:cfg});
    }
   }
-  extra.skins[alias]={source:row.container,graphic:row.graphic||base.units[meta.charId].graphic,points:row.points};
+  extra.skins[alias]={source:row.container,graphic:row.graphic||base.units[meta.charId].graphic,points:row.points,mountBindings:costumeMountBindings(row)};
   const spec={charId:meta.charId,skinId:id,mount:alias,effects,projectiles};
   extra.costumes[alias]=spec;extra.costumes[id]=spec;
  }

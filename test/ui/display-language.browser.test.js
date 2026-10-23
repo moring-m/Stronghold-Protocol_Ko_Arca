@@ -23,7 +23,8 @@ test('display language defaults to Korean, restores four choices and persists ti
    assert.equal(await page.$eval('html',e=>e.lang),lang==='zh'?'zh-CN':lang);
   }
   const beforeCachedSwitch=englishDownloads;await page.click('.title-tools [data-testid="settings-btn"]');
-  await page.waitForSelector('.settings-modal [data-testid="display-language"]');
+  await page.waitForSelector('.settings-modal');await page.click('.settings-modal .set-categories button:last-child');
+  await page.waitForSelector('.settings-modal [data-testid="display-language"]',{visible:true});
   await page.select('.settings-modal [data-testid="display-language"]','en');
   await page.waitForFunction(()=>document.documentElement.lang==='en'&&!!window.__SP__);
   assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('sp.pref.lang'))),'en');assert.equal(englishDownloads,beforeCachedSwitch,'an installed English pack is reused without downloading it again');

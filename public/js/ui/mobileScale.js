@@ -3,6 +3,9 @@ export const MOBILE_UI_SCALES = Object.freeze([.5,.6,.7,.8,.9,1,1.1,1.25,1.5]);
 export const mobileUiScale = value => MOBILE_UI_SCALES.includes(value) ? value : 1;
 export function isMobileScaleTarget(win=globalThis) {
   const matches=q=>{try{return !!win.matchMedia?.(q).matches;}catch{return false;}};
+  const nav=win.navigator||{};
+  // Phones can advertise fine pointers/hover in desktop-site mode or with an attached mouse.
+  if(nav.userAgentData?.mobile||nav.maxTouchPoints>0||/Android|iPhone|iPad|iPod/i.test(nav.userAgent||''))return true;
   return matches('(pointer: coarse)') && !matches('(any-pointer: fine)') && !matches('(any-hover: hover)');
 }
 export function installMobileUiScale(settings,win=globalThis) {
@@ -32,10 +35,10 @@ export function installMobileUiScale(settings,win=globalThis) {
 
 export function mobileUiScaleText(language) {
   return ({
-    ko:{label:'모바일 UI 배율',hint:'화면 전체를 확대·축소합니다.'},
-    en:{label:'Mobile UI scale',hint:'Zoom the entire page in or out.'},
-    ja:{label:'モバイルUIの倍率',hint:'画面全体を拡大・縮小します。'},
-    zh:{label:'移动端界面缩放',hint:'放大或缩小整个页面。'},
-    'zh-TW':{label:'行動版介面縮放',hint:'放大或縮小整個頁面。'},
-  })[language] || {label:'모바일 UI 배율',hint:'화면 전체를 확대·축소합니다.'};
+    ko:{label:'UI 배율',hint:'화면 전체를 확대·축소합니다.'},
+    en:{label:'UI scale',hint:'Zoom the entire page in or out.'},
+    ja:{label:'UIの倍率',hint:'画面全体を拡大・縮小します。'},
+    zh:{label:'界面缩放',hint:'放大或缩小整个页面。'},
+    'zh-TW':{label:'介面縮放',hint:'放大或縮小整個頁面。'},
+  })[language] || {label:'UI 배율',hint:'화면 전체를 확대·축소합니다.'};
 }

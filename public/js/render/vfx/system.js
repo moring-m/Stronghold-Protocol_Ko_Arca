@@ -1,7 +1,7 @@
 // render/vfx/system.js — the official battle effects layer (设置「官方特效」; client docs: the fx layer, DESIGN §33):
 // owns the effect instances, their library (render/vfx/library.js) and the WebGL2 renderer (render/vfx/gl.js), and
 // draws them as two Pixi display objects of the field view — a ground pass under the units (flat ranges / decals) and
-// an over pass above them — with the shared battle camera (render/projection.js; the prefabs are authored for it).
+// an over pass for unbound effects, plus unit-attached passes sorted with their models — with the shared battle camera (render/projection.js; the prefabs are authored for it).
 //
 //   const ofx = new OfficialFx({ P, renderer, assets, cam, heightAt })
 //   ofx.ground / ofx.over                       Pixi containers to add to the layers (they draw through raw GL)
@@ -130,6 +130,8 @@ export class OfficialFx {
     this.depthDone = -1;
     this.fd = new FrameData();
     this.items = { ground: [], over: [] };
+    this.unitItems = new Map();
+    this.unitLayers = new Map();
     this.needDepth = false;
     this.particles = 0;
     this.dropped = 0;
@@ -317,6 +319,7 @@ export class OfficialFx {
     // lists too, so shader warming cannot redraw a previous battle's shield.
     this.items.ground.length = 0;
     this.items.over.length = 0;
+    this.unitItems.clear();for(const layer of this.unitLayers.values())if(!layer.destroyed)layer.destroy?.();this.unitLayers.clear();
     this.fd.reset();
     this.prepared = -1;
     this.depthDone = -1;
@@ -346,18 +349,30 @@ export class OfficialFx {
     fd.reset();
     const g = this.items.ground, o = this.items.over;
     g.length = 0; o.length = 0;
+    this.unitItems.clear();
     let seq = 0, depth = false;
     const sink = (e) => {
       e.seq = seq++;
       if (e.mat.state.zTest) depth = true;
-      (e.ground ? g : o).push(e);
+      const owner=e.effect?.depthOwner;
+      // Explicit Overlay materials retain their authored screen-wide priority.
+      if(!e.ground&&e.queue<4000&&owner?.root&&!owner.root.destroyed){
+        let list=this.unitItems.get(owner);if(!list){list=[];this.unitItems.set(owner,list);}list.push(e);
+      }else (e.ground ? g : o).push(e);
     };
     for (const fx of this.effects) fx.gather(basis, sink);
     g.sort(byUnityOrder);
     o.sort(byUnityOrder);
+    for(const [owner,list]of this.unitItems){
+      list.sort(byUnityOrder);let layer=this.unitLayers.get(owner);
+      if(!layer||layer.destroyed){layer=new this.P.Container();layer._render=renderer=>this.renderPass('over',renderer,owner);this.unitLayers.set(owner,layer);}
+      // Render inside this unit, after its model: even equal-depth units now interleave body/status/body/status.
+      owner.root.addChild(layer);
+    }
+    for(const [owner,layer]of this.unitLayers)if(!this.unitItems.has(owner)||owner.root?.destroyed){if(!layer.destroyed)layer.destroy?.();this.unitLayers.delete(owner);}
     // geometry in draw order: neighbours of one material and kind become one draw (their ranges are contiguous)
     const frameNo = this.frameNo;
-    for (const list of [g, o]) {
+    for (const list of [g, o,...this.unitItems.values()]) {
       let w = 0, prev = null;
       for (const e of list) {
         const r = e.effect.build(e, basis, fd, frameNo);
@@ -375,7 +390,7 @@ export class OfficialFx {
   }
 
   /** Draw one pass from inside Pixi's render (see the header). */
-  renderPass(pass, renderer) {
+  renderPass(pass, renderer, owner = null) {
     if (!this.active || (!this.effects.length && !this.warmQueue.length)) return;
     const gl = renderer.gl;
     if (!this.glr) {
@@ -389,7 +404,7 @@ export class OfficialFx {
     try {
       if (pass === 'ground' || this.prepared !== this.frameNo) this._warmStep();
       if (this.prepared !== this.frameNo) this._prepare(renderer);
-      const items = this.items[pass];
+      const items = owner ? this.unitItems.get(owner)||[] : this.items[pass];
       if (this.needDepth && this.depthDone !== this.frameNo) { this.glr.depthPrepass(this.vpB); this.depthDone = this.frameNo; }
       if (items.length) this.glr.draw(items, { vp: this.vpU, cam: this.camU, time: this.time, half: this.lite, pass: this.frameNo * 2 + (pass === 'over' ? 1 : 0) });
     } catch (err) {
@@ -453,6 +468,7 @@ export class FxHandle {
     }
     fx.track = this.opts.track || null;
     fx.owner = this.opts.owner ?? null;
+    fx.depthOwner = this.opts.depthOwner ?? null;
     fx.handle = this;
     // a one-shot nobody stops is capped: its authored duration (plus its linger), else ONE_SHOT_TTL; a looping prefab
     // nobody owns (the wiring stops it at its end event) ends after LOOP_TTL at the latest
@@ -466,13 +482,13 @@ export class FxHandle {
     // stops with it (OnFinishEmitter's start where it finished)
     this.children = [];
     const skip = Math.max(0, Number(this.opts.skip) || 0) + loadedLate;
-    const own = { track: this.opts.track, data: this.opts.data, loop: this.opts.loop, important: this.opts.important, owner: this.opts.owner, skip, speed: this.opts.speed };
+    const own = { track: this.opts.track, data: this.opts.data, loop: this.opts.loop, important: this.opts.important, owner: this.opts.owner, depthOwner:this.opts.depthOwner, skip, speed: this.opts.speed };
     for (const e of def.onPlay) for (const k of e.keys) if (k !== def.key) { const c = s.spawn(k, this.placeArgs, own); if (c) this.children.push(c); }
     const prev = fx.onFinish;
     fx.onFinish = (f) => {
       prev?.(f);
       this._stopChildren();
-      for (const k of def.onFinish) if (k !== def.key) s.spawn(k, { pos: f.anchor.slice(), yaw: f.yaw, mirror: f.mirror, groundZ: f.groundZ, scale: f.rootScale }, { track: this.opts.track, owner: this.opts.owner });
+      for (const k of def.onFinish) if (k !== def.key) s.spawn(k, { pos: f.anchor.slice(), yaw: f.yaw, mirror: f.mirror, groundZ: f.groundZ, scale: f.rootScale }, { track: this.opts.track, owner: this.opts.owner, depthOwner:this.opts.depthOwner });
     };
     this.effect = fx;
     // Loading must not restart the attack clock. Step through elapsed battle time

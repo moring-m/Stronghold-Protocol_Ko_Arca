@@ -1,0 +1,108 @@
+{
+  "results": [
+    {
+      "id": "char_1050_chen3",
+      "name": "첸 더 던스트릭",
+      "mode": "official",
+      "skin": null,
+      "label": "공식 · 기본",
+      "body": "char_1050_chen3",
+      "bodyIsBase": false,
+      "representativeKey": "chen3_skill_03_trail_01",
+      "file": "shots/char_1050_chen3-official.png",
+      "spineReady": true,
+      "spine": "char_1050_chen3",
+      "costume": null,
+      "official": true,
+      "keys": [
+        "buff_autochess_frozen",
+        "buff_autochess_frozen"
+      ],
+      "failed": [],
+      "stats": {
+        "fps": 3.3,
+        "frameMs": 300.15,
+        "cpuMs": 5.49,
+        "renderMs": 4.74,
+        "mode": "battle",
+        "units": 3,
+        "impostor": 0,
+        "impostorAtlas": {
+          "pages": 1,
+          "slots": 2,
+          "drawn": 1,
+          "full": 0
+        },
+        "boardArt": true,
+        "board3d": {
+          "on": true,
+          "calls": 12,
+          "triangles": 61626,
+          "textures": 28,
+          "geometries": 21,
+          "frames": 158,
+          "cpuMs": 0.48,
+          "lost": false,
+          "originalStage": "act2autochess_m01",
+          "cachedLayouts": 1,
+          "layoutCacheHits": 0,
+          "losses": 0
+        },
+        "pen": 0,
+        "penHidden": true,
+        "prepField": null,
+        "lod": 3,
+        "culled": 0,
+        "particles": 0,
+        "projectiles": 0,
+        "numbers": 0,
+        "rings": 0,
+        "auras": 0,
+        "locks": 0,
+        "flames": 0,
+        "promotions": 0,
+        "officialFx": {
+          "tier": "full",
+          "available": true,
+          "effects": 2,
+          "pending": 0,
+          "particles": 18,
+          "reused": 0,
+          "systems": 8,
+          "dropped": 0,
+          "draws": 16,
+          "programs": 15,
+          "textures": 131,
+          "texMB": 28
+        },
+        "spine": {
+          "size": 18,
+          "ready": 18,
+          "loading": 0,
+          "failed": 0,
+          "refs": 3,
+          "holds": 2,
+          "weight": 52880444,
+          "idleWeight": 39970272,
+          "active": 0,
+          "queued": 0,
+          "unloading": 0
+        },
+        "renderT": 0.43708140004167395,
+        "rate": 1.7000654022197776,
+        "buffered": 5,
+        "camera": {
+          "tx": 6,
+          "ty": 10.998841835002256,
+          "tz": 0,
+          "tilt": 30,
+          "dist": 10.731017003337843,
+          "scale": 76.80942314973585,
+          "cx": 480,
+          "cy": 300
+        }
+      }
+    }
+  ],
+  "errors": []
+}

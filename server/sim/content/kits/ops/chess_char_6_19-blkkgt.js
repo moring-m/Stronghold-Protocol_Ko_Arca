@@ -88,11 +88,11 @@ function blkkgt(bb, chess, def) {
       duration: slashes * iv,
       ...(skillGrid ? { targeting: { rangeGrid: skillGrid } } : {}),
       attack: { noAttack: true },
-      // PRTS 备注 "※多段斩击期间，自身获得无敌，晕眩免疫，冻结免疫": invulnerable while the slashes run (removed in onEnd,
-      // before the finisher); stun / freeze refused by her `beforeStatus` hook (install) while `mem.dgb` is set
+      // Protection covers the repeated slashes, not the recovery before the finisher.
+      // Ending it only in onEnd lets immediate recasts join into uninterrupted invulnerability.
       onStart({ battle, unit }) {
         unit.mem.dgb = { n: 1, acc: 0, pacc: 0 };
-        battle.addBuff(unit, { key: 'blkkgt:slashes', duration: slashes * iv + 1, flags: { invulnerable: true }, visible: true, source: unit });
+        battle.addBuff(unit, { key: 'blkkgt:slashes', duration: (slashes - 1) * iv + .05, flags: { invulnerable: true }, visible: true, source: unit });
         slash(battle, unit, num(bb.d_atk_scale, 1));
       },
       onTick({ battle, unit, dt }) {
@@ -101,6 +101,7 @@ function blkkgt(bb, chess, def) {
         m.acc += dt;
         m.pacc += dt;
         while (m.acc + 1e-9 >= iv && m.n < slashes) { m.acc -= iv; m.n++; slash(battle, unit, num(bb.d_atk_scale, 1)); } // loop-cap: interval floored and textCount total-times
+        if (m.n >= slashes) battle.removeBuff(unit, 'blkkgt:slashes');
         if (m.pacc + 1e-9 >= pullIv) { m.pacc -= pullIv; pull(battle, unit, num(bb.p_force)); }
       },
       onEnd({ battle, unit, reason }) {
