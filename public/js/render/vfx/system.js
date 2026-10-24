@@ -374,7 +374,10 @@ export class OfficialFx {
       list.sort(byUnityOrder);let layer=this.unitLayers.get(owner);
       if(!layer||layer.destroyed){layer=new this.P.Container();layer._render=renderer=>this.renderPass('over',renderer,owner);this.unitLayers.set(owner,layer);}
       // Render inside this unit, after its model: even equal-depth units now interleave body/status/body/status.
-      owner.root.addChild(layer);
+      // addChild removes and re-adds an existing child, invalidating the scene tree.
+      // Reorder only when another child actually followed this layer.
+      const children=owner.root.children;
+      if(layer.parent!==owner.root || !children || children[children.length-1]!==layer)owner.root.addChild(layer);
     }
     for(const [owner,layer]of this.unitLayers)if(!this.unitItems.has(owner)||owner.root?.destroyed){if(!layer.destroyed)layer.destroy?.();this.unitLayers.delete(owner);}
     // geometry in draw order: neighbours of one material and kind become one draw (their ranges are contiguous)

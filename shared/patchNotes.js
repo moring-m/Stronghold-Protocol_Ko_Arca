@@ -1,6 +1,29 @@
 // Player-facing history. Letters a/b were assigned retroactively to the two deployed update batches.
 export const PATCH_NOTES = [
 {
+  "version": "0.3.1i1",
+  "date": "2026-10-24",
+  "status": "released",
+  "title": "전투 성능 및 공격 모션 핫픽스",
+  "sections": [
+    {
+      "title": "전투 및 이펙트",
+      "items": [
+        "유키 마코토가 위쪽을 보는 상태에서 대역에서 본체로 복귀할 때, 모델 교체 중 진행 중인 공격 모션이 초기화되던 문제를 수정했습니다.",
+        "유키 마코토의 전환 직후 첫 공격 모션이 누락되어 공식 공격 잔상과 어긋나던 문제를 수정했습니다.",
+        "잠수부 등 적의 공격 시작 모션을 놓친 경우, 타격 시점에 공격 모션이 처음부터 재생되어 이동과 겹치던 문제를 수정했습니다."
+      ]
+    },
+    {
+      "title": "성능",
+      "items": [
+        "전투 시작 시 공식 이펙트 준비를 분산하고 중복 로딩을 줄였습니다. 전투 중에는 배경 전장의 사전 준비를 미룹니다.",
+        "유키 마코토의 대역 효과 갱신과 유닛·이펙트 렌더링의 반복 계산을 줄였습니다. 전투 판정과 효과의 적용 결과는 유지합니다."
+      ]
+    }
+  ]
+},
+{
   "version": "0.3.1i",
   "date": "2026-10-24",
   "status": "released",

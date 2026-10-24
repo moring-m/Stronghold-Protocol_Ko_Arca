@@ -963,6 +963,7 @@ export class UnitView {
         actor.setSkillIndex(this.info.skillIndex);
         // Play each attack once; enemies with an authored ready stance keep it between attacks.
         actor.clipPerAttack = true;
+        actor.attackFromStrike = this.isEnemy;
         actor.continuousAttacks = !this.isEnemy;
         actor.authoredAttackReady = this.isEnemy;
       } catch (err) {
@@ -1018,6 +1019,7 @@ export class UnitView {
           this.actor.deploy(); if (deployElapsed > 0) this.actor.update(deployElapsed);
         }
         if (STEALTH_FORMS[id]) this.actor.syncFormPose();
+        if(this.info.charId==='char_4217_makoto')this._resumeMakotoAttack();
       }
     }, () => {
       if (req === this._spineReq) { this._spineBusy = false; this._stuckAt = 0; }
@@ -1075,7 +1077,7 @@ export class UnitView {
     const prev = this._formSpec();
     this.form = k;
     this.info.form = k;
-    if(this.info.charId==='char_4217_makoto'){this._formElapsed=k?Math.max(0,Number(fx?.late)||0):null;this._modelDirty=true;}
+    if(this.info.charId==='char_4217_makoto'){this._makotoAttackPlayback=null;this._formElapsed=k?Math.max(0,Number(fx?.late)||0):null;this._modelDirty=true;}
     if (this.imp) this.imp.dirty=true;
     const f = this._formSpec();
     if (!this.actor) return;
@@ -1465,6 +1467,7 @@ export class UnitView {
       this.lungeDir.x = dx / len; this.lungeDir.y = dy / len;
     }
     this.lunge = 1;
+    if(this._makotoAttackPlayback&&this._makotoAttackPlayback.form===this.form)this._makotoAttackPlayback.struck=true;
     if (this.actor) this.actor.attack(this.atkInterval, once);
     if (this.info.charId === 'char_4217_makoto' && !once) this._makotoAttackN = (this._makotoAttackN || 0) + 1; // game seconds: the actor's clock runs in game time
     if (this.imp) this.imp.dirty = true;
@@ -1489,16 +1492,46 @@ export class UnitView {
       this.visFacing = target.x<this.x ? -1 : 1;
   }
 
-  onAttackStart(target, lead, interval, allInRange=false, attackMode) {
+  onAttackStart(target, lead, interval, allInRange=false, attackMode, at=this.gameT) {
     this.atkInterval = interval;
     this.hasAttackInterval = true;
     if(!allInRange)this.faceTarget(target);
     this._selectMakotoAttack();
-    if (this.actor) {this.actor.fortressMelee=attackMode==='melee';this.actor.beginAttack(interval, lead);}
+    if(this.info.charId==='char_4217_makoto'){
+      const prefix=!this.form?'Attack_':this.form==='makoto_s3a'?'Doll_Skill_3_P1_Attack_':null;
+      const clip=prefix?prefix+((this._makotoAttackN||0)%2?'B':'A'):this.form==='makoto_s1'?'Doll_Skill_1_Attack':null;
+      this._makotoAttackPlayback={at,lead,interval,clip,form:this.form,struck:false};
+    }
+    if (this.actor) {
+      this._prepareMakotoAttackActor();
+      this.actor.fortressMelee=attackMode==='melee';this.actor.beginAttack(interval, lead);
+    }
     if (this.imp) this.imp.dirty = true;
   }
 
+  _prepareMakotoAttackActor(){
+    if(this.info.charId==='char_4217_makoto'&&this.actor?.mode==='change'&&(!this.form||['makoto_s1','makoto_s3a'].includes(this.form))){
+      // The authoritative attack start means the protected transition has ended, even if the last render tick lags.
+      this.actor.setForm(this._formSpec()?.roles||null,null,null,{complete:true});
+    }
+  }
+
+  /** Model replacement resumes the current swing; it must not replay its start or lose its strike. */
+  _resumeMakotoAttack() {
+    const r=this._makotoAttackPlayback,a=this.actor;
+    if(!r||!a||!r.clip||r.form!==this.form||!a.has(r.clip)||this.flags&(UF.STUNNED|UF.FROZEN))return false;
+    const elapsed=Math.max(0,this.gameT-r.at),hit=a._hitTime(r.clip,a.dur(r.clip)),speed=r.lead>0?hit/r.lead:Math.max(1,Math.min(4,a.dur(r.clip)/r.interval));
+    if(!(speed>0)||elapsed>=a.dur(r.clip)/speed)return false;
+    a.attackAnimation=r.clip;
+    this._prepareMakotoAttackActor();
+    if(!a.beginAttack(r.interval,r.lead))return false;
+    a.update(elapsed);
+    if(r.struck)a.wound=false;
+    return true;
+  }
+
   onAttackCancel() {
+    this._makotoAttackPlayback=null;
     this.actor?.cancelAttack();
     if (this.imp) this.imp.dirty = true;
   }
@@ -2566,15 +2599,19 @@ export class UnitView {
     if (!box) return false;
     const tracks = this.actor.spine && this.actor.spine.state ? this.actor.spine.state.tracks : null;
     for (let e = tracks && tracks[0], d = 0; e && d < 4; e = e.mixingFrom, d++) if (e.animation && box.over?.has(e.animation.name)) return true;
+    const version=this.actor.poseVersion, cached=this._liveBoundsCheck;
+    if(Number.isFinite(version)&&cached?.actor===this.actor&&cached.box===box&&cached.version===version)return cached.over;
+    let over=false;
     // Sampled animation bounds do not include every mixed/procedural attachment pose. Never crop the live pose to
     // that cached rectangle: render it directly until it fits again (including embedded skill/attack effects).
     try {
       const b = this.actor.spine.getLocalBounds();
       if (b && Number.isFinite(b.x) && Number.isFinite(b.y) && b.width > 0 && b.height > 0) {
-        return b.x < box.x0 - 1 || b.y < box.y0 - 1 || b.x + b.width > box.x0 + box.w + 1 || b.y + b.height > box.y0 + box.h + 1;
+        over = b.x < box.x0 - 1 || b.y < box.y0 - 1 || b.x + b.width > box.x0 + box.w + 1 || b.y + b.height > box.y0 + box.h + 1;
       }
     } catch { /* runtimes without measurable bounds keep the precomputed clip fallback */ }
-    return false;
+    if(Number.isFinite(version))this._liveBoundsCheck={actor:this.actor,box,version,over};
+    return over;
   }
 
   /**

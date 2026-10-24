@@ -26,3 +26,17 @@ test('official effects isolate and restore inherited scissor and stencil tests',
  const {beginUnmaskedFx}=await import('../../public/js/render/vfx/system.js');const enabled=new Set([1,2]),gl={SCISSOR_TEST:1,STENCIL_TEST:2,isEnabled:k=>enabled.has(k),disable:k=>enabled.delete(k),enable:k=>enabled.add(k)};
  const restore=beginUnmaskedFx(gl);assert.equal(enabled.size,0);restore();assert.deepEqual([...enabled],[1,2]);enabled.clear();const again=beginUnmaskedFx(gl);again();assert.equal(enabled.size,0);
 });
+
+test('stable attached layers avoid scene-tree mutations but still follow newly added HUD children',()=>{
+ const renderer={screen:{width:1280,height:720}},cam=presetCamera('normal',renderer.screen);
+ const fx=new OfficialFx({P:{Container},renderer,cam:()=>cam,lib:{}});fx.glr={upload(){}};
+ const owner={root:new Container()},model={id:'model'};owner.root.addChild(model);
+ let writes=0;const add=owner.root.addChild.bind(owner.root);owner.root.addChild=c=>{writes++;return add(c);};
+ const effect={depthOwner:owner,build:()=>({kind:'ps',first:0,count:6})},item={effect,ground:false,queue:3000,order:0,layer:0,dist:0,mat:{state:{}}};
+ fx.effects=[{gather(_basis,sink){sink(item);}}];
+ for(let i=0;i<100;i++){fx.frameNo++;fx._prepare(renderer);}
+ assert.equal(writes,1);const layer=fx.unitLayers.get(owner);assert.deepEqual(owner.root.children,[model,layer]);
+ const hud={id:'hud'};owner.root.addChild(hud);fx.frameNo++;fx._prepare(renderer);assert.deepEqual(owner.root.children,[model,hud,layer]);assert.equal(writes,3);
+ fx.frameNo++;fx._prepare(renderer);assert.equal(writes,3);
+ fx.effects=[];fx.frameNo++;fx._prepare(renderer);assert.equal(layer.destroyed,true);assert.deepEqual(owner.root.children,[model,hud]);
+});

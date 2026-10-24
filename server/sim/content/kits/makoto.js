@@ -98,7 +98,7 @@ export function makotoKit(_bb,raw){
      for(const e of inside)if(e.s.flags.fear&&e.hp<=u.s.atk*num(bb['attack@kill_atk_scale'])&&!st.attempted.has(e.id)){st.attempted.add(e.id);fx('makotoExecute',{target:e.id});b.dealDamage(null,e,{amount:num(bb['attack@kill_damage'],9999999),type:'true',sourceless:true,canDodge:false,tags:['execute','makoto-execute']});}}
    }
    if(st.phase==='s3b'){
-    for(const a of b.allyUnits){const inside=alive(a)&&a.kind==='op'&&u.rangeKeySet.has(a.tileR*b.grid.cols+a.tileC);if(inside)b.addBuff(a,{key:`makoto:dodge:${u.id}`,duration:.12,mods:{dodgePhys:num(bb['attack@prob']),dodgeArts:num(bb['attack@prob'])}});else b.removeBuff(a,`makoto:dodge:${u.id}`);}
+    for(const a of b.allyUnits){const inside=alive(a)&&a.kind==='op'&&u.rangeKeySet.has(a.tileR*b.grid.cols+a.tileC);if(inside){const buff=a.findBuff(`makoto:dodge:${u.id}`);if(buff)buff.timeLeft=.12;else b.addBuff(a,{key:`makoto:dodge:${u.id}`,duration:.12,mods:{dodgePhys:num(bb['attack@prob']),dodgeArts:num(bb['attack@prob'])}});}else b.removeBuff(a,`makoto:dodge:${u.id}`);}
     if(b.time>=st.healAt){st.healAt+=1;healWave();}
    }
   },{owner:u});

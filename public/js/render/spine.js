@@ -228,6 +228,8 @@ function clipHides(slot, att, buf, poly, pn) {
 // sampling throws is recorded as not measurable (false): units.js draws it directly while it plays, never as empty.
 export const CLIP_SAMPLE_HZ = 60;
 export const CLIP_SAMPLE_MAX = 48;
+const VISUAL_STATE_ALIASES = Object.freeze({stun:['stun','stunned'],sleep:['sleep'],invuln:['invuln','invincible'],freeze:['freeze','frozen'],cold:['cold'],burn:['burn','burning'],poison:['poison'],rage:['rage','angry','enrage','berserk','lowhp'],shield:['shield'],refraction:['refraction'],stealth:['stealth','invisible']});
+
 export const CLIP_BOUNDS_BUDGET_MS = 2.5;
 const ATT_REGION = 0, ATT_MESH = 2;      // pixi-spine AttachmentType
 const boundsOf = new WeakMap();          // skeleton data → { data, Skeleton, skel, rects: Map<clip, rect|null|false>, todo, job, users, failed }
@@ -440,6 +442,7 @@ export class SpineActor {
      * clip (server/sim/ai.js attackStand). Off (operators): retain rhythm scaling, but still play each attack once.
      */
     this.clipPerAttack = false;
+    this.attackFromStrike = false; // enemies must not replay a missed wind-up after the damage already happened
     this.wound = false;           // wound up for the coming attack (windUp → attack)
     this._applied = false;        // an update has posed the skeleton since its clip last changed (poseHeld)
     this._posed = false;          // the skeleton was ever posed (a model frozen before that shows its clip's first frame)
@@ -477,11 +480,13 @@ export class SpineActor {
     const skeleton = this.spine?.skeleton;
     const skins = skeleton?.data?.skins || [];
     const base = skeleton?.data?.defaultSkin || skins.find(s=>s.name==='default');
-    const aliases = {stun:['stun','stunned'],sleep:['sleep'],invuln:['invuln','invincible'],freeze:['freeze','frozen'],cold:['cold'],burn:['burn','burning'],poison:['poison'],rage:['rage','angry','enrage','berserk','lowhp'],shield:['shield'],refraction:['refraction'],stealth:['stealth','invisible']};
+
     const chosen = [];
     this.authoredVisualStates = new Set();
-    for (const state of states || []) {
-      const names = aliases[state] || (/^skill[123]$/.test(state) ? [state,state.replace('skill','skill_')] : [state]);
+    // A default-only skeleton cannot supply any state-specific attachment.
+    const hasStateSkins=skins.length>1 || skins.length===1&&skins[0]!==base;
+    for (const state of hasStateSkins ? states || [] : []) {
+      const names = VISUAL_STATE_ALIASES[state] || (/^skill[123]$/.test(state) ? [state,state.replace('skill','skill_')] : [state]);
       const skin = skins.find(s=>names.includes(String(s.name).toLowerCase()));
       if (skin && skin !== base) { this.authoredVisualStates.add(state); if (!chosen.includes(skin)) chosen.push(skin); }
     }
@@ -495,6 +500,7 @@ export class SpineActor {
     skeleton.setSkin(composite);
     skeleton.setSlotsToSetupPose();
     this.spine.state?.apply?.(skeleton);
+    this.poseVersion=(this.poseVersion||0)+1;
     return chosen.length > 0;
   }
 
@@ -562,6 +568,7 @@ export class SpineActor {
     }
     // Apply the new attachments even when normal updates are frozen.
     this.spine.update(0);
+    this.poseVersion = (this.poseVersion || 0) + 1;
     this._posed = true;
   }
 
@@ -638,6 +645,7 @@ export class SpineActor {
       if (start) e.trackTime = start;
     }
     this.current = name;
+    this.poseVersion = (this.poseVersion || 0) + 1;
     this._applied = false;
     return true;
   }
@@ -794,10 +802,10 @@ export class SpineActor {
     this.wound = false;
     if (!wasAttacking) {
       // not wound up (no look-ahead, e.g. a batch that arrived late): the sim already resolved the hit, so show the
-      // strike frame now — unless a clip-per-attack actor's rhythm leaves room for the whole clip (interval ≥ clip):
-      // then the clip plays complete from its wind-up at its own speed, the strike a little late (重犯's iron ball
-      // lifts before the slam; #246 by @TsangAsuna, accepted by the owner on 2026-10-07)
-      const whole = per && this.interval >= loopDur;
+      // strike frame now. Operators retain their existing full-clip fallback when the rhythm leaves room.
+      // Enemies resume at the strike even after a missed start/model load: the simulation only has recovery left,
+      // so replaying their wind-up here would leave them sliding while the displayed attack still plays.
+      const whole = per && !this.attackFromStrike && this.interval >= loopDur;
       if (whole) this.attackUntil = this.clock + loopDur / ts;
       this._play(clip.loop, !single, { timeScale: ts, start: whole ? 0 : hit, mix: 0.06 });
     } else if (single) {
@@ -1161,6 +1169,7 @@ export class SpineActor {
     if (!this.frozen || !this._posed) {
       try {
         this.spine.update(this.frozen ? 0 : dt);
+        this.poseVersion = (this.poseVersion || 0) + 1;
         this._posed = true;               // (a first update that threw is tried again: no setup pose left on screen)
       } catch { /* a broken skeleton must not stop the frame */ }
     }

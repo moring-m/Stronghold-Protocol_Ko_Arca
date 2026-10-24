@@ -1,0 +1,18 @@
+{
+  "skins": {
+    "checks": 10000,
+    "sha256": "471c7fe0f970045ce8b615fe89f888ac41d82b914601622317c9848590522ba4"
+  },
+  "statuses": {
+    "checks": 10000,
+    "sha256": "da05909ad5dd3281cb78d171b76e00d90faf0c36eee4c00eb06db05c3c0e77dc"
+  },
+  "loops": {
+    "checks": 5000,
+    "sha256": "12adf2643a39919fe93d175f85acf15e82d1c684615626232411c22704bd1240"
+  },
+  "drawOrder": {
+    "checks": 500,
+    "sha256": "28ca0f8e6f9f1ce84fcbfba698bbb90eece57927e76b0eacb5c928ad93c04336"
+  }
+}

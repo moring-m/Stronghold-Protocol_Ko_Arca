@@ -1,0 +1,27 @@
+[
+  {
+    "frame": "frame-12.400",
+    "pixelIdentical": false,
+    "meanAbsoluteDifference_0_255": 0.04288719109601962
+  },
+  {
+    "frame": "frame-26.800",
+    "pixelIdentical": false,
+    "meanAbsoluteDifference_0_255": 0.05531692133559706
+  },
+  {
+    "frame": "frame-29.400",
+    "pixelIdentical": false,
+    "meanAbsoluteDifference_0_255": 0.05842010941331824
+  },
+  {
+    "frame": "frame-4.600",
+    "pixelIdentical": false,
+    "meanAbsoluteDifference_0_255": 0.049760422561780794
+  },
+  {
+    "frame": "frame-7.400",
+    "pixelIdentical": false,
+    "meanAbsoluteDifference_0_255": 0.046162044897189204
+  }
+]

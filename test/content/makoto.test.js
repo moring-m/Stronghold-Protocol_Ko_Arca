@@ -149,3 +149,13 @@ for(const phase of ['s1','s2','s3a','s3b'])test(`${phase} returns to a fresh bod
   const before=u.stats.attacks;h.run(1);assert.ok(u.stats.attacks>before);assert.equal(h.b.errorCount,0);
  }finally{setGameData(null)}
 });
+
+test('S3 dodge aura refreshes an existing buff without rebuilding unchanged stats each tick',()=>{
+ setGameData(data);try{
+  const h=combat(2),u=h.unit(id());u.mem.makoto.enter();h.run(2.1);h.b.loseHp(u,u.hp+100,{source:null});h.run(1.6);
+  const key=`makoto:dodge:${u.id}`,buff=u.findBuff(key);assert.ok(buff);const add=h.b.addBuff.bind(h.b);let creations=0;
+  h.b.addBuff=(target,spec)=>{if(spec.key===key)creations++;return add(target,spec);};
+  h.run(2);assert.equal(u.findBuff(key),buff);assert.equal(creations,0);assert.ok(buff.timeLeft>0);assert.ok(u.s.dodgePhys>0);
+  h.run(u.mem.makoto.until-h.b.time+.1);assert.equal(u.findBuff(key),null);assert.equal(u.s.dodgePhys||0,0);
+ }finally{setGameData(null)}
+});

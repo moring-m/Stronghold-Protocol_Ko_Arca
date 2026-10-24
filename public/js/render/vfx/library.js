@@ -93,6 +93,9 @@ export class FxLibrary {
     this._index = null;
     this._texInfo = null;
     this.descs = new Map();     // key → Promise<descriptor|null>
+    this.loads = new Map();     // key → the single in-flight compile
+    this.compileQueue = [];
+    this.compileScheduled = false;
     this.defs = new Map();      // key → compiled EffectDef | null
     this.meshes = new Map();    // key → data | null (loaded)
     this.meshLoads = new Map(); // key → Promise
@@ -160,7 +163,7 @@ export class FxLibrary {
   /** Visual-set changes invalidate plugin descriptors; official cached resources remain valid. */
   reloadPlugins() {
     this.pluginRevision = (this.pluginRevision || 0) + 1;
-    for (const map of [this.descs, this.defs, this.images, this.imageLoads]) for (const key of map.keys()) if (key.startsWith('plugin:')) {
+    for (const map of [this.descs, this.defs, this.loads, this.images, this.imageLoads]) for (const key of map.keys()) if (key.startsWith('plugin:')) {
       if (map === this.images) map.get(key)?.image?.close?.();
       map.delete(key);
     }
@@ -231,19 +234,47 @@ export class FxLibrary {
   def(key) { return this.defs.get(String(key || '').toLowerCase()) || null; }
 
   /** Load and compile a prefab (with its meshes; textures load on first draw or through preload). */
-  async load(key) {
+  load(key) {
     const k = String(key || '').toLowerCase();
+    if (this.defs.has(k)) return Promise.resolve(this.defs.get(k));
+    if (this.loads.has(k)) return this.loads.get(k);
     const revision = this.pluginRevision || 0;
-    if (this.defs.has(k)) return this.defs.get(k);
-    const desc = await this.descriptor(k);
-    if (k.startsWith('plugin:') && revision !== (this.pluginRevision || 0)) return null;
-    if (this.defs.has(k)) return this.defs.get(k);
-    if (!desc) { this.defs.set(k, null); return null; }
-    await Promise.all((desc.meshes || []).map((m) => this.loadMesh(m)));
-    if (k.startsWith('plugin:') && revision !== (this.pluginRevision || 0)) return null;
-    const def = compileEffect(desc, this);
-    this.defs.set(k, def);
-    return def;
+    const pending = (async()=>{
+      const desc = await this.descriptor(k);
+      if (k.startsWith('plugin:') && revision !== (this.pluginRevision || 0)) return null;
+      if (!desc) { this.defs.set(k, null); return null; }
+      await Promise.all((desc.meshes || []).map((m) => this.loadMesh(m)));
+      return this._compile(()=>{
+        if (k.startsWith('plugin:') && revision !== (this.pluginRevision || 0)) return null;
+        if (this.defs.has(k)) return this.defs.get(k);
+        const def = compileEffect(desc, this);
+        this.defs.set(k, def);
+        return def;
+      });
+    })();
+    this.loads.set(k,pending);
+    const clear=()=>{if(this.loads.get(k)===pending)this.loads.delete(k);};
+    pending.then(clear,clear);
+    return pending;
+  }
+
+  /** Download completion must not compile a whole roster in the same microtask burst. */
+  _compile(fn) {
+    return new Promise((resolve,reject)=>{
+      this.compileQueue.push({fn,resolve,reject});
+      if(this.compileScheduled)return;
+      this.compileScheduled=true;
+      const step=()=>{
+        const start=performance.now();
+        do {
+          const job=this.compileQueue.shift();if(!job)break;
+          try{job.resolve(job.fn());}catch(error){job.reject(error);}
+        } while(this.compileQueue.length&&performance.now()-start<2);
+        if(this.compileQueue.length)setTimeout(step,0);
+        else this.compileScheduled=false;
+      };
+      setTimeout(step,0);
+    });
   }
 
   /** Mesh data (sync; null while loading — the load is started). */

@@ -131,7 +131,9 @@ export class TalentFx {
 
   /** The loop entries a binding keeps while it is in force (hold 'skill'), placed on the owner. */
   _loopsOf(b) {
-    return [...b.plan.loop, ...b.plan.start, ...b.plan.range].filter((e) => e.hold === 'skill' && !isPost(e));
+    const out=[];
+    for(const list of [b.plan.loop,b.plan.start,b.plan.range])for(const e of list)if(e.hold==='skill'&&!isPost(e))out.push(e);
+    return out;
   }
 
   /**

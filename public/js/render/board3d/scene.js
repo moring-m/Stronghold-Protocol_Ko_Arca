@@ -560,14 +560,16 @@ export class BoardScene {
     }
   }
 
-  async prewarmLayouts(entries) {
+  async prewarmLayouts(entries, { busy = () => false } = {}) {
     if(this.layoutCacheSize<2 || this.destroyed || this.lost)return;
     const generation=this.warmGeneration=(this.warmGeneration||0)+1;
     const current=()=>!this.destroyed && !this.lost && generation===this.warmGeneration;
-    const idle=()=>new Promise(resolve=>{
+    const idle=async()=>{
+      do { await new Promise(resolve=>{
       if(globalThis.requestIdleCallback)requestIdleCallback(()=>setTimeout(resolve,75),{timeout:1500});
       else setTimeout(resolve,100);
-    });
+      }); } while(current() && busy());
+    };
     // Let the initial field and HUD finish before using idle slices for optional maps.
     await new Promise(resolve=>setTimeout(resolve,2000));
     if(!current())return;

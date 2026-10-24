@@ -1,0 +1,27 @@
+[
+  {
+    "frame": "frame-12.400",
+    "identical": false,
+    "mae": 0.08166949632144878
+  },
+  {
+    "frame": "frame-26.800",
+    "identical": false,
+    "mae": 0.10154404829277495
+  },
+  {
+    "frame": "frame-29.400",
+    "identical": false,
+    "mae": 0.11117996604414261
+  },
+  {
+    "frame": "frame-4.600",
+    "identical": false,
+    "mae": 0.09198264478400302
+  },
+  {
+    "frame": "frame-7.400",
+    "identical": false,
+    "mae": 0.09361158272024146
+  }
+]

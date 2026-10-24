@@ -737,3 +737,13 @@ test('scenery component reuse separates translated positions and filtered index 
  assert.deepEqual(sceneryForArea(filtered,left).index,[],'same positions with different topology must not use old components');
  assert.deepEqual(sceneryForArea(src,left).index,[0,1,2],'derived geometry cannot invalidate the original selection');
 });
+
+test('optional map layouts wait while combat is busy and stop when the scene is destroyed',async(t)=>{
+ t.mock.timers.enable({apis:['setTimeout']});let busy=true,built=0;
+ const clone=()=>({}),scene={layoutCacheSize:2,destroyed:false,lost:false,mapQuality:'low',THREE,key:{clone},hemi:{clone},layoutCache:new Map(),renderer:{},scene:{},camera:{},_clear(){},*_stageSteps(){built++;yield;}};
+ const done=BoardScene.prototype.prewarmLayouts.call(scene,[{stage:{id:'unused',rows:[],devices:[]},area:[]}],{busy:()=>busy});
+ const flush=async(ms)=>{t.mock.timers.tick(ms);for(let i=0;i<8;i++)await Promise.resolve();};
+ await flush(2000);await flush(100);await flush(100);assert.equal(built,0,'no optional geometry during combat');
+ busy=false;await flush(100);await flush(100);assert.equal(built,1,'resume in prep without discarding the request');
+ scene.destroyed=true;await flush(100);await done;
+});

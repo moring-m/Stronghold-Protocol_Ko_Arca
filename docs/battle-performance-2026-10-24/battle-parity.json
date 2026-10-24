@@ -1,0 +1,32 @@
+[
+  {
+    "case": "2-skin",
+    "frames": 930,
+    "equal": true
+  },
+  {
+    "case": "2-base",
+    "frames": 930,
+    "equal": true
+  },
+  {
+    "case": "1-skin",
+    "frames": 930,
+    "equal": true
+  },
+  {
+    "case": "1-base",
+    "frames": 930,
+    "equal": true
+  },
+  {
+    "case": "0-skin",
+    "frames": 930,
+    "equal": true
+  },
+  {
+    "case": "0-base",
+    "frames": 930,
+    "equal": true
+  }
+]

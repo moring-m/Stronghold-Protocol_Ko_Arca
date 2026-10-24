@@ -1069,7 +1069,7 @@ export async function createFieldView(host, options = {}) {
       ...(coop8?[{stage:eightUniteStage(stageRec),area:[{r0:6,r1:13,c0:0,c1:36}]}]:[{stage:cooperativeBossStage(stageRec),area:boardArea('unite')}]),
       {stage:stageRec,area:AREAS.normal},
       {stage:bossPenStage(stageRec),area:boardArea('boss')},
-    ]).catch(err=>{warmStageRequest=null;console.warn('[map prewarm]',err);});
+    ],{busy:()=>mode==='battle'&&!battleMeta?.prep}).catch(err=>{warmStageRequest=null;console.warn('[map prewarm]',err);});
   }
   function applyVisualStage(area) {
     const visual=visualStage();
@@ -1131,6 +1131,7 @@ export async function createFieldView(host, options = {}) {
       kind: 'op', side: 'ally', defId: piece.id, optionalRecruit:!!rec?.optionalRecruit,
       spine: piece.assets?.spine || rec?.assets?.spine || rec?.charId || null, avatar: piece.assets?.avatar || rec?.assets?.avatar || rec?.charId || null,
       skinId: piece.skinId ?? selected?.skinId, charId: piece.charId ?? rec?.charId,
+      skillIndex:rec?.skill?.index,moduleId:rec?.module?.id||null,
       tier: rec?.tier || piece.tier || 1, golden: !!(piece.golden || rec?.isGolden), dir,
     };
   }
@@ -1198,6 +1199,20 @@ export async function createFieldView(host, options = {}) {
     for (const k of [...views.keys()]) if (String(k).startsWith('mapchar:') && !keep.has(k)) dropView(k);
   }
 
+  let prepFxTimer=null,prepFxSignature='';
+  setupCleanup.push(()=>clearTimeout(prepFxTimer));
+  function warmPrepEffects(){
+    if(!ofx.active)return;
+    const units=prepPieces.filter(e=>e.area==='board').map(e=>views.get(e.key)).filter(Boolean);
+    const signature=JSON.stringify(units.map(v=>[v.info.defId,v.info.spine,v.info.skillIndex,v.info.moduleId]));
+    if(signature===prepFxSignature)return;
+    prepFxSignature=signature;clearTimeout(prepFxTimer);
+    prepFxTimer=setTimeout(()=>{
+      if(destroyed||mode!=='prep')return;
+      // Only prepare resources: no deploy, skill, talent or attack events are played in prep.
+      wiring.begin(units).catch(()=>{prepFxSignature='';});
+    },250);
+  }
   const rosterWarmer=createRosterWarmer(assets,{canParse:()=>!destroyed&&mode==='prep'&&!document.hidden});
   setupCleanup.push(()=>rosterWarmer.destroy());
   function setPrep(ps, options) {
@@ -1327,6 +1342,7 @@ export async function createFieldView(host, options = {}) {
     syncReadOnlyPrepUnits([...prepMapChars.map((e) => e.display), ...mate]);
     prepPieces = list.filter((e) => e.key && views.has(e.key));
     if (dragState && !views.has(dragState.key)) { drag.reset(); endDragVisual(false); }
+    warmPrepEffects();
     holdScene(false); // the prep pieces reference their models now (a battle's hold ends here)
     return true;
   }
@@ -2123,7 +2139,7 @@ export async function createFieldView(host, options = {}) {
       case 'atkStart': {
         const src = views.get(e[1]) || battleView(e[1]);
         const tgt = views.get(e[2]) || battleView(e[2]);
-        src?.onAttackStart?.(tgt, e[3], e[4], e[5], e[6]);
+        src?.onAttackStart?.(tgt, e[3], e[4], e[5], e[6], now);
         // New sim events carry the exact shot kind. Older replays retain look-ahead.
         if (typeof e[7] === 'string') wiring.attackStart(src, tgt, e[7], {
           lead: e[3], left: src?.actor?.windCastLeft || e[3], speed: src?.actor?.windFxSpeed || 1,

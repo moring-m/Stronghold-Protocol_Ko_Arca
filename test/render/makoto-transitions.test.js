@@ -99,3 +99,38 @@ test('Makoto looping background reselects the authored left/right variant after 
  const unloaded=t._loopKey(e,v);def={switchable:{right:'backdrop_r',reverse:false}};assert.notEqual(t._loopKey(e,v),unloaded);
  assert.ok(t._loopKey(e,v).endsWith('backdrop_r'));v.dir='LEFT';assert.equal(t._loopKey(e,v),unloaded);
 });
+
+test('UP-facing Makoto retains a started body attack across the Front to Back model replacement',async()=>{
+ for(const id of ['char_4217_makoto','skin_char_4217_makoto_p3r_1']){
+  const spine=assets.chars[id].spine,cam=()=>presetCamera('normal',{width:1280,height:720});
+  const store={picture:()=>null,image:async()=>null,hasBack:()=>true,spineEntry:(_id,o)=>o?.back?spine.back:spine.front,spine:{acquire:async e=>({animations:Object.keys(e.animations).map(name=>({name}))}),release(){}}};
+  const v=new UnitView(fakeViewCtx(fake.P,{assets:store,cam,animRate:()=>1}),{id:1,kind:'op',side:'ally',charId:'char_4217_makoto',spine:id,dir:'UP',x:5,y:10,maxHp:1000});
+  await new Promise(setImmediate);await new Promise(setImmediate);v.setForm('makoto_total',{dur:1.6});v._syncModel();await new Promise(setImmediate);await new Promise(setImmediate);assert.equal(v.entryBack,false);
+  v.actor.update(1.6);v.setForm(null,{form:null});v.gameT=5;v.onAttackStart({x:5,y:11},.533,1.2,false,undefined,5);assert.equal(v.actor.mode,'attack');
+  const clip=v.actor.current;v._syncModel();v.gameT=5.1;await new Promise(setImmediate);await new Promise(setImmediate);
+  assert.equal(v.entryBack,true);assert.equal(v.actor.mode,'attack');assert.equal(v.actor.current,clip);assert.ok(Math.abs(v.actor.spine.state.tracks[0].trackTime-.1)<1e-8);v.destroy();
+ }
+});
+
+test('default-speed persona attack starts at the protected transition boundary without delaying the body behind its trail',async()=>{
+ for(const id of ['char_4217_makoto','skin_char_4217_makoto_p3r_1']){
+  const spine=assets.chars[id].spine;
+  const store={picture:()=>null,image:async()=>null,hasBack:()=>false,spineEntry:()=>spine.front,spine:{acquire:async e=>({animations:Object.keys(e.animations).map(name=>({name}))}),release(){}}};
+  const v=new UnitView(fakeViewCtx(fake.P,{assets:store,cam:()=>presetCamera('normal',{width:1280,height:720}),animRate:()=>1}),{id:1,kind:'op',side:'ally',charId:'char_4217_makoto',spine:id,dir:'UP',x:5,y:10,maxHp:1000});
+  await new Promise(setImmediate);await new Promise(setImmediate);v.actor.revive();
+  v.setForm('makoto_s3a',{late:1.99});assert.equal(v.actor.mode,'change');
+  const lead=.4904214559386973,interval=1.103448275862069;
+  v.onAttackStart(null,lead,interval);assert.equal(v.actor.mode,'attack');assert.equal(v.actor.current,'Doll_Skill_3_P1_Attack_A');assert.equal(v.actor.spine.state.tracks[0].trackTime,0);
+  v.actor.update(lead);const track=v.actor.spine.state.tracks[0],time=track.trackTime;
+  v.onAttack(null,1,'none');assert.equal(v.actor.spine.state.tracks[0],track);assert.equal(track.trackTime,time,'strike must not restart a delayed whole clip');
+  v.actor.update(interval);v.onAttackStart(null,lead,interval);assert.equal(v.actor.current,'Doll_Skill_3_P1_Attack_B');v.destroy();
+ }
+});
+
+test('a delayed Makoto model resumes past its strike, but cancelled or expired swings stay finished',()=>{
+ const a=actor('skin_char_4217_makoto_p3r_1');a.revive();
+ const v={info:{charId:'char_4217_makoto'},actor:a,form:null,flags:0,gameT:5.7,_prepareMakotoAttackActor:()=>{},_makotoAttackPlayback:{at:5,lead:.533,interval:1.2,clip:'Attack_A',form:null,struck:true}};
+ assert.equal(UnitView.prototype._resumeMakotoAttack.call(v),true);assert.ok(Math.abs(a.spine.state.tracks[0].trackTime-.7)<1e-8);assert.equal(a.wound,false);
+ a.update(2);v.gameT=7;assert.equal(UnitView.prototype._resumeMakotoAttack.call(v),false);assert.equal(a.mode,'base');
+ v.gameT=5.1;v._makotoAttackPlayback=null;assert.equal(UnitView.prototype._resumeMakotoAttack.call(v),false);assert.equal(a.mode,'base');
+});

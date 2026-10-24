@@ -216,6 +216,8 @@ export function pickAttacks(a, kind, seed = 0, depth = 0, nth = 0, mem = null) {
  * @param {string} facing 'UP' | 'DOWN' | 'LEFT' | 'RIGHT'
  * @param {boolean} [variantsOnly]
  */
+const STATUS_FLAGS = [[UF.SHIELD,'shield'],[UF.INVULN,'invulnerable'],[UF.STEALTH,'stealth'],[UF.FROZEN,'freeze'],[UF.STUNNED,'stun'],[UF.SLEEP,'sleep'],[UF.COLD,'cold']];
+
 export function modeVariant(modes, name, facing, variantsOnly = false) {
   const want = facing === 'DOWN' ? ['down', 'd'] : facing === 'UP' ? ['up', 'u'] : ['lr'];
   let plain = null, fit = null, other = null;
@@ -1625,11 +1627,16 @@ export class FxWiring {
     const id=v.id??v.info?.id;
     const names=v._iconKeys?[...v._iconKeys(Infinity)]:[...(v.statuses||[])];
     const flags=v.flags||0;
-    for(const [flag,name]of [[UF.SHIELD,'shield'],[UF.INVULN,'invulnerable'],[UF.STEALTH,'stealth'],[UF.FROZEN,'freeze'],[UF.STUNNED,'stun'],[UF.SLEEP,'sleep'],[UF.COLD,'cold']])if((!v._iconKeys||flag===UF.SHIELD)&&(flags&flag))names.push(name);
-    const current=new Set(v.prep||v.alive===false||v.down?[]:names.map(name=>name==='invuln'?'invulnerable':name).filter(name=>!(v.isToken && name==='invulnerable') && this.statusKey(name)));
-    const previous=this.statusSeen.get(id)||new Set();
-    for(const name of previous)if(!current.has(name))this.status(v,name,false);
-    for(const name of current)if(!previous.has(name)||!this.loops.get(`${id}|${name}`)?.alive)this.status(v,name,true);
+    for(const [flag,name]of STATUS_FLAGS)if((!v._iconKeys||flag===UF.SHIELD)&&(flags&flag))names.push(name);
+    const previous=this.statusSeen.get(id);
+    if(!names.length&&!previous)return;
+    const current=new Set();
+    if(!v.prep&&v.alive!==false&&!v.down)for(let name of names){
+      if(name==='invuln')name='invulnerable';
+      if(!(v.isToken&&name==='invulnerable')&&this.statusKey(name))current.add(name);
+    }
+    for(const name of previous||[])if(!current.has(name))this.status(v,name,false);
+    for(const name of current)if(!previous?.has(name)||!this.loops.get(`${id}|${name}`)?.alive)this.status(v,name,true);
     if(current.size)this.statusSeen.set(id,current);else this.statusSeen.delete(id);
   }
 

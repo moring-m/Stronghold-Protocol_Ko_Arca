@@ -1,0 +1,12 @@
+{
+  "result": {
+    "warmBefore": 125,
+    "operators": 4,
+    "preparedBefore": 2,
+    "preparedAfter": 54,
+    "visibleOfficialEffects": 0,
+    "compileQueue": 0,
+    "warmQueue": 0
+  },
+  "errors": []
+}
