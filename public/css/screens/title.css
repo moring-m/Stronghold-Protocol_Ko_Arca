@@ -322,7 +322,7 @@
   width: .08rem; height: .08rem; border-radius: 50%;
   background: #f6a329; background: var(--amber);
 }
-.notice-list { display: flex; flex-direction: column; gap: .12rem; max-height: 60vh; overflow: auto; }
+.notice-list { display: flex; flex-direction: column; gap: .12rem; max-height: calc(60 * var(--ui-vh, 1vh)); overflow: auto; }
 .notice-card { padding: .08rem .1rem; border: 1px solid var(--line); background: rgba(0, 0, 0, .22); }
 .notice-card__meta { margin: 0; font-size: calc(.13 * var(--t)); color: var(--text-dim); overflow-wrap: anywhere; }
 .notice-card__title { margin: .02rem 0; font-size: calc(.16 * var(--t)); color: var(--text-hi); overflow-wrap: anywhere; }

@@ -47,7 +47,7 @@ const BY_NAME = {
   'Torappu/Particles/Disturb/Disturb Anchor': 'disturbAnchor', 'Torappu/Particles-L2D/Disturb/Disturb Anchor (Add)': 'disturbAnchor',
   'Torappu/Particles-L2D/Disturb/Disturb Anchor (AlphaBlend)': 'disturbAnchor',
   'Torappu/Particles/Disturb/Disturb(CustomData)': 'disturbCd', 'Torappu/Particles-L2D/Disturb/Disturb(CustomData)': 'disturbCd',
-  'Torappu/Particles/ZDistort/Disturb(CustomData)': 'disturbCd', 'Torappu/Particles/Disturb/Disturb(CustomData-RT)': 'disturbCd',
+  'Torappu/Particles/ZDistort/Disturb(CustomData)': 'ramDisturbCd', 'Torappu/Particles/Disturb/Disturb(CustomData-RT)': 'disturbCd',
   'Torappu/Particles/Ram/Disturb(CustomData)': 'ramDisturbCd', 'Torappu/Particles-L2D/Ram/Disturb(CustomData)': 'ramDisturbCd',
   'Torappu/Particles/Ram/VertexDisturb(CustomData)': 'ramDisturbCd', 'Torappu/Particles-L2D/Ram/VertexDisturb(CustomData)': 'ramDisturbCd',
   'Torappu/Particles/Ram/Add': 'ram', 'Torappu/Particles/Ram/AlphaBlend': 'ram', 'Torappu/Particles-L2D/Ram/Add': 'ram', 'Torappu/Particles-L2D/Ram/AlphaBlend': 'ram',

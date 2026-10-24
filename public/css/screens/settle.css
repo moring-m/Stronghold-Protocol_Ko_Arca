@@ -398,7 +398,7 @@ span.settle__nexticon .icon { width: .3rem; height: .3rem; }
   display: flex; flex-direction: column; align-items: flex-end; gap: 6px; z-index: 10; }
 .settle > .game-chat .game-chat__toggle { order: -1; }
 .settle > .game-chat .game-chat__panel { margin-bottom: 0; }
-.settle > .game-chat .game-chat__messages { max-height: min(230px, 35vh); }
+.settle > .game-chat .game-chat__messages { max-height: min(230px, calc(35 * var(--ui-vh, 1vh))); }
 .tchip--commend, .tchip--recommend { font-size: calc(.18 * var(--t)); white-space: nowrap; }
 button.tchip--recommend { cursor: pointer; color: var(--mint-400); background: #10251e; border: 1px solid var(--mint-700); padding: .02rem .12rem; }
 button.tchip--recommend:hover, button.tchip--recommend:focus-visible { border-color: var(--mint-400); background: #18372c; }

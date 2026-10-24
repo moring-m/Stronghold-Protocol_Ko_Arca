@@ -1,0 +1,43 @@
+{
+  "source": [
+    "content/custom/makoto/official.json",
+    "https://prts.wiki/w/结城理",
+    "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/master/zh_CN/gamedata/excel/skin_table.json"
+  ],
+  "note": "Official CN skill text; talent numerals are parameterized for this game’s selected potential and module.",
+  "name": "结城理",
+  "subProfessionName": "傀儡师",
+  "trait": "受到致命伤时不撤退，切换成<替身>作战（替身阻挡数为0），持续20秒后自身再次替换<替身>",
+  "moduleTrait": "受到致命伤时不撤退，切换成<替身>作战（替身阻挡数为0，生命值<@ba.kw>提升</>），持续20秒后自身再次替换<替身>",
+  "talents": [
+    [
+      "不羁之力",
+      "结城理切换为<替身>状态时<$ba.sluggish>停顿</>周围一定范围内敌人{sluggish}秒；<替身>状态下结城理召唤人格面具作战，攻击间隔增大，攻击力+{atk:0%}，生命值+{max_hp_t1:0%}，作战能力随技能选择而改变"
+    ],
+    [
+      "S.E.E.S.队长",
+      "结城理的<替身>状态结束后，率领S.E.E.S.成员发起总攻击，对场上所有[S.E.E.S.]干员周围一定范围内的敌人造成相当于结城理攻击力{atk_scale:0%}的真实伤害（可叠加）"
+    ]
+  ],
+  "modules": {
+    "uniequip_002_makoto": "彼此的声音",
+    "default": "结城理证章"
+  },
+  "skins": {
+    "영광의 증명": "见证荣光"
+  },
+  "skills": [
+    [
+      "俄耳甫斯的竖琴",
+      "被动：<替身>状态召唤<@ba.vup>俄耳甫斯</>，攻击对敌人造成攻击力<@ba.vup>{attack@atk_scale:0%}</>的法术伤害，范围内有生命值低于<@ba.vup>50%</>的友方干员时，改为对其治疗相当于结城理攻击力<@ba.vup>{attack@heal_scale:0%}</>的生命值\n主动：立即切换为<替身>状态作战"
+    ],
+    [
+      "塔纳托斯的囚锁",
+      "被动：<替身>状态召唤<@ba.vup>塔纳托斯</>，攻击对至多<@ba.vup>{attack@max_target}</>名敌人造成攻击力<@ba.vup>{attack@atk_scale:0%}</>的法术伤害并有<@ba.vup>{attack@prob:0%}</>概率<$ba.fear>恐惧</>敌人<@ba.vup>{attack@fear}</>秒，范围内<$ba.fear>恐惧</>中的敌人若生命值低于结城理攻击力的<@ba.vup>{attack@kill_atk_scale:0%}</>则立刻倒下\n主动：立即切换为<替身>状态作战"
+    ],
+    [
+      "开辟明日的剑刃",
+      "被动：<替身>状态初始召唤<@ba.vup>塔纳托斯</>，攻击速度<@ba.vup>+{talent@attack_speed}</>，攻击对至多<@ba.vup>{attack@max_target}</>名敌人造成攻击力<@ba.vup>{attack@atk_scale:0%}</>的<$ba.weaknessatk>弱点伤害</>，<@ba.vup>塔纳托斯</>在场时，开启技能或受到致命伤时改为召唤<@ba.vup>俄耳甫斯</>，阻挡数<@ba.vup>+{attack@block_cnt}</>，使范围内友方干员获得<@ba.vup>{attack@prob:0%}</>的物理与法术闪避并每秒治疗范围内最多<@ba.vup>{attack@max_target_heal}</>名友方干员相当于结城理攻击力<@ba.vup>{attack@heal_scale:0%}</>的生命值，直到<替身>状态结束\n主动：立即切换为<替身>状态作战"
+    ]
+  ]
+}

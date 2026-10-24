@@ -376,13 +376,19 @@ export function fitToBudget(records, maxChars = MAX_CHARS) {
   const kept = [];
   let used = 40; // the envelope itself
   const peakId = highestBondRecord(records.slice(0, MAX_RECORDS))?.record.id;
-  records.slice(0, MAX_RECORDS).forEach((r, i) => {
-    const rec = i < FULL_KEEP || r.id === peakId ? r : compactRecord(r);
-    const n = JSON.stringify(rec).length + 1;
-    if (kept.length && used + n > maxChars) return;
+  for (const [i,r] of records.slice(0, MAX_RECORDS).entries()) {
+    let rec = i < FULL_KEEP || r.id === peakId ? r : compactRecord(r);
+    let n = JSON.stringify(rec).length + 1;
+    // Large round-by-round reports must lose detail before they lose their history row.
+    // Do not skip a recent report then fill its place with older, already compacted rows.
+    if (kept.length && used + n > maxChars) {
+      rec = compactRecord(r);
+      n = JSON.stringify(rec).length + 1;
+      if (used + n > maxChars) break;
+    }
     used += n;
     kept.push(rec);
-  });
+  }
   return kept;
 }
 
@@ -409,6 +415,7 @@ export function highestBondRecord(records) {
 export function saveStats(stats) {
   if (stats.newer) return false;
   let recs = fitToBudget(stats.records.filter(r => r.test !== true));
+  let compacted = false;
   for (;;) {
     try {
       const ls = globalThis.localStorage;
@@ -416,6 +423,7 @@ export function saveStats(stats) {
       ls.setItem(FULL_KEY, JSON.stringify({ v: STATS_VERSION, records: recs }));
       return true;
     } catch { /* quota or storage disabled — fall through to shrinking */ }
+    if (!compacted) { recs = recs.map(compactRecord); compacted = true; continue; }
     if (recs.length <= 8) return false; // a small history that still does not fit is foreign quota pressure
     recs = recs.slice(0, Math.max(8, Math.ceil(recs.length / 2)));
   }

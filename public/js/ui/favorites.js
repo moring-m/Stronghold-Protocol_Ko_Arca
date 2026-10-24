@@ -27,13 +27,13 @@ export function isFavorite(kind,id,getChess=(id)=>data.lookup('chess',id)){
  return (kind==='chess'?p.operators:p.items).includes(c?.baseId||c?.chessId||id);
 }
 export function FavoritesButton({class:cls='',view='shop'}){if(view==='editor')return html`<${Button} variant="secondary" size="sm" icon="star" class=${`lo-favorites ${cls}`} onClick=${()=>favoritesStore.set({open:true})} title="선호 오퍼레이터·장비 프리셋">선호 프리셋<//>`;return html`<button type="button" class=${`toolbtn toolbtn--favorite toolbtn--icon ${cls}`} onClick=${()=>favoritesStore.set({open:true})} title="선호 프리셋" aria-label="선호 프리셋"><${Icon} name="star" /></button>`;}
-export function filterFavoriteOperators(rows,{query='',bond='',tier=''}={}) { return rows.filter(c=>c.globalReleased!==false&&!c.optionalRecruit&&(matchesKoreanSearch(tr(c.name||''),query)||matchesKoreanSearch(c.name||'',query))&&(!bond||(c.bonds||[]).includes(bond))&&(!tier||c.tier===Number(tier))); }
+export function filterFavoriteOperators(rows,{query='',bond='',tier=''}={}) { return rows.filter(c=>!c.optionalRecruit&&(matchesKoreanSearch(tr(c.name||''),query)||matchesKoreanSearch(c.name||'',query))&&(!bond||(c.bonds||[]).includes(bond))&&(!tier||c.tier===Number(tier))); }
 export function FavoritesHost(){
  const s=useStore(x=>x,Object.is,favoritesStore),[ready,setReady]=useState(false),[tab,setTab]=useState('operators'),[query,setQuery]=useState(''),[bond,setBond]=useState(''),[tier,setTier]=useState('');
  useEffect(()=>{if(s.open)Promise.all(['chess','items','bonds','assets','local'].map(k=>data.load(k))).then(()=>setReady(true));},[s.open]);
  if(!s.open)return null;
  const p=s.presets.find(p=>p.id===s.active),m=data.get('assets');
- const available=Object.values(data.get(tab==='operators'?'chess':'items')||{}).filter(c=>tab==='operators'?(c.globalReleased!==false&&!c.isGolden&&!c.isHidden&&!c.isDiy&&!c.optionalRecruit&&c.visible):(!c.isGolden&&!c.hideInShop&&!c.shopExcluded&&c.visible!==false));
+ const available=Object.values(data.get(tab==='operators'?'chess':'items')||{}).filter(c=>tab==='operators'?(!c.isGolden&&!c.isHidden&&!c.isDiy&&!c.optionalRecruit&&c.visible):(!c.isGolden&&!c.hideInShop&&!c.shopExcluded&&c.visible!==false));
  const rows=tab==='operators'?filterFavoriteOperators(available,{query,bond,tier}):available.filter(c=>(matchesKoreanSearch(tr(c.name||''),query)||matchesKoreanSearch(c.name||'',query)));
  const update=(patch)=>save({...s,presets:s.presets.map(x=>x.id===p.id?{...x,...patch}:x)});
  const create=()=>{const id=`fav-${Date.now()}-${Math.random().toString(36).slice(2,7)}`;save({...s,active:id,presets:[...s.presets,{id,name:`프리셋 ${s.presets.length+1}`,operators:[],items:[]}]});};

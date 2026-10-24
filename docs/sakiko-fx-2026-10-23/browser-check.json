@@ -1,0 +1,25 @@
+{
+  "audio": {
+    "decoded": [
+      {
+        "url": "/assets/audio/sfx/player/p_atk/p_atk_mjckyrdnt_p.mp3",
+        "duration": 0.9799773242630385,
+        "peak": 0.17715150117874146
+      },
+      {
+        "url": "/assets/audio/sfx/player/p_imp/p_imp_mjckyrdslnt.mp3",
+        "duration": 1.674829931972789,
+        "peak": 0.8566771745681763
+      }
+    ],
+    "started": 2,
+    "state": "running"
+  },
+  "stats": {
+    "count": 45,
+    "compact": 44,
+    "bytes": 608670,
+    "preservedAfterReload": true
+  },
+  "errors": []
+}

@@ -1,3 +1,4 @@
+import {quintusRoles} from '../shared/quintus.js';
 import {buildUrsusChoices} from './build-ursus-choices.mjs';
 import {applyGlobalOperatorList} from './apply-global-operator-list.mjs';
 // Opt-in local overlay. Never writes the committed data/ directory.
@@ -117,6 +118,7 @@ export async function buildUrsus(){
  const oldVoice=previousAssets.audio?.voice;
  if(oldVoice?.kr||oldVoice?.jp)assets.audio.voice={kr:oldVoice.kr||{},jp:oldVoice.jp||assets.audio.voiceJp||{}};
  for(const key of ['voiceAvailability','voiceConditions'])if(previousAssets.audio?.[key])assets.audio[key]=previousAssets.audio[key];
+ const qs=assets.enemies?.enemy_1521_dslily?.spine;if(qs)qs.anims=quintusRoles(qs.anims,qs.animations);
  for(const [key,value]of Object.entries({chess,bonds,garrisons,tokens,assets,items,bands}))await writeFile(join(URSUS_DIR,`${key}.json`),JSON.stringify(value));
  await buildUrsusChoices(URSUS_DIR);
  await buildRecruits(ROOT,URSUS_DIR,{previousChess});

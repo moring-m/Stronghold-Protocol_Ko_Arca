@@ -530,3 +530,15 @@ test('cast playback uses attack rate and preserves authored opt-out and limit', 
     ofx.update(.1);assert.ok(Math.abs(h.effect.time-.1*expected)<1e-8);
   }
 });
+
+test('ZDistort Disturb retains the authored ramp/mask texture instead of exposing the particle quad',async()=>{
+  const {fragmentSource}=await import('../../public/js/render/vfx/glsl.js');
+  for(const lite of [false,true]){
+    const mat=compileMaterial({shader:'Torappu/Particles/ZDistort/Disturb(CustomData)',floats:{_Opacity:1},colors:{_MainColor:[1,1,1,1]},textures:{_MainTex:{tex:'flame'},_RamTex:{tex:'edge-mask',st:[-1,1,0,0]},_DissolveTex:{tex:null,default:'white'},_DisturbTex:{tex:'noise'}}},{lite});
+    const shader=fragmentSource(mat.family,mat.defs);
+    assert.ok(shader.includes('texture(u_RamTex, ruv)'),'mask must actually be sampled in full and light modes');
+    assert.ok(shader.includes('v_col * ram'),'mask must modulate the rendered color/alpha');
+    assert.deepEqual(mat.vecs._RamTex_ST,[-1,1,0,0]);
+    assert.equal(mat.textures.find(t=>t.name==='_RamTex').key,'edge-mask');
+  }
+});

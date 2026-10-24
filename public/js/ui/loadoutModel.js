@@ -418,7 +418,7 @@ export const isLoadoutSlot = (c) => !!c && !c.isGolden && c.visible !== false &&
 
 export function rosterOf(list) {
   return (Array.isArray(list) ? list : [])
-    .filter(c => isLoadoutSlot(c) && c.globalReleased !== false)
+    .filter(c => isLoadoutSlot(c))
     .sort((a, b) => (a.tier ?? 0) - (b.tier ?? 0) || (a.shopSortId ?? 0) - (b.shopSortId ?? 0) || String(a.chessId).localeCompare(String(b.chessId)));
 }
 

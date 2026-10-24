@@ -25,7 +25,7 @@ import { t } from '../../../shared/i18n.js';
 
 import { useEffect, useState } from '../../vendor/hooks.module.js';
 import { html, Button, Icon, MicroLabel, DifficultyTag } from '../ui/components.js';
-import { useGameData, Img, UnitThumb, BandIcon, PlayerAvatar, BondGlyph, LpTower, Sprite } from '../ui/gameComponents.js';
+import { useGameData, RichText, Img, UnitThumb, BandIcon, PlayerAvatar, BondGlyph, LpTower, Sprite } from '../ui/gameComponents.js';
 import { normalizeResult, fmtNum } from '../ui/gameLogic.js';
 import { enemyIconUrl, titleIconUrl, uiUrl } from '../ui/assetUrls.js';
 import { audio } from '../audio.js';
@@ -152,7 +152,7 @@ export function ResultView({ res, pub = null, myId = null, backLabel, onBack, qu
             <span class="medal__label">隐秘核心</span></div>` : null}
         </div>
         ${recordCustomExtensions(res?.customExtensions||pub?.customExtensions)?html`<details class="result__custom"><summary>커스텀 설정</summary>${Object.entries(recordCustomExtensions(res?.customExtensions||pub?.customExtensions)).map(([category,values])=>html`<div><b>${category==='ruleValues'?'규칙 수치':EXTENSION_CATEGORIES.find(c=>c.id===category)?.name||category}</b><p>${category==='ruleValues'?Object.entries(values).map(([id,n])=>{const r=RULE_VALUES.find(r=>r.id===id);return `${r?.name||id} ${n}${r?.unit||''}`;}).join(' · '):values.map(id=>customExtensionCatalog({bonds:gd.bond('leithanienShip')?{leithanienShip:gd.bond('leithanienShip')}: {}})[category]?.find(e=>e.id===id)?.name||(['bonds'].includes(category)?id:category.includes('Bands')?gd.band(id)?.name:category.includes('Bosses')?gd.boss(id)?.name:category.includes('Stages')||category==='stages'?gd.stage(id)?.name:gd.bond(id)?.name)||id).join(' · ')}</p></div>`)}</details>`:null}
-        ${res?.augments?.picks?.length?html`<details class="result__custom"><summary>선택한 증강</summary>${res.augments.picks.map(p=>html`<div><b style=${{color:AUGMENT_GRADES[p.grade]?.color}}>${p.round}라운드 · ${AUGMENT_GRADES[p.grade]?.name} · ${p.side==='enemy'?'적 증강':res.players?.find(x=>x.playerId===p.playerId)?.name||'아군 증강'}</b><p>${p.augment.name} — ${p.augment.description}</p></div>`)}</details>`:null}
+        ${res?.augments?.picks?.length?html`<details class="result__custom"><summary>선택한 증강</summary>${res.augments.picks.map(p=>html`<div><b style=${{color:AUGMENT_GRADES[p.grade]?.color}}>${p.round}라운드 · ${AUGMENT_GRADES[p.grade]?.name} · ${p.side==='enemy'?'적 증강':res.players?.find(x=>x.playerId===p.playerId)?.name||'아군 증강'}</b><p>${p.augment.name} — <${RichText} text=${p.augment.description} /></p></div>`)}</details>`:null}
         ${mins ? html`<p class="result__time t-lo">本局耗时 <b class="num">${mins}</b> 分钟</p>` : null}
         </div>
         ${chat ? html`<${ChatPanel} docked=${true} />` : null}

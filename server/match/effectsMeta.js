@@ -639,9 +639,9 @@ export function makeCtx(m, ps, source, hook, ev = null, preview = null) {
     },
     /** Random chess id from the shared pool (copy-weighted). opts: { maxTier, tier, bond, filter(id) } */
     rollChess: (opts = {}) => {
-      // A strategy can target surviving dual-bond operators even when their faction is inactive.
+      // Strategies and explicit member-count rewards can target surviving operators of an inactive bond.
       // Recruitment and bannedChess filters below still exclude every banned operator.
-      if (opts.bond && !m.bondLive(opts.bond) && source.kind !== 'band') return null;
+      if (opts.bond && !m.bondLive(opts.bond) && source.kind !== 'band' && !opts.allowInactiveBond) return null;
       const f = (id) => {
         if (!ps.canRecruit(id) || m.bannedChess.includes(gd.baseIdOf(id))) return false;
         if (opts.bond) { const c = gd.chess(id); if (!c || !Array.isArray(c.bonds) || !c.bonds.includes(opts.bond)) return false; }

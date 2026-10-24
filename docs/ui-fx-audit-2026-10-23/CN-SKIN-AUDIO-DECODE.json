@@ -1,0 +1,95 @@
+{
+  "engine": "Chromium Web Audio",
+  "files": [
+    {
+      "path": "/assets/local/audio/sfx/p_atk_shotgunx_n_sanrio_2.mp3",
+      "duration": 1.000453514739229,
+      "channels": 1,
+      "peak": 0.9865504503250122
+    },
+    {
+      "path": "/assets/local/audio/sfx/p_atk_shotgunx_d_sanrio_2.mp3",
+      "duration": 1.1426530612244898,
+      "channels": 1,
+      "peak": 0.9900727272033691
+    },
+    {
+      "path": "/assets/local/audio/sfx/p_atk_shotgunxfr_h_sanrio_2.mp3",
+      "duration": 0.3529251700680272,
+      "channels": 1,
+      "peak": 0.5806996822357178
+    },
+    {
+      "path": "/assets/local/audio/sfx/p_atk_shotgunx_s_sanrio_2.mp3",
+      "duration": 1.6334467120181406,
+      "channels": 2,
+      "peak": 1.0176416635513306
+    },
+    {
+      "path": "/assets/local/audio/sfx/p_atk_shotgunx_h_sanrio_2.mp3",
+      "duration": 1.4725396825396826,
+      "channels": 1,
+      "peak": 0.999934196472168
+    },
+    {
+      "path": "/assets/local/audio/sfx/p_atk_firemag_n_sanrio_2.mp3",
+      "duration": 0.8612244897959184,
+      "channels": 1,
+      "peak": 0.6634018421173096
+    },
+    {
+      "path": "/assets/local/audio/sfx/p_imp_firemag_n_sanrio_2.mp3",
+      "duration": 0.8636281179138322,
+      "channels": 1,
+      "peak": 0.9596500396728516
+    },
+    {
+      "path": "/assets/local/audio/sfx/p_atk_firemag_h_sanrio_2.mp3",
+      "duration": 0.8076643990929705,
+      "channels": 1,
+      "peak": 0.7638730406761169
+    },
+    {
+      "path": "/assets/local/audio/sfx/p_imp_firemag_h_sanrio_2.mp3",
+      "duration": 2.0694331065759637,
+      "channels": 2,
+      "peak": 0.8304391503334045
+    },
+    {
+      "path": "/assets/local/audio/sfx/p_imp_firemag_s_sanrio_2.mp3",
+      "duration": 1.1612925170068027,
+      "channels": 1,
+      "peak": 0.962205171585083
+    },
+    {
+      "path": "/assets/local/audio/sfx/p_atk_sparklight_n_sanrio_1.mp3",
+      "duration": 0.8364852607709751,
+      "channels": 1,
+      "peak": 0.3027688264846802
+    },
+    {
+      "path": "/assets/local/audio/sfx/p_imp_sparklight_n_sanrio_1.mp3",
+      "duration": 0.6587301587301587,
+      "channels": 1,
+      "peak": 0.8193060755729675
+    },
+    {
+      "path": "/assets/local/audio/sfx/p_imp_sparklight_d_sanrio_1.mp3",
+      "duration": 1.0217913832199546,
+      "channels": 2,
+      "peak": 0.6062997579574585
+    },
+    {
+      "path": "/assets/local/audio/sfx/p_imp_sparklight_h_sanrio_1.mp3",
+      "duration": 1.1745124716553288,
+      "channels": 2,
+      "peak": 0.4763053059577942
+    },
+    {
+      "path": "/assets/local/audio/sfx/p_imp_sparklightfunnel_s_sanrio_1.mp3",
+      "duration": 1.8671882086167801,
+      "channels": 2,
+      "peak": 0.7079992294311523
+    }
+  ]
+}

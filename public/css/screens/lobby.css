@@ -304,7 +304,7 @@
 @media(max-width:1000px){.lab-panel{height:540px}.lab-panel:last-of-type{height:430px}}@media(max-width:600px){.lab-panel,.lab-panel:last-of-type{height:420px}.lab-selection-detail{flex-basis:115px}}
 .lab-map-grid{grid-auto-rows:max-content}.lab-map-card{min-height:0}.lab-choice .bandicon img{width:100%;height:100%;object-fit:contain}.lab-choice .bandicon{display:inline-grid;place-items:center;overflow:hidden;background:#111b16}
 /* Only the selection boxes scroll; the laboratory page itself stays fixed. */
-.lab-screen{height:100dvh;overflow:hidden;display:flex;flex-direction:column}.lab-screen>.topbar{flex-shrink:0}.lab-screen__body{flex:1;min-height:0;overflow:hidden;box-sizing:border-box;padding:24px}.lab-screen .lab-setup--cards{height:100%;min-height:0;grid-template-rows:minmax(0,1fr) auto;gap:18px}.lab-screen .lab-panel{height:100%;min-height:0}.lab-start{position:static;padding:12px 18px}.lab-screen .lab-map-grid{min-height:0}.lab-screen .lab-choice-grid{min-height:0}
+.lab-screen{height:calc(100 * var(--ui-dvh, 1dvh));overflow:hidden;display:flex;flex-direction:column}.lab-screen>.topbar{flex-shrink:0}.lab-screen__body{flex:1;min-height:0;overflow:hidden;box-sizing:border-box;padding:24px}.lab-screen .lab-setup--cards{height:100%;min-height:0;grid-template-rows:minmax(0,1fr) auto;gap:18px}.lab-screen .lab-panel{height:100%;min-height:0}.lab-start{position:static;padding:12px 18px}.lab-screen .lab-map-grid{min-height:0}.lab-screen .lab-choice-grid{min-height:0}
 @media(max-width:1000px){.lab-screen .lab-setup--cards{grid-template-rows:minmax(0,1fr) minmax(0,1fr) auto}.lab-screen .lab-panel:last-of-type{height:100%}.lab-selection-detail{flex-basis:100px}}
 @media(max-width:600px){.lab-screen__body{padding:8px}.lab-screen .lab-setup--cards{grid-template-rows:repeat(3,minmax(0,1fr)) auto;gap:6px}.lab-screen .lab-panel{padding:8px}.lab-panel .section-label{margin-bottom:6px}.lab-selection-detail{display:none}.lab-choice{min-height:42px}.lab-choice>img,.lab-choice .bandicon{width:30px;height:30px}.lab-start small{font-size:10px}.lab-start>div{gap:8px}.lab-kind{margin-bottom:6px}.lab-kind button{padding:5px}}
 /* Setup actions stay in one row, with equal large buttons. */
@@ -347,7 +347,7 @@
 .mode-card-tip:nth-child(4) { grid-column:2/4;grid-row:2; }
 .public-rooms-entry { grid-column:3;grid-row:1;font:inherit;cursor:pointer;box-sizing:border-box; }
 .public-rooms-entry__total { position:relative;display:flex;align-items:baseline;align-self:flex-end;gap:6px;margin-top:auto;color:var(--text-lo);font-size:13px; }
-.mode-cards .mode-card__name { font-size:clamp(20px,2vw,36px); }
+.mode-cards .mode-card__name { font-size:clamp(20px,calc(2 * var(--ui-vw, 1vw)),36px); }
 .mode-cards .mode-card { padding:.24rem .18rem; }
 .mode-cards .mode-card--lab { flex-wrap:wrap; }
 .mode-cards .mode-card--lab .mode-card__text { display:flex; }
@@ -393,11 +393,11 @@
 .public-rooms__error:not(:empty) { color:var(--amber);margin-bottom:12px; }
 @media(max-width:1100px) { .public-rooms {grid-template-columns:repeat(2,minmax(0,1fr));} }
 @media(max-width:600px) { .public-rooms-page{padding:18px}.public-rooms{grid-template-columns:1fr}.public-rooms__counts{gap:12px}.public-rooms__filters select{min-width:0;flex:1}.public-rooms__toolbar{flex-wrap:wrap} }
-.mode-cards .mode-card__name { font-size:clamp(16px,1.5vw,26px);white-space:nowrap;letter-spacing:.02em; }
+.mode-cards .mode-card__name { font-size:clamp(16px,calc(1.5 * var(--ui-vw, 1vw)),26px);white-space:nowrap;letter-spacing:.02em; }
 .mode-cards .mode-card--lab { flex-wrap:nowrap; }
 .mode-cards .mode-card--lab .mode-card__text { display:grid;grid-template-columns:auto 1fr; }
 .mode-cards .mode-card--lab .mode-card__desc { display:block; }
-.mode-cards .mode-card--lab .mode-card__name { font-size:clamp(20px,1.8vw,28px); }
+.mode-cards .mode-card--lab .mode-card__name { font-size:clamp(20px,calc(1.8 * var(--ui-vw, 1vw)),28px); }
 @media(max-width:900px){.mode-cards .mode-card--lab .mode-card__desc{display:none}}
 
 .mode-card:not(.mode-card--lab) .mode-card__desc { display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;line-height:1.5; }
@@ -419,10 +419,10 @@ html:not([lang="ko"]) .mode-cards .mode-card--lab .mode-card__name{font-size:.24
 
 .public-room__mode dd{display:flex;align-items:center;justify-content:space-between;gap:6px;min-height:28px}.public-room__mode .public-room__settings{flex:none;width:28px;min-width:28px;height:28px;padding:0;display:inline-flex;align-items:center;justify-content:center}
 
-.public-rooms-entry__total{gap:3px}.public-rooms-entry__count,.public-rooms-entry__all{font-family:"RoomCount", var(--font-num);font-size:clamp(24px,3vw,44px);font-weight:700;line-height:1;letter-spacing:.02em;white-space:nowrap}.public-rooms-entry__all{color:var(--text-lo)}
+.public-rooms-entry__total{gap:3px}.public-rooms-entry__count,.public-rooms-entry__all{font-family:"RoomCount", var(--font-num);font-size:clamp(24px,calc(3 * var(--ui-vw, 1vw)),44px);font-weight:700;line-height:1;letter-spacing:.02em;white-space:nowrap}.public-rooms-entry__all{color:var(--text-lo)}
 
 /* Setup descriptions must never consume the selectable list on short viewports. */
-.lab-screen .lab-selection-detail { flex:0 1 72px;max-height:min(14dvh,72px);margin-top:8px;padding:8px;line-height:1.4; }
+.lab-screen .lab-selection-detail { flex:0 1 72px;max-height:min(calc(14 * var(--ui-dvh, 1dvh)),72px);margin-top:8px;padding:8px;line-height:1.4; }
 .lab-screen .lab-choice-grid { flex:1 1 0;min-height:84px; }
 @media(max-height:600px) and (min-width:601px){
  .lab-screen__body{padding:10px;overflow:auto;}

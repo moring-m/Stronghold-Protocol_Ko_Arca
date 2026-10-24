@@ -860,3 +860,21 @@ test('laboratory settlements remain in history but contribute no aggregate stati
 test('practice settlements retain their history label and do not affect normal aggregates',()=>{
  withStorage(()=>{const rec=recordResult(baseResult(),{myId:'p1',practice:true,roomMode:'practice'});assert.equal(rec.roomMode,'practice');const saved=loadStats().records[0];assert.equal(saved.roomMode,'practice');assert.equal(countsTowardStats(saved),false);assert.equal(aggregateStats([saved]).count,0);assert.equal(recordToResult(saved).practice,true);});
 });
+
+test('large recent combat reports compact before older summaries can displace them',()=>{
+ const records=Array.from({length:40},(_,i)=>{
+  const r=buildRecord(baseResult({seed:i}),{myId:'p1',now:40-i});
+  if(i<30)r.players[0].combatRounds=[{round:1,units:Array.from({length:40},(_,j)=>({uid:j,name:'report'.repeat(40),dmg:1234567}))}];
+  return i<30?r:compactRecord(r);
+ });
+ const one=JSON.stringify(records[0]).length;
+ const kept=fitToBudget(records,one+30_000);
+ assert.ok(kept.length>10,'list rows survive while reports are compacted');
+ assert.deepEqual(kept.map(r=>r.id),records.slice(0,kept.length).map(r=>r.id),'keeps a contiguous newest-first history');
+ assert.ok(kept.slice(1).some(r=>r.compact),'large recent rows keep their summaries');
+});
+test('quota pressure compacts all reports before discarding history rows',()=>{
+ const records=Array.from({length:12},(_,i)=>buildRecord(baseResult({seed:i}),{myId:'p1',now:12-i}));
+ const summaries=records.map(compactRecord),budget=JSON.stringify({v:STATS_VERSION,records:summaries}).length+10;
+ withStorage({budget},ls=>{assert.equal(saveStats({v:STATS_VERSION,records}),true);assert.equal(JSON.parse(ls.raw).records.length,12);assert.ok(JSON.parse(ls.raw).records.every(r=>r.compact));});
+});

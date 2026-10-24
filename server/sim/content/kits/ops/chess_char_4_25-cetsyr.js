@@ -1,3 +1,4 @@
+import { emitMotes } from '../shared/cetsyrMotes.js';
 // server/sim/content/kits/ops/chess_char_4_25-cetsyr.js — 魔王 (char_4134_cetsyr) kit, tier 4.
 // Conventions of the tier-4 kits: ../shared/tier4.js; kit contract and rules: ../README.md.
 
@@ -97,9 +98,12 @@ export default withDefaults({
             const i = unit.mem.motes.findIndex((t) => t <= battle.time + 1e-9);
             if (i < 0) return false;
             unit.mem.motes[i] = battle.time + cooldown();
+            showMotes();
             return true;
           };
+          const showMotes = () => emitMotes(battle, unit, unit.mem.motes, S2 && skillActive(unit) ? num(bb.outside_radius, 2) : num(t0.range_radius, 1.15), num(t0.dynamic_spd, 30), skillActive(unit) ? (S2 ? 2 : S3 ? 3 : S1 ? 1 : 0) : 0);
           whileDeployed(battle, unit, 0.25, () => {
+            showMotes();
             if (S2 && skillActive(unit)) {
               // S2: motes orbit wider and hit enemies instead of operators
               const hitAt = unit.mem.moteHit || (unit.mem.moteHit = new Map());
@@ -111,7 +115,7 @@ export default withDefaults({
                 hitAt.set(e.id, battle.time + MOTE_GAP);
                 battle.dealDamage(unit, e, { amount: unit.s.atk * num(bb.atk_scale, 2.2), type: 'true', isSkill: true, tags: ['skill', 'mote'] });
                 if (e.alive) battle.applyStatus(e, 'bind', { duration: num(bb.unmoveable_duration, 3), source: unit });
-                battle.fx('mote', { x: e.x, y: e.y, id: e.id });
+                battle.fx('mote', { x: e.x, y: e.y, id: e.id, src: unit.id, mode: 2 });
               }
               return;
             }
@@ -120,7 +124,7 @@ export default withDefaults({
               if (a === unit || a.kind !== 'op' || a.findBuff(`cetsyr:mote:${unit.id}`)) continue;
               if (!keep && !takeMote()) break;
               battle.addBuff(a, { key: `cetsyr:mote:${unit.id}`, duration: num(t0.talent_duration, 6), visible: true, source: unit });
-              battle.fx('mote', { x: a.x, y: a.y, id: a.id });
+              battle.fx('mote', { x: a.x, y: a.y, id: a.id, src: unit.id });
             }
           });
           // "受到魔王特性效果提升至1.5倍": her trait's 生命回复速度 on that operator (professions.js bardRegen hook)

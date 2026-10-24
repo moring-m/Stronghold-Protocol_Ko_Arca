@@ -649,7 +649,7 @@ function DeviceDetail({ device, snapHp = null, live = null }) {
       </div>
     </div>
     <${Section} title=${t('装置机制')} micro="DEVICE">
-      ${device.lines.map((line, i) => html`<p class="dtext" key=${i}>${line}</p>`)}
+      ${device.lines.map((line, i) => html`<${RichText} as="p" class="dtext" key=${i} text=${line} />`)}
     <//>
     ${Array.isArray(device.stats) && device.stats.length ? html`<div class="dstats">${device.stats.map((x) => html`<${Stat} key=${x.k} k=${x.k} v=${x.v} />`)}</div>` : null}
     ${Array.isArray(device.facts) && device.facts.length ? html`<${Section} title=${t('这一格')}><p class="dtext">${device.facts.join(' · ')}</p><//>` : null}`;

@@ -170,6 +170,11 @@ export function unitTuple(u, t) {
   }
   const doll = u.trait?.doll && u.findBuff('trait:substitute');
   if (doll) { spMax = doll.duration; sp = Math.max(0, doll.timeLeft); }
+  const persona = u.mem.makoto;
+  if (u.trait?.doll && persona?.duration > 0) {
+    spMax = persona.duration;
+    sp = Math.max(0, Math.min(spMax, persona.until - t));
+  }
   // hp is rounded up (a living unit never shows 0) but never above the rounded max HP
   const maxHp = Math.max(1, Math.round(u.s.maxHp));
   const hp = u.alive ? Math.min(Math.max(1, Math.ceil(u.hp)), maxHp) : 0;

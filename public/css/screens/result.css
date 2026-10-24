@@ -125,9 +125,9 @@
 .result__summary { flex: 1 1 auto; }
 .result__hero > .game-chat--docked { position: relative; left: auto; bottom: auto; z-index: 2; width: 100%; flex: 0 0 auto; }
 .game-chat--docked .game-chat__panel, .game-chat--docked .game-chat__preview { width: 100%; max-width: 100%; box-sizing: border-box; }
-.game-chat--docked .game-chat__messages { height: min(20vh, 140px); }
-.game-chat--docked .game-chat__preview { max-height: 12vh; overflow-y: auto; pointer-events: auto; }
-.game-chat--docked .game-chat__factions { max-height: 14vh; overflow-y: auto; }
+.game-chat--docked .game-chat__messages { height: min(calc(20 * var(--ui-vh, 1vh)), 140px); }
+.game-chat--docked .game-chat__preview { max-height: calc(12 * var(--ui-vh, 1vh)); overflow-y: auto; pointer-events: auto; }
+.game-chat--docked .game-chat__factions { max-height: calc(14 * var(--ui-vh, 1vh)); overflow-y: auto; }
 
 /* Match the report controls and panels to the settlement screen. */
 .combat-report{gap:.18rem;max-width:18rem}

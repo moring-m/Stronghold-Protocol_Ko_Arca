@@ -21,3 +21,8 @@ test('attached official effects interleave with unit models; ground and explicit
  assert.deepEqual(a.root.children,[am,fx.unitLayers.get(a)]);assert.deepEqual(b.root.children,[bm,fx.unitLayers.get(b)]);
  const old=fx.unitLayers.get(a);entries.splice(0,entries.length);fx.frameNo++;fx._prepare(renderer);assert.equal(old.destroyed,true);assert.deepEqual(a.root.children,[am]);assert.equal(fx.unitLayers.size,0);
 });
+
+test('official effects isolate and restore inherited scissor and stencil tests',async()=>{
+ const {beginUnmaskedFx}=await import('../../public/js/render/vfx/system.js');const enabled=new Set([1,2]),gl={SCISSOR_TEST:1,STENCIL_TEST:2,isEnabled:k=>enabled.has(k),disable:k=>enabled.delete(k),enable:k=>enabled.add(k)};
+ const restore=beginUnmaskedFx(gl);assert.equal(enabled.size,0);restore();assert.deepEqual([...enabled],[1,2]);enabled.clear();const again=beginUnmaskedFx(gl);again();assert.equal(enabled.size,0);
+});

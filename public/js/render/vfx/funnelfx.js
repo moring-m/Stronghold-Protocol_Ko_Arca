@@ -99,13 +99,13 @@ export class FunnelFx {
       const info = v.info || null;
       if (info && info.side !== 'enemy' && info.kind !== 'device' && info.kind !== 'item') {
         const key = this.w.unitKeyOf(v);
-        const plan = this._plan(key);
+        const plan = this._plan(key,v);
         if (plan) {
           const rec = this._record(info);
           const si = Number.isInteger(info.diy?.skillIndex) ? info.diy.skillIndex : Number.isInteger(info.skillIndex) ? info.skillIndex : undefined;
           const srec = skillRecordOf(rec, si);
           U = {
-            id, key, v, plan, rec, srec, dmgType: rec && typeof rec.dmgType === 'string' ? rec.dmgType : null,
+            id, key, v, plan, rec, srec, costume:this.w.costumeOf?.(v)||null, dmgType: rec && typeof rec.dmgType === 'string' ? rec.dmgType : null,
             attachN: 0,             // units one attach attack showed (0: initialCount)
             home: new Map(),        // `${key}|${mount}` → { h, key, mount, unit }
             out: new Map(),         // `${mode}|${i}` → { until, hit (a remote unit's playing hit), n (its hits) }
@@ -119,6 +119,7 @@ export class FunnelFx {
       }
       this.units.set(id, U);
     }
+    if(U && U.costume!==(this.w.costumeOf?.(v)||null)){this._stopAll(U,true);this.units.delete(id);return this.of(v);}
     if (U) U.v = v;
     return U;
   }
@@ -129,10 +130,11 @@ export class FunnelFx {
   }
 
   /** The plan of an index unit, once per battle. */
-  _plan(key) {
+  _plan(key,view=null) {
     if (!key || !this.w.idx) return null;
-    let p = this.plans.get(key);
-    if (p === undefined) { p = funnelPlan(this.w.idx, key); this.plans.set(key, p); }
+    const costume=view?this.w.costumeOf?.(view):null,cacheKey=costume?`${key}:${costume.mount||costume.skinId}`:key;
+    let p = this.plans.get(cacheKey);
+    if (p === undefined) { p = funnelPlan(this.w.idx, key,costume); this.plans.set(cacheKey, p); }
     return p;
   }
 

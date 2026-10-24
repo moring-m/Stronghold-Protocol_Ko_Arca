@@ -13,3 +13,10 @@ test('full effects keep known operators official and leave missing operators for
  assert.equal(w.deploy(missing),false);assert.equal(w.death(missing),false);
  assert.equal(w.damage(known,'arts',missing,0),false,'unknown caster keeps its simple hit effect');
 });
+
+test('official status events and snapshot flags suppress invulnerability for summons only',async()=>{
+ const {UF}=await import('../../shared/constants.js');
+ const w=new FxWiring({active:true,lib:{has:()=>true}});w.idx={generic:{status:{invulnerable:'invuln_fx'}}};w.hasOfficialUnit=()=>true;
+ const v={id:1,isToken:true,alive:true,flags:UF.INVULN,statuses:new Set(['invuln']),info:{kind:'token'}};
+ assert.equal(w.status(v,'invuln',true),false);w.syncStatuses(v);assert.equal(w.statusSeen.size,0);assert.equal(w.loops.size,0);
+});

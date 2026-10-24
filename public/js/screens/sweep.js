@@ -340,7 +340,7 @@ function EnemyPanel({ sel, m, onCodex }) {
   const shown = keys.map((k) => data.lookup('enemies', k));
   return html`<div class="sw-detail">
     <${Hero} src=${factionIconUrl(m, f.icon)} glyph=${true} name=${f.name} fallback=${html`<${GIcon} name="target" />`} />
-    <div class="sw-text"><p class="rt">${f.desc || ''}</p></div>
+    <div class="sw-text"><${RichText} as="p" text=${f.descRaw || f.desc || ''} /></div>
     <div class="sw-box">
       <div class="sw-box__head">
         <span class="sw-box__k"><${GIcon} name="target" />${t('敌方情报')}<small class="num">${shown.length}</small></span>

@@ -142,9 +142,11 @@ export default {
             if (unit.mem.hsShield !== sh) return;
             const slowed = touching(battle, unit, shieldAt(unit, sh)).length > 0;
             sh.turned += SHIELD_SPEED * (slowed ? 1 - SHIELD_SLOW : 1) * dt;
+            sh.fxAcc=(sh.fxAcc||0)+dt;
+            if(sh.fxAcc>=.1){sh.fxAcc=0;battle.fx('orbitProjectile',{x:unit.x,y:unit.y,id:unit.id,src:unit.id,projectile:'projectile_chr_hsgma2_s2',slots:[true],radius:SHIELD_START,phase:sh.a0+sh.turned*Math.PI/180,speed:SHIELD_SPEED*(slowed?1-SHIELD_SLOW:1),ttl:.2});}
             if (sh.turned >= SHIELD_TURN - 1e-9) skill.end('shield');
           },
-          onEnd({ unit }) { unit.mem.hsShield = null; plainS2(); },
+          onEnd({ battle, unit }) { unit.mem.hsShield = null; plainS2();battle.fx('orbitProjectile',{x:unit.x,y:unit.y,id:unit.id,src:unit.id,projectile:'projectile_chr_hsgma2_s2',slots:[]}); },
         },
         [S3]: {
           kind: 'duration',

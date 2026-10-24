@@ -1,0 +1,54 @@
+{
+  "inventoryVerified": 191,
+  "inventoryMismatches": [],
+  "models": 24,
+  "writtenSkeletons": 20,
+  "writtenPNGPages": 16,
+  "report": {
+    "format": "cn-skin-model-repair",
+    "version": 1,
+    "catalogueSource": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/master/zh_CN/gamedata/excel/skin_table.json",
+    "requestedSkins": [
+      "char_4217_makoto#1",
+      "char_4217_makoto#2",
+      "char_499_kaitou@epoque#37",
+      "char_4109_baslin@witch#5",
+      "char_4047_pianst@wild#8",
+      "char_4217_makoto@p3r#1",
+      "char_2025_shu@nlc#1",
+      "char_1040_blaze2@nlc#1",
+      "char_1033_swire2@nlc#1"
+    ],
+    "modelDiagnostics": [
+      {
+        "bundle": "skinpack/char_4047_pianst.ab",
+        "error": "unknown file extension: .png-c47f94a0"
+      },
+      {
+        "bundle": "skinpack/char_4109_baslin.ab",
+        "error": "unknown file extension: .png-3c0cc9ee"
+      },
+      {
+        "bundle": "skinpack/char_4217_makoto.ab",
+        "error": "unknown file extension: .png-122c9d30"
+      },
+      {
+        "bundle": "skinpack/char_499_kaitou.ab",
+        "error": "unknown file extension: .png-17a4c12c"
+      }
+    ],
+    "missingSkinModels": [
+      "char_499_kaitou@epoque#37",
+      "char_4109_baslin@witch#5",
+      "char_4047_pianst@wild#8",
+      "char_4217_makoto@p3r#1",
+      "char_2025_shu@nlc#1",
+      "char_1040_blaze2@nlc#1",
+      "char_1033_swire2@nlc#1"
+    ],
+    "fxAndAudioReusedFromPreviousUpload": true,
+    "complete": false
+  },
+  "cause": "fx_file sanitized a page filename containing # by appending a hash after .png, preventing Pillow format detection",
+  "fix": "Sanitize the page stem only, append .png, and pass format=PNG explicitly; exercise actual Pillow and real alpha merger in cross-bundle regression"
+}

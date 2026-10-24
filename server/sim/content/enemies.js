@@ -217,6 +217,37 @@ function onBeforeAttack(b, c) {
   if (a && a.side === 'enemy' && a.mem.ab) dispatch(b, a, 'before', c);
 }
 
+// Opt-in attack-turn scheduling, backported from upstream dev for Quintus only.
+export function attackTurnSkill(b, e, ownOnly = false) {
+  const ab = e.mem.ab;
+  if (!ab) return null;
+  let ready = null, top = -Infinity;
+  for (const a of ab.list) {
+    if (!a || !a.atk || !a.fire || a.cd == null || a.left > 1e-9 || (ownOnly && !a.own)) continue;
+    if (!canCast(e, a.sil, b) || (a.cond && !safe(b, e, () => a.cond(b, e, a)))) continue;
+    const pr = a.pr ?? ((a.sk && a.sk.pr) || 0);
+    if (pr > top) { top = pr; ready = [a]; } else if (pr === top) ready.push(a);
+  }
+  if (!ready) return null;
+  const a = ready.length > 1 ? b.rng.pick(ready) : ready[0];
+  castNow(b, e, a);
+  return a;
+}
+
+/**
+ * Cast content skill `a` of enemy `e` now: its cooldown restarts — counted from the end of its clip when the kit gives
+ * its length (`a.clip`, s: PRTS 「同一技能的冷却时间于该技能结束时开始计时」), else from the cast —, then it fires.
+ */
+function castNow(b, e, a) {
+  a.left = Math.max(TICK, a.cd + (a.clip > 0 ? a.clip : 0));
+  a.casts = (a.casts ?? 0) + 1;
+  e.skillAnimUntil = b.time + 0.5;
+  // display only: the skill slot it uses (render/app.js 'cast'); an attack-class one with its clip (DESIGN §35.57)
+  if (a.sk) castSlot(b, e, a.sk, a.clip > 0 ? a.clip : null);
+  if(a.atk && a.clip>0){e.skillAnimUntil=b.time+a.clip;if(a.animation)b.fx('enemySkill',{id:e.id,x:e.x,y:e.y,clip:a.animation.clip,dur:a.clip});}
+  safe(b, e, () => a.fire(b, e, a));
+}
+
 function onKill(b, c) {
   const v = c.victim;
   if (!v || v.side !== 'enemy' || !v.mem.ab) return;
@@ -265,7 +296,7 @@ function onTick(b, dt) {
       }
       if (a.fire && a.cd != null) {
         a.left -= dt;
-        if (a.left <= 1e-9 && canCast(e, a.sil, b) && (!a.cond || safe(b, e, () => a.cond(b, e, a)))) {
+        if (!a.atk && a.left <= 1e-9 && canCast(e, a.sil, b) && (!a.cond || safe(b, e, () => a.cond(b, e, a)))) {
           a.left = Math.max(TICK, a.cd);
           a.casts = (a.casts ?? 0) + 1;
           e.skillAnimUntil = b.time + 0.5;
@@ -273,6 +304,11 @@ function onTick(b, dt) {
           safe(b, e, () => a.fire(b, e, a));
         }
       }
+    }
+    if(e.profile?.attackTurnSkill && e.alive && !e.mem.attackWindup && !(e.atkCd>0)
+      && !e.s.flags.fear && !e.s.flags.disarm && !(e.s.flags.tremble&&e.blockedBy)) {
+      const a=attackTurnSkill(b,e,true);
+      if(a)e.atkCd=Math.max(e.s.interval,a.clip||0);
     }
   }
 }

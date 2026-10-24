@@ -1,0 +1,10 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {NoteFx} from '../../public/js/render/vfx/notefx.js';import {sakikoNoteProjectile} from '../../shared/sakikoNotes.js';
+function fixture(){const spawned=[],hits=[],owner={id:1,info:{skillIndex:2}};const w={view:()=>owner,skills:{of:()=>({index:2})},projectileOf:p=>p,effectKey:k=>k,playOn:(...a)=>(hits.push(a),{}),idx:{projectiles:{phys:{main:'physical',onHit:['impact']},arts:{main:'magical'}}},ofx:{active:true,lib:{has:()=>true},spawn(key,place,opts){const h={key,place,opts,stop(o){this.stopped=o||true;}};spawned.push(h);return h;}}};return{fx:new NoteFx(w),w,spawned,hits};}
+test('official notes follow exact interpolated positions, preserve type and stop when removed',()=>{
+ const {fx,spawned,hits}=fixture(),a=[1,1,4,10,'phys','phys'],b=[1,2,5,10,'arts','arts'];assert.deepEqual(fx.sync([a,b]),[]);assert.deepEqual(spawned.map(h=>h.key),['physical','magical']);
+ fx.sync([[1,1,4.5,10.5,'phys','phys'],b]);assert.equal(spawned.length,2);const f={anchor:[]};spawned[0].opts.track(f);assert.deepEqual(f.anchor,[-5.5,1.5,-.55]);assert.equal(f.yaw,Math.PI/4);
+ assert.equal(fx.hit(6,10,{target:2,projectile:'phys'},{}),true);assert.equal(hits[0][0],'impact');fx.sync([b]);assert.deepEqual(spawned[0].stopped,{hit:true});fx.clear();assert.ok(spawned[1].stopped);
+});
+test('simplified mode and missing individual official assets retain the simple bubbles',()=>{const {fx,w}=fixture(),notes=[[1,1,4,10,'phys','phys']];w.ofx.active=false;assert.deepEqual(fx.sync(notes),notes);w.ofx.active=true;w.ofx.lib.has=()=>false;assert.deepEqual(fx.sync(notes),notes);});
+test('each skill mode selects its own official projectile identity',()=>{assert.equal(sakikoNoteProjectile(2,false,'phys'),'projectile_chr_oblvns');assert.equal(sakikoNoteProjectile(2,true,'phys'),'projectile_chr_oblvns_s3_phy');assert.equal(sakikoNoteProjectile(2,true,'arts'),'projectile_chr_oblvns_s3_mag');assert.equal(sakikoNoteProjectile(1,false,'arts'),'projectile_chr_oblvns_s2_slow');assert.equal(sakikoNoteProjectile(0,true,'arts',8),'projectile_chr_oblvns_s1_8');});

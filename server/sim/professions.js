@@ -191,6 +191,7 @@ export const DOLL_SWITCH = 1;
 const DOLL_SWITCH_IMMUNE = new Set(['stun', 'freeze', 'sleep']);
 
 const installDollkeeper = (battle, unit) => {
+  if(unit.def?.raw?.charId==='char_4217_makoto')return; // Authored multi-persona state machine.
   // the 替身's max HP comes from the unit's own 替身 token (风丸 纸偶) for its selected skill / module (DESIGN §16); a
   // dollkeeper without one (归溟幽灵鲨) must not borrow another operator's token stats: its own max HP (header)
   const dollHpMul = () => {

@@ -44,6 +44,7 @@
 // Funnel = { i, node, mount, projectileKey, idle, back, overload, appear, disappear, hits, overloadHits, delay, attach }
 // (mounts are MountPointType numbers, skills.js mountPointType; hit groups: [[key…]…] in turn per hit).
 
+import {costumeProjectile} from './costumes.js';
 import { mountPointType } from './skills.js';
 import { castPhase } from './skillfx.js';
 
@@ -171,10 +172,12 @@ function dispersedOf(ab, projs) {
  * @param {any} idx index.json (version 3: the emitters, the general abilities)
  * @param {string|null} unitKey
  */
-export function funnelPlan(idx, unitKey) {
-  const unit = unitKey && isObj(idx?.units) ? idx.units[unitKey] : null;
+export function funnelPlan(idx, unitKey, costume = null) {
+  const base = unitKey && isObj(idx?.units) ? idx.units[unitKey] : null;
+  const unit=costume?costumeProjectile(idx,costume,base):base;
   if (!isObj(unit)) return null;
-  const projs = isObj(idx.projectiles) ? idx.projectiles : {};
+  const originals=isObj(idx.projectiles)?idx.projectiles:{};
+  const projs=costume?new Proxy(originals,{get:(target,key)=>costumeProjectile(idx,costume,target[key],key)}):originals;
   const prefabs = isObj(idx.prefabs) ? idx.prefabs : {};
   const modes = {};
   for (const m of Array.isArray(unit.modes) ? unit.modes : []) {

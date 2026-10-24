@@ -7,7 +7,7 @@ import { FactionBadge } from './chatFaction.js';
 import { useState, useMemo, useEffect } from '../../vendor/hooks.module.js';
 import { html, Icon, TierChip, Tooltip } from './components.js';
 import { data, matchData, useData, localAsset } from '../data.js';
-import { parseRichText, rtClassName } from './richText.js';
+import { parseDescriptionText, rtClassName } from './richText.js';
 import { uiUrl, chessAvatarUrl, chessPortraitUrl, itemIconUrl, tokenAvatarUrl, enemyIconUrl, bondIconUrl, bandIconUrl } from './assetUrls.js';
 
 const cx = (...p) => p.flat().filter(Boolean).join(' ');
@@ -84,7 +84,7 @@ export function LocalSprite({ group = 'ui/battle', name, class: cls, fallback = 
  * @param {{ text: any, class?: string, as?: string }} props
  */
 export function RichText({ text, class: cls, as = 'span' }) {
-  const segs = useMemo(() => parseRichText(text), [text]);
+  const segs = useMemo(() => parseDescriptionText(text), [text]);
   const Tag = as;
   return html`<${Tag} class=${cx('rt', cls)}>${segs.map((s, i) => (s.br
     ? html`<br key=${i} />`

@@ -1,3 +1,4 @@
+import {quintusRoles} from '../../shared/quintus.js';
 // Spine model pipeline: download skel/atlas/page PNGs, fetch extra atlas pages,
 // normalize atlases (size:/pma:), parse skeletons and resolve animation roles.
 // Produces the per-model `spine` entries of data/assets.json.
@@ -215,7 +216,8 @@ export async function processModels(models, { root, dl, cachePath, download = tr
     nextCache[m.skel.rel] = { key: ck, info: sk };
     if (sk.missingRegions?.length) problems.push(`${m.key}: ${sk.missingRegions.length} attachment(s) not in atlas (e.g. ${sk.missingRegions[0]})`);
     if (!sk.animations.length) { problems.push(`${m.key}: skeleton has no animations`); continue; }
-    const anims = resolveRoles(sk.animations, { skillIndices: m.skillIndices, numberedSkills: String(m.key).startsWith('enemy_'), durations: sk.durations });
+    let anims = resolveRoles(sk.animations, { skillIndices: m.skillIndices, numberedSkills: String(m.key).startsWith('enemy_'), durations: sk.durations });
+    if(m.key==='enemy_1521_dslily')anims=quintusRoles(anims,sk.durations);
     entries.set(m.key, {
       skel: assetUrl(m.skel.rel),
       atlas: assetUrl(m.atlas.rel),

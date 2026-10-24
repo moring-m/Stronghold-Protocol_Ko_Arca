@@ -214,7 +214,7 @@ export class Unit {
   get flags() { return this.s.flags; }
 
   /** Can act at all this tick (not stunned/frozen/sleeping/levitated). */
-  get canAct() { return this.alive && this.deployed && !this.hidden && !this.s.flags.stun; }
+  get canAct() { return this.alive && this.deployed && !this.hidden && !(this.deployRemaining > 1e-9) && !this.s.flags.stun; }
 
   hasFlag(k) { return !!this.s.flags[k]; }
 

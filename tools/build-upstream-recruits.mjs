@@ -1,3 +1,8 @@
+import {buildRecoveryAssets} from './build-recovery-assets.mjs';
+import {buildMakoto} from './build-makoto.mjs';
+import {buildSkinSfx} from './build-skin-sfx.mjs';
+import {buildMissingSfx} from './build-missing-sfx.mjs';
+import {buildSakikoSounds} from './build-sakiko-sounds.mjs';
 import {withPotentialData} from './build-data.mjs';
 // Compose upstream DIY forms into stable local recruit identities; the existing per-player editor and draft sync remain intact.
 import {buildRecruitResources} from './build-recruit-resources.mjs';
@@ -52,7 +57,8 @@ export async function buildUpstreamRecruits(root,dir){
  assets.audio??={};const voice=assets.audio.voice||{};assets.audio.voice={kr:voice.kr||{},jp:voice.jp||assets.audio.voiceJp||{}};
  assets.stats??={};assets.stats.voiceChars=new Set([...Object.keys(assets.audio.voice.kr),...Object.keys(assets.audio.voice.jp)]).size;
  for(const [k,v]of Object.entries({chess,tokens,assets,bonds}))await writeFile(`${dir}/${k}.json`,JSON.stringify(v));
- await buildRecruitResources(root);
+ await buildMakoto(root,dir);
+ await buildRecruitResources(root,[...await buildSakikoSounds(root,dir),...(await buildMissingSfx(root,dir)).files,...await buildSkinSfx(root,dir),...await buildRecoveryAssets(root,dir)]);
  console.log(`Upstream recruit roster: ${ids.length} operators, preserved Sakiko`);
 }
 if(process.argv[1]?.endsWith('build-upstream-recruits.mjs'))await buildUpstreamRecruits(process.cwd(),`${process.cwd()}/.cache/ursus-data`);

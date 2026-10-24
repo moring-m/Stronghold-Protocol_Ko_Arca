@@ -374,7 +374,7 @@ export class SnapshotBuffer {
     const i=Math.max(0,this._indexAt(time)),a=this.snaps[i],b=this.snaps[i+1];
     const next=new Map((b?.raw.sakikoNotes||[]).map(n=>[`${n[0]}:${n[1]}`,n]));
     const k=b?Math.max(0,Math.min(1,(time-a.t)/(b.t-a.t))):0;
-    return (a.raw.sakikoNotes||[]).map(n=>{const m=next.get(`${n[0]}:${n[1]}`);return m?[n[0],n[1],n[2]+(m[2]-n[2])*k,n[3]+(m[3]-n[3])*k,n[4]]:n;});
+    return (a.raw.sakikoNotes||[]).map(n=>{const m=next.get(`${n[0]}:${n[1]}`);return m?[n[0],n[1],n[2]+(m[2]-n[2])*k,n[3]+(m[3]-n[3])*k,...n.slice(4)]:n;});
   }
 
   downAt(time = this.renderT) {

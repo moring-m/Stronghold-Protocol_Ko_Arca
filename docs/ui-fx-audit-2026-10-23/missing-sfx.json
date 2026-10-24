@@ -1,0 +1,420 @@
+[
+  {
+    "charId": "char_381_bubble",
+    "name": "泡泡",
+    "changes": {
+      "skills": {
+        "1": "/assets/audio/sfx/battle/b_char/b_char_defboost.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_4040_rockr",
+    "name": "洛洛",
+    "changes": {
+      "skills": {
+        "1": "/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_4163_rosesa",
+    "name": "瑰盐",
+    "changes": {
+      "skills": {
+        "1": "/assets/audio/sfx/battle/b_char/b_char_healboost.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_173_slchan",
+    "name": "崖心",
+    "changes": {
+      "skills": {
+        "1": "/assets/audio/sfx/player/p_atk/p_atk_cowboy_h.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_4204_mantra",
+    "name": "만트라",
+    "changes": {
+      "skills": {
+        "2": "/assets/audio/sfx/player/p_skill/p_skill_mtelrncpnt.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_4179_monstr",
+    "name": "Mon3tr",
+    "changes": {
+      "skills": {
+        "2": "/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_446_aroma",
+    "name": "阿罗玛",
+    "changes": {
+      "skills": {
+        "1": "/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_137_brownb",
+    "name": "비헌터",
+    "changes": {
+      "hit": "/assets/audio/sfx/player/p_atk/p_atk_punch_n.mp3"
+    }
+  },
+  {
+    "charId": "char_431_ashlok",
+    "name": "灰毫",
+    "changes": {
+      "skills": {
+        "1": "/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_010_chen",
+    "name": "첸",
+    "changes": {
+      "skills": {
+        "1": "/assets/audio/sfx/player/p_skill/p_skill_chixiaobadao.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_4016_kazema",
+    "name": "风丸",
+    "changes": {
+      "skills": {
+        "1": "/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_4087_ines",
+    "name": "伊内丝",
+    "changes": {
+      "skills": {
+        "1": "/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_108_silent",
+    "name": "赫默",
+    "changes": {
+      "skills": {
+        "1": "/assets/audio/sfx/battle/b_char/b_char_botready.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_4223_botany",
+    "name": "보타니",
+    "changes": {
+      "attack": "/assets/audio/sfx/player/p_atk/p_atk_mgcyrsn_n.mp3",
+      "hit": "/assets/audio/sfx/player/p_imp/p_imp_mgcyrsn_n.mp3",
+      "skills": {
+        "1": "/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_4100_caper",
+    "name": "跃跃",
+    "changes": {
+      "skills": {
+        "1": "/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_4196_reckpr",
+    "name": "录武官",
+    "changes": {
+      "skills": {
+        "1": "/assets/audio/sfx/battle/b_char/b_char_healboost.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_4036_forcer",
+    "name": "见行者",
+    "changes": {
+      "skills": {
+        "1": "/assets/audio/sfx/battle/b_char/b_char_tactboost.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_4151_tinman",
+    "name": "锡人",
+    "changes": {
+      "skills": {
+        "1": "/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_4211_snhunt",
+    "name": "雪猎",
+    "changes": {
+      "skills": {
+        "1": "/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_617_sharp2",
+    "name": "로드·샤프",
+    "changes": {
+      "skills": {
+        "0": "/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_4013_kjera",
+    "name": "耶拉",
+    "changes": {
+      "skills": {
+        "1": "/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_373_lionhd",
+    "name": "莱恩哈特",
+    "changes": {
+      "skills": {
+        "1": "/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_194_leto",
+    "name": "레토",
+    "changes": {
+      "attack": "/assets/audio/sfx/player/p_atk/p_atk_axcpvbl_n.mp3",
+      "hit": "/assets/audio/sfx/player/p_imp/p_imp_axcpvblcmb_n.mp3",
+      "skills": {
+        "0": "/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_4224_turdus",
+    "name": "우쿠시크",
+    "changes": {
+      "attack": "/assets/audio/sfx/player/p_atk/p_atk_crwkdhl_n.mp3",
+      "hit": "/assets/audio/sfx/player/p_imp/p_imp_crwkdhl_n.mp3",
+      "skills": {
+        "0": "/assets/audio/sfx/battle/b_char/b_char_healboost.mp3",
+        "1": "/assets/audio/sfx/battle/b_char/b_char_healboost.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_491_humus",
+    "name": "休谟斯",
+    "changes": {
+      "skills": {
+        "1": "/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_195_glassb",
+    "name": "이스티나",
+    "changes": {
+      "attack": "/assets/audio/sfx/player/p_atk/p_atk_book_n.mp3",
+      "hit": "/assets/audio/sfx/player/p_imp/p_imp_book_n.mp3"
+    }
+  },
+  {
+    "charId": "char_311_mudrok",
+    "name": "泥岩",
+    "changes": {
+      "skills": {
+        "2": "/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_4139_papyrs",
+    "name": "莎草",
+    "changes": {
+      "skills": {
+        "1": "/assets/audio/sfx/battle/b_char/b_char_healboost.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_2027_wang",
+    "name": "왕",
+    "changes": {
+      "skills": {
+        "2": "/assets/audio/sfx/player/p_skill/p_skill_stwctp_s.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_4054_malist",
+    "name": "至简",
+    "changes": {
+      "skills": {
+        "0": "/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_196_sunbr",
+    "name": "古米",
+    "changes": {
+      "skills": {
+        "1": "/assets/audio/sfx/battle/b_char/b_char_healboost.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_294_ayer",
+    "name": "断崖",
+    "changes": {
+      "skills": {
+        "1": "/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_306_leizi",
+    "name": "惊蛰",
+    "changes": {
+      "skills": {
+        "1": "/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_4121_zuole",
+    "name": "좌락",
+    "changes": {
+      "skills": {
+        "1": "/assets/audio/sfx/player/p_skill/p_skill_wrrsldisk.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_4026_vulpis",
+    "name": "忍冬",
+    "changes": {
+      "skills": {
+        "2": "/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_4114_harold",
+    "name": "哈洛德",
+    "changes": {
+      "skills": {
+        "1": "/assets/audio/sfx/battle/b_char/b_char_healboost.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_2025_shu",
+    "name": "슈",
+    "changes": {
+      "skills": {
+        "2": "/assets/audio/sfx/player/p_skill/p_skill_drgndfmrhl.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_1041_angel2",
+    "name": "新约能天使",
+    "changes": {
+      "skills": {
+        "1": "/assets/audio/sfx/player/p_atk/p_atk_tlsrhgn_h.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_1033_swire2",
+    "name": "琳琅诗怀雅",
+    "changes": {
+      "skills": {
+        "2": "/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_4051_akkord",
+    "name": "协律",
+    "changes": {
+      "skills": {
+        "1": "/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_172_svrash",
+    "name": "银灰",
+    "changes": {
+      "skills": {
+        "1": "/assets/audio/sfx/battle/b_char/b_char_defboost.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_4079_haini",
+    "name": "海霓",
+    "changes": {
+      "skills": {
+        "1": "/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_616_pithst",
+    "name": "盟约·辅助干员",
+    "changes": {
+      "skills": {
+        "0": "/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_1045_svash2",
+    "name": "凛御银灰",
+    "changes": {
+      "skills": {
+        "2": "/assets/audio/sfx/player/p_skill/p_skill_snwlprdg_s.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_253_greyy",
+    "name": "格雷伊",
+    "changes": {
+      "skills": {
+        "1": "/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3"
+      }
+    }
+  },
+  {
+    "charId": "char_341_sntlla",
+    "name": "산탈라",
+    "changes": {
+      "fx": {
+        "iceSpike": "/assets/audio/sfx/player/p_imp/p_imp_icnrgystaff_h.mp3"
+      }
+    }
+  }
+]

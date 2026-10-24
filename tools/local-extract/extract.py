@@ -558,13 +558,14 @@ def _text_bytes(text_asset):
     return raw.encode('utf-8', 'surrogateescape') if isinstance(raw, str) else bytes(raw)
 
 
-def merge_alpha(rgb, alpha):
-    """RGBA page of a split texture: RGB of the main texture (premultiplied: the client's Spine material has
-    _StraightAlphaInput 0) and A from its [alpha] texture; RGB is clamped to A (block-compression bleed)."""
+def merge_alpha(rgb, alpha, straight=False):
+    """Merge split/embedded alpha into the premultiplied page expected by normalized Spine atlases."""
     from PIL import Image, ImageChops
     r, g, b = rgb.convert('RGB').split()
-    a = alpha.convert('L').resize(rgb.size) if alpha is not None else Image.new('L', rgb.size, 255)
-    return Image.merge('RGBA', tuple(ImageChops.darker(ch, a) for ch in (r, g, b)) + (a,))
+    a = alpha.convert('L').resize(rgb.size) if alpha is not None else (
+        rgb.getchannel('A') if 'A' in rgb.getbands() else Image.new('L', rgb.size, 255))
+    combine = ImageChops.multiply if straight else ImageChops.darker
+    return Image.merge('RGBA', tuple(combine(ch, a) for ch in (r, g, b)) + (a,))
 
 
 def normalize_atlas(text, sizes):

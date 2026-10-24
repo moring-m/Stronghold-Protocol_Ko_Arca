@@ -53,7 +53,7 @@ export function isCustomStage(id, stage) {
 }
 export const OPTIONAL_FIRST_STAGE = 'act1autochess_m01';
 export function additionalStagesForDifficulty(entries,difficulty){return entries.filter(entry=>difficulty!=='FUNNY'||entry.id!==OPTIONAL_FIRST_STAGE);}
-export const isBannableOperator = c => !!c && !!c.visible && !c.isGolden && !c.isHidden && !c.isDiy && !c.optionalRecruit && c.globalReleased !== false;
+export const isBannableOperator = c => !!c && !!c.visible && !c.isGolden && !c.isHidden && !c.isDiy && !c.optionalRecruit;
 export function customExtensionCatalog(raw = {}) {
   const banCatalog=Object.entries(raw.bonds||{}).filter(([,b])=>b.isCore&&Number(b.weight)>0).map(([id,b])=>({id,name:b.name||id}));
   const auxCatalog=Object.entries(raw.bonds||{}).filter(([,b])=>!b.isCore&&Number(b.weight)>0).map(([id,b])=>({id,name:b.name||id}));

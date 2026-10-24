@@ -7,7 +7,7 @@
    ========================================================================================== */
 
 .lo {
-  width:100%; max-width:100vw; min-width:0; overflow:hidden; box-sizing:border-box;
+  width:100%; max-width:calc(100 * var(--ui-vw, 1vw)); min-width:0; overflow:hidden; box-sizing:border-box;
   position: fixed; inset: 0; z-index: 55; /* above every screen (1) and the in-match banners (40), below the connection
                                              banner (60), modals / confirm dialogs (80), toasts and tooltips */
   display: flex; flex-direction: column;
@@ -577,9 +577,9 @@
 .lo-recruit-selected__empty { min-height:52px; height:52px; display:flex; justify-content:center; align-items:center; gap:8px; background:transparent; cursor:pointer; border-color:color-mix(in srgb,var(--recruit-color) 30%,transparent); }
 .lo-recruit-selected__empty:hover:not(:disabled) { border-color:var(--recruit-color); color:var(--recruit-color); }
 .lo-recruit-selected__empty .icon { width:14px; height:14px; }
-.lo-recruit-picker { width:min(820px,94vw); }
+.lo-recruit-picker { width:min(820px,calc(94 * var(--ui-vw, 1vw))); }
 .lo-recruit-picker__search { flex:none; width:100%; margin-bottom:12px; }
-.lo-recruit-picker__list { display:grid; grid-template-columns:repeat(auto-fill,minmax(86px,1fr)); gap:8px; max-height:55vh; overflow:auto; padding:2px; }
+.lo-recruit-picker__list { display:grid; grid-template-columns:repeat(auto-fill,minmax(86px,1fr)); gap:8px; max-height:calc(55 * var(--ui-vh, 1vh)); overflow:auto; padding:2px; }
 .lo-recruit-picker__list .lo-card { width:100%; }
 .lo-recruit-picker__hint { font-size:12px; margin:12px 0 0; }
 @media(max-width:1100px){.lo-recruit-selected__tier{grid-template-rows:auto repeat(2,76px)}.lo-recruit-selected .lo-row{height:76px;gap:4px 12px}.lo-recruit-selected__empty{height:76px}}

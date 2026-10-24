@@ -1,0 +1,221 @@
+{
+  "version": 1,
+  "units": {
+    "char_1012_skadi2@iteration#2": {
+      "baseCharId": "char_1012_skadi2",
+      "born": "/assets/audio/sfx/battle/b_char/b_char_spskadi1.mp3",
+      "skills": {
+        "0": "/assets/audio/sfx/player/p_skill/p_skill_samegoaldiffways.mp3",
+        "1": "/assets/audio/sfx/player/p_skill/p_skill_burningdarkness.mp3",
+        "2": "/assets/audio/sfx/player/p_skill/p_skill_tidesurging.mp3"
+      },
+      "skillCombat": {}
+    },
+    "char_1032_excu2@sanrio#2": {
+      "baseCharId": "char_1032_excu2",
+      "attack": "/assets/local/audio/sfx/p_atk_shotgunx_n_sanrio_2.mp3",
+      "skills": {
+        "0": "/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3",
+        "1": "/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3",
+        "2": "/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3"
+      },
+      "skillCombat": {
+        "0": {
+          "attack": "/assets/local/audio/sfx/p_atk_shotgunx_d_sanrio_2.mp3"
+        },
+        "1": {
+          "attack": "/assets/local/audio/sfx/p_atk_shotgunxfr_h_sanrio_2.mp3"
+        },
+        "2": {
+          "attack": "/assets/local/audio/sfx/p_atk_shotgunx_s_sanrio_2.mp3"
+        }
+      },
+      "attacks": {
+        "0": "/assets/local/audio/sfx/p_atk_shotgunx_d_sanrio_2.mp3",
+        "1": "/assets/local/audio/sfx/p_atk_shotgunx_h_sanrio_2.mp3",
+        "2": "/assets/local/audio/sfx/p_atk_shotgunx_s_sanrio_2.mp3"
+      }
+    },
+    "char_180_amgoat@sanrio#2": {
+      "baseCharId": "char_180_amgoat",
+      "attack": "/assets/local/audio/sfx/p_atk_firemag_n_sanrio_2.mp3",
+      "born": "/assets/audio/sfx/battle/b_char/b_char_set.mp3",
+      "skills": {
+        "0": "/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3"
+      },
+      "skillCombat": {},
+      "hit": "/assets/local/audio/sfx/p_imp_firemag_n_sanrio_2.mp3",
+      "attacks": {
+        "1": "/assets/local/audio/sfx/p_atk_firemag_h_sanrio_2.mp3"
+      },
+      "hits": {
+        "1": "/assets/local/audio/sfx/p_imp_firemag_h_sanrio_2.mp3",
+        "2": "/assets/local/audio/sfx/p_imp_firemag_s_sanrio_2.mp3"
+      }
+    },
+    "char_377_gdglow@sanrio#1": {
+      "baseCharId": "char_377_gdglow",
+      "attack": "/assets/local/audio/sfx/p_atk_sparklight_n_sanrio_1.mp3",
+      "hit": "/assets/local/audio/sfx/p_imp_sparklight_n_sanrio_1.mp3",
+      "skills": {
+        "0": "/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3",
+        "1": "/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3",
+        "2": "/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3"
+      },
+      "skillCombat": {},
+      "hits": {
+        "0": "/assets/local/audio/sfx/p_imp_sparklight_d_sanrio_1.mp3",
+        "1": "/assets/local/audio/sfx/p_imp_sparklight_h_sanrio_1.mp3",
+        "2": "/assets/local/audio/sfx/p_imp_sparklightfunnel_s_sanrio_1.mp3"
+      }
+    }
+  },
+  "aliases": {
+    "char_1012_skadi2@iteration#2": "char_1012_skadi2@iteration#2",
+    "skin_char_1012_skadi2_iteration_2": "char_1012_skadi2@iteration#2",
+    "char_1032_excu2@sanrio#2": "char_1032_excu2@sanrio#2",
+    "skin_char_1032_excu2_sanrio_2": "char_1032_excu2@sanrio#2",
+    "char_180_amgoat@sanrio#2": "char_180_amgoat@sanrio#2",
+    "skin_char_180_amgoat_sanrio_2": "char_180_amgoat@sanrio#2",
+    "char_377_gdglow@sanrio#1": "char_377_gdglow@sanrio#1",
+    "skin_char_377_gdglow_sanrio_1": "char_377_gdglow@sanrio#1"
+  },
+  "files": [
+    {
+      "path": "/assets/local/audio/sfx/p_atk_shotgunx_n_sanrio_2.mp3",
+      "local": true,
+      "sources": [
+        "/assets/local/audio/sfx/p_atk_shotgunx_n_sanrio_2.mp3"
+      ],
+      "bytes": 21164,
+      "sha256": "fd3da2efeb7cfc7fefc52a6d91a7cc5bedd7413a4edc696a1efb0dae19dd3821"
+    },
+    {
+      "path": "/assets/local/audio/sfx/p_atk_shotgunx_d_sanrio_2.mp3",
+      "local": true,
+      "sources": [
+        "/assets/local/audio/sfx/p_atk_shotgunx_d_sanrio_2.mp3"
+      ],
+      "bytes": 24044,
+      "sha256": "2bf8aca5a8b6a5495e06998c973b44cca6573abe48a6de6a6451462cac312c18"
+    },
+    {
+      "path": "/assets/local/audio/sfx/p_atk_shotgunxfr_h_sanrio_2.mp3",
+      "local": true,
+      "sources": [
+        "/assets/local/audio/sfx/p_atk_shotgunxfr_h_sanrio_2.mp3"
+      ],
+      "bytes": 8204,
+      "sha256": "e7077c705b6611e30b16790f0572ffc79822f3aba236b8176dfc18f1e2ddde16"
+    },
+    {
+      "path": "/assets/local/audio/sfx/p_atk_shotgunx_s_sanrio_2.mp3",
+      "local": true,
+      "sources": [
+        "/assets/local/audio/sfx/p_atk_shotgunx_s_sanrio_2.mp3"
+      ],
+      "bytes": 34124,
+      "sha256": "a6973051c43bc01be92b6f18d261e038e04265366653f05db8ca7e96ef187f09"
+    },
+    {
+      "path": "/assets/local/audio/sfx/p_atk_shotgunx_h_sanrio_2.mp3",
+      "local": true,
+      "sources": [
+        "/assets/local/audio/sfx/p_atk_shotgunx_h_sanrio_2.mp3"
+      ],
+      "bytes": 30764,
+      "sha256": "0995b95a02e89b3eaab2a6cecc6bf80fcdfd39f6495928583d427ac70bcc3ead"
+    },
+    {
+      "path": "/assets/local/audio/sfx/p_atk_firemag_n_sanrio_2.mp3",
+      "local": true,
+      "sources": [
+        "/assets/local/audio/sfx/p_atk_firemag_n_sanrio_2.mp3"
+      ],
+      "bytes": 18284,
+      "sha256": "59bfbeb05e7e719f09412140057a8e42258ff83da0014035ac72165862252ab1"
+    },
+    {
+      "path": "/assets/local/audio/sfx/p_imp_firemag_n_sanrio_2.mp3",
+      "local": true,
+      "sources": [
+        "/assets/local/audio/sfx/p_imp_firemag_n_sanrio_2.mp3"
+      ],
+      "bytes": 18284,
+      "sha256": "63780297be63886796d2dc4bbae587eac271ab175fb0ed39fc24f9f23766974b"
+    },
+    {
+      "path": "/assets/local/audio/sfx/p_atk_firemag_h_sanrio_2.mp3",
+      "local": true,
+      "sources": [
+        "/assets/local/audio/sfx/p_atk_firemag_h_sanrio_2.mp3"
+      ],
+      "bytes": 17324,
+      "sha256": "bc38cebc30e9157196aad9f6783c3b1bf557676da3b9d665350311066e02cd29"
+    },
+    {
+      "path": "/assets/local/audio/sfx/p_imp_firemag_h_sanrio_2.mp3",
+      "local": true,
+      "sources": [
+        "/assets/local/audio/sfx/p_imp_firemag_h_sanrio_2.mp3"
+      ],
+      "bytes": 42764,
+      "sha256": "f0663866ea3a627cf9dfb12fcd87b6ca45d8715a1c8bd4d8387c976b3a1ec6fc"
+    },
+    {
+      "path": "/assets/local/audio/sfx/p_imp_firemag_s_sanrio_2.mp3",
+      "local": true,
+      "sources": [
+        "/assets/local/audio/sfx/p_imp_firemag_s_sanrio_2.mp3"
+      ],
+      "bytes": 24524,
+      "sha256": "142a572ac200823c9ce6fce17c63180ac6445810eeb9fbebd189c7abc4a2f269"
+    },
+    {
+      "path": "/assets/local/audio/sfx/p_atk_sparklight_n_sanrio_1.mp3",
+      "local": true,
+      "sources": [
+        "/assets/local/audio/sfx/p_atk_sparklight_n_sanrio_1.mp3"
+      ],
+      "bytes": 17804,
+      "sha256": "af2955e285e0653331152ea19e65e7f246ca731e706b093c11da22bdbc253171"
+    },
+    {
+      "path": "/assets/local/audio/sfx/p_imp_sparklight_n_sanrio_1.mp3",
+      "local": true,
+      "sources": [
+        "/assets/local/audio/sfx/p_imp_sparklight_n_sanrio_1.mp3"
+      ],
+      "bytes": 14444,
+      "sha256": "fba2572311d61b3fe0fa91234346b371de9ce4a025514dbd794d5d31b430b7eb"
+    },
+    {
+      "path": "/assets/local/audio/sfx/p_imp_sparklight_d_sanrio_1.mp3",
+      "local": true,
+      "sources": [
+        "/assets/local/audio/sfx/p_imp_sparklight_d_sanrio_1.mp3"
+      ],
+      "bytes": 21644,
+      "sha256": "e7625417934e98873110bfa1cbc6cce537c7f691443da390465f8b7608d4a93a"
+    },
+    {
+      "path": "/assets/local/audio/sfx/p_imp_sparklight_h_sanrio_1.mp3",
+      "local": true,
+      "sources": [
+        "/assets/local/audio/sfx/p_imp_sparklight_h_sanrio_1.mp3"
+      ],
+      "bytes": 24524,
+      "sha256": "f3cb52cd643bdcabc48ab58b7be6edec7b3dbb831da67967027086eebfb85a4b"
+    },
+    {
+      "path": "/assets/local/audio/sfx/p_imp_sparklightfunnel_s_sanrio_1.mp3",
+      "local": true,
+      "sources": [
+        "/assets/local/audio/sfx/p_imp_sparklightfunnel_s_sanrio_1.mp3"
+      ],
+      "bytes": 38444,
+      "sha256": "8de7633594439959aa138f8606f2f531256cb05df954570bb99c33f5d70a9830"
+    }
+  ],
+  "source": "cn-missing-fx-audio-20261023-205741-3b1548"
+}

@@ -748,6 +748,22 @@ test('ä½™ 37: a chess of the bond with the most members (normal: 3 in the row; ç
   }
 });
 
+test('Yu rewards ignore shop level and row gaps while retaining operator bans', () => {
+  const s=setup(121);
+  s.ps.shop.level=1;
+  give(s.m,s.ps,'chess_char_6_03_a','board',[10,4]);
+  const row=plain(c=>!c.bonds.includes('egirShip')).slice(0,2);
+  give(s.m,s.ps,row[0],'board',[10,6]);give(s.m,s.ps,row[1],'board',[10,8]);
+  s.ps.bondCountBonus.egirShip=9;s.ps.recompute();
+  const roll=s.ps.pool.roll.bind(s.ps.pool);
+  s.ps.pool.roll=(rng,opts)=>{assert.equal(opts.maxTier,6);return roll(rng,{...opts,tier:6});};
+  s.roundStart();
+  const got=handChess(s.ps);
+  assert.equal(got.length,1);assert.equal(CH(got[0]).tier,6);
+  assert.ok(CH(got[0]).bonds.includes('egirShip'));
+  assert.ok(!s.m.bannedChess.includes(s.m.gd.baseIdOf(got[0])));
+});
+
 // ---------------------------------------------------------------------------------------------------------------------
 // re-triggers / copies
 

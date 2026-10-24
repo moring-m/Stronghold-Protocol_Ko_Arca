@@ -104,6 +104,13 @@ export function resetPixi(renderer) {
   try { renderer.state.reset(); } catch { /* ignore */ }
 }
 
+/** Official FX layers are unmasked. Isolate stale Pixi clipping, including the depth clear. */
+export function beginUnmaskedFx(gl){
+ const scissor=gl.isEnabled(gl.SCISSOR_TEST),stencil=gl.isEnabled(gl.STENCIL_TEST);
+ gl.disable(gl.SCISSOR_TEST);gl.disable(gl.STENCIL_TEST);
+ return ()=>{if(scissor)gl.enable(gl.SCISSOR_TEST);else gl.disable(gl.SCISSOR_TEST);if(stencil)gl.enable(gl.STENCIL_TEST);else gl.disable(gl.STENCIL_TEST);};
+}
+
 /** Draw order of two items: sorting layer, sorting order, render queue, then back to front (Unity's transparent sort). */
 function byUnityOrder(a, b) {
   return (a.layer - b.layer) || (a.order - b.order) || (a.queue - b.queue) || (b.dist - a.dist) || (a.seq - b.seq);
@@ -401,6 +408,7 @@ export class OfficialFx {
       } catch (err) { console.warn('[fx] renderer unavailable', err); this.unsupported = true; return; }
     }
     renderer.batch.flush();
+    const restoreClip=beginUnmaskedFx(gl);
     try {
       if (pass === 'ground' || this.prepared !== this.frameNo) this._warmStep();
       if (this.prepared !== this.frameNo) this._prepare(renderer);
@@ -410,6 +418,7 @@ export class OfficialFx {
     } catch (err) {
       if (!this._warned) { this._warned = true; console.error('[fx] render failed', err); }
     } finally {
+      restoreClip();
       resetPixi(renderer);
     }
   }

@@ -389,3 +389,6 @@ h1, h2, h3, h4, p { margin: 0; }
 /* Native select popups must retain the dark palette, including Windows menus. */
 select { color-scheme: dark; }
 select option, select optgroup { background-color: var(--bg-2, #111b17); color: var(--text-hi, #e2efea); }
+
+/* Desktop CSS zoom keeps viewport-sized panels within the visible window. */
+:root { --ui-vw:calc(1vw / var(--ui-viewport-scale,1)); --ui-vh:calc(1vh / var(--ui-viewport-scale,1)); --ui-dvh:calc(1dvh / var(--ui-viewport-scale,1)); --ui-svh:calc(1svh / var(--ui-viewport-scale,1)); }

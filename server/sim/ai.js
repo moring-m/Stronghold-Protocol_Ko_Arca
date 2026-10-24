@@ -148,7 +148,7 @@ export function updateAlly(b, u, dt) {
   // Run after cooldown/control checks so silence, disarm and the exact attack cadence still apply (#406).
   if (!targets.length && sk?.triggerAllies && sk.onAboutToAttack()) {
     prof = effectiveProfile(u);
-    if (prof.noAttack || !u.alive) return;
+    if (prof.noAttack || !u.canAct || u.s.flags.disarm) return;
     targets = acquireTargets(b, u, prof);
   } else if (!targets.length) {
     // The enemy phase already ran. A target that was in range when this cooldown reached 0 (noteAttackCommit,
@@ -161,7 +161,7 @@ export function updateAlly(b, u, dt) {
   if (sk && sk.onAboutToAttack()) {
     if (u.atkCd > 1e-9 || b.time < (u.mem.skillCastUntil || 0)) return; // an independent cast owns its full animation
     prof = effectiveProfile(u);
-    if (prof.noAttack || !u.alive) return;
+    if (prof.noAttack || !u.canAct || u.s.flags.disarm) return;
     targets = acquireTargets(b, u, prof);
     if (!targets.length && !prof.allowEmptyAttack) { storeEnergy(b,u,prof); return; }
   }
@@ -1016,6 +1016,12 @@ function enemyAttack(b, e) {
   const locked = e.mem.attackWindup?.targets || targets.slice();
   if (e.mem.attackWindup && !e.profile?.continueAttackOnTargetLoss) targets = locked.filter(t => canTargetAlly(e, t, true) && (!own || own(t)));
   if (!targets.length && !(e.mem.attackWindup && e.profile?.continueAttackOnTargetLoss)) { cancelWindup(b, e); return false; }
+  // This fork starts the attack interval at wind-up, so choose a replacement on that same turn.
+  // Only opted-in kits (Quintus) use this path; normal enemies keep their existing attack timing.
+  if(!e.mem.attackWindup && typeof e.profile?.attackTurnSkill==='function') {
+    const skill=e.profile.attackTurnSkill(b,e);
+    if(skill){e.atkCd=Math.max(e.s.interval,skill.clip||0);return false;}
+  }
   let wound = false;
   const pending = e.mem.attackWindup;
   if (pending) {

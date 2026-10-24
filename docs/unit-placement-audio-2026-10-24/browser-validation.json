@@ -1,0 +1,88 @@
+{
+  "errors": [
+    "Failed to load resource: net::ERR_FAILED"
+  ],
+  "stats": {
+    "fps": 1.1,
+    "frameMs": 900.94,
+    "cpuMs": 61.3,
+    "renderMs": 1.64,
+    "mode": "prep",
+    "units": 2,
+    "impostor": 0,
+    "impostorAtlas": {
+      "pages": 0,
+      "slots": 0,
+      "drawn": 0,
+      "full": 0
+    },
+    "boardArt": true,
+    "board3d": {
+      "on": true,
+      "calls": 13,
+      "triangles": 20726,
+      "textures": 30,
+      "geometries": 25,
+      "frames": 20,
+      "cpuMs": 14.57,
+      "lost": false,
+      "originalStage": "act1autochess_m03",
+      "cachedLayouts": 1,
+      "layoutCacheHits": 0,
+      "losses": 0
+    },
+    "pen": 0,
+    "penHidden": true,
+    "prepField": null,
+    "lod": 1,
+    "culled": 0,
+    "particles": 0,
+    "projectiles": 0,
+    "numbers": 0,
+    "rings": 0,
+    "auras": 0,
+    "locks": 0,
+    "flames": 0,
+    "promotions": 0,
+    "officialFx": {
+      "tier": "off",
+      "available": true,
+      "effects": 0,
+      "pending": 0,
+      "particles": 0,
+      "reused": 0,
+      "systems": 0,
+      "dropped": 0,
+      "draws": 0,
+      "programs": 0,
+      "textures": 0,
+      "texMB": 0
+    },
+    "spine": {
+      "size": 5,
+      "ready": 4,
+      "loading": 0,
+      "failed": 1,
+      "refs": 2,
+      "holds": 1,
+      "weight": 7386668,
+      "idleWeight": 1276088,
+      "active": 0,
+      "queued": 0,
+      "unloading": 0
+    },
+    "renderT": null,
+    "rate": 2,
+    "buffered": 0,
+    "camera": {
+      "tx": 6,
+      "ty": 10.998841835002256,
+      "tz": 0,
+      "tilt": 30,
+      "dist": 10.731017003337843,
+      "scale": 102.41256419964779,
+      "cx": 640,
+      "cy": 400
+    }
+  }
+}

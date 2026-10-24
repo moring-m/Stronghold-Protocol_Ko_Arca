@@ -536,3 +536,15 @@ describe('a floating unit on its bone (mounts.js, DESIGN §32.14.36)', () => {
     near(fl.anchor, [5 - 10 + 0.55, 5 - 9 + 0.75 * C, -0.75 * S], 'mirrored');
   });
 });
+
+test('skin funnel plans replace S3 wolves, marks and hits without mutating the base plan', () => {
+  const idx=makeIndex(),base=funnelPlan(idx,'char_901_wolf');
+  const effects=Object.fromEntries(['w_trail','w_hit_1','w_hit_2','w_mark1','w_mark2','w_start'].map(k=>[k,k+'_skin']));
+  for(const key of Object.values(effects))idx.prefabs[key]=P({looping:true});
+  const skin=funnelPlan(idx,'char_901_wolf',{effects});
+  assert.equal(skin.dispersed.units[0].main,'w_trail_skin');
+  assert.deepEqual(skin.dispersed.units[0].hits,[['w_hit_1_skin']]);
+  assert.deepEqual(skin.dispersed.marks,{trace:'w_mark1_skin',latched:'w_mark2_skin'});
+  assert.deepEqual(skin.dispersed.start,[{key:'w_start_skin',s:3}]);
+  assert.deepEqual(funnelPlan(idx,'char_901_wolf'),base);
+});

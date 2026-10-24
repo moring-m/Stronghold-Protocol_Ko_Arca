@@ -42,7 +42,7 @@ test('custom catalog does not include removed operator ban exclusions',()=>{asse
 test('operator ban catalog excludes optional recruits and keeps shop order',()=>{
  const normal=(tier,shopSortId,extra={})=>({name:'operator',visible:true,tier,shopSortId,...extra});
  const data={chess:{b:normal(2,1),a:normal(1,2),c:normal(1,1),recruit:normal(1,0,{optionalRecruit:true}),gold:normal(1,0,{isGolden:true}),hidden:normal(1,0,{isHidden:true}),unreleased:normal(1,0,{globalReleased:false})}};
- assert.deepEqual(customExtensionCatalog(data).bannedOperators.map(c=>c.id),['c','a','b']);
+ assert.deepEqual(customExtensionCatalog(data).bannedOperators.map(c=>c.id),['unreleased','c','a','b']);
  const selection=normalizeCustomExtensions({bannedOperators:['recruit','a']},data);
  assert.deepEqual(selection.bannedOperators,['a']);
 });

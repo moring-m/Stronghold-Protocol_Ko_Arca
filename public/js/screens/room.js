@@ -1,3 +1,4 @@
+import {RichText} from '../ui/gameComponents.js';
 import {AUGMENT_ROUNDS} from '../../../shared/augments.js';
 import {GAMEPLAY_MODES,GAMEPLAY_MODE_NAMES,normalizeGameplayMode,canSwitchPublicMode} from '../../../shared/gameplayModes.js';
 import { TestMark } from "../ui/testConsole.js";
@@ -401,7 +402,7 @@ export function RoomScreen() {
       ${coop ? null : html`<aside class="solo-brief brackets">
         <${MicroLabel} tone="mint">BRIEFING<//>
         <h2>${DIFFICULTY_NAMES[room.difficulty] || ''}<span class="num t-dim"> ${info.code}</span></h2>
-        <p>${info.desc}</p>
+        <${RichText} as="p" text=${info.desc} />
         <ul>
           ${info.effects.map((e) => html`<li key=${e}>${e}</li>`)}
           <li>共 <b class="num">${info.rounds}</b> 回合${info.hidden ? '，满足条件时进入隐秘核心' : ''}</li>

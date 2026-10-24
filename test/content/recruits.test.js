@@ -148,5 +148,5 @@ test('Sakiko generates notes continuously with no enemy in attack range',()=>{
 });
 
 test('Sakiko snapshot exposes real note coordinates with stable IDs and removes them on retreat',()=>{
- setGameData(data);try{const h=combat('oblvns',2,false,6,{enemies:[]}),u=h.unit(id('oblvns'));u.skill.rule='NEVER';u.skill.spType='none';assert.ok(h.runUntil(()=>u.mem.sakikoNotes.length>0,5));const n=u.mem.sakikoNotes[0],snap=h.b.snapshot();assert.ok(snap.sakikoNotes.some(v=>v[0]===u.id&&v[1]===n.id&&Math.abs(v[2]-n.x)<.011));u.deployed=false;assert.equal(h.b.snapshot().sakikoNotes.length,0);}finally{setGameData(null)}
+ setGameData(data);try{const h=combat('oblvns',2,false,6,{enemies:[]}),u=h.unit(id('oblvns'));u.skill.rule='NEVER';u.skill.spType='none';assert.ok(h.runUntil(()=>u.mem.sakikoNotes.length>0,5));const n=u.mem.sakikoNotes[0],snap=h.b.snapshot();assert.ok(snap.sakikoNotes.some(v=>v[0]===u.id&&v[1]===n.id&&Math.abs(v[2]-n.x)<.011&&v[5]===n.projectile));u.deployed=false;assert.equal(h.b.snapshot().sakikoNotes.length,0);}finally{setGameData(null)}
 });

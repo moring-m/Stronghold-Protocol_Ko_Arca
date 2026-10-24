@@ -39,7 +39,7 @@ async function safeImport(path) {
   }
 }
 
-const TIERS = await Promise.all([safeImport('./kits/nativeRegistry.js'),safeImport('./kits/ursus.js'),safeImport('./kits/leithanien.js'),safeImport('./kits/recruits.js'),safeImport('./kits/upstreamRecruits.js'),safeImport('./kits/upstream022.js')]);
+const TIERS = await Promise.all([safeImport('./kits/nativeRegistry.js'),safeImport('./kits/ursus.js'),safeImport('./kits/leithanien.js'),safeImport('./kits/recruits.js'),safeImport('./kits/makoto.js'),safeImport('./kits/upstreamRecruits.js'),safeImport('./kits/upstream022.js')]);
 const DOMAIN_NAMES = ['tokens', 'devices', 'enemies', 'bosses', 'bonds', 'garrisons', 'items', 'bands', 'choices', 'ursus', 'leithanien', 'augments'];
 const DOMAINS = await Promise.all(DOMAIN_NAMES.map((n) => safeImport(`./${n}.js`)));
 const tokens = DOMAINS[0];

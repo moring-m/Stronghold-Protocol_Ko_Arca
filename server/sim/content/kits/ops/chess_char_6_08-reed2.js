@@ -40,12 +40,15 @@ function reed2(bb, chess, def) {
         for (const F of unit.mem.reedFire) {
           battle.addBuff(F.a, { key: `reed2:fireball:${unit.id}`, duration: skill.timeLeft, visible: true, source: unit });
           battle.fx('ember', { x: F.a.x, y: F.a.y, id: F.a.id, src: unit.id, n: 3 });
+          battle.fx('orbitProjectile',{x:F.a.x,y:F.a.y,id:F.a.id,src:unit.id,projectile:'projectile_chr_reed2_fire',slots:[true,true,true],radius:1,phase:battle.time*150*Math.PI/180,speed:150});
         }
       },
       onTick({ battle, unit, dt }) {
         const cd = Math.max(0.1, num(bb.cooldown, 1.5));
         for (const F of unit.mem.reedFire || []) {
           if (!live(F.a)) continue;
+          F.fxAcc=(F.fxAcc||0)+dt;
+          if(F.fxAcc>=.25){F.fxAcc=0;battle.fx('orbitProjectile',{x:F.a.x,y:F.a.y,id:F.a.id,src:unit.id,projectile:'projectile_chr_reed2_fire',slots:[true,true,true],radius:1,phase:battle.time*150*Math.PI/180,speed:150});}
           F.acc += dt;
           if (F.acc + 1e-9 < cd) continue;
           F.acc -= cd;
@@ -56,11 +59,11 @@ function reed2(bb, chess, def) {
           // "每1.5秒对一名敌人造成…法术伤害并仅对该干员触发焰影苇草特性": the trait heal (professions.js
           // installIncantation) runs for this damage and names the carrier instead of the lowest-HP ally in range
           battle.dealDamage(unit, c[0], { amount: unit.s.atk * num(bb.atk_scale, 1), type: 'arts', isSkill: true, tags: ['skill', 'fireball'], traitAlly: F.a });
-          battle.fx('strike', { x: c[0].x, y: c[0].y, id: c[0].id, src: F.a.id });
+          battle.fx('strike', { x: c[0].x, y: c[0].y, id: c[0].id, src: unit.id, carrier: F.a.id });
         }
       },
       onEnd({ battle, unit }) {
-        for (const F of unit.mem.reedFire || []) battle.removeBuff(F.a, `reed2:fireball:${unit.id}`);
+        for (const F of unit.mem.reedFire || []) {battle.removeBuff(F.a, `reed2:fireball:${unit.id}`);battle.fx('orbitProjectile',{x:F.a.x,y:F.a.y,id:F.a.id,src:unit.id,projectile:'projectile_chr_reed2_fire',slots:[]});}
         unit.mem.reedFire = null;
       },
     },

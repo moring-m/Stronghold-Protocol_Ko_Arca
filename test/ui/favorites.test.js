@@ -25,10 +25,10 @@ test('optional recruits never appear in favorite filters or receive a favorite m
 });
 
 
-test('global unreleased operators stay out of selection lists without changing loadout validity',async()=>{
+test('release status does not hide playable operators from selection lists',async()=>{
  const {rosterOf,isLoadoutSlot}=await import('../../public/js/ui/loadoutModel.js');
  const {filterFavoriteOperators}=await import('../../public/js/ui/favorites.js');
  const released={chessId:'released',baseId:'released',name:'출시',visible:true};
  const unreleased={chessId:'unreleased',baseId:'unreleased',name:'미출시',visible:true,globalReleased:false};
- assert.deepEqual(rosterOf([released,unreleased]),[released]);assert.deepEqual(filterFavoriteOperators([released,unreleased]),[released]);assert.ok(isLoadoutSlot(unreleased),'existing battle/loadout records remain valid');
+ assert.deepEqual(rosterOf([released,unreleased]),[released,unreleased]);assert.deepEqual(filterFavoriteOperators([released,unreleased]),[released,unreleased]);assert.ok(isLoadoutSlot(unreleased),'existing battle/loadout records remain valid');
 });

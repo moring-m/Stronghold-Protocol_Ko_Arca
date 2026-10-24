@@ -1,3 +1,5 @@
+import {QUINTUS_CLIP,QUINTUS_ANIMATION} from '../../../shared/quintus.js';
+export {QUINTUS_CLIP} from '../../../shared/quintus.js';
 // server/sim/content/bosses.js — scripted leaders (boss_1…boss_10) and their parts (DESIGN §7, research 05 §5, 06 §10.1).
 //
 // install(battle) ensures the enemy dispatch hooks (enemies.js) and attaches a boss kit to every spawned leader / part
@@ -70,7 +72,7 @@ import { MOVE_SCALE, MAX_ALIVE_ENEMIES } from '../constants.js';
 import { aggroCmp, areaSelectable } from '../targeting.js';
 import { compileRoute } from '../ai.js';
 import { normalizeRoute } from '../simdata.js';
-import { ensureInstalled, abOf, attach, T, elem, hurt, targetsNear, allTargets, byPriority, areaAllies, areaAlliesInTiles, fieldAllies, remainingRoute, stayRoute, stepToward, setHits, hitCount, lpLoss, blinkForward, canCast, unbalancedNow, absorbArts, nthOf, castSlot } from './enemies.js';
+import { ensureInstalled, attackTurnSkill, abOf, attach, T, elem, hurt, targetsNear, allTargets, byPriority, areaAllies, areaAlliesInTiles, fieldAllies, remainingRoute, stayRoute, stepToward, setHits, hitCount, lpLoss, blinkForward, canCast, unbalancedNow, absorbArts, nthOf, castSlot } from './enemies.js';
 import { hypot, powi } from '../detmath.js';
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -908,16 +910,35 @@ function kitQuintus(ab, e, b, tpl) {
   const stageSkills = [['Tidewater', 'Rockfall', 'SummonTentac'], ['TidewaterG1', 'RockfallG1', 'SummonTentacG1'], ['TidewaterG2', 'RockfallG2', 'SummonTentacG2', 'Doom']];
   const skills = [];
   const atkRatio = T(ab, 'epdamage.attack@ep_damage_ratio') ?? 0;
+  // 【大潮】 / 【崩坍】 are attack-class (prefab ability MeleeAttack like the Attack; PRTS 「触发索敌和普通攻击相同」): they take the
+  // attack's turn (enemies.js attackSlotSkill; PRTS 「大多数技能自动触发会占用攻击间隔」), equal priorities at random. Every
+  // skill's cooldown counts from the end of its clip (QUINTUS_CLIP; PRTS 「同一技能的冷却时间于该技能结束时开始计时」): the
+  // third-form tide (3.5 + 1.667 s) alternates with the attack instead of coming on top of it every 3.5 s (DESIGN §35.19).
+  // 断裂生殖 / 物种爆发 (AnimatedActionToOwnerAbility) take the attack's turn too — PRTS's default (most skills; no
+  // exception noted for them) and arknights.wiki.gg's one action ("attacking once or using another ability") between two
+  // tides —, with a trigger of their own (`own`: the abilities' `_allowNoTarget` 1), so they also come with the attack
+  // ready and nothing in range (enemies.js onTick; DESIGN §35.55; until then on their own timers). 断裂生殖 「仅仍有未执行的小队动作指令时
+  // 可触发」: its level branch (blackboard branch_id; prefab MoveNextLevelBranch, not looping) is shared by the three forms
+  // and used up after its last phase (7 in act1autochess_h07_04 / _s); a template without the branch keeps the
+  // random-target fallback with no limit.
+  const tentLeft = (s) => {
+    const br = tpl && tpl.branches && tpl.branches[s.bs.branch_id ?? 'dslily_dstnta'];
+    return Array.isArray(br) && br.length ? br.length : Infinity;
+  };
   const mk = (name, stage) => {
     const s = ab.sk[name];
     if (!s) return null;
     const kind = name.replace(/G\d$/, '');
-    const a = { cd: s.cd, icd: s.icd, sk: s, stage, cond: () => P.stage === stage, fire: (b2, e2) => QUINTUS[kind](b2, e2, s, P, tpl) };
+    const phases = kind === 'SummonTentac' ? tentLeft(s) : Infinity;
+    const a = {
+      cd: s.cd, icd: s.icd, sk: s, stage, atk: true, own: !QUINTUS_ATTACK_SKILLS.has(kind), clip: QUINTUS_CLIP[kind] ?? 0, animation: {clip:QUINTUS_ANIMATION[kind],duration:QUINTUS_CLIP[kind]},
+      cond: () => P.stage === stage && P.tent < phases, fire: (b2, e2) => QUINTUS[kind](b2, e2, s, P, tpl),
+    };
     skills.push(a);
     return a;
   };
   const list = [{
-    spawn(b2, e2) { P.t0 = b2.time; P.stageAt = b2.time; e2.profile.maxTargets = 2; },
+    spawn(b2, e2) { P.t0 = b2.time; P.stageAt = b2.time; e2.profile.maxTargets = 2; e2.profile.attackTurnSkill = attackTurnSkill; },
     before(c, b2, e2) { // 同时攻击防御最高的两个单位
       const l = targetsNear(b2, e2, e2.base.rangeRadius || 99).sort((p, q) => q.s.def - p.s.def || aggroCmp(p, q));
       if (l.length) c.targets = l.slice(0, 2);
@@ -932,6 +953,9 @@ function kitQuintus(ab, e, b, tpl) {
   }];
   const grow = (b2, e2, n) => {
     P.stage = n; P.stageAt = b2.time;
+    // one form's bonus at a time (the key is shared): the official AtkUp1 / AtkUp2 are mode-scoped talents (G1 / G2),
+    // so the third form is +70 %, not 40 + 70 (arknights.wiki.gg's +110 %, unsourced) [ASSUMED: inferred from where the
+    // talents sit; footage of the third-form panel ATK at base × 2.1 would make it one key per form; DESIGN §35.19]
     b2.addBuff(e2, { key: 'boss:grow', persist: true, visible: true, mods: { atkPct: T(ab, `atkup${n}.atk`) ?? 0 } });
     for (const a of skills) if (a.stage === n) a.left = a.icd;   // the new form's skills start from their initial cooldown
     b2.fx('grow', { x: e2.x, y: e2.y, id: e2.id, stage: n });
@@ -939,6 +963,21 @@ function kitQuintus(ab, e, b, tpl) {
   stageSkills.forEach((names, i) => names.forEach((n) => list.push(mk(n, i))));
   return list;
 }
+
+/** 昆图斯's skills whose trigger is the attack's (「触发索敌和普通攻击相同」: MeleeAttack); 断裂生殖 / 物种爆发 trigger on their own. */
+const QUINTUS_ATTACK_SKILLS = new Set(['Tidewater', 'Rockfall']);
+/**
+ * The clip of each 昆图斯 skill, in s: its official ability's animKey (prefab battle/enm_pfb_18.ab — fx/index.json units.
+ * enemy_1521_dslily.skills: tidewater* Skill_02, rockfall* Skill_01, summontentac* Skill_03, doom Skill_04; not
+ * looping, `_maxAnimScale` 1.0: never faster) → that clip's length in the model (data/assets.json
+ * enemies.enemy_1521_dslily.spine.animations). The skill's cooldown counts from the clip's end (enemies.js castNow).
+ * [ASSUMED] the length holds under an attack-speed cut too, as the engine's normal attack clip does (ai.js clipSpeed);
+ * the skills' abilities share the timing fields of 昆图斯's own Attack (`_timeMode` 0, `_maxAnimScale` 1.0), but their
+ * `_affectedBySlowDown` 1 allows a slower clip. So the third-form tide is ready 3.5 + 1.667 = 5.167 s after its cast
+ * whatever the slow: an attack interval past that (寒冷's −30 gives 5.0 s; 寒冷 plus any further cut crosses it) makes
+ * every turn a tide, with no normal attack (DESIGN §35.19, CHANGELOG 0.3.2).
+ */
+
 
 const QUINTUS = {
   Tidewater(b, e, s) { // 【大潮】 "对场上所有我方单位…": every operator it can select (fieldAllies): arts + neural

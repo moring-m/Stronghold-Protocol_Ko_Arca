@@ -1,3 +1,4 @@
+import { emitMotes } from '../shared/cetsyrMotes.js';
 // server/sim/content/kits/ops/chess_char_5_09-cetsyr.js — 魔王 (char_4134_cetsyr) kit, tier 5 (hidden).
 // Conventions of the tier-5 kits: ../shared/tier5.js; kit contract and rules: ../README.md.
 
@@ -76,6 +77,7 @@ export default {
             const keep = !!unit.skill?.active; // S3: "微尘"不再消失
             // "微尘"碰撞友方干员: operators only; a mote never collides with an operator already under a mote effect
             const cands = battle.alliesInRadius(unit.x, unit.y, reach, null).filter((a) => a !== unit && isOp(a) && !a.findBuff('cetsyr:mote'));
+            emitMotes(battle, unit, motes, orbit, num(t0.dynamic_spd, 30), keep ? 3 : 0);
             if (!cands.length) return;
             const t = battle.time - num(unit.deployedAt);
             for (let k = 0; k < cnt; k++) {
@@ -93,7 +95,8 @@ export default {
               if (!hit) continue;
               battle.addBuff(hit, { key: 'cetsyr:mote', duration: dur, visible: true, data: { src: unit, mul } });
               if (!keep) motes[k] = battle.time + cd;
-              battle.fx('mote', { x: hit.x, y: hit.y, id: hit.id });
+              battle.fx('mote', { x: hit.x, y: hit.y, id: hit.id, src: unit.id });
+              emitMotes(battle, unit, motes, orbit, num(t0.dynamic_spd, 30), keep ? 3 : 0);
             }
           });
           // "受到魔王特性效果提升至1.5倍": his trait's 生命回复速度 on that operator (professions.js bardRegen hook)

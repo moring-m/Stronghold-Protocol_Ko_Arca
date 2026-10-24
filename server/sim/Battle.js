@@ -2697,7 +2697,7 @@ export class Battle {
     const shifts = this.units.filter(u=>u.alive && u.mem.visualShift && this.time-u.mem.visualShift[4]<u.mem.visualShift[5]+.2)
       .map(u=>[u.id,...u.mem.visualShift]);
     if(shifts.length) snap.shifts=shifts;
-    snap.sakikoNotes = this.allyUnits.filter(u=>u.alive&&u.deployed&&!u.hidden).flatMap(u=>(u.mem.sakikoNotes||[]).map(n=>[u.id,n.id,r2(n.x),r2(n.y),n.type]));
+    snap.sakikoNotes = this.allyUnits.filter(u=>u.alive&&u.deployed&&!u.hidden).flatMap(u=>(u.mem.sakikoNotes||[]).map(n=>[u.id,n.id,r2(n.x),r2(n.y),n.type,n.projectile]));
     snap.skillRanges = this.allyUnits.flatMap(u=>{const keys=visibleSkillAreaKeys(u,this.time);return keys ? [[u.id,keys.map(k=>[Math.floor(k/this.grid.cols),k%this.grid.cols])]] : [];});
     snap.snow = this.allyUnits.filter(u=>u.alive&&u.deployed&&u.mem.snow instanceof Map).map(u=>[u.id,[...u.mem.snow].map(([k,n])=>[Math.floor(k/this.grid.cols),k%this.grid.cols,n])]);
     snap.airHeights = this.units.filter(u=>u.alive && u.deployed && !u.hidden && (u.s.flags.levitate || u.s.flags.float)).map(u=>[u.id,0.35]);

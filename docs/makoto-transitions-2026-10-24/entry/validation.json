@@ -1,0 +1,793 @@
+{
+  "results": [
+    {
+      "variant": "base",
+      "trace": [
+        {
+          "t": 0,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.03333333333333333,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.03333333333333333,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.06666666666666667,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.06666666666666667,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.1,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.1,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.13333333333333333,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.13333333333333333,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.16666666666666666,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.16666666666666666,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.2,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.19999999999999998,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.23333333333333334,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.2333333333333333,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.26666666666666666,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.26666666666666666,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.3,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.3,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.3333333333333333,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.3333333333333333,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.36666666666666664,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.36666666666666664,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.4,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.39999999999999997,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.43333333333333335,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.4333333333333333,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.4666666666666667,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.4666666666666666,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.5,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.49999999999999994,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.5333333333333333,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.5333333333333333,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.5666666666666667,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.5666666666666667,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.6,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.6,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.6333333333333333,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.6333333333333333,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.6666666666666666,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.6666666666666666,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.7,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.7,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.7333333333333333,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.7333333333333333,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.7666666666666667,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.7666666666666666,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.8,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.7999999999999999,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.8333333333333334,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.8333333333333333,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.8666666666666667,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.8666666666666666,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.9,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.8999999999999999,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.9333333333333333,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.9333333333333332,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.9666666666666667,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.9666666666666666,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 1,
+          "clip": "Doll_Skill_2_Loop",
+          "mode": "base",
+          "loop": true,
+          "ready": true,
+          "trackTime": 0,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 1.0333333333333334,
+          "clip": "Doll_Skill_2_Loop",
+          "mode": "base",
+          "loop": true,
+          "ready": true,
+          "trackTime": 0.03333333333333333,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 1.0666666666666667,
+          "clip": "Doll_Skill_2_Loop",
+          "mode": "base",
+          "loop": true,
+          "ready": true,
+          "trackTime": 0.06666666666666667,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 1.1,
+          "clip": "Doll_Skill_2_Loop",
+          "mode": "base",
+          "loop": true,
+          "ready": true,
+          "trackTime": 0.1,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 1.1333333333333333,
+          "clip": "Doll_Skill_2_Loop",
+          "mode": "base",
+          "loop": true,
+          "ready": true,
+          "trackTime": 0.13333333333333333,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 1.1666666666666667,
+          "clip": "Doll_Skill_2_Loop",
+          "mode": "base",
+          "loop": true,
+          "ready": true,
+          "trackTime": 0.16666666666666666,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 1.2,
+          "clip": "Doll_Skill_2_Loop",
+          "mode": "base",
+          "loop": true,
+          "ready": true,
+          "trackTime": 0.19999999999999998,
+          "form": "makoto_s2"
+        }
+      ]
+    },
+    {
+      "variant": "skin",
+      "trace": [
+        {
+          "t": 0,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.03333333333333333,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.03333333333333333,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.06666666666666667,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.06666666666666667,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.1,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.1,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.13333333333333333,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.13333333333333333,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.16666666666666666,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.16666666666666666,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.2,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.19999999999999998,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.23333333333333334,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.2333333333333333,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.26666666666666666,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.26666666666666666,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.3,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.3,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.3333333333333333,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.3333333333333333,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.36666666666666664,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.36666666666666664,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.4,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.39999999999999997,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.43333333333333335,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.4333333333333333,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.4666666666666667,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.4666666666666666,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.5,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.49999999999999994,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.5333333333333333,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.5333333333333333,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.5666666666666667,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.5666666666666667,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.6,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.6,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.6333333333333333,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.6333333333333333,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.6666666666666666,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.6666666666666666,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.7,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.7,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.7333333333333333,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.7333333333333333,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.7666666666666667,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.7666666666666666,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.8,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.7999999999999999,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.8333333333333334,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.8333333333333333,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.8666666666666667,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.8666666666666666,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.9,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.8999999999999999,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.9333333333333333,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.9333333333333332,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 0.9666666666666667,
+          "clip": "Doll_Skill_2_SwitchIn",
+          "mode": "change",
+          "loop": false,
+          "ready": true,
+          "trackTime": 0.9666666666666666,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 1,
+          "clip": "Doll_Skill_2_Loop",
+          "mode": "base",
+          "loop": true,
+          "ready": true,
+          "trackTime": 0,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 1.0333333333333334,
+          "clip": "Doll_Skill_2_Loop",
+          "mode": "base",
+          "loop": true,
+          "ready": true,
+          "trackTime": 0.03333333333333333,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 1.0666666666666667,
+          "clip": "Doll_Skill_2_Loop",
+          "mode": "base",
+          "loop": true,
+          "ready": true,
+          "trackTime": 0.06666666666666667,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 1.1,
+          "clip": "Doll_Skill_2_Loop",
+          "mode": "base",
+          "loop": true,
+          "ready": true,
+          "trackTime": 0.1,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 1.1333333333333333,
+          "clip": "Doll_Skill_2_Loop",
+          "mode": "base",
+          "loop": true,
+          "ready": true,
+          "trackTime": 0.13333333333333333,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 1.1666666666666667,
+          "clip": "Doll_Skill_2_Loop",
+          "mode": "base",
+          "loop": true,
+          "ready": true,
+          "trackTime": 0.16666666666666666,
+          "form": "makoto_s2"
+        },
+        {
+          "t": 1.2,
+          "clip": "Doll_Skill_2_Loop",
+          "mode": "base",
+          "loop": true,
+          "ready": true,
+          "trackTime": 0.19999999999999998,
+          "form": "makoto_s2"
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "requests": [
+    "/assets/local/map/autochess/TX_autochessi_D.png",
+    "/assets/local/map/autochess/TX_autochessi_N_rgb.png",
+    "/assets/local/map/autochess/TX_autochessi_M_rough.png",
+    "/assets/local/map/autochess/TX_autochessi_E.png",
+    "/assets/local/map/autochess/TX_autochessi_common_D.png",
+    "/assets/local/map/autochess/TX_autochessi_common_E.png",
+    "/assets/local/map/autochess/TX_autochessi_BG.png",
+    "/assets/local/map/common/TX_wind_device.png",
+    "/assets/local/map/fx/[opt]merged_textures.png",
+    "/assets/local/map/water/[ucp]TX_water_normal.png",
+    "/assets/local/map/water/TX_Caustics256.png",
+    "/assets/local/map/water/T_noise_clouds_01.png",
+    "/assets/ui/battle/sprite_shadow.png",
+    "/assets/ui/entry/bg_mountains_tiled.png",
+    "/assets/local/battle/dedicated/chen3/chenDragon.png",
+    "/assets/local/battle/dedicated/titi/special_object_titi_06.png",
+    "/assets/local/battle/dedicated/wisdel/wisdel_03.png",
+    "/assets/local/battle/dedicated/narant/narant_weapon01.png",
+    "/assets/local/map/autochess/tiles.json",
+    "/assets/local/map/autochess/materials.json",
+    "/assets/local/map/fx/materials.json",
+    "/assets/local/map/fx/prefab.json",
+    "/assets/local/map/original/crate-v1.json",
+    "/assets/local/map/original/platform-v1.json",
+    "/assets/local/map/original/materials-v13.json",
+    "/assets/local/map/original/act1autochess_m01-Lightmap-0_comp_light-rgbm-v1.png",
+    "/assets/local/map/original/act1autochess_m01-Lightmap-1_comp_light-rgbm-v1.png",
+    "/assets/local/map/original/TX_Caustics256.png",
+    "/assets/local/map/original/TX_WaterNoise.png",
+    "/assets/local/map/original/fangkuai_06.png",
+    "/assets/local/map/original/TX_Syracuse_metro_E.png",
+    "/assets/local/map/original/TX_Syracuse_metro_D.png",
+    "/assets/local/map/original/TX_Syracuse_metro_floor_D.png",
+    "/assets/local/map/original/TX_Syracuse_metro_common_E.png",
+    "/assets/local/map/original/TX_Syracuse_metro_grass_D.png",
+    "/assets/local/map/original/TX_Syracuse_metro_common_D.png",
+    "/assets/local/map/original/TX_LMZ_common_E.png",
+    "/assets/local/map/original/TX_LMZ_A.png",
+    "/assets/local/map/original/TX_LMZ_common.png",
+    "/assets/local/map/original/TX_LMZ_E.png",
+    "/assets/local/map/original/TX_KXMR_E.png",
+    "/assets/local/map/original/TX_KXMR_A.png",
+    "/assets/local/map/original/TX_Survivaloasis_E.png",
+    "/assets/local/map/original/TX_LakeGarden_E.png",
+    "/assets/local/map/original/TX_AutochessSand_shuidi_A.png",
+    "/assets/local/map/original/TX_AutochessSand_Grass_A.png",
+    "/assets/local/map/original/TX_AutochessSand_common_A.png",
+    "/assets/local/map/original/TX_AutochessSand_sand_A.png",
+    "/assets/local/map/original/TX_AutochessSand_background_A.png",
+    "/assets/local/map/original/TX_AutochessSand_A.png",
+    "/assets/local/map/original/TX_trap_1105_accrate.png",
+    "/assets/local/map/original/TX_trap_1106_achplat.png",
+    "/assets/local/map/original/act1autochess_m02-Lightmap-0_comp_light-rgbm-v1.png",
+    "/assets/local/map/original/act1autochess_m02-Lightmap-1_comp_light-rgbm-v1.png",
+    "/assets/local/map/original/act1autochess_m03-Lightmap-0_comp_light-rgbm-v1.png",
+    "/assets/local/map/original/act1autochess_m04-Lightmap-0_comp_light-rgbm-v1.png",
+    "/assets/local/map/original/act1autochess_m05-Lightmap-0_comp_light-rgbm-v1.png",
+    "/assets/local/map/original/act1autochess_m06-Lightmap-0_comp_light-rgbm-v1.png",
+    "/assets/local/map/original/act1autochess_m07-Lightmap-0_comp_light-rgbm-v1.png",
+    "/assets/local/map/original/act2autochess_m01-Lightmap-0_comp_light-rgbm-v1.png",
+    "/assets/local/map/original/act2autochess_m01-Lightmap-1_comp_light-rgbm-v1.png",
+    "/assets/local/map/original/act2autochess_m02-Lightmap-0_comp_light-rgbm-v1.png",
+    "/assets/local/map/original/act2autochess_m02-Lightmap-1_comp_light-rgbm-v1.png",
+    "/assets/local/map/original/act2autochess_m02-Lightmap-2_comp_light-rgbm-v1.png",
+    "/assets/local/map/original/act2autochess_m02-Lightmap-3_comp_light-rgbm-v1.png",
+    "/assets/local/map/original/act2autochess_m02-Lightmap-4_comp_light-rgbm-v1.png",
+    "/assets/local/map/original/act2autochess_m03-Lightmap-0_comp_light-rgbm-v1.png",
+    "/assets/local/map/original/act2autochess_m03-Lightmap-1_comp_light-rgbm-v1.png",
+    "/assets/local/map/original/act2autochess_m04-Lightmap-0_comp_light-rgbm-v1.png",
+    "/assets/local/map/original/act2autochess_m04-Lightmap-1_comp_light-rgbm-v1.png",
+    "/assets/local/map/original/TX_Syracuse_metro_floor_N_normal-rgb-v2.png",
+    "/assets/local/map/original/TX_Syracuse_metro_floor_M_metalrough-v2.png",
+    "/assets/local/map/original/TX_Syracuse_metro_N_normal-rgb-v2.png",
+    "/assets/local/map/original/TX_Syracuse_metro_M_metalrough-v2.png",
+    "/assets/local/map/original/TX_Syracuse_metro_grass_M_metalrough-v2.png",
+    "/assets/local/map/original/TX_Syracuse_metro_common_M_metalrough-v2.png",
+    "/assets/local/map/original/TX_LMZ_N_normal-rgb-v2.png",
+    "/assets/local/map/original/TX_LMZ_M_metalrough-v2.png",
+    "/assets/local/map/original/TX_LMC_common_M_metalrough-v2.png",
+    "/assets/local/map/original/TX_KXMR_N_normal-rgb-v2.png",
+    "/assets/local/map/original/TX_KXMR_M_metalrough-v2.png",
+    "/assets/local/map/original/TX_AutochessSand_Grass_N_normal-rgb-v2.png",
+    "/assets/local/map/original/TX_AutochessSand_Grass_M_metalrough-v2.png",
+    "/assets/local/map/original/TX_AutochessSand_N_normal-rgb-v2.png",
+    "/assets/local/map/original/TX_AutochessSand_M_metalrough-v2.png",
+    "/assets/local/map/original/TX_AutochessSand_shuidi_N_normal-rgb-v2.png",
+    "/assets/local/map/original/TX_AutochessSand_background_N_normal-rgb-v2.png",
+    "/assets/local/map/original/TX_SmoothWaves_normal-rgb-v2.png",
+    "/assets/local/mesh/s_common_box_01/pCube2.obj",
+    "/assets/local/mesh/s_wind_device/S_wild_wind_device.obj",
+    "/assets/local/mesh/s_background_common/pPlane1.obj",
+    "/assets/local/map/fx/Start_down.obj",
+    "/assets/local/map/fx/Start_up.obj",
+    "/assets/local/map/fx/Start_back_4235658232235163369.obj",
+    "/assets/local/map/fx/Start_down1.obj",
+    "/assets/local/map/fx/Start_up1.obj",
+    "/assets/local/map/original/act2autochess_m01-v16.bin.gz",
+    "/assets/spine/enemy/enemy_1001_bigbo/enemy_1001_bigbo.skel",
+    "/assets/local/recovery/sprites/char_4217_makoto-cee9974a9378.png",
+    "/assets/enemy/icon/enemy_1001_bigbo.png",
+    "/assets/local/recovery/sprites/char_4217_makoto_2-7e70176e2895.png",
+    "/assets/local/recovery/spine/char_4217_makoto_1-73d38e19a0-9eb1a60b/DefaultSkin_FaceSwitcher_Front-20892e3f/char_4217_makoto.skel",
+    "/assets/spine/enemy/enemy_1001_bigbo/enemy_1001_bigbo.atlas",
+    "/assets/local/recovery/spine/char_4217_makoto_1-73d38e19a0-9eb1a60b/DefaultSkin_FaceSwitcher_Front-20892e3f/char_4217_makoto.atlas",
+    "/assets/spine/enemy/enemy_1001_bigbo/enemy_1001_bigbo.png",
+    "/assets/local/recovery/spine/char_4217_makoto_1-73d38e19a0-9eb1a60b/DefaultSkin_FaceSwitcher_Front-20892e3f/char_4217_makoto.png",
+    "/assets/local/recovery/spine/char_4217_makoto_p3r_1-dc6bea880d-0e5db198/char_4217_makoto_p3r_1_FaceSwitcher_Front-1f41c12d/char_4217_makoto_p3r_1-9ee442fb.skel",
+    "/assets/local/recovery/sprites/char_4217_makoto_p3r_1-9ee442fb-08f692c791af.png",
+    "/assets/local/recovery/spine/char_4217_makoto_p3r_1-dc6bea880d-0e5db198/char_4217_makoto_p3r_1_FaceSwitcher_Front-1f41c12d/char_4217_makoto_p3r_1-9ee442fb.atlas",
+    "/assets/local/recovery/spine/char_4217_makoto_p3r_1-dc6bea880d-0e5db198/char_4217_makoto_p3r_1_FaceSwitcher_Front-1f41c12d/char_4217_makoto_p3r_1-9ee442fb.png"
+  ]
+}

@@ -1,0 +1,1750 @@
+{
+  "results": [
+    {
+      "key": "2-skin",
+      "entry": 3.467,
+      "exit": 25.467,
+      "forms": [
+        {
+          "time": 3.467,
+          "form": "makoto_s3a"
+        },
+        {
+          "time": 9.033,
+          "form": "makoto_change"
+        },
+        {
+          "time": 10.567,
+          "form": "makoto_s3b"
+        },
+        {
+          "time": 25.467,
+          "form": "makoto_exit_s3b"
+        },
+        {
+          "time": 26.467,
+          "form": "makoto_total"
+        }
+      ],
+      "trace": [
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 0.8,
+          "visible": true,
+          "t": 2.033,
+          "renderT": 2.033,
+          "form": null,
+          "mode": "base",
+          "clip": "Idle",
+          "trackTime": 0.1,
+          "loop": true,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_attack_a_start_01_p3r#1",
+            "makoto_birth_01_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 2.133,
+          "renderT": 2.133,
+          "form": null,
+          "mode": "base",
+          "clip": "Idle",
+          "trackTime": 0.2,
+          "loop": true,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_attack_a_start_01_p3r#1",
+            "makoto_birth_01_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 2.233,
+          "renderT": 2.233,
+          "form": null,
+          "mode": "attack",
+          "clip": "Attack_B",
+          "trackTime": 0.033,
+          "loop": false,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_attack_a_start_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_start_01_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 2.333,
+          "renderT": 2.333,
+          "form": null,
+          "mode": "attack",
+          "clip": "Attack_B",
+          "trackTime": 0.133,
+          "loop": false,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_attack_a_start_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_start_01_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 2.433,
+          "renderT": 2.433,
+          "form": null,
+          "mode": "attack",
+          "clip": "Attack_B",
+          "trackTime": 0.233,
+          "loop": false,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_attack_a_start_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_start_01_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 2.533,
+          "renderT": 2.533,
+          "form": null,
+          "mode": "attack",
+          "clip": "Attack_B",
+          "trackTime": 0.3330000000000001,
+          "loop": false,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_attack_a_start_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_start_01_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 2.633,
+          "renderT": 2.633,
+          "form": null,
+          "mode": "attack",
+          "clip": "Attack_B",
+          "trackTime": 0.43300000000000016,
+          "loop": false,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_attack_a_start_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_start_01_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 2.733,
+          "renderT": 2.733,
+          "form": null,
+          "mode": "attack",
+          "clip": "Attack_B",
+          "trackTime": 0.5330000000000003,
+          "loop": false,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_attack_a_start_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_start_01_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 2.833,
+          "renderT": 2.833,
+          "form": null,
+          "mode": "attack",
+          "clip": "Attack_B",
+          "trackTime": 0.6330000000000003,
+          "loop": false,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_attack_a_start_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_start_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 2.933,
+          "renderT": 2.933,
+          "form": null,
+          "mode": "attack",
+          "clip": "Attack_B",
+          "trackTime": 0.7330000000000004,
+          "loop": false,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_attack_a_start_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_start_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 3.033,
+          "renderT": 3.033,
+          "form": null,
+          "mode": "attack",
+          "clip": "Attack_B",
+          "trackTime": 0.8330000000000005,
+          "loop": false,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_attack_a_start_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_start_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 3.133,
+          "renderT": 3.133,
+          "form": null,
+          "mode": "attack",
+          "clip": "Attack_B",
+          "trackTime": 0.9330000000000006,
+          "loop": false,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_attack_a_start_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_start_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 3.233,
+          "renderT": 3.233,
+          "form": null,
+          "mode": "attack",
+          "clip": "Attack_B",
+          "trackTime": 1.0330000000000006,
+          "loop": false,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_attack_a_start_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_start_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 3.333,
+          "renderT": 3.333,
+          "form": null,
+          "mode": "attack",
+          "clip": "Attack_B",
+          "trackTime": 1.1330000000000005,
+          "loop": false,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_attack_a_start_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_start_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 3.433,
+          "renderT": 3.433,
+          "form": null,
+          "mode": "base",
+          "clip": "Idle",
+          "trackTime": 0.033,
+          "loop": true,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_attack_a_start_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_start_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 3.467,
+          "renderT": 3.467,
+          "form": "makoto_s3a",
+          "mode": "change",
+          "clip": "SwitchOut",
+          "trackTime": 0.034,
+          "loop": false,
+          "late": 0.034,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_attack_a_start_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_start_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "common_invincible_01",
+            "buff_slowdown"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 3.533,
+          "renderT": 3.533,
+          "form": "makoto_s3a",
+          "mode": "change",
+          "clip": "SwitchOut",
+          "trackTime": 0.1,
+          "loop": false,
+          "late": 0.1,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_attack_a_start_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_start_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "common_invincible_01",
+            "buff_slowdown"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 3.633,
+          "renderT": 3.633,
+          "form": "makoto_s3a",
+          "mode": "change",
+          "clip": "SwitchOut",
+          "trackTime": 0.2,
+          "loop": false,
+          "late": 0.2,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_start_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "common_invincible_01",
+            "buff_slowdown"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 3.733,
+          "renderT": 3.733,
+          "form": "makoto_s3a",
+          "mode": "change",
+          "clip": "SwitchOut",
+          "trackTime": 0.30000000000000004,
+          "loop": false,
+          "late": 0.30000000000000004,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "common_invincible_01",
+            "buff_slowdown"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 3.833,
+          "renderT": 3.833,
+          "form": "makoto_s3a",
+          "mode": "change",
+          "clip": "SwitchOut",
+          "trackTime": 0.40000000000000013,
+          "loop": false,
+          "late": 0.40000000000000013,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "common_invincible_01",
+            "buff_slowdown"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 3.933,
+          "renderT": 3.933,
+          "form": "makoto_s3a",
+          "mode": "change",
+          "clip": "SwitchOut",
+          "trackTime": 0.5000000000000002,
+          "loop": false,
+          "late": 0.5000000000000002,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "common_invincible_01",
+            "buff_slowdown"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 4.033,
+          "renderT": 4.033,
+          "form": "makoto_s3a",
+          "mode": "change",
+          "clip": "SwitchOut",
+          "trackTime": 0.6000000000000003,
+          "loop": false,
+          "late": 0.6000000000000003,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "common_invincible_01",
+            "buff_slowdown"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 4.133,
+          "renderT": 4.133,
+          "form": "makoto_s3a",
+          "mode": "change",
+          "clip": "SwitchOut",
+          "trackTime": 0.7000000000000004,
+          "loop": false,
+          "late": 0.7000000000000004,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "common_invincible_01",
+            "buff_slowdown"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 4.233,
+          "renderT": 4.233,
+          "form": "makoto_s3a",
+          "mode": "change",
+          "clip": "SwitchOut",
+          "trackTime": 0.8000000000000005,
+          "loop": false,
+          "late": 0.8000000000000005,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "common_invincible_01",
+            "buff_slowdown"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 4.333,
+          "renderT": 4.333,
+          "form": "makoto_s3a",
+          "mode": "change",
+          "clip": "SwitchOut",
+          "trackTime": 0.9000000000000006,
+          "loop": false,
+          "late": 0.9000000000000006,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "common_invincible_01",
+            "buff_slowdown"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 4.433,
+          "renderT": 4.433,
+          "form": "makoto_s3a",
+          "mode": "change",
+          "clip": "Doll_Skill_3_P1_SwitchIn",
+          "trackTime": 0,
+          "loop": false,
+          "late": 1.0000000000000007,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "common_invincible_01",
+            "buff_slowdown"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 4.533,
+          "renderT": 4.533,
+          "form": "makoto_s3a",
+          "mode": "change",
+          "clip": "Doll_Skill_3_P1_SwitchIn",
+          "trackTime": 0.1,
+          "loop": false,
+          "late": 1.1000000000000005,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "common_invincible_01",
+            "buff_slowdown",
+            "makoto_skill_03_p1_buff_01_r_p3r#1",
+            "makoto_skill_03_p1_range_01_p3r#1",
+            "makoto_skill_03_p1_range_01_start_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 4.633,
+          "renderT": 4.633,
+          "form": "makoto_s3a",
+          "mode": "change",
+          "clip": "Doll_Skill_3_P1_SwitchIn",
+          "trackTime": 0.2,
+          "loop": false,
+          "late": 1.2000000000000004,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "common_invincible_01",
+            "buff_slowdown",
+            "makoto_skill_03_p1_buff_01_r_p3r#1",
+            "makoto_skill_03_p1_range_01_p3r#1",
+            "makoto_skill_03_p1_range_01_start_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 4.733,
+          "renderT": 4.733,
+          "form": "makoto_s3a",
+          "mode": "change",
+          "clip": "Doll_Skill_3_P1_SwitchIn",
+          "trackTime": 0.30000000000000004,
+          "loop": false,
+          "late": 1.3000000000000003,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "common_invincible_01",
+            "buff_slowdown",
+            "makoto_skill_03_p1_buff_01_r_p3r#1",
+            "makoto_skill_03_p1_range_01_p3r#1",
+            "makoto_skill_03_p1_range_01_start_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 4.833,
+          "renderT": 4.833,
+          "form": "makoto_s3a",
+          "mode": "change",
+          "clip": "Doll_Skill_3_P1_SwitchIn",
+          "trackTime": 0.40000000000000013,
+          "loop": false,
+          "late": 1.4000000000000001,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "common_invincible_01",
+            "buff_slowdown",
+            "makoto_skill_03_p1_buff_01_r_p3r#1",
+            "makoto_skill_03_p1_range_01_p3r#1",
+            "makoto_skill_03_p1_range_01_start_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 4.933,
+          "renderT": 4.933,
+          "form": "makoto_s3a",
+          "mode": "change",
+          "clip": "Doll_Skill_3_P1_SwitchIn",
+          "trackTime": 0.5000000000000002,
+          "loop": false,
+          "late": 1.5,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "common_invincible_01",
+            "buff_slowdown",
+            "makoto_skill_03_p1_buff_01_r_p3r#1",
+            "makoto_skill_03_p1_range_01_p3r#1",
+            "makoto_skill_03_p1_range_01_start_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 5.033,
+          "renderT": 5.033,
+          "form": "makoto_s3a",
+          "mode": "change",
+          "clip": "Doll_Skill_3_P1_SwitchIn",
+          "trackTime": 0.6000000000000003,
+          "loop": false,
+          "late": 1.5999999999999999,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "common_invincible_01",
+            "buff_slowdown",
+            "makoto_skill_03_p1_buff_01_r_p3r#1",
+            "makoto_skill_03_p1_range_01_p3r#1",
+            "makoto_skill_03_p1_range_01_start_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 5.133,
+          "renderT": 5.133,
+          "form": "makoto_s3a",
+          "mode": "change",
+          "clip": "Doll_Skill_3_P1_SwitchIn",
+          "trackTime": 0.7000000000000004,
+          "loop": false,
+          "late": 1.6999999999999997,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "common_invincible_01",
+            "buff_slowdown",
+            "makoto_skill_03_p1_buff_01_r_p3r#1",
+            "makoto_skill_03_p1_range_01_p3r#1",
+            "makoto_skill_03_p1_range_01_start_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 5.233,
+          "renderT": 5.233,
+          "form": "makoto_s3a",
+          "mode": "change",
+          "clip": "Doll_Skill_3_P1_SwitchIn",
+          "trackTime": 0.8000000000000005,
+          "loop": false,
+          "late": 1.7999999999999996,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "common_invincible_01",
+            "buff_slowdown",
+            "makoto_skill_03_p1_buff_01_r_p3r#1",
+            "makoto_skill_03_p1_range_01_p3r#1",
+            "makoto_skill_03_p1_range_01_start_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 5.333,
+          "renderT": 5.333,
+          "form": "makoto_s3a",
+          "mode": "change",
+          "clip": "Doll_Skill_3_P1_SwitchIn",
+          "trackTime": 0.9000000000000006,
+          "loop": false,
+          "late": 1.8999999999999995,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_change_01_p3r#1",
+            "common_invincible_01",
+            "buff_slowdown",
+            "makoto_skill_03_p1_buff_01_r_p3r#1",
+            "makoto_skill_03_p1_range_01_p3r#1",
+            "makoto_skill_03_p1_range_01_start_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 5.433,
+          "renderT": 5.433,
+          "form": "makoto_s3a",
+          "mode": "change",
+          "clip": "Doll_Skill_3_P1_SwitchIn",
+          "trackTime": 1.0000000000000007,
+          "loop": false,
+          "late": 1.9999999999999993,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "common_invincible_01",
+            "buff_slowdown",
+            "makoto_skill_03_p1_buff_01_r_p3r#1",
+            "makoto_skill_03_p1_range_01_p3r#1",
+            "makoto_skill_03_p1_range_01_start_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 5.533,
+          "renderT": 5.533,
+          "form": "makoto_s3a",
+          "mode": "base",
+          "clip": "Doll_Skill_3_P1_Idle",
+          "trackTime": 0.066,
+          "loop": true,
+          "late": 2.099999999999999,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "common_invincible_01",
+            "buff_slowdown",
+            "makoto_skill_03_p1_buff_01_r_p3r#1",
+            "makoto_skill_03_p1_range_01_p3r#1",
+            "makoto_skill_03_p1_range_01_start_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_skill_03_p1_start_a_01_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 5.633,
+          "renderT": 5.633,
+          "form": "makoto_s3a",
+          "mode": "base",
+          "clip": "Doll_Skill_3_P1_Idle",
+          "trackTime": 0.166,
+          "loop": true,
+          "late": 2.199999999999999,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "common_invincible_01",
+            "buff_slowdown",
+            "makoto_skill_03_p1_buff_01_r_p3r#1",
+            "makoto_skill_03_p1_range_01_p3r#1",
+            "makoto_skill_03_p1_range_01_start_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_skill_03_p1_start_a_01_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 5.733,
+          "renderT": 5.733,
+          "form": "makoto_s3a",
+          "mode": "base",
+          "clip": "Doll_Skill_3_P1_Idle",
+          "trackTime": 0.266,
+          "loop": true,
+          "late": 2.2999999999999985,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "common_invincible_01",
+            "buff_slowdown",
+            "makoto_skill_03_p1_buff_01_r_p3r#1",
+            "makoto_skill_03_p1_range_01_p3r#1",
+            "makoto_skill_03_p1_range_01_start_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_skill_03_p1_start_a_01_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 5.833,
+          "renderT": 5.833,
+          "form": "makoto_s3a",
+          "mode": "base",
+          "clip": "Doll_Skill_3_P1_Idle",
+          "trackTime": 0.3660000000000001,
+          "loop": true,
+          "late": 2.399999999999998,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "common_invincible_01",
+            "buff_slowdown",
+            "makoto_skill_03_p1_buff_01_r_p3r#1",
+            "makoto_skill_03_p1_range_01_p3r#1",
+            "makoto_skill_03_p1_range_01_start_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_skill_03_p1_start_a_01_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 5.933,
+          "renderT": 5.933,
+          "form": "makoto_s3a",
+          "mode": "base",
+          "clip": "Doll_Skill_3_P1_Idle",
+          "trackTime": 0.4660000000000002,
+          "loop": true,
+          "late": 2.499999999999998,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "common_invincible_01",
+            "buff_slowdown",
+            "makoto_skill_03_p1_buff_01_r_p3r#1",
+            "makoto_skill_03_p1_range_01_p3r#1",
+            "makoto_skill_03_p1_range_01_start_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_skill_03_p1_start_a_01_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 6.033,
+          "renderT": 6.033,
+          "form": "makoto_s3a",
+          "mode": "attack",
+          "clip": "Doll_Skill_3_P1_Attack_A",
+          "trackTime": 0.963125,
+          "loop": false,
+          "late": 2.5999999999999974,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "common_invincible_01",
+            "buff_slowdown",
+            "makoto_skill_03_p1_buff_01_r_p3r#1",
+            "makoto_skill_03_p1_range_01_p3r#1",
+            "makoto_skill_03_p1_range_01_start_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_skill_03_p1_start_a_01_p3r#1",
+            "common_hit_01",
+            "makoto_skill_03_p1_hit_01_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 6.133,
+          "renderT": 6.133,
+          "form": "makoto_s3a",
+          "mode": "attack",
+          "clip": "Doll_Skill_3_P1_Attack_A",
+          "trackTime": 1.12625,
+          "loop": false,
+          "late": 2.699999999999997,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "common_invincible_01",
+            "buff_slowdown",
+            "makoto_skill_03_p1_buff_01_r_p3r#1",
+            "makoto_skill_03_p1_range_01_p3r#1",
+            "makoto_skill_03_p1_range_01_start_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_skill_03_p1_start_a_01_p3r#1",
+            "common_hit_01",
+            "makoto_skill_03_p1_hit_01_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 6.233,
+          "renderT": 6.233,
+          "form": "makoto_s3a",
+          "mode": "attack",
+          "clip": "Doll_Skill_3_P1_Attack_A",
+          "trackTime": 1.289375,
+          "loop": false,
+          "late": 2.7999999999999967,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "common_invincible_01",
+            "buff_slowdown",
+            "makoto_skill_03_p1_buff_01_r_p3r#1",
+            "makoto_skill_03_p1_range_01_p3r#1",
+            "makoto_skill_03_p1_range_01_start_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_skill_03_p1_start_a_01_p3r#1",
+            "common_hit_01",
+            "makoto_skill_03_p1_hit_01_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 6.333,
+          "renderT": 6.333,
+          "form": "makoto_s3a",
+          "mode": "attack",
+          "clip": "Doll_Skill_3_P1_Attack_A",
+          "trackTime": 1.4525,
+          "loop": false,
+          "late": 2.8999999999999964,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "buff_slowdown",
+            "makoto_skill_03_p1_buff_01_r_p3r#1",
+            "makoto_skill_03_p1_range_01_p3r#1",
+            "makoto_skill_03_p1_range_01_start_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_skill_03_p1_start_a_01_p3r#1",
+            "common_hit_01",
+            "makoto_skill_03_p1_hit_01_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 6.433,
+          "renderT": 6.433,
+          "form": "makoto_s3a",
+          "mode": "attack",
+          "clip": "Doll_Skill_3_P1_Attack_A",
+          "trackTime": 1.6156249999999999,
+          "loop": false,
+          "late": 2.999999999999996,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "buff_slowdown",
+            "makoto_skill_03_p1_buff_01_r_p3r#1",
+            "makoto_skill_03_p1_range_01_p3r#1",
+            "makoto_skill_03_p1_range_01_start_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_skill_03_p1_start_a_01_p3r#1",
+            "common_hit_01",
+            "makoto_skill_03_p1_hit_01_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 6.533,
+          "renderT": 6.533,
+          "form": "makoto_s3a",
+          "mode": "attack",
+          "clip": "Doll_Skill_3_P1_Attack_A",
+          "trackTime": 1.7787499999999998,
+          "loop": false,
+          "late": 3.0999999999999956,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "buff_slowdown",
+            "makoto_skill_03_p1_buff_01_r_p3r#1",
+            "makoto_skill_03_p1_range_01_p3r#1",
+            "makoto_skill_03_p1_range_01_start_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_skill_03_p1_start_a_01_p3r#1",
+            "common_hit_01",
+            "makoto_skill_03_p1_hit_01_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 6.633,
+          "renderT": 6.633,
+          "form": "makoto_s3a",
+          "mode": "attack",
+          "clip": "Doll_Skill_3_P1_Attack_B",
+          "trackTime": 0.10766250000000001,
+          "loop": false,
+          "late": 3.1999999999999953,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "buff_slowdown",
+            "makoto_skill_03_p1_buff_01_r_p3r#1",
+            "makoto_skill_03_p1_range_01_p3r#1",
+            "makoto_skill_03_p1_range_01_start_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_skill_03_p1_start_a_01_p3r#1",
+            "common_hit_01",
+            "makoto_skill_03_p1_hit_01_p3r#1",
+            "makoto_skill_03_p1_start_b_01_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 6.733,
+          "renderT": 6.733,
+          "form": "makoto_s3a",
+          "mode": "attack",
+          "clip": "Doll_Skill_3_P1_Attack_B",
+          "trackTime": 0.2707875,
+          "loop": false,
+          "late": 3.299999999999995,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "buff_slowdown",
+            "makoto_skill_03_p1_buff_01_r_p3r#1",
+            "makoto_skill_03_p1_range_01_p3r#1",
+            "makoto_skill_03_p1_range_01_start_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_skill_03_p1_start_a_01_p3r#1",
+            "common_hit_01",
+            "makoto_skill_03_p1_hit_01_p3r#1",
+            "makoto_skill_03_p1_start_b_01_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 6.833,
+          "renderT": 6.833,
+          "form": "makoto_s3a",
+          "mode": "attack",
+          "clip": "Doll_Skill_3_P1_Attack_B",
+          "trackTime": 0.43391250000000003,
+          "loop": false,
+          "late": 3.3999999999999946,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "buff_slowdown",
+            "makoto_skill_03_p1_buff_01_r_p3r#1",
+            "makoto_skill_03_p1_range_01_p3r#1",
+            "makoto_skill_03_p1_range_01_start_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_skill_03_p1_start_a_01_p3r#1",
+            "common_hit_01",
+            "makoto_skill_03_p1_hit_01_p3r#1",
+            "makoto_skill_03_p1_start_b_01_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 6.933,
+          "renderT": 6.933,
+          "form": "makoto_s3a",
+          "mode": "attack",
+          "clip": "Doll_Skill_3_P1_Attack_B",
+          "trackTime": 0.5970375000000001,
+          "loop": false,
+          "late": 3.4999999999999942,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "buff_slowdown",
+            "makoto_skill_03_p1_buff_01_r_p3r#1",
+            "makoto_skill_03_p1_range_01_p3r#1",
+            "makoto_skill_03_p1_range_01_start_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_skill_03_p1_start_a_01_p3r#1",
+            "common_hit_01",
+            "makoto_skill_03_p1_hit_01_p3r#1",
+            "makoto_skill_03_p1_start_b_01_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 7.033,
+          "renderT": 7.033,
+          "form": "makoto_s3a",
+          "mode": "attack",
+          "clip": "Doll_Skill_3_P1_Attack_B",
+          "trackTime": 0.7601625000000001,
+          "loop": false,
+          "late": 3.599999999999994,
+          "fx": [
+            "makoto_attack_a_hit_01_p3r#1",
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "buff_slowdown",
+            "makoto_skill_03_p1_buff_01_r_p3r#1",
+            "makoto_skill_03_p1_range_01_p3r#1",
+            "makoto_skill_03_p1_range_01_start_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_skill_03_p1_start_a_01_p3r#1",
+            "common_hit_01",
+            "makoto_skill_03_p1_hit_01_p3r#1",
+            "makoto_skill_03_p1_start_b_01_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 7.133,
+          "renderT": 7.133,
+          "form": "makoto_s3a",
+          "mode": "attack",
+          "clip": "Doll_Skill_3_P1_Attack_B",
+          "trackTime": 0.9232875,
+          "loop": false,
+          "late": 3.6999999999999935,
+          "fx": [
+            "makoto_birth_01_p3r#1",
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "buff_slowdown",
+            "makoto_skill_03_p1_buff_01_r_p3r#1",
+            "makoto_skill_03_p1_range_01_p3r#1",
+            "makoto_skill_03_p1_range_01_start_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_skill_03_p1_start_a_01_p3r#1",
+            "common_hit_01",
+            "makoto_skill_03_p1_hit_01_p3r#1",
+            "makoto_skill_03_p1_start_b_01_p3r#1",
+            "common_hit_01",
+            "makoto_skill_03_p1_hit_01_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 7.233,
+          "renderT": 7.233,
+          "form": "makoto_s3a",
+          "mode": "attack",
+          "clip": "Doll_Skill_3_P1_Attack_B",
+          "trackTime": 1.0864125,
+          "loop": false,
+          "bypass": false,
+          "late": 3.799999999999993,
+          "fx": [
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "buff_slowdown",
+            "makoto_skill_03_p1_buff_01_r_p3r#1",
+            "makoto_skill_03_p1_range_01_p3r#1",
+            "makoto_skill_03_p1_range_01_start_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_skill_03_p1_start_a_01_p3r#1",
+            "common_hit_01",
+            "makoto_skill_03_p1_hit_01_p3r#1",
+            "makoto_skill_03_p1_start_b_01_p3r#1",
+            "common_hit_01",
+            "makoto_skill_03_p1_hit_01_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 7.333,
+          "renderT": 7.333,
+          "form": "makoto_s3a",
+          "mode": "attack",
+          "clip": "Doll_Skill_3_P1_Attack_B",
+          "trackTime": 1.19570625,
+          "loop": false,
+          "bypass": false,
+          "late": 3.899999999999993,
+          "fx": [
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "buff_slowdown",
+            "makoto_skill_03_p1_buff_01_r_p3r#1",
+            "makoto_skill_03_p1_range_01_p3r#1",
+            "makoto_skill_03_p1_range_01_start_p3r#1",
+            "makoto_change_01_p3r#1",
+            "makoto_skill_03_p1_start_a_01_p3r#1",
+            "common_hit_01",
+            "makoto_skill_03_p1_hit_01_p3r#1",
+            "makoto_skill_03_p1_start_b_01_p3r#1",
+            "common_hit_01",
+            "makoto_skill_03_p1_hit_01_p3r#1"
+          ]
+        },
+        {
+          "screen": {
+            "x": 457.8518856385208,
+            "y": 465.78566894113385,
+            "s": 92.14811436147922,
+            "top": 357.05089399458836,
+            "depth": 11.330035634773644
+          },
+          "alpha": 1,
+          "visible": true,
+          "t": 7.433,
+          "renderT": 7.433,
+          "form": "makoto_s3a",
+          "mode": "attack",
+          "clip": "Doll_Skill_3_P1_Attack_B",
+          "trackTime": 1.4126625,
+          "loop": false,
+          "bypass": false,
+          "late": 3.9999999999999925,
+          "fx": [
+            "makoto_attack_b_hit_01_p3r#1",
+            "buff_sluggish",
+            "buff_slowdown",
+            "makoto_skill_03_p1_buff_01_r_p3r#1",
+            "makoto_skill_03_p1_range_01_p3r#1",
+            "makoto_skill_03_p1_range_01_start_p3r#1",
+            "makoto_skill_03_p1_start_a_01_p3r#1",
+            "makoto_skill_03_p1_hit_01_p3r#1",
+            "makoto_skill_03_p1_start_b_01_p3r#1",
+            "common_hit_01",
+            "makoto_skill_03_p1_hit_01_p3r#1"
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,59 @@
+[
+  {
+    "charId": "char_499_kaitou",
+    "skinId": "char_499_kaitou@epoque#37",
+    "name": "斜照",
+    "missing": [
+      "selection",
+      "model"
+    ]
+  },
+  {
+    "charId": "char_4109_baslin",
+    "skinId": "char_4109_baslin@witch#5",
+    "name": "夜空星芒",
+    "missing": [
+      "selection",
+      "model"
+    ]
+  },
+  {
+    "charId": "char_4047_pianst",
+    "skinId": "char_4047_pianst@wild#8",
+    "name": "荒野寻音",
+    "missing": [
+      "selection",
+      "model"
+    ]
+  },
+  {
+    "charId": "char_2025_shu",
+    "skinId": "char_2025_shu@nlc#1",
+    "name": "源远流长",
+    "missing": [
+      "selection",
+      "model",
+      "fx-binding"
+    ]
+  },
+  {
+    "charId": "char_1040_blaze2",
+    "skinId": "char_1040_blaze2@nlc#1",
+    "name": "夜行烛火",
+    "missing": [
+      "selection",
+      "model",
+      "fx-binding"
+    ]
+  },
+  {
+    "charId": "char_1033_swire2",
+    "skinId": "char_1033_swire2@nlc#1",
+    "name": "盛世之象",
+    "missing": [
+      "selection",
+      "model",
+      "fx-binding"
+    ]
+  }
+]

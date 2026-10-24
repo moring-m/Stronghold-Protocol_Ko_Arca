@@ -1,0 +1,226 @@
+[
+  {
+    "skin": "skin_char_1038_whitw2_sale_15",
+    "charId": "char_1038_whitw2",
+    "changed": [
+      "whitw2_token_01_sale#15",
+      "whitw2_token_end_01_sale#15",
+      "whitw2_token_hit_01_sale#15",
+      "whitw2_token_02_sale#15",
+      "whitw2_token_end_02_sale#15",
+      "whitw2_token_hit_02_sale#15",
+      "whitw2_token_03_sale#15",
+      "whitw2_token_end_03_sale#15",
+      "whitw2_token_hit_03_sale#15",
+      "whitw2_token_hit_04_sale#15",
+      "whitw2_token_hit_05_sale#15",
+      "whitw2_token_hit_06_sale#15",
+      "whitw2_skill_03_token_trail_01_sale#15",
+      "whitw2_skill_03_buff_start_sale#15",
+      "whitw2_skill_03_mark_01_sale#15",
+      "whitw2_skill_03_mark_02_sale#15"
+    ]
+  },
+  {
+    "skin": "char_1038_whitw2@sale#15",
+    "charId": "char_1038_whitw2",
+    "changed": [
+      "whitw2_token_01_sale#15",
+      "whitw2_token_end_01_sale#15",
+      "whitw2_token_hit_01_sale#15",
+      "whitw2_token_02_sale#15",
+      "whitw2_token_end_02_sale#15",
+      "whitw2_token_hit_02_sale#15",
+      "whitw2_token_03_sale#15",
+      "whitw2_token_end_03_sale#15",
+      "whitw2_token_hit_03_sale#15",
+      "whitw2_token_hit_04_sale#15",
+      "whitw2_token_hit_05_sale#15",
+      "whitw2_token_hit_06_sale#15",
+      "whitw2_skill_03_token_trail_01_sale#15",
+      "whitw2_skill_03_buff_start_sale#15",
+      "whitw2_skill_03_mark_01_sale#15",
+      "whitw2_skill_03_mark_02_sale#15"
+    ]
+  },
+  {
+    "skin": "skin_char_377_gdglow_sanrio_1",
+    "charId": "char_377_gdglow",
+    "changed": [
+      "gdglow_token_skill_01_sanrio#1",
+      "gdglow_token_hide_01_sanrio#1",
+      "gdglow_token_hit_l_01_sanrio#1",
+      "gdglow_token_hit_l_02_sanrio#1",
+      "gdglow_token_hit_r_01_sanrio#1",
+      "gdglow_token_hit_r_02_sanrio#1",
+      "gdglow_token_skill_02_sanrio#1",
+      "gdglow_token_skill_03_sanrio#1",
+      "gdglow_token_01_sanrio#1"
+    ]
+  },
+  {
+    "skin": "char_377_gdglow@sanrio#1",
+    "charId": "char_377_gdglow",
+    "changed": [
+      "gdglow_token_skill_01_sanrio#1",
+      "gdglow_token_hide_01_sanrio#1",
+      "gdglow_token_hit_l_01_sanrio#1",
+      "gdglow_token_hit_l_02_sanrio#1",
+      "gdglow_token_hit_r_01_sanrio#1",
+      "gdglow_token_hit_r_02_sanrio#1",
+      "gdglow_token_skill_02_sanrio#1",
+      "gdglow_token_skill_03_sanrio#1",
+      "gdglow_token_01_sanrio#1"
+    ]
+  },
+  {
+    "skin": "skin_char_377_gdglow_snow_5",
+    "charId": "char_377_gdglow",
+    "changed": [
+      "gdglow_token_skill_01_snow#5",
+      "gdglow_token_hide_01_snow#5",
+      "gdglow_token_hit_l_01_snow#5",
+      "gdglow_token_hit_l_02_snow#5",
+      "gdglow_token_hit_r_01_snow#5",
+      "gdglow_token_hit_r_02_snow#5",
+      "gdglow_token_skill_02_snow#5",
+      "gdglow_token_hide_02_snow#5",
+      "gdglow_token_skill_03_snow#5",
+      "gdglow_token_hide_03_snow#5",
+      "gdglow_token_01_snow#5"
+    ]
+  },
+  {
+    "skin": "char_377_gdglow@snow#5",
+    "charId": "char_377_gdglow",
+    "changed": [
+      "gdglow_token_skill_01_snow#5",
+      "gdglow_token_hide_01_snow#5",
+      "gdglow_token_hit_l_01_snow#5",
+      "gdglow_token_hit_l_02_snow#5",
+      "gdglow_token_hit_r_01_snow#5",
+      "gdglow_token_hit_r_02_snow#5",
+      "gdglow_token_skill_02_snow#5",
+      "gdglow_token_hide_02_snow#5",
+      "gdglow_token_skill_03_snow#5",
+      "gdglow_token_hide_03_snow#5",
+      "gdglow_token_01_snow#5"
+    ]
+  },
+  {
+    "skin": "skin_char_377_gdglow_summer_12",
+    "charId": "char_377_gdglow",
+    "changed": [
+      "gdglow_token_skill_01_summer#12",
+      "gdglow_token_hide_01_summer#12",
+      "gdglow_token_hit_l_01_summer#12",
+      "gdglow_token_hit_l_02_summer#12",
+      "gdglow_token_hit_r_01_summer#12",
+      "gdglow_token_hit_r_02_summer#12",
+      "gdglow_token_skill_02_summer#12",
+      "gdglow_token_hide_02_summer#12",
+      "gdglow_token_skill_03_summer#12",
+      "gdglow_token_hide_03_summer#12",
+      "gdglow_token_01_summer#12"
+    ]
+  },
+  {
+    "skin": "char_377_gdglow@summer#12",
+    "charId": "char_377_gdglow",
+    "changed": [
+      "gdglow_token_skill_01_summer#12",
+      "gdglow_token_hide_01_summer#12",
+      "gdglow_token_hit_l_01_summer#12",
+      "gdglow_token_hit_l_02_summer#12",
+      "gdglow_token_hit_r_01_summer#12",
+      "gdglow_token_hit_r_02_summer#12",
+      "gdglow_token_skill_02_summer#12",
+      "gdglow_token_hide_02_summer#12",
+      "gdglow_token_skill_03_summer#12",
+      "gdglow_token_hide_03_summer#12",
+      "gdglow_token_01_summer#12"
+    ]
+  },
+  {
+    "skin": "skin_char_4013_kjera_epoque_18",
+    "charId": "char_4013_kjera",
+    "changed": [
+      "kjera_token_f_01_epoque#18",
+      "kjera_token_b_01_epoque#18",
+      "kjera_token_show_01_epoque#18",
+      "kjera_token_hide_01_epoque#18",
+      "kjera_token_skill_02_hit_f_l_01_epoque#18",
+      "kjera_token_skill_02_hit_f_l_02_epoque#18",
+      "kjera_token_f_02_epoque#18",
+      "kjera_token_b_02_epoque#18",
+      "kjera_token_show_02_epoque#18",
+      "kjera_token_hide_02_epoque#18",
+      "kjera_token_skill_02_hit_f_r_01_epoque#18",
+      "kjera_token_skill_02_hit_f_r_02_epoque#18",
+      "kjera_token_attack_start_01_epoque#18",
+      "kjera_token_default_epoque#18"
+    ]
+  },
+  {
+    "skin": "char_4013_kjera@epoque#18",
+    "charId": "char_4013_kjera",
+    "changed": [
+      "kjera_token_f_01_epoque#18",
+      "kjera_token_b_01_epoque#18",
+      "kjera_token_show_01_epoque#18",
+      "kjera_token_hide_01_epoque#18",
+      "kjera_token_skill_02_hit_f_l_01_epoque#18",
+      "kjera_token_skill_02_hit_f_l_02_epoque#18",
+      "kjera_token_f_02_epoque#18",
+      "kjera_token_b_02_epoque#18",
+      "kjera_token_show_02_epoque#18",
+      "kjera_token_hide_02_epoque#18",
+      "kjera_token_skill_02_hit_f_r_01_epoque#18",
+      "kjera_token_skill_02_hit_f_r_02_epoque#18",
+      "kjera_token_attack_start_01_epoque#18",
+      "kjera_token_default_epoque#18"
+    ]
+  },
+  {
+    "skin": "skin_char_4040_rockr_lxh_1",
+    "charId": "char_4040_rockr",
+    "changed": [
+      "rockr_token_01_lxh#1",
+      "rockr_token_overload_01_lxh#1",
+      "rockr_token_show_01_lxh#1",
+      "rockr_token_hide_01_lxh#1",
+      "rockr_token_skill_02_hit_l_01_lxh#1",
+      "rockr_token_skill_02_hit_r_01_lxh#1",
+      "rockr_token_skill_02_hit_l_overload_01_lxh#1",
+      "rockr_token_skill_02_hit_r_overload_02_lxh#1"
+    ]
+  },
+  {
+    "skin": "char_4040_rockr@lxh#1",
+    "charId": "char_4040_rockr",
+    "changed": [
+      "rockr_token_01_lxh#1",
+      "rockr_token_overload_01_lxh#1",
+      "rockr_token_show_01_lxh#1",
+      "rockr_token_hide_01_lxh#1",
+      "rockr_token_skill_02_hit_l_01_lxh#1",
+      "rockr_token_skill_02_hit_r_01_lxh#1",
+      "rockr_token_skill_02_hit_l_overload_01_lxh#1",
+      "rockr_token_skill_02_hit_r_overload_02_lxh#1"
+    ]
+  },
+  {
+    "skin": "skin_char_4054_malist_summer_14",
+    "charId": "char_4054_malist",
+    "changed": [
+      "malist_drone_summer#14"
+    ]
+  },
+  {
+    "skin": "char_4054_malist@summer#14",
+    "charId": "char_4054_malist",
+    "changed": [
+      "malist_drone_summer#14"
+    ]
+  }
+]

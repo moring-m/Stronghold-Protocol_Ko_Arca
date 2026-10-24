@@ -1,0 +1,400 @@
+{
+  "trace": [
+    {
+      "frame": 0,
+      "time": 0.21669999999999998,
+      "effects": [
+        {
+          "key": "enemy_emppnt_attack_01_start",
+          "time": 0,
+          "anchor": [
+            -5,
+            1,
+            0
+          ],
+          "active": 0,
+          "particles": 0
+        }
+      ]
+    },
+    {
+      "frame": 10,
+      "time": 0.38336666666666663,
+      "effects": [
+        {
+          "key": "enemy_emppnt_attack_01_start",
+          "time": 0.16666666666666666,
+          "anchor": [
+            -5,
+            1,
+            0
+          ],
+          "active": 1,
+          "particles": 4
+        }
+      ]
+    },
+    {
+      "frame": 20,
+      "time": 0.5500333333333335,
+      "effects": [
+        {
+          "key": "enemy_emppnt_attack_01_start",
+          "time": 0.3333333333333333,
+          "anchor": [
+            -5,
+            1,
+            0
+          ],
+          "active": 1,
+          "particles": 5
+        }
+      ]
+    },
+    {
+      "frame": 30,
+      "time": 0.7167000000000007,
+      "effects": [
+        {
+          "key": "enemy_emppnt_attack_01_start",
+          "time": 0.49999999999999994,
+          "anchor": [
+            -5,
+            1,
+            0
+          ],
+          "active": 1,
+          "particles": 5
+        }
+      ]
+    },
+    {
+      "frame": 40,
+      "time": 0.8833666666666679,
+      "effects": [
+        {
+          "key": "enemy_emppnt_attack_01_start",
+          "time": 0.6666666666666671,
+          "anchor": [
+            -5,
+            1,
+            0
+          ],
+          "active": 1,
+          "particles": 7
+        }
+      ]
+    },
+    {
+      "frame": 50,
+      "time": 1.0500333333333347,
+      "effects": [
+        {
+          "key": "enemy_emppnt_attack_01_start",
+          "time": 0.8333333333333343,
+          "anchor": [
+            -5,
+            1,
+            0
+          ],
+          "active": 1,
+          "particles": 6
+        }
+      ]
+    },
+    {
+      "frame": 60,
+      "time": 1.2167000000000008,
+      "effects": [
+        {
+          "key": "enemy_emppnt_attack_01_start",
+          "time": 1.0000000000000013,
+          "anchor": [
+            -5,
+            1,
+            0
+          ],
+          "active": 1,
+          "particles": 7
+        }
+      ]
+    },
+    {
+      "frame": 70,
+      "time": 1.3833666666666669,
+      "effects": [
+        {
+          "key": "enemy_emppnt_attack_01_start",
+          "time": 1.1666666666666674,
+          "anchor": [
+            -5,
+            1,
+            0
+          ],
+          "active": 1,
+          "particles": 7
+        }
+      ]
+    },
+    {
+      "frame": 80,
+      "time": 1.550033333333333,
+      "effects": [
+        {
+          "key": "enemy_emppnt_attack_01_start",
+          "time": 1.3333333333333335,
+          "anchor": [
+            -5,
+            1,
+            0
+          ],
+          "active": 1,
+          "particles": 6
+        }
+      ]
+    },
+    {
+      "frame": 90,
+      "time": 1.716699999999999,
+      "effects": [
+        {
+          "key": "enemy_emppnt_attack_01_start",
+          "time": 1.4999999999999996,
+          "anchor": [
+            -5,
+            1,
+            0
+          ],
+          "active": 1,
+          "particles": 7
+        }
+      ]
+    },
+    {
+      "frame": 100,
+      "time": 1.883366666666665,
+      "effects": [
+        {
+          "key": "enemy_emppnt_attack_01_start",
+          "time": 1.6666666666666656,
+          "anchor": [
+            -5,
+            1,
+            0
+          ],
+          "active": 1,
+          "particles": 7
+        }
+      ]
+    },
+    {
+      "frame": 110,
+      "time": 2.050033333333331,
+      "effects": [
+        {
+          "key": "enemy_emppnt_attack_01_start",
+          "time": 1.8333333333333317,
+          "anchor": [
+            -5,
+            1,
+            0
+          ],
+          "active": 1,
+          "particles": 7
+        }
+      ]
+    },
+    {
+      "frame": 120,
+      "time": 2.2166999999999972,
+      "effects": [
+        {
+          "key": "enemy_emppnt_attack_01_start",
+          "time": 1.9999999999999978,
+          "anchor": [
+            -5,
+            1,
+            0
+          ],
+          "active": 1,
+          "particles": 6
+        }
+      ]
+    },
+    {
+      "frame": 130,
+      "time": 2.3833666666666633,
+      "effects": [
+        {
+          "key": "enemy_emppnt_attack_01_start",
+          "time": 2.166666666666664,
+          "anchor": [
+            -5,
+            1,
+            0
+          ],
+          "active": 1,
+          "particles": 9
+        }
+      ]
+    },
+    {
+      "frame": 140,
+      "time": 2.5500333333333294,
+      "effects": [
+        {
+          "key": "enemy_emppnt_attack_01_start",
+          "time": 2.33333333333333,
+          "anchor": [
+            -5,
+            1,
+            0
+          ],
+          "active": 1,
+          "particles": 8
+        }
+      ]
+    },
+    {
+      "frame": 150,
+      "time": 2.7166999999999955,
+      "effects": [
+        {
+          "key": "enemy_emppnt_attack_01_start",
+          "time": 2.499999999999996,
+          "anchor": [
+            -5,
+            1,
+            0
+          ],
+          "active": 1,
+          "particles": 4
+        }
+      ]
+    },
+    {
+      "frame": 160,
+      "time": 2.8833666666666615,
+      "effects": [
+        {
+          "key": "enemy_emppnt_attack_01_start",
+          "time": 2.666666666666662,
+          "anchor": [
+            -5,
+            1,
+            0
+          ],
+          "active": 1,
+          "particles": 2
+        },
+        {
+          "key": "enemy_emppnt_attack_01_trail",
+          "time": 2.8106061363636354,
+          "anchor": [
+            -5,
+            1,
+            0
+          ],
+          "active": 1,
+          "particles": 12
+        }
+      ]
+    },
+    {
+      "frame": 170,
+      "time": 3.0500333333333276,
+      "effects": [
+        {
+          "key": "enemy_emppnt_attack_01_start",
+          "time": 2.833333333333328,
+          "anchor": [
+            -5,
+            1,
+            0
+          ],
+          "active": 1,
+          "particles": 1
+        },
+        {
+          "key": "enemy_emppnt_attack_01_trail",
+          "time": 2.911616363636362,
+          "anchor": [
+            -5,
+            1,
+            0
+          ],
+          "active": 1,
+          "particles": 23
+        }
+      ]
+    },
+    {
+      "frame": 180,
+      "time": 3.2166999999999937,
+      "effects": [
+        {
+          "key": "enemy_emppnt_attack_01_start",
+          "time": 2.9999999999999942,
+          "anchor": [
+            -5,
+            1,
+            0
+          ],
+          "active": 1,
+          "particles": 1
+        },
+        {
+          "key": "enemy_emppnt_attack_01_trail",
+          "time": 3.0126265909090884,
+          "anchor": [
+            -5,
+            1,
+            0
+          ],
+          "active": 1,
+          "particles": 32
+        }
+      ]
+    },
+    {
+      "frame": 190,
+      "time": 3.3833666666666598,
+      "effects": [
+        {
+          "key": "enemy_emppnt_attack_01_start",
+          "time": 3.1666666666666603,
+          "anchor": [
+            -5,
+            1,
+            0
+          ],
+          "active": 1,
+          "particles": 0
+        },
+        {
+          "key": "enemy_emppnt_attack_01_trail",
+          "time": 3.113636818181815,
+          "anchor": [
+            -5,
+            1,
+            0
+          ],
+          "active": 1,
+          "particles": 35
+        },
+        {
+          "key": "enemy_emppnt_attack_01_hit",
+          "time": 0.15,
+          "anchor": [
+            -5,
+            1,
+            0
+          ],
+          "active": 1,
+          "particles": 82
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

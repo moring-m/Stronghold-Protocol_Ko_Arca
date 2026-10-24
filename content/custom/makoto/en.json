@@ -1,0 +1,43 @@
+{
+  "source": [
+    "content/custom/makoto/official.json",
+    "https://prts.wiki/w/结城理",
+    "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/master/zh_CN/gamedata/excel/skin_table.json"
+  ],
+  "note": "The current EN official game table has no Makoto record. Descriptions are translated from official CN text; Persona names follow the original series. These are not claimed as official EN Arknights localization.",
+  "name": "Makoto Yuki",
+  "subProfessionName": "Dollkeeper",
+  "trait": "Does not retreat upon taking lethal damage; switches to a <Substitute> to fight (Substitute has 0 Block). Switches back after 20 seconds.",
+  "moduleTrait": "Does not retreat upon taking lethal damage; switches to a <Substitute> to fight (Substitute has 0 Block and <@ba.kw>increased</> HP). Switches back after 20 seconds.",
+  "talents": [
+    [
+      "Unfettered Power",
+      "When switching to the <Substitute>, inflicts <$ba.sluggish>Slow</> on nearby enemies for {sluggish} seconds. The <Substitute> summons a Persona to fight, with an increased attack interval, ATK +{atk:0%}, and Max HP +{max_hp_t1:0%}. Its combat abilities depend on the equipped skill."
+    ],
+    [
+      "S.E.E.S. Leader",
+      "When switching back to the original form, leads an All-Out Attack. Deals True damage equal to {atk_scale:0%} of Makoto Yuki’s ATK to all enemies around each [S.E.E.S.] Operator on the battlefield (can stack)."
+    ]
+  ],
+  "skills": [
+    [
+      "Orpheus’s Harp",
+      "Passive: The <Substitute> summons <@ba.vup>Orpheus</>. Attacks deal Arts damage equal to {attack@atk_scale:0%} of ATK. If an allied Operator within range has less than 50% HP, attacks instead heal that target for {attack@heal_scale:0%} of Makoto Yuki’s ATK.\nActive: Immediately switches to the <Substitute>."
+    ],
+    [
+      "Thanatos’s Chains",
+      "Passive: The <Substitute> summons <@ba.vup>Thanatos</>. Attacks deal Arts damage equal to {attack@atk_scale:0%} of ATK to up to {attack@max_target} enemies, with a {attack@prob:0%} chance to inflict <$ba.fear>Frighten</> for {attack@fear} seconds. Frightened enemies within range are immediately defeated if their HP is below {attack@kill_atk_scale:0%} of Makoto Yuki’s ATK.\nActive: Immediately switches to the <Substitute>."
+    ],
+    [
+      "Blade That Opens Tomorrow",
+      "Passive: The <Substitute> initially summons <@ba.vup>Thanatos</>, gaining +{talent@attack_speed} ASPD. Attacks deal <$ba.weaknessatk>Weakness damage</> equal to {attack@atk_scale:0%} of ATK to up to {attack@max_target} enemies. While Thanatos is present, activating the skill again or taking lethal damage replaces Thanatos with <@ba.vup>Orpheus</>: Block +{attack@block_cnt}; all allied Operators within range gain {attack@prob:0%} Physical and Arts Dodge; heals up to {attack@max_target_heal} allied Operators within range every second for {attack@heal_scale:0%} of Makoto Yuki’s ATK, until the <Substitute> state ends.\nActive: Immediately switches to the <Substitute>."
+    ]
+  ],
+  "modules": {
+    "uniequip_002_makoto": "Each Other’s Voices",
+    "default": "Makoto Yuki’s Badge"
+  },
+  "skins": {
+    "영광의 증명": "Witness to Glory"
+  }
+}

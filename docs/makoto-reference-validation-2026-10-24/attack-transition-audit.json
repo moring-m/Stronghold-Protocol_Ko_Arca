@@ -1,0 +1,126 @@
+[
+  {
+    "case": "0-base",
+    "forms": [
+      [
+        3.467,
+        "makoto_s1"
+      ],
+      [
+        25.467,
+        "makoto_exit_s1"
+      ],
+      [
+        26.467,
+        "makoto_total"
+      ]
+    ],
+    "transitionAttacks": []
+  },
+  {
+    "case": "0-skin",
+    "forms": [
+      [
+        3.467,
+        "makoto_s1"
+      ],
+      [
+        25.467,
+        "makoto_exit_s1"
+      ],
+      [
+        26.467,
+        "makoto_total"
+      ]
+    ],
+    "transitionAttacks": []
+  },
+  {
+    "case": "1-base",
+    "forms": [
+      [
+        3.467,
+        "makoto_s2"
+      ],
+      [
+        25.467,
+        "makoto_exit_s2"
+      ],
+      [
+        26.467,
+        "makoto_total"
+      ]
+    ],
+    "transitionAttacks": []
+  },
+  {
+    "case": "1-skin",
+    "forms": [
+      [
+        3.467,
+        "makoto_s2"
+      ],
+      [
+        25.467,
+        "makoto_exit_s2"
+      ],
+      [
+        26.467,
+        "makoto_total"
+      ]
+    ],
+    "transitionAttacks": []
+  },
+  {
+    "case": "2-base",
+    "forms": [
+      [
+        3.467,
+        "makoto_s3a"
+      ],
+      [
+        9.033,
+        "makoto_change"
+      ],
+      [
+        10.567,
+        "makoto_s3b"
+      ],
+      [
+        25.467,
+        "makoto_exit_s3b"
+      ],
+      [
+        26.467,
+        "makoto_total"
+      ]
+    ],
+    "transitionAttacks": []
+  },
+  {
+    "case": "2-skin",
+    "forms": [
+      [
+        3.467,
+        "makoto_s3a"
+      ],
+      [
+        9.033,
+        "makoto_change"
+      ],
+      [
+        10.567,
+        "makoto_s3b"
+      ],
+      [
+        25.467,
+        "makoto_exit_s3b"
+      ],
+      [
+        26.467,
+        "makoto_total"
+      ]
+    ],
+    "transitionAttacks": []
+  }
+]

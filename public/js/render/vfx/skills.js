@@ -1332,6 +1332,9 @@ export function chargeKeys(plan) {
  */
 const binding = (o) => Object.freeze({ ...o, ...(o.cover ? { cover: Object.freeze(o.cover) } : {}), ...(o.keys ? { keys: Object.freeze(o.keys) } : {}) });
 export const FX_BINDINGS = Object.freeze({
+  // These conditional effects have exact kit events, rather than a generic attack/skill-start cue.
+  skchr_yu_2: Object.freeze({ teleport: binding({owner:'src',keys:['yu_skill2_teleport_02'],at:'point',oneshot:true}) }),
+  skchr_reed2_3: Object.freeze({ scorchBurst: binding({owner:'id',keys:['reed2_debuff_boom_01'],at:'point',oneshot:true}) }),
   // Existing kit event supplies the elimination position (no invented projectile collision or ally trigger).
   skchr_yu_3: Object.freeze({ firewallBlock: binding({ owner: 'id', at: 'point', oneshot: true, keys: ['yu_skill3_annex_01'] }) }),
   // 克莱门莎 S3 (op-clemnt.js bombard): the kit marks an enemy's tile ('lock': id = the enemy, src = her) and strikes it
@@ -1349,12 +1352,13 @@ export const FX_BINDINGS = Object.freeze({
   skchr_tinman_2: Object.freeze({ zone: binding({ owner: 'id', projectile: 'projectile_chr_tinman_s2', at: 'point', hold: 'fx', holdS: 8, during: true, cover: ['zone'] }) }),
   // 引星棘刺 S1 / S3 (chess_char_5_15-thorn2.js: a 'zone' on each chosen ally's tile, id = her, duration): the unit she
   // throws (projectile_chr_thorn2_s1 / _s3) lands there — thorn2_token_start, the unit (thorn2_skill_0N_token, looping),
-  // S1's ring (thorn2_skill_01_range). S2's unit drifts (its zone re-sent every second): not bound — the procedural area
-  // stays (open)
+  // S1's ring (thorn2_skill_01_range). S2's keyed moving unit and growing ring are driven by KitProjectileFx.
   skchr_thorn2_1: Object.freeze({ zone: binding({ owner: 'id', projectile: 'projectile_chr_thorn2_s1', at: 'point', hold: 'fx', holdS: 6, during: true, cover: ['zone'] }) }),
   skchr_thorn2_3: Object.freeze({ zone: binding({ owner: 'id', projectile: 'projectile_chr_thorn2_s3', at: 'point', hold: 'fx', holdS: 19, during: true, cover: ['zone'] }) }),
   // 波登可 S2 ('zone' of her spores, id = her, dur): projectile_chr_podego_s2's reached podego_skill_02_range
   skchr_podego_2: Object.freeze({ zone: binding({ owner: 'id', projectile: 'projectile_chr_podego_s2', at: 'point', hold: 'fx', holdS: 5, during: true, cover: ['zone'] }) }),
+  // Santalla's S2 kit schedules a falling icicle at the chosen tile; no generic attack projectile is emitted.
+  skchr_sntlla_2: Object.freeze({ iceSpike: binding({owner:'id',keys:['sntlla_skill_02_start_01'],at:'point',during:true}) }),
   // 歌蕾蒂娅 S3 ('tornado', id = her, duration): projectile_chr_glady_s3_2's reached glady_skill_03_range / _02
   skchr_glady_3: Object.freeze({ tornado: binding({ owner: 'id', projectile: 'projectile_chr_glady_s3_2', at: 'point', hold: 'fx', holdS: 10, during: true, cover: ['tornado'] }) }),
   // 异客 S3 ('storm', id = him, duration): projectile_chr_pasngr_s3's reached pasngr_skill_03_range; the storm's strikes
@@ -1372,10 +1376,10 @@ export const FX_BINDINGS = Object.freeze({
   // 蕾缪安 S3: a 'lock' (id = the enemy, src = her, hold) is the aim projectile on it (projectile_chr_lemuen_s3_aim: its
   // main lemuen_skill_03_crosshair_range and lemuen_skill_03_crosshair_02), held for the lock [ASSUMED 1.5 s without
   // one]; a 'bombard' (id = her, its point) is projectile_chr_lemuen_s3_attack's reached lemuen_skill_03_hit_01. The
-  // falling shell ('bombardShell': the attack projectile's flight, not flown here) stays procedural
+  // falling shell ('bombardShell') is driven independently by KitProjectileFx until the actual impact event
   skchr_lemuen_3: Object.freeze({
     lock: binding({ owner: 'src', keys: ['lemuen_skill_03_crosshair_range', 'lemuen_skill_03_crosshair_02'], hold: 'fx', holdS: 1.5, during: true }),
-    bombard: binding({ owner: 'id', projectile: 'projectile_chr_lemuen_s3_attack', at: 'point', holdS: 2, during: true }),
+    bombard: binding({ owner: 'id', projectile: 'projectile_chr_lemuen_s3_attack', at: 'point', holdS: 2 }),
   }),
   // 泡泡 S2 (chess_char_2_08-bubble.js): she makes no attack; every damage instance she takes strikes back at its source
   // ('counter': id = her, target = the attacker). The client's bubble_s_2 does it at ON_TAKE_DAMAGE — DamageViaAttr and
@@ -1505,6 +1509,19 @@ export const FX_COVER = Object.freeze({
 /** Whether a skill's official effects stand for a kit fx kind (FX_COVER). */
 export function coverOf(skillId, kind) {
   const list = skillId ? FX_COVER[lc(skillId)] : null;
+  return !!list && list.includes(kind);
+}
+
+export const ENEMY_FX_COVER = Object.freeze({
+  // 盐风主教昆图斯 【大潮】 (server/sim/content/bosses.js QUINTUS.Tidewater: 'tide' at the boss in the tick of its 'cast'):
+  // the skill's start / range rows in every form (enemy_dslily_skill_02_start_l / _r, enemy_dslily_skill_02_range) are
+  // the wave over the field (0.3.2, history §35.19)
+  enemy_1521_dslily: Object.freeze({ tidewater: Object.freeze(['tide']), tidewaterg1: Object.freeze(['tide']), tidewaterg2: Object.freeze(['tide']) }),
+});
+
+/** Whether an enemy skill's official effects stand for a kit fx kind (ENEMY_FX_COVER). */
+export function enemyCoverOf(unitKey, prefabKey, kind) {
+  const list = unitKey && prefabKey ? ENEMY_FX_COVER[unitKey]?.[lc(prefabKey)] : null;
   return !!list && list.includes(kind);
 }
 

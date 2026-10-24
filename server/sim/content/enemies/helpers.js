@@ -97,7 +97,7 @@ export function abOf(b, e) {
   list.forEach((s, i) => {
     if (!s || s.prefabKey == null) return;
     const at = base.findIndex((x) => x && x.prefabKey === s.prefabKey);
-    sk[s.prefabKey] = { prefabKey:s.prefabKey, animation:e.def.raw?.abilityAnimations?.[s.prefabKey], cd: num(s.cooldown, 0), icd: num(s.initCooldown, 0), sp: num(s.spCost, 0), bb: s.bb || {}, bs: s.bbStr || {}, slot: at >= 0 ? at : i };
+    sk[s.prefabKey] = { prefabKey:s.prefabKey, pr:num(s.priority,0), animation:e.def.raw?.abilityAnimations?.[s.prefabKey], cd: num(s.cooldown, 0), icd: num(s.initCooldown, 0), sp: num(s.spCost, 0), bb: s.bb || {}, bs: s.bbStr || {}, slot: at >= 0 ? at : i };
   });
   e.mem.ab = { key, t, tS, sk, list: [], times: null, hitShield: 0, atkType: null, immune: null, origMaxHp: e.base.maxHp };
   return e.mem.ab;
@@ -109,9 +109,9 @@ export function abOf(b, e) {
  * slot's skill clip, render/vfx/skillfx.js: that skill's official effects for the window). No gameplay effect: no state,
  * no random draw (DESIGN §8.2; golden counts the event, nothing else moves).
  */
-export function castSlot(b, e, s) {
+export function castSlot(b, e, s, clipDuration = null) {
   if (!b || !e || !s || !Number.isInteger(s.slot)) return;
-  const d = s.bb && typeof s.bb.duration === 'number' && s.bb.duration > 0 ? Math.round(s.bb.duration * 100) / 100 : 0;
+  const d = clipDuration != null ? clipDuration : s.bb && typeof s.bb.duration === 'number' && s.bb.duration > 0 ? Math.round(s.bb.duration * 100) / 100 : 0;
   b._ev(d > 0 ? ['cast', e.id, s.slot, d] : ['cast', e.id, s.slot]);
 }
 

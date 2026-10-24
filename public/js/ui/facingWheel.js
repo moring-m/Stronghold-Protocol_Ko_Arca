@@ -1,3 +1,4 @@
+import {uiCssZoom} from './mobileScale.js';
 import { settingsStore } from './settings.js';
 import { facingSwallows } from './gameLogic/shortcuts.js';
 
@@ -262,12 +263,12 @@ export function FacingWheel({ view, row, col, grid, name = '', onPreview, onComm
   }, []);
 
   const outside = !!drag && !!dir;
-  const box = half * 2;
+  const box = half * 2,zoom=uiCssZoom();
   return html`<div class=${cx('fwheel', drag && 'is-pressed', dir && `is-${dir.toLowerCase()}`)} role="dialog" aria-label=${`选择${name ? `「${name}」的` : ''}朝向`}
       onPointerDown=${onDown} onPointerMove=${onMove} onPointerUp=${onUp} onPointerCancel=${onPointerCancel}
       onContextMenu=${(e) => { e.preventDefault(); onCancel(); }}>
     ${g ? html`<${Stripes} tiles=${tiles} view=${view} row=${row} col=${col} />` : null}
-    ${g ? html`<div class="fwheel__dia" style=${`left:${g.x}px;top:${g.y}px;width:${box}px;height:${box}px`}>
+    ${g ? html`<div class="fwheel__dia" style=${`left:${g.x/zoom}px;top:${g.y/zoom}px;width:${box/zoom}px;height:${box/zoom}px`}>
       <svg class="fwheel__svg" viewBox="-110 -110 220 220" aria-hidden="true">
         <path class="fwheel__outer" d="M0 -100 L100 0 L0 100 L-100 0 Z" />
         <path class=${cx('fwheel__quad', dir === 'UP' && 'is-on')} d="M0 -100 L50 -50 L0 0 L-50 -50 Z" />
@@ -321,7 +322,7 @@ export function stripePolys(view, tiles, ox = 0, oy = 0) {
   const out = [];
   for (const [r, c] of tiles) {
     const t = tileScreen(view, r, c);
-    if (t && Array.isArray(t.poly) && t.poly.length >= 3) out.push({ k: `${r},${c}`, pts: t.poly.map((p) => `${(p[0] - ox).toFixed(1)},${(p[1] - oy).toFixed(1)}`).join(' ') });
+    if (t && Array.isArray(t.poly) && t.poly.length >= 3) out.push({ k: `${r},${c}`, pts: t.poly.map((p) => `${((p[0] - ox)/uiCssZoom()).toFixed(1)},${((p[1] - oy)/uiCssZoom()).toFixed(1)}`).join(' ') });
   }
   return out;
 }

@@ -1305,7 +1305,8 @@ export class AudioManager {
       }
       const path = unhashedUrl(url).replace(/^\/assets\/audio\/sfx\//, '');
       const sound = req.pool.sounds?.[path];
-      const delay = Math.max(0, sound?.delay || 0);
+      // ON_ABILITY_START delays describe wind-up already consumed by the sim's atk release.
+      const delay = req.pool.atRelease ? 0 : Math.max(0, sound?.delay || 0);
       const due = req.ctx.currentTime + delay;
       const ready = () => {
         if (!this._poolRequestCurrent(req)) { this._dropPoolRequest(req); return; }
@@ -1412,28 +1413,30 @@ export class AudioManager {
    * @param {boolean} [skillActive] whether that skill runs right now (`attacks` / `hits` need it, see header)
    * @returns {boolean} whether a unit-specific sound exists
    */
-  unit(defId, kind, unitId, skillIndex, skillActive = false) {
+  unit(defId, kind, unitId, skillIndex, skillActive = false, form = null) {
     try {
       const pick=()=>{
       const u = this.getManifest()?.audio?.sfx?.units?.[defId];
       // DESIGN §16: the equipped skill's own ON_SKILL_START sound (`skills[index]`) when the manifest has it
       const combat = (kind === 'attack' || kind === 'hit') && skillActive && Number.isInteger(skillIndex) ? u?.skillCombat?.[skillIndex] : null;
+      const persona=u?.forms?.[form];
+      if(persona&&(kind==='attack'||kind==='hit')){const variants=persona[kind+'Variants'];return {u,persona,url:variants?.length?variants[Math.min(variants.length-1,Math.floor(this.random()*variants.length))]:persona[kind]};}
       const own = kind === 'skill' && Number.isInteger(skillIndex) && u?.skills ? u.skills[skillIndex] : null;
       const table=kind==='attack'?u?.attacks:kind==='hit'?u?.hits:null;
       const mode=skillActive&&Number.isInteger(skillIndex)?table?.[skillIndex]:null;
       const indexedSkill = kind === 'skill' && Number.isInteger(skillIndex) && u?.skills && Object.hasOwn(u.skills,skillIndex);
       return {u,mode,combat,url: combat?.[kind] || (indexedSkill ? own : typeof own === 'string' ? own : typeof mode==='string'?mode:u?.[kind])};
       };
-      const {u,mode,combat,url}=pick();
+      const {u,mode,combat,persona,url}=pick();
       if (typeof url !== 'string') return false;
-      if ((kind === 'attack' || kind === 'hit') && !combat?.[kind] && typeof mode!=='string' && !normalAttackSfx(defId, url)) return false;
+      if ((kind === 'attack' || kind === 'hit') && !persona && !combat?.[kind] && typeof mode!=='string' && !normalAttackSfx(defId, url)) return false;
       // the official bank's mix (header): a silent roll still counts as the unit's own sound (no generic fallback)
       const mix = kind === 'skill' ? null : combat?.[kind] ? combat.mix?.[kind] : typeof mode==='string'?(kind==='attack'?u?.attackMix:u?.hitMix)?.[skillIndex]:u?.mix?.[kind];
       if (!unitSoundPlays(mix, this.random())) return true;
       const poolId = typeof mode === 'string'
         ? (kind === 'attack' ? u?.attackPools : u?.hitPools)?.[skillIndex] : u?.pools?.[kind];
       const params = this.getManifest()?.audio?.sfx?.pools?.[poolId];
-      const pool = params ? { ...params, id: poolId } : null;
+      const pool = params ? { ...params, id: poolId, atRelease: kind === 'attack' && /^battle\.ON_ABILITY_START\./.test(poolId) } : null;
       this._play(url, { volume: unitGain(kind === 'attack' || kind === 'hit' ? 0.55 : 0.8, mix), limited: true, unitKey: `${unitId}:${kind}`, again: () => pick().url, pool });
       return true;
     } catch { return false; }
@@ -1609,8 +1612,11 @@ export class AudioManager {
     if (!u || typeof u !== 'object' || u.id == null) return;
     // UnitInfo.spine is the model id (charId / tokenId / enemyId) — the key of sfx.units; kind/defId pick the
     // official class sounds (operator vs summon vs device)
-    this.units.set(u.id, { def: u.charId || u.spine || u.defId, voice: u.voice || u.charId || u.spine || u.defId, defId: u.defId ?? null, kind: u.kind ?? null, side: u.side, boss: !!u.boss,
-      skillIndex: Number.isInteger(u.skillIndex) ? u.skillIndex : null, skillActive: !!u.skillActive });
+    const baseDef=u.charId || u.spine || u.defId;
+    const sfx=this.getManifest()?.audio?.sfx;
+    const skin=[u.skinId,u.spine,u.avatar].map(key=>sfx?.skinAliases?.[key]).find(key=>sfx?.units?.[key]);
+    this.units.set(u.id, { def: skin || baseDef, baseDef, voice: u.voice || u.charId || u.spine || u.defId, defId: u.defId ?? null, kind: u.kind ?? null, side: u.side, boss: !!u.boss,
+      skillIndex: Number.isInteger(u.skillIndex) ? u.skillIndex : null, skillActive: !!u.skillActive, form:u.form || null });
     const held=this.pendingSkill.get(u.id);
     if(held){this.pendingSkill.delete(u.id);this.handleBattleEvents([held]);}
   }
@@ -1737,19 +1743,24 @@ export class AudioManager {
           if (CHAIN_KINDS.has(e[3])) { this.lastAttacker.delete(e[2]); continue; }
           const src = this.units.get(e[1]);
           if (!src) continue;
+          if(src.def==='char_4182_oblvns')continue; // Note release/hit events carry the actual projectile mode.
           // only a hostile attack authors the target's next impact (a heal — an ally aiming at an ally — never does)
           const tgt = this.units.get(e[2]);
-          if (tgt && tgt.side !== src.side) this.lastAttacker.set(e[2], { def: src.def, at: now, skillIndex: src.skillIndex ?? null, skillActive: !!src.skillActive });
-          if (!this.unit(src.def, 'attack', e[1], src.skillIndex ?? undefined, src.skillActive) && src.side === 'enemy') this.battle('enemyHit', { unitKey: `${e[1]}:atk`, volume: 0.35 });
+          const form=src.form==='makoto_s1'&&tgt?.side===src.side?'makoto_s1_heal':src.form;
+          if (tgt) this.lastAttacker.set(e[2], { def: src.def, at: now, skillIndex: src.skillIndex ?? null, skillActive: !!src.skillActive, form });
+          if (!this.unit(src.def, 'attack', e[1], src.skillIndex ?? undefined, src.skillActive, form) && src.side === 'enemy') this.battle('enemyHit', { unitKey: `${e[1]}:atk`, volume: 0.35 });
         } else if (kind === 'dmg') {
           const by = this.lastAttacker.get(e[1]);
           if (!by || !IMPACT_TYPES.has(e[3])) continue;
           this.lastAttacker.delete(e[1]); // one impact per attack
-          if (now - by.at <= IMPACT_WINDOW_MS) this.unit(by.def, 'hit', `h${e[1]}`, by.skillIndex ?? undefined, by.skillActive);
+          if (now - by.at <= IMPACT_WINDOW_MS) this.unit(by.def, 'hit', `h${e[1]}`, by.skillIndex ?? undefined, by.skillActive, by.form);
         } else if (kind === 'heal') {
-          this.battle('heal', { unitKey: `heal:${e[1]}`, volume: 0.35 });
+          const by=this.lastAttacker.get(e[1]);
+          if(by?.form==='makoto_s1_heal'&&now-by.at<=IMPACT_WINDOW_MS){this.lastAttacker.delete(e[1]);this.unit(by.def,'hit',`heal:${e[1]}`,by.skillIndex,false,by.form);}
+          else this.battle('heal', { unitKey: `heal:${e[1]}`, volume: 0.35 });
         } else if (kind === 'skill') {
           const u = this.units.get(e[1]);
+          if(!e[2]){if(u)u.skillActive=false;this.pendingSkill.delete(e[1]);continue;}
           if (u) {
             u.skillActive = !!e[2];
             if (!e[2]) continue;
@@ -1760,7 +1771,7 @@ export class AudioManager {
               const bank=banks?.[this.volumes.voiceLanguage]?.[u.voice] || banks?.jp?.[u.voice] || this.getManifest()?.audio?.voiceJp?.[u.voice] || banks?.[u.voice];
               const slots=['skill1','skill2','skill3','skill4'].filter(k=>bank?.[k]?.length);
               const n=Number(slots[Math.floor(Math.random()*slots.length)]?.slice(-1)) || 1;
-              const condition=this.getManifest()?.audio?.voiceConditions?.[u.def]?.[u.skillIndex];
+              const condition=this.getManifest()?.audio?.voiceConditions?.[u.baseDef || u.def]?.[u.skillIndex];
               this.voice(u.voice, `skill${n}`, { unitKey: e[1], gateSlot: condition?.passive ? (condition.spCost>=10?'passiveImp':'passiveNor') : undefined });
             }
           } else {
@@ -1771,12 +1782,6 @@ export class AudioManager {
             if (this.pendingSkill.size >= PENDING_SKILL_MAX) this.pendingSkill.delete(this.pendingSkill.keys().next().value);
             this.pendingSkill.set(e[1], e);
           }
-        } else if (kind === 'skill') {
-          // ['skill', id, 0] = the skill ENDED (the sim's skills.js: `b._ev(['skill', u.id, 0])`): back to the unit's own
-          // attack / impact. The end carries no sound of its own (the activation sound belongs to the start).
-          const u = this.units.get(e[1]);
-          if (u) u.skillActive = false;
-          this.pendingSkill.delete(e[1]);
         } else if (kind === 'engage') {
           // 行动开始: the first attack a unit makes on an enemy (the sim's ENGAGE, official ENCOUNTER_ENEMY, 3 s apart)
           const u = this.units.get(e[1]);
@@ -1827,6 +1832,19 @@ export class AudioManager {
         } else if (kind === 'fx') {
           // a summon used up by its own effect (香槟炸弹 exploding: `consumed`): its impact sound now, no death sound
           const ex = e[4];
+          if(ex?.id!=null){const u=this.units.get(ex.id);if(u?.baseDef==='char_4217_makoto'){
+            if(e[1]==='substitute'){u.form=ex.form||null;if(['makoto_s1','makoto_s2','makoto_s3a','makoto_change'].includes(u.form))this._playUnitUrl(this.getManifest()?.audio?.sfx?.units?.[u.def]?.fx?.persona,`${ex.id}:persona`);}
+            else if(e[1]==='swap'&&ex.form==null)u.form=null;
+            const url=this.getManifest()?.audio?.sfx?.units?.[u.def]?.fx?.[e[1]];if(url)this._playUnitUrl(url,`${ex.id}:${e[1]}`);
+          }}
+          if(e[1]==='iceSpikeImpact'&&ex){const u=this.units.get(ex.id),url=this.getManifest()?.audio?.sfx?.units?.[u?.def]?.fx?.iceSpike;if(typeof url==='string')this._play(url,{volume:.55,limited:true,unitKey:`${ex.id}:iceSpike`});continue;}
+          if(['sakikoNoteSound','sakikoNoteHit'].includes(e[1])){
+            const owner=this.units.get(ex?.id);if(owner?.def!=='char_4182_oblvns')continue;
+            const phase=e[1]==='sakikoNoteHit'?'hit':'launch';
+            const rec=this.getManifest()?.audio?.sfx?.units?.[owner.def]?.notes?.[ex.projectile],url=rec?.[phase];
+            if(typeof url==='string'&&unitSoundPlays(rec[phase+'Mix'],this.random()))this._play(url,{volume:unitGain(.55,rec[phase+'Mix']),limited:true,unitKey:`${ex.id}:note:${phase}`});
+            continue;
+          }
           if(e[1]==='bombardShell'&&ex?.vertical){
             const warningDuration = Math.max(0,((Number(ex.t)||3)-(Number(ex.fall)||.44))/Math.max(.01,rate));
             if(this.getManifest()?.audio?.sfx?.battle?.droneAim)this.battle('droneAim',{unitKey:`${ex.id}:aim`,volume:.22,maxDuration:warningDuration});

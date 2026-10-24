@@ -1,3 +1,4 @@
+import {makotoSimpleFx} from './makotoFx.js';
 import { damageNumberMode, showDamageNumber, roundedDamageNumber } from '../../../shared/damageDisplay.js';
 import { skillRangeStyle, loadRangeArtColor } from './units.js';
 import { DEDICATED_TEXTURES, dedicatedProjectile } from './dedicatedEffects.js';
@@ -417,6 +418,7 @@ export class FxSystem {
   explosion(x,y,z,...args){return this._anchored(x,y,z,()=>this._explosion(x,y,z,...args))}
   _impact(pr,cam){return pr.tgt&&pr.spec.look!=='shell'?this._bodyAnchored(pr.tgt,SHOT_HEIGHT.aim,()=>this._impactAnchored(pr,cam)):this._anchored(pr.tx,pr.ty,pr.tz,()=>this._impactAnchored(pr,cam))}
   simFx(kind,x,y,extra){
+    if(kind==='iceSpikeImpact')return;
     if(kind==='tornado'&&extra?.phase==='end')return;
     if(kind==='dodge'&&extra?.num==='m'&&this.ctx.settings?.officialDamageNumbers&&this.ctx.settings.damageNumbers!==false)this.officialNumber(this.ctx.view?.(extra.id),0,'miss');
     if(kind==='bombardAim')return this._simFx(kind,x,y,extra);
@@ -1776,6 +1778,17 @@ export class FxSystem {
    * element, n, scale, kind, tiles.
    */
   _simFx(kind, x, y, extra) {
+    if(makotoSimpleFx(this,kind,x,y,extra||{}))return;
+    if(kind==='orbitProjectile')return;
+    if(kind==='moteState'){
+      const slots=extra?.slots||[],r=Number(extra?.radius)||1.15;
+      for(let i=0;i<slots.length;i++)if(slots[i]){
+        const a=(Number(extra.phase)||0)+({RIGHT:0,DOWN:-Math.PI/2,LEFT:Math.PI,UP:Math.PI/2}[extra.dir]||0)+2*Math.PI*i/slots.length,wx=x+Math.cos(a)*r,wy=y+Math.sin(a)*r;
+        const p=this.ctx.cam().project(wx,wy,this._groundZ(wx,wy)+.25);
+        this.particle('dot',p.x,p.y,{tint:0xfff0a8,life:.3/this._ts(),s0:p.s*.12/32,s1:p.s*.08/32,a0:.9,world:{x:wx,y:wy,z:this._groundZ(wx,wy)+.25}});
+      }
+      return;
+    }
     if(kind==='anchor'&&extra?.skill==='clemnt:cabin'){
       const dur=Math.max(.01,Number(extra.dur)||.01)/this._ts(),sx=Number(extra.fromX),sy=Number(extra.fromY);
       if(Number.isFinite(sx)&&Number.isFinite(sy))this.zone(sx,sy,0,.55,0x5fe0ff,dur,'soft',false,{key:'clemnt-cabin:'+extra.id,vx:(x-sx)/dur,vy:(y-sy)/dur});

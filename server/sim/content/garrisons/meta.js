@@ -299,7 +299,7 @@ H.SERVER_MOST_BOND = {
     }
     const order = best.length > 1 ? ctx.rng.shuffle(best.slice()) : best;
     for (const bond of order) {
-      const id = ctx.rollChess({ bond, maxTier: 6 });
+      const id = ctx.rollChess({ bond, maxTier: 6, allowInactiveBond: true });
       if (id && ctx.grantChess(id)) return;
     }
   },

@@ -1,0 +1,11 @@
+{
+  "commit": "24248a978facef0386a0474d151bcb8694a906d8",
+  "url": "https://raw.githubusercontent.com/moring-m/Stronghold-Protocol_Ko_Arca_assets/24248a978facef0386a0474d151bcb8694a906d8/public/assets/local/dev-tools/arknights-cn-skin-recovery-makoto-kit.zip",
+  "bytes": 3243393,
+  "sha256": "2f722cb63ad81fcbf486ff981fbb85aedc9a2d4cbebbb4d0ca3750f34c9cc052",
+  "http": 200,
+  "zipIntegrity": true,
+  "testsPassed": 19,
+  "actualCNClientRun": false,
+  "videoPlaybackVerified": false
+}

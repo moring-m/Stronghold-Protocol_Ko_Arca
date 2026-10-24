@@ -421,3 +421,17 @@ test('battle/screen cleanup stops playing pools and invalidates delays and decod
   assert.equal(f.sources.length, 1);
   assert.equal(f.a.poolLoads.size, 0);
 });
+
+test('ability-start attack banks do not add their wind-up delay again at projectile release',async t=>{
+ const f=fixture(t),id='battle.ON_ABILITY_START.char_145_prove.attack';
+ f.a.getManifest=()=>({audio:{sfx:{
+  units:{char_145_prove:{attack:URL,pools:{attack:id}}},
+  pools:{[id]:pool(id,{sounds:{[PATH]:{delay:.5}}})}
+ }}});
+ for(let i=0;i<2;i++){
+  assert.equal(f.a.unit('char_145_prove','attack',1),true);await flush();
+  assert.equal(f.sources.length,i+1,'every release sounds immediately');f.advance(1000);
+ }
+ await f.play(pool('custom',{sounds:{[PATH]:{delay:.5}}}),URL,'other');assert.equal(f.sources.length,2,'unrelated authored delays remain');
+ f.advance(500);assert.equal(f.sources.length,3);
+});

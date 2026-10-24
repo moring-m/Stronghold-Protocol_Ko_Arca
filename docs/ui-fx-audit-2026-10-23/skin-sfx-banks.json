@@ -1,0 +1,436 @@
+[
+  {
+    "charId": "char_1012_skadi2",
+    "skinId": "char_1012_skadi2@iteration#2",
+    "banks": [
+      "battle.ON_SKILL_START.skchr_skadi2_3.iteration#2",
+      "battle.ON_SKILL_START.skchr_skadi2_2.iteration#2",
+      "battle.ON_SKILL_START.skchr_skadi2_1.iteration#2",
+      "battle.ON_UNIT_BORN.char_1012_skadi2.iteration#2",
+      "battle.ON_SKILL_START.skchr_skadi2_3.iteration#2@JP",
+      "battle.ON_SKILL_START.skchr_skadi2_3.iteration#2@CN_MANDARIN",
+      "battle.ON_SKILL_START.skchr_skadi2_3.iteration#2@EN",
+      "battle.ON_SKILL_START.skchr_skadi2_3.iteration#2@KR",
+      "battle.ON_SKILL_START.skchr_skadi2_2.iteration#2@JP",
+      "battle.ON_SKILL_START.skchr_skadi2_2.iteration#2@CN_MANDARIN",
+      "battle.ON_SKILL_START.skchr_skadi2_2.iteration#2@EN",
+      "battle.ON_SKILL_START.skchr_skadi2_2.iteration#2@KR",
+      "battle.ON_SKILL_START.skchr_skadi2_1.iteration#2@JP",
+      "battle.ON_SKILL_START.skchr_skadi2_1.iteration#2@CN_MANDARIN",
+      "battle.ON_SKILL_START.skchr_skadi2_1.iteration#2@EN",
+      "battle.ON_SKILL_START.skchr_skadi2_1.iteration#2@KR",
+      "battle.ON_UNIT_BORN.char_1012_skadi2.iteration#2@JP",
+      "battle.ON_UNIT_BORN.char_1012_skadi2.iteration#2@CN_MANDARIN",
+      "battle.ON_UNIT_BORN.char_1012_skadi2.iteration#2@EN",
+      "battle.ON_UNIT_BORN.char_1012_skadi2.iteration#2@KR"
+    ],
+    "files": [
+      {
+        "path": "/assets/audio/sfx/player/p_skill/p_skill_tidesurging.mp3",
+        "inCatalogue": true
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_skill/p_skill_burningdarkness.mp3",
+        "inCatalogue": true
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_skill/p_skill_samegoaldiffways.mp3",
+        "inCatalogue": true
+      },
+      {
+        "path": "/assets/audio/sfx/battle/b_char/b_char_spskadi1.mp3",
+        "inCatalogue": true
+      },
+      {
+        "path": "/assets/audio/sfx/voice/char_1012_skadi2_iteration#2/fx_025_3.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice/char_1012_skadi2_iteration#2/fx_026_3.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice/char_1012_skadi2_iteration#2/fx_027_3.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice/char_1012_skadi2_iteration#2/fx_028_3.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_cn/char_1012_skadi2_iteration#2/fx_025_3.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_cn/char_1012_skadi2_iteration#2/fx_026_3.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_cn/char_1012_skadi2_iteration#2/fx_027_3.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_cn/char_1012_skadi2_iteration#2/fx_028_3.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_en/char_1012_skadi2_iteration#2/fx_025_3.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_en/char_1012_skadi2_iteration#2/fx_026_3.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_en/char_1012_skadi2_iteration#2/fx_027_3.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_en/char_1012_skadi2_iteration#2/fx_028_3.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_kr/char_1012_skadi2_iteration#2/fx_025_3.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_kr/char_1012_skadi2_iteration#2/fx_026_3.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_kr/char_1012_skadi2_iteration#2/fx_027_3.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_kr/char_1012_skadi2_iteration#2/fx_028_3.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice/char_1012_skadi2_iteration#2/fx_025_2.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice/char_1012_skadi2_iteration#2/fx_026_2.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice/char_1012_skadi2_iteration#2/fx_027_2.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice/char_1012_skadi2_iteration#2/fx_028_2.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_cn/char_1012_skadi2_iteration#2/fx_025_2.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_cn/char_1012_skadi2_iteration#2/fx_026_2.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_cn/char_1012_skadi2_iteration#2/fx_027_2.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_cn/char_1012_skadi2_iteration#2/fx_028_2.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_en/char_1012_skadi2_iteration#2/fx_025_2.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_en/char_1012_skadi2_iteration#2/fx_026_2.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_en/char_1012_skadi2_iteration#2/fx_027_2.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_en/char_1012_skadi2_iteration#2/fx_028_2.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_kr/char_1012_skadi2_iteration#2/fx_025_2.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_kr/char_1012_skadi2_iteration#2/fx_026_2.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_kr/char_1012_skadi2_iteration#2/fx_027_2.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_kr/char_1012_skadi2_iteration#2/fx_028_2.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice/char_1012_skadi2_iteration#2/fx_025_1.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice/char_1012_skadi2_iteration#2/fx_026_1.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice/char_1012_skadi2_iteration#2/fx_027_1.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice/char_1012_skadi2_iteration#2/fx_028_1.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_cn/char_1012_skadi2_iteration#2/fx_025_1.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_cn/char_1012_skadi2_iteration#2/fx_026_1.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_cn/char_1012_skadi2_iteration#2/fx_027_1.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_cn/char_1012_skadi2_iteration#2/fx_028_1.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_en/char_1012_skadi2_iteration#2/fx_025_1.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_en/char_1012_skadi2_iteration#2/fx_026_1.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_en/char_1012_skadi2_iteration#2/fx_027_1.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_en/char_1012_skadi2_iteration#2/fx_028_1.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_kr/char_1012_skadi2_iteration#2/fx_025_1.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_kr/char_1012_skadi2_iteration#2/fx_026_1.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_kr/char_1012_skadi2_iteration#2/fx_027_1.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_kr/char_1012_skadi2_iteration#2/fx_028_1.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice/char_1012_skadi2_iteration#2/fx_023.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice/char_1012_skadi2_iteration#2/fx_024.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_cn/char_1012_skadi2_iteration#2/fx_023.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_cn/char_1012_skadi2_iteration#2/fx_024.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_en/char_1012_skadi2_iteration#2/fx_023.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_en/char_1012_skadi2_iteration#2/fx_024.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_kr/char_1012_skadi2_iteration#2/fx_023.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/voice_kr/char_1012_skadi2_iteration#2/fx_024.mp3",
+        "inCatalogue": false
+      }
+    ]
+  },
+  {
+    "charId": "char_1032_excu2",
+    "skinId": "char_1032_excu2@sanrio#2",
+    "banks": [
+      "battle.ON_ABILITY_ON.char_1032_excu2_sanrio#2.attack",
+      "battle.ON_SKILL_START.skchr_excu2_1_sanrio#2",
+      "battle.ON_SKILL_SPECIAL_POINT.skchr_excu2_1_sanrio#2",
+      "battle.ON_ABILITY_ON.char_1032_excu2_sanrio#2.attack.1",
+      "battle.ON_SKILL_START.skchr_excu2_2_sanrio#2",
+      "battle.ON_SKILL_SPECIAL_POINT.skchr_excu2_2_sanrio#2",
+      "battle.ON_ABILITY_START.char_1032_excu2_sanrio#2.attack.2",
+      "battle.ON_ABILITY_ON.char_1032_excu2_sanrio#2.attack.2",
+      "battle.ON_SKILL_START.skchr_excu2_3_sanrio#2",
+      "battle.ON_SKILL_SPECIAL_POINT.skchr_excu2_3_sanrio#2",
+      "battle.ON_ABILITY_ON.char_1032_excu2_sanrio#2.attack.3",
+      "battle.ON_ABILITY_START.char_1032_excu2_sanrio#2.attack.4",
+      "battle.ON_ABILITY_HIT.char_1032_excu2_sanrio#2.attack.4",
+      "battle.ON_ABILITY_START.char_1032_excu2_sanrio#2.T.1"
+    ],
+    "files": [
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_shotgunx_n_sanrio#2.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3",
+        "inCatalogue": true
+      },
+      {
+        "path": "/assets/audio/sfx/battle/b_char/b_char_boostclose.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_shotgunx_d_sanrio#2.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_shotgunxfr_h_sanrio#2.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_shotgunx_h_sanrio#2.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_shotgunx_s_sanrio#2.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_bngel_sanrio#2.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_imp/p_imp_bngel_sanrio#2.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_shotgunxdouble_sanrio#2.mp3",
+        "inCatalogue": false
+      }
+    ]
+  },
+  {
+    "charId": "char_180_amgoat",
+    "skinId": "char_180_amgoat@sanrio#2",
+    "banks": [
+      "battle.ON_UNIT_BORN.char_180_amgoat_sanrio#2",
+      "battle.ON_ABILITY_START.char_180_amgoat_sanrio#2.attack",
+      "battle.ON_SKILL_START.skchr_amgoat_1_sanrio#2",
+      "battle.ON_ABILITY_START.skchr_amgoat_2_sanrio#2",
+      "battle.ON_ABILITY_START.skchr_amgoat_3_sanrio#2",
+      "battle.ON_SKILL_START.skchr_amgoat_3_sanrio#2"
+    ],
+    "files": [
+      {
+        "path": "/assets/audio/sfx/battle/b_char/b_char_set.mp3",
+        "inCatalogue": true
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_firemag_n_sanrio#2.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3",
+        "inCatalogue": true
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_firemag_h_sanrio#2.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_skill/p_skill_volcano_loop_sanrio#2.mp3",
+        "inCatalogue": false
+      }
+    ]
+  },
+  {
+    "charId": "char_377_gdglow",
+    "skinId": "char_377_gdglow@sanrio#1",
+    "banks": [
+      "battle.ON_ABILITY_ON.char_377_gdglow.attack_sanrio#1",
+      "battle.ON_PROJECTILE_HIT.projectile_chr_gdglow_sanrio#1",
+      "battle.ON_PROJECTILE_HIT.projectile_chr_gdglow_funnel_sanrio#1",
+      "battle.ON_SKILL_START.skchr_gdglow_1_sanrio#1",
+      "battle.ON_PROJECTILE_HIT.projectile_chr_gdglow_s1_sanrio#1",
+      "battle.ON_PROJECTILE_HIT.projectile_chr_gdglow_funnel_s1_sanrio#1",
+      "battle.ON_PROJECTILE_BEHAVIOUR_TRIGGER.projectile_chr_gdglow_funnel_s1_sanrio#1",
+      "battle.ON_ABILITY_START.skchr_gdglow_2_sanrio#1",
+      "battle.ON_SKILL_START.skchr_gdglow_2_sanrio#1",
+      "battle.ON_PROJECTILE_HIT.projectile_chr_gdglow_s2_sanrio#1",
+      "battle.ON_PROJECTILE_HIT.projectile_chr_gdglow_funnel_s2_sanrio#1",
+      "battle.ON_PROJECTILE_BEHAVIOUR_TRIGGER.projectile_chr_gdglow_funnel_s2_sanrio#1",
+      "battle.ON_PROJECTILE_STOP.projectile_chr_gdglow_funnel_s12_boom_sanrio#1",
+      "battle.ON_ABILITY_START.skchr_gdglow_3_sanrio#1",
+      "battle.ON_SKILL_START.skchr_gdglow_3_sanrio#1",
+      "battle.ON_PROJECTILE_HIT.projectile_chr_gdglow_funnel_s3_sanrio#1",
+      "battle.ON_PROJECTILE_BEHAVIOUR_TRIGGER.projectile_chr_gdglow_funnel_s3_sanrio#1",
+      "battle.ON_PROJECTILE_STOP.projectile_chr_gdglow_funnel_s3_boom_sanrio#1"
+    ],
+    "files": [
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_sparklight_n_sanrio#1.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_imp/p_imp_sparklight_n_sanrio#1.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_imp/p_imp_sparklightfunnel_n_sanrio#1.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3",
+        "inCatalogue": true
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_imp/p_imp_sparklight_d_sanrio#1.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_imp/p_imp_sparklightfunnel_end_n_sanrio#1.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_skill/p_skill_sparklightboost_sanrio#1.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_imp/p_imp_sparklight_h_sanrio#1.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_skill/p_skill_sparklightfunnelexplo_sanrio#1.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_skill/p_skill_sparklightboost1_sanrio#1.mp3",
+        "inCatalogue": false
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_imp/p_imp_sparklightfunnel_s_sanrio#1.mp3",
+        "inCatalogue": false
+      }
+    ]
+  }
+]

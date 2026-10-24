@@ -1,3 +1,4 @@
+import {uiCssZoom} from './mobileScale.js';
 // Underframe — the selection diamond of a tapped own piece (research 09 §1.2 "Tap a deployed unit", §5, §6.5;
 // official `act2autochess_panel_character_menu`: `util_btn` icon_sell + price "+1", funcId autochessSale; the
 // destroy variant `_underFramePanelBtnParamDestroyPos` with icon_destory).
@@ -82,9 +83,9 @@ export function Underframe({ view, uid = null, row, col, actions, name = '', bus
   const g = useTileScreen(view, row, col);
   if (!g || !actions) return null;
   const s = g.s > 0 ? g.s : 64;
-  const half = s * 1.05;
+  const half = s * 1.05,zoom=uiCssZoom();
   const stop = (e) => e.stopPropagation();
-  return html`<div class="uframe" data-uid=${uid} style=${`left:${g.x}px;top:${g.y}px;width:${half * 2}px;height:${half * 2}px`} role="group"
+  return html`<div class="uframe" data-uid=${uid} style=${`left:${g.x/zoom}px;top:${g.y/zoom}px;width:${half * 2/zoom}px;height:${half * 2/zoom}px`} role="group"
       aria-label=${`${name || '单位'} 操作`}>
     <svg class="uframe__dia" viewBox="-110 -110 220 220" aria-hidden="true">
       <path class="uframe__outer" d="M0 -100 L100 0 L0 100 L-100 0 Z" />
@@ -157,12 +158,13 @@ export function TempRowNotice({ view, count, items = 0, label = true, ready = fa
   const b = useTileScreen(view, GEO.TEMP_ROW, GEO.TEMP_C0 + GEO.TEMP_SIZE - 1);
   let rem = 100;
   try { rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 100; } catch { /* default */ }
+  const zoom=uiCssZoom();rem*=zoom;
   const vw = globalThis.innerWidth || 1920;
   const f = count > 0 ? tempRowFrame(a, b, { labelW: rem * 2.9, gap: rem * 0.1, vw }) : null;
   if (!f) return null;
-  const pts = f.quad.map((p) => `${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
+  const pts = f.quad.map((p) => `${(p[0]/zoom).toFixed(1)},${(p[1]/zoom).toFixed(1)}`).join(' ');
   const pad = rem * 0.1;
-  const style = f.side === 'left' ? `left:${(f.left - pad).toFixed(1)}px;top:${f.y.toFixed(1)}px` : `left:${(f.right + pad).toFixed(1)}px;top:${f.y.toFixed(1)}px`;
+  const style = f.side === 'left' ? `left:${((f.left - pad)/zoom).toFixed(1)}px;top:${(f.y/zoom).toFixed(1)}px` : `left:${((f.right + pad)/zoom).toFixed(1)}px;top:${(f.y/zoom).toFixed(1)}px`;
   const what = items > 0 && items === count ? '件道具' : '个单位';
   return html`<div class="tempnote" aria-hidden="false" data-testid="temp-notice">
     <svg class="tempnote__frame" aria-hidden="true"><polygon points=${pts} /></svg>

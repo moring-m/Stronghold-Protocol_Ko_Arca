@@ -31,7 +31,21 @@ const prisoner = (warn, free) => Object.freeze({
 const PRISONER = prisoner('2', '');
 const PRISONER_COLOURED = prisoner('_orange', '_red');
 
+const makotoRoles=(idle,attack=null)=>{const prefix=/^(Doll_Skill_(?:1|2|3_P[12]))_/.exec(idle)?.[1];return {...dollRoles(idle,prefix==='Doll_Skill_3_P1'?'Stun':prefix?prefix+'_Die':'Stun',attack),stun:loop(prefix?prefix+'_Stun':'Stun')};};
+const MAKOTO=Object.freeze({
+ makoto_s1:{change:'SwitchOut',sequence:['SwitchOut','Doll_Skill_1_SwitchIn'],roles:makotoRoles('Doll_Skill_1_Idle','Doll_Skill_1_Attack')},
+ makoto_s2:{change:'SwitchOut',sequence:['SwitchOut','Doll_Skill_2_SwitchIn'],roles:makotoRoles('Doll_Skill_2_Loop')},
+ makoto_s3a:{change:'SwitchOut',sequence:['SwitchOut','Doll_Skill_3_P1_SwitchIn'],roles:makotoRoles('Doll_Skill_3_P1_Idle','Doll_Skill_3_P1_Attack_A')},
+ makoto_change:{change:'Doll_Skill_3_P1toP2_ChangeBegin',sequence:['Doll_Skill_3_P1toP2_ChangeBegin','Doll_Skill_3_P1toP2_ChangeEnd'],roles:makotoRoles('Doll_Skill_3_P2_Loop')},
+ makoto_s3b:{change:null,roles:makotoRoles('Doll_Skill_3_P2_Loop')},
+ makoto_exit_s1:{change:'Doll_Skill_1_SwitchOut',sequence:['Doll_Skill_1_SwitchOut'],roles:makotoRoles('Idle')},
+ makoto_exit_s2:{change:'Doll_Skill_2_SwitchOut',sequence:['Doll_Skill_2_SwitchOut'],roles:makotoRoles('Idle')},
+ makoto_exit_s3a:{change:'Doll_Skill_3_P1_SwitchOut',sequence:['Doll_Skill_3_P1_SwitchOut'],roles:makotoRoles('Idle')},
+ makoto_exit_s3b:{change:'Doll_Skill_3_P2_SwitchOut',sequence:['Doll_Skill_3_P2_SwitchOut'],roles:makotoRoles('Idle')},
+ makoto_total:{change:'Skill_AllOutAttack_Loop',sequence:['Skill_AllOutAttack_Loop','Skill_AllOutAttack_End'],roles:makotoRoles('Idle')},
+});
 export const FORMS = Object.freeze({
+ char_4217_makoto:MAKOTO,
   ['token_10030_mlyss_wtrman']: Object.freeze({
     Default: Object.freeze({ roles: { ...clipSet('Idle_1', null, 'Stun', 'Attack'), deploy: 'Start', stun: loop('Stun') } }),
     Melee: Object.freeze({ change: 'Change_A', combat: 'A_Combat', roles: { ...clipSet('A_Idle', null, 'Die', 'A_Attack'), deploy: 'A_Start', stun: loop('A_Stun'), attackDown: null } }),

@@ -1,0 +1,628 @@
+{
+  "format": "recovery-model-source-catalogue",
+  "models": [
+    {
+      "bundle": "chararts/char_4217_makoto.ab",
+      "container": "dyn/battle/prefabs/skins/character/char_4217_makoto/defaultskin.prefab",
+      "skinIds": [
+        "char_4217_makoto#1",
+        "char_4217_makoto#2"
+      ],
+      "baseCharId": "char_4217_makoto",
+      "components": "components\\char_4217_makoto_1-73d38e19a0-9eb1a60b.json",
+      "skeletons": [
+        {
+          "node": "DefaultSkin/FaceSwitcher/Back",
+          "active": true,
+          "files": [
+            "/assets/local/recovery/spine/char_4217_makoto_1-73d38e19a0-9eb1a60b/DefaultSkin_FaceSwitcher_Back-a41ccdda/char_4217_makoto.atlas",
+            "/assets/local/recovery/spine/char_4217_makoto_1-73d38e19a0-9eb1a60b/DefaultSkin_FaceSwitcher_Back-a41ccdda/char_4217_makoto.png",
+            "/assets/local/recovery/spine/char_4217_makoto_1-73d38e19a0-9eb1a60b/DefaultSkin_FaceSwitcher_Back-a41ccdda/char_4217_makoto.skel"
+          ],
+          "skeleton": "/assets/local/recovery/spine/char_4217_makoto_1-73d38e19a0-9eb1a60b/DefaultSkin_FaceSwitcher_Back-a41ccdda/char_4217_makoto.skel",
+          "atlas": "/assets/local/recovery/spine/char_4217_makoto_1-73d38e19a0-9eb1a60b/DefaultSkin_FaceSwitcher_Back-a41ccdda/char_4217_makoto.atlas"
+        },
+        {
+          "node": "DefaultSkin/FaceSwitcher/Front",
+          "active": true,
+          "files": [
+            "/assets/local/recovery/spine/char_4217_makoto_1-73d38e19a0-9eb1a60b/DefaultSkin_FaceSwitcher_Front-20892e3f/char_4217_makoto.atlas",
+            "/assets/local/recovery/spine/char_4217_makoto_1-73d38e19a0-9eb1a60b/DefaultSkin_FaceSwitcher_Front-20892e3f/char_4217_makoto.png",
+            "/assets/local/recovery/spine/char_4217_makoto_1-73d38e19a0-9eb1a60b/DefaultSkin_FaceSwitcher_Front-20892e3f/char_4217_makoto.skel"
+          ],
+          "skeleton": "/assets/local/recovery/spine/char_4217_makoto_1-73d38e19a0-9eb1a60b/DefaultSkin_FaceSwitcher_Front-20892e3f/char_4217_makoto.skel",
+          "atlas": "/assets/local/recovery/spine/char_4217_makoto_1-73d38e19a0-9eb1a60b/DefaultSkin_FaceSwitcher_Front-20892e3f/char_4217_makoto.atlas"
+        }
+      ],
+      "renderer": {
+        "file": "prefabs/model_char_4217_makoto_1-73d38e19a0-9eb1a60b.json",
+        "bundle": "chararts/char_4217_makoto.ab",
+        "bytes": 10390,
+        "textures": [
+          "char_4217_makoto-2068e6fe",
+          "char_4217_makoto-5a37c5bc"
+        ],
+        "meshes": [],
+        "refs": [],
+        "nodes": 9,
+        "particleSystems": 0,
+        "liveParticles": 0,
+        "duration": 0,
+        "looping": false
+      }
+    },
+    {
+      "bundle": "skinpack/char_4047_pianst.ab",
+      "container": "dyn/battle/prefabs/skins/character/char_4047_pianst/char_4047_pianst_wild#8.prefab",
+      "skinIds": [
+        "char_4047_pianst@wild#8"
+      ],
+      "baseCharId": null,
+      "components": "components\\char_4047_pianst_wild_8-2dda68c216-77653905.json",
+      "skeletons": [
+        {
+          "node": "char_4047_pianst_wild#8/FaceSwitcher/Back",
+          "active": true,
+          "files": [
+            "/assets/local/recovery/spine/char_4047_pianst_wild_8-2dda68c216-77653905/char_4047_pianst_wild_8_FaceSwitcher_Back-17ae711e/char_4047_pianst_wild_8-112f3aa8.atlas",
+            "/assets/local/recovery/spine/char_4047_pianst_wild_8-2dda68c216-77653905/char_4047_pianst_wild_8_FaceSwitcher_Back-17ae711e/char_4047_pianst_wild_8-112f3aa8.png",
+            "/assets/local/recovery/spine/char_4047_pianst_wild_8-2dda68c216-77653905/char_4047_pianst_wild_8_FaceSwitcher_Back-17ae711e/char_4047_pianst_wild_8-112f3aa8.skel"
+          ],
+          "skeleton": "/assets/local/recovery/spine/char_4047_pianst_wild_8-2dda68c216-77653905/char_4047_pianst_wild_8_FaceSwitcher_Back-17ae711e/char_4047_pianst_wild_8-112f3aa8.skel",
+          "atlas": "/assets/local/recovery/spine/char_4047_pianst_wild_8-2dda68c216-77653905/char_4047_pianst_wild_8_FaceSwitcher_Back-17ae711e/char_4047_pianst_wild_8-112f3aa8.atlas"
+        },
+        {
+          "node": "char_4047_pianst_wild#8/FaceSwitcher/Front",
+          "active": true,
+          "files": [
+            "/assets/local/recovery/spine/char_4047_pianst_wild_8-2dda68c216-77653905/char_4047_pianst_wild_8_FaceSwitcher_Front-bc339a2a/char_4047_pianst_wild_8-112f3aa8.atlas",
+            "/assets/local/recovery/spine/char_4047_pianst_wild_8-2dda68c216-77653905/char_4047_pianst_wild_8_FaceSwitcher_Front-bc339a2a/char_4047_pianst_wild_8-112f3aa8.png",
+            "/assets/local/recovery/spine/char_4047_pianst_wild_8-2dda68c216-77653905/char_4047_pianst_wild_8_FaceSwitcher_Front-bc339a2a/char_4047_pianst_wild_8-112f3aa8.skel"
+          ],
+          "skeleton": "/assets/local/recovery/spine/char_4047_pianst_wild_8-2dda68c216-77653905/char_4047_pianst_wild_8_FaceSwitcher_Front-bc339a2a/char_4047_pianst_wild_8-112f3aa8.skel",
+          "atlas": "/assets/local/recovery/spine/char_4047_pianst_wild_8-2dda68c216-77653905/char_4047_pianst_wild_8_FaceSwitcher_Front-bc339a2a/char_4047_pianst_wild_8-112f3aa8.atlas"
+        }
+      ],
+      "renderer": {
+        "file": "prefabs/model_char_4047_pianst_wild_8-2dda68c216-77653905.json",
+        "bundle": "skinpack/char_4047_pianst.ab",
+        "bytes": 10454,
+        "textures": [
+          "char_4047_pianst_wild_8-6ad01a29",
+          "char_4047_pianst_wild_8-d1b68338",
+          "char_4047_pianst_wild_8_alpha-805ecabf",
+          "char_4047_pianst_wild_8_alpha-bd06c55d"
+        ],
+        "meshes": [],
+        "refs": [],
+        "nodes": 11,
+        "particleSystems": 0,
+        "liveParticles": 0,
+        "duration": 0,
+        "looping": false
+      }
+    },
+    {
+      "bundle": "skinpack/char_4047_pianst.ab",
+      "container": "dyn/building/vault/characters/build_char_4047_pianst_wild#8.prefab",
+      "skinIds": [
+        "char_4047_pianst@wild#8"
+      ],
+      "baseCharId": null,
+      "components": "components\\char_4047_pianst_wild_8-3701c3ac82-1b8a600a.json",
+      "skeletons": [
+        {
+          "node": "build_char_4047_pianst_wild#8/Graphic/Spine",
+          "active": true,
+          "files": [
+            "/assets/local/recovery/spine/char_4047_pianst_wild_8-3701c3ac82-1b8a600a/build_char_4047_pianst_wild_8_Graphic_Spine-62caea97/build_char_4047_pianst_wild_8-85923a5c.atlas",
+            "/assets/local/recovery/spine/char_4047_pianst_wild_8-3701c3ac82-1b8a600a/build_char_4047_pianst_wild_8_Graphic_Spine-62caea97/build_char_4047_pianst_wild_8-85923a5c.png",
+            "/assets/local/recovery/spine/char_4047_pianst_wild_8-3701c3ac82-1b8a600a/build_char_4047_pianst_wild_8_Graphic_Spine-62caea97/build_char_4047_pianst_wild_8-85923a5c.skel"
+          ],
+          "skeleton": "/assets/local/recovery/spine/char_4047_pianst_wild_8-3701c3ac82-1b8a600a/build_char_4047_pianst_wild_8_Graphic_Spine-62caea97/build_char_4047_pianst_wild_8-85923a5c.skel",
+          "atlas": "/assets/local/recovery/spine/char_4047_pianst_wild_8-3701c3ac82-1b8a600a/build_char_4047_pianst_wild_8_Graphic_Spine-62caea97/build_char_4047_pianst_wild_8-85923a5c.atlas"
+        }
+      ],
+      "renderer": {
+        "file": "prefabs/model_char_4047_pianst_wild_8-3701c3ac82-1b8a600a.json",
+        "bundle": "skinpack/char_4047_pianst.ab",
+        "bytes": 3101,
+        "textures": [
+          "build_char_4047_pianst_wild_8-9653f2f4"
+        ],
+        "meshes": [],
+        "refs": [],
+        "nodes": 5,
+        "particleSystems": 0,
+        "liveParticles": 0,
+        "duration": 0,
+        "looping": false
+      }
+    },
+    {
+      "bundle": "skinpack/char_4109_baslin.ab",
+      "container": "dyn/battle/prefabs/skins/character/char_4109_baslin/char_4109_baslin_witch#5.prefab",
+      "skinIds": [
+        "char_4109_baslin@witch#5"
+      ],
+      "baseCharId": null,
+      "components": "components\\char_4109_baslin_witch_5-98d0c6ee02-fe59c3e9.json",
+      "skeletons": [
+        {
+          "node": "char_4109_baslin_witch#5/FaceSwitcher/Back",
+          "active": true,
+          "files": [
+            "/assets/local/recovery/spine/char_4109_baslin_witch_5-98d0c6ee02-fe59c3e9/char_4109_baslin_witch_5_FaceSwitcher_Back-b3fe514d/char_4109_baslin_witch_5-94393d4a.atlas",
+            "/assets/local/recovery/spine/char_4109_baslin_witch_5-98d0c6ee02-fe59c3e9/char_4109_baslin_witch_5_FaceSwitcher_Back-b3fe514d/char_4109_baslin_witch_5-94393d4a.png",
+            "/assets/local/recovery/spine/char_4109_baslin_witch_5-98d0c6ee02-fe59c3e9/char_4109_baslin_witch_5_FaceSwitcher_Back-b3fe514d/char_4109_baslin_witch_5-94393d4a.skel"
+          ],
+          "skeleton": "/assets/local/recovery/spine/char_4109_baslin_witch_5-98d0c6ee02-fe59c3e9/char_4109_baslin_witch_5_FaceSwitcher_Back-b3fe514d/char_4109_baslin_witch_5-94393d4a.skel",
+          "atlas": "/assets/local/recovery/spine/char_4109_baslin_witch_5-98d0c6ee02-fe59c3e9/char_4109_baslin_witch_5_FaceSwitcher_Back-b3fe514d/char_4109_baslin_witch_5-94393d4a.atlas"
+        },
+        {
+          "node": "char_4109_baslin_witch#5/FaceSwitcher/Front",
+          "active": true,
+          "files": [
+            "/assets/local/recovery/spine/char_4109_baslin_witch_5-98d0c6ee02-fe59c3e9/char_4109_baslin_witch_5_FaceSwitcher_Front-4ef5ca44/char_4109_baslin_witch_5-94393d4a.atlas",
+            "/assets/local/recovery/spine/char_4109_baslin_witch_5-98d0c6ee02-fe59c3e9/char_4109_baslin_witch_5_FaceSwitcher_Front-4ef5ca44/char_4109_baslin_witch_5-94393d4a.png",
+            "/assets/local/recovery/spine/char_4109_baslin_witch_5-98d0c6ee02-fe59c3e9/char_4109_baslin_witch_5_FaceSwitcher_Front-4ef5ca44/char_4109_baslin_witch_5-94393d4a.skel"
+          ],
+          "skeleton": "/assets/local/recovery/spine/char_4109_baslin_witch_5-98d0c6ee02-fe59c3e9/char_4109_baslin_witch_5_FaceSwitcher_Front-4ef5ca44/char_4109_baslin_witch_5-94393d4a.skel",
+          "atlas": "/assets/local/recovery/spine/char_4109_baslin_witch_5-98d0c6ee02-fe59c3e9/char_4109_baslin_witch_5_FaceSwitcher_Front-4ef5ca44/char_4109_baslin_witch_5-94393d4a.atlas"
+        }
+      ],
+      "renderer": {
+        "file": "prefabs/model_char_4109_baslin_witch_5-98d0c6ee02-fe59c3e9.json",
+        "bundle": "skinpack/char_4109_baslin.ab",
+        "bytes": 8981,
+        "textures": [
+          "char_4109_baslin_witch_5-0da5bd58",
+          "char_4109_baslin_witch_5-74c79ca4"
+        ],
+        "meshes": [],
+        "refs": [],
+        "nodes": 9,
+        "particleSystems": 0,
+        "liveParticles": 0,
+        "duration": 0,
+        "looping": false
+      }
+    },
+    {
+      "bundle": "skinpack/char_4109_baslin.ab",
+      "container": "dyn/building/vault/characters/build_char_4109_baslin_witch#5.prefab",
+      "skinIds": [
+        "char_4109_baslin@witch#5"
+      ],
+      "baseCharId": null,
+      "components": "components\\char_4109_baslin_witch_5-f644029ad7-8818baeb.json",
+      "skeletons": [
+        {
+          "node": "build_char_4109_baslin_witch#5/Graphic/Spine",
+          "active": true,
+          "files": [
+            "/assets/local/recovery/spine/char_4109_baslin_witch_5-f644029ad7-8818baeb/build_char_4109_baslin_witch_5_Graphic_Spine-aa94ce59/build_char_4109_baslin_witch_5-2e7db64f.atlas",
+            "/assets/local/recovery/spine/char_4109_baslin_witch_5-f644029ad7-8818baeb/build_char_4109_baslin_witch_5_Graphic_Spine-aa94ce59/build_char_4109_baslin_witch_5-2e7db64f.png",
+            "/assets/local/recovery/spine/char_4109_baslin_witch_5-f644029ad7-8818baeb/build_char_4109_baslin_witch_5_Graphic_Spine-aa94ce59/build_char_4109_baslin_witch_5-2e7db64f.skel"
+          ],
+          "skeleton": "/assets/local/recovery/spine/char_4109_baslin_witch_5-f644029ad7-8818baeb/build_char_4109_baslin_witch_5_Graphic_Spine-aa94ce59/build_char_4109_baslin_witch_5-2e7db64f.skel",
+          "atlas": "/assets/local/recovery/spine/char_4109_baslin_witch_5-f644029ad7-8818baeb/build_char_4109_baslin_witch_5_Graphic_Spine-aa94ce59/build_char_4109_baslin_witch_5-2e7db64f.atlas"
+        }
+      ],
+      "renderer": {
+        "file": "prefabs/model_char_4109_baslin_witch_5-f644029ad7-8818baeb.json",
+        "bundle": "skinpack/char_4109_baslin.ab",
+        "bytes": 3107,
+        "textures": [
+          "build_char_4109_baslin_witch_5-5c3b92ca"
+        ],
+        "meshes": [],
+        "refs": [],
+        "nodes": 5,
+        "particleSystems": 0,
+        "liveParticles": 0,
+        "duration": 0,
+        "looping": false
+      }
+    },
+    {
+      "bundle": "skinpack/char_4217_makoto.ab",
+      "container": "dyn/battle/prefabs/skins/character/char_4217_makoto/char_4217_makoto_p3r#1.prefab",
+      "skinIds": [
+        "char_4217_makoto@p3r#1"
+      ],
+      "baseCharId": null,
+      "components": "components\\char_4217_makoto_p3r_1-dc6bea880d-0e5db198.json",
+      "skeletons": [
+        {
+          "node": "char_4217_makoto_p3r#1/FaceSwitcher/Back",
+          "active": true,
+          "files": [
+            "/assets/local/recovery/spine/char_4217_makoto_p3r_1-dc6bea880d-0e5db198/char_4217_makoto_p3r_1_FaceSwitcher_Back-d9f5027c/char_4217_makoto_p3r_1-9ee442fb.atlas",
+            "/assets/local/recovery/spine/char_4217_makoto_p3r_1-dc6bea880d-0e5db198/char_4217_makoto_p3r_1_FaceSwitcher_Back-d9f5027c/char_4217_makoto_p3r_1-9ee442fb.png",
+            "/assets/local/recovery/spine/char_4217_makoto_p3r_1-dc6bea880d-0e5db198/char_4217_makoto_p3r_1_FaceSwitcher_Back-d9f5027c/char_4217_makoto_p3r_1-9ee442fb.skel"
+          ],
+          "skeleton": "/assets/local/recovery/spine/char_4217_makoto_p3r_1-dc6bea880d-0e5db198/char_4217_makoto_p3r_1_FaceSwitcher_Back-d9f5027c/char_4217_makoto_p3r_1-9ee442fb.skel",
+          "atlas": "/assets/local/recovery/spine/char_4217_makoto_p3r_1-dc6bea880d-0e5db198/char_4217_makoto_p3r_1_FaceSwitcher_Back-d9f5027c/char_4217_makoto_p3r_1-9ee442fb.atlas"
+        },
+        {
+          "node": "char_4217_makoto_p3r#1/FaceSwitcher/Front",
+          "active": true,
+          "files": [
+            "/assets/local/recovery/spine/char_4217_makoto_p3r_1-dc6bea880d-0e5db198/char_4217_makoto_p3r_1_FaceSwitcher_Front-1f41c12d/char_4217_makoto_p3r_1-9ee442fb.atlas",
+            "/assets/local/recovery/spine/char_4217_makoto_p3r_1-dc6bea880d-0e5db198/char_4217_makoto_p3r_1_FaceSwitcher_Front-1f41c12d/char_4217_makoto_p3r_1-9ee442fb.png",
+            "/assets/local/recovery/spine/char_4217_makoto_p3r_1-dc6bea880d-0e5db198/char_4217_makoto_p3r_1_FaceSwitcher_Front-1f41c12d/char_4217_makoto_p3r_1-9ee442fb.skel"
+          ],
+          "skeleton": "/assets/local/recovery/spine/char_4217_makoto_p3r_1-dc6bea880d-0e5db198/char_4217_makoto_p3r_1_FaceSwitcher_Front-1f41c12d/char_4217_makoto_p3r_1-9ee442fb.skel",
+          "atlas": "/assets/local/recovery/spine/char_4217_makoto_p3r_1-dc6bea880d-0e5db198/char_4217_makoto_p3r_1_FaceSwitcher_Front-1f41c12d/char_4217_makoto_p3r_1-9ee442fb.atlas"
+        }
+      ],
+      "renderer": {
+        "file": "prefabs/model_char_4217_makoto_p3r_1-dc6bea880d-0e5db198.json",
+        "bundle": "skinpack/char_4217_makoto.ab",
+        "bytes": 15699,
+        "textures": [
+          "char_4217_makoto_p3r_1-0ce023d4",
+          "char_4217_makoto_p3r_1-ce251c41"
+        ],
+        "meshes": [],
+        "refs": [],
+        "nodes": 11,
+        "particleSystems": 0,
+        "liveParticles": 0,
+        "duration": 0,
+        "looping": false
+      }
+    },
+    {
+      "bundle": "skinpack/char_4217_makoto.ab",
+      "container": "dyn/building/vault/characters/build_char_4217_makoto_p3r#1.prefab",
+      "skinIds": [
+        "char_4217_makoto@p3r#1"
+      ],
+      "baseCharId": null,
+      "components": "components\\char_4217_makoto_p3r_1-ea92a3cae9-41a9ce42.json",
+      "skeletons": [
+        {
+          "node": "build_char_4217_makoto_p3r#1/Graphic/Spine",
+          "active": true,
+          "files": [
+            "/assets/local/recovery/spine/char_4217_makoto_p3r_1-ea92a3cae9-41a9ce42/build_char_4217_makoto_p3r_1_Graphic_Spine-693f370d/build_char_4217_makoto_p3r_1-47df3272.atlas",
+            "/assets/local/recovery/spine/char_4217_makoto_p3r_1-ea92a3cae9-41a9ce42/build_char_4217_makoto_p3r_1_Graphic_Spine-693f370d/build_char_4217_makoto_p3r_1-47df3272.png",
+            "/assets/local/recovery/spine/char_4217_makoto_p3r_1-ea92a3cae9-41a9ce42/build_char_4217_makoto_p3r_1_Graphic_Spine-693f370d/build_char_4217_makoto_p3r_1-47df3272.skel"
+          ],
+          "skeleton": "/assets/local/recovery/spine/char_4217_makoto_p3r_1-ea92a3cae9-41a9ce42/build_char_4217_makoto_p3r_1_Graphic_Spine-693f370d/build_char_4217_makoto_p3r_1-47df3272.skel",
+          "atlas": "/assets/local/recovery/spine/char_4217_makoto_p3r_1-ea92a3cae9-41a9ce42/build_char_4217_makoto_p3r_1_Graphic_Spine-693f370d/build_char_4217_makoto_p3r_1-47df3272.atlas"
+        }
+      ],
+      "renderer": {
+        "file": "prefabs/model_char_4217_makoto_p3r_1-ea92a3cae9-41a9ce42.json",
+        "bundle": "skinpack/char_4217_makoto.ab",
+        "bytes": 3095,
+        "textures": [
+          "build_char_4217_makoto_p3r_1-430e10f3"
+        ],
+        "meshes": [],
+        "refs": [],
+        "nodes": 5,
+        "particleSystems": 0,
+        "liveParticles": 0,
+        "duration": 0,
+        "looping": false
+      }
+    },
+    {
+      "bundle": "skinpack/char_499_kaitou.ab",
+      "container": "dyn/battle/prefabs/skins/character/char_499_kaitou/char_499_kaitou_epoque#37.prefab",
+      "skinIds": [
+        "char_499_kaitou@epoque#37"
+      ],
+      "baseCharId": null,
+      "components": "components\\char_499_kaitou_epoque_37-5a8be7e91c-d02647a6.json",
+      "skeletons": [
+        {
+          "node": "char_499_kaitou_epoque#37/FaceSwitcher/Back",
+          "active": true,
+          "files": [
+            "/assets/local/recovery/spine/char_499_kaitou_epoque_37-5a8be7e91c-d02647a6/char_499_kaitou_epoque_37_FaceSwitcher_Back-111e94eb/char_499_kaitou_epoque_37-3e3bd273.atlas",
+            "/assets/local/recovery/spine/char_499_kaitou_epoque_37-5a8be7e91c-d02647a6/char_499_kaitou_epoque_37_FaceSwitcher_Back-111e94eb/char_499_kaitou_epoque_37-3e3bd273.png",
+            "/assets/local/recovery/spine/char_499_kaitou_epoque_37-5a8be7e91c-d02647a6/char_499_kaitou_epoque_37_FaceSwitcher_Back-111e94eb/char_499_kaitou_epoque_37-3e3bd273.skel"
+          ],
+          "skeleton": "/assets/local/recovery/spine/char_499_kaitou_epoque_37-5a8be7e91c-d02647a6/char_499_kaitou_epoque_37_FaceSwitcher_Back-111e94eb/char_499_kaitou_epoque_37-3e3bd273.skel",
+          "atlas": "/assets/local/recovery/spine/char_499_kaitou_epoque_37-5a8be7e91c-d02647a6/char_499_kaitou_epoque_37_FaceSwitcher_Back-111e94eb/char_499_kaitou_epoque_37-3e3bd273.atlas"
+        },
+        {
+          "node": "char_499_kaitou_epoque#37/FaceSwitcher/Front",
+          "active": true,
+          "files": [
+            "/assets/local/recovery/spine/char_499_kaitou_epoque_37-5a8be7e91c-d02647a6/char_499_kaitou_epoque_37_FaceSwitcher_Front-71e22c5c/char_499_kaitou_epoque_37-3e3bd273.atlas",
+            "/assets/local/recovery/spine/char_499_kaitou_epoque_37-5a8be7e91c-d02647a6/char_499_kaitou_epoque_37_FaceSwitcher_Front-71e22c5c/char_499_kaitou_epoque_37-3e3bd273.png",
+            "/assets/local/recovery/spine/char_499_kaitou_epoque_37-5a8be7e91c-d02647a6/char_499_kaitou_epoque_37_FaceSwitcher_Front-71e22c5c/char_499_kaitou_epoque_37-3e3bd273.skel"
+          ],
+          "skeleton": "/assets/local/recovery/spine/char_499_kaitou_epoque_37-5a8be7e91c-d02647a6/char_499_kaitou_epoque_37_FaceSwitcher_Front-71e22c5c/char_499_kaitou_epoque_37-3e3bd273.skel",
+          "atlas": "/assets/local/recovery/spine/char_499_kaitou_epoque_37-5a8be7e91c-d02647a6/char_499_kaitou_epoque_37_FaceSwitcher_Front-71e22c5c/char_499_kaitou_epoque_37-3e3bd273.atlas"
+        }
+      ],
+      "renderer": {
+        "file": "prefabs/model_char_499_kaitou_epoque_37-5a8be7e91c-d02647a6.json",
+        "bundle": "skinpack/char_499_kaitou.ab",
+        "bytes": 11870,
+        "textures": [
+          "char_499_kaitou_epoque_37-da912998",
+          "char_499_kaitou_epoque_37-e03371d6"
+        ],
+        "meshes": [],
+        "refs": [],
+        "nodes": 13,
+        "particleSystems": 0,
+        "liveParticles": 0,
+        "duration": 0,
+        "looping": false
+      }
+    },
+    {
+      "bundle": "skinpack/char_499_kaitou.ab",
+      "container": "dyn/building/vault/characters/build_char_499_kaitou_epoque#37.prefab",
+      "skinIds": [
+        "char_499_kaitou@epoque#37"
+      ],
+      "baseCharId": null,
+      "components": "components\\char_499_kaitou_epoque_37-c1823a7b2c-72ef9d52.json",
+      "skeletons": [
+        {
+          "node": "build_char_499_kaitou_epoque#37/Graphic/Spine",
+          "active": true,
+          "files": [
+            "/assets/local/recovery/spine/char_499_kaitou_epoque_37-c1823a7b2c-72ef9d52/build_char_499_kaitou_epoque_37_Graphic_Spine-88745def/build_char_499_kaitou_epoque_37-4eeb6277.atlas",
+            "/assets/local/recovery/spine/char_499_kaitou_epoque_37-c1823a7b2c-72ef9d52/build_char_499_kaitou_epoque_37_Graphic_Spine-88745def/build_char_499_kaitou_epoque_37-4eeb6277.png",
+            "/assets/local/recovery/spine/char_499_kaitou_epoque_37-c1823a7b2c-72ef9d52/build_char_499_kaitou_epoque_37_Graphic_Spine-88745def/build_char_499_kaitou_epoque_37-4eeb6277.skel"
+          ],
+          "skeleton": "/assets/local/recovery/spine/char_499_kaitou_epoque_37-c1823a7b2c-72ef9d52/build_char_499_kaitou_epoque_37_Graphic_Spine-88745def/build_char_499_kaitou_epoque_37-4eeb6277.skel",
+          "atlas": "/assets/local/recovery/spine/char_499_kaitou_epoque_37-c1823a7b2c-72ef9d52/build_char_499_kaitou_epoque_37_Graphic_Spine-88745def/build_char_499_kaitou_epoque_37-4eeb6277.atlas"
+        }
+      ],
+      "renderer": {
+        "file": "prefabs/model_char_499_kaitou_epoque_37-c1823a7b2c-72ef9d52.json",
+        "bundle": "skinpack/char_499_kaitou.ab",
+        "bytes": 3112,
+        "textures": [
+          "build_char_499_kaitou_epoque_37-7c1f52bb"
+        ],
+        "meshes": [],
+        "refs": [],
+        "nodes": 5,
+        "particleSystems": 0,
+        "liveParticles": 0,
+        "duration": 0,
+        "looping": false
+      }
+    }
+  ],
+  "files": [
+    {
+      "path": "/assets/local/recovery/spine/char_4217_makoto_1-73d38e19a0-9eb1a60b/DefaultSkin_FaceSwitcher_Back-a41ccdda/char_4217_makoto.atlas",
+      "bytes": 21161,
+      "sha256": "27903771c3fc17d815b7f94940cebcfe5ea8e401eb4156284db2ed0aa82744a8"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_4217_makoto_1-73d38e19a0-9eb1a60b/DefaultSkin_FaceSwitcher_Back-a41ccdda/char_4217_makoto.png",
+      "bytes": 310190,
+      "sha256": "82ba6c7a239b159d94282dac40417939cb30378e696a91275e655c56296cef1a"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_4217_makoto_1-73d38e19a0-9eb1a60b/DefaultSkin_FaceSwitcher_Back-a41ccdda/char_4217_makoto.skel",
+      "bytes": 391068,
+      "sha256": "7a8e3f1b7a5700088deaffa0e77283241680394b465bc0f0b5a496c34ae952df"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_4217_makoto_1-73d38e19a0-9eb1a60b/DefaultSkin_FaceSwitcher_Front-20892e3f/char_4217_makoto.atlas",
+      "bytes": 31754,
+      "sha256": "1e7cfd81857e875a4c46cb713f92b7c86d4b7e297e6d491fb9afdd40d30d6a1a"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_4217_makoto_1-73d38e19a0-9eb1a60b/DefaultSkin_FaceSwitcher_Front-20892e3f/char_4217_makoto.png",
+      "bytes": 395386,
+      "sha256": "234e1c31ffada88e50a9f6e3d2167ffca54c7a21f0fbe4fb63ccf363bd6a4b3c"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_4217_makoto_1-73d38e19a0-9eb1a60b/DefaultSkin_FaceSwitcher_Front-20892e3f/char_4217_makoto.skel",
+      "bytes": 1750749,
+      "sha256": "e15e15d5eca0f223d5327a808bc147de71dab88ec7c5e42c6666aaf9621f374e"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_4047_pianst_wild_8-2dda68c216-77653905/char_4047_pianst_wild_8_FaceSwitcher_Back-17ae711e/char_4047_pianst_wild_8-112f3aa8.atlas",
+      "bytes": 4786,
+      "sha256": "cdd0c04b7b320f47bcf4e3b8d332114898c6e26edb83769d34fac761b17141f7"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_4047_pianst_wild_8-2dda68c216-77653905/char_4047_pianst_wild_8_FaceSwitcher_Back-17ae711e/char_4047_pianst_wild_8-112f3aa8.png",
+      "bytes": 66672,
+      "sha256": "f882a9b1b27942603501e5a87b59be551d20c96a8c206c98c0c34359420140e3"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_4047_pianst_wild_8-2dda68c216-77653905/char_4047_pianst_wild_8_FaceSwitcher_Back-17ae711e/char_4047_pianst_wild_8-112f3aa8.skel",
+      "bytes": 117180,
+      "sha256": "043be1357821a1fc6d44d6a0ed00f64aa56a48eb28253471d7d348f57a958ad6"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_4047_pianst_wild_8-2dda68c216-77653905/char_4047_pianst_wild_8_FaceSwitcher_Front-bc339a2a/char_4047_pianst_wild_8-112f3aa8.atlas",
+      "bytes": 8917,
+      "sha256": "6c299e297b7f3f4e0b99bb695bb42f4a820febffba4d7e4e69ad7ba024885088"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_4047_pianst_wild_8-2dda68c216-77653905/char_4047_pianst_wild_8_FaceSwitcher_Front-bc339a2a/char_4047_pianst_wild_8-112f3aa8.png",
+      "bytes": 89075,
+      "sha256": "ac9b73050cacbf6a815aa3efb78852605a4b04dcbf55e65a8e651988e38e9bda"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_4047_pianst_wild_8-2dda68c216-77653905/char_4047_pianst_wild_8_FaceSwitcher_Front-bc339a2a/char_4047_pianst_wild_8-112f3aa8.skel",
+      "bytes": 258798,
+      "sha256": "b80ad5cdfca0804dd1879aeb7faa656dd623333b21249172bed4cf261611117a"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_4047_pianst_wild_8-3701c3ac82-1b8a600a/build_char_4047_pianst_wild_8_Graphic_Spine-62caea97/build_char_4047_pianst_wild_8-85923a5c.atlas",
+      "bytes": 11257,
+      "sha256": "d46742963f02c516d96c61aa705dd98d79d7fefc80c6f81c6595839662124de6"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_4047_pianst_wild_8-3701c3ac82-1b8a600a/build_char_4047_pianst_wild_8_Graphic_Spine-62caea97/build_char_4047_pianst_wild_8-85923a5c.png",
+      "bytes": 403612,
+      "sha256": "0a3cd58848339ab33a343fd21e4057ffd8a875bc2a2b3a425d873daa5736d0a0"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_4047_pianst_wild_8-3701c3ac82-1b8a600a/build_char_4047_pianst_wild_8_Graphic_Spine-62caea97/build_char_4047_pianst_wild_8-85923a5c.skel",
+      "bytes": 345568,
+      "sha256": "d58771c9a2467fd9ac592789931b30c1a90a012789d5b675bfd22d88d2a6075e"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_4109_baslin_witch_5-98d0c6ee02-fe59c3e9/char_4109_baslin_witch_5_FaceSwitcher_Back-b3fe514d/char_4109_baslin_witch_5-94393d4a.atlas",
+      "bytes": 5876,
+      "sha256": "670b33f14f4837edc29abe0a64c46ba1f46068c4fd627e7f4178ce9d5355ada2"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_4109_baslin_witch_5-98d0c6ee02-fe59c3e9/char_4109_baslin_witch_5_FaceSwitcher_Back-b3fe514d/char_4109_baslin_witch_5-94393d4a.png",
+      "bytes": 76099,
+      "sha256": "6ec96a2b99b830799fdd3e284587b0bff643ad9226b7a525bd26bffc108ecca9"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_4109_baslin_witch_5-98d0c6ee02-fe59c3e9/char_4109_baslin_witch_5_FaceSwitcher_Back-b3fe514d/char_4109_baslin_witch_5-94393d4a.skel",
+      "bytes": 195766,
+      "sha256": "ab08d8927f400266640404bb30a34307534061a4dc7028237fd4746c4d491a45"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_4109_baslin_witch_5-98d0c6ee02-fe59c3e9/char_4109_baslin_witch_5_FaceSwitcher_Front-4ef5ca44/char_4109_baslin_witch_5-94393d4a.atlas",
+      "bytes": 11096,
+      "sha256": "11afcd189ff88b7314d27b998d1ad8009330d3474d136f772310ac07b48dd42c"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_4109_baslin_witch_5-98d0c6ee02-fe59c3e9/char_4109_baslin_witch_5_FaceSwitcher_Front-4ef5ca44/char_4109_baslin_witch_5-94393d4a.png",
+      "bytes": 109787,
+      "sha256": "5282bc6074e8000e2f05409b51c281a62a3a8defba9531b78fa7d96fe4e72ccb"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_4109_baslin_witch_5-98d0c6ee02-fe59c3e9/char_4109_baslin_witch_5_FaceSwitcher_Front-4ef5ca44/char_4109_baslin_witch_5-94393d4a.skel",
+      "bytes": 300132,
+      "sha256": "a95ddc576f60b6bae05091cc84d719c177ae2949133e9a8c2e12e9f6d4d12b6c"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_4109_baslin_witch_5-f644029ad7-8818baeb/build_char_4109_baslin_witch_5_Graphic_Spine-aa94ce59/build_char_4109_baslin_witch_5-2e7db64f.atlas",
+      "bytes": 11320,
+      "sha256": "db6ef12fd140cbe09cb9da48b1d3c1d276872a5f4c6237771713e579ee7cbd49"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_4109_baslin_witch_5-f644029ad7-8818baeb/build_char_4109_baslin_witch_5_Graphic_Spine-aa94ce59/build_char_4109_baslin_witch_5-2e7db64f.png",
+      "bytes": 433136,
+      "sha256": "33c9bda47f3e1eff474afd5e931a80eae7fe48242f03871c4f080ad4016fc291"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_4109_baslin_witch_5-f644029ad7-8818baeb/build_char_4109_baslin_witch_5_Graphic_Spine-aa94ce59/build_char_4109_baslin_witch_5-2e7db64f.skel",
+      "bytes": 398748,
+      "sha256": "91b3224d7a387040b6ec51e1cf30d832b3ef83dfd43c9fa4b8e7ee2b8e4956c9"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_4217_makoto_p3r_1-dc6bea880d-0e5db198/char_4217_makoto_p3r_1_FaceSwitcher_Back-d9f5027c/char_4217_makoto_p3r_1-9ee442fb.atlas",
+      "bytes": 23870,
+      "sha256": "790e51f7e351773cc792d352fc1d964e662abdac51124ddab56e54378934fa2c"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_4217_makoto_p3r_1-dc6bea880d-0e5db198/char_4217_makoto_p3r_1_FaceSwitcher_Back-d9f5027c/char_4217_makoto_p3r_1-9ee442fb.png",
+      "bytes": 378271,
+      "sha256": "78e1e1f073dfed9c12e17bd2ad163278fc78a07566367628860f914ed97348e3"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_4217_makoto_p3r_1-dc6bea880d-0e5db198/char_4217_makoto_p3r_1_FaceSwitcher_Back-d9f5027c/char_4217_makoto_p3r_1-9ee442fb.skel",
+      "bytes": 679650,
+      "sha256": "c56feb5899a8cd6421bef6e0366bec15ff6910daeaed443091b6e75047c65a36"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_4217_makoto_p3r_1-dc6bea880d-0e5db198/char_4217_makoto_p3r_1_FaceSwitcher_Front-1f41c12d/char_4217_makoto_p3r_1-9ee442fb.atlas",
+      "bytes": 33513,
+      "sha256": "3a367f2e4d845976b95c95a971f1512542d38f52f2003be0173114c773879b6d"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_4217_makoto_p3r_1-dc6bea880d-0e5db198/char_4217_makoto_p3r_1_FaceSwitcher_Front-1f41c12d/char_4217_makoto_p3r_1-9ee442fb.png",
+      "bytes": 444067,
+      "sha256": "3850983de6f0c4dc96f56a0f9853caf7c35b26bfd22e27d78cb5615906eb9d05"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_4217_makoto_p3r_1-dc6bea880d-0e5db198/char_4217_makoto_p3r_1_FaceSwitcher_Front-1f41c12d/char_4217_makoto_p3r_1-9ee442fb.skel",
+      "bytes": 2377459,
+      "sha256": "36800d3bf2498bdcbc5371488de6dfea110a6f9fb201c4ed83d124f5d903493d"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_4217_makoto_p3r_1-ea92a3cae9-41a9ce42/build_char_4217_makoto_p3r_1_Graphic_Spine-693f370d/build_char_4217_makoto_p3r_1-47df3272.atlas",
+      "bytes": 20436,
+      "sha256": "44b5374ef868b22c92c20700cbadf7fbe0e600d893cca503fab52d30a69e1854"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_4217_makoto_p3r_1-ea92a3cae9-41a9ce42/build_char_4217_makoto_p3r_1_Graphic_Spine-693f370d/build_char_4217_makoto_p3r_1-47df3272.png",
+      "bytes": 666494,
+      "sha256": "b1ab32e137c1ba438226cfa0e5af00e956950be1bdc36c2a9f5f9dba600909f1"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_4217_makoto_p3r_1-ea92a3cae9-41a9ce42/build_char_4217_makoto_p3r_1_Graphic_Spine-693f370d/build_char_4217_makoto_p3r_1-47df3272.skel",
+      "bytes": 747364,
+      "sha256": "f0dab07be428638c538634d737d781cc602fef435beb2633413008b24e17c3ad"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_499_kaitou_epoque_37-5a8be7e91c-d02647a6/char_499_kaitou_epoque_37_FaceSwitcher_Back-111e94eb/char_499_kaitou_epoque_37-3e3bd273.atlas",
+      "bytes": 4952,
+      "sha256": "409656474938b0f2fac993748927b15207cbd87095d7b6bd4546e69fdb7585a1"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_499_kaitou_epoque_37-5a8be7e91c-d02647a6/char_499_kaitou_epoque_37_FaceSwitcher_Back-111e94eb/char_499_kaitou_epoque_37-3e3bd273.png",
+      "bytes": 56617,
+      "sha256": "3d7d155889ed74105d690c3ec127b8a3b564432b0ca913187b496142b81c588b"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_499_kaitou_epoque_37-5a8be7e91c-d02647a6/char_499_kaitou_epoque_37_FaceSwitcher_Back-111e94eb/char_499_kaitou_epoque_37-3e3bd273.skel",
+      "bytes": 165097,
+      "sha256": "884c1dd8001265372a73c0439e16a858bb91430c7a05638faf828ce393f8f150"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_499_kaitou_epoque_37-5a8be7e91c-d02647a6/char_499_kaitou_epoque_37_FaceSwitcher_Front-71e22c5c/char_499_kaitou_epoque_37-3e3bd273.atlas",
+      "bytes": 9283,
+      "sha256": "3b367463980cb8713103c804c6c76235720df74acd3ba8ab93865b7584675bd9"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_499_kaitou_epoque_37-5a8be7e91c-d02647a6/char_499_kaitou_epoque_37_FaceSwitcher_Front-71e22c5c/char_499_kaitou_epoque_37-3e3bd273.png",
+      "bytes": 73641,
+      "sha256": "ee5f805ec2eae5631985d3590962c4ea0fab068f1edc70a2cb61326448920f3d"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_499_kaitou_epoque_37-5a8be7e91c-d02647a6/char_499_kaitou_epoque_37_FaceSwitcher_Front-71e22c5c/char_499_kaitou_epoque_37-3e3bd273.skel",
+      "bytes": 377846,
+      "sha256": "af24dc0c7cdf801c2840f2ba4381fdb9c0cb10b030a1a361129994425652fcd6"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_499_kaitou_epoque_37-c1823a7b2c-72ef9d52/build_char_499_kaitou_epoque_37_Graphic_Spine-88745def/build_char_499_kaitou_epoque_37-4eeb6277.atlas",
+      "bytes": 9291,
+      "sha256": "2ef32131b2e0d4a54f05078c19a8c3e01bd7104fdf3b1251a80c04a4f538f93b"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_499_kaitou_epoque_37-c1823a7b2c-72ef9d52/build_char_499_kaitou_epoque_37_Graphic_Spine-88745def/build_char_499_kaitou_epoque_37-4eeb6277.png",
+      "bytes": 294515,
+      "sha256": "ecb518a8c4d11044c7abcf74904bcce7ef25cf41261ea7721f3bc4dcf699e907"
+    },
+    {
+      "path": "/assets/local/recovery/spine/char_499_kaitou_epoque_37-c1823a7b2c-72ef9d52/build_char_499_kaitou_epoque_37_Graphic_Spine-88745def/build_char_499_kaitou_epoque_37-4eeb6277.skel",
+      "bytes": 290483,
+      "sha256": "7f22f92669cfbd6980f048d0bcdd72039e66aa6fd39d961efe33ed3cc44a38eb"
+    }
+  ],
+  "missingSkinModels": [
+    "char_2025_shu@nlc#1",
+    "char_1040_blaze2@nlc#1",
+    "char_1033_swire2@nlc#1"
+  ],
+  "validation": {
+    "archiveIntegrity": true,
+    "inventoryVerified": 235,
+    "inventoryMismatches": 0,
+    "exportErrors": 0,
+    "rgbaPagesDecoded": 14,
+    "gameRuntimeConnected": false
+  },
+  "previousFXAudioResults": "cn-skin-recovery-20261024-004840-090300",
+  "voiceMetadata": "metadata/recovery-voices-20261024.json"
+}

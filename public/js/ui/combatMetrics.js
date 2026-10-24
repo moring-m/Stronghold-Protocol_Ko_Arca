@@ -1,3 +1,4 @@
+import {uiCssZoom} from './mobileScale.js';
 import { useEffect, useLayoutEffect, useRef, useState } from '../../vendor/hooks.module.js';
 import { html, Icon, useTicker } from './components.js';
 import { UnitThumb, useGameData } from './gameComponents.js';
@@ -43,17 +44,17 @@ export function CombatMetricsPanel({ myId, onClose, practice=false, preparing=fa
     const viewport = window.visualViewport;
     const measure = () => {
       if (!panel || !corner) return;
-      const rect = corner.getBoundingClientRect();
+      const rect = corner.getBoundingClientRect(),zoom=uiCssZoom();
       const rootStyle = getComputedStyle(document.documentElement);
       const layout = combatMetricsLayout({
-        cornerTop: rect.top, cornerBottom: rect.bottom,
-        viewportHeight: viewport?.height || window.innerHeight,
-        viewportTop: viewport?.offsetTop || 0,
+        cornerTop: rect.top/zoom, cornerBottom: rect.bottom/zoom,
+        viewportHeight: (viewport?.height || window.innerHeight)/zoom,
+        viewportTop: (viewport?.offsetTop || 0)/zoom,
         rem: parseFloat(rootStyle.fontSize) || 40,
         safeTop: parseFloat(rootStyle.getPropertyValue('--sa-t')) || 0,
         safeBottom: parseFloat(rootStyle.getPropertyValue('--sa-b')) || 0,
       });
-      panel.style.setProperty('--combat-corner-height', `${rect.height || 44}px`);
+      panel.style.setProperty('--combat-corner-height', `${(rect.height || 44)/zoom}px`);
       panel.style.setProperty('--combat-available-height', `${layout.availableHeight}px`);
       panel.style.setProperty('--combat-viewport-height', `${layout.viewportSpace}px`);
       panel.style.setProperty('--combat-viewport-top', `${layout.viewportPanelTop}px`);

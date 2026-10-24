@@ -369,10 +369,10 @@ export class TalentFx {
         if (!on && was) for (const e of uniq(b.plan.end)) this._play(e, v);
         U.act.set(b.id, on);
         if (!on) continue;
-        for (const e of this._layerLoops(U, b, v, this._loopsOf(b))) want.set(`${e.key}|${e.at}`, e);
+        for (const e of this._layerLoops(U, b, v, this._loopsOf(b))) want.set(this._loopKey(e,v), e);
       }
-      for (const e of U.post) want.set(`${e.key}|${e.at}`, e);
-      if (U.inv && now < U.inv.until) for (const e of U.inv.entries) want.set(`${e.key}|${e.at}`, e);
+      for (const e of U.post) want.set(this._loopKey(e,v), e);
+      if (U.inv && now < U.inv.until) for (const e of U.inv.entries) want.set(this._loopKey(e,v), e);
       else if (U.inv) U.inv = null;
       // (a prefab that does not loop plays once while it is wanted — its record stays, so it is not started again)
       for (const [k, t] of U.loops) if (!want.has(k) || (!t.h.alive && t.e.loop)) { if (!want.has(k)) t.h.stop(); U.loops.delete(k); }
@@ -382,6 +382,13 @@ export class TalentFx {
         if (h) U.loops.set(k, { h, e });
       }
     }
+  }
+
+  // SwitchableRightEffect is evaluated again after a cold load and when Makoto turns.
+  _loopKey(e,v) {
+    const def=v.info?.charId==='char_4217_makoto' && this.w.ofx.lib.def(this.w.effectKey(e.key,v));
+    const variant=def?.switchable ? this.w._variant(def.switchable,v,this.w.pose(v)) : '';
+    return `${e.key}|${e.at}|${variant||''}`;
   }
 
   /** Every key the battle's units' talents and abilities can play (preloading). */

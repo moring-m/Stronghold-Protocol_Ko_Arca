@@ -635,3 +635,13 @@ test('official effects replace mystic stored-attack displays and imperial drone 
  const drone=view({side:'enemy',defId:'enemy_1112_emppnt',spine:'enemy_1112_emppnt',rangeRadius:2});drone.ctx.ofx={active:true};drone.update(.016,cam(),0);assert.equal(drone.attackRange.visible,false);
  drone.ctx.ofx.active=false;drone.update(.016,cam(),.1);assert.equal(drone.attackRange.visible,true);drone.destroy();
 });
+
+test('invulnerable summons hide HP and invulnerability while ordinary units retain both',async()=>{
+ const {UF}=await import('../../shared/constants.js');
+ for(const kind of ['token','chess']){
+  const v=view({kind});v.flags=UF.INVULN;v.update(1/60,cam(),1);
+  assert.equal(v.hpBg.visible,kind!=='token');
+  assert.equal(v._iconKeys(Infinity).includes('invuln'),kind!=='token');
+  v.flags=0;v.update(1/60,cam(),2);assert.equal(v.hpBg.visible,true);v.destroy();
+ }
+});

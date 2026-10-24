@@ -175,6 +175,7 @@ function fireBomb(battle, unit, b3) {
   const [fr, fc] = dirVec(unit.dir);
   const k = farthestAhead(unit.liveRangeGrid);
   const bomb = {
+    id: unit.mem.jescaShellSeq = (unit.mem.jescaShellSeq ?? 0) + 1,
     x: unit.x, y: unit.y, tx: unit.tileC + fc * k, ty: unit.tileR + fr * k,
     atk: unit.s.atk,   // the launch's ATK (_cachedAtkKey)
     scale: num(b3['attack@extrabomb.atk_scale'], 2.5),
@@ -183,7 +184,7 @@ function fireBomb(battle, unit, b3) {
   };
   (unit.mem.jescaShells ??= []).push(bomb);
   unit.atkCd = unit.s.interval;   // the shell is her attack: the timer restarts [ASSUMED]
-  battle.fx('bombardShell', { x: bomb.tx, y: bomb.ty, id: unit.id, r: bomb.radius, t: hypot(bomb.tx - bomb.x, bomb.ty - bomb.y) / BOMB_SPEED });
+  battle.fx('bombardShell', { x: bomb.tx, y: bomb.ty, id: unit.id, r: bomb.radius, t: hypot(bomb.tx - bomb.x, bomb.ty - bomb.y) / BOMB_SPEED, shellId: bomb.id, fromX: bomb.x, fromY: bomb.y });
 }
 
 /** Move the shells one tick; a shell touching an enemy or reaching its end point explodes. */
@@ -206,7 +207,7 @@ function flyShells(battle, unit, dt) {
 }
 
 function explode(battle, unit, s) {
-  battle.fx('bombard', { x: s.x, y: s.y, id: unit.id, r: s.radius });
+  battle.fx('bombard', { x: s.x, y: s.y, id: unit.id, r: s.radius, shellId: s.id });
   const dodged = (unit.mem.jescaDodged = new Set());
   for (const e of battle.foesInRadius(s.x, s.y, s.radius)) {
     if (!e.alive) continue;

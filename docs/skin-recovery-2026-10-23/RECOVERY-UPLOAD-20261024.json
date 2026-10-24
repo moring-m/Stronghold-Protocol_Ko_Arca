@@ -1,0 +1,132 @@
+{
+  "archiveIntegrity": "passed",
+  "inventoryVerified": 1044,
+  "inventoryMismatches": 0,
+  "audio": {
+    "requested": 94,
+    "found": 94,
+    "validWav": 94,
+    "durationSeconds": 166.54
+  },
+  "effectManifests": [
+    {
+      "prefabs": 98
+    },
+    {
+      "prefabs": 92
+    }
+  ],
+  "uniqueEffectKeys": 98,
+  "unitCount": 9,
+  "skillCount": 22,
+  "projectileCount": 9,
+  "sprites": 21,
+  "report": {
+    "format": "cn-skin-recovery",
+    "version": 1,
+    "referenceVideoIncluded": false,
+    "catalogueSource": "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/master/zh_CN/gamedata/excel/skin_table.json",
+    "requestedSkins": [
+      "char_4217_makoto#1",
+      "char_4217_makoto#2",
+      "char_499_kaitou@epoque#37",
+      "char_4109_baslin@witch#5",
+      "char_4047_pianst@wild#8",
+      "char_4217_makoto@p3r#1",
+      "char_2025_shu@nlc#1",
+      "char_1040_blaze2@nlc#1",
+      "char_1033_swire2@nlc#1"
+    ],
+    "operators": [
+      "char_1033_swire2",
+      "char_1040_blaze2",
+      "char_2025_shu",
+      "char_4047_pianst",
+      "char_4109_baslin",
+      "char_4217_makoto",
+      "char_4231_clemnt",
+      "char_499_kaitou"
+    ],
+    "missingGraphicFrames": [],
+    "missingUnits": [],
+    "modelDiagnostics": [
+      {
+        "bundle": "chararts/char_1033_swire2.ab",
+        "error": "merge_alpha() takes 2 positional arguments but 3 were given"
+      },
+      {
+        "bundle": "chararts/char_1040_blaze2.ab",
+        "error": "merge_alpha() takes 2 positional arguments but 3 were given"
+      },
+      {
+        "bundle": "chararts/char_2025_shu.ab",
+        "error": "merge_alpha() takes 2 positional arguments but 3 were given"
+      },
+      {
+        "bundle": "chararts/char_4047_pianst.ab",
+        "error": "merge_alpha() takes 2 positional arguments but 3 were given"
+      },
+      {
+        "bundle": "chararts/char_4109_baslin.ab",
+        "error": "merge_alpha() takes 2 positional arguments but 3 were given"
+      },
+      {
+        "bundle": "chararts/char_4217_makoto.ab",
+        "error": "merge_alpha() takes 2 positional arguments but 3 were given"
+      },
+      {
+        "bundle": "chararts/char_4231_clemnt.ab",
+        "error": "merge_alpha() takes 2 positional arguments but 3 were given"
+      },
+      {
+        "bundle": "chararts/char_499_kaitou.ab",
+        "error": "merge_alpha() takes 2 positional arguments but 3 were given"
+      },
+      {
+        "bundle": "skinpack/char_4047_pianst.ab",
+        "error": "merge_alpha() takes 2 positional arguments but 3 were given"
+      },
+      {
+        "bundle": "skinpack/char_4109_baslin.ab",
+        "error": "merge_alpha() takes 2 positional arguments but 3 were given"
+      },
+      {
+        "bundle": "skinpack/char_4217_makoto.ab",
+        "error": "merge_alpha() takes 2 positional arguments but 3 were given"
+      },
+      {
+        "bundle": "skinpack/char_499_kaitou.ab",
+        "error": "merge_alpha() takes 2 positional arguments but 3 were given"
+      }
+    ],
+    "missingSkinModels": [
+      "char_4217_makoto#1",
+      "char_4217_makoto#2",
+      "char_499_kaitou@epoque#37",
+      "char_4109_baslin@witch#5",
+      "char_4047_pianst@wild#8",
+      "char_4217_makoto@p3r#1",
+      "char_2025_shu@nlc#1",
+      "char_1040_blaze2@nlc#1",
+      "char_1033_swire2@nlc#1"
+    ],
+    "missingSkinFXMetadata": [
+      "char_2025_shu@nlc#1",
+      "char_1040_blaze2@nlc#1",
+      "char_1033_swire2@nlc#1"
+    ],
+    "missingSprites": [
+      "char_1033_swire2_nlc#1",
+      "char_1040_blaze2_nlc#1",
+      "char_2025_shu_nlc#1"
+    ],
+    "spriteErrors": [],
+    "audioMissing": [],
+    "audioErrors": [],
+    "errors": [],
+    "complete": false
+  },
+  "cause": "merge_alpha called with straight-alpha flag, but implementation accepted only two arguments",
+  "repairCommand": ".\\EXTRACT-RECOVERY.ps1 -ModelsOnly",
+  "repairRequiresClient": true
+}

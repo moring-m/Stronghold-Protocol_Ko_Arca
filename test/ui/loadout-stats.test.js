@@ -277,12 +277,12 @@ test('css: the section reuses the card\'s .dstats / .drange / .rgrid, sized for 
   assert.match(rule('.lo-sec--stats .dstats-wrap > .dstats'), /flex:\s*1 1 max\(3\.2rem, 190px\)/);
   assert.match(rule('.lo-sec--stats .rgrid'), /--rg:\s*max\(\.14rem, 7px\)/);
   assert.match(rule('.lo-sec--stats .drange'), /min-width:\s*max\(1\.1rem, 56px\)/);
-  // the base classes come from game-panels.css, which every page loads
-  const panels = read('public/css/screens/game-panels.css');
+  // Shared classes must load before any battle screen has been visited.
+  const panels = read('public/css/components.css');
   for (const c of ['.dstats-wrap', '.dstats', '.dstat', '.dstat__k', '.dstat__v', '.drange', '.rgrid', '.rgrid-all']) {
-    assert.ok(new RegExp(`(^|\\n)${c.replace('.', '\\.')}[ ,{]`).test(panels), `${c} is defined in game-panels.css`);
+    assert.ok(new RegExp(`(^|\\n)${c.replace('.', '\\.')}[ ,{]`).test(panels), `${c} is defined in shared components.css`);
   }
-  assert.match(read('public/index.html'), /<link rel="stylesheet" href="\/css\/screens\/game-panels\.css" \/>/);
+  assert.match(read('public/index.html'), /<link rel="stylesheet" href="\/css\/components\.css" \/>/);
 });
 
 test('特性 follows the chosen module also when the skill or the module differs from the default (cloned record)', async () => {

@@ -14,7 +14,7 @@ def text_refs(value):
     return {key.lower() for key in refs if isinstance(key, str)}
 
 
-def complete(game, kit, source, output, log=print):
+def complete(game, kit, source, output, log=print, jobs=2):
     game, kit, source, output = map(Path, (game, kit, source, output))
     if output.exists():
         raise RuntimeError('Use a new follow-up folder. The original extraction must remain unchanged.')
@@ -58,7 +58,7 @@ def complete(game, kit, source, output, log=print):
     new_effects = sorted(needed - known['prefabs'])
     if new_effects:
         (output / 'data').mkdir(parents=True, exist_ok=True)
-        fx.export_fx(game, output / 'public/assets/local', {}, log, selection='keys', keys=new_effects, jobs=2,
+        fx.export_fx(game, output / 'public/assets/local', {}, log, selection='keys', keys=new_effects, jobs=jobs,
                      root=kit, fx_manifest=output / 'data/local-fx.json')
         prune_base(output, {key: sorted(value) for key, value in known.items()})
     result = {'format': 'costume-fx-wiring', 'version': 1, 'sourceFolder': source.name, 'bindings': bindings,

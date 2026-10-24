@@ -453,8 +453,8 @@
 .modal__box {
   --bk-c: var(--mint-500);
   --mstripe: var(--mint-500);
-  width: min(6.4rem, 94vw);
-  max-height: 88vh;
+  width: min(6.4rem, calc(94 * var(--ui-vw, 1vw)));
+  max-height: calc(88 * var(--ui-vh, 1vh));
   display: flex;
   flex-direction: column;
   background:
@@ -513,7 +513,7 @@
 }
 .tooltip.is-shown { opacity: 1; }
 .tooltip--aside { max-width: 3.2rem; white-space: normal; }
-.tooltip--compound { display: flex; gap: .16rem; max-width: min(8rem, calc(100vw - 16px)); max-height: calc(100dvh - 16px); overflow: auto; pointer-events: auto; overscroll-behavior: contain; }
+.tooltip--compound { display: flex; gap: .16rem; max-width: min(8rem, calc(calc(100 * var(--ui-vw, 1vw)) - 16px)); max-height: calc(calc(100 * var(--ui-dvh, 1dvh)) - 16px); overflow: auto; pointer-events: auto; overscroll-behavior: contain; }
 .tooltip--compound .tooltip__main { flex: 1 1 2.2rem; min-width: 0; }
 .tooltip--compound .tooltip--aside { flex: 1 1 2.2rem; min-width: 0; border-left: 1px solid var(--line-2); padding-left: .12rem; }
 @media (max-width: 600px) {
@@ -829,7 +829,7 @@
   gap: .08rem;
   pointer-events: none;
   width: max-content;
-  max-width: 92vw;
+  max-width: calc(92 * var(--ui-vw, 1vw));
 }
 .toast {
   --tc: var(--mint-500);
@@ -998,12 +998,12 @@
 .patch-notes__entry ul { margin: 0; padding-left: .2rem; }
 .patch-notes__entry li { font-size: calc(.14 * var(--t)); line-height: 1.7; color: var(--text-md); margin-bottom: .06rem; }
 
-.patch-notes { height: min(7.2rem, 86dvh); }
+.patch-notes { height: min(7.2rem, calc(86 * var(--ui-dvh, 1dvh))); }
 .patch-notes .modal__body { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
 .patch-notes__hint, .patch-notes__versions { flex: 0 0 auto; }
 .patch-notes__entry { min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
 
-.conn-banner--update { max-width:calc(100vw - 24px); }
+.conn-banner--update { max-width:calc(calc(100 * var(--ui-vw, 1vw)) - 24px); }
 .conn-banner--update > span { min-width:0; }
 .conn-banner__close { flex-shrink:0; display:grid; place-items:center; min-width:28px; min-height:28px; padding:4px; color:var(--text-hi); background:transparent; border:1px solid transparent; cursor:pointer; }
 .conn-banner__close:hover { background:rgba(255,255,255,.08); border-color:var(--line-2); }
@@ -1093,7 +1093,7 @@
 /* Resource choices use the same framed panels, buttons and dark form controls as Settings. */
 .resource-consent {
   position: fixed; right: 8px; bottom: 8px; z-index: 10000;
-  width: min(440px, calc(100vw - 16px)); max-height: calc(100dvh - 16px);
+  width: min(440px, calc(calc(100 * var(--ui-vw, 1vw)) - 16px)); max-height: calc(calc(100 * var(--ui-dvh, 1dvh)) - 16px);
   box-sizing: border-box; color: var(--text-hi); font-family: var(--font-cjk);
 }
 .resource-consent .panel__body { overflow: auto; font-size: max(13px, calc(.16 * var(--t))); line-height: 1.65; }
@@ -1136,6 +1136,7 @@
 .rt-kw { color: #2fd0ff; }
 .rt-mint { color: var(--mint-400); }
 .rt-hl { color: var(--gold-2); }
+.rt-note.rt-vup { color: #3fb6ff; }
 .rt-term { color: #9fd4ff; border-bottom: 1px dotted rgba(159, 212, 255, .6); }
 
 /* ---- unit thumbnail ---- */
@@ -1215,3 +1216,34 @@
 img[src*="/assets/custom/augments/is_choice_new_recruit.png"][src],
 img[src*="/assets/custom/augments/is_choice_recruit.png"][src],
 img[src*="/assets/custom/augments/is_choice_personnel_office.png"][src] { object-fit: contain; max-width: 100%; max-height: 100%; min-width: 0; min-height: 0; }
+
+/* Shared detail statistics: available before opening a battle screen. */
+.dstats-wrap { display: flex; gap: .12rem; align-items: stretch; }
+/* compact 4 × 2 grid (label over value): the skill stays close under the 特质 block (user playtest #3 item 8) */
+/* (enemy / token cards: the grid is a direct child of the column-flex scroller — it must not grow to fill the card) */
+.dstats { flex: none; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+.dstats-wrap > .dstats { flex: 1; }
+.dstat { display: flex; flex-direction: column; justify-content: center; gap: .01rem; min-width: 0; padding: .04rem .07rem; background: #0f1311; }
+.dstat__k { font-size: calc(.12 * var(--t)); color: var(--text-lo); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dstat__row { display: flex; align-items: baseline; min-width: 0; white-space: nowrap; }
+.dstat__v { font-size: calc(.17 * var(--t)); line-height: 1.15; color: #fff; }
+.dstat small { font-size: calc(.11 * var(--t)); color: var(--text-dim); margin-left: .04rem; }
+/* live stats (user playtest #4 item 7): buffed values green, debuffed red (the official card), the difference beside
+   them; a 实时 (battle) / 开战时 (prep preview) tag over the grid's right edge */
+.dstats.is-live, .dstats-wrap.is-live { margin-top: .14rem; }
+.dstats.is-live, .dstats-wrap.is-live .dstats { position: relative; }
+.dstat.is-up .dstat__v { color: #6dfa9c; text-shadow: 0 0 .08rem rgba(80, 240, 140, .35); }
+.dstat.is-up small { color: #56e08a; }
+.dstat.is-down .dstat__v { color: var(--red-premium); text-shadow: 0 0 .08rem rgba(255, 84, 84, .3); }
+.dstat.is-down small { color: #ff8a80; }
+.dstats__tag {
+  position: absolute; right: -1px; bottom: 100%; padding: .01rem .08rem; font-size: calc(.11 * var(--t)); font-weight: 700; letter-spacing: .1em;
+  color: var(--text-on-mint); background: var(--mint-500); pointer-events: auto; cursor: help;
+}
+.dstats__tag.is-battle { background: var(--orange); color: #1d0c00; }
+.drange { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .06rem; padding: .06rem .1rem; background: #0f1311; border: 1px solid var(--line); min-width: 1.1rem; }
+.rgrid { --rg: .14rem; display: grid; gap: 2px; }
+.rgrid i { width: var(--rg); height: var(--rg); border: 1px solid rgba(255, 255, 255, .06); }
+.rgrid i.on { background: rgba(246, 163, 41, .25); border-color: var(--amber); }
+.rgrid i.self { background: var(--mint-500); border-color: var(--mint-400); }
+.rgrid-all { font-size: calc(.16 * var(--t)); font-weight: 700; color: var(--amber); padding: .02rem .06rem; border: 1px solid var(--amber); background: rgba(246, 163, 41, .25); }

@@ -86,7 +86,7 @@ export function BriefingScreen() {
           <h3 class="brief-h"><span>特训敌人</span><${MicroLabel}>SPECIAL ENEMIES</${MicroLabel}></h3>
           ${types.length ? types.map((t) => html`<div key=${t} class="brief-faction">
             <span class="brief-faction__icon"><${Img} src=${factionIconUrl(m, factions[t]?.icon)} /></span>
-            <span class="brief-faction__text"><b>${factions[t]?.name || t}</b><span>${factions[t]?.desc || ''}</span></span>
+            <span class="brief-faction__text"><b>${factions[t]?.name || t}</b><${RichText} text=${factions[t]?.descRaw || factions[t]?.desc || ''} /></span>
           </div>`) : html`<p class="t-dim">本局没有特训敌人</p>`}
         </div>
       </section>

@@ -50,12 +50,12 @@
   left: calc((var(--dock-team-right) + var(--dock-margin)) * 1rem);
   top: calc((var(--dock-bond-bottom) + var(--dock-margin)) * 1rem);
   z-index: 20; display: flex; flex-direction: column; align-items: flex-start;
-  gap: .06rem; width: auto; max-width: min(calc(var(--dock-w) * 1rem), 28vw);
-  max-height: calc(100vh - (var(--dock-hand-clear) + var(--dock-bond-bottom) + var(--dock-margin) * 2) * 1rem);
+  gap: .06rem; width: auto; max-width: min(calc(var(--dock-w) * 1rem), calc(28 * var(--ui-vw, 1vw)));
+  max-height: calc(calc(100 * var(--ui-vh, 1vh)) - (var(--dock-hand-clear) + var(--dock-bond-bottom) + var(--dock-margin) * 2) * 1rem);
   pointer-events: auto; box-sizing: border-box;
 }
 .testconsole.is-open {
-  width: min(calc(var(--dock-w) * 1rem), 28vw);
+  width: min(calc(var(--dock-w) * 1rem), calc(28 * var(--ui-vw, 1vw)));
   overflow: hidden;
 }
 .testconsole__tab, .testconsole__run, .testconsole__row button {
@@ -65,7 +65,7 @@
 .testconsole__body {
   width: 100%; display: grid; gap: .06rem; padding: .1rem; background: rgba(12, 14, 12, .94);
   border: 1px solid rgba(232, 184, 74, .7); color: var(--text-hi); font-size: calc(.15 * var(--t));
-  max-height: calc(100vh - (var(--dock-hand-clear) + var(--dock-bond-bottom) + var(--dock-margin) * 2) * 1rem - .4rem);
+  max-height: calc(calc(100 * var(--ui-vh, 1vh)) - (var(--dock-hand-clear) + var(--dock-bond-bottom) + var(--dock-margin) * 2) * 1rem - .4rem);
   overflow: auto; box-sizing: border-box;
 }
 .testconsole.is-open .testconsole__body { flex: 1 1 auto; min-height: 0; max-height: none; }
@@ -85,10 +85,10 @@
 @media (max-width: 720px) {
   .testconsole {
     top: 8px !important; left: 8px !important; width: auto !important;
-    max-width: calc(100vw - 16px) !important; max-height: none !important; font-size: 14px;
+    max-width: calc(calc(100 * var(--ui-vw, 1vw)) - 16px) !important; max-height: none !important; font-size: 14px;
   }
-  .testconsole.is-open { width: calc(100vw - 16px) !important; max-width: calc(100vw - 16px) !important; max-height: 55vh !important; }
-  .testconsole__body, .testconsole.is-open .testconsole__body { font-size: 14px; max-height: 48vh !important; flex: none; }
+  .testconsole.is-open { width: calc(calc(100 * var(--ui-vw, 1vw)) - 16px) !important; max-width: calc(calc(100 * var(--ui-vw, 1vw)) - 16px) !important; max-height: calc(55 * var(--ui-vh, 1vh)) !important; }
+  .testconsole__body, .testconsole.is-open .testconsole__body { font-size: 14px; max-height: calc(48 * var(--ui-vh, 1vh)) !important; flex: none; }
   .testconsole__tab, .testconsole__run, .testconsole__row button,
   .testconsole__field input, .testconsole__field select {
     min-height: 32px; min-width: 32px; font-size: 14px; padding: 6px 10px;
@@ -513,9 +513,9 @@
 .combat-metrics {
   --bk-c: var(--mint-500);
   position: absolute; left: 0; bottom: calc(100% + max(.1rem, 8px)); z-index: 12;
-  width: min(max(5.2rem, 340px), calc(100vw - var(--sa-l, 0px) - var(--sa-r, 0px) - .48rem));
-  max-height: min(max(6.6rem, 280px), calc(100vh - var(--combat-corner-height, 110px) - max(.9rem, 48px) - .34rem - var(--sa-t, 0px) - var(--sa-b, 0px)));
-  max-height: min(max(6.6rem, 280px), calc(100dvh - var(--combat-corner-height, 110px) - max(.9rem, 48px) - .34rem - var(--sa-t, 0px) - var(--sa-b, 0px)));
+  width: min(max(5.2rem, 340px), calc(calc(100 * var(--ui-vw, 1vw)) - var(--sa-l, 0px) - var(--sa-r, 0px) - .48rem));
+  max-height: min(max(6.6rem, 280px), calc(calc(100 * var(--ui-vh, 1vh)) - var(--combat-corner-height, 110px) - max(.9rem, 48px) - .34rem - var(--sa-t, 0px) - var(--sa-b, 0px)));
+  max-height: min(max(6.6rem, 280px), calc(calc(100 * var(--ui-dvh, 1dvh)) - var(--combat-corner-height, 110px) - max(.9rem, 48px) - .34rem - var(--sa-t, 0px) - var(--sa-b, 0px)));
   display: flex; flex-direction: column; overflow: hidden;
   background: linear-gradient(180deg, rgba(28, 35, 32, .98), rgba(17, 21, 19, .98));
   border: 1px solid var(--line-2); border-top: 2px solid var(--mint-700);
@@ -985,8 +985,8 @@
 .combat-metrics__segment--heal { background:#6ed9a8; }.combat-metrics__values[hidden] { display:none; }
 .combat-metrics__note { font-size:10px; line-height:1.6; }
 .combat-metrics :is(button,select):focus-visible { outline:2px solid var(--mint-400); outline-offset:2px; }
-.combat-metrics { height:min(620px,var(--combat-available-height,620px)); max-height:min(620px,var(--combat-viewport-height,90dvh)); }
-.combat-metrics[data-viewport-docked="true"] { height:min(620px,var(--combat-viewport-height,90dvh)); }
+.combat-metrics { height:min(620px,var(--combat-available-height,620px)); max-height:min(620px,var(--combat-viewport-height,calc(90 * var(--ui-dvh, 1dvh)))); }
+.combat-metrics[data-viewport-docked="true"] { height:min(620px,var(--combat-viewport-height,calc(90 * var(--ui-dvh, 1dvh)))); }
 .combat-metrics__body { overflow:auto; }
 .combat-metrics__list { flex:1 0 auto; overflow:visible; }
 .combat-metrics__density { flex:0 0 auto; }

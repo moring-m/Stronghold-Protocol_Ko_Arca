@@ -1,7 +1,7 @@
 // Native offer UI: two-tap confirmation and the choice overlay's responsive cards.
 import { useEffect, useRef, useState } from '../../vendor/hooks.module.js';
 import { html, Icon, Countdown, Button } from './components.js';
-import { GIcon } from './gameComponents.js';
+import { GIcon, RichText } from './gameComponents.js';
 import { spTap } from './choiceOverlay.js';
 import { t } from '../../../shared/i18n.js';
 
@@ -100,7 +100,7 @@ export function OfferView({ offer, myId, readOnly = false, busy = null, armed = 
         aria-label=${card.available !== false && armed === card.idx ? t('{name}，已选中，再次点击确认', { name: card.name }) : card.name}>
         <span class="spcard__head"><span class="spcard__icon" aria-hidden="true"><${GIcon} name=${ICONS[card.icon]} /></span>
           <b class="spcard__name">${card.name}</b></span>
-        <span class="spcard__desc">${card.desc}</span>
+        <${RichText} class="spcard__desc" text=${card.descRaw || card.desc} />
         ${card.available === false ? html`<span class="spcard__unavailable">${t('暂不可用')}</span>` : null}
         ${can && card.available !== false && armed === card.idx ? html`<span class="spcard__confirm"><${Icon} name="check" />${t('确认选择')}</span>` : null}
       </button>

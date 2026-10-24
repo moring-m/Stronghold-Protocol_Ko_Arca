@@ -22,7 +22,7 @@ test('old favorites migrate without a link; selecting a faction applies its pres
 test('recruit preset replaces recruit settings only; absent picks clear and unavailable picks drop',()=>{
  const records={standard:{},old:{optionalRecruit:true},next:{optionalRecruit:true,visible:true},unreleased:{optionalRecruit:true,visible:true,globalReleased:false}};
  const out=replaceRecruitEntries({standard:{skill:1},old:{selected:true,skin:'old'}},{next:{selected:true,skill:2,skin:'new'},standard:{selected:true},unreleased:{selected:true}},id=>records[id]);
- assert.deepEqual(out,{standard:{skill:1},old:{skin:'old'},next:{selected:true,skill:2,skin:'new'}});
+ assert.deepEqual(out,{standard:{skill:1},old:{skin:'old'},next:{selected:true,skill:2,skin:'new'},unreleased:{selected:true}});
  assert.deepEqual(replaceRecruitEntries(out,{},id=>records[id]),{standard:{skill:1},old:{skin:'old'},next:{skill:2,skin:'new'}});
 });
 test('recruit presets lock after strategy selection including final result and unknown match phases',()=>{

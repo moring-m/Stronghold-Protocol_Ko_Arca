@@ -476,6 +476,7 @@ export function playedClips(anims, forms = null) {
     for (const f of Object.values(forms)) {
       if (!f || typeof f !== 'object') continue;
       add(f.change, true); add(f.end, true); add(f.leave, true);
+      for (const name of f.sequence || []) add(name, true);
       roles(f.roles);
     }
   }
@@ -998,7 +999,12 @@ export class UnitView {
       // one lies in the form it died in (a 替身 knocked out: the sim resets the form at once, but the Front model it lies
       // down with facing UP, §22.1, is built a frame later; a model rebuilt while it is down)
       const f = this._formSpec() || (this.alive ? null : this._dieForm);
-      if (f) this.actor.setForm(f.roles);
+      if (f) {
+        const resume=this.info.charId==='char_4217_makoto'&&this._formElapsed!=null;
+        const elapsed=resume?this._formElapsed:0;
+        const change=resume&&f.change&&elapsed<this.actor.dur(f.change)?f.change:null;
+        this.actor.setForm(f.roles,change,null,resume?{sequence:f.sequence||[f.change].filter(Boolean),elapsed}:null);
+      }
       // replay current state (a dead model resumes its Die clip where it would be — a knocked-down one holds its end)
       if (!this.alive) {
         const d = this.actor.die();
@@ -1037,6 +1043,13 @@ export class UnitView {
     if (form) this.setForm(form);
   }
 
+  _selectMakotoAttack() {
+    if (this.info.charId !== 'char_4217_makoto' || !this.actor) return;
+    const prefix = !this.form ? 'Attack_' : this.form === 'makoto_s3a' ? 'Doll_Skill_3_P1_Attack_' : null;
+    const name = prefix && prefix + ((this._makotoAttackN || 0) % 2 ? 'B' : 'A');
+    this.actor.attackAnimation = name && this.actor.has(name) ? name : null;
+  }
+
   _attackForm(kind) {
     if (!isManifold(this.info)) return;
     const form = manifoldAttackForm(kind);
@@ -1062,6 +1075,7 @@ export class UnitView {
     const prev = this._formSpec();
     this.form = k;
     this.info.form = k;
+    if(this.info.charId==='char_4217_makoto'){this._formElapsed=k?Math.max(0,Number(fx?.late)||0):null;this._modelDirty=true;}
     if (this.imp) this.imp.dirty=true;
     const f = this._formSpec();
     if (!this.actor) return;
@@ -1071,8 +1085,8 @@ export class UnitView {
     // an fx handed out late (render/app.js: a stall, a hidden tab) skips a change clip that would already have ended
     const late = fx && Number(fx.late) > 0 ? Number(fx.late) : 0;
     const change = f && f.change && !(late > 0 && late >= (this.actor.dur?.(f.change) ?? Infinity)) ? f.change : null;
-    if (f) this.actor.setForm(f.roles, change, f.end && dur > 0 ? { clip: f.end, in: dur, roles: next } : null);
-    else if (prev) this.actor.setForm(null, prev.leave && !(late > 0 && late >= (this.actor.dur?.(prev.leave) ?? Infinity)) ? prev.leave : null);
+    if (f) this.actor.setForm(f.roles, change, f.end && dur > 0 ? { clip: f.end, in: dur, roles: next } : null, f.sequence ? {sequence:f.sequence,elapsed:late} : null);
+    else if (prev) this.actor.setForm(null, prev.leave && !(late > 0 && late >= (this.actor.dur?.(prev.leave) ?? Infinity)) ? prev.leave : null, null, fx && this.info.charId==='char_4217_makoto' ? {complete:true} : null);
   }
 
   // ---- HUD -------------------------------------------------------------------------------------------------
@@ -1330,6 +1344,11 @@ export class UnitView {
     // Eyjafjalla's Back skeleton has no Volcano animation, including both skins.
     if (!this.isEnemy && this.info.skillIndex===2 && (this.flags & UF.SKILL) && String(this.info.charId || id).includes('char_180_amgoat')) return false;
     if (this.isEnemy || this.dir !== 'UP' || !id || !a || typeof a.hasBack !== 'function' || !a.hasBack(id)) return false;
+    if(this.info.charId==='char_4217_makoto'&&this.actor?.mode==='change'&&!this.entryBack)return false;
+    if(this.info.charId==='char_4217_makoto'&&this.form){
+      const f=FORMS.char_4217_makoto[this.form],back=a.spineEntry?.(id,{back:true});
+      if(f&&[f.change,...(f.sequence || []),f.roles?.idle].filter(Boolean).some(clip=>!back?.animations?.[clip]))return false;
+    }
     return this.alive || dieClipDur(typeof a.spineEntry === 'function' ? a.spineEntry(id, { back: true }) : null) > 0;
   }
 
@@ -1427,6 +1446,7 @@ export class UnitView {
   onAttack(target, now, kind, allInRange=false, attackInterval=null) {
     if (!this.alive) return;
     this._attackForm(kind);
+    this._selectMakotoAttack();
     this._pendingDeployElapsed = null;
     // a one-off cast (PROJ[kind].once: 暴鸰's bomb drop) is no attack rhythm: its clip plays once at its own speed
     const once = !!PROJ[kind]?.once;
@@ -1445,7 +1465,8 @@ export class UnitView {
       this.lungeDir.x = dx / len; this.lungeDir.y = dy / len;
     }
     this.lunge = 1;
-    if (this.actor) this.actor.attack(this.atkInterval, once); // game seconds: the actor's clock runs in game time
+    if (this.actor) this.actor.attack(this.atkInterval, once);
+    if (this.info.charId === 'char_4217_makoto' && !once) this._makotoAttackN = (this._makotoAttackN || 0) + 1; // game seconds: the actor's clock runs in game time
     if (this.imp) this.imp.dirty = true;
   }
 
@@ -1457,6 +1478,7 @@ export class UnitView {
   windUp(lead, kind) {
     if (!this.alive || !this.actor || !this.spineReady) return false;
     this._attackForm(kind);
+    this._selectMakotoAttack();
     const ok = this.actor.windUp(this.atkInterval, lead, !!PROJ[kind]?.once);
     if (ok && this.imp) this.imp.dirty = true;
     return ok;
@@ -1471,6 +1493,7 @@ export class UnitView {
     this.atkInterval = interval;
     this.hasAttackInterval = true;
     if(!allInRange)this.faceTarget(target);
+    this._selectMakotoAttack();
     if (this.actor) {this.actor.fortressMelee=attackMode==='melee';this.actor.beginAttack(interval, lead);}
     if (this.imp) this.imp.dirty = true;
   }
@@ -1642,6 +1665,8 @@ export class UnitView {
   update(dt, cam, t) {
     if (this.destroyed) return;
     this._updateHpTrail(dt);
+    if(this._formElapsed!=null)this._formElapsed+=dt*(this.ctx.animRate?.()||1);
+    if(this.info.charId==='char_4217_makoto'&&this.dir==='UP')this._modelDirty=true;
     if(this._pendingDeployElapsed != null)this._pendingDeployElapsed += dt*(this.ctx.animRate?.() || 1);
     // a displacement's slide (slideTo): held where it stood until the snapshot with the destination is shown, then
     // eased into the sampled position (sync keeps `lx, ly` current) under a constant deceleration
@@ -1964,6 +1989,8 @@ export class UnitView {
         this._far = this._far ? s < 60 : s < 52;
         if (lvl >= 2 || this._far) interval = Math.max(interval, 2);
       }
+      // Persona entry/change is a short one-shot, not an idle pose to refresh sparsely in a crowd.
+      if (this.info.charId === 'char_4217_makoto' && this.actor.mode === 'change') interval = Math.min(interval, 1);
       let clipFlip = false;
       if (this.actor.clipped) {
         const clip = preview || (this.ctx.clipAllowed ? this.ctx.clipAllowed() : true);
@@ -2089,7 +2116,7 @@ export class UnitView {
     if(this.info.energyMax && !this.energyText)this.setEnergy(this.info.energy || 0);
 
     const damaged = this.hp < this.maxHp - 0.5;
-    const showHp = showBars && (!this.isEnemy || damaged || this.isBoss || this.shieldHp > 0 || this.noteStacks > 0) && !NO_HP_BAR.has(this.info.defId);
+    const showHp = showBars && !(this.isToken && (this.flags & UF.INVULN)) && (!this.isEnemy || damaged || this.isBoss || this.shieldHp > 0 || this.noteStacks > 0) && !NO_HP_BAR.has(this.info.defId);
     const bw = clamp(s * (this.isBoss ? UNIT.bossBarWidth : UNIT.barWidth), 24, this.isBoss ? 260 : 96);
     const bh = clamp(s * (this.isBoss ? 0.09 : 0.065), 3, this.isBoss ? 9 : 6);
     // a knocked-down operator's HUD is its redeploy ring alone, drawn at full strength over the greyed model
@@ -2132,7 +2159,7 @@ export class UnitView {
     let ready = false;
     let sy = 0;
     if (showSp) {
-      const active = !!(this.flags & UF.SKILL) || this.form === 'doll';
+      const active = !!(this.flags & UF.SKILL) || this.form === 'doll' || /^makoto_(s[123]|change)/.test(this.form || '');
       const k = ammo ? ammo[0] / ammo[1] : clamp(this.sp / this.spMax, 0, 1);
       ready = !active && k >= 0.999;
       sy = cy + bh / 2 + spH / 2 + 1.5;
@@ -2504,10 +2531,11 @@ export class UnitView {
     const out = new Map();
     if (idle) out.set(idle, false);
     if (!this.lodIdle) {
-      for (const [name, once] of playedClips(anims, FORMS[this.info.spine || this.info.defId] || null)) {
+      for (const [name, once] of playedClips(anims, FORMS[this.info.spine || this.info.defId] || FORMS[this.info.charId] || null)) {
         if (a.has(name)) out.set(name, out.has(name) ? out.get(name) && once : once);
       }
       if (!anims.die && a.has('Die')) out.set('Die', false);
+      if (this.info.charId === 'char_4217_makoto') for (const name of ['Attack_A','Attack_B','Doll_Skill_3_P1_Attack_A','Doll_Skill_3_P1_Attack_B']) if (a.has(name)) out.set(name, false);
     }
     this._clipsIdle = this.lodIdle;
     this._clipsOf = a;
@@ -2534,10 +2562,18 @@ export class UnitView {
 
   /** Is a clip outside the box (`over`) on screen — the track's clip or one it is still mixing out of? */
   _impOver() {
-    const over = this._box && this._box.over;
-    if (!over || !over.size) return false;
+    const box = this._box;
+    if (!box) return false;
     const tracks = this.actor.spine && this.actor.spine.state ? this.actor.spine.state.tracks : null;
-    for (let e = tracks && tracks[0], d = 0; e && d < 4; e = e.mixingFrom, d++) if (e.animation && over.has(e.animation.name)) return true;
+    for (let e = tracks && tracks[0], d = 0; e && d < 4; e = e.mixingFrom, d++) if (e.animation && box.over?.has(e.animation.name)) return true;
+    // Sampled animation bounds do not include every mixed/procedural attachment pose. Never crop the live pose to
+    // that cached rectangle: render it directly until it fits again (including embedded skill/attack effects).
+    try {
+      const b = this.actor.spine.getLocalBounds();
+      if (b && Number.isFinite(b.x) && Number.isFinite(b.y) && b.width > 0 && b.height > 0) {
+        return b.x < box.x0 - 1 || b.y < box.y0 - 1 || b.x + b.width > box.x0 + box.w + 1 || b.y + b.height > box.y0 + box.h + 1;
+      }
+    } catch { /* runtimes without measurable bounds keep the precomputed clip fallback */ }
     return false;
   }
 
@@ -2695,7 +2731,7 @@ export class UnitView {
     else if (f & UF.STUNNED) push('stun');
     if (f & UF.SLEEP) push('sleep');
     if (f & UF.COLD && !(f & UF.FROZEN)) push('cold');
-    if (f & UF.INVULN) push('invuln');
+    if ((f & UF.INVULN) && !this.isToken) push('invuln');
     if (f & UF.STEALTH) push('stealth');
     for (const k of this.statuses) {
       if (out.length >= limit) break;

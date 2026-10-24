@@ -1,3 +1,7 @@
+import {makotoEffectForm} from '../../../../shared/makoto.js';
+import {makotoOfficialFx} from '../makotoFx.js';
+import { KitProjectileFx } from './kitprojectilefx.js';
+import {NoteFx} from './notefx.js';
 import { bombardAnchor } from './bombardAnchor.js';
 // render/vfx/wiring.js — the battle's events → official effects, generated from index.json (DESIGN §33.12): every
 // unit's normal attack (its mode `Default`, or the mode its skill switches to while the skill is on — the skill plan's
@@ -266,6 +270,8 @@ export class FxWiring {
     this.bombardAims = new Map();
     this.chenWaves = new Map();
     this.windFx = new WindFx(this);
+    this.noteFx = new NoteFx(this);
+    this.kitProjectileFx = new KitProjectileFx(this);
     this.flights = new Set();     // projectile flights in the air
     this.walls = new Set();       // skill-held Yu S3 controller handles
     this.loops = new Map();       // `${unitId}|${status}` → handle
@@ -435,6 +441,7 @@ export class FxWiring {
     // talents' and abilities' (render/vfx/talentfx.js, index v3)
     for (const k of this.skills.keys(views)) keys.add(k);
     for (const k of this.talents.keys(views)) keys.add(k);
+    for (const k of this.kitProjectileFx.keys(views)) keys.add(k);
     for (const k of this.funnels.keys(views)) keys.add(k);   // the 驭械术士's floating units (render/vfx/funnelfx.js)
     for (const view of views) for (const key of costumePreloadKeys(this.idx,this.costumeOf(view))) keys.add(key);
     return [...keys].map(lc).filter((k) => k && this.ofx.lib.has(k));
@@ -479,7 +486,7 @@ export class FxWiring {
     // a form the data ties to a mode (talents.js formModes: a 重生's second form, a husk, a 傀儡师's 替身 → 风丸's Stand),
     // else a form named like a mode
     const fm = formMode(u, this.formOf(v), this.formMap(this.unitKeyOf(v)));
-    if (fm) { const m = modes.find((x) => x.name === fm); if (m && (m.attack || m.combat)) return m; }
+    if (fm) { const m = modes.find((x) => x.name === fm); if (m && (m.attack || m.combat || u.prefab?.includes('char_4217_makoto'))) return m; }
     return modeVariant(modes, 'Default', this._facing(v)) || modes.find((x) => x.name === 'Default') || modes[0];
   }
 
@@ -493,8 +500,8 @@ export class FxWiring {
   /** A unit's sim form now: the last form fx (form()), else the view's / its info's (a view built mid-battle). */
   formOf(v) {
     const id = v?.id ?? v?.info?.id;
-    if (id != null && this.forms.has(id)) return this.forms.get(id);
-    return v?.form ?? v?.info?.form ?? null;
+    const form=id != null && this.forms.has(id) ? this.forms.get(id) : v?.form ?? v?.info?.form ?? null;
+    return v?.info?.charId==='char_4217_makoto' ? makotoEffectForm(form,Number(v._formElapsed)||0) : form;
   }
 
   /** The form → mode map the data gives an index unit (talents.js formModes), cached. */
@@ -884,6 +891,8 @@ export class FxWiring {
     if (r.anim && em?.class === 'UberAnimationEffectEmitter') {
       const anims = Array.isArray(em.replaceAnims) ? em.replaceAnims : [];
       if (!anims.length) return true;
+      // Re-enabling official FX mid-battle may start its counter after the body's. Use the visible Makoto strike.
+      if (src.info?.charId === 'char_4217_makoto' && anims.includes(src.actor?.current)) return r.anim === src.actor.current;
       const random = typeof em.loopTypeName === 'string' ? em.loopTypeName === 'RANDOM' : em.loopType === 1;
       return r.anim === anims[(random ? seedOf(src.id ?? src.info?.id, nth) : nth) % anims.length];
     }
@@ -944,6 +953,7 @@ export class FxWiring {
    */
   attack(src, tgt, kind, time, wound = false) {
     if (!this.ofx.active || !src || !this.idx) return false;
+    if(this.unitKeyOf(src)==='char_4182_oblvns')return true; // Real note positions arrive in snapshots.
     const id = src.id ?? src.info?.id;
     const primaryOnly = /^enemy_116(?:1_tidmag(?:_2)?|2_magmot)$/.test(src.info?.defId || src.info?.spine || '');
     // Cross-area damage is reported as one attack per affected unit. Its wave is one primary-target visual.
@@ -1351,6 +1361,28 @@ export class FxWiring {
    * a directional effect along it; it stays on the target while it lives: `_holdByOwner`), `toTileOnStart` on the
    * target's tile. Returns whether anything played.
    */
+  /** Imperial bombing attaches to the locked target; its prefab already animates the entire fall. */
+  _imperialBombard(proj, src, target, extra) {
+    const duration = Number(extra.t), fall = Math.min(duration, Number(extra.fall) || .266667);
+    const aims = (proj.toTargetOnStart || []).map(k => this.playOn(k, target, {stick:true, toward:beyond(src,target),speed:3/duration})).filter(Boolean);
+    const main = projectileParts(proj).main;
+    setTimeout0(this.ofx, {stop:() => {
+      const pos = [target.x-10,target.y-9,-(target.z||0)];
+      if (main && this.ofx.active) {
+        const def = this.ofx.lib.def(main);
+        const clip = Math.max(0,...(def?.clips || []).map(c=>c.length || 0)) || .266667;
+        const speed=clip/fall;
+        // The prefab includes its original 2.75 s aim delay; this scheduler has already waited for the lock.
+        const delay=Math.max(0,...(def?.fxDelay?.values?.() || [2.75]));
+        this.ofx.spawn(main,{pos,groundZ:pos[2],rootRot:ID_ROT,yaw:def?.mainYaw || 0},{important:true,speed,skip:delay/speed});
+      }
+    }}, Math.max(0,duration-fall), true);
+    setTimeout0(this.ofx, {stop:() => {
+      for (const h of aims) h.stop();
+      if (this.ofx.active) this._arrive(proj,target,[target.x-10,target.y-9,-(target.z||0)],null,null,src);
+    }}, duration, true);
+  }
+
   _startOnTarget(proj, src, tgt) {
     if (!tgt || (!proj.toTargetOnStart?.length && !proj.toTileOnStart?.length)) return false;
     let n = 0;
@@ -1571,6 +1603,7 @@ export class FxWiring {
     name = name==='invuln'?'invulnerable':name;
     const slot = `${id}|${name}`;
     const prev = this.loops.get(slot);
+    if (on && v.isToken && name==='invulnerable') return false;
     if (!on) { if (prev) { prev.stop(); this.loops.delete(slot); } return !!prev; }
     if (!this.ofx.active) return false;
     if (prev && prev.alive) return true;
@@ -1593,7 +1626,7 @@ export class FxWiring {
     const names=v._iconKeys?[...v._iconKeys(Infinity)]:[...(v.statuses||[])];
     const flags=v.flags||0;
     for(const [flag,name]of [[UF.SHIELD,'shield'],[UF.INVULN,'invulnerable'],[UF.STEALTH,'stealth'],[UF.FROZEN,'freeze'],[UF.STUNNED,'stun'],[UF.SLEEP,'sleep'],[UF.COLD,'cold']])if((!v._iconKeys||flag===UF.SHIELD)&&(flags&flag))names.push(name);
-    const current=new Set(v.prep||v.alive===false||v.down?[]:names.map(name=>name==='invuln'?'invulnerable':name).filter(name=>this.statusKey(name)));
+    const current=new Set(v.prep||v.alive===false||v.down?[]:names.map(name=>name==='invuln'?'invulnerable':name).filter(name=>!(v.isToken && name==='invulnerable') && this.statusKey(name)));
     const previous=this.statusSeen.get(id)||new Set();
     for(const name of previous)if(!current.has(name))this.status(v,name,false);
     for(const name of current)if(!previous.has(name)||!this.loops.get(`${id}|${name}`)?.alive)this.status(v,name,true);
@@ -1609,6 +1642,7 @@ export class FxWiring {
     this.skills.release(v);
     this.talents.release(v);
     this.funnels.release(v);
+    this.kitProjectileFx.release(v);
   }
 
   /** b.ev ['skill', id, on] (SkillFx.skill): true when the official layer shows the skill (no procedural burst / aura). */
@@ -1647,9 +1681,12 @@ export class FxWiring {
     this.funnels.sync(list);
   }
 
+  noteBubbles(notes){return this.noteFx.sync(notes);}
+
   // The extracted Clemen(tia) pack has body/attack art, but no independent cabin/vortex asset.
   // Preserve only these missing visuals with their existing procedural fallback.
   simpleEvent(kind,extra){
+    if(kind.startsWith('makoto')&&this.view(extra?.src??extra?.id)?.info?.charId==='char_4217_makoto')return true;
     if(!['anchor','tide'].includes(kind))return false;
     const owner=this.view(extra?.id);if(!owner||this.unitKeyOf(owner)!=='char_4231_clemnt')return false;
     return extra?.skill==='clemnt:cabin'||this.skills.of(owner)?.skillId==='skchr_clemnt_2';
@@ -1664,6 +1701,16 @@ export class FxWiring {
     if (!this.idx) return false;
     const owner = this.view(extra?.src ?? extra?.id);
     if (owner?.info && !this.hasOfficialUnit(owner)) return false;
+    const makoto=makotoOfficialFx(this,owner,kind,x,y,extra);
+    if(makoto!==null)return makoto;
+    if(kind==='iceSpikeImpact'){
+      const p=this.projectileOf(this.idx.projectiles?.projectile_chr_sntlla_s2,owner);
+      for(const id of extra.targets||[]){const target=this.view(id);if(target)for(const key of p?.onHit||[])this.playOn(key,target,{flipFrom:owner});}
+      return true;
+    }
+    if(kind==='sakikoNoteHit')return this.noteFx.hit(x,y,extra,owner);
+    if(kind==='sakikoNoteSound')return true;
+    if(this.kitProjectileFx.simFx(kind,x,y,extra,owner))return true;
     if(this.windFx.simFx(kind,x,y,extra,owner))return true;
     if(kind==='chen3Wave'&&this.ofx.active&&owner){
       const id=owner.id??owner.info?.id;let wave=this.chenWaves.get(id);
@@ -1714,7 +1761,7 @@ export class FxWiring {
           const key = `${extra.id}|${extra.shot}`;
           const target = bombardAnchor(x,y,extra.target,id=>this.view(id),()=>this.ofx.time,this.ofx.time+Math.max(0,Number(extra.t)-Number(extra.fall||0)));
           this.bombardAims.set(key,target);
-          this._fly(proj,src,target,'mortar',this.ofx.time,{dur:Number(extra.t),groundTarget:true});
+          this._imperialBombard(proj,src,target,extra);
           return true;
         }
       }
@@ -1773,6 +1820,8 @@ export class FxWiring {
     this.flights.clear();
     this.bombardAims.clear();
     this.windFx.clear();
+    this.noteFx.clear();
+    this.kitProjectileFx.clear();
     for(const wave of this.chenWaves.values())wave.handle.stop();this.chenWaves.clear();
     this.loops.clear();
     this.statusSeen.clear();
@@ -1799,6 +1848,7 @@ export class FxWiring {
   tick() {
     this.skills.frame++;
     this.windFx.tick();
+    this.kitProjectileFx.tick();
     for(const [id,wave]of this.chenWaves){const owner=this.view(id);if(!this.ofx.active||!owner||owner.alive===false||this.ofx.time-wave.at>.5){wave.handle.stop();this.chenWaves.delete(id);}}
     for (const wall of this.walls) { wall.update(); if (!wall.alive) this.walls.delete(wall); }
     const T = this.ofx.timers;

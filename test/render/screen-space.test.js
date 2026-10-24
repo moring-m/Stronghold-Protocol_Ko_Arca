@@ -1,0 +1,2 @@
+import test from 'node:test';import assert from 'node:assert/strict';import{clientToCanvas,canvasToClient}from '../../public/js/render/screenSpace.js';
+test('zoomed canvas hit tests and DOM overlays use inverse coordinate mappings',()=>{for(const zoom of [.5,.8,1,1.5]){const rect={left:40,top:80,width:1000*zoom,height:600*zoom},screen={width:1000,height:600},point=canvasToClient(rect,screen,300,200);assert.deepEqual(clientToCanvas(rect,screen,point.x,point.y),{x:300,y:200});}});

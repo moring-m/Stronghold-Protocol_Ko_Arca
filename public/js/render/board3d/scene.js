@@ -1100,7 +1100,7 @@ export class BoardScene {
       const native=this.nativeDevice(d);
       if(native){
         const height=native.geometry.bounds?.z1 || .26;
-        nativePlatforms.push(placeMesh(native.geometry,{x:d.c,y:d.r,z:d.z0,sz:.26/height,rot:DIR_TURNS[d.dir]??0}));
+        nativePlatforms.push(placeMesh(native.geometry,{x:d.c,y:d.r,z:d.z0,sz:DEVICE_H.platform/height,rot:DIR_TURNS[d.dir]??0}));
         continue;
       }
       if (d.kind === 'crate') this.staticCrates.push(d);

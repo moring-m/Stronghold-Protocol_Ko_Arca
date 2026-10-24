@@ -509,16 +509,21 @@ export class SpineActor {
    * now, landing in `roles` — a leader's 重生 ends on its last clip while the sim still holds it, and the next form
    * starts on its own clips.
    */
-  setForm(roles, change = null, end = null) {
+  setForm(roles, change = null, end = null, transition = null) {
     const anims = this._baseRoles();
     this.roles = roles ? { ...anims, ...roles } : anims;
     this.endClip = null;
     if (this.dead) return;
+    if (transition?.complete && this.mode === 'change') {
+      this.changeSequence = null; this.changeUntil = this.clock; this.mode = 'base';
+      this.wound = false; this.windUntil = null;
+    }
     if (end && this.has(end.clip) && end.in > 0) {
       this.endClip = end.clip;
       this.endAt = this.clock + Math.max(0, end.in - this.dur(end.clip));
       this.endRoles = end.roles || null;
     }
+    if (transition?.sequence?.length && this._changeSequence(transition.sequence, transition.elapsed || 0)) return;
     if (change && this.has(change)) this._change(change);
     else if (this.mode === 'base') this._play(this._baseName(), true);
     else if (this.mode === 'stun' && this.has(this.roles.stun?.loop)) this._play(this.roles.stun.loop, true);
@@ -575,11 +580,27 @@ export class SpineActor {
 
   /** Play a form's transition clip once; attacks and the resting state wait for it (mode 'change'). */
   _change(clip) {
+    this.changeSequence = null;
     if (this.mode !== 'change') this.stunWanted = this.mode === 'stun';
     this.frozen = false;
     this.mode = 'change';
     this._play(clip, false, { mix: 0.08 });
     this.changeUntil = this.clock + this.dur(clip);
+  }
+
+  /** Authored form transitions are consecutive one-shots, never an idle loop or an extra exit. */
+  _changeSequence(clips, elapsed = 0) {
+    if (!clips.every(clip => this.has(clip))) return false;
+    let at = this.clock - Math.max(0, elapsed);
+    const sequence = clips.map(clip => { const segment = { clip, start: at, end: at + this.dur(clip) }; at = segment.end; return segment; });
+    const current = sequence.find(s => this.clock < s.end - 1e-9);
+    if (!current) { this.mode = 'base'; this.changeSequence = null; this._play(this._baseName(), true); return true; }
+    this._change(current.clip);
+    this.changeSequence = sequence;
+    this.changeUntil = at;
+    const track = this.spine.state.tracks[0];
+    if (track) track.trackTime = Math.max(0, this.clock - current.start);
+    return true;
   }
 
   has(name) { return !!name && this.names.has(name); }
@@ -869,6 +890,7 @@ export class SpineActor {
   }
 
   _attackClip() {
+    if (this.has(this.attackAnimation) && this.roles.attack) return {...this.roles.attack, loop:this.attackAnimation};
     const sk = this.roles.skill;
     const mode = this.skillOn ? this.skillAttackMode?.() : null;
     if (this.skillOn && !this._skillLoopHeld()) {
@@ -1221,7 +1243,12 @@ export class SpineActor {
         if (this.clock >= this.deployUntil) { this.mode = 'base'; this._play(this._baseName(), true,{mix:.18}); }
         break;
       case 'change':
+        if (this.changeSequence) {
+          const segment = this.changeSequence.find(s => this.clock < s.end - 1e-9);
+          if (segment && this.current !== segment.clip) this._play(segment.clip, false, { start: Math.max(0, this.clock - segment.start), mix: 0 });
+        }
         if (this.clock >= this.changeUntil) {
+          this.changeSequence = null;
           this.mode = 'base';
           if (this.stunWanted) { this.stunWanted = false; this._enterStun(); } else this._play(this._baseName(), true);
         }

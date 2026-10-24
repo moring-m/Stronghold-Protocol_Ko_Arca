@@ -151,7 +151,7 @@ export default {
           const key = `thorn2:${unit.id}:${unit.mem.zoneSeq = (unit.mem.zoneSeq ?? 0) + 1}`;
           const z = { x: t.x, y: t.y, vx: (dx / len) * speed, vy: (dy / len) * speed, t: 0, acc: 0, dur: baseDur + extra, key };
           (unit.mem.zones ??= []).push(z);
-          battle.fx('zone', { x: z.x, y: z.y, id: unit.id, r: r0, duration: z.dur, key });
+          battle.fx('zone', { x: z.x, y: z.y, id: unit.id, r: r0, duration: z.dur, key, vx: z.vx, vy: z.vy, baseRadius: r0, grow });
         },
       },
       talents: [
@@ -204,7 +204,7 @@ export default {
                   if (battle.allySelectable(a, unit)) battle.addBuff(a, { key: `${z.key}:regen`, duration: 1 + 2 * battle.dt, source: unit, mods: { hpRegen: regen } });
                 }
               }
-              battle.fx('zone', { x: z.x, y: z.y, id: unit.id, r, duration: Math.max(0, z.dur - z.t), key: z.key });
+              battle.fx('zone', { x: z.x, y: z.y, id: unit.id, r, duration: Math.max(0, z.dur - z.t), key: z.key, vx: z.vx, vy: z.vy, baseRadius: r0, grow });
             }
           }
           for (const [e, steps] of seaHits) { // S3 debuff: 不叠加 — the strongest zone wins

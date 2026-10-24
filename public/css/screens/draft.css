@@ -97,9 +97,9 @@
 }
 .draft-order__info .btn__icon { color: var(--mint-400); }
 .modal__box.minfo-dlg {
-  width: min(max(12rem, 600px), calc(100vw - .6rem - var(--sa-l, 0px) - var(--sa-r, 0px)));
-  max-height: calc(100vh - .6rem);
-  max-height: calc(100svh - .6rem);
+  width: min(max(12rem, 600px), calc(calc(100 * var(--ui-vw, 1vw)) - .6rem - var(--sa-l, 0px) - var(--sa-r, 0px)));
+  max-height: calc(calc(100 * var(--ui-vh, 1vh)) - .6rem);
+  max-height: calc(calc(100 * var(--ui-svh, 1svh)) - .6rem);
 }
 .minfo-dlg .modal__head { padding: .16rem .3rem .02rem; }
 .minfo-dlg .modal__head .micro { font-size: max(.11rem, 8px); }

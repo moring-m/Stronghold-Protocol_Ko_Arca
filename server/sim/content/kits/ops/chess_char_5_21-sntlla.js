@@ -54,12 +54,14 @@ export default {
           unit.stats.attacks++; // "攻击变为…召唤冰凌": every icicle is one of her attacks
           battle.fx('iceSpike', { x: c, y: r, id: unit.id, r: ICICLE_RADIUS });
           battle.after(ICICLE_DELAY, () => {
-            const hit = [];
+            const hit = [],impactIds=[];
             for (const e of battle.foesInRadius(c, r, ICICLE_RADIUS)) {
+              impactIds.push(e.id);
               battle.dealDamage(unit, e, { amount: unit.s.atk * scale, type: 'arts', isAttack: true, isSkill: true, isSplash: true, tags: ['skill', 'iceSpike'] });
               if (e.alive && cold > 0) battle.applyStatus(e, 'cold', { duration: cold, source: unit });
               if (e.alive) hit.push(e);
             }
+            battle.fx('iceSpikeImpact', {x:c,y:r,id:unit.id,targets:impactIds});
             // an icicle is an attack: "攻击时" effects (items, bonds) see it with the enemies it hit
             if (hit.length && battle.hasHook('attack')) battle.emit('attack', { attacker: unit, targets: hit, isSkill: true });
           }, { owner: unit });

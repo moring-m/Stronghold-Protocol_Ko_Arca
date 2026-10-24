@@ -288,7 +288,7 @@ export class FxGL {
    */
   draw(items, frame) {
     const gl = this.gl;
-    // a mask up the Pixi tree may have scissor / stencil on: kept as they are (the effects layers are never masked)
+    // system.renderPass isolates Pixi scissor/stencil state before the terrain depth clear and this draw.
     gl.enable(gl.BLEND);
     gl.frontFace(gl.CW);
     let lastProg = null, lastState = null;

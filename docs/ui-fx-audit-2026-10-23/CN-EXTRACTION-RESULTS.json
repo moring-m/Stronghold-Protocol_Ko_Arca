@@ -1,0 +1,67 @@
+{
+  "archive": "cn-missing-fx-audio-20261023-205741-3b1548",
+  "volumes": 12,
+  "audio": {
+    "requested": 1771,
+    "found": 1757,
+    "files": 1760,
+    "bytes": 366489916,
+    "missing": [
+      "fx_023",
+      "fx_024",
+      "fx_025_1",
+      "fx_025_2",
+      "fx_025_3",
+      "fx_026_1",
+      "fx_026_2",
+      "fx_026_3",
+      "fx_027_1",
+      "fx_027_2",
+      "fx_027_3",
+      "fx_028_1",
+      "fx_028_2",
+      "fx_028_3"
+    ],
+    "hashOrDecodeErrors": [],
+    "formats": {
+      "(1, 2, 48000)": 795,
+      "(1, 2, 44100)": 530,
+      "(2, 2, 48000)": 238,
+      "(2, 2, 44100)": 197
+    }
+  },
+  "fx": {
+    "prefabs": 22,
+    "identicalToExisting": [
+      "clemnt_attack_01_hit_01",
+      "clemnt_attack_01_start_01",
+      "clemnt_attack_01_start_01_down",
+      "clemnt_skill_01_hit_01",
+      "clemnt_skill_01_start_01",
+      "clemnt_skill_02_buff_01",
+      "clemnt_skill_02_hit_01",
+      "clemnt_skill_02_mark_01",
+      "clemnt_skill_02_start_01",
+      "clemnt_skill_02_start_01_down",
+      "clemnt_skill_02_start_01_up",
+      "clemnt_skill_03_buff_01_l",
+      "clemnt_skill_03_buff_01_r",
+      "clemnt_skill_03_buff_02",
+      "clemnt_skill_03_hit_01",
+      "clemnt_skill_03_mark_all_01",
+      "clemnt_skill_03_range",
+      "clemnt_skill_03_range_end",
+      "clemnt_skill_03_start_01",
+      "clemnt_skill_03_start_01_down",
+      "clemnt_skill_03_start_01_up",
+      "clemnt_talent_hit_01"
+    ],
+    "changedOrNew": []
+  },
+  "newWiringKeys": {
+    "units": [],
+    "projectiles": [],
+    "skills": []
+  },
+  "makotoInExtract": false
+}

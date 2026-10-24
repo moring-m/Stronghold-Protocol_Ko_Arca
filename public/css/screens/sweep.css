@@ -289,7 +289,7 @@ button.sw-eth:hover { border-color: #fff; }
 }
 @media (max-aspect-ratio: 1/1) {
   .sw-body { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: .2rem; }
-  .sw-left { max-height: 48vh; }
+  .sw-left { max-height: calc(48 * var(--ui-vh, 1vh)); }
   .sw-tabs .sw-tab { min-width: 0; }
   .sw-codex__body { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, .8fr) minmax(0, 1.2fr); }
   .sw-codex__list { border-right: 0; border-bottom: 2px solid rgba(255, 255, 255, .5); }

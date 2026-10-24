@@ -1,0 +1,205 @@
+{
+  "source": "Actual renderer; production battle-event replay",
+  "results": [
+    {
+      "file": "cetsyr-base.png",
+      "motes": 1,
+      "failed": [],
+      "views": [
+        {
+          "id": 1,
+          "ready": true,
+          "spine": "char_4134_cetsyr"
+        },
+        {
+          "id": 2,
+          "ready": true,
+          "spine": "enemy_1001_bigbo"
+        }
+      ],
+      "stats": {
+        "fps": 2.5,
+        "frameMs": 402.4,
+        "cpuMs": 4.56,
+        "renderMs": 1.24,
+        "mode": "battle",
+        "units": 2,
+        "impostor": 0,
+        "impostorAtlas": {
+          "pages": 1,
+          "slots": 2,
+          "drawn": 1,
+          "full": 0
+        },
+        "boardArt": true,
+        "board3d": {
+          "on": true,
+          "calls": 12,
+          "triangles": 61626,
+          "textures": 28,
+          "geometries": 21,
+          "frames": 161,
+          "cpuMs": 2.66,
+          "lost": false,
+          "originalStage": "act2autochess_m01",
+          "cachedLayouts": 2,
+          "layoutCacheHits": 0,
+          "losses": 0
+        },
+        "pen": 0,
+        "penHidden": true,
+        "prepField": null,
+        "lod": 3,
+        "culled": 0,
+        "particles": 0,
+        "projectiles": 0,
+        "numbers": 0,
+        "rings": 0,
+        "auras": 0,
+        "locks": 0,
+        "flames": 0,
+        "promotions": 0,
+        "officialFx": {
+          "tier": "full",
+          "available": true,
+          "effects": 6,
+          "pending": 0,
+          "particles": 121,
+          "reused": 0,
+          "systems": 31,
+          "dropped": 0,
+          "draws": 44,
+          "programs": 17,
+          "textures": 113,
+          "texMB": 22
+        },
+        "spine": {
+          "size": 2,
+          "ready": 2,
+          "loading": 0,
+          "failed": 0,
+          "refs": 2,
+          "holds": 2,
+          "weight": 8922368,
+          "idleWeight": 0,
+          "active": 0,
+          "queued": 0,
+          "unloading": 0
+        },
+        "renderT": 4.9593139535925435,
+        "rate": 0.40686046407456944,
+        "buffered": 30,
+        "camera": {
+          "tx": 6,
+          "ty": 11.074973251465256,
+          "tz": 0,
+          "tilt": 30,
+          "dist": 11.86752226050627,
+          "scale": 87.97467546087566,
+          "cx": 550,
+          "cy": 380
+        }
+      }
+    },
+    {
+      "file": "cetsyr-skin.png",
+      "motes": 1,
+      "failed": [],
+      "views": [
+        {
+          "id": 1,
+          "ready": true,
+          "spine": "skin_char_4134_cetsyr_epoque_50"
+        },
+        {
+          "id": 2,
+          "ready": true,
+          "spine": "enemy_1001_bigbo"
+        }
+      ],
+      "stats": {
+        "fps": 0.8,
+        "frameMs": 1293.34,
+        "cpuMs": 305.87,
+        "renderMs": 9.21,
+        "mode": "battle",
+        "units": 2,
+        "impostor": 0,
+        "impostorAtlas": {
+          "pages": 1,
+          "slots": 1,
+          "drawn": 1,
+          "full": 0
+        },
+        "boardArt": true,
+        "board3d": {
+          "on": true,
+          "calls": 12,
+          "triangles": 61626,
+          "textures": 28,
+          "geometries": 21,
+          "frames": 269,
+          "cpuMs": 1.22,
+          "lost": false,
+          "originalStage": "act2autochess_m01",
+          "cachedLayouts": 2,
+          "layoutCacheHits": 0,
+          "losses": 0
+        },
+        "pen": 0,
+        "penHidden": true,
+        "prepField": null,
+        "lod": 3,
+        "culled": 0,
+        "particles": 0,
+        "projectiles": 0,
+        "numbers": 0,
+        "rings": 0,
+        "auras": 0,
+        "locks": 0,
+        "flames": 0,
+        "promotions": 0,
+        "officialFx": {
+          "tier": "full",
+          "available": true,
+          "effects": 7,
+          "pending": 0,
+          "particles": 239,
+          "reused": 0,
+          "systems": 50,
+          "dropped": 0,
+          "draws": 60,
+          "programs": 20,
+          "textures": 205,
+          "texMB": 51
+        },
+        "spine": {
+          "size": 3,
+          "ready": 3,
+          "loading": 0,
+          "failed": 0,
+          "refs": 2,
+          "holds": 2,
+          "weight": 26052816,
+          "idleWeight": 8368584,
+          "active": 0,
+          "queued": 0,
+          "unloading": 0
+        },
+        "renderT": 4.971177707581227,
+        "rate": 0.28822292418772477,
+        "buffered": 23,
+        "camera": {
+          "tx": 6,
+          "ty": 11.074973251465256,
+          "tz": 0,
+          "tilt": 30,
+          "dist": 11.86752226050627,
+          "scale": 87.97467546087566,
+          "cx": 550,
+          "cy": 380
+        }
+      }
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+import {uiCssZoom} from './mobileScale.js';
 // Design-system components (Preact + htm, no build step). Styles live in css/components.css.
 //
 // Exports: html (bound htm), Icon, Button, Panel, MicroLabel, Chevrons, HexBadge, TierChip,
@@ -654,7 +655,8 @@ export function TooltipLayer() {
     let left = r.left + r.width / 2 - b.width / 2;
     left = Math.max(m, Math.min(vw - b.width - m, left));
     top = Math.max(m, Math.min(vh - b.height - m, top));
-    const next = { top: Math.round(top), left: Math.round(left), place, id: tipState.id };
+    const zoom=uiCssZoom();
+    const next = { top: Math.round(top/zoom), left: Math.round(left/zoom), place, id: tipState.id };
     if (!pos || pos.top !== next.top || pos.left !== next.left || pos.id !== next.id || pos.place !== next.place) setPos(next);
   });
   if (!tipState) return null;

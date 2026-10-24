@@ -1,0 +1,1064 @@
+{
+  "sourcePage": "https://puppiizsunniiz.github.io/AN-EN-Tags/akhrchars.html",
+  "repository": "PuppiizSunniiz/Arknight-voices",
+  "revision": "2c0d42dda2aa4c245b590dc3acf01228b59a29ad",
+  "files": [
+    {
+      "charId": "char_499_kaitou",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_499_kaitou/cn_019.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_499_kaitou/CN_019.mp3",
+      "gitBlob": "94c71e5baa03a14459a1566e67feecade19e7696",
+      "bytes": 17911,
+      "sha256": "dad89a76ae7cd595834e72218e0cb38b9bbd291dce8e42ed3be7b509b45dbc4d"
+    },
+    {
+      "charId": "char_499_kaitou",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_499_kaitou/cn_020.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_499_kaitou/CN_020.mp3",
+      "gitBlob": "de39623f80157243d3d4bad942cfbcb234c64f37",
+      "bytes": 45497,
+      "sha256": "3f7a4719bb307f02e8d6fbaddd64ba801ba2a41f3cfb93c5e7d6441ec7376bde"
+    },
+    {
+      "charId": "char_499_kaitou",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_499_kaitou/cn_021.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_499_kaitou/CN_021.mp3",
+      "gitBlob": "0d8885dad8bdab39f2bb7cd793c1e2e32bab0d62",
+      "bytes": 10702,
+      "sha256": "ec2b7dd7163bae4a885a1f663de2f224e1de56f4513b159d2c116ad848724bfc"
+    },
+    {
+      "charId": "char_499_kaitou",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_499_kaitou/cn_022.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_499_kaitou/CN_022.mp3",
+      "gitBlob": "c27e7339859c242dc5b0d33603e0aa2393123e7a",
+      "bytes": 33271,
+      "sha256": "8671626b51c4f8fbe86452546fb65f6fae6de9fe03ffc418ab1d18d8513e51cc"
+    },
+    {
+      "charId": "char_499_kaitou",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_499_kaitou/cn_023.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_499_kaitou/CN_023.mp3",
+      "gitBlob": "f489797df3bff611d469f055b7b99561df2c8e53",
+      "bytes": 46750,
+      "sha256": "31a5d2c7e2b5de3907f64a93b2b6b5983cf82c8b09ac7762a950b27e1b46b7ff"
+    },
+    {
+      "charId": "char_499_kaitou",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_499_kaitou/cn_024.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_499_kaitou/CN_024.mp3",
+      "gitBlob": "184086b485dac92197c3a38aa873a0aa151bc588",
+      "bytes": 70574,
+      "sha256": "b9aba6e3b13d86b54a0f95db3f2c47b05ce63276fd4f3ecc970b017544033e30"
+    },
+    {
+      "charId": "char_499_kaitou",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_499_kaitou/cn_025.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_499_kaitou/CN_025.mp3",
+      "gitBlob": "41d0b0c93fcd6ca1d2beb11d8148f3d56c69fa23",
+      "bytes": 37660,
+      "sha256": "676c11fa493a06cf47f8119e0c2a13df9937f9e1b7c912e7ca19966130253dfc"
+    },
+    {
+      "charId": "char_499_kaitou",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_499_kaitou/cn_026.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_499_kaitou/CN_026.mp3",
+      "gitBlob": "8a354043bec4b0726dc780baf64b8ece4c884c2e",
+      "bytes": 53647,
+      "sha256": "13ea900459a33b2cab64f7eb91dcdda46e367d34e040437a40224274df505197"
+    },
+    {
+      "charId": "char_499_kaitou",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_499_kaitou/cn_027.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_499_kaitou/CN_027.mp3",
+      "gitBlob": "2c0634259fb3036e89c3e9c9ff9973896d766891",
+      "bytes": 59603,
+      "sha256": "d205e6d179ae1add0c1371d1141b90075e73b1bafdd22806a3f3bca1804df47a"
+    },
+    {
+      "charId": "char_499_kaitou",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_499_kaitou/cn_028.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_499_kaitou/CN_028.mp3",
+      "gitBlob": "869fcd0b4c760d74f8ff894a5f52ea4532add889",
+      "bytes": 26688,
+      "sha256": "884922b81347c365a2f1f7bbd3a2acfd7903c15a5de664f7992179865a0b5ff3"
+    },
+    {
+      "charId": "char_499_kaitou",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_499_kaitou/cn_029.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_499_kaitou/CN_029.mp3",
+      "gitBlob": "b529496a94a8a4eef695c8bdc61d5e4ecc9f72fa",
+      "bytes": 132955,
+      "sha256": "d01e1ec2a258f515b8cc41275db4c2c66398499ac408d6e15b8dddab5414702c"
+    },
+    {
+      "charId": "char_499_kaitou",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_499_kaitou/cn_030.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_499_kaitou/CN_030.mp3",
+      "gitBlob": "579bd11a5f399f16313c4f446b005a504f1f8541",
+      "bytes": 53333,
+      "sha256": "e61f517c07681d4828b260515e9b523313729c413adb4483e1a36a83040efe7e"
+    },
+    {
+      "charId": "char_499_kaitou",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_499_kaitou/cn_031.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_499_kaitou/CN_031.mp3",
+      "gitBlob": "b85aa8fe456d1e09fcff8bb8c326e9426f98e21b",
+      "bytes": 89696,
+      "sha256": "0b4d98a8909fe9c6cb9959d44675b2c01397a00c7620a97b13dff17d34e857bb"
+    },
+    {
+      "charId": "char_499_kaitou",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_499_kaitou/cn_032.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_499_kaitou/CN_032.mp3",
+      "gitBlob": "0a65b230a65bef70a7cc6469156461b16723ff44",
+      "bytes": 180288,
+      "sha256": "bda939dde6cce6c537346e9c123c95da16ec70377339c1efa9c3a2b79563a398"
+    },
+    {
+      "charId": "char_4109_baslin",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4109_baslin/cn_019.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4109_baslin/CN_019.mp3",
+      "gitBlob": "a897ba63f7efd2d3c6df119dcca2858693be0c8a",
+      "bytes": 42362,
+      "sha256": "fe39050e5b368652d68bd1e5cde0b5fe86c3ca12ac5b8c14df890791c2d351e4"
+    },
+    {
+      "charId": "char_4109_baslin",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4109_baslin/cn_020.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4109_baslin/CN_020.mp3",
+      "gitBlob": "87244040223bdf26693db225c6d1b6791857e4ca",
+      "bytes": 28569,
+      "sha256": "1fcf28cf22a42ac5106c6acf86def8ce01299f39ff742616a22c171105119207"
+    },
+    {
+      "charId": "char_4109_baslin",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4109_baslin/cn_021.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4109_baslin/CN_021.mp3",
+      "gitBlob": "cbe22b3d8b28f9bfc2e19937c58becf750b755ce",
+      "bytes": 57095,
+      "sha256": "1193568ac820ea0dbadb3d849359f7446b0c9f936bf2367dba52940456909996"
+    },
+    {
+      "charId": "char_4109_baslin",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4109_baslin/cn_022.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4109_baslin/CN_022.mp3",
+      "gitBlob": "49d3fdf57b6215f3e1c64eda375e6ce30b68285f",
+      "bytes": 39541,
+      "sha256": "96e0047050a206c3ce709f158c59f3868b149c67a3caf4e1cb49e86d78aeba5f"
+    },
+    {
+      "charId": "char_4109_baslin",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4109_baslin/cn_023.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4109_baslin/CN_023.mp3",
+      "gitBlob": "1156cb7fb0eef8ddd9422c905c3f10d25a928154",
+      "bytes": 19165,
+      "sha256": "0b77b7fd862ae5bfd81f768ebaf2b6d24388fd838d590b26edac2072fcefffbc"
+    },
+    {
+      "charId": "char_4109_baslin",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4109_baslin/cn_024.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4109_baslin/CN_024.mp3",
+      "gitBlob": "73ed2c4ed464c3bf25dc4c69b8acb4448510777f",
+      "bytes": 34839,
+      "sha256": "d50f3778782a91dd52414e121e3a4f04b3e944227069547ea3d472e0669fda85"
+    },
+    {
+      "charId": "char_4109_baslin",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4109_baslin/cn_025.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4109_baslin/CN_025.mp3",
+      "gitBlob": "1bf4fc346313ed759b9efd77535c9f48c0a3305f",
+      "bytes": 43929,
+      "sha256": "39d19297d7800dbddcc8967f09516f1602edd77a335bff76a34c0c76361df3d7"
+    },
+    {
+      "charId": "char_4109_baslin",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4109_baslin/cn_026.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4109_baslin/CN_026.mp3",
+      "gitBlob": "c0bba9b89507e39a0edd581af550938fb32c313c",
+      "bytes": 48004,
+      "sha256": "0c0bf18a44d35e756dbfc63daf42ebc145caa3856b6b50ba153c00643c9d6037"
+    },
+    {
+      "charId": "char_4109_baslin",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4109_baslin/cn_027.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4109_baslin/CN_027.mp3",
+      "gitBlob": "e136c673422d9589418c656a58acdbd76e9c9d05",
+      "bytes": 47691,
+      "sha256": "33b417a7b8d7f3fd7b7e80727f928ebb018e77ce4ce8ea5b820fd198d95389ab"
+    },
+    {
+      "charId": "char_4109_baslin",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4109_baslin/cn_028.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4109_baslin/CN_028.mp3",
+      "gitBlob": "65ccbf7c0b2461f8ed275fb9f1aa14dd86efe6d0",
+      "bytes": 44243,
+      "sha256": "e2b71266e1caf96ad2c0eea6f125a7c8e5aba0d055be6369a2f3b075a7955d44"
+    },
+    {
+      "charId": "char_4109_baslin",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4109_baslin/cn_029.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4109_baslin/CN_029.mp3",
+      "gitBlob": "cdf31a67f2feea5394c65444c76f7daa8d23673e",
+      "bytes": 232638,
+      "sha256": "ab2b95fab0e9d856e70aad2679f98beaedfc2e6c36a5a28d49da87172e5e5104"
+    },
+    {
+      "charId": "char_4109_baslin",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4109_baslin/cn_030.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4109_baslin/CN_030.mp3",
+      "gitBlob": "2928cba8cbbd8f5fda1894c2f9eb1c30c6e727f9",
+      "bytes": 48945,
+      "sha256": "cbf45c4c35d2db2454a5e697cde8229677cf24b8c170132a3a0f5ce5e053f0e6"
+    },
+    {
+      "charId": "char_4109_baslin",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4109_baslin/cn_031.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4109_baslin/CN_031.mp3",
+      "gitBlob": "00a3f5c4d42ff2d0cd22d5169fdba2de4c0c3193",
+      "bytes": 92204,
+      "sha256": "72755df6679aa84be689186109f0979e0c98d45587a21e7090868ae0e6b2b77d"
+    },
+    {
+      "charId": "char_4109_baslin",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4109_baslin/cn_032.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4109_baslin/CN_032.mp3",
+      "gitBlob": "e93cd22e75b8720a69eca93799eb314d50c9329b",
+      "bytes": 125745,
+      "sha256": "f8c5ea7d7c0e6b32648e7cd14032063d0a23589795fa7d281328649e9a3d834c"
+    },
+    {
+      "charId": "char_4047_pianst",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4047_pianst/cn_019.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4047_pianst/CN_019.mp3",
+      "gitBlob": "efbd4c0f2b84f86f97aff1e58076d9f166e83101",
+      "bytes": 43929,
+      "sha256": "3dd00b0f124025798a50872610ea5e6e09a9393f7093f665c481108c06365cfe"
+    },
+    {
+      "charId": "char_4047_pianst",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4047_pianst/cn_020.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4047_pianst/CN_020.mp3",
+      "gitBlob": "32d40a5eb93420644aa85f6a6846a976c6c8ebc5",
+      "bytes": 37033,
+      "sha256": "61f567875697bc8289ede48f6c20fad9085b9fe96fd9b092e985426adf495004"
+    },
+    {
+      "charId": "char_4047_pianst",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4047_pianst/cn_021.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4047_pianst/CN_021.mp3",
+      "gitBlob": "bf7e31d6551eaf264baa9eb9a8b41a0825d16910",
+      "bytes": 27629,
+      "sha256": "6b225347d39e2ee17b7fd8383196341d75846f4e7192c53b3b3e01787ab50e9e"
+    },
+    {
+      "charId": "char_4047_pianst",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4047_pianst/cn_022.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4047_pianst/CN_022.mp3",
+      "gitBlob": "07d24545e1f69ee057124eada03a0b2c328d120f",
+      "bytes": 27002,
+      "sha256": "27d2925efea723d6fc4f6d563a7d2ebcb9e38300dbc37d31c74aafe48f3414a7"
+    },
+    {
+      "charId": "char_4047_pianst",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4047_pianst/cn_023.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4047_pianst/CN_023.mp3",
+      "gitBlob": "05d40a67760937c6de2228409410054d47e8b956",
+      "bytes": 55841,
+      "sha256": "7fcfcada85e5d78b41681e8f7372a209687f5200d816e53ba522f890a33ca2b1"
+    },
+    {
+      "charId": "char_4047_pianst",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4047_pianst/cn_024.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4047_pianst/CN_024.mp3",
+      "gitBlob": "f512987fb044b689507faa113f4d5df7a8158aa0",
+      "bytes": 63678,
+      "sha256": "94ec08c1a252445434c46266ccc22752248f3738ac3c273d3bd8be3f1178516f"
+    },
+    {
+      "charId": "char_4047_pianst",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4047_pianst/cn_025.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4047_pianst/CN_025.mp3",
+      "gitBlob": "c94bd92f108514825adc96ce2800f906bd785d3f",
+      "bytes": 11328,
+      "sha256": "ae54dbc040cfd8a6c4e796264cd4dc9bf7e0980b6e3bb3d1da7ddc9b4c4f2040"
+    },
+    {
+      "charId": "char_4047_pianst",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4047_pianst/cn_026.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4047_pianst/CN_026.mp3",
+      "gitBlob": "fbd75cddc25c5f3d3647964c4e273be45e1a4d79",
+      "bytes": 8821,
+      "sha256": "34fb3d3cc4498f09f79492c419f44a018185ac14c613017178da4b2c8d7d26e4"
+    },
+    {
+      "charId": "char_4047_pianst",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4047_pianst/cn_027.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4047_pianst/CN_027.mp3",
+      "gitBlob": "3c1d18e41f9e7123e6459d56d1dce0d15536ecf3",
+      "bytes": 20419,
+      "sha256": "1a2458931b65dffa9b1f9edb556727568673c82f19d1e6ac8570c888b626a610"
+    },
+    {
+      "charId": "char_4047_pianst",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4047_pianst/cn_028.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4047_pianst/CN_028.mp3",
+      "gitBlob": "07102dbb44f4127e7728d74da88eb25b892635b0",
+      "bytes": 7567,
+      "sha256": "5fecd9bf2290b13dcd71df1c9c67662634f4a84d51c96ca2375914913acc2906"
+    },
+    {
+      "charId": "char_4047_pianst",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4047_pianst/cn_029.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4047_pianst/CN_029.mp3",
+      "gitBlob": "6634758dac81bfb35a525e9932f08bb5c2fa81d2",
+      "bytes": 130447,
+      "sha256": "8b3e69df7598f22e06dc3091c7443398a39eb82b9a2d5eb092db78122aa11d48"
+    },
+    {
+      "charId": "char_4047_pianst",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4047_pianst/cn_030.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4047_pianst/CN_030.mp3",
+      "gitBlob": "2d2919c77ca29480009593d69e7e7abe14796eb2",
+      "bytes": 107877,
+      "sha256": "717eb5494834caa386c5d8442a21f068d4fe9a5e9cdc959c7011ea0b23f41b9e"
+    },
+    {
+      "charId": "char_4047_pianst",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4047_pianst/cn_031.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4047_pianst/CN_031.mp3",
+      "gitBlob": "cba3cf67391dd27507f04d73b113ca24e576b90b",
+      "bytes": 147374,
+      "sha256": "d739ead5f0a1eefa64d329f121102ac2bc2c59a91c6ffa8c151fdc5deb918027"
+    },
+    {
+      "charId": "char_4047_pianst",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4047_pianst/cn_032.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4047_pianst/CN_032.mp3",
+      "gitBlob": "133d0910dee8ff4c031d24bbd283d8da848dc055",
+      "bytes": 179035,
+      "sha256": "f672222f0154a941eea49287b7e3d5219de040aaaa20e3ea5c966b5072284e65"
+    },
+    {
+      "charId": "char_4217_makoto",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4217_makoto/cn_019.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4217_makoto/CN_019.mp3",
+      "gitBlob": "da7a2c2edecbaafea4340d130e057e58404692c4",
+      "bytes": 25122,
+      "sha256": "60b1e3d4b8590a8b691cb53353059346635ff240c23c5ea4175e18ef0c64e238"
+    },
+    {
+      "charId": "char_4217_makoto",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4217_makoto/cn_020.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4217_makoto/CN_020.mp3",
+      "gitBlob": "25087581783e09dd9c0524fc746cace1285cb10f",
+      "bytes": 24495,
+      "sha256": "b7040a806261950f49cdc628577c43221083f1555dc8bfb0b92901c613938b88"
+    },
+    {
+      "charId": "char_4217_makoto",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4217_makoto/cn_021.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4217_makoto/CN_021.mp3",
+      "gitBlob": "9d2f59b4993627d526ec956cb45d62892299fead",
+      "bytes": 13210,
+      "sha256": "bd947fe76575c0dfba684de378a9c844c78dc39e8ac0dbf3fdf3120bff4852e9"
+    },
+    {
+      "charId": "char_4217_makoto",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4217_makoto/cn_022.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4217_makoto/CN_022.mp3",
+      "gitBlob": "274c15f109d41fcae70a92bb348e29d7dc8d0d8a",
+      "bytes": 11643,
+      "sha256": "6d4c0c6a9e861ae0016fcf1c85d82b6e321d8e532bcb748134285032c9e75ba0"
+    },
+    {
+      "charId": "char_4217_makoto",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4217_makoto/cn_023.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4217_makoto/CN_023.mp3",
+      "gitBlob": "b568b83d7eb5bf99838d6ab555b3054c83074bda",
+      "bytes": 9762,
+      "sha256": "76c897b8fe5411e2cd34d40a25e76abae6548b2450c09e3f4d65a124584df518"
+    },
+    {
+      "charId": "char_4217_makoto",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4217_makoto/cn_024.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4217_makoto/CN_024.mp3",
+      "gitBlob": "7f30b052e53d4db3816c287279e7cb1432405840",
+      "bytes": 12583,
+      "sha256": "d3ae6311e171679bee0b7e683e6acd5c90eeb4d0f9845d4c1a62e82bc5f9a39a"
+    },
+    {
+      "charId": "char_4217_makoto",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4217_makoto/cn_025.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4217_makoto/CN_025.mp3",
+      "gitBlob": "05441453404815bef45398420b6f3350cc21a768",
+      "bytes": 12270,
+      "sha256": "4923b55162ee49b43d34d3766bf533bf6162464c650dab785a610c06733ea68c"
+    },
+    {
+      "charId": "char_4217_makoto",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4217_makoto/cn_026.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4217_makoto/CN_026.mp3",
+      "gitBlob": "25f9ed7a9ea0047d93b33353aac507d48eda3f9b",
+      "bytes": 5687,
+      "sha256": "e8d3ac6d6a9dd9fda29104287eefd716faeb551369a1077b30885c8f814329ed"
+    },
+    {
+      "charId": "char_4217_makoto",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4217_makoto/cn_027.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4217_makoto/CN_027.mp3",
+      "gitBlob": "2189b16e67830baaf29f97962ea51254a32816ad",
+      "bytes": 14151,
+      "sha256": "6f0acf0282f9c18268395987a5cb4c5a5fa591818fbafa592e0c3d08bb24241a"
+    },
+    {
+      "charId": "char_4217_makoto",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4217_makoto/cn_028.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4217_makoto/CN_028.mp3",
+      "gitBlob": "7b5c40d67a99dd31367b40f8b993c35d945fc05f",
+      "bytes": 23555,
+      "sha256": "6584ab0bb6cf1d8e4e3253accf2e23984aedac82e8bd4c174432a416aea1b9c1"
+    },
+    {
+      "charId": "char_4217_makoto",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4217_makoto/cn_029.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4217_makoto/CN_029.mp3",
+      "gitBlob": "357724cee58e88882e802552e81c0b497853d174",
+      "bytes": 95966,
+      "sha256": "2c8775ee11ebbbd52ceab10d426498d8bf986d1646c93bf187c99e458021a61b"
+    },
+    {
+      "charId": "char_4217_makoto",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4217_makoto/cn_030.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4217_makoto/CN_030.mp3",
+      "gitBlob": "8b8249b4dc1793dce21a28b34fdca4b99466fda8",
+      "bytes": 90951,
+      "sha256": "4cf226a404a3aea6b8b6e9733322e0b21d586d23bf2c69ff1e26c109019c83c1"
+    },
+    {
+      "charId": "char_4217_makoto",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4217_makoto/cn_031.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4217_makoto/CN_031.mp3",
+      "gitBlob": "0946a4c7e04be2638c2d21cd2c56c21bc2b424d2",
+      "bytes": 75904,
+      "sha256": "8c2c9f1103a7be1c1c22ef5d7f51d62c908bc289d933e29f74fb7b56b2f46eb6"
+    },
+    {
+      "charId": "char_4217_makoto",
+      "language": "jp",
+      "path": "/assets/audio/voice/voice/char_4217_makoto/cn_032.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice/char_4217_makoto/CN_032.mp3",
+      "gitBlob": "c1f4be2191dbb23e4be6dad63b71dc704ac42cea",
+      "bytes": 33899,
+      "sha256": "71a18f0917ccb8bfcb0f7a62ce914323d15ec11398d5eef5a39a5625c2af9c20"
+    },
+    {
+      "charId": "char_499_kaitou",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_499_kaitou/cn_019.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_499_kaitou/CN_019.mp3",
+      "gitBlob": "fad6897f1aeb682727df73e8d4a81c9a4bcf377d",
+      "bytes": 19479,
+      "sha256": "b76d20578481392cfffe3a1113129def6446affa49ec180d825c4fabc07ab4a9"
+    },
+    {
+      "charId": "char_499_kaitou",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_499_kaitou/cn_020.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_499_kaitou/CN_020.mp3",
+      "gitBlob": "0814182ca82b13afbc70981253f436b0677af7d4",
+      "bytes": 47377,
+      "sha256": "1120985481809119678e63f06712524845aad6c37131b7a5cabe5982e4073ff9"
+    },
+    {
+      "charId": "char_499_kaitou",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_499_kaitou/cn_021.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_499_kaitou/CN_021.mp3",
+      "gitBlob": "5e5265f13464dd051e3522026d7202463055b38d",
+      "bytes": 11642,
+      "sha256": "d7724ef79c6d59c5e7a81381ed4039d15c63b84b1f529cab69f3abc2b07eec67"
+    },
+    {
+      "charId": "char_499_kaitou",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_499_kaitou/cn_022.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_499_kaitou/CN_022.mp3",
+      "gitBlob": "de0afb60214a1ead4f543c8c9dcd3f656129a1d1",
+      "bytes": 37346,
+      "sha256": "16ab6a32a3e1275bebf7e01496f69f6f2553a9708d3a3c4b6488d466e65a4a39"
+    },
+    {
+      "charId": "char_499_kaitou",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_499_kaitou/cn_023.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_499_kaitou/CN_023.mp3",
+      "gitBlob": "e8eec1ed72a3b9c9c90cd18b6f9639d931f81363",
+      "bytes": 53333,
+      "sha256": "b190565dda2321a267526038588269ec2b29b24ad840d8e6fccbf4a0d27098a5"
+    },
+    {
+      "charId": "char_499_kaitou",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_499_kaitou/cn_024.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_499_kaitou/CN_024.mp3",
+      "gitBlob": "d6e80f6f54131f2696add64ad8fb31340542c276",
+      "bytes": 81232,
+      "sha256": "1df02ff252c7196c7f2715239674cf1933616fefc286d786f8018e46e6b48dbf"
+    },
+    {
+      "charId": "char_499_kaitou",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_499_kaitou/cn_025.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_499_kaitou/CN_025.mp3",
+      "gitBlob": "2d28aab095dbbbbcc4640d7318fdad0a24e10b2e",
+      "bytes": 40795,
+      "sha256": "46803715a8d457343d2fe5b4ff4f971089847caab280f3981ef45b1d90d9abe2"
+    },
+    {
+      "charId": "char_499_kaitou",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_499_kaitou/cn_026.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_499_kaitou/CN_026.mp3",
+      "gitBlob": "b597e928a9936ce2abda736927dd563f69d99248",
+      "bytes": 61170,
+      "sha256": "56638ffbc81c787f83872772711c5482a60c392bf6c9daaa648b00033fefde24"
+    },
+    {
+      "charId": "char_499_kaitou",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_499_kaitou/cn_027.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_499_kaitou/CN_027.mp3",
+      "gitBlob": "d96f6e3fd6657dc78cb4f9a98853ef0f70c36596",
+      "bytes": 53020,
+      "sha256": "4807e4f736e4e5c7a897781bb3c94d539db117805b0ffa23f309179ea5abeea2"
+    },
+    {
+      "charId": "char_499_kaitou",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_499_kaitou/cn_028.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_499_kaitou/CN_028.mp3",
+      "gitBlob": "ccf1270afb34652f4acc907254c4f9ffaf95e78b",
+      "bytes": 25435,
+      "sha256": "f34b703864eab6dd1126b90ec229772fd8fb518d711a8bac6f82daae0b8d7c1e"
+    },
+    {
+      "charId": "char_499_kaitou",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_499_kaitou/cn_029.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_499_kaitou/CN_029.mp3",
+      "gitBlob": "a7d8c6d22ee4dc63ae987b362d2d3d017f6cc53b",
+      "bytes": 145180,
+      "sha256": "31313910da775286286228524c6185762dde673b5b8e44ac116731aa56dad6f2"
+    },
+    {
+      "charId": "char_499_kaitou",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_499_kaitou/cn_030.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_499_kaitou/CN_030.mp3",
+      "gitBlob": "c2f6c1c06cac80ddd12674c9fad158c27a7a8b3b",
+      "bytes": 57722,
+      "sha256": "0761f06df4c48a615b33c4c26a2482291130ae99a12cd6a5d42a671b85349e31"
+    },
+    {
+      "charId": "char_499_kaitou",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_499_kaitou/cn_031.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_499_kaitou/CN_031.mp3",
+      "gitBlob": "df5b8ef11ec0e64ce637567b46b41410c454a684",
+      "bytes": 73082,
+      "sha256": "f0d48d470e5cdd4076dbc69cdffe12c1b33f2b818dd48d3602b3984a6164f91f"
+    },
+    {
+      "charId": "char_499_kaitou",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_499_kaitou/cn_032.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_499_kaitou/CN_032.mp3",
+      "gitBlob": "e63938fc73f9f01f1f6e993fb89e035424a68e0f",
+      "bytes": 171825,
+      "sha256": "364504bf5fe158d17bc28e28aaffe167686e3260f03cd3ee11f327d0cbb5d615"
+    },
+    {
+      "charId": "char_4109_baslin",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_4109_baslin/cn_019.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4109_baslin/CN_019.mp3",
+      "gitBlob": "0f9c80ff6c3c6f5da5b385a62055fe9d0b169c13",
+      "bytes": 58035,
+      "sha256": "dd658bf52e23cdc1039b2fac714680f955eb0e9f5845fc1d670dcd419301de2d"
+    },
+    {
+      "charId": "char_4109_baslin",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_4109_baslin/cn_020.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4109_baslin/CN_020.mp3",
+      "gitBlob": "895236ddc71b5d2ae5052944b09797a8eed573cd",
+      "bytes": 31704,
+      "sha256": "e56062f7c4a7e30884d19f6e7b699871dfbf1a0c513074c0cc3e7cb4f2aa066f"
+    },
+    {
+      "charId": "char_4109_baslin",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_4109_baslin/cn_021.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4109_baslin/CN_021.mp3",
+      "gitBlob": "31ab97589c90e4c38c0a50d974e38d356ab91f3f",
+      "bytes": 47064,
+      "sha256": "ac8b5c0c6dbb9afe4ac6b2f694c25dfe81c6efd9a371e5833a6bc9ced3bc927e"
+    },
+    {
+      "charId": "char_4109_baslin",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_4109_baslin/cn_022.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4109_baslin/CN_022.mp3",
+      "gitBlob": "4db42b71f4e0f6099f8f2bf4fc03bb910b54cceb",
+      "bytes": 42675,
+      "sha256": "b47f45d4476d5aeb78fe7966bf16cad18e9e7d3561a0b5944a576cba16731e53"
+    },
+    {
+      "charId": "char_4109_baslin",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_4109_baslin/cn_023.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4109_baslin/CN_023.mp3",
+      "gitBlob": "5fc9d51ead750aad49f1fb4376a890bcca72f706",
+      "bytes": 23867,
+      "sha256": "cefb073e851b4c7115d1b5c409bb3b85e7bef2a53187588143bf9b97fcf0de62"
+    },
+    {
+      "charId": "char_4109_baslin",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_4109_baslin/cn_024.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4109_baslin/CN_024.mp3",
+      "gitBlob": "1835a426b490ff2a857d6cf0012cfb2c3fa39d21",
+      "bytes": 24494,
+      "sha256": "72f6f1c957ab6e522fc8b845743f460d1b99d6222db06acfe1b2b59694756ba1"
+    },
+    {
+      "charId": "char_4109_baslin",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_4109_baslin/cn_025.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4109_baslin/CN_025.mp3",
+      "gitBlob": "ae7f7f7ecc7b97fab1eec9b22692a01425cbdb21",
+      "bytes": 35779,
+      "sha256": "8e9d3431fa9432414c029601fb5096495fcba728f20fa71eb1d544887c596dad"
+    },
+    {
+      "charId": "char_4109_baslin",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_4109_baslin/cn_026.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4109_baslin/CN_026.mp3",
+      "gitBlob": "b3bfa12e57c5debc34ebd5c0c5113bee852be8b7",
+      "bytes": 44556,
+      "sha256": "283b7213aad2f41c749180e9591b76dd0a9d2dc636e387870c27bf2a5c7b1a52"
+    },
+    {
+      "charId": "char_4109_baslin",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_4109_baslin/cn_027.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4109_baslin/CN_027.mp3",
+      "gitBlob": "b1c5f98180e12b6447ab32113b7d54137f2c401c",
+      "bytes": 55528,
+      "sha256": "5a716d1e0c5e23f73c483ead70b9718573ea102d7bb55f5f478957036956da86"
+    },
+    {
+      "charId": "char_4109_baslin",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_4109_baslin/cn_028.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4109_baslin/CN_028.mp3",
+      "gitBlob": "d73364e1e349b6d39a3fdd8f23818bc01f10696f",
+      "bytes": 37973,
+      "sha256": "7b4a1687e2fc17b14ab5812fa7a712d44d5f3f48df53936fedcf05e26d27fe26"
+    },
+    {
+      "charId": "char_4109_baslin",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_4109_baslin/cn_029.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4109_baslin/CN_029.mp3",
+      "gitBlob": "c7d8fee2c4ebe6a24dd907530a2ba27a5bed8d80",
+      "bytes": 237026,
+      "sha256": "28b955b2433f655b8f9b9308c534680eba2fc8b15e2bb55d42414cc6c802df18"
+    },
+    {
+      "charId": "char_4109_baslin",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_4109_baslin/cn_030.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4109_baslin/CN_030.mp3",
+      "gitBlob": "4143ba4f0b644113fd3a5574bf7cc952cc9c2d1a",
+      "bytes": 38914,
+      "sha256": "f74f98c6971ea6f40c4edcea9d483af1d42e04c19f94cf5e7e0c818046ccd68d"
+    },
+    {
+      "charId": "char_4109_baslin",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_4109_baslin/cn_031.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4109_baslin/CN_031.mp3",
+      "gitBlob": "5ee263ca5b72c1b10405628140ce93f68180fc68",
+      "bytes": 128879,
+      "sha256": "08536a42dd6f105e784786f739fb61191e0d50caa8ea1412ad19bae2b59c08ff"
+    },
+    {
+      "charId": "char_4109_baslin",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_4109_baslin/cn_032.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4109_baslin/CN_032.mp3",
+      "gitBlob": "7e99b661ad8e8a11bf425e0b45292efee189c3a8",
+      "bytes": 121043,
+      "sha256": "fbe51167d5ca970ba9c552efa6814f918064f40d398f094fa4a99ab7f2f41cb7"
+    },
+    {
+      "charId": "char_4047_pianst",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_4047_pianst/cn_019.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4047_pianst/CN_019.mp3",
+      "gitBlob": "30e4780f4348c1830d781c3b8dfbe1692e1d8c22",
+      "bytes": 48004,
+      "sha256": "6388baf2b5d86559f851845c2e55356df9159682aa60dd2424804e48eb3a2edc"
+    },
+    {
+      "charId": "char_4047_pianst",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_4047_pianst/cn_020.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4047_pianst/CN_020.mp3",
+      "gitBlob": "97b8727f8a12ecb0fbf8b0cdd91857c0c61c2907",
+      "bytes": 31390,
+      "sha256": "447b30113fb33d3dafacf23845c23e354e094fc0fec4f221e0bd0eaaab04cd6c"
+    },
+    {
+      "charId": "char_4047_pianst",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_4047_pianst/cn_021.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4047_pianst/CN_021.mp3",
+      "gitBlob": "4facf1bfa2d66602ce491983d2468e730701bdc4",
+      "bytes": 26688,
+      "sha256": "ff098b7d4954d54d7d542ec2c15121e1e1778e179fa2d2d5a3f31a5f8b946a4c"
+    },
+    {
+      "charId": "char_4047_pianst",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_4047_pianst/cn_022.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4047_pianst/CN_022.mp3",
+      "gitBlob": "1affed72b4285710593f6a1d502d75a11173c405",
+      "bytes": 30137,
+      "sha256": "b7643b4c3707cb4506b5328fa27c37a86b172501ec74b896f005e2fc32bc7ec4"
+    },
+    {
+      "charId": "char_4047_pianst",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_4047_pianst/cn_023.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4047_pianst/CN_023.mp3",
+      "gitBlob": "a2267f8ef91d73d02789dfad88c9a112aed12b59",
+      "bytes": 54901,
+      "sha256": "0e9b9e9337ad2febb57af5ae2f66e5d01a9a18e4ccd294727ffa40cbe9fa40a0"
+    },
+    {
+      "charId": "char_4047_pianst",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_4047_pianst/cn_024.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4047_pianst/CN_024.mp3",
+      "gitBlob": "f9b6fd068114c2eefed563ac559ec92bb8f71537",
+      "bytes": 58349,
+      "sha256": "ce461ab55c35902bac48cfc3d216a76f18ee5091f95795a365af348c1c16cb84"
+    },
+    {
+      "charId": "char_4047_pianst",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_4047_pianst/cn_025.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4047_pianst/CN_025.mp3",
+      "gitBlob": "12ef4a85275af4cb8271efa59ac68a71b9a30946",
+      "bytes": 11955,
+      "sha256": "72b9b51feda1141c9195f129a131448852271cf2ca0062b0471126dc0848373b"
+    },
+    {
+      "charId": "char_4047_pianst",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_4047_pianst/cn_026.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4047_pianst/CN_026.mp3",
+      "gitBlob": "f6eb677b9a4ef02ab65a4ee6869237770b059a4a",
+      "bytes": 12896,
+      "sha256": "4de5bd2d33db6fee1e815485597861cdbe500c5e42f89062b7beea5b76916255"
+    },
+    {
+      "charId": "char_4047_pianst",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_4047_pianst/cn_027.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4047_pianst/CN_027.mp3",
+      "gitBlob": "a0651b06d9e45993bb0b43be700c159897b03a26",
+      "bytes": 24181,
+      "sha256": "12053ffc13a35763c7e8c3f27047326206752b948054a001997d545b43afccd6"
+    },
+    {
+      "charId": "char_4047_pianst",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_4047_pianst/cn_028.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4047_pianst/CN_028.mp3",
+      "gitBlob": "7f05196cc5d7bfa146f108fb59a7aeea8fb36c2d",
+      "bytes": 16344,
+      "sha256": "34a360e137dc7817f5f8fef619a97668265e61360ae6b5ca64396d171fd2cc96"
+    },
+    {
+      "charId": "char_4047_pianst",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_4047_pianst/cn_029.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4047_pianst/CN_029.mp3",
+      "gitBlob": "ffadfc6ddfa8658bb720f83853acb7c378edce1b",
+      "bytes": 107564,
+      "sha256": "b71271be7767de276d727a29760aab759968b33ccfca0c62f7dd5f01b0e9f53c"
+    },
+    {
+      "charId": "char_4047_pianst",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_4047_pianst/cn_030.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4047_pianst/CN_030.mp3",
+      "gitBlob": "c56ba0e89cfd32a4b42247552f71e6fcab056613",
+      "bytes": 100040,
+      "sha256": "f52801b4c50b936bb93ec3cdffa9758d368f0fe1c514303c1ce2e5eec188a7f6"
+    },
+    {
+      "charId": "char_4047_pianst",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_4047_pianst/cn_031.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4047_pianst/CN_031.mp3",
+      "gitBlob": "1f2794edd9c38d3fc44a3e000f9db855eb0c0094",
+      "bytes": 151763,
+      "sha256": "3814e864298d3a941422bc9d8e0847fe511a40e50d29ab5fe77951976de22c37"
+    },
+    {
+      "charId": "char_4047_pianst",
+      "language": "kr",
+      "path": "/assets/audio/voice/voice_kr/char_4047_pianst/cn_032.mp3",
+      "source": "https://raw.githubusercontent.com/PuppiizSunniiz/Arknight-voices/2c0d42dda2aa4c245b590dc3acf01228b59a29ad/voice_kr/char_4047_pianst/CN_032.mp3",
+      "gitBlob": "647c65adfa2ac13c7c89103e96b9334b9518fbbc",
+      "bytes": 165555,
+      "sha256": "f09180574202b8c1fc5cfb90bfa3b7962cea51209a14b094e270d7063d7f699e"
+    }
+  ],
+  "missing": [
+    {
+      "charId": "char_4217_makoto",
+      "language": "voice_kr",
+      "reason": "folder absent from website source"
+    }
+  ],
+  "slotAssets": {
+    "char_499_kaitou": {
+      "start": [
+        "char_499_kaitou/CN_019"
+      ],
+      "faceEnemy": [
+        "char_499_kaitou/CN_020"
+      ],
+      "select": [
+        "char_499_kaitou/CN_021",
+        "char_499_kaitou/CN_022"
+      ],
+      "place": [
+        "char_499_kaitou/CN_023",
+        "char_499_kaitou/CN_024"
+      ],
+      "skill1": [
+        "char_499_kaitou/CN_025"
+      ],
+      "skill2": [
+        "char_499_kaitou/CN_026"
+      ],
+      "skill3": [
+        "char_499_kaitou/CN_027"
+      ],
+      "skill4": [
+        "char_499_kaitou/CN_028"
+      ],
+      "resultFour": [
+        "char_499_kaitou/CN_029"
+      ],
+      "resultThree": [
+        "char_499_kaitou/CN_030"
+      ],
+      "resultTwo": [
+        "char_499_kaitou/CN_031"
+      ],
+      "resultLose": [
+        "char_499_kaitou/CN_032"
+      ]
+    },
+    "char_4109_baslin": {
+      "start": [
+        "char_4109_baslin/CN_019"
+      ],
+      "faceEnemy": [
+        "char_4109_baslin/CN_020"
+      ],
+      "select": [
+        "char_4109_baslin/CN_021",
+        "char_4109_baslin/CN_022"
+      ],
+      "place": [
+        "char_4109_baslin/CN_023",
+        "char_4109_baslin/CN_024"
+      ],
+      "skill1": [
+        "char_4109_baslin/CN_025"
+      ],
+      "skill2": [
+        "char_4109_baslin/CN_026"
+      ],
+      "skill3": [
+        "char_4109_baslin/CN_027"
+      ],
+      "skill4": [
+        "char_4109_baslin/CN_028"
+      ],
+      "resultFour": [
+        "char_4109_baslin/CN_029"
+      ],
+      "resultThree": [
+        "char_4109_baslin/CN_030"
+      ],
+      "resultTwo": [
+        "char_4109_baslin/CN_031"
+      ],
+      "resultLose": [
+        "char_4109_baslin/CN_032"
+      ]
+    },
+    "char_4047_pianst": {
+      "start": [
+        "char_4047_pianst/CN_019"
+      ],
+      "faceEnemy": [
+        "char_4047_pianst/CN_020"
+      ],
+      "select": [
+        "char_4047_pianst/CN_021",
+        "char_4047_pianst/CN_022"
+      ],
+      "place": [
+        "char_4047_pianst/CN_023",
+        "char_4047_pianst/CN_024"
+      ],
+      "skill1": [
+        "char_4047_pianst/CN_025"
+      ],
+      "skill2": [
+        "char_4047_pianst/CN_026"
+      ],
+      "skill3": [
+        "char_4047_pianst/CN_027"
+      ],
+      "skill4": [
+        "char_4047_pianst/CN_028"
+      ],
+      "resultFour": [
+        "char_4047_pianst/CN_029"
+      ],
+      "resultThree": [
+        "char_4047_pianst/CN_030"
+      ],
+      "resultTwo": [
+        "char_4047_pianst/CN_031"
+      ],
+      "resultLose": [
+        "char_4047_pianst/CN_032"
+      ]
+    },
+    "char_4217_makoto": {
+      "start": [
+        "char_4217_makoto/CN_019"
+      ],
+      "faceEnemy": [
+        "char_4217_makoto/CN_020"
+      ],
+      "select": [
+        "char_4217_makoto/CN_021",
+        "char_4217_makoto/CN_022"
+      ],
+      "place": [
+        "char_4217_makoto/CN_023",
+        "char_4217_makoto/CN_024"
+      ],
+      "skill1": [
+        "char_4217_makoto/CN_025"
+      ],
+      "skill2": [
+        "char_4217_makoto/CN_026"
+      ],
+      "skill3": [
+        "char_4217_makoto/CN_027"
+      ],
+      "skill4": [
+        "char_4217_makoto/CN_028"
+      ],
+      "resultFour": [
+        "char_4217_makoto/CN_029"
+      ],
+      "resultThree": [
+        "char_4217_makoto/CN_030"
+      ],
+      "resultTwo": [
+        "char_4217_makoto/CN_031"
+      ],
+      "resultLose": [
+        "char_4217_makoto/CN_032"
+      ]
+    }
+  },
+  "scope": "Missing JP/KR battle lines for three current operators plus Makoto; existing voice banks retained; no separate costume voice wordkeys in current official metadata",
+  "validation": {
+    "gitBlobVerified": 98,
+    "mp3Decoded": 98,
+    "gamePlaybackConnected": false
+  }
+}

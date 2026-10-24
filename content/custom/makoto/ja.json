@@ -1,0 +1,43 @@
+{
+  "source": [
+    "https://arknights.wikiru.jp/?結城理",
+    "content/custom/makoto/official.json",
+    "https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/master/zh_CN/gamedata/excel/skin_table.json"
+  ],
+  "note": "Japanese gameplay prose follows the community wiki. Unlocalized titles are translated from CN, not represented as official JP Arknights names.",
+  "name": "結城理",
+  "subProfessionName": "傀儡師",
+  "trait": "致命的なダメージを受けても撤退せず、<身替り>と入れ替わり戦闘を続行する（身替りのブロック数は0）。20秒後、再び自身に入れ替わる",
+  "moduleTrait": "致命的なダメージを受けても撤退せず、<身替り>と入れ替わり戦闘を続行する（身替りのブロック数は0、HP<@ba.kw>増加</>）。20秒後、再び自身に入れ替わる",
+  "talents": [
+    [
+      "不羈の力",
+      "<身替り>状態へ移行した時、周囲一定範囲内の敵に{sluggish}秒間の<$ba.sluggish>足止め</>を付与する。<身替り>状態ではペルソナを召喚して戦い、攻撃間隔延長、攻撃力+{atk:0%}、最大HP+{max_hp_t1:0%}。戦闘能力は装備中のスキルによって変化する"
+    ],
+    [
+      "S.E.E.S.リーダー",
+      "本体に戻る時、S.E.E.S.メンバーを率いて総攻撃を行い、戦場内の各[S.E.E.S.]オペレーターの周囲一定範囲内の敵全員に結城理の攻撃力の{atk_scale:0%}の確定ダメージを与える（重複可能）"
+    ]
+  ],
+  "skills": [
+    [
+      "オルフェウスの竪琴",
+      "パッシブ：<身替り>状態では<@ba.vup>オルフェウス</>を召喚し、攻撃時、敵に攻撃力の{attack@atk_scale:0%}の術ダメージを与える。攻撃範囲内にHPが50%未満の味方オペレーターがいる場合、攻撃の代わりに対象のHPを結城理の攻撃力の{attack@heal_scale:0%}回復する\nアクティブ：直ちに<身替り>状態へ移行する"
+    ],
+    [
+      "タナトスの鎖",
+      "パッシブ：<身替り>状態では<@ba.vup>タナトス</>を召喚し、攻撃時、最大{attack@max_target}体の敵に攻撃力の{attack@atk_scale:0%}の術ダメージを与え、{attack@prob:0%}の確率で{attack@fear}秒間<$ba.fear>恐怖</>状態にする。攻撃範囲内の恐怖状態の敵のHPが結城理の攻撃力の{attack@kill_atk_scale:0%}未満の場合、その敵は即座に倒れる\nアクティブ：直ちに<身替り>状態へ移行する"
+    ],
+    [
+      "明日を切り拓く刃",
+      "パッシブ：<身替り>状態では最初に<@ba.vup>タナトス</>を召喚し、攻撃速度+{talent@attack_speed}。攻撃時、最大{attack@max_target}体の敵に攻撃力の{attack@atk_scale:0%}の<$ba.weaknessatk>弱点ダメージ</>を与える。タナトスが存在する間にスキルを再使用するか致命的なダメージを受けると、<@ba.vup>オルフェウス</>に切り替わる。ブロック数+{attack@block_cnt}、攻撃範囲内の味方全員の物理・術回避率+{attack@prob:0%}、1秒ごとに範囲内の最大{attack@max_target_heal}名の味方HPを結城理の攻撃力の{attack@heal_scale:0%}回復する。<身替り>状態終了まで継続する\nアクティブ：直ちに<身替り>状態へ移行する"
+    ]
+  ],
+  "modules": {
+    "uniequip_002_makoto": "互いの声",
+    "default": "結城理の記章"
+  },
+  "skins": {
+    "영광의 증명": "栄光を見届けて"
+  }
+}

@@ -297,3 +297,7 @@ test('legacy scalar energy metadata cannot discard the entire combat frame',()=>
  const previous=normalizeSnapshot({...snap(1,[U(1,4,10)]),energy:{1:[2,4]}});
  assert.deepEqual(previous.energy.get(1),[2,4]);
 });
+
+test('note interpolation preserves the projectile identity captured before a mode switch',()=>{
+ const b=new SnapshotBuffer(),key='projectile_chr_oblvns_s3_phy';b.push({...snap(0,[]),sakikoNotes:[[1,1,3,10,'phys',key]]},0);b.push({...snap(1,[]),sakikoNotes:[[1,1,5,10,'phys',key]]},1);assert.deepEqual(b.notesAt(.5),[[1,1,4,10,'phys',key]]);
+});

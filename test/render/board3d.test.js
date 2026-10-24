@@ -601,7 +601,10 @@ test('original shooting platforms use their own mesh/material and omit the atlas
  const pack={images:{D:{width:4,height:4}},original:{platform:geom,images:{},materials:{MT_trap_1106_achplat:{}},scenes:{'native-platform-test':{stageId:'native-platform-test',buckets:{}}}}};
  const scene=new BoardScene(THREE,pack,{width:800,height:600,renderer:stubRenderer()});
  scene.setStage(st);assert.ok(scene.meshes.platforms);assert.equal(scene.meshes.platforms.material,scene.originalMaterials.MT_trap_1106_achplat);
- assert.equal(scene.meshes.deviceSlabs,null);scene.destroy();
+ assert.equal(scene.meshes.deviceSlabs,null);
+ const p=scene.meshes.platforms.geometry.getAttribute('position');let top=-Infinity;
+ for(let i=0;i<p.count;i++)top=Math.max(top,p.getZ(i));
+ assert.ok(near(top,TILE_H.platform),'rendered platform height agrees with the unit standing height');scene.destroy();
 });
 
 test('environmental replacement surfaces remain in fallback maps and disappear after native stage loads', () => {

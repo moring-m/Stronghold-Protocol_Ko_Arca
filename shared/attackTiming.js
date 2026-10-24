@@ -102,7 +102,7 @@ export function attachAttackTimings({ chess, enemies, tokens }, assets) {
       const front = spineAttackTiming(sp.front || sp), back = sp.back ? spineAttackTiming(sp.back) : null;
       if (front?.deploy > 0 || front?.attack || Object.keys(front?.skills || {}).length) {
         const forms = {};
-        for (const [name, form] of Object.entries(FORMS[key] || {})) forms[name] = spineAttackTiming({...sp, anims:{...sp.anims,...form.roles}});
+        for (const [name, form] of Object.entries(FORMS[key] || {})) forms[name] = spineAttackTiming({...sp.front || sp, anims:{...(sp.front || sp).anims,...form.roles}});
         rec.attackTiming = { front, back, forms };
       }
     }

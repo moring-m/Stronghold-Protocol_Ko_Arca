@@ -88,7 +88,7 @@
 
 import {
   planFor, skillPlan, attackFx as planAttack, slotKey, planKeys, chargeKeys, chargeStep, skillProjectile, targetsOf, buffDuration,
-  eventNum, FX_BINDINGS, bindingEffects, bindingKeys, lifeOf, COND_BUFFS, condState, BOUND_BY_SKILL, coverOf,
+  eventNum, FX_BINDINGS, bindingEffects, bindingKeys, lifeOf, COND_BUFFS, condState, BOUND_BY_SKILL, coverOf, enemyCoverOf,
   ENEMY_FX_BINDINGS, ENEMY_FX_KINDS, OWNER_NEAR, auraTargets, enemyBindingKeys, modeLoopKeys,
 } from './skills.js';
 import { fxSpec } from '../fx/kinds.js';
@@ -136,6 +136,7 @@ export const AURA_HOLD_S = 1.25;
 export function formMode(unit, form, map = null) {
   if (typeof form !== 'string' || !form) return null;
   const modes = Array.isArray(unit?.modes) ? unit.modes : [];
+  if(unit?.prefab?.includes('char_4217_makoto')){if(form==='makoto_entering'||form?.startsWith('makoto_exit_'))return modes.some(m=>m.name==='Default')?'Default':null;const name={makoto_s1:'Stand_S1',makoto_s2:'Stand_S2',makoto_s3a:'Stand_S3_1',makoto_change:'Stand_S3_1',makoto_s3b:'Stand_S3_2',makoto_total:'Switch2Normal'}[form];if(name&&modes.some(m=>m.name===name))return name;}
   if (map && typeof map[form] === 'string' && modes.some((m) => m?.name === map[form])) return map[form];
   const f = form.toLowerCase();
   const hit = modes.find((m) => typeof m?.name === 'string' && m.name.toLowerCase() === f) || (f === 'form2' ? modes.find((m) => m?.name === 'Reborn') : null);
@@ -1081,8 +1082,20 @@ export class SkillFx {
     for (const field of ['src', 'id']) {
       const U = extra[field] != null ? this.units.get(extra[field]) : null;
       if (U && U.v && coverOf(U.skillId, kind) && this._lasts(U) && this._planDrawn(U)) return true;
+      if (U && U.v && U.ewin && enemyCoverOf(U.key, U.ewin.plan?.skillId, kind) && this._ewinDraws(U.ewin)) return true;
     }
     return false;
+  }
+
+  /**
+   * An enemy's skill window shows the skill's official effects: its start / range / loop rows drew, or — an
+   * attack-rooted skill (盐风主教昆图斯's 【大潮】 / 【崩坍】) — its attack's cast / range rows are installed: they play at the
+   * next sync (sync: `win.shown`), or with the enemy's attack in the window.
+   */
+  _ewinDraws(win) {
+    if (win.draws) return true;
+    const a = win.plan?.attacks?.[0];
+    return !!a && [...a.cast, ...a.range].some((e) => this.w.ofx.lib.has(e.key));
   }
 
   /**

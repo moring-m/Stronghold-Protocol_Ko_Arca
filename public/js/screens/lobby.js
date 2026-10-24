@@ -1,3 +1,4 @@
+import {RichText} from '../ui/gameComponents.js';
 import {lang}from'../i18n/i18n.js';
 import {PublicRoomsScreen} from './publicRooms.js';
 import { confirmDialog } from "../ui/components.js";
@@ -247,7 +248,7 @@ function ModeCard({ card, selected, onSelect, coopSize=4, onCoopSize, publicOn, 
     <span class="mode-card__text">
       <${MicroLabel} tone=${selected ? 'mint' : undefined}>${card.en}<//>
       <span class="mode-card__name">${card.name}</span>
-      <span class="mode-card__desc">${card.desc}</span>
+      <${RichText} class="mode-card__desc" text=${card.desc} />
       <span class="mode-card__points">${card.points.map((p) => html`<span key=${p}>${p}</span>`)}</span>
     </span>
     <span class="mode-card__check" aria-hidden="true"><${Icon} name="check" />已选定</span>
@@ -273,7 +274,7 @@ function DifficultyCard({ roomMode, difficulty, selected, onSelect }) {
         ${roomMode==='laboratory'?html`<span>1회 전투</span>`:html`<span class="num">${info.rounds}</span> 回合${info.hidden ? html`<span class="diff-card__hidden">+ 隐秘核心</span>` : null}`}
       </span>
     </span>
-    <span class="diff-card__desc">${info.desc}</span>
+    <${RichText} class="diff-card__desc" text=${info.desc} />
     <span class="diff-card__effects">${(roomMode==='laboratory'?['밴 없음','일반·히든 보스 선택 가능']:info.effects).map((e) => html`<span key=${e}>${e}</span>`)}${roomMode!=='laboratory'&&info.stageNote ? html`<span key="stage" class="diff-card__stage"><${Icon} name="rook" />${info.stageNote}</span>` : null}</span>
     <span class="diff-card__check" aria-hidden="true"><${Icon} name="check" /><span>已选定</span></span>
   </button>`;

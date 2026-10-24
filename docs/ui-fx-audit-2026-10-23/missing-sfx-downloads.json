@@ -1,0 +1,112 @@
+[
+  {
+    "path": "/assets/audio/sfx/player/p_skill/p_skill_wrrsldisk.mp3",
+    "status": 200,
+    "bytes": 51693
+  },
+  {
+    "path": "/assets/audio/sfx/player/p_atk/p_atk_tlsrhgn_h.mp3",
+    "status": 200,
+    "bytes": 40173
+  },
+  {
+    "path": "/assets/audio/sfx/player/p_skill/p_skill_drgndfmrhl.mp3",
+    "status": 200,
+    "bytes": 95853
+  },
+  {
+    "path": "/assets/audio/sfx/player/p_skill/p_skill_snwlprdg_s.mp3",
+    "status": 200,
+    "bytes": 54765
+  },
+  {
+    "path": "/assets/audio/sfx/player/p_imp/p_imp_book_n.mp3",
+    "status": 200,
+    "bytes": 7750
+  },
+  {
+    "path": "/assets/audio/sfx/player/p_skill/p_skill_stwctp_s.mp3",
+    "status": 200,
+    "bytes": 82797
+  },
+  {
+    "path": "/assets/audio/sfx/player/p_atk/p_atk_book_n.mp3",
+    "status": 200,
+    "bytes": 2734
+  },
+  {
+    "path": "/assets/audio/sfx/player/p_imp/p_imp_crwkdhl_n.mp3",
+    "status": 200,
+    "bytes": 6189
+  },
+  {
+    "path": "/assets/audio/sfx/player/p_imp/p_imp_axcpvblcmb_n.mp3",
+    "status": 200,
+    "bytes": 3309
+  },
+  {
+    "path": "/assets/audio/sfx/player/p_atk/p_atk_axcpvbl_n.mp3",
+    "status": 200,
+    "bytes": 1581
+  },
+  {
+    "path": "/assets/audio/sfx/player/p_atk/p_atk_crwkdhl_n.mp3",
+    "status": 200,
+    "bytes": 3117
+  },
+  {
+    "path": "/assets/audio/sfx/battle/b_char/b_char_tactboost.mp3",
+    "status": 200,
+    "bytes": 34943
+  },
+  {
+    "path": "/assets/audio/sfx/player/p_imp/p_imp_mgcyrsn_n.mp3",
+    "status": 200,
+    "bytes": 5421
+  },
+  {
+    "path": "/assets/audio/sfx/player/p_atk/p_atk_mgcyrsn_n.mp3",
+    "status": 200,
+    "bytes": 2925
+  },
+  {
+    "path": "/assets/audio/sfx/battle/b_char/b_char_botready.mp3",
+    "status": 200,
+    "bytes": 13601
+  },
+  {
+    "path": "/assets/audio/sfx/player/p_skill/p_skill_chixiaobadao.mp3",
+    "status": 200,
+    "bytes": 34525
+  },
+  {
+    "path": "/assets/audio/sfx/player/p_atk/p_atk_punch_n.mp3",
+    "status": 200,
+    "bytes": 6078
+  },
+  {
+    "path": "/assets/audio/sfx/player/p_atk/p_atk_cowboy_h.mp3",
+    "status": 200,
+    "bytes": 12347
+  },
+  {
+    "path": "/assets/audio/sfx/player/p_skill/p_skill_mtelrncpnt.mp3",
+    "status": 200,
+    "bytes": 40173
+  },
+  {
+    "path": "/assets/audio/sfx/battle/b_char/b_char_healboost.mp3",
+    "status": 200,
+    "bytes": 36197
+  },
+  {
+    "path": "/assets/audio/sfx/battle/b_char/b_char_defboost.mp3",
+    "status": 200,
+    "bytes": 36615
+  },
+  {
+    "path": "/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3",
+    "status": 200,
+    "bytes": 34943
+  }
+]

@@ -1,0 +1,59 @@
+[
+  {
+    "dir": "RIGHT",
+    "visFacing": 1,
+    "form": "makoto_s3a",
+    "effects": [
+      "makoto_attack_b_hit_01_p3r#1",
+      "buff_sluggish",
+      "buff_slowdown",
+      "makoto_skill_03_p1_buff_01_r_p3r#1",
+      "makoto_skill_03_p1_range_01_p3r#1",
+      "makoto_skill_03_p1_range_01_start_p3r#1",
+      "makoto_skill_03_p1_start_a_01_p3r#1",
+      "makoto_skill_03_p1_hit_01_p3r#1",
+      "makoto_skill_03_p1_start_b_01_p3r#1",
+      "common_hit_01",
+      "makoto_skill_03_p1_hit_01_p3r#1"
+    ]
+  },
+  {
+    "dir": "LEFT",
+    "visFacing": -1,
+    "form": "makoto_s3a",
+    "effects": [
+      "makoto_attack_b_hit_01_p3r#1",
+      "buff_sluggish",
+      "buff_slowdown",
+      "makoto_skill_03_p1_buff_01_r_p3r#1",
+      "makoto_skill_03_p1_range_01_p3r#1",
+      "makoto_skill_03_p1_range_01_start_p3r#1",
+      "makoto_skill_03_p1_start_a_01_p3r#1",
+      "makoto_skill_03_p1_hit_01_p3r#1",
+      "makoto_skill_03_p1_start_b_01_p3r#1",
+      "common_hit_01",
+      "makoto_skill_03_p1_hit_01_p3r#1",
+      "makoto_skill_03_p1_buff_01_l_p3r#1"
+    ]
+  },
+  {
+    "dir": "RIGHT",
+    "visFacing": 1,
+    "form": "makoto_s3a",
+    "effects": [
+      "makoto_attack_b_hit_01_p3r#1",
+      "buff_sluggish",
+      "buff_slowdown",
+      "makoto_skill_03_p1_buff_01_r_p3r#1",
+      "makoto_skill_03_p1_range_01_p3r#1",
+      "makoto_skill_03_p1_range_01_start_p3r#1",
+      "makoto_skill_03_p1_start_a_01_p3r#1",
+      "makoto_skill_03_p1_hit_01_p3r#1",
+      "makoto_skill_03_p1_start_b_01_p3r#1",
+      "common_hit_01",
+      "makoto_skill_03_p1_hit_01_p3r#1",
+      "makoto_skill_03_p1_buff_01_l_p3r#1",
+      "makoto_skill_03_p1_buff_01_r_p3r#1"
+    ]
+  }
+]

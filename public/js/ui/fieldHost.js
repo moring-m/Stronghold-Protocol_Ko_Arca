@@ -1,3 +1,4 @@
+import {uiCssZoom} from './mobileScale.js';
 // Field view loader: mounts the Pixi render engine (public/js/render/app.js → createFieldView, DESIGN §9)
 // into a host element, falling back to the DOM view (fallbackField.js) when the engine is missing, times
 // out or throws. Every call into the view goes through a guard so a render bug can never crash the HUD.
@@ -90,13 +91,14 @@ export function hudBands(kind, size, opts) {
   try {
     rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 100;
     // 异形屏适配 (ui/screenFit.js): the board's host may not start at the viewport's top — the HUD rects are measured from it
-    const oy = document.querySelector('.gm__field')?.getBoundingClientRect()?.top || 0;
+    const zoom=uiCssZoom();
+    const oy = (document.querySelector('.gm__field')?.getBoundingClientRect()?.top || 0)/zoom;
     // the HUD layer starts below the top safe-area inset and ends above the bottom one (css/devices.css .gm__hud)
     const hud = document.querySelector('.gm__hud')?.getBoundingClientRect();
-    safeTop = Math.max(0, hud?.top || 0);
-    bondBottom = document.querySelector('.gm__bonds')?.getBoundingClientRect()?.bottom || 0;
+    safeTop = Math.max(0, (hud?.top || 0)/zoom);
+    bondBottom = (document.querySelector('.gm__bonds')?.getBoundingClientRect()?.bottom || 0)/zoom;
     if (folded) {
-      if (hud && hud.bottom - oy > 0) safeBottom = Math.max(0, h - (hud.bottom - oy));
+      if (hud && hud.bottom/zoom - oy > 0) safeBottom = Math.max(0, h - (hud.bottom/zoom - oy));
       corner = cornerBand(h, oy);
     }
   } catch { /* ignore */ }
@@ -122,10 +124,10 @@ function cornerBand(h, oy = 0) {
   if (!btns || !btns.length) return 0;
   const root = document.documentElement;
   const tap = root?.classList?.contains('sp-coarse') ? parseFloat(getComputedStyle(root).getPropertyValue('--tap-min')) || 0 : 0;
-  let top = Infinity;
+  let top = Infinity;const zoom=uiCssZoom();
   for (const b of btns) {
     const r = b.getBoundingClientRect();
-    if (r && r.height > 0) top = Math.min(top, r.top + r.height / 2 - Math.max(r.height, tap) / 2);
+    if (r && r.height > 0) top = Math.min(top, r.top/zoom + r.height/zoom / 2 - Math.max(r.height/zoom, tap) / 2);
   }
   return top < Infinity ? Math.max(0, h - (top - oy)) : 0;
 }

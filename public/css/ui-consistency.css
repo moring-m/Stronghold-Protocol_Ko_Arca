@@ -45,7 +45,7 @@ html body header.app-topbar.lo-top .lo-title-tabs button { padding-top:0; paddin
 /* Touch navigation keeps heading and tools in the same row, including zoomed-out layouts. */
 @media (pointer:coarse), (max-width:760px) {
  html body header.app-topbar:is(.topbar,.lo-top,.st-top){--ui-control-height:32px;--ui-title-font:16px;height:56px;min-height:56px;padding:8px 12px;grid-template-columns:minmax(0,1fr) minmax(0,auto) minmax(0,1fr);grid-template-rows:40px;gap:8px;}
- html body header.app-topbar:is(.topbar,.lo-top,.st-top)>:is(.topbar__center,.lo-top__center,.st-top__center){grid-column:2;grid-row:1;max-width:26vw;min-width:0;gap:0;}
+ html body header.app-topbar:is(.topbar,.lo-top,.st-top)>:is(.topbar__center,.lo-top__center,.st-top__center){grid-column:2;grid-row:1;max-width:calc(26 * var(--ui-vw, 1vw));min-width:0;gap:0;}
  html body header.app-topbar:is(.topbar,.lo-top,.st-top)>:is(.topbar__left,.lo-top__left,.st-top__left){grid-column:1;grid-row:1;}
  html body header.app-topbar:is(.topbar,.lo-top,.st-top)>:is(.topbar__right,.lo-top__right,.st-top__right){grid-column:3;grid-row:1;justify-content:safe flex-end;}
  html body header.app-topbar:is(.topbar,.lo-top,.st-top)>:is(.topbar__left,.lo-top__left,.st-top__left,.topbar__right,.lo-top__right,.st-top__right){max-width:100%;width:100%;min-width:0;gap:8px;overflow-x:auto;overflow-y:hidden;flex-wrap:nowrap;padding:2px;box-sizing:border-box;}

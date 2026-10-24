@@ -1,3 +1,4 @@
+import {clientToCanvas,canvasToClient} from './screenSpace.js';
 import { advanceEffectClock } from "./app/playback.js";
 import {officialFxDownloaded} from '../../../shared/resourceSelection.js';
 import {createRosterWarmer} from './rosterWarm.js';
@@ -1745,7 +1746,7 @@ export async function createFieldView(host, options = {}) {
 
   function canvasPoint(e) {
     const r = canvas.getBoundingClientRect();
-    return { x: e.clientX - r.left, y: e.clientY - r.top };
+    return clientToCanvas(r,app.renderer.screen,e.clientX,e.clientY);
   }
 
   function evPayload(e) {
@@ -2298,7 +2299,7 @@ export async function createFieldView(host, options = {}) {
     slideAt = interp.nextSnapT(renderT);
     if (slideAt > renderT) interp.forEachUpcoming(renderT, slideAt, startSlide);
     interp.sample(renderT, sample);
-    fx.noteBubbles(interp.notesAt(renderT));
+    fx.noteBubbles(wiring.noteBubbles(interp.notesAt(renderT)));
     for (const [id, s] of sample) {
       if(s.anim===ANIM.DIE)bossDeaths.note(infos.get(id));
       // A final HP acknowledgement / repeated field push must not stand up a
@@ -2638,8 +2639,8 @@ export async function createFieldView(host, options = {}) {
       if (!v || v.destroyed || !v.placed) return null;
       const b = v.bounds();
       const r = canvas.getBoundingClientRect();
-      const left = r.left + b.x, top = r.top + b.y;
-      return { left, top, right: left + b.width, bottom: top + b.height, width: b.width, height: b.height, x: left, y: top };
+      const a=canvasToClient(r,app.renderer.screen,b.x,b.y),z=canvasToClient(r,app.renderer.screen,b.x+b.width,b.y+b.height);
+      return {left:a.x,top:a.y,right:z.x,bottom:z.y,width:z.x-a.x,height:z.y-a.y,x:a.x,y:a.y};
     },
     pieceArt(uid) {
       let v = views.get('p:' + uid);
@@ -2661,8 +2662,9 @@ export async function createFieldView(host, options = {}) {
       const r = canvas.getBoundingClientRect();
       const c = cam.project(d.col, d.row, z);
       if (!c || !Number.isFinite(c.x) || !Number.isFinite(c.y)) return null;
-      const corner = (dx, dy) => { const p = cam.project(d.col + dx, d.row + dy, z); return [r.left + p.x, r.top + p.y]; };
-      return { x: r.left + c.x, y: r.top + c.y, s: c.s, poly: [corner(-0.5, 0.5), corner(0.5, 0.5), corner(0.5, -0.5), corner(-0.5, -0.5)], mirror: mode === 'prep' && prepXf.mirror };
+      const corner = (dx, dy) => { const p = cam.project(d.col + dx, d.row + dy, z); const q=canvasToClient(r,app.renderer.screen,p.x,p.y);return [q.x,q.y]; };
+      const point=canvasToClient(r,app.renderer.screen,c.x,c.y);
+      return { x: point.x, y: point.y, s: c.s*r.width/app.renderer.screen.width, poly: [corner(-0.5, 0.5), corner(0.5, 0.5), corner(0.5, -0.5), corner(-0.5, -0.5)], mirror: mode === 'prep' && prepXf.mirror };
     },
     /**
      * True when the view itself stripes range previews ('facing' / 'selRange' / 'range' groups) under the units (the 2D

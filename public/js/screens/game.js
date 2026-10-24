@@ -1,3 +1,4 @@
+import {uiCssZoom} from '../ui/mobileScale.js';
 import {deployZoomStep,deployZoomRemember,prepDeployCamera} from '../ui/gameLogic.js';
 import { ruleOption } from '../../../shared/plugins/rules.js';
 import { reducedMotion } from "../ui/device.js";
@@ -1639,7 +1640,7 @@ function MatchScreen() {
     try { b = hudElRef.current?.getBoundingClientRect() || null; } catch { b = null; }
     const vp = b && b.width > 0 && b.height > 0 ? { left: b.left, top: b.top, width: b.width, height: b.height }
       : { left: 0, top: 0, width: globalThis.innerWidth || 1920, height: globalThis.innerHeight || 1080 };
-    return { rem, vp };
+    return { rem:rem*uiCssZoom(), vp };
   };
   const dSide = (() => {
     if (ufShown) {

@@ -24,6 +24,15 @@ def matching_skins(container, bundle, catalog):
     for skin in catalog:
         char = skin['charId']
         prefab = skin['battleSkin']['skinOrPrefabId']
+        # DefaultSkin is shared by every operator: bind it to its declared character only.
+        if normalized(prefab) == 'defaultskin':
+            variant_match = any(s['charId'] == char and normalized(s['battleSkin']['skinOrPrefabId']) != 'defaultskin'
+                                and normalized(s['battleSkin']['skinOrPrefabId']) in path + bundle_key for s in catalog)
+            base_bundle = normalized(bundle.rsplit('/', 1)[-1].removesuffix('.ab')) == normalized(char)
+            base_container = container.lower().endswith('/' + char.lower() + '/defaultskin.prefab')
+            if not variant_match and (base_bundle or base_container) and normalized(leaf) == 'defaultskin':
+                found.append(skin)
+            continue
         if normalized(prefab) in path or normalized(prefab) in bundle_key:
             found.append(skin)
             continue
@@ -104,7 +113,7 @@ def prune_base(output, baseline):
     fx.write_atomic(tex_path, json.dumps(textures, separators=(',', ':')).encode())
 
 
-def export_skins(game, kit, output, log=print, strict_catalog=False):
+def export_skins(game, kit, output, log=print, strict_catalog=False, jobs=2):
     game, kit, output = map(Path, (game, kit, output))
     if output.exists():
         raise RuntimeError('Use a new output folder; existing base results are never replaced.')
@@ -153,7 +162,7 @@ def export_skins(game, kit, output, log=print, strict_catalog=False):
     new_keys = sorted(references - set(baseline['prefabs']))
     if new_keys:
         (output / 'data').mkdir(parents=True, exist_ok=True)
-        fx.export_fx(game, output / 'public/assets/local', {}, log, selection='keys', keys=new_keys, jobs=2,
+        fx.export_fx(game, output / 'public/assets/local', {}, log, selection='keys', keys=new_keys, jobs=jobs,
                      root=kit, fx_manifest=output / 'data/local-fx.json')
         prune_base(output, baseline)
     matched = {skin for row in rows for skin in row['skinIds']}

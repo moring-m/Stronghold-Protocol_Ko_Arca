@@ -1,3 +1,4 @@
+import {sakikoNoteProjectile} from '../../../../shared/sakikoNotes.js';
 import { hypot, sin, cos, atan2 } from '../../detmath.js';
 // Opt-in recruits. Skill, talent and module numbers are read from the selected official record.
 import { num, talentBb, traitBb, moduleBb, batMod } from './tier1.js';
@@ -63,16 +64,18 @@ function skill(raw,s){
   return duration(s,{attack:{atkScale:num(bb['attack@atk_scale']),...(i===2?{hits:num(bb.cnt,3)}:{}),onEachHit({battle,unit,target}){if(i===1)battle.applyStatus(target,'sluggish',{duration:num(bb['attack@sluggish'],1),source:unit})}}});
  }
  if(cid==='char_4182_oblvns'){
-  if(i===0)return{kind:'charges',onStart({battle,unit}){for(let n=0;n<8;n++)note(battle,unit,n===0?num(bb.atk_scale):num(bb[`atk_scale_${n+1}`]),'arts')}};
+  if(i===0)return{kind:'charges',onStart({battle,unit}){for(let n=0;n<8;n++)note(battle,unit,n===0?num(bb.atk_scale):num(bb[`atk_scale_${n+1}`]),'arts',false,n+1)}};
   if(i===1)return{kind:'instant',onStart({battle,unit}){if((battle._recruitFever?.value||0)>=450||battle.time<(battle._recruitFever?.until||0))return;unit.mem.sakikoOrgan=!unit.mem.sakikoOrgan;S.passiveBuff(battle,unit,'sakiko:instrument',unit.mem.sakikoOrgan?{aspd:num(bb['attack@attack_speed'])}:{atkPct:num(bb['attack@atk'])});unit.profile.dmgType=unit.mem.sakikoOrgan?'arts':'phys'}};
   return duration(s,{targeting:{rangeGrid:s.rangeGrid},attack:{noAttack:true},onTick({battle,unit,dt}){unit.mem.sakikoSkillTick=(unit.mem.sakikoSkillTick||0)+dt;if(unit.mem.sakikoSkillTick>=unit.s.interval){unit.mem.sakikoSkillTick=0;for(const type of ['phys','arts'])for(let n=0;n<2;n++)note(battle,unit,num(bb['attack@atk_scale']),type,true)}}});
  }
  throw Error(`Unauthored recruit skill ${s.skillId}`);
 }
-function note(b,u,scale=1,type='phys',high=false){
+function note(b,u,scale=1,type='phys',high=false,ordinal=0){
+ const projectile=sakikoNoteProjectile(u.def.raw.skill.index,u.skill.active,type,ordinal);
+ b.fx('sakikoNoteSound',{id:u.id,x:u.x,y:u.y,projectile,phase:'launch'});
  const list=foes(b,u);if(high)list.sort((a,b)=>type==='phys'?b.s.res-a.s.res:b.s.def-a.s.def);
  const target=list[0];if(target&&u.skill.active&&u.def.raw.skill.index===2)b._ev(['atk',u.id,target.id,type==='arts'?'arts':'bolt']);const angle={UP:-Math.PI/2,RIGHT:0,DOWN:Math.PI/2,LEFT:Math.PI}[u.dir]??0;
- (u.mem.sakikoNotes||=[]).push({id:(u.mem.sakikoNoteSeq=(u.mem.sakikoNoteSeq||0)+1),x:u.x,y:u.y,angle:angle+(b.rng()-.5)*Math.PI*40/180,target,type,amount:u.s.atk*scale,age:0,outside:0,seek:0,hit:false,tail:0,seen:new Set(),seq:u.deploySeq,high});
+ (u.mem.sakikoNotes||=[]).push({id:(u.mem.sakikoNoteSeq=(u.mem.sakikoNoteSeq||0)+1),x:u.x,y:u.y,angle:angle+(b.rng()-.5)*Math.PI*40/180,target,type,amount:u.s.atk*scale,age:0,outside:0,seek:0,hit:false,tail:0,seen:new Set(),seq:u.deploySeq,high,projectile});
 }
 function advanceNotes(b,u,dt){
  const kept=[];for(const n of u.mem.sakikoNotes){
@@ -82,7 +85,7 @@ function advanceNotes(b,u,dt){
   if(seek&&n.age>=.1)n.angle=atan2(n.target.y-n.y,n.target.x-n.x);
   const speed=u.def.raw.skill.index===1?(n.type==='phys'?3.5:1):2;
   n.x+=cos(n.angle)*speed*dt;n.y+=sin(n.angle)*speed*dt;
-  const hit=e=>{const mod=!!u.def.raw.module?.active&&u.skill.active;const scale=!u.blocking.includes(e)?(mod?1:num(traitBb(u.def.raw).atk_scale,.8)):1;b.dealDamage(u,e,{amount:n.amount*scale,type:n.type,isAttack:true,isSkill:u.skill.active,tags:['sakiko-note']});n.seen.add(e.id);};
+  const hit=e=>{const mod=!!u.def.raw.module?.active&&u.skill.active;const scale=!u.blocking.includes(e)?(mod?1:num(traitBb(u.def.raw).atk_scale,.8)):1;b.dealDamage(u,e,{amount:n.amount*scale,type:n.type,isAttack:true,isSkill:u.skill.active,tags:['sakiko-note']});n.seen.add(e.id);b.fx('sakikoNoteHit',{id:u.id,target:e.id,x:e.x,y:e.y,projectile:n.projectile});};
   if(seek&&hypot(n.target.x-n.x,n.target.y-n.y)<=Math.max(.16,speed*dt)){hit(n.target);n.hit=true;n.tail=u.def.raw.skill.index===1&&n.type==='phys'?.5:0;}
   if(n.hit){n.tail-=dt;if(n.tail<=0)continue;for(const e of b.foesInRadius(n.x,n.y,.8))if(up(e)&&!n.seen.has(e.id))hit(e);}
   const r=Math.round(n.y),c=Math.round(n.x),inside=b.grid.inRect(r,c)&&u.rangeKeySet.has(r*(b.grid?.cols ?? COLS)+c);n.outside=inside?0:n.outside+dt;
