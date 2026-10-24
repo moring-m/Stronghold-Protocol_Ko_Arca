@@ -6,7 +6,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { pipeline } from 'node:stream';
 import { authorized, json, body } from './runtime.js';
-import { RELEASE_RETENTION_MS } from '../../shared/releaseRetirement.js';
+import { RELEASE_RETENTION_MS, retainedDeadline } from '../../shared/releaseRetirement.js';
 import { transform } from './transform.js';
 export async function startGateway({
   port = 3000,
@@ -69,7 +69,12 @@ export async function startGateway({
   const expired = id => id!==state.current && Number.isSafeInteger(state.releases[id]?.expiresAt) && state.releases[id].expiresAt<=now();
   async function ensureDeadlines(){
     let changed=false;
-    for(const [id,r] of Object.entries(state.releases))if(id!==state.current&&!r.expiresAt){r.expiresAt=now()+RELEASE_RETENTION_MS;changed=true;}
+    for(const [id,r] of Object.entries(state.releases))if(id!==state.current){
+      const next=retainedDeadline(r,now());
+      if(r.expiresAt!==next.expiresAt){r.deadlineSynced=false;changed=true;}
+      if(r.retentionMs!==next.retentionMs||r.retiredAt!==next.retiredAt)changed=true;
+      Object.assign(r,next);
+    }
     if(changed)save();
     for(const [id,r] of Object.entries(state.releases))if(id!==state.current&&r.expiresAt&&!r.deadlineSynced){
       try{const status=await control(id);r.retirementNotices=!!status.retirementNotices;await control(id,'drain',{draining:true,expiresAt:r.expiresAt});r.deadlineSynced=true;save();}catch{}
@@ -225,8 +230,8 @@ export async function startGateway({
       try {
         await control(id, "drain", { draining: false });
         state.current = id;
-        delete state.releases[id].expiresAt;delete state.releases[id].deadlineSynced;
-        if(old){state.releases[old].expiresAt=deadline;state.releases[old].deadlineSynced=true;}
+        delete state.releases[id].expiresAt;delete state.releases[id].deadlineSynced;delete state.releases[id].retiredAt;delete state.releases[id].retentionMs;
+        if(old){Object.assign(state.releases[old],{expiresAt:deadline,retiredAt:deadline-RELEASE_RETENTION_MS,retentionMs:RELEASE_RETENTION_MS,deadlineSynced:true});}
         expiring.delete(id);
         save();
         statusCache=null;

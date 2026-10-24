@@ -218,15 +218,35 @@ test("import rewriting preserves static, dynamic and commented text", async () =
  assert.ok(output.includes('import("./fixed.js?release='+OLD+'")'));
  });
 
-test('two-hour deadline and forced retirement close only the old release; active rooms are counted once',async t=>{
+test('one-hour deadline and forced retirement close only the old release; active rooms are counted once',async t=>{
  const dir=await mkdtemp(join(tmpdir(),'deadline-release-'));t.after(()=>rm(dir,{recursive:true,force:true}));let now=Date.now();
  const old=await startServer({port:0,host:'127.0.0.1',quiet:true,assetIndex:false,releaseId:OLD,releaseToken:token,roomCodePrefix:'A'}),next=await startServer({port:0,host:'127.0.0.1',quiet:true,assetIndex:false,releaseId:NEW,releaseToken:token,roomCodePrefix:'B'});t.after(()=>Promise.all([old.close(),next.close()]));
  const gateway=await startGateway({port:0,stateFile:join(dir,'state.json'),token,now:()=>now,log:{error(){}}});t.after(()=>gateway.close());const base=`http://127.0.0.1:${gateway.port}`;
  const post=async(action,input)=>fetch(base+'/__roll/admin/'+action,{method:'POST',headers:{authorization:'Bearer '+token,'content-type':'application/json'},body:JSON.stringify(input)});
  assert.equal((await post('register',{id:OLD,port:old.port,prefix:'A'})).status,200);await post('activate',{id:OLD});const a=await socket(gateway.port,OLD);t.after(()=>a.ws.close());await a.request('room.create',{mode:'solo',difficulty:'NORMAL'});await a.request('room.start');
- await post('register',{id:NEW,port:next.port,prefix:'B'});await post('activate',{id:NEW});const deadline=gateway.state().releases[OLD].expiresAt;assert.equal(deadline,now+7200000);assert.equal(gateway.state().releases[NEW].expiresAt,undefined);await post('activate',{id:NEW});assert.equal(gateway.state().releases[OLD].expiresAt,deadline);
- await a.wait(m=>m.t==='m.toast'&&m.text.includes('2시간'));const b=await socket(gateway.port,NEW);t.after(()=>b.ws.close());await b.request('room.create',{mode:'solo',difficulty:'NORMAL'});await b.request('room.start');
+ await post('register',{id:NEW,port:next.port,prefix:'B'});await post('activate',{id:NEW});const deadline=gateway.state().releases[OLD].expiresAt;assert.equal(deadline,now+3600000);assert.equal(gateway.state().releases[NEW].expiresAt,undefined);await post('activate',{id:NEW});assert.equal(gateway.state().releases[OLD].expiresAt,deadline);
+ await a.wait(m=>m.t==='m.toast'&&m.text.includes('1시간'));const b=await socket(gateway.port,NEW);t.after(()=>b.ws.close());await b.request('room.create',{mode:'solo',difficulty:'NORMAL'});await b.request('room.start');
  const summary=await(await fetch(base+'/__roll/status.json')).json();assert.equal(summary.totals.rooms,2);assert.equal(summary.totals.matches,2);assert.equal((await post('force-retire',{id:NEW})).status,409);assert.equal(next.lobby.rooms.size,1);
  now=deadline-1;await gateway.expireRetained();assert.equal(old.lobby.rooms.size,1);now=deadline;await gateway.expireRetained();assert.equal(old.lobby.rooms.size,0);assert.equal(next.lobby.rooms.size,1);assert.equal(next.lobby.stats().matches,1);assert.equal((await fetch(base+`/r/${OLD}/`)).status,410);
  assert.equal((await post('force-retire',{id:OLD})).status,200);assert.deepEqual(Object.keys(gateway.state().releases),[NEW]);assert.equal((await b.request('ping',{c:Date.now()})).t,'pong');
+});
+
+test('router reconciliation shortens legacy deadlines from their original activation and leaves current intact',async t=>{
+ const {createServer}=await import('node:http');const {writeFile}=await import('node:fs/promises');
+ const dir=await mkdtemp(join(tmpdir(),'legacy-deadline-'));t.after(()=>rm(dir,{recursive:true,force:true}));
+ const activated=Date.now()-45*60000,now=activated+45*60000,calls=[];
+ async function worker(id,prefix){
+  const server=createServer((req,res)=>{
+   calls.push([id,req.url]);res.setHeader('content-type','application/json');
+   res.end(JSON.stringify({release:id,roomPrefix:prefix,draining:id===OLD,rooms:1,matches:1,humans:1,sockets:1}));
+  });await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));t.after(()=>new Promise(resolve=>server.close(resolve)));return server.address().port;
+ }
+ const oldPort=await worker(OLD,'A'),newPort=await worker(NEW,'B'),stateFile=join(dir,'state.json');
+ await writeFile(stateFile,JSON.stringify({current:NEW,releases:{[OLD]:{port:oldPort,prefix:'A',expiresAt:activated+7200000},[NEW]:{port:newPort,prefix:'B'}}}));
+ const gateway=await startGateway({port:0,stateFile,token,now:()=>now,log:{error(){}}});t.after(()=>gateway.close());
+ const response=await fetch(`http://127.0.0.1:${gateway.port}/__roll/admin/status`,{headers:{authorization:'Bearer '+token}});
+ assert.equal(response.status,200);const state=gateway.state();assert.equal(state.releases[OLD].expiresAt,activated+3600000);
+ assert.equal(state.releases[OLD].retiredAt,activated);assert.equal(state.releases[NEW].expiresAt,undefined);
+ assert.ok(calls.some(([id,url])=>id===OLD&&url==='/__release/drain'));
+ assert.ok(!calls.some(([id,url])=>id===NEW&&url==='/__release/shutdown'));
 });

@@ -1,7 +1,7 @@
 // Served by the permanent router, so old game clients can also receive deadlines.
 export function startRetirementMonitor({release=globalThis.__SP_RELEASE,fetchFn=(...args)=>fetch(...args),notify=text=>import('/js/ui/toasts.js?release='+release).then(m=>m.toast(text,'warn',{ttl:10000})).catch(()=>{}),leave=()=>globalThis.__SP_GO_LATEST?globalThis.__SP_GO_LATEST():location.assign('/'),setInterval:setIv=setInterval,clearInterval:clearIv=clearInterval}={}){
- const thresholds=[60,30,10,5,1].map(n=>n*60000);let deadline=null,seen=new Set(),pending=false,stopped=false,timer;
- const text=(remaining,initial)=>{const minutes=Math.max(1,Math.ceil(remaining/60000)),label=minutes%60===0?`${minutes/60}시간`:`${minutes}분`;return `${initial?'새 버전이 적용되었습니다. 기존 버전은 최대 2시간 유지됩니다. ':''}기존 버전 종료까지 ${label} 남았습니다. 시간이 끝나면 이 버전의 방과 게임이 종료됩니다.`;};
+ const thresholds=[30,10,5,1].map(n=>n*60000);let deadline=null,seen=new Set(),pending=false,stopped=false,timer;
+ const text=(remaining,initial)=>{const minutes=Math.max(1,Math.ceil(remaining/60000)),label=minutes%60===0?`${minutes/60}시간`:`${minutes}분`;return `${initial?'새 버전이 적용되었습니다. 기존 버전은 최대 1시간 유지됩니다. ':''}기존 버전 종료까지 ${label} 남았습니다. 시간이 끝나면 이 버전의 방과 게임이 종료됩니다.`;};
  const stop=()=>{stopped=true;if(timer!=null)clearIv(timer);};
  const check=async()=>{
   if(!release||pending||stopped)return;pending=true;

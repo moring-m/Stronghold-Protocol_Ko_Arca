@@ -1,6 +1,22 @@
 // Player-facing history. Letters a/b were assigned retroactively to the two deployed update batches.
 export const PATCH_NOTES = [
 {
+  "version": "0.3.1i2",
+  "date": "2026-10-25",
+  "status": "released",
+  "title": "서버 메모리 및 구버전 정리 핫픽스",
+  "sections": [
+    {
+      "title": "서버 운영",
+      "items": [
+        "게임 서버의 메모리를 버전별 고정 제한 대신 합계 1.4GiB의 공유 예산으로 관리합니다. 최신 버전의 메모리를 우선 보호하며, 한 버전만 남으면 전체 예산을 사용할 수 있습니다.",
+        "구버전 유지 시간을 최대 1시간으로 변경했습니다. 기존 2시간 만료 기록도 최초 전환 시점을 기준으로 단축합니다.",
+        "구버전은 접속 연결이 없거나 사람 플레이어가 없으면 자동 종료합니다. 봇과 관전자는 사람 플레이어 수에서 제외하며 최신 버전은 유지합니다."
+      ]
+    }
+  ]
+},
+{
   "version": "0.3.1i1",
   "date": "2026-10-24",
   "status": "released",

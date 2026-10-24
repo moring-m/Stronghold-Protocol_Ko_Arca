@@ -152,17 +152,17 @@ sudo docker update --memory 256m --memory-swap 256m stronghold-router
 
 The updated installation and router replacement scripts preserve the 256 MiB limit.
 
-### Two-hour retained-release deadline
+### One-hour retained-release deadline
 
-Activating a new release gives the previous release an absolute two-hour deadline.
+Activating a new release gives the previous release an absolute one-hour deadline.
 It is stored in router state and never extended by reactivating the current release
-or restarting the router. Retained clients are warned at activation and with one
-hour, 30 minutes, 10 minutes, five minutes and one minute remaining. Workers close
+or restarting the router. Retained clients are warned at activation and with
+30 minutes, 10 minutes, five minutes and one minute remaining. Workers close
 their rooms at the deadline; the router also disconnects and rejects expired-release
 connections. The maintenance timer removes the old container and starts the queued
 deployment on its next run (within about a minute). The current release is never
 force-retired. Older workers without this feature receive browser fallback notices
-after a page reload. Existing retained releases without metadata get a two-hour
+after a page reload. Existing retained releases without metadata get a one-hour
 deadline when the upgraded router first reconciles them.
 
 The router updater installs the new update, maintenance and manual retirement
@@ -185,17 +185,19 @@ past their deadline), the updater prunes unused build cache once. The manual
 records still in use are protected by Docker. Cleanup failure does not prevent
 maintenance from continuing.
 
-Before pulling a new worker image, the updater requires 512 MiB available RAM and
-2 GiB free Docker disk. If disk space is below that threshold, it runs
+Before pulling a new worker image, the updater requires 2 GiB free Docker disk.
+There is no free-RAM preflight that defers deployment; workers share a bounded memory pool. If disk space is below that threshold, it runs
 `docker builder prune --force` once and checks the free space again. Only unused
 build cache is pruned; no game containers, images or volumes are pruned. If space
 is still insufficient, deployment stops and existing games continue. If no release was retired, cleanup is skipped when the requested version is
 already current or a deployment is queued behind two occupied workers. Install the updated `update.sh` through the reviewed
 router updater; pushing game code alone does not replace host deployment scripts.
 
-Retained workers are also force-retired when their live socket count is zero,
+Retained workers are also force-retired when their live socket count OR human
+player count (`humans`, excluding bots and spectators) is confirmed zero,
 even if abandoned rooms or games remain. The current worker is always excluded.
-Missing socket counts and failed status requests never count as zero. Older workers
+Missing or invalid counts and failed status requests never count as zero. A
+positive socket count does not keep a version with zero human players alive. Older workers
 are checked through healthz. The maintenance timer applies this check about once a
 minute; install both the updated router and host update script for this policy.
 
@@ -210,3 +212,36 @@ Install the new wrapper/bootstrap once from a trusted console on existing hosts.
 `rolling-scripts-update.sh`, `rolling-update.sh`, `rolling-maintain.sh`, `rolling-retire-old.sh`,
 `rolling-deploy.sh`, and `ssh-deploy-command.sh` from the same full commit into a temporary directory,
 then run `sudo bash DIR/rolling-scripts-update.sh`. Future Actions deployments refresh scripts automatically.
+
+
+### Shared 1.4 GiB game memory budget
+
+New game workers use the `stronghold-games.slice` parent cgroup. Its `MemoryMax`
+is 1.4 GiB, rounded down to a kernel page, and `MemorySwapMax=0`. Both child
+containers may individually use the whole pool; the parent enforces the **sum of
+actual memory usage**, not the sum of the child limits shown by `docker stats`.
+The router remains outside this pool at its existing 256 MiB limit.
+
+Kernel reclaim distributes free memory dynamically without a polling service.
+The updater sets soft `--memory-reservation` protection to 60% of the pool for
+the latest worker and 20% for a retained worker. These values do not preallocate
+RAM or cap usage; either may borrow unused space. Pressure may still cause an
+OOM kill if the combined working set cannot fit. Deployment is not queued or
+rejected because a safe per-worker shrink cannot be found; live worker hard
+limits are never lowered to make room. The existing two-release slot queue is
+unchanged.
+
+During the first upgrade, legacy 700 MiB workers keep their original cgroups and
+limits. Their full limit is subtracted from the new shared group's budget, so
+legacy + new workers still cannot exceed 1.4 GiB. Once the legacy worker retires,
+the next maintenance run (within about one minute) expands the pool to 1.4 GiB.
+Subsequent versions both belong to the same group and share it directly. No
+existing game worker needs a restart or recreation for this transition.
+
+Requires Docker cgroup v2 with its systemd driver (verify with
+`docker info --format '{{.CgroupVersion}} {{.CgroupDriver}}'`: `2 systemd`).
+The updater creates the dedicated slice and persists its limits with systemd.
+No change to the router memory limit is needed. Installing the updated scripts
+activates the memory policy for new workers; the one-hour deadline also requires
+the updated router. Existing two-hour retirement metadata is shortened from the
+original activation time rather than granting a fresh hour on router restart.

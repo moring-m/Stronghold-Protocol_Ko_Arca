@@ -20,7 +20,7 @@ printf '%s %s\\n' "\${0##*/}" "$*" >> "$MOCK_LOG"
 case "\${0##*/}" in
 id) echo 0;;
 curl) printf '%s' "$MOCK_STATUS";;
-df) echo 'Filesystem 1024-blocks Used Available Capacity Mounted'; if [[ "$SCENARIO" == enough || ( "$SCENARIO" == reclaimed && -f "$PRUNED" ) ]];then echo 'disk 10000000 0 3000000 70% /';else echo 'disk 10000000 0 1000000 90% /';fi;;
+df) echo 'Filesystem 1024-blocks Used Available Capacity Mounted'; if [[ "$SCENARIO" == enough || "$SCENARIO" == low-memory || ( "$SCENARIO" == reclaimed && -f "$PRUNED" ) ]];then echo 'disk 10000000 0 3000000 70% /';else echo 'disk 10000000 0 1000000 90% /';fi;;
 docker) [[ "$*" == 'builder prune --force' ]] || exit 90; [[ "$SCENARIO" != cleanup-failed ]] || exit 1; touch "$PRUNED";;
 esac
 `;
@@ -29,7 +29,7 @@ esac
   const calls=readFileSync(log,'utf8'),prunes=calls.split('\n').filter(x=>x==='docker builder prune --force');
   assert.equal(prunes.length,['reclaimed','still-low','cleanup-failed'].includes(scenario)?1:0,calls);
   assert.ok(!/docker (image|container|volume|system|stop|rm|pull)/.test(calls),calls);
-  if(['enough','reclaimed'].includes(scenario)){assert.equal(result.status,0,result.stderr);assert.match(result.stdout,/RESOURCE_CHECK_OK/);}
+  if(['enough','reclaimed','low-memory'].includes(scenario)){assert.equal(result.status,0,result.stderr);assert.match(result.stdout,/RESOURCE_CHECK_OK/);}
   else if(['queued','already-current'].includes(scenario)){assert.equal(result.status,0,result.stderr);assert.ok(!result.stdout.includes('RESOURCE_CHECK_OK'));}
   else{assert.notEqual(result.status,0);assert.match(result.stderr,/current games were not changed/);assert.ok(!result.stdout.includes('RESOURCE_CHECK_OK'));}
  }finally{rmSync(dir,{recursive:true,force:true});}
