@@ -47,7 +47,7 @@ test('Sarkaz greatswordsmen retain their authored attack-ready stance between su
   for(let i=0;i<3;i++){
    a.beginAttack(2,.9);a.update(.9);a.attack(2);
    const track=a.spine.state.tracks[0];a.update(.59);
-   assert.equal(a.current,'Attack',`${id}: recovery must finish before changing stance`);
+   assert.equal(a.current,i===0?'Attack':'Attack_NoPre',`${id}: recovery must finish before changing stance`);
    assert.equal(a.spine.state.tracks[0],track);
    a.update(.02);assert.equal(a.current,'Attack_Idle',`${id}: remain ready for the next strike`);
    a.update(.49);assert.equal(a.current,'Attack_Idle');
@@ -68,5 +68,29 @@ test('enemy ready stances stop for movement, cancelled attacks and stun, includi
   if(interrupt==='cancel'){a.cancelAttack();assert.equal(a.current,'Idle');}
   else if(interrupt==='stun'){a.setBase('stun');assert.equal(a.mode,'stun');}
   else{a.setBase('move');a.update(.001);assert.equal(a.current,'Attack_End');assert.equal(a.mode,'base');}
+ }
+});
+
+test('Sarkaz successive attacks skip the Idle-to-ready prefix without changing the hit deadline',()=>{
+ const manifest=JSON.parse(readFileSync(new URL('../../content/production/data/assets.json',import.meta.url)));
+ for(const id of ['enemy_1010_demon','enemy_1010_demon_2'])for(const lookahead of [false,true]){
+  const entry=manifest.enemies[id].spine;
+  const a=new SpineActor({animations:Object.keys(entry.animations).map(name=>({name}))},entry);
+  a.clipPerAttack=true;a.authoredAttackReady=true;
+  a.beginAttack(2,.9);
+  assert.equal(a.spine.state.tracks[0].trackTime,0,'first attack retains its preparation');
+  a.update(.9);a.attack(2);a.update(.61);
+  assert.equal(a.current,'Attack_Idle');
+  const lead=lookahead?.2:.9;
+  if(lookahead)assert.ok(a.windUp(2,lead));else assert.ok(a.beginAttack(2,lead));
+  const track=a.spine.state.tracks[0];
+  assert.equal(a.current,'Attack_NoPre','repeat uses the authored ready-to-attack clip');
+  if(lookahead){assert.equal(a.windUp(2,lead),false);assert.equal(a.spine.state.tracks[0],track,'look-ahead cannot restart the prepared continuation');}
+  a.update(lead);
+  assert.ok(Math.abs(track.trackTime-.5)<1e-6,'hit remains at the authoritative deadline');
+  a.attack(2);a.update(.59);assert.equal(a.current,'Attack_NoPre');
+  a.update(.02);assert.equal(a.current,'Attack_Idle');
+  a.cancelAttack();a.beginAttack(2,.9);
+  assert.equal(a.spine.state.tracks[0].trackTime,0,'a genuinely interrupted attack starts normally');
  }
 });

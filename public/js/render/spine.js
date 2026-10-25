@@ -722,7 +722,7 @@ export class SpineActor {
   windUp(interval, lead, once = false) {
     if (this._continuousSkillLoop()) return false;
     if (this.dead || this.mode === 'stun' || this.mode === 'die' || this.mode === 'change' || this.mode === 'skillCast' || this.mode === 'skillBegin' || !(lead >= 0)) return false;
-    const clip = this._attackClip();
+    const clip = once || this.mode === 'attack' ? this._attackClip() : this._prepareAttackClip();
     if (!clip) return false;
     // One queued attack owns one wind-up. A later attack may begin while the previous recovery is still playing.
     if (this.mode === 'attack' && this.current === clip.loop && (once || this.wound)) return false;
@@ -732,6 +732,7 @@ export class SpineActor {
     const hit = this._hitTime(clip.loop, loopDur);
     // clip per attack: its own speed, sped up only when the attacks come quicker than the clip
     const plan = windUpPlan(loopDur, hit, this.clipPerAttack && !once ? Math.min(iv, loopDur) : iv, lead);
+    if (clip === this._repeatClip) { plan.tsWind = plan.ts; plan.start = Math.max(0, hit - lead * plan.ts); }
     if (!(hit > 0) || lead * plan.ts > hit + 1e-6) return false;
     if (!once) { this.interval = iv; this.attackPoseUntil = this.clock + lead + iv + .12; }
     this.mode = 'attack';
@@ -754,7 +755,7 @@ export class SpineActor {
   beginAttack(interval, lead) {
     if (this._continuousSkillLoop()) {this.interval=clampN(interval,.08,8);return false;}
     if (this.dead || this.mode === 'stun' || this.mode === 'die' || this.mode === 'change' || this.mode === 'skillCast' || (this.mode === 'skillBegin' && this.skillBeginBlocking !== false)) return false;
-    const clip = this._attackClip(); if (!clip) return false;
+    const clip = this._prepareAttackClip(); if (!clip) return false;
     const dur = this.dur(clip.loop), hit = this._hitTime(clip.loop, dur);
     this.interval = clampN(interval, .08, 8);
     const ts = lead > 0 && hit > 0 ? hit / lead : Math.max(1, Math.min(4, dur / this.interval));
@@ -843,15 +844,29 @@ export class SpineActor {
     }
   }
 
+  // A ready stance can have its own authored continuation attack. The normal
+  // Attack starts from Idle; cropping its timeline is not the same bone pose.
+  _prepareAttackClip() {
+    this._repeatClip = null;
+    const clip = this._attackClip();
+    if (this.mode !== 'attackRest' || clip !== this.roles.attack || this.current !== this._normalAttackIdle(clip)) return clip;
+    const repeat = `${clip.loop}_NoPre`;
+    const hit = this.entry.hits?.[repeat]?.[0];
+    if (!this.has(repeat) || !Number.isFinite(hit) || !(hit > 0 && hit < this.dur(repeat))) return clip;
+    return this._repeatClip = {...clip, loop: repeat};
+  }
+
   // Split attack models have an authored ready pose between shots. Keep it
   // for the expected next shot; never loop the firing clip to fill a cooldown.
   _normalAttackIdle(clip) {
+    if (clip && clip === this._repeatClip) clip = this.roles.attack;
     if (!clip || (!this.continuousAttacks && !this.authoredAttackReady) || clip !== this.roles.attack) return null;
     const idle = clip.idle || (/Loop$/i.test(clip.loop) ? clip.loop.replace(/Loop$/i, 'Idle') : `${clip.loop}_Idle`);
     return idle !== clip.loop && this.has(idle) ? idle : null;
   }
 
   _normalAttackEnd(clip) {
+    if (clip && clip === this._repeatClip) clip = this.roles.attack;
     const end = clip?.end || (this.authoredAttackReady && clip === this.roles.attack && this._normalAttackIdle(clip)
       ? /Loop$/i.test(clip.loop) ? clip.loop.replace(/Loop$/i, 'End') : `${clip.loop}_End`
       : null);
@@ -920,6 +935,7 @@ export class SpineActor {
 
   _attackClip() {
     if (this.strike) return this.strike;
+    if (this.mode === 'attack' && this._repeatClip) return this._repeatClip;
     if(this.enemyModel && this.formRoles?.attack && this.has(this.formRoles.attack.loop))return this.formRoles.attack;
     if (this.has(this.attackAnimation) && this.roles.attack) return {...this.roles.attack, loop:this.attackAnimation};
     const sk = this.roles.skill;

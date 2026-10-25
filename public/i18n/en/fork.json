@@ -3027,5 +3027,8 @@
   "프리셋 목록은 이름과 연결 아이콘으로 표시하며, 상점의 선호 오퍼레이터·장비는 배경색이 있는 배지로 표시합니다.": "Preset lists show names and linked icons. Favorite shop operators and equipment now use badges with a colored background.",
   "모바일 전체화면의 UI 배율 적용 경로와 전략명·수배 선택 카드의 번역 및 강조 표시를 보완했습니다.": "Improved mobile fullscreen UI scaling and translation/highlighting of strategy names and bounty cards.",
   "전투와 리소스 로딩의 반복 할당·중복 계산을 줄이고, 준비 데이터가 늦게 도착하거나 렌더러 생성에 실패했을 때의 재시도를 보완했습니다.": "Reduced repeated allocations and duplicate work in battle and resource loading, and improved retries for late data and failed renderer creation.",
-  "연결 정리, 서버 종료 및 리소스 패키징·추출 도구의 오류 처리를 개선했습니다.": "Improved connection cleanup, server shutdown, and error handling in resource packaging and extraction tools."
+  "연결 정리, 서버 종료 및 리소스 패키징·추출 도구의 오류 처리를 개선했습니다.": "Improved connection cleanup, server shutdown, and error handling in resource packaging and extraction tools.",
+  "전투 포기 및 연속 공격 모션 핫픽스": "Battle surrender and consecutive attack animation hotfix",
+  "전투 포기 시 잘못된 접근 안내가 표시되어 포기할 수 없던 문제를 수정했습니다.": "Fixed an invalid-access error that prevented surrendering a battle.",
+  "살카즈 대검사 계열의 연속 공격이 대기 자세로 되돌아가는 문제를 수정했습니다. 타격 시점과 공격 후딜레이는 유지됩니다.": "Fixed Sarkaz greatsword enemies returning to their resting pose between consecutive attacks. Hit timing and attack recovery remain unchanged."
 }

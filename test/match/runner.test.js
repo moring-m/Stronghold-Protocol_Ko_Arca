@@ -1,3 +1,4 @@
+import {endBattleFields} from '../../public/js/ui/endBattleRequest.js';
 import {cultivatedStats} from '../../shared/potential.js';
 // The browser battle runner (public/js/battle/runner.js) under Node with a fake socket, a manual clock and manual
 // animation frames: pacing (60 ticks per real second at 2×, ≤ 8 per frame), the b.snap / b.ev feed and the field meta,
@@ -109,6 +110,9 @@ test('authoritative battle: 2× pacing, ≤ max(8, 4·speed) ticks per frame, b.
   assert.equal(snap.t, 'b.snap');
   assert.equal(snap.fieldId, start.fieldId);
   assert.equal(typeof snap.gt, 'number');
+  const surrender=endBattleFields(start.fieldId,snap);
+  assert.equal(surrender.gt,snap.gt);
+  await r.net.request('g.endBattle',surrender);
   assert.ok(r.feed.evs.every((x) => x.t === 'b.ev' && Array.isArray(x.ev) && typeof x.gt === 'number'));
   const spawnedOf = () => r.feed.evs.flatMap((x) => x.ev).filter((x) => x[0] === 'spawn').map((x) => x[1]);
   assert.ok(spawnedOf().some((u) => u.side === 'ally' && /^chess_/.test(u.defId)), 'the board arrives as spawn events at the first tick');

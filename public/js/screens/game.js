@@ -1,3 +1,4 @@
+import {endBattleFields} from '../ui/endBattleRequest.js';
 import {diyRecordFor} from '../ui/gameLogic/diy.js';
 import {uiCssZoom} from '../ui/mobileScale.js';
 import {deployZoomStep,deployZoomRemember,prepDeployCamera} from '../ui/gameLogic.js';
@@ -1721,7 +1722,7 @@ function MatchScreen() {
         const f=pub.fields?.find(f=>f.live && f.players?.includes(myId)); if(!f)return;
         const shared=f.kind==='boss'||f.kind==='hidden'||f.players.length>1;
         if(await confirmDialog({title:'현재 전투 포기',text:shared?'모든 참가자가 포기를 요청하면 전투를 끝냅니다. 남은 적은 미처치로 정산되며, 보스전은 패배합니다.':'지금 전투를 끝내고 다음 단계로 넘어갑니다. 남은 적은 미처치로 정산됩니다.',okText:'전투 포기',danger:true})) {
-          try {await net.request('g.endBattle',{fieldId:f.fieldId,gt:snapBufRef.current.get(f.fieldId)?.t}); if(shared)toast('전투 포기를 요청했습니다. 동료의 요청을 기다립니다.','info');}catch(e){toast(e.message,'error');}
+          try {await net.request('g.endBattle',endBattleFields(f.fieldId,snapBufRef.current.get(f.fieldId))); if(shared)toast('전투 포기를 요청했습니다. 동료의 요청을 기다립니다.','info');}catch(e){toast(e.message,'error');}
         }
       }}><span class="readybtn__box"><${Icon} name="close" /></span><span class="readybtn__label">${endField.endVotes?.includes(myId)?'포기 요청됨':'전투 포기'}</span></button>` : null} pub=${pub} priv=${priv} conn=${conn} hud=${hud} total=${total} drawer=${drawer}
         onExit=${() => setExitOpen(true)} onDrawer=${(t) => setDrawer((d) => (d ? null : t))} onReady=${toggleReady}

@@ -1,6 +1,21 @@
 // Player-facing history. Letters a/b were assigned retroactively to the two deployed update batches.
 export const PATCH_NOTES = [
 {
+  "version": "0.3.3a1",
+  "date": "2026-10-25",
+  "status": "released",
+  "title": "전투 포기 및 연속 공격 모션 핫픽스",
+  "sections": [
+    {
+      "title": "전투",
+      "items": [
+        "전투 포기 시 잘못된 접근 안내가 표시되어 포기할 수 없던 문제를 수정했습니다.",
+        "살카즈 대검사 계열의 연속 공격이 대기 자세로 되돌아가는 문제를 수정했습니다. 타격 시점과 공격 후딜레이는 유지됩니다."
+      ]
+    }
+  ]
+},
+{
   "version": "0.3.3a",
   "date": "2026-10-25",
   "status": "released",
