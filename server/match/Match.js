@@ -1,3 +1,4 @@
+import {replaceRecruitEntries} from '../../shared/recruitPresetLinks.js';
 import {normalizeGameplayMode,gameplayExtensions} from '../../shared/gameplayModes.js';
 import { ruleOption } from '../../shared/plugins/rules.js';
 import { MatchOffers as UpstreamFallback18 } from './match/offers.js';
@@ -456,6 +457,7 @@ export class Match {
       if (!s || typeof s.playerId !== 'string' || seen.has(s.playerId)) continue;
       seen.add(s.playerId);
       this.players.set(s.playerId, new PlayerState(this, s));
+      this.players.get(s.playerId).strategyPresets=s.strategyPresets||{};
     }
     if (!this.players.size) throw new TypeError('Match: seats required');
     this.order = [...this.players.values()].sort((a, b) => a.seat - b.seat);
@@ -608,7 +610,7 @@ export class Match {
    * @param {Record<string, { skill: number, module: string|null }> | null} loadout
    * @returns {{ ok: true } | { error: string, detail?: string }}
    */
-  setLoadout(playerId, loadout, ops = undefined) {
+  setLoadout(playerId, loadout, ops = undefined, strategyPresets = undefined) {
     const ps = this.players.get(playerId);
     if (!ps || ps.isBot || ps.left) return fail(ERR.NOT_IN_ROOM);
     const prep = this.phase === PHASE.PREP && ruleOption(this.rules, 'prepLoadout') === 'prep';
@@ -618,6 +620,7 @@ export class Match {
     this.guard(() => {
       const before = prep ? ps.allChess().map(owner => ({ owner, loadout: ps.loadoutFor(ps.gd.chess(owner.id)) })) : [];
       if (!ps.setLoadout(loadout, ops, prep ? { merge: true } : undefined)) { res = fail(ERR.BAD_TARGET, 'loadout does not match the game data'); return; }
+      if(strategyPresets!==undefined)ps.strategyPresets=strategyPresets;
       this.markPrivate(ps);
       if (prep) {
         for (const { owner, loadout: previous } of before) {
@@ -1022,6 +1025,7 @@ export class Match {
     let view;
     try { view = ps.privateView(); } catch (e) { this.reportError('privateView', e); return; }
     if(this.augments.enabled)view.augments=this.augments.privateView(ps);
+    if(ps.strategyPresetApplied)view.strategyPresetApplied=ps.strategyPresetApplied;
     const json = JSON.stringify(view);
     if (!force && json === ps._lastPriv) return;
     ps._lastPriv = json;
@@ -1406,7 +1410,7 @@ if (this.test === true) {
       case 'g.pause': return this.setPause(ps, !!msg.on);
       // the stats the board's units start their next battle with (the detail card in prep, user playtest #4 item 7)
       case 'g.unitStats': return this.unitStats(ps, msg.seq ?? null);
-      case 'g.endBattle': return this.endBattle(ps, msg.fieldId);
+      case 'g.endBattle': return this.endBattle(ps, msg.fieldId, msg.gt);
       case 'g.leave': this.onLeave(ps.playerId); return OK;
       case 'b.progress': return this._onProgress(ps, msg);
       case 'b.result': return this._onResult(ps, msg);
@@ -1417,7 +1421,7 @@ if (this.test === true) {
     }
   }
 
-  endBattle(ps, fieldId) {
+  endBattle(ps, fieldId, gt) {
     const f = this.fields.find(f=>f.fieldId===fieldId && f.live && !f.done);
     if (!ps.alive || !f || !f.players.includes(ps.playerId) || ![PHASE.COMBAT,PHASE.UNITE,PHASE.FINAL_ASSAULT,PHASE.HIDDEN_CORE].includes(this.phase)) return fail(ERR.WRONG_PHASE);
     if (f.endRequested) return OK;
@@ -1434,7 +1438,13 @@ if (this.test === true) {
       return OK;
     }
     // Reconstruct only the elapsed fight on the authority; never grant future kills.
-    const elapsed = Math.max(.01,this._fieldElapsed(f));
+    const wallElapsed = this._fieldElapsed(f);
+    // A loading/throttled browser can trail the field clock. Replaying to wall time
+    // would award future kills and erase surrender leaks. Only the authority may
+    // supply its current snapshot time; older clients fall back to b.progress.
+    const reported = Math.max(0,Number(f.progress?.gt)||0);
+    const observed = f.authority===ps.playerId && Number.isFinite(gt) && gt>=0 ? Math.max(reported,gt) : reported;
+    const elapsed = Math.max(.01,f.mode==='client'?Math.min(wallElapsed,observed):wallElapsed);
     const battle = this._specBattle(f.spec);
     const job = new HeadlessJob(battle,{players:f.players,onError:e=>this.reportError('end battle',e)});
     job.cap = Math.max(1,Math.ceil(elapsed / (battle.dt || 1/30)));
@@ -1928,6 +1938,12 @@ if (this.test === true) {
       const id=this.rngDraft.pick(eligible);if(!id)throw new Error('No strategy available for random assignment');
       used.add(id);this.draft.picks[pid]=ps.bandId=id;ps.randomBandBonus=5;ps.lp=this.gd.startLp(id)+ps.randomBandBonus;this.markPrivate(ps);
     }
+    for(const ps of this.order){
+      const preset=ps.strategyPresets?.[ps.bandId];if(!preset||ps.isBot)continue;
+      const next=replaceRecruitEntries(ps.loadout,preset,id=>this.gd.chess(id));
+      if(Object.keys(preset).length&&!Object.entries(next).some(([id,e])=>e.selected&&this.gd.chess(id)?.optionalRecruit))continue;
+      if(this.setLoadout(ps.playerId,next).ok){ps.strategyPresetApplied=ps.bandId;this.markPrivate(ps);}
+    }
     void timeout;
     this.enterBattleCheck();
   }
@@ -2419,7 +2435,8 @@ if (this.test === true) {
     const input = ps.battleInput({ side: 'L', colOffset: 0 });
     // the client's list: bounty units inserted among their host action's own units, which are re-timed around them
     const spawns = withBounties(this.gd, this.round, wave, ps.bounties, ps.playerId).map((s) => ({ ...s, ownerPlayerId: ps.playerId }));
-    const ev = { input, kind: 'normal', round: this.round, spawns, ...(preview ? { preview: true } : {}) };
+    const waveSpawns = (wave.spawns || []).map(s => ({...s, mods:s.mods?{...s.mods}:undefined}));
+    const ev = { input, kind: 'normal', round: this.round, spawns, waveSpawns, ...(preview ? { preview: true } : {}) };
     // Preview construction failures go to the rehearsal's discard path, never Match.dispatch's live error sink.
     if (preview) this.dispatcher.dispatch(ps, 'onBattleStart', ev);
     else this.dispatch(ps, 'onBattleStart', ev);
@@ -3620,7 +3637,7 @@ if (this.test === true) {
         const input = ps.battleInput({ side: j === 0 ? 'L' : 'R', colOffset: j === 0 ? 0 : 8 });
         input.lpForBoss = this.teamLp;
         // `side` + `routes`: the player's half of a pair field (spawn-list edits for one player, e.g. 鸭爵's swap)
-        const ev = { input, kind: hidden ? 'hidden' : 'boss', round: this.round, spawns, routes: wave.routes, side: g.length > 1 ? (j === 0 ? 'L' : 'R') : null };
+        const ev = { input, kind: hidden ? 'hidden' : 'boss', round: this.round, spawns, waveSpawns:wave.spawns.map(s=>({...s,mods:s.mods?{...s.mods}:undefined})), routes: wave.routes, side: g.length > 1 ? (j === 0 ? 'L' : 'R') : null };
         this.dispatch(ps, 'onBattleStart', ev);
         return ev.input && typeof ev.input === 'object' ? ev.input : input;
       });

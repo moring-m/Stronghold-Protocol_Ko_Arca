@@ -51,6 +51,7 @@ import { registerBuiltins } from './builtinMeta.js';
 import { msg, dn } from '../../shared/i18n.js';
 
 import { previewContext } from './preview.js';
+import { deriveSeed } from '../sim/rng.js';
 
 export const HOOKS = Object.freeze([
   'onRoundStart', 'onIncome', 'onPrepStart', 'onPrepEnd', 'onGain', 'onSold', 'onRefresh', 'onPrice', 'onBuy',
@@ -63,7 +64,7 @@ const HANDLER_EXTRAS = new Set(['run', 'garrisonHooks']);
 /** Garrison eventType → dispatcher hook. */
 export const GARRISON_HOOK = Object.freeze({
   SERVER_GAIN: 'onGain',
-  SERVER_PREP_START: 'onRoundStart',
+  SERVER_PREP_START: 'onPrepStart',
   SERVER_PREP_FIN: 'onPrepEnd',
   SERVER_CHESS_SOLD: 'onSold',
   SERVER_PRICE: 'onPrice',
@@ -355,7 +356,7 @@ export class EffectDispatcher {
       if (ev && ev.slot && ev.slot.kind === 'chess') run({ uid: 0, kind: 'chess', id: ev.slot.id, items: [] }, 'shop');
       return;
     }
-    if (hook !== 'onRoundStart' && hook !== 'onPrepEnd' && hook !== 'onRefresh') return;
+    if (hook !== 'onRoundStart' && hook !== 'onPrepStart' && hook !== 'onPrepEnd' && hook !== 'onRefresh') return;
     if (refreshed) {
       for (const { piece, area } of refreshed) {
         const loc = ps.find(piece.uid);
@@ -528,6 +529,11 @@ export function makeCtx(m, ps, source, hook, ev = null, preview = null) {
     data: gd.raw,
     gd,
     rng,
+    /**
+     * A uint32 derived from the match seed and `salt`: the same for every player, dispatch and preview, consuming no
+     * stream — for a draw that every player of a round must share (鸭爵's swaps, GitHub #839: createRng(seedFor(…))).
+     */
+    seedFor: (salt) => deriveSeed(m.seed, `meta:${String(salt)}`),
     log: (msg) => m.log.info?.(`[meta ${m.roomCode}] ${ps.playerId}: ${msg}`),
 
     // ---- reads

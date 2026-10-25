@@ -120,6 +120,7 @@ const DIRS = ['UP', 'RIGHT', 'DOWN', 'LEFT'];
 const CAST_START = new Set([0, 2]);
 /** Battle seconds an enemy's skill window outlasts its start before the snapshot's anim may end it (the sim's 0.5 s). */
 const ENEMY_GRACE = 0.3;
+const LOCK_T = 5, LOCK_SHELL_NEAR = 3, MAX_LOCKS = 48;
 /**
  * Battle seconds an aura's looping buff effect stays on a unit after the last tick that hurt it (鼎沸's
  * enemy_cjhot_debuff: the client keeps it while the unit is in the aura — its ticks come every second) [ASSUMED].
@@ -204,7 +205,8 @@ export class SkillFx {
     this.w = w;
     this.units = new Map();    // battle id → unit record | null (nothing official to play)
     this.tloops = new Map();   // `${target id}|${key}` → { h, until, U, tgt, bySkill } (skills.js targetsOf `hit`)
-    this.marks = [];           // FX_BINDINGS reached effects: { owner, r, c, until, h, cover }
+    this.marks = [];
+    this.locks = [];           // FX_BINDINGS reached effects: { owner, r, c, until, h, cover }
     this.born = new Map();     // unit id → { frame, own } of its official birth effect (deployed: FxWiring.deploy's key)
     this.frame = 0;            // FxWiring.tick counts frames: events of one frame share a value
     this.sweep = 0;
@@ -909,6 +911,8 @@ export class SkillFx {
       this.tloops.clear();
       for (const t of this.aloops.values()) t.h.stop();
       this.aloops.clear();
+      for(const L of this.locks)this._endLock(L);
+      this.locks.length=0;
       this.tier = tier;
       this.wasActive = active;
     }
@@ -986,6 +990,7 @@ export class SkillFx {
       if (!tv || tv.destroyed || tv.alive === false || now >= t.until || !t.h.alive) { t.h.stop(); this.aloops.delete(slot); }
     }
     if (this.marks.length) this.marks = this.marks.filter((m) => m.until > now);
+    if(this.locks.length)this._syncLocks(now);
   }
 
   /**
@@ -1024,6 +1029,7 @@ export class SkillFx {
     if (extra.charged === true && extra.id != null) { const C = this.units.get(extra.id); if (C) C.charged = true; }
     // (0) an enemy's area: its zone's official prefabs at the fx's point, an aura tick its talent loops stand for
     if (this._enemyFx(kind, x, y, extra)) return true;
+    if((kind==='bombardShell'||kind==='bombard')&&this.locks.length)this._lockShell(kind,x,y,extra);
     // (1) explicit bindings and what they cover
     for (const m of this.marks) {
       if (m.until > now && m.cover.includes(kind) && extra.id === m.owner && Math.round(y) === m.r && Math.round(x) === m.c) return true;
@@ -1119,6 +1125,7 @@ export class SkillFx {
       for (const k of keys) if (this.w.playOn(k, at, { important: true, flipFrom:U.v || undefined })) drew = true;
       return drew;
     }
+    if(bind.hold==='lock')return this._lockOn(U,keys,at,tv,x,y);
     const bb = U.srec?.bb || {};
     const fxS = Number(extra.duration ?? extra.dur ?? extra.hold);
     const holdS = bind.hold === 'fx' ? (fxS > 0 ? fxS : bind.holdS || SKILL_CAST_S)
@@ -1372,10 +1379,69 @@ export class SkillFx {
   }
 
   /** Battle reset: forget every unit (the effects themselves are cleared by OfficialFx.clear). */
+  _lockOn(U, keys, at, tv, x, y) {
+    const hs = [];
+    for (const k of keys) {
+      const h = this.w.playOn(k, at, { loop: true, important: true, stick: !!tv });
+      if (h) hs.push(h);
+    }
+    if (!hs.length) return false;
+    const now = this.w.ofx.time;
+    for (const L of this.locks) if (L.src === U.id) L.idle = now;
+    this.locks.push({ src: U.id, tv, x, y, shell: null, idle: now, hs });
+    if (this.locks.length > MAX_LOCKS) this._endLock(this.locks.shift());
+    return true;
+  }
+
+  /**
+   * fx 'bombardShell' / 'bombard' (id = the shooter): a shell takes her free lock nearest its spot (the sim's spot is
+   * the mark ± emit_offset); its landing ends the lock that shell took — the one nearest the spot, else a lock no shell
+   * took within its blast (render/fx/projectiles.js _landed).
+   */
+  _lockShell(kind, x, y, extra) {
+    const src = extra.id ?? extra.src;
+    if (src == null || !Number.isFinite(x) || !Number.isFinite(y)) return;
+    const now = this.w.ofx.time;
+    let best = -1, bd = Infinity;
+    for (let i = 0; i < this.locks.length; i++) {
+      const L = this.locks[i];
+      if (L.src !== src) continue;
+      L.idle = now;
+      if (kind === 'bombardShell' && L.shell) continue;
+      const d = L.shell ? Math.hypot(L.shell.x - x, L.shell.y - y) : Math.hypot(L.x - x, L.y - y) + (kind === 'bombard' ? 0.5 : 0);
+      if (d < bd) { bd = d; best = i; }
+    }
+    if (best < 0) return;
+    if (kind === 'bombardShell') { if (bd <= LOCK_SHELL_NEAR) this.locks[best].shell = { x, y }; return; }
+    const r = Number(extra.r ?? extra.radius);
+    if (bd <= (r > 0 ? r : 1) + 1.5) this._endLock(this.locks.splice(best, 1)[0]);
+  }
+
+  /** Once per frame: the crosshairs follow their standing enemies; those whose shell will not come go. */
+  _syncLocks(now) {
+    let w = 0;
+    for (const L of this.locks) {
+      const tv = L.tv;
+      if (tv && !tv.destroyed && tv.alive !== false) { L.x = tv.x; L.y = tv.y; }
+      const U = this.units.get(L.src);
+      const sv = U?.v;
+      if (U && this._on(U)) L.idle = now;
+      const gone = !L.shell && (!sv || sv.destroyed || sv.alive === false);
+      if (gone || now - L.idle >= LOCK_T || !L.hs.some((h) => h.alive)) { this._endLock(L); continue; }
+      this.locks[w++] = L;
+    }
+    this.locks.length = w;
+  }
+
+  _endLock(L) { for (const h of L.hs) h.stop(); }
+
+
   clear() {
     this.units.clear();
     this.tloops.clear();
     this.marks = [];
+    for(const L of this.locks)this._endLock(L);
+    this.locks=[];
     this.hitLog = [];
     this.windows = [];
     this.born.clear();

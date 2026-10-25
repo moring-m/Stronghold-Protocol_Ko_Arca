@@ -1361,7 +1361,7 @@ export class Lobby {
    * game data, store both on the session and the seat, and — while a match runs — hand them to the match (accepted only
    * during INFO_CHECK, see the header). Either part refused: nothing is stored.
    */
-  loadout(session, { entries, ops }) {
+  loadout(session, { entries, ops, strategyPresets }) {
     const room = this.roomOf(session);
     // checked against the room's own data: a room with gameplay plugins knows its plugins' operators (header "Gameplay plugins")
     const data = this.dataFor(room);
@@ -1370,6 +1370,19 @@ export class Lobby {
     const ids = opsCharIds(data);
     const resOps = checkLoadoutOps(ops, (id) => ids.has(id), (id) => charPotentialChanges(data, id));
     if (!resOps || resOps.error) return fail(resOps && isErrCode(resOps.error) ? resOps.error : ERR.BAD_MSG, resOps && resOps.detail);
+    let linked=session.strategyPresets||{};
+    if(strategyPresets!==undefined){
+      if(!strategyPresets||typeof strategyPresets!=='object'||Array.isArray(strategyPresets)||Object.keys(strategyPresets).length>30)return fail(ERR.BAD_MSG);
+      linked={};
+      for(const [bandId,preset]of Object.entries(strategyPresets)){
+        if(!Object.hasOwn(data.bands||{},bandId))return fail(ERR.BAD_TARGET,'unknown strategy');
+        if(Object.keys(preset||{}).some(id=>!lookup('chess',id,data)?.optionalRecruit))return fail(ERR.BAD_TARGET,'recruit presets only');
+        const check=checkLoadout(preset,id=>lookup('chess',id,data));if(!check.ok)return fail(ERR.BAD_TARGET,check.detail);
+        linked[bandId]=freezeLoadout(check.loadout);
+      }
+      linked=Object.freeze(linked);
+    }
+    session.strategyPresets=linked;
     const loadout = freezeLoadout(res.loadout);
     const opsSet = freezeOps(resOps.ops);
     const cs = this.csOf(room);
@@ -1378,15 +1391,15 @@ export class Lobby {
     session.loadoutCs = cs;
     if (!room) return OK;
     const seat = room.seatOf(session.playerId);
-    if (seat) { seat.loadout = loadout; seat.ops = opsSet; seat.loadoutCs = cs; }
+    if (seat) { seat.strategyPresets=linked;seat.loadout = loadout; seat.ops = opsSet; seat.loadoutCs = cs; }
     if (!room.match || !seat) return OK; // a spectator's loadout stays on its session, never reaching the match
     if (typeof room.match.setLoadout !== 'function') return fail(ERR.ROOM_STARTED, 'stored for the next match');
     let r;
     try {
       // Preserve named defaults for prep merging: normalisation drops them, but they mean reset this operator.
       r = ruleOption(room.content?.rules, 'prepLoadout') === 'prep'
-        ? room.match.setLoadout(session.playerId, entries, ops)
-        : room.match.setLoadout(session.playerId, loadout, opsSet);
+        ? room.match.setLoadout(session.playerId, entries, ops, linked)
+        : room.match.setLoadout(session.playerId, loadout, opsSet, linked);
     } catch (e) {
       this.log.error(`[lobby] ${room.code} match.setLoadout threw`, e);
       return fail(ERR.INTERNAL);
@@ -1533,7 +1546,7 @@ export class Lobby {
       const res = checkSkinSelection(s.skins, (id) => ids.has(id));
       if (res.ok) skins = Object.freeze({ ...res.skins });
     }
-    return { loadout, ops, notOwned, diy, skins };
+    return { loadout, ops, notOwned, diy, skins, strategyPresets:s.strategyPresets||{} };
   }
 
   /**
@@ -1573,6 +1586,7 @@ export class Lobby {
         seat: s.seat, playerId: s.playerId, name: s.name, isBot: s.isBot, connected: s.connected,
         // DESIGN §16: the human's checked operator loadout and (0.2.2) per-operator 潜能 / 练度 (bots fight with the defaults)
         loadout: own ? own.loadout : null,
+        strategyPresets:own?.strategyPresets||{},
         ops: own ? own.ops : null,
         // 0.2.0 补位: the chess the human marked as not owned (bots own every operator)
         notOwned: own ? own.notOwned : null,
@@ -1964,6 +1978,7 @@ export class Lobby {
     return {
       seat: idx, playerId: session.playerId, name: session.name, isBot: false, ready: false, connected: session.connected, left: false,
       loadout: session.loadout || null,
+      strategyPresets:session.strategyPresets||{},
       ops: session.ops || null,
       notOwned: session.notOwned || null,
       diy: session.diy || null,

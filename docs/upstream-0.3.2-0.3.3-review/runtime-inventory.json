@@ -1,0 +1,2550 @@
+[
+  {
+    "path": "public/css/components.css",
+    "kind": "diverged",
+    "base": 53956,
+    "upstream": 61170,
+    "local": 64151
+  },
+  {
+    "path": "public/css/devices.css",
+    "kind": "diverged",
+    "base": 13851,
+    "upstream": 14796,
+    "local": 13948
+  },
+  {
+    "path": "public/css/emotes.css",
+    "kind": "diverged",
+    "base": 10047,
+    "upstream": 10107,
+    "local": 10647
+  },
+  {
+    "path": "public/css/screens/briefing.css",
+    "kind": "diverged",
+    "base": 11755,
+    "upstream": 24107,
+    "local": 11415
+  },
+  {
+    "path": "public/css/screens/draft.css",
+    "kind": "diverged",
+    "base": 11396,
+    "upstream": 38850,
+    "local": 12112
+  },
+  {
+    "path": "public/css/screens/game-panels.css",
+    "kind": "diverged",
+    "base": 67927,
+    "upstream": 70803,
+    "local": 66771
+  },
+  {
+    "path": "public/css/screens/game.css",
+    "kind": "diverged",
+    "base": 82855,
+    "upstream": 96877,
+    "local": 80154
+  },
+  {
+    "path": "public/css/screens/guide.css",
+    "kind": "diverged",
+    "base": 6571,
+    "upstream": 6938,
+    "local": 6715
+  },
+  {
+    "path": "public/css/screens/loadout.css",
+    "kind": "diverged",
+    "base": 59696,
+    "upstream": 85986,
+    "local": 47052
+  },
+  {
+    "path": "public/css/screens/lobby.css",
+    "kind": "diverged",
+    "base": 11813,
+    "upstream": 76699,
+    "local": 34045
+  },
+  {
+    "path": "public/css/screens/protocol-boot.css",
+    "kind": "unchanged-local",
+    "base": 12331,
+    "upstream": 14789,
+    "local": 12331
+  },
+  {
+    "path": "public/css/screens/result.css",
+    "kind": "diverged",
+    "base": 7937,
+    "upstream": 8081,
+    "local": 21907
+  },
+  {
+    "path": "public/css/screens/room.css",
+    "kind": "diverged",
+    "base": 14341,
+    "upstream": 46664,
+    "local": 22034
+  },
+  {
+    "path": "public/css/screens/settle.css",
+    "kind": "diverged",
+    "base": 37958,
+    "upstream": 39123,
+    "local": 40566
+  },
+  {
+    "path": "public/css/screens/stats.css",
+    "kind": "diverged",
+    "base": 31882,
+    "upstream": 38915,
+    "local": 32626
+  },
+  {
+    "path": "public/css/screens/sweep.css",
+    "kind": "diverged",
+    "base": 27047,
+    "upstream": 27360,
+    "local": 30823
+  },
+  {
+    "path": "public/css/theme.css",
+    "kind": "diverged",
+    "base": 14952,
+    "upstream": 16145,
+    "local": 14933
+  },
+  {
+    "path": "public/js/assetCache.js",
+    "kind": "diverged",
+    "base": 11257,
+    "upstream": 11999,
+    "local": 11275
+  },
+  {
+    "path": "public/js/assets.js",
+    "kind": "diverged",
+    "base": 55844,
+    "upstream": 55863,
+    "local": 58367
+  },
+  {
+    "path": "public/js/audio.js",
+    "kind": "diverged",
+    "base": 91171,
+    "upstream": 97115,
+    "local": 106265
+  },
+  {
+    "path": "public/js/battle/metrics.js",
+    "kind": "diverged",
+    "base": 5013,
+    "upstream": 5319,
+    "local": 6443
+  },
+  {
+    "path": "public/js/battle/rehearsal.js",
+    "kind": "unchanged-local",
+    "base": 11010,
+    "upstream": 11079,
+    "local": 11010
+  },
+  {
+    "path": "public/js/battle/rehearsalWorker.js",
+    "kind": "unchanged-local",
+    "base": 3649,
+    "upstream": 3843,
+    "local": 3649
+  },
+  {
+    "path": "public/js/battle/runner.js",
+    "kind": "diverged",
+    "base": 56209,
+    "upstream": 61688,
+    "local": 59466
+  },
+  {
+    "path": "public/js/battle/simHost.js",
+    "kind": "unchanged-local",
+    "base": 6660,
+    "upstream": 7265,
+    "local": 6660
+  },
+  {
+    "path": "public/js/battle/simLoader.js",
+    "kind": "diverged",
+    "base": 6745,
+    "upstream": 9182,
+    "local": 7312
+  },
+  {
+    "path": "public/js/content.js",
+    "kind": "unchanged-local",
+    "base": 40214,
+    "upstream": 50584,
+    "local": 40214
+  },
+  {
+    "path": "public/js/data.js",
+    "kind": "diverged",
+    "base": 30590,
+    "upstream": 32427,
+    "local": 32611
+  },
+  {
+    "path": "public/js/diag.js",
+    "kind": "unchanged-local",
+    "base": 21566,
+    "upstream": 22167,
+    "local": 21566
+  },
+  {
+    "path": "public/js/main.js",
+    "kind": "diverged",
+    "base": 24762,
+    "upstream": 28802,
+    "local": 28324
+  },
+  {
+    "path": "public/js/net.js",
+    "kind": "diverged",
+    "base": 40162,
+    "upstream": 42964,
+    "local": 41931
+  },
+  {
+    "path": "public/js/render/app.js",
+    "kind": "diverged",
+    "base": 134594,
+    "upstream": 135264,
+    "local": 161442
+  },
+  {
+    "path": "public/js/render/app/host.js",
+    "kind": "unchanged-local",
+    "base": 5387,
+    "upstream": 5532,
+    "local": 5387
+  },
+  {
+    "path": "public/js/render/app/info.js",
+    "kind": "diverged",
+    "base": 5257,
+    "upstream": 5596,
+    "local": 5514
+  },
+  {
+    "path": "public/js/render/app/windup.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 3121,
+    "local": 0
+  },
+  {
+    "path": "public/js/render/attackRate.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 5862,
+    "local": 0
+  },
+  {
+    "path": "public/js/render/battlePresentation.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 890,
+    "local": 0
+  },
+  {
+    "path": "public/js/render/board3d/layout.js",
+    "kind": "diverged",
+    "base": 32831,
+    "upstream": 34010,
+    "local": 33397
+  },
+  {
+    "path": "public/js/render/fx/kinds.js",
+    "kind": "diverged",
+    "base": 12871,
+    "upstream": 12878,
+    "local": 12910
+  },
+  {
+    "path": "public/js/render/interp.js",
+    "kind": "diverged",
+    "base": 24587,
+    "upstream": 27052,
+    "local": 28245
+  },
+  {
+    "path": "public/js/render/motes.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 7265,
+    "local": 0
+  },
+  {
+    "path": "public/js/render/skillAttack.js",
+    "kind": "unchanged-local",
+    "base": 2354,
+    "upstream": 4449,
+    "local": 2354
+  },
+  {
+    "path": "public/js/render/spine.js",
+    "kind": "diverged",
+    "base": 60740,
+    "upstream": 64029,
+    "local": 73077
+  },
+  {
+    "path": "public/js/render/textures.js",
+    "kind": "diverged",
+    "base": 78414,
+    "upstream": 78457,
+    "local": 79321
+  },
+  {
+    "path": "public/js/render/units.js",
+    "kind": "diverged",
+    "base": 151763,
+    "upstream": 166908,
+    "local": 178559
+  },
+  {
+    "path": "public/js/render/vfx/pluginPlayer.js",
+    "kind": "unchanged-local",
+    "base": 7055,
+    "upstream": 7168,
+    "local": 7055
+  },
+  {
+    "path": "public/js/render/vfx/skillfx.js",
+    "kind": "diverged",
+    "base": 75130,
+    "upstream": 79978,
+    "local": 77899
+  },
+  {
+    "path": "public/js/render/vfx/skills.js",
+    "kind": "diverged",
+    "base": 115391,
+    "upstream": 117040,
+    "local": 116757
+  },
+  {
+    "path": "public/js/render/vfx/system.js",
+    "kind": "diverged",
+    "base": 22486,
+    "upstream": 22799,
+    "local": 25786
+  },
+  {
+    "path": "public/js/screens/bandDraft.js",
+    "kind": "diverged",
+    "base": 22570,
+    "upstream": 35319,
+    "local": 22897
+  },
+  {
+    "path": "public/js/screens/briefing.js",
+    "kind": "diverged",
+    "base": 6752,
+    "upstream": 5563,
+    "local": 6640
+  },
+  {
+    "path": "public/js/screens/cultivation.js",
+    "kind": "unchanged-local",
+    "base": 8282,
+    "upstream": 8472,
+    "local": 8282
+  },
+  {
+    "path": "public/js/screens/diy.js",
+    "kind": "diverged",
+    "base": 22299,
+    "upstream": 32687,
+    "local": 22482
+  },
+  {
+    "path": "public/js/screens/game.js",
+    "kind": "diverged",
+    "base": 122661,
+    "upstream": 134188,
+    "local": 124149
+  },
+  {
+    "path": "public/js/screens/loadout.js",
+    "kind": "diverged",
+    "base": 62678,
+    "upstream": 83067,
+    "local": 54153
+  },
+  {
+    "path": "public/js/screens/loadoutSections.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 14916,
+    "local": 0
+  },
+  {
+    "path": "public/js/screens/lobby.js",
+    "kind": "diverged",
+    "base": 23085,
+    "upstream": 50598,
+    "local": 29150
+  },
+  {
+    "path": "public/js/screens/ownership.js",
+    "kind": "unchanged-local",
+    "base": 5851,
+    "upstream": 5832,
+    "local": 5851
+  },
+  {
+    "path": "public/js/screens/result.js",
+    "kind": "diverged",
+    "base": 13353,
+    "upstream": 13877,
+    "local": 15349
+  },
+  {
+    "path": "public/js/screens/room.js",
+    "kind": "diverged",
+    "base": 26377,
+    "upstream": 57750,
+    "local": 34189
+  },
+  {
+    "path": "public/js/screens/settle.js",
+    "kind": "diverged",
+    "base": 38744,
+    "upstream": 40518,
+    "local": 40169
+  },
+  {
+    "path": "public/js/screens/stats.js",
+    "kind": "diverged",
+    "base": 36387,
+    "upstream": 51310,
+    "local": 37443
+  },
+  {
+    "path": "public/js/screens/sweep.js",
+    "kind": "diverged",
+    "base": 28033,
+    "upstream": 28997,
+    "local": 36903
+  },
+  {
+    "path": "public/js/screens/title.js",
+    "kind": "diverged",
+    "base": 15062,
+    "upstream": 15069,
+    "local": 14410
+  },
+  {
+    "path": "public/js/store.js",
+    "kind": "diverged",
+    "base": 9084,
+    "upstream": 10155,
+    "local": 9139
+  },
+  {
+    "path": "public/js/ui/aiTakeover.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 2828,
+    "local": 0
+  },
+  {
+    "path": "public/js/ui/allyArt.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 4720,
+    "local": 0
+  },
+  {
+    "path": "public/js/ui/assetDownload.js",
+    "kind": "unchanged-local",
+    "base": 4102,
+    "upstream": 4193,
+    "local": 4102
+  },
+  {
+    "path": "public/js/ui/assetUrls.js",
+    "kind": "diverged",
+    "base": 8866,
+    "upstream": 9868,
+    "local": 8772
+  },
+  {
+    "path": "public/js/ui/bondStrip.js",
+    "kind": "diverged",
+    "base": 16230,
+    "upstream": 18358,
+    "local": 16178
+  },
+  {
+    "path": "public/js/ui/bondTimers.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 1458,
+    "local": 0
+  },
+  {
+    "path": "public/js/ui/combatMetrics.js",
+    "kind": "diverged",
+    "base": 6677,
+    "upstream": 6915,
+    "local": 10567
+  },
+  {
+    "path": "public/js/ui/components.js",
+    "kind": "diverged",
+    "base": 48838,
+    "upstream": 57190,
+    "local": 48378
+  },
+  {
+    "path": "public/js/ui/detailPanel.js",
+    "kind": "diverged",
+    "base": 68314,
+    "upstream": 68991,
+    "local": 54965
+  },
+  {
+    "path": "public/js/ui/device.js",
+    "kind": "diverged",
+    "base": 15422,
+    "upstream": 18889,
+    "local": 15522
+  },
+  {
+    "path": "public/js/ui/diyModel.js",
+    "kind": "unchanged-local",
+    "base": 10884,
+    "upstream": 11773,
+    "local": 10884
+  },
+  {
+    "path": "public/js/ui/enemyDrawer.js",
+    "kind": "diverged",
+    "base": 7974,
+    "upstream": 7990,
+    "local": 8689
+  },
+  {
+    "path": "public/js/ui/fallbackField.js",
+    "kind": "diverged",
+    "base": 31600,
+    "upstream": 32291,
+    "local": 32951
+  },
+  {
+    "path": "public/js/ui/fieldHost.js",
+    "kind": "diverged",
+    "base": 18704,
+    "upstream": 20179,
+    "local": 18960
+  },
+  {
+    "path": "public/js/ui/gameComponents.js",
+    "kind": "diverged",
+    "base": 14834,
+    "upstream": 16851,
+    "local": 14743
+  },
+  {
+    "path": "public/js/ui/gameLogic.js",
+    "kind": "diverged",
+    "base": 5543,
+    "upstream": 5557,
+    "local": 112444
+  },
+  {
+    "path": "public/js/ui/gameLogic/bonds.js",
+    "kind": "unchanged-local",
+    "base": 20774,
+    "upstream": 21949,
+    "local": 20774
+  },
+  {
+    "path": "public/js/ui/gameLogic/draft.js",
+    "kind": "diverged",
+    "base": 4467,
+    "upstream": 5311,
+    "local": 4467
+  },
+  {
+    "path": "public/js/ui/gameLogic/result.js",
+    "kind": "unchanged-local",
+    "base": 3202,
+    "upstream": 3340,
+    "local": 3202
+  },
+  {
+    "path": "public/js/ui/gameLogic/settings.js",
+    "kind": "diverged",
+    "base": 6386,
+    "upstream": 6871,
+    "local": 271
+  },
+  {
+    "path": "public/js/ui/guide.js",
+    "kind": "diverged",
+    "base": 11196,
+    "upstream": 11847,
+    "local": 11012
+  },
+  {
+    "path": "public/js/ui/hubScene.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 7725,
+    "local": 0
+  },
+  {
+    "path": "public/js/ui/hud.js",
+    "kind": "diverged",
+    "base": 36282,
+    "upstream": 38955,
+    "local": 36454
+  },
+  {
+    "path": "public/js/ui/loadoutModel.js",
+    "kind": "diverged",
+    "base": 27512,
+    "upstream": 33447,
+    "local": 31327
+  },
+  {
+    "path": "public/js/ui/loadoutSync.js",
+    "kind": "diverged",
+    "base": 23588,
+    "upstream": 44047,
+    "local": 24116
+  },
+  {
+    "path": "public/js/ui/lobbyMedia.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 28506,
+    "local": 0
+  },
+  {
+    "path": "public/js/ui/matchChrome.js",
+    "kind": "diverged",
+    "base": 7784,
+    "upstream": 8459,
+    "local": 7624
+  },
+  {
+    "path": "public/js/ui/matchEnemies.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 6794,
+    "local": 0
+  },
+  {
+    "path": "public/js/ui/matchInfo.js",
+    "kind": "diverged",
+    "base": 10580,
+    "upstream": 10855,
+    "local": 10524
+  },
+  {
+    "path": "public/js/ui/ownershipModel.js",
+    "kind": "unchanged-local",
+    "base": 8186,
+    "upstream": 11009,
+    "local": 8186
+  },
+  {
+    "path": "public/js/ui/pluginPanel.js",
+    "kind": "unchanged-local",
+    "base": 20186,
+    "upstream": 20896,
+    "local": 20186
+  },
+  {
+    "path": "public/js/ui/pluginTag.js",
+    "kind": "unchanged-local",
+    "base": 6129,
+    "upstream": 7375,
+    "local": 6129
+  },
+  {
+    "path": "public/js/ui/protocolBoot.js",
+    "kind": "unchanged-local",
+    "base": 6789,
+    "upstream": 7784,
+    "local": 6789
+  },
+  {
+    "path": "public/js/ui/protocolScene.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 8947,
+    "local": 0
+  },
+  {
+    "path": "public/js/ui/screenFit.js",
+    "kind": "unchanged-local",
+    "base": 5021,
+    "upstream": 10961,
+    "local": 5021
+  },
+  {
+    "path": "public/js/ui/seatArt.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 6652,
+    "local": 0
+  },
+  {
+    "path": "public/js/ui/settings.js",
+    "kind": "diverged",
+    "base": 39683,
+    "upstream": 40753,
+    "local": 31476
+  },
+  {
+    "path": "public/js/ui/settingsStore.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 638,
+    "local": 0
+  },
+  {
+    "path": "public/js/ui/setupReroll.js",
+    "kind": "diverged",
+    "base": 3081,
+    "upstream": 3141,
+    "local": 3261
+  },
+  {
+    "path": "public/js/ui/shopBar.js",
+    "kind": "diverged",
+    "base": 29019,
+    "upstream": 29691,
+    "local": 27542
+  },
+  {
+    "path": "public/js/ui/skinPicker.js",
+    "kind": "unchanged-local",
+    "base": 9093,
+    "upstream": 9167,
+    "local": 9093
+  },
+  {
+    "path": "public/js/ui/skins.js",
+    "kind": "unchanged-local",
+    "base": 13445,
+    "upstream": 14559,
+    "local": 13445
+  },
+  {
+    "path": "public/js/ui/stats.js",
+    "kind": "diverged",
+    "base": 43488,
+    "upstream": 48038,
+    "local": 45346
+  },
+  {
+    "path": "public/js/ui/testConsole.js",
+    "kind": "unchanged-local",
+    "base": 17142,
+    "upstream": 17400,
+    "local": 17142
+  },
+  {
+    "path": "public/js/ui/testDock.js",
+    "kind": "unchanged-local",
+    "base": 7797,
+    "upstream": 8215,
+    "local": 7797
+  },
+  {
+    "path": "public/js/ui/toasts.js",
+    "kind": "diverged",
+    "base": 6112,
+    "upstream": 6424,
+    "local": 5967
+  },
+  {
+    "path": "public/js/ui/transitions.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 1468,
+    "local": 0
+  },
+  {
+    "path": "public/js/ui/turnBanner.js",
+    "kind": "unchanged-local",
+    "base": 3217,
+    "upstream": 4110,
+    "local": 3217
+  },
+  {
+    "path": "public/js/ui/turnPopup.js",
+    "kind": "unchanged-local",
+    "base": 3328,
+    "upstream": 4793,
+    "local": 3328
+  },
+  {
+    "path": "public/js/ui/versionPicker.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 7455,
+    "local": 0
+  },
+  {
+    "path": "public/js/ui/versionVote.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 9774,
+    "local": 0
+  },
+  {
+    "path": "public/js/versions.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 11697,
+    "local": 0
+  },
+  {
+    "path": "server/ai/community-candidates.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 6542,
+    "local": 0
+  },
+  {
+    "path": "server/ai/cycle-candidates.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 9102,
+    "local": 0
+  },
+  {
+    "path": "server/ai/cycles.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 9101,
+    "local": 0
+  },
+  {
+    "path": "server/ai/knowledge.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 12973,
+    "local": 0
+  },
+  {
+    "path": "server/ai/playbook.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 18585,
+    "local": 0
+  },
+  {
+    "path": "server/ai/strategy-community.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 16128,
+    "local": 0
+  },
+  {
+    "path": "server/ai/strategy.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 15699,
+    "local": 0
+  },
+  {
+    "path": "server/ai/transport.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 5480,
+    "local": 0
+  },
+  {
+    "path": "server/aiTakeover.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 6566,
+    "local": 0
+  },
+  {
+    "path": "server/data.js",
+    "kind": "diverged",
+    "base": 9292,
+    "upstream": 11563,
+    "local": 9580
+  },
+  {
+    "path": "server/health/eventLoop.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 6252,
+    "local": 0
+  },
+  {
+    "path": "server/http/boot.js",
+    "kind": "unchanged-local",
+    "base": 5525,
+    "upstream": 7450,
+    "local": 5525
+  },
+  {
+    "path": "server/http/buildTag.js",
+    "kind": "diverged",
+    "base": 3890,
+    "upstream": 5126,
+    "local": 3906
+  },
+  {
+    "path": "server/http/config.js",
+    "kind": "diverged",
+    "base": 6539,
+    "upstream": 14212,
+    "local": 6567
+  },
+  {
+    "path": "server/http/csp.js",
+    "kind": "diverged",
+    "base": 1562,
+    "upstream": 1775,
+    "local": 1840
+  },
+  {
+    "path": "server/http/routes.js",
+    "kind": "diverged",
+    "base": 7285,
+    "upstream": 8061,
+    "local": 7557
+  },
+  {
+    "path": "server/http/static.js",
+    "kind": "diverged",
+    "base": 25058,
+    "upstream": 27416,
+    "local": 25536
+  },
+  {
+    "path": "server/http/websocket.js",
+    "kind": "diverged",
+    "base": 6458,
+    "upstream": 9200,
+    "local": 4569
+  },
+  {
+    "path": "server/index.js",
+    "kind": "diverged",
+    "base": 15141,
+    "upstream": 21347,
+    "local": 16137
+  },
+  {
+    "path": "server/lobby.js",
+    "kind": "diverged",
+    "base": 105102,
+    "upstream": 148270,
+    "local": 122719
+  },
+  {
+    "path": "server/match/Match.js",
+    "kind": "diverged",
+    "base": 39054,
+    "upstream": 41482,
+    "local": 210510
+  },
+  {
+    "path": "server/match/aiDigest.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 9456,
+    "local": 0
+  },
+  {
+    "path": "server/match/aiEconomy.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 4180,
+    "local": 0
+  },
+  {
+    "path": "server/match/aiPlan.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 4977,
+    "local": 0
+  },
+  {
+    "path": "server/match/bot.js",
+    "kind": "diverged",
+    "base": 107808,
+    "upstream": 144436,
+    "local": 104591
+  },
+  {
+    "path": "server/match/botAdaptive.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 1025,
+    "local": 0
+  },
+  {
+    "path": "server/match/botFormationCandidates.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 4580,
+    "local": 0
+  },
+  {
+    "path": "server/match/botIoleta.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 1710,
+    "local": 0
+  },
+  {
+    "path": "server/match/botIoletaPolicy.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 13143,
+    "local": 0
+  },
+  {
+    "path": "server/match/botPrep.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 2909,
+    "local": 0
+  },
+  {
+    "path": "server/match/botStrategies.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 1660,
+    "local": 0
+  },
+  {
+    "path": "server/match/botStrategyContract.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 3083,
+    "local": 0
+  },
+  {
+    "path": "server/match/builtinMeta.js",
+    "kind": "diverged",
+    "base": 20187,
+    "upstream": 21653,
+    "local": 19672
+  },
+  {
+    "path": "server/match/effectsMeta.js",
+    "kind": "diverged",
+    "base": 42414,
+    "upstream": 43013,
+    "local": 43443
+  },
+  {
+    "path": "server/match/externalAI.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 14758,
+    "local": 0
+  },
+  {
+    "path": "server/match/externalConfig.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 3359,
+    "local": 0
+  },
+  {
+    "path": "server/match/finalAssault.js",
+    "kind": "diverged",
+    "base": 9682,
+    "upstream": 10058,
+    "local": 9776
+  },
+  {
+    "path": "server/match/host/entry.js",
+    "kind": "unchanged-local",
+    "base": 15936,
+    "upstream": 16804,
+    "local": 15936
+  },
+  {
+    "path": "server/match/host/index.js",
+    "kind": "unchanged-local",
+    "base": 14549,
+    "upstream": 15912,
+    "local": 14549
+  },
+  {
+    "path": "server/match/host/proxy.js",
+    "kind": "diverged",
+    "base": 11410,
+    "upstream": 12061,
+    "local": 11461
+  },
+  {
+    "path": "server/match/llmGate.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 3498,
+    "local": 0
+  },
+  {
+    "path": "server/match/llmRelease.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 2975,
+    "local": 0
+  },
+  {
+    "path": "server/match/match/bossRounds.js",
+    "kind": "unchanged-local",
+    "base": 29520,
+    "upstream": 29898,
+    "local": 29520
+  },
+  {
+    "path": "server/match/match/clientCombat.js",
+    "kind": "diverged",
+    "base": 13335,
+    "upstream": 13375,
+    "local": 13560
+  },
+  {
+    "path": "server/match/match/combat.js",
+    "kind": "unchanged-local",
+    "base": 8657,
+    "upstream": 8940,
+    "local": 8657
+  },
+  {
+    "path": "server/match/match/infra.js",
+    "kind": "diverged",
+    "base": 7399,
+    "upstream": 7698,
+    "local": 7487
+  },
+  {
+    "path": "server/match/match/offers.js",
+    "kind": "unchanged-local",
+    "base": 8424,
+    "upstream": 8825,
+    "local": 8424
+  },
+  {
+    "path": "server/match/match/phases.js",
+    "kind": "diverged",
+    "base": 15911,
+    "upstream": 17095,
+    "local": 15945
+  },
+  {
+    "path": "server/match/match/platform.js",
+    "kind": "unchanged-local",
+    "base": 12870,
+    "upstream": 13438,
+    "local": 12870
+  },
+  {
+    "path": "server/match/match/prep.js",
+    "kind": "unchanged-local",
+    "base": 9116,
+    "upstream": 9543,
+    "local": 9116
+  },
+  {
+    "path": "server/match/match/rehearsal.js",
+    "kind": "unchanged-local",
+    "base": 9994,
+    "upstream": 15237,
+    "local": 9994
+  },
+  {
+    "path": "server/match/match/settle.js",
+    "kind": "diverged",
+    "base": 9425,
+    "upstream": 9455,
+    "local": 9493
+  },
+  {
+    "path": "server/match/match/setupVote.js",
+    "kind": "diverged",
+    "base": 4965,
+    "upstream": 6169,
+    "local": 5281
+  },
+  {
+    "path": "server/match/match/spDraft.js",
+    "kind": "diverged",
+    "base": 14394,
+    "upstream": 14687,
+    "local": 14526
+  },
+  {
+    "path": "server/match/match/views.js",
+    "kind": "diverged",
+    "base": 26642,
+    "upstream": 27087,
+    "local": 26708
+  },
+  {
+    "path": "server/match/player/items.js",
+    "kind": "unchanged-local",
+    "base": 11234,
+    "upstream": 11349,
+    "local": 11234
+  },
+  {
+    "path": "server/match/player/placement.js",
+    "kind": "unchanged-local",
+    "base": 17934,
+    "upstream": 18006,
+    "local": 17934
+  },
+  {
+    "path": "server/match/player/prep.js",
+    "kind": "unchanged-local",
+    "base": 5242,
+    "upstream": 5314,
+    "local": 5242
+  },
+  {
+    "path": "server/match/player/views.js",
+    "kind": "unchanged-local",
+    "base": 7719,
+    "upstream": 7900,
+    "local": 7719
+  },
+  {
+    "path": "server/match/preview.js",
+    "kind": "unchanged-local",
+    "base": 3289,
+    "upstream": 3302,
+    "local": 3289
+  },
+  {
+    "path": "server/match/results.js",
+    "kind": "diverged",
+    "base": 8155,
+    "upstream": 8773,
+    "local": 7880
+  },
+  {
+    "path": "server/match/testReplay.js",
+    "kind": "unchanged-local",
+    "base": 3127,
+    "upstream": 4191,
+    "local": 3127
+  },
+  {
+    "path": "server/match/testTrace.js",
+    "kind": "unchanged-local",
+    "base": 6173,
+    "upstream": 6316,
+    "local": 6173
+  },
+  {
+    "path": "server/net.js",
+    "kind": "diverged",
+    "base": 36452,
+    "upstream": 42159,
+    "local": 36913
+  },
+  {
+    "path": "server/plugins/identity.js",
+    "kind": "unchanged-local",
+    "base": 7978,
+    "upstream": 10421,
+    "local": 7978
+  },
+  {
+    "path": "server/plugins/officialUnitBuilder.js",
+    "kind": "unchanged-local",
+    "base": 48081,
+    "upstream": 48879,
+    "local": 48081
+  },
+  {
+    "path": "server/plugins/operatorTraits.js",
+    "kind": "unchanged-local",
+    "base": 13083,
+    "upstream": 13107,
+    "local": 13083
+  },
+  {
+    "path": "server/plugins/roomSets.js",
+    "kind": "unchanged-local",
+    "base": 9697,
+    "upstream": 10350,
+    "local": 9697
+  },
+  {
+    "path": "server/plugins/scriptPreflight.js",
+    "kind": "unchanged-local",
+    "base": 3641,
+    "upstream": 3693,
+    "local": 3641
+  },
+  {
+    "path": "server/sim/AGENTS.md",
+    "kind": "new",
+    "base": 0,
+    "upstream": 976,
+    "local": 0
+  },
+  {
+    "path": "server/sim/Battle.js",
+    "kind": "diverged",
+    "base": 14210,
+    "upstream": 14214,
+    "local": 165220
+  },
+  {
+    "path": "server/sim/ai.js",
+    "kind": "diverged",
+    "base": 62833,
+    "upstream": 63537,
+    "local": 66010
+  },
+  {
+    "path": "server/sim/attack.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 4835,
+    "local": 0
+  },
+  {
+    "path": "server/sim/attack/calculation.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 3966,
+    "local": 0
+  },
+  {
+    "path": "server/sim/attack/effects.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 6448,
+    "local": 0
+  },
+  {
+    "path": "server/sim/attack/element.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 16308,
+    "local": 0
+  },
+  {
+    "path": "server/sim/attack/heal.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 3857,
+    "local": 0
+  },
+  {
+    "path": "server/sim/attack/health.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 6873,
+    "local": 0
+  },
+  {
+    "path": "server/sim/attack/helpers.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 6972,
+    "local": 0
+  },
+  {
+    "path": "server/sim/attack/hit.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 6709,
+    "local": 0
+  },
+  {
+    "path": "server/sim/attack/legacy.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 1775,
+    "local": 0
+  },
+  {
+    "path": "server/sim/attack/transfer.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 1212,
+    "local": 0
+  },
+  {
+    "path": "server/sim/battle/blocking.js",
+    "kind": "unchanged-local",
+    "base": 8464,
+    "upstream": 8552,
+    "local": 8464
+  },
+  {
+    "path": "server/sim/battle/combat.js",
+    "kind": "diverged",
+    "base": 3691,
+    "upstream": 4583,
+    "local": 3672
+  },
+  {
+    "path": "server/sim/battle/deploy.js",
+    "kind": "diverged",
+    "base": 15118,
+    "upstream": 15149,
+    "local": 15137
+  },
+  {
+    "path": "server/sim/battle/displacement.js",
+    "kind": "diverged",
+    "base": 14743,
+    "upstream": 14292,
+    "local": 14738
+  },
+  {
+    "path": "server/sim/battle/events.js",
+    "kind": "unchanged-local",
+    "base": 7131,
+    "upstream": 9583,
+    "local": 7131
+  },
+  {
+    "path": "server/sim/battle/hooks.js",
+    "kind": "unchanged-local",
+    "base": 8172,
+    "upstream": 9623,
+    "local": 8172
+  },
+  {
+    "path": "server/sim/battle/lifecycle.js",
+    "kind": "unchanged-local",
+    "base": 15179,
+    "upstream": 16023,
+    "local": 15179
+  },
+  {
+    "path": "server/sim/battle/queries.js",
+    "kind": "unchanged-local",
+    "base": 19463,
+    "upstream": 19468,
+    "local": 19463
+  },
+  {
+    "path": "server/sim/battle/status.js",
+    "kind": "unchanged-local",
+    "base": 20027,
+    "upstream": 21105,
+    "local": 20027
+  },
+  {
+    "path": "server/sim/buffs.js",
+    "kind": "diverged",
+    "base": 14402,
+    "upstream": 15045,
+    "local": 14380
+  },
+  {
+    "path": "server/sim/constants.js",
+    "kind": "unchanged-local",
+    "base": 19520,
+    "upstream": 19655,
+    "local": 19520
+  },
+  {
+    "path": "server/sim/content/bands/battle.js",
+    "kind": "diverged",
+    "base": 14939,
+    "upstream": 15925,
+    "local": 14658
+  },
+  {
+    "path": "server/sim/content/bands/meta.js",
+    "kind": "diverged",
+    "base": 26579,
+    "upstream": 32118,
+    "local": 26858
+  },
+  {
+    "path": "server/sim/content/bonds/addon/battle.js",
+    "kind": "diverged",
+    "base": 41797,
+    "upstream": 41851,
+    "local": 41881
+  },
+  {
+    "path": "server/sim/content/bonds/addon/meta.js",
+    "kind": "diverged",
+    "base": 7272,
+    "upstream": 8160,
+    "local": 7152
+  },
+  {
+    "path": "server/sim/content/bonds/core.js",
+    "kind": "diverged",
+    "base": 42713,
+    "upstream": 44643,
+    "local": 36778
+  },
+  {
+    "path": "server/sim/content/bonds/timers.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 1507,
+    "local": 0
+  },
+  {
+    "path": "server/sim/content/bosses.js",
+    "kind": "diverged",
+    "base": 75106,
+    "upstream": 83622,
+    "local": 78916
+  },
+  {
+    "path": "server/sim/content/choices.js",
+    "kind": "unchanged-local",
+    "base": 27432,
+    "upstream": 27432,
+    "local": 27432
+  },
+  {
+    "path": "server/sim/content/devices.js",
+    "kind": "diverged",
+    "base": 30538,
+    "upstream": 31068,
+    "local": 31071
+  },
+  {
+    "path": "server/sim/content/enemies.js",
+    "kind": "diverged",
+    "base": 23069,
+    "upstream": 28743,
+    "local": 25151
+  },
+  {
+    "path": "server/sim/content/enemies/archetypes.js",
+    "kind": "diverged",
+    "base": 40758,
+    "upstream": 40832,
+    "local": 40698
+  },
+  {
+    "path": "server/sim/content/enemies/element.js",
+    "kind": "diverged",
+    "base": 12494,
+    "upstream": 13221,
+    "local": 12462
+  },
+  {
+    "path": "server/sim/content/enemies/fly.js",
+    "kind": "diverged",
+    "base": 19805,
+    "upstream": 19922,
+    "local": 19984
+  },
+  {
+    "path": "server/sim/content/enemies/helpers.js",
+    "kind": "diverged",
+    "base": 22299,
+    "upstream": 24740,
+    "local": 23106
+  },
+  {
+    "path": "server/sim/content/enemies/invisible.js",
+    "kind": "unchanged-local",
+    "base": 11646,
+    "upstream": 11938,
+    "local": 11646
+  },
+  {
+    "path": "server/sim/content/enemies/leaders.js",
+    "kind": "diverged",
+    "base": 57975,
+    "upstream": 59134,
+    "local": 57404
+  },
+  {
+    "path": "server/sim/content/enemies/passengers.js",
+    "kind": "unchanged-local",
+    "base": 6388,
+    "upstream": 6399,
+    "local": 6388
+  },
+  {
+    "path": "server/sim/content/enemies/special.js",
+    "kind": "diverged",
+    "base": 33355,
+    "upstream": 34972,
+    "local": 34613
+  },
+  {
+    "path": "server/sim/content/enemies/times.js",
+    "kind": "diverged",
+    "base": 10456,
+    "upstream": 10419,
+    "local": 10314
+  },
+  {
+    "path": "server/sim/content/garrisons/battle.js",
+    "kind": "diverged",
+    "base": 24170,
+    "upstream": 26197,
+    "local": 24771
+  },
+  {
+    "path": "server/sim/content/garrisons/meta.js",
+    "kind": "diverged",
+    "base": 21132,
+    "upstream": 22403,
+    "local": 19982
+  },
+  {
+    "path": "server/sim/content/index.js",
+    "kind": "diverged",
+    "base": 19222,
+    "upstream": 23209,
+    "local": 18553
+  },
+  {
+    "path": "server/sim/content/items/battle.js",
+    "kind": "diverged",
+    "base": 51760,
+    "upstream": 56759,
+    "local": 51298
+  },
+  {
+    "path": "server/sim/content/items/meta.js",
+    "kind": "diverged",
+    "base": 12339,
+    "upstream": 15353,
+    "local": 12359
+  },
+  {
+    "path": "server/sim/content/kits/README.md",
+    "kind": "unchanged-local",
+    "base": 31298,
+    "upstream": 33913,
+    "local": 31298
+  },
+  {
+    "path": "server/sim/content/kits/index.js",
+    "kind": "diverged",
+    "base": 10859,
+    "upstream": 23645,
+    "local": 208
+  },
+  {
+    "path": "server/sim/content/kits/ops/chess_char_1_06-vendla.js",
+    "kind": "unchanged-local",
+    "base": 5249,
+    "upstream": 4716,
+    "local": 5249
+  },
+  {
+    "path": "server/sim/content/kits/ops/chess_char_1_15-pithst.js",
+    "kind": "unchanged-local",
+    "base": 3364,
+    "upstream": 3364,
+    "local": 3364
+  },
+  {
+    "path": "server/sim/content/kits/ops/chess_char_1_16-tinman.js",
+    "kind": "unchanged-local",
+    "base": 4333,
+    "upstream": 5824,
+    "local": 4333
+  },
+  {
+    "path": "server/sim/content/kits/ops/chess_char_1_19-wildmn.js",
+    "kind": "unchanged-local",
+    "base": 3913,
+    "upstream": 4279,
+    "local": 3913
+  },
+  {
+    "path": "server/sim/content/kits/ops/chess_char_1_20-liskam.js",
+    "kind": "diverged",
+    "base": 4689,
+    "upstream": 4526,
+    "local": 4684
+  },
+  {
+    "path": "server/sim/content/kits/ops/chess_char_2_08-bubble.js",
+    "kind": "unchanged-local",
+    "base": 2325,
+    "upstream": 2755,
+    "local": 2325
+  },
+  {
+    "path": "server/sim/content/kits/ops/chess_char_2_13-tippi.js",
+    "kind": "unchanged-local",
+    "base": 4851,
+    "upstream": 6163,
+    "local": 4851
+  },
+  {
+    "path": "server/sim/content/kits/ops/chess_char_2_16-whitew.js",
+    "kind": "unchanged-local",
+    "base": 2599,
+    "upstream": 1514,
+    "local": 2599
+  },
+  {
+    "path": "server/sim/content/kits/ops/chess_char_2_19-tinman.js",
+    "kind": "unchanged-local",
+    "base": 2912,
+    "upstream": 3022,
+    "local": 2912
+  },
+  {
+    "path": "server/sim/content/kits/ops/chess_char_3_02-ayer.js",
+    "kind": "diverged",
+    "base": 3217,
+    "upstream": 3438,
+    "local": 3214
+  },
+  {
+    "path": "server/sim/content/kits/ops/chess_char_3_05-skadi.js",
+    "kind": "unchanged-local",
+    "base": 3379,
+    "upstream": 3539,
+    "local": 3379
+  },
+  {
+    "path": "server/sim/content/kits/ops/chess_char_3_06-philae.js",
+    "kind": "unchanged-local",
+    "base": 6658,
+    "upstream": 7428,
+    "local": 6658
+  },
+  {
+    "path": "server/sim/content/kits/ops/chess_char_3_12-blemsh.js",
+    "kind": "diverged",
+    "base": 10440,
+    "upstream": 11030,
+    "local": 10435
+  },
+  {
+    "path": "server/sim/content/kits/ops/chess_char_4_01-rmixer.js",
+    "kind": "diverged",
+    "base": 10360,
+    "upstream": 9662,
+    "local": 10355
+  },
+  {
+    "path": "server/sim/content/kits/ops/chess_char_4_12-glady.js",
+    "kind": "diverged",
+    "base": 6476,
+    "upstream": 6532,
+    "local": 6471
+  },
+  {
+    "path": "server/sim/content/kits/ops/chess_char_4_15-reckpr.js",
+    "kind": "diverged",
+    "base": 2318,
+    "upstream": 2318,
+    "local": 2341
+  },
+  {
+    "path": "server/sim/content/kits/ops/chess_char_4_17-hsguma.js",
+    "kind": "unchanged-local",
+    "base": 3218,
+    "upstream": 2987,
+    "local": 3218
+  },
+  {
+    "path": "server/sim/content/kits/ops/chess_char_4_18-mudrok.js",
+    "kind": "diverged",
+    "base": 6252,
+    "upstream": 6458,
+    "local": 6247
+  },
+  {
+    "path": "server/sim/content/kits/ops/chess_char_4_19-flamtl.js",
+    "kind": "diverged",
+    "base": 7340,
+    "upstream": 6262,
+    "local": 7335
+  },
+  {
+    "path": "server/sim/content/kits/ops/chess_char_4_20-fartth.js",
+    "kind": "diverged",
+    "base": 6122,
+    "upstream": 6122,
+    "local": 6175
+  },
+  {
+    "path": "server/sim/content/kits/ops/chess_char_4_22-svrash.js",
+    "kind": "diverged",
+    "base": 3039,
+    "upstream": 3740,
+    "local": 3036
+  },
+  {
+    "path": "server/sim/content/kits/ops/chess_char_4_25-cetsyr.js",
+    "kind": "diverged",
+    "base": 9428,
+    "upstream": 9807,
+    "local": 9825
+  },
+  {
+    "path": "server/sim/content/kits/ops/chess_char_5_01-excu2.js",
+    "kind": "diverged",
+    "base": 7638,
+    "upstream": 7147,
+    "local": 7635
+  },
+  {
+    "path": "server/sim/content/kits/ops/chess_char_5_05-ulpia.js",
+    "kind": "diverged",
+    "base": 13179,
+    "upstream": 13179,
+    "local": 13197
+  },
+  {
+    "path": "server/sim/content/kits/ops/chess_char_5_06-etlchi.js",
+    "kind": "diverged",
+    "base": 11854,
+    "upstream": 11946,
+    "local": 11851
+  },
+  {
+    "path": "server/sim/content/kits/ops/chess_char_5_14-svash2.js",
+    "kind": "diverged",
+    "base": 11595,
+    "upstream": 13149,
+    "local": 11636
+  },
+  {
+    "path": "server/sim/content/kits/ops/chess_char_5_19-mlynar.js",
+    "kind": "diverged",
+    "base": 8804,
+    "upstream": 10052,
+    "local": 8799
+  },
+  {
+    "path": "server/sim/content/kits/ops/chess_char_5_22-nymph.js",
+    "kind": "diverged",
+    "base": 6278,
+    "upstream": 6278,
+    "local": 6273
+  },
+  {
+    "path": "server/sim/content/kits/ops/chess_char_5_23-reckpr.js",
+    "kind": "diverged",
+    "base": 2783,
+    "upstream": 2783,
+    "local": 2780
+  },
+  {
+    "path": "server/sim/content/kits/ops/chess_char_6_03-yu.js",
+    "kind": "diverged",
+    "base": 9972,
+    "upstream": 10650,
+    "local": 9967
+  },
+  {
+    "path": "server/sim/content/kits/ops/chess_char_6_04-skadi2.js",
+    "kind": "diverged",
+    "base": 12604,
+    "upstream": 12242,
+    "local": 12624
+  },
+  {
+    "path": "server/sim/content/kits/ops/chess_char_6_09-cello.js",
+    "kind": "diverged",
+    "base": 8585,
+    "upstream": 8585,
+    "local": 8582
+  },
+  {
+    "path": "server/sim/content/kits/ops/chess_char_6_11-mlyss.js",
+    "kind": "diverged",
+    "base": 19597,
+    "upstream": 20439,
+    "local": 19592
+  },
+  {
+    "path": "server/sim/content/kits/ops/chess_char_6_13-angel2.js",
+    "kind": "unchanged-local",
+    "base": 10509,
+    "upstream": 12786,
+    "local": 10509
+  },
+  {
+    "path": "server/sim/content/kits/ops/chess_char_6_15-qiubai.js",
+    "kind": "unchanged-local",
+    "base": 5737,
+    "upstream": 7012,
+    "local": 5737
+  },
+  {
+    "path": "server/sim/content/kits/ops/chess_char_6_20-agoat2.js",
+    "kind": "diverged",
+    "base": 8142,
+    "upstream": 8301,
+    "local": 8191
+  },
+  {
+    "path": "server/sim/content/kits/ops/op-aglna2.js",
+    "kind": "diverged",
+    "base": 24882,
+    "upstream": 24882,
+    "local": 25003
+  },
+  {
+    "path": "server/sim/content/kits/ops/op-amgoat.js",
+    "kind": "unchanged-local",
+    "base": 13624,
+    "upstream": 13624,
+    "local": 13624
+  },
+  {
+    "path": "server/sim/content/kits/ops/op-ascln.js",
+    "kind": "diverged",
+    "base": 16184,
+    "upstream": 16323,
+    "local": 16574
+  },
+  {
+    "path": "server/sim/content/kits/ops/op-bgsnow.js",
+    "kind": "diverged",
+    "base": 14332,
+    "upstream": 14332,
+    "local": 14403
+  },
+  {
+    "path": "server/sim/content/kits/ops/op-cerber.js",
+    "kind": "unchanged-local",
+    "base": 12077,
+    "upstream": 12077,
+    "local": 12077
+  },
+  {
+    "path": "server/sim/content/kits/ops/op-cgbird.js",
+    "kind": "unchanged-local",
+    "base": 11138,
+    "upstream": 11146,
+    "local": 11138
+  },
+  {
+    "path": "server/sim/content/kits/ops/op-chen3.js",
+    "kind": "diverged",
+    "base": 22784,
+    "upstream": 22538,
+    "local": 23039
+  },
+  {
+    "path": "server/sim/content/kits/ops/op-chyue.js",
+    "kind": "diverged",
+    "base": 14384,
+    "upstream": 14384,
+    "local": 14428
+  },
+  {
+    "path": "server/sim/content/kits/ops/op-clemnt.js",
+    "kind": "diverged",
+    "base": 13713,
+    "upstream": 13713,
+    "local": 13816
+  },
+  {
+    "path": "server/sim/content/kits/ops/op-cqbw.js",
+    "kind": "diverged",
+    "base": 22097,
+    "upstream": 22097,
+    "local": 22189
+  },
+  {
+    "path": "server/sim/content/kits/ops/op-crosly.js",
+    "kind": "diverged",
+    "base": 16287,
+    "upstream": 16379,
+    "local": 16316
+  },
+  {
+    "path": "server/sim/content/kits/ops/op-ebnhlz.js",
+    "kind": "diverged",
+    "base": 21733,
+    "upstream": 21733,
+    "local": 22659
+  },
+  {
+    "path": "server/sim/content/kits/ops/op-hodrer.js",
+    "kind": "unchanged-local",
+    "base": 12842,
+    "upstream": 12842,
+    "local": 12842
+  },
+  {
+    "path": "server/sim/content/kits/ops/op-hsgma2.js",
+    "kind": "diverged",
+    "base": 21883,
+    "upstream": 22398,
+    "local": 22355
+  },
+  {
+    "path": "server/sim/content/kits/ops/op-ifrit.js",
+    "kind": "unchanged-local",
+    "base": 15399,
+    "upstream": 15399,
+    "local": 15399
+  },
+  {
+    "path": "server/sim/content/kits/ops/op-jesca2.js",
+    "kind": "diverged",
+    "base": 21197,
+    "upstream": 21197,
+    "local": 21328
+  },
+  {
+    "path": "server/sim/content/kits/ops/op-judge.js",
+    "kind": "unchanged-local",
+    "base": 13785,
+    "upstream": 13521,
+    "local": 13785
+  },
+  {
+    "path": "server/sim/content/kits/ops/op-kalts.js",
+    "kind": "diverged",
+    "base": 18400,
+    "upstream": 18279,
+    "local": 18436
+  },
+  {
+    "path": "server/sim/content/kits/ops/op-lin.js",
+    "kind": "diverged",
+    "base": 16100,
+    "upstream": 16100,
+    "local": 16136
+  },
+  {
+    "path": "server/sim/content/kits/ops/op-lmlee.js",
+    "kind": "diverged",
+    "base": 15548,
+    "upstream": 15071,
+    "local": 15561
+  },
+  {
+    "path": "server/sim/content/kits/ops/op-logos.js",
+    "kind": "diverged",
+    "base": 17790,
+    "upstream": 17895,
+    "local": 17892
+  },
+  {
+    "path": "server/sim/content/kits/ops/op-mantra.js",
+    "kind": "diverged",
+    "base": 19472,
+    "upstream": 19472,
+    "local": 19384
+  },
+  {
+    "path": "server/sim/content/kits/ops/op-mcnist.js",
+    "kind": "diverged",
+    "base": 25368,
+    "upstream": 25376,
+    "local": 25414
+  },
+  {
+    "path": "server/sim/content/kits/ops/op-narant.js",
+    "kind": "diverged",
+    "base": 17743,
+    "upstream": 17820,
+    "local": 17865
+  },
+  {
+    "path": "server/sim/content/kits/ops/op-nasti.js",
+    "kind": "diverged",
+    "base": 29022,
+    "upstream": 29027,
+    "local": 29064
+  },
+  {
+    "path": "server/sim/content/kits/ops/op-nian.js",
+    "kind": "diverged",
+    "base": 12204,
+    "upstream": 12093,
+    "local": 12240
+  },
+  {
+    "path": "server/sim/content/kits/ops/op-phatm2.js",
+    "kind": "diverged",
+    "base": 26347,
+    "upstream": 26355,
+    "local": 26363
+  },
+  {
+    "path": "server/sim/content/kits/ops/op-poca.js",
+    "kind": "unchanged-local",
+    "base": 11702,
+    "upstream": 11702,
+    "local": 11702
+  },
+  {
+    "path": "server/sim/content/kits/ops/op-saga.js",
+    "kind": "diverged",
+    "base": 16214,
+    "upstream": 16221,
+    "local": 16227
+  },
+  {
+    "path": "server/sim/content/kits/ops/op-shining.js",
+    "kind": "unchanged-local",
+    "base": 10102,
+    "upstream": 10110,
+    "local": 10102
+  },
+  {
+    "path": "server/sim/content/kits/ops/op-shwaz.js",
+    "kind": "diverged",
+    "base": 10495,
+    "upstream": 10495,
+    "local": 10553
+  },
+  {
+    "path": "server/sim/content/kits/ops/op-thorns.js",
+    "kind": "diverged",
+    "base": 16976,
+    "upstream": 16707,
+    "local": 16989
+  },
+  {
+    "path": "server/sim/content/kits/ops/op-thumpy.js",
+    "kind": "diverged",
+    "base": 21255,
+    "upstream": 21255,
+    "local": 21416
+  },
+  {
+    "path": "server/sim/content/kits/ops/op-vvana.js",
+    "kind": "unchanged-local",
+    "base": 20335,
+    "upstream": 20008,
+    "local": 20335
+  },
+  {
+    "path": "server/sim/content/kits/ops/op-wisdel.js",
+    "kind": "diverged",
+    "base": 20439,
+    "upstream": 20439,
+    "local": 20567
+  },
+  {
+    "path": "server/sim/content/kits/ops/op-zuole.js",
+    "kind": "diverged",
+    "base": 17013,
+    "upstream": 16281,
+    "local": 17026
+  },
+  {
+    "path": "server/sim/content/kits/ops/standin-acsupo.js",
+    "kind": "unchanged-local",
+    "base": 9868,
+    "upstream": 9960,
+    "local": 9868
+  },
+  {
+    "path": "server/sim/content/kits/ops/standin-sharp2.js",
+    "kind": "unchanged-local",
+    "base": 3806,
+    "upstream": 3806,
+    "local": 3806
+  },
+  {
+    "path": "server/sim/content/kits/ops/ver-aurora.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 3333,
+    "local": 0
+  },
+  {
+    "path": "server/sim/content/kits/ops/ver-blackd.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 1921,
+    "local": 0
+  },
+  {
+    "path": "server/sim/content/kits/ops/ver-ceylon.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 2424,
+    "local": 0
+  },
+  {
+    "path": "server/sim/content/kits/ops/ver-cuttle.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 2460,
+    "local": 0
+  },
+  {
+    "path": "server/sim/content/kits/ops/ver-diy.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 4627,
+    "local": 0
+  },
+  {
+    "path": "server/sim/content/kits/ops/ver-ethan.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 2278,
+    "local": 0
+  },
+  {
+    "path": "server/sim/content/kits/ops/ver-fmout.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 2073,
+    "local": 0
+  },
+  {
+    "path": "server/sim/content/kits/ops/ver-folnic.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 2775,
+    "local": 0
+  },
+  {
+    "path": "server/sim/content/kits/ops/ver-glider.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 3011,
+    "local": 0
+  },
+  {
+    "path": "server/sim/content/kits/ops/ver-halo.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 2180,
+    "local": 0
+  },
+  {
+    "path": "server/sim/content/kits/ops/ver-heidi.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 2976,
+    "local": 0
+  },
+  {
+    "path": "server/sim/content/kits/ops/ver-mantic.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 3115,
+    "local": 0
+  },
+  {
+    "path": "server/sim/content/kits/ops/ver-mberry.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 2851,
+    "local": 0
+  },
+  {
+    "path": "server/sim/content/kits/ops/ver-mm.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 1718,
+    "local": 0
+  },
+  {
+    "path": "server/sim/content/kits/ops/ver-pudd.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 1050,
+    "local": 0
+  },
+  {
+    "path": "server/sim/content/kits/ops/ver-savage.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 1712,
+    "local": 0
+  },
+  {
+    "path": "server/sim/content/kits/ops/ver-spikes.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 2161,
+    "local": 0
+  },
+  {
+    "path": "server/sim/content/kits/ops/ver-waaifu.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 2627,
+    "local": 0
+  },
+  {
+    "path": "server/sim/content/kits/ops/ver-wanqin.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 3790,
+    "local": 0
+  },
+  {
+    "path": "server/sim/content/kits/ops/ver-zebra.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 2463,
+    "local": 0
+  },
+  {
+    "path": "server/sim/content/kits/shared/borrow.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 4596,
+    "local": 0
+  },
+  {
+    "path": "server/sim/content/kits/shared/injury.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 908,
+    "local": 0
+  },
+  {
+    "path": "server/sim/content/kits/shared/lord.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 771,
+    "local": 0
+  },
+  {
+    "path": "server/sim/content/kits/shared/tier1.js",
+    "kind": "diverged",
+    "base": 17074,
+    "upstream": 16167,
+    "local": 17152
+  },
+  {
+    "path": "server/sim/content/kits/shared/tier5.js",
+    "kind": "diverged",
+    "base": 13924,
+    "upstream": 14656,
+    "local": 13937
+  },
+  {
+    "path": "server/sim/content/kits/shared/tier6.js",
+    "kind": "diverged",
+    "base": 20763,
+    "upstream": 20751,
+    "local": 20899
+  },
+  {
+    "path": "server/sim/content/kits/shared/version.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 6913,
+    "local": 0
+  },
+  {
+    "path": "server/sim/content/support/index.js",
+    "kind": "diverged",
+    "base": 18935,
+    "upstream": 23507,
+    "local": 19084
+  },
+  {
+    "path": "server/sim/content/tokens.js",
+    "kind": "diverged",
+    "base": 107748,
+    "upstream": 108620,
+    "local": 109152
+  },
+  {
+    "path": "server/sim/damage.js",
+    "kind": "deleted",
+    "base": 40814,
+    "upstream": 0,
+    "local": 41804
+  },
+  {
+    "path": "server/sim/professions.js",
+    "kind": "diverged",
+    "base": 46337,
+    "upstream": 45189,
+    "local": 46500
+  },
+  {
+    "path": "server/sim/projectiles.js",
+    "kind": "unchanged-local",
+    "base": 2824,
+    "upstream": 3501,
+    "local": 2824
+  },
+  {
+    "path": "server/sim/rehearsal.js",
+    "kind": "unchanged-local",
+    "base": 8076,
+    "upstream": 10270,
+    "local": 8076
+  },
+  {
+    "path": "server/sim/simdata.js",
+    "kind": "diverged",
+    "base": 46681,
+    "upstream": 46715,
+    "local": 47994
+  },
+  {
+    "path": "server/sim/skills.js",
+    "kind": "diverged",
+    "base": 40044,
+    "upstream": 40613,
+    "local": 44665
+  },
+  {
+    "path": "server/sim/snapshot.js",
+    "kind": "diverged",
+    "base": 13339,
+    "upstream": 14906,
+    "local": 16046
+  },
+  {
+    "path": "server/sim/spec.js",
+    "kind": "diverged",
+    "base": 27813,
+    "upstream": 28302,
+    "local": 29107
+  },
+  {
+    "path": "server/sim/targeting.js",
+    "kind": "diverged",
+    "base": 17911,
+    "upstream": 17933,
+    "local": 18497
+  },
+  {
+    "path": "server/sim/units.js",
+    "kind": "diverged",
+    "base": 14877,
+    "upstream": 16459,
+    "local": 15751
+  },
+  {
+    "path": "server/stateTransport.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 4627,
+    "local": 0
+  },
+  {
+    "path": "server/versions.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 14163,
+    "local": 0
+  },
+  {
+    "path": "server/workers/memory.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 300,
+    "local": 0
+  },
+  {
+    "path": "server/workers/pool.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 10298,
+    "local": 0
+  },
+  {
+    "path": "server/workers/roomPool.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 2993,
+    "local": 0
+  },
+  {
+    "path": "server/workers/simulation.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 2550,
+    "local": 0
+  },
+  {
+    "path": "shared/bondTimers.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 1030,
+    "local": 0
+  },
+  {
+    "path": "shared/constants.js",
+    "kind": "diverged",
+    "base": 20188,
+    "upstream": 21673,
+    "local": 19583
+  },
+  {
+    "path": "shared/plugins/officialBounds.js",
+    "kind": "unchanged-local",
+    "base": 15027,
+    "upstream": 15549,
+    "local": 15027
+  },
+  {
+    "path": "shared/plugins/skillSpec.js",
+    "kind": "unchanged-local",
+    "base": 5156,
+    "upstream": 5374,
+    "local": 5156
+  },
+  {
+    "path": "shared/plugins/textNumber.js",
+    "kind": "unchanged-local",
+    "base": 2298,
+    "upstream": 3152,
+    "local": 2298
+  },
+  {
+    "path": "shared/plugins/ui.js",
+    "kind": "unchanged-local",
+    "base": 32798,
+    "upstream": 32816,
+    "local": 32798
+  },
+  {
+    "path": "shared/protocol.js",
+    "kind": "diverged",
+    "base": 46922,
+    "upstream": 50824,
+    "local": 50007
+  },
+  {
+    "path": "shared/stateDelta.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 4958,
+    "local": 0
+  },
+  {
+    "path": "shared/versions.js",
+    "kind": "new",
+    "base": 0,
+    "upstream": 4132,
+    "local": 0
+  }
+]

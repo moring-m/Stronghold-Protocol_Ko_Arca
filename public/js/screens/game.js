@@ -1,3 +1,4 @@
+import {diyRecordFor} from '../ui/gameLogic/diy.js';
 import {uiCssZoom} from '../ui/mobileScale.js';
 import {deployZoomStep,deployZoomRemember,prepDeployCamera} from '../ui/gameLogic.js';
 import { ruleOption } from '../../../shared/plugins/rules.js';
@@ -148,7 +149,7 @@ import '../ui/pluginFrame.js';
 import { screenStrip, playerBonds, playerLayer, detailBondOwner, toggleBond, popupView } from '../ui/watchBonds.js';
 import { data, localAsset, getMode } from '../data.js';
 import { audio } from '../audio.js';
-import { useDocClass, FullscreenButton } from '../ui/device.js';
+import { useDocClass, FullscreenButton, useScreenWakeLock } from '../ui/device.js';
 
 const cx = (...p) => p.flat().filter(Boolean).join(' ');
 const HUD_HZ_MS = 200;
@@ -323,6 +324,7 @@ function MatchScreen() {
   const phase = pub?.phase;
   const mode = phaseMode(phase);
   const combat = isCombatPhase(phase);
+  useScreenWakeLock(combat);
   const endField = pub.fields?.find(f=>f.live && f.players?.includes(myId));
   const solo = roomSolo || String(pub?.modeId || '').includes('single');
   const players = sortedPlayers(pub);
@@ -645,6 +647,15 @@ function MatchScreen() {
     const bench = packet?.benches?.find(b => b.playerId === watchWho?.playerId) || packet?.benches?.[0];
     view.setObservedBench?.(bench || null, { boss: field?.kind === 'boss' || field?.kind === 'hidden', unite: field?.kind === 'unite', side: bench?.side || field?.sides?.[bench?.playerId] || 'L' });
   }, [view, combat, spectator, watchingOther, observedBenches, field, watchWho]);
+
+  // A finished field has a cosmetic tail; a paused/stalled field retains its combat pose.
+  useEffect(() => {
+    if (!view || showPrep || !field?.fieldId || field.prep) return;
+    const pf = pub?.fields?.find((f) => f.fieldId === field.fieldId);
+    const done = field.local ? battleState?.fieldId === field.fieldId && battleState.done : pf?.live === false;
+    if (done || field.live === false) view.finishBattle?.();
+  }, [view, showPrep, field, battleState?.fieldId, battleState?.done, pub?.fields]);
+
   // the round start (PR #416 by @Cromemadnd; the maintainer's confirmation from official play, 2026-10-13): the own board's
   // pieces replay their Start clip and landing sound one after another in deployment order — once per round, in 回合开始, on
   // the own board only (gameLogic roundStartReplay). After the wiring effect above, so the view already holds this state's
@@ -674,10 +685,9 @@ function MatchScreen() {
     const onSnap = (snap) => {
       const cur = shownId();
       if (!snap || typeof snap !== 'object') return;
-      if (!cur || (snap.fieldId && snap.fieldId !== cur)) {
-        if (typeof snap.fieldId === 'string') snapBufRef.current.set(snap.fieldId, snap);
-        return;
-      }
+      // Also retain the displayed field's current time for an exact surrender cutoff.
+      if (typeof snap.fieldId === 'string') snapBufRef.current.set(snap.fieldId, snap);
+      if (!cur || (snap.fieldId && snap.fieldId !== cur)) return;
       view?.pushSnapshot(snap);
       if (Array.isArray(snap.units)) {
         const mp = new Map();
@@ -1711,7 +1721,7 @@ function MatchScreen() {
         const f=pub.fields?.find(f=>f.live && f.players?.includes(myId)); if(!f)return;
         const shared=f.kind==='boss'||f.kind==='hidden'||f.players.length>1;
         if(await confirmDialog({title:'현재 전투 포기',text:shared?'모든 참가자가 포기를 요청하면 전투를 끝냅니다. 남은 적은 미처치로 정산되며, 보스전은 패배합니다.':'지금 전투를 끝내고 다음 단계로 넘어갑니다. 남은 적은 미처치로 정산됩니다.',okText:'전투 포기',danger:true})) {
-          try {await net.request('g.endBattle',{fieldId:f.fieldId}); if(shared)toast('전투 포기를 요청했습니다. 동료의 요청을 기다립니다.','info');}catch(e){toast(e.message,'error');}
+          try {await net.request('g.endBattle',{fieldId:f.fieldId,gt:snapBufRef.current.get(f.fieldId)?.t}); if(shared)toast('전투 포기를 요청했습니다. 동료의 요청을 기다립니다.','info');}catch(e){toast(e.message,'error');}
         }
       }}><span class="readybtn__box"><${Icon} name="close" /></span><span class="readybtn__label">${endField.endVotes?.includes(myId)?'포기 요청됨':'전투 포기'}</span></button>` : null} pub=${pub} priv=${priv} conn=${conn} hud=${hud} total=${total} drawer=${drawer}
         onExit=${() => setExitOpen(true)} onDrawer=${(t) => setDrawer((d) => (d ? null : t))} onReady=${toggleReady}
@@ -1790,7 +1800,7 @@ function MatchScreen() {
       ${bondPop ? html`<${BondPopup} bondId=${bondPop.bondId} entry=${bondPop.entry} priv=${bondPop.priv} banned=${pub?.bannedChess || []} owner=${bondPop.name}
         off=${offBonds.has(bondPop.bondId)} morphMode=${morphMode}
         place=${bpPlace} over=${!!resolved && bpPlace === dSide}
-        onClose=${() => setBondOpen(null)} onMember=${(id, items) => { setDetail({ kind: 'chess', id, owner: bondPop.ownerId, items: items || null }); }} />` : null}
+        onClose=${() => setBondOpen(null)} onMember=${(id,items,_standIn,pick)=>{const p=pick||(bondPop.priv||priv)?.diy?.[id];const rec=p?diyRecordFor(data.lookup('chess',id),p,{chess:data.get('chess'),backups:data.get('backups')}):null;setDetail({kind:'chess',id,owner:bondPop.ownerId,items:items||null,rec});}} />` : null}
 
       ${resolved ? html`<${DetailPanel} detail=${resolved} snapHp=${snapHp} onClose=${() => { setDetail(null); setSel(null); }}
         bonds=${detailBonds} offBonds=${offBonds} loadout=${detailLoadout} ops=${priv?.ops ?? null} side=${dSide} shopOpen=${shopOpen} live=${liveStats} voice=${true}

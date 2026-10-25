@@ -217,7 +217,7 @@ function onBeforeAttack(b, c) {
   if (a && a.side === 'enemy' && a.mem.ab) dispatch(b, a, 'before', c);
 }
 
-// Opt-in attack-turn scheduling, backported from upstream dev for Quintus only.
+// Attack-turn scheduling for explicitly classified skills; keep this fork's wind-up clock.
 export function attackTurnSkill(b, e, ownOnly = false) {
   const ab = e.mem.ab;
   if (!ab) return null;
@@ -243,8 +243,8 @@ function castNow(b, e, a) {
   a.casts = (a.casts ?? 0) + 1;
   e.skillAnimUntil = b.time + 0.5;
   // display only: the skill slot it uses (render/app.js 'cast'); an attack-class one with its clip (DESIGN §35.57)
-  if (a.sk) castSlot(b, e, a.sk, a.clip > 0 ? a.clip : null);
-  if(a.atk && a.clip>0){e.skillAnimUntil=b.time+a.clip;if(a.animation)b.fx('enemySkill',{id:e.id,x:e.x,y:e.y,clip:a.animation.clip,dur:a.clip});}
+  if (a.sk) castSlot(b, e, a.sk, a.atk ? a.clip || 0 : null);
+  if(a.atk && a.clip>0){e.mem.abilityAnimUntil=Math.max(e.mem.abilityAnimUntil||0,b.time+a.clip);e.skillAnimUntil=b.time+a.clip;if(a.animation)b.fx('enemySkill',{id:e.id,x:e.x,y:e.y,clip:a.animation.clip,dur:a.clip});}
   safe(b, e, () => a.fire(b, e, a));
 }
 
@@ -305,7 +305,7 @@ function onTick(b, dt) {
         }
       }
     }
-    if(e.profile?.attackTurnSkill && e.alive && !e.mem.attackWindup && !(e.atkCd>0)
+    if(e.profile?.attackTurnSkill && (!e.profile.attackTurnAtHit || b.time+1e-9 >= (e.lastAttackAt??-Infinity)+e.s.interval) && e.alive && !e.mem.attackWindup && !(e.atkCd>0)
       && !e.s.flags.fear && !e.s.flags.disarm && !(e.s.flags.tremble&&e.blockedBy)) {
       const a=attackTurnSkill(b,e,true);
       if(a)e.atkCd=Math.max(e.s.interval,a.clip||0);
@@ -338,7 +338,6 @@ export const STATS_ONLY = Object.freeze({
   enemy_1046_agent: 'plain', enemy_1071_dftman: 'plain', enemy_1092_mdgint: 'plain (bounty)',
   enemy_1251_lysyta: 'R-series armour interaction absent', enemy_1251_lysyta_2: 'same',
   enemy_1252_lysytb_2: 'same', enemy_1254_lypa_2: 'no listed ability', enemy_1325_cbgpro: 'plain', enemy_1325_cbgpro_2: 'plain',
-  enemy_1367_dseed: 'altar pulse absent (骸骨拷打者 leaves them inert, uncounted, in place)',
   enemy_1381_winman: 'plain', enemy_1381_winman_2: 'plain', enemy_1387_winshd: '封冻/供暖器 zones absent', enemy_1415_mmkabi_2: 'chains absent',
   enemy_1433_dsbasi: 'plain', enemy_1433_dsbasi_2: 'plain', enemy_1438_dspred: '赘生甲壳 absent',
   enemy_2002_bearmi: 'plain', enemy_2002_bearmi_2: 'plain',

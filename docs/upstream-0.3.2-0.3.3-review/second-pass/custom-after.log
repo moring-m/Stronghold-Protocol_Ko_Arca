@@ -1,0 +1,839 @@
+✔ ally/enemy stat augments apply immediately to the right camp, including spawned enemies (26.573693ms)
+✔ personal slow/weak effects never enter cooperative or boss battles and stack independently (4.261507ms)
+✔ enemy shields, silence immunity, regeneration and status extension work with their stated scopes (3.565914ms)
+✔ frequency enemies receive no regeneration (0.876516ms)
+✔ corrosion reaches exactly fifty stacks and persists in snapshots (3.393784ms)
+✔ weakness uses whichever mitigation yields more damage (1.035525ms)
+✔ archmage SP cost rounds up after the forty-percent reduction and remains stable (1.131148ms)
+✔ enemy elemental damage and elemental buildup scale once, not twice (0.969205ms)
+✔ 기습 I deployment attack speed lasts thirty seconds (7.220791ms)
+✔ 기습 II deployment attack speed lasts thirty seconds (4.221357ms)
+✔ extra attack launches at a 0.18-second interval and can recursively proc (3.047946ms)
+✔ skill SP recovery works while duration skills are active, and Sargon stacks expire individually (8.055223ms)
+✔ surrendered unspawned enemies retain ordinary leak HP for separate settlement (11.662408ms)
+✔ enemy elemental buildup uses the same once-only multiplier as elemental damage (0.862305ms)
+✔ all-enemy HP augments also increase frequency HP without granting regeneration (0.627061ms)
+✔ per-second recovery augments also recover attack and defensive SP types (2.890058ms)
+✔ swordmaster uses a thirty-five percent proc threshold (1.726892ms)
+✔ extra attacks preserve the remaining normal-attack cooldown (6.924055ms)
+✔ runtime enemies never advance the stage enemy counter but leaks retain HP loss (23.456264ms)
+✔ swordmaster waits for the full current recovery and serializes each bonus animation (1.642255ms)
+✔ regeneration augments stop when an enemy becomes hit-count after deployment (1.89201ms)
+✔ 회피 I grants the stated physical and magical dodge (0.810907ms)
+✔ 회피 II grants the stated physical and magical dodge (0.541883ms)
+✔ 회피 III grants the stated physical and magical dodge (0.558067ms)
+✔ 무사 I heals the operator once per attack (0.697527ms)
+✔ 무사 II heals the operator once per attack (0.500231ms)
+✔ 무사 III heals the operator once per attack (0.554692ms)
+✔ Siracusa augment grants stealth to operators and Karlans eye reveals only the personal field (3.6637ms)
+✔ enemy allied reductions I apply to allies rather than enemies (0.956957ms)
+✔ enemy allied reductions II apply to allies rather than enemies (0.613021ms)
+✔ enemy allied reductions III apply to allies rather than enemies (0.561784ms)
+✔ enemy allied drain I removes HP per second irrespective of defenses (1.336025ms)
+✔ enemy allied drain II removes HP per second irrespective of defenses (0.944147ms)
+✔ enemy allied drain III removes HP per second irrespective of defenses (0.905179ms)
+✔ structural devices ignore enemy max HP reduction and continuous HP drain while operators retain them (1.57237ms)
+✔ Swordmaster I uses the requested probability (0.084366ms)
+✔ Swordmaster II uses the requested probability (0.039849ms)
+✔ Swordmaster III uses the requested probability (0.029835ms)
+✔ Arts master I reduces maximum SP with upward rounding (0.689896ms)
+✔ Arts master II reduces maximum SP with upward rounding (0.535704ms)
+✔ Arts master III reduces maximum SP with upward rounding (0.554813ms)
+✔ damage increase I multiplies physical, magical and true damage (0.823115ms)
+✔ damage increase II multiplies physical, magical and true damage (0.516085ms)
+✔ damage increase III multiplies physical, magical and true damage (0.578719ms)
+✔ Victoria grants thirty-five percent attack per equipped item (0.546851ms)
+✔ updated augment probabilities, equipment bonus and grade labels match the requested values (11.812914ms)
+✔ Strong Strike buffs the triggering immediate skill, expires at 5s, and combines distinct grades (14.150383ms)
+✔ Kjerag augment adds 80 percentage points to native cold-target damage instead of multiplying it (7.82726ms)
+✔ Leithanien augment gives any operator ten independent ticks unaffected by native bond layers (43.235496ms)
+✔ civilization I: only allied true damage is increased (0.751177ms)
+✔ civilization II: only allied true damage is increased (0.526601ms)
+✔ civilization III: only allied true damage is increased (0.49967ms)
+✔ enemy arts damage I replaces RES reduction and scales arts damage only (0.547853ms)
+✔ enemy arts damage II replaces RES reduction and scales arts damage only (0.417307ms)
+✔ enemy arts damage III replaces RES reduction and scales arts damage only (0.45245ms)
+✔ enemy balance descriptions and executable effects use the requested grade values (0.325779ms)
+✔ grade HP multiplies non-boss enemy health once, including new summons and unite entries (0.970387ms)
+✔ augment defense starts at original DEF and original RES, then adds eight percent ATK/DEF and four RES per selection (0.829586ms)
+✔ Karlans eye reveals enemies only while inside its owners unite board, irrespective of source owner (0.916126ms)
+✔ enemy prism stealth affects all normal and cooperative fields but excludes boss battles (27.744911ms)
+✔ 어스스피릿: official attack and skill sound files are indexed (2.148966ms)
+✔ 비비아나: official attack and skill sound files are indexed (6.769503ms)
+✔ 레싱: official attack and skill sound files are indexed (0.39305ms)
+✖ 체르니: official attack and skill sound files are indexed (1.377208ms)
+✖ 디아만테: official attack and skill sound files are indexed (0.502865ms)
+✖ 베이스라인: official attack and skill sound files are indexed (0.379119ms)
+✔ 에벤홀츠: official attack and skill sound files are indexed (0.195023ms)
+✔ 에이야퍄들라: official attack and skill sound files are indexed (0.437617ms)
+✔ independent notes last five seconds, merge equal-frame stacks, do not recursively apply (69.958924ms)
+✔ six synergy extends each duration by ten seconds + one per twenty-five layers and weakens enemy damage (10.641626ms)
+✔ faction content is opt-in and each custom core adds exactly one ban (109.078202ms)
+✔ all eight new normal/elite operators enter actual combat without content errors (152.799478ms)
+✔ Viviana damage gains and other battle traits respect their limits; equipment sharing applies once per caster (6.215822ms)
+✔ three thousand simultaneous hits are throttled to one note and five damage batches (32.317246ms)
+✔ newly supported operators also cast their alternative skills without content errors (31.747249ms)
+✔ battle entry preserves enabled Leithanien operators through DataSource and Spec filtering (29.610243ms)
+✔ notes from multiple casters are recorded separately for each caster (2.104649ms)
+✔ Leithanien description displays the current attack coefficient scaling (1.738169ms)
+✔ notes suppress floating damage numbers while retaining caster statistics (1.376496ms)
+✔ Ebenholz uses one/two percent attack per three Leithanien layers (1.124939ms)
+✔ final operator tiers and Diamante affiliations match the selected changes (0.134712ms)
+✖ current Leithanien effect shows floored duration bonuses without per-layer formulas (4.150161ms)
+✔ note application cooldown is per caster and expires at 0.1 game seconds (2.525612ms)
+✔ one caster applies notes to a new target during the first target cooldown (2.028165ms)
+✔ Viviana belongs to Kazimierz in both forms (0.129765ms)
+✔ Makoto tiers, skills, module and cooperation-defense membership resolve without a generic kit (163.363337ms)
+✔ S3 skill entry ignores full SP and flips only on lethal damage (3.419504ms)
+✔ S3 fatal entry ignores full SP and flips only on lethal damage (3.098331ms)
+✔ persona expiry restores base stats and clears invulnerability after all-out attack (7.086459ms)
+✔ S3 personas share the original deadline; lethal transition never restarts its duration (56.088397ms)
+✔ persona range and attack impact follow the official diamond and Spine markers (1.915956ms)
+✔ S1 prioritizes a half-health ally and excludes healing-blocked targets (3.437591ms)
+✔ S2 attempts execution once per range entry even if the target survives (2.796358ms)
+✔ S3 second persona heals after half a second and clears its dodge aura at expiry (6.342481ms)
+✔ Makoto is selectable in the real recruit roster and shares skill/module/skin choices across tiers (22.623613ms)
+✔ Makoto uses community wording for every skill and is first in both recruit tiers (1.03233ms)
+✔ persona SP gauge drains across both S3 forms without resetting its shared duration (4.901428ms)
+✔ Makoto skill filled during windup waits for attack recovery; fatal substitution stays immediate (2.116527ms)
+✔ Makoto skill filled during recovery waits for attack recovery; fatal substitution stays immediate (1.835055ms)
+✔ persona expiry plays its full one-second SwitchOut before the all-out attack and body recovery (11.844051ms)
+✔ S1 deployment and every persona transition suppress attack starts and strikes (23.579347ms)
+✔ S2 deployment and every persona transition suppress attack starts and strikes (4.542048ms)
+✔ S3 deployment and every persona transition suppress attack starts and strikes (3.453164ms)
+✔ auto-cast persona entry does not continue the triggering normal attack in the same tick (1.31855ms)
+✔ s1 returns to a fresh body attack without persona attack locks or cooldown (3.783029ms)
+✔ s2 returns to a fresh body attack without persona attack locks or cooldown (4.439034ms)
+✔ s3a returns to a fresh body attack without persona attack locks or cooldown (3.508638ms)
+✔ s3b returns to a fresh body attack without persona attack locks or cooldown (3.27666ms)
+✔ S3 dodge aura refreshes an existing buff without rebuilding unchanged stats each tick (6.586188ms)
+✔ Angelina alter recruit tier 5 normal S1 displays flight attacks without introducing damage travel time (44.533576ms)
+✔ Angelina alter recruit tier 5 normal S2 displays flight attacks without introducing damage travel time (25.684629ms)
+✔ Angelina alter recruit tier 5 normal S3 displays flight attacks without introducing damage travel time (15.155832ms)
+✔ Angelina alter recruit tier 5 elite S1 displays flight attacks without introducing damage travel time (22.655131ms)
+✔ Angelina alter recruit tier 5 elite S2 displays flight attacks without introducing damage travel time (4.515609ms)
+✔ Angelina alter recruit tier 5 elite S3 displays flight attacks without introducing damage travel time (5.498593ms)
+✔ Angelina alter recruit tier 6 normal S1 displays flight attacks without introducing damage travel time (4.363899ms)
+✔ Angelina alter recruit tier 6 normal S2 displays flight attacks without introducing damage travel time (3.49869ms)
+✔ Angelina alter recruit tier 6 normal S3 displays flight attacks without introducing damage travel time (3.886222ms)
+✔ Angelina alter recruit tier 6 elite S1 displays flight attacks without introducing damage travel time (3.388375ms)
+✔ Angelina alter recruit tier 6 elite S2 displays flight attacks without introducing damage travel time (3.113282ms)
+✔ Angelina alter recruit tier 6 elite S3 displays flight attacks without introducing damage travel time (3.250949ms)
+✔ every visible recruit can toggle its active tier off or clear both tiers (29.996725ms)
+✔ tier toggling preserves skin and skill settings; prototype tiers remain independent (0.829545ms)
+✖ all mystic identities expose their actual stores, including Ebenholz and Veen conversions (28.513118ms)
+✔ each recruit ranged profile has a renderable attack visual before and during its skills (1133.788442ms)
+✔ Revenant shadow arts visual has a projectile without changing simulation speed (0.172149ms)
+✔ optional recruits: all 60 skill variants activate without content errors, no garrison traits (741.387431ms)
+✔ server validates per-tier limits, uniqueness and optional-only selection (1.726531ms)
+✔ personal selection filters shop, reward and grants, including another player selection (35.103899ms)
+✔ Ascalon poison stacks, slows and ticks arts damage; elite module boosts it (17.150167ms)
+✔ Narantuya steals stats up to cap and collects returning boomerangs (10.525345ms)
+✔ Ascalon periodic basic damage activates Dormant Progeny healing without another attack or poison recursion (2.859761ms)
+✔ all seven official modules select their exact data and execute the authored kits (39.335549ms)
+✔ single-core recruits are banned despite an active auxiliary bond; another active core keeps dual-core recruits available (0.419279ms)
+✖ Dawnstriker S3 auto-casts on airborne targets; only the opening wave hits air (7.633596ms)
+✔ verified anti-air skill variants activate and damage when only a flying enemy is present (13.984396ms)
+✔ Ascalon poison propagation excludes concealed enemies without applying its slow (2.203647ms)
+✔ Ascalon S2 slow multiplies module slow, affects air, and poison tick survives frequent hits (20.684109ms)
+✔ Narantuya S1 actually shortens her range and restores it when the skill ends (1.394453ms)
+✔ Sakiko basic attacks create a travelling note; no direct basic damage precedes note contact (18.413924ms)
+✔ Sakiko generates notes continuously with no enemy in attack range (3.842707ms)
+✔ Sakiko snapshot exposes real note coordinates with stable IDs and removes them on retreat (3.218159ms)
+✖ Kaschey: host gate, HP 22, promotion discount once per round, floor zero (288.102353ms)
+✔ Local overlay: 8 new normal/elite operators, existing affiliations, valid shop and selected-default-skill combat (593.520842ms)
+✔ Ursus drone prioritises bosses, choosing the closest boss; firing considers only in-range candidates (37.107696ms)
+✔ drone can acquire again immediately after losing all targets before launch; completed shots retain cooldown (50.828576ms)
+✔ favor: universal stats; Ursus-only true damage (false) (43.023188ms)
+✔ favor: universal stats; Ursus-only true damage (true) (5.880518ms)
+✔ favor + cutlass counts actual separate strikes, stops at 100, and never recursively procs (6.866738ms)
+✔ updated roster uses new tiers and real trait blackboards, with existing elite multipliers (0.977227ms)
+✔ elite favor grants +40% HP/+40 attack speed with the same 10% Ursus coefficient (3.098531ms)
+✖ All 19 Ursus skills, normal and elite: selected authored runtime and complete activation without errors (36.222717ms)
+✔ Botani acquisition grants no layers; morph grants Ursus only when paired (64.86268ms)
+✖ Hellagur garrison adds attack speed by each complete three active Ursus layers (15.345376ms)
+✔ Rosa locks heavy targets for six one-second pulses and prevents ordinary attacks (9.842055ms)
+✔ Zima S2 doubles on second activation and remains active; S3 consumes exactly five strikes (29.076589ms)
+✔ Zima elevated tiles hit ground neighbours and root them; Botani burst talent caps at three stacks (3.814457ms)
+✔ Ukusik self-bounce grants an extra hop without decay; S2 applies HoT and camouflage (8.736555ms)
+✖ Leto S2 starts ready student skills, excludes non-students, and removes ASPD at skill end (2.839333ms)
+✖ Absinthe S2 refuses targets above half HP; Botani S1 adds both extra arts damage and erosion (1.095895ms)
+✔ Zima preparation start and end each grant six / twelve layers when active (33.423064ms)
+✔ Ursus Cutlass applies normal / elite ATK and max-HP buffs through the real equipment runtime (5.019025ms)
+✖ Ursus drone approaches and attacks stationary ground and flying targets with shell projectiles (14.240186ms)
+✔ Airborne Ursus drone pursues distant enemies, stops in range, and resumes pursuit after target loss (13.193535ms)
+✔ New operator skills, talents and traits use Korean source strings with resolved combat values (3.708728ms)
+✔ Every new elite operator has selectable official modules; all module loadouts run without callback errors (103.073411ms)
+✖ Updated affiliations/tier and default/alternate skill icons follow the UI manifest contract (5.072485ms)
+✔ Leto: own Ursus skill activations grant 2/4 layers per activation, capped at eight activations (11.039483ms)
+✔ Drone spawns one tile right of map centre; shells wait three seconds, hit a fixed 1.2-radius area, and survive shooter death (3.985372ms)
+✔ Drone ignores taunt for base-distance priority and pursues the leading enemy despite in-range trailing enemies (2.816267ms)
+✖ Ukusik preparation grants +4 / +8 to each active bond (31.45519ms)
+✔ Istina normal: only sluggish deaths inside range grant +2 / +4 to active bonds, at most eight triggers (8.742684ms)
+✔ Istina elite: only sluggish deaths inside range grant +2 / +4 to active bonds, at most eight triggers (2.386612ms)
+✔ Istina never grants inactive bonds and shares one eight-trigger budget across later activation (2.713292ms)
+✖ Ursus default skills match the requested roster for normal and elite records (0.803336ms)
+✔ every Ursus operator has distinct normal and elite trait data and matching nested effects (0.954272ms)
+✔ in-place Ukusik promotion uses the upgraded prep trait on the same piece (7.289052ms)
+✔ Zima S3 fires all five rounds at its fixed front tile without enemies (7.656293ms)
+✔ Botani first skill grants seven / fourteen active Ursus layers by grade (2.051019ms)
+✔ production cutlass a: talent pairing, prep membership, combat membership and stats (33.012898ms)
+✔ production cutlass b: talent pairing, prep membership, combat membership and stats (3.460545ms)
+✔ Ursus 2: no drone or speed buff (34.720752ms)
+✔ Ursus 3: one drone, layer scaling, selective +50 ASPD (13.188839ms)
+✔ Ursus 5: one drone, layer scaling, selective +50 ASPD (2.901436ms)
+✔ Ursus 6: one drone, layer scaling, selective +50 ASPD (2.126012ms)
+✔ Default official data has no experimental faction, operators, or drone (33.459768ms)
+✔ Coop Ursus effects and live layer gains stay with the owning player (3.046593ms)
+✔ Drone +50 ASPD shortens actual launches from five seconds to 3.33 seconds (35.156826ms)
+✔ drone pursues a priority boss despite other enemies in range, fires while travelling, and resumes (4.525634ms)
+✔ drone cannot receive external heals and targets large enemy bodies intersecting its radius (1.580733ms)
+✔ Ursus shell excludes concealed enemies at impact and hits them after reveal (16.499618ms)
+✔ six Ursus reveals only enemies inside the live drone radius (2.771731ms)
+✔ drone ASPD shortens the shell delay as well as attack cooldown (5.865025ms)
+✔ drone movement gets a fixed 50 percent boost, independent of Ursus layers (2.820003ms)
+✔ drone prioritizes main leaders by distance, but bounty bosses use base distance (1.559671ms)
+✔ attack speed debuffs and increased attack intervals cannot slow the drone, buffs still work (1.114864ms)
+✔ aim follows a moving target and changes dead or out-of-range targets without resetting its deadline (7.268812ms)
+✔ six Ursus adds donated total ATK before the three-member percentage, tracks skill buffs and deaths without recursion (1.460362ms)
+✔ hidden drone visual scale grows from 85 percent by 0.2 percent of that base per layer and is serialized (2.321845ms)
+✔ hidden drone range grows by 0.1 percent per layer and updates selection, reveal and snapshots (1.88489ms)
+✔ Ursus donation rebalance at 0 layers (0.948834ms)
+✔ Ursus donation rebalance at 499 layers (0.916095ms)
+✔ Ursus donation rebalance at 500 layers (0.849946ms)
+✔ Ursus donation rebalance at 501 layers (0.851388ms)
+✔ three and five Ursus keep base drone size and range even with large layer counts (1.839851ms)
+✔ live six-Ursus eligibility updates drone size and range in both directions (1.188154ms)
+✔ always banned cores are included and protected cores never enter seeded random bans (11.319883ms)
+✔ forced bans above the normal quota still leave five cores, and constraints reject conflicting settings (49.610143ms)
+✔ the real match applies the ban policy and legacy disabled presets retain their exclusion semantics (20.852573ms)
+✔ UI changes between policies never leave contradictory selections or mutate saved presets (0.295453ms)
+✔ auxiliary bans support forced/protected policies independently, including an explicit ban of every auxiliary bond (34.798854ms)
+✔ independent extension selections isolate match data and add only the selected custom map (42.567481ms)
+✔ selecting a custom map makes it reachable by the real weighted draw while unselected maps never enter it (10.441364ms)
+✔ extension shape rejects unknown categories, duplicate entries and malformed selections (1.221774ms)
+✔ multiple maps can coexist and switching extensions never mutates skill/skin preferences (27.792852ms)
+✔ custom catalog does not include removed operator ban exclusions (0.798108ms)
+✔ operator ban catalog excludes optional recruits and keeps shop order (0.421092ms)
+✔ disabled custom factions leave catalogue untouched and exclude custom gameplay records (1.353161ms)
+✔ multi-effect traits do not repeat a line already shown in an earlier description (0.663967ms)
+✔ each match uses its host faction setting, including native Gummy affiliation (221.479688ms)
+✔ disabled Ursus entries do not discard ordinary skill and skin preferences (244.224329ms)
+✔ Gummy remains eligible with Steadfast banned while enabled Ursus remains available (283.701792ms)
+✔ enabling Ursus adds one core ban and keeps five core factions available in playable difficulties (343.491112ms)
+✖ Ursus descriptions use the same highlighted thresholds and live layer formatting as core bonds (224.1239ms)
+✔ custom stock supports 1–8 player scaling against four-player copies and migrates legacy unlimited stock (49.134558ms)
+✔ scarecrow rule replaces normal and hidden bosses and preserves their stationary dummy definitions (28.003934ms)
+✔ ally stat and SP custom ratios apply to combat and default 100% preserves base behavior (36.519477ms)
+✔ all humans can select random, which resolves in order without duplicates or choosing a fixed pick (9.050896ms)
+✔ random is AI-ineligible and cannot be disabled, but duplicate-enabled random assignments may repeat (8.402593ms)
+✔ scarecrow boss and hidden waves contain only the laboratory Jesselton, which can be attacked and never attacks back (48.185766ms)
+✔ random strategy is resolved before game-start Pith grants for all eight humans (35.743984ms)
+✔ ally SP rules never modify enemy skills (5.110735ms)
+✔ eight real clients complete random strategy, modified allied stats and both scarecrow boss rounds (21284.243002ms)
+✔ boss ratios apply only to final and hidden bosses, never bounty leaders (9.626046ms)
+✔ mode_single_normal: 3 ordinary rounds, followed by boss and optional hidden boss (16.583905ms)
+✔ mode_multi_normal: 3 ordinary rounds, followed by boss and optional hidden boss (5.688933ms)
+✔ mode_multi_funny: 3 ordinary rounds, followed by boss and optional hidden boss (10.392578ms)
+✔ mode_single_normal: 13 ordinary rounds, followed by boss and optional hidden boss (5.701912ms)
+✔ mode_multi_normal: 13 ordinary rounds, followed by boss and optional hidden boss (6.085007ms)
+✔ mode_multi_funny: 13 ordinary rounds, followed by boss and optional hidden boss (4.683825ms)
+✔ mode_single_normal: 20 ordinary rounds, followed by boss and optional hidden boss (19.505347ms)
+✔ mode_multi_normal: 20 ordinary rounds, followed by boss and optional hidden boss (5.90025ms)
+✔ mode_multi_funny: 20 ordinary rounds, followed by boss and optional hidden boss (6.62721ms)
+✔ default selection preserves ordinary modes, custom values are recorded and invalid counts rejected (12.638697ms)
+✔ match plans the new boss phase after the configured ordinary rounds (70.848368ms)
+✔ numeric rules validate and retain their values through normalization (6.62699ms)
+✔ unlimited inventory keeps finite sampling weights and never reserves copies (1.140461ms)
+✔ default Harmony works without a Harmony operator and adds the native core-member bonus (0.807732ms)
+✔ uncapped layers apply immediately while default games retain 999 (19.017895ms)
+✔ custom settings survive recording, replay and compact history; empty settings stay absent (1.698297ms)
+✔ enemy ratios apply once at spawn, including after battle-data extension filtering (41.819096ms)
+✔ Personnel File increases configured deployment capacity by exactly one (17.531265ms)
+✔ shared HP charges leaks at settlement and keeps every participant alive until the pool is empty (24.944616ms)
+✔ the rule auditor validates shared losses rather than personal HP shares (13.281231ms)
+✔ disabled augment settings do not count as changed settings, but saved values remain intact (0.469484ms)
+✔ host extension selection reaches the match and preserves both participants loadouts (158.203476ms)
+✔ creation restores selected extensions atomically and joining does not replace host settings (98.191353ms)
+✔ minimum violations and addon exclusions are rejected without changing the host settings (118.625166ms)
+✔ eight-player room accepts eight human seats and rejects the ninth, preserving per-mode capacity (122.698099ms)
+✔ augment mode multiplies boss HP once per offered grade, starting at 100%; custom preset remains independent (87.326844ms)
+✔ breakthrough is immediate; duplicate cumulative reports and final result do not charge twice (7.23516ms)
+✔ authoritative client progress charges breakthrough before settlement and ignores other senders (6.12851ms)
+✔ actual goal entries are reported separately from timeout leaks, including headless timelines (25.806157ms)
+✔ breakthrough debits shared HP immediately, ignores unite re-entries, and leaves normal settlement intact (8.675563ms)
+✔ breakthrough is offered in rounds 4 and 7, never round 10 (50.183219ms)
+✔ shared breakthrough can exceed the leaking player’s displayed share and synchronizes all teammates (13.552083ms)
+✔ augment mode defaults to ordinary enemy voting; custom cumulative HP uses the same base and grade factors (14.7295ms)
+✔ ordinary enemies scale from 100% by each offered grade and custom fixed values remain stored (14.335008ms)
+✔ custom cumulative ATK DEF and RES can be enabled separately without losing fixed values (14.062539ms)
+✔ approved surrender charges only unpaid remaining leaks against shared HP and never repeats in unite (5.015359ms)
+✔ breakthrough caps each player at ten per round across progress and surrender; next round resets (10.060101ms)
+✔ grade probability boundaries and three consecutive silver prevention preserve gold/prism ratio (1.849386ms)
+✔ catalog expands valid bond/tier grants and enforces allowed rounds and enemy tiers (75.469475ms)
+✔ each player gets private choices; independent rerolls retain other slots and reject stale cards (63.983144ms)
+✔ seen cards never return until exhaustion; reset excludes the currently displayed cards (0.247011ms)
+✔ all eight picks settle for exactly three seconds; only host controls enemy choices and rerolls (44.683964ms)
+✔ solo choices have no deadline but retain three-second settling (13.731092ms)
+✔ disabled augments never change normal phases or expose selected cards (6.546366ms)
+✔ grant rewards ignore stock, beacon remains separate, and funds/price effects persist (14.245704ms)
+✔ an eight-player augmented match progresses through all selections (vote=0) (2910.521487ms)
+✔ an eight-player augmented match progresses through all selections (vote=1) (3113.243897ms)
+✔ one human with seven AI seats gets untimed personal and enemy augment choices (28.882841ms)
+✔ custom grade weights and separate rerolls persist; obsolete exclusions have no effect (16.166339ms)
+✔ personal augment grants wait for all choices and the settling countdown (21.309186ms)
+✔ enemy votes accept every alive player, settle in three seconds and apply only the majority (19.288785ms)
+✔ full reroll votes consume one opportunity, reset votes and forbid individual rerolls (22.236598ms)
+✔ ties are randomized only among the highest voted choices, including reroll (26.047856ms)
+✔ vote deadline resolves abstentions and selected cards never return after candidate exhaustion (35.704798ms)
+✔ a selected augment excludes only itself, not a different grade of the same effect or another players choices (20.515044ms)
+✔ only the new Harmony activation augment exists, is personal and is excluded by the custom rule (22.496718ms)
+✔ Stack I gives only active stackable core/aux bonds their round 4 amounts (15.36086ms)
+✔ Stack I gives only active stackable core/aux bonds their round 7 amounts (13.562942ms)
+✔ Stack I gives only active stackable core/aux bonds their round 10 amounts (13.803203ms)
+✔ Starter pack grants one operator of each tier up to 4 from one eligible bond (14.711326ms)
+✔ Starter pack grants one operator of each tier up to 5 from one eligible bond (14.657394ms)
+✔ Starter pack grants one operator of each tier up to 6 from one eligible bond (16.280149ms)
+✔ round variants of the same named augment retain one identity while tiers remain distinct (24.972844ms)
+✔ spectators see all ally offers and selected card without exposing offers publicly (14.1414ms)
+✔ Swordmaster and Arts master exclude every other tier in their own family after selection (97.617813ms)
+✔ cataclysm replaces deployed operators without gains, retaining promotion, equipment, position and direction (15.301802ms)
+✔ Head hunting grants one, three or five operators and absent call grants eight communicators (41.257761ms)
+✔ breakthrough charges each entry immediately, separately from the round HP cap (7.923602ms)
+✔ random operator rewards draw with replacement rather than guaranteeing unique operators (5.614858ms)
+✔ drawn bond bans suppress named supports and starter families even when dual-bond operators remain (269.862373ms)
+✔ random operator augments and pending rewards never grant a banned operator (6.917353ms)
+✔ generic layer augments skip banned bonds even if a stale active state exists (4.513305ms)
+✔ listed and weighted random operator pools reject banned operators and banned bond pools (4.916449ms)
+✔ generic headhunting offers disappear when all operators at the reward tier are banned (19.983083ms)
+✔ recast transformation skips every banned operator at the upgraded tier (5.961257ms)
+✔ new CSV augments expose correct rounds, grade, effects and existing icons (263.610224ms)
+✔ Catherine support silver: variant hammers only, correct quantity, stock exempt (13.1718ms)
+✔ Catherine support gold: variant hammers only, correct quantity, stock exempt (12.760503ms)
+✔ Catherine support prism: variant hammers only, correct quantity, stock exempt (12.866702ms)
+✔ Goliath HP applies once, shared=false (16.648308ms)
+✔ Goliath HP applies once, shared=true (18.031464ms)
+✔ level up grants three funds, waives only next upgrade, hides at max shop level (11.170225ms)
+✔ beast heart sells board/bench operators, destroys equipment and queues twelve ban-safe elites (15.085022ms)
+✔ our light repeats the same gain trait as Suzuran and stacks with her strategy (15.05733ms)
+✔ Du Yaoye shop guarantee still finds allowed Yan operators when Yan is banned, without granting banned operators (6.252185ms)
+✔ new true-damage family is mutually exclusive across all grades (21.338328ms)
+✔ beast heart grants twelve promoted operators (15.210851ms)
+✔ strict majority shortens only ordinary votes to 10 seconds without extending a shorter deadline (31.491126ms)
+✔ weighted votes use all received votes, include reroll and give zero votes zero probability (17.186116ms)
+✔ weighted timeout keeps actual votes and does not create weights for abstentions (17.429029ms)
+✔ coop final server: actual round pool and public HP use 1000% exactly once (24.117398ms)
+✔ coop final client: actual round pool and public HP use 1000% exactly once (45.057499ms)
+✔ coop hidden server: actual round pool and public HP use 1000% exactly once (7.636672ms)
+✔ coop hidden client: actual round pool and public HP use 1000% exactly once (24.333874ms)
+✔ coop8 final server: actual round pool and public HP use 1000% exactly once (8.390774ms)
+✔ coop8 final client: actual round pool and public HP use 1000% exactly once (32.898659ms)
+✔ coop8 hidden server: actual round pool and public HP use 1000% exactly once (6.893867ms)
+✔ coop8 hidden client: actual round pool and public HP use 1000% exactly once (32.14632ms)
+✔ boss_1: real boss template stats obey custom ratios after native spawn hooks (2.657859ms)
+✔ boss_2: real boss template stats obey custom ratios after native spawn hooks (1.658339ms)
+✔ boss_3: real boss template stats obey custom ratios after native spawn hooks (1.330156ms)
+✔ boss_4: real boss template stats obey custom ratios after native spawn hooks (1.644899ms)
+✔ boss_5: real boss template stats obey custom ratios after native spawn hooks (1.303646ms)
+✔ boss_6: real boss template stats obey custom ratios after native spawn hooks (1.654544ms)
+✔ boss_7: real boss template stats obey custom ratios after native spawn hooks (1.056085ms)
+✔ boss_8: real boss template stats obey custom ratios after native spawn hooks (2.542126ms)
+✔ boss_9: real boss template stats obey custom ratios after native spawn hooks (3.651742ms)
+✔ boss_10: real boss template stats obey custom ratios after native spawn hooks (2.485351ms)
+✔ configured boss ATK, DEF, RES and speed affect actual damage, attacks and movement (27.259956ms)
+✔ default times preserve each normal round and 120-second boss countdown (19.671962ms)
+✔ solo: custom normal and boss times flow into specs and clocks (1x boss) (12.86724ms)
+✔ solo: custom normal and boss times flow into specs and clocks (2x boss) (6.114355ms)
+✔ coop: custom normal and boss times flow into specs and clocks (1x boss) (7.906055ms)
+✔ coop: custom normal and boss times flow into specs and clocks (2x boss) (5.667846ms)
+✔ coop8: custom normal and boss times flow into specs and clocks (1x boss) (8.851474ms)
+✔ coop8: custom normal and boss times flow into specs and clocks (2x boss) (10.494529ms)
+✔ time settings validate, persist and reset with ordinary custom settings (1.397467ms)
+✔ custom boss countdown retains the AI-team overtime grace (5.282948ms)
+✔ acquisition and Bassline preparation trait use active bonds and per-operator contribution (26.659759ms)
+✔ Witch King rewards each 40-layer milestone once, at or below shop tier on next preparation, without shared stock (20.665963ms)
+✔ practice starts at round 1, preserves first-round grants and uses the normal match (33.711481ms)
+✔ practice starts at round 4, preserves first-round grants and uses the normal match (24.979056ms)
+✔ practice starts at round 14, preserves first-round grants and uses the normal match (8.985916ms)
+✔ practice starts at round 15, preserves first-round grants and uses the normal match (7.74968ms)
+✔ normal shop purchase, refresh, freezing and level-up remain active with unlimited spending (11.42794ms)
+✔ practice keeps selected bans and enemy training, and settlement advances normally (11.561831ms)
+✔ practice results use a distinct mode and retain normal result bookkeeping (10.207599ms)
+✔ prep layer counters record actual gains per round, preserve sources and survive private resync (13.676044ms)
+✔ beacon rejects normal recruits without consuming either piece (48.818893ms)
+✔ beacon rejects elite recruits without consuming either piece (9.852766ms)
+✔ selecting a single-core recruit during strategy draft cannot bypass the match ban, shop or grants (34.359244ms)
+✔ a single pooled release may use all of the page-aligned 1.4 GiB budget (29.387723ms)
+✔ two versions share ONE parent limit, with more protection for the latest (24.181259ms)
+✔ legacy 700 MiB workers remain untouched, and retirement releases their entire reservation (26.552939ms)
+✔ live memory limits are never lowered; only soft reservations change between pooled versions (25.897044ms)
+✔ shared slice is persistent, swap-free, and configured without restarting any game (28.015543ms)
+✔ an unchanged pool performs no property writes (27.62009ms)
+✔ candidate and maintenance both use the shared pool and no RAM preflight defers deployment (0.392278ms)
+✔ retained worker announces 1h, 30m, 10m, 5m and 1m, then expires exactly at its original deadline (1.140111ms)
+✔ reactivating a worker cancels its retirement and a restart uses remaining time, not a fresh 1h (0.262054ms)
+✔ legacy client monitoring deduplicates reminders and leaves only when its own release expires (4.103729ms)
+✔ old two-hour state migrates to one hour from original activation, never from restart (0.868463ms)
+✔ a diver whose initial wind-up was missed resumes at its real strike frame, never from the start (1.966912ms)
+✔ diver movement and displayed recovery agree at ASPD 100, missed start false (37.329361ms)
+✔ diver movement and displayed recovery agree at ASPD 200, missed start false (8.613927ms)
+✔ diver movement and displayed recovery agree at ASPD 600, missed start false (6.479473ms)
+✔ diver movement and displayed recovery agree at ASPD 100, missed start true (36.385234ms)
+✔ diver movement and displayed recovery agree at ASPD 200, missed start true (3.596708ms)
+✔ diver movement and displayed recovery agree at ASPD 600, missed start true (3.251039ms)
+✔ normal enemy wind-up still plays from frame zero, while the existing operator fallback is preserved (0.377677ms)
+▶ clip bounds (render/spine.js): what a skeleton draws, measured once per skeleton data
+  ✔ a clip by every pose it samples — a short-lived attachment counts, an invisible slot does not (4.223238ms)
+  ✔ the queue samples pose by pose within the frame budget — a clip resumes on the next call —, oldest request first (0.838228ms)
+  ✔ a record leaves the queue when its last actor is destroyed — pending clips, the clip in progress and its scratch skeleton —; a later actor queues them again (1.108934ms)
+  ✔ a clip whose sampling throws is recorded as not measurable (false), never as drawing nothing (1.257407ms)
+  ✔ SpineActor.clipBounds: null while queued, then a Map clip → rect; false for a runtime that cannot be posed (0.930867ms)
+✔ clip bounds (render/spine.js): what a skeleton draws, measured once per skeleton data (22.441358ms)
+▶ a model frozen before its first update shows its clip's first frame, never its setup pose (render/spine.js)
+  ✔ stunned without a stun clip before any update: posed once at t = 0 of its clip, then the pose holds (0.835384ms)
+  ✔ a first update that throws is tried again: the frozen model is posed once an update succeeds (0.31991ms)
+  ✔ stunned after it was posed: the pose it had holds (unchanged) (0.265428ms)
+  ✔ dead without a death or idle clip: frozen, and posed once at t = 0 of the clip it had (its first) (0.26026ms)
+✔ a model frozen before its first update shows its clip's first frame, never its setup pose (render/spine.js) (1.944899ms)
+▶ impostor box (render/units.js impostorBox, playedClips)
+  ✔ playedClips: every role of the entry and of its forms; one-off = deploy, begin / end of skills, stun, move; a shared name loops (0.47284ms)
+  ✔ the idle clip always; then each clip while the box stays within 5× (looping) / 2× (one-off) of that core (0.23329ms)
+  ✔ a one-off clip fits under the 2× limit, a looping one up to 5×; a clip inside the box is never left out (0.220131ms)
+  ✔ without an idle clip that draws anything the looping clips make the core; nothing drawn → null (0.139209ms)
+✔ impostor box (render/units.js impostorBox, playedClips) (1.241513ms)
+▶ impostor atlas (render/impostor.js): every slot is cleared and clipped to itself
+  ✔ a slot owns an eraser and a box masked by exactly its rectangle (PIXI draws a rectangle mask as a scissor rect) (0.819891ms)
+  ✔ a queued skeleton is drawn inside its slot box, then parked; freeing a slot never destroys a skeleton queued in it (0.600041ms)
+✔ impostor atlas (render/impostor.js): every slot is cleared and clipped to itself (1.51932ms)
+▶ UnitView impostor mode (render/units.js)
+  ✔ while the model's clips are still measured the unit is drawn directly; then an impostor sized from them (17.966051ms)
+  ✔ a clip too large for the box is drawn directly while it plays — the slot stays the unit's — and redrawn into it after (5.757811ms)
+  ✔ a clip whose sampling threw is drawn directly while it plays — the attack, or even the idle clip —, never cut by the slot (1.91887ms)
+  ✔ a runtime whose clips cannot be measured keeps the box from the pose shown (the pre-#542 rule) (0.740782ms)
+  ✔ built while stunned without a stun clip: posed once at its idle clip's first frame — the box's core —, then held (1.003026ms)
+  ✔ a skeleton without an Idle clip: the clip SpineActor idles on instead (its first) is the box's core (0.523506ms)
+  ✔ a pen figure (lod idle) needs its idle clip only (0.707752ms)
+✔ UnitView impostor mode (render/units.js) (29.060391ms)
+✔ char_4217_makoto: all-out End is a one-shot and returns without another SwitchOut (16.16538ms)
+✔ skin_char_4217_makoto_p3r_1: all-out End is a one-shot and returns without another SwitchOut (2.426532ms)
+✔ S3 persona change has no interim P1 idle and later state events do not restart its end (0.390335ms)
+✔ late or rebuilt form resumes the current authored segment; an expired transition stays idle (0.480331ms)
+✔ UP-facing base/skin swaps to the Front transition and resumes elapsed time after the model load (14.645258ms)
+✔ all persona entries resume late progress rather than replaying SwitchIn from zero (0.53328ms)
+✔ Makoto body follows the same A/B sequence as the official attack emitter; cancel preserves the pending variant (2.753903ms)
+✔ official Makoto emitter follows the visible variant even when enabled after earlier simplified attacks (16.893102ms)
+✔ live embedded effects outside sampled impostor bounds bypass the rectangle, including mixed poses (0.336685ms)
+✔ each persona returns through its authored SwitchOut from frame zero before the all-out animation (0.614963ms)
+✔ char_4217_makoto authoritative body return accepts its first attack before the next render update (0.214111ms)
+✔ skin_char_4217_makoto_p3r_1 authoritative body return accepts its first attack before the next render update (0.068984ms)
+✔ Makoto background waits for SwitchIn and the S3 second persona follows ChangeEnd (0.340191ms)
+✔ Makoto looping background reselects the authored left/right variant after loading and turning (0.573811ms)
+✔ UP-facing Makoto retains a started body attack across the Front to Back model replacement (3.201975ms)
+✔ default-speed persona attack starts at the protected transition boundary without delaying the body behind its trail (1.25923ms)
+✔ a delayed Makoto model resumes past its strike, but cancelled or expired swings stay finished (0.257457ms)
+✔ attached official effects interleave with unit models; ground and explicit overlays retain their passes (2.54539ms)
+✔ official effects isolate and restore inherited scissor and stencil tests (0.301783ms)
+✔ stable attached layers avoid scene-tree mutations but still follow newly added HUD children (1.902505ms)
+✔ default-only bodies remain visible and immediately support a state skin added at runtime (2.098108ms)
+✔ state attachment changes invalidate live bounds even when the animation is frozen (0.309725ms)
+✔ official status loops recover after expiry and stop for death, downed state or hidden preparation (0.453992ms)
+✔ talent loop rows preserve order, duplicate entries, post-effect exclusions and later plan changes (0.295564ms)
+✔ fetchBuild: the tag, or null when unreachable / not reported / too slow (22.052254ms)
+✔ checkBuildOnce: first sighting, unchanged, changed, and unknown when the server says nothing (1.412049ms)
+✔ startBuildGuard: records this page's build in memory, reloads once on a NEW build (after two agreeing checks) (6.50324ms)
+✔ startBuildGuard: a NEW build that is then not served twice is dropped (rolling deploy / reverts) (4.96442ms)
+✔ startBuildGuard: an unreadable /healthz never reloads — not even after a new build was seen (7.428028ms)
+✔ startBuildGuard: a match on screen is never thrown away — it waits for the match (and its settlement) to end (6.301016ms)
+✔ startBuildGuard: stop() ends the watch (3.709557ms)
+✔ rolling guard compares release IDs and clears an obsolete notice when the live release matches again (1.719731ms)
+✔ rolling room lobby, spectators and reconnect keep the old release until the room is left (0.787482ms)
+✔ non-rolling builds retain match-only refresh behavior and rolling main lobby can update (0.265789ms)
+✔ extension preferences persist including an explicit empty selection and leave loadouts untouched (2.534384ms)
+✔ content exclusions persist with extension selections (0.247171ms)
+✔ extension presets copy additions and exclusions, reject malformed selections and duplicate IDs (2.301003ms)
+✔ loading extension presets filters stale IDs without changing stored values (0.257246ms)
+✔ built-in augment preset is copied, cannot be overwritten, and cannot be deleted (0.420291ms)
+✔ disabled Ursus is absent from gameplay lookups without erasing the saved configuration catalogue (126.706095ms)
+✔ in-game custom info exposes selected rules, exclusions and modified numerical settings (1.818289ms)
+✔ favorites and recruit preset files round-trip independently and reject another kind (0.599199ms)
+✔ damage dummy is offered in the lab at all difficulties, and absent from ordinary data (248.306306ms)
+✔ preset codes preserve Korean names in one line and distinguish favorite/recruit collections (0.974543ms)
+✔ stock selections and ally ratios have readable labels in game info and old unlimited presets migrate (1.61239ms)
+✔ sync: a reset supersedes the old loadout awaiting backups, even after the reset was accepted (6.179013ms)
+✔ sync: a later nonempty edit wins while the old backups preparation is waiting (0.816575ms)
+✔ sync: an edit invalidates preparation before its debounce runs (0.499159ms)
+✔ sync: obsolete missing data does not replace the accepted reset status (0.707852ms)
+✔ sync: obsolete rejected data does not replace the accepted reset status (0.57299ms)
+✔ sync: welcome invalidates preparation from the earlier session (0.732329ms)
+✔ sync: an obsolete result does not swallow the newest reset RATE retry (0.408073ms)
+✔ sync: a current missing-data preparation remains an error and can be retried (0.43981ms)
+✔ sync: unrelated screen state changes do not cancel a current preparation (0.495153ms)
+✔ recruit skill/module settings are shared both ways without selecting another tier (1.962546ms)
+✔ switching tier migrates an existing tier-only choice (0.27331ms)
+✔ prototype tiers retain independent selection flags when sharing legal choices (0.784838ms)
+ℹ tests 463
+ℹ suites 5
+ℹ pass 447
+ℹ fail 16
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 33577.368494
+
+✖ failing tests:
+
+test at test/content/leithanien-sfx.test.js:6:115
+✖ 체르니: official attack and skill sound files are indexed (1.377208ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+
+    {
+  +   attack: '/assets/local/audio/sfx/p_imp_pianohit_n.mp3',
+  -   attack: '/assets/audio/sfx/player/p_imp/p_imp_pianohit_n.mp3',
+      attacks: {
+  +     '1': '/assets/local/audio/sfx/p_imp_pianohit_h.mp3'
+  -     '1': '/assets/audio/sfx/player/p_imp/p_imp_pianohit_h.mp3'
+      },
+      skillCombat: {},
+      skills: {
+  +     '0': '/assets/local/audio/sfx/b_char_defboost.mp3',
+  +     '1': '/assets/local/audio/sfx/b_char_atkboost.mp3'
+  -     '0': '/assets/audio/sfx/battle/b_char/b_char_defboost.mp3',
+  -     '1': '/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3'
+      }
+    }
+
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/content/leithanien-sfx.test.js:8:74)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { attack: '/assets/local/audio/sfx/p_imp_pianohit_n.mp3', skills: { '0': '/assets/local/audio/sfx/b_char_defboost.mp3', '1': '/assets/local/audio/sfx/b_char_atkboost.mp3' }, skillCombat: {}, attacks: { '1': '/assets/local/audio/sfx/p_imp_pianohit_h.mp3' } },
+    expected: { attack: '/assets/audio/sfx/player/p_imp/p_imp_pianohit_n.mp3', skills: { '0': '/assets/audio/sfx/battle/b_char/b_char_defboost.mp3', '1': '/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3' }, skillCombat: {}, attacks: { '1': '/assets/audio/sfx/player/p_imp/p_imp_pianohit_h.mp3' } },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at test/content/leithanien-sfx.test.js:6:115
+✖ 디아만테: official attack and skill sound files are indexed (0.502865ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+
+    {
+  +   attack: '/assets/local/audio/sfx/p_atk_elemntstff_n.mp3',
+  -   attack: '/assets/audio/sfx/player/p_atk/p_atk_elemntstff_n.mp3',
+      attacks: {
+  +     '0': '/assets/local/audio/sfx/p_atk_elemntstff_d.mp3',
+  +     '1': '/assets/local/audio/sfx/p_atk_elemntstff_h.mp3'
+  -     '0': '/assets/audio/sfx/player/p_atk/p_atk_elemntstff_d.mp3',
+  -     '1': '/assets/audio/sfx/player/p_atk/p_atk_elemntstff_h.mp3'
+      },
+  +   hit: '/assets/local/audio/sfx/p_imp_elemntstff_n.mp3',
+  -   hit: '/assets/audio/sfx/player/p_imp/p_imp_elemntstff_n.mp3',
+      skillCombat: {},
+      skills: {
+  +     '0': '/assets/local/audio/sfx/b_char_atkboost.mp3',
+  +     '1': '/assets/local/audio/sfx/b_char_atkboost.mp3'
+  -     '0': '/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3',
+  -     '1': '/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3'
+      }
+    }
+
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/content/leithanien-sfx.test.js:8:74)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { attack: '/assets/local/audio/sfx/p_atk_elemntstff_n.mp3', hit: '/assets/local/audio/sfx/p_imp_elemntstff_n.mp3', skills: { '0': '/assets/local/audio/sfx/b_char_atkboost.mp3', '1': '/assets/local/audio/sfx/b_char_atkboost.mp3' }, skillCombat: {}, attacks: { '0': '/assets/local/audio/sfx/p_atk_elemntstff_d.mp3', '1': '/assets/local/audio/sfx/p_atk_elemntstff_h.mp3' } },
+    expected: { attack: '/assets/audio/sfx/player/p_atk/p_atk_elemntstff_n.mp3', hit: '/assets/audio/sfx/player/p_imp/p_imp_elemntstff_n.mp3', skills: { '0': '/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3', '1': '/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3' }, skillCombat: {}, attacks: { '0': '/assets/audio/sfx/player/p_atk/p_atk_elemntstff_d.mp3', '1': '/assets/audio/sfx/player/p_atk/p_atk_elemntstff_h.mp3' } },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at test/content/leithanien-sfx.test.js:6:115
+✖ 베이스라인: official attack and skill sound files are indexed (0.379119ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+
+    {
+  +   attack: '/assets/local/audio/sfx/p_atk_euphnium_n.mp3',
+  -   attack: '/assets/audio/sfx/player/p_atk/p_atk_euphnium_n.mp3',
+      attacks: {
+  +     '1': '/assets/local/audio/sfx/p_atk_euphnium_h.mp3'
+  -     '1': '/assets/audio/sfx/player/p_atk/p_atk_euphnium_h.mp3'
+      },
+  +   hit: '/assets/local/audio/sfx/p_imp_euphnium_n.mp3',
+  -   hit: '/assets/audio/sfx/player/p_imp/p_imp_euphnium_n.mp3',
+      hits: {
+  +     '1': '/assets/local/audio/sfx/p_imp_euphnium_h.mp3'
+  -     '1': '/assets/audio/sfx/player/p_imp/p_imp_euphnium_h.mp3'
+      },
+      skillCombat: {},
+      skills: {
+        '0': null,
+  +     '1': '/assets/local/audio/sfx/b_char_atkboost.mp3'
+  -     '1': '/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3'
+      }
+    }
+
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/content/leithanien-sfx.test.js:8:74)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { attack: '/assets/local/audio/sfx/p_atk_euphnium_n.mp3', hit: '/assets/local/audio/sfx/p_imp_euphnium_n.mp3', skills: { '0': null, '1': '/assets/local/audio/sfx/b_char_atkboost.mp3' }, skillCombat: {}, attacks: { '1': '/assets/local/audio/sfx/p_atk_euphnium_h.mp3' }, hits: { '1': '/assets/local/audio/sfx/p_imp_euphnium_h.mp3' } },
+    expected: { attack: '/assets/audio/sfx/player/p_atk/p_atk_euphnium_n.mp3', hit: '/assets/audio/sfx/player/p_imp/p_imp_euphnium_n.mp3', skills: { '0': null, '1': '/assets/audio/sfx/battle/b_char/b_char_atkboost.mp3' }, skillCombat: {}, attacks: { '1': '/assets/audio/sfx/player/p_atk/p_atk_euphnium_h.mp3' }, hits: { '1': '/assets/audio/sfx/player/p_imp/p_imp_euphnium_h.mp3' } },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at test/content/leithanien.test.js:130:1
+✖ current Leithanien effect shows floored duration bonuses without per-layer formulas (4.150161ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+    assert.ok(text.includes(`목표에게 ${10+bonus}초간`))
+
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/content/leithanien.test.js:134:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at test/content/recruit-mystic-024a.test.js:31:1
+✖ all mystic identities expose their actual stores, including Ebenholz and Veen conversions (28.513118ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  undefined !== 4
+
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/content/recruit-mystic-024a.test.js:35:148)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: 4,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/content/recruits.test.js:62:1
+✖ Dawnstriker S3 auto-casts on airborne targets; only the opening wave hits air (7.633596ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+    assert.ok(h.runUntil(()=>h.hooksOf('hit').some(c=>c.target===e&&c.dmg.tags?.includes('chen3:wave')),3))
+
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/content/recruits.test.js:69:11)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at test/content/ursus-band.test.js:10:1
+✖ Kaschey: host gate, HP 22, promotion discount once per round, floor zero (288.102353ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  10 !== 6
+
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/content/ursus-band.test.js:25:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 10,
+    expected: 6,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/content/ursus-kits.test.js:20:1
+✖ All 19 Ursus skills, normal and elite: selected authored runtime and complete activation without errors (36.222717ms)
+  AssertionError [ERR_ASSERTION]: 비헌터 풋워크
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/content/ursus-kits.test.js:24:56)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at test/content/ursus-kits.test.js:36:1
+✖ Hellagur garrison adds attack speed by each complete three active Ursus layers (15.345376ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+    assert.ok(Math.abs(b.s.maxHp/a.s.maxHp-1.28/1.2)<1e-6)
+
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/content/ursus-kits.test.js:39:131)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at test/content/ursus-kits.test.js:69:1
+✖ Leto S2 starts ready student skills, excludes non-students, and removes ASPD at skill end (2.839333ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  145 !== 142
+
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/content/ursus-kits.test.js:73:178)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 145,
+    expected: 142,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/content/ursus-kits.test.js:77:1
+✖ Absinthe S2 refuses targets above half HP; Botani S1 adds both extra arts damage and erosion (1.095895ms)
+  TypeError: Cannot read properties of null (reading 'skill')
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/content/ursus-kits.test.js:79:74)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at test/content/ursus-kits.test.js:98:1
+✖ Ursus drone approaches and attacks stationary ground and flying targets with shell projectiles (14.240186ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  16900 !== 17680
+
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/content/ursus-kits.test.js:102:295)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 16900,
+    expected: 17680,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/content/ursus-kits.test.js:125:1
+✖ Updated affiliations/tier and default/alternate skill icons follow the UI manifest contract (5.072485ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+
+    [
+      'ursusShip',
+      'raidShip',
+  +   'indomShip'
+    ]
+
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/content/ursus-kits.test.js:126:205)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [ 'ursusShip', 'raidShip', 'indomShip' ],
+    expected: [ 'ursusShip', 'raidShip' ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at test/content/ursus-kits.test.js:165:1
+✖ Ukusik preparation grants +4 / +8 to each active bond (31.45519ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  3 !== 4
+
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/content/ursus-kits.test.js:172:81)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 3,
+    expected: 4,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/content/ursus-kits.test.js:196:1
+✖ Ursus default skills match the requested roster for normal and elite records (0.803336ms)
+  TypeError: Cannot read properties of undefined (reading 'skill')
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/content/ursus-kits.test.js:200:56)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at test/custom-factions.test.js:77:1
+✖ Ursus descriptions use the same highlighted thresholds and live layer formatting as core bonds (224.1239ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+    assert.ok(bond.descRaw.includes('<@autochess.dgreen>3</>'))
+
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/custom-factions.test.js:81:9)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

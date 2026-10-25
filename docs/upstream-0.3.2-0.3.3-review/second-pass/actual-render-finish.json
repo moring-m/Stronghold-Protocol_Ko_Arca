@@ -1,0 +1,24 @@
+{
+  "results": [
+    {
+      "key": "2-skin",
+      "before": {
+        "clip": "Doll_Skill_3_P1_Attack_B",
+        "mode": "attack",
+        "loop": "play"
+      },
+      "paused": {
+        "loop": "play",
+        "effects": 14
+      },
+      "after": {
+        "clip": "Doll_Skill_3_P1_Idle",
+        "mode": "base",
+        "base": "idle",
+        "effects": 0,
+        "loop": "done"
+      }
+    }
+  ],
+  "errors": []
+}

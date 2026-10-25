@@ -18,18 +18,21 @@ export function installMobileUiScale(settings,win=globalThis) {
   const root=win.document.documentElement,originalZoom=root?.style?.zoom||'';
   const apply=()=>{
     const scale=mobileUiScale(settings.get().mobileUiScale),mobile=isMobileScaleTarget(win);
+    // Mobile browsers may ignore viewport-meta scaling in the fullscreen top layer.
+    const fullscreen=!!(win.document.fullscreenElement||win.document.webkitFullscreenElement);
+    const nativeViewport=mobile&&!fullscreen;
     if(root?.style){
-      root.style.zoom=mobile?originalZoom:(scale===1?originalZoom:String(scale));
-      root.style.setProperty('--ui-viewport-scale',mobile?'1':String(scale));
+      root.style.zoom=nativeViewport?originalZoom:(scale===1?originalZoom:String(scale));
+      root.style.setProperty('--ui-viewport-scale',nativeViewport?'1':String(scale));
     }
     let content=original;
-    if(mobile&&scale!==1){
+    if(nativeViewport&&scale!==1){
       const viewport=win.visualViewport;
       const physicalWidth=Math.round(viewport?.width>0 && viewport?.scale>0 ? viewport.width*viewport.scale : win.innerWidth*lastScale);
       if(!(physicalWidth>0))return;
       content=`width=${Math.round(physicalWidth/scale)}, initial-scale=${scale}, minimum-scale=${scale}, maximum-scale=${scale}, user-scalable=no, viewport-fit=cover`;
     }
-    lastScale=scale;
+    lastScale=nativeViewport?scale:1;
     if(meta.getAttribute('content')!==content)meta.setAttribute('content',content);
   };
   const off=settings.subscribe(apply);

@@ -1,3 +1,4 @@
+import { attackTurnSkill } from '../enemies.js';
 import {FORMS} from '../../../../shared/animationForms.js';
 import {offspringMods} from '../../../../shared/enemyRewards.js';
 // server/sim/content/enemies/helpers.js — shared helpers of the enemy kits (split from content/enemies.js; the module
@@ -109,10 +110,11 @@ export function abOf(b, e) {
  * slot's skill clip, render/vfx/skillfx.js: that skill's official effects for the window). No gameplay effect: no state,
  * no random draw (DESIGN §8.2; golden counts the event, nothing else moves).
  */
-export function castSlot(b, e, s, clipDuration = null) {
+export function castSlot(b, e, s, turnClip = null) {
   if (!b || !e || !s || !Number.isInteger(s.slot)) return;
-  const d = clipDuration != null ? clipDuration : s.bb && typeof s.bb.duration === 'number' && s.bb.duration > 0 ? Math.round(s.bb.duration * 100) / 100 : 0;
-  b._ev(d > 0 ? ['cast', e.id, s.slot, d] : ['cast', e.id, s.slot]);
+  const d = s.bb && typeof s.bb.duration === 'number' && s.bb.duration > 0 ? Math.round(s.bb.duration * 100) / 100 : 0;
+  if (turnClip != null) b._ev(['cast', e.id, s.slot, d, Math.round(Math.max(0,turnClip)*1000)/1000]);
+  else b._ev(d>0?['cast',e.id,s.slot,d]:['cast',e.id,s.slot]);
 }
 
 /** Attach abilities to an enemy (calls their spawn()). */
@@ -121,6 +123,7 @@ export function attach(b, e, list) {
   for (const a of list) {
     if (!a) continue;
     if (a.cd != null) a.left = num(a.left, num(a.icd, 0));
+    if (a.atk) { e.profile.attackTurnSkill = attackTurnSkill; if(e.defId!=='enemy_1521_dslily') e.profile.attackTurnAtHit=true; }
     ab.list.push(a);
     if (a.spawn) safe(b, e, () => a.spawn(b, e, a, ab));
   }
@@ -432,3 +435,24 @@ export {
   BOOM_RADIUS, POLLUTION_INTERVAL, STEALTH_RESTORE_BY_KEY, DUCK_STEALTH_RESTORE, TEA_SPLASH_RADIUS, SHELL_SPLASH_RADIUS, stOf, safe, dispatch,
   num, auraBuff, watchDeaths, onTerrain,
 };
+
+export const ENEMY_ATTACK_SKILL_CLIP = Object.freeze({
+  enemy_1404_msnip: { CrossAttack: 0 },
+  enemy_1275_dwlock_2: { DeathEye: 0 },
+  enemy_9009_acfort: { FireWeapon: 2 },
+  enemy_1273_stmgun_2: { Cannon: 10 },
+  enemy_1504_cqbw: { C4: 4.8 },
+  enemy_1509_mousek: { DriftSand: 2.333, SandStorm: 1.333 },
+  enemy_1513_dekght: { ChargeAttack: 0 },
+  enemy_1513_dekght_2: { TripleAttack: 1.667 },
+  enemy_2003_rockman: { StunAttack: 2.333 },
+  enemy_2050_smsha: { ChainBuff: 1.667 },
+  enemy_1517_xi: { CrossAttack: 1.333, ShieldBurst: 0, ShieldBurstReborn: 0 },
+  enemy_1525_blkswb: { CircleAttack: 2.067, CircleAttack2: 2.067 },
+  enemy_1535_wlfmster: { FearCage: 0 },
+  enemy_10034_cnvsax: { fire: 0 },
+});
+export function attackSkillOf(key, prefabKey, own = true) {
+  const clip = ENEMY_ATTACK_SKILL_CLIP[key]?.[prefabKey];
+  return clip == null ? {} : { atk: true, clip, own };
+}

@@ -78,10 +78,10 @@ export const loadoutStore = createStore({
 });
 
 /** Replace the stored entries (persisted at once with the settings; the sync picks the change up). */
-export function setEntries(entries) {
+export function setEntries(entries,{strategyMirror=false}={}) {
   const next = entries && typeof entries === 'object' ? entries : {};
   savePref(LOADOUT_PREF, toStored(next, loadoutStore.get().ops));
-  loadoutStore.set({ entries: next });
+  loadoutStore.set({ entries: next, strategyMirror });
 }
 
 /** Replace the stored per-operator 潜能 / 练度 (0.2.2; persisted at once with the entries; the sync picks it up). */
@@ -253,7 +253,7 @@ function installPrefSync({ net, timers, target, notify, key, stateKey, msgType, 
   const offWelcome = net.on('welcome', () => { revision++; lastSent = null; pendingJson = null; seq++; schedule(50); });
   const keys = Array.isArray(key) ? key : [key];
   const offStore = target.subscribe((s, prev) => {
-    if (keys.some((k) => s[k] !== prev[k])) { revision++; edited = true; schedule(); }
+    if (keys.some((k) => s[k] !== prev[k])) { revision++; edited = edited || tag!=='loadout' || s.strategyMirror!==true; schedule(); }
     // closing the overlay sends a pending edit at once (review fix): the player's next click — 准备就绪 in the solo
     // briefing, 开始模拟 in the room — must not overtake the debounced message (the match locks its loadout when
     // INFO_CHECK ends, so a late edit would silently only apply to the next match). Same socket ⇒ ordered.
@@ -296,18 +296,31 @@ export function installLoadoutSync({ net, getChessReady, getBackupsReady, lookup
   // the operators a 潜能 / 练度 may name (shared/protocol.js cultivationCharIds: the roster + the 自选 owned pool)
   const opIds = operatorIds || (() => cultivationCharIds(data.get('chess'), data.get('backups')));
   const sync = installPrefSync({
-    net, timers, target, notify, key: ['entries', 'ops'], stateKey: 'sync', msgType: 'room.loadout', field: null, tag: 'loadout',
+    net, timers, target, notify, key: ['entries', 'ops','strategyPresets'], stateKey: 'sync', msgType: 'room.loadout', field: null, tag: 'loadout',
     lockedText: N_('本局的干员调配已锁定，修改将在下一局生效'),
     async prepare() {
       const current = target.get().entries;
       const ops = target.get().ops;
       const state = matchState();
+      const rawPresets=target.get().strategyPresets;
+      const linked={};
+      if(rawPresets&&Object.keys(rawPresets).length){
+        if((await ready())==null)return null;
+        const bands=await data.load('bands');if(bands==null)return null;
+        for(const [id,entries]of Object.entries(rawPresets)){
+          if(!Object.hasOwn(bands,id))continue;
+          const clean=sanitizeEntries(entries,lookup);
+          if(Object.keys(entries).length&&!Object.values(clean).some(e=>e.selected))continue;
+          linked[id]=clean;
+        }
+      }
+      const strategy=rawPresets?{strategyPresets:linked}:{};
       const prep = state.match?.public?.phase === PHASE.PREP && ruleOption(state.room?.content?.rules, 'prepLoadout') === 'prep';
       const live = prep ? state.match?.private : null;
       const hasOps = (!!ops && Object.keys(ops).length > 0) || !!Object.keys(live?.ops || {}).length;
       // an empty loadout needs no data (nothing to sanitise): a player who never opened 干员调配 does not download
       // chess.json in the lobby just for this
-      if ((!current || Object.keys(current).length === 0) && !Object.keys(live?.loadout || {}).length && !hasOps) return { entries: {}, ops: {} };
+      if ((!current || Object.keys(current).length === 0) && !Object.keys(live?.loadout || {}).length && !hasOps) return { entries: {}, ops: {}, ...strategy };
       const loaded = await ready();
       if (loaded == null) return null;
       const entries = sanitizeEntries(target.get().entries, lookup);
@@ -319,12 +332,12 @@ export function installLoadoutSync({ net, getChessReady, getBackupsReady, lookup
         const opt = loadoutOptions(base, base.goldenId ? lookup(base.goldenId) : null);
         entries[id] = { skill: opt.defaultSkill, ...(typeof opt.defaultModule === 'string' ? { module: opt.defaultModule } : {}) };
       }
-      if (!hasOps) return { entries, ops: {} };
+      if (!hasOps) return { entries, ops: {}, ...strategy };
       if ((await readyBackups()) == null) return null;
       const ids = opIds();
       const cleanOps = sanitizeOps(target.get().ops, (id) => ids.has(id), (id) => charPotentialChanges({ chess: data.get('chess'), backups: data.get('backups') }, id));
       if (live) for (const id of Object.keys(live.ops || {})) if (ids.has(id) && !Object.hasOwn(cleanOps, id)) cleanOps[id] = { potential: POTENTIAL_DEFAULT, cultivate: CULTIVATE_DEFAULT };
-      return { entries, ops: cleanOps };
+      return { entries, ops: cleanOps, ...strategy };
     },
   });
   activeFlush = sync.flush;

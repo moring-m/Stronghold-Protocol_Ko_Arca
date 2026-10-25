@@ -1,0 +1,45 @@
+✔ strategy links are independent from factions, unique per strategy and migrate old presets (1.301934ms)
+✔ favorites activate at confirmed strategy completion, not preview or draft; later state pushes do not override manual changes (0.552609ms)
+✔ recruit strategy preset applies before loadout lock (manual) (22.80118ms)
+✔ recruit strategy preset applies before loadout lock (timeout) (7.064091ms)
+✔ recruit strategy preset applies before loadout lock (random) (5.629308ms)
+✔ strategy recruit links are validated, stored before joining and carried to the room seat (175.405551ms)
+✔ a faction has one preset owner; relinking releases the old owner (1.469065ms)
+✔ old favorites migrate without a link; selecting a faction applies its preset only (0.310376ms)
+✔ recruit preset replaces recruit settings only; absent picks clear and unavailable picks drop (0.403516ms)
+✔ recruit presets lock after strategy selection including final result and unknown match phases (0.189083ms)
+✔ locked manual apply changes neither stored loadout nor active recruit preset (0.334121ms)
+✔ an obsolete nonempty preset cannot silently clear the current loadout (0.278968ms)
+✔ recruit preset activation respects current operator skills including returning to default (0.257076ms)
+✔ cooperative defense chat choice has a bond icon but cannot link favorites or recruit presets (0.371508ms)
+✔ duplicate preset IDs retain separate faction links and activate the matching favorite list (0.51359ms)
+✔ recruit presets also repair duplicate IDs without moving links or dropping entries (0.383686ms)
+✔ a stale preset ID cannot remove another presets faction link (0.102523ms)
+✔ every linkable chat faction selects its own preset regardless of faction list order (0.855794ms)
+✔ restored chat faction activates the linked favorite preset without requiring another button click (0.408864ms)
+✔ linking a preset to the already selected faction immediately activates that preset (0.258679ms)
+✔ favorite presets retain separate operators and items, deduplicate and fall back after deletion (4.642548ms)
+✔ only the active preset marks shop cards; elite cards share the base operator preference (0.353481ms)
+✔ operator search combines bond, tier and name filters without changing presets (0.637877ms)
+✔ optional recruits never appear in favorite filters or receive a favorite marker (0.390786ms)
+✔ release status does not hide playable operators from selection lists (10.059567ms)
+▶ parseRichText
+  ✔ styled spans, terms, literal trigger labels, newlines (1.483817ms)
+  ✔ nesting, escaped newlines, stray closers, unterminated tags (0.516115ms)
+  ✔ non-strings and empty (0.205578ms)
+  ✔ class names (0.157106ms)
+  ✔ every official description parses to the same plain text as `desc` (79.669079ms)
+✔ parseRichText (83.153639ms)
+▶ placeholders
+  ✔ formatPlaceholder (0.240892ms)
+  ✔ fillPlaceholders keeps unknown indexes (0.306971ms)
+  ✔ formatBondEffect resolves base + perStack × layers for every bond (1.650657ms)
+✔ placeholders (2.434674ms)
+ℹ tests 33
+ℹ suites 2
+ℹ pass 33
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 885.261631

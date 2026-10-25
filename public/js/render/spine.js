@@ -426,6 +426,7 @@ export class SpineActor {
     this.endClip = null;          // setForm's closing clip, played as a change clip once the clock reaches endAt,
     this.endAt = 0;               // landing in endRoles (the next form's) when given
     this.endRoles = null;
+    this.strike = null;
     this.skillOn = false;
     this.skillClipOnce = false;    // skillBegin: the skill's own clip plays once (a clip with no Begin / own Idle)
     this.skillEndPending = false;  // … and the skill turned off inside it: play its End clip / base when it ends
@@ -469,10 +470,19 @@ export class SpineActor {
    * index (`anims.skills`), else the primary skill's clip.
    * @param {number|undefined} index 0-based skill index
    */
+  effectTexture(slotName, attachmentName) {
+    const key = `${slotName}|${attachmentName}`;
+    if (this._effectTex?.has(key)) return this._effectTex.get(key);
+    const out = attachmentTexture(this.spine?.spineData, slotName, attachmentName, globalThis.PIXI);
+    (this._effectTex || (this._effectTex = new Map())).set(key, out);
+    return out;
+  }
+
   setSkillIndex(index) {
     const anims = selectedAnimationRoles(this.entry);
     const clip = Number.isInteger(index) && anims.skills ? selectedSkillClip(this.entry,index) : null;
-    this.roles = this.baseRoles = Number.isInteger(index) && anims.skills ? { ...anims, skill: clip || null } : anims;
+    this.baseRoles = Number.isInteger(index) && anims.skills ? { ...anims, skill: clip || null } : anims;
+    this.roles = this.formRoles ? {...this.baseRoles,...this.formRoles} : this.baseRoles;
   }
 
   /** Compose authored state attachments with the default skin; never drop the unit's body. */
@@ -517,6 +527,7 @@ export class SpineActor {
    */
   setForm(roles, change = null, end = null, transition = null) {
     const anims = this._baseRoles();
+    this.formRoles=roles||null;
     this.roles = roles ? { ...anims, ...roles } : anims;
     this.endClip = null;
     if (this.dead) return;
@@ -532,7 +543,7 @@ export class SpineActor {
     if (transition?.sequence?.length && this._changeSequence(transition.sequence, transition.elapsed || 0)) return;
     if (change && this.has(change)) this._change(change);
     else if (this.mode === 'base') this._play(this._baseName(), true);
-    else if (this.mode === 'stun' && this.has(this.roles.stun?.loop)) this._play(this.roles.stun.loop, true);
+    else if (this.mode === 'stun' && this.has(this.roles.stun?.loop)) this._play(this.roles.stun.loop, !this.holdStunPose);
   }
 
   /**
@@ -678,8 +689,8 @@ export class SpineActor {
     const fallback=[...this.names].find(n=>suffix && n.toLowerCase()===`stun_${suffix}`) || [...this.names].find(n=>/^stun(?:_loop|_idle|_\d+)?$/i.test(n));
     const s = this.roles.stun || (fallback ? {loop:fallback} : null);
     if (s && this.has(s.loop)) {
-      if (this.has(s.begin)) { this._play(s.begin, false); this._queue(s.loop, true); }
-      else this._play(s.loop, true);
+      if (this.has(s.begin)) { this._play(s.begin, false); this._queue(s.loop, !this.holdStunPose); }
+      else this._play(s.loop, !this.holdStunPose);
     } else {
       this.frozen = true;
     }
@@ -897,7 +908,19 @@ export class SpineActor {
     return withHit || cands[0];
   }
 
+  /**
+   * The clip of the attack-class skill the next attack is (render/units.js UnitView.onCast: an enemy's `strike` slot,
+   * `anims.skills[slot]` — 杰斯顿·威廉姆斯's C1_Skill): that attack plays it in place of its attack clip, then the clip's end
+   * restores the attack role; null = a plain attack. A clip the model lacks is ignored.
+   * @param {{ begin: string|null, loop: string, end: string|null }|null} clip
+   */
+  castStrike(clip) {
+    this.strike = clip && this.has(clip.loop) ? clip : null;
+  }
+
   _attackClip() {
+    if (this.strike) return this.strike;
+    if(this.enemyModel && this.formRoles?.attack && this.has(this.formRoles.attack.loop))return this.formRoles.attack;
     if (this.has(this.attackAnimation) && this.roles.attack) return {...this.roles.attack, loop:this.attackAnimation};
     const sk = this.roles.skill;
     const mode = this.skillOn ? this.skillAttackMode?.() : null;
@@ -1195,6 +1218,7 @@ export class SpineActor {
             break;
           }
           const clip = this._attackClip() || this.roles.attack;
+          this.strike = null;
           const ready = this._normalAttackIdle(clip);
           if (ready && this.clock < this.attackPoseUntil) {
             this.mode = 'attackRest';
@@ -1359,4 +1383,21 @@ export class SpineActor {
     try { this.spine.destroy({ children: true, texture: false, baseTexture: false }); } catch { /* ignore */ }
     this.spine = null;
   }
+}
+
+export function attachmentTexture(spineData, slotName, attachmentName, PIXI = globalThis.PIXI) {
+  try {
+    const i = spineData?.slots?.findIndex((s) => s.name === slotName) ?? -1;
+    const skin = spineData?.skins?.[0];
+    const att = i >= 0 && typeof skin?.getAttachment === 'function' ? skin.getAttachment(i, attachmentName) : null;
+    const region = att?.region;
+    if (!region || !PIXI?.Texture) return null;
+    if (region.texture) return region.texture;              // pixi-spine's own cut (rotated regions included)
+    const page = region.page;
+    const base = page?.baseTexture;
+    if (!base || region.rotate || !PIXI.Rectangle) return null;
+    const w = base.width || page.width || 0, h = base.height || page.height || 0;
+    if (!w || !h) return null;
+    return new PIXI.Texture(base, new PIXI.Rectangle(Math.round(region.u * w), Math.round(region.v * h), region.width, region.height));
+  } catch { return null; }
 }

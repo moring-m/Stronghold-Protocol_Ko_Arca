@@ -204,6 +204,7 @@ export function noteAttackCommit(b, dt) {
   const allies = b.allyUnits;
   if (!allies || !allies.length) return;
   let map = null;
+  const meleeState = { fortressMelee: false };
   for (let i = 0; i < allies.length; i++) {
     const u = allies[i];
     if (!u.alive || !u.deployed || !u.canAct || !u.profile) continue;
@@ -217,8 +218,8 @@ export function noteAttackCommit(b, dt) {
     if (prof.heal && prof.dmgType === 'heal') continue;
     if (prof.allInRange || prof.rangeAoe) continue;
     if (prof.canAttack && !prof.canAttack(b, u)) continue;
-    // acquireTargets writes `_fortressMelee` on the profile it is given; keep that off the live profile
-    const targets = acquireTargets(b, u, Object.assign({}, prof));
+    // Collect the fortress answer separately, keeping the live profile untouched.
+    const targets = acquireTargets(b, u, prof, meleeState);
     if (!targets.length) continue;
     (map ??= new Map()).set(u.id, targets.filter((t) => t && t.alive));
   }
@@ -236,7 +237,11 @@ function committedAttackTargets(b, u, prof) {
 }
 
 /** Collect targets for an ally with profile `prof`. */
-export function acquireTargets(b, u, prof) {
+function setFortressMelee(prof, state, v) {
+  if (state) state.fortressMelee = v; else prof._fortressMelee = v;
+}
+
+export function acquireTargets(b, u, prof, state = null) {
   if (typeof prof.acquireTargets === 'function') return prof.acquireTargets(b,u);
   // a heal attack (医师 / 群愈师 / 疗养师 / 链愈师 / 行医, a skill attack turned into a heal) selects injured allies only,
   // never the enemies its unit blocks — a blocking healer keeps healing: PRTS 卫戍协议/帮助 "对于医疗干员（咒愈师分支除外），
@@ -254,10 +259,10 @@ export function acquireTargets(b, u, prof) {
   if (prof.fortress) {
     if (u.blocking.length) {
       const t = u.blocking.filter((e) => canTargetEnemy(u, e, { canHitFly: false }));
-      prof._fortressMelee = true;
+      setFortressMelee(prof, state, true);
       return t.slice(0, 1);
     }
-    prof._fortressMelee = false;
+    setFortressMelee(prof, state, false);
   }
   const cands = b.enemiesInKeys(u.rangeKeys, u, prof);
   // "可以选择且优先选择阻挡单位" (PRTS 选择器): the enemies a unit blocks are always selectable by it — the block radius
@@ -272,7 +277,7 @@ export function acquireTargets(b, u, prof) {
     const here = [u.tileR * COLS + u.tileC];
     const near = b.enemiesInKeys(here, u, prof);
     if (!near.length && b._allyTargets?.size) near.push(...b.allyTargetsInKeys(here, u));
-    prof._fortressMelee = near.length > 0;
+    setFortressMelee(prof, state, near.length > 0);
     sortEnemyTargets(b, u, near, prof.priority);
     return near.slice(0, 1);
   }
@@ -1018,7 +1023,7 @@ function enemyAttack(b, e) {
   if (!targets.length && !(e.mem.attackWindup && e.profile?.continueAttackOnTargetLoss)) { cancelWindup(b, e); return false; }
   // This fork starts the attack interval at wind-up, so choose a replacement on that same turn.
   // Only opted-in kits (Quintus) use this path; normal enemies keep their existing attack timing.
-  if(!e.mem.attackWindup && typeof e.profile?.attackTurnSkill==='function') {
+  if(!e.profile?.attackTurnAtHit && !e.mem.attackWindup && typeof e.profile?.attackTurnSkill==='function') {
     const skill=e.profile.attackTurnSkill(b,e);
     if(skill){e.atkCd=Math.max(e.s.interval,skill.clip||0);return false;}
   }
@@ -1037,6 +1042,10 @@ function enemyAttack(b, e) {
       b._ev(['atkStart', e.id, targets[0].id, wind, e.s.interval, false, undefined, e.profile?.deferHit ? (e.profile.shot || 'none') : radius > 0 && !(e.blockedBy && targets[0] === e.blockedBy && radius < 1) ? 'enemy' : 'none']);
       return true;
     }
+  }
+  if(e.profile?.attackTurnAtHit && typeof e.profile.attackTurnSkill==='function'){
+    const skill=e.profile.attackTurnSkill(b,e);
+    if(skill){e.atkCd=Math.max(e.s.interval,skill.clip||0);return false;}
   }
   if (b._hooks.enemyAttackStart) {
     b.emit('enemyAttackStart', { enemy: e, targets });

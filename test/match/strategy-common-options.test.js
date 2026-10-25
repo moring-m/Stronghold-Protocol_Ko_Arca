@@ -5,7 +5,7 @@ import{GameData}from '../../server/match/gamedata.js';
 test('disabled personal strategies may still supply common preparation and battle effects',t=>{
  const selection={bonds:[],stages:[],disabledBands:['band_quintus','band_amiya'],commonBands:['band_quintus','band_amiya']};assert.deepEqual(validateExtensionMinimums(DATA,selection,{mode:'coop8',difficulty:'NORMAL'}),[]);
  const h=makeMatch({mode:'coop8',humans:8,customExtensions:selection});t.after(()=>h.m.dispose());const m=h.m;m.round=3;assert.ok(!m.gd.bandAllowed('band_quintus'));assert.ok(!m.gd.bandIds().includes('band_quintus'));
- for(const ps of m.order){ps.bandId='band_pith';m.dispatch(ps,'onRoundStart',{});assert.equal(ps._itemLocations('chess_item_5_08_e_a').length,1);}
+ for(const ps of m.order){ps.bandId='band_pith';m.dispatch(ps,'onPrepStart',{});assert.equal(ps._itemLocations('chess_item_5_08_e_a').length,1);}
  const d=applyCustomExtensions(DATA,selection);d.chess={...d.chess,test:chessRec({id:'test',stats:{atk:100},skill:null})};const b=makeBattle({data:d,units:[{chessId:'test',row:10,col:4}],bandId:'band_pith',bonds:Object.fromEntries(['yanShip','swiftShip','arcaneShip'].map(id=>[id,{active:true,count:3,tier:1,layers:0}])),autoFinish:false});b.run(.1);assert.equal(b.unit('test').s.atk,120);assert.equal(b.b.errorCount,0);
 });
 test('Touch scales both normal and upgraded medical map operators by all personal and common copies',()=>{
@@ -34,7 +34,7 @@ test('Duck Lord common-only and repeated team sources each replace their own wav
   const h=makeMatch({mode:'coop8',humans:8,seed:4,customExtensions:{bonds:[],stages:[],commonBands:['band_ducklord']}});t.after(()=>h.m.dispose());const m=h.m;m.round=5;
   for(const [i,p] of m.order.entries())p.bandId=i<personal?'band_ducklord':null;
   let total=0,max=0;
-  for(let i=0;i<100;i++){
+  for(let i=0;i<100;i++){m.seed=4+i;
    const ev={kind:'normal',spawns:Array.from({length:100},(_,i)=>({enemyKey:normal,time:i,count:1,routeIndex:0}))};m.dispatch(m.order[0],'onBattleStart',ev);
    const count=ev.spawns.filter(s=>s.tag==='duck').length;total+=count;max=Math.max(max,count);assert.equal(ev.spawns.length,100);
   }

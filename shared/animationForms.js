@@ -1,3 +1,4 @@
+const withoutSkill=r=>Object.freeze(Object.fromEntries(Object.entries(r).filter(([k])=>k!=='skill')));
 // Shared model clip sets: rendering and authoritative attack timing use the same forms.
 const loop = (name, via = null) => Object.freeze(via ? { begin: null, loop: name, end: null, via } : { begin: null, loop: name, end: null });
 const clipSet = (idle, move, die, attack = null) => Object.freeze({
@@ -19,7 +20,7 @@ const STATUE = Object.freeze({
   stone: Object.freeze({ change: null, roles: Object.freeze({ idle: 'Sleep', deploy: 'Sleep', move: loop('Sleep'), stun: loop('Sleep'), attack: null, skill: null }) }),
   fly: Object.freeze({ change: null, roles: clipSet('Idle_2', 'Move_2', 'Die_2', 'Attack_2') }),
 });
-const JAKILL2 = clipSet('C2_Idle', 'C2_Move', 'C2_Die', 'C2_Attack');
+const JAKILL2 = withoutSkill(clipSet('C2_Idle', 'C2_Move', 'C2_Die', 'C2_Attack'));
 /** A 傀儡师's 替身 roles: idle `idle`, death `die`, attack `attack` (null: none), no skill clip of its own. */
 const dollRoles = (idle, die, attack = null) => Object.freeze({
   idle, deploy: idle, die, attack: attack ? Object.freeze({ begin: null, loop: attack, end: null }) : null, attackDown: null, skill: null,
@@ -91,7 +92,7 @@ export const FORMS = Object.freeze({
     husk: Object.freeze({ change: 'A_Die', end: 'B_Revive', next: 'revived', roles: clipSet('B_Idle', 'B_Move', 'B_Die') }),
     revived: Object.freeze({ change: null, roles: Object.freeze({}) }),
   }),
-  enemy_1525_blkswb: rebirth('Revive1', 'Revive2', 'Revive3', clipSet('B_Idle', 'B_Move', 'B_Die', 'B_Attack')),
+  enemy_1525_blkswb: rebirth('Revive1', 'Revive2', 'Revive3', withoutSkill(clipSet('B_Idle', 'B_Move', 'B_Die', 'B_Attack'))),
   enemy_1535_wlfmster: rebirth('A_revive_1', 'A_revive_2', 'A_revive_3', clipSet('B_Idle', 'B_Move', 'B_Die', 'B_Attack')),
   enemy_1539_reid: rebirth('Revive_Begin', 'Revive_Loop', 'Revive_End'),
   enemy_1516_jakill: Object.freeze({

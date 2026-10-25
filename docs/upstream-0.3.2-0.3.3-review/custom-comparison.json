@@ -1,0 +1,67 @@
+{
+  "before": {
+    "failures": [
+      "Absinthe S2 refuses targets above half HP; Botani S1 adds both extra arts damage and erosion",
+      "All 19 Ursus skills, normal and elite: selected authored runtime and complete activation without errors",
+      "Dawnstriker S3 auto-casts on airborne targets; only the opening wave hits air",
+      "Hellagur garrison adds attack speed by each complete three active Ursus layers",
+      "Kaschey: host gate, HP 22, promotion discount once per round, floor zero",
+      "Leto S2 starts ready student skills, excludes non-students, and removes ASPD at skill end",
+      "Ukusik preparation grants +4 / +8 to each active bond",
+      "Updated affiliations/tier and default/alternate skill icons follow the UI manifest contract",
+      "Ursus default skills match the requested roster for normal and elite records",
+      "Ursus descriptions use the same highlighted thresholds and live layer formatting as core bonds",
+      "Ursus drone approaches and attacks stationary ground and flying targets with shell projectiles",
+      "all mystic identities expose their actual stores, including Ebenholz and Veen conversions",
+      "current Leithanien effect shows floored duration bonuses without per-layer formulas",
+      "verified anti-air skill variants activate and damage when only a flying enemy is present",
+      "디아만테: official attack and skill sound files are indexed",
+      "베이스라인: official attack and skill sound files are indexed",
+      "체르니: official attack and skill sound files are indexed"
+    ],
+    "summary": [
+      "ℹ tests 463",
+      "ℹ suites 5",
+      "ℹ pass 446",
+      "ℹ fail 17",
+      "ℹ cancelled 0",
+      "ℹ skipped 0",
+      "ℹ todo 0",
+      "ℹ duration_ms 32996.390656"
+    ]
+  },
+  "after": {
+    "failures": [
+      "Absinthe S2 refuses targets above half HP; Botani S1 adds both extra arts damage and erosion",
+      "All 19 Ursus skills, normal and elite: selected authored runtime and complete activation without errors",
+      "Dawnstriker S3 auto-casts on airborne targets; only the opening wave hits air",
+      "Hellagur garrison adds attack speed by each complete three active Ursus layers",
+      "Kaschey: host gate, HP 22, promotion discount once per round, floor zero",
+      "Leto S2 starts ready student skills, excludes non-students, and removes ASPD at skill end",
+      "Ukusik preparation grants +4 / +8 to each active bond",
+      "Updated affiliations/tier and default/alternate skill icons follow the UI manifest contract",
+      "Ursus default skills match the requested roster for normal and elite records",
+      "Ursus descriptions use the same highlighted thresholds and live layer formatting as core bonds",
+      "Ursus drone approaches and attacks stationary ground and flying targets with shell projectiles",
+      "all mystic identities expose their actual stores, including Ebenholz and Veen conversions",
+      "current Leithanien effect shows floored duration bonuses without per-layer formulas",
+      "디아만테: official attack and skill sound files are indexed",
+      "베이스라인: official attack and skill sound files are indexed",
+      "체르니: official attack and skill sound files are indexed"
+    ],
+    "summary": [
+      "ℹ tests 463",
+      "ℹ suites 5",
+      "ℹ pass 447",
+      "ℹ fail 16",
+      "ℹ cancelled 0",
+      "ℹ skipped 0",
+      "ℹ todo 0",
+      "ℹ duration_ms 30292.72354"
+    ]
+  },
+  "newFailures": [],
+  "fixedFailures": [
+    "verified anti-air skill variants activate and damage when only a flying enemy is present"
+  ]
+}

@@ -82,11 +82,11 @@ test('Absinthe S2 refuses targets above half HP; Botani S1 adds both extra arts 
 });
 test('Zima preparation start and end each grant six / twelve layers when active',{skip:!ready},()=>{
  for(const elite of [false,true]){const h=makeMatch({data,customFactions:true,mode:'solo',fake:true}).start();h.toPrep(1);const ps=h.ps('p_0');ps.board.clear();ps.hand.fill(null);ps.temp.fill(null);ps.layers={};ps.bandId=null;
-  const p=ps.acquireChess(id('headb2',elite),{source:'test'});ps.board.set('10,3',p);ps.hand.fill(null);ps.bondCountBonus.ursusShip=3;ps.recompute();h.m.dispatch(ps,'onRoundStart',{round:h.m.round});assert.equal(ps.layers.ursusShip,elite?12:6);
+  const p=ps.acquireChess(id('headb2',elite),{source:'test'});ps.board.set('10,3',p);ps.hand.fill(null);ps.bondCountBonus.ursusShip=3;ps.recompute();h.m.dispatch(ps,'onPrepStart',{round:h.m.round});assert.equal(ps.layers.ursusShip,elite?12:6);
   h.m.dispatch(ps,'onPrepEnd',{round:h.m.round});assert.equal(ps.layers.ursusShip,elite?24:12);
   assert.equal(h.m.dispatcher.triggerGarrisons(ps,p,'SERVER_PREP_FIN'),1,'prep-end trait can be triggered by other operators');assert.equal(ps.layers.ursusShip,elite?36:18);
   ps.bondCountBonus.ursusShip=0;ps.recompute();h.m.dispatch(ps,'onPrepEnd',{});assert.equal(ps.layers.ursusShip,elite?36:18,'inactive bond gains nothing');
-  ps.bondCountBonus.ursusShip=3;ps.board.clear();ps.hand[0]=p;ps.recompute();h.m.dispatch(ps,'onRoundStart',{});h.m.dispatch(ps,'onPrepEnd',{});assert.equal(ps.layers.ursusShip,elite?36:18,'bench trait does not run');h.m.dispose();
+  ps.bondCountBonus.ursusShip=3;ps.board.clear();ps.hand[0]=p;ps.recompute();h.m.dispatch(ps,'onPrepStart',{});h.m.dispatch(ps,'onPrepEnd',{});assert.equal(ps.layers.ursusShip,elite?36:18,'bench trait does not run');h.m.dispose();
  }
 });
 test('Ursus Cutlass applies normal / elite ATK and max-HP buffs through the real equipment runtime',{skip:!ready},()=>{
@@ -169,7 +169,7 @@ test('Ukusik preparation grants +4 / +8 to each active bond',{skip:!ready},()=>{
   const p=ps.acquireChess(id('turdus',elite),{source:'test'});ps.board.set('10,3',p);ps.hand.fill(null);
   ps.bondCountBonus.ursusShip=3;ps.bondCountBonus.deputShip=3;ps.recompute();
   const active=['ursusShip','deputShip'].filter(k=>ps.bonds[k]?.active);assert.ok(active.includes('ursusShip'));
-  h.m.dispatch(ps,'onRoundStart',{round:h.m.round});for(const k of active)assert.equal(ps.layers[k],elite?8:4);
+  h.m.dispatch(ps,'onPrepStart',{round:h.m.round});for(const k of active)assert.equal(ps.layers[k],elite?8:4);
  }
 });
 
@@ -219,9 +219,9 @@ test('in-place Ukusik promotion uses the upgraded prep trait on the same piece',
  const h=makeMatch({data,customFactions:true,mode:'solo',fake:true}).start();h.toPrep(1);const ps=h.ps('p_0');
  ps.board.clear();ps.hand.fill(null);ps.temp.fill(null);ps.layers={};ps.bandId=null;
  const p=ps.acquireChess(id('turdus'),{source:'test'});ps.hand.fill(null);ps.board.set('10,3',p);ps.bondCountBonus.ursusShip=3;ps.recompute();
- h.m.dispatch(ps,'onRoundStart',{});assert.equal(ps.layers.ursusShip,3);
+ h.m.dispatch(ps,'onPrepStart',{});assert.equal(ps.layers.ursusShip,3);
  assert.ok(ps.promote(p));assert.equal(p.id,id('turdus',true));
- h.m.dispatch(ps,'onRoundStart',{});assert.equal(ps.layers.ursusShip,9,'elite contributes six after the normal three');h.m.dispose();
+ h.m.dispatch(ps,'onPrepStart',{});assert.equal(ps.layers.ursusShip,9,'elite contributes six after the normal three');h.m.dispose();
 });
 
 test('Zima S3 fires all five rounds at its fixed front tile without enemies',{skip:!ready},()=>{

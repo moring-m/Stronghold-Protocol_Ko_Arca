@@ -1,0 +1,46 @@
+✔ char_4217_makoto: all-out End is a one-shot and returns without another SwitchOut (14.809274ms)
+✔ skin_char_4217_makoto_p3r_1: all-out End is a one-shot and returns without another SwitchOut (0.26569ms)
+✔ S3 persona change has no interim P1 idle and later state events do not restart its end (4.89735ms)
+✔ late or rebuilt form resumes the current authored segment; an expired transition stays idle (0.336637ms)
+✔ UP-facing base/skin swaps to the Front transition and resumes elapsed time after the model load (12.484667ms)
+✔ all persona entries resume late progress rather than replaying SwitchIn from zero (0.47835ms)
+✔ Makoto body follows the same A/B sequence as the official attack emitter; cancel preserves the pending variant (2.457257ms)
+✔ official Makoto emitter follows the visible variant even when enabled after earlier simplified attacks (16.073947ms)
+✔ live embedded effects outside sampled impostor bounds bypass the rectangle, including mixed poses (0.319761ms)
+✔ each persona returns through its authored SwitchOut from frame zero before the all-out animation (0.443588ms)
+✔ char_4217_makoto authoritative body return accepts its first attack before the next render update (0.214813ms)
+✔ skin_char_4217_makoto_p3r_1 authoritative body return accepts its first attack before the next render update (0.064377ms)
+✔ Makoto background waits for SwitchIn and the S3 second persona follows ChangeEnd (0.29931ms)
+✔ Makoto looping background reselects the authored left/right variant after loading and turning (0.43174ms)
+✔ UP-facing Makoto retains a started body attack across the Front to Back model replacement (2.499871ms)
+✔ default-speed persona attack starts at the protected transition boundary without delaying the body behind its trail (1.015248ms)
+✔ a delayed Makoto model resumes past its strike, but cancelled or expired swings stay finished (0.26606ms)
+✔ Makoto base and skin stun enter once, hold the pose and recover in every persona (2.25921ms)
+✖ UP-facing personas use their authored Back attack after Front-only entry finishes (1.567749ms)
+ℹ tests 19
+ℹ suites 0
+ℹ pass 18
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 139.309921
+
+✖ failing tests:
+
+test at test/render/makoto-transitions.test.js:154:1
+✖ UP-facing personas use their authored Back attack after Front-only entry finishes (1.567749ms)
+  AssertionError [ERR_ASSERTION]: char_4217_makoto makoto_s1 must stop requiring Front-only entry clips after entry
+
+  false !== true
+
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/render/makoto-transitions.test.js:164:10)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

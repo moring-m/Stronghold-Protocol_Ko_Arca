@@ -1,3 +1,4 @@
+import {skillStartPaths} from './audio.mjs';
 // Builds the asset plan: which files the game needs, where they come from and
 // where they go, as a *manifest template* that mirrors data/assets.json.
 //
@@ -458,7 +459,7 @@ export function buildPlan({ assets07, ops03, enemies05, maps05, audio, modelsDat
     for (const i of idx) {
       const s = (o.skills || []).find((k) => k.index === i);
       if (!s) continue;
-      const start = s.skillId ? audio.skillBanks.get(s.skillId)?.get('ON_SKILL_START') : null;
+      const start = s.skillId ? skillStartPaths(audio,s.skillId,s) : null;
       const linked = cm && s.skillId ? cm.skillMode.get(s.skillId) : undefined;
       skillRows.push({
         index: i, skillId: s.skillId ?? null,
@@ -477,7 +478,7 @@ export function buildPlan({ assets07, ops03, enemies05, maps05, audio, modelsDat
       const iconId = s.iconId || s.skillId;
       if (s.icon?.url && !skills[iconId]) skills[iconId] = leaf(alt(`skill/${safeName(iconId)}.png`, s.icon.url, s.icon.bytes));
       if (s.skillId) skillsById[s.skillId] = iconId;
-      const ss = audio.skillBanks.get(s.skillId)?.get('ON_SKILL_START');
+      const ss = skillStartPaths(audio,s.skillId,s);
       if (ss?.length) skillSfx[String(i)] = soundLeaf(ss);
       const ak = assigned.attacks[String(i)];
       if (ak) {

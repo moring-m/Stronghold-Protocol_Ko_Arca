@@ -1,0 +1,525 @@
+✔ bands.js wires both parts: 28 bands with a prep handler, 10 with a battle part, 鸭爵 global, 歌利亚 = LP only (1.795585ms)
+✔ starting LP = totalHp for every band (歌利亚 坚不可摧 45, 铃兰 20) (26.731847ms)
+✔ 华法琳 重点监护: prep end — for every distinct tier on the board, 1 random operator's bonds +2 layers (无需激活) (53.779608ms)
+✔ 杜遥夜 广交豪杰: the first 2 manual refreshes of a round show ≥ 1 <炎> operator; the 3rd is a normal refresh (101.207513ms)
+✔ 梓兰 猎头顾问: every manual refresh copies the highest-tier shop operator into another slot and freezes the copy; R10 寻呼模块 (12.844556ms)
+✔ fixed-round grants: 小贾斯汀 / 昆图斯 / 马克维茨 / 变形者集群 / 杰西卡 / 缪尔赛思 / 芬 / Pith / 夕 (进入休整期时) (75.35067ms)
+✔ 杜宾 加练！: a 教鞭 every 2 rounds (even rounds) (8.786416ms)
+✔ 老鲤 得闲饮茶: income R1 0, R2 0, R3 15; R3 round start: 1 random tier-II and 1 tier-IV operator (11.761401ms)
+✔ 绮良 通关奖励: every 20 funds spent ⇒ 1 random operator of tier ≤ shop level (9.945836ms)
+✔ 佩佩 博学多通: upgrading to 2 / 4 / 6 gives 1 special refresh whose operators are <萨尔贡> first — paid normally, not a free refresh (GitHub #200) (36.061449ms)
+✔ 哈洛德 人才盲盒: from R4 every 2 rounds a <维多利亚> operator (8.218323ms)
+✔ 休露丝 雪域礼赠: the first <谢拉格> operator bought each round costs 1 (7.21661ms)
+✔ 潘格尼尼 定制铳械: after 55 funds spent in total, 1 random elite <拉特兰> operator of tier ≥ IV (once) (10.60782ms)
+✔ 余 文火慢炖: R8 round start — exactly 1 active bond +36 layers, otherwise every active bond +12 (12.136653ms)
+✖ 凯瑟琳 定向投放: every shop upgrade offers 3 different items (tier ≤ new level), 1 free pick (11.164374ms)
+✔ 坎诺特 利滚利: leftover funds are kept; ≥ 5 left ⇒ +1 at round start (max 1) (7.231593ms)
+✔ 鸭爵 “神秘顾客”: from R5, 0–2 ground enemies in the last 40 % of every teammate's wave become 鸭爵 & co. worth 1 fund to the killer (13.198587ms)
+✔ 铃兰 御守之力: each round start re-triggers the 获得时 effect of the right-most (then bottom-most) board operator (19.237771ms)
+✔ 巫恋 替身娃娃: the first sale of a normal operator each round swaps it with a random shop operator (no funds) (7.339524ms)
+✔ 松桐 九流之缘: at even rounds' prep start 1 random shop operator is taken for free (its slot empties) (6.293845ms)
+✔ 玛恩纳 业务指标: each <卡西米尔> operator bought ⇒ +1 fund next round, at most 3 per round (21.624742ms)
+✔ 贾维 团伙行动: every 6 manual refreshes ⇒ a <叙拉古> operator (≤ shop level), at most 2 per round (28.891267ms)
+✔ 娜仁图亚 见者有份: even rounds' prep start — pick 1 of 2 different shop equips for free (any tier [ASSUMED]) (6.635007ms)
+✔ 阿米娅 众志合一: 3 / 4 / ≥ 5 active bonds ⇒ every operator ATK and HP ×1.2 / ×1.3 / ×1.4 (30.9787ms)
+✖ 埃芒加德 命结之秘: the first 3 knock-downs of the battle revive at full HP (after the operators' own revive items) (9.525665ms)
+✔ 克莱门莎 崇高牺牲: a <阿戈尔> operator knocked down ⇒ +its tier <阿戈尔> layers (requires activation; none in 联防/boss) (5.993454ms)
+✔ 大帝 加急调派: every deployment halves the operator's next redeploy time (cumulative) (2.61881ms)
+✔ 桑葚 药枚实验: the units on the right-most column get a 25 % chance per attack of 1 shield layer (max 1) (6.790721ms)
+✔ 休谟斯 回收利用: a ground operator's skill end gives a random operator on its 4 neighbouring tiles 3 SP (1.535845ms)
+✔ 卡莱莎 食腐之蝶: an operator knocked down ⇒ the others on the field ATK +20 % per knock-down (additive, max +200 %), lost when they fall (54.272999ms)
+✔ 陈 以己之长: the player's operators deal physical / arts damage as 弱点伤害 (2.04579ms)
+✔ 夕 墨色真颜: operators with a same-name partner on the field ATK +30 % (0.905559ms)
+✔ 伊奥莱塔 统御号令: n elite operators on the field ⇒ each elite ATK and HP ×(1 + 0.1 n) (1.18629ms)
+✔ Touch 外勤医疗: every player of a match with the band gets 预备干员-医疗 (≤ 1 elite) or Touch (≥ 2 elites) on its stage slot (6.420696ms)
+✔ 外勤医疗: 预备干员-医疗 and Touch keep preplaced targeting order against a flying 守墓石像 (15.393832ms)
+✔ 外勤医疗: 联防右侧 Touch retains its prepared targeting order (5.63768ms)
+✖ coverage: every band is exercised by a test above (0.824768ms)
+✔ 获得时 自身所属盟约 +N without activation (角峰 / 艾丝黛尔 / 深靛 / 野鬃 25, 雪猎 / 灵知 111, 忍冬 71, 星熊 / 锏 65, 崖心 41, 协律 130) (298.130348ms)
+✔ 投资人: 获得时 traits run ×2 while active, ×3 at ≥ 100 layers (dispatcher; handlers add once per call) (43.069806ms)
+✔ SERVER_ADD_BOND 获得时: 烛煌 35 炎/维多利亚 +5 / +10; 录武官 (hidden 4_15) 156 + 157 grant 奇迹 once (55.89953ms)
+✔ SERVER_ADD_MULTIPLE_BOND 录武官 156: 炎 +6 / 奇迹 +3 (精锐 12 / 6), no activation needed (18.679902ms)
+✔ SERVER_ADD_BOND_METHOD shoplv (惊蛰 30): 调度中心等级 × multi, no activation needed (18.646613ms)
+✔ SERVER_ADD_BOND_ACTIVATED_MOST_LAYER: 灰毫 105 获得时; 波登可 102 / 调香师 81 at prep end, also from the hand (72.089515ms)
+✔ SERVER_ADD_BOND at prep start / end (寒檀 141 / 142, 刺玫 154, 雷蛇 158, 折桠 69): active bond, board only (131.71098ms)
+✔ SERVER_ADD_BOND_CHESS_ALL at prep start / end (赫默 / 蒂比 80, 伊内丝 104, 莱恩哈特 51): own ACTIVE bonds, board only (99.161512ms)
+✔ SERVER_ADD_BOND_METHOD round_gain_char (小满 31, 山 34, 夕 119): operators gained this round × multi (44.523237ms)
+✔ SERVER_ADD_BOND_METHOD same_bond_diff_lv (薄绿 48, 维娜 53 维多利亚 / 54 奇迹): distinct tiers on the board × multi (44.381664ms)
+✔ SERVER_ADD_BOND_METHOD hand_count (妮芙 56) and same_row (蛇屠箱 70) (49.782789ms)
+✔ 号角 61: the top active bond + multi per distinct tier of its members on the board (11.265577ms)
+✔ 流明 57: every hand operator adds +N to each of its ACTIVE bonds (14.722995ms)
+✔ SERVER_ADD_BOND_POSITION (断崖 / 见行者 47 behind, 引星棘刺 79 front, 空弦 150 front at round start): each target operator (56.538312ms)
+✔ regression: POSITION — a bond shared by 断崖 and the operator behind her gets +N from each (per-operator targets) (10.914371ms)
+✔ coin / refresh counters: 溯光星源 121 per 3 spent, 阿罗玛 122 / 安洁莉娜 147 refreshes × multiplier (capped), 拉普兰德 123 (92.563075ms)
+✔ SERVER_CHESS_PRICE: 购买价格为1 — bb.price is the discount off the tier price (至简 Ⅲ 3 − 2, 红豆 Ⅰ 2 − 1; user playtest #5) (26.08135ms)
+✔ regression: 购买价格为1 runs before the other price modifiers — 远见 150 (−1, no floor since 0.1.3) takes 至简 to 0 (5.777983ms)
+✔ SERVER_GAIN_EQUIP (诗怀雅 133, 耶拉 92, 卡涅利安 / 蜜蜡 49, 缪尔赛思 76): bb.count copies of bbStr.chess (85.75819ms)
+✔ free refreshes: 普罗旺斯 113 获得时, 德克萨斯 120 / 巫恋 132 售出时, 缄默德克萨斯 114 进入休整期时 (board only) (47.043357ms)
+✔ funds: 能天使 26 / 新约能天使 32 获得时, 格雷伊 67 / 泥岩 21 售出时 → next round; 琳琅诗怀雅 98 (hand needs 炎 / 投资人) (85.985221ms)
+✔ 松果 116 on sale: a free special recruit of tier I (精锐: tier V) (12.89718ms)
+✔ pools: 凯瑟琳 127 odd rounds, 佩佩 94, 洛洛 91, 焰尾 149, 歌蕾蒂娅 139 row of 3 — bb.count each (142.352132ms)
+✔ 歌蕾蒂娅 / 余: granting a chess toasts 「名字：获得X」 (12.587535ms)
+✔ 余 37: a chess of the bond with the most members (normal: 3 in the row; 精锐: always) (12.167755ms)
+✔ Yu rewards ignore shop level and row gaps while retaining operator bans (6.836713ms)
+✔ 铃兰 60: front "获得时" traits (精锐: the two tiles in front), ×投资人; nothing from the hand (31.32385ms)
+✔ regression: 瑰盐 82 (hidden) triggers the top-most (highest row: row 0 is the bottom), then right-most prep-end trait (11.232481ms)
+✔ 塞雷娅 99 / 白面鸮 86: the copier runs the front operator's prep-end / prep-start trait as its own (chains followed) (62.794921ms)
+✔ triggerGainEffects export (band 铃兰): re-runs 获得时 garrisons ×投资人 and returns the effects run (5.731413ms)
+✔ 风丸 93: only 2 copies merge into the elite (6.660078ms)
+✔ every SERVER_* effectKey of the data has a registered handler (0.257737ms)
+✔ coverage: every SERVER_* garrison id of a visible chess was exercised above (0.154492ms)
+✔ Yu most-member trait rewards every eligible faction, not only Yan (122.40524ms)
+✔ equipment-grant traits overflow into the temporary bench when the normal bench is full (109.181932ms)
+✔ Cathy: after taking a cell, later upgrades exclude it even after destruction, reconnect and a new round (37.910273ms)
+✔ Cathy: showing a cell without taking it leaves it eligible on the next upgrade [ASSUMED] (17.335836ms)
+✔ Cathy: a refused full-hand pick does not use the allowance (10.267493ms)
+✔ Cathy: taking a cell removes it from queued Cathy offers and preserves other sources [ASSUMED] (16.981925ms)
+✔ Quintus's R3 grant stays independent before Cathy's cell [ASSUMED] (13.652709ms)
+✔ Quintus's R3 grant stays independent after Cathy's cell [ASSUMED] (15.001773ms)
+✔ the bot reward routine uses the same Cathy allowance (12.469182ms)
+✔ inherited Cathy effects share the canonical source, queued offers and match-long allowance (13.34656ms)
+✔ Cathy fills all three eligible choices after excluding the cell, across 300 seeds (1076.304704ms)
+✔ Cathy samples eligible choices without replacement and stops only at exhaustion [ASSUMED] (8.977576ms)
+✔ item-pool exclusions filter explicit items, weights, tiers and also before sampling (6.827068ms)
+✔ the Cathy allowance belongs to the player, even when the cell is the only available item (9.774242ms)
+✔ test-console upgrades, strategy switches and reconnect replay the same source-specific allowance (19.530557ms)
+✖ fixed gift garrison_49_a/chess_char_4_05_a is produced past stock and still occupies it (33.438695ms)
+✖ fixed gift garrison_49_a/chess_char_4_24_a is produced past stock and still occupies it (12.089618ms)
+✖ fixed gift garrison_49_b/chess_char_4_05_b is produced past stock and still occupies it (8.739068ms)
+✖ fixed gift garrison_49_b/chess_char_4_24_b is produced past stock and still occupies it (7.830845ms)
+✖ fixed gift garrison_76_a/chess_char_6_11_a is produced past stock and still occupies it (9.900652ms)
+✖ fixed gift garrison_76_b/chess_char_6_11_b is produced past stock and still occupies it (7.042872ms)
+✖ fixed gift garrison_92_a/chess_char_3_20_a is produced past stock and still occupies it (6.960819ms)
+✖ fixed gift garrison_92_a/chess_char_4_03_a is produced past stock and still occupies it (7.046087ms)
+✖ fixed gift garrison_92_b/chess_char_3_20_b is produced past stock and still occupies it (7.616122ms)
+✖ fixed gift garrison_92_b/chess_char_4_03_b is produced past stock and still occupies it (9.478819ms)
+✖ fixed gift garrison_133_a/chess_char_3_03_a is produced past stock and still occupies it (6.580327ms)
+✖ fixed gift garrison_133_b/chess_char_3_03_b is produced past stock and still occupies it (6.617343ms)
+✖ unlimited fixed-item gifts do not exempt unrelated strategy equipment from stock (6.919187ms)
+✖ repeated Muelsyse acquisition and elite gifts remain unlimited (investor=false) (6.332216ms)
+✖ repeated Muelsyse acquisition and elite gifts remain unlimited (investor=true) (11.078119ms)
+✖ Damazti strategy grants its fixed item at rounds 5/10/15 past cap; releasing overflow does not free stock early (6.765285ms)
+✔ seven distinct Yan operators plus Yan-converted chess_char_6_11_a activate nine Yan (1.129826ms)
+✔ seven distinct Yan operators plus Yan-converted chess_char_6_11_b activate nine Yan (0.663205ms)
+ℹ tests 103
+ℹ suites 0
+ℹ pass 84
+ℹ fail 19
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2600.33571
+
+✖ failing tests:
+
+test at test/content/bands.test.js:305:1
+✖ 凯瑟琳 定向投放: every shop upgrade offers 3 different items (tier ≤ new level), 1 free pick (11.164374ms)
+  AssertionError [ERR_ASSERTION]: chess_item_4_04_e_a
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/content/bands.test.js:316:34)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at test/content/bands.test.js:537:1
+✖ 埃芒加德 命结之秘: the first 3 knock-downs of the battle revive at full HP (after the operators' own revive items) (9.525665ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+    assert.ok(PRIO_BAND_REVIVE < PRIO_REVIVE)
+
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/content/bands.test.js:550:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at test/content/bands.test.js:766:1
+✖ coverage: every band is exercised by a test above (0.824768ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+
+  + [
+  +   'band_cathy',
+  +   'band_ermengard'
+  + ]
+  - []
+
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/content/bands.test.js:769:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [ 'band_cathy', 'band_ermengard' ],
+    expected: [],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at test/match/community-round30.test.js:16:33
+✖ fixed gift garrison_49_a/chess_char_4_05_a is produced past stock and still occupies it (33.438695ms)
+  AssertionError [ERR_ASSERTION]: the trait must finish all grants, including merges
+
+  7 !== 8
+
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/match/community-round30.test.js:22:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 7,
+    expected: 8,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/match/community-round30.test.js:16:33
+✖ fixed gift garrison_49_a/chess_char_4_24_a is produced past stock and still occupies it (12.089618ms)
+  AssertionError [ERR_ASSERTION]: the trait must finish all grants, including merges
+
+  7 !== 8
+
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/match/community-round30.test.js:22:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 7,
+    expected: 8,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/match/community-round30.test.js:16:33
+✖ fixed gift garrison_49_b/chess_char_4_05_b is produced past stock and still occupies it (8.739068ms)
+  AssertionError [ERR_ASSERTION]: the trait must finish all grants, including merges
+
+  7 !== 9
+
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/match/community-round30.test.js:22:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 7,
+    expected: 9,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/match/community-round30.test.js:16:33
+✖ fixed gift garrison_49_b/chess_char_4_24_b is produced past stock and still occupies it (7.830845ms)
+  AssertionError [ERR_ASSERTION]: the trait must finish all grants, including merges
+
+  7 !== 9
+
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/match/community-round30.test.js:22:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 7,
+    expected: 9,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/match/community-round30.test.js:16:33
+✖ fixed gift garrison_76_a/chess_char_6_11_a is produced past stock and still occupies it (9.900652ms)
+  AssertionError [ERR_ASSERTION]: the trait must finish all grants, including merges
+
+  3 !== 4
+
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/match/community-round30.test.js:22:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 3,
+    expected: 4,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/match/community-round30.test.js:16:33
+✖ fixed gift garrison_76_b/chess_char_6_11_b is produced past stock and still occupies it (7.042872ms)
+  AssertionError [ERR_ASSERTION]: the trait must finish all grants, including merges
+
+  3 !== 5
+
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/match/community-round30.test.js:22:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 3,
+    expected: 5,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/match/community-round30.test.js:16:33
+✖ fixed gift garrison_92_a/chess_char_3_20_a is produced past stock and still occupies it (6.960819ms)
+  AssertionError [ERR_ASSERTION]: the trait must finish all grants, including merges
+
+  7 !== 8
+
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/match/community-round30.test.js:22:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 7,
+    expected: 8,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/match/community-round30.test.js:16:33
+✖ fixed gift garrison_92_a/chess_char_4_03_a is produced past stock and still occupies it (7.046087ms)
+  AssertionError [ERR_ASSERTION]: the trait must finish all grants, including merges
+
+  7 !== 8
+
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/match/community-round30.test.js:22:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 7,
+    expected: 8,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/match/community-round30.test.js:16:33
+✖ fixed gift garrison_92_b/chess_char_3_20_b is produced past stock and still occupies it (7.616122ms)
+  AssertionError [ERR_ASSERTION]: the trait must finish all grants, including merges
+
+  7 !== 9
+
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/match/community-round30.test.js:22:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 7,
+    expected: 9,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/match/community-round30.test.js:16:33
+✖ fixed gift garrison_92_b/chess_char_4_03_b is produced past stock and still occupies it (9.478819ms)
+  AssertionError [ERR_ASSERTION]: the trait must finish all grants, including merges
+
+  7 !== 9
+
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/match/community-round30.test.js:22:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 7,
+    expected: 9,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/match/community-round30.test.js:16:33
+✖ fixed gift garrison_133_a/chess_char_3_03_a is produced past stock and still occupies it (6.580327ms)
+  AssertionError [ERR_ASSERTION]: the trait must finish all grants, including merges
+
+  4 !== 5
+
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/match/community-round30.test.js:22:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 4,
+    expected: 5,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/match/community-round30.test.js:16:33
+✖ fixed gift garrison_133_b/chess_char_3_03_b is produced past stock and still occupies it (6.617343ms)
+  AssertionError [ERR_ASSERTION]: the trait must finish all grants, including merges
+
+  4 !== 6
+
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/match/community-round30.test.js:22:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 4,
+    expected: 6,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/match/community-round30.test.js:29:1
+✖ unlimited fixed-item gifts do not exempt unrelated strategy equipment from stock (6.919187ms)
+  AssertionError [ERR_ASSERTION]: commercial packaging is not a fixed operator gift
+  + actual - expected
+
+  + {
+  +   boughtRound: 1,
+  +   count: undefined,
+  +   id: 'chess_item_5_07_e_a',
+  +   items: undefined,
+  +   kind: 'item',
+  +   meta: {},
+  +   ownerUid: undefined,
+  +   poolCopies: 0,
+  +   stockCopies: 0,
+  +   uid: 4
+  + }
+  - null
+
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/match/community-round30.test.js:32:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: { uid: 4, kind: 'item', id: 'chess_item_5_07_e_a', items: undefined, count: undefined, ownerUid: undefined, poolCopies: 0, boughtRound: 1, meta: {}, stockCopies: 0 },
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/match/community-round30.test.js:36:37
+✖ repeated Muelsyse acquisition and elite gifts remain unlimited (investor=false) (6.332216ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  0 !== 1
+
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/match/community-round30.test.js:46:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/match/community-round30.test.js:36:37
+✖ repeated Muelsyse acquisition and elite gifts remain unlimited (investor=true) (11.078119ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  0 !== 2
+
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/match/community-round30.test.js:46:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 2,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/match/community-round30.test.js:56:1
+✖ Damazti strategy grants its fixed item at rounds 5/10/15 past cap; releasing overflow does not free stock early (6.765285ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  3 !== 4
+
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/match/community-round30.test.js:62:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 3,
+    expected: 4,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

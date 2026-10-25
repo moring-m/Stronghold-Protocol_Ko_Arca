@@ -2,7 +2,7 @@
 // (split from content/enemies.js).
 
 import { TICK, PROJECTILE_SPEEDS, ALLY_COLLIDER_RADIUS } from '../../constants.js';
-import { num, T, hurt, targetsNear, allTargets, areaAllies, areaAlliesInTiles, fieldAllies, byPriority, spawnChildren, setForm, expose, unbalancedNow } from './helpers.js';
+import { num, T, hurt, targetsNear, allTargets, areaAllies, areaAlliesInTiles, fieldAllies, byPriority, spawnChildren, setForm, expose, unbalancedNow, attackSkillOf } from './helpers.js';
 import { enemyAura, allyAura, selfFear, skill, kitSelfFear } from './archetypes.js';
 import { hypot } from '../../detmath.js';
 import { bbCap, fieldCap } from '../../../../shared/plugins/officialBounds.js';
@@ -98,7 +98,8 @@ function kitBlackCloud(ab, e) {
         b.fx('beam', { x: e2.x, y: e2.y, from: e2.id, to: t.id, kind: 'fireWeapon' });
         hurt(b, e2, t, e2.s.atk * num(f.bb.atk_scale, 1), 'phys');
       }
-    }, { sil: true, cond: (b, e2) => (e2.mem.ab.ammo ?? 0) >= Math.max(1, num(f.sp, 1)) && allTargets(b, e2).length > 0 }),
+    }, { sil: true, cond: (b, e2) => (e2.mem.ab.ammo ?? 0) >= Math.max(1, num(f.sp, 1)) && allTargets(b, e2).length > 0,
+      turn: attackSkillOf('enemy_9009_acfort', 'FireWeapon') }),   // the attack's turn (DESIGN §35.52)
   ];
 }
 

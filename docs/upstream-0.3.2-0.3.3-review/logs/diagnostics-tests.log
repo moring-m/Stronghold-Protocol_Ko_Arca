@@ -1,0 +1,18 @@
+✔ a real server samples the loop with no worker pool and leaves /healthz alone (219.160367ms)
+✔ SP_LOOP_SAMPLE=0 switches the sampler off (162.530922ms)
+✔ the sampler reports a phase for the window it is asked about (41.047125ms)
+✔ closing the server stops the sampler (41.990452ms)
+✔ an unset sample setting allocates no monitor (49.831462ms)
+✔ the sampler is off by default and only SP_LOOP_SAMPLE=1 enables it (0.774794ms)
+✔ the sampler works with no pool at all and never reaches /healthz (5.131115ms)
+✔ the log stays bounded and drops the oldest lines (1.385651ms)
+✔ percentiles come from the real histogram, so a stalled tick shows up (0.302765ms)
+✔ a real sampler observes the loop and stays quiet when it is closed (90.992703ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1293.179606

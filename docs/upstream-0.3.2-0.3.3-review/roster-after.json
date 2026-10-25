@@ -1,0 +1,667 @@
+[
+  {
+    "id": "chess_char_1_01_a",
+    "hash": "2bb441ca9a52f968ac4f825d74c167e2fc1abd18d3e586db8901a6b4ed5d9d27",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_1_02_a",
+    "hash": "3b3e4355ed36edee582e9977f280c509a6533629058594a349bbe500c0c5d024",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_1_03_a",
+    "hash": "27c42921f6d67e3bc29480945029b31abe5445e1cf16fce38ce3d45a971b9f5d",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_1_04_a",
+    "hash": "ec20db07a32b9071fe9110f1ff841cbf33123725c28a858ce1cedf58da2f44b0",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_1_05_a",
+    "hash": "e0b36ac37d1a972b71fe63a79907660a90d4c553dbf664ff1e498999653e5294",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_1_06_a",
+    "hash": "d0050ea558afce1e502dfba8d577fcd2728f15b38de6f5de5c11a1ec1a99483c",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_1_07_a",
+    "hash": "a18ab6f362effa93b35183c6a3fb30b3e8358eba8da6eddb70445b8ce309ff52",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_1_08_a",
+    "hash": "b23b1d970bc1d2ffdc939c7645e59e803404e7ca6dbc5cbe69309cec4d4348e3",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_1_09_a",
+    "hash": "4b5fe7275582c9f17efc77e8e14de71acd26116cb4494e67361f7f380c4c6b85",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_1_10_a",
+    "hash": "3d42391771f7cddc628a9e426f648727f389a7602fb00733eb821cd488f95095",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_1_11_a",
+    "hash": "6deb429efd31ad3114259d178de4a65a80507cf2e4fcb8edbe4a5cb70e9850d5",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_1_12_a",
+    "hash": "4980cc595991c78ad2d4ed907b9efb020dfb4c3cb6c9bba64237ddfa40598600",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_1_13_a",
+    "hash": "dc6435130882cf59d1d106735f50fec71306c3e438a524b3e8950d9f917b40aa",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_1_14_a",
+    "hash": "74c8d0e2fd563e7db5244a4c7d0d27e04094fbfeeba73e28548638f024daf331",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_1_15_a",
+    "hash": "069ca693f3fd86ed0d61312e461f365f51576e2aeeb0d233020db5438c0ba64f",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_1_16_a",
+    "hash": "229f4ae34ce2a330fabc28b4a93710d983851e4f504c9e5cd9b60b270af4a619",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_1_17_a",
+    "hash": "03a1ca442965292cd45fef2729dc6fd1575c7ae5883a6358c20b1ac90cc9b8c7",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_1_18_a",
+    "hash": "3d21abe0040322b22fcc8ef1f01793b4151d92da333677a82b879f949a3b3d25",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_1_19_a",
+    "hash": "6fe042fd24d57bf44e14cf9519097de342485af0a369c0ddab736781c0632efb",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_1_20_a",
+    "hash": "ceff13a9ae2d1fb7f2b45fd0352a6bcc7d37ca81d9dfc210376ad8c45cc74bf8",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_2_01_a",
+    "hash": "6f68f224ba5694815a3b16039b628850cd52ab0b80651593003a38e37b76989f",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_2_02_a",
+    "hash": "6794ae503067798239b630c0dbe1ecbd442243051dfebcbce12be1b47eca9ee8",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_2_03_a",
+    "hash": "9bc29bfa5d27a1be31a63594e661d08f472122e512ad7c1e16561ac0584bbaf3",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_2_04_a",
+    "hash": "c883f1f43dd102903d7f2dbbfc0f8054e340b473163c8dfd69eef7400d96cf08",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_2_05_a",
+    "hash": "81011b853e87e8cac6009c289684c3578eb9cdf825abe00e7f8bb470bb19bc6d",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_2_06_a",
+    "hash": "963b142e9dcf4668eec92a12164288d8cfaea5cc5afc592ef44f9d7724b194f3",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_2_07_a",
+    "hash": "b2af176225486722ca22d10c972be9d4aa9cc73c259d0381d989278a89ba90d9",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_2_08_a",
+    "hash": "998d7ea9f668b3324d0b5038b7dfce11829277fe35cc8fe2acb2113e3bb63e98",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_2_09_a",
+    "hash": "cc18fa823e4acae12500273ef18ef4fd85f98c336fc7e8f5a70b088458dd1eab",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_2_10_a",
+    "hash": "666d1db11cd6d143638d6450e723590706fb21319396463e64a0bc786ba6d30d",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_2_11_a",
+    "hash": "527fe667ee5f26823332638f25574ad582a63e0e4f1a27c74a5abb18a8ddc154",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_2_12_a",
+    "hash": "01aea86b0eaaaef5d27a5d167d8447fe2133addf07608f30f8f50cf4ba50489d",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_2_13_a",
+    "hash": "62919904f5a017bc7e70c6309ff7e488340e18a1f9ef46950131308c0bee2736",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_2_14_a",
+    "hash": "20fefdec91492885d123625a95bd87b9e9f70ff0fa244b3cf6f725dc1dea7001",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_2_15_a",
+    "hash": "cf9c7b8ee9e23eaf5cbe495c6a5b2832630718119025c6b3c9ac8cf9268fa912",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_2_16_a",
+    "hash": "1b48d892ea0112e84eb6595118b6f2c6b1e86a6c35f741d5c181180c29098bd4",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_2_17_a",
+    "hash": "3b8f469287e2dc7a9e7325e7a66ce284549d1a8bed5d2cd68920760971076c1e",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_2_18_a",
+    "hash": "c71b7dcd5ed1955fbaf767bb5797c1e427cda2729400be4bdb7b80883ad8c393",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_2_19_a",
+    "hash": "f6e6ffe982474a40708948621c220268c8bd75bd83349f86654a5e1a4e6b05f1",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_3_01_a",
+    "hash": "4d7005643314f12700ef2d0c0fb332c821c397eadd82144f31e883dae41c9dfe",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_3_02_a",
+    "hash": "0aac881c95a9ffc4405cbfc8a6aa9b682104cef4188a706e2e0330640f5d6751",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_3_03_a",
+    "hash": "dd7cb8d8b991408b5bf98b945fe7365539887e5cca9a739f3adfd9bfb9ed1f57",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_3_04_a",
+    "hash": "c0426643808b1d1547bb5cec092f02b8224d5d175f794c05c17c78a0550b012a",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_3_05_a",
+    "hash": "127178415e3d94d2a13fbbbf8594464bc6871ebd80e5b102d71b21dc5d698cb0",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_3_06_a",
+    "hash": "81c09e5b4c800c9fe8b1476b420308cbab8be0b6fd7e48f618c26f3ef3d907e5",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_3_07_a",
+    "hash": "db2518caaa2e7e8b84dd0376b7c2d0a4e8e9be0ecc5708c6c3688e7632c25f07",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_3_08_a",
+    "hash": "b15d09d44aec68ac6b6242855292c34cd27e4080d9da440f88a5ff69c669339b",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_3_09_a",
+    "hash": "b66d3e3ca67b5a81f0a6d9050cf09bd2c8031cbdea197366e0d6fa17c963d2d2",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_3_10_a",
+    "hash": "60a268cdafc9e11beb5f270fd25be6b7a87d21d1c7790d27b9d9a504c85f6e1c",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_3_11_a",
+    "hash": "a34978ff7528b94cabab014e26022f951459e274f6a2c4b4b83bc537ed923fb0",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_3_12_a",
+    "hash": "84c819eb74d6a18a6cffd45b6f8eada228ff9f479ec84a9045e8d44c81a1175a",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_3_13_a",
+    "hash": "88fd9cbd99ec1702c2891c1fae6a7e330300b302b2fc9f041e150ac02f8d3fdf",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_3_14_a",
+    "hash": "59a87b8ef2c91712b2b355fd7040abc055dddc0914d8da3a73d7ba2288d1a01a",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_3_15_a",
+    "hash": "56f7f63b8381d9e84ae301dbf1b7ac79756ae9a12c8f997989f99edfaa83da9a",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_3_16_a",
+    "hash": "bf11c4ee362108ea978ff882a0ccb325f6c1002080244156bc1e8d90b1f3b74f",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_3_17_a",
+    "hash": "30d337c1a368b544332578d4a46ca2dca06f08254b394f91541095c64aabed11",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_3_18_a",
+    "hash": "633c34e99ad645eccfd7cce612a6fa9fd24253e1b2791b871a2707960dc5005c",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_3_19_a",
+    "hash": "2d45f9c373ce0fee852cd227915e35e3eabb66b515d4baa9274d7a1ba1162d98",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_3_20_a",
+    "hash": "97e9398c86b232892d9dc3a9d75b405519a831cf0c9354e3978391a1b8a61bbd",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_3_21_a",
+    "hash": "8b4dc0100703d08974aa1167a44e0ff506cb0d989950be2f8b9a594902b273d8",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_4_01_a",
+    "hash": "297a359ee04944874d3f689d2a2f1bb45ba1ab3c5cb89d317bbcef7187a49ba5",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_4_02_a",
+    "hash": "73fbc53810e733289a63f505495446cbac67849515d6c4b6e4dccc35bd371845",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_4_03_a",
+    "hash": "667e5525868d04c283e80131dd518dd41cf8bc0e7843efee6da28aea73a2c550",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_4_04_a",
+    "hash": "df163579dfd444a4aa3dbbd012abcab001a110dba7e001d07ddea3fc1d70f908",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_4_05_a",
+    "hash": "208e5b6da0082e917b1b883b8b9353396ed9c38ee8b937a98061113728756298",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_4_06_a",
+    "hash": "bfc9edcbb82a5f16994a42f15c048df754ed8cdf4790388a8bb6ec40c23e9f04",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_4_07_a",
+    "hash": "85c69b2c971045a0d8fa88cddc9e3da9eb8b68cc5ef344b9a2cc339742841c6b",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_4_08_a",
+    "hash": "0dc52ad4863d1d1c6ad57342a314c42cf6df3295f9172bcd082e2c341f4bf3d0",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_4_09_a",
+    "hash": "653f5c01389933de5439ae0cad49ad4e934c012bc11b8843278679b04a901e2f",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_4_10_a",
+    "hash": "bb244b4ce7586000de4a2d0df465b52a152050d20a8750838e2b1f4ad0d0b28d",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_4_11_a",
+    "hash": "bae2449dd6efa61233f2e5d2d4f8c7ba51347af35f0c5aff70b94e666ad0b485",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_4_12_a",
+    "hash": "ce83136d71734d561e639d84f700e6b889e83193413cb7edbe4e31fe1e8d7ef1",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_4_13_a",
+    "hash": "a29f23aa055c51a3e4cc9e8838fc50003fd93166e05bc6fee93ab9d9a260325c",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_4_14_a",
+    "hash": "ee4a96916fb52af81ee0a3c997ff88c1e8a7a94bc3c90ac5d33472fe2621dde6",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_4_15_a",
+    "hash": "bce143579aed36584505939b2e1904f89d4a0120ea4eda00505b147129376e84",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_4_16_a",
+    "hash": "9cda725ad7ff73180c01ba852a1628840e50f192bd12889a8b406eb3ed7578d1",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_4_17_a",
+    "hash": "d312728e87cd7d4bf93f2283d0f0f1757a794f7e41e2d7ceec5e5e6b538002d9",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_4_18_a",
+    "hash": "5e9648dfc6d90dca8dde7f251580e43edf97e90fbc811de53d8b2545422cceb6",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_4_19_a",
+    "hash": "1d3961161d93cb3b27a4b07873dfb0d172d768d3c085492529a0cb17d7ad7ee8",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_4_20_a",
+    "hash": "5205c6af271195395bc531848baba724c26f23f4d89be72a89a43f4f8dbc9c82",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_4_21_a",
+    "hash": "80e1ba9adb65617c5f2cd62c2b0fa857b073fd1f05042558f2d955c8c99006dc",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_4_22_a",
+    "hash": "0014df4b74c21940b4455a0d22116699e0724a01adc1ba652d20c5f75212ee49",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_4_23_a",
+    "hash": "6ed647037326c2f510ad8b2c28523989de860b1634027f580d03b0d08d6a61e5",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_4_24_a",
+    "hash": "9a1575b7e294e970567b8e0813f5ce82c23905d7c11f26c29eea2a77b24ac5e1",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_4_25_a",
+    "hash": "edb9d0b507a19f541aa1487c6525f20573d8db6610207857999b8c59ee1333e0",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_4_26_a",
+    "hash": "46fad92b60716f6cd52fa1e7e96f924c2d51925b2b321b63896bbf288d36d2a4",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_5_01_a",
+    "hash": "f39df0d3c3a7d4a68ab93c95c977d919e69bb4d76d23e5335afc6cded5393907",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_5_02_a",
+    "hash": "89bb620002786e6f4886f26988023d8b90bfece5ac8b5c001ef65f42213b0767",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_5_03_a",
+    "hash": "a5715c3daba335c221e65b651e4d7f81e3b3c043fb1b8704569eb99e334de4c1",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_5_04_a",
+    "hash": "33051c45fb4714682d9d23d7204c4adb2c4449aacc3cb65a59a945822c38faf7",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_5_05_a",
+    "hash": "b5d8d83f80b82ddbbb938c937e20ca698de9cc1cd00c6738b6ee4ed3b6b06776",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_5_06_a",
+    "hash": "e3baae3fbcb655ca71b523d2e454fbf14a2da32959ac0d8c73c1a6bc995f47cc",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_5_07_a",
+    "hash": "ac8c6f5ac54924c9592bdd4fc7fdcbee5200097ce9f46c761c05915d0cca67ac",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_5_08_a",
+    "hash": "7ffec489fb6534e2dcc513d3093449604c60a2607394666b8b5b7faa4ccec459",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_5_09_a",
+    "hash": "3167771fd07322578a3ead531fc4f93c8ae6a91223e82787b0efb81d0984b52f",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_5_10_a",
+    "hash": "4063b5a21cff439e396ef826fa69370bc619f27cfa0cbd63d52e6b17d65ea981",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_5_11_a",
+    "hash": "631411afcb9d48040631fd302a81c15553376c7f6f1739af62f111870801f9b2",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_5_12_a",
+    "hash": "b067383979b7d337a35b6233868911f4d7f9f5bb95eeb65f9f30b02586db8f6a",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_5_13_a",
+    "hash": "26715827046827d65afcf6b4b773d973ff580f4c4f88a8146ca88f543283e6b7",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_5_14_a",
+    "hash": "c71f55f6ef769cea39d73b9f130ba84a446a820ed94f2cf80feb1df3a49f509b",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_5_15_a",
+    "hash": "7ac305e1cb154274086fb46f722f39dfc7a92a7d0d8bd6ec0be9f22ffab39f50",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_5_16_a",
+    "hash": "d9689cdf5487e2f7406bec91b1719bba9c4d22fa5ce58665570aed31e265a2ca",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_5_17_a",
+    "hash": "4e5722f4144338e26026ba032574d7474bf8d7a7026a501183d99da1afd5c9d4",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_5_18_a",
+    "hash": "f1dd69ca9ce32f9f87df51b6622ebae1fae28fef6fa071bc44b564e8eea1d5d2",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_5_19_a",
+    "hash": "8a586124667a6a37154b7ccdfd9821e9d56ea22aee6d3186045ee6b24eb1489f",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_5_20_a",
+    "hash": "dba693f7f88bac08610e6017b0b95d4335df544905f9a9a62852f6cca9460e11",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_5_21_a",
+    "hash": "8b81cc5afee1a5c174d7ade152c9fa558a904a77b478fbdfde65e91636515be2",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_5_22_a",
+    "hash": "405388a330f0a9b78b0d5788ffbd48b5d0ed98c0ec58b89596b946f910157954",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_5_23_a",
+    "hash": "07a1612a9fa9bcc7419f69bdd826b9e151c47ea77d14fd64471ab71e345d0687",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_5_diy1_a",
+    "hash": "92484316fabce7e39c4077b7720120c4b459768fb625e5e3e5347e718e7f58c3",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_5_diy2_a",
+    "hash": "92484316fabce7e39c4077b7720120c4b459768fb625e5e3e5347e718e7f58c3",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_6_01_a",
+    "hash": "a7d3219447703f15f9e01d4507a376e1444e13363b51026afc97efb6c8374462",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_6_02_a",
+    "hash": "072e682e7dccbf1b68b3e7dd5db0ae1fbd55e48451629dbb840afab55f62c24d",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_6_03_a",
+    "hash": "7ee41c276f3eb0dd5628e7d26674e6b31f0dac4f999656475675a4e49061d810",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_6_04_a",
+    "hash": "97569a9ce5770e39653853d742c130e17737c29defed1f8f8726a9af6257e3b8",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_6_05_a",
+    "hash": "f741836894b4afcd959de5d58ba968c4031565c4e59518dd6030325cb04ab798",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_6_06_a",
+    "hash": "35f986f837a111990907c72fdd2a601caf68bd71ba94ecc3116a3d4ea08cad3c",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_6_07_a",
+    "hash": "041625437e4f3f212a95a05a0863f05455e007d0fce8e26b304bdc6f388c8ddf",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_6_08_a",
+    "hash": "ec8b32512d330e6b4756deda20a239ac68e9415453e40285f8266845f96cd829",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_6_09_a",
+    "hash": "3c68c2a64460440ce3df2a97240342ca8f2f019ec5a4a6d094963c0ae3de11e3",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_6_10_a",
+    "hash": "7cfae5643e0ca8459e35eb504841ab6853e717d933c94c795aeab4838530ffee",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_6_11_a",
+    "hash": "7385ab373ac77cc7099e2824ca377688c2677540114d23c2e80cdc886f8d49bf",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_6_12_a",
+    "hash": "fe4bc71ee13573dfb80bc18cd65e54eb24ec40f3b11ec8499963d2c2774f037c",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_6_13_a",
+    "hash": "44cd80988eb08b27298a2374f0bd7ca133df4b4502a35a707dce800f85f4b360",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_6_14_a",
+    "hash": "01bcdeefc1b344ece20057ff855658c95304b74c71c8767c04522b424ae27a3f",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_6_15_a",
+    "hash": "f575034ad368f48f053ff9ab0a39cf1da3d7add91b6ccaa429e08764ba5bf50d",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_6_16_a",
+    "hash": "11e27c8a0455725777a71d827d4f83a809a914fab050b8065d30f69703b2086c",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_6_17_a",
+    "hash": "e41132bf394e1f67d4b6f77ca12b0d9a7fc2c85dfc37a8ce8fed521350c52be8",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_6_18_a",
+    "hash": "6fa5bccad788a70165127384d5dc13d4a138319a429d9149c6a74a6d1939bd71",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_6_19_a",
+    "hash": "0c24e516380fd7749f94acc643d28f46bcf0aa790c1000acff8f7a44d015d36b",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_6_20_a",
+    "hash": "80cb50b18f7f6eac956e8b9f7ee5a498e5d6df5a09d56e1886c6dbcba4aee370",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_6_diy1_a",
+    "hash": "92484316fabce7e39c4077b7720120c4b459768fb625e5e3e5347e718e7f58c3",
+    "errors": 0
+  },
+  {
+    "id": "chess_char_6_diy2_a",
+    "hash": "92484316fabce7e39c4077b7720120c4b459768fb625e5e3e5347e718e7f58c3",
+    "errors": 0
+  }
+]

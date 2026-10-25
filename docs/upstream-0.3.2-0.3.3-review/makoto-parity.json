@@ -1,0 +1,32 @@
+[
+  {
+    "case": "0-base.json",
+    "frames": 930,
+    "identical": true
+  },
+  {
+    "case": "0-skin.json",
+    "frames": 930,
+    "identical": true
+  },
+  {
+    "case": "1-base.json",
+    "frames": 930,
+    "identical": true
+  },
+  {
+    "case": "1-skin.json",
+    "frames": 930,
+    "identical": true
+  },
+  {
+    "case": "2-base.json",
+    "frames": 930,
+    "identical": true
+  },
+  {
+    "case": "2-skin.json",
+    "frames": 930,
+    "identical": true
+  }
+]

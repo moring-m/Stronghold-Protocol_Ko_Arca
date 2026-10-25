@@ -1,0 +1,8 @@
+no import-boundary violations
+6 allowed note(s):
+note server/sim/content/support/index.js:20: ../../../data.js -> server/data.js
+note server/sim/nodeData.js:11: node:fs -> node:fs
+note server/sim/nodeData.js:12: node:path -> node:path
+note server/sim/nodeData.js:13: node:url -> node:url
+note server/sim/nodeData.js:23: ../data.js -> server/data.js
+note server/sim/nodeData.js:33: ../data.js -> server/data.js

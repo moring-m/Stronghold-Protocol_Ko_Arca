@@ -1,0 +1,10 @@
+✔ all faction links apply favorites and legal recruit settings, including restore, relink and locked phases (1112.3246ms)
+✔ confirmed strategy mirrors the server recruit preset once and survives later UI updates (2329.775227ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3069.93837

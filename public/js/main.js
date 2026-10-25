@@ -70,7 +70,7 @@ import { installDeviceSupport } from './ui/device.js';
 const LoadoutHost=lazyComponent(()=>Promise.all([import('./screens/loadout.js'),loadScreenStyles(['/css/screens/loadout.css'])]).then(([module])=>module),'LoadoutHost');
 import { installLoadoutSync, installOwnershipSync, installDiySync, installSkinsSync } from './ui/loadoutSync.js';
 import { CHAT_HISTORY_LIMIT } from '../../shared/chat.js';
-import { startBuildGuard } from './ui/buildGuard.js';
+import { startBuildGuard, deferBuildReload } from './ui/buildGuard.js';
 import { registerImportedAssetWorker } from './assetCache.js';
 import { installRehearsal } from './battle/rehearsal.js';
 import { initLang, useLang, tickerText } from './ui/lang.js';
@@ -494,12 +494,12 @@ async function boot() {
   if(typeof requestIdleCallback==='function')requestIdleCallback(()=>data.load('local').catch(()=>{}),{timeout:2500});
   else setTimeout(()=>data.load('local').catch(()=>{}),300);
   // A page keeps the modules it imported at load time for its whole lifetime, so a deploy cannot reach an open tab
-  // (ui/buildGuard.js): watch `/healthz.build`. Outside a match the page reloads itself; during a match the guard says
-  // so instead (the connection banner offers 刷新页面) and reloads once the match — settlement screen included — is over,
-  // so a running game is never thrown away.
+  // (ui/buildGuard.js): keep rolling-release rooms through waiting, combat, settlement and reconnect.
+  // A newer build only reloads automatically once the player leaves the room. Retirement expiry is enforced separately.
+  // Non-rolling deployments retain the existing match-only protection.
   try {
     startBuildGuard({
-      inMatch: () => selectRoute(store.get()) === 'game',
+      inMatch: () => { const state = store.get(); return deferBuildReload(state, selectRoute(state)); },
       onStale: ({ waiting, build }) => { if (waiting) store.patch('ui', { buildStale: true, buildStaleTarget: build }); },
       onCurrent: () => store.patch('ui', { buildStale: false, buildStaleTarget: null }),
       // the same /healthz names how many plugins the server has: the title screen shows it before any hello

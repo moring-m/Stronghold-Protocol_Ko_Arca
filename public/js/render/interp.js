@@ -14,8 +14,9 @@ import { DamageEventGate } from '../../../shared/damageDisplay.js';
 //   * sample(): per unit, lerps x/y/hp/sp between the two snapshots bracketing renderT; flags/anim come from
 //     the older one. A unit missing from the newer snapshot (died/left mid-buffer) holds its last position
 //     until renderT reaches the newer snapshot; a unit that only exists in the newer one (spawned mid-buffer)
-//     appears when renderT reaches it. Moves longer than `teleport` tiles between two snapshots snap, and so does a
-//     unit whose deploy animation starts in between (a redeploy while it stays listed: 乌尔比安's 【移动】, a 突袭 jump).
+//     appears when renderT reaches it. Moves longer than `teleport` tiles between two snapshots snap, as do moves
+//     marked by a parasite attachment `teleport` fx (even a short blink) and units whose deploy animation starts
+//     between snapshots. Other teleport effects retain the normal distance-threshold interpolation rule.
 //   * event queue: a `b.ev` batch is stamped with its game time (`gt`, the snapshot it was drained with); a batch
 //     without one is placed inside the latest snapshot interval (newest snapshot time minus half an interval),
 //     and handed out by `takeEvents()` once renderT passes the stamp. Stale cosmetic events (> `eventMaxLag`
@@ -186,7 +187,11 @@ export function normalizeSnapshot(snap) {
       (standCut || (standCut = new Map())).set(e[0], e[1]);
     }
   }
-  return { t, units, down, ammo, wolves, coins, energy, charges, layers, neg, stand, standCut, raw: snap };
+  let face = null;
+  if(Array.isArray(snap.face))for(const e of snap.face){
+    if(Array.isArray(e)&&units.has(e[0])&&(e[1]===-1||e[1]===1))(face||(face=new Map())).set(e[0],e[1]);
+  }
+  return { face, t, units, down, ammo, wolves, coins, energy, charges, layers, neg, stand, standCut, raw: snap };
 }
 
 /**
@@ -235,6 +240,8 @@ export class SnapshotBuffer {
     /** @type {{t:number, ev:any}[]} */
     this.events = [];
     this.damageEvents = new DamageEventGate();
+    /** @type {Map<number|string, number[]>} Parasite attachment blink times, retained after cosmetic fx is consumed. */
+    this.parasiteBlinkTimes = new Map();
     this.meta = null; // latest snapshot's extra fields (dp, killed, total, boss…)
     return this;
   }
@@ -277,6 +284,11 @@ export class SnapshotBuffer {
     // (no animation frames) snapshots keep arriving and must not pile up; a clock left behind is clamped.
     const horizon = s.t - this.keep * this.rate;
     while (this.snaps.length > 2 && this.snaps[1].t < horizon) this.snaps.shift();
+    for (const [id, times] of this.parasiteBlinkTimes) {
+      const kept = times.filter((t) => t > this.snaps[0].t);
+      if (kept.length) this.parasiteBlinkTimes.set(id, kept);
+      else this.parasiteBlinkTimes.delete(id);
+    }
     if (!Number.isFinite(this.renderT)) this.renderT = Math.max(this.snaps[0].t, s.t - this.delay * this.rate);
     else if (this.renderT < this.snaps[0].t) this.renderT = this.snaps[0].t;
     return true;
@@ -297,6 +309,15 @@ export class SnapshotBuffer {
     for (const ev of evs) {
       if (!Array.isArray(ev) || typeof ev[0] !== 'string' || !this.damageEvents.accept(ev)) continue;
       this.events.push({ t: stamp, ev });
+      if (ev[0] === 'fx' && ev[1] === 'teleport' && ev[4]?.kind === 'parasite') {
+        const id = ev[4]?.id;
+        if ((typeof id === 'number' && Number.isFinite(id)) || (typeof id === 'string' && id)) {
+          const times = this.parasiteBlinkTimes.get(id) ?? [];
+          times.push(stamp);
+          if (times.length > 32) times.shift();
+          this.parasiteBlinkTimes.set(id, times);
+        }
+      }
       added++;
     }
     // bounded queue (hidden tab: nothing consumes it) — shed the oldest cosmetic events first
@@ -353,6 +374,12 @@ export class SnapshotBuffer {
       if (s[mid].t <= time) { ans = mid; lo = mid + 1; } else hi = mid - 1;
     }
     return ans;
+  }
+
+  _parasiteBlinkAt(id, from, to) {
+    let first = Infinity;
+    for (const t of this.parasiteBlinkTimes.get(id) ?? []) if (t > from && t <= to && t < first) first = t;
+    return first;
   }
 
   /**
@@ -417,12 +444,14 @@ export class SnapshotBuffer {
       if (b) {
         const dx = b[1] - a[1], dy = b[2] - a[2];
         // (a deployment in between — the newer snapshot starts its deploy animation — lands on its tile, no slide)
-        const tele = dx * dx + dy * dy > this.teleport * this.teleport || redeployed(a, b);
+        const jumpAt = this._parasiteBlinkAt(id, A.t, B.t);
+        const tele = dx * dx + dy * dy > this.teleport * this.teleport || redeployed(a, b) || jumpAt < Infinity;
+        const afterJump = alpha >= 1 || time >= jumpAt;
         const start = movementStart(A, B, id);
         const moveSpan = B.t - start;
         const moveAlpha = moveSpan > 0 ? clamp((time - start) / moveSpan, 0, 1) : 0;
-        o.x = tele ? (alpha < 1 ? a[1] : b[1]) : a[1] + dx * moveAlpha;
-        o.y = tele ? (alpha < 1 ? a[2] : b[2]) : a[2] + dy * moveAlpha;
+        o.x = tele ? (afterJump ? b[1] : a[1]) : a[1] + dx * moveAlpha;
+        o.y = tele ? (afterJump ? b[2] : a[2]) : a[2] + dy * moveAlpha;
         o.vx = !tele && moveSpan > 0 && (start === A.t || time >= start) ? dx / moveSpan : 0;
         o.vy = !tele && moveSpan > 0 && (start === A.t || time >= start) ? dy / moveSpan : 0;
         o.hp = a[3] + (b[3] - a[3]) * alpha;
@@ -439,7 +468,7 @@ export class SnapshotBuffer {
           const moveSpan = A.t - movementStart(P, A, id);
           if (p && dtp > 0 && moveSpan > 0) {
             const dx = a[1] - p[1], dy = a[2] - p[2];
-            if (dx * dx + dy * dy <= this.teleport * this.teleport && !redeployed(p, a) && !(a[16] && a[16][4]>=P.t)) {
+            if (dx * dx + dy * dy <= this.teleport * this.teleport && !redeployed(p, a) && this._parasiteBlinkAt(id, P.t, A.t) === Infinity && !(a[16] && a[16][4]>=P.t)) {
               vx = dx / moveSpan; vy = dy / moveSpan;
             }
           }
@@ -475,6 +504,7 @@ export class SnapshotBuffer {
       o.charges = A.charges?.get(id) ?? null;
       o.layers = A.layers?.get(id) ?? 0;
       o.neg = A.neg ? A.neg.get(id) || 0 : 0;
+      o.face = A.face?.get(id) ?? null;
       o.seen = stamp;
     }
     for (const id of out.keys()) if (!A.units.has(id)) out.delete(id);

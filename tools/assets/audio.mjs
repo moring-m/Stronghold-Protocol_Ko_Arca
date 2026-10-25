@@ -329,14 +329,26 @@ export function assignSkillModeSfx(banks, skills, modes = null, allLinks = null)
   const collect = (events) => {
     const found = [];
     if (!banks || !banks.size) return found;
+    // The unit's normal-mode files of this kind: the bare ability banks (attack / combat) and a numbered default
+    // (attack.0). They only tell a mode's own plain `_n` sound from the normal attack's same-suffix file.
+    const normalFiles = new Set();
     for (const [name, paths] of banks) {
       const ev = events.find((e) => name.startsWith(e + '.'));
       if (!ev || !Array.isArray(paths) || !paths.length) continue;
       const ability = name.slice(ev.length + 1).split('.')[0];
       if (!/attack|combat/i.test(ability)) continue;
-      const letter = skillModeLetter(paths[0]);
-      if (!letter || paths.some((p) => skillModeLetter(p) !== letter)) continue;
       const rest = name.slice(ev.length + 1 + ability.length);
+      // mode 0's sub-abilities count too (仇白's `combat.0.1` stab plays in her S2 mode as well)
+      if (rest === '' || /^\.0(?:\.\d+)*$/.test(rest)) for (const p of paths) normalFiles.add(p);
+    }
+    for (const [name, paths] of banks) {
+      const ev = events.find((e) => name.startsWith(e + '.'));
+      if (!ev || !Array.isArray(paths) || !paths.length) continue;
+      const ability = name.slice(ev.length + 1).split('.')[0];
+      if (!/attack|combat/i.test(ability)) continue;
+      const rest = name.slice(ev.length + 1 + ability.length);
+      const letter = skillModeLetter(paths[0]);
+      const uniform = !!letter && paths.every((p) => skillModeLetter(p) === letter);
       const numbered = rest ? 1 : 0;
       const rank = `${events.indexOf(ev)}${numbered}`;
       let modeIndex = null;
@@ -345,11 +357,22 @@ export function assignSkillModeSfx(banks, skills, modes = null, allLinks = null)
         const seg = rest.slice(1).split('.')[0];
         if (/^\d+$/.test(seg)) modeIndex = Number(seg);
       }
-      found.push({ rank, rest, paths, letter, modeIndex, bare: rest === '' });
+      // A numbered mode bank of plain `_n` files is that mode's sound when it plays a file the unit's normal attack
+      // never does: 宴's S2 impact `p_imp_darksword_n` beside her normal `p_imp_sword_n`, 银灰's S2/S3 `p_imp_sword_n`
+      // beside the Combat `p_imp_spear_n`. Judged per kind, so his S3 swing (no plain swing bank to compare with) stays
+      // out, and the client's normal-attack gate is untouched.
+      // Every file plain: a mixed bank (a plain first file, a lettered later one) stays skipped, as ASSETS.md says.
+      const ownPlain = !uniform && paths.every((p) => !skillModeLetter(p)) && Number.isInteger(modeIndex) && modeIndex > 0
+        && normalFiles.size > 0 && paths.some((p) => !normalFiles.has(p));
+      if (!uniform && !ownPlain) continue;
+      found.push({ rank, rest, paths, letter, modeIndex, bare: rest === '', plain: ownPlain });
     }
     return found;
   };
-  const best = (cands) => cands.slice().sort((a, b) => (a.rank !== b.rank ? (a.rank < b.rank ? -1 : 1) : abilityOrder(a.rest, b.rest)))[0];
+  // A lettered bank beats a plain one for the same skill: a plain mode bank only fills a skill no `_d` / `_h` / `_s`
+  // bank does (假日威龙陈's START `p_atk_watergun_d_cast` never displaces her ON `p_atk_watergun_d`, PR #848 review).
+  const best = (cands) => cands.slice().sort((a, b) => (a.plain !== b.plain ? (a.plain ? 1 : -1)
+    : a.rank !== b.rank ? (a.rank < b.rank ? -1 : 1) : abilityOrder(a.rest, b.rest)))[0];
   const assignKind = (events) => {
     const bySkill = new Map();
     const phase = new Map();
@@ -368,6 +391,9 @@ export function assignSkillModeSfx(banks, skills, modes = null, allLinks = null)
       const ph = Array.isArray(modes) && Number.isInteger(c.modeIndex) && c.modeIndex >= 0 && c.modeIndex < modes.length
         ? phaseOfModeName(modes[c.modeIndex]?.name) : null;
       if (ph && !ph.end) {
+        // a plain bank speaks only for its own linked mode, never as a phase fill (乌尔比安's S3_Respawn_A swing is not
+        // her S3 mode's sound, which is the normal `_n` file)
+        if (c.plain) continue;
         if (!phase.has(ph.index)) phase.set(ph.index, []);
         phase.get(ph.index).push(c);
       } else unclaimed.push(c);
@@ -402,7 +428,7 @@ export function assignSkillModeSfx(banks, skills, modes = null, allLinks = null)
     }
     const byLetter = new Map();
     for (const c of unclaimed) {
-      if (namedUsed.has(c)) continue;
+      if (namedUsed.has(c) || !c.letter) continue;   // a letterless (plain `_n`) bank belongs to a mode, never a fallback slot
       if (!byLetter.has(c.letter)) byLetter.set(c.letter, []);
       byLetter.get(c.letter).push(c);
     }
@@ -673,4 +699,14 @@ export function indexVoice(charword, lang = 'CN', only = null) {
     out.set(charId, rec);
   }
   return out;
+}
+
+/** Exact skill-ability start is a cast signal too; never infer it from numbered unit attack banks. */
+export function skillStartPaths(audio,skillId,skill=null){
+ if(!skillId)return [];
+ const main=audio.bank(`battle.ON_SKILL_START.${skillId}`);
+ if(main?.length)return main;
+ // Next-attack/passive ability cues are attack sounds, not a second activation cue.
+ if(skill?.skillType!=='MANUAL'&&!(skill?.duration>0))return [];
+ return audio.bank(`battle.ON_ABILITY_START.${skillId}`)||[];
 }

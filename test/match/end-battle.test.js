@@ -77,3 +77,43 @@ for(const clientCombat of [true,false])test(`surrender charges breakthrough for 
  m.augments.creditResult(f,result);assert.equal(ps.lp,hp-Math.min(10,scheduled),'repeated final reports do not charge twice');
  h.runToPhase('PREP',2);assert.equal(ps.lp,hp-2*Math.min(10,scheduled),'ordinary settlement is still separate');
 });
+
+for(const clientCombat of [true,false])test(`ordinary surrender at ten HP has no health floor (${clientCombat?'client':'server'} combat)`,t=>{
+ const h=makeMatch({mode:'solo',difficulty:'ABYSS',humans:1,seed:2125392049,clientCombat,clients:false,instant:false}).start();t.after(()=>h.m.dispose());
+ h.toPrep(1);h.m.startRound(2);h.m.enterPrep();
+ const m=h.m,ps=m.players.get('p_0');ps.lp=10;ps.dirty();
+ assert.equal(m.augments.enabled,false);
+ m.handle(ps.playerId,{t:'g.ready',ready:true});h.runToPhase('COMBAT',2);
+ const f=m.fields[0];assert.ok(m.handle(ps.playerId,{t:'g.endBattle',fieldId:f.fieldId}).ok);
+ h.run(()=>m.phase==='SETTLE'||m.ended,{maxSteps:10000});
+ const result=(f.result||f.battle.result()).perPlayer[ps.playerId];
+ const leaked=result.leaked.filter(l=>l.counted!==false).length;
+ assert.ok(leaked>=10,'the fixture must exercise lethal loss from exactly ten HP');
+ assert.equal(ps.lp,0);assert.equal(ps.alive,false);
+ const pub=m.publicView();assert.equal(pub.players.find(p=>p.playerId===ps.playerId).lp,0);
+ assert.equal(ps.privateView().lp,0);
+});
+
+test('surrender does not grant kills from wall time ahead of a delayed browser simulation',t=>{
+ const h=combat();t.after(()=>h.m.dispose());const m=h.m,ps=m.players.get('p_0'),f=m.fields[0];
+ ps.lp=10;ps.dirty();f.spec.spawns=[{...f.spec.spawns[0],time:0,count:10}];
+ const build=m._specBattle.bind(m);m._specBattle=(spec,...args)=>{
+  const b=build(spec,...args);b.after(3,()=>{for(const e of [...b.enemies])if(e.alive)b.kill(e);});return b;
+ };
+ f.startAt-=30000;f.progress.gt=1;
+ m.handle(ps.playerId,{t:'g.endBattle',fieldId:f.fieldId});h.run(()=>m.phase==='SETTLE'||m.ended,{maxSteps:10000});
+ assert.ok(f.result.time<=1.05,'replay must stop at the known client battle time, not the later server wall clock');
+ assert.equal(f.result.perPlayer[ps.playerId].killed,0);assert.equal(ps.lp,0);
+});
+
+for(const gt of [1,.2])test(`surrender preserves completed kills with a current or stale snapshot (${gt})`,t=>{
+ const h=combat();t.after(()=>h.m.dispose());const m=h.m,ps=m.players.get('p_0'),f=m.fields[0];
+ ps.lp=10;ps.dirty();f.spec.spawns=[{...f.spec.spawns[0],time:0,count:10}];
+ const build=m._specBattle.bind(m);m._specBattle=(spec,...args)=>{
+  const b=build(spec,...args);b.after(.6,()=>b.kill(b.enemies.find(e=>e.alive)));
+  b.after(3,()=>{for(const e of [...b.enemies])if(e.alive)b.kill(e);});return b;
+ };
+ f.startAt-=30000;f.progress.gt=gt===1?.5:1;
+ m.handle(ps.playerId,{t:'g.endBattle',fieldId:f.fieldId,gt});h.run(()=>m.phase==='SETTLE'||m.ended,{maxSteps:10000});
+ assert.ok(f.result.time<=1.05);assert.equal(f.result.perPlayer[ps.playerId].killed,1);assert.equal(ps.lp,1);
+});

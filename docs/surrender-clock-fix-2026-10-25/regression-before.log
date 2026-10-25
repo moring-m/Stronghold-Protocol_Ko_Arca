@@ -1,0 +1,41 @@
+✔ end battle resolves the own field immediately and stale client reports cannot overwrite it (50.170724ms)
+✔ a player cannot stop a teammate field (15.660371ms)
+✔ shared field requires every human vote (18.0241ms)
+✔ boss fight requires the whole human team to agree before forcing its end (10.245047ms)
+✔ pending shared termination is reevaluated when a nonvoter leaves (43.440862ms)
+✔ early surrender includes every scheduled enemy for HP settlement (21.158739ms)
+✔ early surrender transfers scheduled enemies to cooperative defense (15.12845ms)
+✔ eight-player unite requires votes from all four human defenders, excludes leakers, and completes surrender (31.168782ms)
+✔ surrender charges breakthrough for pending enemies (client combat) (18.945898ms)
+✔ surrender charges breakthrough for pending enemies (server combat) (14.848803ms)
+✔ ordinary surrender at ten HP has no health floor (client combat) (16.877613ms)
+✔ ordinary surrender at ten HP has no health floor (server combat) (8.29533ms)
+✖ surrender does not grant kills from wall time ahead of a delayed browser simulation (31.749627ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 12
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 956.161539
+
+✖ failing tests:
+
+test at test/match/end-battle.test.js:97:1
+✖ surrender does not grant kills from wall time ahead of a delayed browser simulation (31.749627ms)
+  AssertionError [ERR_ASSERTION]: replay must stop at the known client battle time, not the later server wall clock
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/match/end-battle.test.js:105:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

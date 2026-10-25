@@ -1,0 +1,19 @@
+✔ #839 同盟: the four players get the same 鸭爵 swaps each round (count, units, enemies), with different bounties (407.263364ms)
+✔ #839 applyDuckPicks finds the k-th own unit of an action across the runs a bounty split it into (0.566535ms)
+✔ #839 custom common strategy and duplicate holders retain additive shared draws in eight-player rooms (1370.291948ms)
+✔ disabled personal strategies may still supply common preparation and battle effects (62.715449ms)
+✔ Touch scales both normal and upgraded medical map operators by all personal and common copies (16.59915ms)
+✔ Touch counts common and personal picks even without precomputed content info (0.788329ms)
+✔ random strategy grants exactly five additional starting HP in the laboratory (10.03356ms)
+✔ common starting HP modifiers stack with the personal strategy (5.254323ms)
+✔ Duck Lord common-only and repeated team sources each replace their own wave entries (79.111181ms)
+✔ personal and common milestone rewards have independent once-only counters (11.531499ms)
+✔ personal and common Amiya apply separate battle buffs (6.50585ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2487.452775

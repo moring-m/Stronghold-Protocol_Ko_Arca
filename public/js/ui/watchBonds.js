@@ -164,7 +164,7 @@ export function ownerBoard(field, ownerId, extra = null) {
   if (!fromField && !fromBattle) return null;
   const board = [...(fromField || []), ...(fromBattle || [])]
     .filter((u) => isObj(u) && u.ownerId === ownerId && u.kind === 'op' && typeof u.defId === 'string')
-    .map((u) => (Array.isArray(u.items) && u.items.length ? { kind: 'chess', id: u.defId, items: u.items.filter((x) => typeof x === 'string') } : { kind: 'chess', id: u.defId }));
+    .map(u=>({kind:'chess',id:u.defId,items:Array.isArray(u.items)?u.items.filter(x=>typeof x==='string'):[],...(u.diy&&typeof u.diy==='object'?{diy:u.diy}:{})}));
   return { board, hand: [], temp: [] };
 }
 

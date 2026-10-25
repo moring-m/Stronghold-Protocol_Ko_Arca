@@ -1,7 +1,7 @@
 // Resolve every equipped skill against the official bank, including custom/recruit operators.
 import {readFile,writeFile} from 'node:fs/promises';
 import {join} from 'node:path';
-import {indexAudio} from './assets/audio.mjs';
+import {indexAudio,skillStartPaths} from './assets/audio.mjs';
 import {skillCombatSounds} from './assets/skill-combat-sounds.mjs';
 import {unitCombatSounds} from './assets/unit-combat-sounds.mjs';
 import {RAW} from './assets/sources.mjs';
@@ -18,7 +18,7 @@ export async function buildSkillSounds(root,dir){
   const skills=new Map(records.flatMap(c=>c.skills||[c.skill]).filter(Boolean).map(s=>[s.index,s]));
   const mapping={},combat={};
   for(const [i,s]of skills){
-   const paths=audio.bank(`battle.ON_SKILL_START.${s.skillId}`);
+   const paths=skillStartPaths(audio,s.skillId,s);
    const sound=paths[0];mapping[i]=null;
    if(sound){const path=`/assets/audio/sfx/${sound}`;mapping[i]=path;files.push({path,sources:[RAW.aa2voice+sound]});}
    const resolved=skillCombatSounds(audio,id,i);

@@ -541,7 +541,7 @@ export const C2S = {
   'room.cancelReroll': { voteId: (v) => isInt(v, 1, 2 ** 31) },
   // operator loadout (DESIGN §16): stored per session/seat; accepted until the match leaves INFO_CHECK — `ops` (0.2.2):
   // the per-operator 潜能 / 练度 (absent = none set: every operator at 潜能 6, 精英2 Lv.60)
-  'room.loadout': { entries: isLoadoutEntries, ops: isLoadoutOps, $optional: ['ops'] },
+  'room.loadout': { entries: isLoadoutEntries, ops: isLoadoutOps, strategyPresets: v=>isMap(v,30,isId,isLoadoutEntries), $optional: ['ops','strategyPresets'] },
   // 干员皮肤 (docs/SKINS.md): the appearances the player wears, keyed by operator charId; PUBLIC, so it is accepted in
   // any room phase (the loadout locks at INFO_CHECK because it changes what a unit does; a skin changes only the model)
   'room.skins': { skins: isSkinSelection },
@@ -605,7 +605,7 @@ export const C2S = {
   'g.offer': { offerId: isId, pluginId: isId, seq: (v) => isInt(v, 0, 1000000), cardId: optional(isId), idx: (v) => isInt(v, 0, PLUGIN_OFFER_SLOTS - 1) },
   'g.offerRefresh': { offerId: isId, pluginId: isId, seq: (v) => isInt(v, 0, 1000000), cardId: optional(isId), idx: (v) => isInt(v, 0, PLUGIN_OFFER_SLOTS - 1) },
   'g.ready': { ready: isBool },
-  'g.endBattle': { fieldId: isId },
+  'g.endBattle': { fieldId: isId, gt: optional(v=>isNum(v,0,3700)) },
   'g.emote': { id: (v) => EMOTES.includes(v) },
   'g.chat': { text: (v) => !!normalizeChatText(v) },
   'g.chatFaction': { faction: (v) => v === null || !!chatFaction(v) },

@@ -59,7 +59,7 @@ function setup(seed = 70) {
   const active = (b) => !!(ps.bonds[b] && ps.bonds[b].active);
   const L = (b) => ps.layers[b] || 0;
   const prepEnd = () => m.dispatch(ps, 'onPrepEnd', { round: m.round });
-  const roundStart = () => m.dispatch(ps, 'onRoundStart', { round: m.round });
+  const roundStart = () => m.dispatch(ps, 'onPrepStart', { round: m.round });
   const acquire = (id) => ps.acquireChess(id, { source: 'test' });
   const sell = (p) => assert.deepEqual(m.handle('p_0', { t: 'g.sell', uid: p.uid }), { ok: true });
   const gainsNow = () => Object.fromEntries(Object.entries(gains).filter(([, v]) => v > 0));
@@ -919,7 +919,7 @@ test('equipment-grant traits overflow into the temporary bench when the normal b
             else {
               ps.board.set('10,4', ps.newPiece('chess', owner));
               ps.recompute();
-              m.dispatch(ps, event === 'SERVER_PREP_START' ? 'onRoundStart' : 'onPrepEnd', {round:3});
+              m.dispatch(ps, event === 'SERVER_PREP_START' ? 'onPrepStart' : 'onPrepEnd', {round:3});
             }
             assert.ok(ps.temp.some(p => p?.kind === 'item'), `${gid} ${owner} must grant equipment to temp`);
           } finally { m.dispose(); }

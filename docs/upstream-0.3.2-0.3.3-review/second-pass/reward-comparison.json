@@ -1,0 +1,64 @@
+{
+  "before": {
+    "summary": [
+      "ℹ tests 103",
+      "ℹ pass 84",
+      "ℹ fail 19",
+      "ℹ skipped 0",
+      "ℹ duration_ms 3008.404445"
+    ],
+    "failures": [
+      "Damazti strategy grants its fixed item at rounds 5/10/15 past cap; releasing overflow does not free stock early",
+      "coverage: every band is exercised by a test above",
+      "fixed gift garrison_133_a/chess_char_3_03_a is produced past stock and still occupies it",
+      "fixed gift garrison_133_b/chess_char_3_03_b is produced past stock and still occupies it",
+      "fixed gift garrison_49_a/chess_char_4_05_a is produced past stock and still occupies it",
+      "fixed gift garrison_49_a/chess_char_4_24_a is produced past stock and still occupies it",
+      "fixed gift garrison_49_b/chess_char_4_05_b is produced past stock and still occupies it",
+      "fixed gift garrison_49_b/chess_char_4_24_b is produced past stock and still occupies it",
+      "fixed gift garrison_76_a/chess_char_6_11_a is produced past stock and still occupies it",
+      "fixed gift garrison_76_b/chess_char_6_11_b is produced past stock and still occupies it",
+      "fixed gift garrison_92_a/chess_char_3_20_a is produced past stock and still occupies it",
+      "fixed gift garrison_92_a/chess_char_4_03_a is produced past stock and still occupies it",
+      "fixed gift garrison_92_b/chess_char_3_20_b is produced past stock and still occupies it",
+      "fixed gift garrison_92_b/chess_char_4_03_b is produced past stock and still occupies it",
+      "repeated Muelsyse acquisition and elite gifts remain unlimited (investor=false)",
+      "repeated Muelsyse acquisition and elite gifts remain unlimited (investor=true)",
+      "unlimited fixed-item gifts do not exempt unrelated strategy equipment from stock",
+      "凯瑟琳 定向投放: every shop upgrade offers 3 different items (tier ≤ new level), 1 free pick",
+      "埃芒加德 命结之秘: the first 3 knock-downs of the battle revive at full HP (after the operators' own revive items)"
+    ]
+  },
+  "after": {
+    "summary": [
+      "ℹ tests 103",
+      "ℹ pass 84",
+      "ℹ fail 19",
+      "ℹ skipped 0",
+      "ℹ duration_ms 2600.33571"
+    ],
+    "failures": [
+      "Damazti strategy grants its fixed item at rounds 5/10/15 past cap; releasing overflow does not free stock early",
+      "coverage: every band is exercised by a test above",
+      "fixed gift garrison_133_a/chess_char_3_03_a is produced past stock and still occupies it",
+      "fixed gift garrison_133_b/chess_char_3_03_b is produced past stock and still occupies it",
+      "fixed gift garrison_49_a/chess_char_4_05_a is produced past stock and still occupies it",
+      "fixed gift garrison_49_a/chess_char_4_24_a is produced past stock and still occupies it",
+      "fixed gift garrison_49_b/chess_char_4_05_b is produced past stock and still occupies it",
+      "fixed gift garrison_49_b/chess_char_4_24_b is produced past stock and still occupies it",
+      "fixed gift garrison_76_a/chess_char_6_11_a is produced past stock and still occupies it",
+      "fixed gift garrison_76_b/chess_char_6_11_b is produced past stock and still occupies it",
+      "fixed gift garrison_92_a/chess_char_3_20_a is produced past stock and still occupies it",
+      "fixed gift garrison_92_a/chess_char_4_03_a is produced past stock and still occupies it",
+      "fixed gift garrison_92_b/chess_char_3_20_b is produced past stock and still occupies it",
+      "fixed gift garrison_92_b/chess_char_4_03_b is produced past stock and still occupies it",
+      "repeated Muelsyse acquisition and elite gifts remain unlimited (investor=false)",
+      "repeated Muelsyse acquisition and elite gifts remain unlimited (investor=true)",
+      "unlimited fixed-item gifts do not exempt unrelated strategy equipment from stock",
+      "凯瑟琳 定向投放: every shop upgrade offers 3 different items (tier ≤ new level), 1 free pick",
+      "埃芒加德 命结之秘: the first 3 knock-downs of the battle revive at full HP (after the operators' own revive items)"
+    ]
+  },
+  "newFailures": [],
+  "fixedFailures": []
+}

@@ -20,7 +20,8 @@ export function costumeProjectile(index, costume, projectile, key) {
   if (!costume || !projectile) return projectile;
   const fake = key && costume.projectiles?.[key];
   const graphic = fake && index.projectiles?.[fake.graphic];
-  const source = graphic || projectile;
+  // Graphic prefabs supply the body, not the gameplay projectile's impact/reach lifecycle.
+  const source = graphic ? {...projectile,...graphic, ...(graphic.onHit==null&&projectile.onHit!=null?{onHit:projectile.onHit}:{}), ...(graphic.onReached==null&&projectile.onReached!=null?{onReached:projectile.onReached}:{}), effects:[...new Set([...(projectile.effects||[]),...(graphic.effects||[])])]} : projectile;
   const effects = Object.fromEntries(Object.entries(costume.effects || {}).filter(([,to])=>index.prefabs?.[to]));
   const out = rewrite(source, effects);
   if (graphic && Number.isInteger(fake.mount)) out.costumeMount = fake.mount;

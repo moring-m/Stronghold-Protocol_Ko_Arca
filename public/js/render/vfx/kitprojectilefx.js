@@ -17,7 +17,11 @@ export class KitProjectileFx {
     if(!w.ofx.active||!owner)return false;
     const id=w.unitKeyOf(owner);
     if(kind==='orbitProjectile'&&['char_1020_reed2','char_1044_hsgma2'].includes(id))return this.moteState(extra,owner);
-    if(id==='char_4134_cetsyr'&&kind==='moteState')return this.moteState(extra,owner);
+    if(id==='char_4134_cetsyr'&&kind==='moteState'){
+      if(/^chess_char_(?:4_25|5_09)_[ab]$/.test(owner.info?.defId)&&typeof owner.setMoteState==='function'
+        &&(!owner.spineReady||owner.actor?.effectTexture?.('C_Eff_Moire_B','C_Eff_Moire_B'))){owner.setMoteState(extra);return true;}
+      return this.moteState(extra,owner);
+    }
     if(id==='char_4134_cetsyr'&&kind==='mote'){const p=w.projectileOf(w.idx.projectiles?.['projectile_chr_cetsyr_talent'+(extra.mode?'_s'+extra.mode:'')],owner);let drew=false;for(const key of p?.onHit||[])drew=!!w.playOn(key,{x,y,z:0},{flipFrom:owner})||drew;return drew;}
     if(kind==='zone'&&id==='char_1039_thorn2'&&extra.key?.startsWith('thorn2:'))return this.zone(x,y,extra,owner);
     if(kind==='bombardShell'&&id==='char_4193_lemuen')return this.shell(x,y,extra,owner);

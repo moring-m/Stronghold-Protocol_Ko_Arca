@@ -51,7 +51,7 @@ test('setup reroll retains explicit custom ban policies',t=>{
 
 test('common Pith applies to all eight players without replacing their personal strategy',t=>{
  const h=makeMatch({mode:'coop8',humans:8,customExtensions:{bonds:[],stages:[],commonBands:['band_pith']}});t.after(()=>h.m.dispose());const m=h.m;m.round=1;
- for(const ps of m.order){ps.bandId='band_amedic';m.dispatch(ps,'onRoundStart',{});assert.equal(ps.bandId,'band_amedic');assert.ok([...ps.hand,...ps.temp].some(p=>p?.id==='chess_char_1_15_a'));}
+ for(const ps of m.order){ps.bandId='band_amedic';m.dispatch(ps,'onPrepStart',{});assert.equal(ps.bandId,'band_amedic');assert.ok([...ps.hand,...ps.temp].some(p=>p?.id==='chess_char_1_15_a'));}
  assert.equal(m.errorCount,0);
 });
 

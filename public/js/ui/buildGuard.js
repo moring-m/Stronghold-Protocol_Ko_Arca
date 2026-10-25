@@ -21,6 +21,11 @@
 //
 // Kept dependency-free and injectable (fetch / reload / inMatch / timers) so test/ui/buildGuard.test.js can drive it.
 
+/** Keep a retained release while a room (including its waiting lobby) or restoration owns the session. */
+export function deferBuildReload(state, route, release = globalThis.__SP_RELEASE) {
+  return route === 'game' || !!(release && (state.room || state.ui?.restoring));
+}
+
 /** How often a page re-asks the server for its build tag. */
 export const BUILD_CHECK_MS = 60_000;
 /** Give up on a `/healthz` that does not answer: a request left hanging must not stop the guard from ever checking again. */

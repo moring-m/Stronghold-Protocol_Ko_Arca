@@ -1,0 +1,14 @@
+▶ cross-tab index updates preserve imports and prune results
+  ✔ add/add (44.050941ms)
+  ✔ add/prune (21.593749ms)
+  ✔ prune/add (21.492407ms)
+  ✔ prune/prune (19.224409ms)
+✔ cross-tab index updates preserve imports and prune results (594.12478ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 669.760464

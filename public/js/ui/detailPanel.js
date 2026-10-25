@@ -676,7 +676,7 @@ export function resolveDetail(target, pieces) {
   }
   if (target.kind === 'chess') {
     // a bond popup's 变形同构体 row hands the wearer's item ids on (bondStrip onMember): the card shows the pair and the chip
-    const c = data.lookup('chess', target.id);
+    const c = target.rec?.diyFor===target.id ? target.rec : data.lookup('chess', target.id);
     const items = Array.isArray(target.items) ? target.items.filter((x) => typeof x === 'string') : [];
     return c ? { type: 'chess', chess: c, hint: target.hint || null, ...(items.length ? { unitItems: items } : {}) } : null;
   }

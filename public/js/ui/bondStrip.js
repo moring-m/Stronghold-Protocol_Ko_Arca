@@ -1,3 +1,4 @@
+import {diyGetter,diyRecordFor} from './gameLogic/diy.js';
 import { useEffect, useRef } from '../../vendor/hooks.module.js';
 
 
@@ -94,8 +95,10 @@ export function BondPopup({ bondId, entry, priv, banned = [], onClose, onMember,
   const th = Array.isArray(entry?.thresholds) && entry.thresholds.length ? entry.thresholds : b.thresholds || [];
   const tier = off ? 0 : entry?.tier ?? bondTier(count, th, b.maxCount);
   const active = !off && (entry ? !!entry.active : tier > 0);
-  const getChess = (id) => data.lookup('chess', id);
-  const members = bondMembers(b, priv, banned, getChess, (id) => data.lookup('items', id));
+  const dd={chess:data.get('chess'),backups:data.get('backups')};
+  const getChess=diyGetter(id=>data.lookup('chess',id),priv,dd);
+  const pieceRecord=p=>(p?.diy?diyRecordFor(data.lookup('chess',p.id),p.diy,dd):null)||getChess(p.id);
+  const members = bondMembers(b, priv, banned, getChess, (id) => data.lookup('items', id), pieceRecord, morphMode);
   const countsHand = entry?.countsHand ?? b.countsHand;
   const next = nextThreshold(count, th);
   const hasNow = !off && !!(b.effectDescRaw || b.effectDesc);
@@ -142,9 +145,9 @@ export function BondPopup({ bondId, entry, priv, banned = [], onClose, onMember,
           <${BondGlyph} bondId=${HARMONY_BOND} /><b>${harmonyName} +${harmony}</b><span>${harmonyText}</span></div>`) : null}
       <div class="bpop__members">
         ${members.map((mb) => html`<button key=${mb.id} type="button" class=${cx('bpop__member', mb.onBoard && 'is-on', mb.owned && !mb.onBoard && 'is-owned', mb.banned && 'is-banned', mb.granted && 'is-granted')}
-            onClick=${() => onMember?.(mb.id, mb.granted && Array.isArray(mb.items) ? mb.items : null)} data-granted=${mb.granted ? '1' : null}
+            onClick=${() => mb.pick?onMember?.(mb.id,mb.granted&&Array.isArray(mb.items)?mb.items:null,null,mb.pick):onMember?.(mb.id,mb.granted&&Array.isArray(mb.items)?mb.items:null)} data-granted=${mb.granted ? '1' : null}
             title=${`${mb.name}${mb.granted ? '（变形同构体：视为本盟约成员）' : ''}${mb.banned ? '（本局禁用）' : mb.onBoard ? '（在场）' : mb.owned ? '（整备区）' : ''}`}>
-          <${UnitThumb} kind="chess" id=${mb.id} size="sm" dim=${!mb.owned || mb.banned} />
+          <${UnitThumb} kind="chess" id=${mb.id} rec=${mb.rec||null} size="sm" dim=${!mb.owned || mb.banned} />
           <span class="bpop__mname">${mb.name}</span>
           ${mb.banned ? html`<span class="bpop__ban"><${Icon} name="close" /></span>` : null}
           ${mb.granted ? html`<span class="bpop__iso" aria-hidden="true">同构</span>` : null}

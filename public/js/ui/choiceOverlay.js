@@ -1,3 +1,4 @@
+import {tr} from '../i18n/i18n.js';
 import { t } from '../../../shared/i18n.js';
 
 // 机变 draft overlay (research 06 §4.4 / §11.5): family title | description, "倒计时结束后仍未选定将自动分配",
@@ -30,6 +31,9 @@ const cx = (...p) => p.flat().filter(Boolean).join(' ');
 
 const bare = (t) => String(t || '').replace(/\s+/g, '');
 
+/** @param {{name?:string,desc?:string}} card */
+export function choiceCardTooltip(card){return `${tr(card.name||'')}\n${richTextPlain(card.desc||'')}`;}
+
 /**
  * A card's effect text: the card's own rich text, else the data's rich text (highlighted numbers, 下场作战, set bonuses,
  * line breaks — the detail card's text) while it says what the server's plain `desc` says, else that plain text (a
@@ -38,7 +42,7 @@ const bare = (t) => String(t || '').replace(/\s+/g, '');
  */
 export function cardText(card, rich) {
   if (card.descRaw) return card.descRaw;
-  if (rich && (!card.desc || bare(richTextPlain(rich)) === bare(card.desc))) return rich;
+  if (rich && (!card.desc || bare(richTextPlain(rich)) === bare(richTextPlain(card.desc)))) return rich;
   return card.desc || rich || '';
 }
 
@@ -69,7 +73,7 @@ export function resolveSpCard(card, family) {
   return {
     kind,
     name: card.name || item?.name || eff?.name || bounty?.name || tactic?.name || '机变',
-    desc: cardText(card, item?.descRaw || eff?.descRaw || '') || item?.desc || eff?.desc || bounty?.desc || tactic?.desc || '',
+    desc: tr(cardText(card, item?.descRaw || eff?.descRaw || '') || item?.desc || eff?.desc || bounty?.desc || tactic?.desc || ''),
     tier: Number.isFinite(card.tier) ? card.tier : item?.tier ?? bounty?.tier ?? null,
     icon,
     team: !!team,
@@ -232,12 +236,12 @@ export function ChoiceView({ pub, sp, myId, solo, personal = false, busyIdx = nu
           const takerName = taker ? (card.takenBy === myId ? '你' : taker.name) : null;
           return html`<button key=${card.idx} type="button" class=${cx('spcard', `spcard--${r.kind}`, (card.takenBy || card.soldOut) && 'is-taken', card.takenBy === myId && 'is-mine', can && 'is-pickable', isArmed && 'is-armed', busy && 'is-busy')}
               aria-busy=${busy ? 'true' : undefined} aria-pressed=${can ? String(isArmed) : undefined} disabled=${!can} onClick=${() => can && onTap(card.idx)}
-              aria-label=${isArmed ? `${r.name}，已选中，再次点击确认` : takerName ? `${r.name}，${takerName}已选择` : r.name} title=${`${r.name}\n${richTextPlain(r.desc)}`}>
+              aria-label=${isArmed ? `${r.name}，已选中，再次点击确认` : takerName ? `${r.name}，${takerName}已选择` : r.name} title=${choiceCardTooltip(r)}>
             <span class="spcard__glow" aria-hidden="true"></span>
             <span class="spcard__head">
               <span class="spcard__icon"><${Img} src=${r.icon} fallback=${html`<${GIcon} name=${r.kind === 'bounty' ? 'target' : 'bolt'} />`} /></span>
               <span class="spcard__title">
-                <b class="spcard__name">${r.name}</b>
+                <b class="spcard__name">${tr(r.name)}</b>
                 ${r.team || (r.kind === 'bounty' && r.coin) ? html`<span class="spcard__tags">
                   ${r.team ? html`<span class="spcard__tag spcard__tag--team">全队获得</span>` : null}
                   ${r.kind === 'bounty' && r.coin ? html`<span class="spcard__tag spcard__tag--coin">赏金 ${r.coin}</span>` : null}

@@ -1,0 +1,14 @@
+[
+  {
+    "before": {
+      "id": "chess_char_3_12_a",
+      "hash": "11c17ba853a1aa0b41cf4f50fa4eae7e9069501ce823bca5ffbc4739d75fc12c",
+      "errors": 0
+    },
+    "after": {
+      "id": "chess_char_3_12_a",
+      "hash": "84c819eb74d6a18a6cffd45b6f8eada228ff9f479ec84a9045e8d44c81a1175a",
+      "errors": 0
+    }
+  }
+]

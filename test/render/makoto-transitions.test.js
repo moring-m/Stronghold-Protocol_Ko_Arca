@@ -134,3 +134,36 @@ test('a delayed Makoto model resumes past its strike, but cancelled or expired s
  a.update(2);v.gameT=7;assert.equal(UnitView.prototype._resumeMakotoAttack.call(v),false);assert.equal(a.mode,'base');
  v.gameT=5.1;v._makotoAttackPlayback=null;assert.equal(UnitView.prototype._resumeMakotoAttack.call(v),false);assert.equal(a.mode,'base');
 });
+test('Makoto base and skin stun enter once, hold the pose and recover in every persona',async()=>{
+ for(const id of ['char_4217_makoto','skin_char_4217_makoto_p3r_1']){
+  const spine=assets.chars[id].spine,store={picture:()=>null,image:async()=>null,hasBack:()=>false,spineEntry:()=>spine.front,spine:{acquire:async e=>({animations:Object.keys(e.animations).map(name=>({name}))}),release(){}}};
+  const v=new UnitView(fakeViewCtx(fake.P,{assets:store}),{id:1,kind:'op',side:'ally',charId:'char_4217_makoto',spine:id,x:5,y:10,maxHp:1000});
+  await new Promise(setImmediate);await new Promise(setImmediate);
+  const a=v.actor;assert.equal(a.holdStunPose,true);
+  for(const name of [null,'makoto_s1','makoto_s2','makoto_s3a','makoto_s3b']){
+   a.setBase('idle');a.setForm(name?forms[name].roles:null);a.setBase('stun');
+   const track=a.spine.state.tracks[0];assert.match(a.current,/Stun/);assert.equal(track.loop,false);
+   for(let i=0;i<120;i++){a.setBase('stun');a.update(1/30);}
+   assert.equal(a.spine.state.tracks[0],track);assert.equal(a.mode,'stun');
+   a.setBase('idle');assert.equal(a.mode,'base');assert.doesNotMatch(a.current,/Stun/);
+  }
+  v.destroy();
+ }
+});
+
+test('UP-facing personas use their authored Back attack after Front-only entry finishes',async()=>{
+ for(const id of ['char_4217_makoto','skin_char_4217_makoto_p3r_1'])for(const form of ['makoto_s1','makoto_s2','makoto_s3a']){
+  const spine=assets.chars[id].spine,store={picture:()=>null,image:async()=>null,hasBack:()=>true,spineEntry:(_id,o)=>o?.back?spine.back:spine.front,spine:{acquire:async e=>({animations:Object.keys(e.animations).map(name=>({name}))}),release(){}}};
+  const v=new UnitView(fakeViewCtx(fake.P,{assets:store,animRate:()=>1}),{id:1,kind:'op',side:'ally',charId:'char_4217_makoto',spine:id,dir:'UP',x:5,y:10,maxHp:1000});
+  await new Promise(setImmediate);await new Promise(setImmediate);assert.equal(v.entryBack,true);
+  v.setForm(form);v._syncModel();await new Promise(setImmediate);await new Promise(setImmediate);
+  assert.equal(v.entryBack,false,'entry clips exist only on Front');
+  v.actor.update(2.01);v._formElapsed=2.01;v.gameT=5;
+  if(form!=='makoto_s2')v.onAttackStart({x:5,y:11},.5,1.8,false,undefined,5);
+  v._syncModel();v.gameT=5.1;await new Promise(setImmediate);await new Promise(setImmediate);
+  assert.equal(v.entryBack,true,`${id} ${form} must stop requiring Front-only entry clips after entry`);
+  if(form!=='makoto_s2'){assert.match(v.actor.current,/Doll_Skill_(?:1|3_P1)_Attack/);assert.equal(v.actor.mode,'attack');assert.ok(v.actor.spine.state.tracks[0].trackTime>0);}
+  else assert.equal(v.actor.current,'Doll_Skill_2_Loop');
+  v.destroy();
+ }
+});

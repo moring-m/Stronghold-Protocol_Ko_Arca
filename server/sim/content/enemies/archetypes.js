@@ -609,8 +609,8 @@ function dmgZone(b, src, x, y, r, life, iv, amount, type = 'arts', kind = 'zone'
 }
 
 /** A cooldown skill ability (`id` labels it for tests / other abilities). */
-const skill = (s, fire, { cond = null, sil = false, cd = null, icd = null, id = null } = {}) => (s || cd != null) && fire ? ({
-  id: id ?? null, sil, cd: cd ?? s.cd, icd: icd ?? s.icd, cond, fire, sk: s || null,   // sk: its slot for the 'cast' event
+const skill = (s, fire, { cond = null, sil = false, cd = null, icd = null, id = null, turn = null } = {}) => (s || cd != null) && fire ? ({
+  id: id ?? null, sil, cd: cd ?? s.cd, icd: icd ?? s.icd, cond, fire, ...turn, sk: s || null,   // sk: its slot for the 'cast' event
 }) : null;
 
 /** Blink past the blocker along the path (弑君者 / 卢西恩). Returns the start position. */

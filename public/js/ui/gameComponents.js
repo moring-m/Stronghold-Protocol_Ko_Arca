@@ -101,13 +101,13 @@ export const isGoldenPiece = (piece, chess) => !!(piece?.golden || chess?.isGold
  * @param {{ kind?: 'chess'|'item'|'token'|'enemy', id: string, golden?: boolean, size?: 'xs'|'sm'|'md'|'lg', tier?: number,
  *   showTier?: boolean, class?: string, dim?: boolean, badge?: any, title?: string }} props
  */
-export function UnitThumb({ kind = 'chess', id, golden, size = 'md', tier, showTier = true, class: cls, dim = false, badge = null, title }) {
+export function UnitThumb({ rec = null, kind = 'chess', id, golden, size = 'md', tier, showTier = true, class: cls, dim = false, badge = null, title }) {
   const m = data.get('assets');
   let src = null;
   let name = '';
   let t = tier;
   if (kind === 'chess') {
-    const c = data.lookup('chess', id);
+    const c = rec || data.lookup('chess', id);
     src = chessAvatarUrl(m, c);
     name = c?.name || '';
     t = t ?? c?.tier;

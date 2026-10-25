@@ -574,49 +574,7 @@ export function harmonyMembers(priv, getChess = () => null) {
  * @param {(id:string)=>any} [getChess]
  * @param {(id:string)=>any} [getItem] items.json lookup (the 变形同构体 pairings)
  */
-export function bondMembers(bond, priv, banned = [], getChess = () => null, getItem = () => null) {
-  const bannedSet = banned instanceof Set ? banned : new Set(Array.isArray(banned) ? banned : []);
-  const members = Array.isArray(bond?.visibleMembers) && bond.visibleMembers.length ? bond.visibleMembers : (Array.isArray(bond?.members) ? bond.members : []);
-  const baseOf = (id) => getChess(id)?.baseId || (typeof id === 'string' ? id.replace(/_b$/, '_a') : id);
-  const onBoard = new Set();
-  const owned = new Set();
-  const inHand = new Set();
-  const memberSet = new Set(members);
-  /** base id → { on: on the board?, hand: in the hand?, items: the wearer's item ids } — operators of the player that join this bond through 变形同构体 */
-  const granted = new Map();
-  const grants = (p) => typeof bond?.bondId === 'string' && grantedBonds(p.items, getItem).includes(bond.bondId);
-  const itemIds = (p) => p.items.map((it) => (typeof it === 'string' ? it : it?.id)).filter((x) => typeof x === 'string');
-  for (const p of Array.isArray(priv?.board) ? priv.board : []) {
-    if (p?.kind !== 'chess') continue;
-    const base = baseOf(p.id);
-    onBoard.add(base); owned.add(base);
-    if (!memberSet.has(base) && !granted.has(base) && grants(p)) granted.set(base, { on: true, hand: false, items: itemIds(p) });
-  }
-  for (const [list, hand] of [[priv?.hand, true], [priv?.temp, false]]) {
-    for (const p of Array.isArray(list) ? list : []) {
-      if (p?.kind !== 'chess') continue;
-      const base = baseOf(p.id);
-      owned.add(base);
-      if (hand) inHand.add(base);
-      if (memberSet.has(base) || !grants(p)) continue;
-      const g = granted.get(base);
-      if (!g) granted.set(base, { on: false, hand, items: itemIds(p) });
-      else if (hand) g.hand = true;
-    }
-  }
-  const rows = members.filter(id => {
-    const c = getChess(id);
-    return !c?.optionalRecruit || owned.has(baseOf(id)) || priv?.loadout?.[baseOf(id)]?.selected === true || priv?.selectedRecruits?.includes(baseOf(id));
-  }).map((id) => {
-    const c = getChess(id);
-    return { id, tier: c?.tier ?? 0, name: c?.name ?? id, onBoard: onBoard.has(id), owned: owned.has(id), inHand: inHand.has(id), banned: bannedSet.has(id) };
-  });
-  for (const [id, g] of granted) {
-    const c = getChess(id);
-    rows.push({ id, tier: c?.tier ?? 0, name: c?.name ?? id, onBoard: g.on, owned: true, inHand: g.hand, banned: false, granted: true, items: g.items });
-  }
-  return rows.sort((a, b) => (b.onBoard - a.onBoard) || (b.owned - a.owned) || (a.tier - b.tier) || (a.id < b.id ? -1 : 1));
-}
+export {bondMembers} from './gameLogic/bonds.js';
 
 /**
  * The member count of a bond popup's 成员 header: the rows on the board — and, for a bond that counts the hand

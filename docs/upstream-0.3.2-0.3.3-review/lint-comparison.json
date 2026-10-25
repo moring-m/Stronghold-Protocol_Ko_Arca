@@ -1,0 +1,762 @@
+{
+  "before": {
+    "errors": 0,
+    "warnings": 76,
+    "files": [
+      {
+        "file": "public/js/battle/runner.js",
+        "messages": [
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'attachAttackTimings' is defined but never used. Allowed unused vars must match /^_/u."
+          }
+        ]
+      },
+      {
+        "file": "public/js/main.js",
+        "messages": [
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'useLang' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'tickerText' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'N_' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'translateWire' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": null,
+            "message": "Unused eslint-disable directive (no problems were reported from 'no-unused-vars')."
+          }
+        ]
+      },
+      {
+        "file": "public/js/render/app.js",
+        "messages": [
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'t' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'DAMAGE_NUMBER_MODES' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'syncPrepMapChars' is defined but never used. Allowed unused vars must match /^_/u."
+          }
+        ]
+      },
+      {
+        "file": "public/js/render/board3d/layout.js",
+        "messages": [
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'tintRgb' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'mul' is assigned a value but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'x1' is assigned a value but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'y1' is assigned a value but never used. Allowed unused vars must match /^_/u."
+          }
+        ]
+      },
+      {
+        "file": "public/js/render/textures.js",
+        "messages": [
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'rgba' is assigned a value but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'r' is defined but never used. Allowed unused args must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'r' is defined but never used. Allowed unused args must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'r' is defined but never used. Allowed unused args must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'r' is defined but never used. Allowed unused args must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'name' is assigned a value but never used. Allowed unused vars must match /^_/u."
+          }
+        ]
+      },
+      {
+        "file": "public/js/render/units.js",
+        "messages": [
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'skillAttackMode' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'MANIFOLD' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-useless-assignment",
+            "message": "The value assigned to 'actor' is not used in subsequent statements."
+          },
+          {
+            "ruleId": "no-useless-assignment",
+            "message": "The value assigned to 'sy' is not used in subsequent statements."
+          },
+          {
+            "ruleId": "no-useless-assignment",
+            "message": "The value assigned to 'b' is not used in subsequent statements."
+          }
+        ]
+      },
+      {
+        "file": "public/js/screens/game.js",
+        "messages": [
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'FinalAssaultPlate' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'HiddenCorePlate' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'EndPlate' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'finalPlateRows' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'OfferOverlay' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'phasePopupOf' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'roundsToBoss' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'foldCamera' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'uniteResultBox' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'battleResultBox' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'deployedRecord' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'ownDiyRecord' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'ownStandIn' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'bootArtReady' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'loneHalf' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'followedScout' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'cardTap' is assigned a value but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'resultBox' is assigned a value but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'bossPlate' is assigned a value but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-useless-assignment",
+            "message": "The value assigned to 'asked' is not used in subsequent statements."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'removeSpectator' is assigned a value but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'lookups' is assigned a value but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-useless-assignment",
+            "message": "The value assigned to 'b' is not used in subsequent statements."
+          }
+        ]
+      },
+      {
+        "file": "public/js/ui/device.js",
+        "messages": [
+          {
+            "ruleId": "no-useless-assignment",
+            "message": "The value assigned to 'importMaps' is not used in subsequent statements."
+          }
+        ]
+      },
+      {
+        "file": "public/js/ui/shopBar.js",
+        "messages": [
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'standInForText' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'name' is assigned a value but never used. Allowed unused vars must match /^_/u."
+          }
+        ]
+      },
+      {
+        "file": "server/match/PlayerState.js",
+        "messages": [
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'msg' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'dn' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'checkNotOwned' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'diyGameData' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'reason' is assigned a value but never used. Allowed unused args must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'base' is assigned a value but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'need' is assigned a value but never used. Allowed unused vars must match /^_/u."
+          }
+        ]
+      },
+      {
+        "file": "server/sim/Battle.js",
+        "messages": [
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'ammoView' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'ROWS' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'COLS' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-useless-assignment",
+            "message": "The value assigned to 'ux' is not used in subsequent statements."
+          },
+          {
+            "ruleId": "no-useless-assignment",
+            "message": "The value assigned to 'uy' is not used in subsequent statements."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'fromX' is assigned a value but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'fromY' is assigned a value but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'ammo' is assigned a value but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'wolves' is assigned a value but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'neg' is assigned a value but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'energy' is assigned a value but never used. Allowed unused vars must match /^_/u."
+          }
+        ]
+      },
+      {
+        "file": "server/sim/ai.js",
+        "messages": [
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'attackTargets' is defined but never used. Allowed unused vars must match /^_/u."
+          }
+        ]
+      },
+      {
+        "file": "server/sim/content/enemies/special.js",
+        "messages": [
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'STEP_PER_TICK' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'RUSH_LISTEN' is assigned a value but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'catapultVolley' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'b' is defined but never used. Allowed unused args must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'e' is defined but never used. Allowed unused args must match /^_/u."
+          }
+        ]
+      },
+      {
+        "file": "server/sim/damage.js",
+        "messages": [
+          {
+            "ruleId": "no-useless-assignment",
+            "message": "The value assigned to 'i' is not used in subsequent statements."
+          },
+          {
+            "ruleId": "no-useless-assignment",
+            "message": "The value assigned to 'dealt' is not used in subsequent statements."
+          }
+        ]
+      }
+    ]
+  },
+  "after": {
+    "errors": 0,
+    "warnings": 76,
+    "files": [
+      {
+        "file": "public/js/battle/runner.js",
+        "messages": [
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'attachAttackTimings' is defined but never used. Allowed unused vars must match /^_/u."
+          }
+        ]
+      },
+      {
+        "file": "public/js/main.js",
+        "messages": [
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'useLang' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'tickerText' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'N_' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'translateWire' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": null,
+            "message": "Unused eslint-disable directive (no problems were reported from 'no-unused-vars')."
+          }
+        ]
+      },
+      {
+        "file": "public/js/render/app.js",
+        "messages": [
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'t' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'DAMAGE_NUMBER_MODES' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'syncPrepMapChars' is defined but never used. Allowed unused vars must match /^_/u."
+          }
+        ]
+      },
+      {
+        "file": "public/js/render/board3d/layout.js",
+        "messages": [
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'tintRgb' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'mul' is assigned a value but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'x1' is assigned a value but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'y1' is assigned a value but never used. Allowed unused vars must match /^_/u."
+          }
+        ]
+      },
+      {
+        "file": "public/js/render/textures.js",
+        "messages": [
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'rgba' is assigned a value but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'r' is defined but never used. Allowed unused args must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'r' is defined but never used. Allowed unused args must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'r' is defined but never used. Allowed unused args must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'r' is defined but never used. Allowed unused args must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'name' is assigned a value but never used. Allowed unused vars must match /^_/u."
+          }
+        ]
+      },
+      {
+        "file": "public/js/render/units.js",
+        "messages": [
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'skillAttackMode' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'MANIFOLD' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-useless-assignment",
+            "message": "The value assigned to 'actor' is not used in subsequent statements."
+          },
+          {
+            "ruleId": "no-useless-assignment",
+            "message": "The value assigned to 'sy' is not used in subsequent statements."
+          },
+          {
+            "ruleId": "no-useless-assignment",
+            "message": "The value assigned to 'b' is not used in subsequent statements."
+          }
+        ]
+      },
+      {
+        "file": "public/js/screens/game.js",
+        "messages": [
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'FinalAssaultPlate' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'HiddenCorePlate' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'EndPlate' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'finalPlateRows' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'OfferOverlay' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'phasePopupOf' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'roundsToBoss' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'foldCamera' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'uniteResultBox' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'battleResultBox' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'deployedRecord' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'ownDiyRecord' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'ownStandIn' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'bootArtReady' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'loneHalf' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'followedScout' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'cardTap' is assigned a value but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'resultBox' is assigned a value but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'bossPlate' is assigned a value but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-useless-assignment",
+            "message": "The value assigned to 'asked' is not used in subsequent statements."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'removeSpectator' is assigned a value but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'lookups' is assigned a value but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-useless-assignment",
+            "message": "The value assigned to 'b' is not used in subsequent statements."
+          }
+        ]
+      },
+      {
+        "file": "public/js/ui/device.js",
+        "messages": [
+          {
+            "ruleId": "no-useless-assignment",
+            "message": "The value assigned to 'importMaps' is not used in subsequent statements."
+          }
+        ]
+      },
+      {
+        "file": "public/js/ui/shopBar.js",
+        "messages": [
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'standInForText' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'name' is assigned a value but never used. Allowed unused vars must match /^_/u."
+          }
+        ]
+      },
+      {
+        "file": "server/match/PlayerState.js",
+        "messages": [
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'msg' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'dn' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'checkNotOwned' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'diyGameData' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'reason' is assigned a value but never used. Allowed unused args must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'base' is assigned a value but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'need' is assigned a value but never used. Allowed unused vars must match /^_/u."
+          }
+        ]
+      },
+      {
+        "file": "server/sim/Battle.js",
+        "messages": [
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'ammoView' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'ROWS' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'COLS' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-useless-assignment",
+            "message": "The value assigned to 'ux' is not used in subsequent statements."
+          },
+          {
+            "ruleId": "no-useless-assignment",
+            "message": "The value assigned to 'uy' is not used in subsequent statements."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'fromX' is assigned a value but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'fromY' is assigned a value but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'ammo' is assigned a value but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'wolves' is assigned a value but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'neg' is assigned a value but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'energy' is assigned a value but never used. Allowed unused vars must match /^_/u."
+          }
+        ]
+      },
+      {
+        "file": "server/sim/ai.js",
+        "messages": [
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'attackTargets' is defined but never used. Allowed unused vars must match /^_/u."
+          }
+        ]
+      },
+      {
+        "file": "server/sim/content/enemies/special.js",
+        "messages": [
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'STEP_PER_TICK' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'RUSH_LISTEN' is assigned a value but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'catapultVolley' is defined but never used. Allowed unused vars must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'b' is defined but never used. Allowed unused args must match /^_/u."
+          },
+          {
+            "ruleId": "no-unused-vars",
+            "message": "'e' is defined but never used. Allowed unused args must match /^_/u."
+          }
+        ]
+      },
+      {
+        "file": "server/sim/damage.js",
+        "messages": [
+          {
+            "ruleId": "no-useless-assignment",
+            "message": "The value assigned to 'i' is not used in subsequent statements."
+          },
+          {
+            "ruleId": "no-useless-assignment",
+            "message": "The value assigned to 'dealt' is not used in subsequent statements."
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,3 +1,4 @@
+import { createEventLoopMonitor } from './health/eventLoop.js';
 import fs from 'node:fs';
 import { workerControls } from './release/runtime.js';
 // server/index.js — process entry & boot (DESIGN §1, §2). Plain node:http + ws, no framework: startServer() below
@@ -132,6 +133,12 @@ export async function startServer(opts = {}) {
   const transport = String(process.env.SP_MATCH_HOST || '').trim().toLowerCase() === 'worker' ? 'worker' : 'process';
   const hosts = createMatchHosts({ contents, log, options: { transport, maxWorkers: Math.max(1, policy.get().maxSets), ...(opts.matchHost || {}) } });
   const { registry, lobby, network } = createSessionStack(opts, { data, log, content, plugins: roomSets, hosts });
+  // Opt-in diagnostics: bounded local logs, no extra simulation worker or public health fields.
+  const eventLoop = createEventLoopMonitor({log,windowMs:opts.loopSample?.windowMs,counts:()=>{
+    const stats=lobby.stats(),phases=new Set();let rehearsals=0;
+    for(const room of lobby.rooms.values()){if(room.match?.phase)phases.add(room.match.phase);rehearsals+=room.match?._rehearsalTasks?.size||0;}
+    return {...stats,phase:[...phases].sort().join('+')||'idle',rehearsals};
+  }});
   const releaseControl=release?workerControls(lobby,{release,token:releaseToken,network}):null;
   const serveStatic = createStaticHandler({ publicDir, dataDir, sharedDir, simDir, packsDir, pluginsDir, packs, content, log, assetIndex, views, visual, contents });
   // the plugin studio (DESIGN §32.9): its page and API for this machine and the local network; it watches plugins/ only
@@ -190,6 +197,7 @@ export async function startServer(opts = {}) {
       await trustedRuntime?.close();
     }
   } catch (e) {
+    eventLoop?.close();
     network.close(); // stop heartbeat/sweep timers of the half-built server
     assetIndex?.close();
     studio?.close();
@@ -200,6 +208,7 @@ export async function startServer(opts = {}) {
   assetIndex?.start();
 
   const addr = server.address();
+  eventLoop?.start();
   const actualPort = typeof addr === 'object' && addr ? addr.port : port;
   const url = `http://${displayHost(boundHost)}:${actualPort}`;
 
@@ -210,6 +219,7 @@ export async function startServer(opts = {}) {
       releaseControl?.close?.();
       try { lobby.shutdown('shutdown'); } catch (e) { log.error('[shutdown] lobby', e); }
       try { hosts.close(); } catch (e) { log.error('[shutdown] match hosts', e); }
+      eventLoop?.close();
       network.close();
       assetIndex?.close();
       studio?.close();
@@ -224,7 +234,7 @@ export async function startServer(opts = {}) {
     return closing;
   }
 
-  return { port: actualPort, host: boundHost, url, server, wss, lobby, network, registry, packs, content, visual, contents, hosts, traffic, assetIndex, views, studio, close };
+  return { port: actualPort, host: boundHost, url, server, wss, lobby, network, registry, packs, content, visual, contents, hosts, traffic, assetIndex, views, studio, eventLoop, close };
 }
 
 // `node server/index.js` / npm start: listen, print the banner, stop on SIGINT / SIGTERM (http/boot.js).

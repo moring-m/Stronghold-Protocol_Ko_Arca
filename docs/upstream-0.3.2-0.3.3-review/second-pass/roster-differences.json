@@ -1,0 +1,26 @@
+[
+  {
+    "before": {
+      "id": "chess_char_3_12_a",
+      "hash": "11c17ba853a1aa0b41cf4f50fa4eae7e9069501ce823bca5ffbc4739d75fc12c",
+      "errors": 0
+    },
+    "after": {
+      "id": "chess_char_3_12_a",
+      "hash": "84c819eb74d6a18a6cffd45b6f8eada228ff9f479ec84a9045e8d44c81a1175a",
+      "errors": 0
+    }
+  },
+  {
+    "before": {
+      "id": "chess_char_6_13_a",
+      "hash": "44cd80988eb08b27298a2374f0bd7ca133df4b4502a35a707dce800f85f4b360",
+      "errors": 0
+    },
+    "after": {
+      "id": "chess_char_6_13_a",
+      "hash": "8ef0ee5d81633d9c812ca9a8fd95c09e7ada5e14aef65351bf49dd17ec4fbdb9",
+      "errors": 0
+    }
+  }
+]

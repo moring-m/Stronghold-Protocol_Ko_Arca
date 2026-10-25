@@ -1,0 +1,13 @@
+✔ base package version and letter-suffixed site version stay consistent (0.970166ms)
+✔ CHANGELOG.md opens with the release version, and the README links it (1.171307ms)
+✔ the release version is what players see (0.487992ms)
+✔ the English title is the official one: Stronghold Protocol: Alliance (as in the reply to GitHub issue #38, which stays open) (1.280962ms)
+✔ GPL-3.0-or-later: LICENSE, package metadata and notices (0.409344ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 188.562202

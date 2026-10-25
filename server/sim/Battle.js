@@ -606,11 +606,17 @@ export class Battle {
     // §5.5) — never merely because it emptied: the h07_04 pair leader (official route: no wait) can walk into the
     // objective, and the field then idles while another field may still empty the pool or the overtime drain ends it.
     const poolHolds = !!this.sharedBoss && (this.kind === 'boss' || this.kind === 'hidden');
-    if (this.autoFinish && !poolHolds && !this._pending.length && !this.enemies.some((e) => e.alive) && this.started) {
+    if (this.autoFinish && !poolHolds && !this._pending.length && this.started && !this._anyEnemyAlive()) {
       if (!this._hasPendingEnemySchedules()) { this._finish('cleared'); return; }
     }
     if (this.time >= this.timeLimit - 1e-9) { this._timeout(); return; }
     if (this.time >= MAX_BATTLE_TIME) { this._timeout(); return; }
+  }
+
+  _anyEnemyAlive() {
+    const list = this.enemies;
+    for (let i = 0; i < list.length; i++) if (list[i].alive) return true;
+    return false;
   }
 
   _hasPendingEnemySchedules() {
@@ -784,11 +790,16 @@ export class Battle {
       this._handlerError(`hookDepth:${name}`, null, new Error(`hook nesting deeper than ${MAX_HOOK_DEPTH}; handlers skipped — ${this._chain(name)}`));
       return ctx;
     }
-    const arr = list.length === 1 ? [list[0]] : list.slice();
     const d = this._emitDepth++;
+    // The hooks are iterated over a snapshot (a handler may add / remove hooks): one buffer per nesting level, reused
+    // across emits — this runs several times a tick, so a fresh `slice()` per call was pure garbage.
+    const arr = (this._emitBufs ?? (this._emitBufs = []))[d] ?? (this._emitBufs[d] = []);
+    arr.length = list.length;
+    for (let i = 0; i < list.length; i++) arr[i] = list[i];
     this._frameCtx[d] = ctx;
     try {
-      for (const h of arr) {
+      for (let i = 0; i < arr.length; i++) {
+        const h = arr[i];
         if (h.removed) continue;
         this._frameName[d] = name;
         this._frameOwner[d] = h.owner;
@@ -798,6 +809,7 @@ export class Battle {
       }
     } finally {
       this._emitDepth--;
+      arr.length = 0; // drop the snapshot's references: a hook removed after this emit must not stay reachable
     }
     return ctx;
   }
@@ -846,27 +858,56 @@ export class Battle {
   }
 
   _runScheduled() {
-    if (!this._sched.length) return;
+    const all = this._sched;
+    if (!all.length) return;
     const now = this.time + 1e-9;
-    let due = this._sched.filter((s) => !s.cancelled && s.due <= now);
-    if (!due.length) { if (this._sched.some((s) => s.cancelled)) this._sched = this._sched.filter((s) => !s.cancelled); return; }
-    due.sort((a, b) => a.due - b.due || a.seq - b.seq);
-    for (const s of due) {
-      if (s.cancelled) continue;
-      if (s.interval > 0) {
-        let n = 0;
-        while (s.due <= now && !s.cancelled && n++ < 8) { // loop-cap: battle.every at most 8 per tick
-          s.count++;
-          this._safe(() => s.fn(this, s), 'every', s.owner);
-          s.due += s.interval;
-        }
-        if (s.due <= now) s.due = this.time + s.interval;
-      } else {
-        s.cancelled = true;
-        this._safe(() => s.fn(this, s), 'after', s.owner);
+    // Collected into a reused buffer (one per nesting level, emptied afterwards): this runs every tick, and `filter`
+    // plus `slice` allocated two arrays per tick.
+    const bufs = this._dueBufs ?? (this._dueBufs = []);
+    const depth = this._runDepth ?? 0;
+    const due = bufs[depth] ?? (bufs[depth] = []);
+    due.length = 0;
+    this._runDepth = depth + 1;
+    try {
+      let cancelled = 0;
+      for (let i = 0; i < all.length; i++) {
+        const s = all[i];
+        if (s.cancelled) { cancelled++; continue; }
+        if (s.due <= now) due.push(s);
       }
+      if (!due.length) {
+        if (cancelled) this._compactDue();
+        return;
+      }
+      due.sort((a, b) => a.due - b.due || a.seq - b.seq);
+      for (let i = 0; i < due.length; i++) {
+        const s = due[i];
+        if (s.cancelled) continue;
+        if (s.interval > 0) {
+          let n = 0;
+          while (s.due <= now && !s.cancelled && n++ < 8) { // loop-cap: battle.every at most 8 per tick
+            s.count++;
+            this._safe(() => s.fn(this, s), 'every', s.owner);
+            s.due += s.interval;
+          }
+          if (s.due <= now) s.due = this.time + s.interval;
+        } else {
+          s.cancelled = true;
+          this._safe(() => s.fn(this, s), 'after', s.owner);
+        }
+      }
+      this._compactDue();
+    } finally {
+      this._runDepth = depth;
+      due.length = 0; // a fired timer must not stay reachable through the scratch buffer
     }
-    this._sched = this._sched.filter((s) => !s.cancelled);
+  }
+
+  _compactDue() {
+    const all = this._sched;
+    let m = 0;
+    for (let i = 0; i < all.length; i++) { const s = all[i]; if (!s.cancelled) all[m++] = s; }
+    all.length = m;
   }
 
   // =============================================================================================================
@@ -1380,18 +1421,21 @@ export class Battle {
    * (Battle.displace stops it at the tile edge, 0.5 from the fenced unit — inside the ground block radius). An airborne
    * unit (起飞, flag `liftoff`: "不阻挡地面敌人…可以阻挡飞行敌人") blocks flyers only.
    */
-  _blockerFor(u, e, w) {
+  _blockerFor(u, e, w, fly = e.isFlying) {
     // flag `noNewBlock`: a unit that takes no new enemy by contact — it blocks only those content hands it (酒神's 迷狂牢笼,
     // PRTS "只在生成/刷新时判定阻挡新的敌人"); the blocks it holds go on as usual
-    if (!u.alive || !u.deployed || u.hidden || u.s.flags.noBlock || u.s.flags.sleep || u.s.flags.noNewBlock) return false;
-    if (e.isFlying && !(u.s.flags.blockFly || (u.profile && u.profile.blockFly))) return false;
+    if (!u.alive || !u.deployed || u.hidden) return false;
+    const us = u.s;
+    if (us.flags.noBlock || us.flags.sleep || us.flags.noNewBlock) return false;
+    if (fly && !(us.flags.blockFly || (u.profile && u.profile.blockFly))) return false;
     // ground enemies: only a ground unit that has not taken off (起飞 "不阻挡地面敌人": flag `liftoff`), standing on a tile
     // ground units can pass (not a fenced 围墙 / 围栏 tile)
-    if (!e.isFlying && (!u.ground || u.s.flags.liftoff || this.grid.tile(u.tileR, u.tileC).pass !== 'ALL')) return false;
-    const cap = u.s.blockCnt;
+    if (!fly && (!u.ground || us.flags.liftoff || this.grid.tile(u.tileR, u.tileC).pass !== 'ALL')) return false;
+    const cap = us.blockCnt;
     if (cap <= 0) return false;
     let used = 0;
-    for (const x of u.blocking) used += x.blockWeight ?? 1;
+    const held = u.blocking;
+    for (let i = 0; i < held.length; i++) used += held[i].blockWeight ?? 1;
     return used + w <= cap;
   }
 
@@ -1488,10 +1532,13 @@ export class Battle {
 
   removeBuff(unit, keyOrBuff) {
     if (!unit) return 0;
+    // Removal callbacks may synchronously remove another matching buff. Snapshot
+    // identities, then locate survivors; additions wait until the next call.
+    const matches = unit.buffs.filter(b => b === keyOrBuff || b.key === keyOrBuff).reverse();
     let n = 0;
-    for (let i = unit.buffs.length - 1; i >= 0; i--) {
-      const b = unit.buffs[i];
-      if (b === keyOrBuff || b.key === keyOrBuff) { this._removeBuffAt(unit, i, true); n++; }
+    for (const b of matches) {
+      const i=unit.buffs.indexOf(b);
+      if(i>=0){this._removeBuffAt(unit,i,true);n++;}
     }
     return n;
   }
@@ -1510,48 +1557,63 @@ export class Battle {
 
   _tickBuffs(dt) {
     const units = this.units;
-    for (let i = 0, n = units.length; i < n; i++) { // units created by onTick handlers start ticking next tick
-      const u = units[i];
-      if (!u.alive || u.removed) continue;
-      if(u.deployed&&!u.hidden)u.stats.activeTime=(u.stats.activeTime||0)+dt;
-      if (u.buffs.length) {
-        const arr = u.buffs.slice();
-        for (const b of arr) {
-          if (!u.alive) break;
-          if (u.buffs.indexOf(b) < 0) continue;
-          if (b.onTick) {
-            if (b.interval > 0) {
-              b._acc += dt;
-              let n = 0;
-              while (b._acc >= b.interval - 1e-9 && n++ < 8) { // loop-cap: at most 8 interval ticks
-                b._acc -= b.interval;
-                this._safe(() => b.onTick({ battle: this, unit: u, buff: b, dt: b.interval }), 'buff.onTick', u);
-              }
-            } else this._safe(() => b.onTick({ battle: this, unit: u, buff: b, dt }), 'buff.onTick', u);
-          }
-          if (b.timeLeft !== Infinity) {
-            b.timeLeft -= dt;
-            if (b.timeLeft <= 1e-9) {
-              const i = u.buffs.indexOf(b);
-              if (i >= 0) {
-                this._removeBuffAt(u, i, false);
-                if (b.onExpire) this._safe(() => b.onExpire({ battle: this, unit: u, buff: b }), 'buff.onExpire', u);
+    // Snapshot of a unit's buffs (a handler may add / remove them): a buffer per nesting level, refilled per unit and
+    // emptied afterwards — `u.buffs.slice()` was an array per buffed unit per tick (a hundred a tick in a crowded wave).
+    const bufs = this._buffScratch ?? (this._buffScratch = []);
+    const depth = this._buffDepth ?? 0;
+    const arr = bufs[depth] ?? (bufs[depth] = []);
+    this._buffDepth = depth + 1;
+    try {
+      for (let i = 0, n = units.length; i < n; i++) { // units created by onTick handlers start ticking next tick
+        const u = units[i];
+        if (!u.alive || u.removed) continue;
+        if(u.deployed&&!u.hidden)u.stats.activeTime=(u.stats.activeTime||0)+dt;
+        if (u.buffs.length) {
+          const src = u.buffs;
+          let m = 0;
+          for (let j = 0; j < src.length; j++) arr[m++] = src[j];
+          arr.length = m;
+          for (let k = 0; k < arr.length; k++) {
+            const b = arr[k];
+            if (!u.alive) break;
+            if (u.buffs.indexOf(b) < 0) continue;
+            if (b.onTick) {
+              if (b.interval > 0) {
+                b._acc += dt;
+                let n = 0;
+                while (b._acc >= b.interval - 1e-9 && n++ < 8) { // loop-cap: at most 8 interval ticks
+                  b._acc -= b.interval;
+                  this._safe(() => b.onTick({ battle: this, unit: u, buff: b, dt: b.interval }), 'buff.onTick', u);
+                }
+              } else this._safe(() => b.onTick({ battle: this, unit: u, buff: b, dt }), 'buff.onTick', u);
+            }
+            if (b.timeLeft !== Infinity) {
+              b.timeLeft -= dt;
+              if (b.timeLeft <= 1e-9) {
+                const i = u.buffs.indexOf(b);
+                if (i >= 0) {
+                  this._removeBuffAt(u, i, false);
+                  if (b.onExpire) this._safe(() => b.onExpire({ battle: this, unit: u, buff: b }), 'buff.onExpire', u);
+                }
               }
             }
           }
         }
-      }
-      // natural HP regeneration
-      if (u.alive && u.deployed && !u.bossPool) {
-        const regen = u.s.hpRegen;
-        if (regen > 0 && u.hp < u.s.maxHp) {
-          u._regenAcc = (u._regenAcc ?? 0) + regen * dt;
-          if (u._regenAcc >= 1 || u.hp + u._regenAcc >= u.s.maxHp) {
-            this.heal(u, u, u._regenAcc, { self: true, silent: true, regen: true });
-            u._regenAcc = 0;
+        // natural HP regeneration
+        if (u.alive && u.deployed && !u.bossPool) {
+          const regen = u.s.hpRegen;
+          if (regen > 0 && u.hp < u.s.maxHp) {
+            u._regenAcc = (u._regenAcc ?? 0) + regen * dt;
+            if (u._regenAcc >= 1 || u.hp + u._regenAcc >= u.s.maxHp) {
+              this.heal(u, u, u._regenAcc, { self: true, silent: true, regen: true });
+              u._regenAcc = 0;
+            }
           }
         }
       }
+    } finally {
+      this._buffDepth = depth;
+      arr.length = 0; // a removed buff must not stay reachable through the scratch buffer
     }
   }
 
@@ -2661,7 +2723,7 @@ export class Battle {
       (down || (down = [])).push([u.id, r2(u.respawnAt), r2(Math.max(0, u.respawnAt - u.deathAt)), this._downState(u), ...this.restTile(u)]);
     }
     if (down) snap.down = down;
-    let elem = null, ammo = null, wolves = null, neg = null, energy = null, stand = null, standCut = null;
+    let elem = null, ammo = null, wolves = null, neg = null, energy = null, stand = null, standCut = null, face = null;
     let listed = null;   // the ids in snap.units, built for the first enemy with a cut to report
     for (const u of this.units) {
       if (u.side === 'enemy' && u.atkStandCutAt >= 0) {
@@ -2669,6 +2731,7 @@ export class Battle {
         if (cutAt <= snap.t && (listed || (listed = new Set(snap.units.map((x) => x[0])))).has(u.id)) (standCut || (standCut = [])).push([u.id, cutAt]);
       }
       if (!u.alive || !u.deployed || u.hidden) continue;
+      if (u.mem.publishFacing) (face || (face = [])).push([u.id,u.facing]);
       const until = Math.round(u.atkStandUntil * 1000) / 1000;
       if (u.side === 'enemy' && !u.s.flags.fear && !u.s.flags.stun && Number.isFinite(until) && until > snap.t) {
         (stand || (stand = [])).push([u.id, until]);
@@ -2712,6 +2775,7 @@ export class Battle {
     const coinList = this.units.filter(u => u.alive && u.deployed && !u.hidden).map(u => [u.id, coinView(u)]).filter(([,c]) => c).map(([id,c]) => [id,...c]);
     if (coinList.length) snap.coins = coinList;
     for(const u of this.units){if(!u.alive||!u.deployed||u.hidden)continue;const ly=layerView(u);if(ly)(snap.layers||(snap.layers=[])).push([u.id,ly]);const ch=chargeView(u);if(ch)(snap.charges||(snap.charges=[])).push([u.id,...ch]);}
+    if(face)snap.face=face;
     return snap;
   }
 

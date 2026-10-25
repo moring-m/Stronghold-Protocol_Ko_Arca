@@ -1,3 +1,4 @@
+export const ENEMY_SKILL_ROLES = {"enemy_1511_mdrock":{"skill":{"begin":null,"loop":"Skill_2","end":null,"index":0,"idle":null},"skills":{"0":{"begin":null,"loop":"Skill_2","end":null,"index":0,"idle":null},"1":{"begin":null,"loop":"Skill_1","end":null,"index":1,"idle":null}}},"enemy_1517_xi":{"skill":{"begin":null,"loop":"Skill_01_02","end":null,"index":0,"idle":null},"skills":{"0":{"begin":null,"loop":"Skill_01_02","end":null,"index":0,"idle":null},"1":{"begin":"Skill_02_Begin","loop":"Skill_02_Loop","end":"Skill_02_End","index":1,"idle":null},"2":{"begin":"Skill_02_Begin","loop":"Skill_02_Loop","end":"Skill_02_End","index":2,"idle":null}}},"enemy_9014_acstma":{"skill":{"begin":null,"loop":"Launch_Begin","end":null,"index":0,"idle":null},"skills":{"0":{"begin":null,"loop":"Launch_Begin","end":null,"index":0,"idle":null},"1":{"begin":null,"loop":"Back_End","end":null,"index":1,"idle":null}}},"enemy_9015_acstmb":{"skill":{"begin":null,"loop":"Launch_Begin","end":null,"index":0,"idle":null},"skills":{"0":{"begin":null,"loop":"Launch_Begin","end":null,"index":0,"idle":null},"1":{"begin":null,"loop":"Back_End","end":null,"index":1,"idle":null}}},"enemy_1525_blkswb":{"skill":{"begin":null,"loop":"A_Attack","end":null,"via":"attack","index":0,"idle":null},"skills":{"0":{"begin":null,"loop":"A_Skill2","end":null,"index":0,"idle":null},"1":{"begin":null,"loop":"A_Attack","end":null,"index":1,"idle":null,"via":"attack"},"2":{"begin":null,"loop":"B_Skill2","end":null,"index":2,"idle":null},"3":{"begin":null,"loop":"B_Attack","end":null,"index":3,"idle":null,"via":"attack"}}},"enemy_1516_jakill":{"skill":{"begin":null,"loop":"C1_Attack","end":null,"via":"attack","index":0,"idle":null},"skills":{"0":{"begin":null,"loop":"C1_Skill","end":null,"index":0,"idle":null,"strike":true},"1":{"begin":null,"loop":"C2_Skill","end":null,"index":1,"idle":null,"strike":true}}},"enemy_9019_actrpb":{"skill":{"begin":null,"loop":"Attack","end":null,"via":"attack","index":0,"idle":null},"skills":{"0":{"begin":null,"loop":"Skill_b","end":null,"index":0,"idle":null,"strike":true}}},"enemy_9020_actrpc":{"skill":{"begin":null,"loop":"Attack","end":null,"via":"attack","index":0,"idle":null},"skills":{"0":{"begin":null,"loop":"Skill_c","end":null,"index":0,"idle":null,"strike":true}}},"enemy_9013_acstmk":{"skill":{"begin":null,"loop":"Skill_1","end":null,"index":0,"idle":null},"skills":{"0":{"begin":null,"loop":"Skill_1","end":null,"index":0,"idle":null},"1":{"begin":null,"loop":"Skill_3","end":null,"index":1,"idle":null},"2":{"begin":null,"loop":"Revive","end":null,"index":2,"idle":null}}},"enemy_9013_acstmk_2":{"skill":{"begin":null,"loop":"Skill_1","end":null,"index":0,"idle":null},"skills":{"0":{"begin":null,"loop":"Skill_1","end":null,"index":0,"idle":null},"1":{"begin":null,"loop":"Skill_3","end":null,"index":1,"idle":null},"2":{"begin":null,"loop":"Revive","end":null,"index":2,"idle":null}}},"enemy_9032_aclionk":{"skill":{"begin":null,"loop":"Skill_1","end":null,"index":0,"idle":null},"skills":{"0":{"begin":null,"loop":"Skill_1","end":null,"index":0,"idle":null},"1":{"begin":null,"loop":"Skill_2","end":null,"index":1,"idle":null},"2":{"begin":null,"loop":"Skill_2","end":null,"index":2,"idle":null},"3":{"begin":null,"loop":"Skill_1","end":null,"index":3,"idle":null},"4":{"begin":null,"loop":"Skill_3","end":null,"index":4,"idle":null}}}};
 import {quintusRoles} from '../../shared/quintus.js';
 // Spine model pipeline: download skel/atlas/page PNGs, fetch extra atlas pages,
 // normalize atlases (size:/pma:), parse skeletons and resolve animation roles.
@@ -217,6 +218,7 @@ export async function processModels(models, { root, dl, cachePath, download = tr
     if (sk.missingRegions?.length) problems.push(`${m.key}: ${sk.missingRegions.length} attachment(s) not in atlas (e.g. ${sk.missingRegions[0]})`);
     if (!sk.animations.length) { problems.push(`${m.key}: skeleton has no animations`); continue; }
     let anims = resolveRoles(sk.animations, { skillIndices: m.skillIndices, numberedSkills: String(m.key).startsWith('enemy_'), durations: sk.durations });
+    if(ENEMY_SKILL_ROLES[m.key])anims=applyRoleFix(anims,ENEMY_SKILL_ROLES[m.key],sk.durations).roles;
     if(m.key==='enemy_1521_dslily')anims=quintusRoles(anims,sk.durations);
     entries.set(m.key, {
       skel: assetUrl(m.skel.rel),
@@ -244,4 +246,19 @@ export async function processModels(models, { root, dl, cachePath, download = tr
   if (ledgerDirty && dl?.saveLedger) { try { await dl.saveLedger(); } catch { /* next run re-validates */ } }
   log(`[spine] models ok=${entries.size}/${list.length} (parsed ${parsed}, cached ${cached})`);
   return { entries, problems };
+}
+
+export function applyRoleFix(roles, fix, durations) {
+  if (!fix) return { roles, missing: [] };
+  const out = { ...roles };
+  const missing = [];
+  const has = (n) => n == null || Object.hasOwn(durations || {}, n);
+  const clipOk = (c) => !!c && typeof c === 'object' && [c.begin, c.loop, c.end, c.idle].every(has);
+  for (const [role, v] of Object.entries(fix)) {
+    // a clip name, a clip, null (no such role) — or for `skills` a map slot → clip, every slot's clips checked
+    const ok = typeof v === 'string' ? has(v) : v == null ? true : role === 'skills' ? Object.values(v).every(clipOk) : clipOk(v);
+    if (ok) out[role] = v;
+    else missing.push(role);
+  }
+  return { roles: out, missing };
 }

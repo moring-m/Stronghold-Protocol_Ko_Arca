@@ -1,0 +1,4556 @@
+[
+  {
+    "skin": "skin_char_1016_agoat2_epoque_57",
+    "projectile": "projectile_chr_agoat2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_1016_agoat2_epoque_57",
+    "projectile": "projectile_chr_agoat2_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1016_agoat2@epoque#57",
+    "projectile": "projectile_chr_agoat2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1016_agoat2@epoque#57",
+    "projectile": "projectile_chr_agoat2_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_1035_wisdel_game_9",
+    "projectile": "projectile_chr_wisdel_default",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_1035_wisdel_game_9",
+    "projectile": "projectile_chr_wisdel_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_1035_wisdel_game_9",
+    "projectile": "projectile_chr_wisdel_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1035_wisdel@game#9",
+    "projectile": "projectile_chr_wisdel_default",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1035_wisdel@game#9",
+    "projectile": "projectile_chr_wisdel_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1035_wisdel@game#9",
+    "projectile": "projectile_chr_wisdel_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_194_leto_sightseer_4",
+    "projectile": "projectile_chr_leto",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_194_leto_sightseer_4",
+    "projectile": "projectile_chr_leto_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_194_leto@sightseer#4",
+    "projectile": "projectile_chr_leto",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_194_leto@sightseer#4",
+    "projectile": "projectile_chr_leto_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4117_ray_summer_22",
+    "projectile": "projectile_chr_ray",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4117_ray_summer_22",
+    "projectile": "projectile_chr_ray_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4117_ray_summer_22",
+    "projectile": "projectile_chr_ray_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4117_ray_summer_22",
+    "projectile": "projectile_chr_ray_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4117_ray@summer#22",
+    "projectile": "projectile_chr_ray",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4117_ray@summer#22",
+    "projectile": "projectile_chr_ray_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4117_ray@summer#22",
+    "projectile": "projectile_chr_ray_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4117_ray@summer#22",
+    "projectile": "projectile_chr_ray_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4138_narant_littlePony_1",
+    "projectile": "projectile_chr_narant",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4138_narant_littlePony_1",
+    "projectile": "projectile_chr_narant_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4138_narant_littlePony_1",
+    "projectile": "projectile_chr_narant_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4138_narant_littlePony_1",
+    "projectile": "projectile_chr_narant_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4138_narant_littlePony_1",
+    "projectile": "projectile_chr_narant_s3_1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4138_narant_littlePony_1",
+    "projectile": "projectile_chr_narant_s3_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4138_narant@littlePony#1",
+    "projectile": "projectile_chr_narant",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4138_narant@littlePony#1",
+    "projectile": "projectile_chr_narant_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4138_narant@littlePony#1",
+    "projectile": "projectile_chr_narant_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4138_narant@littlePony#1",
+    "projectile": "projectile_chr_narant_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4138_narant@littlePony#1",
+    "projectile": "projectile_chr_narant_s3_1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4138_narant@littlePony#1",
+    "projectile": "projectile_chr_narant_s3_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4191_tippi_epoque_57",
+    "projectile": "projectile_chr_tippi",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4191_tippi_epoque_57",
+    "projectile": "projectile_chr_tippi_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4191_tippi_epoque_57",
+    "projectile": "projectile_chr_tippi_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4191_tippi_epoque_57",
+    "projectile": "projectile_chr_tippi_s2_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4191_tippi_epoque_57",
+    "projectile": "projectile_chr_tippi_s2_3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4191_tippi@epoque#57",
+    "projectile": "projectile_chr_tippi",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4191_tippi@epoque#57",
+    "projectile": "projectile_chr_tippi_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4191_tippi@epoque#57",
+    "projectile": "projectile_chr_tippi_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4191_tippi@epoque#57",
+    "projectile": "projectile_chr_tippi_s2_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4191_tippi@epoque#57",
+    "projectile": "projectile_chr_tippi_s2_3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4194_rmixer_boc_12",
+    "projectile": "projectile_chr_rmixer",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4194_rmixer_boc_12",
+    "projectile": "projectile_chr_rmixer_sk1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4194_rmixer_boc_12",
+    "projectile": "projectile_chr_rmixer_sk2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4194_rmixer@boc#12",
+    "projectile": "projectile_chr_rmixer",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4194_rmixer@boc#12",
+    "projectile": "projectile_chr_rmixer_sk1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4194_rmixer@boc#12",
+    "projectile": "projectile_chr_rmixer_sk2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4204_mantra_sightseer_4",
+    "projectile": "projectile_chr_mantra",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4204_mantra_sightseer_4",
+    "projectile": "projectile_chr_mantra_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4204_mantra@sightseer#4",
+    "projectile": "projectile_chr_mantra",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4204_mantra@sightseer#4",
+    "projectile": "projectile_chr_mantra_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_494_vendla_game_10",
+    "projectile": "projectile_chr_vendla",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_494_vendla@game#10",
+    "projectile": "projectile_chr_vendla",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_498_inside_summer_22",
+    "projectile": "projectile_chr_inside",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_498_inside_summer_22",
+    "projectile": "projectile_chr_inside_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_498_inside_summer_22",
+    "projectile": "projectile_chr_inside_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_498_inside@summer#22",
+    "projectile": "projectile_chr_inside",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_498_inside@summer#22",
+    "projectile": "projectile_chr_inside_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_498_inside@summer#22",
+    "projectile": "projectile_chr_inside_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_003_kalts_boc_6",
+    "projectile": "projectile_chr_kalts",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_003_kalts@boc#6",
+    "projectile": "projectile_chr_kalts",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_003_kalts_sale_14",
+    "projectile": "projectile_chr_kalts",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_003_kalts@sale#14",
+    "projectile": "projectile_chr_kalts",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_1016_agoat2_epoque_34",
+    "projectile": "projectile_chr_agoat2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_1016_agoat2_epoque_34",
+    "projectile": "projectile_chr_agoat2_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1016_agoat2@epoque#34",
+    "projectile": "projectile_chr_agoat2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1016_agoat2@epoque#34",
+    "projectile": "projectile_chr_agoat2_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_1020_reed2_epoque_30",
+    "projectile": "projectile_chr_reed2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_1020_reed2_epoque_30",
+    "projectile": "projectile_chr_reed2_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1020_reed2@epoque#30",
+    "projectile": "projectile_chr_reed2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1020_reed2@epoque#30",
+    "projectile": "projectile_chr_reed2_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_1020_reed2_snow_8",
+    "projectile": "projectile_chr_reed2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_1020_reed2_snow_8",
+    "projectile": "projectile_chr_reed2_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1020_reed2@snow#8",
+    "projectile": "projectile_chr_reed2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1020_reed2@snow#8",
+    "projectile": "projectile_chr_reed2_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_1020_reed2_summer_17",
+    "projectile": "projectile_chr_reed2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_1020_reed2_summer_17",
+    "projectile": "projectile_chr_reed2_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1020_reed2@summer#17",
+    "projectile": "projectile_chr_reed2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1020_reed2@summer#17",
+    "projectile": "projectile_chr_reed2_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_1021_kroos2_game_3",
+    "projectile": "projectile_chr_kroos2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_1021_kroos2_game_3",
+    "projectile": "projectile_chr_kroos2_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_1021_kroos2_game_3",
+    "projectile": "projectile_chr_kroos2_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_1021_kroos2_game_3",
+    "projectile": "projectile_chr_kroos2_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_1021_kroos2_game_3",
+    "projectile": "projectile_chr_kroos2_s2_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1021_kroos2@game#3",
+    "projectile": "projectile_chr_kroos2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1021_kroos2@game#3",
+    "projectile": "projectile_chr_kroos2_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1021_kroos2@game#3",
+    "projectile": "projectile_chr_kroos2_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1021_kroos2@game#3",
+    "projectile": "projectile_chr_kroos2_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1021_kroos2@game#3",
+    "projectile": "projectile_chr_kroos2_s2_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_1021_kroos2_nian_8",
+    "projectile": "projectile_chr_kroos2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_1021_kroos2_nian_8",
+    "projectile": "projectile_chr_kroos2_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_1021_kroos2_nian_8",
+    "projectile": "projectile_chr_kroos2_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_1021_kroos2_nian_8",
+    "projectile": "projectile_chr_kroos2_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_1021_kroos2_nian_8",
+    "projectile": "projectile_chr_kroos2_s2_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1021_kroos2@nian#8",
+    "projectile": "projectile_chr_kroos2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1021_kroos2@nian#8",
+    "projectile": "projectile_chr_kroos2_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1021_kroos2@nian#8",
+    "projectile": "projectile_chr_kroos2_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1021_kroos2@nian#8",
+    "projectile": "projectile_chr_kroos2_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1021_kroos2@nian#8",
+    "projectile": "projectile_chr_kroos2_s2_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_1031_slent2_epoque_32",
+    "projectile": "projectile_chr_slent2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_1031_slent2_epoque_32",
+    "projectile": "projectile_chr_slent2_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_1031_slent2_epoque_32",
+    "projectile": "projectile_chr_slent2_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_1031_slent2_epoque_32",
+    "projectile": "projectile_chr_slent2_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1031_slent2@epoque#32",
+    "projectile": "projectile_chr_slent2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1031_slent2@epoque#32",
+    "projectile": "projectile_chr_slent2_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1031_slent2@epoque#32",
+    "projectile": "projectile_chr_slent2_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1031_slent2@epoque#32",
+    "projectile": "projectile_chr_slent2_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_1033_swire2_ambienceSynesthesia_4",
+    "projectile": "projectile_chr_swire2_s_3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1033_swire2@ambienceSynesthesia#4",
+    "projectile": "projectile_chr_swire2_s_3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_1034_jesca2_cfa_1",
+    "projectile": "projectile_chr_jesca2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_1034_jesca2_cfa_1",
+    "projectile": "projectile_chr_jesca2_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_1034_jesca2_cfa_1",
+    "projectile": "projectile_chr_jesca2_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_1034_jesca2_cfa_1",
+    "projectile": "projectile_chr_jesca2_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1034_jesca2@cfa#1",
+    "projectile": "projectile_chr_jesca2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1034_jesca2@cfa#1",
+    "projectile": "projectile_chr_jesca2_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1034_jesca2@cfa#1",
+    "projectile": "projectile_chr_jesca2_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1034_jesca2@cfa#1",
+    "projectile": "projectile_chr_jesca2_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_1035_wisdel_sale_14",
+    "projectile": "projectile_chr_wisdel_default",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_1035_wisdel_sale_14",
+    "projectile": "projectile_chr_wisdel_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_1035_wisdel_sale_14",
+    "projectile": "projectile_chr_wisdel_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_1035_wisdel_sale_14",
+    "projectile": "projectile_chr_wisdel_s2",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "char_1035_wisdel@sale#14",
+    "projectile": "projectile_chr_wisdel_default",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1035_wisdel@sale#14",
+    "projectile": "projectile_chr_wisdel_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1035_wisdel@sale#14",
+    "projectile": "projectile_chr_wisdel_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1035_wisdel@sale#14",
+    "projectile": "projectile_chr_wisdel_s2",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "skin_char_1039_thorn2_marthe_9",
+    "projectile": "projectile_chr_thorn2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_1039_thorn2_marthe_9",
+    "projectile": "projectile_chr_thorn2_s1",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "skin_char_1039_thorn2_marthe_9",
+    "projectile": "projectile_chr_thorn2_s2",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "skin_char_1039_thorn2_marthe_9",
+    "projectile": "projectile_chr_thorn2_s3",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "char_1039_thorn2@marthe#9",
+    "projectile": "projectile_chr_thorn2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1039_thorn2@marthe#9",
+    "projectile": "projectile_chr_thorn2_s1",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "char_1039_thorn2@marthe#9",
+    "projectile": "projectile_chr_thorn2_s2",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "char_1039_thorn2@marthe#9",
+    "projectile": "projectile_chr_thorn2_s3",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "skin_char_1040_blaze2_winter_5",
+    "projectile": "projectile_chr_blaze2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_1040_blaze2_winter_5",
+    "projectile": "projectile_chr_blaze2_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1040_blaze2@winter#5",
+    "projectile": "projectile_chr_blaze2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1040_blaze2@winter#5",
+    "projectile": "projectile_chr_blaze2_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_1041_angel2_iteration_6",
+    "projectile": "projectile_chr_angel2_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_1041_angel2_iteration_6",
+    "projectile": "projectile_chr_angel2_s1_close",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_1041_angel2_iteration_6",
+    "projectile": "projectile_chr_angel2_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1041_angel2@iteration#6",
+    "projectile": "projectile_chr_angel2_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1041_angel2@iteration#6",
+    "projectile": "projectile_chr_angel2_s1_close",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_1041_angel2@iteration#6",
+    "projectile": "projectile_chr_angel2_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_126_shotst_epoque_10",
+    "projectile": "projectile_arrow",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_126_shotst_epoque_10",
+    "projectile": "projectile_shotst_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_126_shotst_epoque_10",
+    "projectile": "projectile_shotst_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_126_shotst@epoque#10",
+    "projectile": "projectile_arrow",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_126_shotst@epoque#10",
+    "projectile": "projectile_shotst_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_126_shotst@epoque#10",
+    "projectile": "projectile_shotst_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_126_shotst_epoque_28",
+    "projectile": "projectile_shotst_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_126_shotst_epoque_28",
+    "projectile": "projectile_shotst_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_126_shotst@epoque#28",
+    "projectile": "projectile_shotst_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_126_shotst@epoque#28",
+    "projectile": "projectile_shotst_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_145_prove_wild_5",
+    "projectile": "projectile_prove",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_145_prove@wild#5",
+    "projectile": "projectile_prove",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_180_amgoat_sanrio_2",
+    "projectile": "projectile_amgoat",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_180_amgoat_sanrio_2",
+    "projectile": "projectile_amgoat_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_180_amgoat_sanrio_2",
+    "projectile": "projectile_amgoat_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_180_amgoat@sanrio#2",
+    "projectile": "projectile_amgoat",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_180_amgoat@sanrio#2",
+    "projectile": "projectile_amgoat_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_180_amgoat@sanrio#2",
+    "projectile": "projectile_amgoat_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_180_amgoat_summer_5",
+    "projectile": "projectile_amgoat",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_180_amgoat_summer_5",
+    "projectile": "projectile_amgoat_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_180_amgoat_summer_5",
+    "projectile": "projectile_amgoat_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_180_amgoat@summer#5",
+    "projectile": "projectile_amgoat",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_180_amgoat@summer#5",
+    "projectile": "projectile_amgoat_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_180_amgoat@summer#5",
+    "projectile": "projectile_amgoat_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_183_skgoat_epoque_30",
+    "projectile": "projectile_skgoat",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_183_skgoat@epoque#30",
+    "projectile": "projectile_skgoat",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_197_poca_epoque_12",
+    "projectile": "projectile_chr_poca",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_197_poca_epoque_12",
+    "projectile": "projectile_chr_poca_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_197_poca_epoque_12",
+    "projectile": "projectile_chr_poca_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_197_poca@epoque#12",
+    "projectile": "projectile_chr_poca",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_197_poca@epoque#12",
+    "projectile": "projectile_chr_poca_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_197_poca@epoque#12",
+    "projectile": "projectile_chr_poca_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_197_poca_rilakkuma_1",
+    "projectile": "projectile_chr_poca",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_197_poca_rilakkuma_1",
+    "projectile": "projectile_chr_poca_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_197_poca_rilakkuma_1",
+    "projectile": "projectile_chr_poca_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_197_poca@rilakkuma#1",
+    "projectile": "projectile_chr_poca",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_197_poca@rilakkuma#1",
+    "projectile": "projectile_chr_poca_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_197_poca@rilakkuma#1",
+    "projectile": "projectile_chr_poca_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_2012_typhon_summer_17",
+    "projectile": "projectile_chr_typhon",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_2012_typhon_summer_17",
+    "projectile": "projectile_chr_typhon_s2_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_2012_typhon@summer#17",
+    "projectile": "projectile_chr_typhon",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_2012_typhon@summer#17",
+    "projectile": "projectile_chr_typhon_s2_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_2012_typhon_wild_9",
+    "projectile": "projectile_chr_typhon",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_2012_typhon_wild_9",
+    "projectile": "projectile_chr_typhon_s2_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_2012_typhon@wild#9",
+    "projectile": "projectile_chr_typhon",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_2012_typhon@wild#9",
+    "projectile": "projectile_chr_typhon_s2_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_2013_cerber_whirlwind_2",
+    "projectile": "projectile_cerber",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_2013_cerber_whirlwind_2",
+    "projectile": "projectile_cerber_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_2013_cerber_whirlwind_2",
+    "projectile": "projectile_cerber_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_2013_cerber_whirlwind_2",
+    "projectile": "projectile_cerber_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_2013_cerber@whirlwind#2",
+    "projectile": "projectile_cerber",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_2013_cerber@whirlwind#2",
+    "projectile": "projectile_cerber_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_2013_cerber@whirlwind#2",
+    "projectile": "projectile_cerber_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_2013_cerber@whirlwind#2",
+    "projectile": "projectile_cerber_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_2023_ling_ncg_1",
+    "projectile": "projectile_chr_ling",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_2023_ling_ncg_1",
+    "projectile": "projectile_chr_ling_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_2023_ling_ncg_1",
+    "projectile": "projectile_chr_ling_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_2023_ling_ncg_1",
+    "projectile": "projectile_chr_ling_soul2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_2023_ling_ncg_1",
+    "projectile": "projectile_chr_ling_soul2_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_2023_ling@ncg#1",
+    "projectile": "projectile_chr_ling",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_2023_ling@ncg#1",
+    "projectile": "projectile_chr_ling_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_2023_ling@ncg#1",
+    "projectile": "projectile_chr_ling_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_2023_ling@ncg#1",
+    "projectile": "projectile_chr_ling_soul2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_2023_ling@ncg#1",
+    "projectile": "projectile_chr_ling_soul2_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_2023_ling_nian_12",
+    "projectile": "projectile_chr_ling",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_2023_ling_nian_12",
+    "projectile": "projectile_chr_ling_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_2023_ling_nian_12",
+    "projectile": "projectile_chr_ling_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_2023_ling_nian_12",
+    "projectile": "projectile_chr_ling_soul2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_2023_ling_nian_12",
+    "projectile": "projectile_chr_ling_soul2_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_2023_ling@nian#12",
+    "projectile": "projectile_chr_ling",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_2023_ling@nian#12",
+    "projectile": "projectile_chr_ling_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_2023_ling@nian#12",
+    "projectile": "projectile_chr_ling_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_2023_ling@nian#12",
+    "projectile": "projectile_chr_ling_soul2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_2023_ling@nian#12",
+    "projectile": "projectile_chr_ling_soul2_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_2023_ling_nian_9",
+    "projectile": "projectile_chr_ling",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_2023_ling_nian_9",
+    "projectile": "projectile_chr_ling_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_2023_ling_nian_9",
+    "projectile": "projectile_chr_ling_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_2023_ling_nian_9",
+    "projectile": "projectile_chr_ling_soul2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_2023_ling_nian_9",
+    "projectile": "projectile_chr_ling_soul2_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_2023_ling@nian#9",
+    "projectile": "projectile_chr_ling",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_2023_ling@nian#9",
+    "projectile": "projectile_chr_ling_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_2023_ling@nian#9",
+    "projectile": "projectile_chr_ling_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_2023_ling@nian#9",
+    "projectile": "projectile_chr_ling_soul2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_2023_ling@nian#9",
+    "projectile": "projectile_chr_ling_soul2_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_206_gnosis_boc_4",
+    "projectile": "projectile_chr_gnosis",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_206_gnosis_boc_4",
+    "projectile": "projectile_chr_gnosis_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_206_gnosis_boc_4",
+    "projectile": "projectile_chr_gnosis_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_206_gnosis@boc#4",
+    "projectile": "projectile_chr_gnosis",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_206_gnosis@boc#4",
+    "projectile": "projectile_chr_gnosis_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_206_gnosis@boc#4",
+    "projectile": "projectile_chr_gnosis_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_245_cello_sale_12",
+    "projectile": "projectile_chr_cello",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_245_cello_sale_12",
+    "projectile": "projectile_chr_cello_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_245_cello_sale_12",
+    "projectile": "projectile_chr_cello_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_245_cello@sale#12",
+    "projectile": "projectile_chr_cello",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_245_cello@sale#12",
+    "projectile": "projectile_chr_cello_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_245_cello@sale#12",
+    "projectile": "projectile_chr_cello_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_249_mlyss_ambienceSynesthesia_6",
+    "projectile": "projectile_chr_mlyss",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_249_mlyss_ambienceSynesthesia_6",
+    "projectile": "projectile_chr_mlyss_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_249_mlyss_ambienceSynesthesia_6",
+    "projectile": "projectile_chr_mlyss_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_249_mlyss@ambienceSynesthesia#6",
+    "projectile": "projectile_chr_mlyss",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_249_mlyss@ambienceSynesthesia#6",
+    "projectile": "projectile_chr_mlyss_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_249_mlyss@ambienceSynesthesia#6",
+    "projectile": "projectile_chr_mlyss_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_249_mlyss_boc_8",
+    "projectile": "projectile_chr_mlyss",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_249_mlyss_boc_8",
+    "projectile": "projectile_chr_mlyss_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_249_mlyss_boc_8",
+    "projectile": "projectile_chr_mlyss_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_249_mlyss@boc#8",
+    "projectile": "projectile_chr_mlyss",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_249_mlyss@boc#8",
+    "projectile": "projectile_chr_mlyss_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_249_mlyss@boc#8",
+    "projectile": "projectile_chr_mlyss_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_254_vodfox_witch_2",
+    "projectile": "projectile_vodfox",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_254_vodfox@witch#2",
+    "projectile": "projectile_vodfox",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_254_vodfox_yun_8",
+    "projectile": "projectile_vodfox",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_254_vodfox@yun#8",
+    "projectile": "projectile_vodfox",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_291_aglina_summer_5",
+    "projectile": "projectile_aglina",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_291_aglina_summer_5",
+    "projectile": "projectile_aglina_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_291_aglina@summer#5",
+    "projectile": "projectile_aglina",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_291_aglina@summer#5",
+    "projectile": "projectile_aglina_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_293_thorns_boc_8",
+    "projectile": "projectile_chr_thorns",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_293_thorns_boc_8",
+    "projectile": "projectile_chr_thorns_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_293_thorns@boc#8",
+    "projectile": "projectile_chr_thorns",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_293_thorns@boc#8",
+    "projectile": "projectile_chr_thorns_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_300_phenxi_boc_9",
+    "projectile": "projectile_chr_phenxi",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_300_phenxi_boc_9",
+    "projectile": "projectile_chr_phenxi_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_300_phenxi@boc#9",
+    "projectile": "projectile_chr_phenxi",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_300_phenxi@boc#9",
+    "projectile": "projectile_chr_phenxi_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_300_phenxi_witch_4",
+    "projectile": "projectile_chr_phenxi",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_300_phenxi_witch_4",
+    "projectile": "projectile_chr_phenxi_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_300_phenxi@witch#4",
+    "projectile": "projectile_chr_phenxi",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_300_phenxi@witch#4",
+    "projectile": "projectile_chr_phenxi_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_306_leizi_game_3",
+    "projectile": "projectile_leizi",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_306_leizi_game_3",
+    "projectile": "projectile_leizi_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_306_leizi@game#3",
+    "projectile": "projectile_leizi",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_306_leizi@game#3",
+    "projectile": "projectile_leizi_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_322_lmlee_sanrio_1",
+    "projectile": "projectile_chr_lmlee_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_322_lmlee@sanrio#1",
+    "projectile": "projectile_chr_lmlee_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_322_lmlee_whirlwind_10",
+    "projectile": "projectile_chr_lmlee_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_322_lmlee@whirlwind#10",
+    "projectile": "projectile_chr_lmlee_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_322_lmlee_witch_3",
+    "projectile": "projectile_chr_lmlee_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_322_lmlee@witch#3",
+    "projectile": "projectile_chr_lmlee_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_332_archet_sale_14",
+    "projectile": "projectile_chr_archet",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_332_archet_sale_14",
+    "projectile": "projectile_chr_archet_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_332_archet_sale_14",
+    "projectile": "projectile_chr_archet_s1_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_332_archet_sale_14",
+    "projectile": "projectile_chr_archet_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_332_archet_sale_14",
+    "projectile": "projectile_chr_archet_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_332_archet@sale#14",
+    "projectile": "projectile_chr_archet",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_332_archet@sale#14",
+    "projectile": "projectile_chr_archet_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_332_archet@sale#14",
+    "projectile": "projectile_chr_archet_s1_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_332_archet@sale#14",
+    "projectile": "projectile_chr_archet_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_332_archet@sale#14",
+    "projectile": "projectile_chr_archet_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_332_archet_shining_1",
+    "projectile": "projectile_chr_archet",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_332_archet_shining_1",
+    "projectile": "projectile_chr_archet_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_332_archet_shining_1",
+    "projectile": "projectile_chr_archet_s1_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_332_archet_shining_1",
+    "projectile": "projectile_chr_archet_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_332_archet_shining_1",
+    "projectile": "projectile_chr_archet_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_332_archet@shining#1",
+    "projectile": "projectile_chr_archet",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_332_archet@shining#1",
+    "projectile": "projectile_chr_archet_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_332_archet@shining#1",
+    "projectile": "projectile_chr_archet_s1_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_332_archet@shining#1",
+    "projectile": "projectile_chr_archet_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_332_archet@shining#1",
+    "projectile": "projectile_chr_archet_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_358_lisa_epoque_22",
+    "projectile": "projectile_chr_lisa",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_358_lisa_epoque_22",
+    "projectile": "projectile_chr_lisa_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_358_lisa@epoque#22",
+    "projectile": "projectile_chr_lisa",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_358_lisa@epoque#22",
+    "projectile": "projectile_chr_lisa_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_358_lisa_lxh_1",
+    "projectile": "projectile_chr_lisa",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_358_lisa_lxh_1",
+    "projectile": "projectile_chr_lisa_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_358_lisa@lxh#1",
+    "projectile": "projectile_chr_lisa",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_358_lisa@lxh#1",
+    "projectile": "projectile_chr_lisa_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_377_gdglow_sanrio_1",
+    "projectile": "projectile_chr_gdglow",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_377_gdglow_sanrio_1",
+    "projectile": "projectile_chr_gdglow_funnel",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_377_gdglow_sanrio_1",
+    "projectile": "projectile_chr_gdglow_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_377_gdglow_sanrio_1",
+    "projectile": "projectile_chr_gdglow_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_377_gdglow@sanrio#1",
+    "projectile": "projectile_chr_gdglow",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_377_gdglow@sanrio#1",
+    "projectile": "projectile_chr_gdglow_funnel",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_377_gdglow@sanrio#1",
+    "projectile": "projectile_chr_gdglow_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_377_gdglow@sanrio#1",
+    "projectile": "projectile_chr_gdglow_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_377_gdglow_snow_5",
+    "projectile": "projectile_chr_gdglow",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_377_gdglow_snow_5",
+    "projectile": "projectile_chr_gdglow_funnel",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_377_gdglow_snow_5",
+    "projectile": "projectile_chr_gdglow_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_377_gdglow_snow_5",
+    "projectile": "projectile_chr_gdglow_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_377_gdglow@snow#5",
+    "projectile": "projectile_chr_gdglow",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_377_gdglow@snow#5",
+    "projectile": "projectile_chr_gdglow_funnel",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_377_gdglow@snow#5",
+    "projectile": "projectile_chr_gdglow_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_377_gdglow@snow#5",
+    "projectile": "projectile_chr_gdglow_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_377_gdglow_summer_12",
+    "projectile": "projectile_chr_gdglow",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_377_gdglow_summer_12",
+    "projectile": "projectile_chr_gdglow_funnel",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_377_gdglow_summer_12",
+    "projectile": "projectile_chr_gdglow_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_377_gdglow_summer_12",
+    "projectile": "projectile_chr_gdglow_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_377_gdglow@summer#12",
+    "projectile": "projectile_chr_gdglow",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_377_gdglow@summer#12",
+    "projectile": "projectile_chr_gdglow_funnel",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_377_gdglow@summer#12",
+    "projectile": "projectile_chr_gdglow_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_377_gdglow@summer#12",
+    "projectile": "projectile_chr_gdglow_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_400_weedy_sightseer_1",
+    "projectile": "projectile_weedy_s2",
+    "inherited": [
+      "onHit",
+      "onReached"
+    ]
+  },
+  {
+    "skin": "skin_char_400_weedy_sightseer_1",
+    "projectile": "projectile_weedy_s3",
+    "inherited": [
+      "onHit",
+      "onReached"
+    ]
+  },
+  {
+    "skin": "char_400_weedy@sightseer#1",
+    "projectile": "projectile_weedy_s2",
+    "inherited": [
+      "onHit",
+      "onReached"
+    ]
+  },
+  {
+    "skin": "char_400_weedy@sightseer#1",
+    "projectile": "projectile_weedy_s3",
+    "inherited": [
+      "onHit",
+      "onReached"
+    ]
+  },
+  {
+    "skin": "skin_char_4013_kjera_epoque_18",
+    "projectile": "projectile_chr_kjera",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4013_kjera_epoque_18",
+    "projectile": "projectile_chr_kjera_funnel",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4013_kjera_epoque_18",
+    "projectile": "projectile_chr_kjera_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4013_kjera@epoque#18",
+    "projectile": "projectile_chr_kjera",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4013_kjera@epoque#18",
+    "projectile": "projectile_chr_kjera_funnel",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4013_kjera@epoque#18",
+    "projectile": "projectile_chr_kjera_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4027_heyak_ambienceSynesthesia_4",
+    "projectile": "projectile_chr_heyak",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4027_heyak_ambienceSynesthesia_4",
+    "projectile": "projectile_chr_heyak_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4027_heyak_ambienceSynesthesia_4",
+    "projectile": "projectile_chr_heyak_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4027_heyak@ambienceSynesthesia#4",
+    "projectile": "projectile_chr_heyak",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4027_heyak@ambienceSynesthesia#4",
+    "projectile": "projectile_chr_heyak_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4027_heyak@ambienceSynesthesia#4",
+    "projectile": "projectile_chr_heyak_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4027_heyak_epoque_50",
+    "projectile": "projectile_chr_heyak",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4027_heyak_epoque_50",
+    "projectile": "projectile_chr_heyak_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4027_heyak_epoque_50",
+    "projectile": "projectile_chr_heyak_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4027_heyak@epoque#50",
+    "projectile": "projectile_chr_heyak",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4027_heyak@epoque#50",
+    "projectile": "projectile_chr_heyak_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4027_heyak@epoque#50",
+    "projectile": "projectile_chr_heyak_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4039_horn_epoque_24",
+    "projectile": "projectile_chr_horn",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "skin_char_4039_horn_epoque_24",
+    "projectile": "projectile_chr_horn_s2",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "skin_char_4039_horn_epoque_24",
+    "projectile": "projectile_chr_horn_s2_full",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "skin_char_4039_horn_epoque_24",
+    "projectile": "projectile_chr_horn_s2_full_02",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "skin_char_4039_horn_epoque_24",
+    "projectile": "projectile_chr_horn_s2_full_03",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "skin_char_4039_horn_epoque_24",
+    "projectile": "projectile_chr_horn_s2_full_04",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "skin_char_4039_horn_epoque_24",
+    "projectile": "projectile_chr_horn_s2_full_05",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "skin_char_4039_horn_epoque_24",
+    "projectile": "projectile_chr_horn_s3",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "skin_char_4039_horn_epoque_24",
+    "projectile": "projectile_chr_thorns",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4039_horn_epoque_24",
+    "projectile": "projectile_chr_thorns_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4039_horn@epoque#24",
+    "projectile": "projectile_chr_horn",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "char_4039_horn@epoque#24",
+    "projectile": "projectile_chr_horn_s2",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "char_4039_horn@epoque#24",
+    "projectile": "projectile_chr_horn_s2_full",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "char_4039_horn@epoque#24",
+    "projectile": "projectile_chr_horn_s2_full_02",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "char_4039_horn@epoque#24",
+    "projectile": "projectile_chr_horn_s2_full_03",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "char_4039_horn@epoque#24",
+    "projectile": "projectile_chr_horn_s2_full_04",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "char_4039_horn@epoque#24",
+    "projectile": "projectile_chr_horn_s2_full_05",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "char_4039_horn@epoque#24",
+    "projectile": "projectile_chr_horn_s3",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "char_4039_horn@epoque#24",
+    "projectile": "projectile_chr_thorns",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4039_horn@epoque#24",
+    "projectile": "projectile_chr_thorns_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4040_rockr_lxh_1",
+    "projectile": "projectile_chr_rockr",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4040_rockr_lxh_1",
+    "projectile": "projectile_chr_rockr_funnel",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4040_rockr_lxh_1",
+    "projectile": "projectile_chr_rockr_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4040_rockr@lxh#1",
+    "projectile": "projectile_chr_rockr",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4040_rockr@lxh#1",
+    "projectile": "projectile_chr_rockr_funnel",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4040_rockr@lxh#1",
+    "projectile": "projectile_chr_rockr_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4042_lumen_ambienceSynesthesia_3",
+    "projectile": "projectile_chr_lumen",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4042_lumen_ambienceSynesthesia_3",
+    "projectile": "projectile_chr_lumen_s3_1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4042_lumen_ambienceSynesthesia_3",
+    "projectile": "projectile_chr_lumen_s3_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4042_lumen@ambienceSynesthesia#3",
+    "projectile": "projectile_chr_lumen",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4042_lumen@ambienceSynesthesia#3",
+    "projectile": "projectile_chr_lumen_s3_1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4042_lumen@ambienceSynesthesia#3",
+    "projectile": "projectile_chr_lumen_s3_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4042_lumen_sanrio_2",
+    "projectile": "projectile_chr_lumen",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4042_lumen_sanrio_2",
+    "projectile": "projectile_chr_lumen_s3_1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4042_lumen_sanrio_2",
+    "projectile": "projectile_chr_lumen_s3_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4042_lumen@sanrio#2",
+    "projectile": "projectile_chr_lumen",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4042_lumen@sanrio#2",
+    "projectile": "projectile_chr_lumen_s3_1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4042_lumen@sanrio#2",
+    "projectile": "projectile_chr_lumen_s3_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4046_ebnhlz_boc_6",
+    "projectile": "projectile_chr_ebnhlz_s3_elite",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4046_ebnhlz_boc_6",
+    "projectile": "projectile_chr_ebnhlz",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4046_ebnhlz_boc_6",
+    "projectile": "projectile_chr_ebnhlz_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4046_ebnhlz@boc#6",
+    "projectile": "projectile_chr_ebnhlz_s3_elite",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4046_ebnhlz@boc#6",
+    "projectile": "projectile_chr_ebnhlz",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4046_ebnhlz@boc#6",
+    "projectile": "projectile_chr_ebnhlz_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4048_doroth_witch_4",
+    "projectile": "projectile_chr_doroth_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4048_doroth_witch_4",
+    "projectile": "projectile_chr_doroth",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4048_doroth@witch#4",
+    "projectile": "projectile_chr_doroth_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4048_doroth@witch#4",
+    "projectile": "projectile_chr_doroth",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4054_malist_summer_14",
+    "projectile": "projectile_chr_malist",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4054_malist_summer_14",
+    "projectile": "projectile_chr_malist_s1s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4054_malist_summer_14",
+    "projectile": "projectile_chr_malist_s2_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4054_malist@summer#14",
+    "projectile": "projectile_chr_malist",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4054_malist@summer#14",
+    "projectile": "projectile_chr_malist_s1s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4054_malist@summer#14",
+    "projectile": "projectile_chr_malist_s2_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4055_bgsnow_wild_7",
+    "projectile": "projectile_chr_bgsnow",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4055_bgsnow_wild_7",
+    "projectile": "projectile_chr_bgsnow_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4055_bgsnow_wild_7",
+    "projectile": "projectile_chr_bgsnow_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4055_bgsnow_wild_7",
+    "projectile": "projectile_chr_bgsnow_subbow",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4055_bgsnow_wild_7",
+    "projectile": "projectile_chr_bgsnow_subbow_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4055_bgsnow_wild_7",
+    "projectile": "projectile_chr_bgsnow_subbow_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4055_bgsnow@wild#7",
+    "projectile": "projectile_chr_bgsnow",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4055_bgsnow@wild#7",
+    "projectile": "projectile_chr_bgsnow_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4055_bgsnow@wild#7",
+    "projectile": "projectile_chr_bgsnow_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4055_bgsnow@wild#7",
+    "projectile": "projectile_chr_bgsnow_subbow",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4055_bgsnow@wild#7",
+    "projectile": "projectile_chr_bgsnow_subbow_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4055_bgsnow@wild#7",
+    "projectile": "projectile_chr_bgsnow_subbow_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4055_bgsnow_yun_7",
+    "projectile": "projectile_chr_bgsnow",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4055_bgsnow_yun_7",
+    "projectile": "projectile_chr_bgsnow_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4055_bgsnow_yun_7",
+    "projectile": "projectile_chr_bgsnow_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4055_bgsnow_yun_7",
+    "projectile": "projectile_chr_bgsnow_subbow",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4055_bgsnow_yun_7",
+    "projectile": "projectile_chr_bgsnow_subbow_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4055_bgsnow_yun_7",
+    "projectile": "projectile_chr_bgsnow_subbow_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4055_bgsnow@yun#7",
+    "projectile": "projectile_chr_bgsnow",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4055_bgsnow@yun#7",
+    "projectile": "projectile_chr_bgsnow_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4055_bgsnow@yun#7",
+    "projectile": "projectile_chr_bgsnow_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4055_bgsnow@yun#7",
+    "projectile": "projectile_chr_bgsnow_subbow",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4055_bgsnow@yun#7",
+    "projectile": "projectile_chr_bgsnow_subbow_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4055_bgsnow@yun#7",
+    "projectile": "projectile_chr_bgsnow_subbow_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4079_haini_epoque_45",
+    "projectile": "projectile_chr_haini",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4079_haini_epoque_45",
+    "projectile": "projectile_chr_haini_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4079_haini_epoque_45",
+    "projectile": "projectile_chr_haini_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4079_haini@epoque#45",
+    "projectile": "projectile_chr_haini",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4079_haini@epoque#45",
+    "projectile": "projectile_chr_haini_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4079_haini@epoque#45",
+    "projectile": "projectile_chr_haini_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4080_lin_nian_10",
+    "projectile": "projectile_aglina",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4080_lin_nian_10",
+    "projectile": "projectile_aglina_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4080_lin_nian_10",
+    "projectile": "projectile_chr_ling",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4080_lin_nian_10",
+    "projectile": "projectile_chr_ling_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4080_lin_nian_10",
+    "projectile": "projectile_chr_ling_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4080_lin_nian_10",
+    "projectile": "projectile_chr_ling_soul2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4080_lin_nian_10",
+    "projectile": "projectile_chr_ling_soul2_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4080_lin@nian#10",
+    "projectile": "projectile_aglina",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4080_lin@nian#10",
+    "projectile": "projectile_aglina_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4080_lin@nian#10",
+    "projectile": "projectile_chr_ling",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4080_lin@nian#10",
+    "projectile": "projectile_chr_ling_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4080_lin@nian#10",
+    "projectile": "projectile_chr_ling_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4080_lin@nian#10",
+    "projectile": "projectile_chr_ling_soul2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4080_lin@nian#10",
+    "projectile": "projectile_chr_ling_soul2_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4082_qiubai_epoque_31",
+    "projectile": "projectile_chr_qiubai",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4082_qiubai_epoque_31",
+    "projectile": "projectile_chr_qiubai_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4082_qiubai_epoque_31",
+    "projectile": "projectile_chr_qiubai_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4082_qiubai@epoque#31",
+    "projectile": "projectile_chr_qiubai",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4082_qiubai@epoque#31",
+    "projectile": "projectile_chr_qiubai_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4082_qiubai@epoque#31",
+    "projectile": "projectile_chr_qiubai_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4082_qiubai_ncg_1",
+    "projectile": "projectile_chr_qiubai",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4082_qiubai_ncg_1",
+    "projectile": "projectile_chr_qiubai_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4082_qiubai_ncg_1",
+    "projectile": "projectile_chr_qiubai_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4082_qiubai@ncg#1",
+    "projectile": "projectile_chr_qiubai",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4082_qiubai@ncg#1",
+    "projectile": "projectile_chr_qiubai_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4082_qiubai@ncg#1",
+    "projectile": "projectile_chr_qiubai_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4087_ines_ambienceSynesthesia_5",
+    "projectile": "projectile_chr_ines_normal",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4087_ines_ambienceSynesthesia_5",
+    "projectile": "projectile_chr_ines_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4087_ines_ambienceSynesthesia_5",
+    "projectile": "projectile_chr_ines_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4087_ines_ambienceSynesthesia_5",
+    "projectile": "projectile_chr_ines_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4087_ines@ambienceSynesthesia#5",
+    "projectile": "projectile_chr_ines_normal",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4087_ines@ambienceSynesthesia#5",
+    "projectile": "projectile_chr_ines_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4087_ines@ambienceSynesthesia#5",
+    "projectile": "projectile_chr_ines_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4087_ines@ambienceSynesthesia#5",
+    "projectile": "projectile_chr_ines_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4087_ines_boc_8",
+    "projectile": "projectile_chr_ines_normal",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4087_ines_boc_8",
+    "projectile": "projectile_chr_ines_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4087_ines_boc_8",
+    "projectile": "projectile_chr_ines_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4087_ines_boc_8",
+    "projectile": "projectile_chr_ines_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4087_ines@boc#8",
+    "projectile": "projectile_chr_ines_normal",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4087_ines@boc#8",
+    "projectile": "projectile_chr_ines_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4087_ines@boc#8",
+    "projectile": "projectile_chr_ines_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4087_ines@boc#8",
+    "projectile": "projectile_chr_ines_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4100_caper_summer_18",
+    "projectile": "projectile_chr_caper",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4100_caper_summer_18",
+    "projectile": "projectile_chr_caper_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4100_caper_summer_18",
+    "projectile": "projectile_chr_caper_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4100_caper@summer#18",
+    "projectile": "projectile_chr_caper",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4100_caper@summer#18",
+    "projectile": "projectile_chr_caper_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4100_caper@summer#18",
+    "projectile": "projectile_chr_caper_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4114_harold_snow_7",
+    "projectile": "projectile_chr_harold",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4114_harold_snow_7",
+    "projectile": "projectile_chr_harold_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4114_harold@snow#7",
+    "projectile": "projectile_chr_harold",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4114_harold@snow#7",
+    "projectile": "projectile_chr_harold_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4117_ray_shining_2",
+    "projectile": "projectile_chr_ray",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4117_ray_shining_2",
+    "projectile": "projectile_chr_ray_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4117_ray_shining_2",
+    "projectile": "projectile_chr_ray_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4117_ray_shining_2",
+    "projectile": "projectile_chr_ray_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4117_ray@shining#2",
+    "projectile": "projectile_chr_ray",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4117_ray@shining#2",
+    "projectile": "projectile_chr_ray_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4117_ray@shining#2",
+    "projectile": "projectile_chr_ray_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4117_ray@shining#2",
+    "projectile": "projectile_chr_ray_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4122_grabds_yun_3",
+    "projectile": "projectile_chr_grabds",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4122_grabds_yun_3",
+    "projectile": "projectile_chr_grabds_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4122_grabds_yun_3",
+    "projectile": "projectile_chr_grabds_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4122_grabds@yun#3",
+    "projectile": "projectile_chr_grabds",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4122_grabds@yun#3",
+    "projectile": "projectile_chr_grabds_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4122_grabds@yun#3",
+    "projectile": "projectile_chr_grabds_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4133_logos_ambienceSynesthesia_6",
+    "projectile": "projectile_chr_logos",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4133_logos_ambienceSynesthesia_6",
+    "projectile": "projectile_chr_logos_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4133_logos_ambienceSynesthesia_6",
+    "projectile": "projectile_chr_logos_s1_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4133_logos@ambienceSynesthesia#6",
+    "projectile": "projectile_chr_logos",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4133_logos@ambienceSynesthesia#6",
+    "projectile": "projectile_chr_logos_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4133_logos@ambienceSynesthesia#6",
+    "projectile": "projectile_chr_logos_s1_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4137_udflow_epoque_46",
+    "projectile": "projectile_chr_udflow",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4137_udflow@epoque#46",
+    "projectile": "projectile_chr_udflow",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4138_narant_breaker_1",
+    "projectile": "projectile_chr_narant",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4138_narant_breaker_1",
+    "projectile": "projectile_chr_narant_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4138_narant_breaker_1",
+    "projectile": "projectile_chr_narant_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4138_narant_breaker_1",
+    "projectile": "projectile_chr_narant_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4138_narant_breaker_1",
+    "projectile": "projectile_chr_narant_s3_1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4138_narant_breaker_1",
+    "projectile": "projectile_chr_narant_s3_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4138_narant@breaker#1",
+    "projectile": "projectile_chr_narant",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4138_narant@breaker#1",
+    "projectile": "projectile_chr_narant_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4138_narant@breaker#1",
+    "projectile": "projectile_chr_narant_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4138_narant@breaker#1",
+    "projectile": "projectile_chr_narant_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4138_narant@breaker#1",
+    "projectile": "projectile_chr_narant_s3_1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4138_narant@breaker#1",
+    "projectile": "projectile_chr_narant_s3_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4139_papyrs_game_8",
+    "projectile": "projectile_chr_papyrs",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4139_papyrs_game_8",
+    "projectile": "projectile_chr_papyrs_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4139_papyrs@game#8",
+    "projectile": "projectile_chr_papyrs",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4139_papyrs@game#8",
+    "projectile": "projectile_chr_papyrs_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4145_ulpia_epoque_48",
+    "projectile": "projectile_chr_ulpia_s1",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "skin_char_4145_ulpia_epoque_48",
+    "projectile": "projectile_chr_ulpia_s3",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "char_4145_ulpia@epoque#48",
+    "projectile": "projectile_chr_ulpia_s1",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "char_4145_ulpia@epoque#48",
+    "projectile": "projectile_chr_ulpia_s3",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "skin_char_4146_nymph_ambienceSynesthesia_6",
+    "projectile": "projectile_chr_nymph",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4146_nymph_ambienceSynesthesia_6",
+    "projectile": "projectile_chr_nymph_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4146_nymph_ambienceSynesthesia_6",
+    "projectile": "projectile_chr_nymph_s2",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "skin_char_4146_nymph_ambienceSynesthesia_6",
+    "projectile": "projectile_chr_nymph_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4146_nymph@ambienceSynesthesia#6",
+    "projectile": "projectile_chr_nymph",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4146_nymph@ambienceSynesthesia#6",
+    "projectile": "projectile_chr_nymph_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4146_nymph@ambienceSynesthesia#6",
+    "projectile": "projectile_chr_nymph_s2",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "char_4146_nymph@ambienceSynesthesia#6",
+    "projectile": "projectile_chr_nymph_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4146_nymph_epoque_42",
+    "projectile": "projectile_chr_nymph",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4146_nymph_epoque_42",
+    "projectile": "projectile_chr_nymph_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4146_nymph_epoque_42",
+    "projectile": "projectile_chr_nymph_s2",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "skin_char_4146_nymph_epoque_42",
+    "projectile": "projectile_chr_nymph_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4146_nymph@epoque#42",
+    "projectile": "projectile_chr_nymph",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4146_nymph@epoque#42",
+    "projectile": "projectile_chr_nymph_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4146_nymph@epoque#42",
+    "projectile": "projectile_chr_nymph_s2",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "char_4146_nymph@epoque#42",
+    "projectile": "projectile_chr_nymph_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4151_tinman_sale_11",
+    "projectile": "projectile_chr_tinman",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4151_tinman_sale_11",
+    "projectile": "projectile_chr_tinman_s1",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "skin_char_4151_tinman_sale_11",
+    "projectile": "projectile_chr_tinman_s2",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "char_4151_tinman@sale#11",
+    "projectile": "projectile_chr_tinman",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4151_tinman@sale#11",
+    "projectile": "projectile_chr_tinman_s1",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "char_4151_tinman@sale#11",
+    "projectile": "projectile_chr_tinman_s2",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "skin_char_4179_monstr_boc_11",
+    "projectile": "projectile_chr_monstr",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4179_monstr_boc_11",
+    "projectile": "projectile_chr_monstr_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4179_monstr_boc_11",
+    "projectile": "projectile_chr_monstr_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4179_monstr@boc#11",
+    "projectile": "projectile_chr_monstr",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4179_monstr@boc#11",
+    "projectile": "projectile_chr_monstr_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4179_monstr@boc#11",
+    "projectile": "projectile_chr_monstr_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4193_lemuen_ambienceSynesthesia_7",
+    "projectile": "projectile_chr_lemuen",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4193_lemuen_ambienceSynesthesia_7",
+    "projectile": "projectile_chr_lemuen_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4193_lemuen_ambienceSynesthesia_7",
+    "projectile": "projectile_chr_lemuen_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4193_lemuen_ambienceSynesthesia_7",
+    "projectile": "projectile_chr_lemuen_s3_attack",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "char_4193_lemuen@ambienceSynesthesia#7",
+    "projectile": "projectile_chr_lemuen",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4193_lemuen@ambienceSynesthesia#7",
+    "projectile": "projectile_chr_lemuen_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4193_lemuen@ambienceSynesthesia#7",
+    "projectile": "projectile_chr_lemuen_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4193_lemuen@ambienceSynesthesia#7",
+    "projectile": "projectile_chr_lemuen_s3_attack",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "skin_char_4195_radian_game_8",
+    "projectile": "projectile_chr_radian",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4195_radian_game_8",
+    "projectile": "projectile_chr_radian_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4195_radian_game_8",
+    "projectile": "projectile_chr_radian_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4195_radian_game_8",
+    "projectile": "projectile_chr_radian_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4195_radian@game#8",
+    "projectile": "projectile_chr_radian",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4195_radian@game#8",
+    "projectile": "projectile_chr_radian_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4195_radian@game#8",
+    "projectile": "projectile_chr_radian_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4195_radian@game#8",
+    "projectile": "projectile_chr_radian_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4202_haruka_iteration_6",
+    "projectile": "projectile_chr_haruka",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4202_haruka_iteration_6",
+    "projectile": "projectile_chr_haruka_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4202_haruka_iteration_6",
+    "projectile": "projectile_chr_haruka_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4202_haruka_iteration_6",
+    "projectile": "projectile_chr_haruka_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4202_haruka@iteration#6",
+    "projectile": "projectile_chr_haruka",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4202_haruka@iteration#6",
+    "projectile": "projectile_chr_haruka_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4202_haruka@iteration#6",
+    "projectile": "projectile_chr_haruka_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4202_haruka@iteration#6",
+    "projectile": "projectile_chr_haruka_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_427_vigil_epoque_27",
+    "projectile": "projectile_chr_vigil",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_427_vigil_epoque_27",
+    "projectile": "projectile_chr_vigil_s3_1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_427_vigil_epoque_27",
+    "projectile": "projectile_chr_vigil_s3_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_427_vigil_epoque_27",
+    "projectile": "projectile_chr_vigil_s3_3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_427_vigil@epoque#27",
+    "projectile": "projectile_chr_vigil",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_427_vigil@epoque#27",
+    "projectile": "projectile_chr_vigil_s3_1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_427_vigil@epoque#27",
+    "projectile": "projectile_chr_vigil_s3_2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_427_vigil@epoque#27",
+    "projectile": "projectile_chr_vigil_s3_3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_430_fartth_whirlwind_5",
+    "projectile": "projectile_chr_fartth",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_430_fartth_whirlwind_5",
+    "projectile": "projectile_chr_fartth_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_430_fartth_whirlwind_5",
+    "projectile": "projectile_chr_fartth_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_430_fartth_whirlwind_5",
+    "projectile": "projectile_chr_fartth_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_430_fartth@whirlwind#5",
+    "projectile": "projectile_chr_fartth",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_430_fartth@whirlwind#5",
+    "projectile": "projectile_chr_fartth_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_430_fartth@whirlwind#5",
+    "projectile": "projectile_chr_fartth_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_430_fartth@whirlwind#5",
+    "projectile": "projectile_chr_fartth_s3",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_431_ashlok_epoque_28",
+    "projectile": "projectile_chr_ashlok",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "skin_char_431_ashlok_epoque_28",
+    "projectile": "projectile_chr_ashlok_s2",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "char_431_ashlok@epoque#28",
+    "projectile": "projectile_chr_ashlok",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "char_431_ashlok@epoque#28",
+    "projectile": "projectile_chr_ashlok_s2",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "skin_char_450_necras_ambienceSynesthesia_7",
+    "projectile": "projectile_chr_necras",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_450_necras_ambienceSynesthesia_7",
+    "projectile": "projectile_chr_necras_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_450_necras@ambienceSynesthesia#7",
+    "projectile": "projectile_chr_necras",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_450_necras@ambienceSynesthesia#7",
+    "projectile": "projectile_chr_necras_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_450_necras_summer_20",
+    "projectile": "projectile_chr_necras",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_450_necras@summer#20",
+    "projectile": "projectile_chr_necras",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_472_pasngr_epoque_17",
+    "projectile": "projectile_chr_pasngr",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_472_pasngr_epoque_17",
+    "projectile": "projectile_chr_pasngr_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_472_pasngr_epoque_17",
+    "projectile": "projectile_chr_pasngr_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_472_pasngr@epoque#17",
+    "projectile": "projectile_chr_pasngr",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_472_pasngr@epoque#17",
+    "projectile": "projectile_chr_pasngr_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_472_pasngr@epoque#17",
+    "projectile": "projectile_chr_pasngr_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_474_glady_boc_5",
+    "projectile": "projectile_chr_glady",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_474_glady_boc_5",
+    "projectile": "projectile_chr_glady_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_474_glady_boc_5",
+    "projectile": "projectile_chr_glady_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_474_glady_boc_5",
+    "projectile": "projectile_chr_glady_s3_3",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "char_474_glady@boc#5",
+    "projectile": "projectile_chr_glady",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_474_glady@boc#5",
+    "projectile": "projectile_chr_glady_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_474_glady@boc#5",
+    "projectile": "projectile_chr_glady_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_474_glady@boc#5",
+    "projectile": "projectile_chr_glady_s3_3",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "skin_char_474_glady_epoque_33",
+    "projectile": "projectile_chr_glady",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_474_glady_epoque_33",
+    "projectile": "projectile_chr_glady_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_474_glady_epoque_33",
+    "projectile": "projectile_chr_glady_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_474_glady_epoque_33",
+    "projectile": "projectile_chr_glady_s3_3",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "char_474_glady@epoque#33",
+    "projectile": "projectile_chr_glady",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_474_glady@epoque#33",
+    "projectile": "projectile_chr_glady_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_474_glady@epoque#33",
+    "projectile": "projectile_chr_glady_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_474_glady@epoque#33",
+    "projectile": "projectile_chr_glady_s3_3",
+    "inherited": [
+      "onReached"
+    ]
+  },
+  {
+    "skin": "skin_char_498_inside_kitchen_2",
+    "projectile": "projectile_chr_inside",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_498_inside_kitchen_2",
+    "projectile": "projectile_chr_inside_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_498_inside_kitchen_2",
+    "projectile": "projectile_chr_inside_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_498_inside@kitchen#2",
+    "projectile": "projectile_chr_inside",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_498_inside@kitchen#2",
+    "projectile": "projectile_chr_inside_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_498_inside@kitchen#2",
+    "projectile": "projectile_chr_inside_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_499_kaitou_epoque_37",
+    "projectile": "projectile_chr_kaitou",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_499_kaitou_epoque_37",
+    "projectile": "projectile_chr_kaitou_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_499_kaitou_epoque_37",
+    "projectile": "projectile_chr_kaitou_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_499_kaitou@epoque#37",
+    "projectile": "projectile_chr_kaitou",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_499_kaitou@epoque#37",
+    "projectile": "projectile_chr_kaitou_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_499_kaitou@epoque#37",
+    "projectile": "projectile_chr_kaitou_s2",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "char_4217_makoto@p3r#1",
+    "projectile": "projectile_chr_makoto_s1",
+    "inherited": [
+      "onHit"
+    ]
+  },
+  {
+    "skin": "skin_char_4217_makoto_p3r_1",
+    "projectile": "projectile_chr_makoto_s1",
+    "inherited": [
+      "onHit"
+    ]
+  }
+]

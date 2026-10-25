@@ -1,0 +1,65 @@
+{
+  "results": [
+    {
+      "key": "0-base",
+      "dir": "UP",
+      "form": "makoto_s1",
+      "back": false,
+      "clip": "Doll_Skill_1_Attack",
+      "mode": "attack",
+      "time": 1.7628750000000015,
+      "formElapsed": 3.566999999999994
+    },
+    {
+      "key": "0-skin",
+      "dir": "UP",
+      "form": "makoto_s1",
+      "back": false,
+      "clip": "Doll_Skill_1_Attack",
+      "mode": "attack",
+      "time": 1.7628750000000015,
+      "formElapsed": 3.566999999999994
+    },
+    {
+      "key": "1-base",
+      "dir": "UP",
+      "form": "makoto_s2",
+      "back": false,
+      "clip": "Doll_Skill_2_Loop",
+      "mode": "base",
+      "time": 1.533,
+      "formElapsed": 3.566999999999994
+    },
+    {
+      "key": "1-skin",
+      "dir": "UP",
+      "form": "makoto_s2",
+      "back": false,
+      "clip": "Doll_Skill_2_Loop",
+      "mode": "base",
+      "time": 1.533,
+      "formElapsed": 3.566999999999994
+    },
+    {
+      "key": "2-base",
+      "dir": "UP",
+      "form": "makoto_s3a",
+      "back": false,
+      "clip": "Doll_Skill_3_P1_Attack_B",
+      "mode": "attack",
+      "time": 0.7063312500000001,
+      "formElapsed": 3.566999999999994
+    },
+    {
+      "key": "2-skin",
+      "dir": "UP",
+      "form": "makoto_s3a",
+      "back": false,
+      "clip": "Doll_Skill_3_P1_Attack_B",
+      "mode": "attack",
+      "time": 0.7063312500000001,
+      "formElapsed": 3.566999999999994
+    }
+  ],
+  "errors": []
+}

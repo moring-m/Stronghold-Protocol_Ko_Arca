@@ -1,0 +1,16 @@
+Browser started
+CONSOLE Failed to load resource: the server responded with a status of 404 (Not Found)
+CASE 2-skin
+CASE READY {
+  alpha: 0.4,
+  screen: {
+    x: 457.8518856385208,
+    y: 465.78566894113385,
+    s: 92.14811436147922,
+    top: 357.05089399458836,
+    depth: 11.330035634773644
+  },
+  views: 2
+}
+RESULT {"before":{"clip":"Doll_Skill_3_P1_Attack_B","mode":"attack","loop":"play"},"paused":{"loop":"play","effects":14},"after":{"clip":"Doll_Skill_3_P1_Idle","mode":"base","base":"idle","effects":0,"loop":"done"}}
+Errors []

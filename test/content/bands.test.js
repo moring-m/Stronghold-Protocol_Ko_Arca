@@ -36,7 +36,7 @@ function setup({ band, mode = 'solo', humans = 1, seed = 41, bands: perPlayer = 
   const ps = h.ps('p_0');
   if (band) ps.bandId = band;
   const at = (r) => { m.round = r; };
-  const roundStart = (r, who = ps) => { at(r); m.dispatch(who, 'onRoundStart', { round: r }); };
+  const roundStart = (r, who = ps) => { at(r); m.dispatch(who, 'onRoundStart', { round: r }); m.dispatch(who, 'onPrepStart', { round:r }); };
   const prepEnd = (who = ps) => m.dispatch(who, 'onPrepEnd', { round: m.round });
   return { h, m, ps, at, roundStart, prepEnd };
 }
@@ -347,6 +347,7 @@ test('鸭爵 “神秘顾客”: from R5, 0–2 ground enemies in the last 40 % 
   const p0 = h.ps('p_0');
   const counts = {};
   for (let k = 0; k < 30; k++) {
+    m.seed=4+k; // a new match seed; the same round now intentionally keeps the same draw
     m.round = 5;
     const ev = { input: p0.battleInput({ side: 'L', colOffset: 0 }), kind: 'normal', round: 5, spawns: wave() };
     m.dispatch(p0, 'onBattleStart', ev);

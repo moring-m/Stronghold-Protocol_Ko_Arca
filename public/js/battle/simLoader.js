@@ -22,7 +22,8 @@ function deepFreeze(root) {
  */
 let loadedScripts = false, loadedTraits = false, traitInstaller = null;
 export async function loadBrowserSim({ base = '/sim/', dataBase = '/data/', fetchFn = (...a) => globalThis.fetch(...a), data = null, cs = null, bounds = null,
-  scripts = [], hashInput = null, nativeVerified = false, deferScripts = false, traitRuntimeVerified = null } = {}) {
+  scripts = [], hashInput = null, nativeVerified = false, deferScripts = false, traitRuntimeVerified = null, reuse = null, reuseOwner = null } = {}) {
+  const original = typeof reuse === 'function' && typeof reuseOwner === 'function' ? () => reuseOwner() === null : null;
   const release=globalThis.__SP_RELEASE || new URL(import.meta.url).searchParams.get('release');
   const pin = value => { if(!release || /^file:/.test(String(value)))return value;const u=new URL(value,globalThis.location.href);if(u.origin===globalThis.location.origin)u.searchParams.set('release',release);return u.href;};
   const [spec, simdata, support] = await Promise.all([
@@ -36,13 +37,23 @@ export async function loadBrowserSim({ base = '/sim/', dataBase = '/data/', fetc
   };
   // (a content set's data: structured copies, frozen below like downloaded files)
   const files = data ? SIM_DATA_FILES.map((n) => (data[n] && typeof data[n] === 'object' ? structuredClone(data[n]) : null))
-    : await Promise.all(SIM_DATA_FILES.map(async (n) => (await fetchOnce(n)) ?? fetchOnce(n)));
+     : await Promise.all(SIM_DATA_FILES.map(async (n) => {
+      let local = original && original() ? reuse(n) : null;
+      if (local && !original()) local = null;
+      return local && typeof local === 'object' ? local : (await fetchOnce(n)) ?? fetchOnce(n);
+    }));
   // a battle simulated without part of the data would still produce a plausible result the server accepts: never run
   // one — the loader fails (the next b.start retries it; meanwhile the server's deadline takes the field over)
   const missing = SIM_DATA_FILES.filter((n,i)=> !(data&&n==='assets') && (!files[i]||typeof files[i]!=='object'));
   if (missing.length) throw new Error(`simulation data unavailable: ${missing.join(', ')}`);
   const raw = {};
   SIM_DATA_FILES.forEach((n, i) => { raw[n] = files[i]; });
+  // A prior simulation may have frozen these records. Clone only their outer timing targets;
+  // preserve the shared authored trees and the local authoritative animation timing extension.
+  const timingCopy = records => records && Object.isFrozen(records)
+    ? Object.fromEntries(Object.entries(records).map(([id, rec]) => [id, {...rec}])) : records;
+  for(const key of ['chess','enemies','tokens'])raw[key]=timingCopy(raw[key]);
+  if(raw.backups && Object.isFrozen(raw.backups))raw.backups={...raw.backups,units:timingCopy(raw.backups.units)};
   attachAttackTimings(raw,raw.assets);
   if(raw.backups?.units)attachAttackTimings({chess:raw.backups.units},raw.assets);
   deepFreeze(raw);

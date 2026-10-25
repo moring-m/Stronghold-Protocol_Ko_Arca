@@ -36,10 +36,11 @@ aklz4.py registers a decoder for it. This script pulls the art the web sources l
     only while the season runs: they are read from the client when it has them, else from --scenes <dir> (default
     .cache/official-scenes/*, filled by tools/local-extract/fetch_scenes.py)
   - the official battle effects (特效) of the mode's operators, enemies and tokens (fx.py, DESIGN §33)
-    → fx/index.json, fx/textures.json, fx/prefabs/*.json, fx/tex/**.webp, fx/mesh/*.json, listed in their own
+    → fx/index.json, fx/textures.json, fx/prefabs/*.json, fx/tex/**.webp (or .png), fx/mesh/*.json, listed in their own
     data/local-fx.json (next to --manifest; data/local-assets.json has no fx group);
     only with an explicit --only fx (a plain run leaves them out): the Phase 1a sample by default, --fx-set used for
-    every effect the units reference, --fx-keys <k1,k2> for named prefabs
+    every effect the units reference, --fx-keys <k1,k2> for named prefabs; textures are WebP quality 90 by default,
+    --fx-texture-format png selects lossless PNG
 
 Usage:
   python3 -m venv .venv && .venv/bin/pip install -r tools/local-extract/requirements.txt
@@ -50,6 +51,7 @@ Usage:
                                                           copied from a release bundle; needs Pillow)
   .venv/bin/python tools/local-extract/extract.py --only scene [--scenes <dir of in-season bundles>]
   .venv/bin/python tools/local-extract/extract.py --only fx [--fx-set sample|used] [--fx-keys k1,k2] [--fx-jobs N]
+                                                        [--fx-texture-format webp|png]
   .venv/bin/python tools/local-extract/extract.py --only plugin-art [--plugin-root <installation>]
 
 Writes <out>/**.png|.webp|.skel|.atlas and data/local-assets.json (manifest of what was extracted). With --only, just
@@ -211,19 +213,24 @@ def job_parts(job):
     return rel, sub, kinds, keep
 
 
+def names_sub(only, sub):
+    """A prefix names this output directory or one of its parents."""
+    return any(sub == only_prefix(p) or sub.startswith(only_prefix(p) + '/') for p in only)
+
+def only_prefix(prefix):
+    """Only the two documented Spine categories have short aliases."""
+    prefix = prefix.rstrip('/')
+    return {'enemy': 'spine/enemy', 'token': 'spine/token'}.get(prefix, prefix)
+
+
 def wants_sub(only, sub):
-    """Whether output subdir `sub` runs under --only: no prefixes, or one prefix is `sub`, a parent of it or below it."""
-    if not only:
-        return True
-    return any(sub == p.rstrip('/') or sub.startswith(p.rstrip('/') + '/') or p.rstrip('/').startswith(sub + '/')
-               for p in only)
+    """Include parent jobs when selecting an individual model below them."""
+    return not only or names_sub(only, sub) or any(only_prefix(p).startswith(sub + '/') for p in only)
 
 
 def select_jobs(only):
-    """The jobs whose output subdir starts with one of the `only` prefixes (all jobs when `only` is empty)."""
-    if not only:
-        return list(JOBS)
-    return [j for j in JOBS if any(j[1] == p.rstrip('/') or j[1].startswith(p.rstrip('/') + '/') for p in only)]
+    """Select explicit directories and the two documented Spine aliases."""
+    return [j for j in JOBS if wants_sub(only, j[1])]
 
 
 def enemy_spine_id(container, wanted):
@@ -758,6 +765,8 @@ def main():
     ap.add_argument('--fx-keys', default='', metavar='K1,K2',
                     help='with --only fx: export only these effect prefabs (comma-separated keys)')
     ap.add_argument('--fx-jobs', type=int, default=0, metavar='N', help='with --only fx: worker processes (default up to 8)')
+    ap.add_argument('--fx-texture-format', choices=('webp', 'png'), default='webp',
+                    help='with --only fx: WebP quality 90 textures (default) or lossless PNG')
     ap.add_argument('--webp', action='store_true',
                     help='only write the WebP copies of the board textures and the guide pages from the PNGs already '
                          'under --out and list them in the manifest (needs Pillow, not the client)')
@@ -778,6 +787,7 @@ def main():
                           'fx': {'sub': fx.FX_SUB, 'groups': list(fx.FX_GROUPS), 'version': fx.FORMAT_VERSION,
                                  'indexVersion': fx.INDEX_VERSION, 'meshVersion': fx.MESH_VERSION,
                                  'manifestVersion': fx.MANIFEST_VERSION, 'optIn': True,
+                                 'textureFormat': args.fx_texture_format, 'textureFormats': ['webp', 'png'],
                                  'sample': {'keys': fx.FX_SAMPLE_KEYS, 'units': fx.FX_SAMPLE_UNITS,
                                             'coverage': fx.FX_COVERAGE_KEYS}},
                           'scenes': {'sub': scenes.SCENE_SUB, 'tex': scenes.TEX_SUB,
@@ -822,7 +832,7 @@ def main():
         keys = [k.strip().lower() for k in args.fx_keys.split(',') if k.strip()]
         total += fx.export_fx(ab_root, out_root, manifest, print, selection=args.fx_set, keys=keys or None,
                               jobs=args.fx_jobs or None, root=ROOT,
-                              fx_manifest=Path(args.manifest).with_name(fx.FX_MANIFEST))
+                              fx_manifest=Path(args.manifest).with_name(fx.FX_MANIFEST), texture_format=args.fx_texture_format)
     if stage_ids:
         total += export_scenes(ab_root, out_root, manifest, print, stage_ids, scene_roots(ab_root, args.scenes))
     old, old_chars = {}, {}
@@ -874,10 +884,11 @@ def token_prefab_id(container, wanted):
 
 def spine_ids(only, sub, ids):
     """The ids of a Spine model list (ENEMY_SPINES / TOKEN_SPINES, written to `<sub>/<id>`) that run under --only: all of
-    them with no prefix, `sub` or a parent of it; else those whose output dir is a prefix or below one."""
+    them with no prefix, `sub` or the short form of it (`enemy` / `token`) or a parent of it; else those whose output dir
+    is a prefix or below one."""
     if not wants_sub(only, sub):
         return []
-    if not only or any(sub == p.rstrip('/') or sub.startswith(p.rstrip('/') + '/') for p in only):
+    if not only or names_sub(only, sub):
         return list(ids)
     return [i for i in ids if any(f'{sub}/{i}' == p.rstrip('/') or f'{sub}/{i}'.startswith(p.rstrip('/') + '/')
                                   for p in only)]

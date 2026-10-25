@@ -1,0 +1,107 @@
+[
+  {
+    "path": "shared/constants.js",
+    "unchanged": false,
+    "sha256": "9cc62cec40ae3cfc550c79736e011833e56d0f58a4f900047193b0b8ef89a68c",
+    "reviewed_change": "스킬 회차 병합(bosses) 또는 신규 SERVER_FULL 오류/번역만 추가. 앱 버전과 배포 정책 유지."
+  },
+  {
+    "path": "shared/customExtensions.js",
+    "unchanged": true,
+    "sha256": "c976a0348b39ef9bc23e65e2594e642c8d070f788301c2744dae8ad7ba0279ad"
+  },
+  {
+    "path": "shared/augments.js",
+    "unchanged": true,
+    "sha256": "19e202e4296401d30258e196352f7575c266c3e438024c30246dd5a4154ab9e1"
+  },
+  {
+    "path": "server/sim/content/kits/makoto.js",
+    "unchanged": true,
+    "sha256": "dda802057594374125c2371bee468673b010994db4387695581050b1ffc0b13f"
+  },
+  {
+    "path": "server/sim/content/ursus.js",
+    "unchanged": true,
+    "sha256": "42e57525951764c2da508fced9bff4a14c1aa27b39b365c9a52658fa9031bbcb"
+  },
+  {
+    "path": "server/sim/content/leithanien.js",
+    "unchanged": true,
+    "sha256": "d41c6064d324fd4ae8ff9877cdcce6961e9eeec54b49b54d26ea25b54821ccbd"
+  },
+  {
+    "path": "server/sim/content/bosses.js",
+    "unchanged": false,
+    "sha256": "2448612a3ad847dc646b9871a3c729f3fafcf549c143ceb1568c8a3cc116d6aa",
+    "reviewed_change": "스킬 회차 병합(bosses) 또는 신규 SERVER_FULL 오류/번역만 추가. 앱 버전과 배포 정책 유지."
+  },
+  {
+    "path": "deploy/ec2/rolling-update.sh",
+    "unchanged": true,
+    "sha256": "4c73cf27bf8324dbc8c1e80bc72a1bf00cf9b03bab6548f7a25ed1547a4a01d1"
+  },
+  {
+    "path": "server/release/gateway.js",
+    "unchanged": true,
+    "sha256": "f68f0694c0402a8746aa32a16df76c2afec87f7911bdf6c96d0ea45854105492"
+  },
+  {
+    "path": "shared/releaseRetirement.js",
+    "unchanged": true,
+    "sha256": "aa2ce0e83415b230e1df17995807d0769b19923d5e7cfb5fc80de99e1ab20d9f"
+  },
+  {
+    "path": "public/js/ui/mobileScale.js",
+    "unchanged": true,
+    "sha256": "ec9f9b931dc1d24cd9e3a2f33cc1aa0666706a285707b2cfc95c6cc846d45106"
+  },
+  {
+    "path": "public/js/ui/customExtensions.js",
+    "unchanged": true,
+    "sha256": "9780e60e0c88c2f01d3753a2cb5e5fbcfdb316ec25dc8467de6beabfc9e21092"
+  },
+  {
+    "path": "public/js/ui/loadoutModel.js",
+    "unchanged": true,
+    "sha256": "7a99c57df55ed521aede7021b66f0377995a7c477612530beddf193acfd2c2a2"
+  },
+  {
+    "path": "data/chess.json",
+    "unchanged": true,
+    "sha256": "6528ba5a6c726b9819e8cd3a624f6fd49ced5af9ff2854ee79b2c4c959affc8b"
+  },
+  {
+    "path": "data/enemies.json",
+    "unchanged": true,
+    "sha256": "a19dfde9371f9b2c8c3a9453c5e6ab59d85d0b90cd735783808a3ddb141b7fba"
+  },
+  {
+    "path": "package.json",
+    "unchanged": true,
+    "sha256": "033bf50a99c23ecca7405131e7eb06e1e3b1a1fa312387cc5c233f8f73a9ee02"
+  },
+  {
+    "path": "package-lock.json",
+    "unchanged": true,
+    "sha256": "d658bdc448c14373b797c97106ec6c8846463d2e2c3f40341ebf0d94bcdf734c"
+  },
+  {
+    "path": "public/i18n/ko.json",
+    "unchanged": false,
+    "sha256": "42b3b74e80d0c5afcdd88ace2ef75fa7a8cb947a23dffc81531899622b5de0ec",
+    "reviewed_change": "스킬 회차 병합(bosses) 또는 신규 SERVER_FULL 오류/번역만 추가. 앱 버전과 배포 정책 유지."
+  },
+  {
+    "path": "public/i18n/en.json",
+    "unchanged": false,
+    "sha256": "001d036a4160d8ec255c8ea7a8b8689ae6fc5ab2af8ed53079d5de8285a04872",
+    "reviewed_change": "스킬 회차 병합(bosses) 또는 신규 SERVER_FULL 오류/번역만 추가. 앱 버전과 배포 정책 유지."
+  },
+  {
+    "path": "public/i18n/ja.json",
+    "unchanged": false,
+    "sha256": "3abb3cb7188fe6bb9a2e9fd85aed7eaf267e93b4ad19f1afbdcdaef7c16d3120",
+    "reviewed_change": "스킬 회차 병합(bosses) 또는 신규 SERVER_FULL 오류/번역만 추가. 앱 버전과 배포 정책 유지."
+  }
+]

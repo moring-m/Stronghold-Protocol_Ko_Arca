@@ -33,7 +33,7 @@ export class PracticeMatch extends Match {
   }
  }
  start(){if(this.disposed||this.ended||this.phase!==PHASE.LOBBY)return;this.guard(()=>{
-  if(this.practice.round>1){this.round=1;for(const ps of this.order){ps.startRound(1);this.dispatch(ps,'onRoundStart',{round:1});ps.recompute();}}
+  if(this.practice.round>1){this.round=1;for(const ps of this.order){ps.startRound(1);this.dispatch(ps,'onRoundStart',{round:1});this.dispatch(ps,'onPrepStart',{round:1});ps.recompute();}}
   this.hiddenReached=this.practice.round===this.gd.hiddenRound;this.startRound(this.practice.round);this.flush(true);
  });}
  enterPrep(){for(const ps of this.order)ps.funds=Math.max(ps.funds,PRACTICE_FUNDS);return super.enterPrep();}

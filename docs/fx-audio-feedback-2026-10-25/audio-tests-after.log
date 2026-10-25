@@ -1,0 +1,183 @@
+✔ bank indexing preserves per-file parameters and canonical pool identity through aliases (1.793284ms)
+✔ the asset plan emits ordinary and mode pool references and literal metadata without extra downloads (7.189471ms)
+✖ every generated attack/hit reference resolves to a valid pool and its selected sound parameters (1.184749ms)
+✖ all exported pools match the cached official bank limits, pitches and delays (43.696998ms)
+✔ chess_char_4_25_a: emits available orbit slots without collision targets (29.815701ms)
+✔ chess_char_5_09_a: emits available orbit slots without collision targets (2.476012ms)
+✔ costume artwork keeps its own size while verified oversized Ascalon slashes shrink (2.142484ms)
+✔ new exports bind explicit animator Transforms even when their names conflict with slot names (1.505427ms)
+✔ old uploads recover only a unique unnamed slot; ambiguous OriginMuzzle choices remain unresolved (0.259444ms)
+✔ skin projectile uses its actual bone, overriding the logical muzzle (left=false, back=false) (1.705181ms)
+✔ skin projectile uses its actual bone, overriding the logical muzzle (left=false, back=true) (0.259264ms)
+✔ skin projectile uses its actual bone, overriding the logical muzzle (left=true, back=false) (0.260887ms)
+✔ skin projectile uses its actual bone, overriding the logical muzzle (left=true, back=true) (0.261387ms)
+✔ an unresolved legacy fake mount falls back to the skin muzzle, never the generic body anchor (1.0205ms)
+✔ popOldest stops the oldest instance, admits the newest and releases exactly once (4.253061ms)
+✔ popOldest false drops new instances across files in the same bank until one ends (0.591348ms)
+✔ distinct banks sharing a file have independent caps; an official cap above two is honored (0.926137ms)
+✔ a full global budget still permits takeover inside a full pool and never steals another bank (1.061742ms)
+✔ pitch uses each file range, including fixed pitches and both ends of a variable range (0.78994ms)
+✔ the selected fallback file and hashed URL choose their own pitch and delay in AudioContext seconds (0.510525ms)
+✔ delayed requests use no playing slots and only take over when playback is due (0.343982ms)
+✔ the retained 160 ms unit / 45 ms URL gaps reject a request without stealing a voice (0.561923ms)
+✔ pending downloads never steal; the oldest started instance is replaced after out-of-order decode (1.348869ms)
+✔ decode failures and node/start failures leave no pool or limiter slots occupied (0.80917ms)
+✔ mute or a changed context during decode cancels a pending source (0.373898ms)
+✔ safety cleanup accounts for both pitch-adjusted duration and delay (0.288268ms)
+✔ unit playback picks the normal/mode pool and preserves the official pool on cosmetic fallback (1.103988ms)
+✔ a zero bank cap remains bounded by the remake global voice budget (0.465728ms)
+✔ a sustained two-unit 4x stream sounds throughout a delay longer than the attack spacing (#680 review) (12.229266ms)
+✔ field replacement cancels delayed, decoding and playing pool sounds even when unit ids repeat (#680 review) (0.725472ms)
+✔ 10000 requests for a stalled buffer share bounded decode work and cannot replay after exit (#680 review) (278.537936ms)
+✔ distinct stalled URLs have a bounded subscriber count across repeated field changes (58.186858ms)
+✔ delayed requests have a separate bound and release their queue entries when due (10.923403ms)
+✔ a stalled decode discards old attacks and coalesces the latest bank/unit request (0.442322ms)
+✔ a suspended audio clock does not consume the delay or admit playing voices (0.403242ms)
+✔ battle/screen cleanup stops playing pools and invalidates delays and decodes without replacing the field (0.618029ms)
+✔ ability-start attack banks do not add their wind-up delay again at projectile release (0.560902ms)
+▶ bgm selection
+  ✔ route and phase → key (0.92866ms)
+  ✔ combat music switches after round 7 while Unite keeps its official track (0.312665ms)
+  ✔ resolveBgm uses the manifest (boss fallback, intro optional) (0.433599ms)
+  ✔ installAudio: the round's own 开战 track, fixed per round and the same on every client (1.65236ms)
+✔ bgm selection (5.092676ms)
+▶ SfxLimiter
+  ✔ caps concurrent voices (0.323912ms)
+  ✔ per-unit cooldown and per-url gap (0.218492ms)
+  ✔ at most 2 overlapping copies of one sound (official banks: maxSoundAllowed 2) (0.188045ms)
+✔ SfxLimiter (1.08ms)
+▶ operator battle voice
+  ✔ resultVoiceSlot: 完美作战 / 高难 / 漏怪 / 全灭 (0.386817ms)
+  ✔ resultSpeaker: the operators of THAT battle (survivors first), never the field on screen (0.497115ms)
+  ✔ resultSpeaker on a real battle result: unitsEnd names the chess, the chess record gives the speaking operator (75.024696ms)
+  ✔ VoiceGate: one line at a time, a global gap, per-unit cooldowns, higher priority takes over (0.508743ms)
+  ✔ AudioManager.voice: manifest slots (a drawn array), the gate, and the battle events that drive them (106.505087ms)
+[audio] /v/a_sel.mp3 unavailable HTTP 404
+  ✔ voice: a stale callback never frees the channel the newest line holds (review on #73) (72.260397ms)
+✔ operator battle voice (256.047226ms)
+▶ AudioManager
+  ✔ chat has an independent volume, drops bursts, and obeys mute/hidden state (1.584116ms)
+  ✔ turning chat off during a download cancels pending playback (0.347638ms)
+  ✔ no AudioContext / no manifest: every call is a silent no-op (0.312214ms)
+[audio] /audio/chat-notification/emote.mp3 unavailable Failed to parse URL from /audio/chat-notification/emote.mp3
+  ✔ unlocks on the first gesture, then plays BGM and SFX from the manifest (59.834852ms)
+  ✔ BGM is not downloaded while the music is muted or at volume 0; the wanted track starts once it is audible (72.325626ms)
+  ✔ fetch failures are swallowed (20.120685ms)
+  ✔ a served manifest's content-hashed audio URL is fetched as /media/~<hash>/…, falling back to the hashed .mp3 URL (20.338685ms)
+  ✔ 音频先走无扩展名的 /media/ 路由；只有它 404 才回退到带扩展名的原地址 (102.012823ms)
+✔ AudioManager (277.557833ms)
+▶ impact sounds (user playtest #4 item 6)
+  ✔ an operator never plays a skill-mode file (_d / _h / _s) as its normal attack or impact; enemies keep their _h (0.25661ms)
+  ✖ a heal never makes the healer the author of the next damage on the healed ally (6.636681ms)
+  ✔ a chain bounce plays no attack sound of the previous target; a stale attack is no impact (10.235868ms)
+✖ impact sounds (user playtest #4 item 6) (17.507694ms)
+▶ official KR/JP operator voices
+  ✔ equal-priority active skills interrupt; passive skills obey their 10 second cooldown (0.238212ms)
+  ✔ language switching picks official bank and stops the old voice before playback (31.587332ms)
+✔ official KR/JP operator voices (32.065989ms)
+✔ voice prewarming waits for gesture and shares decoded buffers with playback (41.349101ms)
+[audio] /assets/audio/sfx/battle/b_char/b_char_set.mp3 unavailable Failed to parse URL from /media/sfx/battle/b_char/b_char_set
+✔ BGM coalesces pending same-track requests and keeps its loop alive (0.685992ms)
+✔ preparation uses rest music even when a round combat track is selected (0.168566ms)
+✔ a skill without its own bank never borrows the sound of another equipped skill (0.267797ms)
+✔ battle-start voice randomly selects the field lineup and only fires once (0.603336ms)
+✔ imperial drone warning is quieter and ends when the vertical drop starts at any playback speed (0.189278ms)
+✔ warning audio stop deadline includes decoding time, preventing a delayed warning during the fall (1.265743ms)
+▶ 漏怪 sound
+  ✔ an escaped enemy plays the original stage exit alarm — and no death sound (a leak is not a `die`) (11.001031ms)
+[audio] /assets/audio/sfx/battle/b_char/b_char_set.mp3 unavailable Failed to parse URL from /media/sfx/battle/b_char/b_char_set
+[audio] /audio/chat-notification/emote.mp3 unavailable Failed to parse URL from /audio/chat-notification/emote.mp3
+  ✔ leaks of one disaster are ONE alarm (the cue is 1.44 s long), a later one rings again (1631.22281ms)
+✔ 漏怪 sound (1642.511754ms)
+✔ rollback: windup is silent, attack audio starts at atk and skill end is silent (0.690066ms)
+✔ partial volume updates preserve Japanese and Korean voice settings (0.255163ms)
+[audio] /audio/chat-notification/emote.mp3 unavailable Failed to parse URL from /audio/chat-notification/emote.mp3
+[audio] /audio/chat-notification/emote.mp3 unavailable Failed to parse URL from /audio/chat-notification/emote.mp3
+✔ language change immediately stops the old line and cancels a still-decoding line (1.667113ms)
+✔ skill combat sounds follow activation and preserve the mode until impact (0.414672ms)
+✔ selected KR/JP bank passes its actual URL to playback, including Korean fallback (0.422624ms)
+✔ a closed audio context is rebuilt on the next gesture with channel volumes retained (0.514573ms)
+✔ an unexpected visible audio suspension resumes without waiting for a tab switch (0.438588ms)
+✔ a stalled audio decode releases its cached promise so later playback can retry (11.313464ms)
+[audio] /assets/audio/sfx/battle/b_char/b_char_set.mp3 unavailable Failed to parse URL from /media/sfx/battle/b_char/b_char_set
+[audio] /assets/audio/sfx/player/p_skill/p_skill_frbytrtn_bn.mp3 unavailable Failed to parse URL from /media/sfx/player/p_skill/p_skill_frbytrtn_bn
+✔ the bank mix: an empty asset is a chance of silence, the played file's volume (bankMix, indexAudio().mixOf) (1.977033ms)
+✔ data/assets.json carries the official mix: dogs 20 %, 妖怪 / 威龙 0.7 (and matches audio_data.json when cached) (43.104637ms)
+✔ a dog barks only on its chance and never falls back to the generic enemy sound; at most the old gain (21.043085ms)
+✔ 妖怪 plays at 0.55 × 0.7; a bank louder than 1 stays at the old gain; die / born use the mix too (0.86262ms)
+✔ Santalla impact sound plays once on ground contact, including an empty target tile (3.669284ms)
+✔ Santalla controller-projectile fallback preloads its actual falling icicle prefab (0.204361ms)
+✔ Santalla impact effects are placed once on each actually hit target (21.467099ms)
+✔ Makoto persona attack and heal sounds follow the form after the instant skill has ended (0.63855ms)
+✖ Makoto execution and heal events bind existing official prefabs to the actual affected unit (0.508232ms)
+✔ Sakiko official sound mapping covers every note mode and is included in resource downloads (1.878164ms)
+✔ note SFX use real launch/contact events without duplicate generic attack sounds (2.722706ms)
+ℹ tests 91
+ℹ suites 7
+ℹ pass 87
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4893.742199
+
+✖ failing tests:
+
+test at test/audio-pools-data.test.js:37:1
+✖ every generated attack/hit reference resolves to a valid pool and its selected sound parameters (1.184749ms)
+  AssertionError [ERR_ASSERTION]: char_107_liskam.hit
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/audio-pools-data.test.js:45:16)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at test/audio-pools-data.test.js:61:1
+✖ all exported pools match the cached official bank limits, pitches and delays (43.696998ms)
+  AssertionError [ERR_ASSERTION]: battle.ON_ABILITY_START.char_4231_clemnt.attack.0
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/audio-pools-data.test.js:66:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at test/ui/audio.test.js:721:3
+✖ a heal never makes the healer the author of the next damage on the healed ally (6.636681ms)
+  AssertionError [ERR_ASSERTION]: no impact sound of hers on the ally
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/ui/audio.test.js:735:14)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at test/ui/kit-event-audio.test.js:16:1
+✖ Makoto execution and heal events bind existing official prefabs to the actual affected unit (0.508232ms)
+  TypeError: Cannot read properties of undefined (reading 'active')
+      at makotoOfficialFx (file:///workspace/Stronghold-Protocol_Ko_Arca/public/js/render/makotoFx.js:8:13)
+      at Object.simFx (file:///workspace/Stronghold-Protocol_Ko_Arca/public/js/render/vfx/wiring.js:1711:18)
+      at TestContext.<anonymous> (file:///workspace/Stronghold-Protocol_Ko_Arca/test/ui/kit-event-audio.test.js:18:246)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)

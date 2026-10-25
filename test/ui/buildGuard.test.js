@@ -6,7 +6,7 @@
 // in a row agree, and a match on screen is never thrown away — the guard waits for it (and its settlement) to end.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { checkBuildOnce, startBuildGuard, fetchBuild, BUILD_CHECK_MS, BUILD_FETCH_TIMEOUT_MS } from '../../public/js/ui/buildGuard.js';
+import { checkBuildOnce, startBuildGuard, deferBuildReload, fetchBuild, BUILD_CHECK_MS, BUILD_FETCH_TIMEOUT_MS } from '../../public/js/ui/buildGuard.js';
 
 /** A fake fetch answering /healthz with `build` (null → the frame carries none). */
 const fetchOf = (build) => async (url, init) => {
@@ -139,4 +139,25 @@ test('startBuildGuard: stop() ends the watch', async () => {
 test('rolling guard compares release IDs and clears an obsolete notice when the live release matches again',async()=>{
  const previous=globalThis.__SP_RELEASE;globalThis.__SP_RELEASE='current-release';let build='new-release',fresh=0,stale=0,reloaded=0,guard;
  try{guard=startBuildGuard({fetchFn:async url=>{assert.equal(url,'/__roll/latest');return{ok:true,json:async()=>({build})};},inMatch:()=>true,reload:()=>reloaded++,setInterval:()=>0,clearInterval(){},onCurrent:()=>fresh++,onStale:()=>stale++});await new Promise(r=>setTimeout(r,0));await guard.check();assert.equal(guard.stale(),true);assert.equal(stale,1);assert.equal(reloaded,0);build='current-release';const result=await guard.check();assert.equal(result.status,'current');assert.equal(guard.stale(),false);assert.equal(fresh,1);assert.equal(reloaded,0);}finally{guard?.stop();if(previous===undefined)delete globalThis.__SP_RELEASE;else globalThis.__SP_RELEASE=previous;}
+});
+
+test('rolling room lobby, spectators and reconnect keep the old release until the room is left', async () => {
+ let state={room:{code:'ABCD'},ui:{}},route='room',build='old',reloaded=0;
+ const guard=startBuildGuard({fetchFn:async()=>({ok:true,json:async()=>({build})}),
+  inMatch:()=>deferBuildReload(state,route,'old-release'),reload:()=>reloaded++,setInterval:()=>1,clearInterval(){}});
+ try{
+  await new Promise(resolve=>setImmediate(resolve));build='new';await guard.check();await guard.check();
+  assert.equal(guard.stale(),true);assert.equal(reloaded,0,'waiting room survives the new build');
+  route='game';await guard.check();assert.equal(reloaded,0);
+  route='room';await guard.check();assert.equal(reloaded,0,'returning after battle keeps the room');
+  state={room:{code:'ABCD',spectator:true},ui:{}};await guard.check();assert.equal(reloaded,0);
+  state={room:null,ui:{restoring:true}};route='lobby';await guard.check();assert.equal(reloaded,0,'a reconnect must not jump versions');
+  state={room:null,ui:{restoring:false}};await guard.check();assert.equal(reloaded,1,'leaving the room releases protection');
+  await guard.check();assert.equal(reloaded,1);
+ }finally{guard.stop();}
+});
+test('non-rolling builds retain match-only refresh behavior and rolling main lobby can update',()=>{
+ assert.equal(deferBuildReload({room:{},ui:{}},'room',null),false);
+ assert.equal(deferBuildReload({room:null,ui:{}},'game',null),true);
+ assert.equal(deferBuildReload({room:null,ui:{}},'lobby','old-release'),false);
 });

@@ -97,6 +97,7 @@ export class LaboratoryMatch extends Match {
     for (const ps of this.order) {
       ps.startRound(1);
       this.dispatch(ps, 'onRoundStart', { round: 1 });
+      this.dispatch(ps, 'onPrepStart', { round: 1 });
       ps.recompute();
     }
     this.hiddenReached = this.laboratory.kind === 'hidden';

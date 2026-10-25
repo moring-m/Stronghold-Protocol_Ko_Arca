@@ -256,7 +256,7 @@
   position:absolute; left:.06rem; right:auto; top:.43rem; height:.25rem;
   display:grid; place-items:center; z-index:6; pointer-events:none;
 }
-.scard__favorite { font-size: .25rem; color:#61d7ff; text-shadow:0 1px 3px #000; }
+.scard__favorite { box-sizing:border-box; padding:.025rem .06rem; font-size:.14rem; font-weight:800; color:#06141a; background:#61d7ff; text-shadow:none; }
 .scard__recruit { box-sizing:border-box; padding:.025rem .06rem; color:#06140f; background:#53e3c2; font-size: .14rem; font-weight:800; }
 .dtag-recruit { border:1px solid #53e3c2; color:#53e3c2; padding:.02rem .06rem; font-size:calc(.14 * var(--t)); }
 .lo-preset-actions { display:flex; gap:.08rem; flex-wrap:wrap; }
