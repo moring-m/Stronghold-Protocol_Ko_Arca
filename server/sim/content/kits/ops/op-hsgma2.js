@@ -109,7 +109,7 @@ export default {
         if (!e.alive) continue;
         const dealt = battle.dealDamage(unit, e, { amount: unit.s.atk * num(b2.shield_atk_scale), type: 'arts', isSkill: true, tags: ['skill', 'hsgma2:shield'] });
         if (dealt > 0 && unit.alive) battle.heal(unit, unit, dealt * num(b2.heal_ratio), { self: true, ignoreHealFree: true });
-        battle.fx('strike', { x: p.x, y: p.y, id: unit.id, skill: 'hsgma2:shield' });
+        battle.fx('strike', { x: p.x, y: p.y, id: unit.id, target: e.id, skill: 'hsgma2:shield' });
       }
     };
 

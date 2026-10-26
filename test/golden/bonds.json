@@ -444,8 +444,8 @@
       ],
       "enemies": {"enemy_1158_divman":[15,15,0,1384,44550],"enemy_1160_hvyslr":[2,2,0,1821,18000],"enemy_1161_tidmag":[1,1,0,3631,5400]},
       "hooks": [1,45,1798,197,197,285,300,505,20,33,10,9,0,4854,44,10,18,0,1,21,0,1,4],
-      "events": {"atk":208,"atkCancel":8,"atkRetarget":1,"atkStart":210,"cast":1,"deploy":24,"die":33,"dmg":300,"engage":6,"fx":85,"heal":1,"skill":23,"skillImpact":2,"spawn":44,"status":79},
-      "fx": {"aoe":4,"burst":1,"coin":18,"dodge":4,"explode":14,"flame":1,"garrisonGrant":1,"revive":1,"sp":1,"spRecovered":4,"summon":15,"swordRain":16,"swordStorm":3,"zone":2},
+      "events": {"atk":208,"atkCancel":8,"atkRetarget":1,"atkStart":210,"cast":1,"deploy":24,"die":33,"dmg":300,"engage":6,"fx":118,"heal":1,"skill":23,"skillImpact":2,"spawn":44,"status":79},
+      "fx": {"aoe":4,"burst":1,"coin":18,"dodge":4,"explode":14,"flame":1,"garrisonGrant":1,"revive":1,"sp":1,"spRecovered":4,"summon":15,"swordRain":16,"swordStorm":3,"zone":2,"zoneHit":33},
       "snaps": "6ea08358 babee7ff bf2f8555 958077f3 19a279be eec6ba67"
     },
     "bond-investShip-high": {

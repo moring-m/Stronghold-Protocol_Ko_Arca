@@ -29,7 +29,7 @@ function lumen(bb, chess, def) {
           if (a.kind === 'device' || a.s.flags.noHeal || a.profile?.noHeal) continue; // a heal: never on 禁疗 / 孤立
           battle.addBuff(a, {
             key: `lumen:rain:${unit.id}`, duration: life, interval: iv, refresh: 'replace', visible: true, source: unit,
-            onTick: ({ unit: x }) => { if (x.hp < x.s.maxHp) battle.heal(unit, x, unit.s.atk * sc, { hot: true }); },
+            onTick: ({ unit: x }) => { if (x.hp < x.s.maxHp) { battle.heal(unit, x, unit.s.atk * sc, { hot: true }); battle.fx('rainHeal', { x: x.x, y: x.y, id: unit.id, target: x.id }); } },
           });
         }
       },

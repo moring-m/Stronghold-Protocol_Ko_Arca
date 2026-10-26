@@ -1332,6 +1332,18 @@ export function chargeKeys(plan) {
  */
 const binding = (o) => Object.freeze({ ...o, ...(o.cover ? { cover: Object.freeze(o.cover) } : {}), ...(o.keys ? { keys: Object.freeze(o.keys) } : {}) });
 export const FX_BINDINGS = Object.freeze({
+  // Official buff ticks the kits now mark (2026-10-26 audit: effects the plan could not place, render/vfx coverage
+  // `tick`): each is the buff template's ON_BUFF_TRIGGER CreateEffect on its targets (or its owner).
+  // 斥罪 S2 (op-judge.js 'aoe' every S2_EVERY s: judge_s_2[aoe] AOEDamage + CreateEffect on her)
+  skchr_judge_2: Object.freeze({ aoe: binding({ owner: 'id', keys: ['judge_skill_02_hit_01', 'judge_skill_02_weapon_hit_01'], during: true }) }),
+  // 死芒 S2 (op-necras.js 'linkHit' on each linked enemy per damage tick: necras_s_2 CreateEffect on targets)
+  skchr_necras_2: Object.freeze({ linkHit: binding({ owner: 'id', keys: ['necras_skill_02_hit_01'], at: 'target', during: true }) }),
+  // 流明 S1 ('rainHeal' on each ally a heal tick of the field reaches: lumen_s_1[heal] on targets)
+  skchr_lumen_1: Object.freeze({ rainHeal: binding({ owner: 'id', keys: ['lumen_skill_01_hit'], at: 'target' }) }),
+  // 森蚺 the 2nd's S2 shield ('strike' on each enemy it hits: hsgma2_s_2[projectile] on targets)
+  skchr_hsgma2_2: Object.freeze({ strike: binding({ owner: 'id', keys: ['hsgma2_skill_02_hit_04'], at: 'target', during: true }) }),
+  // 缇缇 S3 ('wake' on the enemy whose sleep ends while it lasts: titi_s_3[dmg_ticker] on targets)
+  skchr_titi_3: Object.freeze({ wake: binding({ owner: 'skill', keys: ['titi_skill_03_hit_02'], at: 'target', target: 'id', during: true }) }),
   // These conditional effects have exact kit events, rather than a generic attack/skill-start cue.
   skchr_yu_2: Object.freeze({ teleport: binding({owner:'src',keys:['yu_skill2_teleport_02'],at:'point',oneshot:true}) }),
   skchr_reed2_3: Object.freeze({ scorchBurst: binding({owner:'id',keys:['reed2_debuff_boom_01'],at:'point',oneshot:true}) }),
@@ -1348,8 +1360,8 @@ export const FX_BINDINGS = Object.freeze({
   // 锡人 S1 / S2 (chess_char_2_19-tinman.js: the 'zone' on the struck tile, id = him, dur = the area's time): the client's
   // flask (projectile_chr_tinman_s1 / _s2) lands there — its reached effects are the ring (tinman_skill_0N_range_01,
   // looping), the flask on the ground (_token_01, looping) and the splash (_start_01 / _02)
-  skchr_tinman_1: Object.freeze({ zone: binding({ owner: 'id', projectile: 'projectile_chr_tinman_s1', at: 'point', hold: 'fx', holdS: 8, during: true, cover: ['zone'] }) }),
-  skchr_tinman_2: Object.freeze({ zone: binding({ owner: 'id', projectile: 'projectile_chr_tinman_s2', at: 'point', hold: 'fx', holdS: 8, during: true, cover: ['zone'] }) }),
+  skchr_tinman_1: Object.freeze({ zone: binding({ owner: 'id', projectile: 'projectile_chr_tinman_s1', at: 'point', hold: 'fx', holdS: 8, during: true, cover: ['zone'] }), zoneHit: binding({ owner: 'id', keys: ['tinman_skill_01_hit_01'], at: 'target' }) }),
+  skchr_tinman_2: Object.freeze({ zone: binding({ owner: 'id', projectile: 'projectile_chr_tinman_s2', at: 'point', hold: 'fx', holdS: 8, during: true, cover: ['zone'] }), zoneHit: binding({ owner: 'id', keys: ['tinman_skill_02_hit_01'], at: 'target' }) }),
   // 引星棘刺 S1 / S3 (chess_char_5_15-thorn2.js: a 'zone' on each chosen ally's tile, id = her, duration): the unit she
   // throws (projectile_chr_thorn2_s1 / _s3) lands there — thorn2_token_start, the unit (thorn2_skill_0N_token, looping),
   // S1's ring (thorn2_skill_01_range). S2's keyed moving unit and growing ring are driven by KitProjectileFx.
