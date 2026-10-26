@@ -56,7 +56,7 @@ function blkkgt(bb, chess, def) {
         if (v.length) battle.fx('slash', { x: unit.x, y: unit.y, id: unit.id, n: v.length });
         for (const e of v) {
           const n = e.blockedBy ? nBlocked : nFree;
-          for (let i = 0; i < n && e.alive; i++) battle.dealDamage(unit, e, { amount: unit.s.atk * num(bb.dot_scale, 1), type: 'phys', isSkill: true, tags: ['skill', 'slash'] });
+          for (let i = 0; i < n && e.alive; i++) { battle.dealDamage(unit, e, { amount: unit.s.atk * num(bb.dot_scale, 1), type: 'phys', isSkill: true, tags: ['skill', 'slash'] }); battle.fx('slashHit', { x: e.x, y: e.y, id: unit.id, target: e.id }); }
         }
       },
     },

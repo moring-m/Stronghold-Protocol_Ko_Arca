@@ -127,7 +127,7 @@ export default {
               if (s.k >= S3_CYCLES) { finish(battle, unit, s); return; }
               const foes = cutTargets(battle, unit);
               if (foes.length) battle.fx('aoe', { x: unit.x, y: unit.y, radius: 0.6, id: unit.id, skill: 'huang:cut' });
-              for (const e of foes) if (e.alive) battle.dealDamage(unit, e, { amount: unit.s.atk, type: 'phys', isSkill: true, tags: ['skill'] });
+              for (const e of foes) if (e.alive) { battle.dealDamage(unit, e, { amount: unit.s.atk, type: 'phys', isSkill: true, tags: ['skill'] }); battle.fx('cutHit', { x: e.x, y: e.y, id: unit.id, target: e.id }); }
             }
           },
           onEnd({ battle, unit, reason }) {

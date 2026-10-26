@@ -226,8 +226,8 @@
       ],
       "enemies": {"enemy_1249_lysdb_2":[5,5,0,3130,107495],"enemy_1430_lrrook":[2,0,0,0,243339],"enemy_9017_achunt":[1,0,0,90030,352679]},
       "hooks": [1,32,6000,300,323,747,944,1461,15,16,16,14,0,6719,4,7,8,0,1,14,0,17,0],
-      "events": {"atk":318,"atkCancel":2,"atkStart":304,"cast":7,"deploy":18,"die":16,"dmg":930,"engage":6,"fx":813,"heal":96,"skill":30,"spawn":25,"status":104},
-      "fx": {"aoe":13,"burst":17,"charge":7,"flame":70,"shield":8,"shieldBreak":5,"spRecovered":15,"takeoff":1,"thorns":5,"tornado":648,"tornadoPulse":23,"undying":1},
+      "events": {"atk":318,"atkCancel":2,"atkStart":304,"cast":7,"deploy":18,"die":16,"dmg":930,"engage":6,"fx":814,"heal":96,"skill":30,"spawn":25,"status":104},
+      "fx": {"aoe":13,"burst":17,"charge":7,"cutHit":1,"flame":70,"shield":8,"shieldBreak":5,"spRecovered":15,"takeoff":1,"thorns":5,"tornado":648,"tornadoPulse":23,"undying":1},
       "snaps": "68e6d16e ff550fbf b523d0a4 47cd10b0 f98b531c ac8cb19c e3226734 66db8078 d40b9a24 c1773727 7ebfbe2e 265ae5f2 99b41569 d58775c0 a69c377e 660f0fe6 9a53378c 22e0910b 4e906e35 a88c5f88"
     },
     "boss-boss_3-pair": {
@@ -620,8 +620,8 @@
         "enemy_9032_aclionk": [1,0,0,31907,719042]
       },
       "hooks": [1,53,6000,548,559,931,1141,141,24,26,35,31,32,23401,177,10,15,0,1,15,0,0,0],
-      "events": {"atk":612,"atkCancel":9,"atkStart":569,"cast":25,"deploy":34,"die":26,"dmg":983,"energy":101,"engage":12,"fx":535,"heal":62,"skill":66,"spawn":41,"status":402},
-      "fx": {"aoe":15,"appear":2,"buff":1,"crit":23,"disappear":2,"drone":66,"droneLock":11,"drones":2,"equip":8,"explode":5,"heal":6,"lightning":58,"shield":24,"spRecovered":8,"sword":6,"takeoff":1,"telegraph":17,"thorns":5,"tornado":239,"tornadoPulse":31,"vest":2,"volley":3},
+      "events": {"atk":612,"atkCancel":9,"atkStart":569,"cast":25,"deploy":34,"die":26,"dmg":983,"energy":101,"engage":12,"fx":543,"heal":62,"skill":66,"spawn":41,"status":402},
+      "fx": {"aoe":15,"appear":2,"buff":1,"crit":23,"cutHit":8,"disappear":2,"drone":66,"droneLock":11,"drones":2,"equip":8,"explode":5,"heal":6,"lightning":58,"shield":24,"spRecovered":8,"sword":6,"takeoff":1,"telegraph":17,"thorns":5,"tornado":239,"tornadoPulse":31,"vest":2,"volley":3},
       "snaps": "106eab1a bc7e6b81 d0ce0734 f2cf7570 060dc6b7 76d33f97 7260079a e96985b4 db5e9a48 451b9ade 9a8854b4 3a2ff4bf c902cafb a54e38be dbd4fe94 b3dcfa61 2bbc4123 d514977b 7449a68b 903504f2"
     },
     "boss-boss_6-solo": {

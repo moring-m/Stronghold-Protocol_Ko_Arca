@@ -224,6 +224,7 @@ export default {
               unit.mem.beamNext += iv;
               for (const e of battle.enemiesInKeys(unit.rangeKeys, unit, unit.profile)) {
                 battle.dealDamage(unit, e, { amount: unit.s.atk * num(b2.atk_scale), type: 'arts', isSkill: true, tags: ['skill', 'aphris:beam'] });
+                battle.fx('beamHit', { x: e.x, y: e.y, id: unit.id, target: e.id });
               }
             }
           },

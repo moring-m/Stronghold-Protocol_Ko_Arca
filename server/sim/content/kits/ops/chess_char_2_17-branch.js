@@ -20,7 +20,7 @@ export default {
           const grid = def?.skill?.rangeGrid;
           const foes = grid ? enemiesInGrid(battle, unit, grid, { canHitFly: false, groundOnly: true }) : battle.foesInRadius(unit.x, unit.y, 1.5).filter((e) => !e.isFlying);
           battle.fx('aoe', { x: unit.x, y: unit.y, radius: 1.5, id: unit.id, skill: 'resolve' });
-          for (const e of foes) battle.applyStatus(e, 'tremble', { duration: num(bb.not_combat), source: unit });
+          for (const e of foes) { battle.applyStatus(e, 'tremble', { duration: num(bb.not_combat), source: unit }); battle.fx('resolveHit', { x: e.x, y: e.y, id: unit.id, target: e.id }); }
         },
       },
       skills: {

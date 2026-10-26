@@ -1566,8 +1566,8 @@
       ],
       "enemies": {"enemy_1010_demon":[7,5,2,514,43200],"enemy_1422_lrsldr_2":[14,14,0,285,88704],"enemy_1425_lrcmra_2":[3,3,0,5286,86400]},
       "hooks": [1,32,2839,140,140,388,430,1,23,25,8,6,10,3035,1,18,24,2,1,23,0,0,0],
-      "events": {"atk":163,"atkStart":145,"deploy":8,"die":23,"dmg":430,"engage":5,"fx":71,"heal":1,"leak":2,"skill":14,"spawn":32,"status":6},
-      "fx": {"aoe":13,"flame":40,"heal":1,"sp":6,"spRecovered":11},
+      "events": {"atk":163,"atkStart":145,"deploy":8,"die":23,"dmg":430,"engage":5,"fx":84,"heal":1,"leak":2,"skill":14,"spawn":32,"status":6},
+      "fx": {"aoe":13,"cutHit":13,"flame":40,"heal":1,"sp":6,"spRecovered":11},
       "snaps": "f4250129 824c3151 e06ebab1 0dd2dbef 2552142d a8d03f17 15d737d3 1a9538b8 c9ca3ac9 f263e0a2"
     },
     "bond-victoriaShip-low": {

@@ -44,6 +44,7 @@ export default withDefaults({
               L.acc -= 1;
               for (const e of enemiesOnRange(battle, unit)) {
                 battle.dealDamage(unit, e, { amount: unit.s.atk * num(bb.atk_scale, 1), type: 'arts', isSkill: true, tags: ['skill', 'timeLock'] });
+                battle.fx('lockHit', { x: e.x, y: e.y, id: unit.id, target: e.id });
               }
             }
           },

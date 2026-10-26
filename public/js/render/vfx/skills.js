@@ -1332,6 +1332,18 @@ export function chargeKeys(plan) {
  */
 const binding = (o) => Object.freeze({ ...o, ...(o.cover ? { cover: Object.freeze(o.cover) } : {}), ...(o.keys ? { keys: Object.freeze(o.keys) } : {}) });
 export const FX_BINDINGS = Object.freeze({
+  skchr_wang_2: Object.freeze({ stoneHit: binding({ owner: 'id', keys: ['token_wang_skill_02_hit_02'], at: 'target' }) }),
+  skchr_ayer_2: Object.freeze({ strike: binding({ owner: 'src', keys: ['ayer_skill_02_hit_02'], at: 'target', target: 'id', during: true }) }),
+  skchr_branch_2: Object.freeze({ resolveHit: binding({ owner: 'id', keys: ['branch_skill_02_hit_01'], at: 'target', during: true }) }),
+  skchr_blkkgt_2: Object.freeze({ slashHit: binding({ owner: 'id', keys: ['blkkgt_skill_02_hit_1'], at: 'target', during: true }) }),
+  skchr_hsguma_3: Object.freeze({ sawHit: binding({ owner: 'id', keys: ['hsguma_skill_03_hit'], at: 'target', during: true }) }),
+  skchr_aphris_2: Object.freeze({ beamHit: binding({ owner: 'id', keys: ['aphris_skill_02_hit_01'], at: 'target', during: true }) }),
+  skchr_mostma_2: Object.freeze({ lockHit: binding({ owner: 'id', keys: ['mostma_skill_02_hit'], at: 'target', during: true }) }),
+  skchr_huang_3: Object.freeze({ cutHit: binding({ owner: 'id', keys: ['huang_attack_01_hit'], at: 'target', during: true }) }),
+  // Channel ticks and hits of non-attack abilities the kits now mark (2026-10-26 audit: `channel-hit`, `hit-no-attack`):
+  // the official hit effect on each enemy the tick or ability damages. 煌 S3 'cutHit', 莫斯提马 S2 'lockHit', 谬因 S2
+  // 'beamHit', 斑点 S3 'sawHit' (ChannelingMeleeAttack hits); 锏 S2 'slashHit', 折桠 S2 'resolveHit', 断崖 S2 'strike'
+  // (its blockees' blade), 望 S2 'stoneHit' (the stone's row / column blast: token_wang skill 2's hit)
   // Official buff ticks the kits now mark (2026-10-26 audit: effects the plan could not place, render/vfx coverage
   // `tick`): each is the buff template's ON_BUFF_TRIGGER CreateEffect on its targets (or its owner).
   // 斥罪 S2 (op-judge.js 'aoe' every S2_EVERY s: judge_s_2[aoe] AOEDamage + CreateEffect on her)
