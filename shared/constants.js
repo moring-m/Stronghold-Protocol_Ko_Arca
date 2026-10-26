@@ -4,7 +4,7 @@ import {N_} from './i18n.js';
 
 export const PROTOCOL_VERSION = 1;
 export const BASE_VERSION = '0.3.3';
-export const APP_VERSION = '0.3.3a1';
+export const APP_VERSION = '0.3.3b';
 export const DEV_BUILD = /-dev$/.test(APP_VERSION);
 /**
  * The plugin API levels this build supports (DESIGN §32, shared/plugins/manifest.js): a manifest 2 states the level it

@@ -11,6 +11,7 @@
 //        &attack=<unit id> (the wiring demo: that unit attacks a dummy 3 tiles away every second — its casts,
 //        projectile and hits from index.json through render/vfx/wiring.js, as in a battle) &kind=<projKind> &skill=1
 //        &dist=<tiles> (to the dummy; with &face=L it stands on the left and the attacker faces it)
+//        &skin=<costume mount> (the attacker wears that outfit: its costume effects, render/vfx/costumes.js)
 //        &skilldemo=<unit id> (the skill demo, render/vfx/skillfx.js: that unit's official skill — &s=<skill slot, 0-based>
 //        or &sid=<skill id> — turns on, attacks the dummy every second and turns off, every 6 s; &instant=1 one attack
 //        between on and off in one frame, &passive=1 deployed instead, &charge=<n> stores n energies a cycle and releases
@@ -211,7 +212,7 @@ async function main() {
   const wiring = new FxWiring(ofx, { speed: projSpeed });
   await wiring.ready();
   const fake = (id, unitKey, col, row, enemy) => ({ id, x: col, y: row, z: 0, hover: 0, visFacing: enemy ? -1 : 1, isEnemy: enemy, alive: true, flags: 0,
-    info: { id, spine: unitKey, defId: unitKey, side: enemy ? 'enemy' : 'ally', kind: enemy ? 'enemy' : 'op', skillIndex: 0 } });
+    info: { id, spine: unitKey, defId: unitKey, side: enemy ? 'enemy' : 'ally', kind: enemy ? 'enemy' : 'op', skillIndex: 0, ...(!enemy && q.get('skin') ? { skin: q.get('skin') } : {}) } });
   function startAttackDemo(unitKey, o = {}) {
     ofx.clear(); wiring.clear();
     demo.on = true; demo.t = 0; demo.kind = o.kind || demo.kind;
