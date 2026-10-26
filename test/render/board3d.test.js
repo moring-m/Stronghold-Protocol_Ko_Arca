@@ -156,12 +156,13 @@ describe('board geometry (layout.js)', () => {
         assert.ok(tops > 100, `${id} tops`);
         const G = b.grid;
         // Gates come from the whole grid, not from the drawn tiles (the enemy half's start gate is outside the
-        // current area); a boss field keeps only the gates inside AREAS.boss.
+        // current area), in the rows the area builds; a boss field keeps only the gates inside AREAS.boss.
         const bossField = area === AREAS.boss;
         const expected = [];
         for (const row of G) for (const t of row) {
           if (t.glyph !== 'S' && t.glyph !== 'E') continue;
           if (bossField && !area.some((a) => t.r >= a.r0 && t.r <= a.r1 && t.c >= a.c0 && t.c <= a.c1)) continue;
+          if (!bossField && area && !area.some((a) => t.r >= a.r0 && t.r <= a.r1)) continue;
           expected.push(`${t.r},${t.c}`);
         }
         assert.deepEqual(b.gates.map((x) => `${x.r},${x.c}`).sort(), expected.sort(), `${id} gates`);
@@ -186,7 +187,11 @@ describe('board geometry (layout.js)', () => {
     for (const id of ACTIVE) {
       const whole = buildBoard(stages[id], { area: AREAS.all }).gates;
       const normal = buildBoard(stages[id], { area: AREAS.normal }).gates;
-      assert.deepEqual(normal.map((g) => `${g.r},${g.c}`).sort(), whole.map((g) => `${g.r},${g.c}`).sort(), `${id}: a half shows every gate`);
+      const rows = (g, set) => set.some((a) => g.r >= a.r0 && g.r <= a.r1);
+      assert.deepEqual(normal.map((g) => `${g.r},${g.c}`).sort(), whole.filter((g) => rows(g, AREAS.normal)).map((g) => `${g.r},${g.c}`).sort(), `${id}: a half shows every gate of its rows`);
+      // the battle view builds the field without the pen: the pen's gates do not float over the scenery
+      const battle = buildBoard(stages[id], { area: AREAS.normal.filter((a) => a.r1 <= 13) }).gates;
+      assert.ok(battle.every((g) => g.r <= 13), `${id}: no pen gate in battle`);
       if (normal.some((g) => !inArea(g, AREAS.normal))) sawOutsideGate = true;
       for (const g of buildBoard(stages[id], { area: AREAS.boss }).gates) assert.ok(inArea(g, AREAS.boss), `${id}: the boss field keeps only its own gates`);
     }
