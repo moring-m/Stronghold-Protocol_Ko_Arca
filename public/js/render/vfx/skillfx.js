@@ -1007,6 +1007,8 @@ export class SkillFx {
       const g = COND_BUFFS[e.buff];
       if (!g) continue;
       if (g.always) { if (g.always.includes(e.key)) want.set(e.key, e); continue; }
+      if (g.byFacing) { if (on && g.byFacing[(v.visFacing ?? 1) < 0 ? 'left' : 'right']?.includes(e.key)) want.set(e.key, e); continue; }
+      if (g.whileBlocked) { if (on && ((v.flags | 0) & UF.BLOCKED) && g.whileBlocked.includes(e.key)) want.set(e.key, e); continue; }
       if (g.counts) { const n = Math.min(3, Array.isArray(v.charges) ? Number(v.charges[0]) | 0 : 0); if (g.counts[n]?.includes(e.key)) want.set(e.key, e); continue; }
       const st = condState({ on, charged: !!U.charged, charges: v.charges, byCharges: !!g.byCharges });
       if (st && g[st]?.includes(e.key)) want.set(e.key, e);

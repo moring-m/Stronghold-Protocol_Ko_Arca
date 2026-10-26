@@ -543,6 +543,9 @@ export const COND_BUFFS = Object.freeze({
   'lumen_s_2[eff_cond]': Object.freeze({ byCharges: true, full: ['lumen_skill_02_buff_02'], ready: ['lumen_skill_02_buff'] }),
   'malist_s_2[eff_cond]': Object.freeze({ byCharges: true, full: ['malist_skill_2_buff_weapon', 'malist_skill_2_buff'], ready: ['malist_skill_2_buff_weapon', 'malist_skill_2_buff'] }),
   // Mon3tr S1: any charge stored; 雷蛇 the 2nd S1: one more loop per charge stored (`counts`: stored charges → loops)
+  // while the skill runs: 安洁莉娜 the 2nd S3 by her left / right facing (CheckFaceLOrR); 莱伊 S2 while she blocks (CheckBlocked)
+  'aglna2_s_3[mode]': Object.freeze({ byFacing: Object.freeze({ right: ['aglna2_skill_03_buff_right_01'], left: ['aglna2_skill_03_buff_left_01'] }) }),
+  'lessng_s2[eff_manager]': Object.freeze({ whileBlocked: ['lessng_skill_02_buff_2'] }),
   // 卡夫卡 S1: its SP ratio test (≥ 0) always passes — the loop shows while the passive is equipped
   'caper_s_1[effect_trigger]': Object.freeze({ always: ['caper_skill_01_buff'] }),
   'monstr_s_1[ready]': Object.freeze({ byCharges: true, full: ['monstr_skill_01_buff'], ready: ['monstr_skill_01_buff'] }),
@@ -1349,6 +1352,11 @@ export function chargeKeys(plan) {
  */
 const binding = (o) => Object.freeze({ ...o, ...(o.cover ? { cover: Object.freeze(o.cover) } : {}), ...(o.keys ? { keys: Object.freeze(o.keys) } : {}) });
 export const FX_BINDINGS = Object.freeze({
+  skchr_rmixer_2: Object.freeze({ shield: binding({ owner: 'id', keys: ['rmixer_skill_02_start_02'], oneshot: true, during: true }) }),
+  skchr_philae_2: Object.freeze({ rageStart: binding({ owner: 'id', keys: ['philae_skill_02_start_02'], oneshot: true, during: true }), rage: binding({ owner: 'id', keys: ['philae_skill_02_buff_02'], hold: 'fx', during: true, refresh: true }), aoe: binding({ owner: 'id', keys: ['philae_skill_02_start_01'], oneshot: true, during: true }) }),
+  // 菲莱 S2 philae_s_2: the first element hit of the skill ('rageStart' one-shot, 'rage' held for the rest of it), the
+  // retaliation burst ('aoe' on her: CreateEffect philae_skill_02_start_01); 信仰搅拌机 S2 rmixer_sk2: the fatal hit the
+  // ammo blocks ('shield' on him: CreateEffect rmixer_skill_02_start_02)
   skchr_ascln_2: Object.freeze({ aoe: binding({ owner: 'id', keys: ['ascln_skill_02_death_01'], at: 'point', oneshot: true, during: true }) }),
   skchr_slent2_3: Object.freeze({ undying: binding({ owner: 'src', keys: ['slent2_skill_03_buff_02'], hold: 'fx', refresh: true }) }),
   skchr_demetr_1: Object.freeze({ means: binding({ owner: 'src', keys: ['demetr_buff_01'], hold: 'fx', refresh: true }) }),
