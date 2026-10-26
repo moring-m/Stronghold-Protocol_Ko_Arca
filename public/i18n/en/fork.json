@@ -3033,5 +3033,8 @@
   "살카즈 대검사 계열의 연속 공격이 대기 자세로 되돌아가는 문제를 수정했습니다. 타격 시점과 공격 후딜레이는 유지됩니다.": "Fixed Sarkaz greatsword enemies returning to their resting pose between consecutive attacks. Hit timing and attack recovery remain unchanged.",
   "최근 {max}개 기록을 보관하며, 상세 기록은 별도로 저장합니다.": "Keeps the latest {max} matches, with full details stored separately.",
   "통합": "Combined",
-  "통합 패치노트": "Combined Patch Notes"
+  "통합 패치노트": "Combined Patch Notes",
+  "유구한 물결": "Enduring Current",
+  "밤길의 촛불": "Candlelight on the Night Road",
+  "태평성대의 풍경": "Portrait of Prosperity"
 }

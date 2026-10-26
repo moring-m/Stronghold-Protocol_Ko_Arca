@@ -1,6 +1,7 @@
 // Add freshly extracted effects to the resource repository's additive FX supplement (never replacing a key or a file).
 //
 //   node tools/add-fx-supplement.mjs EXTRACT_FX_DIR LOCAL_FX_JSON ASSET_REPO [--keys k1,k2] [--units u1,u2]
+//   node tools/add-fx-supplement.mjs --pack PACK_DIR ASSET_REPO      (a tools/prepare-costume-fx.mjs output)
 //
 // EXTRACT_FX_DIR is an `extract.py --only fx` / fx.export_fx output (index.json, textures.json, prefabs/, tex/, mesh/),
 // LOCAL_FX_JSON its file list. The prefabs named by --keys (default: every prefab of the extract), the units named by
@@ -79,7 +80,43 @@ export async function addSupplement(extractDir, localFxPath, repo, { keys = null
   return added;
 }
 
+/**
+ * Merge a prepared supplement pack (tools/prepare-costume-fx.mjs OUTPUT: supplement.json + files/) into the repository's
+ * supplement: every section entry and file it does not hold yet (an existing key keeps its value, an existing file must
+ * be byte-identical).
+ */
+export async function mergePack(packDir, repo) {
+  const pack = await read(resolve(packDir, 'supplement.json'));
+  const supPath = resolve(repo, 'metadata/costume-supplement.json'), invPath = resolve(repo, 'inventory.json');
+  const sup = await read(supPath), inv = await read(invPath);
+  const added = { entries: 0, files: 0, bytes: 0 };
+  for (const section of ['units', 'skills', 'projectiles', 'skins', 'prefabs', 'textures', 'costumes']) {
+    for (const [k, v] of Object.entries(pack[section] || {})) if (!(sup[section] ??= {})[k]) { sup[section][k] = v; added.entries++; }
+  }
+  for (const [g, rows] of Object.entries(pack.groups || {})) for (const [k, v] of Object.entries(rows)) (sup.groups[g] ??= {})[k] ??= v;
+  const files = new Map(sup.files.map((f) => [f.path, f])), rows = new Map(inv.inventory.map((f) => [f.path, f]));
+  for (const f of pack.files) {
+    const from = resolve(packDir, 'files', f.path.slice('/assets/local/fx/'.length)), to = resolve(repo, 'public' + f.path);
+    const bytes = await readFile(from);
+    if (sha(bytes) !== f.sha256) throw Error('Pack hash mismatch: ' + f.path);
+    let prior = null; try { prior = await readFile(to); } catch (e) { if (e.code !== 'ENOENT') throw e; }
+    if (prior && sha(prior) !== f.sha256) throw Error('Refusing to replace a different payload: ' + f.path);
+    if (!prior) { await mkdir(dirname(to), { recursive: true }); await copyFile(from, to); added.files++; added.bytes += bytes.length; }
+    const row = { path: f.path, bytes: f.bytes, sha256: f.sha256 };
+    files.set(f.path, row); rows.set(f.path, row);
+  }
+  sup.files = [...files.values()];
+  inv.inventory = [...rows.values()]; inv.files = rows.size; inv.bytes = inv.inventory.reduce((n, f) => n + f.bytes, 0);
+  await writeFile(supPath, JSON.stringify(sup));
+  await writeFile(invPath, JSON.stringify(inv, null, 2) + '\n');
+  return added;
+}
+
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  if (process.argv[2] === '--pack') {
+    console.log(JSON.stringify(await mergePack(resolve(process.argv[3]), resolve(process.argv[4]))));
+    process.exit(0);
+  }
   const [extractDir, localFx, repo, ...rest] = process.argv.slice(2);
   const opt = (name) => { const i = rest.indexOf(name); return i >= 0 ? rest[i + 1].split(',').filter(Boolean) : null; };
   if (!repo) throw Error('Usage: add-fx-supplement.mjs EXTRACT_FX_DIR LOCAL_FX_JSON ASSET_REPO [--keys k1,k2] [--units u1,u2]');
