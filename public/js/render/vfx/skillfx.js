@@ -1145,8 +1145,9 @@ export class SkillFx {
       : Number(bb[bind.hold]) > 0 ? Number(bb[bind.hold]) : bind.holdS || SKILL_CAST_S;
     let drew = false;
     // `refresh`: the loop held on this unit for the binding is replaced, not stacked
-    const slot = bind.refresh ? `${keys.join(',')}|${tv?.id ?? `${Math.round(x)},${Math.round(y)}`}` : null;
+    const slot = bind.refresh || bind.release ? `${keys.join(',')}|${tv?.id ?? `${Math.round(x)},${Math.round(y)}`}` : null;
     if (slot) { for (const h of this.held.get(slot) || []) h.stop(); this.held.delete(slot); }
+    if (bind.release) return true;
     for (const k of keys) {
       const h = this.w.playOn(k, at, { loop: true, important: true, flipFrom:U.v || undefined });
       if (!h) continue;

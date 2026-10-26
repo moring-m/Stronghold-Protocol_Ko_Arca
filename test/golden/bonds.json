@@ -1033,8 +1033,8 @@
       ],
       "enemies": {"enemy_1010_demon":[7,7,0,4831,130637],"enemy_1422_lrsldr_2":[14,14,0,128,191601],"enemy_1425_lrcmra_2":[3,3,0,1991,186624]},
       "hooks": [1,44,1982,188,207,228,230,127,24,32,9,6,16,2598,19,17,24,0,1,24,0,0,0],
-      "events": {"atk":208,"atkCancel":7,"atkRetarget":1,"atkStart":204,"deploy":18,"die":32,"dmg":227,"engage":6,"fx":14,"heal":95,"skill":15,"spawn":36,"status":48},
-      "fx": {"aoe":8,"blink":6},
+      "events": {"atk":208,"atkCancel":7,"atkRetarget":1,"atkStart":204,"deploy":18,"die":32,"dmg":227,"engage":6,"fx":26,"heal":95,"skill":15,"spawn":36,"status":48},
+      "fx": {"aoe":8,"auraIn":6,"auraOut":6,"blink":6},
       "snaps": "5707567a afe18ec3 f8bc27f7 3fbdd752 0f1ad978 f2386a93 c93ccef0"
     },
     "bond-sargonShip-low": {

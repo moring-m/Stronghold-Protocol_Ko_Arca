@@ -795,8 +795,8 @@
         "enemy_1535_wlfmster": [1,0,0,7078,37800]
       },
       "hooks": [1,126,5700,709,1074,1697,1671,510,107,114,17,16,64,27028,239,57,100,2,1,109,0,0,46],
-      "events": {"atk":861,"atkCancel":21,"atkRetarget":22,"atkStart":753,"bounty":2,"cast":2,"deploy":26,"die":112,"dmg":1670,"engage":11,"fx":189,"heal":510,"leak":2,"skill":36,"spawn":114,"status":246},
-      "fx": {"aoe":62,"beam":3,"displace":1,"dodge":46,"dp":11,"phase":15,"revive":4,"shieldBreak":21,"slash":18,"spRecovered":3,"summon":1,"takeoff":2,"telegraph":1,"zone":1},
+      "events": {"atk":861,"atkCancel":21,"atkRetarget":22,"atkStart":753,"bounty":2,"cast":2,"deploy":26,"die":112,"dmg":1670,"engage":11,"fx":243,"heal":510,"leak":2,"skill":36,"spawn":114,"status":246},
+      "fx": {"aoe":62,"auraIn":27,"auraOut":27,"beam":3,"displace":1,"dodge":46,"dp":11,"phase":15,"revive":4,"shieldBreak":21,"slash":18,"spRecovered":3,"summon":1,"takeoff":2,"telegraph":1,"zone":1},
       "snaps": "f7461744 afea01ef 18336010 15253154 c79d01d1 e50cb712 8e6a1ab8 9cb9e5f3 b6c59ec4 5e39d97f 31a758aa 90bf2687 257d126c 04a41757 b80c7947 443b11ff 4ae7b355 5c31a8d6 d89b61f9"
     },
     "roster-016": {
@@ -1463,8 +1463,8 @@
         "enemy_9006_actoxi": [30,6,24,13959,140228]
       },
       "hooks": [1,131,5790,498,528,594,1268,261,28,115,18,16,50,21154,66,7,98,75,1,28,0,0,9],
-      "events": {"atk":632,"atkCancel":10,"atkRetarget":11,"atkStart":491,"bounty":1,"cast":2,"deploy":33,"die":40,"dmg":580,"engage":7,"fx":67,"heal":261,"leak":75,"skill":34,"spawn":118,"status":147},
-      "fx": {"aoe":21,"dodge":9,"explode":12,"shield":13,"zone":12},
+      "events": {"atk":632,"atkCancel":10,"atkRetarget":11,"atkStart":491,"bounty":1,"cast":2,"deploy":33,"die":40,"dmg":580,"engage":7,"fx":111,"heal":261,"leak":75,"skill":34,"spawn":118,"status":147},
+      "fx": {"aoe":21,"auraIn":22,"auraOut":22,"dodge":9,"explode":12,"shield":13,"zone":12},
       "snaps": "6edb2c5c f24936ed 262e7dee 1d7802ee 488ff081 3792adc4 6b923e0c cc92edd0 6d0d6fc1 406cecf0 a18429f0 ce765427 dd94bef6 29ba5ed1 34fd68bb 6934f7cb b6b48444 493082e8 aac851d2 f42374f2"
     },
     "roster-028": {
@@ -2248,8 +2248,8 @@
         "enemy_9010_acpupp": [1,1,0,0,11535]
       },
       "hooks": [1,131,6011,412,792,1231,1226,0,111,118,19,16,74,25807,212,29,110,0,1,112,0,0,0],
-      "events": {"atk":643,"atkCancel":18,"atkRetarget":15,"atkStart":433,"bounty":3,"deploy":21,"die":118,"dmg":1228,"engage":7,"fx":117,"skill":37,"spawn":124,"status":309},
-      "fx": {"aoe":70,"dp":7,"ember":1,"phase":1,"shieldBreak":1,"slash":32,"spRecovered":1,"takeoff":3,"telegraph":1},
+      "events": {"atk":643,"atkCancel":18,"atkRetarget":15,"atkStart":433,"bounty":3,"deploy":21,"die":118,"dmg":1228,"engage":7,"fx":203,"skill":37,"spawn":124,"status":309},
+      "fx": {"aoe":70,"auraIn":43,"auraOut":43,"dp":7,"ember":1,"phase":1,"shieldBreak":1,"slash":32,"spRecovered":1,"takeoff":3,"telegraph":1},
       "snaps": "cb6d05f1 04d58ee9 481d3daa 3d4a6015 74480c9a f43c9b9c b7a36775 9670b978 747feee1 9868d4eb a7dfdc91 398ecacf 2004c303 d479272f 2ad6398d e757cefa a4cd0ef0 313c360a 9a2ad05e 10f1aaf0"
     },
     "roster-042": {

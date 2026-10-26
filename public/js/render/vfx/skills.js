@@ -1375,7 +1375,7 @@ export const FX_BINDINGS = Object.freeze({
   // 菲莱 S2 philae_s_2: the first element hit of the skill ('rageStart' one-shot, 'rage' held for the rest of it), the
   // retaliation burst ('aoe' on her: CreateEffect philae_skill_02_start_01); 信仰搅拌机 S2 rmixer_sk2: the fatal hit the
   // ammo blocks ('shield' on him: CreateEffect rmixer_skill_02_start_02)
-  skchr_ascln_2: Object.freeze({ aoe: binding({ owner: 'id', keys: ['ascln_skill_02_death_01'], at: 'point', oneshot: true, during: true }) }),
+  skchr_ascln_2: Object.freeze({ aoe: binding({ owner: 'id', keys: ['ascln_skill_02_death_01'], at: 'point', oneshot: true, during: true }), auraIn: binding({ owner: 'src', keys: ['ascln_buff_01'], hold: 'fx', holdS: 600, refresh: true }), auraOut: binding({ owner: 'src', keys: ['ascln_buff_01'], release: true }) }),
   skchr_slent2_3: Object.freeze({ undying: binding({ owner: 'src', keys: ['slent2_skill_03_buff_02'], hold: 'fx', refresh: true }) }),
   skchr_demetr_1: Object.freeze({ means: binding({ owner: 'src', keys: ['demetr_buff_01'], hold: 'fx', refresh: true }) }),
   skchr_shwaz_1: Object.freeze({ defDown: binding({ owner: 'src', keys: ['buff_defdown'], hold: 'fx', refresh: true }) }),
@@ -1384,7 +1384,8 @@ export const FX_BINDINGS = Object.freeze({
   // 陈 the 3rd S2 chen3_s2[respawn_buff] (her landing 'blink': the two loops while the skill lasts); 推进 talent
   // shwaz_t_1 (the crit's 'defDown' on the target, its duration) and 德米特里 T1 demetr_t1[def_dec] ('means' on the enemy,
   // refreshed with each stack); 浊心斯卡蒂's sister 斯卡蒂 slent2_s_3 shallow grave ('undying' on the ally, its duration);
-  // 阿斯卡纶 S2 ascln_s_2[enemy] (a knocked-out enemy's 'aoe' burst). `refresh`: a newer signal on the same unit replaces
+  // 阿斯卡纶 S2 ascln_s_2[enemy] (a knocked-out enemy's 'aoe' burst; the aura's loop on an enemy from 'auraIn' to
+  // 'auraOut' — `release` ends the loop its `refresh` twin holds). `refresh`: a newer signal on the same unit replaces
   // the held loop.
   skchr_wang_2: Object.freeze({ stoneHit: binding({ owner: 'id', keys: ['token_wang_skill_02_hit_02'], at: 'target' }) }),
   skchr_ayer_2: Object.freeze({ strike: binding({ owner: 'src', keys: ['ayer_skill_02_hit_02'], at: 'target', target: 'id', during: true }) }),
