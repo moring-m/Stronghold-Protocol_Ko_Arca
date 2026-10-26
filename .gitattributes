@@ -25,3 +25,6 @@
 *.ttf binary
 *.mp3 binary
 *.ogg binary
+
+# Game resources are checked against pinned hashes (tools/install-hosted-resources.mjs): never convert line endings
+content/production/assets/** -text
