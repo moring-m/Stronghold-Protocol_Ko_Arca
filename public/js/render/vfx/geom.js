@@ -307,11 +307,13 @@ export function buildParticles(ps, r, cam, fd, frameNo) {
           else { Y0 = ny * X2 - nz * X1; Y1 = nz * X0 - nx * X2; Y2 = nx * X1 - ny * X0; }
         } else { X0 = R[0]; X1 = R[1]; X2 = R[2]; Y0 = U[0]; Y1 = U[1]; Y2 = U[2]; }
         if (def.rot3D && (ps.rx[i] || ps.ry[i]) && (align === 'local' || align === 'world' || align === 'view')) {
-          // a 3D start rotation turns the quad out of its alignment plane (Unity: frame · Euler(x, y, z), as the mesh
-          // particles below) — the roll alone would leave 阿斯卡纶 迭代's blades flat in their system's plane
+          // a 3D start rotation turns the quad out of its alignment plane (Unity: frame · Euler(x, y, z)) — the roll alone
+          // would leave 阿斯卡纶 迭代's blades flat in their system's plane. Unity's frame is left-handed: in this one the
+          // turns about X and Y change sign (about Z the roll keeps the billboard's own convention, as above); checked
+          // against the official recording of 2026-10-27 (the blades' triangle around her)
           const Z = align === 'local' ? lz : align === 'world' ? [0, 0, 1] : F;
           const DEGR = 180 / Math.PI;
-          quatEuler(ps.rx[i] * DEGR, ps.ry[i] * DEGR, ps.rz[i] * DEGR, _q);
+          quatEuler(-ps.rx[i] * DEGR, -ps.ry[i] * DEGR, ps.rz[i] * DEGR, _q);
           const qx = _q[0], qy = _q[1], qz = _q[2], qw = _q[3];
           const c0 = [1 - 2 * (qy * qy + qz * qz), 2 * (qx * qy + qw * qz), 2 * (qx * qz - qw * qy)];
           const c1 = [2 * (qx * qy - qw * qz), 1 - 2 * (qx * qx + qz * qz), 2 * (qy * qz + qw * qx)];
