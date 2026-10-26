@@ -70,8 +70,8 @@
         "enemy_9016_acstmr": [7,7,0,0,56]
       },
       "hooks": [1,60,5857,1426,1426,3248,3598,4359,29,39,111,105,70,50512,1931,11,28,0,1,28,0,14,0],
-      "events": {"atk":1694,"atkCancel":9,"atkRetarget":7,"atkStart":1444,"cast":11,"deploy":32,"die":39,"dmg":3322,"engage":16,"fx":824,"heal":254,"skill":216,"skillImpact":10,"spawn":58,"status":672},
-      "fx": {"beam":45,"blink":1,"bombard":67,"bombardShell":68,"burst":14,"copy":1,"dp":5,"drone":187,"droneLock":15,"drones":3,"finale":8,"firewall":1,"garrisonGrant":1,"lightning":99,"link":1,"lock":69,"phase":1,"pulse":40,"scorchBurst":3,"shell":7,"slash":88,"snow":5,"spRecovered":59,"steal":1,"storm":10,"summon":8,"sunBurst":4,"talent":4,"tide":5,"wanted":4},
+      "events": {"atk":1694,"atkCancel":9,"atkRetarget":7,"atkStart":1444,"cast":11,"deploy":32,"die":39,"dmg":3322,"engage":16,"fx":829,"heal":254,"skill":216,"skillImpact":10,"spawn":58,"status":672},
+      "fx": {"beam":45,"blink":1,"bombard":67,"bombardShell":68,"burst":14,"copy":1,"dp":5,"drone":187,"droneLock":15,"drones":3,"finale":8,"firewall":1,"garrisonGrant":1,"lightning":99,"link":1,"lock":69,"manifold":5,"phase":1,"pulse":40,"scorchBurst":3,"shell":7,"slash":88,"snow":5,"spRecovered":59,"steal":1,"storm":10,"summon":8,"sunBurst":4,"talent":4,"tide":5,"wanted":4},
       "snaps": "0996420f 640bc74b 50c5f022 c35438eb 082701c1 fc30e46e 42ef222e eacc584f eb9c576c a7f479de ef11efa8 f0f0c313 c0ca0925 7c9ca6e3 518dfb21 e861e242 505bcbbe 7cfe2dc5 51f1ccec c5a5f42d"
     },
     "boss-boss_1-solo": {
@@ -962,8 +962,8 @@
         "enemy_9016_acstmr": [6,5,0,0,26]
       },
       "hooks": [1,67,6000,280,280,622,720,1172,50,62,19,19,103,6143,107,0,33,6,1,44,0,3,0],
-      "events": {"atk":295,"atkCancel":4,"atkRetarget":5,"atkStart":293,"cast":16,"deploy":34,"die":56,"dmg":635,"engage":8,"fx":161,"heal":34,"leak":6,"skill":38,"spawn":49,"status":180},
-      "fx": {"airstrike":33,"appear":7,"beam":34,"blink":11,"bombard":24,"burst":3,"charge":6,"copy":2,"disappear":7,"dp":1,"explode":8,"firewall":1,"link":1,"scorchBurst":1,"shell":6,"spRecovered":1,"steal":2,"summon":7,"telegraph":3,"tide":3},
+      "events": {"atk":295,"atkCancel":4,"atkRetarget":5,"atkStart":293,"cast":16,"deploy":34,"die":56,"dmg":635,"engage":8,"fx":162,"heal":34,"leak":6,"skill":38,"spawn":49,"status":180},
+      "fx": {"airstrike":33,"appear":7,"beam":34,"blink":11,"bombard":24,"burst":3,"charge":6,"copy":2,"disappear":7,"dp":1,"explode":8,"firewall":1,"link":1,"manifold":1,"scorchBurst":1,"shell":6,"spRecovered":1,"steal":2,"summon":7,"telegraph":3,"tide":3},
       "snaps": "a0b6a6f3 100da79b 57060669 7e766c23 b3b3f75c 92cbb9f4 f982571f fb4e183c bc04d53f b9b26b98 cdd4d09f bdf47fe9 9cd293c3 b0e4a5be 812a0069 4e4f7a91 c338b6ac d5ab9f7c 4d665147 766a1925"
     },
     "hidden-boss_9-pair": {

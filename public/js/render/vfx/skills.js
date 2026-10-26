@@ -1352,6 +1352,13 @@ export function chargeKeys(plan) {
  */
 const binding = (o) => Object.freeze({ ...o, ...(o.cover ? { cover: Object.freeze(o.cover) } : {}), ...(o.keys ? { keys: Object.freeze(o.keys) } : {}) });
 export const FX_BINDINGS = Object.freeze({
+  skchr_mlyss_3: Object.freeze({ manifold: binding({ owner: 'skill', keys: ['token_10030_mlyss_wtrman_c2_skill_03_buff_01'], hold: 'fx', refresh: true }) }),
+  skchr_lmlee_2: Object.freeze({ paperHit: binding({ owner: 'id', keys: ['lmlee_skill_02_debuff_hit'], at: 'target' }) }),
+  skchr_skadi2_1: Object.freeze({ share: binding({ owner: 'id', keys: ['skadi2_skill_01_hit', 'skadi2_skill_01_hit_02'], oneshot: true, during: true }) }),
+  skchr_cetsyr_2: Object.freeze({ tie: binding({ owner: 'src', keys: ['cetsyr_skill_02_tie'], hold: 'fx', refresh: true }) }),
+  // 斥罪's sister kits: 塑心 S2 cetsyr_s_2 (the root on each enemy her shot binds: 'tie', its duration); 浊心斯卡蒂 S1
+  // skadi2_s_1[protect] (each share she takes: 'share' on her); 老鲤 S2 lmlee_s_2[paper] (each hit on the marked enemy:
+  // 'paperHit'); 缪尔赛思 S3 mlyss_s_3[buff_refresh] (her 流形's loop while it holds the S3 buff: 'manifold')
   skchr_rmixer_2: Object.freeze({ shield: binding({ owner: 'id', keys: ['rmixer_skill_02_start_02'], oneshot: true, during: true }) }),
   skchr_philae_2: Object.freeze({ rageStart: binding({ owner: 'id', keys: ['philae_skill_02_start_02'], oneshot: true, during: true }), rage: binding({ owner: 'id', keys: ['philae_skill_02_buff_02'], hold: 'fx', during: true, refresh: true }), aoe: binding({ owner: 'id', keys: ['philae_skill_02_start_01'], oneshot: true, during: true }) }),
   // 菲莱 S2 philae_s_2: the first element hit of the skill ('rageStart' one-shot, 'rage' held for the rest of it), the

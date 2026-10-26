@@ -66,7 +66,7 @@ function mlyss(bb, chess, def) {
   const pulseIv = Math.max(0.2, bv(bb, 'interval', 2)), bindDur = isDef ? bv(bb, 'duration', 1.5) : 0;
   // "自身与流形攻击力+N%（攻击速度+N）" — every skill of hers buffs the 流形 too while it runs
   const manifoldMods = { atkPct: num(bb.atk), ...(num(bb.attack_speed) ? { aspd: num(bb.attack_speed) } : {}) };
-  const buffManifold = (battle, t, dur) => battle.addBuff(t, { key: 'mlyss:s3', mods: manifoldMods, duration: dur });
+  const buffManifold = (battle, t, dur) => { battle.fx('manifold', { x: t.x, y: t.y, id: t.id, dur }); return battle.addBuff(t, { key: 'mlyss:s3', mods: manifoldMods, duration: dur }); };
   // module 落叶四季 (开源节流): copying a 莱茵生命 operator ⇒ she gains `sp`; deploying the copied one ⇒ it gains `sp_other`
   const rhineSp = num(mod.sp), rhineSpOther = num(mod.sp_other);
   const tokTal = (t, key) => { for (const x of t.def?.talents || []) if (x?.bb && typeof x.bb[key] === 'number') return x.bb; return {}; };

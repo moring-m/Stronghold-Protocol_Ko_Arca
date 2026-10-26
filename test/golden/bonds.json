@@ -751,8 +751,8 @@
       ],
       "enemies": {"enemy_1195_sfyin":[11,11,0,635,19800],"enemy_1196_msfyin":[22,22,0,0,44],"enemy_1197_sfshu":[5,5,0,261,11250],"enemy_1198_msfshu":[15,15,0,0,45]},
       "hooks": [1,66,1436,125,125,154,154,0,53,53,6,5,0,7177,45,8,53,0,1,53,0,0,0],
-      "events": {"atk":162,"atkCancel":5,"atkRetarget":24,"atkStart":134,"deploy":10,"die":53,"dmg":154,"engage":6,"fx":24,"skill":11,"skillImpact":2,"spawn":66,"status":61},
-      "fx": {"copy":1,"dp":1,"sleep":3,"split":1,"summon":16,"volley":2},
+      "events": {"atk":162,"atkCancel":5,"atkRetarget":24,"atkStart":134,"deploy":10,"die":53,"dmg":154,"engage":6,"fx":26,"skill":11,"skillImpact":2,"spawn":66,"status":61},
+      "fx": {"copy":1,"dp":1,"manifold":2,"sleep":3,"split":1,"summon":16,"volley":2},
       "snaps": "45760633 1c80cc6d bcefe6e3 124eb063 29c9cac8"
     },
     "bond-maniShip-high": {
@@ -791,8 +791,8 @@
       ],
       "enemies": {"enemy_1288_duskls":[11,11,0,0,63415],"enemy_1288_duskls_2":[7,7,0,0,48419],"enemy_1292_duskld":[5,5,0,542,57650]},
       "hooks": [1,36,2604,135,191,601,601,1724,23,24,19,16,0,11902,193,25,23,0,1,49,0,0,0],
-      "events": {"atk":159,"atkCancel":13,"atkRetarget":13,"atkStart":148,"deploy":10,"die":24,"dmg":603,"engage":8,"fx":296,"skill":35,"skillImpact":6,"spawn":36,"status":425},
-      "fx": {"aoe":2,"copy":1,"dp":2,"ember":23,"iceSpike":82,"iceSpikeImpact":82,"sleep":3,"spRecovered":1,"split":1,"weightless":3,"zone":96},
+      "events": {"atk":159,"atkCancel":13,"atkRetarget":13,"atkStart":148,"deploy":10,"die":24,"dmg":603,"engage":8,"fx":299,"skill":35,"skillImpact":6,"spawn":36,"status":425},
+      "fx": {"aoe":2,"copy":1,"dp":2,"ember":23,"iceSpike":82,"iceSpikeImpact":82,"manifold":3,"sleep":3,"spRecovered":1,"split":1,"weightless":3,"zone":96},
       "snaps": "3ea93337 46c986d3 9b8fee08 b924efb1 bca42438 09f72092 4228f571 af4b0f28 74fc16bf"
     },
     "bond-miraShip-low": {
