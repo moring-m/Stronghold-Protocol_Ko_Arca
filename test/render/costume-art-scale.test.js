@@ -15,3 +15,11 @@ test('costume artwork keeps its own size while verified oversized Ascalon slashe
  w.playOn('ascln_skill_03_range_01',v);assert.equal(placed.place.scale,undefined);
  w.playOn('ascln_attack_start_01',v,{scale:()=>2});assert.equal(placed.place.scale,1);
 });
+test('every oversized Ascalon iteration burst is halved; its range decals, deploy effect and the operator own effects are not',async()=>{
+ const {effectArtScale}=await import('../../public/js/render/vfx/artScale.js');
+ for(const k of ['ascln_attack_start_01','ascln_attack_start_03','ascln_attack_hit_01','ascln_buff_01','ascln_skill_01_hit_02','ascln_skill_01_start_04','ascln_skill_02_hit_01','ascln_skill_02_start_01','ascln_skill_03_hit_01','ascln_skill_03_start_01'])
+  assert.equal(effectArtScale(k,k+'_iteration#4'),.5,k);
+ for(const k of ['ascln_skill_02_range_01','ascln_skill_03_range_01','ascln_skill_03_range_02','ascln_birth_01','ascln_attack_start_02','ascln_skill_02_start_02'])
+  assert.equal(effectArtScale(k,k+'_iteration#4'),1,k);
+ assert.equal(effectArtScale('ascln_skill_02_start_01'),1,'the default outfit keeps its size');
+});
