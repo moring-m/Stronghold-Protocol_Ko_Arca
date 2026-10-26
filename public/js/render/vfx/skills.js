@@ -543,6 +543,8 @@ export const COND_BUFFS = Object.freeze({
   'lumen_s_2[eff_cond]': Object.freeze({ byCharges: true, full: ['lumen_skill_02_buff_02'], ready: ['lumen_skill_02_buff'] }),
   'malist_s_2[eff_cond]': Object.freeze({ byCharges: true, full: ['malist_skill_2_buff_weapon', 'malist_skill_2_buff'], ready: ['malist_skill_2_buff_weapon', 'malist_skill_2_buff'] }),
   // Mon3tr S1: any charge stored; 雷蛇 the 2nd S1: one more loop per charge stored (`counts`: stored charges → loops)
+  // 卡夫卡 S1: its SP ratio test (≥ 0) always passes — the loop shows while the passive is equipped
+  'caper_s_1[effect_trigger]': Object.freeze({ always: ['caper_skill_01_buff'] }),
   'monstr_s_1[ready]': Object.freeze({ byCharges: true, full: ['monstr_skill_01_buff'], ready: ['monstr_skill_01_buff'] }),
   'leizi2_s_1[effect_controller]': Object.freeze({ byCharges: true, counts: Object.freeze({ 1: ['leizi2_skill_01_buff_01'], 2: ['leizi2_skill_01_buff_01', 'leizi2_skill_01_buff_02'], 3: ['leizi2_skill_01_buff_01', 'leizi2_skill_01_buff_02', 'leizi2_skill_01_buff_03'] }),
     full: ['leizi2_skill_01_buff_01', 'leizi2_skill_01_buff_02'], ready: ['leizi2_skill_01_buff_01'] }),
@@ -1347,6 +1349,17 @@ export function chargeKeys(plan) {
  */
 const binding = (o) => Object.freeze({ ...o, ...(o.cover ? { cover: Object.freeze(o.cover) } : {}), ...(o.keys ? { keys: Object.freeze(o.keys) } : {}) });
 export const FX_BINDINGS = Object.freeze({
+  skchr_ascln_2: Object.freeze({ aoe: binding({ owner: 'id', keys: ['ascln_skill_02_death_01'], at: 'point', oneshot: true, during: true }) }),
+  skchr_slent2_3: Object.freeze({ undying: binding({ owner: 'src', keys: ['slent2_skill_03_buff_02'], hold: 'fx', refresh: true }) }),
+  skchr_demetr_1: Object.freeze({ means: binding({ owner: 'src', keys: ['demetr_buff_01'], hold: 'fx', refresh: true }) }),
+  skchr_shwaz_1: Object.freeze({ defDown: binding({ owner: 'src', keys: ['buff_defdown'], hold: 'fx', refresh: true }) }),
+  skchr_chen3_2: Object.freeze({ blink: binding({ owner: 'id', keys: ['chen3_skill_02_buff_01', 'chen3_skill_02_f_buff_02'], hold: 'fx', during: true, refresh: true }) }),
+  // Buff loops whose condition the kits now mark (2026-10-26, buff_template_holder of the CN client 2026-10-22):
+  // 陈 the 3rd S2 chen3_s2[respawn_buff] (her landing 'blink': the two loops while the skill lasts); 推进 talent
+  // shwaz_t_1 (the crit's 'defDown' on the target, its duration) and 德米特里 T1 demetr_t1[def_dec] ('means' on the enemy,
+  // refreshed with each stack); 浊心斯卡蒂's sister 斯卡蒂 slent2_s_3 shallow grave ('undying' on the ally, its duration);
+  // 阿斯卡纶 S2 ascln_s_2[enemy] (a knocked-out enemy's 'aoe' burst). `refresh`: a newer signal on the same unit replaces
+  // the held loop.
   skchr_wang_2: Object.freeze({ stoneHit: binding({ owner: 'id', keys: ['token_wang_skill_02_hit_02'], at: 'target' }) }),
   skchr_ayer_2: Object.freeze({ strike: binding({ owner: 'src', keys: ['ayer_skill_02_hit_02'], at: 'target', target: 'id', during: true }) }),
   skchr_branch_2: Object.freeze({ resolveHit: binding({ owner: 'id', keys: ['branch_skill_02_hit_01'], at: 'target', during: true }) }),

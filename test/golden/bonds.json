@@ -1344,8 +1344,8 @@
         "enemy_1208_msfji": [5,0,5,0,103]
       },
       "hooks": [1,100,2581,290,290,491,484,0,64,84,17,15,0,8846,177,10,69,5,1,64,0,0,7],
-      "events": {"atk":290,"atkCancel":7,"atkRetarget":18,"atkStart":301,"deploy":29,"die":79,"dmg":484,"energy":13,"engage":8,"fx":251,"leak":5,"skill":32,"spawn":84,"status":175},
-      "fx": {"aoe":3,"dodge":7,"dp":3,"drone":108,"droneLock":69,"drones":2,"explode":22,"mark":5,"stealth":1,"strike":2,"summon":23,"teleport":4,"volley":2},
+      "events": {"atk":290,"atkCancel":7,"atkRetarget":18,"atkStart":301,"deploy":29,"die":79,"dmg":484,"energy":13,"engage":8,"fx":378,"leak":5,"skill":32,"spawn":84,"status":175},
+      "fx": {"aoe":3,"dodge":7,"dp":3,"drone":108,"droneLock":69,"drones":2,"explode":22,"mark":5,"means":127,"stealth":1,"strike":2,"summon":23,"teleport":4,"volley":2},
       "snaps": "7bfb7278 564bb353 c1fd3aed fa1ce34c e1c77407 9c2ab9c9 efdc2ef8 02597e3b ffa2af89"
     },
     "bond-steadShip-low": {

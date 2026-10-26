@@ -206,6 +206,7 @@ export class SkillFx {
     this.units = new Map();    // battle id → unit record | null (nothing official to play)
     this.tloops = new Map();   // `${target id}|${key}` → { h, until, U, tgt, bySkill } (skills.js targetsOf `hit`)
     this.marks = [];
+    this.held = new Map();   // `refresh` bindings: slot → the loops held on that unit (_bound)
     this.locks = [];           // FX_BINDINGS reached effects: { owner, r, c, until, h, cover }
     this.born = new Map();     // unit id → { frame, own } of its official birth effect (deployed: FxWiring.deploy's key)
     this.frame = 0;            // FxWiring.tick counts frames: events of one frame share a value
@@ -1005,6 +1006,7 @@ export class SkillFx {
     for (const e of U.plan.cond) {
       const g = COND_BUFFS[e.buff];
       if (!g) continue;
+      if (g.always) { if (g.always.includes(e.key)) want.set(e.key, e); continue; }
       if (g.counts) { const n = Math.min(3, Array.isArray(v.charges) ? Number(v.charges[0]) | 0 : 0); if (g.counts[n]?.includes(e.key)) want.set(e.key, e); continue; }
       const st = condState({ on, charged: !!U.charged, charges: v.charges, byCharges: !!g.byCharges });
       if (st && g[st]?.includes(e.key)) want.set(e.key, e);
@@ -1136,10 +1138,14 @@ export class SkillFx {
     const holdS = bind.hold === 'fx' ? (fxS > 0 ? fxS : bind.holdS || SKILL_CAST_S)
       : Number(bb[bind.hold]) > 0 ? Number(bb[bind.hold]) : bind.holdS || SKILL_CAST_S;
     let drew = false;
+    // `refresh`: the loop held on this unit for the binding is replaced, not stacked
+    const slot = bind.refresh ? `${keys.join(',')}|${tv?.id ?? `${Math.round(x)},${Math.round(y)}`}` : null;
+    if (slot) { for (const h of this.held.get(slot) || []) h.stop(); this.held.delete(slot); }
     for (const k of keys) {
       const h = this.w.playOn(k, at, { loop: true, important: true, flipFrom:U.v || undefined });
       if (!h) continue;
       drew = true;
+      if (slot) { const list = this.held.get(slot) || []; list.push(h); this.held.set(slot, list); }
       later(this.w.ofx, holdS, () => h.stop());
       this.marks.push({ owner: U.id, r: Math.round(y), c: Math.round(x), until: this.w.ofx.time + holdS, h, cover: bind.cover || [] });
     }
@@ -1445,6 +1451,8 @@ export class SkillFx {
     this.units.clear();
     this.tloops.clear();
     this.marks = [];
+    for (const list of this.held.values()) for (const h of list) h.stop();
+    this.held.clear();
     for(const L of this.locks)this._endLock(L);
     this.locks=[];
     this.hitLog = [];

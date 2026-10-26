@@ -139,7 +139,7 @@ export default {
       const keep = m.target && !m.lost && !gone(m.target) && m.at;
       const [r, c] = keep && landable(battle, unit, m.at[0], m.at[1]) ? m.at : [unit.tileR, unit.tileC];
       battle.moveRedeploy(unit, r, c);
-      battle.fx('blink', { x: unit.x, y: unit.y, id: unit.id, skill: 'chen3:respawn' });
+      battle.fx('blink', { x: unit.x, y: unit.y, id: unit.id, skill: 'chen3:respawn', dur: skill.duration });
       if (!unit.alive || !skill.active) return;
       const p = num(b2['chen3_s2[respawn_buff].prob']);
       battle.addBuff(unit, { key: AFTER_KEY, mods: { atkPct: num(b2['chen3_s2[respawn_buff].atk']), dodgePhys: p, dodgeArts: p }, tags: ['skill'] });
