@@ -8,7 +8,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { APP_VERSION, BASE_VERSION, PROTOCOL_VERSION, DEV_BUILD } from '../shared/constants.js';
 
-import { PATCH_NOTES } from '../shared/patchNotes.js';
+import { PATCH_NOTES, patchNoteFor } from '../shared/patchNotes.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(ROOT, p), 'utf8');
@@ -18,9 +18,17 @@ const lock = JSON.parse(read('package-lock.json'));
 test('base package version and letter-suffixed site version stay consistent', () => {
   assert.match(APP_VERSION, /^\d+\.\d+\.\d+[a-z]\d*(?:-dev)?$/);
   assert.equal(APP_VERSION.replace(/-dev$/,'').replace(/[a-z]\d*$/,''),BASE_VERSION);
-  if(!DEV_BUILD)assert.equal(PATCH_NOTES[0].version,APP_VERSION);
+  // vA.B.CdE: the newest A.B.C opens with its integrated note, then the update d; a hotfix E is listed inside d
+  if(!DEV_BUILD){
+    const [integrated,update]=PATCH_NOTES;
+    assert.equal(integrated.kind,'integrated');
+    assert.equal(integrated.version,BASE_VERSION);
+    assert.equal(update.version,APP_VERSION.replace(/\d+$/,''));
+    assert.equal(patchNoteFor(APP_VERSION),update);
+    if(/\d$/.test(APP_VERSION))assert.ok(update.hotfixes.some(h=>h.version===APP_VERSION),'the hotfix is listed in its update');
+  }
   assert.equal(new Set(PATCH_NOTES.map(n=>n.version)).size,PATCH_NOTES.length);
-  for(const note of PATCH_NOTES)assert.match(note.version,/^\d+\.\d+\.\d+[a-z]\d*$/);
+  for(const note of PATCH_NOTES)assert.match(note.version,note.kind==='integrated'?/^\d+\.\d+\.\d+$/:/^\d+\.\d+\.\d+[a-z]$/);
   assert.equal(pkg.version, BASE_VERSION);
   assert.equal(lock.version, BASE_VERSION);
   assert.equal(lock.packages[''].version, BASE_VERSION);
@@ -30,9 +38,12 @@ test('base package version and letter-suffixed site version stay consistent', ()
 
 test('CHANGELOG.md opens with the release version, and the README links it', () => {
   const log = read('CHANGELOG.md');
-  const first = log.match(/^## (\d+\.\d+\.\d+(?:[a-z]\d*)?) — (\d{4}-\d{2}-\d{2})/m);
-  assert.ok(first, 'a "## x.y.z — date" heading');
-  assert.equal(first[1], DEV_BUILD ? PATCH_NOTES[0].version : APP_VERSION, 'published notes follow the published release');
+  const first = log.match(/^## (\d+\.\d+\.\d+) 통합 패치노트 — \d{4}-\d{2}-\d{2}/m);
+  assert.ok(first, 'a "## x.y.z 통합 패치노트 — date" heading');
+  assert.equal(first[1], BASE_VERSION, 'the newest A.B.C opens with its integrated notes');
+  const update = log.match(/^## (\d+\.\d+\.\d+[a-z]) — (\d{4}-\d{2}-\d{2})/m);
+  assert.equal(update[1], DEV_BUILD ? PATCH_NOTES[1].version : APP_VERSION.replace(/\d+$/, ''), 'published notes follow the published release');
+  if (!DEV_BUILD && /\d$/.test(APP_VERSION)) assert.match(log, new RegExp(`^### 핫픽스 v${APP_VERSION.replace(/\./g, '\\.')} `, 'm'), 'the hotfix is listed in its update');
   assert.match(log, /^## 0\.1\.0 — 2026-10-02/m, 'the first public release stays listed');
   const readme = read('README.md');
   assert.match(readme, /\[CHANGELOG\.md\]\(CHANGELOG\.md\)/);
