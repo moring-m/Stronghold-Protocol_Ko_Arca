@@ -409,8 +409,8 @@
       ],
       "enemies": {"enemy_1010_demon":[4,4,0,732,200612],"enemy_1438_dspred":[10,7,3,32301,757819],"enemy_1521_dslily":[1,0,0,83302,1956709]},
       "hooks": [1,105,6000,706,706,2104,2728,5970,43,97,120,119,136,26049,2248,23,15,3,1,141,0,32,0],
-      "events": {"atk":762,"atkCancel":12,"atkRetarget":1,"atkStart":720,"cast":12,"deploy":88,"die":94,"dmg":2311,"energy":56,"engage":17,"fx":618,"heal":106,"leak":3,"skill":239,"spawn":43,"status":426},
-      "fx": {"anchor":3,"aoe":34,"appear":9,"bloodBattle":2,"burst":32,"disappear":9,"displace":3,"downed":2,"ember":2,"enemySkill":12,"explode":108,"extraAttack":2,"frostNova":3,"grow":1,"healAoe":9,"overload":1,"reborn":2,"revive":2,"rockfall":14,"shield":7,"spRecovered":88,"splash":102,"strike":60,"summon":64,"tentacle":4,"tide":4,"veenBounce":27,"veenVolley":11,"zone":1},
+      "events": {"atk":762,"atkCancel":12,"atkRetarget":1,"atkStart":720,"cast":12,"deploy":88,"die":94,"dmg":2311,"energy":56,"engage":17,"fx":619,"heal":106,"leak":3,"skill":239,"spawn":43,"status":426},
+      "fx": {"anchor":3,"aoe":34,"appear":9,"bloodBattle":2,"burst":32,"disappear":9,"displace":3,"downed":2,"ember":2,"enemySkill":12,"explode":108,"extraAttack":2,"frostNova":3,"grow":1,"healAoe":9,"overload":1,"overloadFront":1,"reborn":2,"revive":2,"rockfall":14,"shield":7,"spRecovered":88,"splash":102,"strike":60,"summon":64,"tentacle":4,"tide":4,"veenBounce":27,"veenVolley":11,"zone":1},
       "snaps": "9f942773 2e5a9e68 b6ee3c24 68bc9b75 b15e7e06 72684e68 deca1aee 47e31a63 8dcc2014 ae59064c 77dfe3c7 dff181c4 87eec99b a4f0540f 3a84f736 b447b1ed 0d4d26e3 cfc9c0b7 f5fee19c 6080f45f"
     },
     "boss-boss_4-solo": {

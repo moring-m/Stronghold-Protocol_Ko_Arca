@@ -441,6 +441,9 @@ export class SkillFx {
     // the skill's final attack (tagCasts 'end'): its rows, its hits on this frame's damage (the kit deals it before the 0)
     if (was) this._endCast(U, v);
     this._stopLoops(U);
+    // the loops an `untilEnd` binding holds end with the skill (号角's overload: an ammo skill has no known end)
+    for (const h of U.duringHeld || []) h.stop();
+    U.duringHeld = null;
     for (const e of uniq(U.plan.end)) this._keep(U, e, this._play(e, v));
     return U.drawsStart;
   }
@@ -1149,6 +1152,7 @@ export class SkillFx {
       if (!h) continue;
       drew = true;
       if (slot) { const list = this.held.get(slot) || []; list.push(h); this.held.set(slot, list); }
+      if (bind.untilEnd) (U.duringHeld ||= []).push(h);
       later(this.w.ofx, holdS, () => h.stop());
       this.marks.push({ owner: U.id, r: Math.round(y), c: Math.round(x), until: this.w.ofx.time + holdS, h, cover: bind.cover || [] });
     }

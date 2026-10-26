@@ -1359,6 +1359,10 @@ export function chargeKeys(plan) {
  */
 const binding = (o) => Object.freeze({ ...o, ...(o.cover ? { cover: Object.freeze(o.cover) } : {}), ...(o.keys ? { keys: Object.freeze(o.keys) } : {}) });
 export const FX_BINDINGS = Object.freeze({
+  skchr_horn_3: Object.freeze({ overloadFront: binding({ owner: 'id', keys: ['horn_skill_03_buff_02_03_front'], hold: 'fx', during: true, untilEnd: true, refresh: true }), overloadBack: binding({ owner: 'id', keys: ['horn_skill_03_buff_02_03_back'], hold: 'fx', during: true, untilEnd: true, refresh: true }) }),
+  skchr_horn_2: Object.freeze({ overloadFront: binding({ owner: 'id', keys: ['horn_skill_02_buff_03_front'], hold: 'fx', during: true, untilEnd: true, refresh: true }), overloadBack: binding({ owner: 'id', keys: ['horn_skill_02_buff_03_back'], hold: 'fx', during: true, untilEnd: true, refresh: true }) }),
+  // 号角 S2 / S3 overload ([overload_switch_effect]: the back view when she faces up — CheckCharacterDefaultDirection UP —,
+  // else the front): the kit's 'overloadBack' / 'overloadFront' as it starts, held until the skill ends
   skchr_mlyss_3: Object.freeze({ manifold: binding({ owner: 'skill', keys: ['token_10030_mlyss_wtrman_c2_skill_03_buff_01'], hold: 'fx', refresh: true }) }),
   skchr_lmlee_2: Object.freeze({ paperHit: binding({ owner: 'id', keys: ['lmlee_skill_02_debuff_hit'], at: 'target' }) }),
   skchr_skadi2_1: Object.freeze({ share: binding({ owner: 'id', keys: ['skadi2_skill_01_hit', 'skadi2_skill_01_hit_02'], oneshot: true, during: true }) }),

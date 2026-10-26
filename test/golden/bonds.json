@@ -553,8 +553,8 @@
       ],
       "enemies": {"enemy_10124_uashld_2":[2,1,1,0,62208],"enemy_1043_zomsbr":[23,18,5,95,115164],"enemy_1061_zomshd":[5,2,3,3095,79156]},
       "hooks": [1,38,2396,105,105,191,246,2469,22,31,4,4,0,2219,38,19,30,9,1,26,0,0,5],
-      "events": {"atk":105,"atkCancel":18,"atkRetarget":2,"atkStart":127,"deploy":8,"die":22,"dmg":186,"engage":3,"fx":66,"leak":9,"skill":8,"spawn":38,"status":80},
-      "fx": {"aoe":38,"camouflage":1,"dodge":5,"overload":1,"shield":1,"spRecovered":20},
+      "events": {"atk":105,"atkCancel":18,"atkRetarget":2,"atkStart":127,"deploy":8,"die":22,"dmg":186,"engage":3,"fx":67,"leak":9,"skill":8,"spawn":38,"status":80},
+      "fx": {"aoe":38,"camouflage":1,"dodge":5,"overload":1,"overloadFront":1,"shield":1,"spRecovered":20},
       "snaps": "2e8f4e76 eb6b457e 5d594443 cc254779 f7b0a1dd 3b7ef78a 0b543f3e d53830d3"
     },
     "bond-kjeragShip-low": {
