@@ -180,3 +180,12 @@
 | 나이팅게일 (`char_179_cgbird`) | S3 `skchr_cgbird_3` | S3 | official p_field_elefield_loop, game none |
 | 이스티나 (`char_195_glassb`) | S2 `skchr_glassb_2` | S2 | official p_field_elefield_loop, game none |
 
+
+## 결정 (2026-10-26)
+
+남은 항목은 모두 현재 상태로 유지한다.
+
+- 공식 클립이 모델에 없는 모션 6건: mint S1, fartth S3, thorns S3, pasngr S2, surtr S3, saga S3.
+- 공식 공격음·타격음 묶음이 없는 25곳: 같은 오퍼레이터의 자기 음원을 유지한다.
+- 공식 발동음 묶음이 없는 13곳: 오퍼레이터 전용 `p_skill_*` 음원을 유지한다.
+- 다른 스킬의 모드를 가리키는 공식 연결 4건(ironmn S2, mostma S3, mizuki S2·S3): 추출 오류로 보고 기존 모션을 유지한다.
