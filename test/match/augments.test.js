@@ -13,7 +13,7 @@ test('catalog expands valid bond/tier grants and enforces allowed rounds and ene
   assert.ok(c.rounds.includes(round));if(c.effect.candidates)assert.ok(c.effect.candidates.every(id=>data.chess[id].tier===c.effect.tier));
   if(c.effect.kind==='items')assert.ok(c.effect.items.every(id=>data.items[id]));
  }
- assert.ok(!createAugmentCatalog(data,4).some(a=>a.name==='페가수스'));assert.ok(createAugmentCatalog(data,10).some(a=>a.name==='페가수스'));
+ assert.ok(!createAugmentCatalog(data,4).some(a=>a.name==='페가수스 II'));assert.ok(createAugmentCatalog(data,10).some(a=>a.name==='페가수스 II'));
 });
 test('each player gets private choices; independent rerolls retain other slots and reject stale cards',t=>{
  const {m}=fixture(t,{n:8});m.round=4;m.afterRoundStart();const ps=m.players.get('p0'),other=m.players.get('p1'),slot=m.augments.current.slots.get(ps.playerId);const old=slot.cards.slice(),others=m.augments.privateView(other).selection;
@@ -37,7 +37,7 @@ test('solo choices have no deadline but retain three-second settling',t=>{
 });
 test('disabled augments never change normal phases or expose selected cards',t=>{const {m}=fixture(t,{enabled:false});m.round=4;m.afterRoundStart();assert.equal(m.augments.current,null);assert.equal(m.augments.battleState(),null);assert.equal(m.augments.publicView(),null);assert.equal(m.augments.income(m.players.get('p0')),0);});
 test('grant rewards ignore stock, beacon remains separate, and funds/price effects persist',t=>{
- const {m,ps}=fixture(t);m.round=4;const catalog=createAugmentCatalog(m.data,10);const beacon=catalog.find(a=>a.name==='인력사무소');m.augments.grant(ps,beacon);assert.equal([...ps.hand,...ps.temp].filter(p=>p?.id==='chess_item_5_04_e_a').length,4);assert.equal(ps.completesItemMerge('chess_item_5_04_e_a'),false);
+ const {m,ps}=fixture(t);m.round=4;const catalog=createAugmentCatalog(m.data,10);const beacon=catalog.find(a=>a.name==='인력사무소 II');m.augments.grant(ps,beacon);assert.equal([...ps.hand,...ps.temp].filter(p=>p?.id==='chess_item_5_04_e_a').length,4);assert.equal(ps.completesItemMerge('chess_item_5_04_e_a'),false);
  const frugal=createAugmentCatalog(m.data,4).find(a=>a.name==='알뜰살뜰 III'),price=catalog.find(a=>a.name==='예견');m.augments.allies.set(ps.playerId,[frugal,price]);assert.equal(m.augments.income(ps),3);for(const tier of [1,2,3,4,5,6]){const id=Object.keys(m.data.chess).find(id=>m.data.chess[id].tier===tier&&!m.data.chess[id].isGolden);assert.equal(ps.priceOf({kind:'chess',id,basePrice:2}),tier<=3?1:2);}assert.equal(ps.priceOf({kind:'item',id:'x',basePrice:2}),2);
  const result=buildResult(m,{victory:false,hiddenReached:false,hiddenCleared:false,reason:'test'});assert.ok(result.augments);assert.equal(result.players[0].augments.length,2);
 });
@@ -113,12 +113,12 @@ test('Swordmaster and Arts master exclude every other tier in their own family a
 test('cataclysm replaces deployed operators without gains, retaining promotion, equipment, position and direction',t=>{
  const{m,ps}=fixture(t);const normal=Object.keys(data.chess).find(id=>data.chess[id].tier===2&&!data.chess[id].isGolden&&!data.chess[id].isDiy&&!data.chess[id].isHidden&&!data.chess[id].optionalRecruit),gold=m.gd.goldenIdOf(normal);
  const piece=ps.newPiece('chess',gold,{dir:'LEFT',poolExempt:true});piece.items=[ps.newPiece('item','chess_item_2_06_e_a')];ps.board.set('10,3',piece);const items=piece.items,uid=piece.uid,gained=ps.round.gainedChess;
- m.augments.grant(ps,createAugmentCatalog(data,4).find(a=>a.name==='대격변'));assert.equal(ps.board.get('10,3'),piece);assert.equal(m.gd.chess(piece.id).tier,3);assert.equal(m.gd.chess(piece.id).isGolden,true);assert.equal(piece.dir,'LEFT');assert.equal(piece.uid,uid);assert.equal(piece.items,items);assert.equal(ps.round.gainedChess,gained);assert.equal(piece.poolCopies,0);
+ m.augments.grant(ps,createAugmentCatalog(data,4).find(a=>a.name==='대격변 I'));assert.equal(ps.board.get('10,3'),piece);assert.equal(m.gd.chess(piece.id).tier,3);assert.equal(m.gd.chess(piece.id).isGolden,true);assert.equal(piece.dir,'LEFT');assert.equal(piece.uid,uid);assert.equal(piece.items,items);assert.equal(ps.round.gainedChess,gained);assert.equal(piece.poolCopies,0);
 });
 test('Head hunting grants one, three or five operators and absent call grants eight communicators',t=>{
  const{m,ps}=fixture(t);ps.hand.fill(null);ps.temp.fill(null);
- for(const [suffix,n]of [['I',1],['II',3],['III',5]]){const c=createAugmentCatalog(data,10).find(a=>a.name===`헤드헌팅 ${suffix}`);assert.equal(c.effect.count,n);const before=ps.round.gainedChess;m.augments.grant(ps,c);assert.equal(ps.round.gainedChess-before,n);ps.hand.fill(null);ps.temp.fill(null);}
- const c=createAugmentCatalog(data,4).find(a=>a.name==='부재중 전화');assert.equal(c.effect.count,8);assert.deepEqual(c.effect.items,['chess_item_2_06_e_a']);
+ for(const [suffix,n]of [['I',2],['II',3],['III',5]]){const c=createAugmentCatalog(data,10).find(a=>a.name===`헤드헌팅 ${suffix}`);assert.equal(c.effect.count,n);const before=ps.round.gainedChess;m.augments.grant(ps,c);assert.equal(ps.round.gainedChess-before,n);ps.hand.fill(null);ps.temp.fill(null);}
+ const c=createAugmentCatalog(data,4).find(a=>a.name==='공개모집 III');assert.equal(c.effect.count,7);assert.deepEqual(c.effect.items,['chess_item_2_06_e_a']);
 });
 test('breakthrough charges each entry immediately, separately from the round HP cap',t=>{
  const {m}=fixture(t,{n:2});const players=[...m.players.values()];for(const p of players){p.bandId=m.gd.bandIds()[0];p.lp=30;}m.startRound(1);
@@ -184,10 +184,10 @@ test('recast transformation skips every banned operator at the upgraded tier',t=
 });
 
 test('new CSV augments expose correct rounds, grade, effects and existing icons',()=>{
- const names=['야수의 심장','우리들의 빛','레벨 업','캐서린의 지원 I','캐서린의 지원 II','캐서린의 지원 III','골리앗 I','골리앗 II','골리앗 III'];
+ const names=['야수의 심장 III','우리들의 빛','레벨 업 II','캐서린의 지원 I','캐서린의 지원 II','캐서린의 지원 III','골리앗 I','골리앗 II','골리앗 III'];
  for(const name of names){const cards=[4,7,10].flatMap(r=>createAugmentCatalog(data,r).filter(a=>a.name===name));assert.ok(cards.length,name);for(const card of cards)assert.ok(card.effect.kind);}
- assert.ok(!createAugmentCatalog(data,4).some(a=>a.name==='야수의 심장'));
- assert.ok(!createAugmentCatalog(data,4).some(a=>a.name==='레벨 업'));
+ assert.ok(!createAugmentCatalog(data,4).some(a=>a.name==='야수의 심장 III'));
+ assert.ok(!createAugmentCatalog(data,4).some(a=>a.name==='레벨 업 II'));
  assert.ok(!createAugmentCatalog(data,10).some(a=>a.name==='우리들의 빛'));
  for(const [name,count] of [['실드 II',3],['실드 III',5]])assert.equal(createAugmentCatalog(data,4).find(a=>a.name===name).effect.count,count);
 });
@@ -200,19 +200,19 @@ for(const [grade,count] of [['silver',2],['gold',4],['prism',7]])test(`Catherine
 for(const shared of [false,true])test(`Goliath HP applies once, shared=${shared}`,t=>{
  const {m,ps}=fixture(t,{n:4,rules:shared?['sharedHp']:[]});m.startRound(4);const before=shared?m.teamLp:ps.lp;
  const card=createAugmentCatalog(data,4).find(a=>a.name==='골리앗 I');m.augments.grant(ps,card);
- assert.equal(shared?m.teamLp:ps.lp,before+11);if(shared)assert.equal(m.order.reduce((n,p)=>n+p.lp,0),m.teamLp);
+ assert.equal(shared?m.teamLp:ps.lp,before+21);if(shared)assert.equal(m.order.reduce((n,p)=>n+p.lp,0),m.teamLp);
 });
 test('level up grants three funds, waives only next upgrade, hides at max shop level',t=>{
  const {m,ps}=fixture(t);m.round=7;m.phase=PHASE.PREP;m.augments.current={grade:'prism'};
- const card=m.augments.catalog('ally',ps).find(a=>a.name==='레벨 업'),before=ps.funds;assert.ok(card);m.augments.grant(ps,card);
+ const card=m.augments.catalog('ally',ps).find(a=>a.name==='레벨 업 II'),before=ps.funds;assert.ok(card);m.augments.grant(ps,card);
  assert.equal(ps.funds,before+3);assert.equal(ps.shop.upgradePrice,0);const level=ps.shop.level;ps.levelUp();assert.equal(ps.shop.level,level+1);assert.equal(ps.shop.upgradePrice,m.gd.upgradeBase(ps.shop.level));
- ps.shop.level=m.gd.maxShopLevel;assert.ok(!m.augments.catalog('ally',ps).some(a=>a.name==='레벨 업'));
+ ps.shop.level=m.gd.maxShopLevel;assert.ok(!m.augments.catalog('ally',ps).some(a=>a.name==='레벨 업 II'));
 });
 test('beast heart sells board/bench operators, destroys equipment and queues twelve ban-safe elites',t=>{
  const {m,ps}=fixture(t);m.round=10;const ids=Object.keys(data.chess).filter(id=>!data.chess[id].isGolden&&!data.chess[id].optionalRecruit&&data.chess[id].visible!==false);
  const p=ps.acquireChess(ids[0],{fromPool:false});const item=ps.newPiece('item','chess_item_1_01_e_a');p.items.push(item);
  const q=ps.acquireChess(ids[1],{fromPool:false});ps._detach(ps.find(q.uid));ps.board.set('0,0',q);
- const banned=ids[2];m.bannedChess.push(banned);const before=ps.funds;const card=createAugmentCatalog(data,10).find(a=>a.name==='야수의 심장');
+ const banned=ids[2];m.bannedChess.push(banned);const before=ps.funds;const card=createAugmentCatalog(data,10).find(a=>a.name==='야수의 심장 III');
  const grants=[];ps.acquireChess=(id,opts)=>{grants.push({id,opts});return null;};m.augments.grant(ps,card);
  assert.ok(!ps.find(p.uid));assert.ok(!ps.find(q.uid));assert.ok(!ps.find(item.uid));assert.ok(ps.funds>=before+m.gd.sellPrice(p.id)+m.gd.sellPrice(q.id));
  const queued=m.augments.pending.get(ps.playerId);assert.equal(queued.length,12);assert.ok(queued.every(g=>data.chess[g.id].isGolden&&m.gd.baseIdOf(g.id)!==banned));assert.ok(grants.every(g=>g.opts.fromPool===false));
@@ -241,7 +241,7 @@ test('new true-damage family is mutually exclusive across all grades',t=>{
  for(const grade of ['silver','gold','prism']){m.augments.current={grade};assert.ok(m.augments.catalog('ally',ps).every(c=>c.effect.kind!=='trueDamage'));}
 });
 test('beast heart grants twelve promoted operators',t=>{
- const {m,ps}=fixture(t);const card=createAugmentCatalog(data,10).find(c=>c.name==='야수의 심장');
+ const {m,ps}=fixture(t);const card=createAugmentCatalog(data,10).find(c=>c.name==='야수의 심장 III');
  assert.equal(card.effect.count,12);const before=ps.round.gainedChess;m.augments.grant(ps,card);assert.equal(ps.round.gainedChess-before,12);
 });
 
@@ -263,4 +263,24 @@ test('weighted votes use all received votes, include reroll and give zero votes 
 test('weighted timeout keeps actual votes and does not create weights for abstentions',t=>{
  const {m}=fixture(t,{n:4,ruleValues:{augmentEnemyVote:2}});m.round=4;m.augments.enter();m.augments.enterEnemy();const a=m.augments,s=a.current;
  a.vote(m.order[0],{idx:1,cardId:s.boss.cards[1].id});a.timeout();assert.equal(s.votes.size,1);assert.equal(s.voteResultIdx,1);
+});
+test('graded item counts, corrosion tiers and disabled bond supports',()=>{
+ const cat=[...createAugmentCatalog(data,4),...createAugmentCatalog(data,10)],c=n=>cat.find(a=>a.name===n).effect;
+ for(const [n,k]of [['공개모집 I',3],['공개모집 II',5],['공개모집 III',7],['대발견 I',2],['대발견 II',3],['대발견 III',5],['인력사무소 I',2],['인력사무소 II',4],['뮤엘시스의 지원 I',1],['이샤믈라의 축복 I',1],['정예화 I',1],['정예화 II',3],['페가수스 I',1],['페가수스 II',2]])assert.equal(c(n).count,k,n);
+ assert.deepEqual([c('야수의 심장 I').count,c('야수의 심장 II').count,c('야수의 심장 III').count],[7,9,12]);
+ assert.deepEqual([c('부식 I').perHit,c('부식 I').cap,c('부식 II').cap,c('부식 III').cap],[.005,.25,.35,.5]);
+ assert.deepEqual(c('약점 공격 I').mods,{});assert.equal(c('약점 공격 II').mods.atkPct,.2);
+ assert.ok(!cat.some(a=>['investShip','miraShip','visiShip'].includes(a.bondId)));
+});
+test('level up I sets the cost to 2 and hides when it would not help; any corrosion hides the rest',t=>{
+ const {m,ps}=fixture(t);m.round=7;m.augments.current={grade:'gold'};
+ ps.shop.upgradePrice=5;const card=m.augments.catalog('ally',ps).find(a=>a.name==='레벨 업 I');assert.ok(card);const f=ps.funds;m.augments.grant(ps,card);assert.equal(ps.shop.upgradePrice,2);assert.equal(ps.funds,f);
+ assert.ok(!m.augments.catalog('ally',ps).some(a=>a.name==='레벨 업 I'));
+ m.round=10;m.augments.allies.set(ps.playerId,[createAugmentCatalog(data,10).find(a=>a.name==='부식 I')]);
+ for(const grade of ['silver','gold','prism']){m.augments.current={grade};assert.ok(!m.augments.catalog('ally',ps).some(a=>a.effect.kind==='corrosion'));}
+});
+test('cataclysm II promotes a normal operator to a golden one tier higher in place',t=>{
+ const{m,ps}=fixture(t);const normal=Object.keys(data.chess).find(id=>data.chess[id].tier===2&&!data.chess[id].isGolden&&!data.chess[id].isDiy&&!data.chess[id].isHidden&&!data.chess[id].optionalRecruit);
+ const piece=ps.newPiece('chess',normal,{dir:'UP',poolExempt:true});piece.items=[ps.newPiece('item','chess_item_2_06_e_a')];ps.board.set('10,3',piece);const items=piece.items;
+ m.augments.grant(ps,createAugmentCatalog(data,4).find(a=>a.name==='대격변 II'));assert.equal(ps.board.get('10,3'),piece);assert.equal(m.gd.chess(piece.id).tier,3);assert.equal(m.gd.chess(piece.id).isGolden,true);assert.equal(piece.dir,'UP');assert.equal(piece.items,items);
 });

@@ -50,7 +50,7 @@
   },
   {
     "side": "ally",
-    "name": "박사의 머리",
+    "name": "정예화",
     "path": "/assets/custom/augments/is2_doctor_command.png",
     "label": "통합전략 · 로도스 지휘 문양",
     "reason": "박사의 판단과 지휘를 상징하는 문양으로 효과 표현"
@@ -106,7 +106,7 @@
   },
   {
     "side": "ally",
-    "name": "부재중 전화",
+    "name": "공개모집",
     "path": "/assets/custom/augments/is2_communications.png",
     "label": "통합전략 · 연결망",
     "reason": "서로 연결된 점과 선으로 통신·연락 효과 표현"

@@ -653,14 +653,14 @@ export const AUGMENT_SOURCES = [
   "source": 49,
   "identity": 49,
   "grade": "prism",
-  "name": "약점 공격",
+  "name": "약점 공격 II",
   "rounds": [
    4,
    7,
    10
   ],
   "side": "ally",
-  "description": "모든 아군 유닛의 공격력 +15%, 모든 아군 유닛의 대미지 유형이 약점 대미지로 변경",
+  "description": "모든 아군 유닛의 공격력 +20%, 모든 아군 유닛의 대미지 유형이 약점 대미지로 변경",
   "notes": ""
  },
  {
@@ -695,7 +695,7 @@ export const AUGMENT_SOURCES = [
   "source": 52,
   "identity": 52,
   "grade": "prism",
-  "name": "페가수스",
+  "name": "페가수스 II",
   "rounds": [
    10
   ],
@@ -707,7 +707,7 @@ export const AUGMENT_SOURCES = [
   "source": 53,
   "identity": 53,
   "grade": "prism",
-  "name": "이샤믈라의 축복",
+  "name": "이샤믈라의 축복 II",
   "rounds": [
    4
   ],
@@ -732,7 +732,7 @@ export const AUGMENT_SOURCES = [
   "source": 55,
   "identity": 55,
   "grade": "prism",
-  "name": "뮤엘시스의 지원",
+  "name": "뮤엘시스의 지원 II",
   "rounds": [
    4,
    7,
@@ -746,7 +746,7 @@ export const AUGMENT_SOURCES = [
   "source": 56,
   "identity": 56,
   "grade": "prism",
-  "name": "박사의 머리",
+  "name": "정예화 II",
   "rounds": [
    4,
    7,
@@ -760,7 +760,7 @@ export const AUGMENT_SOURCES = [
   "source": 57,
   "identity": 57,
   "grade": "prism",
-  "name": "인력사무소",
+  "name": "인력사무소 II",
   "rounds": [
    7,
    10
@@ -773,7 +773,7 @@ export const AUGMENT_SOURCES = [
   "source": 58,
   "identity": 58,
   "grade": "prism",
-  "name": "대발견",
+  "name": "대발견 III",
   "rounds": [
    4,
    7,
@@ -836,7 +836,7 @@ export const AUGMENT_SOURCES = [
   "source": 63,
   "identity": 63,
   "grade": "prism",
-  "name": "부식",
+  "name": "부식 III",
   "rounds": [
    10
   ],
@@ -1845,7 +1845,7 @@ export const AUGMENT_SOURCES = [
    10
   ],
   "side": "ally",
-  "description": "무작위 6등급 오퍼레이터 1명 획득",
+  "description": "무작위 6등급 오퍼레이터 2명 획득",
   "notes": ""
  },
  {
@@ -1920,7 +1920,7 @@ export const AUGMENT_SOURCES = [
   "source": 143,
   "identity": 143,
   "grade": "silver",
-  "name": "대격변",
+  "name": "대격변 I",
   "rounds": [
    4
   ],
@@ -1932,14 +1932,14 @@ export const AUGMENT_SOURCES = [
   "source": 144,
   "identity": 144,
   "grade": "prism",
-  "name": "부재중 전화",
+  "name": "공개모집 III",
   "rounds": [
    4,
    7,
    10
   ],
   "side": "ally",
-  "description": "간이 통신기 8개 획득",
+  "description": "간이 통신기 7개 획득",
   "notes": ""
  },
  {
@@ -2072,7 +2072,7 @@ export const AUGMENT_SOURCES = [
   "source": 154,
   "identity": 154,
   "grade": "prism",
-  "name": "야수의 심장",
+  "name": "야수의 심장 III",
   "rounds": [
    10
   ],
@@ -2097,7 +2097,7 @@ export const AUGMENT_SOURCES = [
   "source": 156,
   "identity": 156,
   "grade": "prism",
-  "name": "레벨 업",
+  "name": "레벨 업 II",
   "rounds": [
    7,
    10
@@ -2157,7 +2157,7 @@ export const AUGMENT_SOURCES = [
    4
   ],
   "side": "ally",
-  "description": "목표 HP +11",
+  "description": "목표 HP +21",
   "notes": "공유 HP일 경우 공유 HP에 합산"
  },
  {
@@ -2169,7 +2169,7 @@ export const AUGMENT_SOURCES = [
    4
   ],
   "side": "ally",
-  "description": "목표 HP +21",
+  "description": "목표 HP +41",
   "notes": "공유 HP일 경우 공유 HP에 합산"
  },
  {
@@ -2181,7 +2181,7 @@ export const AUGMENT_SOURCES = [
    4
   ],
   "side": "ally",
-  "description": "목표 HP +31",
+  "description": "목표 HP +61",
   "notes": "공유 HP일 경우 공유 HP에 합산"
  },
  {
@@ -2238,5 +2238,213 @@ export const AUGMENT_SOURCES = [
   "side": "enemy",
   "description": "모든 적 유닛이 은신 획득",
   "notes": "보스전 및 보스 유닛에는 적용되지 않음"
+ },
+ {
+  "source": 167,
+  "identity": 167,
+  "grade": "gold",
+  "name": "뮤엘시스의 지원 I",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "ally",
+  "description": "변형 구조체 1개 획득",
+  "notes": ""
+ },
+ {
+  "source": 168,
+  "identity": 168,
+  "grade": "gold",
+  "name": "부식 II",
+  "rounds": [
+   10
+  ],
+  "side": "ally",
+  "description": "오퍼레이터가 피해를 입힐 때마다 대상 적의 방어력 및 마법 저항 -0.7% (최대 -35%)",
+  "notes": "아무 부식을 선택하면 앞으로 부식 I/II/III 은 등장 안 함 (모든 부식의 공통 규칙)"
+ },
+ {
+  "source": 169,
+  "identity": 169,
+  "grade": "silver",
+  "name": "부식 I",
+  "rounds": [
+   10
+  ],
+  "side": "ally",
+  "description": "오퍼레이터가 피해를 입힐 때마다 대상 적의 방어력 및 마법 저항 -0.5% (최대 -25%)",
+  "notes": ""
+ },
+ {
+  "source": 170,
+  "identity": 170,
+  "grade": "gold",
+  "name": "정예화 I",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "ally",
+  "description": "박사의 홀로그램 1개 획득",
+  "notes": ""
+ },
+ {
+  "source": 171,
+  "identity": 171,
+  "grade": "gold",
+  "name": "인력사무소 I",
+  "rounds": [
+   7,
+   10
+  ],
+  "side": "ally",
+  "description": "비콘 2개 획득",
+  "notes": ""
+ },
+ {
+  "source": 172,
+  "identity": 172,
+  "grade": "gold",
+  "name": "대발견 II",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "ally",
+  "description": "호출 모듈 3개 획득",
+  "notes": ""
+ },
+ {
+  "source": 173,
+  "identity": 173,
+  "grade": "gold",
+  "name": "대발견 I",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "ally",
+  "description": "호출 모듈 2개 획득",
+  "notes": ""
+ },
+ {
+  "source": 174,
+  "identity": 174,
+  "grade": "gold",
+  "name": "약점 공격 I",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "ally",
+  "description": "모든 아군 유닛의 대미지 유형이 약점 대미지로 변경",
+  "notes": ""
+ },
+ {
+  "source": 175,
+  "identity": 175,
+  "grade": "gold",
+  "name": "페가수스 I",
+  "rounds": [
+   10
+  ],
+  "side": "ally",
+  "description": "페가수스의 투구, 페가수스의 랜스 획득",
+  "notes": ""
+ },
+ {
+  "source": 176,
+  "identity": 176,
+  "grade": "gold",
+  "name": "공개모집 II",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "ally",
+  "description": "간이 통신기 5개 획득",
+  "notes": ""
+ },
+ {
+  "source": 177,
+  "identity": 177,
+  "grade": "silver",
+  "name": "공개모집 I",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "ally",
+  "description": "간이 통신기 3개 획득",
+  "notes": ""
+ },
+ {
+  "source": 178,
+  "identity": 178,
+  "grade": "gold",
+  "name": "야수의 심장 II",
+  "rounds": [
+   10
+  ],
+  "side": "ally",
+  "description": "전장과 대기석의 모든 오퍼레이터를 판매하고 모든 장비 파기. 무작위 정예화 오퍼레이터 9명 획득",
+  "notes": "상점 등급에 관계없이 완전 무작위로 획득"
+ },
+ {
+  "source": 179,
+  "identity": 179,
+  "grade": "silver",
+  "name": "야수의 심장 I",
+  "rounds": [
+   10
+  ],
+  "side": "ally",
+  "description": "전장과 대기석의 모든 오퍼레이터를 판매하고 모든 장비 파기. 무작위 정예화 오퍼레이터 7명 획득",
+  "notes": "상점 등급에 관계없이 완전 무작위로 획득"
+ },
+ {
+  "source": 180,
+  "identity": 180,
+  "grade": "gold",
+  "name": "레벨 업 I",
+  "rounds": [
+   7,
+   10
+  ],
+  "side": "ally",
+  "description": "이번 상점 승급 비용을 2로 설정",
+  "notes": "이미 6레벨이거나 이번 라운드 상점 승급 비용이 2 이하라면 등장하지 않아야 함"
+ },
+ {
+  "source": 181,
+  "identity": 181,
+  "grade": "gold",
+  "name": "이샤믈라의 축복 I",
+  "rounds": [
+   4
+  ],
+  "side": "ally",
+  "description": "돌연변이 세포 1개 획득",
+  "notes": ""
+ },
+ {
+  "source": 182,
+  "identity": 182,
+  "grade": "prism",
+  "name": "대격변 II",
+  "rounds": [
+   4
+  ],
+  "side": "ally",
+  "description": "전장에 배치된 모든 오퍼레이터를 한 단계 높은 무작위 정예화 오퍼레이터로 교체",
+  "notes": "획득 판정이 아니며, 위치와 방향이 동일하게 배치되어야 하고, 장비를 그대로 승계"
  }
 ];
