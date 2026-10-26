@@ -3036,5 +3036,22 @@
   "통합 패치노트": "Combined Patch Notes",
   "유구한 물결": "Enduring Current",
   "밤길의 촛불": "Candlelight on the Night Road",
-  "태평성대의 풍경": "Portrait of Prosperity"
+  "태평성대의 풍경": "Portrait of Prosperity",
+  "신규 스킨 · 공식 이펙트 보강 · 소환물 표시 수정": "New skins · More official effects · Summon display fixes",
+  "공식 이펙트": "Official effects",
+  "소환물 표시": "Summon display",
+  "전투 및 기록": "Battle and records",
+  "성능": "Performance",
+  "슈·블레이즈 디 이그나이팅 스파크·스와이어 디 엘리건트 위트의 신규 스킨을 추가했습니다. 스킨 전용 공격·스킬 이펙트가 함께 적용됩니다.": "Added new skins for Shu, Blaze the Igniting Spark and Swire the Elegant Wit, with their own attack and skill effects.",
+  "클레멘티아 2스킬의 부유 추방 포드와 소용돌이를 공식 이펙트로 표시합니다.": "Clementia's S2 floating exile pod and vortex now use the official effects.",
+  "유키 마코토의 이펙트가 공식 부착 위치에서 재생되도록 수정했습니다.": "Makoto Yuki's effects now play at their official mount points.",
+  "캐서린·위셔델 등 일부 소환물이 모델 대신 마름모로 표시되던 문제를 수정했습니다.": "Fixed some summons, such as Catherine's and Wiš'adel's, being drawn as a diamond instead of their model.",
+  "울피아누스 등의 모델이 없는 소환물 표식에 마름모가 함께 표시되던 문제를 수정했습니다.": "Fixed a diamond appearing on model-less summon markers such as Ulpianus's.",
+  "엑시아 3스킬이 주변에 적이 없어도 SP가 가득 차면 발동합니다.": "Exusiai's S3 now activates when her SP is full, even with no enemies nearby.",
+  "혼의 스킬 공격도 거리에 따라 근거리·원거리 공격 모션을 사용합니다.": "Horn's skill attacks now also use her melee or ranged attack motion by distance.",
+  "돌파 선택 후 누수 수가 전투 종료 시 사라지던 문제를 수정했습니다.": "Fixed the leak count disappearing at the end of battle after choosing a breakthrough.",
+  "선발로 선택한 전용 오퍼레이터가 맹약 목록에 표시되도록 수정했습니다.": "Exclusive operators selected as recruits now appear in the bond list.",
+  "저장 공간이 부족할 때 최근 전투 기록의 상세가 보이지 않던 문제를 수정했습니다.": "Fixed recent battle record details not showing when storage ran short.",
+  "전용 효과음이 없는 스킬에서 다른 스킬의 효과음이 재생되던 문제를 수정했습니다.": "Fixed skills without their own sound effect playing another skill's sound.",
+  "전투 계산의 반복 연산을 줄였습니다.": "Reduced repeated calculations in battle."
 }
