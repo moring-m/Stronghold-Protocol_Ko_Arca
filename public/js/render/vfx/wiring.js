@@ -47,6 +47,7 @@ import { bombardAnchor } from './bombardAnchor.js';
 import { spawnPoint, mountPoint, unitPoint, skinPoint, spawnKind, mountKind, spawnRotation, mountRotation, graphicRotation } from './mounts.js';
 import { projectileParts, paracurve, arcHeight, wobble } from './flight.js';
 import { WindFx } from './windfx.js';
+import { ClemntFx } from './clemntfx.js';
 import { effectArtScale } from './artScale.js';
 import { costumeFor, costumeSkin, costumeEffect, costumeProjectile, costumePreloadKeys } from './costumes.js';
 import { GROUND_SPAWNS } from './effect.js';
@@ -272,6 +273,7 @@ export class FxWiring {
     this.bombardAims = new Map();
     this.chenWaves = new Map();
     this.windFx = new WindFx(this);
+    this.clemntFx = new ClemntFx(this);
     this.noteFx = new NoteFx(this);
     this.kitProjectileFx = new KitProjectileFx(this);
     this.flights = new Set();     // projectile flights in the air
@@ -1655,7 +1657,7 @@ export class FxWiring {
   /** b.ev ['skill', id, on] (SkillFx.skill): true when the official layer shows the skill (no procedural burst / aura). */
   skill(v, on, cast = null) {
     if (!v || v.prep || !this.idx) return false;
-    if(!on){const id=v.id??v.info?.id;this.chenWaves.get(id)?.handle.stop();this.chenWaves.delete(id);}
+    if(!on){const id=v.id??v.info?.id;this.chenWaves.get(id)?.handle.stop();this.chenWaves.delete(id);this.clemntFx.skillOff(id);}
     const drew = this.skills.skill(v, !!on, cast);
     this.talents.skill(v, !!on);   // the talents a skill start casts (ON_SKILL_START)
     this.funnels.skill(v, !!on);   // the floating units of the skill's mode (render/vfx/funnelfx.js)
@@ -1690,8 +1692,7 @@ export class FxWiring {
 
   noteBubbles(notes){return this.noteFx.sync(notes);}
 
-  // The extracted Clemen(tia) pack has body/attack art, but no independent cabin/vortex asset.
-  // Preserve only these missing visuals with their existing procedural fallback.
+  // 克莱门莎's cabin / vortex: the official prefabs (vfx/clemntfx.js) when installed, else these procedural zones.
   simpleEvent(kind,extra){
     if(kind.startsWith('makoto')&&this.view(extra?.src??extra?.id)?.info?.charId==='char_4217_makoto')return true;
     if(!['anchor','tide'].includes(kind))return false;
@@ -1719,6 +1720,7 @@ export class FxWiring {
     if(kind==='sakikoNoteSound')return true;
     if(this.kitProjectileFx.simFx(kind,x,y,extra,owner))return true;
     if(this.windFx.simFx(kind,x,y,extra,owner))return true;
+    if(this.clemntFx.simFx(kind,x,y,extra,owner))return true;
     if(kind==='chen3Wave'&&this.ofx.active&&owner){
       const id=owner.id??owner.info?.id;let wave=this.chenWaves.get(id);
       if(!wave){
@@ -1827,6 +1829,7 @@ export class FxWiring {
     this.flights.clear();
     this.bombardAims.clear();
     this.windFx.clear();
+    this.clemntFx.clear();
     this.noteFx.clear();
     this.kitProjectileFx.clear();
     for(const wave of this.chenWaves.values())wave.handle.stop();this.chenWaves.clear();
@@ -1855,6 +1858,7 @@ export class FxWiring {
   tick() {
     this.skills.frame++;
     this.windFx.tick();
+    this.clemntFx.tick();
     this.kitProjectileFx.tick();
     for(const [id,wave]of this.chenWaves){const owner=this.view(id);if(!this.ofx.active||!owner||owner.alive===false||this.ofx.time-wave.at>.5){wave.handle.stop();this.chenWaves.delete(id);}}
     for (const wall of this.walls) { wall.update(); if (!wall.alive) this.walls.delete(wall); }
