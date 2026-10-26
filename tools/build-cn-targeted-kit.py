@@ -1,7 +1,8 @@
 """Build the targeted CN recovery add-on (tools/local-extract/targeted_recovery.py) for the existing Windows CN kit.
 
 Usage: python3 -I tools/build-cn-targeted-kit.py OUT.zip
-No Node or repository checkout is needed on the client PC; the kit's own .venv and prepare_client.py are reused.
+No Node or repository checkout is needed on the client PC: the kit installs its Python 3.12 environment (or reuses an
+existing CN kit's .venv) and prepares a hard-linked, read-only view of the client (prepare_client.py).
 """
 import json
 from pathlib import Path
@@ -42,14 +43,22 @@ def plan():
 
 README = """중국판 클라이언트 대상 추출 (2026-10-26)
 
-기존 중국판 추출 도구 폴더(.venv, prepare_client.py, work 가 있는 곳)에 압축을 풀고 덮어쓰세요.
-PowerShell에서 실행:
+준비
+- 중국판 명일방주 PC 클라이언트를 설치하고 최신 버전으로 업데이트해 둡니다(한국판 클라이언트가 아닙니다).
+- 이 ZIP을 중국 클라이언트와 같은 드라이브(NTFS)의 새 폴더에 풀어 주세요. 예: D:\\ak-extract
+  (클라이언트 파일을 복사하지 않고 하드링크로 읽기 때문에 같은 드라이브여야 합니다.)
+- 예전 추출 도구 폴더(.venv, work 가 있는 곳)가 있다면 그 폴더에 덮어써도 됩니다. Python 환경을 다시 설치하지 않습니다.
 
-  .\\EXTRACT-TARGETED.ps1
+실행 (PowerShell)
 
-기본으로 가장 최근 work\\cn-client-* 준비 폴더를 사용합니다. 게임을 업데이트했다면 설치 폴더를 지정하세요:
+  cd D:\\ak-extract
+  powershell -ExecutionPolicy Bypass -File .\\EXTRACT-TARGETED.ps1
 
-  .\\EXTRACT-TARGETED.ps1 -ClientPath '중국 클라이언트 설치 폴더'
+- 처음에는 64비트 Python 3.12와 필요한 패키지를 설치합니다(관리자 권한·C++ 빌드 도구 불필요).
+- 중국 클라이언트 게임 폴더를 고르는 창이 뜹니다. 선택한 경로는 client-path.txt 에 저장됩니다.
+- 이미 준비된 work\\cn-client-* 폴더가 있으면 가장 최근 것을 씁니다. 게임을 업데이트했다면 설치 폴더를 지정하세요:
+
+  powershell -ExecutionPolicy Bypass -File .\\EXTRACT-TARGETED.ps1 -ClientPath '중국 클라이언트 설치 폴더'
 
 대상
 - 스킨 3종(슈 源远流长, 烛煌 夜行烛火, 琳琅诗怀雅 盛世之象): 모델·이펙트·초상화
@@ -73,6 +82,7 @@ def build(out):
             z.write(ROOT / 'tools/local-extract' / name, 'tools/local-extract/' + name)
         z.writestr('tools/local-extract/plugin-fx.mjs', 'process.stdout.write("[]");\n')
         z.write(ROOT / 'tools/local-extract/targeted-START.ps1', 'EXTRACT-TARGETED.ps1')
+        z.write(ROOT / 'tools/local-extract/prepare_client.py', 'prepare_client.py')
         z.writestr('targeted-plan.json', json.dumps(plan(), ensure_ascii=False, indent=2))
         z.writestr('README-targeted-ko.txt', README.replace('\n', '\r\n'))
     return out
