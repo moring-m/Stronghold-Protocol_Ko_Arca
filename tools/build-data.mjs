@@ -535,6 +535,7 @@ const TRIGGER_DEVIATIONS = Object.freeze({
  *   summons keep DEFAULT); chessId = the chess's NORMAL id (TRIGGER_DEVIATIONS key)
  */
 function resolveTrigger(ctx, char, charId, skillIdx, skill, { operator = false, chessId = null } = {}) {
+  if (charId === 'char_103_angel' && skillIdx === 2) return {rule:'SP_FULL',rawRule:'SP_FULL',customRangeGrid:null};
   const rows = Object.values(ctx.ac.skillTriggerDataList || {});
   const manual = skill.skillType === 'MANUAL';
   const pick =

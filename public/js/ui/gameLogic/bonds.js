@@ -189,6 +189,8 @@ export function bondMembers(bond, priv, banned = [], getChess = () => null, getI
   const baseOf = (id) => getChess(id)?.baseId || (typeof id === 'string' ? id.replace(/_b$/, '_a') : id);
   const onBoard = new Set();
   const owned = new Set();
+  const selected = new Set(Array.isArray(priv?.selectedRecruits) ? priv.selectedRecruits.map(baseOf) : []);
+  for (const [id, entry] of Object.entries(priv?.loadout || {})) if (entry?.selected === true) selected.add(baseOf(id));
   const inHand = new Set();
   const memberSet = new Set(members);
   /** base id → { on: on the board?, hand: in the hand?, items: the wearer's item ids } — operators of the player that join this bond through 变形同构体 */
@@ -252,10 +254,11 @@ export function bondMembers(bond, priv, banned = [], getChess = () => null, getI
   for (const slotId of Object.keys(diyPicks(priv))) {
     if (diy.has(slotId)) continue;
     const rec = recOf({ kind: 'chess', id: slotId });
+    if (rec?.optionalRecruit && !selected.has(baseOf(slotId))) continue;
     if (diyOfBond(rec) && rec.diyFor === slotId) diy.set(slotId, { on: false, hand: false, owned: false, rec, pick: null });
   }
   const diyBanned = new Set(Array.isArray(priv?.diyBanned) ? priv.diyBanned : []);
-  const rows = members.map((id) => {
+  const rows = members.filter(id => !getChess(id)?.optionalRecruit || selected.has(baseOf(id)) || owned.has(baseOf(id))).map((id) => {
     const c = getChess(id);
     return { id, tier: c?.tier ?? 0, name: c?.name ?? id, onBoard: onBoard.has(id), owned: owned.has(id), inHand: inHand.has(id), banned: bannedSet.has(id) };
   });

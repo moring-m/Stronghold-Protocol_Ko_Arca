@@ -722,7 +722,7 @@ describe('special terrain tip', () => {
   });
 });
 
- test('bond member list includes only selected optional recruits, preserving owned and watched selections', () => {
+ test('bond member list includes selected and owned recruits, excluding unselected recruits', () => {
   const records = {normal: {name:'Normal'}, recruit: {name:'Recruit',optionalRecruit:true,baseId:'recruit'}};
   const bond = {members:['normal','recruit']};
   const rows = priv => bondMembers(bond,priv,[],id=>records[id]).map(r=>r.id).sort();
@@ -747,3 +747,11 @@ describe('special terrain tip', () => {
   assert.equal(migrateSavedSettings(sanitizeSettings(custom)).chatSound, custom.chatSound);
   assert.deepEqual(migrateSavedSettings(migrated), migrated);
  });
+
+test('unselected recruit-only operators are absent from bond catalogue members',()=>{
+ const lookup=id=>({base:{tier:1},recruit:{tier:6,optionalRecruit:true}}[id]);
+ const b={bondId:'test',members:['base','recruit'],visibleMembers:['base','recruit']};
+ assert.deepEqual(bondMembers(b,{board:[],hand:[]},[],lookup).map(r=>r.id),['base']);
+ const own=bondMembers(b,{board:[{kind:'chess',id:'recruit',items:[]}],hand:[]},[],lookup);
+ assert.equal(own.find(r=>r.id==='recruit')?.onBoard,true,'an actually owned recruit remains visible');
+});

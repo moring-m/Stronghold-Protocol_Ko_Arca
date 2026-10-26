@@ -1,3 +1,4 @@
+import {archiveStatsRecords,readStatsArchive,clearStatsArchive} from './statsArchive.js';
 import {isGameplayMode} from '../../../shared/gameplayModes.js';
 import { recordAugments } from '../../../shared/augments.js';
 import { recordCustomExtensions } from '../../../shared/customExtensions.js';
@@ -66,7 +67,7 @@ export const FULL_KEEP = 30;
 /** Budget of the stored JSON in characters (a character costs up to 2 bytes of the browser's ~5 MB quota): the oldest records go first. */
 export const MAX_CHARS = 800_000;
 /** Largest export file the page reads. */
-export const IMPORT_MAX_CHARS = 8_000_000;
+export const IMPORT_MAX_CHARS = 64_000_000;
 
 const FULL_KEY = `sp.pref.${STATS_PREF_KEY}`;
 const DAMAGED_KEY = `${FULL_KEY}.damaged`;
@@ -337,6 +338,25 @@ export function loadStats() {
   return { ...stats, newer, dropped, damaged: false };
 }
 
+/** Hydrate detailed JSON independently of the localStorage index budget. */
+export async function loadStatsWithDetails() {
+  const local = loadStats();
+  if (local.newer) return local;
+  await archiveStatsRecords(local.records);
+  const archived = (await readStatsArchive()).map(normalizeRecord).filter(r => r && !r.compact && r.test !== true);
+  // A summary in localStorage must never win over a full archived row.
+  const localFull = local.records.filter(r => !r.compact);
+  const records = mergeStats({records:localFull}, mergeStats({records:archived},local)).records;
+  return {...local, records};
+}
+
+export async function clearStats() {
+  const saved = saveStats(emptyStats());
+  if (!saved) { try { globalThis.localStorage?.removeItem(FULL_KEY); } catch { /* unavailable */ } }
+  const cleared = await clearStatsArchive();
+  return saved && (!globalThis.indexedDB || cleared);
+}
+
 // ---- compaction + the storage budget ---------------------------------------------------------------------------
 
 const COMPACT_FRAME = ['id', 'v', 't', 'end', 'victory', 'roundsPassed', 'lastRound', 'hiddenReached', 'hiddenCleared', 'reason', 'modeId',
@@ -414,6 +434,7 @@ export function highestBondRecord(records) {
  */
 export function saveStats(stats) {
   if (stats.newer) return false;
+  void archiveStatsRecords(stats.records);
   let recs = fitToBudget(stats.records.filter(r => r.test !== true));
   let compacted = false;
   for (;;) {
@@ -689,7 +710,7 @@ export function recordQuit(state, ctx = {}) {
 
 /**
  * Merge two envelopes (import into existing): union by record id, newest first, capped.
- * @param {{ records: any[] }} a current (wins ties)
+ * @param {{ records: any[] }} a current (wins ties between equally detailed rows)
  * @param {{ records: any[] }} b incoming
  * @returns {{ v: number, records: any[] }}
  */
@@ -697,7 +718,7 @@ export function mergeStats(a, b) {
   const byId = new Map();
   for (const r of [...(Array.isArray(b?.records) ? b.records : []), ...(Array.isArray(a?.records) ? a.records : [])]) {
     const rec = normalizeRecord(r);
-    if (rec && rec.test !== true) byId.set(rec.id, rec);
+    if (rec && rec.test !== true && (!rec.compact || !byId.has(rec.id) || byId.get(rec.id).compact)) byId.set(rec.id, rec);
   }
   const records = [...byId.values()].sort(newestFirst).slice(0, MAX_RECORDS);
   return { v: STATS_VERSION, records };
@@ -731,9 +752,11 @@ export function importStats(raw, current) {
   const have = new Set((Array.isArray(current?.records) ? current.records : []).map((r) => r.id));
   const merged = mergeStats(current, incoming);
   const added = incoming.records.filter((r) => !have.has(r.id)).length;
+  const compactIds = new Set((current.records || []).filter(r => r.compact).map(r => r.id));
+  const restored = merged.records.filter(r => !r.compact && compactIds.has(r.id)).length;
   // Incoming rows are newest first; compacted or unnamed rows cannot restore a nickname.
   const name = incoming.records.map((rec) => sanitizeName(selfRowOf(rec)?.name)).find(Boolean) || '';
-  return { stats: merged, added, skipped: incoming.records.length - added, dropped, name };
+  return { stats: merged, added, restored, skipped: incoming.records.length - added - restored, dropped, name };
 }
 
 /**
@@ -747,7 +770,7 @@ export function exportStats(stats) {
     kind: 'local-stats',
     v: STATS_VERSION,
     exportedAt: new Date().toISOString(),
-    records: fitToBudget(Array.isArray(stats?.records) ? stats.records : []),
+    records: mergeStats(stats,emptyStats()).records,
   };
 }
 

@@ -40,3 +40,12 @@ test('Grain Buds S2 activation event reaches the indexed cast sound once',async(
  audio._track({id:1,kind:'op',side:'ally',charId:'char_4122_grabds',skillIndex:1});audio.handleBattleEvents([['skill',1,8]]);
  assert.equal(played.filter(p=>p==='/assets/audio/sfx/player/p_skill/p_skill_ctefltpn.mp3').length,1);
 });
+
+test('AUTO next-attack abilities use their exact skill-id bank for the strike, never the cast',()=>{
+ const a=JSON.parse(readFileSync('content/production/data/assets.json'));
+ const u=a.audio.sfx.units.char_1047_halo2;
+ assert.equal(u.skillCombat[1].attack,'/assets/audio/sfx/player/p_atk/p_atk_strbsvr_h.mp3');
+ assert.equal(u.skills[1],undefined,'the next-attack strike is not a separate activation cue');
+ assert.notEqual(u.skillCombat[1].attack,u.attacks[0]);
+ assert.notEqual(u.skillCombat[1].attack,u.attacks[2]);
+});

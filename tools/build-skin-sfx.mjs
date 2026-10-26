@@ -3,6 +3,12 @@ import {resolve} from 'node:path';
 export function mergeSkinSfx(base,patch){
  const out={...base,...patch};
  for(const key of ['skills','attacks','hits','skillCombat','mix','attackMix','hitMix'])if(base?.[key]||patch?.[key])out[key]={...base?.[key],...patch?.[key]};
+ // A skin's explicit strike/impact wins over an inherited base skill bank.
+ for(const [table,role]of [['attacks','attack'],['hits','hit']])for(const index of Object.keys(patch?.[table]||{})){
+  if(!out.skillCombat?.[index] || patch?.skillCombat?.[index]?.[role])continue;
+  const combat={...out.skillCombat[index]};delete combat[role];
+  out.skillCombat[index]=combat;
+ }
  return out;
 }
 export async function buildSkinSfx(root,dir){

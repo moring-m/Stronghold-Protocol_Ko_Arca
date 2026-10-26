@@ -6,6 +6,8 @@
 ![license](https://img.shields.io/badge/code%20license-GPL--3.0--or--later-blue)
 ![node](https://img.shields.io/badge/node-22%20%7C%2024-339933)
 
+Claude Code 개발 안내: [설정·실행](docs/CLAUDE-CODE.md) · [현재 작업 인계](docs/CLAUDE-HANDOFF.md).
+
 ## 고지사항
 
 > [!IMPORTANT]

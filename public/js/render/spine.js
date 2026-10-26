@@ -934,6 +934,11 @@ export class SpineActor {
   }
 
   _attackClip() {
+    const clip = this._selectedAttackClip();
+    return this.fortressMelee ? fortressMeleeRole(this.entry, clip) : clip;
+  }
+
+  _selectedAttackClip() {
     if (this.strike) return this.strike;
     if (this.mode === 'attack' && this._repeatClip) return this._repeatClip;
     if(this.enemyModel && this.formRoles?.attack && this.has(this.formRoles.attack.loop))return this.formRoles.attack;
@@ -967,7 +972,7 @@ export class SpineActor {
       return sk;
     }
     const a = this.roles.attack;
-    if (a && this.has(a.loop)) return this.fortressMelee?fortressMeleeRole(this.entry,a):a;
+    if (a && this.has(a.loop)) return a;
     return null;
   }
 
@@ -993,7 +998,7 @@ export class SpineActor {
   _skillIdle() {
     const sk = this.roles.skill;
     if (!this.skillOn || !sk || sk.idle === sk.loop || !this.has(sk.idle)) return null;
-    return this._attackClip() === sk ? sk.idle : null;
+    return this._selectedAttackClip() === sk ? sk.idle : null;
   }
 
   /**
@@ -1243,7 +1248,7 @@ export class SpineActor {
           }
           this.mode = 'base';
           // a skill with its own idle: back to that idle (its end clip is for the end of the skill, setSkill(false))
-          const toSkillIdle = clip === this.roles.skill && !!this._skillIdle();
+          const toSkillIdle = !!this._skillIdle() && (clip === this.roles.skill || this.fortressMelee && clip.loop === fortressMeleeRole(this.entry,this.roles.skill)?.loop);
           const end = this._normalAttackEnd(clip);
           if (end && !toSkillIdle) { this._play(end, false); this._queue(this._baseName(), true); }
           else this._play(this._baseName(), true, { mix: 0.15 });

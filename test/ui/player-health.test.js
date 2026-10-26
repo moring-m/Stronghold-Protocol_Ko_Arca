@@ -26,3 +26,11 @@ test('teammate breakthrough previews multiply HP loss but retain united-defense 
  const united={...state,phase:'UNITE',unite:{leakers:['p2']}};
  assert.deepEqual(rowLp(pub.players[1],united,null,{uniteLocal:{p2:3}}),{lp:15,pending:6,unite:true,left:3});
 });
+
+test('immediate Breakthrough damage does not clear the pending normal leak count before settlement',()=>{
+ const start=liveLp(null,{phase:'COMBAT',round:2,lp:20,statsLeaks:0,leaks:0,immediateLeaks:true});
+ const leaked=liveLp(start.base,{phase:'COMBAT',round:2,lp:17,statsLeaks:0,leaks:3,immediateLeaks:true});
+ assert.equal(leaked.pending,3);assert.equal(leaked.shown,14,'17 current HP minus the later normal settlement');
+ const end=liveLp(leaked.base,{phase:'COMBAT',round:2,lp:17,statsLeaks:0,leaks:3,immediateLeaks:true});assert.equal(end.pending,3);
+ const settled=liveLp(end.base,{phase:'SETTLE',round:2,lp:14,statsLeaks:3,leaks:3,immediateLeaks:true});assert.equal(settled.pending,0);assert.equal(settled.shown,14);
+});

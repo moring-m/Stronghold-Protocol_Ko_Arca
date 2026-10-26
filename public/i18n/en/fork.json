@@ -3030,5 +3030,6 @@
   "연결 정리, 서버 종료 및 리소스 패키징·추출 도구의 오류 처리를 개선했습니다.": "Improved connection cleanup, server shutdown, and error handling in resource packaging and extraction tools.",
   "전투 포기 및 연속 공격 모션 핫픽스": "Battle surrender and consecutive attack animation hotfix",
   "전투 포기 시 잘못된 접근 안내가 표시되어 포기할 수 없던 문제를 수정했습니다.": "Fixed an invalid-access error that prevented surrendering a battle.",
-  "살카즈 대검사 계열의 연속 공격이 대기 자세로 되돌아가는 문제를 수정했습니다. 타격 시점과 공격 후딜레이는 유지됩니다.": "Fixed Sarkaz greatsword enemies returning to their resting pose between consecutive attacks. Hit timing and attack recovery remain unchanged."
+  "살카즈 대검사 계열의 연속 공격이 대기 자세로 되돌아가는 문제를 수정했습니다. 타격 시점과 공격 후딜레이는 유지됩니다.": "Fixed Sarkaz greatsword enemies returning to their resting pose between consecutive attacks. Hit timing and attack recovery remain unchanged.",
+  "최근 {max}개 기록을 보관하며, 상세 기록은 별도로 저장합니다.": "Keeps the latest {max} matches, with full details stored separately."
 }
