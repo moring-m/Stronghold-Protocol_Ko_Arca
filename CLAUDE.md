@@ -52,6 +52,11 @@
 ## 운영·Git·리소스
 
 - 사용자 요청 없이 커밋·푸시·릴리즈·배포하지 않는다. 요청이 있으면 지정 버전과 범위로 진행한다.
+- 버전 형식은 `vA.B.CdE`다 (d: 업데이트 문자, E: 핫픽스 숫자). PR을 만들 때 버전을 올린다.
+  - 핫픽스 PR: E를 올린다 (`0.3.3a` → `0.3.3a1`, `0.3.3a1` → `0.3.3a2`). 패치노트는 해당 d 항목의 `hotfixes`에 넣는다.
+  - 그 외 PR: d를 다음 문자로 올리고 E는 뗀다 (`0.3.3a1` → `0.3.3b`).
+  - 원본 저장소(`sganggs/Stronghold-Protocol`)의 새 C버전을 병합한 뒤 첫 배포: A.B.C를 원본과 같게 맞추고 d를 `a`부터 시작한다 (원본 0.3.4 병합 → `0.3.4a`).
+  - 함께 고칠 곳: `shared/constants.js`(`APP_VERSION`, `BASE_VERSION`), `package.json`·`package-lock.json`(A.B.C), `README.md` 버전 배지, `shared/patchNotes.js`, `CHANGELOG.md`(통합 패치노트 포함). `test/version.test.js`로 확인한다.
 - **`origin/master`에 푸시하면 GitHub Actions의 운영 배포가 시작될 수 있다.** 기본 원격은 `moring-m/Stronghold-Protocol_Ko_Arca`이며, 원본 `sganggs/Stronghold-Protocol`과 혼동하지 않는다.
 - 배포/라우터 프로토콜을 바꿀 때 운영 서버 스크립트와 라우터의 동시 갱신 필요성을 검토하고 정확한 명령을 제공한다. 구버전의 진행 중인 방을 보호한다.
 - `.env`, API 키, 세션 쿠키, SSH 키, Cloudflare 토큰 등은 문서·아카이브·커밋에 넣지 않는다.
