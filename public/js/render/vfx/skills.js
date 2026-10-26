@@ -531,6 +531,21 @@ export const COND_BUFFS = Object.freeze({
     on: ['billro_skill_03_buff_02_01', 'billro_skill_03_buff_01_01_02'],
     full: ['billro_skill_03_buff_01_02', 'billro_skill_03_buff_01_01_02'], ready: ['billro_skill_03_buff_01_01'],
   }),
+  // read from the CN client of 2026-10-22 (the same graph shapes): 陈 the 2nd S2 is 卡涅利安's (the enhance mark: `charged`)
+  'chen2_s_2[eff_cond]': Object.freeze({
+    charged: ['chen2_skill_02_buff_01_02', 'chen2_skill_02_buff_01_01'], on: ['chen2_skill_02_buff_01_01'],
+    full: ['chen2_skill_02_buff_01_02', 'chen2_skill_02_buff_01_01'], ready: ['chen2_skill_02_buff_01_01'],
+  }),
+  // `byCharges`: the graph reads the stored charges alone (CompareCharSkillAvailableCnt / CheckCharSkillAvailable), the
+  // skill running or not — 诺希斯 S2 and 流明 S2: one charge → the first effect, two → the second (the client's 诺希斯 graph
+  // keeps a stale first effect when it drops from two to one [ASSUMED: shown alone]); 至简 S2: any charge → both
+  'gnosis_s_2[eff_cond]': Object.freeze({ byCharges: true, full: ['gnosis_skill_02_buff_02'], ready: ['gnosis_skill_02_buff_01'] }),
+  'lumen_s_2[eff_cond]': Object.freeze({ byCharges: true, full: ['lumen_skill_02_buff_02'], ready: ['lumen_skill_02_buff'] }),
+  'malist_s_2[eff_cond]': Object.freeze({ byCharges: true, full: ['malist_skill_2_buff_weapon', 'malist_skill_2_buff'], ready: ['malist_skill_2_buff_weapon', 'malist_skill_2_buff'] }),
+  // Mon3tr S1: any charge stored; 雷蛇 the 2nd S1: one more loop per charge stored (`counts`: stored charges → loops)
+  'monstr_s_1[ready]': Object.freeze({ byCharges: true, full: ['monstr_skill_01_buff'], ready: ['monstr_skill_01_buff'] }),
+  'leizi2_s_1[effect_controller]': Object.freeze({ byCharges: true, counts: Object.freeze({ 1: ['leizi2_skill_01_buff_01'], 2: ['leizi2_skill_01_buff_01', 'leizi2_skill_01_buff_02'], 3: ['leizi2_skill_01_buff_01', 'leizi2_skill_01_buff_02', 'leizi2_skill_01_buff_03'] }),
+    full: ['leizi2_skill_01_buff_01', 'leizi2_skill_01_buff_02'], ready: ['leizi2_skill_01_buff_01'] }),
 });
 
 /**
@@ -538,8 +553,8 @@ export const COND_BUFFS = Object.freeze({
  * charge; `charges` — [stored, maximum] (b.snap `charges`), null when unknown. Returns 'charged' | 'on' | 'full' |
  * 'ready' | null.
  */
-export function condState({ on = false, charged = false, charges = null } = {}) {
-  if (on) return charged ? 'charged' : 'on';
+export function condState({ on = false, charged = false, charges = null, byCharges = false } = {}) {
+  if (on && !byCharges) return charged ? 'charged' : 'on';
   const n = Array.isArray(charges) ? Number(charges[0]) || 0 : 0;
   return n >= 2 ? 'full' : n >= 1 ? 'ready' : null;
 }

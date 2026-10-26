@@ -1001,9 +1001,14 @@ export class SkillFx {
   _cond(U, v) {
     const on = this._on(U);
     if (!on) U.charged = false;
-    const st = condState({ on, charged: !!U.charged, charges: v.charges });
     const want = new Map();
-    if (st) for (const e of U.plan.cond) if (COND_BUFFS[e.buff]?.[st]?.includes(e.key)) want.set(e.key, e);
+    for (const e of U.plan.cond) {
+      const g = COND_BUFFS[e.buff];
+      if (!g) continue;
+      if (g.counts) { const n = Math.min(3, Array.isArray(v.charges) ? Number(v.charges[0]) | 0 : 0); if (g.counts[n]?.includes(e.key)) want.set(e.key, e); continue; }
+      const st = condState({ on, charged: !!U.charged, charges: v.charges, byCharges: !!g.byCharges });
+      if (st && g[st]?.includes(e.key)) want.set(e.key, e);
+    }
     const map = U.cond || (U.cond = new Map());
     for (const [k, t] of map) if (!want.has(k) || (!t.h.alive && t.e.loop)) { if (!want.has(k)) t.h.stop(); map.delete(k); }
     for (const [k, e] of want) {
