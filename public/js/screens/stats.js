@@ -30,7 +30,7 @@ import { TITLE_HEX_SECTORS, titleSectorClip } from '../ui/titleHexagon.js';
 import { store, createStore, useStore, selectRoute } from '../store.js';
 import { ResultView } from './result.js';
 import { toast, toastError } from '../ui/toasts.js';
-import { loadStats, saveStats, emptyStats, importStats, exportStats, aggregateStats, countsTowardStats, selfRowOf, roundsOf, isModdedRecord, recordToResult, MAX_RECORDS, FULL_KEEP, IMPORT_MAX_CHARS, trophyMedalOf, strategyBadgeIds, bondMemberChess, highestBondRecord } from '../ui/stats.js';
+import { loadStats, loadStatsWithDetails, clearStats, saveStats, importStats, exportStats, aggregateStats, countsTowardStats, selfRowOf, roundsOf, isModdedRecord, recordToResult, MAX_RECORDS, IMPORT_MAX_CHARS, trophyMedalOf, strategyBadgeIds, bondMemberChess, highestBondRecord } from '../ui/stats.js';
 import { t, N_ } from '../../../shared/i18n.js';
 
 const cx = (...p) => p.flat().filter(Boolean).join(' ');
@@ -453,7 +453,7 @@ function History({ records, gd, onOpen }) {
       <tbody>${rows.map((r) => html`<${HistoryRow} key=${r.id} rec=${r} gd=${gd} onOpen=${onOpen} />`)}</tbody>
     </table></div>
     ${records.length > shown ? html`<div class="st-more"><${Button} size="sm" variant="secondary" onClick=${() => setShown(shown + HISTORY_PAGE)}>${t('显示更多（还有 {n} 局）', { n: records.length - shown })}<//></div>` : null}
-    <p class="st-hint">${t('点击一行，回看该局结算；中途退出的对局只留记录。')} ${t('最多保留最近 {max} 局，最新的 {full} 局及盟约最高叠加战绩能回看结算。', { max: MAX_RECORDS, full: FULL_KEEP })}</p>`
+    <p class="st-hint">${t('点击一行，回看该局结算；中途退出的对局只留记录。')} ${t('최근 {max}개 기록을 보관하며, 상세 기록은 별도로 저장합니다.', { max: MAX_RECORDS })}</p>`
       : html`<p class="st-empty">${t('还没有记录 —— 完成一局对局后，这里会开始积累。')}</p>`}
   <//>`;
 }
@@ -496,11 +496,17 @@ function StatsScreen({ tab }) {
 
   const withModded = useStore((s) => s.withModded, Object.is, statsStore);
   const agg = useMemo(() => aggregateStats(stats.records, { modded: withModded }), [stats, withModded]);
-  const reload = () => setStats(loadStats());
+  const reloadSeq = useRef(0);
+  const reload = async () => {
+    const request = ++reloadSeq.current;
+    const next = await loadStatsWithDetails();
+    if (request === reloadSeq.current) setStats(next);
+  };
+  useEffect(() => { void reload(); return () => { reloadSeq.current++; }; }, []);
 
-  const doExport = () => {
+  const doExport = async () => {
     try {
-      const payload = exportStats(stats);
+      const payload = exportStats(await loadStatsWithDetails());
       downloadText(exportFilename(), JSON.stringify(payload));
       toast(t('已导出 {n} 条对局记录', { n: payload.records.length }), 'success');
     } catch (err) {
@@ -514,15 +520,15 @@ function StatsScreen({ tab }) {
     if (file.size > IMPORT_MAX_CHARS) { toast(t('文件过大，无法导入'), 'error'); return; }
     try {
       const raw = JSON.parse(await readFileText(file));
-      const { stats: merged, added, skipped, dropped, name } = importStats(raw, loadStats());
-      if (added && !saveStats(merged)) { toast(t('无法写入本机存储，可能已满'), 'error'); return; }
+      const { stats: merged, added, restored, skipped, dropped, name } = importStats(raw, await loadStatsWithDetails());
+      if ((added || restored) && !saveStats(merged)) { toast(t('无法写入本机存储，可能已满'), 'error'); return; }
       if (!store.get().me.name && name) {
         identity.saveName(name);
         store.patch('me', { name });
       }
       reload();
       const tail = (skipped ? t('（跳过重复 {skipped} 条）', { skipped }) : '') + (dropped ? t('（{n} 条无法读取）', { n: dropped }) : '');
-      toast(added ? t('已导入 {added} 条记录{tail}', { added, tail }) : t('没有新记录（全部与现有数据重复）'), 'success');
+      toast(added || restored ? t('已导入 {added} 条记录{tail}', { added: added + restored, tail }) : t('没有新记录（全部与现有数据重复）'), 'success');
     } catch (err) {
       toast(err?.code === 'stats-newer-version' ? t('导入失败：这份文件由更新版本的客户端导出，请先升级客户端') : t('导入失败：不是有效的统计导出文件'), 'error');
     }
@@ -533,7 +539,7 @@ function StatsScreen({ tab }) {
       text: t('将删除本机保存的 {n} 条对局记录，无法恢复。', { n: stats.records.length }),
     });
     if (!ok) return;
-    if (!saveStats(emptyStats())) { try { globalThis.localStorage?.removeItem('sp.pref.stats'); } catch { /* ignore */ } }
+    if (!await clearStats()) { toast(t('无法写入本机存储，可能已满'), 'error'); return; }
     reload();
     toast(t('已清空本机统计数据'), 'success');
   };

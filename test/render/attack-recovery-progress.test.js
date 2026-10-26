@@ -93,3 +93,18 @@ test('Executor S1 keeps normal attacks for the base model and every skin; S2 kee
   const second=actor(entry,1);assert.notEqual(second._attackClip().loop,entry.anims.attack.loop,`${assetId}/${face} S2`);checked++;
  }assert.ok(checked>=4);
 });
+
+test('Horn front/back and costume skill attacks select their authored melee and ranged clips',()=>{
+ let checked=0;
+ for(const [id,value]of Object.entries(releaseAssets.chars))for(const [face,entry]of Object.entries(value.spine||{})){
+  if(!entry?.skel?.includes('char_4039_horn'))continue;
+  for(const index of [null,0,1,2]){
+   const a=actor(entry,index);a.fortressMelee=false;const ranged=a._attackClip();if(!ranged?.loop?.includes('_A'))continue;
+   const melee=ranged.loop.replace('_A','_B');if(!entry.animations[melee])continue;
+   a.fortressMelee=true;assert.equal(a._attackClip().loop,melee,`${id}/${face}/skill ${index}`);
+   if(index!=null && a._skillIdle()){a.beginAttack(2,a._hitTime(melee,a.dur(melee)));a.attack(2);a.update(a.dur(melee)+.01);assert.equal(a.current,a.roles.skill.idle,'melee attacks return to skill idle without replaying Skill_End');}
+   a.fortressMelee=false;assert.equal(a._attackClip().loop,ranged.loop);checked++;
+  }
+ }
+ assert.ok(checked>=8,`checked ${checked} Horn clip pairs`);
+});

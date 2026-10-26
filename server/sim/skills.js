@@ -510,10 +510,16 @@ export class SkillRuntime {
     const grid = tg?.rangeGrid || (!this.isTimed ? u.def?.skill?.rangeGrid : null);
     const extra = (tg?.rangeExtend || 0) + (this.spec.mods?.rangeExtend || 0);
     if (!grid && !extra) return null;
-    const keys = absoluteRangeKeys(grid || u.rangeGrid || [[0,0]], u.tileR, u.tileC, u.dir,
-      (tg?.noRangeExtend ? 0 : u.s.rangeExtend) + extra, this.battle.grid);
-    const base = new Set(u.baseRangeKeys || u.rangeKeys || []);
-    return keys.some(k => !base.has(k)) ? keys : null;
+    // cached per input (checked every tick, twice): range arrays are replaced, never mutated (Battle._refreshRange)
+    const g = grid || u.rangeGrid || null, ext = (tg?.noRangeExtend ? 0 : u.s.rangeExtend) + extra;
+    const baseArr = u.baseRangeKeys || u.rangeKeys || null, dims = this.battle.grid;
+    const c = this._prosCache;
+    if (c && c.g === g && c.r === u.tileR && c.c === u.tileC && c.dir === u.dir && c.ext === ext && c.base === baseArr && c.dims === dims) return c.out;
+    const keys = absoluteRangeKeys(g || [[0,0]], u.tileR, u.tileC, u.dir, ext, dims);
+    const base = new Set(baseArr || []);
+    const out = keys.some(k => !base.has(k)) ? keys : null;
+    this._prosCache = { g, r: u.tileR, c: u.tileC, dir: u.dir, ext, base: baseArr, dims, out };
+    return out;
   }
 
   /**

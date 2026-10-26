@@ -18,3 +18,9 @@ test('new skin audio URLs have no fragment and are included in the downloadable 
  const catalog=JSON.parse(readFileSync('content/production/resources.json'));const files=new Map(catalog.files.map(f=>[f.path,f]));
  for(const f of supplement.files){assert.ok(!f.path.includes('#'));assert.equal(files.get(f.path)?.bytes,f.bytes);assert.match(f.sha256,/^[a-f0-9]{64}$/);}
 });
+
+test('a costume strike takes priority over an inherited base skill combat sound without mutating the base',()=>{
+ const base={skillCombat:{1:{attack:'base-s2',hit:'base-hit'}}};
+ const m=mergeSkinSfx(base,{attacks:{1:'skin-s2'}});
+ assert.equal(m.skillCombat[1].attack,undefined);assert.equal(m.skillCombat[1].hit,'base-hit');assert.equal(base.skillCombat[1].attack,'base-s2');
+});

@@ -1,0 +1,1348 @@
+{
+  "production": {
+    "files": [
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_firemag_n.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_firemag_n.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_smksndrt_n.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_smksndrt_n.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_rsltdglk_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_rsltdglk_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_rdbrkncls_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_rdbrkncls_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_blkswrdphycrdy_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_blkswrdphycrdy_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_cowboy_h.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_cowboy_h.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_mtelrncpnt_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_mtelrncpnt_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_ancientsword_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_ancientsword_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_seasword_h.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_seasword_h.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_kxdtctm_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_kxdtctm_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_insasn_n_1.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_insasn_n_1.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_mgcyrsn_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_mgcyrsn_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_rbbtbmrng_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_rbbtbmrng_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_rcdofc_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_rcdofc_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_fgun_h.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_fgun_h.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_stmpnklch_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_stmpnklch_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_sncrbw_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_sncrbw_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_ctmnyhmr_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_ctmnyhmr_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_shpbygrd_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_shpbygrd_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_sicklemetalhu_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_sicklemetalhu_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_imp/p_imp_sandswd_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_imp/p_imp_sandswd_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_imp/p_imp_sandswd_s.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_imp/p_imp_sandswd_s.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_oprdmgrc_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_oprdmgrc_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_hcnsrfr_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_hcnsrfr_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_vmprsckl_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_vmprsckl_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_trshldacys_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_trshldacys_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_ctschlar_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_ctschlar_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_euphnium_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_euphnium_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_swordfar_n.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_swordfar_n.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_quetzstaff_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_quetzstaff_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_staffcannon_h.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_staffcannon_h.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_hdvysword_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_hdvysword_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_shotgun_double.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_shotgun_double.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_fxssnom_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_fxssnom_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_strbsvr_h.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_strbsvr_h.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_mlysndv_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_mlysndv_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_archet_h_cast.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_archet_h_cast.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_tchnlgywr_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_tchnlgywr_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_snwlprdg_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_snwlprdg_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_wtrbatnchr_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_wtrbatnchr_d.mp3"
+        ]
+      }
+    ],
+    "audit": [
+      {
+        "charId": "char_180_amgoat",
+        "name": "에이야퍄들라",
+        "changes": {
+          "skillCombat": {
+            "1": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_firemag_n.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4132_ascln",
+        "name": "아스카론",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_smksndrt_n.mp3",
+              "mix": {
+                "attack": {
+                  "vol": 2
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4163_rosesa",
+        "name": "瑰盐",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_rsltdglk_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4037_demetr",
+        "name": "벨로네",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_rdbrkncls_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4116_blkkgt",
+        "name": "锏",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_blkswrdphycrdy_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_173_slchan",
+        "name": "崖心",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_cowboy_h.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4204_mantra",
+        "name": "만트라",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_mtelrncpnt_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_2015_dusk",
+        "name": "夕",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_ancientsword_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_474_glady",
+        "name": "歌蕾蒂娅",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_seasword_h.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4179_monstr",
+        "name": "Mon3tr",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_kxdtctm_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4087_ines",
+        "name": "伊内丝",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_insasn_n_1.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4223_botany",
+        "name": "보타니",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_mgcyrsn_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4100_caper",
+        "name": "跃跃",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_rbbtbmrng_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4196_reckpr",
+        "name": "录武官",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_rcdofc_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4036_forcer",
+        "name": "见行者",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_fgun_h.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4151_tinman",
+        "name": "锡人",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_stmpnklch_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4211_snhunt",
+        "name": "雪猎",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_sncrbw_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4058_pepe",
+        "name": "佩佩",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_ctmnyhmr_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4011_lessng",
+        "name": "레싱",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_shpbygrd_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_491_humus",
+        "name": "休谟斯",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_sicklemetalhu_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4080_lin",
+        "name": "린",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "hit": "/assets/audio/sfx/player/p_imp/p_imp_sandswd_d.mp3"
+            },
+            "2": {
+              "hit": "/assets/audio/sfx/player/p_imp/p_imp_sandswd_s.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_1042_phatm2",
+        "name": "트라고디아",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_oprdmgrc_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_1040_blaze2",
+        "name": "烛煌",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_hcnsrfr_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4010_etlchi",
+        "name": "隐德来希",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_vmprsckl_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_1039_thorn2",
+        "name": "引星棘刺",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_trshldacys_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4139_papyrs",
+        "name": "莎草",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_ctschlar_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4109_baslin",
+        "name": "베이스라인",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_euphnium_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4082_qiubai",
+        "name": "仇白",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_swordfar_n.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4027_heyak",
+        "name": "오올헤약",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_quetzstaff_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4054_malist",
+        "name": "至简",
+        "changes": {
+          "skillCombat": {
+            "1": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_staffcannon_h.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4088_hodrer",
+        "name": "외드레르",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_hdvysword_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_279_excu",
+        "name": "送葬人",
+        "changes": {
+          "skillCombat": {
+            "1": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_shotgun_double.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4026_vulpis",
+        "name": "忍冬",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_fxssnom_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_1047_halo2",
+        "name": "溯光星源",
+        "changes": {
+          "skillCombat": {
+            "1": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_strbsvr_h.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4051_akkord",
+        "name": "协律",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_mlysndv_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_332_archet",
+        "name": "空弦",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_archet_h_cast.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4079_haini",
+        "name": "海霓",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_tchnlgywr_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_1045_svash2",
+        "name": "凛御银灰",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_snwlprdg_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4145_ulpia",
+        "name": "乌尔比安",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_wtrbatnchr_d.mp3"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "base": {
+    "files": [
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_firemag_n.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_firemag_n.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_smksndrt_n.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_smksndrt_n.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_rsltdglk_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_rsltdglk_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_rdbrkncls_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_rdbrkncls_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_blkswrdphycrdy_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_blkswrdphycrdy_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_cowboy_h.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_cowboy_h.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_mtelrncpnt_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_mtelrncpnt_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_ancientsword_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_ancientsword_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_seasword_h.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_seasword_h.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_kxdtctm_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_kxdtctm_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_insasn_n_1.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_insasn_n_1.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_rbbtbmrng_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_rbbtbmrng_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_rcdofc_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_rcdofc_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_fgun_h.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_fgun_h.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_stmpnklch_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_stmpnklch_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_sncrbw_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_sncrbw_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_ctmnyhmr_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_ctmnyhmr_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_sicklemetalhu_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_sicklemetalhu_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_imp/p_imp_sandswd_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_imp/p_imp_sandswd_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_imp/p_imp_sandswd_s.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_imp/p_imp_sandswd_s.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_oprdmgrc_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_oprdmgrc_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_hcnsrfr_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_hcnsrfr_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_vmprsckl_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_vmprsckl_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_trshldacys_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_trshldacys_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_ctschlar_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_ctschlar_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_shpbygrd_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_shpbygrd_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_swordfar_n.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_swordfar_n.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_quetzstaff_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_quetzstaff_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_staffcannon_h.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_staffcannon_h.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_hdvysword_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_hdvysword_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_shotgun_double.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_shotgun_double.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_fxssnom_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_fxssnom_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_strbsvr_h.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_strbsvr_h.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_mlysndv_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_mlysndv_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_archet_h_cast.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_archet_h_cast.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_tchnlgywr_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_tchnlgywr_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_snwlprdg_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_snwlprdg_d.mp3"
+        ]
+      },
+      {
+        "path": "/assets/audio/sfx/player/p_atk/p_atk_wtrbatnchr_d.mp3",
+        "sources": [
+          "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_atk/p_atk_wtrbatnchr_d.mp3"
+        ]
+      }
+    ],
+    "audit": [
+      {
+        "charId": "char_180_amgoat",
+        "name": "에이야퍄들라",
+        "changes": {
+          "skillCombat": {
+            "1": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_firemag_n.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4132_ascln",
+        "name": "아스카론",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_smksndrt_n.mp3",
+              "mix": {
+                "attack": {
+                  "vol": 2
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4163_rosesa",
+        "name": "瑰盐",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_rsltdglk_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4037_demetr",
+        "name": "벨로네",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_rdbrkncls_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4116_blkkgt",
+        "name": "锏",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_blkswrdphycrdy_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_173_slchan",
+        "name": "崖心",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_cowboy_h.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4204_mantra",
+        "name": "만트라",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_mtelrncpnt_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_2015_dusk",
+        "name": "夕",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_ancientsword_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_474_glady",
+        "name": "歌蕾蒂娅",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_seasword_h.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4179_monstr",
+        "name": "Mon3tr",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_kxdtctm_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4087_ines",
+        "name": "伊内丝",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_insasn_n_1.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4100_caper",
+        "name": "跃跃",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_rbbtbmrng_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4196_reckpr",
+        "name": "录武官",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_rcdofc_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4036_forcer",
+        "name": "见行者",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_fgun_h.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4151_tinman",
+        "name": "锡人",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_stmpnklch_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4211_snhunt",
+        "name": "雪猎",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_sncrbw_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4058_pepe",
+        "name": "佩佩",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_ctmnyhmr_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_491_humus",
+        "name": "休谟斯",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_sicklemetalhu_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4080_lin",
+        "name": "린",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "hit": "/assets/audio/sfx/player/p_imp/p_imp_sandswd_d.mp3"
+            },
+            "2": {
+              "hit": "/assets/audio/sfx/player/p_imp/p_imp_sandswd_s.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_1042_phatm2",
+        "name": "트라고디아",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_oprdmgrc_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_1040_blaze2",
+        "name": "烛煌",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_hcnsrfr_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4010_etlchi",
+        "name": "隐德来希",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_vmprsckl_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_1039_thorn2",
+        "name": "引星棘刺",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_trshldacys_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4139_papyrs",
+        "name": "莎草",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_ctschlar_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4011_lessng",
+        "name": "레싱",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_shpbygrd_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4082_qiubai",
+        "name": "仇白",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_swordfar_n.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4027_heyak",
+        "name": "오올헤약",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_quetzstaff_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4054_malist",
+        "name": "至简",
+        "changes": {
+          "skillCombat": {
+            "1": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_staffcannon_h.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4088_hodrer",
+        "name": "외드레르",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_hdvysword_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_279_excu",
+        "name": "送葬人",
+        "changes": {
+          "skillCombat": {
+            "1": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_shotgun_double.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4026_vulpis",
+        "name": "忍冬",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_fxssnom_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_1047_halo2",
+        "name": "溯光星源",
+        "changes": {
+          "skillCombat": {
+            "1": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_strbsvr_h.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4051_akkord",
+        "name": "协律",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_mlysndv_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_332_archet",
+        "name": "空弦",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_archet_h_cast.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4079_haini",
+        "name": "海霓",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_tchnlgywr_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_1045_svash2",
+        "name": "凛御银灰",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_snwlprdg_d.mp3"
+            }
+          }
+        }
+      },
+      {
+        "charId": "char_4145_ulpia",
+        "name": "乌尔比安",
+        "changes": {
+          "skillCombat": {
+            "0": {
+              "attack": "/assets/audio/sfx/player/p_atk/p_atk_wtrbatnchr_d.mp3"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "added": [
+    {
+      "path": "/assets/audio/sfx/player/p_imp/p_imp_sandswd_d.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_imp/p_imp_sandswd_d.mp3"
+      ]
+    },
+    {
+      "path": "/assets/audio/sfx/player/p_imp/p_imp_sandswd_s.mp3",
+      "sources": [
+        "https://raw.githubusercontent.com/ArknightsAssets/ArknightsAssets2/voice/assets/dyn/audio/sound_beta_2/player/p_imp/p_imp_sandswd_s.mp3"
+      ]
+    }
+  ]
+}

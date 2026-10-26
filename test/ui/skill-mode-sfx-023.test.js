@@ -57,3 +57,20 @@ test('mixed mode banks are not guessed; the selected official bank retains its m
   const { template } = buildPlan({ assets07: {}, ops03: {}, extraOperators: { [id]: { skills: [{ index: 2, skillId: 'test' }] } }, enemies05: {}, maps05: {}, audio, modelsData: {} });
   assert.deepEqual(template.audio.sfx.units[id].attackMix, { 2: { p: 0.5, vol: 0.6 } });
 });
+
+test('a missing selected-skill start sound never borrows another skill start sound',()=>{
+ const units={char_1047_halo2:{skill:'/s3.mp3',skills:{0:'/s1.mp3',2:'/s3.mp3'}}};
+ const a=new AudioManager({getManifest:()=>({audio:{sfx:{units}}})});const played=[];a._play=url=>played.push(url);
+ assert.equal(a.unit('char_1047_halo2','skill',1,1),false);
+ assert.equal(a.unit('char_1047_halo2','skill',1,0),true);
+ assert.equal(a.unit('char_1047_halo2','skill',1,2),true);
+ assert.deepEqual(played,['/s1.mp3','/s3.mp3']);
+});
+
+test('skill-specific combat audio does not inherit a normal-attack random pool',()=>{
+ const units={char_1047_halo2:{attack:'/normal.mp3',pools:{attack:'normal'},skills:{2:'/s3.mp3'},skillCombat:{1:{attack:'/s2.mp3'}}}};
+ const pools={normal:{sounds:[{url:'/wrong.mp3'}]}};
+ const a=new AudioManager({getManifest:()=>({audio:{sfx:{units,pools}}})});const played=[];a._play=(url,opts)=>played.push({url,pool:opts.pool});
+ assert.equal(a.unit('char_1047_halo2','attack',1,1,true),true);
+ assert.deepEqual(played,[{url:'/s2.mp3',pool:null}]);
+});

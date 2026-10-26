@@ -878,3 +878,17 @@ test('quota pressure compacts all reports before discarding history rows',()=>{
  const summaries=records.map(compactRecord),budget=JSON.stringify({v:STATS_VERSION,records:summaries}).length+10;
  withStorage({budget},ls=>{assert.equal(saveStats({v:STATS_VERSION,records}),true);assert.equal(JSON.parse(ls.raw).records.length,12);assert.ok(JSON.parse(ls.raw).records.every(r=>r.compact));});
 });
+
+test('JSON export does not apply the small localStorage detail budget',()=>{
+ const records=Array.from({length:FULL_KEEP+5},(_,i)=>({...buildRecord(baseResult(),{myId:'p1',now:1000-i}),id:`export-${i}`}));
+ const exported=exportStats({v:STATS_VERSION,records});
+ assert.equal(exported.records.length,FULL_KEEP+5);
+ assert.ok(exported.records.every(r=>!r.compact&&r.players[0].lineup.length>0));
+});
+test('importing a full backup restores a matching compacted recent record',()=>{
+ const full=buildRecord(baseResult(),{myId:'p1',now:1000});
+ const restored=importStats(exportStats({v:STATS_VERSION,records:[full]}),{v:STATS_VERSION,records:[compactRecord(full)]});
+ assert.equal(restored.added,0);assert.equal(restored.restored,1);assert.equal(restored.skipped,0);
+ assert.equal(restored.stats.records[0].compact,undefined);
+ assert.deepEqual(restored.stats.records[0].players[0].lineup,full.players[0].lineup);
+});

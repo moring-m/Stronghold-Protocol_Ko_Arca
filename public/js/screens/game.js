@@ -382,6 +382,7 @@ function MatchScreen() {
     leaks: ownLeaks(localLeaks, (meP?.pendingLp||0)/(pub?.augments?.leakHpCost||1)), cap: gd.config?.lpCapPerRound,
     uniteLeft: leaker?uniteRemaining(localLeft,meP?.uniteLeft):null,
     leakHpCost:pub?.augments?.leakHpCost||1,
+    immediateLeaks:!!pub?.augments?.selectedEnemies?.some(a=>a.kind==='leak'),
   });
   lpBaseRef.current = liveLpNow.base;
   // What this round's battle will cost me, remembered while it still runs: at SETTLE the settlement has already landed

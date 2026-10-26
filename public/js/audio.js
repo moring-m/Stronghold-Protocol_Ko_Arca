@@ -1424,7 +1424,7 @@ export class AudioManager {
       const own = kind === 'skill' && Number.isInteger(skillIndex) && u?.skills ? u.skills[skillIndex] : null;
       const table=kind==='attack'?u?.attacks:kind==='hit'?u?.hits:null;
       const mode=skillActive&&Number.isInteger(skillIndex)?table?.[skillIndex]:null;
-      const indexedSkill = kind === 'skill' && Number.isInteger(skillIndex) && u?.skills && Object.hasOwn(u.skills,skillIndex);
+      const indexedSkill = kind === 'skill' && Number.isInteger(skillIndex) && u?.skills != null;
       return {u,mode,combat,url: combat?.[kind] || (indexedSkill ? own : typeof own === 'string' ? own : typeof mode==='string'?mode:u?.[kind])};
       };
       const {u,mode,combat,persona,url}=pick();
@@ -1433,7 +1433,7 @@ export class AudioManager {
       // the official bank's mix (header): a silent roll still counts as the unit's own sound (no generic fallback)
       const mix = kind === 'skill' ? null : combat?.[kind] ? combat.mix?.[kind] : typeof mode==='string'?(kind==='attack'?u?.attackMix:u?.hitMix)?.[skillIndex]:u?.mix?.[kind];
       if (!unitSoundPlays(mix, this.random())) return true;
-      const poolId = typeof mode === 'string'
+      const poolId = kind === 'skill' && Number.isInteger(skillIndex) && u?.skills != null ? u?.skillPools?.[skillIndex] : combat?.[kind] ? combat.pools?.[kind] : typeof mode === 'string'
         ? (kind === 'attack' ? u?.attackPools : u?.hitPools)?.[skillIndex] : u?.pools?.[kind];
       const params = this.getManifest()?.audio?.sfx?.pools?.[poolId];
       const pool = params ? { ...params, id: poolId, atRelease: kind === 'attack' && /^battle\.ON_ABILITY_START\./.test(poolId) } : null;

@@ -302,12 +302,13 @@ export function uniteRemaining(local, server) {
  * @param {{ phase: string, round: any, lp: any, statsLeaks?: any, leaks?: any, cap?: number, alive?: boolean, uniteLeft?: number|null }} s
  * @returns {{ base: { round: any, lp: number, statsLeaks: number|null } | null, pending: number, shown: number|null, unite: boolean, left: number|null }}
  */
-export function liveLp(base, { phase, round, lp, statsLeaks = null, leaks = 0, cap = 10, alive = true, uniteLeft = null, leakHpCost=1 }) {
+export function liveLp(base, { phase, round, lp, statsLeaks = null, leaks = 0, cap = 10, alive = true, uniteLeft = null, leakHpCost=1, immediateLeaks=false }) {
   if (!Number.isFinite(lp)) return { base: null, pending: 0, shown: null, unite: false, left: null };
   if (!LEAK_PHASES.has(phase) || alive === false) return { base: null, pending: 0, shown: lp, unite: false, left: null };
   const sl = Number.isFinite(statsLeaks) ? statsLeaks : null;
   const b = base && base.round === round ? base : { round, lp, statsLeaks: sl };
-  const landed = lp !== b.lp || (sl != null && b.statsLeaks != null && sl !== b.statsLeaks);
+  const settledLeaks = sl != null && b.statsLeaks != null && sl !== b.statsLeaks;
+  const landed = settledLeaks || (!immediateLeaks && lp !== b.lp);
   const left = phase === PHASE.UNITE && Number.isFinite(uniteLeft) && uniteLeft >= 0 && !landed ? Math.trunc(uniteLeft) : null;
   const pending = landed ? 0 : Math.min(lp, pendingLoss((left != null ? left : leaks)*leakHpCost, cap));
   return { base: b, pending, shown: lp - pending, unite: phase === PHASE.UNITE && (pending > 0 || left != null), left };

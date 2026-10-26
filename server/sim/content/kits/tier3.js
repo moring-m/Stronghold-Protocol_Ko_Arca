@@ -279,6 +279,7 @@ const KITS = {
     const kit = {
       skill: {
         kind: 'duration',
+        trigger: d.skill?.index === 2 ? 'SP_FULL' : undefined,
         mods: { batPct: num(bb.base_attack_time) },
         attack: { atkScale: num(bb['attack@atk_scale'], 1), hits: Math.max(1, Math.floor(num(bb['attack@times'], 1))) },
       },

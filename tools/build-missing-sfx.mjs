@@ -8,9 +8,14 @@ export async function buildMissingSfx(root,dir){
   const skills=[...new Map(cs.flatMap(c=>c.skills||[c.skill]).filter(Boolean).map(s=>[s.index,s])).values()],old=a.audio.sfx.units[id],{unit}=unitCombatSounds(audio,id,skills,old),changes={};
   for(const role of ['attack','hit','born','die'])if(!old?.[role]&&unit[role]){changes[role]=unit[role];add(unit[role]);}
   for(const s of skills){if(typeof old?.skills?.[s.index]==='string'&&old.skills[s.index])continue;const path=skillStartPaths(audio,s.skillId,s)[0];if(!path||/(?:_loop|_lp)\d*\.mp3$/i.test(path))continue;(changes.skills||={})[s.index]='/assets/audio/sfx/'+path;add(changes.skills[s.index]);}
+  for(const [index,combat]of Object.entries(unit.skillCombat||{}))for(const role of ['attack','hit'])if(combat[role]&&!old?.skillCombat?.[index]?.[role]&&!old?.[role==='attack'?'attacks':'hits']?.[index]){
+   const dest=(changes.skillCombat||={})[index]||={};dest[role]=combat[role];if(combat.mix?.[role])(dest.mix||={})[role]=combat.mix[role];add(combat[role]);
+  }
   if(!Object.keys(changes).length)continue;
   const dest=a.audio.sfx.units[id]||={};for(const role of ['attack','hit','born','die'])if(changes[role]){dest[role]=changes[role];if(unit.mix?.[role])(dest.mix||={})[role]=unit.mix[role];}
-  if(changes.skills)dest.skills={...dest.skills,...changes.skills};audit.push({charId:id,name:cs[0].name,changes});
+  if(changes.skills)dest.skills={...dest.skills,...changes.skills};
+  if(changes.skillCombat)for(const[index,combat]of Object.entries(changes.skillCombat))Object.assign((dest.skillCombat||={})[index]||={},combat);
+  audit.push({charId:id,name:cs[0].name,changes});
  }
  const ice=audio.bank('battle.ON_PROJECTILE_REACH.projectile_chr_sntlla_s2')[0];
  if(ice&&!a.audio.sfx.units.char_341_sntlla?.fx?.iceSpike){const unit=a.audio.sfx.units.char_341_sntlla||={};(unit.fx||={}).iceSpike='/assets/audio/sfx/'+ice;add(unit.fx.iceSpike);audit.push({charId:'char_341_sntlla',name:'산탈라',changes:{fx:{iceSpike:unit.fx.iceSpike}}});}

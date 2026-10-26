@@ -19,6 +19,12 @@ export function unitCombatSounds(audio,id,skills,existing={}) {
    const mix=audio.mixOf(bank);if(mix)(unit[role+'Mix']||={})[i]=mix;
   }
   const combat=skillCombatSounds(audio,id,i);
+  // AUTO next-attack skills expose their strike cue under the exact skill id.
+  // This is an attack sound, not an activation cue or a numbered mode guess.
+  if(skill.skillType==='AUTO' && !(skill.duration>0) && !combat.attack){
+   const bank=audio.bank(`battle.ON_ABILITY_START.${skill.skillId}`);
+   if(bank?.[0]?.startsWith('player/p_atk/'))combat.attack={path:bank[0],mix:audio.mixOf(bank)};
+  }
   if(Object.keys(combat).length){unit.skillCombat[i]={};for(const [role,rec]of Object.entries(combat)){put(unit.skillCombat[i],role,[rec.path]);if(rec.mix)(unit.skillCombat[i].mix||={})[role]=rec.mix;}}
  }
  return {unit,paths:[...paths]};

@@ -61,7 +61,11 @@ desktop.ini
 *.swp
 .idea/
 .vscode/
-.claude/
+# Shared Claude Code instructions/skills; keep personal settings and sessions local.
+.claude/*
+!.claude/settings.json
+!.claude/skills/
+CLAUDE.local.md
 # Cloudflare local state and deployment dependencies
 deploy/cloudflare/node_modules/
 deploy/cloudflare/.wrangler/
