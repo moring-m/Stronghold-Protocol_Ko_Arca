@@ -264,7 +264,8 @@ export default {
           onAttack(ctx) { ctx.noAmmo = true; },   // her bullets go on 屏障 only (CharSkillManualTriggerCountEvent)
           onStart({ battle, unit }) {
             grantBarrier(battle, unit, unit, S2_KEY, num(b2.hp_ratio));
-            for (const t of grafsOf(battle, unit)) if (up(t)) grantBarrier(battle, unit, t, S2_KEY, num(b2.hp_ratio));
+            battle.fx('modeLoop', { x: unit.x, y: unit.y, id: unit.id, src: unit.id, dur: 600 });
+            for (const t of grafsOf(battle, unit)) if (up(t)) { grantBarrier(battle, unit, t, S2_KEY, num(b2.hp_ratio)); battle.fx('modeLoop', { x: t.x, y: t.y, id: t.id, src: unit.id, dur: 600 }); }
           },
         },
         [S3]: {

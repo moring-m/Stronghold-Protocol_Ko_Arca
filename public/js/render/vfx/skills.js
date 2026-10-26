@@ -1359,6 +1359,11 @@ export function chargeKeys(plan) {
  */
 const binding = (o) => Object.freeze({ ...o, ...(o.cover ? { cover: Object.freeze(o.cover) } : {}), ...(o.keys ? { keys: Object.freeze(o.keys) } : {}) });
 export const FX_BINDINGS = Object.freeze({
+  skchr_mcnist_2: Object.freeze({ modeLoop: binding({ owner: 'src', keys: ['mcnist_skill_02_buff_01'], hold: 'fx', during: true, untilEnd: true, refresh: true }) }),
+  skchr_closur_3: Object.freeze({ baseRange: binding({ owner: 'src', keys: ['token_closur_ourbase_range_03_loop'], hold: 'fx', during: true, untilEnd: true, refresh: true }) }),
+  skchr_closur_2: Object.freeze({ baseRange: binding({ owner: 'src', keys: ['token_closur_ourbase_range_02_loop'], hold: 'fx', during: true, untilEnd: true, refresh: true }) }),
+  // Loops a skill puts on its operator's tokens (`token`: the client's CreateBuffToToken): 可露希尔 S2 / S3 on her 指挥中心
+  // ('baseRange'), 麦克尼斯 S2 on her and her 结构性原理 ('modeLoop') — held until the skill ends
   skchr_horn_3: Object.freeze({ overloadFront: binding({ owner: 'id', keys: ['horn_skill_03_buff_02_03_front'], hold: 'fx', during: true, untilEnd: true, refresh: true }), overloadBack: binding({ owner: 'id', keys: ['horn_skill_03_buff_02_03_back'], hold: 'fx', during: true, untilEnd: true, refresh: true }) }),
   skchr_horn_2: Object.freeze({ overloadFront: binding({ owner: 'id', keys: ['horn_skill_02_buff_03_front'], hold: 'fx', during: true, untilEnd: true, refresh: true }), overloadBack: binding({ owner: 'id', keys: ['horn_skill_02_buff_03_back'], hold: 'fx', during: true, untilEnd: true, refresh: true }) }),
   // 号角 S2 / S3 overload ([overload_switch_effect]: the back view when she faces up — CheckCharacterDefaultDirection UP —,
