@@ -546,6 +546,11 @@ export const COND_BUFFS = Object.freeze({
   // while the skill runs: 安洁莉娜 the 2nd S3 by her left / right facing (CheckFaceLOrR); 莱伊 S2 while she blocks (CheckBlocked)
   'aglna2_s_3[mode]': Object.freeze({ byFacing: Object.freeze({ right: ['aglna2_skill_03_buff_right_01'], left: ['aglna2_skill_03_buff_left_01'] }) }),
   'lessng_s2[eff_manager]': Object.freeze({ whileBlocked: ['lessng_skill_02_buff_2'] }),
+  // `whileOff`: the skill's buff creates the loop when it finishes and ends it when it starts again (BuffDuringSkill: the
+  // client's idle look) — 森蚺's sister 雪雉 the 2nd (sbell2_s[idle_effect]) and 娜斯提 S1 (nasti_s1[effect_manager]: its
+  // common loop) [ASSUMED: also before the first cast]
+  'sbell2_s[idle_effect]': Object.freeze({ whileOff: ['sbell2_idle'] }),
+  'nasti_s1[effect_manager]': Object.freeze({ whileOff: ['nasti_skill_01_common_buff_01'] }),
   // 卡夫卡 S1: its SP ratio test (≥ 0) always passes — the loop shows while the passive is equipped
   'caper_s_1[effect_trigger]': Object.freeze({ always: ['caper_skill_01_buff'] }),
   'monstr_s_1[ready]': Object.freeze({ byCharges: true, full: ['monstr_skill_01_buff'], ready: ['monstr_skill_01_buff'] }),
@@ -907,6 +912,8 @@ function place(plan, e, u, { attackOf, eachHit }) {
   const ev = u.event;
   if (ev && !START_EVENTS.has(ev)) {
     if (END_EVENTS.has(ev)) {
+      // a loop the skill's end creates: its state where the graph is transcribed (COND_BUFFS `whileOff`)
+      if (role === 'loop' && COND_BUFFS[u.buff]?.whileOff) { e.hold = 'cond'; plan.cond.push(e); return null; }
       if (role === 'loop') return 'after-end';
       if (onTargets) { e.at = 'targets'; e.hold = oneShotHold(e); plan.targets.push(e); return null; }
       e.hold = oneShotHold(e);
