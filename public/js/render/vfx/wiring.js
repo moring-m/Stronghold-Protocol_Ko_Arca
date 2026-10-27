@@ -220,14 +220,18 @@ export function pickAttacks(a, kind, seed = 0, depth = 0, nth = 0, mem = null) {
  */
 const STATUS_FLAGS = [[UF.SHIELD,'shield'],[UF.INVULN,'invulnerable'],[UF.STEALTH,'stealth'],[UF.FROZEN,'freeze'],[UF.STUNNED,'stun'],[UF.SLEEP,'sleep'],[UF.COLD,'cold']];
 
+// Mode names as the prefabs spell them: S3, Sk3 (信仰搅拌机, 谬因), s3 (卡涅利安, 艾雅法拉 the 2nd, 凯尔希 the 2nd), default
+const modeName = (n) => String(n || '').toLowerCase().replace(/^sk(?=\d)/, 's');
+
 export function modeVariant(modes, name, facing, variantsOnly = false) {
   const want = facing === 'DOWN' ? ['down', 'd'] : facing === 'UP' ? ['up', 'u'] : ['lr'];
+  const key = modeName(name);
   let plain = null, fit = null, other = null;
   for (const m of modes || []) {
     if (!m || !(m.attack || m.combat)) continue;
-    if (m.name === name) { plain = m; continue; }
+    if (modeName(m.name) === key) { plain = m; continue; }
     const g = MODE_VARIANT.exec(String(m.name || ''));
-    if (!g || g[1] !== name) continue;
+    if (!g || modeName(g[1]) !== key) continue;
     if (want.includes((g[2] || g[3]).toLowerCase())) fit = fit || m;
     else other = other || m;
   }
@@ -495,7 +499,7 @@ export class FxWiring {
     // else a form named like a mode
     const fm = formMode(u, this.formOf(v), this.formMap(this.unitKeyOf(v)));
     if (fm) { const m = modes.find((x) => x.name === fm); if (m && (m.attack || m.combat || u.prefab?.includes('char_4217_makoto'))) return m; }
-    return modeVariant(modes, 'Default', this._facing(v)) || modes.find((x) => x.name === 'Default') || modes[0];
+    return modeVariant(modes, 'Default', this._facing(v)) || modes.find((x) => modeName(x.name) === 'default') || modes[0];
   }
 
   /** The facing a mode variant is chosen by: an operator's deploy direction, else left / right by its facing. */
