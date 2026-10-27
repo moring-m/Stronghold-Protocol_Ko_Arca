@@ -50,21 +50,27 @@ for (const [id, rec] of Object.entries(chess)) {
     const plan = unitKey ? skillPlan(idx, unitKey, r?.skillId || sid, { rec: srec }) : null;
     const keys = plan ? ownKeys(plan) : new Set();
     // the attack mode the skill switches to (its plan's modeName, else S<n> / Sk<n> / s<n>): its casts and hits play on the
-    // skill's attacks — only for a skill that keeps attacking
+    // skill's attacks — of the unit the client draws (a skin's own index unit when the chess wears one)
     const canon = (n) => String(n || '').toLowerCase().replace(/^sk(?=\d)/, 's').replace(/[([].*$/, '');
-    const want = canon(plan?.modeName || `s${skillIndex + 1}`);
-    for (const m of idx.units?.[unitKey]?.modes || []) {
-      if (canon(m.name) !== want || !m.attack) continue;
-      for (const c of m.attack.cast || []) for (const k of c.effects || []) if (k) keys.add(k);
-      for (const c of m.attack.hit || []) for (const k of c.effects || []) if (k) keys.add(k);
-    }
-    if (!keys.size) return;
+    // as wiring.js mode(): the plan's mode, else S<n> only when a buff of the skill switches the mode (`…[mode]`)
+    const switches = !!plan && [...plan.start, ...plan.loop].some((e) => /\[mode\]$/.test(e.buff || ''));
+    const want = plan?.modeName ? canon(plan.modeName) : switches ? `s${skillIndex + 1}` : null;
+    const modeKeys = (key) => {
+      const out = new Set();
+      for (const m of want ? idx.units?.[key]?.modes || [] : []) {
+        if (canon(m.name) !== want || !m.attack) continue;
+        for (const c of [...(m.attack.cast || []), ...(m.attack.hit || [])]) for (const k of c.effects || []) if (k) out.add(k);
+      }
+      return out;
+    };
+    let drawnKey = unitKey;
+    if (!keys.size && !modeKeys(unitKey).size) return;
     const played = new Set();
     let started = 0, error = null;
     for (const DIR of ['RIGHT', 'UP', 'DOWN', 'LEFT']) try {
       const ofx = { active: true, time: 0, lite: false, tier: 'full', timers: [],
         lib: { has: (k) => !!idx.prefabs[k], def: (k) => (idx.prefabs[k] ? { isLoop: idx.prefabs[k].looping, spawn: 2, stats: {} } : null), index: async () => idx, preload: async () => 0, defs: new Map(), mesh: () => null },
-        spawn(k) { if (keys.has(k)) played.add(k); return { alive: true, anchor: [0, 0, 0], stop() { this.alive = false; }, kill() { this.alive = false; }, linkLines() {} }; } };
+        spawn(k) { played.add(k); return { alive: true, anchor: [0, 0, 0], stop() { this.alive = false; }, kill() { this.alive = false; }, linkLines() {} }; } };
       const views = new Map();
       const w = new FxWiring(ofx, { speed: () => 1, record: (info) => (info.side === 'enemy' ? ATTACKER : chess[info.defId] || null), view: (vid) => views.get(vid) || null });
       w.idx = idx;
@@ -83,7 +89,7 @@ for (const [id, rec] of Object.entries(chess)) {
       for (let tick = 0; tick < SECONDS * 30; tick++) {
         h.step();
         const now = h.b.time;
-        for (const x of h.b.units) if (x.alive) { const v = viewOf(x); v.x = x.x; v.y = x.y; v.dir = x.dir; }
+        for (const x of h.b.units) if (x.alive) { const v = viewOf(x); v.x = x.x; v.y = x.y; v.dir = x.dir; if (x.uid === 1) drawnKey = w.unitKeyOf(v) || drawnKey; }
         for (const e of h.events.splice(0)) {
           const v = views.get(e[1]);
           switch (e[0]) {
@@ -101,15 +107,17 @@ for (const [id, rec] of Object.entries(chess)) {
             case 'die': if (v) { v.alive = false; w.release(v); } break;
           }
         }
-        for (const t of h.b.snapshot().units) { const v = views.get(t[0]); if (v) { v.hp = t[3]; v.maxHp = t[4]; v.flags = t[7]; v.anim = t[8]; } }
+        for (const t of h.b.snapshot().units) { const v = views.get(t[0]); if (v) { v.hp = t[3]; v.maxHp = t[4]; v.sp = t[5]; v.spMax = t[6]; v.flags = t[7]; v.anim = t[8]; } }
         w.sync(views.values());
         w.tick();
         ofx.time += 1 / 30;
       }
     } catch (e) { error = String(e && e.message || e).slice(0, 160) + (process.env.STACK ? "\n" + e.stack : ""); }
+    for (const k of modeKeys(drawnKey)) keys.add(k);
+    for (const k of [...played]) if (!keys.has(k)) played.delete(k);
     const missing = [...keys].filter((k) => !played.has(k));
     const verdict = error ? 'error' : !started ? 'no cast' : !played.size ? 'none' : missing.length ? 'partial' : 'ok';
-    rows.push({ chess: id, charId: rec.charId, skill: sid, skillIndex, verdict, played: [...played], missing, error });
+    rows.push({ chess: id, charId: rec.charId, drawn: drawnKey, skill: sid, skillIndex, verdict, played: [...played], missing, error });
   });
 }
 

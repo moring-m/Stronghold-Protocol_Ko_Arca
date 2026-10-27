@@ -31,3 +31,9 @@ test('阿罗玛 S1: the replaced attack after the activation\'s wind-up is the s
   // 斩业星熊 S2 stays on in her S2 mode: those attacks keep the mode's rows
   assert.equal(verdict(audit('char_1044_hsgma2'), 'skchr_hsgma2_2').verdict, 'ok');
 });
+
+test("泥岩 S3 wakes with its awake rows; 假日威龙陈 S2 and 郁金香 S3 play every cut's hit", { skip: !existsSync(INDEX) }, () => {
+  assert.equal(verdict(audit('char_311_mudrok'), 'skchr_mudrok_3').verdict, 'ok');
+  assert.equal(verdict(audit('char_1050_chen3'), 'skchr_chen3_2').verdict, 'ok');
+  assert.equal(verdict(audit('char_608_acpion'), 'skchr_acpion_3').verdict, 'ok');
+});

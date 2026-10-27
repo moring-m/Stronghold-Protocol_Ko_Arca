@@ -1384,7 +1384,11 @@ export const FX_BINDINGS = Object.freeze({
   skchr_slent2_3: Object.freeze({ undying: binding({ owner: 'src', keys: ['slent2_skill_03_buff_02'], hold: 'fx', refresh: true }) }),
   skchr_demetr_1: Object.freeze({ means: binding({ owner: 'src', keys: ['demetr_buff_01'], hold: 'fx', refresh: true }) }),
   skchr_shwaz_1: Object.freeze({ defDown: binding({ owner: 'src', keys: ['buff_defdown'], hold: 'fx', refresh: true }) }),
-  skchr_chen3_2: Object.freeze({ blink: binding({ owner: 'id', keys: ['chen3_skill_02_buff_01', 'chen3_skill_02_f_buff_02'], hold: 'fx', during: true, refresh: true }) }),
+  skchr_chen3_2: Object.freeze({
+    blink: binding({ owner: 'id', keys: ['chen3_skill_02_buff_01', 'chen3_skill_02_f_buff_02'], hold: 'fx', during: true, refresh: true }),
+    // a 'slash' per cut after her dash: the skill's attack — hit group k on cut k (_hit_01 … _06)
+    slash: binding({ owner: 'id', attack: 'skchr_chen3_2', once: true }),
+  }),
   // Buff loops whose condition the kits now mark (2026-10-26, buff_template_holder of the CN client 2026-10-22):
   // 陈 the 3rd S2 chen3_s2[respawn_buff] (her landing 'blink': the two loops while the skill lasts); 推进 talent
   // shwaz_t_1 (the crit's 'defDown' on the target, its duration) and 德米特里 T1 demetr_t1[def_dec] ('means' on the enemy,
@@ -1491,6 +1495,11 @@ export const FX_BINDINGS = Object.freeze({
   skchr_irene_3: Object.freeze({ aoe: binding({ owner: 'id', attack: Object.freeze(['StartAttack', 'MultiAttack']), once: true }) }),
   // 棘刺 S2 (a 'thorns' per spray, id = him): the skill's Thorn attack — its cast and range rows
   skchr_thorns_2: Object.freeze({ thorns: binding({ owner: 'id', attack: 'Thorn' }) }),
+  // 泥岩 S3 秽壤的血脉: she wakes from the 闭锁 mid-skill (the kit's 'rockfall' on her, id = her) — the sequence's
+  // awake rows (mudrok_skill_03_awake / _02) play there, not at the skill's end
+  skchr_mudrok_3: Object.freeze({ rockfall: binding({ owner: 'id', keys: ['mudrok_skill_03_awake', 'mudrok_skill_03_awake_02'], at: 'target', target: 'id' }) }),
+  // 郁金香 S3 (a 'slash' per cut once the skill fired): the skill's attack — hit group k on cut k (_hit_01 … _08)
+  skchr_acpion_3: Object.freeze({ slash: binding({ owner: 'id', attack: 'Skill', once: true }) }),
   skchr_blkkgt_3: Object.freeze({
     slash: binding({ owner: 'id', attack: 'Damage', once: true }),
   }),
