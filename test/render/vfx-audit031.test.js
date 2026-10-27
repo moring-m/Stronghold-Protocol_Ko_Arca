@@ -372,7 +372,9 @@ describe('an effect authored behind its unit is drawn under the units at order 0
     assert.deepEqual(gathered(0.23, [0, 10]), [true, false]);
     assert.deepEqual(gathered(-0.2, [0, 10]), [false, false]);
     assert.deepEqual(gathered(0, [0]), [false]);
-    assert.deepEqual(gathered(0.23, [0], 'other_helper'), [false], 'only the root\'s static_offset says so');
+    // a feet-spawned effect's renderer whose node chain lies deeper than its anchor (모스티마 스킨 S3's castle, z +0.07)
+    assert.deepEqual(gathered(0.23, [0, 10], 'other_helper'), [true, false], 'a deeper node at the feet is behind at order 0');
+    assert.deepEqual(gathered(0.01, [0], 'other_helper'), [false], 'within 0.02 of the anchor: over as before');
   });
 });
 

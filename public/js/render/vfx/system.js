@@ -503,8 +503,18 @@ export class FxHandle {
     // stops with it (OnFinishEmitter's start where it finished)
     this.children = [];
     const skip = Math.max(0, Number(this.opts.skip) || 0) + loadedLate;
-    const own = { track: this.opts.track, data: this.opts.data, loop: this.opts.loop, important: this.opts.important, owner: this.opts.owner, depthOwner:this.opts.depthOwner, skip, speed: this.opts.speed };
-    for (const e of def.onPlay) for (const k of e.keys) if (k !== def.key) { const c = s.spawn(k, this.placeArgs, own); if (c) this.children.push(c); }
+    const own = { track: this.opts.track, data: this.opts.data, loop: this.opts.loop, important: this.opts.important, owner: this.opts.owner, depthOwner:this.opts.depthOwner, skip, speed: this.opts.speed, resolveKey: this.opts.resolveKey };
+    // An effect played on a unit (the wiring's `playChild`) emits its chained keys as the client does: on the owner again —
+    // the outfit's replacement, the facing variant, the key's own spawn location — unless `_useSourceEffectPos` keeps them
+    // at this one (수르트 스킨 S3's sun: surtr_skill_03_buff_02 → _left/_right_*, at the feet, not on the weapon the buff
+    // loop follows); `resolveKey` gives a kept one the outfit's key.
+    for (const e of def.onPlay) for (const k0 of e.keys) {
+      if (k0 === def.key) continue;
+      let c = null;
+      if (this.opts.playChild && !e.sourcePos) c = this.opts.playChild(k0, skip);
+      else { const k = this.opts.resolveKey ? this.opts.resolveKey(k0) : k0; if (k && k !== def.key) c = s.spawn(k, this.placeArgs, own); }
+      if (c) this.children.push(c);
+    }
     const prev = fx.onFinish;
     fx.onFinish = (f) => {
       prev?.(f);

@@ -713,6 +713,17 @@ export class FxWiring {
         if (d && d.pause) fx.hidden = this._paused(d.pause, v, p);
       };
     }
+    opts.resolveKey = (key) => {
+      let c = this.effectKey(key, o.flipFrom || v);
+      const cd = c && this.ofx.lib.def(c);
+      if (cd?.switchable) {
+        const alt = lc(this._variant(cd.switchable, v, this.pose(v)));
+        if (alt === 'common_empty') return null;
+        if (alt && alt !== c && this.ofx.lib.has(alt)) c = alt;
+      }
+      return c;
+    };
+    if (!o.track) opts.playChild = (key, skip) => this.playOn(key, v, { loop: o.loop, important: o.important, follow: !!(o.follow || P.follow || P.keep), skip, speed: o.speed, data: o.data });
     return this.ofx.spawn(k, place, opts);
   }
 
