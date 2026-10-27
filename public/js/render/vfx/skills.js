@@ -1483,6 +1483,14 @@ export const FX_BINDINGS = Object.freeze({
   // 锏 S3 (op-blkkgt.js): each slash of the kit ('slash', id = her, every 0.3 s while the skill lasts) is the skill's
   // Damage ability (MultiMeleeAttack: blkkgt_skill_03_start_01 / _02 on her, cast effects held ON_CAST_START → ON_CAST_END of
   // one Skill_3_Loop cast of 10 hits: `once`); the finale is its EndAttack (`when: 'end'`)
+  // 陈 S3 赤霄·绝影 (custom recruit kit: a 'slash' per cut, id = her): the skill's attack — its cast rows (_start / _02 /
+  // _03) held over the cuts, the hit of each cut (_hit_01 … _10) on its damage
+  skchr_chen_3: Object.freeze({ slash: binding({ owner: 'id', attack: 'skchr_chen_3', once: true }) }),
+  // 艾丽妮 S3 (an 'aoe' per strike, id = her): the first is its StartAttack (start_01, range_01 / _03, type1 hit), the
+  // rest the MultiAttack's — casts held over the strikes
+  skchr_irene_3: Object.freeze({ aoe: binding({ owner: 'id', attack: Object.freeze(['StartAttack', 'MultiAttack']), once: true }) }),
+  // 棘刺 S2 (a 'thorns' per spray, id = him): the skill's Thorn attack — its cast and range rows
+  skchr_thorns_2: Object.freeze({ thorns: binding({ owner: 'id', attack: 'Thorn' }) }),
   skchr_blkkgt_3: Object.freeze({
     slash: binding({ owner: 'id', attack: 'Damage', once: true }),
   }),

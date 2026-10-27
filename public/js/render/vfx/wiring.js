@@ -492,7 +492,9 @@ export class FxWiring {
     if (st.on && (name || sn)) {
       // the mode, or its variant for the unit's facing; a skill whose plan names no mode switches to the facing variants of
       // S<n> when the unit has them (灰毫 S2: S2(U) / S2(D) / S2(LR), no plain S2 — the extractor's name rule missed them)
-      const m = modeVariant(modes, name || sn, this._facing(v), !name);
+      // a skill whose buff switches the mode (`…[mode]`: 信仰搅拌机 S3's rmixer_sk3[mode] → Sk3) takes the plain S<n> too
+      const switches = !name && !!st.plan && [...st.plan.start, ...st.plan.loop].some((e) => /\[mode\]$/.test(e.buff || ''));
+      const m = modeVariant(modes, name || sn, this._facing(v), !name && !switches);
       if (m) return m;
     }
     // a form the data ties to a mode (talents.js formModes: a 重生's second form, a husk, a 傀儡师's 替身 → 风丸's Stand),
@@ -1496,7 +1498,7 @@ export class FxWiring {
    * the owner's skill `trigger` (SkillFx.trigger). Returns true when the official effect stands for this damage (no
    * procedural spark).
    */
-  damage(v, type, src, time) {
+  damage(v, type, src, time, extra = null) {
     if (!this.ofx.active || !v || !this.idx) return false;
     // an element gauge fill ('dmg' typed by its element: a rider, a 灼燃 tick …) is no hit of the attack and no damage
     // taken in the skills' sense (the sim's TAKE_DAMAGE skips it too)
@@ -1510,10 +1512,13 @@ export class FxWiring {
     const drawn = (m && hpHit ? this._landed(m, v, time, type) : false) || fun;
     // an official shot on its way stands for the damage it brings (R3: the sim lands it before the drawn flight ends)
     const flying = this._inAir(id, time, hpHit);
-    // a skill's kit hit (SkillFx.seen: no attack owns it — the frame's order names the skill): its hit stands for the spark
-    if (hpHit && this.skills.seen(v, false, !!(m || src || fun || flying))) return true;
+    // a skill's kit hit (SkillFx.seen: no attack owns it — the frame's order names the skill): its hit stands for the spark.
+    // The sim names every damage's source (sourceId); only an attack's damage (isAttack) is owned by that attack — a
+    // skill's own damage (isAttack false: 陈 S3's cuts, 艾丽妮 S3's storm) stays a kit hit
+    const owned = !!(m || fun || flying || (src && (!extra || extra.isAttack !== false)));
+    if (hpHit && this.skills.seen(v, false, owned)) return true;
     // an enemy aura's tick on it (SkillFx.auraHit: 深溟巢涌者's pulse, 鼎沸's boil — the aura's buff effect on the unit)
-    if (hpHit && this.skills.auraHit(v, !!(m || src || fun || flying))) return true;
+    if (hpHit && this.skills.auraHit(v, owned)) return true;
     if (flying) return true;
     const arr = this.arrived.get(id);
     if (arr != null && this.ofx.time - arr < ARRIVAL_WINDOW) return true;

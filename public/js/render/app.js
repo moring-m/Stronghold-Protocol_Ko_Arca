@@ -2158,7 +2158,7 @@ export async function createFieldView(host, options = {}) {
         let src = e[4]?.sourceId != null ? views.get(e[4].sourceId) || null : null;
         if (m && now - m.t < 0.35 && (!src || src===m.src)) { src = m.src; meleePending.delete(v.id); fx._slashAt = src.id; }
         // an official hit drawn for this damage replaces the procedural spark / slash (the numbers stay)
-        const official = pluginFx.hit(src,v) || wiring.damage(v, e[3], src, now);
+        const official = pluginFx.hit(src,v) || wiring.damage(v, e[3], src, now, e[4] && typeof e[4] === 'object' ? e[4] : null);
         fx.damage(v, amt, e[3], src, e[4], (official || ctx.officialFor(src || v)) ? NO_SPARK : undefined);
         break;
       }

@@ -329,6 +329,8 @@ export class SkillFx {
     for (const h of U.loops) h.stop();
     U.loops = [];
     U.boundCast?.clear();
+    U.boundN?.clear();
+    U.boundStruck = false;
     U.loopsOn = false;
     U.byFlag = false;
   }
@@ -470,9 +472,9 @@ export class SkillFx {
   }
 
   /** Open a kit-hit window of this frame for attack `a` of U (null: an instant activation's — the hit's kind picks it). */
-  _open(U, a, inst = false) {
+  _open(U, a, inst = false, n = null) {
     this._mark();
-    this.windows.push({ U, a, inst, frame: this.frame, n: new Map(), sawHeal: false, sawDmg: false });
+    this.windows.push({ U, a, inst, frame: this.frame, n: n || new Map(), sawHeal: false, sawDmg: false });
   }
 
   /**
@@ -1088,7 +1090,10 @@ export class SkillFx {
 
   /** An FX_BINDINGS `attack` entry: that plan attack's rows on the owner now, its hits on the damage that follows. */
   _boundAttack(U, bind) {
-    const a = U.plan?.attacks.find((x) => x.node === bind.attack);
+    // `attack: [first, rest]`: the skill's first strike is another ability (艾丽妮 S3's StartAttack, then its MultiAttack)
+    const node = Array.isArray(bind.attack) ? bind.attack[U.boundStruck ? 1 : 0] : bind.attack;
+    U.boundStruck = true;
+    const a = U.plan?.attacks.find((x) => x.node === node);
     const v = U.v;
     if (!a || !v) return false;
     let drew = false;
@@ -1102,7 +1107,8 @@ export class SkillFx {
       drew = true;
       if (held) { held.set(e.key, h); U.loops.push(h); } else this._keep(U, e, h);
     }
-    if (a.hit.some((g) => g.length) || (a.aim || []).length || U.tHit.length) this._open(U, a);
+    // a held cast counts its strikes across the frames (陈 S3's cut k plays hit group k)
+    if (a.hit.some((g) => g.length) || (a.aim || []).length || U.tHit.length) this._open(U, a, false, held ? (U.boundN ||= new Map()) : null);
     return drew;
   }
 
