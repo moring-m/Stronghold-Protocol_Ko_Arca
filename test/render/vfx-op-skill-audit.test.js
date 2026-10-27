@@ -24,3 +24,10 @@ test("陈 S3's cuts and 艾丽妮 S3's storm play their casts and every hit (ski
 test('skills cast at their start (阿 S2 / S3) play without errors', { skip: !existsSync(INDEX) }, () => {
   for (const r of audit('char_225_haak')) assert.notEqual(r.verdict, 'error', JSON.stringify(r));
 });
+
+test('阿罗玛 S1: the replaced attack after the activation\'s wind-up is the skill\'s (its cast and hit)', { skip: !existsSync(INDEX) }, () => {
+  const r = verdict(audit('char_446_aroma'), 'skchr_aroma_1');
+  for (const k of ['aroma_skill_01_start_up_01', 'aroma_skill_01_hit_01']) assert.ok(r.played.includes(k), JSON.stringify(r));
+  // 斩业星熊 S2 stays on in her S2 mode: those attacks keep the mode's rows
+  assert.equal(verdict(audit('char_1044_hsgma2'), 'skchr_hsgma2_2').verdict, 'ok');
+});

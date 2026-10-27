@@ -777,7 +777,10 @@ export class SkillFx {
     // of an instant skill's activation its attack is the skill's whatever kind the sim made it (阿罗玛 S1's 'beam' is her
     // MeleeAttack, 夕 S1's 'bolt' her MultiMeleeAttack: their cast, aim and hits) — a heal stays a heal
     const fits = !!fx.ability && fitsAttack(fx.ability, { heal, ranged });
-    const forced = !fits && inst && !!fx.ability && /Heal/.test(fx.ability) === heal;
+    // …or the replaced attack while a ReplacementSkill's window is still on (阿罗玛 S1: on, a wind-up, then the 'beam' and
+    // off) — not every attack of an instant skill that stays on in a mode (斩业星熊 S2 attacks in her S2 mode)
+    const instOn = inst || (!!U && !U.ewin && U.plan?.kind === 'instant' && /^ReplacementSkill/.test(U.plan?.rootClass || '') && st.on);
+    const forced = !fits && instOn && !!fx.ability && /Heal/.test(fx.ability) === heal;
     const replace = fits || forced;
     if (fx.ability && !replace) { fx.cast = fx.cast.filter((e) => e.ability !== fx.ability); fx.range = []; fx.aim = []; fx.hit = st.plan.each.hit[0].length ? [st.plan.each.hit[0]] : []; }
     // the projectile its ability fires (index v3: abilities[].projectileKey, a use's projectileKey), else the naming guess
