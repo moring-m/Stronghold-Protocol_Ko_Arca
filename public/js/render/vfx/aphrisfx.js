@@ -78,15 +78,17 @@ export class AphrisFx {
     const put = (key, pos) => { if (key && lib.has(key)) { const x = ofx.spawn(key, { pos, groundZ: 0, rootRot: [0, 0, 0, 1] }, opt); if (x) out.push(x); } };
     const skin = this.w.skinOf?.(this.w.unitOf(v)), start = unitPoint(skin, 'hit', this.w.pose ? this.w.pose(v) : v);
     put(keys.start, start);
-    const pts = path.corners.map((i) => ground(path.tiles[i], h));
-    pts[0] = start;
+    // the line runs level at her muzzle height from her own tile, so a long or turned path stays straight on the board
+    const g0 = ground(path.tiles[0]), dy = start[1] - g0[1], dz = start[2] - g0[2];
+    const level = (t) => { const g = ground(t); g[1] += dy; g[2] += dz; return g; };
+    const pts = path.corners.map((i) => level(path.tiles[i]));
     if (keys.line && lib.has(keys.line)) for (let i = 1; i < pts.length; i++) {
       const a = pts[i - 1], b = pts[i];
       const x = ofx.spawn(keys.line, { pos: a.slice(), groundZ: 0 }, { ...opt, track: (fx) => { fx.anchor[0] = a[0]; fx.anchor[1] = a[1]; fx.anchor[2] = a[2]; fx.linkLines(a, b); } });
       if (x) out.push(x);
     }
     for (const i of path.relays) put(keys.waypoint, ground(path.tiles[i], h));
-    if (path.tiles.length > 1) put(keys.end, ground(path.tiles[path.tiles.length - 1], h));
+    if (path.tiles.length > 1) put(keys.end, level(path.tiles[path.tiles.length - 1]));
     return out;
   }
 

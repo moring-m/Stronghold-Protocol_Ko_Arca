@@ -2321,7 +2321,7 @@ export const AUGMENT_SOURCES = [
  {
   "source": 173,
   "identity": 173,
-  "grade": "gold",
+  "grade": "silver",
   "name": "대발견 I",
   "rounds": [
    4,
