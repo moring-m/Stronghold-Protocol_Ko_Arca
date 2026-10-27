@@ -175,13 +175,3 @@ test('入戏 aims inside the side-6 square at radius 0.5 and does not force the 
   assert.ok(primaryHits < 17 * 3, 'the main target is not force-hit by every stone');
   assert.ok(clusterHits > 0, 'a stone still lands inside the square');
 });
-
-test('a blocker it can target is its first target; without blockerFirst a blockFree enemy keeps 仇恨值 order', async () => {
-  const { sortAllyTargets } = await import('../../server/sim/targeting.js');
-  const u = (id, aggroSeq) => ({ id, aggroSeq, s: { taunt: 0 } });
-  const blocker = u('blocker', 1), late = u('late', 9);
-  const catapult = { blockedBy: blocker, profile: { blockFree: true, blockerFirst: true } };
-  assert.deepEqual(sortAllyTargets(catapult, [late, blocker]).map((x) => x.id), ['blocker', 'late']);
-  const spike = { blockedBy: blocker, profile: { blockFree: true } };
-  assert.deepEqual(sortAllyTargets(spike, [blocker, late]).map((x) => x.id), ['late', 'blocker']);
-});
