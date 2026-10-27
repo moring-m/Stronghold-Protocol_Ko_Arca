@@ -206,6 +206,7 @@ export class SkillFx {
     this.units = new Map();    // battle id → unit record | null (nothing official to play)
     this.tloops = new Map();   // `${target id}|${key}` → { h, until, U, tgt, bySkill } (skills.js targetsOf `hit`)
     this.marks = [];
+    this.held = new Map();   // `refresh` bindings: slot → the loops held on that unit (_bound)
     this.locks = [];           // FX_BINDINGS reached effects: { owner, r, c, until, h, cover }
     this.born = new Map();     // unit id → { frame, own } of its official birth effect (deployed: FxWiring.deploy's key)
     this.frame = 0;            // FxWiring.tick counts frames: events of one frame share a value
@@ -327,6 +328,7 @@ export class SkillFx {
   _stopLoops(U) {
     for (const h of U.loops) h.stop();
     U.loops = [];
+    U.boundCast?.clear();
     U.loopsOn = false;
     U.byFlag = false;
   }
@@ -440,6 +442,9 @@ export class SkillFx {
     // the skill's final attack (tagCasts 'end'): its rows, its hits on this frame's damage (the kit deals it before the 0)
     if (was) this._endCast(U, v);
     this._stopLoops(U);
+    // the loops an `untilEnd` binding holds end with the skill (号角's overload: an ammo skill has no known end)
+    for (const h of U.duringHeld || []) h.stop();
+    U.duringHeld = null;
     for (const e of uniq(U.plan.end)) this._keep(U, e, this._play(e, v));
     return U.drawsStart;
   }
@@ -530,7 +535,16 @@ export class SkillFx {
     let drew = false;
     for (const a of U.plan.attacks) {
       if (a.when !== when) continue;
-      for (const e of uniq([...a.cast, ...a.range])) { const h = this._play(e, v); if (h) { drew = true; this._keep(U, e, h); } }
+      // `once`: one official cast holds many strikes (锏 S3's MultiMeleeAttack, 10 hits in one Skill_3_Loop): its cast rows
+    // play at the first strike and stay until the skill ends, instead of restarting at every strike
+    const held = bind.once ? (U.boundCast ||= new Map()) : null;
+    for (const e of uniq([...a.cast, ...a.range])) {
+      if (held && held.get(e.key)?.alive) { drew = true; continue; }
+      const h = this._play(e, v);
+      if (!h) continue;
+      drew = true;
+      if (held) { held.set(e.key, h); U.loops.push(h); } else this._keep(U, e, h);
+    }
       if (when === 'start' && (a.hit.some((g) => g.length) || (a.aim || []).length || U.tHit.length)) this._open(U, a);
     }
     return drew;
@@ -1001,9 +1015,18 @@ export class SkillFx {
   _cond(U, v) {
     const on = this._on(U);
     if (!on) U.charged = false;
-    const st = condState({ on, charged: !!U.charged, charges: v.charges });
     const want = new Map();
-    if (st) for (const e of U.plan.cond) if (COND_BUFFS[e.buff]?.[st]?.includes(e.key)) want.set(e.key, e);
+    for (const e of U.plan.cond) {
+      const g = COND_BUFFS[e.buff];
+      if (!g) continue;
+      if (g.always) { if (g.always.includes(e.key)) want.set(e.key, e); continue; }
+      if (g.whileOff) { if (!on && g.whileOff.includes(e.key)) want.set(e.key, e); continue; }
+      if (g.byFacing) { if (on && g.byFacing[(v.visFacing ?? 1) < 0 ? 'left' : 'right']?.includes(e.key)) want.set(e.key, e); continue; }
+      if (g.whileBlocked) { if (on && ((v.flags | 0) & UF.BLOCKED) && g.whileBlocked.includes(e.key)) want.set(e.key, e); continue; }
+      if (g.counts) { const n = Math.min(3, Array.isArray(v.charges) ? Number(v.charges[0]) | 0 : 0); if (g.counts[n]?.includes(e.key)) want.set(e.key, e); continue; }
+      const st = condState({ on, charged: !!U.charged, charges: v.charges, byCharges: !!g.byCharges });
+      if (st && g[st]?.includes(e.key)) want.set(e.key, e);
+    }
     const map = U.cond || (U.cond = new Map());
     for (const [k, t] of map) if (!want.has(k) || (!t.h.alive && t.e.loop)) { if (!want.has(k)) t.h.stop(); map.delete(k); }
     for (const [k, e] of want) {
@@ -1078,7 +1101,16 @@ export class SkillFx {
     const v = U.v;
     if (!a || !v) return false;
     let drew = false;
-    for (const e of uniq([...a.cast, ...a.range])) { const h = this._play(e, v); if (h) { drew = true; this._keep(U, e, h); } }
+    // `once`: one official cast holds many strikes (锏 S3's MultiMeleeAttack, 10 hits in one Skill_3_Loop): its cast rows
+    // play at the first strike and stay until the skill ends, instead of restarting at every strike
+    const held = bind.once ? (U.boundCast ||= new Map()) : null;
+    for (const e of uniq([...a.cast, ...a.range])) {
+      if (held && held.get(e.key)?.alive) { drew = true; continue; }
+      const h = this._play(e, v);
+      if (!h) continue;
+      drew = true;
+      if (held) { held.set(e.key, h); U.loops.push(h); } else this._keep(U, e, h);
+    }
     if (a.hit.some((g) => g.length) || (a.aim || []).length || U.tHit.length) this._open(U, a);
     return drew;
   }
@@ -1131,10 +1163,16 @@ export class SkillFx {
     const holdS = bind.hold === 'fx' ? (fxS > 0 ? fxS : bind.holdS || SKILL_CAST_S)
       : Number(bb[bind.hold]) > 0 ? Number(bb[bind.hold]) : bind.holdS || SKILL_CAST_S;
     let drew = false;
+    // `refresh`: the loop held on this unit for the binding is replaced, not stacked
+    const slot = bind.refresh || bind.release ? `${keys.join(',')}|${tv?.id ?? `${Math.round(x)},${Math.round(y)}`}` : null;
+    if (slot) { for (const h of this.held.get(slot) || []) h.stop(); this.held.delete(slot); }
+    if (bind.release) return true;
     for (const k of keys) {
       const h = this.w.playOn(k, at, { loop: true, important: true, flipFrom:U.v || undefined });
       if (!h) continue;
       drew = true;
+      if (slot) { const list = this.held.get(slot) || []; list.push(h); this.held.set(slot, list); }
+      if (bind.untilEnd) (U.duringHeld ||= []).push(h);
       later(this.w.ofx, holdS, () => h.stop());
       this.marks.push({ owner: U.id, r: Math.round(y), c: Math.round(x), until: this.w.ofx.time + holdS, h, cover: bind.cover || [] });
     }
@@ -1440,6 +1478,8 @@ export class SkillFx {
     this.units.clear();
     this.tloops.clear();
     this.marks = [];
+    for (const list of this.held.values()) for (const h of list) h.stop();
+    this.held.clear();
     for(const L of this.locks)this._endLock(L);
     this.locks=[];
     this.hitLog = [];

@@ -28,7 +28,7 @@ test('every curated family resolves for its actual names and every grade, withou
 });
 
 test('nonbond item rewards, recruitment, growth and healing no longer share their generic fallback',()=>{
- const families=['이샤믈라의 축복','뮤엘시스의 지원','박사의 머리','대발견','부재중 전화','캐서린의 지원','신병','인력사무소','페가수스'];
+ const families=['이샤믈라의 축복','뮤엘시스의 지원','정예화','대발견','공개모집','캐서린의 지원','신병','인력사무소','페가수스'];
  const icons=families.map(name=>augmentView(catalog.find(a=>a.name.replace(/ (?:I|II|III)$/,'')===name)).icon);
  assert.equal(new Set(icons).size,families.length);
  for(const [first,second]of [['도박','알뜰살뜰'],['레벨 업','새로고침 지원'],['스타터 팩','헤드헌팅'],['소드마스터','강타'],['중첩','우리들의 빛']]){

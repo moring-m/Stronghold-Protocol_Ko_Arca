@@ -1,0 +1,3248 @@
+{
+ "operators": 218,
+ "skills": 581,
+ "skillsWithIssues": 120,
+ "byKind": {
+  "sfx attack": 91,
+  "sfx hit": 16,
+  "motion": 17,
+  "sfx start": 14
+ },
+ "issues": [
+  {
+   "charId": "char_4231_clemnt",
+   "name": "克莱门莎",
+   "slot": 0,
+   "skillId": "skchr_clemnt_1",
+   "issues": [
+    "sfx attack: official p_atk_wtsdrvr_d, game p_atk_wtsdrvr_n"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_1",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_wtsdrvr_d"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_wtsdrvr_n",
+     "hit": "p_imp_wtsdrvr_n",
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_4055_bgsnow",
+   "name": "파죰카",
+   "slot": 0,
+   "skillId": "skchr_bgsnow_1",
+   "issues": [
+    "sfx attack: no official bank for this skill's mode, game borrows p_atk_penarrow_d"
+   ],
+   "mode": "S1",
+   "animKey": "Skill_1_Loop",
+   "clip": "Skill_1_Begin/Skill_1_Loop",
+   "sfx": {
+    "want": {
+     "attack": [],
+     "hit": [],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_penarrow_d",
+     "hit": null,
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_4055_bgsnow",
+   "name": "파죰카",
+   "slot": 2,
+   "skillId": "skchr_bgsnow_3",
+   "issues": [
+    "sfx attack: official p_atk_penarrow_s, game none"
+   ],
+   "mode": "S3",
+   "animKey": "Skill_3_Loop",
+   "clip": "Skill_3_Begin/Skill_3_Loop/Skill_3_End",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_penarrow_s"
+     ],
+     "hit": [],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": null,
+     "hit": null,
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_1038_whitw2",
+   "name": "荒芜拉普兰德",
+   "slot": 0,
+   "skillId": "skchr_whitw2_1",
+   "issues": [
+    "sfx attack: no official bank for this skill's mode, game borrows p_atk_whtolfdrksl_d"
+   ],
+   "mode": "S1",
+   "animKey": "Skill_1_Loop",
+   "clip": "Skill_1_Begin/Skill_1_Loop/Skill_1_End",
+   "sfx": {
+    "want": {
+     "attack": [],
+     "hit": [],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_whtolfdrksl_d",
+     "hit": null,
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_4163_rosesa",
+   "name": "瑰盐",
+   "slot": 0,
+   "skillId": "skchr_rosesa_1",
+   "issues": [
+    "sfx attack: official p_atk_rsltdglk_d, game p_atk_rsltdglk_n"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_1",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_rsltdglk_d"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_rsltdglk_n",
+     "hit": null,
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_4037_demetr",
+   "name": "벨로네",
+   "slot": 0,
+   "skillId": "skchr_demetr_1",
+   "issues": [
+    "sfx attack: official p_atk_rdbrkncls_d, game p_atk_rdbrkncls_n"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_1",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_rdbrkncls_d"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_rdbrkncls_n",
+     "hit": "p_imp_rdbrkncls_n",
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_4037_demetr",
+   "name": "벨로네",
+   "slot": 2,
+   "skillId": "skchr_demetr_3",
+   "issues": [
+    "sfx attack: official p_atk_rdbrkncls_n|p_atk_rdbrknclsflh, game p_atk_rdbrkncls_s",
+    "sfx hit: official p_imp_rdbrkncls_n, game p_imp_rdbrkncls_s1"
+   ],
+   "mode": "S3",
+   "animKey": null,
+   "clip": "Skill_3_Begin/Skill_3_Back/Skill_3_End",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_rdbrkncls_n",
+      "p_atk_rdbrknclsflh"
+     ],
+     "hit": [
+      "p_imp_rdbrkncls_n"
+     ],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_rdbrkncls_s",
+     "hit": "p_imp_rdbrkncls_s1",
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_4116_blkkgt",
+   "name": "锏",
+   "slot": 0,
+   "skillId": "skchr_blkkgt_1",
+   "issues": [
+    "sfx attack: official p_atk_blkswrdphycrdy_d, game p_atk_blkswrdphyc_n_1"
+   ],
+   "mode": "S1",
+   "animKey": "Attack",
+   "clip": "Skill_1",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_blkswrdphycrdy_d"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_blkswrdphyc_n_1",
+     "hit": "p_imp_blkswrdphyc_n",
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_4116_blkkgt",
+   "name": "锏",
+   "slot": 2,
+   "skillId": "skchr_blkkgt_3",
+   "issues": [
+    "sfx attack: official p_atk_blkswrdphyclp_s|p_atk_blkswrdphycslrdy_s, game p_atk_blkswrdphyc_n_1"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_3_Begin/Skill_3_Loop/Skill_3_End",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_blkswrdphyclp_s",
+      "p_atk_blkswrdphycslrdy_s"
+     ],
+     "hit": [],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_blkswrdphyc_n_1",
+     "hit": "p_imp_blkswrdphyc_n",
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_173_slchan",
+   "name": "崖心",
+   "slot": 0,
+   "skillId": "skchr_slchan_1",
+   "issues": [
+    "sfx attack: official p_atk_cowboy_h, game p_atk_chain_n"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_Start/Skill_Loop/Skill_End",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_cowboy_h"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_chain_n",
+     "hit": null,
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_4117_ray",
+   "name": "레이",
+   "slot": 2,
+   "skillId": "skchr_ray_3",
+   "issues": [
+    "sfx attack: no official bank for this skill's mode, game borrows p_atk_sndshotgun_s"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_3_Begin/Skill_3_Loop/Skill_3_End",
+   "sfx": {
+    "want": {
+     "attack": [],
+     "hit": [],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_sndshotgun_s",
+     "hit": "p_imp_sndshotgun_n",
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_4204_mantra",
+   "name": "만트라",
+   "slot": 0,
+   "skillId": "skchr_mantra_1",
+   "issues": [
+    "sfx attack: official p_atk_mtelrncpnt_d, game p_atk_mtelrncpnt_n"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_1",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_mtelrncpnt_d"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_mtelrncpnt_n",
+     "hit": "p_imp_mtelrncpnt_n",
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_2015_dusk",
+   "name": "夕",
+   "slot": 0,
+   "skillId": "skchr_dusk_1",
+   "issues": [
+    "sfx attack: official p_atk_ancientsword_d, game p_atk_ancientsword_n"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Attack",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_ancientsword_d"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_ancientsword_n",
+     "hit": null,
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_1034_jesca2",
+   "name": "제시카 더 리버레이티드",
+   "slot": 1,
+   "skillId": "skchr_jesca2_2",
+   "issues": [
+    "sfx attack: official p_atk_carbine_n, game p_atk_pistolup_n"
+   ],
+   "mode": "S2",
+   "animKey": "Attack",
+   "clip": "Skill_2_Begin/Skill_2_Loop/Skill_2_End",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_carbine_n"
+     ],
+     "hit": [],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_pistolup_n",
+     "hit": "p_imp_pistolup_n",
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_474_glady",
+   "name": "歌蕾蒂娅",
+   "slot": 0,
+   "skillId": "skchr_glady_1",
+   "issues": [
+    "sfx attack: official p_atk_seasword_h, game p_atk_seasword_n"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_1_Begin/Skill_1_Loop/Skill_1_End",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_seasword_h"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_seasword_n",
+     "hit": "p_imp_seasword_n",
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_474_glady",
+   "name": "歌蕾蒂娅",
+   "slot": 2,
+   "skillId": "skchr_glady_3",
+   "issues": [
+    "sfx attack: official p_atk_seasword_h, game p_atk_seasword_n"
+   ],
+   "mode": "S3",
+   "animKey": null,
+   "clip": "Skill_3_Begin/Skill_3_Loop/Skill_3_End",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_seasword_h"
+     ],
+     "hit": [],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_seasword_n",
+     "hit": "p_imp_seasword_n",
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_4179_monstr",
+   "name": "Mon3tr",
+   "slot": 0,
+   "skillId": "skchr_monstr_1",
+   "issues": [
+    "sfx attack: official p_atk_kxdtctm_d, game p_atk_kxdtctm_n"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_1",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_kxdtctm_d"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_kxdtctm_n",
+     "hit": "p_imp_kxdtctm_n",
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_4179_monstr",
+   "name": "Mon3tr",
+   "slot": 2,
+   "skillId": "skchr_monstr_3",
+   "issues": [
+    "sfx attack: official p_atk_kxdtctmtl_s|p_atk_kxdtctmnd_s, game p_atk_kxdtctm_s",
+    "sfx hit: no official bank for this skill's mode, game borrows p_imp_kxdtctm_s"
+   ],
+   "mode": "S3",
+   "animKey": "Attack",
+   "clip": "Skill_3_Begin/Skill_3_Loop/Skill_3_End",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_kxdtctmtl_s",
+      "p_atk_kxdtctmnd_s"
+     ],
+     "hit": [],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_kxdtctm_s",
+     "hit": "p_imp_kxdtctm_s",
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_300_phenxi",
+   "name": "피아메타",
+   "slot": 2,
+   "skillId": "skchr_phenxi_3",
+   "issues": [
+    "motion: official Skill_2_Loop, game Skill_Begin/Skill_Loop/Skill_End"
+   ],
+   "mode": "S3",
+   "animKey": "Skill_2_Loop",
+   "clip": "Skill_Begin/Skill_Loop/Skill_End",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_fireboom_s"
+     ],
+     "hit": [],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_fireboom_s",
+     "hit": "p_imp_fireboom_n",
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_4098_vvana",
+   "name": "비비아나",
+   "slot": 2,
+   "skillId": "skchr_vvana_3",
+   "issues": [
+    "sfx attack: no official bank for this skill's mode, game borrows p_atk_shdswrd_s",
+    "sfx hit: no official bank for this skill's mode, game borrows p_imp_lghtnswrd_s"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_3_Attack_A",
+   "sfx": {
+    "want": {
+     "attack": [],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_shdswrd_s",
+     "hit": "p_imp_lghtnswrd_s",
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_427_vigil",
+   "name": "伺夜",
+   "slot": 2,
+   "skillId": "skchr_vigil_3",
+   "issues": [
+    "sfx attack: official p_atk_vwgun_h_1, game p_atk_vwgun_n"
+   ],
+   "mode": "S3",
+   "animKey": null,
+   "clip": "Skill3_Begin/Skill3_Attack_A/Skill3_End",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_vwgun_h_1"
+     ],
+     "hit": [],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_vwgun_n",
+     "hit": "p_imp_vwgun_n",
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_431_ashlok",
+   "name": "灰毫",
+   "slot": 1,
+   "skillId": "skchr_ashlok_2",
+   "issues": [
+    "sfx attack: no official bank for this skill's mode, game borrows p_atk_heavygun_h"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_Loop",
+   "sfx": {
+    "want": {
+     "attack": [],
+     "hit": [],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_heavygun_h",
+     "hit": "p_imp_heavygun_n",
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_4087_ines",
+   "name": "伊内丝",
+   "slot": 1,
+   "skillId": "skchr_ines_2",
+   "issues": [
+    "sfx attack: official p_atk_insasn_h_2, game p_atk_insasn_n_1"
+   ],
+   "mode": "S2",
+   "animKey": "Attack",
+   "clip": "Skill_2_Begin/Skill_2_Attack/Skill_2_End",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_insasn_h_2"
+     ],
+     "hit": [],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_insasn_n_1",
+     "hit": "p_imp_insasn_n_2",
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_4087_ines",
+   "name": "伊内丝",
+   "slot": 2,
+   "skillId": "skchr_ines_3",
+   "issues": [
+    "sfx attack: official p_atk_insasn_s_2|p_atk_insasntback, game p_atk_insasn_n_1"
+   ],
+   "mode": "S3",
+   "animKey": "Attack",
+   "clip": "Attack",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_insasn_s_2",
+      "p_atk_insasntback"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_insasn_n_1",
+     "hit": "p_imp_insasn_n_2",
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_388_mint",
+   "name": "薄绿",
+   "slot": 0,
+   "skillId": "skchr_mint_1",
+   "issues": [
+    "motion: model has no Skill_1_Attack clip"
+   ],
+   "mode": "S1",
+   "animKey": "Skill_1_Attack",
+   "clip": "Skill_1_Begin/Skill_1_Loop/Skill_1_End",
+   "sfx": {
+    "want": {
+     "attack": [],
+     "hit": [
+      "p_imp_smallmaghit_n"
+     ],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": null,
+     "hit": "p_imp_smallmaghit_n",
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_102_texas",
+   "name": "德克萨斯",
+   "slot": 1,
+   "skillId": "skchr_texas_2",
+   "issues": [
+    "sfx start: no official activation bank, game plays p_skill_swordrain"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill",
+   "sfx": {
+    "want": {
+     "attack": [],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_sword_n",
+     "hit": "p_imp_sword_n",
+     "start": "p_skill_swordrain"
+    }
+   }
+  },
+  {
+   "charId": "char_4223_botany",
+   "name": "보타니",
+   "slot": 0,
+   "skillId": "skchr_botany_1",
+   "issues": [
+    "sfx attack: official p_atk_mgcyrsn_d, game p_atk_mgcyrsn_n"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_1",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_mgcyrsn_d"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_mgcyrsn_n",
+     "hit": "p_imp_mgcyrsn_n",
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_4223_botany",
+   "name": "보타니",
+   "slot": 1,
+   "skillId": "skchr_botany_2",
+   "issues": [
+    "sfx attack: official p_atk_mgcyrsn_h|p_atk_mgcyrsnfr_h, game p_atk_mgcyrsn_n"
+   ],
+   "mode": "S2",
+   "animKey": "Attack",
+   "clip": "Skill_2_Begin/Skill_2_Loop/Skill_2_End",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_mgcyrsn_h",
+      "p_atk_mgcyrsnfr_h"
+     ],
+     "hit": [],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_mgcyrsn_n",
+     "hit": "p_imp_mgcyrsn_n",
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_4100_caper",
+   "name": "跃跃",
+   "slot": 0,
+   "skillId": "skchr_caper_1",
+   "issues": [
+    "sfx attack: official p_atk_rbbtbmrng_d, game p_atk_rbbtbmrng_n"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_Begin/Skill_Loop/Skill_End",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_rbbtbmrng_d"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_rbbtbmrng_n",
+     "hit": "p_imp_rbbtbmrng_n",
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_450_necras",
+   "name": "네크라스",
+   "slot": 2,
+   "skillId": "skchr_necras_3",
+   "issues": [
+    "sfx attack: official p_atk_prlfrhlrdrls|p_atk_prlfrhlrdcft, game p_atk_prlfrhlrd_n"
+   ],
+   "mode": "S3",
+   "animKey": "Skill_3_Loop",
+   "clip": "Skill_3_Begin/Skill_3_Loop/Skill_3_End",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_prlfrhlrdrls",
+      "p_atk_prlfrhlrdcft"
+     ],
+     "hit": [],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_prlfrhlrd_n",
+     "hit": "p_imp_prlfrhlrd_n",
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_017_huang",
+   "name": "블레이즈",
+   "slot": 1,
+   "skillId": "skchr_huang_2",
+   "issues": [
+    "motion: official Skill_1, game Skill_2_Begin/Skill_2_Loop"
+   ],
+   "mode": "S2",
+   "animKey": "Skill_1",
+   "clip": "Skill_2_Begin/Skill_2_Loop",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_chainsaw_h"
+     ],
+     "hit": [
+      "p_imp_chainsaw_n"
+     ],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_chainsaw_h",
+     "hit": "p_imp_chainsaw_n",
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_4196_reckpr",
+   "name": "录武官",
+   "slot": 0,
+   "skillId": "skchr_reckpr_1",
+   "issues": [
+    "sfx attack: official p_atk_rcdofc_d, game p_atk_rcdofc_n"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_Begin/Skill_Loop/Skill_End",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_rcdofc_d"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_rcdofc_n",
+     "hit": "p_imp_rcdofc_n",
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_4072_ironmn",
+   "name": "스테인리스",
+   "slot": 1,
+   "skillId": "skchr_ironmn_2",
+   "issues": [
+    "motion: official Skill_1, game Skill_2",
+    "sfx attack: official p_imp_elecdrill_d, game p_atk_elecdrill_h"
+   ],
+   "mode": "S1",
+   "animKey": "Skill_1",
+   "clip": "Skill_2",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_imp_elecdrill_d"
+     ],
+     "hit": [],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_elecdrill_h",
+     "hit": null,
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_179_cgbird",
+   "name": "나이팅게일",
+   "slot": 2,
+   "skillId": "skchr_cgbird_3",
+   "issues": [
+    "sfx start: official p_field_elefield_loop, game none"
+   ],
+   "mode": "S3",
+   "animKey": "Attack_C",
+   "clip": "Attack",
+   "sfx": {
+    "want": {
+     "attack": [],
+     "hit": [],
+     "start": [
+      "p_field_elefield_loop"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_heal_l",
+     "hit": null,
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_337_utage",
+   "name": "宴",
+   "slot": 1,
+   "skillId": "skchr_utage_2",
+   "issues": [
+    "sfx hit: official p_imp_darksword_n, game p_imp_sword_n"
+   ],
+   "mode": "S2",
+   "animKey": "Attack",
+   "clip": "Skill_Start/Skill_Loop/Skill_End",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_sword_n"
+     ],
+     "hit": [
+      "p_imp_darksword_n"
+     ],
+     "start": [
+      "b_char_tactboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_sword_n",
+     "hit": "p_imp_sword_n",
+     "start": "b_char_tactboost"
+    }
+   }
+  },
+  {
+   "charId": "char_4036_forcer",
+   "name": "见行者",
+   "slot": 0,
+   "skillId": "skchr_forcer_1",
+   "issues": [
+    "sfx attack: official p_atk_fgun_h, game p_imp_fgun_n"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_fgun_h"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_imp_fgun_n",
+     "hit": null,
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_250_phatom",
+   "name": "팬텀",
+   "slot": 1,
+   "skillId": "skchr_phatom_2",
+   "issues": [
+    "sfx attack: official p_atk_machete_fire, game p_atk_knife_n",
+    "sfx hit: official p_imp_machete_fire, game p_imp_knife_n"
+   ],
+   "mode": "S2",
+   "animKey": "Attack_2",
+   "clip": "Skill",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_machete_fire"
+     ],
+     "hit": [
+      "p_imp_machete_fire"
+     ],
+     "start": [
+      "p_skill_nightraid"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_knife_n",
+     "hit": "p_imp_knife_n",
+     "start": "p_skill_nightraid"
+    }
+   }
+  },
+  {
+   "charId": "char_107_liskam",
+   "name": "雷蛇",
+   "slot": 1,
+   "skillId": "skchr_liskam_2",
+   "issues": [
+    "sfx attack: official p_atk_lightning_n, game p_atk_pistol_n"
+   ],
+   "mode": "S2",
+   "animKey": "Skill",
+   "clip": "Skill",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_lightning_n"
+     ],
+     "hit": [
+      "p_imp_lightning_n"
+     ],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_pistol_n",
+     "hit": "p_imp_lightning_n",
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_4151_tinman",
+   "name": "锡人",
+   "slot": 0,
+   "skillId": "skchr_tinman_1",
+   "issues": [
+    "sfx attack: official p_atk_stmpnklch_d, game p_atk_stmpnklch_n"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_stmpnklch_d"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_stmpnklch_n",
+     "hit": "p_imp_stmpnklch_n",
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_4151_tinman",
+   "name": "锡人",
+   "slot": 1,
+   "skillId": "skchr_tinman_2",
+   "issues": [
+    "sfx attack: official p_atk_stmpnklch_h, game p_atk_stmpnklch_n"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_2",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_stmpnklch_h"
+     ],
+     "hit": [],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_stmpnklch_n",
+     "hit": "p_imp_stmpnklch_n",
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_4211_snhunt",
+   "name": "雪猎",
+   "slot": 0,
+   "skillId": "skchr_snhunt_1",
+   "issues": [
+    "sfx attack: official p_atk_sncrbw_d, game p_atk_sncrbw_n"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_1",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_sncrbw_d"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_sncrbw_n",
+     "hit": "p_imp_sncrbw_n",
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_4042_lumen",
+   "name": "流明",
+   "slot": 1,
+   "skillId": "skchr_lumen_2",
+   "issues": [
+    "sfx attack: official p_atk_fishheal_h, game p_atk_fishheal_n"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_2",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_fishheal_h"
+     ],
+     "hit": [],
+     "start": [
+      "b_char_healboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_fishheal_n",
+     "hit": "p_imp_fishheal_n",
+     "start": "b_char_healboost"
+    }
+   }
+  },
+  {
+   "charId": "char_4048_doroth",
+   "name": "도로시",
+   "slot": 1,
+   "skillId": "skchr_doroth_2",
+   "issues": [
+    "sfx attack: no official bank for this skill's mode, game borrows p_atk_sandatk_h"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Attack",
+   "sfx": {
+    "want": {
+     "attack": [],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_sandatk_h",
+     "hit": "p_imp_sandatk_n",
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_1023_ghost2",
+   "name": "归溟幽灵鲨",
+   "slot": 0,
+   "skillId": "skchr_ghost2_1",
+   "issues": [
+    "sfx attack: no official bank for this skill's mode, game borrows p_atk_sharpsaw_d",
+    "sfx hit: no official bank for this skill's mode, game borrows p_imp_sharpsaw_d"
+   ],
+   "mode": "Empty",
+   "animKey": null,
+   "clip": "Skill_1",
+   "sfx": {
+    "want": {
+     "attack": [],
+     "hit": [],
+     "start": [
+      "b_char_tactboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_sharpsaw_d",
+     "hit": "p_imp_sharpsaw_d",
+     "start": "b_char_tactboost"
+    }
+   }
+  },
+  {
+   "charId": "char_437_mizuki",
+   "name": "水月",
+   "slot": 1,
+   "skillId": "skchr_mizuki_2",
+   "issues": [
+    "motion: official Skill_1, game Skill_2_Start/Skill_2_Loop/Skill_2_End"
+   ],
+   "mode": "S1",
+   "animKey": "Skill_1",
+   "clip": "Skill_2_Start/Skill_2_Loop/Skill_2_End",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_imp_tentacle_h"
+     ],
+     "hit": [],
+     "start": [
+      "b_char_tactboost"
+     ]
+    },
+    "have": {
+     "attack": "p_imp_tentacle_h",
+     "hit": null,
+     "start": "b_char_tactboost"
+    }
+   }
+  },
+  {
+   "charId": "char_437_mizuki",
+   "name": "水月",
+   "slot": 2,
+   "skillId": "skchr_mizuki_3",
+   "issues": [
+    "motion: official Skill_2_Loop, game Attack"
+   ],
+   "mode": "S2",
+   "animKey": "Skill_2_Loop",
+   "clip": "Attack",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_imp_tentacle_s"
+     ],
+     "hit": [],
+     "start": [
+      "b_char_tactboost"
+     ]
+    },
+    "have": {
+     "attack": "p_imp_tentacle_s",
+     "hit": null,
+     "start": "b_char_tactboost"
+    }
+   }
+  },
+  {
+   "charId": "char_430_fartth",
+   "name": "远牙",
+   "slot": 2,
+   "skillId": "skchr_fartth_3",
+   "issues": [
+    "motion: model has no Skill_Loop clip"
+   ],
+   "mode": "S3",
+   "animKey": "Skill_Loop",
+   "clip": "Skill3_Begin/Skill3_Loop/Skill3_End",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_birdarrow_s"
+     ],
+     "hit": [],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_birdarrow_s",
+     "hit": "p_imp_birdarrow_n",
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_140_whitew",
+   "name": "拉普兰德",
+   "slot": 1,
+   "skillId": "skchr_whitew_2",
+   "issues": [
+    "sfx attack: official p_atk_katanawave_n, game p_atk_swordwave_n"
+   ],
+   "mode": "S2",
+   "animKey": "Skill",
+   "clip": "Skill",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_katanawave_n"
+     ],
+     "hit": [],
+     "start": [
+      "p_skill_soulwolf"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_swordwave_n",
+     "hit": "p_imp_sword_n",
+     "start": "p_skill_soulwolf"
+    }
+   }
+  },
+  {
+   "charId": "char_1050_chen3",
+   "name": "첸 더 던스트릭",
+   "slot": 1,
+   "skillId": "skchr_chen3_2",
+   "issues": [
+    "sfx attack: official p_atk_hljdswd_h, game p_atk_hljdswd_n"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_2_Begin/Skill_2_Disappear",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_hljdswd_h"
+     ],
+     "hit": [],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_hljdswd_n",
+     "hit": "p_imp_hljdswd_n",
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_4122_grabds",
+   "name": "小满",
+   "slot": 1,
+   "skillId": "skchr_grabds_2",
+   "issues": [
+    "sfx start: no official activation bank, game plays p_skill_ctefltpn"
+   ],
+   "mode": "S2",
+   "animKey": "",
+   "clip": "Skill_2_Begin/Skill_2_Loop/Skill_2_End",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_cteflt_h"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_cteflt_h",
+     "hit": "p_imp_cteflt_n",
+     "start": "p_skill_ctefltpn"
+    }
+   }
+  },
+  {
+   "charId": "char_1043_leizi2",
+   "name": "레이즈 더 썬더브링어",
+   "slot": 0,
+   "skillId": "skchr_leizi2_1",
+   "issues": [
+    "sfx attack: no official bank for this skill's mode, game borrows p_atk_lzxqlkl_d1"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_1_Begin/Skill_1_End",
+   "sfx": {
+    "want": {
+     "attack": [],
+     "hit": [],
+     "start": [
+      "p_skill_lzxqlkl_d"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_lzxqlkl_d1",
+     "hit": "p_imp_lzxqlkl_n",
+     "start": "p_skill_lzxqlkl_d"
+    }
+   }
+  },
+  {
+   "charId": "char_494_vendla",
+   "name": "刺玫",
+   "slot": 1,
+   "skillId": "skchr_vendla_2",
+   "issues": [
+    "sfx attack: official p_atk_brmblhl_h, game p_atk_brmblhl_n"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_brmblhl_h"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_brmblhl_n",
+     "hit": "p_imp_brmblhl_n",
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_194_leto",
+   "name": "레토",
+   "slot": 1,
+   "skillId": "skchr_leto_2",
+   "issues": [
+    "sfx attack: official p_atk_axcpvbl_h|p_atk_axcpvblsht_h, game p_atk_axcpvbl_n"
+   ],
+   "mode": "S2",
+   "animKey": "Skill_2",
+   "clip": "Skill_2",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_axcpvbl_h",
+      "p_atk_axcpvblsht_h"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_axcpvbl_n",
+     "hit": "p_imp_axcpvblcmb_n",
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_4058_pepe",
+   "name": "佩佩",
+   "slot": 0,
+   "skillId": "skchr_pepe_1",
+   "issues": [
+    "sfx attack: official p_atk_ctmnyhmr_d, game p_atk_ctmnyhmr_n"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_1",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_ctmnyhmr_d"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_ctmnyhmr_n",
+     "hit": "p_imp_ctmnyhmr_n",
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_4224_turdus",
+   "name": "우쿠시크",
+   "slot": 0,
+   "skillId": "skchr_turdus_1",
+   "issues": [
+    "sfx attack: official p_atk_crwkdhl_d|p_atk_crwkdhlfr_d, game p_atk_crwkdhl_n"
+   ],
+   "mode": "S1",
+   "animKey": "Skill_1_Loop",
+   "clip": "Skill_1_Begin/Skill_1_Loop/Skill_1_End",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_crwkdhl_d",
+      "p_atk_crwkdhlfr_d"
+     ],
+     "hit": [],
+     "start": [
+      "b_char_healboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_crwkdhl_n",
+     "hit": "p_imp_crwkdhl_n",
+     "start": "b_char_healboost"
+    }
+   }
+  },
+  {
+   "charId": "char_4011_lessng",
+   "name": "레싱",
+   "slot": 0,
+   "skillId": "skchr_lessng_1",
+   "issues": [
+    "sfx attack: official p_atk_shpbygrd_d, game p_atk_shpbygrd_n"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Attack",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_shpbygrd_d"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_shpbygrd_n",
+     "hit": "p_imp_shpbygrd_n",
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_491_humus",
+   "name": "休谟斯",
+   "slot": 0,
+   "skillId": "skchr_humus_1",
+   "issues": [
+    "sfx attack: official p_atk_sicklemetalhu_d, game p_atk_sicklemetalhu_n"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Attack",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_sicklemetalhu_d"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_sicklemetalhu_n",
+     "hit": "p_imp_sicklemetalhu_n",
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_213_mostma",
+   "name": "莫斯提马",
+   "slot": 2,
+   "skillId": "skchr_mostma_3",
+   "issues": [
+    "motion: official Skill_2_Loop, game Skill_Begin/Skill_Loop/Skill_End"
+   ],
+   "mode": "S2",
+   "animKey": "Skill_2_Loop",
+   "clip": "Skill_Begin/Skill_Loop/Skill_End",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_whitetimewand_s"
+     ],
+     "hit": [],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_whitetimewand_s",
+     "hit": null,
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_195_glassb",
+   "name": "이스티나",
+   "slot": 1,
+   "skillId": "skchr_glassb_2",
+   "issues": [
+    "sfx start: official p_field_elefield_loop, game none"
+   ],
+   "mode": "S2",
+   "animKey": "",
+   "clip": "Skill_Start/Skill_Loop/Skill_End",
+   "sfx": {
+    "want": {
+     "attack": [],
+     "hit": [],
+     "start": [
+      "p_field_elefield_loop"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_book_n",
+     "hit": "p_imp_book_n",
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_4182_oblvns",
+   "name": "토가와 사키코",
+   "slot": 0,
+   "skillId": "skchr_oblvns_1",
+   "issues": [
+    "sfx start: no official activation bank, game plays p_skill_mjckyrdglsnt_d1"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_1",
+   "sfx": {
+    "want": {
+     "attack": [],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": null,
+     "hit": null,
+     "start": "p_skill_mjckyrdglsnt_d1"
+    }
+   }
+  },
+  {
+   "charId": "char_4182_oblvns",
+   "name": "토가와 사키코",
+   "slot": 1,
+   "skillId": "skchr_oblvns_2",
+   "issues": [
+    "sfx attack: official p_atk_mjckyrdnt_h, game none",
+    "sfx start: no official activation bank, game plays p_skill_mjckyrdslnt_h2"
+   ],
+   "mode": "S2_AttackSpeed",
+   "animKey": null,
+   "clip": "Skill_2_Start/Skill_2_Idle_A",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_mjckyrdnt_h"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": null,
+     "hit": null,
+     "start": "p_skill_mjckyrdslnt_h2"
+    }
+   }
+  },
+  {
+   "charId": "char_4182_oblvns",
+   "name": "토가와 사키코",
+   "slot": 2,
+   "skillId": "skchr_oblvns_3",
+   "issues": [
+    "sfx attack: official p_atk_mjckyrdslnt, game none",
+    "sfx start: no official activation bank, game plays p_skill_mjckyrdslnt_s1"
+   ],
+   "mode": "S3",
+   "animKey": null,
+   "clip": "Skill_3_Begin/Skill_3_Loop/Skill_3_End",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_mjckyrdslnt"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": null,
+     "hit": null,
+     "start": "p_skill_mjckyrdslnt_s1"
+    }
+   }
+  },
+  {
+   "charId": "char_4229_aphris",
+   "name": "谬因",
+   "slot": 0,
+   "skillId": "skchr_aphris_1",
+   "issues": [
+    "sfx attack: no official bank for this skill's mode, game borrows p_atk_mcdtlsrfr_d"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_1_Begin/Skill_1_Loop_A",
+   "sfx": {
+    "want": {
+     "attack": [],
+     "hit": [],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_mcdtlsrfr_d",
+     "hit": "p_imp_mcdtlsr_n",
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_4229_aphris",
+   "name": "谬因",
+   "slot": 2,
+   "skillId": "skchr_aphris_3",
+   "issues": [
+    "sfx attack: no official bank for this skill's mode, game borrows p_atk_mcdtlsr_s",
+    "sfx hit: no official bank for this skill's mode, game borrows p_imp_mcdtlsr_s"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_3_Loop/Skill_3_End",
+   "sfx": {
+    "want": {
+     "attack": [],
+     "hit": [],
+     "start": [
+      "p_skill_mcdtlsr_s"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_mcdtlsr_s",
+     "hit": "p_imp_mcdtlsr_s",
+     "start": "p_skill_mcdtlsr_s"
+    }
+   }
+  },
+  {
+   "charId": "char_416_zumama",
+   "name": "유넥티스",
+   "slot": 2,
+   "skillId": "skchr_zumama_3",
+   "issues": [
+    "motion: official Skill_2_Loop, game Skill",
+    "sfx hit: official p_atk_robotsaw_n, game p_imp_snakeknife_n"
+   ],
+   "mode": "S3",
+   "animKey": "Skill_2_Loop",
+   "clip": "Skill",
+   "sfx": {
+    "want": {
+     "attack": [],
+     "hit": [
+      "p_atk_robotsaw_n"
+     ],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_snakeknife_n",
+     "hit": "p_imp_snakeknife_n",
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_1042_phatm2",
+   "name": "트라고디아",
+   "slot": 0,
+   "skillId": "skchr_phatm2_1",
+   "issues": [
+    "sfx attack: official p_atk_oprdmgrc_d, game p_atk_oprdmgrc_n"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_1",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_oprdmgrc_d"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_oprdmgrc_n",
+     "hit": "p_imp_oprdmgrc_n",
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_1040_blaze2",
+   "name": "烛煌",
+   "slot": 0,
+   "skillId": "skchr_blaze2_1",
+   "issues": [
+    "sfx attack: official p_atk_hcnsrfr_d, game p_atk_hcnsrfr_n"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_1",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_hcnsrfr_d"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_hcnsrfr_n",
+     "hit": "p_imp_hcnsrfr_n",
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_4010_etlchi",
+   "name": "隐德来希",
+   "slot": 0,
+   "skillId": "skchr_etlchi_1",
+   "issues": [
+    "sfx attack: official p_atk_vmprsckl_d, game p_atk_vmprsckl_n"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_1",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_vmprsckl_d"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_vmprsckl_n",
+     "hit": "p_imp_vmprsckl_n",
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_4202_haruka",
+   "name": "하루카",
+   "slot": 0,
+   "skillId": "skchr_haruka_1",
+   "issues": [
+    "sfx attack: official p_atk_idgfshblh, game p_atk_idgfshbl_n"
+   ],
+   "mode": "S1",
+   "animKey": null,
+   "clip": "Skill_Begin/Skill_Loop/Skill_End",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_idgfshblh"
+     ],
+     "hit": [],
+     "start": [
+      "b_char_healboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_idgfshbl_n",
+     "hit": "p_imp_idgfshbl_n",
+     "start": "b_char_healboost"
+    }
+   }
+  },
+  {
+   "charId": "char_4202_haruka",
+   "name": "하루카",
+   "slot": 1,
+   "skillId": "skchr_haruka_2",
+   "issues": [
+    "sfx attack: official p_atk_idgfshblh, game p_atk_idgfshbl_n"
+   ],
+   "mode": "S2",
+   "animKey": null,
+   "clip": "Skill_2_Begin/Skill_2_loop",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_idgfshblh"
+     ],
+     "hit": [],
+     "start": [
+      "p_skill_idgfshbl_h"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_idgfshbl_n",
+     "hit": "p_imp_idgfshbl_n",
+     "start": "p_skill_idgfshbl_h"
+    }
+   }
+  },
+  {
+   "charId": "char_1039_thorn2",
+   "name": "引星棘刺",
+   "slot": 0,
+   "skillId": "skchr_thorn2_1",
+   "issues": [
+    "sfx attack: official p_atk_trshldacys_d, game p_atk_trshldacys_n"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_trshldacys_d"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_trshldacys_n",
+     "hit": "p_imp_trshldacy_n",
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_1020_reed2",
+   "name": "焰影苇草",
+   "slot": 2,
+   "skillId": "skchr_reed2_3",
+   "issues": [
+    "motion: official Skill_3_Attack, game Skill_3_Begin/Skill_3_Loop/Skill_3_End"
+   ],
+   "mode": "S3",
+   "animKey": "Skill_3_Attack",
+   "clip": "Skill_3_Begin/Skill_3_Loop/Skill_3_End",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_firespear_h"
+     ],
+     "hit": [],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_firespear_h",
+     "hit": "p_imp_firespear_n",
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_426_billro",
+   "name": "卡涅利安",
+   "slot": 1,
+   "skillId": "skchr_billro_2",
+   "issues": [
+    "motion: official Skill_Loop, game Skill_2_Begin/Skill_2_Loop/Skill_2_End"
+   ],
+   "mode": "S2",
+   "animKey": "Skill_Loop",
+   "clip": "Skill_2_Begin/Skill_2_Loop/Skill_2_End",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_goldexplo_h",
+      "p_imp_goldexplo_h"
+     ],
+     "hit": [],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_goldexplo_h",
+     "hit": null,
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_4047_pianst",
+   "name": "체르니",
+   "slot": 0,
+   "skillId": "skchr_pianst_1",
+   "issues": [
+    "sfx attack: official p_imp_pianohit_h, game p_imp_pianohit_n"
+   ],
+   "mode": "S1",
+   "animKey": "Attack",
+   "clip": "Attack",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_imp_pianohit_h"
+     ],
+     "hit": [],
+     "start": [
+      "b_char_defboost"
+     ]
+    },
+    "have": {
+     "attack": "p_imp_pianohit_n",
+     "hit": null,
+     "start": "b_char_defboost"
+    }
+   }
+  },
+  {
+   "charId": "char_4047_pianst",
+   "name": "체르니",
+   "slot": 1,
+   "skillId": "skchr_pianst_2",
+   "issues": [
+    "sfx attack: official p_imp_pianohit_s1|p_imp_pianohit_s2|p_imp_pianohit_s3, game p_imp_pianohit_h"
+   ],
+   "mode": "S2",
+   "animKey": "Skill_2_Attack",
+   "clip": "Skill_2_Begin/Skill_2_Attack/Skill_2_End",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_imp_pianohit_s1",
+      "p_imp_pianohit_s2",
+      "p_imp_pianohit_s3"
+     ],
+     "hit": [],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": "p_imp_pianohit_h",
+     "hit": null,
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_293_thorns",
+   "name": "쏜즈",
+   "slot": 2,
+   "skillId": "skchr_thorns_3",
+   "issues": [
+    "motion: model has no Skill_2 clip",
+    "sfx hit: no official bank for this skill's mode, game borrows p_imp_brandishsabre_s"
+   ],
+   "mode": "S3",
+   "animKey": "Skill_2",
+   "clip": "Attack_1",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_throwsabre_s"
+     ],
+     "hit": [],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_throwsabre_s",
+     "hit": "p_imp_brandishsabre_s",
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_188_helage",
+   "name": "헬라그",
+   "slot": 2,
+   "skillId": "skchr_helage_3",
+   "issues": [
+    "sfx attack: official p_skill_huirenzhan, game p_atk_falchion_n"
+   ],
+   "mode": "S3",
+   "animKey": "",
+   "clip": "Skill_3_Begin/Skill_3_Loop/Skill_3_End",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_skill_huirenzhan"
+     ],
+     "hit": [],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_falchion_n",
+     "hit": "p_imp_falchion_n",
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_4191_tippi",
+   "name": "蒂比",
+   "slot": 0,
+   "skillId": "skchr_tippi_1",
+   "issues": [
+    "sfx start: no official activation bank, game plays p_skill_pmtjtckp"
+   ],
+   "mode": "S1",
+   "animKey": "Attack",
+   "clip": "Skill_Begin/Skill_Loop/Skill_End",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_wtrgnpmt_d"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_wtrgnpmt_d",
+     "hit": "p_imp_wtrgnpmt_n",
+     "start": "p_skill_pmtjtckp"
+    }
+   }
+  },
+  {
+   "charId": "char_4191_tippi",
+   "name": "蒂比",
+   "slot": 1,
+   "skillId": "skchr_tippi_2",
+   "issues": [
+    "sfx start: no official activation bank, game plays p_skill_pmtjtckp"
+   ],
+   "mode": "S2",
+   "animKey": "Attack",
+   "clip": "Skill_2_Begin/Skill_2_Loop/Skill_2_End",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_wtrgnpmt_h"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_wtrgnpmt_h",
+     "hit": "p_imp_wtrgnpmt_n",
+     "start": "p_skill_pmtjtckp"
+    }
+   }
+  },
+  {
+   "charId": "char_496_wildmn",
+   "name": "野鬃",
+   "slot": 0,
+   "skillId": "skchr_wildmn_1",
+   "issues": [
+    "sfx attack: official p_imp_spearstab_n, game p_atk_spearstab_n"
+   ],
+   "mode": "S1",
+   "animKey": "Skill_1_Loop",
+   "clip": "Skill_1_Begin/Skill_1_Loop/Skill_1_End",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_imp_spearstab_n"
+     ],
+     "hit": [],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_spearstab_n",
+     "hit": null,
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_248_mgllan",
+   "name": "마젤란",
+   "slot": 0,
+   "skillId": "skchr_mgllan_1",
+   "issues": [
+    "sfx attack: no official bank for this skill's mode, game borrows p_atk_icecamera_h",
+    "sfx hit: no official bank for this skill's mode, game borrows p_imp_icecamera_h"
+   ],
+   "mode": "S1_Default",
+   "animKey": "Attack",
+   "clip": "Skill",
+   "sfx": {
+    "want": {
+     "attack": [],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_icecamera_h",
+     "hit": "p_imp_icecamera_h",
+     "start": "b_char_tactboost"
+    }
+   }
+  },
+  {
+   "charId": "char_248_mgllan",
+   "name": "마젤란",
+   "slot": 1,
+   "skillId": "skchr_mgllan_2",
+   "issues": [
+    "sfx attack: no official bank for this skill's mode, game borrows p_atk_icecamera_h",
+    "sfx hit: no official bank for this skill's mode, game borrows p_imp_icecamera_h"
+   ],
+   "mode": "S1_Default",
+   "animKey": "Attack",
+   "clip": "Skill",
+   "sfx": {
+    "want": {
+     "attack": [],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_icecamera_h",
+     "hit": "p_imp_icecamera_h",
+     "start": "b_char_tactboost"
+    }
+   }
+  },
+  {
+   "charId": "char_248_mgllan",
+   "name": "마젤란",
+   "slot": 2,
+   "skillId": "skchr_mgllan_3",
+   "issues": [
+    "sfx attack: no official bank for this skill's mode, game borrows p_atk_icecamera_h",
+    "sfx hit: no official bank for this skill's mode, game borrows p_imp_icecamera_h"
+   ],
+   "mode": "S1_Default",
+   "animKey": "Attack",
+   "clip": "Skill",
+   "sfx": {
+    "want": {
+     "attack": [],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_icecamera_h",
+     "hit": "p_imp_icecamera_h",
+     "start": "b_char_tactboost"
+    }
+   }
+  },
+  {
+   "charId": "char_4139_papyrs",
+   "name": "莎草",
+   "slot": 0,
+   "skillId": "skchr_papyrs_1",
+   "issues": [
+    "sfx attack: official p_atk_ctschlar_d, game p_atk_ctschlar_n"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_1",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_ctschlar_d"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_ctschlar_n",
+     "hit": null,
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_2014_nian",
+   "name": "니엔",
+   "slot": 2,
+   "skillId": "skchr_nian_3",
+   "issues": [
+    "motion: official Skill_2_Loop, game Attack_Begin/Attack_Loop/Attack_End"
+   ],
+   "mode": "S3",
+   "animKey": "Skill_2_Loop",
+   "clip": "Attack_Begin/Attack_Loop/Attack_End",
+   "sfx": {
+    "want": {
+     "attack": [],
+     "hit": [],
+     "start": [
+      "p_skill_irondefense"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_blade_n",
+     "hit": "p_imp_blade_n",
+     "start": "p_skill_irondefense"
+    }
+   }
+  },
+  {
+   "charId": "char_1035_wisdel",
+   "name": "위셔델",
+   "slot": 0,
+   "skillId": "skchr_wisdel_1",
+   "issues": [
+    "sfx attack: official p_atk_dkmrcaygn_d, game p_atk_dkmrcaygn_n"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_1",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_dkmrcaygn_d"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_dkmrcaygn_n",
+     "hit": null,
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_4109_baslin",
+   "name": "베이스라인",
+   "slot": 0,
+   "skillId": "skchr_baslin_1",
+   "issues": [
+    "sfx attack: official p_atk_euphnium_d, game p_atk_euphnium_n"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_1",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_euphnium_d"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_euphnium_n",
+     "hit": "p_imp_euphnium_n",
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_472_pasngr",
+   "name": "异客",
+   "slot": 1,
+   "skillId": "skchr_pasngr_2",
+   "issues": [
+    "motion: model has no Skill_2 clip"
+   ],
+   "mode": "S2",
+   "animKey": "Skill_2",
+   "clip": "Skill2_Begin/Skill2/Skill2_End",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_thunder_s"
+     ],
+     "hit": [],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_thunder_s",
+     "hit": "p_imp_thunder_n",
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_222_bpipe",
+   "name": "风笛",
+   "slot": 2,
+   "skillId": "skchr_bpipe_3",
+   "issues": [
+    "motion: official Skill_2_Loop, game Skill"
+   ],
+   "mode": "S3",
+   "animKey": "Skill_2_Loop",
+   "clip": "Skill",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_gunlance_s"
+     ],
+     "hit": [
+      "p_imp_gunlance_s"
+     ],
+     "start": [
+      "b_char_tactboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_gunlance_s",
+     "hit": "p_imp_gunlance_s",
+     "start": "b_char_tactboost"
+    }
+   }
+  },
+  {
+   "charId": "char_4027_heyak",
+   "name": "오올헤약",
+   "slot": 0,
+   "skillId": "skchr_heyak_1",
+   "issues": [
+    "sfx attack: official p_atk_quetzstaff_d, game p_atk_quetzstaff_n"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_1",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_quetzstaff_d"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_quetzstaff_n",
+     "hit": "p_imp_quetzstaff_n",
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_2026_yu",
+   "name": "余",
+   "slot": 0,
+   "skillId": "skchr_yu_1",
+   "issues": [
+    "sfx attack: official p_atk_frbytrtn_p, game p_atk_frbytrtn_n",
+    "sfx hit: official p_imp_frbytrtn_p, game p_imp_frbytrtn_n"
+   ],
+   "mode": "S1",
+   "animKey": "Skill_1",
+   "clip": "Skill_1",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_frbytrtn_p"
+     ],
+     "hit": [
+      "p_imp_frbytrtn_p"
+     ],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_frbytrtn_n",
+     "hit": "p_imp_frbytrtn_n",
+     "start": "b_char_defboost"
+    }
+   }
+  },
+  {
+   "charId": "char_003_kalts",
+   "name": "켈시",
+   "slot": 2,
+   "skillId": "skchr_kalts_3",
+   "issues": [
+    "sfx start: no official activation bank, game plays p_skill_mon3trburst"
+   ],
+   "mode": "S3",
+   "animKey": "Attack",
+   "clip": "Attack",
+   "sfx": {
+    "want": {
+     "attack": [],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_healpistol_n",
+     "hit": null,
+     "start": "p_skill_mon3trburst"
+    }
+   }
+  },
+  {
+   "charId": "char_350_surtr",
+   "name": "史尔特尔",
+   "slot": 2,
+   "skillId": "skchr_surtr_3",
+   "issues": [
+    "motion: model has no Skill_3_Attack clip"
+   ],
+   "mode": "S3",
+   "animKey": "Skill_3_Attack",
+   "clip": "Skill_3_Begin/Skill_3_Loop",
+   "sfx": {
+    "want": {
+     "attack": [],
+     "hit": [
+      "p_imp_fireswordstab_s"
+     ],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_firesword_n",
+     "hit": "p_imp_fireswordstab_s",
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_4039_horn",
+   "name": "号角",
+   "slot": 0,
+   "skillId": "skchr_horn_1",
+   "issues": [
+    "sfx attack: official p_atk_blackcannoncast_d, game p_skill_blackcannonfull_cast"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_1_A",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_blackcannoncast_d"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_skill_blackcannonfull_cast",
+     "hit": "p_imp_heavygun_n",
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_4039_horn",
+   "name": "号角",
+   "slot": 2,
+   "skillId": "skchr_horn_3",
+   "issues": [
+    "sfx attack: official p_atk_heavygun_n, game p_skill_blackcannonfull_cast"
+   ],
+   "mode": "S3",
+   "animKey": null,
+   "clip": "Skill_3_Begin/Skill_3_A_Loop/Skill_3_End",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_heavygun_n"
+     ],
+     "hit": [],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": "p_skill_blackcannonfull_cast",
+     "hit": "p_imp_heavygun_n",
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_4054_malist",
+   "name": "至简",
+   "slot": 0,
+   "skillId": "skcom_quickattack[3]",
+   "issues": [
+    "sfx attack: no official bank for this skill's mode, game borrows p_atk_staffcannon_d",
+    "sfx hit: no official bank for this skill's mode, game borrows p_imp_staffcannon_d"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Attack",
+   "sfx": {
+    "want": {
+     "attack": [],
+     "hit": [],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_staffcannon_d",
+     "hit": "p_imp_staffcannon_d",
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_4054_malist",
+   "name": "至简",
+   "slot": 1,
+   "skillId": "skchr_malist_2",
+   "issues": [
+    "sfx attack: official p_atk_staffcannon_h, game p_atk_staffcannon_n"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_2",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_staffcannon_h"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_staffcannon_n",
+     "hit": "p_imp_staffcannon_n",
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_362_saga",
+   "name": "사가",
+   "slot": 2,
+   "skillId": "skchr_saga_3",
+   "issues": [
+    "motion: model has no Skill_3_Loop clip",
+    "sfx hit: official p_imp_ninjasword_h_1, game p_imp_ninjasword_n"
+   ],
+   "mode": "S3",
+   "animKey": "Skill_3_Loop",
+   "clip": "Skill",
+   "sfx": {
+    "want": {
+     "attack": [],
+     "hit": [
+      "p_imp_ninjasword_h_1"
+     ],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": null,
+     "hit": "p_imp_ninjasword_n",
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_4088_hodrer",
+   "name": "외드레르",
+   "slot": 0,
+   "skillId": "skchr_hodrer_1",
+   "issues": [
+    "sfx attack: official p_atk_hdvysword_d, game p_atk_hdvysword_n"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_1",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_hdvysword_d"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_hdvysword_n",
+     "hit": "p_imp_hdvysword_n",
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_279_excu",
+   "name": "送葬人",
+   "slot": 1,
+   "skillId": "skchr_excu_2",
+   "issues": [
+    "sfx attack: official p_atk_shotgun_double, game p_atk_shotgun_n"
+   ],
+   "mode": "S2",
+   "animKey": "",
+   "clip": "Skill_Right_Begin/Skill_Right_Loop/Skill_Right_End",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_shotgun_double"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_shotgun_n",
+     "hit": null,
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_4121_zuole",
+   "name": "좌락",
+   "slot": 0,
+   "skillId": "skchr_zuole_1",
+   "issues": [
+    "sfx attack: official p_atk_wrrsrd_d, game p_atk_wrrsrd_n"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_1_Begin/Skill_1_Loop/Skill_1_End",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_wrrsrd_d"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_wrrsrd_n",
+     "hit": "p_imp_wrrsrd_n",
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_4026_vulpis",
+   "name": "忍冬",
+   "slot": 0,
+   "skillId": "skchr_vulpis_1",
+   "issues": [
+    "sfx attack: official p_atk_fxssnom_d, game p_atk_fxssnom_n"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_1",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_fxssnom_d"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_fxssnom_n",
+     "hit": "p_imp_fxssnom_n",
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_4026_vulpis",
+   "name": "忍冬",
+   "slot": 1,
+   "skillId": "skchr_vulpis_2",
+   "issues": [
+    "sfx start: no official activation bank, game plays p_skill_fxssnomswdrn"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_2",
+   "sfx": {
+    "want": {
+     "attack": [],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_fxssnom_n",
+     "hit": "p_imp_fxssnom_n",
+     "start": "p_skill_fxssnomswdrn"
+    }
+   }
+  },
+  {
+   "charId": "char_2025_shu",
+   "name": "슈",
+   "slot": 1,
+   "skillId": "skchr_shu_2",
+   "issues": [
+    "sfx start: no official activation bank, game plays p_skill_drgndfmrt"
+   ],
+   "mode": "S2",
+   "animKey": "Attack",
+   "clip": "Skill_2_Begin/Skill_2_Attack/Skill_2_End",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_drgndfmr_h"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_drgndfmr_h",
+     "hit": "p_imp_drgndfmr_n",
+     "start": "p_skill_drgndfmrt"
+    }
+   }
+  },
+  {
+   "charId": "char_1047_halo2",
+   "name": "溯光星源",
+   "slot": 1,
+   "skillId": "skchr_halo2_2",
+   "issues": [
+    "sfx attack: official p_atk_strbsvr_h, game p_atk_strbsvr_n"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_2",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_strbsvr_h"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_strbsvr_n",
+     "hit": "p_imp_strbsvr_n",
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_4194_rmixer",
+   "name": "信仰搅拌机",
+   "slot": 2,
+   "skillId": "skchr_rmixer_3",
+   "issues": [
+    "sfx attack: official p_atk_ftmxbrtlm_skiiop, game p_atk_ftmxbrtlm_s"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_3_Begin/Skill_3_Idle/Skill_3_End",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_ftmxbrtlm_skiiop"
+     ],
+     "hit": [],
+     "start": [
+      "p_atk_ftmxbrtlm_skii"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_ftmxbrtlm_s",
+     "hit": "p_imp_ftmxbrtlm_n",
+     "start": "p_atk_ftmxbrtlm_skii"
+    }
+   }
+  },
+  {
+   "charId": "char_4051_akkord",
+   "name": "协律",
+   "slot": 0,
+   "skillId": "skchr_akkord_1",
+   "issues": [
+    "sfx attack: official p_atk_mlysndv_d, game p_atk_mlysndv_n"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Attack",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_mlysndv_d"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_mlysndv_n",
+     "hit": "p_imp_mlysndv_n",
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_245_cello",
+   "name": "塑心",
+   "slot": 1,
+   "skillId": "skchr_cello_2",
+   "issues": [
+    "sfx attack: official p_atk_shphrt_s_1|p_atk_shphrt_s_2|p_atk_shphrt_s_3, game p_atk_shphrt_n_1"
+   ],
+   "mode": "S2",
+   "animKey": "Attack",
+   "clip": "Skill_2_Begin/Skill_2_Attack/Skill_2_End",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_shphrt_s_1",
+      "p_atk_shphrt_s_2",
+      "p_atk_shphrt_s_3"
+     ],
+     "hit": [],
+     "start": [
+      "p_skill_shphrtclspicc"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_shphrt_n_1",
+     "hit": "p_imp_shphrt_n_1",
+     "start": "p_skill_shphrtclspicc"
+    }
+   }
+  },
+  {
+   "charId": "char_4146_nymph",
+   "name": "妮芙",
+   "slot": 1,
+   "skillId": "skchr_nymph_2",
+   "issues": [
+    "sfx attack: official p_atk_scbslck_h, game p_atk_scbslck_n"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_2",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_scbslck_h"
+     ],
+     "hit": [],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_scbslck_n",
+     "hit": "p_imp_scbslck_n",
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_1016_agoat2",
+   "name": "纯烬艾雅法拉",
+   "slot": 1,
+   "skillId": "skchr_agoat2_2",
+   "issues": [
+    "sfx start: no official activation bank, game plays p_skill_gtshpbrnch_h"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_2",
+   "sfx": {
+    "want": {
+     "attack": [],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_gtshpbrnch_n",
+     "hit": "p_imp_gtshpbrnch_n",
+     "start": "p_skill_gtshpbrnch_h"
+    }
+   }
+  },
+  {
+   "charId": "char_332_archet",
+   "name": "空弦",
+   "slot": 0,
+   "skillId": "skchr_archet_1",
+   "issues": [
+    "sfx attack: official p_atk_archet_h_cast, game p_atk_archet_n"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_1",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_archet_h_cast"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_archet_n",
+     "hit": "p_imp_archet_n",
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_332_archet",
+   "name": "空弦",
+   "slot": 2,
+   "skillId": "skchr_archet_3",
+   "issues": [
+    "sfx attack: official p_atk_archet_s_cast, game p_atk_archet_n"
+   ],
+   "mode": "S3",
+   "animKey": "Skill_3",
+   "clip": "Skill_3",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_archet_s_cast"
+     ],
+     "hit": [
+      "p_atk_archet_s"
+     ],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_archet_n",
+     "hit": "p_atk_archet_s",
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_4079_haini",
+   "name": "海霓",
+   "slot": 0,
+   "skillId": "skchr_haini_1",
+   "issues": [
+    "sfx attack: official p_atk_tchnlgywr_d, game p_atk_tchnlgywr_n"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_1",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_tchnlgywr_d"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_tchnlgywr_n",
+     "hit": "p_imp_tchnlgywr_n",
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_1045_svash2",
+   "name": "凛御银灰",
+   "slot": 0,
+   "skillId": "skchr_svash2_1",
+   "issues": [
+    "sfx attack: official p_atk_snwlprdg_d, game p_atk_snwlprdg_n1"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_1_A",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_snwlprdg_d"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_snwlprdg_n1",
+     "hit": "p_imp_snwlprdg_n",
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_1045_svash2",
+   "name": "凛御银灰",
+   "slot": 1,
+   "skillId": "skchr_svash2_2",
+   "issues": [
+    "sfx start: no official activation bank, game plays p_skill_snwlprdg_h"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_2",
+   "sfx": {
+    "want": {
+     "attack": [],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_snwlprdg_n1",
+     "hit": "p_imp_snwlprdg_n",
+     "start": "p_skill_snwlprdg_h"
+    }
+   }
+  },
+  {
+   "charId": "char_1021_kroos2",
+   "name": "寒芒克洛丝",
+   "slot": 0,
+   "skillId": "skchr_kroos2_1",
+   "issues": [
+    "sfx attack: official p_atk_krossbow_n, game p_atk_crossbow_n"
+   ],
+   "mode": "S1",
+   "animKey": "Skill_Loop",
+   "clip": "Skill_Begin/Skill_Loop/Skill_End",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_krossbow_n"
+     ],
+     "hit": [],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_crossbow_n",
+     "hit": "p_imp_crossbow_n",
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_4145_ulpia",
+   "name": "乌尔比安",
+   "slot": 0,
+   "skillId": "skchr_ulpia_1",
+   "issues": [
+    "sfx attack: official p_atk_wtrbatnchr_d, game p_atk_wtrbatnchr_n"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Skill_1_Begin/Skill_1_Loop/Skill_1_End",
+   "sfx": {
+    "want": {
+     "attack": [
+      "p_atk_wtrbatnchr_d"
+     ],
+     "hit": [],
+     "start": []
+    },
+    "have": {
+     "attack": "p_atk_wtrbatnchr_n",
+     "hit": "p_imp_wtrbatnchr_n",
+     "start": null
+    }
+   }
+  },
+  {
+   "charId": "char_4217_makoto",
+   "name": "유키 마코토",
+   "slot": 0,
+   "skillId": "skchr_makoto_1",
+   "issues": [
+    "sfx attack: no official bank for this skill's mode, game borrows p_atk_pskptldrh_d"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Attack_A",
+   "sfx": {
+    "want": {
+     "attack": [],
+     "hit": [],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_pskptldrh_d",
+     "hit": "p_imp_pskptldr_n",
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_4217_makoto",
+   "name": "유키 마코토",
+   "slot": 1,
+   "skillId": "skchr_makoto_2",
+   "issues": [
+    "sfx attack: no official bank for this skill's mode, game borrows p_atk_pskptldr_h",
+    "sfx hit: no official bank for this skill's mode, game borrows p_imp_pskptldr_h"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Attack_A",
+   "sfx": {
+    "want": {
+     "attack": [],
+     "hit": [],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_pskptldr_h",
+     "hit": "p_imp_pskptldr_h",
+     "start": "b_char_atkboost"
+    }
+   }
+  },
+  {
+   "charId": "char_4217_makoto",
+   "name": "유키 마코토",
+   "slot": 2,
+   "skillId": "skchr_makoto_3",
+   "issues": [
+    "sfx attack: no official bank for this skill's mode, game borrows p_atk_pskptldr_s1"
+   ],
+   "mode": null,
+   "animKey": null,
+   "clip": "Attack_A",
+   "sfx": {
+    "want": {
+     "attack": [],
+     "hit": [],
+     "start": [
+      "b_char_atkboost"
+     ]
+    },
+    "have": {
+     "attack": "p_atk_pskptldr_s1",
+     "hit": "p_imp_pskptldr_n",
+     "start": "b_char_atkboost"
+    }
+   }
+  }
+ ]
+}

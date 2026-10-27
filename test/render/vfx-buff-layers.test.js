@@ -178,7 +178,7 @@ describe('[eff_cond] state loops (skills.js COND_BUFFS, skillfx.js, b.snap `char
     assert.equal(condState({ charges: [1, 2] }), 'ready');
     assert.equal(condState({ charges: [0, 2] }), null);
     assert.equal(condState({}), null);
-    for (const t of Object.values(COND_BUFFS)) for (const st of ['charged', 'on', 'full', 'ready']) assert.ok(t[st].length >= 1);
+    for (const t of Object.values(COND_BUFFS)) for (const st of t.always ? ['always'] : t.byFacing ? [] : t.whileBlocked ? ['whileBlocked'] : t.whileOff ? ['whileOff'] : t.byCharges ? ['full', 'ready'] : ['charged', 'on', 'full', 'ready']) assert.ok(t[st].length >= 1);
   });
 
   test('ready with 1 charge → the half armour, 2 → full + half, the skill on → its half, cast with every charge → full + half', async () => {

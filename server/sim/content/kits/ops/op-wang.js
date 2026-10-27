@@ -351,6 +351,7 @@ export default {
           for (const e of victims) {
             if (!e.alive) continue;
             battle.dealDamage(src, e, { amount: unit.s.atk * scale, ...hitOpts(n) });
+            if (sid === S2) battle.fx('stoneHit', { x: e.x, y: e.y, id: unit.id, target: e.id });
             if (sid === S2 && e.alive) addSlow(battle, unit, e, num(b2['attack@move_speed']), num(b2['attack@duration']));
           }
         };

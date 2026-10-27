@@ -228,11 +228,18 @@ export default {
         }
         if (picked === S2) {
           const ms = Math.abs(num(b2.move_speed)), radius = num(b2.range_radius, 1.3);
+          // the enemies in her aura (display only: 'auraIn' / 'auraOut' as one enters or leaves it, ascln_s_2[enemy]'s loop)
+          const inAura = new Map();
+          const auraOut = (keep) => { for (const [id, e] of inAura) if (!keep?.has(id)) { inAura.delete(id); battle.fx('auraOut', { x: e.x, y: e.y, id: e.id, src: unit.id }); } };
           const slow = () => {
-            if (!up(unit) || !unit.skill?.active) return;
+            if (!up(unit) || !unit.skill?.active) { if (inAura.size) auraOut(null); return; }
+            const now = new Set();
             for (const e of battle.enemiesInKeys(unit.rangeKeys, unit, ANY)) {
               battle.applyStrongest(e, 'ascln:s2slow', { duration: AURA_DUR, value: ms, mods: (v) => ({ moveMul: Math.max(0, 1 - v) }), source: unit });
+              now.add(e.id);
+              if (!inAura.has(e.id)) { inAura.set(e.id, e); battle.fx('auraIn', { x: e.x, y: e.y, id: e.id, src: unit.id }); }
             }
+            auraOut(now);
           };
           if (ms > 0) {
             battle.on('skillStart', (ctx) => { if (ctx.unit === unit) slow(); }, { owner: unit });

@@ -72,6 +72,8 @@ const S1 = 'skchr_closur_1';
 const S2 = 'skchr_closur_2';
 const S3 = 'skchr_closur_3';
 export const BASE = 'token_10066_closur_ourbase';
+/** Her 指挥中心's range loop while S2 / S3 runs (closur_s_N[switch] on the token; display only): 'baseRange' on each. */
+const baseFx = (battle, unit) => { for (const t of battle.allyUnits) if (t.alive && t.defId === BASE && t.ownerUnit === unit) battle.fx('baseRange', { x: t.x, y: t.y, id: t.id, src: unit.id, dur: unit.skill?.timeLeft }); };
 /** 精准投放 "其被击败后会在15秒后自动刷新" when the token def carries no interval. */
 const REFRESH_FALLBACK = 15;
 /** Seconds between two tries of a 指挥中心 whose 战术点形态 is over but whose tile is taken. */
@@ -247,6 +249,7 @@ export default {
             if (cost > 0) { battle.addDp(unit.ownerId, cost); battle.fx('dp', { x: unit.x, y: unit.y, n: cost, id: unit.id }); }
             dpTicker(unit, { total: num(b2.cost_period), step: num(b2['closur_s_2[add_cost_period].cost'], 1), iv: num(b2['closur_s_2[add_cost_period].interval'], 2) });
             unit.mem.closurS2Set = new Set();
+            baseFx(battle, unit);
           },
           onTick({ battle, unit, dt }) {
             dpTick(battle, unit, dt);
@@ -282,6 +285,7 @@ export default {
           onStart({ battle, unit }) {
             dpTicker(unit, { total: num(b3.cost_period), step: num(b3['closur_s_3[add_cost_period].cost'], 1), iv: num(b3['closur_s_3[add_cost_period].interval'], 1.66) });
             unit.mem.closurS3 = { attacks: 0, extra: 0 };
+            baseFx(battle, unit);
             battle.removeBuff(unit, S3_KEY);
           },
           onAttack({ battle, unit }) {

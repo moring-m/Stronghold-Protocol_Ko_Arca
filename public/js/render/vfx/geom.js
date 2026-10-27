@@ -306,6 +306,32 @@ export function buildParticles(ps, r, cam, fd, frameNo) {
           if (align === 'vertical') { Y0 = 0; Y1 = 1; Y2 = 0; }
           else { Y0 = ny * X2 - nz * X1; Y1 = nz * X0 - nx * X2; Y2 = nx * X1 - ny * X0; }
         } else { X0 = R[0]; X1 = R[1]; X2 = R[2]; Y0 = U[0]; Y1 = U[1]; Y2 = U[2]; }
+        if (def.rot3D && (ps.rx[i] || ps.ry[i]) && (align === 'local' || align === 'world' || align === 'view')) {
+          // a 3D start rotation turns the quad out of its alignment plane (Unity: frame · Euler(x, y, z)) — the roll alone
+          // would leave 阿斯卡纶 迭代's blades flat in their system's plane. Unity's frame is left-handed: in this one the
+          // turns about X and Y change sign (about Z the roll keeps the billboard's own convention, as above); checked
+          // against the official recording of 2026-10-27 (the blades' triangle around her)
+          const Z = align === 'local' ? lz : align === 'world' ? [0, 0, 1] : F;
+          const DEGR = 180 / Math.PI;
+          quatEuler(-ps.rx[i] * DEGR, -ps.ry[i] * DEGR, ps.rz[i] * DEGR, _q);
+          const qx = _q[0], qy = _q[1], qz = _q[2], qw = _q[3];
+          const c0 = [1 - 2 * (qy * qy + qz * qz), 2 * (qx * qy + qw * qz), 2 * (qx * qz - qw * qy)];
+          const c1 = [2 * (qx * qy - qw * qz), 1 - 2 * (qx * qx + qz * qz), 2 * (qy * qz + qw * qx)];
+          const kx = sx * fx * mirror, ky = sy * fy;
+          ax0 = (X0 * c0[0] + Y0 * c0[1] + Z[0] * c0[2]) * kx; ax1 = (X1 * c0[0] + Y1 * c0[1] + Z[1] * c0[2]) * kx; ax2 = (X2 * c0[0] + Y2 * c0[1] + Z[2] * c0[2]) * kx;
+          ay0 = (X0 * c1[0] + Y0 * c1[1] + Z[0] * c1[2]) * ky; ay1 = (X1 * c1[0] + Y1 * c1[1] + Z[1] * c1[2]) * ky; ay2 = (X2 * c1[0] + Y2 * c1[1] + Z[2] * c1[2]) * ky;
+          if (pv && (pv[0] || pv[1])) { cx += ax0 * pv[0] + ay0 * pv[1]; cy += ax1 * pv[0] + ay1 * pv[1]; cz += ax2 * pv[0] + ay2 * pv[1]; }
+          buf[o] = cx; buf[o + 1] = cy; buf[o + 2] = cz;
+          buf[o + 3] = ax0; buf[o + 4] = ax1; buf[o + 5] = ax2;
+          buf[o + 6] = ay0; buf[o + 7] = ay1; buf[o + 8] = ay2;
+          const uvr = sheetRect(def, ps, i, t, _uvr);
+          buf[o + 9] = _c4[0]; buf[o + 10] = _c4[1]; buf[o + 11] = _c4[2]; buf[o + 12] = _c4[3];
+          buf[o + 13] = uvr[0]; buf[o + 14] = uvr[1]; buf[o + 15] = uvr[2]; buf[o + 16] = uvr[3];
+          if (r.streams) packStreams(ps, i, t, r.streams, buf, o + 17, frameNo);
+          else for (let j = 17; j < 27; j++) buf[o + j] = 0;
+          w++;
+          continue;
+        }
         // roll
         const a = ROLL_SIGN * ps.rz[i] * mirror;
         const ca = Math.cos(a), sa = Math.sin(a);

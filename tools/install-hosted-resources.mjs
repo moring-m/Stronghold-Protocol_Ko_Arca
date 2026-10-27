@@ -35,7 +35,7 @@ export async function installHostedResources(directory=root,configPath=resolve(d
  }
  const pack=resolve(directory,'.cache/hosted-costume-install');await mkdir(pack,{recursive:true});
  await copyFile(resolve(stage,'metadata/costume-supplement.json'),resolve(pack,'supplement.json'));
- try{await symlink(resolve(stage,'public/assets/local/fx'),resolve(pack,'files'),'dir');}catch(e){if(e.code!=='EEXIST')throw e;}
+ try{await symlink(resolve(stage,'public/assets/local/fx'),resolve(pack,'files'),process.platform==='win32'?'junction':'dir');}catch(e){if(e.code!=='EEXIST')throw e;}
  const result=await installSupplement(directory,pack);
  return {files:inventory.files,bytes:inventory.bytes,costumeResources:result.resources};
 }

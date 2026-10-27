@@ -48,7 +48,8 @@ import { spawnPoint, mountPoint, unitPoint, skinPoint, spawnKind, mountKind, spa
 import { projectileParts, paracurve, arcHeight, wobble } from './flight.js';
 import { WindFx } from './windfx.js';
 import { ClemntFx } from './clemntfx.js';
-import { effectArtScale } from './artScale.js';
+import { AphrisFx, pathKeys } from './aphrisfx.js';
+import { effectArtScale, effectStretchScale } from './artScale.js';
 import { costumeFor, costumeSkin, costumeEffect, costumeProjectile, costumePreloadKeys } from './costumes.js';
 import { GROUND_SPAWNS } from './effect.js';
 import { SkillFx, fitsAttack, pickGroup, formMode } from './skillfx.js';
@@ -274,6 +275,7 @@ export class FxWiring {
     this.chenWaves = new Map();
     this.windFx = new WindFx(this);
     this.clemntFx = new ClemntFx(this);
+    this.aphrisFx = new AphrisFx(this);
     this.noteFx = new NoteFx(this);
     this.kitProjectileFx = new KitProjectileFx(this);
     this.flights = new Set();     // projectile flights in the air
@@ -425,6 +427,7 @@ export class FxWiring {
         const p = pk && this.idx.projectiles[lc(pk)];
         if (p) for (const k of p.effects || []) keys.add(k);
       }
+      for (const em of a.emitters || []) { const pk = pathKeys(em); if (pk) for (const k of [pk.line, pk.start, pk.waypoint, pk.end]) if (k) keys.add(k); }
       for (const sub of a.abilities || []) walk(sub, depth + 1);
     };
     for (const v of views) {
@@ -446,7 +449,8 @@ export class FxWiring {
     for (const k of this.skills.keys(views)) keys.add(k);
     for (const k of this.talents.keys(views)) keys.add(k);
     for (const k of this.kitProjectileFx.keys(views)) keys.add(k);
-    for (const k of this.funnels.keys(views)) keys.add(k);   // the 驭械术士's floating units (render/vfx/funnelfx.js)
+    for (const k of this.funnels.keys(views)) keys.add(k);
+    for (const k of this.aphrisFx.keys(views)) keys.add(k);   // 谬因's S2 beam path (render/vfx/aphrisfx.js)   // the 驭械术士's floating units (render/vfx/funnelfx.js)
     for (const view of views) for (const key of costumePreloadKeys(this.idx,this.costumeOf(view))) keys.add(key);
     return [...keys].map(lc).filter((k) => k && this.ofx.lib.has(k));
   }
@@ -621,7 +625,8 @@ export class FxWiring {
     const place = { pos, scale: typeof effectScale === 'function' ? effectScale() : effectScale, groundZ: -ground, yaw: 0, mirror: false, flipY: false, mountRot: null, rootRot: null };
     this._rotate(P, place, skin, pose);
     this._orient(def, place, pose, o, v);
-    const opts = { track: o.track || null, data: o.data ?? null, loop: !!o.loop, important: !!o.important, skip: o.skip > 0 ? o.skip : 0, speed: o.speed, owner: v, depthOwner:o.depthOwner ?? ((o.follow || o.stick || P.follow || P.keep) && v.root ? v : null) };
+    const stretchMul = effectStretchScale(lc(key), k);
+    const opts = { ...(stretchMul !== 1 ? { stretchMul } : {}), track: o.track || null, data: o.data ?? null, loop: !!o.loop, important: !!o.important, skip: o.skip > 0 ? o.skip : 0, speed: o.speed, owner: v, depthOwner:o.depthOwner ?? ((o.follow || o.stick || P.follow || P.keep) && v.root ? v : null) };
     // the owner each frame: FollowMountPoint keeps the effect on the unit's point (and its rotation), a held effect
     // moves with the unit (`keep`), FollowDirection turns it with the unit, PauseEffectIf hides it while the unit shows
     // a condition; a prefab with chained effects (OnPlayEmitter: system.js FxHandle._start hands them this track) has
@@ -855,11 +860,13 @@ export class FxWiring {
     let mem = this.picks.get(id);
     if (!mem) { mem = new Map(); this.picks.set(id, mem); }
     const list = pickAttacks(a, { heal, ranged: !!kind && kind !== 'none', blocked: !!((src.flags | 0) & UF.BLOCKED) }, seedOf(id, nth), 0, nth, mem);
-    const set = { cast: [], castTarget: [], inputTarget: [], hit: [], groups: null, hitOpts: null, projectileKey: null, shot: null, shotClass: null };
+    const set = { cast: [], castTarget: [], inputTarget: [], hit: [], groups: null, hitOpts: null, projectileKey: null, shot: null, shotClass: null, path: null };
     const modeIdx = (u?.modes || []).indexOf(m);
     for (const x of list) {
       const ems = Array.isArray(x.emitters) ? x.emitters : [];
       const ok = (r) => this._rowOk(r, ems[r?.emitter], src, nth, modeIdx);
+      // 谬因's path (vfx/aphrisfx.js): the emitter has no rows of its own
+      set.path ||= ems.find((e) => e?.class === 'AphrisEffectEmitter') || null;
       for (const f of ['cast', 'castTarget', 'inputTarget']) for (const r of x[f] || []) if (ok(r)) set[f].push(r);
       for (const r of x.hit || []) {
         if (!ok(r)) continue;
@@ -982,6 +989,7 @@ export class FxWiring {
     const phase = wound ? 'strike' : 'all';
     if (a) this._casts(a, src, tgt, phase, { owner: !again });
     if (sk) { this.skills.casts(sk, src, tgt, phase, { owner: !again }); if (!again) this.skills.attacked(sk); }
+    if (a?.path && !again) this.aphrisFx.attack(src, a.path);
     if (!again) this.attackN.set(id, nth + 1);
     // the hit rows wait for the damage (each target hit: HitEffectOptions); useOwnerToTargetDirection turns the hit
     // along the blow
@@ -1652,6 +1660,7 @@ export class FxWiring {
     this.talents.release(v);
     this.funnels.release(v);
     this.kitProjectileFx.release(v);
+    this.aphrisFx.release(v);
   }
 
   /** b.ev ['skill', id, on] (SkillFx.skill): true when the official layer shows the skill (no procedural burst / aura). */
@@ -1659,6 +1668,7 @@ export class FxWiring {
     if (!v || v.prep || !this.idx) return false;
     if(!on){const id=v.id??v.info?.id;this.chenWaves.get(id)?.handle.stop();this.chenWaves.delete(id);this.clemntFx.skillOff(id);}
     const drew = this.skills.skill(v, !!on, cast);
+    this.aphrisFx.skill(v, !!on, this.skills.of(v)?.skillId);
     this.talents.skill(v, !!on);   // the talents a skill start casts (ON_SKILL_START)
     this.funnels.skill(v, !!on);   // the floating units of the skill's mode (render/vfx/funnelfx.js)
     return drew;
@@ -1688,6 +1698,7 @@ export class FxWiring {
     this.skills.sync(list);
     this.talents.sync(list);
     this.funnels.sync(list);
+    this.aphrisFx.sync(all);   // her 中继器 turn the path whether or not the index draws them
   }
 
   noteBubbles(notes){return this.noteFx.sync(notes);}
@@ -1830,6 +1841,7 @@ export class FxWiring {
     this.bombardAims.clear();
     this.windFx.clear();
     this.clemntFx.clear();
+    this.aphrisFx.clear();
     this.noteFx.clear();
     this.kitProjectileFx.clear();
     for(const wave of this.chenWaves.values())wave.handle.stop();this.chenWaves.clear();
@@ -1859,6 +1871,7 @@ export class FxWiring {
     this.skills.frame++;
     this.windFx.tick();
     this.clemntFx.tick();
+    this.aphrisFx.tick();
     this.kitProjectileFx.tick();
     for(const [id,wave]of this.chenWaves){const owner=this.view(id);if(!this.ofx.active||!owner||owner.alive===false||this.ofx.time-wave.at>.5){wave.handle.stop();this.chenWaves.delete(id);}}
     for (const wall of this.walls) { wall.update(); if (!wall.alive) this.walls.delete(wall); }

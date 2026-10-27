@@ -112,13 +112,18 @@ function aphrisPath(battle, unit, beam = false) {
   const index = new Map([[unit.tileR * (battle.grid?.cols ?? COLS) + unit.tileC, 0]]);
   const relays = [];
   let [dr, dc] = dirVec(unit.dir);
+  // a path may cross itself (an S2 beam turned back by allies runs on); it stops only where it would repeat a tile
+  // in the same direction (a closed loop) or leaves the board
+  const passed = new Set();
   let reach = beam ? Infinity : baseReach(unit);
   let r = unit.tileR, c = unit.tileC, steps = 0;
   while (steps < reach) { // loop-cap: grid: breaks when the tile is off-board or already seen
     const nr = r + dr, nc = c + dc;
     const k = nr * (battle.grid?.cols ?? COLS) + nc;
-    if (!battle.grid.inBounds(nr, nc) || index.has(k)) break;
-    index.set(k, tiles.length);
+    const state = `${k}|${dr},${dc}`;
+    if (!battle.grid.inBounds(nr, nc) || passed.has(state)) break;
+    passed.add(state);
+    if (!index.has(k)) index.set(k, tiles.length);
     tiles.push([nr, nc]);
     r = nr; c = nc; steps++;
     const o = battle.unitAt(nr, nc);
@@ -140,7 +145,7 @@ function refreshPath(battle, unit) {
   unit.mem.aphrisPath = p;
   if (unit.mem.aphrisSig === sig) return;
   unit.mem.aphrisSig = sig;
-  unit.rangeGrid = p.tiles.map(([r, c]) => toLocal(r - unit.tileR, c - unit.tileC, unit.dir));
+  unit.rangeGrid = [...new Map(p.tiles.map(([r, c]) => { const l = toLocal(r - unit.tileR, c - unit.tileC, unit.dir); return [l.join(','), l]; })).values()];
   battle.refreshRange(unit);
 }
 
@@ -224,6 +229,7 @@ export default {
               unit.mem.beamNext += iv;
               for (const e of battle.enemiesInKeys(unit.rangeKeys, unit, unit.profile)) {
                 battle.dealDamage(unit, e, { amount: unit.s.atk * num(b2.atk_scale), type: 'arts', isSkill: true, tags: ['skill', 'aphris:beam'] });
+                battle.fx('beamHit', { x: e.x, y: e.y, id: unit.id, target: e.id });
               }
             }
           },

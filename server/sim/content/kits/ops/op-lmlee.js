@@ -193,6 +193,7 @@ export default {
             const d = ctx.dmg;
             if (!who || who.side !== 'ally' || !d || ctx.type === 'element' || isHpLoss(d) || d.tags?.includes(BURST_TAG)) return;
             m.n = Math.min(maxN, m.n + 1);
+            battle.fx('paperHit', { x: m.target.x, y: m.target.y, id: unit.id, target: m.target.id });
             if (m.n >= maxN) burstMark(battle, unit, m, b2);
           }, { owner: unit, priority: -20 });
           battle.on('tick', () => {

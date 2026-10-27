@@ -487,6 +487,7 @@ export class FxHandle {
       fx.speed = Math.min(rate, limit > 0 ? limit : rate);
     }
     fx.track = this.opts.track || null;
+    fx.stretchMul = this.opts.stretchMul > 0 ? this.opts.stretchMul : 1;
     fx.owner = this.opts.owner ?? null;
     fx.depthOwner = this.opts.depthOwner ?? null;
     fx.handle = this;

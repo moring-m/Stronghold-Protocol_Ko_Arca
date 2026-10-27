@@ -104,6 +104,7 @@ function applyMeans(battle, unit, e, p) {
   setMeans(battle, e, unit, { stacks, pct, cap5: p.cap5, cap8: p.cap8 }, p.dur);
 }
 function setMeans(battle, e, src, data, dur) {
+  battle.fx('means', { x: e.x, y: e.y, id: e.id, src: src.id, dur });
   battle.addBuff(e, { key: MEANS_KEY, duration: dur, refresh: 'replace', source: src, mods: { defMul: Math.max(0, 1 - data.pct * data.stacks) }, data: { ...data, src }, tags: ['talent'] });
   if (data.stacks >= data.cap8) battle.addBuff(e, { key: MEANS_SLUG_KEY, duration: dur, refresh: 'replace', source: src, status: 'sluggish', mods: { moveMul: 0.2 }, visible: true, tags: ['talent'] });
   else battle.removeBuff(e, MEANS_SLUG_KEY);

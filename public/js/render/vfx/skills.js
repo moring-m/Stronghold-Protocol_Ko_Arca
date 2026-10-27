@@ -531,6 +531,31 @@ export const COND_BUFFS = Object.freeze({
     on: ['billro_skill_03_buff_02_01', 'billro_skill_03_buff_01_01_02'],
     full: ['billro_skill_03_buff_01_02', 'billro_skill_03_buff_01_01_02'], ready: ['billro_skill_03_buff_01_01'],
   }),
+  // read from the CN client of 2026-10-22 (the same graph shapes): 陈 the 2nd S2 is 卡涅利安's (the enhance mark: `charged`)
+  'chen2_s_2[eff_cond]': Object.freeze({
+    charged: ['chen2_skill_02_buff_01_02', 'chen2_skill_02_buff_01_01'], on: ['chen2_skill_02_buff_01_01'],
+    full: ['chen2_skill_02_buff_01_02', 'chen2_skill_02_buff_01_01'], ready: ['chen2_skill_02_buff_01_01'],
+  }),
+  // `byCharges`: the graph reads the stored charges alone (CompareCharSkillAvailableCnt / CheckCharSkillAvailable), the
+  // skill running or not — 诺希斯 S2 and 流明 S2: one charge → the first effect, two → the second (the client's 诺希斯 graph
+  // keeps a stale first effect when it drops from two to one [ASSUMED: shown alone]); 至简 S2: any charge → both
+  'gnosis_s_2[eff_cond]': Object.freeze({ byCharges: true, full: ['gnosis_skill_02_buff_02'], ready: ['gnosis_skill_02_buff_01'] }),
+  'lumen_s_2[eff_cond]': Object.freeze({ byCharges: true, full: ['lumen_skill_02_buff_02'], ready: ['lumen_skill_02_buff'] }),
+  'malist_s_2[eff_cond]': Object.freeze({ byCharges: true, full: ['malist_skill_2_buff_weapon', 'malist_skill_2_buff'], ready: ['malist_skill_2_buff_weapon', 'malist_skill_2_buff'] }),
+  // Mon3tr S1: any charge stored; 雷蛇 the 2nd S1: one more loop per charge stored (`counts`: stored charges → loops)
+  // while the skill runs: 安洁莉娜 the 2nd S3 by her left / right facing (CheckFaceLOrR); 莱伊 S2 while she blocks (CheckBlocked)
+  'aglna2_s_3[mode]': Object.freeze({ byFacing: Object.freeze({ right: ['aglna2_skill_03_buff_right_01'], left: ['aglna2_skill_03_buff_left_01'] }) }),
+  'lessng_s2[eff_manager]': Object.freeze({ whileBlocked: ['lessng_skill_02_buff_2'] }),
+  // `whileOff`: the skill's buff creates the loop when it finishes and ends it when it starts again (BuffDuringSkill: the
+  // client's idle look) — 森蚺's sister 雪雉 the 2nd (sbell2_s[idle_effect]) and 娜斯提 S1 (nasti_s1[effect_manager]: its
+  // common loop) [ASSUMED: also before the first cast]
+  'sbell2_s[idle_effect]': Object.freeze({ whileOff: ['sbell2_idle'] }),
+  'nasti_s1[effect_manager]': Object.freeze({ whileOff: ['nasti_skill_01_common_buff_01'] }),
+  // 卡夫卡 S1: its SP ratio test (≥ 0) always passes — the loop shows while the passive is equipped
+  'caper_s_1[effect_trigger]': Object.freeze({ always: ['caper_skill_01_buff'] }),
+  'monstr_s_1[ready]': Object.freeze({ byCharges: true, full: ['monstr_skill_01_buff'], ready: ['monstr_skill_01_buff'] }),
+  'leizi2_s_1[effect_controller]': Object.freeze({ byCharges: true, counts: Object.freeze({ 1: ['leizi2_skill_01_buff_01'], 2: ['leizi2_skill_01_buff_01', 'leizi2_skill_01_buff_02'], 3: ['leizi2_skill_01_buff_01', 'leizi2_skill_01_buff_02', 'leizi2_skill_01_buff_03'] }),
+    full: ['leizi2_skill_01_buff_01', 'leizi2_skill_01_buff_02'], ready: ['leizi2_skill_01_buff_01'] }),
 });
 
 /**
@@ -538,8 +563,8 @@ export const COND_BUFFS = Object.freeze({
  * charge; `charges` — [stored, maximum] (b.snap `charges`), null when unknown. Returns 'charged' | 'on' | 'full' |
  * 'ready' | null.
  */
-export function condState({ on = false, charged = false, charges = null } = {}) {
-  if (on) return charged ? 'charged' : 'on';
+export function condState({ on = false, charged = false, charges = null, byCharges = false } = {}) {
+  if (on && !byCharges) return charged ? 'charged' : 'on';
   const n = Array.isArray(charges) ? Number(charges[0]) || 0 : 0;
   return n >= 2 ? 'full' : n >= 1 ? 'ready' : null;
 }
@@ -887,6 +912,8 @@ function place(plan, e, u, { attackOf, eachHit }) {
   const ev = u.event;
   if (ev && !START_EVENTS.has(ev)) {
     if (END_EVENTS.has(ev)) {
+      // a loop the skill's end creates: its state where the graph is transcribed (COND_BUFFS `whileOff`)
+      if (role === 'loop' && COND_BUFFS[u.buff]?.whileOff) { e.hold = 'cond'; plan.cond.push(e); return null; }
       if (role === 'loop') return 'after-end';
       if (onTargets) { e.at = 'targets'; e.hold = oneShotHold(e); plan.targets.push(e); return null; }
       e.hold = oneShotHold(e);
@@ -1332,6 +1359,63 @@ export function chargeKeys(plan) {
  */
 const binding = (o) => Object.freeze({ ...o, ...(o.cover ? { cover: Object.freeze(o.cover) } : {}), ...(o.keys ? { keys: Object.freeze(o.keys) } : {}) });
 export const FX_BINDINGS = Object.freeze({
+  skchr_mcnist_2: Object.freeze({ modeLoop: binding({ owner: 'src', keys: ['mcnist_skill_02_buff_01'], hold: 'fx', during: true, untilEnd: true, refresh: true }) }),
+  skchr_closur_3: Object.freeze({ baseRange: binding({ owner: 'src', keys: ['token_closur_ourbase_range_03_loop'], hold: 'fx', during: true, untilEnd: true, refresh: true }) }),
+  skchr_closur_2: Object.freeze({ baseRange: binding({ owner: 'src', keys: ['token_closur_ourbase_range_02_loop'], hold: 'fx', during: true, untilEnd: true, refresh: true }) }),
+  // Loops a skill puts on its operator's tokens (`token`: the client's CreateBuffToToken): 可露希尔 S2 / S3 on her 指挥中心
+  // ('baseRange'), 麦克尼斯 S2 on her and her 结构性原理 ('modeLoop') — held until the skill ends
+  skchr_horn_3: Object.freeze({ overloadFront: binding({ owner: 'id', keys: ['horn_skill_03_buff_02_03_front'], hold: 'fx', during: true, untilEnd: true, refresh: true }), overloadBack: binding({ owner: 'id', keys: ['horn_skill_03_buff_02_03_back'], hold: 'fx', during: true, untilEnd: true, refresh: true }) }),
+  skchr_horn_2: Object.freeze({ overloadFront: binding({ owner: 'id', keys: ['horn_skill_02_buff_03_front'], hold: 'fx', during: true, untilEnd: true, refresh: true }), overloadBack: binding({ owner: 'id', keys: ['horn_skill_02_buff_03_back'], hold: 'fx', during: true, untilEnd: true, refresh: true }) }),
+  // 号角 S2 / S3 overload ([overload_switch_effect]: the back view when she faces up — CheckCharacterDefaultDirection UP —,
+  // else the front): the kit's 'overloadBack' / 'overloadFront' as it starts, held until the skill ends
+  skchr_mlyss_3: Object.freeze({ manifold: binding({ owner: 'skill', keys: ['token_10030_mlyss_wtrman_c2_skill_03_buff_01'], hold: 'fx', refresh: true }) }),
+  skchr_lmlee_2: Object.freeze({ paperHit: binding({ owner: 'id', keys: ['lmlee_skill_02_debuff_hit'], at: 'target' }) }),
+  skchr_skadi2_1: Object.freeze({ share: binding({ owner: 'id', keys: ['skadi2_skill_01_hit', 'skadi2_skill_01_hit_02'], oneshot: true, during: true }) }),
+  skchr_cetsyr_2: Object.freeze({ tie: binding({ owner: 'src', keys: ['cetsyr_skill_02_tie'], hold: 'fx', refresh: true }) }),
+  // 斥罪's sister kits: 塑心 S2 cetsyr_s_2 (the root on each enemy her shot binds: 'tie', its duration); 浊心斯卡蒂 S1
+  // skadi2_s_1[protect] (each share she takes: 'share' on her); 老鲤 S2 lmlee_s_2[paper] (each hit on the marked enemy:
+  // 'paperHit'); 缪尔赛思 S3 mlyss_s_3[buff_refresh] (her 流形's loop while it holds the S3 buff: 'manifold')
+  skchr_rmixer_2: Object.freeze({ shield: binding({ owner: 'id', keys: ['rmixer_skill_02_start_02'], oneshot: true, during: true }) }),
+  skchr_philae_2: Object.freeze({ rageStart: binding({ owner: 'id', keys: ['philae_skill_02_start_02'], oneshot: true, during: true }), rage: binding({ owner: 'id', keys: ['philae_skill_02_buff_02'], hold: 'fx', during: true, refresh: true }), aoe: binding({ owner: 'id', keys: ['philae_skill_02_start_01'], oneshot: true, during: true }) }),
+  // 菲莱 S2 philae_s_2: the first element hit of the skill ('rageStart' one-shot, 'rage' held for the rest of it), the
+  // retaliation burst ('aoe' on her: CreateEffect philae_skill_02_start_01); 信仰搅拌机 S2 rmixer_sk2: the fatal hit the
+  // ammo blocks ('shield' on him: CreateEffect rmixer_skill_02_start_02)
+  skchr_ascln_2: Object.freeze({ aoe: binding({ owner: 'id', keys: ['ascln_skill_02_death_01'], at: 'point', oneshot: true, during: true }), auraIn: binding({ owner: 'src', keys: ['ascln_buff_01'], hold: 'fx', holdS: 600, refresh: true }), auraOut: binding({ owner: 'src', keys: ['ascln_buff_01'], release: true }) }),
+  skchr_slent2_3: Object.freeze({ undying: binding({ owner: 'src', keys: ['slent2_skill_03_buff_02'], hold: 'fx', refresh: true }) }),
+  skchr_demetr_1: Object.freeze({ means: binding({ owner: 'src', keys: ['demetr_buff_01'], hold: 'fx', refresh: true }) }),
+  skchr_shwaz_1: Object.freeze({ defDown: binding({ owner: 'src', keys: ['buff_defdown'], hold: 'fx', refresh: true }) }),
+  skchr_chen3_2: Object.freeze({ blink: binding({ owner: 'id', keys: ['chen3_skill_02_buff_01', 'chen3_skill_02_f_buff_02'], hold: 'fx', during: true, refresh: true }) }),
+  // Buff loops whose condition the kits now mark (2026-10-26, buff_template_holder of the CN client 2026-10-22):
+  // 陈 the 3rd S2 chen3_s2[respawn_buff] (her landing 'blink': the two loops while the skill lasts); 推进 talent
+  // shwaz_t_1 (the crit's 'defDown' on the target, its duration) and 德米特里 T1 demetr_t1[def_dec] ('means' on the enemy,
+  // refreshed with each stack); 浊心斯卡蒂's sister 斯卡蒂 slent2_s_3 shallow grave ('undying' on the ally, its duration);
+  // 阿斯卡纶 S2 ascln_s_2[enemy] (a knocked-out enemy's 'aoe' burst; the aura's loop on an enemy from 'auraIn' to
+  // 'auraOut' — `release` ends the loop its `refresh` twin holds). `refresh`: a newer signal on the same unit replaces
+  // the held loop.
+  skchr_wang_2: Object.freeze({ stoneHit: binding({ owner: 'id', keys: ['token_wang_skill_02_hit_02'], at: 'target' }) }),
+  skchr_ayer_2: Object.freeze({ strike: binding({ owner: 'src', keys: ['ayer_skill_02_hit_02'], at: 'target', target: 'id', during: true }) }),
+  skchr_branch_2: Object.freeze({ resolveHit: binding({ owner: 'id', keys: ['branch_skill_02_hit_01'], at: 'target', during: true }) }),
+  skchr_blkkgt_2: Object.freeze({ slashHit: binding({ owner: 'id', keys: ['blkkgt_skill_02_hit_1'], at: 'target', during: true }) }),
+  skchr_hsguma_3: Object.freeze({ sawHit: binding({ owner: 'id', keys: ['hsguma_skill_03_hit'], at: 'target', during: true }) }),
+  skchr_aphris_2: Object.freeze({ beamHit: binding({ owner: 'id', keys: ['aphris_skill_02_hit_01'], at: 'target', during: true }) }),
+  skchr_mostma_2: Object.freeze({ lockHit: binding({ owner: 'id', keys: ['mostma_skill_02_hit'], at: 'target', during: true }) }),
+  skchr_huang_3: Object.freeze({ cutHit: binding({ owner: 'id', keys: ['huang_attack_01_hit'], at: 'target', during: true }) }),
+  // Channel ticks and hits of non-attack abilities the kits now mark (2026-10-26 audit: `channel-hit`, `hit-no-attack`):
+  // the official hit effect on each enemy the tick or ability damages. 煌 S3 'cutHit', 莫斯提马 S2 'lockHit', 谬因 S2
+  // 'beamHit', 斑点 S3 'sawHit' (ChannelingMeleeAttack hits); 锏 S2 'slashHit', 折桠 S2 'resolveHit', 断崖 S2 'strike'
+  // (its blockees' blade), 望 S2 'stoneHit' (the stone's row / column blast: token_wang skill 2's hit)
+  // Official buff ticks the kits now mark (2026-10-26 audit: effects the plan could not place, render/vfx coverage
+  // `tick`): each is the buff template's ON_BUFF_TRIGGER CreateEffect on its targets (or its owner).
+  // 斥罪 S2 (op-judge.js 'aoe' every S2_EVERY s: judge_s_2[aoe] AOEDamage + CreateEffect on her)
+  skchr_judge_2: Object.freeze({ aoe: binding({ owner: 'id', keys: ['judge_skill_02_hit_01', 'judge_skill_02_weapon_hit_01'], during: true }) }),
+  // 死芒 S2 (op-necras.js 'linkHit' on each linked enemy per damage tick: necras_s_2 CreateEffect on targets)
+  skchr_necras_2: Object.freeze({ linkHit: binding({ owner: 'id', keys: ['necras_skill_02_hit_01'], at: 'target', during: true }) }),
+  // 流明 S1 ('rainHeal' on each ally a heal tick of the field reaches: lumen_s_1[heal] on targets)
+  skchr_lumen_1: Object.freeze({ rainHeal: binding({ owner: 'id', keys: ['lumen_skill_01_hit'], at: 'target' }) }),
+  // 森蚺 the 2nd's S2 shield ('strike' on each enemy it hits: hsgma2_s_2[projectile] on targets)
+  skchr_hsgma2_2: Object.freeze({ strike: binding({ owner: 'id', keys: ['hsgma2_skill_02_hit_04'], at: 'target', during: true }) }),
+  // 缇缇 S3 ('wake' on the enemy whose sleep ends while it lasts: titi_s_3[dmg_ticker] on targets)
+  skchr_titi_3: Object.freeze({ wake: binding({ owner: 'skill', keys: ['titi_skill_03_hit_02'], at: 'target', target: 'id', during: true }) }),
   // These conditional effects have exact kit events, rather than a generic attack/skill-start cue.
   skchr_yu_2: Object.freeze({ teleport: binding({owner:'src',keys:['yu_skill2_teleport_02'],at:'point',oneshot:true}) }),
   skchr_reed2_3: Object.freeze({ scorchBurst: binding({owner:'id',keys:['reed2_debuff_boom_01'],at:'point',oneshot:true}) }),
@@ -1348,8 +1432,8 @@ export const FX_BINDINGS = Object.freeze({
   // 锡人 S1 / S2 (chess_char_2_19-tinman.js: the 'zone' on the struck tile, id = him, dur = the area's time): the client's
   // flask (projectile_chr_tinman_s1 / _s2) lands there — its reached effects are the ring (tinman_skill_0N_range_01,
   // looping), the flask on the ground (_token_01, looping) and the splash (_start_01 / _02)
-  skchr_tinman_1: Object.freeze({ zone: binding({ owner: 'id', projectile: 'projectile_chr_tinman_s1', at: 'point', hold: 'fx', holdS: 8, during: true, cover: ['zone'] }) }),
-  skchr_tinman_2: Object.freeze({ zone: binding({ owner: 'id', projectile: 'projectile_chr_tinman_s2', at: 'point', hold: 'fx', holdS: 8, during: true, cover: ['zone'] }) }),
+  skchr_tinman_1: Object.freeze({ zone: binding({ owner: 'id', projectile: 'projectile_chr_tinman_s1', at: 'point', hold: 'fx', holdS: 8, during: true, cover: ['zone'] }), zoneHit: binding({ owner: 'id', keys: ['tinman_skill_01_hit_01'], at: 'target' }) }),
+  skchr_tinman_2: Object.freeze({ zone: binding({ owner: 'id', projectile: 'projectile_chr_tinman_s2', at: 'point', hold: 'fx', holdS: 8, during: true, cover: ['zone'] }), zoneHit: binding({ owner: 'id', keys: ['tinman_skill_02_hit_01'], at: 'target' }) }),
   // 引星棘刺 S1 / S3 (chess_char_5_15-thorn2.js: a 'zone' on each chosen ally's tile, id = her, duration): the unit she
   // throws (projectile_chr_thorn2_s1 / _s3) lands there — thorn2_token_start, the unit (thorn2_skill_0N_token, looping),
   // S1's ring (thorn2_skill_01_range). S2's keyed moving unit and growing ring are driven by KitProjectileFx.
@@ -1397,9 +1481,10 @@ export const FX_BINDINGS = Object.freeze({
     hpShare: binding({ owner: 'id', keys: ['ghost2_skill_01_hit'], at: 'target', target: 'to' }),
   }),
   // 锏 S3 (op-blkkgt.js): each slash of the kit ('slash', id = her, every 0.3 s while the skill lasts) is the skill's
-  // Damage ability (MultiMeleeAttack: blkkgt_skill_03_start_01 / _02 on her); the finale is its EndAttack (`when: 'end'`)
+  // Damage ability (MultiMeleeAttack: blkkgt_skill_03_start_01 / _02 on her, cast effects held ON_CAST_START → ON_CAST_END of
+  // one Skill_3_Loop cast of 10 hits: `once`); the finale is its EndAttack (`when: 'end'`)
   skchr_blkkgt_3: Object.freeze({
-    slash: binding({ owner: 'id', attack: 'Damage' }),
+    slash: binding({ owner: 'id', attack: 'Damage', once: true }),
   }),
   // 号角 S1 (chess_char_5_08-horn.js: the flare's 'zone' where her S1 shot lands, id = her, r = projectile_range, duration =
   // projectile_delay_time): the skill's RangedAttackGroup (AbilityParallelGroup) fires the shell projectile_chr_horn_s1 —

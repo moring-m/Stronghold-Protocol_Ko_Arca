@@ -19,6 +19,8 @@ export default withDefaults({
           kind: 'duration',
           mods: { atkPct: num(bb.atk), defPct: num(bb.def) },
           targeting: { allInRange: true },
+          // the saw's hit on every enemy it cuts (ChannelingEffectEmitter._hitEffect: display only)
+          attack: { onEachHit({ battle, unit, target }) { battle.fx('sawHit', { x: target.x, y: target.y, id: unit.id, target: target.id }); } },
           onStart({ battle, unit }) { battle.fx('overclock', { x: unit.x, y: unit.y, id: unit.id }); },
         }),
       }),

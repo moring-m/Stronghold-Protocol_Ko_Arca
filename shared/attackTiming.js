@@ -37,6 +37,10 @@ export function selectedSkillClip(sp, index) {
     return {...sp.anims.attack, begin:null, end:null, index, via:'attack',
       ...(activation && role.via !== 'attack' && role.loop !== sp.anims.attack.loop ? {activation:role.loop} : {})};
   }
+  // Mudrock's chess skills are [skcom_def_up, skchr_mudrok_2, skchr_mudrok_3]: S2 is the official AnimatedActionToOwnerAbility
+  // with animKey Skill_1 (one swing of the hammer about her), not the Skill_2_* sleep / awake set of S3.
+  if (index === 1 && /char_311_mudrok/.test(sp?.skel || '') && sp?.animations?.Skill_1 > 0)
+    return {begin:null, loop:'Skill_1', end:null, index, idle:null};
   // Utage's unnumbered Skill_Start/Loop/End is her sheathed S1, not S2.
   if (index === 1 && /char_337_utage/.test(sp?.skel || '') && role && skillIsStance(sp, role))
     return {...sp.anims.attack, begin:null, end:null, index, via:'attack'};

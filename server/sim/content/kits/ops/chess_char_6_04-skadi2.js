@@ -127,6 +127,7 @@ function skadi2(bb, chess, def) {
         battle.on('damaged', (ctx) => {
           const x = ctx.dmg?.skadiShare;
           if (!x || x.tag !== TAG || !(ctx.amount > 0) || !live(unit)) return;
+          battle.fx('share', { x: unit.x, y: unit.y, id: unit.id });
           // Keep the earlier 坚守 redirect's marker. Rebuilding damage without it lets the same two effects bounce
           // the hit forever; each existing sharing effect still gets its first application along this path.
           battle.dealDamage(ctx.source, unit, { amount: redirectShare(ctx.amount, x.share, ctx.dmg.redirectCuts), type: 'true', canDodge: false,

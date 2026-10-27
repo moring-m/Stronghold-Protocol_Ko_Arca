@@ -126,6 +126,7 @@ export default {
           battle.on('damaged', (ctx) => {
             if (ctx.source !== unit || !ctx.dmg?.shwazPierce || !(cut > 0) || !hasHp(ctx.target) || ctx.target.side !== 'enemy') return;
             battle.applyStatus(ctx.target, 'defDown', { duration: dur, value: cut, source: unit });
+            battle.fx('defDown', { x: ctx.target.x, y: ctx.target.y, id: ctx.target.id, src: unit.id, dur });
           }, { owner: unit });
         } },
         { install(battle, unit) { // 交叉火力: field aura, or (ARC-X stage 2+) the squad's snipers for the whole battle

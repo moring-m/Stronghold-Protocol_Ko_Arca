@@ -1,0 +1,98 @@
+{"changes":72,"newFiles":34,"review":25}
+char_4231_clemnt s1 attack: player/p_atk/p_atk_wtsdrvr_n.mp3 -> player/p_atk/p_atk_wtsdrvr_d.mp3
+char_4163_rosesa s1 attack: player/p_atk/p_atk_rsltdglk_n.mp3 -> player/p_atk/p_atk_rsltdglk_d.mp3
+char_4037_demetr s1 attack: player/p_atk/p_atk_rdbrkncls_n.mp3 -> player/p_atk/p_atk_rdbrkncls_d.mp3
+char_4037_demetr s3 attack: player/p_atk/p_atk_rdbrkncls_s.mp3 -> player/p_atk/p_atk_rdbrkncls_n.mp3
+char_4037_demetr s3 hit: player/p_imp/p_imp_rdbrkncls_s1.mp3 -> player/p_imp/p_imp_rdbrkncls_n.mp3
+char_4204_mantra s1 attack: player/p_atk/p_atk_mtelrncpnt_n.mp3 -> player/p_atk/p_atk_mtelrncpnt_d.mp3
+char_2015_dusk s1 attack: player/p_atk/p_atk_ancientsword_n.mp3 -> player/p_atk/p_atk_ancientsword_d.mp3
+char_1034_jesca2 s2 attack: player/p_atk/p_atk_pistolup_n.mp3 -> player/p_atk/p_atk_carbine_n.mp3
+char_474_glady s1 attack: player/p_atk/p_atk_seasword_n.mp3 -> player/p_atk/p_atk_seasword_h.mp3
+char_474_glady s3 attack: player/p_atk/p_atk_seasword_n.mp3 -> player/p_atk/p_atk_seasword_h.mp3
+char_4179_monstr s1 attack: player/p_atk/p_atk_kxdtctm_n.mp3 -> player/p_atk/p_atk_kxdtctm_d.mp3
+char_427_vigil s3 attack: player/p_atk/p_atk_vwgun_n.mp3 -> player/p_atk/p_atk_vwgun_h_1.mp3
+char_4087_ines s2 attack: player/p_atk/p_atk_insasn_n_1.mp3 -> player/p_atk/p_atk_insasn_h_2.mp3
+char_4087_ines s3 attack: player/p_atk/p_atk_insasn_n_1.mp3 -> player/p_atk/p_atk_insasn_s_2.mp3
+char_4223_botany s1 attack: player/p_atk/p_atk_mgcyrsn_n.mp3 -> player/p_atk/p_atk_mgcyrsn_d.mp3
+char_4223_botany s2 attack: player/p_atk/p_atk_mgcyrsn_n.mp3 -> player/p_atk/p_atk_mgcyrsn_h.mp3
+char_4100_caper s1 attack: player/p_atk/p_atk_rbbtbmrng_n.mp3 -> player/p_atk/p_atk_rbbtbmrng_d.mp3
+char_450_necras s3 attack: player/p_atk/p_atk_prlfrhlrd_n.mp3 -> player/p_atk/p_atk_prlfrhlrdrls.mp3
+char_4196_reckpr s1 attack: player/p_atk/p_atk_rcdofc_n.mp3 -> player/p_atk/p_atk_rcdofc_d.mp3
+char_4072_ironmn s2 attack: player/p_atk/p_atk_elecdrill_h.mp3 -> player/p_imp/p_imp_elecdrill_d.mp3
+char_179_cgbird s3 start: null -> player/p_skill/p_field_elefield_loop.mp3
+char_337_utage s2 hit: player/p_imp/p_imp_sword_n.mp3 -> player/p_imp/p_imp_darksword_n.mp3
+char_4036_forcer s1 attack: player/p_imp/p_imp_fgun_n.mp3 -> player/p_atk/p_atk_fgun_h.mp3
+char_250_phatom s2 attack: player/p_atk/p_atk_knife_n.mp3 -> player/p_atk/p_atk_machete_fire.mp3
+char_250_phatom s2 hit: player/p_imp/p_imp_knife_n.mp3 -> player/p_imp/p_imp_machete_fire.mp3
+char_107_liskam s2 attack: player/p_atk/p_atk_pistol_n.mp3 -> player/p_atk/p_atk_lightning_n.mp3
+char_4151_tinman s1 attack: player/p_atk/p_atk_stmpnklch_n.mp3 -> player/p_atk/p_atk_stmpnklch_d.mp3
+char_4151_tinman s2 attack: player/p_atk/p_atk_stmpnklch_n.mp3 -> player/p_atk/p_atk_stmpnklch_h.mp3
+char_4211_snhunt s1 attack: player/p_atk/p_atk_sncrbw_n.mp3 -> player/p_atk/p_atk_sncrbw_d.mp3
+char_4042_lumen s2 attack: player/p_atk/p_atk_fishheal_n.mp3 -> player/p_atk/p_atk_fishheal_h.mp3
+char_140_whitew s2 attack: player/p_atk/p_atk_swordwave_n.mp3 -> player/p_atk/p_atk_katanawave_n.mp3
+char_1050_chen3 s2 attack: player/p_atk/p_atk_hljdswd_n.mp3 -> player/p_atk/p_atk_hljdswd_h.mp3
+char_494_vendla s2 attack: player/p_atk/p_atk_brmblhl_n.mp3 -> player/p_atk/p_atk_brmblhl_h.mp3
+char_194_leto s2 attack: player/p_atk/p_atk_axcpvbl_n.mp3 -> player/p_atk/p_atk_axcpvbl_h.mp3
+char_4058_pepe s1 attack: player/p_atk/p_atk_ctmnyhmr_n.mp3 -> player/p_atk/p_atk_ctmnyhmr_d.mp3
+char_4224_turdus s1 attack: player/p_atk/p_atk_crwkdhl_n.mp3 -> player/p_atk/p_atk_crwkdhl_d.mp3
+char_4011_lessng s1 attack: player/p_atk/p_atk_shpbygrd_n.mp3 -> player/p_atk/p_atk_shpbygrd_d.mp3
+char_491_humus s1 attack: player/p_atk/p_atk_sicklemetalhu_n.mp3 -> player/p_atk/p_atk_sicklemetalhu_d.mp3
+char_195_glassb s2 start: null -> player/p_skill/p_field_elefield_loop.mp3
+char_4182_oblvns s2 attack: null -> player/p_atk/p_atk_mjckyrdnt_h.mp3
+char_4182_oblvns s3 attack: null -> player/p_atk/p_atk_mjckyrdslnt.mp3
+char_416_zumama s3 hit: player/p_imp/p_imp_snakeknife_n.mp3 -> player/p_atk/p_atk_robotsaw_n.mp3
+char_1042_phatm2 s1 attack: player/p_atk/p_atk_oprdmgrc_n.mp3 -> player/p_atk/p_atk_oprdmgrc_d.mp3
+char_1040_blaze2 s1 attack: player/p_atk/p_atk_hcnsrfr_n.mp3 -> player/p_atk/p_atk_hcnsrfr_d.mp3
+char_4010_etlchi s1 attack: player/p_atk/p_atk_vmprsckl_n.mp3 -> player/p_atk/p_atk_vmprsckl_d.mp3
+char_4202_haruka s1 attack: player/p_atk/p_atk_idgfshbl_n.mp3 -> player/p_atk/p_atk_idgfshblh.mp3
+char_4202_haruka s2 attack: player/p_atk/p_atk_idgfshbl_n.mp3 -> player/p_atk/p_atk_idgfshblh.mp3
+char_1039_thorn2 s1 attack: player/p_atk/p_atk_trshldacys_n.mp3 -> player/p_atk/p_atk_trshldacys_d.mp3
+char_1015_aglna2 s3 start: null -> player/p_skill/p_skill_arstrnstf_s.mp3
+char_188_helage s3 attack: player/p_atk/p_atk_falchion_n.mp3 -> player/p_skill/p_skill_huirenzhan.mp3
+char_496_wildmn s1 attack: player/p_atk/p_atk_spearstab_n.mp3 -> player/p_imp/p_imp_spearstab_n.mp3
+char_4139_papyrs s1 attack: player/p_atk/p_atk_ctschlar_n.mp3 -> player/p_atk/p_atk_ctschlar_d.mp3
+char_1035_wisdel s1 attack: player/p_atk/p_atk_dkmrcaygn_n.mp3 -> player/p_atk/p_atk_dkmrcaygn_d.mp3
+char_4027_heyak s1 attack: player/p_atk/p_atk_quetzstaff_n.mp3 -> player/p_atk/p_atk_quetzstaff_d.mp3
+char_2026_yu s1 attack: player/p_atk/p_atk_frbytrtn_n.mp3 -> player/p_atk/p_atk_frbytrtn_p.mp3
+char_2026_yu s1 hit: player/p_imp/p_imp_frbytrtn_n.mp3 -> player/p_imp/p_imp_frbytrtn_p.mp3
+char_4039_horn s3 attack: player/p_skill/p_skill_blackcannonfull_cast.mp3 -> player/p_atk/p_atk_heavygun_n.mp3
+char_4054_malist s2 attack: player/p_atk/p_atk_staffcannon_n.mp3 -> player/p_atk/p_atk_staffcannon_h.mp3
+char_362_saga s3 hit: player/p_imp/p_imp_ninjasword_n.mp3 -> player/p_imp/p_imp_ninjasword_h_1.mp3
+char_4088_hodrer s1 attack: player/p_atk/p_atk_hdvysword_n.mp3 -> player/p_atk/p_atk_hdvysword_d.mp3
+char_279_excu s2 attack: player/p_atk/p_atk_shotgun_n.mp3 -> player/p_atk/p_atk_shotgun_double.mp3
+char_4121_zuole s1 attack: player/p_atk/p_atk_wrrsrd_n.mp3 -> player/p_atk/p_atk_wrrsrd_d.mp3
+char_4026_vulpis s1 attack: player/p_atk/p_atk_fxssnom_n.mp3 -> player/p_atk/p_atk_fxssnom_d.mp3
+char_1047_halo2 s2 attack: player/p_atk/p_atk_strbsvr_n.mp3 -> player/p_atk/p_atk_strbsvr_h.mp3
+char_4051_akkord s1 attack: player/p_atk/p_atk_mlysndv_n.mp3 -> player/p_atk/p_atk_mlysndv_d.mp3
+char_245_cello s2 attack: player/p_atk/p_atk_shphrt_n_1.mp3 -> player/p_atk/p_atk_shphrt_s_1.mp3
+char_4146_nymph s2 attack: player/p_atk/p_atk_scbslck_n.mp3 -> player/p_atk/p_atk_scbslck_h.mp3
+char_332_archet s3 attack: player/p_atk/p_atk_archet_n.mp3 -> player/p_atk/p_atk_archet_s_cast.mp3
+char_4079_haini s1 attack: player/p_atk/p_atk_tchnlgywr_n.mp3 -> player/p_atk/p_atk_tchnlgywr_d.mp3
+char_1045_svash2 s1 attack: player/p_atk/p_atk_snwlprdg_n1.mp3 -> player/p_atk/p_atk_snwlprdg_d.mp3
+char_1021_kroos2 s1 attack: player/p_atk/p_atk_crossbow_n.mp3 -> player/p_atk/p_atk_krossbow_n.mp3
+char_4145_ulpia s1 attack: player/p_atk/p_atk_wtrbatnchr_n.mp3 -> player/p_atk/p_atk_wtrbatnchr_d.mp3
+REVIEW char_4055_bgsnow s1 attack: no bank of the skill's mode, keeps player/p_atk/p_atk_penarrow_d.mp3
+REVIEW char_1038_whitw2 s1 attack: no bank of the skill's mode, keeps player/p_atk/p_atk_whtolfdrksl_d.mp3
+REVIEW char_4117_ray s3 attack: no bank of the skill's mode, keeps player/p_atk/p_atk_sndshotgun_s.mp3
+REVIEW char_4179_monstr s3 attack: no bank of the skill's mode, keeps player/p_atk/p_atk_kxdtctm_s.mp3
+REVIEW char_4179_monstr s3 hit: no bank of the skill's mode, keeps player/p_imp/p_imp_kxdtctm_s.mp3
+REVIEW char_4098_vvana s3 attack: no bank of the skill's mode, keeps player/p_atk/p_atk_shdswrd_s.mp3
+REVIEW char_4098_vvana s3 hit: no bank of the skill's mode, keeps player/p_imp/p_imp_lghtnswrd_s.mp3
+REVIEW char_431_ashlok s2 attack: no bank of the skill's mode, keeps player/p_atk/p_atk_heavygun_h.mp3
+REVIEW char_4048_doroth s2 attack: no bank of the skill's mode, keeps player/p_atk/p_atk_sandatk_h.mp3
+REVIEW char_1023_ghost2 s1 attack: no bank of the skill's mode, keeps player/p_atk/p_atk_sharpsaw_d.mp3
+REVIEW char_1023_ghost2 s1 hit: no bank of the skill's mode, keeps player/p_imp/p_imp_sharpsaw_d.mp3
+REVIEW char_1043_leizi2 s1 attack: no bank of the skill's mode, keeps player/p_atk/p_atk_lzxqlkl_d1.mp3
+REVIEW char_4229_aphris s1 attack: no bank of the skill's mode, keeps player/p_atk/p_atk_mcdtlsrfr_d.mp3
+REVIEW char_4229_aphris s3 attack: no bank of the skill's mode, keeps player/p_atk/p_atk_mcdtlsr_s.mp3
+REVIEW char_4229_aphris s3 hit: no bank of the skill's mode, keeps player/p_imp/p_imp_mcdtlsr_s.mp3
+REVIEW char_293_thorns s3 hit: no bank of the skill's mode, keeps player/p_imp/p_imp_brandishsabre_s.mp3
+REVIEW char_248_mgllan s1 attack: no bank of the skill's mode, keeps player/p_atk/p_atk_icecamera_h.mp3
+REVIEW char_248_mgllan s1 hit: no bank of the skill's mode, keeps player/p_imp/p_imp_icecamera_h.mp3
+REVIEW char_248_mgllan s2 attack: no bank of the skill's mode, keeps player/p_atk/p_atk_icecamera_h.mp3
+REVIEW char_248_mgllan s2 hit: no bank of the skill's mode, keeps player/p_imp/p_imp_icecamera_h.mp3
+REVIEW char_248_mgllan s3 attack: no bank of the skill's mode, keeps player/p_atk/p_atk_icecamera_h.mp3
+REVIEW char_248_mgllan s3 hit: no bank of the skill's mode, keeps player/p_imp/p_imp_icecamera_h.mp3
+REVIEW char_4054_malist s1 attack: no bank of the skill's mode, keeps player/p_atk/p_atk_staffcannon_d.mp3
+REVIEW char_4054_malist s1 hit: no bank of the skill's mode, keeps player/p_imp/p_imp_staffcannon_d.mp3
+REVIEW char_4194_rmixer s3 attack: no bank of the skill's mode, keeps player/p_atk/p_atk_ftmxbrtlm_s.mp3
