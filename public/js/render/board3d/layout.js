@@ -354,8 +354,9 @@ export function buildBoard(stage, opts = {}) {
     if (bossField && !areaSet.some((a) => r >= a.r0 && r <= a.r1 && c >= a.c0 && c <= a.c1)) continue;
     // outside the built rows (the battle and 联防 views build the field without the enemy preview pen): the pen's two
     // gates would float over the scenery behind the field, so a gate only shows in the rows of a built area — the
-    // other half's gate, in the same rows, stays
-    if (areaSet && !bossField && !areaSet.some((a) => r >= a.r0 && r <= a.r1)) continue;
+    // other half's gate stays only where the area builds that half too (联防: AREAS.unite) — a personal field's area ends at
+    // its own start gate (column 10), so the partner half's gates (column 18) are not drawn beside it
+    if (areaSet && !bossField && !areaSet.some((a) => r >= a.r0 && r <= a.r1 && c >= a.c0 && c <= a.c1)) continue;
     gates.push({ r, c, kind: g === 'S' ? 'start' : 'end', z: 0 });
   }
   let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;

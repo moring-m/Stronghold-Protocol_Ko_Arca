@@ -150,7 +150,10 @@ export function seedOf(id, n) {
   let h = 2166136261;
   for (const c of String(id ?? '')) h = Math.imul(h ^ c.charCodeAt(0), 16777619);
   h = Math.imul(h ^ (n | 0), 2654435761);
-  return (h ^ (h >>> 15)) >>> 0;
+  // murmur3's finaliser: every bit of the id and n reaches the low bits a `% 2` pick reads (the bare multiply left them
+  // nearly fixed — unit 1 drew the same of two replace animations ten times running)
+  h ^= h >>> 16; h = Math.imul(h, 0x85ebca6b); h ^= h >>> 13; h = Math.imul(h, 0xc2b2ae35); h ^= h >>> 16;
+  return h >>> 0;
 }
 
 /** Whether an ability — or a group holding one — is the kind of attack the sim made. */
@@ -220,14 +223,18 @@ export function pickAttacks(a, kind, seed = 0, depth = 0, nth = 0, mem = null) {
  */
 const STATUS_FLAGS = [[UF.SHIELD,'shield'],[UF.INVULN,'invulnerable'],[UF.STEALTH,'stealth'],[UF.FROZEN,'freeze'],[UF.STUNNED,'stun'],[UF.SLEEP,'sleep'],[UF.COLD,'cold']];
 
+// Mode names as the prefabs spell them: S3, Sk3 (信仰搅拌机, 谬因), s3 (卡涅利安, 艾雅法拉 the 2nd, 凯尔希 the 2nd), default
+const modeName = (n) => String(n || '').toLowerCase().replace(/^sk(?=\d)/, 's');
+
 export function modeVariant(modes, name, facing, variantsOnly = false) {
   const want = facing === 'DOWN' ? ['down', 'd'] : facing === 'UP' ? ['up', 'u'] : ['lr'];
+  const key = modeName(name);
   let plain = null, fit = null, other = null;
   for (const m of modes || []) {
     if (!m || !(m.attack || m.combat)) continue;
-    if (m.name === name) { plain = m; continue; }
+    if (modeName(m.name) === key) { plain = m; continue; }
     const g = MODE_VARIANT.exec(String(m.name || ''));
-    if (!g || g[1] !== name) continue;
+    if (!g || modeName(g[1]) !== key) continue;
     if (want.includes((g[2] || g[3]).toLowerCase())) fit = fit || m;
     else other = other || m;
   }
@@ -488,14 +495,16 @@ export class FxWiring {
     if (st.on && (name || sn)) {
       // the mode, or its variant for the unit's facing; a skill whose plan names no mode switches to the facing variants of
       // S<n> when the unit has them (灰毫 S2: S2(U) / S2(D) / S2(LR), no plain S2 — the extractor's name rule missed them)
-      const m = modeVariant(modes, name || sn, this._facing(v), !name);
+      // a skill whose buff switches the mode (`…[mode]`: 信仰搅拌机 S3's rmixer_sk3[mode] → Sk3) takes the plain S<n> too
+      const switches = !name && !!st.plan && [...st.plan.start, ...st.plan.loop].some((e) => /\[mode\]$/.test(e.buff || ''));
+      const m = modeVariant(modes, name || sn, this._facing(v), !name && !switches);
       if (m) return m;
     }
     // a form the data ties to a mode (talents.js formModes: a 重生's second form, a husk, a 傀儡师's 替身 → 风丸's Stand),
     // else a form named like a mode
     const fm = formMode(u, this.formOf(v), this.formMap(this.unitKeyOf(v)));
     if (fm) { const m = modes.find((x) => x.name === fm); if (m && (m.attack || m.combat || u.prefab?.includes('char_4217_makoto'))) return m; }
-    return modeVariant(modes, 'Default', this._facing(v)) || modes.find((x) => x.name === 'Default') || modes[0];
+    return modeVariant(modes, 'Default', this._facing(v)) || modes.find((x) => modeName(x.name) === 'default') || modes[0];
   }
 
   /** The facing a mode variant is chosen by: an operator's deploy direction, else left / right by its facing. */
@@ -1492,7 +1501,7 @@ export class FxWiring {
    * the owner's skill `trigger` (SkillFx.trigger). Returns true when the official effect stands for this damage (no
    * procedural spark).
    */
-  damage(v, type, src, time) {
+  damage(v, type, src, time, extra = null) {
     if (!this.ofx.active || !v || !this.idx) return false;
     // an element gauge fill ('dmg' typed by its element: a rider, a 灼燃 tick …) is no hit of the attack and no damage
     // taken in the skills' sense (the sim's TAKE_DAMAGE skips it too)
@@ -1506,10 +1515,13 @@ export class FxWiring {
     const drawn = (m && hpHit ? this._landed(m, v, time, type) : false) || fun;
     // an official shot on its way stands for the damage it brings (R3: the sim lands it before the drawn flight ends)
     const flying = this._inAir(id, time, hpHit);
-    // a skill's kit hit (SkillFx.seen: no attack owns it — the frame's order names the skill): its hit stands for the spark
-    if (hpHit && this.skills.seen(v, false, !!(m || src || fun || flying))) return true;
+    // a skill's kit hit (SkillFx.seen: no attack owns it — the frame's order names the skill): its hit stands for the spark.
+    // The sim names every damage's source (sourceId); only an attack's damage (isAttack) is owned by that attack — a
+    // skill's own damage (isAttack false: 陈 S3's cuts, 艾丽妮 S3's storm) stays a kit hit
+    const owned = !!(m || fun || flying || (src && (!extra || extra.isAttack !== false)));
+    if (hpHit && this.skills.seen(v, false, owned)) return true;
     // an enemy aura's tick on it (SkillFx.auraHit: 深溟巢涌者's pulse, 鼎沸's boil — the aura's buff effect on the unit)
-    if (hpHit && this.skills.auraHit(v, !!(m || src || fun || flying))) return true;
+    if (hpHit && this.skills.auraHit(v, owned)) return true;
     if (flying) return true;
     const arr = this.arrived.get(id);
     if (arr != null && this.ofx.time - arr < ARRIVAL_WINDOW) return true;

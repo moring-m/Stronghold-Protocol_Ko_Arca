@@ -162,6 +162,9 @@ export function formModes(idx, unitKey) {
   const nodes = [];
   for (const t of Object.values(isObj(unit.talents) ? unit.talents : {})) for (const n of Array.isArray(t.nodes) ? t.nodes : []) if (isObj(n)) nodes.push(n);
   for (const a of Array.isArray(unit.abilities) ? unit.abilities : []) if (isObj(a)) nodes.push(a);
+  // a form whose mode the data ties by the mode of its nodes only (no reborn block): 假想敌：再生's 再生状态 — its revive
+  // listener and anim_trigger (enemy_acpupp_henshin, enemy_duskls_idle_2) live on the Prop mode
+  if (unitKey === 'enemy_9010_acpupp' && hasMode('Prop')) out.husk = 'Prop';
   for (const n of nodes) {
     const r = n.reborn;
     if (isObj(r) && hasMode(r.mode)) {

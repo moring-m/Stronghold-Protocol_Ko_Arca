@@ -542,3 +542,11 @@ test('ZDistort Disturb retains the authored ramp/mask texture instead of exposin
     assert.equal(mat.textures.find(t=>t.name==='_RamTex').key,'edge-mask');
   }
 });
+
+describe('skill casts at start (regression: 0.3.3c)', () => {
+  test('a skill cast at its start does not throw (the `once` hold belongs to FX_BINDINGS attacks only)', async () => {
+    const src = (await import('node:fs')).readFileSync(new URL('../../public/js/render/vfx/skillfx.js', import.meta.url), 'utf8');
+    const body = src.slice(src.indexOf('_castOnce(U, v, when) {'), src.indexOf('_endCast(U, v) {'));
+    assert.ok(body.length > 0 && !/\bbind\b/.test(body), '_castOnce has no FX_BINDINGS entry in scope');
+  });
+});

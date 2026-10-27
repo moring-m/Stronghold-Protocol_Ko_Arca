@@ -641,6 +641,9 @@ function tagCasts(plan, skill) {
   for (const a of plan.attacks) {
     if (END_ATTACK.test(String(a.node || '')) || (a.cast.length && a.cast.every((e) => e.role === 'end'))) a.when = 'end';
     else if (once) a.when = 'start';
+    // a lasting skill whose root ability is this attack (死芒 S2: one RangedAttack as it starts, then its pulses): its
+    // cast is the skill's start, not a row of every normal attack while it lasts
+    else if (plan.kind === 'lasting' && lc(a.node) === lc(plan.skillId) && /Attack$/.test(String(skill?.rootAbility || ''))) a.when = 'start';
   }
 }
 
@@ -667,6 +670,8 @@ export function skillPlan(idx, unitKey, skillId, opts = {}) {
     attach = attachUses(unit?.modes?.[skill.mode]);
   }
   if (typeof skill.rootClass === 'string' && skill.rootClass) plan.rootClass = skill.rootClass;
+  // the root ability's choice among its attacks (AbilityRandomGroup: 嵯峨 S2's Red / Blue — display only)
+  if (typeof skill.rootAbility === 'string' && skill.rootAbility) plan.rootAbility = skill.rootAbility;
   const projs = isObj(idx.projectiles) ? idx.projectiles : {};
   for (const k of Array.isArray(skill.projectiles) ? skill.projectiles : []) {
     const kk = lc(k);
@@ -693,6 +698,12 @@ export function skillPlan(idx, unitKey, skillId, opts = {}) {
     }
   }
   if (isObj(opts.rec)) tagCasts(plan, skill);
+  // 凛御银灰 S3: his eagle 丹增 takes its place on him as the skill starts (BirdAura_Self: svash2_skill_03_deploy_01); the
+  // allies' BirdAura has no client signal (the sim gives them no eagle) — the attacks while it lasts are the S3 mode's
+  if (id === 'skchr_svash2_3') {
+    for (const a of plan.attacks) if (a.node === 'BirdAura_Self') a.when = 'start';
+    plan.attacks = plan.attacks.filter((a) => a.node !== 'BirdAura' || (plan.unmapped.push({ key: 'svash2_skill_03_deploy_01', role: 'cast', reason: 'conditional', from: 'BirdAura' }), false));
+  }
   return plan;
 }
 
@@ -1384,7 +1395,11 @@ export const FX_BINDINGS = Object.freeze({
   skchr_slent2_3: Object.freeze({ undying: binding({ owner: 'src', keys: ['slent2_skill_03_buff_02'], hold: 'fx', refresh: true }) }),
   skchr_demetr_1: Object.freeze({ means: binding({ owner: 'src', keys: ['demetr_buff_01'], hold: 'fx', refresh: true }) }),
   skchr_shwaz_1: Object.freeze({ defDown: binding({ owner: 'src', keys: ['buff_defdown'], hold: 'fx', refresh: true }) }),
-  skchr_chen3_2: Object.freeze({ blink: binding({ owner: 'id', keys: ['chen3_skill_02_buff_01', 'chen3_skill_02_f_buff_02'], hold: 'fx', during: true, refresh: true }) }),
+  skchr_chen3_2: Object.freeze({
+    blink: binding({ owner: 'id', keys: ['chen3_skill_02_buff_01', 'chen3_skill_02_f_buff_02'], hold: 'fx', during: true, refresh: true }),
+    // a 'slash' per cut after her dash: the skill's attack — hit group k on cut k (_hit_01 … _06)
+    slash: binding({ owner: 'id', attack: 'skchr_chen3_2', once: true }),
+  }),
   // Buff loops whose condition the kits now mark (2026-10-26, buff_template_holder of the CN client 2026-10-22):
   // 陈 the 3rd S2 chen3_s2[respawn_buff] (her landing 'blink': the two loops while the skill lasts); 推进 talent
   // shwaz_t_1 (the crit's 'defDown' on the target, its duration) and 德米特里 T1 demetr_t1[def_dec] ('means' on the enemy,
@@ -1483,6 +1498,26 @@ export const FX_BINDINGS = Object.freeze({
   // 锏 S3 (op-blkkgt.js): each slash of the kit ('slash', id = her, every 0.3 s while the skill lasts) is the skill's
   // Damage ability (MultiMeleeAttack: blkkgt_skill_03_start_01 / _02 on her, cast effects held ON_CAST_START → ON_CAST_END of
   // one Skill_3_Loop cast of 10 hits: `once`); the finale is its EndAttack (`when: 'end'`)
+  // 陈 S3 赤霄·绝影 (custom recruit kit: a 'slash' per cut, id = her): the skill's attack — its cast rows (_start / _02 /
+  // _03) held over the cuts, the hit of each cut (_hit_01 … _10) on its damage
+  skchr_chen_3: Object.freeze({ slash: binding({ owner: 'id', attack: 'skchr_chen_3', once: true }) }),
+  // 艾丽妮 S3 (an 'aoe' per strike, id = her): the first is its StartAttack (start_01, range_01 / _03, type1 hit), the
+  // rest the MultiAttack's — casts held over the strikes
+  skchr_irene_3: Object.freeze({ aoe: binding({ owner: 'id', attack: Object.freeze(['StartAttack', 'MultiAttack']), once: true }) }),
+  // 棘刺 S2 (a 'thorns' per spray, id = him): the skill's Thorn attack — its cast and range rows
+  skchr_thorns_2: Object.freeze({ thorns: binding({ owner: 'id', attack: 'Thorn' }) }),
+  // 泥岩 S3 秽壤的血脉: she wakes from the 闭锁 mid-skill (the kit's 'rockfall' on her, id = her) — the sequence's
+  // awake rows (mudrok_skill_03_awake / _02) play there, not at the skill's end
+  skchr_mudrok_3: Object.freeze({ rockfall: binding({ owner: 'id', keys: ['mudrok_skill_03_awake', 'mudrok_skill_03_awake_02'], at: 'target', target: 'id' }) }),
+  // 郁金香 S3 (a 'slash' per cut once the skill fired): the skill's attack — hit group k on cut k (_hit_01 … _08)
+  skchr_acpion_3: Object.freeze({ slash: binding({ owner: 'id', attack: 'Skill', once: true }) }),
+  // 重岳 S2: the kit's 'aoe' names its part — 'chyue:whisk' the LiftAttack (Skill_2_Begin), 'chyue:down' the SecAttack
+  skchr_chyue_2: Object.freeze({ aoe: binding({ owner: 'id', attack: Object.freeze({ 'chyue:whisk': 'LiftAttack', 'chyue:down': 'SecAttack' }) }) }),
+  // 何为 S3: each volley of whirlwinds ('windCast' on her, id = her) is her S3 mode's cast (start_01 / _02)
+  skchr_heyak_3: Object.freeze({ windCast: binding({ owner: 'id', keys: ['heyak_skill_03_start_01', 'heyak_skill_03_start_02'], at: 'target', target: 'id' }) }),
+  // char_1051_headb2 S3 无可抵挡: each hammer ('aoe' 'headb2:hammer', id = him) is the skill's MultiMelee attack — its
+  // casts held over the five hammers, hit k on hammer k; each 高台 taking effect ('aoe' 'headb2:highland') its tile effect
+  skchr_headb2_3: Object.freeze({ aoe: binding({ owner: 'id', once: true, attack: Object.freeze({ 'headb2:hammer': 'skchr_headb2_3', 'headb2:highland': Object.freeze(['headb2_highground', 'headb2_highground_hit']) }) }) }),
   skchr_blkkgt_3: Object.freeze({
     slash: binding({ owner: 'id', attack: 'Damage', once: true }),
   }),
@@ -1679,6 +1714,9 @@ export const ENEMY_FX_BINDINGS = Object.freeze({
   // 1.projectile_range, dur = 1.projectile_life_time): its talent 1 (BslimeTalent_1) fires projectile_enemy_actoxi at its
   // killer, whose reached effect enemy_actoxi_idle (looping) is the cloud
   enemy_9006_actoxi: Object.freeze({ zone: ebind({ xkind: 'poison', owner: 'any', projectile: 'projectile_enemy_actoxi', hold: 'fx', holdS: 8 }) }),
+  // 假想敌：再生 (times.js kitRegen: the 'telegraph' of kind 'regenShield' on it as its 再生状态 begins, id = it): its Prop
+  // mode's anim_trigger (enemy_acpupp[born_anim] → enemy_acpupp_henshin) — the shield it hands out has no effect of its own
+  enemy_9010_acpupp: Object.freeze({ telegraph: ebind({ xkind: 'regenShield', owner: 'id', keys: ['enemy_acpupp_henshin'], once: true }) }),
   // 咸鳞汁推荐者 (special.js: its barrel blow's 'zone' of kind 'barrel' where it stands, dur = fixed_duration, in the tick of
   // its 'cast'): the skill BlockedBoom (ProjectileToTileAbility) puts projectile_enemy_wintun_range on its tile —
   // AuraHitBehaviour, its reached effect enemy_wintun_range (looping) the zone

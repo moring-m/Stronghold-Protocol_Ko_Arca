@@ -155,14 +155,14 @@ describe('board geometry (layout.js)', () => {
         }
         assert.ok(tops > 100, `${id} tops`);
         const G = b.grid;
-        // Gates come from the whole grid, not from the drawn tiles (the enemy half's start gate is outside the
-        // current area), in the rows the area builds; a boss field keeps only the gates inside AREAS.boss.
+        // Gates come from the whole grid, not from the drawn tiles, inside the area's rows and columns: a personal field
+        // shows no partner-half gate (column 18), 联防 both; a boss field keeps only the gates inside AREAS.boss.
         const bossField = area === AREAS.boss;
         const expected = [];
         for (const row of G) for (const t of row) {
           if (t.glyph !== 'S' && t.glyph !== 'E') continue;
           if (bossField && !area.some((a) => t.r >= a.r0 && t.r <= a.r1 && t.c >= a.c0 && t.c <= a.c1)) continue;
-          if (!bossField && area && !area.some((a) => t.r >= a.r0 && t.r <= a.r1)) continue;
+          if (!bossField && area && !area.some((a) => t.r >= a.r0 && t.r <= a.r1 && t.c >= a.c0 && t.c <= a.c1)) continue;
           expected.push(`${t.r},${t.c}`);
         }
         assert.deepEqual(b.gates.map((x) => `${x.r},${x.c}`).sort(), expected.sort(), `${id} gates`);
@@ -180,22 +180,24 @@ describe('board geometry (layout.js)', () => {
     // blowers are active devices of act2 m01; inactive crates of act1 m02 are not built
     assert.ok(buildBoard(stages.act2autochess_m01).devices.some((d) => d.kind === 'blower' && d.dir === 'DOWN'));
     assert.ok(!buildBoard(stages.act1autochess_m02).devices.some((d) => d.kind === 'crate'));
-    // gates are collected over the whole grid, so watching one half still shows the other half's start gate;
-    // on a boss field only the arena's own gates survive (the others would sit on top of the arena's own).
+    // a personal field (AREAS.normal) shows its own gates only — not the partner half's (column 18: user report of
+    // 2026-10-27); 联防 (AREAS.unite) builds both halves and shows both; on a boss field only the arena's own gates
+    // survive (the others would sit on top of the arena's own).
     const inArea = (g, set) => set.some((a) => g.r >= a.r0 && g.r <= a.r1 && g.c >= a.c0 && g.c <= a.c1);
-    let sawOutsideGate = false;
+    let sawPartnerGate = false;
     for (const id of ACTIVE) {
       const whole = buildBoard(stages[id], { area: AREAS.all }).gates;
       const normal = buildBoard(stages[id], { area: AREAS.normal }).gates;
-      const rows = (g, set) => set.some((a) => g.r >= a.r0 && g.r <= a.r1);
-      assert.deepEqual(normal.map((g) => `${g.r},${g.c}`).sort(), whole.filter((g) => rows(g, AREAS.normal)).map((g) => `${g.r},${g.c}`).sort(), `${id}: a half shows every gate of its rows`);
+      const unite = buildBoard(stages[id], { area: AREAS.unite }).gates;
+      assert.deepEqual(normal.map((g) => `${g.r},${g.c}`).sort(), whole.filter((g) => inArea(g, AREAS.normal)).map((g) => `${g.r},${g.c}`).sort(), `${id}: a personal field shows its own gates`);
+      assert.deepEqual(unite.map((g) => `${g.r},${g.c}`).sort(), whole.filter((g) => inArea(g, AREAS.unite)).map((g) => `${g.r},${g.c}`).sort(), `${id}: 联防 shows both halves' gates`);
+      if (whole.some((g) => !inArea(g, AREAS.normal) && inArea(g, AREAS.unite))) sawPartnerGate = true;
       // the battle view builds the field without the pen: the pen's gates do not float over the scenery
       const battle = buildBoard(stages[id], { area: AREAS.normal.filter((a) => a.r1 <= 13) }).gates;
       assert.ok(battle.every((g) => g.r <= 13), `${id}: no pen gate in battle`);
-      if (normal.some((g) => !inArea(g, AREAS.normal))) sawOutsideGate = true;
       for (const g of buildBoard(stages[id], { area: AREAS.boss }).gates) assert.ok(inArea(g, AREAS.boss), `${id}: the boss field keeps only its own gates`);
     }
-    assert.ok(sawOutsideGate, 'some stage has a gate outside the normal area (the case the filter used to drop)');
+    assert.ok(sawPartnerGate, 'some stage has a partner-half gate (the case the personal field leaves out)');
   });
 
   test('#569: the device slabs (射击台 / 特制水上平台 / 封印的地面) are repeated for an official scene, their sides reaching under its ground; nothing else is', () => {

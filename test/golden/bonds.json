@@ -1254,8 +1254,8 @@
       ],
       "enemies": {"enemy_1116_liprr_2":[10,10,0,0,86400],"enemy_1119_vofsd":[5,5,0,0,63360],"enemy_1121_lifbos_2":[3,3,0,0,86400]},
       "hooks": [1,30,2197,141,141,212,235,0,19,19,5,3,3,2435,1,1,18,0,1,19,0,6,0],
-      "events": {"atk":164,"atkCancel":2,"atkRetarget":5,"atkStart":144,"deploy":9,"die":19,"dmg":235,"engage":3,"fx":52,"skill":10,"spawn":30,"status":32},
-      "fx": {"baseRange":2,"blast":9,"buff":1,"burst":6,"dp":1,"lock":3,"spRecovered":29,"summon":1},
+      "events": {"atk":164,"atkCancel":2,"atkRetarget":5,"atkStart":144,"deploy":9,"die":19,"dmg":235,"engage":3,"fx":54,"skill":10,"spawn":30,"status":32},
+      "fx": {"baseRange":2,"blast":9,"buff":1,"burst":6,"dp":1,"lock":3,"skillVariant":2,"spRecovered":29,"summon":1},
       "snaps": "c69b4420 feecb997 3bb0a4fe 0c318f94 348dee4e 8854f8b4 42b19bba 3073e610"
     },
     "bond-soloShip-low": {
@@ -1419,8 +1419,8 @@
       ],
       "enemies": {"enemy_1251_lysyta_2":[19,19,0,251,70042],"enemy_1252_lysytb_2":[7,7,0,916,72576],"enemy_1329_cbshld_2":[4,4,0,1621,59904]},
       "hooks": [1,38,2422,119,131,229,309,346,30,30,25,25,0,6611,31,31,30,0,1,30,0,0,0],
-      "events": {"atk":119,"atkCancel":5,"atkStart":126,"deploy":8,"die":30,"dmg":229,"engage":3,"fx":448,"heal":35,"skill":50,"spawn":38,"status":119},
-      "fx": {"counter":13,"crit":1,"heal":47,"shield":31,"tornado":346,"tornadoPulse":10},
+      "events": {"atk":119,"atkCancel":5,"atkStart":126,"deploy":8,"die":30,"dmg":229,"engage":3,"fx":460,"heal":35,"skill":50,"spawn":38,"status":119},
+      "fx": {"counter":13,"crit":1,"heal":47,"shield":31,"tornado":346,"tornadoPulse":10,"windCast":12},
       "snaps": "1bcc6494 b3efeecf c4cb6ba3 2eee5b7a b51a4599 882a9b89 ee5d73c0 c90cd7d0"
     },
     "bond-suntShip-low": {

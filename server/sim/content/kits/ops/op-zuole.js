@@ -101,7 +101,12 @@ export default {
           kind: num(s1?.maxChargeTime, 1) > 1 ? 'charges' : 'instant',
           // the HP that decides the extra strikes: when the skill fires, before its strike lands (the trait heals at each
           // damage instance — professions.js musha — so after the first strike he would read healed) [ASSUMED]
-          onStart({ unit }) { unit.mem.zuoleS1Hp = unit.hpRatio; },
+          onStart({ battle, unit }) {
+            unit.mem.zuoleS1Hp = unit.hpRatio;
+            // display only: the official ability of this strike (s1_single / s1_double / s1_tripple by the same HP rule)
+            const n = (unit.hpRatio < num(b1.hp_ratio_double, 0.8) ? 1 : 0) + (unit.hpRatio < num(b1.hp_ratio_tripple, 0.5) ? 1 : 0);
+            battle.fx('skillVariant', { x: unit.x, y: unit.y, id: unit.id, node: ['s1_single', 's1_double', 's1_tripple'][n] });
+          },
           attack: {
             atkScale: num(b1.atk_scale, 1),
             onHit({ battle, unit, target }) {
