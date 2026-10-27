@@ -48,3 +48,13 @@ test('the attack draws start, one line per straight run, waypoints and the end',
   ofx.time = 1; fx.tick();
   assert.ok(spawned.every((h) => h.stopped), 'an attack path clears after it shows');
 });
+
+test('the S2 beam may cross its own path and runs on until it would repeat a tile in the same direction', () => {
+  const her = op(0, 4, 'RIGHT', { id: 'a' });
+  // right along row 4, down at column 2, left along row 2, up column 1 — back across row 4
+  const allies = [op(2, 4, 'DOWN', { id: 'b' }), op(2, 2, 'LEFT', { id: 'c' }), op(1, 2, 'UP', { id: 'd' })];
+  const p = aphrisPath(her, [her, ...allies], Infinity, BOUNDS, true);
+  // up column 1 it crosses row 4 at (4,1) — a tile it already passed going right — and keeps going to the top
+  assert.deepEqual(p.tiles.slice(-1)[0], [8, 1]);
+  assert.ok(p.tiles.filter(([r, c]) => r === 4 && c === 1).length === 2);
+});

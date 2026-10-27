@@ -1481,9 +1481,10 @@ export const FX_BINDINGS = Object.freeze({
     hpShare: binding({ owner: 'id', keys: ['ghost2_skill_01_hit'], at: 'target', target: 'to' }),
   }),
   // 锏 S3 (op-blkkgt.js): each slash of the kit ('slash', id = her, every 0.3 s while the skill lasts) is the skill's
-  // Damage ability (MultiMeleeAttack: blkkgt_skill_03_start_01 / _02 on her); the finale is its EndAttack (`when: 'end'`)
+  // Damage ability (MultiMeleeAttack: blkkgt_skill_03_start_01 / _02 on her, cast effects held ON_CAST_START → ON_CAST_END of
+  // one Skill_3_Loop cast of 10 hits: `once`); the finale is its EndAttack (`when: 'end'`)
   skchr_blkkgt_3: Object.freeze({
-    slash: binding({ owner: 'id', attack: 'Damage' }),
+    slash: binding({ owner: 'id', attack: 'Damage', once: true }),
   }),
   // 号角 S1 (chess_char_5_08-horn.js: the flare's 'zone' where her S1 shot lands, id = her, r = projectile_range, duration =
   // projectile_delay_time): the skill's RangedAttackGroup (AbilityParallelGroup) fires the shell projectile_chr_horn_s1 —

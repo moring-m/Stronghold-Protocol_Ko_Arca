@@ -4,6 +4,9 @@
 import { sortEnemyTargets, canTargetEnemy } from '../../../targeting.js';
 import { num, tbb, textCount, live, ANY, enemiesIn, instantKind, pullToward } from '../shared/tier6.js';
 
+// S3's finisher clip (Skill_3_End 1.567 s) after its OnAttack (0.333 s): no normal attack until it ends
+const END_RECOVERY_S = 1.567 - 0.333;
+
 // ------------------------------------------------------------------------------------------------------------------
 // 锏 chess_char_6_19 (剑豪) — S3 归于宁静; “天生的武者”; 活着的传奇; module “过往的注脚”
 
@@ -112,6 +115,8 @@ function blkkgt(bb, chess, def) {
         unit.mem.dgbFinale = true; // the finisher is part of the skill (talent at 100 %, module +10 %)
         try { slash(battle, unit, num(bb.e_atk_scale_end, 1)); } finally { unit.mem.dgbFinale = false; }
         pull(battle, unit, num(bb.e_force), true);
+        // the finisher is EndAttack (animKey Skill_3_End, 1.567 s, OnAttack at 0.333 s): she attacks again only once it ends
+        battle.addBuff(unit, { key: 'blkkgt:finale', duration: END_RECOVERY_S, flags: { disarm: true }, source: unit });
       },
     },
     talents: [

@@ -33,12 +33,14 @@ export function aphrisPath(unit, views, reach, bounds, beam = false) {
   const [r0, c0] = tileOf(unit);
   const at = new Map();
   for (const v of views) if (v !== unit && v.alive !== false && !v.prep) at.set(tileOf(v).join(','), v);
-  const tiles = [[r0, c0]], seen = new Set([`${r0},${c0}`]), relays = [], corners = [0];
+  const tiles = [[r0, c0]], passed = new Set(), relays = [], corners = [0];
   let [dr, dc] = DIR[unit.dir] || DIR.RIGHT, r = r0, c = c0, left = beam ? Infinity : reach;
   while (left-- > 0) {
     const nr = r + dr, nc = c + dc, k = `${nr},${nc}`;
-    if (nr < bounds.r0 || nr > bounds.r1 || nc < bounds.c0 || nc > bounds.c1 || seen.has(k)) break;
-    seen.add(k); tiles.push([nr, nc]); r = nr; c = nc;
+    // as op-aphris.js: it may cross itself, and stops where it would repeat a tile in the same direction
+    const state = `${k}|${dr},${dc}`;
+    if (nr < bounds.r0 || nr > bounds.r1 || nc < bounds.c0 || nc > bounds.c1 || passed.has(state)) break;
+    passed.add(state); tiles.push([nr, nc]); r = nr; c = nc;
     const o = at.get(k);
     const turn = o && (isRelayOf(o, unit) || (beam && !o.isEnemy && o.info?.kind === 'op')) ? DIR[o.dir] || null : null;
     if (o && isRelayOf(o, unit)) { left += RELAY_REACH; relays.push(tiles.length - 1); }
@@ -76,12 +78,14 @@ export class AphrisFx {
     const ofx = this.w.ofx, lib = ofx.lib, out = [], h = keys.height || 0;
     const opt = { loop, important: true };
     const put = (key, pos) => { if (key && lib.has(key)) { const x = ofx.spawn(key, { pos, groundZ: 0, rootRot: [0, 0, 0, 1] }, opt); if (x) out.push(x); } };
-    const skin = this.w.skinOf?.(this.w.unitOf(v)), start = unitPoint(skin, 'hit', this.w.pose ? this.w.pose(v) : v);
+    const skin = this.w.skinOf?.(this.w.unitOf(v)), start = unitPoint(skin, 'muzzle', this.w.pose ? this.w.pose(v) : v); // startMountType 2: MUZZLE
     put(keys.start, start);
-    // the line runs level at her muzzle height from her own tile, so a long or turned path stays straight on the board
+    // the line runs level at her muzzle height, so a long or turned path stays straight on the board
     const g0 = ground(path.tiles[0]), dy = start[1] - g0[1], dz = start[2] - g0[2];
     const level = (t) => { const g = ground(t); g[1] += dy; g[2] += dz; return g; };
     const pts = path.corners.map((i) => level(path.tiles[i]));
+    // it leaves from her muzzle: along a row, from the muzzle's own x (a run along a column keeps her tile's x)
+    if (path.tiles.length > 1 && path.tiles[1][0] === path.tiles[0][0]) pts[0][0] = start[0];
     if (keys.line && lib.has(keys.line)) for (let i = 1; i < pts.length; i++) {
       const a = pts[i - 1], b = pts[i];
       const x = ofx.spawn(keys.line, { pos: a.slice(), groundZ: 0 }, { ...opt, track: (fx) => { fx.anchor[0] = a[0]; fx.anchor[1] = a[1]; fx.anchor[2] = a[2]; fx.linkLines(a, b); } });

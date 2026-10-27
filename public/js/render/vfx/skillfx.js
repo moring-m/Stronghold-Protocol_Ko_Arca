@@ -328,6 +328,7 @@ export class SkillFx {
   _stopLoops(U) {
     for (const h of U.loops) h.stop();
     U.loops = [];
+    U.boundCast?.clear();
     U.loopsOn = false;
     U.byFlag = false;
   }
@@ -534,7 +535,16 @@ export class SkillFx {
     let drew = false;
     for (const a of U.plan.attacks) {
       if (a.when !== when) continue;
-      for (const e of uniq([...a.cast, ...a.range])) { const h = this._play(e, v); if (h) { drew = true; this._keep(U, e, h); } }
+      // `once`: one official cast holds many strikes (锏 S3's MultiMeleeAttack, 10 hits in one Skill_3_Loop): its cast rows
+    // play at the first strike and stay until the skill ends, instead of restarting at every strike
+    const held = bind.once ? (U.boundCast ||= new Map()) : null;
+    for (const e of uniq([...a.cast, ...a.range])) {
+      if (held && held.get(e.key)?.alive) { drew = true; continue; }
+      const h = this._play(e, v);
+      if (!h) continue;
+      drew = true;
+      if (held) { held.set(e.key, h); U.loops.push(h); } else this._keep(U, e, h);
+    }
       if (when === 'start' && (a.hit.some((g) => g.length) || (a.aim || []).length || U.tHit.length)) this._open(U, a);
     }
     return drew;
@@ -1091,7 +1101,16 @@ export class SkillFx {
     const v = U.v;
     if (!a || !v) return false;
     let drew = false;
-    for (const e of uniq([...a.cast, ...a.range])) { const h = this._play(e, v); if (h) { drew = true; this._keep(U, e, h); } }
+    // `once`: one official cast holds many strikes (锏 S3's MultiMeleeAttack, 10 hits in one Skill_3_Loop): its cast rows
+    // play at the first strike and stay until the skill ends, instead of restarting at every strike
+    const held = bind.once ? (U.boundCast ||= new Map()) : null;
+    for (const e of uniq([...a.cast, ...a.range])) {
+      if (held && held.get(e.key)?.alive) { drew = true; continue; }
+      const h = this._play(e, v);
+      if (!h) continue;
+      drew = true;
+      if (held) { held.set(e.key, h); U.loops.push(h); } else this._keep(U, e, h);
+    }
     if (a.hit.some((g) => g.length) || (a.aim || []).length || U.tHit.length) this._open(U, a);
     return drew;
   }
