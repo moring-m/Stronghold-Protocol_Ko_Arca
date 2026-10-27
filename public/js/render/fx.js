@@ -280,7 +280,8 @@ export function fxSpec(kind, extra = {}) {
 
 /** Gameplay notices and animation commands remain visible with official combat art. */
 const UTILITY_FX=new Set(['sp','dp','coin','lp','down','telegraph','mark','reticle']);
-export function utilityFx(kind,extra){return kind==='enemySkill'||UTILITY_FX.has(fxSpec(kind,extra).a);}
+// 카시미어 6명: the bond's shockwave has no official prefab, so it is drawn with official effects on too
+export function utilityFx(kind,extra){return kind==='enemySkill'||(kind==='aoe'&&extra?.src==='bond:kazimierzShip')||UTILITY_FX.has(fxSpec(kind,extra).a);}
 
 /** Tiles covered by a blast / telegraph: `tiles` = [[r,c]…] or 'box' (Chebyshev ⌊r⌋ around the centre) or 'disc'. */
 export function tilesAround(x, y, r, tiles) {
