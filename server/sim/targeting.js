@@ -241,7 +241,8 @@ export function sortEnemyTargets(battle, attacker, cands, priority) {
  */
 export function sortAllyTargets(enemy, cands) {
   if (cands.length <= 1) return cands;
-  const bl = enemy.profile && enemy.profile.blockFree ? null : enemy.blockedBy;   // 索敌不受阻挡影响: no blocker first
+  // 索敌不受阻挡影响: no blocker first — unless the enemy still prefers the blocker it can target (`blockerFirst`: 自制投石机)
+  const bl = enemy.profile && enemy.profile.blockFree && !enemy.profile.blockerFirst ? null : enemy.blockedBy;
   cands.sort((a, b) => {
     const ba = bl === a ? 0 : 1, bb = bl === b ? 0 : 1;
     return ba - bb || aggroCmp(a, b);

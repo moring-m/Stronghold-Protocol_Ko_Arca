@@ -524,8 +524,9 @@ export const SPECIAL_KITS = Object.freeze({
   enemy_10162_mnctpt: (ab) => [{                                     // 自制投石机 · 3-hit attacks with small splash; 索敌不受阻挡影响
     // PRTS 天赋 「索敌不受阻挡影响，且不会因丢失目标而结束攻击」: its target selection ignores its block — a 隐匿 blocker (an
     // operator on the 排气格栅) is no target, so with nobody else in range it does not attack (the official game, community
-    // report of 2026-10-06, item 24); it picks by 仇恨值, not its blocker first
-    spawn(b, e) { Object.assign(e.profile,{blockFree:true,deferHit:true,continueAttackOnTargetLoss:true}); },
+    // report of 2026-10-06, item 24); a blocker it can target is still its first target (user report of 2026-10-27),
+    // the others by 仇恨值
+    spawn(b, e) { Object.assign(e.profile,{blockFree:true,blockerFirst:true,deferHit:true,continueAttackOnTargetLoss:true}); },
     attack(c, b, e) {
       const n = T(ab, 'Attack.attack@times') ?? 3, interval=T(ab,'Attack.attack@hit_interval') ?? .3;
       const t = c.targets[0];if(!t)return;
