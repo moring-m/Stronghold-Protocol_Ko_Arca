@@ -45,3 +45,8 @@ test('kit-named variants and parts: 重岳 S2 whisk / down, 左乐 S1 by HP, 维
   assert.equal(verdict(audit('char_4088_hodrer'), 'skchr_hodrer_2').verdict, 'ok');
   for (const [c, s] of [['char_4027_heyak', 'skchr_heyak_3'], ['char_2012_typhon', 'skchr_typhon_2'], ['char_1045_svash2', 'skchr_svash2_3'], ['char_362_saga', 'skchr_saga_2']]) assert.equal(verdict(audit(c), s).verdict, 'ok', c);
 });
+
+test("重岳 S3's blow plays its projectile's hit effect (chyue_skill_03_hit_02), not the normal attack's only", { skip: !existsSync(INDEX) }, () => {
+  const out = execFileSync(process.execPath, ['tools/vfx-op-skill-audit.mjs', '--index', INDEX, '--only', 'char_2024_chyue', '--seconds', '90', '--json'], { cwd: ROOT, encoding: 'utf8', maxBuffer: 1 << 26, env: { ...process.env, AUDIT_ALL: '1' } });
+  assert.ok(JSON.parse(out).find((r) => r.skill === 'skchr_chyue_3').spawnedAll.includes('chyue_skill_03_hit_02'));
+});

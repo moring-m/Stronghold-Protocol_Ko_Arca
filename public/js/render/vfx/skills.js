@@ -1714,6 +1714,9 @@ export const ENEMY_FX_BINDINGS = Object.freeze({
   // 1.projectile_range, dur = 1.projectile_life_time): its talent 1 (BslimeTalent_1) fires projectile_enemy_actoxi at its
   // killer, whose reached effect enemy_actoxi_idle (looping) is the cloud
   enemy_9006_actoxi: Object.freeze({ zone: ebind({ xkind: 'poison', owner: 'any', projectile: 'projectile_enemy_actoxi', hold: 'fx', holdS: 8 }) }),
+  // 假想敌：再生 (times.js kitRegen: the 'telegraph' of kind 'regenShield' on it as its 再生状态 begins, id = it): its Prop
+  // mode's anim_trigger (enemy_acpupp[born_anim] → enemy_acpupp_henshin) — the shield it hands out has no effect of its own
+  enemy_9010_acpupp: Object.freeze({ telegraph: ebind({ xkind: 'regenShield', owner: 'id', keys: ['enemy_acpupp_henshin'], once: true }) }),
   // 咸鳞汁推荐者 (special.js: its barrel blow's 'zone' of kind 'barrel' where it stands, dur = fixed_duration, in the tick of
   // its 'cast'): the skill BlockedBoom (ProjectileToTileAbility) puts projectile_enemy_wintun_range on its tile —
   // AuraHitBehaviour, its reached effect enemy_wintun_range (looping) the zone

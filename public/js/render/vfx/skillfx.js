@@ -152,6 +152,13 @@ const isLoop = (e) => e.hold === 'skill' && e.loop !== false;
 // (U.variant: 重岳 S1 蓄力 Skill_1_Charge / Skill_1, S3 Skill_3 → Skill_3_Charge → Skill_3_Charged …)
 const doneAttacks = (U, nth) => (U.plan?.kind === 'instant' ? U.atkTotal || 0 : nth);
 
+/** A projectile's own hit effects (HitBehaviour / its kind's `_effectsWhenHit`), lower-cased. */
+const projectileHitKeys = (proj) => {
+  const out = [];
+  for (const b of Array.isArray(proj?.behaviours) ? proj.behaviours : []) for (const k of b?.fields?._effectsWhenHit || []) if (typeof k === 'string' && k) out.push(k.toLowerCase());
+  return [...new Set(out)];
+};
+
 const perAttack = (plan, U = null) => {
   let p = plan.attacks.some((a) => a.when) ? { ...plan, attacks: plan.attacks.filter((a) => !a.when) } : plan;
   const only = U?.variant ? p.attacks.filter((a) => a.node === U.variant) : null;
@@ -800,6 +807,13 @@ export class SkillFx {
     const instOn = inst || (!!U && !U.ewin && U.plan?.kind === 'instant' && /^ReplacementSkill/.test(U.plan?.rootClass || '') && st.on);
     const forced = !fits && instOn && !!fx.ability && /Heal/.test(fx.ability) === heal;
     const replace = fits || forced;
+    // a ranged ability the sim strikes in melee (重岳 S3: RangedAttack, the sim's blow): no flight, so its projectile's hit
+    // effects (_effectsWhenHit: chyue_skill_03_hit_02) are the blow's — not the mode's normal hit
+    if (replace && !ranged && !fx.hit.some((g) => g.length)) {
+      const pk = fx.projectile || skillProjectile(this.w.idx, st.plan);
+      const keys = projectileHitKeys(this.w.idx?.projectiles?.[pk]);
+      if (keys.length) fx.hit = [keys.map((key) => ({ key, role: 'hit', at: 'target', loop: false, from: `${pk}._effectsWhenHit`, point: 'HIT_POINT' }))];
+    }
     if (fx.ability && !replace) { fx.cast = fx.cast.filter((e) => e.ability !== fx.ability); fx.range = []; fx.aim = []; fx.hit = st.plan.each.hit[0].length ? [st.plan.each.hit[0]] : []; }
     // the projectile its ability fires (index v3: abilities[].projectileKey, a use's projectileKey), else the naming guess
     const projectile = fits && ranged ? fx.projectile || skillProjectile(this.w.idx, st.plan) : null;

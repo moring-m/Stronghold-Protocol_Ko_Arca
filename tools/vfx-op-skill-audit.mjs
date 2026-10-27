@@ -116,12 +116,13 @@ for (const [id, rec] of Object.entries(chess)) {
       }
     } catch (e) { error = String(e && e.message || e).slice(0, 160) + (process.env.STACK ? "\n" + e.stack : ""); }
     for (const k of modeKeys(drawnKey)) keys.add(k);
+    const spawnedAll = [...played];
     for (const k of [...played]) if (!keys.has(k)) played.delete(k);
     // a controller that spawns other prefabs and is never drawn itself (余 S3's wall source: render/vfx/yuwall.js)
     keys.delete('yu_skill3_range_01_source');
     const missing = [...keys].filter((k) => !played.has(k));
     const verdict = error ? 'error' : !started ? 'no cast' : !played.size ? 'none' : missing.length ? 'partial' : 'ok';
-    rows.push({ chess: id, charId: rec.charId, drawn: drawnKey, skill: sid, skillIndex, verdict, played: [...played], missing, error });
+    rows.push({ chess: id, charId: rec.charId, drawn: drawnKey, ...(process.env.AUDIT_ALL ? { spawnedAll } : {}), skill: sid, skillIndex, verdict, played: [...played], missing, error });
   });
 }
 
