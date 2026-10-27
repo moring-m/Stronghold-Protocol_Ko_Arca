@@ -136,10 +136,12 @@ export default {
         [S1]: {
           kind: 'charges',
           attack: { atkScale: num(b1.atk_scale, 1), hitsFn: (b, u) => (u.mem.vvanaCast === 'charged' ? S1_CHARGED_HITS : S1_HITS) },
-          onStart({ unit, skill }) {
+          onStart({ battle, unit, skill }) {
             // after activate's one charge: still ≥ max − 1 ⇒ every charge was stored (蓄力) — a charged cast spends them all
             const charged = !!unit.mem.vvanaCharged || (skill.maxCharges > 1 && skill.charges >= skill.maxCharges - 1);
             unit.mem.vvanaCast = charged ? 'charged' : 'plain';
+            // display only: the official ability — S1_Attack (蓄力, three hits, Skill_1_Attack) or S1_Attack2 (two hits)
+            battle.fx('skillVariant', { x: unit.x, y: unit.y, id: unit.id, node: charged ? 'S1_Attack' : 'S1_Attack2' });
             if (charged) { skill.charges = 0; skill.sp = 0; }
           },
           onEnd({ unit }) { unit.mem.vvanaCast = null; },

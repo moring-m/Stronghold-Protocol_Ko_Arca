@@ -150,7 +150,10 @@ export function seedOf(id, n) {
   let h = 2166136261;
   for (const c of String(id ?? '')) h = Math.imul(h ^ c.charCodeAt(0), 16777619);
   h = Math.imul(h ^ (n | 0), 2654435761);
-  return (h ^ (h >>> 15)) >>> 0;
+  // murmur3's finaliser: every bit of the id and n reaches the low bits a `% 2` pick reads (the bare multiply left them
+  // nearly fixed — unit 1 drew the same of two replace animations ten times running)
+  h ^= h >>> 16; h = Math.imul(h, 0x85ebca6b); h ^= h >>> 13; h = Math.imul(h, 0xc2b2ae35); h ^= h >>> 16;
+  return h >>> 0;
 }
 
 /** Whether an ability — or a group holding one — is the kind of attack the sim made. */

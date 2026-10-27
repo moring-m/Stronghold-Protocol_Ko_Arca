@@ -54,11 +54,13 @@ for (const [id, rec] of Object.entries(chess)) {
     const canon = (n) => String(n || '').toLowerCase().replace(/^sk(?=\d)/, 's').replace(/[([].*$/, '');
     // as wiring.js mode(): the plan's mode, else S<n> only when a buff of the skill switches the mode (`…[mode]`)
     const switches = !!plan && [...plan.start, ...plan.loop].some((e) => /\[mode\]$/.test(e.buff || ''));
-    const want = plan?.modeName ? canon(plan.modeName) : switches ? `s${skillIndex + 1}` : null;
+    // …or, with neither, the facing variants of S<n> (灰烬 S2: S2(U) / S2(D) / S2(LR)) — not a plain S<n>
+    const facingOnly = !plan?.modeName && !switches;
+    const want = plan?.modeName ? canon(plan.modeName) : `s${skillIndex + 1}`;
     const modeKeys = (key) => {
       const out = new Set();
-      for (const m of want ? idx.units?.[key]?.modes || [] : []) {
-        if (canon(m.name) !== want || !m.attack) continue;
+      for (const m of idx.units?.[key]?.modes || []) {
+        if (canon(m.name) !== want || !m.attack || (facingOnly && !/[([](?:down|d|up|u|lr)[)\]]$/i.test(m.name))) continue;
         for (const c of [...(m.attack.cast || []), ...(m.attack.hit || [])]) for (const k of c.effects || []) if (k) out.add(k);
       }
       return out;
@@ -68,7 +70,7 @@ for (const [id, rec] of Object.entries(chess)) {
     const played = new Set();
     let started = 0, error = null;
     for (const DIR of ['RIGHT', 'UP', 'DOWN', 'LEFT']) try {
-      const ofx = { active: true, time: 0, lite: false, tier: 'full', timers: [],
+      const ofx = { active: true, time: 0, lite: false, tier: 'full', timers: [], ctx: { fieldRect: () => ({ r0: 9, r1: 12, c0: 2, c1: 18 }) },
         lib: { has: (k) => !!idx.prefabs[k], def: (k) => (idx.prefabs[k] ? { isLoop: idx.prefabs[k].looping, spawn: 2, stats: {} } : null), index: async () => idx, preload: async () => 0, defs: new Map(), mesh: () => null },
         spawn(k) { played.add(k); return { alive: true, anchor: [0, 0, 0], stop() { this.alive = false; }, kill() { this.alive = false; }, linkLines() {} }; } };
       const views = new Map();
@@ -115,6 +117,8 @@ for (const [id, rec] of Object.entries(chess)) {
     } catch (e) { error = String(e && e.message || e).slice(0, 160) + (process.env.STACK ? "\n" + e.stack : ""); }
     for (const k of modeKeys(drawnKey)) keys.add(k);
     for (const k of [...played]) if (!keys.has(k)) played.delete(k);
+    // a controller that spawns other prefabs and is never drawn itself (余 S3's wall source: render/vfx/yuwall.js)
+    keys.delete('yu_skill3_range_01_source');
     const missing = [...keys].filter((k) => !played.has(k));
     const verdict = error ? 'error' : !started ? 'no cast' : !played.size ? 'none' : missing.length ? 'partial' : 'ok';
     rows.push({ chess: id, charId: rec.charId, drawn: drawnKey, skill: sid, skillIndex, verdict, played: [...played], missing, error });

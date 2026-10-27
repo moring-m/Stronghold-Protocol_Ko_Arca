@@ -108,9 +108,11 @@ export default {
         [S1]: {
           kind: 'charges',
           attack: { atkScale: num(b1.atk_scale, 1), hitsFn: (b, u) => u.mem.chyueS1Hits || 1 },
-          onStart({ unit, skill }) {
+          onStart({ battle, unit, skill }) {
             // 蓄力: the cast took one charge of a full stack ⇒ the rest goes too and the strike lands `times` times
             const full = skill.maxCharges > 1 && skill.charges === skill.maxCharges - 1;
+            // display only: the official ability of this cast (AbilitySelectableGroup: Skill_1_Charge / Skill_1)
+            battle.fx('skillVariant', { x: unit.x, y: unit.y, id: unit.id, node: full ? 'Skill_1_Charge' : 'Skill_1' });
             unit.mem.chyueS1Hits = full ? Math.max(1, Math.floor(num(b1.times, skill.maxCharges))) : 1;
             if (full) { skill.charges = 0; skill.sp = 0; }
           },
@@ -152,7 +154,12 @@ export default {
               }
             },
           },
-          onStart({ unit }) { unit.mem.chyueCasts = (unit.mem.chyueCasts || 0) + 1; },
+          onStart({ battle, unit }) {
+            unit.mem.chyueCasts = (unit.mem.chyueCasts || 0) + 1;
+            // display only: Skill_3 → Skill_3_Charge (the cast that transforms him, anim Skill_3_Change) → Skill_3_Charged
+            const node = unit.mem.chyueAwake ? 'Skill_3_Charged' : unit.mem.chyueCasts >= castCnt ? 'Skill_3_Charge' : 'Skill_3';
+            battle.fx('skillVariant', { x: unit.x, y: unit.y, id: unit.id, node });
+          },
           onEnd({ battle, unit }) {
             settle(unit);
             if (!unit.mem.chyueAwake && unit.mem.chyueCasts >= castCnt && up(unit)) awaken(battle, unit);

@@ -148,7 +148,16 @@ const idOf = (v) => v?.info?.id ?? v?.id;
 /** A held entry that loops for its hold: hold 'skill' and a looping prefab (a one-shot prefab plays once at the start). */
 const isLoop = (e) => e.hold === 'skill' && e.loop !== false;
 /** The plan's attacks a normal attack can use: not the skill's own casts at its start / end (`when`, skills.js tagCasts). */
-const perAttack = (plan) => (plan.attacks.some((a) => a.when) ? { ...plan, attacks: plan.attacks.filter((a) => !a.when) } : plan);
+// the attacks of the skill's attacks (not its start / end casts); a kit's 'skillVariant' fx names the one this cast uses
+// (U.variant: 重岳 S1 蓄力 Skill_1_Charge / Skill_1, S3 Skill_3 → Skill_3_Charge → Skill_3_Charged …)
+const doneAttacks = (U, nth) => (U.plan?.kind === 'instant' ? U.atkTotal || 0 : nth);
+
+const perAttack = (plan, U = null) => {
+  let p = plan.attacks.some((a) => a.when) ? { ...plan, attacks: plan.attacks.filter((a) => !a.when) } : plan;
+  const only = U?.variant ? p.attacks.filter((a) => a.node === U.variant) : null;
+  if (only?.length) p = { ...p, attacks: only };
+  return p;
+};
 /**
  * The entries of a list with a key of their own (the first of each): the extractor may reach one effect by two paths
  * (a buff's `_buffs` and `_extraBuffs`, two nodes of one skill) — played once, as the one buff it is [ASSUMED].
@@ -412,6 +421,12 @@ export class SkillFx {
       U.startFrame = this.frame;
       U.atkN = 0;
       U.attacked = false;
+      U.casts = (U.casts || 0) + 1;
+      // a random group's pick (嵯峨 S2: Red / Blue): seeded by the unit and its cast count — the sim keeps no such choice
+      if (/RandomGroup$/.test(U.plan.rootAbility || '')) {
+        const att = U.plan.attacks.filter((a) => !a.when);
+        if (att.length > 1) U.variant = att[(Math.imul((Number(idOf(v)) | 0) + 1, 2654435761) + U.casts * 40503 >>> 0) % att.length].node;
+      }
       if (!live) return false;
       this._stopReady(U);
       this._stopLoops(U);          // a cast while on (onEnd re-cast) starts afresh
@@ -425,7 +440,7 @@ export class SkillFx {
       if (U.independentCast) { if (this._instCast(U, v, undefined, 'start')) drew = true; }
       else if (this._castOnce(U, v, 'start')) drew = true;
       // an instant skill: what its kit hits in this frame without an attack are its attack's hits (kit hits)
-      if (!U.independentCast && U.plan.kind === 'instant' && perAttack(U.plan).attacks.length) this._open(U, null, true);
+      if (!U.independentCast && U.plan.kind === 'instant' && perAttack(U.plan, U).attacks.length) this._open(U, null, true);
       U.loopsOn = true;
       return drew || U.drawsStart || this._noBurst(U);
     }
@@ -437,7 +452,7 @@ export class SkillFx {
     // an instant skill whose kit made no attack between 1 and 0: its own attack's cast plays once (skills.js: one cast)
     // and its hits on what the kit hit in between (kit hits); a ReplacementSkill's replaced attack may still follow the
     // 0 in this frame — the fallback waits for the frame's end (instPending)
-    if (was && !U.independentCast && !U.attacked && U.startFrame === this.frame && perAttack(U.plan).attacks.length) {
+    if (was && !U.independentCast && !U.attacked && U.startFrame === this.frame && perAttack(U.plan, U).attacks.length) {
       if (/^ReplacementSkill/.test(U.plan.rootClass || '')) U.instPending = this.frame;
       else { this._instCast(U, v); this.windows = this.windows.filter((w) => !(w.inst && w.U === U)); }
     }
@@ -504,7 +519,7 @@ export class SkillFx {
 
   /** The attack of an instant activation a kit hit belongs to: a heal ability for a heal, another for damage. */
   _instAttack(U, heal) {
-    const att = perAttack(U.plan).attacks;
+    const att = perAttack(U.plan, U).attacks;
     return (heal ? att.find((x) => /Heal/.test(x.ability)) : att.find((x) => !/Heal/.test(x.ability))) || null;
   }
 
@@ -563,7 +578,7 @@ export class SkillFx {
    * damage, else the first) casts its rows on the owner; the hits played as they came (seen).
    */
   _instCast(U, v, win = this.windows.find((w) => w.inst && w.U === U), phase = null) {
-    const att = perAttack(U.plan).attacks;
+    const att = perAttack(U.plan, U).attacks;
     const a = (win?.sawDmg ? this._instAttack(U, false) : win?.sawHeal ? this._instAttack(U, true) : null) || att[0];
     // A key can be reached both through a buff and through its attack emitter (Tin Man S2). Play it once.
     const rows = phase ? [...U.plan.start, ...U.plan.range, ...U.plan.loop, ...(a?.cast || []), ...(a?.range || [])]
@@ -771,12 +786,15 @@ export class SkillFx {
     const ranged = !!kind && kind !== 'none';
     const heal = !!tgt && !tgt.isEnemy && !src.isEnemy;
     // the skill's own casts at its start / end are no normal attack (tagCasts): the mode attacks while it is on
-    const fx = planAttack(perAttack(st.plan), { heal, ranged });
+    const fx = planAttack(perAttack(st.plan, U), { heal, ranged });
     // the skill's own ability replaces the mode's rows when it is this kind of attack: a melee blow is no shield throw
     // (斩业星熊 S2: her MultiMelee mode attacks while the skill's AroundTargetRangedAttack throws on its own); in the frame
     // of an instant skill's activation its attack is the skill's whatever kind the sim made it (阿罗玛 S1's 'beam' is her
     // MeleeAttack, 夕 S1's 'bolt' her MultiMeleeAttack: their cast, aim and hits) — a heal stays a heal
-    const fits = !!fx.ability && fitsAttack(fx.ability, { heal, ranged });
+    // an ability with no rows of its own (提丰 S2's S2SecondShot: damage only) replaces nothing — the mode's
+    // rows stay
+    const rows = fx.cast.length + fx.range.length + fx.aim.length + fx.hit.some((g) => g.length);
+    const fits = !!fx.ability && !!rows && fitsAttack(fx.ability, { heal, ranged });
     // …or the replaced attack while a ReplacementSkill's window is still on (阿罗玛 S1: on, a wind-up, then the 'beam' and
     // off) — not every attack of an instant skill that stays on in a mode (斩业星熊 S2 attacks in her S2 mode)
     const instOn = inst || (!!U && !U.ewin && U.plan?.kind === 'instant' && /^ReplacementSkill/.test(U.plan?.rootClass || '') && st.on);
@@ -795,14 +813,19 @@ export class SkillFx {
    */
   casts(sk, src, tgt, phase, info = {}) {
     const nth = sk.U.atkN;
-    // a skill attack known only at the strike (attackFx `late`): the wind-up played the mode's rows, the strike all of its
-    if (sk.late && phase === 'strike') phase = 'all';
+    // a skill attack known only at the strike (attackFx `late`), or whose wind-up began before the skill was on (左乐 S1:
+    // the replaced attack's wind-up, then the skill): the wind-up played the mode's rows, the strike all of its
+    if (phase === 'start') sk.U.woundFrame = this.frame;
+    else if (phase === 'strike' && (sk.late || !(sk.U.woundFrame >= sk.U.startFrame))) phase = 'all';
     for (const [rows, onTarget] of [[sk.fx.cast, false], [sk.fx.range, false], [sk.fx.aim, true]]) {
       if (!onTarget && (info.owner === false || (sk.U.independentCast && sk.U.impactFrame === this.frame))) continue;
       for (const e of uniq(rows)) {
         const first = castPhase(e) === 'start';
         if ((phase === 'start' && !first) || (phase === 'strike' && first) || (onTarget && !tgt)) continue;
-        if ((e.firstOnly && nth > 0) || (e.afterFirst && nth === 0)) continue;
+        // _hookEffectAfterFirstAttack: the ability's first attack of the deployment, not of this cast (左乐 S1's start_01 from
+        // its second cast on — an instant skill's count starts over every cast)
+        const done = doneAttacks(sk.U, nth);
+        if ((e.firstOnly && done > 0) || (e.afterFirst && done === 0)) continue;
         const skip = phase === 'start' ? info.skip : 0;
         const h = onTarget ? this._play(e, tgt, { toward: beyond(src, tgt), flipFrom: src, skip, speed: info.speed }) : this._play(e, src, { toward: tgt, skip, speed: info.speed, strike: phase !== 'start' });
         if (h && (e.hold === 'cast' || e.loop)) later(this.w.ofx, phase === 'start' && info.left > 0 ? Math.min(3, info.left) : SKILL_CAST_S, () => h.stop());
@@ -811,7 +834,7 @@ export class SkillFx {
   }
 
   /** The attack was made (FxWiring.attack, after its rows): the activation's attack count. */
-  attacked(sk) { sk.U.atkN++; sk.U.attacked = true; }
+  attacked(sk) { sk.U.atkN++; sk.U.atkTotal = (sk.U.atkTotal || 0) + 1; sk.U.attacked = true; }
 
   /**
    * Hit k (0-based: the k-th HP 'dmg' — or 'heal' — on v in the frame of the blow; FxWiring keeps the record `m` = {
@@ -1046,6 +1069,8 @@ export class SkillFx {
     const now = this.w.ofx.time;
     // a skill start cast with every charge stored (the kit's `charged`: 卡涅利安) — the `[eff_cond]` state (_cond)
     if (extra.charged === true && extra.id != null) { const C = this.units.get(extra.id); if (C) C.charged = true; }
+    // a kit names the attack ability of its skill's next cast (display only): kept until the next one
+    if (kind === 'skillVariant') { const V = this.units.get(extra.id); if (V) V.variant = typeof extra.node === 'string' ? extra.node : null; return true; }
     // (0) an enemy's area: its zone's official prefabs at the fx's point, an aura tick its talent loops stand for
     if (this._enemyFx(kind, x, y, extra)) return true;
     if((kind==='bombardShell'||kind==='bombard')&&this.locks.length)this._lockShell(kind,x,y,extra);
@@ -1056,7 +1081,12 @@ export class SkillFx {
     for (const field of ['src', 'id']) {
       const U = extra[field] != null ? this.units.get(extra[field]) : null;
       const bind = U ? FX_BINDINGS[U.skillId]?.[kind] : null;
-      if (bind && bind.owner === field && (!bind.during || this._lasts(U))) return bind.attack ? this._boundAttack(U, bind) : this._bound(U, bind, x, y, extra);
+      if (bind && bind.owner === field && (!bind.during || this._lasts(U))) {
+        // a map's entry may name keys instead of an attack: those keys where the fx happens (char_1051_headb2 S3's 高台 tiles)
+        const part = bind.attack && typeof bind.attack === 'object' && !Array.isArray(bind.attack) ? bind.attack[extra?.[bind.by || 'skill']] : null;
+        if (Array.isArray(part)) return this._bound(U, { ...bind, attack: undefined, keys: part }, x, y, extra);
+        return bind.attack ? this._boundAttack(U, bind, extra) : this._bound(U, bind, x, y, extra);
+      }
     }
     // a binding whose fx names no owner: the unit whose skill of that id lasts
     for (const sid of BOUND_BY_SKILL[kind] || []) {
@@ -1092,9 +1122,12 @@ export class SkillFx {
   }
 
   /** An FX_BINDINGS `attack` entry: that plan attack's rows on the owner now, its hits on the damage that follows. */
-  _boundAttack(U, bind) {
+  _boundAttack(U, bind, extra = null) {
     // `attack: [first, rest]`: the skill's first strike is another ability (艾丽妮 S3's StartAttack, then its MultiAttack)
-    const node = Array.isArray(bind.attack) ? bind.attack[U.boundStruck ? 1 : 0] : bind.attack;
+    // `attack: { [extra.skill]: node }`: the kit names the part (重岳 S2's 'chyue:whisk' LiftAttack, 'chyue:down' SecAttack)
+    const node = Array.isArray(bind.attack) ? bind.attack[U.boundStruck ? 1 : 0]
+      : typeof bind.attack === 'object' ? bind.attack[extra?.[bind.by || 'skill']] : bind.attack;
+    if (!node) return false;
     U.boundStruck = true;
     const a = U.plan?.attacks.find((x) => x.node === node);
     const v = U.v;

@@ -104,6 +104,8 @@ export default {
     /** S3: release one attack's three whirlwinds. */
     function releaseWinds(battle, unit, winds) {
       const seq = unit.deploySeq;
+      // display only: her S3 mode's cast (AnimatedActionToOwnerAbility Skill_3_Loop: heyak_skill_03_start_01 / _02)
+      battle.fx('windCast', { x: unit.x, y: unit.y, id: unit.id });
       const [fr, fc] = dirVec(unit.dir);
       const x0 = unit.tileC, y0 = unit.tileR;
       for (const lane of WIND_LANES) {

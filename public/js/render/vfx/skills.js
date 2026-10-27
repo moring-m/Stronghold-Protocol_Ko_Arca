@@ -641,6 +641,9 @@ function tagCasts(plan, skill) {
   for (const a of plan.attacks) {
     if (END_ATTACK.test(String(a.node || '')) || (a.cast.length && a.cast.every((e) => e.role === 'end'))) a.when = 'end';
     else if (once) a.when = 'start';
+    // a lasting skill whose root ability is this attack (死芒 S2: one RangedAttack as it starts, then its pulses): its
+    // cast is the skill's start, not a row of every normal attack while it lasts
+    else if (plan.kind === 'lasting' && lc(a.node) === lc(plan.skillId) && /Attack$/.test(String(skill?.rootAbility || ''))) a.when = 'start';
   }
 }
 
@@ -667,6 +670,8 @@ export function skillPlan(idx, unitKey, skillId, opts = {}) {
     attach = attachUses(unit?.modes?.[skill.mode]);
   }
   if (typeof skill.rootClass === 'string' && skill.rootClass) plan.rootClass = skill.rootClass;
+  // the root ability's choice among its attacks (AbilityRandomGroup: 嵯峨 S2's Red / Blue — display only)
+  if (typeof skill.rootAbility === 'string' && skill.rootAbility) plan.rootAbility = skill.rootAbility;
   const projs = isObj(idx.projectiles) ? idx.projectiles : {};
   for (const k of Array.isArray(skill.projectiles) ? skill.projectiles : []) {
     const kk = lc(k);
@@ -693,6 +698,12 @@ export function skillPlan(idx, unitKey, skillId, opts = {}) {
     }
   }
   if (isObj(opts.rec)) tagCasts(plan, skill);
+  // 凛御银灰 S3: his eagle 丹增 takes its place on him as the skill starts (BirdAura_Self: svash2_skill_03_deploy_01); the
+  // allies' BirdAura has no client signal (the sim gives them no eagle) — the attacks while it lasts are the S3 mode's
+  if (id === 'skchr_svash2_3') {
+    for (const a of plan.attacks) if (a.node === 'BirdAura_Self') a.when = 'start';
+    plan.attacks = plan.attacks.filter((a) => a.node !== 'BirdAura' || (plan.unmapped.push({ key: 'svash2_skill_03_deploy_01', role: 'cast', reason: 'conditional', from: 'BirdAura' }), false));
+  }
   return plan;
 }
 
@@ -1500,6 +1511,13 @@ export const FX_BINDINGS = Object.freeze({
   skchr_mudrok_3: Object.freeze({ rockfall: binding({ owner: 'id', keys: ['mudrok_skill_03_awake', 'mudrok_skill_03_awake_02'], at: 'target', target: 'id' }) }),
   // 郁金香 S3 (a 'slash' per cut once the skill fired): the skill's attack — hit group k on cut k (_hit_01 … _08)
   skchr_acpion_3: Object.freeze({ slash: binding({ owner: 'id', attack: 'Skill', once: true }) }),
+  // 重岳 S2: the kit's 'aoe' names its part — 'chyue:whisk' the LiftAttack (Skill_2_Begin), 'chyue:down' the SecAttack
+  skchr_chyue_2: Object.freeze({ aoe: binding({ owner: 'id', attack: Object.freeze({ 'chyue:whisk': 'LiftAttack', 'chyue:down': 'SecAttack' }) }) }),
+  // 何为 S3: each volley of whirlwinds ('windCast' on her, id = her) is her S3 mode's cast (start_01 / _02)
+  skchr_heyak_3: Object.freeze({ windCast: binding({ owner: 'id', keys: ['heyak_skill_03_start_01', 'heyak_skill_03_start_02'], at: 'target', target: 'id' }) }),
+  // char_1051_headb2 S3 无可抵挡: each hammer ('aoe' 'headb2:hammer', id = him) is the skill's MultiMelee attack — its
+  // casts held over the five hammers, hit k on hammer k; each 高台 taking effect ('aoe' 'headb2:highland') its tile effect
+  skchr_headb2_3: Object.freeze({ aoe: binding({ owner: 'id', once: true, attack: Object.freeze({ 'headb2:hammer': 'skchr_headb2_3', 'headb2:highland': Object.freeze(['headb2_highground', 'headb2_highground_hit']) }) }) }),
   skchr_blkkgt_3: Object.freeze({
     slash: binding({ owner: 'id', attack: 'Damage', once: true }),
   }),

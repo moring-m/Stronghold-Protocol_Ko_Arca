@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = fileURLToPath(new URL('../..', import.meta.url));
 const INDEX = process.env.SP_FX_INDEX || `${ROOT}public/assets/local/fx/index.json`;
-const audit = (only) => JSON.parse(execFileSync(process.execPath, ['tools/vfx-op-skill-audit.mjs', '--index', INDEX, '--only', only, '--seconds', '45', '--json'], { cwd: ROOT, encoding: 'utf8', maxBuffer: 1 << 26 }));
+const audit = (only) => JSON.parse(execFileSync(process.execPath, ['tools/vfx-op-skill-audit.mjs', '--index', INDEX, '--only', only, '--seconds', '90', '--json'], { cwd: ROOT, encoding: 'utf8', maxBuffer: 1 << 26 }));
 const verdict = (rows, skill) => rows.find((r) => r.skill === skill);
 
 test('信仰搅拌机 S3 counters use its Sk3 mode (switched by rmixer_sk3[mode])', { skip: !existsSync(INDEX) }, () => {
@@ -36,4 +36,12 @@ test("泥岩 S3 wakes with its awake rows; 假日威龙陈 S2 and 郁金香 S3 p
   assert.equal(verdict(audit('char_311_mudrok'), 'skchr_mudrok_3').verdict, 'ok');
   assert.equal(verdict(audit('char_1050_chen3'), 'skchr_chen3_2').verdict, 'ok');
   assert.equal(verdict(audit('char_608_acpion'), 'skchr_acpion_3').verdict, 'ok');
+});
+
+test('kit-named variants and parts: 重岳 S2 whisk / down, 左乐 S1 by HP, 维娜·维多利亚 S1; random pairs both drawn (赫德雷 S2)', { skip: !existsSync(INDEX) }, () => {
+  assert.equal(verdict(audit('char_2024_chyue'), 'skchr_chyue_2').verdict, 'ok');
+  assert.equal(verdict(audit('char_4121_zuole'), 'skchr_zuole_1').verdict, 'ok');
+  assert.equal(verdict(audit('char_4098_vvana'), 'skchr_vvana_1').verdict, 'ok');
+  assert.equal(verdict(audit('char_4088_hodrer'), 'skchr_hodrer_2').verdict, 'ok');
+  for (const [c, s] of [['char_4027_heyak', 'skchr_heyak_3'], ['char_2012_typhon', 'skchr_typhon_2'], ['char_1045_svash2', 'skchr_svash2_3'], ['char_362_saga', 'skchr_saga_2']]) assert.equal(verdict(audit(c), s).verdict, 'ok', c);
 });
