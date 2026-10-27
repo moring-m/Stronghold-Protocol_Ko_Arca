@@ -10,7 +10,7 @@ test('costume and default artwork keep their authored size',()=>{
  const v={id:1,x:5,y:10,z:0,dir:'RIGHT',alive:true};
  for(const key of ['blkkgt_skill_03_start_01','blkkgt_skill_03_end']){w.playOn(key,v);assert.equal(placed.place.scale,undefined);assert.equal(placed.key,mappings[key]);}
  w.playOn('ascln_attack_start_01',v);assert.equal(placed.place.scale,undefined);
- const skinResolver=w.effectKey;w.effectKey=key=>key;w.playOn('blkkgt_skill_03_start_01',v);assert.equal(placed.place.scale,.5,'default dash slashes are halved');w.effectKey=skinResolver;
+ const skinResolver=w.effectKey;w.effectKey=key=>key;w.playOn('blkkgt_skill_03_start_01',v);assert.equal(placed.place.scale,undefined);w.effectKey=skinResolver;
  w.playOn('blkkgt_skill_03_start_02',v);assert.equal(placed.place.scale,undefined);
  w.playOn('ascln_skill_03_range_01',v);assert.equal(placed.place.scale,undefined);
  w.playOn('ascln_attack_start_01',v,{scale:()=>2});assert.equal(placed.place.scale,2);

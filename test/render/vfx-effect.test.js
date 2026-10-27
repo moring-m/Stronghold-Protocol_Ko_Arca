@@ -308,10 +308,10 @@ describe('wiring', () => {
   }
   const view = (id, key, x, enemy = false) => ({ id, x, y: 10, z: 0, visFacing: enemy ? -1 : 1, isEnemy: enemy, alive: true, flags: 0, info: { id, spine: key, defId: key, side: enemy ? 'enemy' : 'ally', kind: enemy ? 'enemy' : 'op', skillIndex: 1 } });
 
-  test('Degenbrecher S3: the finisher keeps its authored size, the dash slashes are halved (recordings of 2026-10-27)',async()=>{
+  test('Degenbrecher S3: the finisher keeps its authored size, the dash streaks are shortened, not thinned (recordings of 2026-10-27)',async()=>{
     const {ofx,handles}=fakeOfx();const w=new FxWiring(ofx);await w.ready();const v=view(1,'char_x',5);
     w.playOn('blkkgt_skill_03_end',v);assert.equal(handles.at(-1).place.scale,undefined,'the finisher keeps its size');
-    w.playOn('blkkgt_skill_03_start_01',v);assert.equal(handles.at(-1).place.scale,.5,'the dash slashes are halved');
+    w.playOn('blkkgt_skill_03_start_01',v);assert.equal(handles.at(-1).place.scale,undefined,'the dash slashes keep their width');assert.equal(handles.at(-1).opts.stretchMul,.6,'their streaks are shortened');
     for(const k of ['blkkgt_skill_03_start_02','blkkgt_skill_03_hit_1','blkkgt_skill_03_hit_2','blkkgt_skill_03_start_03','blkkgt_skill_03_start_04','x_start']){w.playOn(k,v);assert.equal(handles.at(-1).place.scale,undefined,k);}
     w.playOn('blkkgt_skill_03_end',v,{scale:2});assert.equal(handles.at(-1).place.scale,2,'explicit runtime scaling stays');
     w.clear();

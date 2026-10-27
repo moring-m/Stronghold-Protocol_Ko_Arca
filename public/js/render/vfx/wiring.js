@@ -49,7 +49,7 @@ import { projectileParts, paracurve, arcHeight, wobble } from './flight.js';
 import { WindFx } from './windfx.js';
 import { ClemntFx } from './clemntfx.js';
 import { AphrisFx, pathKeys } from './aphrisfx.js';
-import { effectArtScale } from './artScale.js';
+import { effectArtScale, effectStretchScale } from './artScale.js';
 import { costumeFor, costumeSkin, costumeEffect, costumeProjectile, costumePreloadKeys } from './costumes.js';
 import { GROUND_SPAWNS } from './effect.js';
 import { SkillFx, fitsAttack, pickGroup, formMode } from './skillfx.js';
@@ -625,7 +625,8 @@ export class FxWiring {
     const place = { pos, scale: typeof effectScale === 'function' ? effectScale() : effectScale, groundZ: -ground, yaw: 0, mirror: false, flipY: false, mountRot: null, rootRot: null };
     this._rotate(P, place, skin, pose);
     this._orient(def, place, pose, o, v);
-    const opts = { track: o.track || null, data: o.data ?? null, loop: !!o.loop, important: !!o.important, skip: o.skip > 0 ? o.skip : 0, speed: o.speed, owner: v, depthOwner:o.depthOwner ?? ((o.follow || o.stick || P.follow || P.keep) && v.root ? v : null) };
+    const stretchMul = effectStretchScale(lc(key), k);
+    const opts = { ...(stretchMul !== 1 ? { stretchMul } : {}), track: o.track || null, data: o.data ?? null, loop: !!o.loop, important: !!o.important, skip: o.skip > 0 ? o.skip : 0, speed: o.speed, owner: v, depthOwner:o.depthOwner ?? ((o.follow || o.stick || P.follow || P.keep) && v.root ? v : null) };
     // the owner each frame: FollowMountPoint keeps the effect on the unit's point (and its rotation), a held effect
     // moves with the unit (`keep`), FollowDirection turns it with the unit, PauseEffectIf hides it while the unit shows
     // a condition; a prefab with chained effects (OnPlayEmitter: system.js FxHandle._start hands them this track) has

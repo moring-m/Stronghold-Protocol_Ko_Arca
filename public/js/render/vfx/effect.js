@@ -790,6 +790,8 @@ export class Effect {
         const r = def.psr[i], s = this.sys[i];
         const info = this.__ri || (this.__ri = {});
         Object.assign(info, r, { meshData: e.meshKey && this.lib ? this.lib.mesh(e.meshKey) : null, tint });
+        // a spawn's stretched-length correction (artScale.js effectStretchScale): the streaks' length, not their width
+        if (r.mode === 'stretch' && this.stretchMul > 0 && this.stretchMul !== 1) info.lengthScale = r.lengthScale * this.stretchMul;
         return buildParticles(s, info, cam, fd, frameNo);
       }
       case 'trailmod': {

@@ -639,10 +639,10 @@
         "enemy_1288_duskls": [1,1,0,0,5765],
         "enemy_1516_jakill": [1,1,0,3699,57600]
       },
-      "hooks": [1,107,4811,389,389,1134,1146,1098,90,90,69,68,0,16560,1879,16,89,0,1,123,1,0,0],
-      "events": {"atk":559,"atkCancel":17,"atkRetarget":13,"atkStart":413,"bounty":3,"cast":1,"deploy":15,"die":90,"dmg":1165,"engage":7,"fx":203,"heal":221,"layer":1,"skill":139,"skillImpact":53,"spawn":106,"status":656},
-      "fx": {"ember":1,"explode":1,"explosion":14,"featherArrow":5,"flame":2,"frostNova":39,"garrison":1,"garrisonGrant":1,"healField":2,"levitate":6,"phase":1,"revive":1,"rockslide":1,"shieldBreak":1,"slash":48,"slippery":2,"splash":3,"swordStorm":1,"telegraph":1,"truesilver":3,"zone":69},
-      "snaps": "927aeebd 5391b9db 61824274 cec69679 a0a88943 53ea0f77 1a717212 c84e8156 5908f8bd 91e302a0 27320e33 e26f1bcd 8e60bb45 54dac828 742252f3 bebea96d"
+      "hooks": [1,107,4811,388,388,1133,1145,1097,90,90,69,68,0,16559,1880,16,89,0,1,123,1,0,0],
+      "events": {"atk":558,"atkCancel":18,"atkRetarget":13,"atkStart":412,"bounty":3,"cast":1,"deploy":15,"die":90,"dmg":1165,"engage":7,"fx":202,"heal":221,"layer":1,"skill":139,"skillImpact":53,"spawn":106,"status":656},
+      "fx": {"ember":1,"explode":1,"explosion":14,"featherArrow":5,"flame":2,"frostNova":39,"garrison":1,"garrisonGrant":1,"healField":2,"levitate":6,"phase":1,"revive":1,"rockslide":1,"slash":48,"slippery":2,"splash":3,"swordStorm":1,"telegraph":1,"truesilver":3,"zone":69},
+      "snaps": "927aeebd 5391b9db 61824274 cec69679 a0a88943 53ea0f77 1a717212 c84e8156 5908f8bd 91e302a0 27320e33 e26f1bcd 8e60bb45 54dac828 ee7398c9 15c3e648"
     },
     "roster-013": {
       "about": "pass 0 band 5: chess_char_4_23_b chess_char_5_08_a chess_char_5_01_a chess_char_5_05_a chess_char_5_06_a chess_char_5_07_a chess_char_4_24_b chess_char_4_25_b chess_char_4_26_b chess_char_5_02_a chess_char_5_03_a chess_char_5_10_a",
