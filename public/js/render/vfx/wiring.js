@@ -69,6 +69,10 @@ const ENEMY_ZONES = Object.freeze({
   enemy_1272_nhtank: ['pollution', 'projectile_enemy_nhtank_polluted', 'onReached'],
   enemy_1272_nhtank_2: ['pollution', 'projectile_enemy_nhtank_polluted', 'onReached'],
   enemy_9006_actoxi: ['poison', 'projectile_enemy_actoxi', 'onReached'],
+  // 集团军重型火炮's 【燃烧区域】: the shell's own hit effect (enemy_uacann_attack_hit_01: its ground fire lasts ~5 s) is the
+  // zone — the projectile already plays it where it lands, so the zone draws nothing more (`shown`)
+  enemy_10122_uacann: ['burning', 'projectile_enemy_uacann', 'onHit', 'shown'],
+  enemy_10122_uacann_2: ['burning', 'projectile_enemy_uacann', 'onHit', 'shown'],
 });
 
 /** Battle seconds a melee blow waits for its damage. */
@@ -1774,10 +1778,19 @@ export class FxWiring {
       }
       Object.assign(wave,{x,y,dr:Number(extra.dr)||0,dc:Number(extra.dc)||0,at:this.ofx.time});return true;
     }
+    // W (enemy_1504_cqbw) 【C4】: projectile_enemy_cqbw_s1's charge on its target while the fuse burns
+    // (enemy_cqbw_skill_01_buff), then its reached effect (enemy_cqbw_skill_02_hit) for the blast
+    if ((kind === 'telegraph' || kind === 'explode') && extra?.kind === 'c4' && this.ofx.active) {
+      const proj = this.idx.projectiles?.projectile_enemy_cqbw_s1;
+      const key = kind === 'telegraph' ? proj?.effects?.find((k) => /_buff$/.test(k)) : proj?.onReached?.[0];
+      const h = key ? this.playOn(key, { x, y, z: 0 }, { loop: kind === 'telegraph', important: true }) : null;
+      if (h) { if (kind === 'telegraph') setTimeout0(this.ofx, h, Number(extra.dur) || 0); return true; }
+    }
     if (kind === 'zone' && this.ofx.active) {
       const zone = ENEMY_ZONES[extra?.sourceDef];
       if (zone && extra.kind === zone[0] && Number(extra.dur) > 0) {
         const keys = this.idx.projectiles?.[zone[1]]?.[zone[2]] || [];
+        if (zone[3] === 'shown' && keys.length) return true;
         // A detached ground anchor survives the source's death/removal. Each cloud has
         // its own lifetime; overlapping clouds must not replace one another.
         const at = { x, y, z: 0 };

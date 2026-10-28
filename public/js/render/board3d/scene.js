@@ -695,7 +695,8 @@ export class BoardScene {
    */
   _themeMaterial(stage) {
     const name = stage.boardTheme;
-    if (!name || !this.pack?.loadTheme) return null;
+    // 'low' (단순 3D) keeps the one simple board style of every map: no theme atlas, surroundings, light or haze
+    if (!name || !this.pack?.loadTheme || this.mapQuality === 'low') return null;
     this.themeMats ||= {};
     if (name in this.themeMats) return this.themeMats[name];
     if (!(name in (this.pack.themes || {}))) {
