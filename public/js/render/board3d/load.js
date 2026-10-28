@@ -87,9 +87,10 @@ export const BOARD_THEMES = Object.freeze({
     // map/original scene of the surroundings (tools/local-extract/compose-snowfield-scene.py; level_main_08-01)
     scenery: 'snowfield-scenery',
     light: Object.freeze({ color: 0xe6e8ec, intensity: 1.55, hemi: 0.42 }),
+    haze: 0x7f90a6,
     // tile glyph → official tile mesh role(s) of that scene's kit, stacked ('#' : 'rocks' next to a field tile, else 'dirt';
     // the preview pen's floor: 'ground')
-    kit: Object.freeze({ r: 'ground', k: 'ground', h: 'high', b: ['ground', 'fence'], f: ['ground', 'nopass'], p: 'ground', a: 'iceblock', A: 'dirt', X: 'block', '#': 'dirt' }),
+    kit: Object.freeze({ r: 'ground', k: 'ground', S: 'ground', E: 'ground', I: 'ground', O: 'ground', R: 'ground', h: 'high', b: ['ground', 'fence'], f: ['ground', 'nopass'], p: 'ground', a: 'iceblock', A: 'dirt', X: 'block', '#': 'dirt' }),
   }),
 });
 

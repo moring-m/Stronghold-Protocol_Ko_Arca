@@ -882,6 +882,8 @@ export class BoardScene {
       for(const child of cached.children)this.root.add(child);
       for(const prop of ['meshes','board','staticCrates','lightmapMaterials','lightmapTextures','originalStage','stageLightDir','official','sceneWater'])this[prop]=cached[prop];
       this.key.intensity=cached.keyIntensity;this.key.color.copy(cached.keyColor);this.hemi.intensity=cached.hemiIntensity;
+      const haze=themed && !cached.originalStage ? BOARD_THEMES[stage.boardTheme]?.haze ?? null : null;
+      this.scene.fog?.color.setHex(haze ?? LIGHTING.fog.color);this.renderer.setClearColor?.(haze ?? LIGHTING.clear);
       this._applyActiveWater();
       this._fitShadow(this.board);this._rebuildCrates();
       this.renderer.shadowMap.needsUpdate=true;this.layoutCacheHits++;
@@ -926,6 +928,10 @@ export class BoardScene {
     // a board theme's own light (the snow field: a cool, softer key under an overcast sky)
     const themeLight = themed && !original ? BOARD_THEMES[stage.boardTheme]?.light : null;
     if (themeLight) { this.key.color.setHex(themeLight.color); this.key.intensity = themeLight.intensity; this.hemi.intensity = themeLight.hemi; }
+    // the distance fades into the theme's haze (the snow field's blue-grey) instead of the dark void
+    const haze = themed && !original ? BOARD_THEMES[stage.boardTheme]?.haze ?? null : null;
+    this.scene.fog?.color.setHex(haze ?? LIGHTING.fog.color);
+    this.renderer.setClearColor?.(haze ?? LIGHTING.clear);
     const nativeLightMaterials=new Map();
     if (original) {
       for (const [material, sourceGeometry] of Object.entries(original.buckets)) {

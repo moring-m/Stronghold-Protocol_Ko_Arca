@@ -52,6 +52,8 @@ function snowfield() {
     id: 'custom_snowfield',
     name: '설원 덤불 전장',
     boardTheme: 'snow',
+    // the boss field's fence tiles (rows 3–4, col 8): the cooperative defense keeps its wall there (render/pen.js)
+    bossOnlyTiles: [[3, 8], [4, 8]],
     rows,
     tiles: {
       k: { tileKey: 'tile_custom_thicket', height: 'LOW', buildable: 'ALL', passable: 'ALL', groundPassable: true, flyPassable: true, special: 'thicket', bb: {} },
@@ -71,6 +73,7 @@ for (const def of [snowfield()]) {
     weight: 50, active: true,
     // the chapter 8 snow tileset on the procedural board (render/board3d/load.js BOARD_THEMES)
     boardTheme: def.boardTheme,
+    ...(def.bossOnlyTiles ? { bossOnlyTiles: def.bossOnlyTiles } : {}),
     // a custom stage joins a mode's pool only when the room picks it (shared/customExtensions.js)
     customExtension: { category: 'stages' },
     // the base's band / card devices (turrets, crates, platforms) sit on its own layout: only the field-wide ones stay

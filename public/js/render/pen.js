@@ -75,12 +75,14 @@ export function cooperativeBossStage(stage) {
   const rightField={r0:1,r1:5,c0:12,c1:18};
   const patches=[rightField];
   const structuralRows=[...boss.rows];
+  // Tiles a stage makes different in the boss arena only (stage.bossOnlyTiles, boss rows) show the cooperative tile.
+  const bossOnly=new Set((stage.bossOnlyTiles||[]).map(([r,c])=>`${r+worldOffset},${c}`));
   for(let r=8;r<=12;r++) {
     const line=rows[r].split(''), canonical=structuralRows[r-worldOffset].split('');
     for(let c=0;c<line.length;c++) {
       const actual=stage.rows[r][c], displayed=line[c];
       const right=c>=rightField.c0 && c<=rightField.c1;
-      if(!right && (actual===displayed || !(r>=9 && c>=9 && c<=11 || /[SEIO]/.test(actual+displayed))))continue;
+      if(!right && !bossOnly.has(`${r},${c}`) && (actual===displayed || !(r>=9 && c>=9 && c<=11 || /[SEIO]/.test(actual+displayed))))continue;
       line[c]=actual;canonical[c]=actual;
       if(!right)patches.push({r0:r-worldOffset,r1:r-worldOffset,c0:c,c1:c});
     }

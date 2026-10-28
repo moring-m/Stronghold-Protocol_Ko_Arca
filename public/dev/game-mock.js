@@ -19,12 +19,15 @@ import { settingsStore } from '/js/ui/settings.js';
 import { awayStore } from '/js/ui/matchChrome.js';
 import { GAME_FILES } from '/js/ui/gameComponents.js';
 import { PHASE, GEO } from '/shared/constants.js';
+import { EIGHT_UNITE_RECT, eightUniteStageId } from '/shared/cooperativeEight.js';
 
 const params = new URLSearchParams(location.search);
 const SHOT = params.get('shot') === '1';
 const VARIANTS = new Set((params.get('variant') || '').split(',').filter(Boolean));
 /** ?stage=<id>: the battlefield to show (default 战场#05 下半). */
 const STAGE_ID = params.get('stage') || 'act2autochess_m01';
+/** ?coop8=1: the cooperative defense phase on the four-field board of the 8-player mode (shared/cooperativeEight.js). */
+const COOP8 = params.get('coop8') === '1';
 
 // ---- deterministic rng ----------------------------------------------------------------------------------
 let seed = 20260927;
@@ -418,7 +421,7 @@ function startCombat(phase) {
   } else if (phase === PHASE.UNITE) {
     kind = 'unite';
     fields = [{ fieldId: 'u', kind: 'unite', players: ['p1', 'ai_2'], live: true }];
-    rect = { ...GEO.UNITE_RECT };
+    rect = COOP8 ? { ...EIGHT_UNITE_RECT } : { ...GEO.UNITE_RECT };
   } else {
     kind = 'normal';
     fields = pub.players.map((p) => ({ fieldId: `n:${p.playerId}`, kind: 'normal', players: [p.playerId], live: true }));
@@ -460,7 +463,7 @@ function startCombat(phase) {
     const e = data.lookup('enemies', bossRec.enemyKey);
     enemies.push({ id: id++, kind: 'enemy', side: 'enemy', ownerId: ME, defId: bossRec.enemyKey, name: bossRec.name, spine: bossRec.enemyKey, avatar: bossRec.enemyKey, x: 10, y: 3, facing: -1, maxHp: e?.stats?.maxHp || 1e5, hp: (e?.stats?.maxHp || 1e5) * 0.62, spawnAt: 0, dir: 0, boss: true, dead: false });
   }
-  const field = { fieldId, kind, rect, stageId: pub.stageId, units: units.map((u) => ({ ...u })) };
+  const field = { fieldId, kind, rect, stageId: COOP8 && kind === 'unite' ? eightUniteStageId(pub.stageId) : pub.stageId, units: units.map((u) => ({ ...u })) };
   store.patch('match', { field });
   const allyState = units.map((u) => ({ ...u, hp: u.maxHp * (0.55 + rnd() * 0.45), sp: rnd() * 20, spMax: 20 }));
   const t0 = performance.now();
