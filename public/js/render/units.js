@@ -2384,14 +2384,15 @@ export class UnitView {
     const showSp = showBars && !this.isEnemy && (this.spMax > 0 || !!ammo);
     this.spBg.visible = this.spFill.visible = showSp;
     this.ammoDividers.clear(); this.ammoDividers.visible = showSp && !!ammo;
-    const spH = off ? Math.max(2, s * OFFICIAL_BARS.spH) : Math.max(2, bh * 0.55);
+    // official: the SP bar is the HP bar's height, right under it (no gap)
+    const spH = off ? bh : Math.max(2, bh * 0.55);
     let ready = false;
     let sy = 0;
     if (showSp) {
       const active = !!(this.flags & UF.SKILL) || this.form === 'doll' || /^makoto_(s[123]|change)/.test(this.form || '');
       const k = ammo ? ammo[0] / ammo[1] : clamp(this.sp / this.spMax, 0, 1);
       ready = !active && k >= 0.999;
-      sy = cy + bh / 2 + spH / 2 + 1.5;
+      sy = cy + bh / 2 + spH / 2 + (off ? 0 : 1.5);
       this.spBg.position.set(x0 - (off ? 0 : 1), sy); this.spBg.width = bw + (off ? 0 : 2); this.spBg.height = spH + (off ? 0 : 2);
       this.spBg.tint = off ? OFFICIAL_BARS.back : COLORS.hpBack; this.spBg.alpha = off ? 0.55 : 1;
       this.spFill.position.set(x0, sy); this.spFill.width = bw * k; this.spFill.height = spH;
@@ -2454,7 +2455,7 @@ export class UnitView {
     }
     const wolfH = this._updateWolfPips(showBars && !this.isEnemy && !!this.wolves, x0, gaugeTop + energyH, s);
     const coinH = this._updateCoins(showBars && !this.isEnemy && !!this.coins, x0, gaugeTop + energyH + wolfH, s);
-    this._updateElementBar(showBars && !!this.el, x0, bw, gaugeTop + energyH + wolfH + coinH + 1, spH, s, t, official ? { x: x0, y: cy - s * OFFICIAL_BARS.elementAbove } : null);
+    this._updateElementBar(showBars && !!this.el, x0, bw, gaugeTop + energyH + wolfH + coinH + 1, spH, s, t, off ? { x: x0, y: cy - s * OFFICIAL_BARS.elementAbove } : null);
     this._updateDownRing(!prep && !!this.down && !this.alive, x, this.screen.y - DOWN_LOOK.height * s, s, t);
     // blocked marker at the feet (enemies held by a blocker)
     const blocked = !prep && this.alive && this.isEnemy && (this.flags & UF.BLOCKED);
@@ -2628,7 +2629,7 @@ export class UnitView {
    * `elementLeft()` on a dark track `h` px tall — white for the 元素值 left; in the element's colour, the disc pulsing
    * (clock `t`), while it refills over a 爆发冷却. Built on the first gauge, hidden while there is none.
    */
-  /** `at` (the official effects on — 设置「官方特效」, whatever the HP bar style): the client's gauge — its disc with a ring filling around it, left of the unit above
+  /** `at` (HP bar style official): the client's gauge — its disc with a ring filling around it, left of the unit above
    *  the bars' left end (no bar). */
   _updateElementBar(show, x0, bw, top, h, s, t = 0, at = null) {
     let r = this._elBar;
@@ -3041,7 +3042,7 @@ const HUD_P = { x: 0, y: 0, s: 0, depth: 0 };
 const ICON_TMP = [];
 /** 设置「HP 바 표시 방식」 official: the client's bar colours (read off its battle screens): operator HP light blue, SP
  *  yellow-green charging / amber while the skill runs, enemy HP orange, a leader's (悬赏 leaders, the bosses) red on grey. */
-const OFFICIAL_BARS = Object.freeze({ elementAbove: 0.28, width: 0.9, fixedBossWidth: 4, hpH: 0.042, leaderH: 0.06, spH: 0.034, belowFeet: 0.28,
+const OFFICIAL_BARS = Object.freeze({ elementAbove: 0.28, width: 0.9, fixedBossWidth: 4, hpH: 0.042, leaderH: 0.06, belowFeet: 0.28,
   ally: 0x6cb2d2, sp: 0x8aa43f, skill: 0xc3991c, enemy: 0xd46c3a, leader: 0xcf2a33, back: 0x1c1c1c, leaderBack: 0x7d8088 });
 
 /**
