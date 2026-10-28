@@ -3312,5 +3312,6 @@
   "로비에서 연합 시뮬레이션을 공개로 만들면 이 목록에 표시됩니다.": "Alliance simulations created as public in the lobby appear here.",
   "접속 중 {0}명": "{0} online",
   "접속 인원 확인 중": "Checking players online",
-  "공개 방을 불러오는 중입니다.": "Loading public rooms."
+  "공개 방을 불러오는 중입니다.": "Loading public rooms.",
+  "안내 닫기": "Close notice"
 }

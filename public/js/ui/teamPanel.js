@@ -163,7 +163,7 @@ export function TeamPanel({ pub, myId, watching, bubbles, onWatch, compact = fal
       const bubble = bubbles?.get(p.playerId);
       const offline = p.connected === false && !p.isBot;
       const open = !!observe && openPid === p.playerId && !self;
-      const back = !!observe && self && observe.observing;
+      const back = !!observe && self && observe.observing && !!observe.onBack; // none for an eliminated player (a spectator)
       const title = observe ? (self ? (observe.observing ? '返回战场' : '你自己') : `查看 ${p.name} 的战场`) : (self ? '查看自己的阵地' : `查看 ${p.name} 的阵地`);
       const lp = rowLp(shared?{...p,lp:pub.teamLp}:p, pub, self ? (shared&&selfLive?{...selfLive,lp:pub.teamLp}:selfLive) : null, { uniteLocal, normalLeaks, cap });
       const same = !self && mates.has(p.playerId);
