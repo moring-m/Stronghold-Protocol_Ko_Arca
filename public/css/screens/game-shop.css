@@ -281,161 +281,38 @@
   cursor:default;
 }
 
-/* =====================================================================================================================
-   The official 调度中心 sprites (ui/autochess/[uc]autochessbattle/shop: autochess_shop, _shop_card_item, _shop_cost_item;
-   shopBar.js shopSpriteVars) on the bar's own layout: the cards 1.56×2 rem, the level card 1.24×2 rem, the 冻结 / 刷新
-   buttons in one row with their price inline, the funds column (bg_money, 目前资金, the bg_close 收起 panel). Every part
-   keeps its own box: nothing overlaps another part or reaches out of the bar.
-   ===================================================================================================================== */
-.oshop .shopbar__row { gap: .08rem; padding: .1rem; border: 0; box-shadow: none;
-  background: var(--sp-panel-shadow-right, none) right bottom / 2.37rem 1.91rem no-repeat,
-    var(--sp-panel-shadow-total, linear-gradient(180deg, rgba(0, 0, 0, .55), rgba(0, 0, 0, .9))) center / 100% 100% no-repeat; }
-.oshop .shopbar__row::before { content: none; }
-.oshop.is-frozen .shopbar__row { border: 0; box-shadow: inset 0 2px 0 rgba(159, 212, 255, .7); }
-.oshop .shopbar__cards, .oshop .shopbar__rwcards, .oshop .shopbar__item { gap: .08rem; }
-.oshop .shopbar__item { padding-left: 0; border-left: 0; }
-
-/* ---- card ---- */
-.scard.oc { position: relative; width: 1.56rem; height: 2rem; padding: 0; border: 0; background: none; overflow: hidden; display: block; text-align: left; box-shadow: none; }
-.scard.oc > * { position: absolute; }
-.oc__bkg, .oc__bg, .oc__lines, .oc__frame { inset: 0; pointer-events: none; }
-.oc__bkg { background: var(--sp-card-bg-black, #0c0c0c) center / 100% 100% no-repeat; }
-.oc__char { right: 0; top: 0; width: 62%; height: 74%; overflow: hidden; }
-.oc__char .oc__portrait { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; object-position: center top; -webkit-mask-image: none; mask-image: none; }
-.oc__bg { background: var(--sp-card-bg-common, none) center / 100% 100% no-repeat; }
-.oc__garrison { left: .06rem; top: .42rem; width: .62rem; height: .62rem; opacity: .35; pointer-events: none; }
-.oc__lines { opacity: .5; background: var(--sp-card-repeat-line, none) center / 100% 100% no-repeat; }
-.oc__frame { background: var(--sp-card-frame-lv1, none) center / 100% 100% no-repeat; }
-.oc--f2 .oc__frame { background-image: var(--sp-card-frame-lv2, none); }
-.oc--f3 .oc__frame { background-image: var(--sp-card-frame-lv3, none); }
-.oc .oc__triple { inset: 0; padding: 0; background: none; font-size: 0; pointer-events: none; box-shadow: inset 0 0 0 2px rgba(255, 216, 61, .8), inset 0 0 .16rem rgba(255, 148, 0, .55); }
-.oc__disable { inset: 0; background: rgba(91, 91, 91, .45); pointer-events: none; }
-.oc__square { right: .08rem; top: .1rem; width: .14rem; height: .14rem; background: var(--sp-card-square-fx-1, none) center / 100% 100% no-repeat; }
-.oc__tier { left: .06rem; top: .06rem; width: .32rem; height: .32rem; }
-.oc__tier .tier { width: 100%; height: 100%; }
-.oc__cost { left: 50%; top: .03rem; transform: translateX(-50%); }
-/* the price plate (cost_bg_1 / cost_bg_2 / cost_free) */
-.oc-cost { position: relative; display: grid; place-items: center; width: .5rem; height: .4rem; background: var(--sp-panel-cost-bg-1, #000) center / 100% 100% no-repeat; }
-.oc-cost b { transform: translateY(-.06rem); font-size: .24rem; line-height: 1; font-weight: 600; color: #ffc600; }
-.oc-cost.is-poor { background-image: var(--sp-panel-cost-bg-2, none); }
-.oc-cost.is-poor b { color: #c0c5c3; }
-.oc-cost--discount b { color: #6cf0b0; } .oc-cost--premium b { color: #ff7a6b; }
-.oc-cost--free { width: 1.01rem; height: .35rem; background-image: var(--sp-panel-cost-free, none); background-color: transparent; color: transparent; font-size: 0; }
-.oc-cost--free b { position: absolute; right: .12rem; top: 50%; transform: translateY(-55%); font-size: .19rem; color: #fff; }
-.oc .scard__favorite, .oc .scard__recruit { left: .06rem; top: .42rem; height: .24rem; padding: 0 .06rem; font-size: .14rem; z-index: 1; }
-/* bonds above the name row; the name row at the bottom (class icon + name) */
-.oc .oc__bonds { left: .06rem; right: .06rem; bottom: .33rem; display: flex; flex-direction: column; align-items: flex-start; gap: .01rem; }
-.oc .scard__bond { height: .2rem; gap: .04rem; font-size: .13rem; color: #b7b7b7; text-shadow: 0 1px 2px #000; white-space: nowrap; max-width: 100%; overflow: hidden; }
-.oc .scard__bond .bglyph { flex: none; width: .2rem; height: .2rem; }
-.oc .scard__bond .bglyph img { filter: brightness(0) invert(.72); }
-.oc .scard__bond.is-off { color: #777; text-decoration: line-through; }
-.oc__name { left: .06rem; right: .06rem; bottom: .06rem; height: .26rem; display: flex; align-items: center; gap: .05rem; }
-.oc__prof, .oc__itemicon { flex: none; width: .2rem; height: .2rem; object-fit: contain; }
-.oc__itemicon { background: var(--sp-card-icon-item, none) center / contain no-repeat; }
-.oc .scard__name { min-width: 0; flex: 1 1 auto; font-size: .17rem; font-weight: 700; letter-spacing: .02em; color: #fff; text-shadow: 0 1px 3px #000; padding: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.oc .scard__mod { position: static; flex: none; font-size: .1rem; }
-/* frozen: ice_matte over the lower third, icon_ice on it */
-.oc .oc__frozen { left: 0; right: 0; bottom: 0; top: auto; transform: none; width: auto; height: .76rem; border: 0; display: block; pointer-events: none;
-  background: var(--sp-card-ice-matte, rgba(159, 212, 255, .4)) center / 100% 100% no-repeat; }
-.oc .oc__frozen i { position: absolute; left: 50%; bottom: .04rem; transform: translateX(-50%); width: .3rem; height: .33rem; background: var(--sp-card-icon-ice, none) center / 100% 100% no-repeat; }
-/* two-tap: bg_doublecheck1 / bg_doublecheck2 over the lower 70 % */
-.oc .scard__confirm { left: 0; right: 0; bottom: 0; top: auto; height: 1.42rem; padding: 0 0 .14rem; justify-content: flex-end; gap: .02rem;
-  background: var(--sp-card-bg-doublecheck1, rgba(16, 200, 160, .7)) center / 100% 100% no-repeat; color: #dcfff7; animation: none; }
-.oc .scard__confirm b { font-size: .22rem; font-weight: 700; letter-spacing: .06em; padding: 0; text-shadow: 0 1px 3px rgba(0, 0, 0, .45); }
-.oc .scard__confirm small { font-size: .12rem; color: #dcfff7; opacity: .85; }
-.oc .scard__confirm.is-no { background-image: var(--sp-card-bg-doublecheck2, none); background-color: rgba(120, 120, 120, .6); color: #fff; }
-.oc .scard__confirm.is-no small { color: #fff; max-width: 100%; padding: 0 .06rem; text-align: center; white-space: normal; }
-.scard.oc.is-armed { transform: translateY(-.1rem) !important; border: 0; box-shadow: 0 .1rem .24rem rgba(0, 0, 0, .6) !important; }
-.oshop.has-armed .scard.oc:not(.is-armed):not(.scard--sold) { filter: brightness(.8); }
-.scard.oc:not(.is-disabled):not(.scard--sold):hover { transform: translateY(-.06rem); border: 0; box-shadow: 0 .08rem .2rem rgba(0, 0, 0, .5); }
-.scard.oc.is-merge, .scard.oc.is-favorite, .scard.oc.is-recruit { border: 0; box-shadow: none; }
-.scard.oc.is-frozen::after { content: none; }
-.scard.oc.is-disabled .scard__art { filter: none; }
-/* item: the equipment on deco_item, its name, its text */
-.oc__deco { left: 50%; top: .36rem; transform: translateX(-50%); width: 1.28rem; height: .99rem; background: var(--sp-card-deco-item, none) center / 100% 100% no-repeat; }
-.oc .oc__equip { left: 50%; top: .42rem; transform: translateX(-50%); width: .84rem; height: .84rem; background: none; display: grid; place-items: center; }
-.oc .oc__equip img { width: 100%; height: 100%; object-fit: contain; filter: none; }
-.oc--item .oc__name { bottom: auto; top: 1.3rem; }
-.oc .oc__idesc { left: .08rem; right: .08rem; top: 1.56rem; bottom: .06rem; font-size: .11rem; line-height: 1.4; color: #b7b7b7; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-/* sold: bg_empty (its own [ NO INFO ]) */
-.scard.oc.scard--sold { background: var(--sp-card-bg-empty, rgba(8, 11, 10, .75)) center / 100% 100% no-repeat; border: 0; }
-.scard.oc.scard--sold .scard__soldtxt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
-.scard.oc.scard--empty { opacity: .6; }
-
-/* ---- level card: 1.24×2 rem (111×175 at --u), the official parts at their places ---- */
-.lvcard.olv { --u: .01117rem; position: relative; display: block; width: 1.24rem; height: 2rem; padding: 0; border: 0; clip-path: none; gap: 0;
-  background: #107463; color: #57e8cb; overflow: hidden; }
-.olv::before { content: ''; position: absolute; inset: 0; opacity: .6; pointer-events: none; background: var(--sp-card-repeat-line, none) 0 0 / .32rem .32rem repeat; }
-.olv > * { position: absolute; }
-.olv__deco-up { left: 50%; transform: translateX(-50%); top: calc(16 * var(--u)); width: calc(49 * var(--u)); height: calc(6 * var(--u)); opacity: .5; background: var(--sp-panel-deco-up, none) center / 100% 100% no-repeat; }
-.olv__deco-down { left: 50%; transform: translateX(-50%); bottom: calc(8 * var(--u)); width: calc(95 * var(--u)); height: calc(10 * var(--u)); opacity: .5; background: var(--sp-panel-deco-down, none) center / 100% 100% no-repeat; }
-.olv__inner { left: 50%; transform: translateX(-50%); top: calc(34 * var(--u)); width: calc(111 * var(--u)); height: calc(96 * var(--u)); }
-.olv__inner > i { position: absolute; }
-.olv__innerbg { left: calc(13 * var(--u)); top: calc(14.5 * var(--u)); width: calc(85 * var(--u)); height: calc(69 * var(--u)); background: rgba(2, 2, 1, .6); }
-.olv__icon { left: calc(26.5 * var(--u)); top: calc(17.5 * var(--u)); width: calc(60 * var(--u)); height: calc(61 * var(--u)); background: rgba(2, 5, 5, .3);
-  -webkit-mask: var(--sp-panel-icon, none) center / 100% 100% no-repeat; mask: var(--sp-panel-icon, none) center / 100% 100% no-repeat; }
-.olv__frame { left: calc(7 * var(--u)); top: calc(5.5 * var(--u)); width: calc(97 * var(--u)); height: calc(85 * var(--u)); background: var(--sp-panel-frame, none) center / 100% 100% no-repeat; }
-.olv__level { left: calc(36 * var(--u)); top: calc(16 * var(--u)); width: calc(39 * var(--u)); height: calc(9 * var(--u)); background: var(--sp-panel-level, none) center / 100% 100% no-repeat; }
-.olv__outline { left: calc(4 * var(--u)); top: calc(5.5 * var(--u)); width: calc(103 * var(--u)); height: calc(87 * var(--u)); background: var(--sp-panel-frame-glow, none) center / 100% 100% no-repeat; }
-.olv__stripe { inset: 0; background: var(--sp-panel-stripe-line, none) center / 100% 100% no-repeat; pointer-events: none; }
-.olv .olv__num { left: 0; right: 0; top: calc(60 * var(--u)); text-align: center; font-size: calc(56 * var(--u)); line-height: calc(54 * var(--u)); font-weight: 500; color: #57e8cb; }
-.olv .olv__tip { left: 0; right: 0; top: calc(140 * var(--u)); text-align: center; font-size: .2rem; line-height: .3rem; font-weight: 700; letter-spacing: .1em; padding: 0; color: #6eecd2; }
-.olv .lvcard__key { right: .06rem; bottom: .04rem; color: #6eecd2 !important; border-color: rgba(110, 236, 210, .4) !important; background: transparent !important; }
-.olv .olv__cost { left: 50%; top: .03rem; transform: translateX(-50%); }
-.olv.is-armed { animation: none; box-shadow: none; background: #107463; color: #d6fff6; }
-.olv__check { inset: 0; background: var(--sp-panel-check-frame, none) center / 100% 100% no-repeat, var(--sp-panel-check-grad, none) center bottom / 100% 78% no-repeat; }
-.olv__arrow { left: 50%; transform: translateX(-50%); top: calc(125 * var(--u)); width: calc(20 * var(--u)); height: calc(11 * var(--u)); background: var(--sp-panel-check-arrow, none) center / 100% 100% no-repeat; }
-.olv.is-armed .olv__tip { color: #d6fff6; }
-.olv.is-max { background: var(--sp-panel-upgrade-max, #1f3b36) center / 100% 100% no-repeat; cursor: default; }
-.olv.is-max .olv__num, .olv.is-max .olv__tip { color: #679a90; }
-.olv.is-disabled:not(.is-max) { background: var(--sp-panel-upgrade-disable, #3b3b3b) center / 100% 100% no-repeat; }
-.olv.is-disabled:not(.is-max) .olv__num { color: #b6b6b6; }
-.olv.is-disabled:not(.is-max) .olv__tip { color: #8a8a8a; }
-.olv.is-max::before, .olv.is-disabled::before { content: none; }
-
-/* ---- 冻结 / 刷新: one row, the plate behind the whole button, the price inside it ---- */
-.oshop .obtn { position: relative; isolation: isolate; display: flex; align-items: center; gap: .08rem; height: .5rem; min-width: 1.3rem; padding: 0 .14rem 0 .1rem;
-  border: 0; background: none; box-shadow: none; color: rgba(0, 0, 0, .88); font-size: .19rem; font-weight: 700; letter-spacing: .06em; }
-.oshop .obtn__plate { position: absolute; z-index: -1; inset: -.02rem -.06rem -.1rem; pointer-events: none; background: var(--sp-panel-refresh-bg-normal, #e0a800) center / 100% 100% no-repeat; }
-.oshop .toolbtn--ice .obtn__plate { background-image: var(--sp-panel-frozen-bg-unselect, none); background-color: transparent; }
-.oshop .toolbtn--ice.is-on .obtn__plate { background-image: var(--sp-panel-frozen-bg-normal, none); }
-.oshop .obtn:disabled .obtn__plate { background-image: var(--sp-panel-bg-lock, none); }
-.oshop .obtn__icon { flex: none; width: .32rem; height: .32rem; }
-.oshop .obtn__text { white-space: nowrap; }
-.oshop .obtn__cost { display: flex; align-items: center; }
-.oshop .obtn__cost .oc-cost { width: .38rem; height: .3rem; }
-.oshop .obtn__cost .oc-cost b { font-size: .19rem; transform: translateY(-.04rem); }
-.oshop .obtn__cost .oc-cost--free { width: .78rem; height: .27rem; }
-.oshop .obtn__cost .oc-cost--free b { font-size: .15rem; right: .08rem; }
-.oshop .obtn kbd { color: rgba(0, 0, 0, .65) !important; border-color: rgba(0, 0, 0, .3) !important; background: rgba(255, 255, 255, .25) !important; }
-.oshop .obtn:hover:not(:disabled) { filter: brightness(1.06); background: none; box-shadow: none; }
-.oshop .obtn:disabled { color: rgba(0, 0, 0, .7); background: none; }
-.oshop .shopbar__tools { gap: .1rem .16rem; }
-.oshop .shopbar__remain { border-left: 0; background: rgba(49, 49, 49, .7); padding: .04rem .12rem; font-size: .16rem; color: #fff; }
-.oshop .shopbar__remain b { color: #fff; }
-
-/* ---- funds column: bg_money, 目前资金, the bg_close 收起 panel ---- */
-.oshop .ofunds { width: 1.18rem; padding: 0; border-left: 0; gap: .04rem; justify-content: space-between; }
-.oshop .ofunds__money { position: relative; width: 1.1rem; height: .37rem; flex: none; clip-path: none; display: flex; align-items: center; justify-content: center; padding: 0 0 0 .34rem;
-  background: var(--sp-panel-bg-money, #222) center / 100% 100% no-repeat; }
-.oshop .ofunds__money::before { content: none; }
-.ofunds__money b { font-size: .28rem; line-height: 1; font-weight: 600; color: #ffba00; }
-.oshop .oclose { position: relative; flex: 1 1 auto; width: 100%; min-height: 0; padding: 0 0 .1rem; border: 0; display: flex; flex-direction: column; justify-content: flex-end; align-items: center;
-  color: #37e5ca; font-size: .19rem; font-weight: 700; background: var(--sp-panel-bg-close, #17362e) center / contain no-repeat; }
-.oshop .oclose:hover { color: #9ffff0; background-color: transparent; filter: brightness(1.1); }
-.oclose__shadow { display: none; }
-.oclose__text { display: flex; align-items: center; gap: .04rem; text-shadow: 0 1px 3px #000; }
-.oclose__x { width: .18rem; height: .18rem; background: var(--sp-panel-icon-x, none) center / 100% 100% no-repeat; }
-.oshop .oclose kbd { margin-top: .02rem; }
-
-/* ---- folded tab: the money plate and the bg_open 1 panel with the level ---- */
-.oshop-tab { border: 0; background: none; padding: 0; align-items: flex-end; gap: .08rem; }
-.oshop-tab .ofunds__money { position: relative; width: 1.1rem; height: .37rem; display: flex; align-items: center; justify-content: center; padding: 0 0 0 .34rem;
-  background: var(--sp-panel-bg-money, #222) center / 100% 100% no-repeat; }
-.oshop-tab .ofunds__money b { color: #ffba00; font-size: .26rem; }
-.oshop-tab .oopen { position: relative; width: 1.18rem; height: 1.28rem; padding: 0; border: 0; background: none; display: block; }
-.oopen > * { position: absolute; }
-.oopen__shadow { inset: 0; background: var(--sp-panel-bg-open-shadow, none) center / contain no-repeat; }
-.oopen__bg { inset: 0; background: var(--sp-panel-bg-open-1, #17362e) center / contain no-repeat; }
-.oopen__level { left: .08rem; bottom: .12rem; width: .44rem; text-align: center; font-size: .34rem; line-height: 1; font-weight: 600; color: #3bdfbe; }
-.oopen kbd { right: .06rem; top: .06rem; }
+/* ---- official parts (autochess_shop_card_item / autochess_shop; shopBar.js shopSpriteVars) ---------------------------- */
+/* root_tier: the 29 px chip 8.5 / 9.5 px into the 158 px card */
+.scard__top .tier { width: .29rem; height: .29rem; margin: .025rem 0 0 .025rem; }
+/* root_name: the class icon (16 px) before the 16 px white name; bond_list's rows above it */
+.scard__namerow { display: flex; align-items: center; gap: .05rem; min-width: 0; }
+.scard__namerow .scard__skill { position: relative; right: auto; top: auto; flex: none; width: .2rem; height: .2rem; background: none; border: 0; box-shadow: none; }
+.scard__namerow .scard__skill.is-custom { box-shadow: 0 0 0 1px var(--mint-400); }
+.scard__namerow .scard__mod { right: auto; left: 100%; bottom: auto; top: -.22rem; margin: 0; }
+.scard__namerow .scard__name { min-width: 0; font-size: .17rem; font-weight: 500; letter-spacing: 0; }
+/* state_fx_frozen: ice_matte (159×67) over the card's foot, icon_ice (31×34) 18 px up on it */
+.shopbar .scard.is-frozen::after { inset: auto 0 0 0; height: 38%; box-shadow: none; z-index: 1;
+  background: var(--sp-card-ice-matte, linear-gradient(0deg, rgba(159, 212, 255, .5), transparent)) center / 100% 100% no-repeat; }
+.shopbar .scard__ice { bottom: .02rem; width: .31rem; height: .34rem; background: none; border: 0; }
+.scard__iceicon { display: block; width: 100%; height: 100%; background: var(--sp-card-icon-ice, none) center / 100% 100% no-repeat; }
+/* 冻结 / 刷新: the official plates (frozen_bg_unselect → frozen_bg_normal while frozen, refresh_bg_normal, bg_lock when refused)
+   behind the whole button, the 31 px icons, 19 px dark text, the price on cost_bg_1 (cost_free while free refreshes last) */
+.shopbar .obtn { position: relative; isolation: isolate; height: .5rem; padding: 0 .14rem 0 .1rem; border: 0; background: none; box-shadow: none;
+  color: rgba(0, 0, 0, .88); font-size: .19rem; font-weight: 700; letter-spacing: .06em; }
+.shopbar .obtn__plate { position: absolute; z-index: -1; inset: -.02rem -.06rem -.1rem; pointer-events: none; background: var(--sp-panel-refresh-bg-normal, var(--amber)) center / 100% 100% no-repeat; }
+.shopbar .toolbtn--ice .obtn__plate { background: var(--sp-panel-frozen-bg-unselect, #bfe3f7) center / 100% 100% no-repeat; }
+.shopbar .toolbtn--ice.is-on .obtn__plate { background-image: var(--sp-panel-frozen-bg-normal, none); background-color: transparent; }
+.shopbar .obtn:disabled .obtn__plate { background: var(--sp-panel-bg-lock, #555) center / 100% 100% no-repeat; }
+.shopbar .obtn .toolbtn__img { width: .31rem; height: .31rem; }
+.shopbar .obtn:hover:not(:disabled), .shopbar .toolbtn--ice.is-on, .shopbar .toolbtn--ice.is-on:hover:not(:disabled) { background: none; box-shadow: none; color: rgba(0, 0, 0, .88); }
+.shopbar .obtn:hover:not(:disabled) { filter: brightness(1.06); }
+.shopbar .obtn:disabled { color: rgba(0, 0, 0, .7); }
+.shopbar .obtn kbd, .shopbar .toolbtn--ice.is-on kbd { color: rgba(0, 0, 0, .65) !important; border-color: rgba(0, 0, 0, .3) !important; background: rgba(255, 255, 255, .25) !important; }
+.obtn__cost { display: grid; place-items: center; width: .38rem; height: .3rem; letter-spacing: 0; background: var(--sp-panel-cost-bg-1, #000) center / 100% 100% no-repeat; }
+.obtn__cost b { transform: translateY(-.04rem); font-size: .19rem; line-height: 1; color: #ffc600; }
+.obtn__cost.is-poor { background-image: var(--sp-panel-cost-bg-2, none); }
+.obtn__cost.is-poor b { color: #c0c5c3; }
+.shopbar .obtn__cost--free { position: relative; width: .78rem; height: .27rem; padding: 0; background: var(--sp-panel-cost-free, var(--mint-500)) center / 100% 100% no-repeat; }
+.obtn__cost--free b { position: absolute; right: .08rem; top: 50%; transform: translateY(-55%); font-size: .15rem; color: #fff; }
+.shopbar .scard.is-frozen .scard__body { background: linear-gradient(0deg, rgba(8, 11, 10, .45), transparent); }
+.shopbar .scard__ice { left: auto; right: .05rem; bottom: .05rem; transform: none; width: .26rem; height: .29rem; }
