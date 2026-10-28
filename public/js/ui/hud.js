@@ -49,6 +49,15 @@ import { UnofficialMark } from './pluginTag.js';
 
 const cx = (...p) => p.flat().filter(Boolean).join(' ');
 
+/** The official top-bar plates (autochess_hud_panel: bg_round, bg_rest / bg_battle / bg_coop / bg_boss, bg_lose_hp) as CSS
+ *  variables for game.css; a sprite missing from the manifest leaves its variable unset and the CSS look stays. */
+const HUD_SPRITES = Object.freeze(['bg_round', 'bg_rest', 'bg_battle', 'bg_coop', 'bg_boss', 'bg_lose_hp']);
+function hudSpriteVars(m = data.get('assets')) {
+  const out = [];
+  for (const k of HUD_SPRITES) { const u = uiUrl(m, `hudPanel/${k}`); if (u) out.push(`--hud-${k.replace(/_/g, '-')}:url("${u}")`); }
+  return out.join(';') || undefined;
+}
+
 /**
  * 观战席 capsule of the in-match top bar (community report #26): the spectator seats of the room, which the room screen
  * shows as a strip but the game screen used to hide completely — so the host could only remove a spectator after the
@@ -233,7 +242,7 @@ export function missTip(n, name = null) {
  */
 export function MissTag({ n, name = null }) {
   const v = Math.max(0, Math.trunc(Number(n) || 0));
-  const art = localAsset('ui/battle', 'bg_miss_enemy');
+  const art = uiUrl(data.get('assets'), 'hudPanel/bg_miss_enemy') || localAsset('ui/battle', 'bg_miss_enemy');
   return html`<span class=${cx('misstag', art && 'has-art', v === 0 && 'is-clear')} data-testid="miss-tag"
       title=${missTip(v, name)} aria-label=${`剩余敌人 ${v}`}
       style=${art ? `background-image:url("${art}")` : null}>
@@ -498,7 +507,7 @@ export function TopBar({ battleEnd = null, pub, priv, conn, hud, total, drawer, 
   useEffect(() => { preloadCapsuleArt(); }, []);
   const onLeft = () => (pen ? onPen(false) : onDrawer('info'));
   const onRight = () => (pen ? onPen(false) : penAvail ? onPen(true) : null);
-  return html`<header class=${cx('gtop', pen && 'is-pen')}>
+  return html`<header class=${cx('gtop', pen && 'is-pen')} style=${hudSpriteVars()}>
     <div class="gtop__left">
       <div class="gtop__left-row">
       <${Button} variant="danger" size="lg" square=${true} icon="exit" onClick=${onExit} aria-label="离开" title="离开 / 暂离" class="gtop__exit tapx" />

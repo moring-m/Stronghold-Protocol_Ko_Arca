@@ -1018,3 +1018,18 @@
 .combat-metrics__list { flex:1 0 auto; overflow:visible; }
 .combat-metrics__density { flex:0 0 auto; }
 .combat-metrics__filters { padding-bottom:8px; flex-wrap:wrap; }
+
+/* ---- official top-bar plates (autochess_hud_panel; hud.js hudSpriteVars): the layout stays, the parts take the art ---- */
+/* root_round: the number on bg_round (#171717, 20 px), the title #a8a8a8 */
+.gtop .roundbox__label { color: #a8a8a8; }
+.gtop .roundbox__num { clip-path: none; color: #171717; background: var(--hud-bg-round, #eef3f1) center / 100% 100% no-repeat; }
+/* group_mid_screen: group_rest bg_rest (#40b196 text), group_battle bg_battle / group_coop bg_coop (#cecece numbers), the boss
+   bg_boss — the plates' own octagon and rim replace the CSS border */
+.gtop .capsule { border: 0; border-radius: 0; box-shadow: none; background: var(--hud-bg-rest, none) center / 100% 100% no-repeat; }
+.gtop .capsule--prep .capsule__label { color: #40b196; }
+.gtop .capsule--combat { background-image: var(--hud-bg-battle, none); }
+.gtop .capsule--unite { background-image: var(--hud-bg-coop, none); }
+.gtop .capsule--boss { background-image: var(--hud-bg-boss, none); }
+.gtop .capsule--combat .capsule__kills, .gtop .capsule--combat .capsule__kills b, .gtop .capsule--boss .capsule__kills, .gtop .capsule--boss .capsule__kills b { color: #cecece; }
+/* root_hp: the LP figure #a8a8a8 (red stays for the danger / pending states) */
+.gtop .lp:not(.lp--danger):not(.lp--team) { color: #a8a8a8; }
