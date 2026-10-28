@@ -280,3 +280,128 @@
   box-shadow:none;
   cursor:default;
 }
+
+/* =====================================================================================================================
+   The official 调度中心 (autochess_shop, autochess_shop_card_item, autochess_shop_cost_item): its sprites arrive as
+   variables on .shopbar--official (shopBar.js shopSpriteVars). The band: shadow_total's dark gradient under the row, no
+   mint frame. Cards: bg_black + bg_common, the half-body art right, the tier frame frame_lv1 (teal) / _lv2 (gold: a copy
+   owned) / _lv3 (orange: this purchase promotes), the price on cost_bg_1 (cost_bg_2 when it can't be paid), the name
+   row bottom-left with the class icon before it, the bond rows above. Two-tap: bg_doublecheck1 (bg_doublecheck2 when
+   refused) over the card's lower part. Frozen: ice_matte + icon_ice. Level card: #107463 with repeat_line, the inner
+   LEVEL frame, the 56 px #57e8cb level; max upgrade_max, refused upgrade_disable. 刷新 on the yellow refresh_bg_normal,
+   冻结 on frozen_bg_unselect (frozen: frozen_bg_normal), refused ones on bg_lock. Funds on bg_money, 收起 on bg_close.
+   ===================================================================================================================== */
+.shopbar--official .shopbar__row { background: var(--sp-panel-shadow-total, linear-gradient(180deg, rgba(14, 19, 17, .94), rgba(8, 11, 10, .97))) center / 100% 100% no-repeat;
+  border: 0; box-shadow: none; padding: .1rem .1rem .06rem; gap: .055rem; }
+.shopbar--official .shopbar__row::before { content: none; }
+.shopbar--official.is-frozen .shopbar__row { box-shadow: inset 0 2px 0 rgba(159, 212, 255, .6); }
+.shopbar--official .shopbar__cards { gap: .055rem; }
+.shopbar--official .shopbar__item { border-left: 0; padding-left: .04rem; }
+
+/* card */
+.shopbar--official .scard { width: 1.58rem; height: 1.76rem; border: 0; background: #000; overflow: visible; }
+.shopbar--official .scard__bg { inset: .02rem; background: var(--sp-card-bg-common, none) center / 100% 100% no-repeat, var(--sp-card-bg-black, #111) center / 100% 100% no-repeat; }
+.shopbar--official .scard__bg::after { content: ''; position: absolute; inset: 0; opacity: .12; background: var(--sp-card-repeat-line, none) 0 0 / .16rem .16rem repeat; }
+.shopbar--official .scard__art { inset: -.1rem 0 0 auto; width: 78%; height: calc(100% + .1rem); object-position: right top; z-index: 1;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 22%); mask-image: linear-gradient(90deg, transparent, #000 22%); }
+.shopbar--official .scard__water { left: .04rem; top: .32rem; width: .65rem; height: .65rem; opacity: .35; z-index: 1; }
+.shopbar--official .scard::before { content: ''; position: absolute; inset: 0; z-index: 3; pointer-events: none;
+  background: var(--sp-card-frame-lv1, none) center / 100% 100% no-repeat; }
+.shopbar--official .scard--f2::before { background-image: var(--sp-card-frame-lv2, none); }
+.shopbar--official .scard--f3::before { background-image: var(--sp-card-frame-lv3, none); }
+.shopbar--official .scard--f3 { box-shadow: 0 .06rem .14rem rgba(214, 122, 25, .35); }
+.shopbar--official .scard--f2 { box-shadow: 0 .06rem .14rem rgba(207, 157, 62, .3); }
+.shopbar--official .scard.is-merge { border: 0; }
+.shopbar--official .scard__top { z-index: 4; left: .04rem; right: .04rem; top: .04rem; }
+.shopbar--official .scard__body { z-index: 4; background: linear-gradient(0deg, rgba(0, 0, 0, .9) 30%, transparent); padding: .16rem .08rem .06rem; gap: .02rem; }
+.shopbar--official .scard__name { font-size: .17rem; font-weight: 700; padding-left: .22rem; }
+.shopbar--official .scard__skill { left: .08rem; right: auto; top: auto; bottom: .075rem; width: .18rem; height: .18rem; background: none; border: 0; box-shadow: none; }
+.shopbar--official .scard__mod { right: auto; left: calc(100% + .03rem); bottom: auto; top: -.24rem; }
+/* price: the official cost plate (gold number); discounts / surcharges keep their own colours */
+.shopbar--official .scard__price.hex--gold, .shopbar--official .scard__price.hex--dark { width: .5rem; height: .4rem; filter: none; }
+.shopbar--official .scard__price.hex--gold .hex__fill, .shopbar--official .scard__price.hex--dark .hex__fill { clip-path: none; background: var(--sp-panel-cost-bg-1, none) center / 100% 100% no-repeat; }
+.shopbar--official .scard__price.hex--dark .hex__fill { background-image: var(--sp-panel-cost-bg-2, none); }
+.shopbar--official .scard__price.hex--gold::before, .shopbar--official .scard__price.hex--dark::before { content: none; }
+.shopbar--official .scard__price.hex--gold .hex__value { color: #ffc600; font-size: .22rem; }
+.shopbar--official .scard__price.hex--dark .hex__value { color: #c0c5c3; font-size: .22rem; }
+.shopbar--official .scard__free { background: var(--sp-panel-cost-free, var(--mint-400)) center / 100% 100% no-repeat; color: transparent; clip-path: none; width: 1.01rem; height: .35rem; padding: 0; }
+/* frozen */
+.shopbar--official .scard.is-frozen::after { inset: auto 0 0 0; height: .67rem; z-index: 5; box-shadow: none; background: var(--sp-card-ice-matte, linear-gradient(0deg, rgba(159, 212, 255, .5), transparent)) center / 100% 100% no-repeat; }
+.shopbar--official .scard__ice { bottom: .18rem; width: .31rem; height: .34rem; background: var(--sp-card-icon-ice, #0c1a26) center / contain no-repeat; border: 0; z-index: 6; }
+.shopbar--official .scard__ice .icon { opacity: 0; }
+/* two-tap */
+.shopbar--official .scard.is-armed { transform: translateY(-.12rem) !important; border: 0; box-shadow: 0 .12rem .3rem rgba(0, 0, 0, .65) !important; }
+.shopbar--official .scard.is-armed.is-disabled { box-shadow: 0 .12rem .3rem rgba(0, 0, 0, .65) !important; }
+.shopbar--official .scard__confirm { top: auto; height: 1.25rem; justify-content: flex-end; padding: 0 0 .3rem; z-index: 6;
+  background: var(--sp-card-bg-doublecheck1, linear-gradient(0deg, var(--mint-500), transparent)) center bottom / 100% 100% no-repeat; color: #dcfff7; }
+.shopbar--official .scard__confirm b { font-size: .22rem; font-weight: 700; letter-spacing: .08em; padding-left: .08em; text-shadow: 0 1px 3px rgba(0, 0, 0, .5); }
+.shopbar--official .scard__confirm small { color: #dcfff7; }
+.shopbar--official .scard__confirm.is-no { background-image: var(--sp-card-bg-doublecheck2, none); background-color: transparent; color: #e4e4e4; }
+.shopbar--official .scard__confirm.is-no small { color: #fff; }
+/* sold / empty */
+.shopbar--official .scard--sold { border: 0; background: var(--sp-card-bg-empty, rgba(8, 11, 10, .75)) center / 100% 100% no-repeat; }
+/* the sprite carries its own [ NO INFO ]: the text stays for screen readers only */
+.shopbar--official .scard--sold .scard__soldtxt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.shopbar--official .scard--sold.scard--empty { opacity: .6; }
+.shopbar--official .scard--sold::before { content: none; }
+.shopbar--official .scard--item .scard__itemart { background: var(--sp-card-deco-item, none) center / 1.28rem .99rem no-repeat; width: 1.28rem; height: .99rem; top: .38rem; }
+
+/* level card (group_upgrade, 111×175) */
+.shopbar--official .lvcard { width: 1.11rem; height: 1.76rem; clip-path: none; gap: 0; padding: 0; justify-content: flex-start; color: #57e8cb;
+  background: var(--sp-panel-stripe-line, none) center / 100% 100% no-repeat, #107463; }
+.shopbar--official .lvcard::before { content: ''; position: absolute; inset: 0; opacity: .6; background: var(--sp-card-repeat-line, none) 0 0 / .16rem .16rem repeat; pointer-events: none; }
+.shopbar--official .lvcard__price { top: -.2rem; z-index: 2; }
+.shopbar--official .lvcard__frame { margin-top: .28rem; width: .97rem; height: .85rem; padding: 0; border: 0; justify-content: center;
+  background: var(--sp-panel-frame, none) center / 100% 100% no-repeat, rgba(2, 2, 1, .6); }
+.shopbar--official .lvcard__frame::before { left: 50%; top: .08rem; transform: translateX(-50%); width: .39rem; height: .09rem; border: 0; background: var(--sp-panel-level, none) center / contain no-repeat; }
+.shopbar--official .lvcard__frame::after { content: none; }
+.shopbar--official .lvcard__micro { opacity: 0; font-size: .08rem; }
+.shopbar--official .lvcard__num { font-size: .56rem; line-height: 1; color: #57e8cb; font-weight: 400; }
+.shopbar--official .lvcard__label { margin-top: .16rem; font-size: .2rem; font-weight: 500; letter-spacing: .1em; color: #6eecd2; }
+.shopbar--official .lvcard__key { color: #6eecd2 !important; }
+.shopbar--official .lvcard.is-max { background: var(--sp-panel-upgrade-max, none) center / 100% 100% no-repeat, #1f3b36; color: #679a90; }
+.shopbar--official .lvcard.is-max .lvcard__frame, .shopbar--official .lvcard.is-disabled .lvcard__frame { background: none; }
+.shopbar--official .lvcard.is-max .lvcard__num, .shopbar--official .lvcard.is-max .lvcard__label { color: #679a90; }
+.shopbar--official .lvcard.is-disabled { background: var(--sp-panel-upgrade-disable, none) center / 100% 100% no-repeat, #3b3b3b; color: #b6b6b6; }
+.shopbar--official .lvcard.is-disabled .lvcard__num { color: #b6b6b6; }
+.shopbar--official .lvcard.is-disabled .lvcard__label { color: #444; }
+.shopbar--official .lvcard.is-max::before, .shopbar--official .lvcard.is-disabled::before { content: none; }
+.shopbar--official .lvcard.is-armed { animation: none; box-shadow: none; color: #d6fff6;
+  background: var(--sp-panel-check-frame, none) center / 100% 100% no-repeat, var(--sp-panel-check-grad, none) center bottom / 100% 78% no-repeat, #107463; }
+.shopbar--official .lvcard.is-armed .lvcard__label { color: #d6fff6; }
+
+/* 冻结 / 刷新 (147×77 plates) */
+.shopbar--official .toolbtn--ice, .shopbar--official .toolbtn--amber { height: .55rem; min-width: 1.28rem; padding: 0 .12rem 0 .08rem; border: 0; color: rgba(0, 0, 0, .9);
+  font-size: .19rem; font-weight: 700; letter-spacing: .04em; box-shadow: none; background: var(--sp-panel-refresh-bg-normal, var(--amber)) center / 115% 140% no-repeat; }
+.shopbar--official .toolbtn--ice { background-image: var(--sp-panel-frozen-bg-unselect, none); background-color: #bfe3f7; }
+.shopbar--official .toolbtn--ice.is-on { background-image: var(--sp-panel-frozen-bg-normal, none); background-color: #6cc4ef; color: rgba(0, 0, 0, .9); }
+.shopbar--official .toolbtn--ice:disabled, .shopbar--official .toolbtn--amber:disabled { background-image: var(--sp-panel-bg-lock, none); background-color: #555; color: rgba(0, 0, 0, .9); }
+.shopbar--official .toolbtn--ice:hover:not(:disabled), .shopbar--official .toolbtn--amber:hover:not(:disabled) { filter: brightness(1.08); box-shadow: none; }
+.shopbar--official .toolbtn--ice kbd, .shopbar--official .toolbtn--amber kbd { color: rgba(0, 0, 0, .65) !important; border-color: rgba(0, 0, 0, .3) !important; background: rgba(255, 255, 255, .25) !important; }
+.shopbar--official .toolbtn--amber .hex--gold .hex__fill { background: var(--sp-panel-cost-bg-1, none) center / 100% 100% no-repeat; clip-path: none; }
+.shopbar--official .toolbtn--amber .hex--gold::before { content: none; }
+.shopbar--official .toolbtn--amber .hex--gold .hex__value { color: #ffc600; }
+.shopbar--official .toolbtn__free { background: #000; color: #fff; }
+.shopbar--official .shopbar__remain { background: rgba(49, 49, 49, .7); border-left: 0; padding: .04rem .1rem; font-size: .2rem; color: #fff; }
+.shopbar--official .shopbar__remain b { color: #fff; }
+
+/* funds (bg_money 110×37, #ffba00 28 px) and 收起 (bg_close 181×197) */
+.shopbar--official .funds { width: 1.68rem; border-left: 0; justify-content: flex-end; gap: .04rem; padding: 0; }
+.shopbar--official .funds__hex { width: 1.1rem; height: .37rem; clip-path: none; flex-direction: row; justify-content: flex-end; padding-right: .22rem;
+  background: var(--sp-panel-bg-money, linear-gradient(180deg, #2b2410, #16120a)) center / 100% 100% no-repeat; }
+.shopbar--official .funds__hex::before { content: none; }
+.shopbar--official .funds__coin { opacity: 0; width: .2rem; }
+.shopbar--official .funds__num { font-size: .28rem; color: #ffba00; font-weight: 500; }
+.shopbar--official .funds__label { display: none; }
+.shopbar--official .funds__collapse { position: relative; width: 1.68rem; height: 1.3rem; flex-direction: column; justify-content: flex-end; gap: 0;
+  padding: 0 0 .1rem; border: 0; color: #37e5ca; font-size: .2rem; font-weight: 500;
+  background: var(--sp-panel-bg-close, #17362e) center top / contain no-repeat; }
+.shopbar--official .funds__collapse:hover { background-color: transparent; color: #8ffff0; filter: brightness(1.1); }
+.shopbar--official .funds__collapse .icon { display: none; }
+.shopbar--official .funds__collapse kbd { color: #37e5ca !important; border-color: rgba(55, 229, 202, .5) !important; background: rgba(0, 0, 0, .4) !important; }
+
+/* folded (btn_open: bg_open 1 with the level) */
+.shopbar-tab--official { border: 0; background: none; padding: 0; }
+.shopbar-tab--official .shopbar-tab__funds { height: .37rem; padding: 0 .22rem 0 .4rem; background: var(--sp-panel-bg-money, none) center / 100% 100% no-repeat; }
+.shopbar-tab--official .shopbar-tab__funds .coin-glyph { opacity: 0; width: .01rem; }
+.shopbar-tab--official .shopbar-tab__funds b { color: #ffba00; font-size: .26rem; font-weight: 500; }

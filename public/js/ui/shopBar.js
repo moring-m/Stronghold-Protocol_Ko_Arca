@@ -56,6 +56,23 @@ function PriceHex({ slot, free, poor = false }) {
 /** Data lookups for shopBlockReason (full-hand purchases that complete a merge stay allowed). */
 const LOOKUPS = { getChess: (id) => data.lookup('chess', id), getItem: (id) => data.lookup('items', id) };
 
+/** The official shop sprites (autochess_shop / _shop_card_item / _shop_cost_item) as CSS variables for game-shop.css
+ *  (`--sp-<group>-<key>`); a sprite missing from the manifest leaves its variable unset and the CSS keeps the old look. */
+const SHOP_SPRITES = Object.freeze({
+  shopCard: ['bg_black', 'bg_common', 'repeat_line', 'frame_lv1', 'frame_lv2', 'frame_lv3', 'bg_doublecheck1', 'bg_doublecheck2', 'ice_matte', 'icon_ice', 'bg_empty', 'deco_item'],
+  shopPanel: ['refresh_bg_normal', 'bg_lock', 'frozen_bg_unselect', 'frozen_bg_normal', 'bg_money', 'bg_close', 'close_text_shadow', 'icon_x', 'upgrade_max',
+    'upgrade_disable', 'check_grad', 'check_frame', 'check_arrow', 'deco_up', 'deco_down', 'frame', 'frame_glow', 'icon', 'level', 'stripe_line',
+    'shadow_total', 'shadow_right', 'cost_free', 'cost_bg_1', 'cost_bg_2', 'bg_open_1', 'bg_open_shadow'],
+});
+export function shopSpriteVars(m = data.get('assets')) {
+  const out = [];
+  for (const [g, keys] of Object.entries(SHOP_SPRITES)) for (const k of keys) {
+    const u = uiUrl(m, `${g}/${k}`);
+    if (u) out.push(`--sp-${g === 'shopCard' ? 'card' : 'panel'}-${k.replace(/_/g, '-')}:url("${u}")`);
+  }
+  return out.join(';') || undefined;
+}
+
 /**
  * Where a merge-completing buy sends the elite (DESIGN §20.11), null when the card completes no merge: the 可晋升 tag's
  * title, and a line of the detail card the first tap opens — a touch screen never shows a title (QA 6b).
@@ -105,7 +122,8 @@ export function ChessCardView({ slot, idx, priv, frozen = false, reason = null, 
   const mod=lo?.module && !lo.module.none ? lo.module : null;
   const tap = () => { if (onTap) onTap(idx); else if (!disabled) onBuy(idx); else onDetail(slot.id, 'chess', hint); };
   const name = c?.name || t('干员');
-  const card = html`<button type="button" class=${cx('scard', `scard--t${tier}`, favorite && 'is-favorite', recruit && 'is-recruit', frozen && 'is-frozen', disabled && 'is-disabled', willMerge && 'is-merge', armed && 'is-armed')}
+  const frameLv = willMerge ? 3 : prog.copies > 0 ? 2 : 1;
+  const card = html`<button type="button" class=${cx('scard', `scard--t${tier}`, `scard--f${frameLv}`, favorite && 'is-favorite', recruit && 'is-recruit', frozen && 'is-frozen', disabled && 'is-disabled', willMerge && 'is-merge', armed && 'is-armed')}
       data-shop-slot=${free ? undefined : idx} aria-keyshortcuts=${free ? undefined : hotkeyLabelOf('buy')}
       title=${free || reason ? undefined : t('购买鼠标指向的商品 · {key}', { key: hotkeyLabelOf('buy') })}
       onClick=${tap} onContextMenu=${(e) => { e.preventDefault(); onDetail(slot.id, 'chess', hint); }}
@@ -349,13 +367,13 @@ function RegularShopBar({ priv, editable, collapsed, refreshBusy = false, onColl
   };
 
   if (collapsed) {
-    return html`<div class="shopbar-tab" ref=${barRef}>
+    return html`<div class="shopbar-tab shopbar-tab--official" style=${shopSpriteVars()} ref=${barRef}>
       <div class="shopbar-tab__funds"><${CoinGlyph} /><b class="num">${store.get().match.public?.practice?'∞':funds}</b></div>
       <button type="button" class="shopbar-tab__btn" onClick=${() => onCollapse(false)}><${Icon} name="chevronLeft" />展开商店 <kbd>${keyLabel('collapseShop')}</kbd></button>
     </div>`;
   }
 
-  return html`<section class=${cx('shopbar', frozen && 'is-frozen', !editable && 'is-locked', showReward && 'has-reward', armed && 'has-armed', preferences.shopItemLeft && 'shopbar--item-left')} ref=${barRef} aria-label="调度中心">
+  return html`<section class=${cx('shopbar', 'shopbar--official', frozen && 'is-frozen', !editable && 'is-locked', showReward && 'has-reward', armed && 'has-armed', preferences.shopItemLeft && 'shopbar--item-left')} style=${shopSpriteVars()} ref=${barRef} aria-label="调度中心">
     <div class="shopbar__tools">
       <span class="shopbar__remain">剩余可放置角色：<b class=${cx('num', remaining === 0 && 't-orange')}>${remaining}</b></span>
       <${FavoritesButton}/>
