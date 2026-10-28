@@ -603,8 +603,6 @@ export class SkillRuntime {
       // otherwise noAttack prevents updateAlly from ever reaching the attack that would clear `pending`.
       this.active = true;
       this.pending = !!this.spec.attack && !this.spec.attack.noAttack;
-      // display only (snapshot.js): the wait for that attack is the skill's shown duration
-      this.pendingSince = b.time; this.pendingWait = Math.max(0.2, u.atkCd || 0);
       // (a targeting-only instant skill must still switch to its skill range for the pending attack)
       if (this.spec.mods || this.spec.flags || this.spec.targeting) this._applyMods();
     }

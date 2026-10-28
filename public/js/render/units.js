@@ -2389,10 +2389,19 @@ export class UnitView {
     let ready = false;
     let sy = 0;
     if (showSp) {
-      const active = !!(this.flags & UF.SKILL) || this.form === 'doll' || /^makoto_(s[123]|change)/.test(this.form || '');
+      let active = !!(this.flags & UF.SKILL) || this.form === 'doll' || /^makoto_(s[123]|change)/.test(this.form || '');
+      // a skill that waited for its next attack (b.snap: full while it waits) ends as that attack starts: its duration is
+      // the attack's animation — the bar drains over the clip that plays now
+      const A = this.actor;
+      if (this._wasSkill && !active && this._lastSpK > 0.95 && A && A.mode === 'attack' && A.clock < A.attackUntil) this._skillHold = { until: A.attackUntil, total: Math.max(0.05, A.attackUntil - A.clock) };
+      this._wasSkill = active;
+      const hold = !active && this._skillHold && A && A.clock < this._skillHold.until ? this._skillHold : null;
+      if (!hold) this._skillHold = null;
+      if (hold) active = true;
       // a charge skill with a charge stored is ready (full), whatever the next charge's SP; while it runs, its duration
       const stored = Array.isArray(this.charges) && Number(this.charges[0]) >= 1;
-      const k = ammo ? ammo[0] / ammo[1] : !active && stored ? 1 : clamp(this.sp / this.spMax, 0, 1);
+      const k = hold ? clamp((hold.until - A.clock) / hold.total, 0, 1) : ammo ? ammo[0] / ammo[1] : !active && stored ? 1 : clamp(this.sp / this.spMax, 0, 1);
+      if (!hold) this._lastSpK = k;
       ready = !active && k >= 0.999;
       sy = cy + bh / 2 + spH / 2 + (off ? 0 : 1.5);
       this.spBg.position.set(x0 - (off ? 0 : 1), sy); this.spBg.width = bw + (off ? 0 : 2); this.spBg.height = spH + (off ? 0 : 2);
