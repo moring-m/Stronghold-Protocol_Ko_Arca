@@ -592,3 +592,16 @@
  .lo-recruit-selected .lo-recruit-remove { grid-column:2;grid-row:1/4;width:20px; }
  .lo-recruit-selected__empty { height:104px; }
 }
+/* preset button shows the active preset and its links */
+.lo-preset-button { max-width:min(100%,5.2rem); gap:6px; }
+.lo-preset-button__k { flex:none; }
+.lo-preset-button__v { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding-left:6px; border-left:1px solid var(--line-2); color:var(--mint-400); font-weight:600; }
+.lo-preset-button .preset-manager__links { flex-wrap:nowrap; flex:none; }
+.lo-preset-button .preset-link-chip { padding:1px 6px 1px 1px; font-size:11px; }
+.lo-preset-button .preset-link-chip img { width:18px; height:18px; }
+.lo-filter-reset { display:inline-flex; align-items:center; gap:4px; }
+.lo-recruit-choice__none { font-size:11px; }
+.lo-preset-button { flex-wrap:nowrap; white-space:nowrap; max-width:min(100%,4.6rem); }
+.lo-preset-button .preset-link-chip { padding:1px; font-size:0; gap:0; border-radius:2px; }
+.lo-preset-button .preset-link-chip img { width:20px; height:20px; }
+.lo-preset-button .btn__label { display:inline-flex; align-items:center; gap:6px; flex-wrap:nowrap; min-width:0; }

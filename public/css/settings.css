@@ -558,3 +558,12 @@
 .preset-manager .favorites-preset:has(.preset-strategy-icon) { padding-right:.1rem; }
 .preset-manager__links .preset-link-icons > span:has(.preset-strategy-icon) { position:static; aspect-ratio:auto; }
 .preset-manager__links .preset-link-icons .preset-strategy-icon { width:16px; height:16px; border-radius:2px; }
+/* link chips: readable faction/strategy labels under a preset name */
+.favorites-layout { grid-template-columns:minmax(200px,2.9rem) minmax(0,1fr); }
+.preset-manager__links { display:flex; flex-wrap:wrap; gap:4px; min-width:0; }
+.preset-link-chip { --chip-color:var(--mint-400); display:inline-flex; align-items:center; gap:5px; max-width:100%; min-width:0; padding:2px 8px 2px 2px; border:1px solid color-mix(in srgb,var(--chip-color) 70%,transparent); background:color-mix(in srgb,var(--chip-color) 14%,transparent); color:var(--text-hi); font-size:max(.15rem,12px); font-weight:600; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.preset-link-chip img { flex:none; width:22px; height:22px; object-fit:contain; }
+.preset-link-chip--strategy { --chip-color:#61d7ff; }
+.preset-link-chip--strategy img { object-fit:cover; border-radius:2px; }
+.preset-manager__row > .favorites-preset { gap:6px; padding:.09rem .1rem; }
+.preset-manager__row > .favorites-preset { height:auto!important; min-height:44px; align-items:stretch; }

@@ -1,6 +1,6 @@
 import {normalizePresetStrategies,completedStrategy} from '../../../shared/recruitPresetLinks.js';
 import {PresetLinks,PresetLinkIcons} from './presetLinks.js';
-import { PresetManager, PresetNameField } from './settingsFrame.js';
+import { PresetManager, PresetNameField, PresetLinkChips } from './settingsFrame.js';
 import { html, Modal, Button } from './components.js';
 import { createStore, loadPref, savePref, useStore, store } from '../store.js';
 import { data } from '../data.js';
@@ -56,7 +56,7 @@ export function applyRecruitFaction(faction,{guardFaction=false}={}){
 })();
  const request={faction,id:linked?.id,seq,promise:null};request.promise=promise.finally(()=>{if(factionRequest===request)factionRequest=null;});factionRequest=request;return request.promise;
 }
-export function RecruitPresetButton({size='sm',class:cls=''}={}){return html`<${Button} variant="secondary" size=${size} class=${cls} icon="users" onClick=${()=>recruitPresetStore.set({open:true})}>선발 프리셋<//>`;}
+export function RecruitPresetButton({size='sm',class:cls=''}={}){const s=useStore(x=>x,Object.is,recruitPresetStore),p=s.presets.find(x=>x.id===s.active);return html`<${Button} variant="secondary" size=${size} class=${`lo-preset-button ${cls}`} icon="users" onClick=${()=>recruitPresetStore.set({open:true})}><span class="lo-preset-button__k">선발 프리셋</span>${p?html`<span class="lo-preset-button__v">${p.name}</span><${PresetLinkChips} preset=${p} manifest=${data.get('assets')}/>`:null}<//>`;}
 export function RecruitPresetsHost(){
  const s=useStore(x=>x,Object.is,recruitPresetStore),app=useStore(x=>x),[ready,setReady]=useState(false);
  useEffect(()=>{if(!s.open)return;let live=true;Promise.all(['chess','assets','bands'].map(k=>data.load(k))).then(()=>{if(live)setReady(true);}).catch(()=>{if(live)toast('선발 목록을 불러오지 못했습니다. 다시 열어주세요.','warn');});return()=>{live=false;};},[s.open]);

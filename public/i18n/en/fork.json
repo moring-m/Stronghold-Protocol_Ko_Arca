@@ -3289,5 +3289,11 @@
   "클래식 불러오기": "Load Classic",
   "증강 모드 불러오기": "Load Augment mode",
   "모드 기본 설정 불러오기": "Load mode defaults",
-  "{0} 기본 설정으로 바꿉니다. 적용을 눌러야 방에 반영됩니다.": "Switches to {0} defaults. Press Apply to update the room."
+  "{0} 기본 설정으로 바꿉니다. 적용을 눌러야 방에 반영됩니다.": "Switches to {0} defaults. Press Apply to update the room.",
+  "안 함": "None",
+  "선발 안 함": "Not recruited",
+  "{0}단계로 선발": "Recruit at tier {0}",
+  "진영 연동: {0}": "Faction link: {0}",
+  "전략 연동: {0}": "Strategy link: {0}",
+  "필터 초기화": "Reset filters"
 }

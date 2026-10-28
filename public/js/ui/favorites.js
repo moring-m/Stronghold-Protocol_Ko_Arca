@@ -2,7 +2,7 @@ import {normalizePresetStrategies,completedStrategy} from '../../../shared/recru
 import {PresetLinks,PresetLinkIcons} from './presetLinks.js';
 import { tr } from '../i18n/i18n.js';
 import { matchesKoreanSearch } from '../../../shared/search.js';
-import { PresetManager, PresetNameField } from './settingsFrame.js';
+import { PresetManager, PresetNameField, PresetLinkChips } from './settingsFrame.js';
 import { normalizePresetFactions } from './factionPresetModel.js';
 import { useEffect, useState } from '../../vendor/hooks.module.js';
 import { html, Modal, Button, Icon } from './components.js';
@@ -30,7 +30,8 @@ export function isFavorite(kind,id,getChess=(id)=>data.lookup('chess',id)){
  if(kind==='chess' && c?.optionalRecruit)return false;
  return (kind==='chess'?p.operators:p.items).includes(c?.baseId||c?.chessId||id);
 }
-export function FavoritesButton({class:cls='',view='shop'}){if(view==='editor')return html`<${Button} variant="secondary" size="sm" icon="star" class=${`lo-favorites ${cls}`} onClick=${()=>favoritesStore.set({open:true})} title="선호 오퍼레이터·장비 프리셋">선호 프리셋<//>`;return html`<button type="button" class=${`toolbtn toolbtn--favorite toolbtn--icon ${cls}`} onClick=${()=>favoritesStore.set({open:true})} title="선호 프리셋" aria-label="선호 프리셋"><${Icon} name="star" /></button>`;}
+function FavoritesEditorButton({cls}){const s=useStore(x=>x,Object.is,favoritesStore),p=s.presets.find(x=>x.id===s.active);return html`<${Button} variant="secondary" size="sm" icon="star" class=${`lo-favorites lo-preset-button ${cls}`} onClick=${()=>favoritesStore.set({open:true})} title="선호 오퍼레이터·장비 프리셋"><span class="lo-preset-button__k">선호 프리셋</span>${p?html`<span class="lo-preset-button__v">${p.name}</span><${PresetLinkChips} preset=${p} manifest=${data.get('assets')}/>`:null}<//>`;}
+export function FavoritesButton({class:cls='',view='shop'}){if(view==='editor')return html`<${FavoritesEditorButton} cls=${cls}/>`;return html`<button type="button" class=${`toolbtn toolbtn--favorite toolbtn--icon ${cls}`} onClick=${()=>favoritesStore.set({open:true})} title="선호 프리셋" aria-label="선호 프리셋"><${Icon} name="star" /></button>`;}
 export function filterFavoriteOperators(rows,{query='',bond='',tier=''}={}) { return rows.filter(c=>!c.optionalRecruit&&(matchesKoreanSearch(tr(c.name||''),query)||matchesKoreanSearch(c.name||'',query))&&(!bond||(c.bonds||[]).includes(bond))&&(!tier||c.tier===Number(tier))); }
 export function FavoritesHost(){
  const s=useStore(x=>x,Object.is,favoritesStore),[ready,setReady]=useState(false),[tab,setTab]=useState('operators'),[query,setQuery]=useState(''),[bond,setBond]=useState(''),[tier,setTier]=useState('');
