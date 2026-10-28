@@ -224,9 +224,11 @@ export function classifyStage(stage, area = null, theme = null) {
       case 'X': t.surf = 'hatch'; t.tint = [0.36, 0.38, 0.41]; t.side = (t.c % 5 === 2) ? 'evacPanel' : 'restPanel'; t.sideTint = [0.8, 0.82, 0.86]; break;
       default: break;
     }
-    // the snow battlefield's atlas (load.js BOARD_THEMES): frosted rock for the forbidden blocks and separators
+    // the snow battlefield's atlas (load.js BOARD_THEMES): dirt-rimmed snow blocks for the forbidden tiles and separators
+    // the Final Assault benches' plain plates (rows 0–1): snow slabs, not the dark concrete
+    if (snow && (t.glyph === 'a' || t.glyph === 'A') && t.r <= 1) t.tint = [0.86, 0.9, 0.95];
     if (snow && (t.glyph === '#' || t.glyph === 'X')) {
-      t.surf = 'snowRock'; t.rot = (h % 4) * 90; t.tint = [0.86, 0.9, 0.96]; t.side = 'graySide'; t.sideTint = [0.8, 0.84, 0.9];
+      t.surf = 'snowRock'; t.rot = (h % 4) * 90; t.tint = [1, 1, 1]; t.side = 'graySide'; t.sideTint = [0.8, 0.84, 0.9];
     }
   }
   // high-ground plates by connectivity (texture top = the tile's far edge)

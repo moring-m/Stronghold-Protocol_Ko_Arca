@@ -84,6 +84,11 @@ export const BOARD_THEMES = Object.freeze({
     E: ['map/snowfield', 'TX_snowfield_E'],
     // the ground far below (MT_LAND _Color of level_main_08-01, as compose-snowfield-scene.py `backdrop`)
     backdrop: [0.78, 0.859, 0.945],
+    // map/original scene of the surroundings (tools/local-extract/compose-snowfield-scene.py; level_main_08-01)
+    scenery: 'snowfield-scenery',
+    light: Object.freeze({ color: 0xd6e2f0, intensity: 1.9, hemi: 0.5 }),
+    // tile glyph → official tile mesh role of that scene's kit ('#' : 'rocks' next to a field tile, else 'block')
+    kit: Object.freeze({ r: 'ground', k: 'ground', h: 'high', b: 'fence', a: 'ice', A: 'dirt', X: 'block', '#': 'dirt' }),
   }),
 });
 
@@ -219,7 +224,7 @@ export function loadBoardPack(assets, { native = true } = {}) {
       if (name in themes) return Promise.resolve(themes[name]);
       return themePending[name] ||= (async () => {
         const out = {};
-        await Promise.all(Object.entries(spec).filter(([k]) => k !== 'backdrop').map(async ([k, [g, n]]) => {
+        await Promise.all(Object.entries(spec).filter(([, v]) => Array.isArray(v) && typeof v[0] === 'string').map(async ([k, [g, n]]) => {
           const u = url(g, n);
           const img = u ? await assets.image(u, { retry: true }).catch(() => null) : null;
           if (img && (img.width || img.naturalWidth) > 0) out[k] = img;

@@ -31,6 +31,7 @@ import { buildBoard, buildDeviceSlabs, objToBoard, boxProjectUV, ROWS, COLS, DEV
 import { surfaceUV } from './atlas.js';
 import { focusUniforms, addFocus, makeTexture, boardMaterial, glassMaterial, decalMaterial, pipeMaterial, unlitMaterial, gateMaterial, glowMaterial, waterMaterial, mireMaterial, infectionMaterial, infectionGlowMaterial, infectionRiseMaterial, smogMaterial, dashTexture, environmentMap, nativePhysicalLighting, addShadowContrast, sceneMaterial, sceneWaterMaterial, sceneEnvTexture, sceneWaterDecalMaterial, applyWaterMaterial, trapMaterial } from './materials.js';
 import { syncThreeCamera } from '../projection.js';
+import { TILE_H } from '../style.js';
 import { mergeSceneChunks, sceneMaterialKey, sceneWaterInfo, isSceneWater, BOARD_THEMES } from './load.js';
 
 /** Lighting rig (tuned against the official screenshots: bright even tops, darker sides, soft shadows). */
@@ -136,6 +137,20 @@ export function outsideTileAreas(holes) {
     return [{...a,r1:r0-1},{...a,r0:r1+1},{r0,r1,c0:a.c0,c1:c0-1},{r0,r1,c0:c1+1,c1:a.c1}].filter(b=>b.r0<=b.r1&&b.c0<=b.c1);
   });
   return parts;
+}
+
+/** Row runs ({r0,r1,c0,c1}) of a classified grid's tiles not in `covered` ('r,c'), for surfaceForArea. */
+function uncoveredRows(grid, covered) {
+  const open = [];
+  for (let r = 0; r < grid.length; r++) {
+    const cols = grid[r].length;
+    for (let c = 0, c0 = null; c <= cols; c++) {
+      const free = c < cols && !covered.has(`${r},${c}`);
+      if (free && c0 === null) c0 = c;
+      else if (!free && c0 !== null) { open.push({ r0: r, r1: r, c0, c1: c - 1 }); c0 = null; }
+    }
+  }
+  return open;
 }
 
 export function surfaceForArea(src, areas) {
@@ -695,6 +710,119 @@ export class BoardScene {
     return (this.themeMats[name] = boardMaterial(T, tex, this.focus, { emissive: LIGHTING.emissive, roughness: LIGHTING.roughness }));
   }
 
+  /**
+   * The decoded scenery scene of a stage's board theme (BOARD_THEMES[theme].scenery, compose-snowfield-scene.py), or
+   * null while it loads / when absent / at 'low' quality (no original map meshes there). A finished load rebuilds.
+   */
+  _themeScenery(stage) {
+    const id = BOARD_THEMES[stage?.boardTheme]?.scenery, original = this.pack?.original;
+    if (!id || this.mapQuality === 'low' || !original?.loadStage) return null;
+    if (original.scenes[id]) return original.scenes[id];
+    (this.themeLoads ||= {})[`scenery:${id}`] ||= original.loadStage(id).then((scene) => {
+      delete this.themeLoads[`scenery:${id}`];
+      if (scene && !this.destroyed && this.stage?.boardTheme === stage.boardTheme) { this.stageKey = null; this.setStage(this.stage); }
+    });
+    return null;
+  }
+
+  /**
+   * The theme's scenery about the built board: the 'left' buckets against its left edge, the 'right' ones against its
+   * right edge, the 'centre' terrain about its centre minus its footprint, centred on its rows — outside every tile, so
+   * no field, bench or preview pen is covered in any mode.
+   */
+  _buildThemeScenery(stage, board) {
+    const scene = this._themeScenery(stage), b = board?.bounds;
+    if (!scene || ![b?.x0, b?.x1, b?.y0, b?.y1].every(Number.isFinite)) return;
+    const cy = (b.y0 + b.y1) / 2, themed = this._themeMaterial(stage);
+    for (const [key, bucket] of Object.entries(scene.buckets)) {
+      // '@board': the strips' ground in the themed board material (vertex colours on); the rest native pieces
+      const board = bucket.material === '@board', source = board ? themed : this.originalMaterials[bucket.material];
+      if (!source || !bucket.position?.length) continue;
+      if (bucket.side === 'kit') continue;
+      const dx = bucket.side === 'left' ? b.x0 : bucket.side === 'right' ? b.x1 : (b.x0 + b.x1) / 2;
+      const position = Float32Array.from(bucket.position, (v, i) => v + (i % 3 === 0 ? dx : i % 3 === 1 ? cy : 0));
+      // the terrain ('centre') stops at the board's footprint: whole triangles whose centre lies on it are dropped
+      let index = bucket.index;
+      if (bucket.side === 'centre') {
+        const keep = [];
+        for (let t = 0; t < index.length; t += 3) {
+          let x = 0, y = 0;
+          for (let k = 0; k < 3; k++) { x += position[index[t + k] * 3] / 3; y += position[index[t + k] * 3 + 1] / 3; }
+          if (x < b.x0 || x > b.x1 || y < b.y0 || y > b.y1) keep.push(index[t], index[t + 1], index[t + 2]);
+        }
+        index = keep;
+      }
+      const material = board ? source : this._lightmapped(source, bucket.material, bucket.lightMap);
+      this.meshes[`scenery:${key}`] = this._mesh({ ...bucket, position, index, ...(board ? {} : { color: null }) }, material, { cast: !board && bucket.side !== 'centre' });
+    }
+  }
+
+  /**
+   * The theme's tile kit (BOARD_THEMES[theme].kit; the scenery scene's 'kit' buckets): each drawn tile whose glyph has a
+   * role gets one variant of the official tile mesh of that role, picked by a tile hash. Returns the covered tiles
+   * ('r,c'), or null while the scene loads (the procedural board then covers everything).
+   */
+  _buildThemeKit(stage, grid) {
+    const theme = BOARD_THEMES[stage.boardTheme], scene = this._themeScenery(stage);
+    if (!theme?.kit || !scene || !Array.isArray(grid)) return null;
+    const roles = {};
+    for (const bucket of Object.values(scene.buckets)) {
+      if (bucket.side !== 'kit' || !this.originalMaterials[bucket.material]) continue;
+      ((roles[bucket.role] ||= [])[bucket.variant] ||= []).push(bucket);
+    }
+    for (const k of Object.keys(roles)) roles[k] = roles[k].filter(Boolean);
+    const FIELD = new Set(['r', 'k', 'h', 'f', 'b', 'S', 'E', 'O', 'R']);
+    const glyph = (r, c) => grid[r]?.[c]?.glyph;
+    const lists = new Map(), covered = new Set();
+    for (const row of grid) for (const t of row) {
+      if (!t.drawn) continue;
+      let role = theme.kit[t.glyph];
+      if (t.glyph === '#' && [[0, 1], [0, -1], [1, 0], [-1, 0]].some(([dr, dc]) => FIELD.has(glyph(t.r + dr, t.c + dc)))) role = 'rocks';
+      const variants = role && roles[role];
+      if (!variants?.length) continue;
+      const pick = variants[((Math.imul(t.r + 1, 73856093) ^ Math.imul(t.c + 1, 19349663)) >>> 0) % variants.length];
+      for (const bucket of pick) {
+        // high ground: the official block (top 0.38) raised to the board's high-ground height, where units stand
+        const zs = role === 'high' ? TILE_H.wall / 0.38 : 1;
+        const position = Float32Array.from(bucket.position, (v, i) => (i % 3 === 0 ? v + t.c : i % 3 === 1 ? v + t.r : v * zs));
+        const key = `${bucket.material}|${bucket.lightMap || ''}`;
+        if (!lists.has(key)) lists.set(key, { bucket, list: [] });
+        lists.get(key).list.push({ ...bucket, position });
+      }
+      covered.add(`${t.r},${t.c}`);
+    }
+    for (const [key, { bucket, list }] of lists) {
+      const source = this.originalMaterials[bucket.material];
+      this.meshes[`kit:${key}`] = this._mesh({ ...mergeInto(list), color: null }, this._lightmapped(source, bucket.material, bucket.lightMap), { cast: true });
+    }
+    return covered;
+  }
+
+  /** A native material with a baked RGBM lightmap on uv1 (as the original scenes' buckets), cached per pair. */
+  _lightmapped(source, sourceName, name) {
+    const image = name && this.pack?.original?.images?.[name];
+    if (!image) return source;
+    const cache = this.themeLightMaterials ||= new Map(), key = `${sourceName}|${name}`;
+    if (cache.has(key)) return cache.get(key);
+    const T = this.THREE, nativeGamma = source.userData.nativeGamma;
+    const tex = makeTexture(T, image, { srgb: !nativeGamma });
+    tex.channel = 1;
+    const material = source.clone();
+    material.lightMap = tex;
+    // the procedural board's key / hemisphere lights stay on (unlike a native scene's own lighting): a third of the bake
+    material.lightMapIntensity = (nativeGamma ? 1 : Math.PI) * 0.35;
+    const sourceCompile = source.onBeforeCompile;
+    material.onBeforeCompile = (shader) => {
+      sourceCompile(shader);
+      shader.fragmentShader = shader.fragmentShader.replace('#include <lights_fragment_maps>', T.ShaderChunk.lights_fragment_maps.replace(
+        'lightMapTexel.rgb * lightMapIntensity',
+        nativeGamma ? 'lightMapTexel.rgb * (5.0 * lightMapTexel.a) * lightMapIntensity' : 'lightMapTexel.rgb * (pow(5.0, 2.2) * pow(lightMapTexel.a, 2.2)) * lightMapIntensity'));
+    };
+    material.customProgramCacheKey = () => nativeGamma ? 'sp-focus-native-gamma-rgbm5' : 'sp-focus-unity-rgbm5';
+    cache.set(key, material);
+    return material;
+  }
+
   setStage(stage, area) {
     for(const ignored of this._stageSteps(stage,area)) { /* foreground builds remain immediate */ }
   }
@@ -710,7 +838,7 @@ export class BoardScene {
     // 'low' (단순 3D) never draws the official scene pack (the original map's mesh): the procedural board stands alone
     const official = stage && !nativeReady && this.mapQuality !== 'low' ? this.scenePacks.get(stage.id) || null : null;
     const themed = stage ? this._themeMaterial(stage) : null;
-    const key = stage ? `${stage.id || ''}|${official ? official.key : ''}|${themed ? stage.boardTheme : ''}|${stage.previewLayout ? stage.previewLayout.worldOffset || 0 : 'native'}|${(stage.rows || []).join('/')}|${JSON.stringify((stage.devices || []).map((d) => [d.key, d.pos, d.active, d.dir]))}` : '';
+    const key = stage ? `${stage.id || ''}|${official ? official.key : ''}|${themed ? stage.boardTheme + (this._themeScenery(stage) ? '+scenery' : '') : ''}|${stage.previewLayout ? stage.previewLayout.worldOffset || 0 : 'native'}|${(stage.rows || []).join('/')}|${JSON.stringify((stage.devices || []).map((d) => [d.key, d.pos, d.active, d.dir]))}` : '';
     if (key === this.stageKey) return;
     const layoutKey=stage ? `${key}|${this.areaKey}|${this.mapQuality}|${!!this.pack?.original?.scenes?.[stage.originalStageId || stage.id]}` : null;
     const cached=this.layoutCache.get(layoutKey);
@@ -765,6 +893,9 @@ export class BoardScene {
     this.key.intensity = original?.lighting?.intensity != null ? original.lighting.intensity * LIGHTING.nativeDirectGain : LIGHTING.key.intensity;
     if (original?.lighting?.color) this.key.color.setRGB(...original.lighting.color);
     else this.key.color.setHex(LIGHTING.key.color);
+    // a board theme's own light (the snow field: a cool, softer key under an overcast sky)
+    const themeLight = themed && !original ? BOARD_THEMES[stage.boardTheme]?.light : null;
+    if (themeLight) { this.key.color.setHex(themeLight.color); this.key.intensity = themeLight.intensity; this.hemi.intensity = themeLight.hemi; }
     const nativeLightMaterials=new Map();
     if (original) {
       for (const [material, sourceGeometry] of Object.entries(original.buckets)) {
@@ -860,10 +991,13 @@ export class BoardScene {
         yield;
       }
     } else if (!this.official) {
-      const fallback=stage.previewLayout ? buildBoard(structuralStage,{uv:this.pack?.uv || null,area:[...AREAS.boss,{r0:7,r1:11,c0:6,c1:14}]}) : board;
+      const fallback=stage.previewLayout ? buildBoard(structuralStage,{uv:this.pack?.uv || null,area:[...AREAS.boss,{r0:7,r1:11,c0:6,c1:14}],theme:themed ? stage.boardTheme : null}) : board;
       const areas=stage.previewLayout ? [{r0:0,r1:5,c0:0,c1:20}] : combatBorderAreas(stage,this.area);
       const cells=stage.previewLayout ? vacantBorderCells(borderCells(structuralStage,areas),[fallback.buckets.board]) : [];
-      const buckets=Object.fromEntries(['board','glass','decal','pipe'].map(key=>[key,[fallback.buckets[key]]]));
+      // the theme's official tile meshes on the tiles they cover; the procedural board keeps the others
+      const covered=themed ? this._buildThemeKit(stage,fallback.grid) : null;
+      const open=covered ? uncoveredRows(fallback.grid,covered) : null;
+      const buckets=Object.fromEntries(['board','glass','decal','pipe'].map(key=>[key,[open && fallback.buckets[key]?.index?.length ? surfaceForArea(fallback.buckets[key],open) : fallback.buckets[key]]]));
       oppositeBorderRuns(cells,areas,{mirror:true}).forEach(({source,axis})=>{
         for(const key of Object.keys(buckets)){
           const geometry=fallback.buckets[key];
@@ -874,7 +1008,8 @@ export class BoardScene {
       });
       for(const[key,list]of Object.entries(buckets))M[key]=this._mesh(mergeInto(list),key==='board'&&themed||this.mat[key],{cast:key!=='decal'});
     }
-    if (original && !original.cover && !stage.coopEightStage && !['act2autochess_m01','act2autochess_m03'].includes(stage.id) && this.area.some(a=>a.c1>=20)) {
+    if (themed && !original) this._buildThemeScenery(stage, board);
+    if (original && !stage.coopEightStage && !['act2autochess_m01','act2autochess_m03'].includes(stage.id) && this.area.some(a=>a.c1>=20)) {
       // The sand island has a water notch outside its right rim. Extend the
       // opposite authored hill strip only into uncovered cells; keep the sea
       // beyond the rim and the existing stairs/props intact in both modes.
@@ -909,25 +1044,7 @@ export class BoardScene {
       }
     }
     yield;
-    if (original?.cover) {
-      // A composed scene (tools/local-extract/compose-snowfield-scene.py) covers only the field tiles it lists with
-      // the chapter's pieces; every other tile (benches, gates, objective, works, pen, separators) is the procedural
-      // board in the stage's themed atlas.
-      const covered=new Set(original.cover.map(([r,c])=>`${r},${c}`)),open=[];
-      for(let r=0;r<ROWS;r++)for(let c=0,c0=null;c<=COLS;c++){
-        const free=c<COLS && !covered.has(`${r},${c}`);
-        if(free && c0===null)c0=c;
-        else if(!free && c0!==null){open.push({r0:r,r1:r,c0,c1:c-1});c0=null;}
-      }
-      for(const key of ['board','glass','decal','pipe']){
-        const geometry=board.buckets[key];
-        if(geometry?.index?.length)M[`uncovered:${key}`]=this._mesh(surfaceForArea(geometry,open),key==='board'&&themed||this.mat[key],{cast:key!=='decal'});
-      }
-      const slabs = buildDeviceSlabs(board.devices.filter(d=>!this.nativeDevice(d)), board.grid, this.pack?.uv);
-      M.deviceSlabs = this._mesh(slabs.board, this.mat.board);
-      M.deviceDecals = this._mesh(slabs.decal, this.mat.decal, { cast: false });
-    }
-    if (original && !original.cover && !stage.coopEightStage) {
+    if (original && !stage.coopEightStage) {
       const areas=structuralStage.previewLayout ? [{r0:0,r1:5,c0:0,c1:20}] : combatBorderAreas(stage,this.area);
       const raised=borderSurfaces.map(g=>g.platform ? g : ({...g,index:Array.from(g.index).filter((_,i,a)=>{const base=i-i%3;return Math.max(...a.slice(base,base+3).map(id=>g.position[id*3+2]))>.08 && a.slice(base,base+3).every(id=>g.normal?.[id*3+2]>.85);})}));
       const cells=stage.previewLayout ? vacantBorderCells(borderCells(structuralStage,areas),raised) : [];
@@ -1001,7 +1118,7 @@ export class BoardScene {
     this._buildThicket(board);
     yield;
     this._buildTerrain(board);
-    if (!this.official) this._buildBackground(board, original?.backdrop || (themed && BOARD_THEMES[stage.boardTheme]?.backdrop) || null);
+    if (!this.official) this._buildBackground(board, themed && !original ? BOARD_THEMES[stage.boardTheme]?.backdrop || null : null);
     this._fitShadow(board);
     this.renderer.shadowMap.needsUpdate = true;
   }
@@ -1506,6 +1623,7 @@ export class BoardScene {
     this.scenePacks.clear();
     this.mat.edge?.map?.dispose?.(); // canvas dash texture (not in this.tex)
     for (const m of Object.values(this.mat)) m?.dispose?.();
+    for (const m of this.themeLightMaterials?.values() || []) { m.lightMap?.dispose(); m.dispose(); }
     for (const m of Object.values(this.themeMats || {})) { if (m) { for (const t of [m.map, m.normalMap, m.roughnessMap, m.emissiveMap]) if (!Object.values(this.tex).includes(t)) t?.dispose(); m.dispose(); } }
     for (const t of Object.values(this.tex)) t?.dispose?.();
     for (const m of Object.values(this.originalMaterials)) m?.dispose?.();
