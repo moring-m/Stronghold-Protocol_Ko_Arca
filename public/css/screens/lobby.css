@@ -458,7 +458,8 @@ html:not([lang="ko"]) .mode-cards .mode-card--lab .mode-card__name{font-size:.24
 .lobby-screen .mode-card__public span { font-size:max(.18rem,15px); }
 .lobby-screen .diff-card__meta > .num { line-height:18px; }
 /* latency + online players stacked in the top bar (lobby and public rooms) */
-.lobby-presence { display:flex; flex-direction:column; align-items:flex-start; gap:.04rem; }
+.lobby-presence { display:flex; flex-direction:row; align-items:center; gap:.06rem; }
+.ping--online .ping__value { display:inline-block; min-width:3ch; text-align:right; }
 .ping--online { --pc:var(--text-hi); }
 .ping--online.ping--off { --pc:var(--text-dim); }
 /* public rooms: clearer primary action, shared switch, refresh state, real empty state */
@@ -479,3 +480,4 @@ html:not([lang="ko"]) .mode-cards .mode-card--lab .mode-card__name{font-size:.24
  .public-rooms-screen .public-room__actions .btn,.public-rooms__empty .btn { height:40px; font-size:14px; }
  .public-rooms-screen .public-room__actions .btn .icon { width:15px; height:15px; }
 }
+@media(max-width:600px){ .lobby-presence { flex-direction:column; align-items:flex-start; gap:2px; } }
