@@ -37,7 +37,7 @@ import { store } from '../store.js';
 
 import { useEffect, useState } from '../../vendor/hooks.module.js';
 import { html, Icon, TierChip, Tooltip, MicroLabel } from './components.js';
-import { Img, BondGlyph, GIcon } from './gameComponents.js';
+import { Img, BondGlyph, GIcon, RichText } from './gameComponents.js';
 import { priceTone, mergeProgress, mergeTarget, shopBlockReason, chessLoadout, offerHeader, briefingBondTip } from './gameLogic.js';
 import { chessPortraitUrl, itemIconUrl, profIconUrl, uiUrl, moduleTypeIconUrl } from './assetUrls.js';
 import { matchData as data } from '../data.js';
@@ -193,6 +193,7 @@ export function ItemCardView({ slot, idx, frozen = false, reason = null, free = 
     <span class="scard__itemart oc__equip"><${Img} src=${itemIconUrl(m, it)} fallback=${html`<${GIcon} name="bolt" />`} /></span>
     <span class="oc__lines" aria-hidden="true"></span>
     <span class="oc__name"><i class="oc__itemicon" aria-hidden="true"></i><span class="scard__name">${it?.name || slot.id}</span></span>
+    <span class="scard__idesc oc__idesc"><${RichText} text=${it?.descRaw || it?.desc || ''} /></span>
     <span class="oc__frame" aria-hidden="true"></span>
     ${disabled && !armed ? html`<span class="oc__disable" aria-hidden="true"></span>` : null}
     <span class="oc__tier"><${TierChip} tier=${it?.tier ?? 1} size="md" /></span>
