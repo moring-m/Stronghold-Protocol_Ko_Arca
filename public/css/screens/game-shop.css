@@ -321,3 +321,7 @@
 .shopbar .obtn { font-size: .17rem; letter-spacing: .02em; gap: .04rem; }
 .shopbar .obtn .toolbtn__img { width: .28rem; height: .28rem; }
 .shopbar .obtn kbd { margin-left: 0; }
+/* the plates' drawn part (x 11–138 of 147, y 2–56 of 77) covers the button box exactly; ★ takes the same height */
+.shopbar .obtn__plate { inset: auto; left: -8.66%; top: -3.7%; width: 115.75%; height: 142.6%; }
+.shopbar .shopbar__tools { align-items: center; }
+.shopbar .shopbar__tools .toolbtn--favorite, .shopbar .shopbar__tools .toolbtn--icon { height: .55rem; width: .55rem; }
