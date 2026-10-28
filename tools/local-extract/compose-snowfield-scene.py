@@ -7,8 +7,9 @@ The official scene is cut into its authored pieces (one per renderer, board spac
                 builds (normal field, cooperative / boss arena, the four-field co-op board) by the tile glyph
                 (load.js BOARD_THEMES.snow.kit); tiles without a role (benches' gates, works, preview pen, ...) stay
                 the procedural board in the themed atlas (compose-snowfield-atlas.py)
-  side 'centre': the snow terrain (iceland), spread about the board's centre; the renderer drops it under the board
-  side 'left' / 'right': the blue ice cliff of the left edge as authored, mirrored for the right edge
+  side 'around': the surroundings as authored (snow terrain, mountain rocks, ice walls, rock cubes, snow planes), each
+                half moved out by SPREAD for the wider autochess board, about the board's centre; the renderer drops
+                the terrain triangles and the whole pieces that reach over the board it builds
 Nothing is placed over a tile the board draws, so no field, bench or the enemy preview pen is covered.
 
 Usage: python -I compose-snowfield-scene.py <bundle dir> <out dir>
@@ -174,22 +175,30 @@ def prototype(pc):
 
 
 FIELD_X0, FIELD_X1, FIELD_CY = 4.5, 15.5, 9.0  # the official field (cols 5–15) and its centre row, board space
-walls = [prototype(pc) for pc in pieces if pc['name'].startswith('S_outworld_icewall2')]
-# the snow terrain (iceland) about the board's centre, spread to the wider autochess board; the renderer drops the
-# triangles under the board's own footprint
-for pc in pieces:
+SPREAD = 5.5  # the autochess board is ~11 tiles wider: each half of the surroundings moves out by this much
+SURROUNDINGS = ('iceland', 'mountain_rock', 'S_outworld_icewall', 'S_outworld_cube', 'S_outworld_rock', 'decore_rock',
+                'pPlane', 'ouworld_rock')
+cx0 = (FIELD_X0 + FIELD_X1) / 2
+for k_, pc in enumerate(pieces):
+    if not pc['name'].startswith(SURROUNDINGS):
+        continue
     if pc['name'].startswith('iceland'):
-        p = pc['p'] - np.array([(FIELD_X0 + FIELD_X1) / 2, FIELD_CY, 0])
-        p[:, 0] *= 2.2; p[:, 1] *= 1.6; p[:, 2] -= 0.35
-        add(bucket(pc['material'], pc['light'], 'centre'), p, pc['n'], pc['uv'], pc['uv1'], pc['col'], pc['tri'])
-# the blue ice cliff of the left edge (as authored) and its mirror on the right edge
-for side, sign in (('left', -1), ('right', 1)):
-    for j in (-6, 0, 6):
-        pc = walls[0]
-        p = pc['p'] * np.array([sign * -1, 1, 1]) + np.array([sign * 1.2, j, -0.4])
-        n = pc['n'] * np.array([sign * -1, 1, 1])
-        tri = pc['tri'] if sign < 0 else pc['tri'][:, ::-1]
-        add(bucket(pc['material'], pc['light'], side), p, n, pc['uv'], pc['uv1'], pc['col'], tri)
+        # the snow terrain: each triangle moves with its half; the renderer drops those over the board
+        cen = pc['p'][pc['tri']].mean(axis=1)[:, 0]
+        for half, sign in ((cen < cx0, -1), (cen >= cx0, 1)):
+            b = bucket(pc['material'], pc['light'], 'around')
+            b['cut'] = 'terrain'
+            used, idx = np.unique(pc['tri'][half], return_inverse=True)
+            p = pc['p'][used] - np.array([cx0 - sign * SPREAD, FIELD_CY, 0])
+            add(b, p, pc['n'][used], pc['uv'][used], pc['uv1'][used], pc['col'][used], idx.reshape(-1, 3))
+        continue
+    # a whole piece moves with the half it stands in; the renderer leaves out any piece reaching over the board
+    sign = -1 if pc['centre'][0] < cx0 else 1
+    key = f'around:{k_}:' + pc['material'] + (f'@lightmap{pc["light"]}' if pc['light'] is not None else '')
+    b = buckets.setdefault(key, {'material': pc['material'], 'platform': False, 'side': 'around', 'cut': 'piece',
+                                 'lightMap': lightmaps[pc['light']] if pc['light'] is not None else None,
+                                 'position': [], 'normal': [], 'uv': [], 'uv1': [], 'color': [], 'index': []})
+    add(b, pc['p'] - np.array([cx0 - sign * SPREAD, FIELD_CY, 0]), pc['n'], pc['uv'], pc['uv1'], pc['col'], pc['tri'])
 
 # ---- the tile kit: the official tile meshes, one prototype per piece, centred on its tile (x, y about 0) ----
 # role ← piece (matched against the official field of the screenshot): white snow slab = ground, dark-blue slab = ice
@@ -213,6 +222,8 @@ def role(pc):
         return 'fence'
     if n.startswith('S_playground_fixhighground') or (n.startswith('S_playground_gird') and top > 0.3):
         return 'high'
+    if n.startswith('S_playground_bake2'):
+        return 'iceblock'  # the ice-topped slab block: the bench row by the camera
     if n.startswith(('S_playground_import268', 'S_playground_import302', 'S_playground_stone6')):
         return 'dirt'  # the dirt-rimmed raised snow slab: the temporary bench and the outer forbidden ring
     if n.startswith(('S_playground_import', 'S_playground_stone', 'S_playground_bake')) and top > 0.3:
@@ -252,7 +263,7 @@ path.write_bytes(gzip.compress(json.dumps(data, separators=(',', ':')).encode(),
 (out / f'{STAGE}-v16.bin.gz').write_bytes(gzip.compress(pack(data), mtime=0))
 # textures of the used materials (normal / gloss maps derived like extract-original-maps.py)
 from PIL import Image, ImageOps
-used = {b['material'] for b in buckets.values()} - {'@board'}
+used = {b['material'] for b in buckets.values()}
 mats = {k: v for k, v in materials.items() if k in used}
 for rec in mats.values():
     for slot, ref in rec['textures'].items():

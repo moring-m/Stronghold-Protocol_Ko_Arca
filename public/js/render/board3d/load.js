@@ -88,7 +88,7 @@ export const BOARD_THEMES = Object.freeze({
     scenery: 'snowfield-scenery',
     light: Object.freeze({ color: 0xd6e2f0, intensity: 1.9, hemi: 0.5 }),
     // tile glyph → official tile mesh role of that scene's kit ('#' : 'rocks' next to a field tile, else 'block')
-    kit: Object.freeze({ r: 'ground', k: 'ground', h: 'high', b: 'fence', a: 'ice', A: 'dirt', X: 'block', '#': 'dirt' }),
+    kit: Object.freeze({ r: 'ground', k: 'ground', h: 'high', b: 'fence', a: 'iceblock', A: 'dirt', X: 'block', '#': 'dirt' }),
   }),
 });
 

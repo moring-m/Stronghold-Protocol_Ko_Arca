@@ -726,35 +726,43 @@ export class BoardScene {
   }
 
   /**
-   * The theme's scenery about the built board: the 'left' buckets against its left edge, the 'right' ones against its
-   * right edge, the 'centre' terrain about its centre minus its footprint, centred on its rows — outside every tile, so
-   * no field, bench or preview pen is covered in any mode.
+   * The theme's surroundings ('around' buckets) about the built board's centre: the terrain minus the board's footprint
+   * and the pieces that stay clear of it — so no field, bench or preview pen is covered in any mode.
    */
   _buildThemeScenery(stage, board) {
     const scene = this._themeScenery(stage), b = board?.bounds;
     if (!scene || ![b?.x0, b?.x1, b?.y0, b?.y1].every(Number.isFinite)) return;
-    const cy = (b.y0 + b.y1) / 2, themed = this._themeMaterial(stage);
-    for (const [key, bucket] of Object.entries(scene.buckets)) {
-      // '@board': the strips' ground in the themed board material (vertex colours on); the rest native pieces
-      const board = bucket.material === '@board', source = board ? themed : this.originalMaterials[bucket.material];
+    const cy = (b.y0 + b.y1) / 2, groups = new Map();
+    for (const bucket of Object.values(scene.buckets)) {
+      const source = this.originalMaterials[bucket.material];
       if (!source || !bucket.position?.length) continue;
       if (bucket.side === 'kit') continue;
-      const dx = bucket.side === 'left' ? b.x0 : bucket.side === 'right' ? b.x1 : (b.x0 + b.x1) / 2;
-      const position = Float32Array.from(bucket.position, (v, i) => v + (i % 3 === 0 ? dx : i % 3 === 1 ? cy : 0));
-      // the terrain ('centre') stops at the board's footprint: whole triangles whose centre lies on it are dropped
+      const position = Float32Array.from(bucket.position, (v, i) => v + (i % 3 === 0 ? (b.x0 + b.x1) / 2 : i % 3 === 1 ? cy : 0));
+      const over = (x, y) => x > b.x0 - 0.2 && x < b.x1 + 0.2 && y > b.y0 - 0.2 && y < b.y1 + 0.2;
       let index = bucket.index;
-      if (bucket.side === 'centre') {
+      if (bucket.cut === 'terrain') {
+        // the snow terrain stops at the board: whole triangles whose centre lies on its footprint are dropped
         const keep = [];
         for (let t = 0; t < index.length; t += 3) {
           let x = 0, y = 0;
           for (let k = 0; k < 3; k++) { x += position[index[t + k] * 3] / 3; y += position[index[t + k] * 3 + 1] / 3; }
-          if (x < b.x0 || x > b.x1 || y < b.y0 || y > b.y1) keep.push(index[t], index[t + 1], index[t + 2]);
+          if (!over(x, y)) keep.push(index[t], index[t + 1], index[t + 2]);
         }
         index = keep;
+      } else {
+        // a whole piece reaching over the board is left out (it would stand on a field, bench or the preview pen)
+        let hit = false;
+        for (let v = 0; v < position.length && !hit; v += 3) hit = over(position[v], position[v + 1]);
+        if (hit) continue;
       }
-      const material = board ? source : this._lightmapped(source, bucket.material, bucket.lightMap);
-      this.meshes[`scenery:${key}`] = this._mesh({ ...bucket, position, index, ...(board ? {} : { color: null }) }, material, { cast: !board && bucket.side !== 'centre' });
+      if (!index.length) continue;
+      const material = this._lightmapped(source, bucket.material, bucket.lightMap);
+      const group = groups.get(material) || [];
+      group.push({ ...bucket, position, index });
+      groups.set(material, group);
     }
+    let n = 0;
+    for (const [material, list] of groups) this.meshes[`scenery:${n++}`] = this._mesh({ ...mergeInto(list), color: null }, material, { cast: true });
   }
 
   /**
@@ -773,17 +781,23 @@ export class BoardScene {
     for (const k of Object.keys(roles)) roles[k] = roles[k].filter(Boolean);
     const FIELD = new Set(['r', 'k', 'h', 'f', 'b', 'S', 'E', 'O', 'R']);
     const glyph = (r, c) => grid[r]?.[c]?.glyph;
+    const slots = new Set((stage.mapChars || []).map((m) => `${m.pos?.[0]},${m.pos?.[1]}`));
+    // raised kit blocks take the height the board gives the glyph (units, map characters and benches stand on it)
+    const height = { '#': TILE_H.forbid, a: TILE_H.bench, A: TILE_H.bench, X: TILE_H.sep, h: TILE_H.wall };
+    const top = (list) => list.reduce((m, bucket) => { for (let i = 2; i < bucket.position.length; i += 3) m = Math.max(m, bucket.position[i]); return m; }, 0);
     const lists = new Map(), covered = new Set();
     for (const row of grid) for (const t of row) {
       if (!t.drawn) continue;
       let role = theme.kit[t.glyph];
-      if (t.glyph === '#' && [[0, 1], [0, -1], [1, 0], [-1, 0]].some(([dr, dc]) => FIELD.has(glyph(t.r + dr, t.c + dc)))) role = 'rocks';
+      // a forbidden tile by a field is a rock heap — except the map characters' slots (Touch / reserve medic of the
+      // 外勤医疗 strategy), which stay a flat block they stand on
+      if (t.glyph === '#' && !slots.has(`${t.r},${t.c}`) && [[0, 1], [0, -1], [1, 0], [-1, 0]].some(([dr, dc]) => FIELD.has(glyph(t.r + dr, t.c + dc)))) role = 'rocks';
       const variants = role && roles[role];
       if (!variants?.length) continue;
       const pick = variants[((Math.imul(t.r + 1, 73856093) ^ Math.imul(t.c + 1, 19349663)) >>> 0) % variants.length];
       for (const bucket of pick) {
-        // high ground: the official block (top 0.38) raised to the board's high-ground height, where units stand
-        const zs = role === 'high' ? TILE_H.wall / 0.38 : 1;
+        const h = role !== 'rocks' && height[t.glyph], z0 = h ? top(pick) : 0;
+        const zs = h && z0 > 0.05 ? h / z0 : 1;
         const position = Float32Array.from(bucket.position, (v, i) => (i % 3 === 0 ? v + t.c : i % 3 === 1 ? v + t.r : v * zs));
         const key = `${bucket.material}|${bucket.lightMap || ''}`;
         if (!lists.has(key)) lists.set(key, { bucket, list: [] });
