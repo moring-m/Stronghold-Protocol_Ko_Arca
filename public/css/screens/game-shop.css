@@ -350,7 +350,7 @@
 .shopbar--official .lvcard { width: 1.11rem; height: 1.76rem; clip-path: none; gap: 0; padding: 0; justify-content: flex-start; color: #57e8cb;
   background: var(--sp-panel-stripe-line, none) center / 100% 100% no-repeat, #107463; }
 .shopbar--official .lvcard::before { content: ''; position: absolute; inset: 0; opacity: .6; background: var(--sp-card-repeat-line, none) 0 0 / .16rem .16rem repeat; pointer-events: none; }
-.shopbar--official .lvcard__price { top: -.2rem; z-index: 2; }
+.shopbar--official .lvcard__price { top: -.05rem; z-index: 2; } /* root_cost 75 px above the card's centre: on its top edge */
 .shopbar--official .lvcard__frame { margin-top: .28rem; width: .97rem; height: .85rem; padding: 0; border: 0; justify-content: center;
   background: var(--sp-panel-frame, none) center / 100% 100% no-repeat, rgba(2, 2, 1, .6); }
 .shopbar--official .lvcard__frame::before { left: 50%; top: .08rem; transform: translateX(-50%); width: .39rem; height: .09rem; border: 0; background: var(--sp-panel-level, none) center / contain no-repeat; }
@@ -371,11 +371,17 @@
 .shopbar--official .lvcard.is-armed .lvcard__label { color: #d6fff6; }
 
 /* 冻结 / 刷新 (147×77 plates) */
-.shopbar--official .toolbtn--ice, .shopbar--official .toolbtn--amber { height: .55rem; min-width: 1.28rem; padding: 0 .12rem 0 .08rem; border: 0; color: rgba(0, 0, 0, .9);
-  font-size: .19rem; font-weight: 700; letter-spacing: .04em; box-shadow: none; background: var(--sp-panel-refresh-bg-normal, var(--amber)) center / 115% 140% no-repeat; }
-.shopbar--official .toolbtn--ice { background-image: var(--sp-panel-frozen-bg-unselect, none); background-color: #bfe3f7; }
-.shopbar--official .toolbtn--ice.is-on { background-image: var(--sp-panel-frozen-bg-normal, none); background-color: #6cc4ef; color: rgba(0, 0, 0, .9); }
-.shopbar--official .toolbtn--ice:disabled, .shopbar--official .toolbtn--amber:disabled { background-image: var(--sp-panel-bg-lock, none); background-color: #555; color: rgba(0, 0, 0, .9); }
+.shopbar--official .toolbtn--ice, .shopbar--official .toolbtn--amber { position: relative; isolation: isolate; height: .55rem; min-width: 1.28rem; padding: 0 .1rem 0 .08rem;
+  border: 0; color: rgba(0, 0, 0, .9); font-size: .19rem; font-weight: 700; letter-spacing: .04em; box-shadow: none; background: none; }
+/* the 147×77 plate hangs 1 px left and 9 px low of the 128×55 button (its drop shadow under it) */
+.shopbar--official .toolbtn--ice::before, .shopbar--official .toolbtn--amber::before { content: ''; position: absolute; z-index: -1; pointer-events: none;
+  left: -7.4%; right: -7.4%; top: -.02rem; bottom: -.2rem; background: var(--sp-panel-refresh-bg-normal, var(--amber)) center / 100% 100% no-repeat; }
+.shopbar--official .toolbtn--ice::before { background: var(--sp-panel-frozen-bg-unselect, #bfe3f7) center / 100% 100% no-repeat; }
+.shopbar--official .toolbtn--ice.is-on { background: none; color: rgba(0, 0, 0, .9); }
+.shopbar--official .toolbtn--ice.is-on::before { background-image: var(--sp-panel-frozen-bg-normal, none); }
+.shopbar--official .toolbtn--ice:disabled::before, .shopbar--official .toolbtn--amber:disabled::before { background: var(--sp-panel-bg-lock, #555) center / 100% 100% no-repeat; }
+.shopbar--official .toolbtn--ice:disabled, .shopbar--official .toolbtn--amber:disabled { background: none; color: rgba(0, 0, 0, .9); }
+.shopbar--official .shopbar__tools { row-gap: .14rem; margin-bottom: .5rem; }
 .shopbar--official .toolbtn--ice:hover:not(:disabled), .shopbar--official .toolbtn--amber:hover:not(:disabled) { filter: brightness(1.08); box-shadow: none; }
 .shopbar--official .toolbtn--ice kbd, .shopbar--official .toolbtn--amber kbd { color: rgba(0, 0, 0, .65) !important; border-color: rgba(0, 0, 0, .3) !important; background: rgba(255, 255, 255, .25) !important; }
 .shopbar--official .toolbtn--amber .hex--gold .hex__fill { background: var(--sp-panel-cost-bg-1, none) center / 100% 100% no-repeat; clip-path: none; }
@@ -386,16 +392,17 @@
 .shopbar--official .shopbar__remain b { color: #fff; }
 
 /* funds (bg_money 110×37, #ffba00 28 px) and 收起 (bg_close 181×197) */
-.shopbar--official .funds { width: 1.68rem; border-left: 0; justify-content: flex-end; gap: .04rem; padding: 0; }
-.shopbar--official .funds__hex { width: 1.1rem; height: .37rem; clip-path: none; flex-direction: row; justify-content: flex-end; padding-right: .22rem;
+.shopbar--official .funds { position: relative; width: 1.68rem; border-left: 0; justify-content: flex-end; gap: 0; padding: 0; }
+/* group_money: the plate 46 px above the 收起 panel's centre, over the band's top edge */
+.shopbar--official .funds__hex { position: absolute; left: 50%; top: -.44rem; transform: translateX(-50%); width: 1.1rem; height: .37rem; clip-path: none; flex-direction: row; justify-content: flex-end; padding-right: .22rem;
   background: var(--sp-panel-bg-money, linear-gradient(180deg, #2b2410, #16120a)) center / 100% 100% no-repeat; }
 .shopbar--official .funds__hex::before { content: none; }
 .shopbar--official .funds__coin { opacity: 0; width: .2rem; }
 .shopbar--official .funds__num { font-size: .28rem; color: #ffba00; font-weight: 500; }
 .shopbar--official .funds__label { display: none; }
-.shopbar--official .funds__collapse { position: relative; width: 1.68rem; height: 1.3rem; flex-direction: column; justify-content: flex-end; gap: 0;
+.shopbar--official .funds__collapse { position: relative; width: 1.68rem; height: 100%; flex-direction: column; justify-content: flex-end; gap: 0;
   padding: 0 0 .1rem; border: 0; color: #37e5ca; font-size: .2rem; font-weight: 500;
-  background: var(--sp-panel-bg-close, #17362e) center top / contain no-repeat; }
+  background: var(--sp-panel-bg-close, #17362e) center / 100% 100% no-repeat; }
 .shopbar--official .funds__collapse:hover { background-color: transparent; color: #8ffff0; filter: brightness(1.1); }
 .shopbar--official .funds__collapse .icon { display: none; }
 .shopbar--official .funds__collapse kbd { color: #37e5ca !important; border-color: rgba(55, 229, 202, .5) !important; background: rgba(0, 0, 0, .4) !important; }
