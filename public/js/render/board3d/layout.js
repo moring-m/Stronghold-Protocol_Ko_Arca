@@ -204,6 +204,7 @@ export function classifyStage(stage, area = null) {
         t.glass = t.r >= pen.r0 && t.r <= pen.r1 && t.c >= pen.c0 && t.c <= pen.c1;
         break;
       case 'b': t.rot = (h % 4) * 90; break;
+      case 'k': t.rot = (h % 4) * 90; t.flipX = ((h >> 3) & 1) === 1; break;
       case 'S': t.surf = 'concreteArrow'; break;
       case 'E': t.surf = 'ringHatch'; break;
       case 'I': case 'O': t.surf = 'lift'; t.rot = t.glyph === 'O' ? 180 : 0; break;
@@ -445,6 +446,16 @@ export function buildBoard(stage, opts = {}) {
     if (E && !S && !N && (r % 2 === 0)) corner(x1 - e, y0, `${r},${c},em`);
   }
 
+  // 덤불 (thicket 'k'): a glowing pink frame on every cell — its outer border and the seams between its cells (a shared
+  // seam once: the S / W side always, the N / E side only on the region's border)
+  const thicket = [];
+  const isK = (r, c) => { const n = at(r, c); return !!n && n.drawn && n.glyph === 'k'; };
+  for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+    if (!isK(r, c)) continue;
+    const z = topZ(grid[r][c]);
+    for (const [dir, dx, dy] of DIRS) if (dir === 'S' || dir === 'W' || !isK(r + dy, c + dx)) thicket.push({ r, c, dir, z, outer: !isK(r + dy, c + dx) });
+  }
+
   // cyan field edge: emissive strips along the play areas' outer border (the official boundary glow)
   const edges = [];
   const zone = (t) => !!t && t.drawn && t.content && t.glyph !== 'a' && t.glyph !== 'A';
@@ -485,7 +496,7 @@ export function buildBoard(stage, opts = {}) {
   }
 
   return {
-    grid, gates, devices, terrain, edges,
+    grid, gates, devices, terrain, edges, thicket,
     buckets: { board: board.finish(), decal: decal.finish(), pipe: pipe.finish(), glass: glass.finish(), raised: raised.finish(), raisedDecal: raisedDecal.finish() },
     bounds: { x0: minX, x1: maxX, y0: minY, y1: maxY },
     stats: { tiles: grid.flat().filter((t) => t.drawn).length, vertices: board.vertexCount + decal.vertexCount + pipe.vertexCount },

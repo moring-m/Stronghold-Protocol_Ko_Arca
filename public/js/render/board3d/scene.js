@@ -685,7 +685,8 @@ export class BoardScene {
     const native = this.mapQuality !== 'low' && stage ? this.pack?.original?.scenes?.[stage.originalStageId || stage.id] : null;
     const nativeReady = native && Object.keys(native.buckets).length > 0
       && Object.entries(native.buckets).every(([k,g]) => this.originalMaterials[g.material || k]);
-    const official = stage && !nativeReady ? this.scenePacks.get(stage.id) || null : null;
+    // 'low' (단순 3D) never draws the official scene pack (the original map's mesh): the procedural board stands alone
+    const official = stage && !nativeReady && this.mapQuality !== 'low' ? this.scenePacks.get(stage.id) || null : null;
     const key = stage ? `${stage.id || ''}|${official ? official.key : ''}|${stage.previewLayout ? stage.previewLayout.worldOffset || 0 : 'native'}|${(stage.rows || []).join('/')}|${JSON.stringify((stage.devices || []).map((d) => [d.key, d.pos, d.active, d.dir]))}` : '';
     if (key === this.stageKey) return;
     const layoutKey=stage ? `${key}|${this.areaKey}|${this.mapQuality}|${!!this.pack?.original?.scenes?.[stage.originalStageId || stage.id]}` : null;
@@ -956,6 +957,7 @@ export class BoardScene {
     yield;
     this._buildGates(board);
     if (!original) this._buildEdges(board);
+    this._buildThicket(board);
     yield;
     this._buildTerrain(board);
     if (!this.official) this._buildBackground(board);
@@ -1160,6 +1162,30 @@ export class BoardScene {
     if (startAdd.length) this.meshes.gateStart = this._mesh(mergeInto(startAdd), this.mat.gateStartAdd, opt);
     if (endAdd.length) this.meshes.gateEndAdd = this._mesh(mergeInto(endAdd), this.mat.gateEndAdd, opt);
     if (endAb.length) this.meshes.gateEndAb = this._mesh(mergeInto(endAb), this.mat.gateEndAb, { ...opt, order: 4 });
+  }
+
+  /** 덤불 frames (layout.js `thicket`): a pink glow strip along each side, the region's border wider. */
+  _buildThicket(board) {
+    const list = board.thicket || [];
+    if (!list.length) return;
+    const pos = [], uv = [], idx = [];
+    for (const s of list) {
+      const w = s.outer ? 0.07 : 0.04, x0 = s.c - 0.5, x1 = s.c + 0.5, y0 = s.r - 0.5, y1 = s.r + 0.5, z = s.z + 0.008;
+      let q;
+      switch (s.dir) {
+        case 'S': q = [[x0, y0, z], [x1, y0, z], [x1, y0 + w, z], [x0, y0 + w, z]]; break;
+        case 'N': q = [[x0, y1 - w, z], [x1, y1 - w, z], [x1, y1, z], [x0, y1, z]]; break;
+        case 'E': q = [[x1 - w, y0, z], [x1, y0, z], [x1, y1, z], [x1 - w, y1, z]]; break;
+        default: q = [[x0, y0, z], [x0 + w, y0, z], [x0 + w, y1, z], [x0, y1, z]]; break;
+      }
+      const b = pos.length / 3;
+      for (const p of q) pos.push(...p);
+      uv.push(0, 0, 1, 0, 1, 1, 0, 1);
+      idx.push(b, b + 1, b + 2, b, b + 2, b + 3);
+    }
+    const nrm = new Float32Array(pos.length); for (let i = 2; i < nrm.length; i += 3) nrm[i] = 1;
+    this.mat.thicket ||= new this.THREE.MeshBasicMaterial({ color: 0xff7f6a, transparent: true, opacity: 0.95, depthWrite: false, side: this.THREE.DoubleSide, fog: false, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3 });
+    this.meshes.thicket = this._mesh({ position: new Float32Array(pos), normal: nrm, uv: new Float32Array(uv), color: null, index: new Uint16Array(idx) }, this.mat.thicket, { cast: false, receive: false, order: 3 });
   }
 
   _buildEdges(board) {

@@ -88,6 +88,8 @@ export const DEFAULT_LEGEND = Object.freeze({
   g: { height: 'LOW', build: 'ALL', pass: 'ALL', key: 'tile_smog', terrain: 'smog' },
   d: { height: 'LOW', build: 'NONE', pass: 'ALL', key: 'tile_deepsea', terrain: 'deepsea' },
   i: { height: 'LOW', build: 'ALL', pass: 'ALL', key: 'tile_infection', terrain: 'infection' },
+  // 덤불 (the fork's 설원 battlefield): 隐匿 for the operators and the enemies on it (content/devices.js thicket)
+  k: { height: 'LOW', build: 'ALL', pass: 'ALL', key: 'tile_custom_thicket', terrain: 'thicket' },
 });
 
 /**
@@ -99,7 +101,7 @@ export const DEFAULT_LEGEND = Object.freeze({
  */
 export const DEPLOY_REFUSED_TILES = Object.freeze(new Set(['tile_deepsea']));
 
-const TERRAIN_BY_KEY = { tile_mire: 'mire', tile_smog: 'smog', tile_deepsea: 'deepsea', tile_infection: 'infection', tile_deepwater: 'deepsea' };
+const TERRAIN_BY_KEY = { tile_mire: 'mire', tile_smog: 'smog', tile_deepsea: 'deepsea', tile_infection: 'infection', tile_deepwater: 'deepsea', tile_custom_thicket: 'thicket' };
 const SPECIAL_BY_KEY = { tile_start: 'start', tile_end: 'end', tile_telin: 'telin', tile_telout: 'telout' };
 
 function normPass(v) {

@@ -56,6 +56,7 @@ export function fallbackTileClass(stage, row, col) {
   if (glyph === 'g') return 'smog';
   if (glyph === 'd') return 'deep';
   if (glyph === 'i') return 'infect';
+  if (glyph === 'k') return 'thicket';
   if (t.buildable === 'NONE') return 'lane';
   return 'floor';
 }

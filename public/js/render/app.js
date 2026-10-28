@@ -753,6 +753,8 @@ export async function createFieldView(host, options = {}) {
   /** The stage's official scene, once loaded (the procedural board shows meanwhile and when there is none). */
   function useOfficialScene(st) {
     if (st?.coopEightStage || st?.previewLayout) return;
+    // 맵 품질 '낮음' (단순 3D): the simple procedural board only — the official scene pack is the original map's mesh
+    if (settings.mapQuality === 'low') return;
     const id = st && typeof st.id === 'string' ? st.id : '';
     if (!id || !board3d) return;
     loadScenePack(assets, id).then((scene) => {

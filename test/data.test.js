@@ -277,7 +277,7 @@ test('config: modes, rounds and templates', () => {
 });
 
 test('stages: 19 rows × 21 cols with known glyphs; paths are contiguous', () => {
-  const glyphs = new Set('#XrRfphbaASEIOmgdi'.split(''));
+  const glyphs = new Set('#XrRfphbaASEIOmgdik'.split('')); // k: 덤불 (the fork's custom battlefields)
   for (const s of Object.values(stages)) {
     assert.equal(s.rows.length, 19, `${s.id}: rows`);
     for (const row of s.rows) {
@@ -298,7 +298,7 @@ test('stages: 19 rows × 21 cols with known glyphs; paths are contiguous', () =>
     }
     assert.ok(s.groundPaths['9,10->9,2'], `${s.id}: lower gate path`);
   }
-  assert.equal(Object.values(stages).filter((s) => s.active).length, 8);
+  assert.equal(Object.values(stages).filter((s) => s.active && !s.customExtension).length, 8); // official ones (custom: room pick)
 });
 
 test('bosses, factions, tokens and choices resolve', () => {

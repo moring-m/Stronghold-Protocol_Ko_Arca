@@ -729,6 +729,12 @@ export class TileField {
   _buildBoxes() {
     for (const b of this.boxes) b.g.destroy();
     this.boxes = [];
+    // 덤불 (thicket 'k') frames on the 2D board (the 3D board draws its own: board3d/scene.js _buildThicket)
+    this.thicketG?.destroy();
+    this.thicketG = null;
+    this.thicketTiles = [];
+    for (let r = 0; r < this.grid.length; r++) for (let c = 0; c < this.grid[0].length; c++) if (this.grid[r][c].drawn && this.grid[r][c].glyph === 'k') this.thicketTiles.push([r, c]);
+    if (this.thicketTiles.length) { this.thicketG = new this.P.Graphics(); this.thicketG.zIndex = -1e6; this.layers.props.addChild(this.thicketG); }
     // the field's gates / objectives, and the enemy preview pen's two gates (the red cubes behind which the next
     // round's enemies wait) whenever the pen's rows are drawn — the prep and pen cameras (render/app/view.js bandFor),
     // also as dim scenery
@@ -749,6 +755,18 @@ export class TileField {
     const cam = this.cam;
     if (!cam) return;
     const t = this.time;
+    if (this.thicketG) {
+      const g = this.thicketG;
+      g.clear();
+      g.visible = !this.external;
+      if (g.visible) for (const [r, c] of this.thicketTiles) {
+        const k = boxCorners(cam, c, r, 0.01, 0.94, 0);
+        g.lineStyle(Math.max(1.5, cam.scaleAt(c, r, 0) * 0.05), 0xff7f6a, 0.95);
+        g.beginFill(0xff7f6a, 0.08);
+        g.drawPolygon([...k.b0, ...k.b1, ...k.b2, ...k.b3]);
+        g.endFill();
+      }
+    }
     for (const { r, c, gate, g } of this.boxes) {
       g.clear();
       // just in front of its row's blocks, behind the units standing in the gate
