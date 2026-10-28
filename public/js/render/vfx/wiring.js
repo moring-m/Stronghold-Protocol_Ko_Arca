@@ -75,6 +75,19 @@ const ENEMY_ZONES = Object.freeze({
   enemy_10122_uacann_2: ['burning', 'projectile_enemy_uacann', 'onHit', 'shown'],
 });
 
+/**
+ * Sim area fx (b.fx 'telegraph' / 'explode', extra.kind) drawn with the source unit's own skill effects (its skill's
+ * roles in the fx index) instead of the simple rings: { skill, telegraph: role played on the ground for the warning's
+ * duration, explode: role played once at the blast (null: the skill's start effect, cast with it, already holds it) }.
+ */
+const ENEMY_AREA_FX = Object.freeze({
+  // “巨大的丑东西” KO self-destruct (bomb[reborning]): mcmstr_die_01_range marks the area; mcmstr_die_01_start (cast at the
+  // KO with the skill) carries the blast
+  mechBomb: Object.freeze({ skill: 'bomb[reborning]', telegraph: 'range', explode: null }),
+  // “自在” 破桎而出 (ShieldBurst / ShieldBurstReborn): the barrier loops while it holds, its trigger effects at the burst
+  breakFree: Object.freeze({ skill: ['shieldburstreborn', 'shieldburst'], telegraph: 'loop', explode: 'trigger' }),
+});
+
 /** Battle seconds a melee blow waits for its damage. */
 const MELEE_WINDOW = 0.4;
 /** Battle seconds a projectile's arrival covers the damage event it stands for. */
@@ -1785,6 +1798,22 @@ export class FxWiring {
       const key = kind === 'telegraph' ? proj?.effects?.find((k) => /_buff$/.test(k)) : proj?.onReached?.[0];
       const h = key ? this.playOn(key, { x, y, z: 0 }, { loop: kind === 'telegraph', important: true }) : null;
       if (h) { if (kind === 'telegraph') setTimeout0(this.ofx, h, Number(extra.dur) || 0); return true; }
+    }
+    if ((kind === 'telegraph' || kind === 'explode') && ENEMY_AREA_FX[extra?.kind] && this.ofx.active) {
+      const spec = ENEMY_AREA_FX[extra.kind], src = this.view(extra.id), unit = src ? this.unitOf(src) : null;
+      const skills = unit?.skills || {};
+      const sk = [].concat(spec.skill).map((n) => skills[n]).find(Boolean);
+      const role = spec[kind];
+      if (sk && role === null) return true;
+      const keys = sk && role ? sk.roles?.[role] || [] : [];
+      let drawn = false;
+      for (const key of keys) {
+        const h = this.playOn(key, { x, y, z: 0 }, { loop: kind === 'telegraph', important: true });
+        if (!h) continue;
+        if (kind === 'telegraph') setTimeout0(this.ofx, h, Number(extra.dur) || 0);
+        drawn = true;
+      }
+      if (drawn) return true;
     }
     if (kind === 'zone' && this.ofx.active) {
       const zone = ENEMY_ZONES[extra?.sourceDef];
