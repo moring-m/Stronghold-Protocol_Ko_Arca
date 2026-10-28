@@ -441,19 +441,19 @@ html:not([lang="ko"]) .mode-cards .mode-card--lab .mode-card__name{font-size:.24
  .practice-screen .practice-options{min-height:140px;}.practice-screen .practice-options:last-of-type{grid-column:span 2;}
 }
 
-/* ── visual consistency (layout unchanged): one selected badge, shared switch, labeled counts ── */
-.lobby-screen .diff-card__check { flex-direction:row; align-self:start; grid-row:1; gap:.05rem; padding:.03rem .1rem; border:1px solid transparent; font-size:calc(.13 * var(--t)); font-weight:700; opacity:0; transition:opacity var(--t-med); }
-.lobby-screen .diff-card__check .icon { width:.16rem; height:.16rem; padding:0; border:0; border-radius:0; background:none!important; color:inherit!important; transform:none!important; }
-.lobby-screen .diff-card__check span { opacity:1; }
-.lobby-screen .diff-card.is-selected .diff-card__check { opacity:1; color:#111; background:var(--d-color); border-color:var(--d-color); }
-.lobby-screen .diff-card__head { grid-column:1; }
+/* ── visual consistency (layout unchanged): shared switch, tag-style round count ── */
 .lobby-screen .diff-card__meta { gap:.06rem; }
 .lobby-screen .diff-card__meta > .num { padding:0 .06rem; border:1px solid var(--line-2); }
 .lobby-screen .diff-card__effects { color:var(--text-md); }
 .lobby-screen .mode-card__public { display:inline-flex; align-items:center; gap:.06rem; }
 .lobby-screen .mode-card__public input.ui-switch { width:34px; height:18px; margin:0; }
 .lobby-screen .lobby-create { letter-spacing:.08em; }
-.lobby-screen .public-rooms-entry__total { gap:.16rem; }
-.public-rooms-entry__stat { display:flex; flex-direction:column; align-items:flex-end; gap:2px; }
-.public-rooms-entry__stat small { color:var(--text-lo); font-size:max(.13rem,11px); white-space:nowrap; letter-spacing:0; font-family:inherit; }
-.lobby-screen .public-rooms-entry__all { color:var(--text-md); }
+/* same type scale for the same role across mode, lab and difficulty cards */
+.lobby-screen .mode-cards .mode-card--lab .mode-card__name { font-size:clamp(16px,calc(1.5 * var(--ui-vw, 1vw)),26px); }
+.lobby-screen .mode-card:not(.mode-card--lab) .mode-card__desc,.lobby-screen .diff-card__desc { font-size:max(.16rem,12px); }
+.lobby-screen .mode-card__desc { color:var(--text-md); }
+.lobby-screen .mode-card__points span,.lobby-screen .diff-card__effects span { font-size:max(.14rem,11px); }
+.lobby-screen .diff-card__hidden { display:inline-flex; align-items:center; min-height:20px; box-sizing:border-box; font-size:max(.14rem,11px); }
+.lobby-screen .join-foot .t-dim,.lobby-screen .create-box__hint { color:var(--text-lo); font-size:max(.14rem,12px); }
+.lobby-screen .mode-card__public span { font-size:max(.18rem,15px); }
+.lobby-screen .diff-card__meta > .num { line-height:18px; }
