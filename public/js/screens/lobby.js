@@ -23,7 +23,7 @@ import { TestMark } from '../ui/testConsole.js';
 import { ResumeMatchButton } from '../ui/resumeMatch.js';
 import { useEffect, useRef, useState } from '../../vendor/hooks.module.js';
 import { DIFFICULTIES, DIFFICULTY_NAMES, DIFFICULTY_COLORS, ROOM_CODE_LEN, MAX_SEATS, MAX_SPECTATORS, MAX_SPECTATOR_SEATS, ERR, modeIdFor } from '../../../shared/constants.js';
-import { html, Button, Icon, MicroLabel, Panel, TextField, PingPill, AvatarFrame, Tooltip, Spinner, Modal, DifficultyIcon, doctorNo } from '../ui/components.js';
+import { html, Button, Icon, MicroLabel, Panel, TextField, PingPill, OnlinePill, AvatarFrame, Tooltip, Spinner, Modal, DifficultyIcon, doctorNo } from '../ui/components.js';
 import { toast, toastError } from '../ui/toasts.js';
 import { GuideButton } from '../ui/guide.js';
 import { SettingsButton } from '../ui/settings.js';
@@ -375,7 +375,7 @@ export function LobbyScreen() {
 
   const headerLeft=onBack=>html`      <div class="topbar__left">
         <${Button} variant="ghost" size="sm" icon="chevronLeft" class="nav-back" onClick=${onBack} title="返回标题">返回<//>
-        <${PingPill} ms=${conn.ping} online=${online} />
+        <div class="lobby-presence"><${PingPill} ms=${conn.ping} online=${online} /><${OnlinePill} count=${online?publicRoomCount?.online:undefined} /></div>
         <${PatchNotesButton} autoOpen=${true} />
         <${Button} variant="secondary" size="sm" icon="report" class="lobby-sweep" onClick=${() => setSweepOpen(true)}>S.W.E.E.P. 리포트<//>
       </div>
@@ -394,7 +394,7 @@ export function LobbyScreen() {
         </button>
       </div>
 `;
-  if(publicOpen)return html`<${PublicRoomsScreen} headerLeft=${headerLeft(()=>setPublicOpen(false))} headerRight=${headerRight} onJoin=${join} onSpectate=${spectate}/>${sweepOpen?html`<${SweepReport} onClose=${()=>setSweepOpen(false)}/>`:null}`;
+  if(publicOpen)return html`<${PublicRoomsScreen} onCounts=${setPublicRoomCount} headerLeft=${headerLeft(()=>setPublicOpen(false))} headerRight=${headerRight} onJoin=${join} onSpectate=${spectate}/>${sweepOpen?html`<${SweepReport} onClose=${()=>setSweepOpen(false)}/>`:null}`;
   return html`<div class="screen lobby-screen">
     <header class="topbar app-topbar">
       ${headerLeft(backToTitle)}

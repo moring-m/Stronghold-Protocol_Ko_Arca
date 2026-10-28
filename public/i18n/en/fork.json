@@ -3302,5 +3302,15 @@
   "연합 8인": "Alliance 8P",
   "참가 · 탐색": "Join · Browse",
   "전체 방": "All rooms",
-  "공개 방 탐색": "Browse public rooms"
+  "공개 방 탐색": "Browse public rooms",
+  "새로고침": "Refresh",
+  "목록 새로고침": "Refresh list",
+  "방금 갱신": "Just updated",
+  "{0}초 전 갱신": "Updated {0}s ago",
+  "지금 열려 있는 공개 방이 없습니다.": "No public rooms are open right now.",
+  "필터를 바꾸거나 초기화해 보세요.": "Try changing or resetting the filters.",
+  "로비에서 연합 시뮬레이션을 공개로 만들면 이 목록에 표시됩니다.": "Alliance simulations created as public in the lobby appear here.",
+  "접속 중 {0}명": "{0} online",
+  "접속 인원 확인 중": "Checking players online",
+  "공개 방을 불러오는 중입니다.": "Loading public rooms."
 }
