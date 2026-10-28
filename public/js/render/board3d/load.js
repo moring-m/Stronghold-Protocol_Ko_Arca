@@ -82,8 +82,8 @@ export const BOARD_THEMES = Object.freeze({
   snow: Object.freeze({
     D: ['map/snowfield', 'TX_snowfield_D'], N: ['map/snowfield', 'TX_snowfield_N_rgb'], R: ['map/snowfield', 'TX_snowfield_M_rough'],
     E: ['map/snowfield', 'TX_snowfield_E'],
-    // the ground far below (MT_LAND _Color of level_main_08-01, as compose-snowfield-scene.py `backdrop`)
-    backdrop: [0.78, 0.859, 0.945],
+    // the ground far below: the blue-grey of the official snow scenes' distance
+    backdrop: [0.42, 0.5, 0.6],
     // map/original scene of the surroundings (tools/local-extract/compose-snowfield-scene.py; level_main_08-01)
     scenery: 'snowfield-scenery',
     light: Object.freeze({ color: 0xd6e2f0, intensity: 1.9, hemi: 0.5 }),

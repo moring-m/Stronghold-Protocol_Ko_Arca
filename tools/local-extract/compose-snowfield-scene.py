@@ -7,9 +7,10 @@ The official scene is cut into its authored pieces (one per renderer, board spac
                 builds (normal field, cooperative / boss arena, the four-field co-op board) by the tile glyph
                 (load.js BOARD_THEMES.snow.kit); tiles without a role (benches' gates, works, preview pen, ...) stay
                 the procedural board in the themed atlas (compose-snowfield-atlas.py)
-  side 'around': the surroundings as authored (snow terrain, mountain rocks, ice walls, rock cubes, snow planes), each
-                half moved out by SPREAD for the wider autochess board, about the board's centre; the renderer drops
-                the terrain triangles and the whole pieces that reach over the board it builds
+  side 'around': the surroundings as authored (snow terrain, land planes, mountain rocks, ice walls, rock cubes, snow
+                planes) about the board's centre; the renderer presses the terrain under the board and moves each
+                piece reaching over the board it builds just clear of it (the official island is as large as the
+                autochess board, so most pieces would stand on it as authored)
 Nothing is placed over a tile the board draws, so no field, bench or the enemy preview pen is covered.
 
 Usage: python -I compose-snowfield-scene.py <bundle dir> <out dir>
@@ -175,30 +176,20 @@ def prototype(pc):
 
 
 FIELD_X0, FIELD_X1, FIELD_CY = 4.5, 15.5, 9.0  # the official field (cols 5–15) and its centre row, board space
-SPREAD = 5.5  # the autochess board is ~11 tiles wider: each half of the surroundings moves out by this much
 SURROUNDINGS = ('iceland', 'mountain_rock', 'S_outworld_icewall', 'S_outworld_cube', 'S_outworld_rock', 'decore_rock',
-                'pPlane', 'ouworld_rock')
+                'pPlane', 'ouworld_rock', 'land_base')
 cx0 = (FIELD_X0 + FIELD_X1) / 2
 for k_, pc in enumerate(pieces):
     if not pc['name'].startswith(SURROUNDINGS):
         continue
-    if pc['name'].startswith('iceland'):
-        # the snow terrain: each triangle moves with its half; the renderer drops those over the board
-        cen = pc['p'][pc['tri']].mean(axis=1)[:, 0]
-        for half, sign in ((cen < cx0, -1), (cen >= cx0, 1)):
-            b = bucket(pc['material'], pc['light'], 'around')
-            b['cut'] = 'terrain'
-            used, idx = np.unique(pc['tri'][half], return_inverse=True)
-            p = pc['p'][used] - np.array([cx0 - sign * SPREAD, FIELD_CY, 0])
-            add(b, p, pc['n'][used], pc['uv'][used], pc['uv1'][used], pc['col'][used], idx.reshape(-1, 3))
-        continue
-    # a whole piece moves with the half it stands in; the renderer leaves out any piece reaching over the board
-    sign = -1 if pc['centre'][0] < cx0 else 1
+    # as authored, about the official field's centre: the snow terrain (pressed under the board by the renderer), the
+    # land planes (the ground everywhere beyond) and the pieces (moved just clear of the board by the renderer)
+    cut = 'terrain' if pc['name'].startswith('iceland') else 'none' if pc['name'].startswith('land_base') else 'piece'
     key = f'around:{k_}:' + pc['material'] + (f'@lightmap{pc["light"]}' if pc['light'] is not None else '')
-    b = buckets.setdefault(key, {'material': pc['material'], 'platform': False, 'side': 'around', 'cut': 'piece',
+    b = buckets.setdefault(key, {'material': pc['material'], 'platform': False, 'side': 'around', 'cut': cut,
                                  'lightMap': lightmaps[pc['light']] if pc['light'] is not None else None,
                                  'position': [], 'normal': [], 'uv': [], 'uv1': [], 'color': [], 'index': []})
-    add(b, pc['p'] - np.array([cx0 - sign * SPREAD, FIELD_CY, 0]), pc['n'], pc['uv'], pc['uv1'], pc['col'], pc['tri'])
+    add(b, pc['p'] - np.array([cx0, FIELD_CY, 0]), pc['n'], pc['uv'], pc['uv1'], pc['col'], pc['tri'])
 
 # ---- the tile kit: the official tile meshes, one prototype per piece, centred on its tile (x, y about 0) ----
 # role ← piece (matched against the official field of the screenshot): white snow slab = ground, dark-blue slab = ice
@@ -218,6 +209,8 @@ def luminance(pc):
 
 def role(pc):
     n, top = pc['name'], pc['p'][:, 2].max()
+    if pc['p'][:, 2].min() > 0:
+        return None  # a slab resting on another piece (S_playground_stone8): it would float on its own
     if n.startswith('S_playground_import304'):
         return 'fence'
     if n.startswith('S_playground_fixhighground') or (n.startswith('S_playground_gird') and top > 0.3):

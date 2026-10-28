@@ -726,8 +726,9 @@ export class BoardScene {
   }
 
   /**
-   * The theme's surroundings ('around' buckets) about the built board's centre: the terrain minus the board's footprint
-   * and the pieces that stay clear of it — so no field, bench or preview pen is covered in any mode.
+   * The theme's surroundings ('around' buckets) about the built board's centre, as authored: the land planes, the terrain
+   * pressed under the board's footprint and the pieces moved just clear of it — so no field, bench or preview pen is covered
+   * in any mode, and nothing lies open between the board and its surroundings.
    */
   _buildThemeScenery(stage, board) {
     const scene = this._themeScenery(stage), b = board?.bounds;
@@ -741,19 +742,23 @@ export class BoardScene {
       const over = (x, y) => x > b.x0 - 0.2 && x < b.x1 + 0.2 && y > b.y0 - 0.2 && y < b.y1 + 0.2;
       let index = bucket.index;
       if (bucket.cut === 'terrain') {
-        // the snow terrain stops at the board: whole triangles whose centre lies on its footprint are dropped
-        const keep = [];
-        for (let t = 0; t < index.length; t += 3) {
-          let x = 0, y = 0;
-          for (let k = 0; k < 3; k++) { x += position[index[t + k] * 3] / 3; y += position[index[t + k] * 3 + 1] / 3; }
-          if (!over(x, y)) keep.push(index[t], index[t + 1], index[t + 2]);
-        }
-        index = keep;
+        // the snow terrain stays whole (no hole): on the board's footprint it is pressed under the snow ground
+        for (let v = 0; v < position.length; v += 3) if (over(position[v], position[v + 1])) position[v + 2] = Math.min(position[v + 2], -0.3);
+      } else if (bucket.cut === 'none') {
+        // the land planes: the ground everywhere beyond the terrain, as authored
       } else {
-        // a whole piece reaching over the board is left out (it would stand on a field, bench or the preview pen)
-        let hit = false;
-        for (let v = 0; v < position.length && !hit; v += 3) hit = over(position[v], position[v + 1]);
-        if (hit) continue;
+        // a whole piece reaching over the board moves out by the shortest way that clears it (left, right, front or
+        // back), so the surroundings keep their authored arrangement and hug the board without standing on a field,
+        // a bench or the preview pen
+        let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+        for (let v = 0; v < position.length; v += 3) {
+          x0 = Math.min(x0, position[v]); x1 = Math.max(x1, position[v]); y0 = Math.min(y0, position[v + 1]); y1 = Math.max(y1, position[v + 1]);
+        }
+        if (x1 > b.x0 - 0.2 && x0 < b.x1 + 0.2 && y1 > b.y0 - 0.2 && y0 < b.y1 + 0.2) {
+          const moves = [[b.x0 - 0.2 - x1, 0], [b.x1 + 0.2 - x0, 0], [0, b.y0 - 0.2 - y1], [0, b.y1 + 0.2 - y0]];
+          const [dx, dy] = moves.reduce((m, d) => (Math.abs(d[0] + d[1]) < Math.abs(m[0] + m[1]) ? d : m));
+          for (let v = 0; v < position.length; v += 3) { position[v] += dx; position[v + 1] += dy; }
+        }
       }
       if (!index.length) continue;
       const material = this._lightmapped(source, bucket.material, bucket.lightMap);
@@ -794,9 +799,12 @@ export class BoardScene {
       if (t.glyph === '#' && !slots.has(`${t.r},${t.c}`) && [[0, 1], [0, -1], [1, 0], [-1, 0]].some(([dr, dc]) => FIELD.has(glyph(t.r + dr, t.c + dc)))) role = 'rocks';
       const variants = role && roles[role];
       if (!variants?.length) continue;
-      const pick = variants[((Math.imul(t.r + 1, 73856093) ^ Math.imul(t.c + 1, 19349663)) >>> 0) % variants.length];
-      for (const bucket of pick) {
-        const h = role !== 'rocks' && height[t.glyph], z0 = h ? top(pick) : 0;
+      const hash = (Math.imul(t.r + 1, 73856093) ^ Math.imul(t.c + 1, 19349663)) >>> 0;
+      const pick = variants[hash % variants.length];
+      // the fence is an open frame: the snow slab under it
+      const under = role === 'fence' && roles.ground?.length ? roles.ground[hash % roles.ground.length] : [];
+      for (const bucket of [...pick, ...under]) {
+        const h = role !== 'rocks' && !under.includes(bucket) && height[t.glyph], z0 = h ? top(pick) : 0;
         const zs = h && z0 > 0.05 ? h / z0 : 1;
         const position = Float32Array.from(bucket.position, (v, i) => (i % 3 === 0 ? v + t.c : i % 3 === 1 ? v + t.r : v * zs));
         const key = `${bucket.material}|${bucket.lightMap || ''}`;
@@ -823,8 +831,8 @@ export class BoardScene {
     tex.channel = 1;
     const material = source.clone();
     material.lightMap = tex;
-    // the procedural board's key / hemisphere lights stay on (unlike a native scene's own lighting): a third of the bake
-    material.lightMapIntensity = (nativeGamma ? 1 : Math.PI) * 0.35;
+    // the procedural board's key / hemisphere lights stay on (unlike a native scene's own lighting): part of the bake
+    material.lightMapIntensity = (nativeGamma ? 1 : Math.PI) * 0.6;
     const sourceCompile = source.onBeforeCompile;
     material.onBeforeCompile = (shader) => {
       sourceCompile(shader);
@@ -907,6 +915,7 @@ export class BoardScene {
     this.key.intensity = original?.lighting?.intensity != null ? original.lighting.intensity * LIGHTING.nativeDirectGain : LIGHTING.key.intensity;
     if (original?.lighting?.color) this.key.color.setRGB(...original.lighting.color);
     else this.key.color.setHex(LIGHTING.key.color);
+    // a board theme's own light (the snow field: a cool, softer key under an overcast sky)
     // a board theme's own light (the snow field: a cool, softer key under an overcast sky)
     const themeLight = themed && !original ? BOARD_THEMES[stage.boardTheme]?.light : null;
     if (themeLight) { this.key.color.setHex(themeLight.color); this.key.intensity = themeLight.intensity; this.hemi.intensity = themeLight.hemi; }
@@ -1120,8 +1129,9 @@ export class BoardScene {
 
     // Apply the same translation to every native structural mesh, including
     // copied supports and the preview pen. Devices retain gameplay positions.
-    if(worldOffset)for(const mesh of Object.values(M)) {
-      if(mesh?.position && mesh!==M.deviceSlabs && mesh!==M.deviceDecals){ mesh.position.y+=worldOffset; mesh.updateMatrix(); }
+    // (the theme's surroundings are laid about the displayed board already: they stay)
+    if(worldOffset)for(const [name,mesh] of Object.entries(M)) {
+      if(mesh?.position && mesh!==M.deviceSlabs && mesh!==M.deviceDecals && !name.startsWith('scenery:')){ mesh.position.y+=worldOffset; mesh.updateMatrix(); }
     }
     if(original)this._batchNativeMeshes();
     yield;

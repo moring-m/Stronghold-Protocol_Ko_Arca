@@ -28,8 +28,9 @@ function snowfield() {
     'aaaaaaaaaa#aaaaaaaaaa',
     '###IAAAAA###AAAAAI###',
     `##E${L[9]}rOr${mirror(L[9])}E##`,
-    `###${L[10]}fff${mirror(L[10])}###`,
-    `###${L[11]}fff${mirror(L[11])}###`,
+    // the boss field: the two tiles left of the works (3,8) / (4,8) are a fence there (the owner's note), not a wall
+    `###${L[10].slice(0, 5)}bfff${mirror(L[10])}###`,
+    `###${L[11].slice(0, 5)}bfff${mirror(L[11])}###`,
     `###${L[12]}fOf${mirror(L[12])}###`,
     'XXXXXXXXXXXXXXXXXXXXX',
     'aaaaaaaaaa###########',
