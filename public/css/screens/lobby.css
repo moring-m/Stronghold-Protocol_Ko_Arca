@@ -509,7 +509,9 @@ html:not([lang="ko"]) .mode-cards .mode-card--lab .mode-card__name{font-size:.24
 }
 .lobby-screen .create-box__hint { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.04rem .16rem; }
 .lobby-screen .create-box__summary { margin:0; }
-@media (max-height:760px) and (min-width:761px){
+@media (max-height:820px) and (min-width:761px){
+ .lobby-screen .mode-cards { margin-bottom:.22rem; }
+ .lobby-screen .join-foot > .public-rooms-entry { padding:.03rem .12rem; }
  .lobby-screen .mode-cards .mode-card--lab { padding:.08rem .2rem; }
  .lobby-screen .mode-cards .mode-card--lab .mode-card__desc { line-height:1.35; }
  .lobby-screen .join-panel .panel__body { padding:.14rem .22rem .12rem; gap:.1rem; }
