@@ -23,11 +23,11 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const INDEX = path.join(ROOT, 'public/assets/local/fx/index.json');
 const HAS_INDEX = existsSync(INDEX);
 
-const LOOPING = new Set(['ymgtop_spin', 'enemy_nhpbr_attack_range', 'enemy_nhtank_attack_range', 'enemy_actoxi_idle', 'enemy_wintun_range', 'dsubrl_aura', 'cjhot_aura',
+const LOOPING = new Set(['wisdel_skill_02_buff_02', 'ymgtop_spin', 'enemy_nhpbr_attack_range', 'enemy_nhtank_attack_range', 'enemy_actoxi_idle', 'enemy_wintun_range', 'dsubrl_aura', 'cjhot_aura',
   'enemy_cjhot_debuff', 'horn_skill_01_hit_02_buff', 'skadi2_skill_03_buff', 'svrash_skill_02_buff', 'tinman_skill_01_range_01', 'sleach_skill_02_flag_01',
   'sleach_skill_02_ground_01', 'sleach_skill_03_flag_01', 'sleach_skill_03_range_loop_01', 'thumpy_skill_03_range_01']);
 const KEYS = [...LOOPING, 'mousek_skill_02_range', 'mousek_skill_02_start', 'bombd_cast', 'enemy_dsubrl_attack_hit', 'horn_skill_01_hit_02', 'g_hit', 'g_enemy', 'g_heal',
-  'tank_shell_hit', 'sleach_skill_03_range_start_01', 'chen2_skill_02_range_01'];
+  'tank_shell_hit', 'sleach_skill_03_range_start_01', 'chen2_skill_02_range_01', 'wisdel_skill_02_overload_start'];
 const GROUND = new Set(['enemy_nhpbr_attack_range', 'enemy_nhtank_attack_range', 'enemy_actoxi_idle', 'enemy_wintun_range', 'mousek_skill_02_range']);
 
 function makeIndex({ installed = KEYS } = {}) {
@@ -70,6 +70,7 @@ function makeIndex({ installed = KEYS } = {}) {
           { role: 'loop', keys: ['ymgtop_spin'], from: 'PassiveBuffAbility._buffs → template ymgtop_m1_t[rotate_effect]', event: 'ON_BUFF_TRIGGER', action: 'CreateBuff', on: 'owner', node: 'Modes/M1/Body/Talents/RotateEffect', mode: 'M1', life: { type: 'INFINITY', tick: 0.1 } },
         ] } } }),
       char_4039_horn: { kind: 'char', modes: melee('g_hit'), startEffect: null, deadEffect: null, skills: { skchr_horn_1: { rootClass: 'ReplacementSkillFixed', mode: null, projectiles: ['projectile_chr_horn_s1_light'], uses: [] } } },
+      char_1035_wisdel: { kind: 'char', modes: melee('g_hit'), startEffect: null, deadEffect: null, skills: { skchr_wisdel_2: { rootClass: 'CastSkill', mode: null, projectiles: [], uses: [] } } },
       char_1012_skadi2: { kind: 'char', modes: melee('g_hit'), startEffect: null, deadEffect: null, skills: { skchr_skadi2_3: { rootClass: 'CastSkill', mode: null, projectiles: [], uses: [aura('skadi2_skill_03_buff')] } } },
       char_172_svrash: { kind: 'char', modes: melee('g_hit'), startEffect: null, deadEffect: null, skills: { skchr_svrash_2: { rootClass: 'ToggleSkill', mode: null, projectiles: [], uses: [
         { role: 'loop', keys: ['svrash_skill_02_buff'], from: 'PassiveBuffAbility._buffs', node: 'skchr_svrash_2', on: 'owner' }] } } },
@@ -103,6 +104,7 @@ const RECS = {
   enemy_10116_ymgtop: { talents: { bb: { 'EndRotate.rotate_duration': 5 } }, skills: [{ prefabKey: 'SwitchModeTrigger', bb: {} }] },
   char_4039_horn: opRec('skchr_horn_1'),
   char_1012_skadi2: opRec('skchr_skadi2_3', { duration: 20 }),
+  char_1035_wisdel: opRec('skchr_wisdel_2', { duration: 25 }),
   char_172_svrash: opRec('skchr_svrash_2'),
   char_4151_tinman: opRec('skchr_tinman_1'),
   char_479_sleach: { skills: [{ skillId: 'skchr_sleach_1', index: 0 }, { skillId: 'skchr_sleach_2', index: 1, skillType: 'MANUAL', duration: 15, bb: {} }, { skillId: 'skchr_sleach_3', index: 2, skillType: 'MANUAL', duration: 10, bb: {} }] },
@@ -383,6 +385,16 @@ describe('operators\' areas', () => {
     assert.equal(w.simFx('zone', 9.9, 9, { id: 1, r: 1.7, duration: 6 }), true);
     assert.deepEqual(spawned, ['horn_skill_01_hit_02_buff', 'horn_skill_01_hit_02']);
     assert.ok(FX_BINDINGS.skchr_horn_1.zone);
+  });
+
+  test('维什戴尔 S2 过载: the kit\'s overload plays overload_start once and holds the overload loop until the skill ends (not the 驭械术士 funnel layer)', async () => {
+    const { w, view, frame, spawned, handles } = await setup();
+    const u = view(1, 'char_1035_wisdel', 4);
+    frame(); w.skill(u, true);
+    assert.equal(w.simFx('overload', 4, 9, { id: 1 }), true);
+    assert.deepEqual(spawned.filter((k) => /^wisdel/.test(k)), ['wisdel_skill_02_overload_start', 'wisdel_skill_02_buff_02']);
+    assert.equal(live(handles, 'wisdel_skill_02_buff_02').length, 1, 'the overload loop is held');
+    assert.notEqual(handles.find((h) => h.key === 'wisdel_skill_02_overload_start').opts?.loop, true, 'the start burst does not loop');
   });
 
   test('浊心斯卡蒂 S3 and 银灰 S2: the cast\'s tide / snow is covered by the skill\'s own loops (FX_COVER); 珊比 S3 / 假日威龙陈 S2 / S3 likewise', async () => {
