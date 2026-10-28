@@ -159,8 +159,10 @@ export function uvAt(uv, fx, fy) {
  * tint, side (side panel surface) }`. Tolerant of malformed stages (missing rows → forbidden). `area` = the built
  * areas (inclusive tile rects, see AREAS): content outside them is not built, like the client which only builds the
  * areas of the current phase (configBlackBoard leftNormal / rightNormal / leftBoss / rightBoss + the preview pen).
+ * `theme` = the board atlas theme in use (load.js BOARD_THEMES; its extra surfaces exist in that atlas only).
  */
-export function classifyStage(stage, area = null) {
+export function classifyStage(stage, area = null, theme = null) {
+  const snow = theme === 'snow';
   const rows = Array.isArray(stage?.rows) ? stage.rows : [];
   const ROWS=Math.max(19,rows.length),COLS=Math.max(21,...rows.map(r=>r.length));
   const pen = parsePenRect(stage?.config?.enemy_place_rect) || PEN_RECT;
@@ -222,6 +224,8 @@ export function classifyStage(stage, area = null) {
       case 'X': t.surf = 'hatch'; t.tint = [0.36, 0.38, 0.41]; t.side = (t.c % 5 === 2) ? 'evacPanel' : 'restPanel'; t.sideTint = [0.8, 0.82, 0.86]; break;
       default: break;
     }
+    // the snow battlefield's atlas (load.js BOARD_THEMES): frosted rock for the forbidden blocks
+    if (snow && t.glyph === '#') { t.surf = 'snowRock'; t.rot = (h % 4) * 90; t.tint = [0.62, 0.66, 0.72]; }
   }
   // high-ground plates by connectivity (texture top = the tile's far edge)
   const wall = (r, c) => { const n = at(r, c); return !!n && n.glyph === 'h'; };
@@ -336,7 +340,7 @@ function sideFace(g, uvTable, surfName, dir, x0, x1, y0, y1, zb, zt, colBottom, 
 export function buildBoard(stage, opts = {}) {
   const uvTable = opts.uv || null;
   const UVT = uvTable || Object.fromEntries(Object.entries(SURFACES).map(([k, v]) => [k, { ...v, rect: [...v.rect] }]));
-  const grid = classifyStage(stage, opts.area || null);
+  const grid = classifyStage(stage, opts.area || null, opts.theme || null);
   const ROWS=grid.length,COLS=grid[0].length;
   const at = (r, c) => grid[r]?.[c] || null;
   const topZ = (t) => (t.glyph === 'd' ? -BASIN : t.h);

@@ -90,7 +90,7 @@ const HL_STYLES = {
 
 const SIDE_MAT = {
   wall: 'wallSide', forbid: 'forbidSide', forbid2: 'forbidSide', sep: 'sepSide', hand: 'benchSide', temp: 'benchSideTemp',
-  fence: 'fenceSide', margin: 'forbidSide',
+  fence: 'fenceSide', margin: 'forbidSide', ice: 'iceSide',
 };
 
 /**
@@ -142,10 +142,15 @@ export function parseStage(stage, band = [0, ROWS - 1], field = [0, 13]) {
     t.alpha = t.dist === 0 ? 1 : t.dist === 1 ? 0.92 : 0.5;
     if (t.glyph === '#' && t.dist >= 2) t.mat = 'margin';
   }
+  // the snow battlefield (stage.boardTheme 'snow', board3d BOARD_THEMES): packed-snow ground and ice blocks
+  if (stage?.boardTheme === 'snow') for (const row of grid) for (const t of row) {
+    if (t.mat === 'road' || t.mat === 'roadN' || t.mat === 'floor') t.mat = 'snow';
+    else if (t.mat === 'wall') t.mat = 'ice';
+  }
   // high-ground plates: frame piece by connectivity (texture top = the tile's far edge)
   const wall = (r, c) => { const n = grid[r]?.[c]; return !!n && n.drawn && n.glyph === 'h'; };
   for (const row of grid) for (const t of row) {
-    if (t.glyph !== 'h' || !t.drawn) continue;
+    if (t.glyph !== 'h' || !t.drawn || t.mat === 'ice') continue;
     const L = wall(t.r, t.c - 1), Rt = wall(t.r, t.c + 1);
     if (L || Rt) t.top = L && Rt ? 'wallM' : Rt ? 'wallL' : 'wallR';
     else {
@@ -193,6 +198,7 @@ function variantMat(t) {
     case 'road': return h < 3 ? 'road' : h < 5 ? 'road2' : 'road3';
     case 'roadN': return h < 4 ? 'roadN' : 'roadN2';
     case 'floor': return h < 4 ? 'floor' : 'floor2';
+    case 'snow': return h < 4 ? 'snow' : 'snow2';
     case 'forbid': return h < 4 ? 'forbid' : 'forbid2';
     // 活性源石: the same material twice (the second mirrored), so a field of it does not repeat one pattern
     // (textures.js originiumOverlay — the palette and recipe match the 3D board's shader, GitHub #184)

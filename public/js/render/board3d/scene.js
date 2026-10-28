@@ -673,6 +673,28 @@ export class BoardScene {
   }
 
   /** Rebuild everything for a stage (no-op when the same stage object/grid is set again). */
+  /**
+   * Board material of a stage's themed atlas (stage.boardTheme, load.js BOARD_THEMES), or null while it loads / when the
+   * manifest does not list it (the stock MT_autochess atlas then stands in). A finished load rebuilds the stage.
+   */
+  _themeMaterial(stage) {
+    const name = stage.boardTheme;
+    if (!name || !this.pack?.loadTheme) return null;
+    this.themeMats ||= {};
+    if (name in this.themeMats) return this.themeMats[name];
+    if (!(name in (this.pack.themes || {}))) {
+      (this.themeLoads ||= {})[name] ||= this.pack.loadTheme(name).then(() => {
+        if (!this.destroyed && this.stage?.boardTheme === name) { this.stageKey = null; this.setStage(this.stage); }
+      });
+      return null;
+    }
+    const img = this.pack.themes[name];
+    if (!img) return (this.themeMats[name] = null);
+    const T = this.THREE, aniso = Math.min(8, this.renderer.capabilities?.getMaxAnisotropy?.() || 1);
+    const tex = { ...this.tex, D: makeTexture(T, img.D, { aniso }), N: makeTexture(T, img.N, { srgb: false, aniso }) || this.tex.N, R: makeTexture(T, img.R, { srgb: false, aniso }) || this.tex.R, E: makeTexture(T, img.E, { aniso }) || this.tex.E };
+    return (this.themeMats[name] = boardMaterial(T, tex, this.focus, { emissive: LIGHTING.emissive, roughness: LIGHTING.roughness }));
+  }
+
   setStage(stage, area) {
     for(const ignored of this._stageSteps(stage,area)) { /* foreground builds remain immediate */ }
   }
@@ -687,7 +709,8 @@ export class BoardScene {
       && Object.entries(native.buckets).every(([k,g]) => this.originalMaterials[g.material || k]);
     // 'low' (단순 3D) never draws the official scene pack (the original map's mesh): the procedural board stands alone
     const official = stage && !nativeReady && this.mapQuality !== 'low' ? this.scenePacks.get(stage.id) || null : null;
-    const key = stage ? `${stage.id || ''}|${official ? official.key : ''}|${stage.previewLayout ? stage.previewLayout.worldOffset || 0 : 'native'}|${(stage.rows || []).join('/')}|${JSON.stringify((stage.devices || []).map((d) => [d.key, d.pos, d.active, d.dir]))}` : '';
+    const themed = stage ? this._themeMaterial(stage) : null;
+    const key = stage ? `${stage.id || ''}|${official ? official.key : ''}|${themed ? stage.boardTheme : ''}|${stage.previewLayout ? stage.previewLayout.worldOffset || 0 : 'native'}|${(stage.rows || []).join('/')}|${JSON.stringify((stage.devices || []).map((d) => [d.key, d.pos, d.active, d.dir]))}` : '';
     if (key === this.stageKey) return;
     const layoutKey=stage ? `${key}|${this.areaKey}|${this.mapQuality}|${!!this.pack?.original?.scenes?.[stage.originalStageId || stage.id]}` : null;
     const cached=this.layoutCache.get(layoutKey);
@@ -718,7 +741,7 @@ export class BoardScene {
     yield;
     const worldOffset=stage.previewLayout?.worldOffset || 0;
     const structuralStage=stage.structuralSource || stage;
-    const board = buildBoard(stage, { uv: this.pack?.uv || null, area: this.area, platformMesh: !!this.platformGeometry() });
+    const board = buildBoard(stage, { uv: this.pack?.uv || null, area: this.area, platformMesh: !!this.platformGeometry(), theme: themed ? stage.boardTheme : null });
     this.board = board;
     const M = this.meshes = {};
     this.official = !stage.coopEightStage && !stage.previewLayout && official && this._buildScene(official) ? official : null;
@@ -849,7 +872,7 @@ export class BoardScene {
           if(tile.index.length)buckets[key].push(reflectOppositeBorder(tile,axis));
         }
       });
-      for(const[key,list]of Object.entries(buckets))M[key]=this._mesh(mergeInto(list),this.mat[key],{cast:key!=='decal'});
+      for(const[key,list]of Object.entries(buckets))M[key]=this._mesh(mergeInto(list),key==='board'&&themed||this.mat[key],{cast:key!=='decal'});
     }
     if (original && !stage.coopEightStage && !['act2autochess_m01','act2autochess_m03'].includes(stage.id) && this.area.some(a=>a.c1>=20)) {
       // The sand island has a water notch outside its right rim. Extend the
@@ -1463,6 +1486,7 @@ export class BoardScene {
     this.scenePacks.clear();
     this.mat.edge?.map?.dispose?.(); // canvas dash texture (not in this.tex)
     for (const m of Object.values(this.mat)) m?.dispose?.();
+    for (const m of Object.values(this.themeMats || {})) { if (m) { for (const t of [m.map, m.normalMap, m.roughnessMap, m.emissiveMap]) if (!Object.values(this.tex).includes(t)) t?.dispose(); m.dispose(); } }
     for (const t of Object.values(this.tex)) t?.dispose?.();
     for (const m of Object.values(this.originalMaterials)) m?.dispose?.();
     for (const t of Object.values(this.originalTextures)) t?.dispose?.();

@@ -74,6 +74,17 @@ export const PACK_IMAGES = Object.freeze({
   crate: ['mesh/trap_110', 'TX_trap_1105_accrate'],
 });
 
+/**
+ * Per-stage board atlases (stage.boardTheme): the same UV layout as TX_autochessi_D/_N/_M_rough/_E with themed cells
+ * (tools/local-extract/compose-snowfield-atlas.py). Loaded on demand by pack.loadTheme, only for the stages using them.
+ */
+export const BOARD_THEMES = Object.freeze({
+  snow: Object.freeze({
+    D: ['map/snowfield', 'TX_snowfield_D'], N: ['map/snowfield', 'TX_snowfield_N_rgb'], R: ['map/snowfield', 'TX_snowfield_M_rough'],
+    E: ['map/snowfield', 'TX_snowfield_E'],
+  }),
+});
+
 export const PACK_MESHES = Object.freeze({
   crate: ['mesh/trap_110', 'trap_1105_accrate'],
   box: ['mesh/s_common_box_01', 'pCube2'],
@@ -198,7 +209,26 @@ export function loadBoardPack(assets, { native = true } = {}) {
       const m = text ? parseObj(text) : null;
       if (m) meshes.gate[slot] = { mesh: m, material: rec && Array.isArray(rec.materials) ? rec.materials[0] || null : null };
     }));
+    const themes = {}, themePending = {};
+    /** Images of a board theme ({ D, N?, R?, E? }), or null when the manifest does not list it. */
+    const loadTheme = (name) => {
+      const spec = BOARD_THEMES[name];
+      if (!spec) return Promise.resolve(null);
+      if (name in themes) return Promise.resolve(themes[name]);
+      return themePending[name] ||= (async () => {
+        const out = {};
+        await Promise.all(Object.entries(spec).map(async ([k, [g, n]]) => {
+          const u = url(g, n);
+          const img = u ? await assets.image(u, { retry: true }).catch(() => null) : null;
+          if (img && (img.width || img.naturalWidth) > 0) out[k] = img;
+        }));
+        themes[name] = out.D ? out : null;
+        delete themePending[name];
+        return themes[name];
+      })();
+    };
     return {
+      themes, loadTheme,
       key: `${dUrl}#${tiles?.version || 0}`,
       images, meshes, original, tiles: isObj(tiles) ? tiles : null, uv: resolveUvTable(isObj(tiles) ? tiles : null),
       materials: { theme: isObj(theme) ? theme : null, fx: isObj(fxMats) ? fxMats : null },

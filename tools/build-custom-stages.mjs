@@ -50,6 +50,7 @@ function snowfield() {
     base: 'act1autochess_m02',
     id: 'custom_snowfield',
     name: '설원 덤불 전장',
+    boardTheme: 'snow',
     rows,
     tiles: {
       k: { tileKey: 'tile_custom_thicket', height: 'LOW', buildable: 'ALL', passable: 'ALL', groundPassable: true, flyPassable: true, special: 'thicket', bb: {} },
@@ -67,6 +68,8 @@ for (const def of [snowfield()]) {
     id: def.id, name: def.name, rows: def.rows,
     tiles: { ...structuredClone(base.tiles), ...def.tiles },
     weight: 50, active: true,
+    // the chapter 8 snow tileset on the procedural board (render/board3d/load.js BOARD_THEMES)
+    boardTheme: def.boardTheme,
     // a custom stage joins a mode's pool only when the room picks it (shared/customExtensions.js)
     customExtension: { category: 'stages' },
     // the base's band / card devices (turrets, crates, platforms) sit on its own layout: only the field-wide ones stay
