@@ -31,7 +31,7 @@ import { buildBoard, buildDeviceSlabs, objToBoard, boxProjectUV, ROWS, COLS, DEV
 import { surfaceUV } from './atlas.js';
 import { focusUniforms, addFocus, makeTexture, boardMaterial, glassMaterial, decalMaterial, pipeMaterial, unlitMaterial, gateMaterial, glowMaterial, waterMaterial, mireMaterial, infectionMaterial, infectionGlowMaterial, infectionRiseMaterial, smogMaterial, dashTexture, environmentMap, nativePhysicalLighting, addShadowContrast, sceneMaterial, sceneWaterMaterial, sceneEnvTexture, sceneWaterDecalMaterial, applyWaterMaterial, trapMaterial } from './materials.js';
 import { syncThreeCamera } from '../projection.js';
-import { mergeSceneChunks, sceneMaterialKey, sceneWaterInfo, isSceneWater } from './load.js';
+import { mergeSceneChunks, sceneMaterialKey, sceneWaterInfo, isSceneWater, BOARD_THEMES } from './load.js';
 
 /** Lighting rig (tuned against the official screenshots: bright even tops, darker sides, soft shadows). */
 export const LIGHTING = Object.freeze({
@@ -874,7 +874,7 @@ export class BoardScene {
       });
       for(const[key,list]of Object.entries(buckets))M[key]=this._mesh(mergeInto(list),key==='board'&&themed||this.mat[key],{cast:key!=='decal'});
     }
-    if (original && !stage.coopEightStage && !['act2autochess_m01','act2autochess_m03'].includes(stage.id) && this.area.some(a=>a.c1>=20)) {
+    if (original && !original.cover && !stage.coopEightStage && !['act2autochess_m01','act2autochess_m03'].includes(stage.id) && this.area.some(a=>a.c1>=20)) {
       // The sand island has a water notch outside its right rim. Extend the
       // opposite authored hill strip only into uncovered cells; keep the sea
       // beyond the rim and the existing stairs/props intact in both modes.
@@ -909,7 +909,25 @@ export class BoardScene {
       }
     }
     yield;
-    if (original && !stage.coopEightStage) {
+    if (original?.cover) {
+      // A composed scene (tools/local-extract/compose-snowfield-scene.py) covers only the field tiles it lists with
+      // the chapter's pieces; every other tile (benches, gates, objective, works, pen, separators) is the procedural
+      // board in the stage's themed atlas.
+      const covered=new Set(original.cover.map(([r,c])=>`${r},${c}`)),open=[];
+      for(let r=0;r<ROWS;r++)for(let c=0,c0=null;c<=COLS;c++){
+        const free=c<COLS && !covered.has(`${r},${c}`);
+        if(free && c0===null)c0=c;
+        else if(!free && c0!==null){open.push({r0:r,r1:r,c0,c1:c-1});c0=null;}
+      }
+      for(const key of ['board','glass','decal','pipe']){
+        const geometry=board.buckets[key];
+        if(geometry?.index?.length)M[`uncovered:${key}`]=this._mesh(surfaceForArea(geometry,open),key==='board'&&themed||this.mat[key],{cast:key!=='decal'});
+      }
+      const slabs = buildDeviceSlabs(board.devices.filter(d=>!this.nativeDevice(d)), board.grid, this.pack?.uv);
+      M.deviceSlabs = this._mesh(slabs.board, this.mat.board);
+      M.deviceDecals = this._mesh(slabs.decal, this.mat.decal, { cast: false });
+    }
+    if (original && !original.cover && !stage.coopEightStage) {
       const areas=structuralStage.previewLayout ? [{r0:0,r1:5,c0:0,c1:20}] : combatBorderAreas(stage,this.area);
       const raised=borderSurfaces.map(g=>g.platform ? g : ({...g,index:Array.from(g.index).filter((_,i,a)=>{const base=i-i%3;return Math.max(...a.slice(base,base+3).map(id=>g.position[id*3+2]))>.08 && a.slice(base,base+3).every(id=>g.normal?.[id*3+2]>.85);})}));
       const cells=stage.previewLayout ? vacantBorderCells(borderCells(structuralStage,areas),raised) : [];
@@ -983,7 +1001,7 @@ export class BoardScene {
     this._buildThicket(board);
     yield;
     this._buildTerrain(board);
-    if (!this.official) this._buildBackground(board);
+    if (!this.official) this._buildBackground(board, original?.backdrop || (themed && BOARD_THEMES[stage.boardTheme]?.backdrop) || null);
     this._fitShadow(board);
     this.renderer.shadowMap.needsUpdate = true;
   }
@@ -1303,7 +1321,8 @@ export class BoardScene {
     }
   }
 
-  _buildBackground(board) {
+  /** The ground far below the island; `tint` (a composed scene's land colour, rgb 0..1) replaces the backdrop art. */
+  _buildBackground(board, tint = null) {
     const T = this.THREE;
     const B = LIGHTING.bg;
     const cx = ((board.grid?.[0]?.length ?? COLS) - 1) / 2, cy = ((board.grid?.length ?? ROWS) - 1) / 2;
@@ -1318,7 +1337,8 @@ export class BoardScene {
       const ix = placed.index;
       for (let i = 0; i < ix.length; i += 3) { const t = ix[i + 1]; ix[i + 1] = ix[i + 2]; ix[i + 2] = t; }
     }
-    this.meshes.bg = this._mesh({ ...placed, color: null }, this.mat.bg, { cast: false, receive: false, order: -2 });
+    const material = Array.isArray(tint) ? (this.mat.backdrop ||= new T.MeshBasicMaterial({ color: new T.Color(...tint).multiplyScalar(B.dim) })) : this.mat.bg;
+    this.meshes.bg = this._mesh({ ...placed, color: null }, material, { cast: false, receive: false, order: -2 });
     // the key light's shadow of the island on the ground far below (S_Background_shadow's role)
     const s = B.size;
     const q = { position: new Float32Array([cx - s / 2, cy - s / 2, B.z + 0.02, cx + s / 2, cy - s / 2, B.z + 0.02, cx + s / 2, cy + s / 2, B.z + 0.02, cx - s / 2, cy + s / 2, B.z + 0.02]), normal: new Float32Array([0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1]), uv: new Float32Array([0, 0, 1, 0, 1, 1, 0, 1]), color: null, index: new Uint16Array([0, 1, 2, 0, 2, 3]) };

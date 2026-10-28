@@ -224,8 +224,10 @@ export function classifyStage(stage, area = null, theme = null) {
       case 'X': t.surf = 'hatch'; t.tint = [0.36, 0.38, 0.41]; t.side = (t.c % 5 === 2) ? 'evacPanel' : 'restPanel'; t.sideTint = [0.8, 0.82, 0.86]; break;
       default: break;
     }
-    // the snow battlefield's atlas (load.js BOARD_THEMES): frosted rock for the forbidden blocks
-    if (snow && t.glyph === '#') { t.surf = 'snowRock'; t.rot = (h % 4) * 90; t.tint = [0.62, 0.66, 0.72]; }
+    // the snow battlefield's atlas (load.js BOARD_THEMES): frosted rock for the forbidden blocks and separators
+    if (snow && (t.glyph === '#' || t.glyph === 'X')) {
+      t.surf = 'snowRock'; t.rot = (h % 4) * 90; t.tint = [0.86, 0.9, 0.96]; t.side = 'graySide'; t.sideTint = [0.8, 0.84, 0.9];
+    }
   }
   // high-ground plates by connectivity (texture top = the tile's far edge)
   const wall = (r, c) => { const n = at(r, c); return !!n && n.glyph === 'h'; };

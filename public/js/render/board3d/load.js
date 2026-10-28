@@ -82,6 +82,8 @@ export const BOARD_THEMES = Object.freeze({
   snow: Object.freeze({
     D: ['map/snowfield', 'TX_snowfield_D'], N: ['map/snowfield', 'TX_snowfield_N_rgb'], R: ['map/snowfield', 'TX_snowfield_M_rough'],
     E: ['map/snowfield', 'TX_snowfield_E'],
+    // the ground far below (MT_LAND _Color of level_main_08-01, as compose-snowfield-scene.py `backdrop`)
+    backdrop: [0.78, 0.859, 0.945],
   }),
 });
 
@@ -217,7 +219,7 @@ export function loadBoardPack(assets, { native = true } = {}) {
       if (name in themes) return Promise.resolve(themes[name]);
       return themePending[name] ||= (async () => {
         const out = {};
-        await Promise.all(Object.entries(spec).map(async ([k, [g, n]]) => {
+        await Promise.all(Object.entries(spec).filter(([k]) => k !== 'backdrop').map(async ([k, [g, n]]) => {
           const u = url(g, n);
           const img = u ? await assets.image(u, { retry: true }).catch(() => null) : null;
           if (img && (img.width || img.naturalWidth) > 0) out[k] = img;
