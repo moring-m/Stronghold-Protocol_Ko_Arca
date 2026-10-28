@@ -8,8 +8,8 @@ export const LANGUAGE_PACKS = {
     },
     {
       "path": "/i18n/en/fork.json",
-      "bytes": 221089,
-      "hash": "432e600d1d079d8e25176e17514420e797dccd069863950cebb336337a01aa4b"
+      "bytes": 221552,
+      "hash": "6f49278ee5776f82679022a29fb11bbedf50ff878875556ece7a53590eafe7f0"
     },
     {
       "path": "/i18n/ko/compiled.json",
@@ -35,8 +35,8 @@ export const LANGUAGE_PACKS = {
     },
     {
       "path": "/i18n/ja/fork.json",
-      "bytes": 241061,
-      "hash": "b43e3e88dabd1d794c476ab0fad8bc3d700d9b3979767b4ddf884f4da68b6fb1"
+      "bytes": 241549,
+      "hash": "4b740d81926e007d89a0368f8726ae93889213850b95ab7e7e9aa1578765fa69"
     },
     {
       "path": "/i18n/ko/compiled.json",
@@ -60,8 +60,8 @@ export const LANGUAGE_PACKS = {
     },
     {
       "path": "/i18n/en/fork.json",
-      "bytes": 221089,
-      "hash": "432e600d1d079d8e25176e17514420e797dccd069863950cebb336337a01aa4b"
+      "bytes": 221552,
+      "hash": "6f49278ee5776f82679022a29fb11bbedf50ff878875556ece7a53590eafe7f0"
     },
     {
       "path": "/i18n/en.json",
@@ -82,8 +82,8 @@ export const LANGUAGE_PACKS = {
     },
     {
       "path": "/i18n/zh/fork.json",
-      "bytes": 214913,
-      "hash": "7d99aa975fa354fb41df1cc05d4cc2f6a165c0531f5681520d887d8fff875988"
+      "bytes": 215335,
+      "hash": "f2390e5c7288210687e45ce651e408c08c4df2773197813915e025ee79d72c65"
     },
     {
       "path": "/i18n/ko/compiled.json",

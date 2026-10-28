@@ -84,9 +84,33 @@ const ENEMY_AREA_FX = Object.freeze({
   // “巨大的丑东西” KO self-destruct (bomb[reborning]): mcmstr_die_01_range marks the area; mcmstr_die_01_start (cast at the
   // KO with the skill) carries the blast
   mechBomb: Object.freeze({ skill: 'bomb[reborning]', telegraph: 'range', explode: null }),
-  // “自在” 破桎而出 (ShieldBurst / ShieldBurstReborn): the barrier loops while it holds, its trigger effects at the burst
+  // “自在” 破桎而出 (ShieldBurst / ShieldBurstReborn): the barrier loops while it holds, its trigger effects at the burst;
+  // its cross: the cross projectile's hit (enemy_xi_skill_01_hit) where it lands
   breakFree: Object.freeze({ skill: ['shieldburstreborn', 'shieldburst'], telegraph: 'loop', explode: 'trigger' }),
+  xiCross: Object.freeze({ projectile: 'projectile_enemy_xi_s', telegraph: 'onHit' }),
+  // 鼠王 【唱沙】: its DriftSand skill's hit effects (the sand cross) on the target
+  driftSand: Object.freeze({ skill: 'driftsand', telegraph: 'hit' }),
+  // 无畏者 冲锋: the range mark (dekght_skill_01_range) through the wind-up, its hit at the blow
+  chargeAttack: Object.freeze({ skill: 'chargeattack', telegraph: 'hit', match: /range/, explode: 'hit', skip: /range/ }),
+  // 无畏者·二 爆裂箭: the range mark (its trigger) through the delay; the blast is the arrow's
+  blastArrow: Object.freeze({ skill: 'tripleattack', telegraph: 'trigger', explode: null }),
+  // 庞贝 (RangeDamageAbility): its range effect at each pulse
+  selfBlast: Object.freeze({ ability: 'RangeDamageAbility', explode: 'range' }),
+  // 锏 CircleAttack / CircleAttack2 (blizzard, the HP-step clear): the skill's hit effects around it
+  blizzard: Object.freeze({ skill: ['circleattack2', 'circleattack'], explode: 'hit' }),
+  clearSp: Object.freeze({ skill: ['circleattack2', 'circleattack'], explode: 'hit' }),
+  // 乌顶巨角卢鲁 角力对决: its skill's hit at the clash
+  elkClash: Object.freeze({ skill: 'skill', explode: 'hit' }),
 });
+
+/** Sim 'beam' fx (b.fx 'beam', extra.kind) drawn on its target with the source's own effects. */
+const ENEMY_BEAM_FX = Object.freeze({
+  // 萨卡兹萨满 链式: the chain projectile's hit on each linked unit
+  chainBuff: Object.freeze({ projectile: 'projectile_enemy_smsha_s', role: 'onHit' }),
+  // 扎罗 溶血骇惧: the fear cage's end effects on each caged operator
+  fearCage: Object.freeze({ skill: 'fearcage', role: 'end' }),
+});
+
 
 /** Battle seconds a melee blow waits for its damage. */
 const MELEE_WINDOW = 0.4;
@@ -1799,13 +1823,19 @@ export class FxWiring {
       const h = key ? this.playOn(key, { x, y, z: 0 }, { loop: kind === 'telegraph', important: true }) : null;
       if (h) { if (kind === 'telegraph') setTimeout0(this.ofx, h, Number(extra.dur) || 0); return true; }
     }
+    if (kind === 'beam' && ENEMY_BEAM_FX[extra?.kind] && this.ofx.active) {
+      const spec = ENEMY_BEAM_FX[extra.kind], src = this.view(extra.from), to = this.view(extra.to);
+      const keys = to ? this._enemyRoles(src ? this.unitOf(src) : null, spec)?.[spec.role] || [] : [];
+      let drawn = false;
+      for (const key of keys) if (this.playOn(key, to, { important: true })) drawn = true;
+      if (drawn) return true;
+    }
     if ((kind === 'telegraph' || kind === 'explode') && ENEMY_AREA_FX[extra?.kind] && this.ofx.active) {
       const spec = ENEMY_AREA_FX[extra.kind], src = this.view(extra.id), unit = src ? this.unitOf(src) : null;
-      const skills = unit?.skills || {};
-      const sk = [].concat(spec.skill).map((n) => skills[n]).find(Boolean);
+      const roles = this._enemyRoles(unit, spec);
       const role = spec[kind];
-      if (sk && role === null) return true;
-      const keys = sk && role ? sk.roles?.[role] || [] : [];
+      if (roles && role === null) return true;
+      const keys = (roles && role ? roles[role] || [] : []).filter((k) => kind === 'telegraph' ? !spec.match || spec.match.test(k) : !spec.skip || !spec.skip.test(k));
       let drawn = false;
       for (const key of keys) {
         const h = this.playOn(key, { x, y, z: 0 }, { loop: kind === 'telegraph', important: true });
@@ -1856,6 +1886,17 @@ export class FxWiring {
     // the floating units stand for the kit's 'drone' / 'drones' / 'droneLock' / 'overload' (render/vfx/funnelfx.js)
     const f = this.funnels.simFx(kind, x, y, extra);
     return this.skills.simFx(kind, x, y, extra) || t || f;
+  }
+
+  /** Effect roles of a unit's skill / ability / projectile named by an ENEMY_AREA_FX / ENEMY_BEAM_FX spec (null: none). */
+  _enemyRoles(unit, spec) {
+    if (spec.projectile) {
+      const p = this.idx?.projectiles?.[spec.projectile];
+      return p ? { onHit: p.onHit || [], onReached: p.onReached || [] } : null;
+    }
+    if (!unit) return null;
+    if (spec.ability) return (unit.abilities || []).find((a) => a.name === spec.ability)?.roles || null;
+    return [].concat(spec.skill).map((n) => unit.skills?.[n]).find(Boolean)?.roles || null;
   }
 
   /** b.ev 'die': the unit's own death effect or the generic one. */

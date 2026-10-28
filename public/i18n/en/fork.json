@@ -3314,5 +3314,8 @@
   "접속 인원 확인 중": "Checking players online",
   "공개 방을 불러오는 중입니다.": "Loading public rooms.",
   "안내 닫기": "Close notice",
-  "설원 덤불 전장": "Snowfield Thicket"
+  "설원 덤불 전장": "Snowfield Thicket",
+  "인식 저해 구역": "Perception Disruption Zone",
+  "이 구역 위의 아군 오퍼레이터와 적은 모두 은신 상태가 됩니다": "Allied Operators and enemies on this zone all gain Camouflage",
+  "은신 중에는 상대의 원거리 공격 대상으로 선택되지 않지만, 저지 중인 상대에게는 공격받습니다": "While camouflaged, a unit cannot be chosen by opposing ranged attacks, but the unit it blocks can still attack it"
 }

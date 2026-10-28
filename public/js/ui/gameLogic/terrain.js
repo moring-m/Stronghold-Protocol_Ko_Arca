@@ -61,6 +61,14 @@ const TERRAIN_TIPS = Object.freeze({
       t('但挡住敌人的干员仍会被它攻击到'),
     ],
   },
+  // the snow battlefield's thicket (tile_custom_thicket, devices.js TERRAIN.thicket): 隐匿 for operators AND enemies on it
+  thicket: {
+    name: N_('인식 저해 구역'), tag: N_('特殊地形'),
+    lines: () => [
+      t('이 구역 위의 아군 오퍼레이터와 적은 모두 은신 상태가 됩니다'),
+      t('은신 중에는 상대의 원거리 공격 대상으로 선택되지 않지만, 저지 중인 상대에게는 공격받습니다'),
+    ],
+  },
   deepsea: {
     name: N_('深水区'), tag: N_('特殊地形'),
     lines: (st) => {
