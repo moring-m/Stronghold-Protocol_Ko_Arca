@@ -404,6 +404,8 @@ export function SettingsModal({ open, onClose }) {
         </div>
       </div>
       <${Toggle} label=${t('官方伤害数字')} micro="OFFICIAL NUMBERS" value=${s.officialDamageNumbers} onChange=${v=>updateSettings({officialDamageNumbers:v})}/>
+      <${Choice} testId="hp-bar-style" label="HP 바 표시 방식" value=${s.hpBarStyle} options=${[['default','기본'],['official','공식']]} onChange=${v=>updateSettings({hpBarStyle:v})} />
+      <p class="set-hint">공식: 원작 전투 화면의 HP·SP 바 색과 모양을 쓰고, 전투 중 HP 바 옆의 등급 표시를 숨깁니다.</p>
       <${Toggle} label=${t('弹药数量')} micro="AMMO COUNT" value=${s.ammoCount} onChange=${(v) => updateSettings({ ammoCount: v })} />
       <p class="set-hint">${t('弹药类技能开启时，在弹药条下方显示剩余弹药 / 总弹药数（如 13/14）。官方界面没有这个数字。')}</p>
       <p class="set-hint" data-i18n-skip>합산: 연속 피해를 묶어 표시 · 모두: 타격마다 표시 · 기본: 명일방주의 붉은 대미지 표시 판정(예상 피해의 1.5배 이상)을 적용합니다.</p>

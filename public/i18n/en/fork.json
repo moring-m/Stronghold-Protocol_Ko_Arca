@@ -3317,5 +3317,7 @@
   "설원 덤불 전장": "Snowfield Thicket",
   "인식 저해 구역": "Perception Disruption Zone",
   "이 구역 위의 아군 오퍼레이터와 적은 모두 은신 상태가 됩니다": "Allied Operators and enemies on this zone all gain Camouflage",
-  "은신 중에는 상대의 원거리 공격 대상으로 선택되지 않지만, 저지 중인 상대에게는 공격받습니다": "While camouflaged, a unit cannot be chosen by opposing ranged attacks, but the unit it blocks can still attack it"
+  "은신 중에는 상대의 원거리 공격 대상으로 선택되지 않지만, 저지 중인 상대에게는 공격받습니다": "While camouflaged, a unit cannot be chosen by opposing ranged attacks, but the unit it blocks can still attack it",
+  "HP 바 표시 방식": "HP bar style",
+  "공식: 원작 전투 화면의 HP·SP 바 색과 모양을 쓰고, 전투 중 HP 바 옆의 등급 표시를 숨깁니다.": "Official: uses the original battle screen's HP/SP bar colours and shapes, and hides the tier mark beside HP bars during battle."
 }

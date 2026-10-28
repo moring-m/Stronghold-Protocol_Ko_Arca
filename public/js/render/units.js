@@ -2330,8 +2330,11 @@ export class UnitView {
 
     const damaged = this.hp < this.maxHp - 0.5;
     const showHp = showBars && !(this.isToken && (this.flags & UF.INVULN)) && (!this.isEnemy || damaged || this.isBoss || this.shieldHp > 0 || this.noteStacks > 0) && !NO_HP_BAR.has(this.info.defId);
+    // 设置「HP 바 표시 방식」 official: the client's flat bars (OFFICIAL_BARS) — no frame, no tier chip in battle
+    const off = this.ctx.settings?.hpBarStyle === 'official';
+    const leader = off && this.isEnemy && !this.isBoss && this.info.tier >= 3;
     const bw = clamp(s * (this.isBoss ? UNIT.bossBarWidth : UNIT.barWidth), 24, this.isBoss ? 260 : 96);
-    const bh = clamp(s * (this.isBoss ? 0.09 : 0.065), 3, this.isBoss ? 9 : 6);
+    const bh = off ? clamp(s * (this.isBoss || leader ? 0.075 : 0.05), 2.5, this.isBoss ? 8 : 5) : clamp(s * (this.isBoss ? 0.09 : 0.065), 3, this.isBoss ? 9 : 6);
     // a knocked-down operator's HUD is its redeploy ring alone, drawn at full strength over the greyed model
     this.hud.alpha = this.down ? this.fadeIn : this.dying > 0 ? 0 : alpha;
     let sx = this.shake > 0 ? Math.sin(t * 90) * this.shake * 10 : 0;
@@ -2341,14 +2344,21 @@ export class UnitView {
     if(this.noteText){this.noteText.visible=showBars&&this.noteStacks>0;this.noteText.scale.set(clamp(s/90,.65,1));this.noteText.position.set(x0-1+18*clamp(s/90,.65,1),cy-3);this.noteIcon.visible=this.noteText.visible;this.noteIcon.width=this.noteIcon.height=16*clamp(s/90,.65,1);this.noteIcon.position.set(x0-1,cy-3);}
     // HP
     this.hpBg.visible = this.hpFill.visible = showHp;
-    this.hpGhost.visible = showHp && this.ghostHp > this.hp + .5;
+    this.hpGhost.visible = showHp && !off && this.ghostHp > this.hp + .5;
     if (showHp) {
       const k = this.maxHp > 0 ? clamp(this.hp / this.maxHp, 0, 1) : 0;
       const g = this.maxHp > 0 ? clamp(this.ghostHp / this.maxHp, 0, 1) : 0;
       this.hpGhost.position.set(x0, cy); this.hpGhost.width = bw * g; this.hpGhost.height = bh;
-      this.hpBg.position.set(x0 - 1, cy); this.hpBg.width = bw + 2; this.hpBg.height = bh + 2;
+      this.hpBg.position.set(x0 - (off ? 0 : 1), cy); this.hpBg.width = bw + (off ? 0 : 2); this.hpBg.height = bh + (off ? 0 : 2);
       this.hpFill.position.set(x0, cy); this.hpFill.width = bw * k; this.hpFill.height = bh;
-      if (!this.isEnemy) this.hpFill.tint = COLORS.hpAlly;
+      if (off) {
+        this.hpFill.tint = !this.isEnemy ? OFFICIAL_BARS.ally : this.isBoss || leader ? OFFICIAL_BARS.leader : OFFICIAL_BARS.enemy;
+        this.hpBg.tint = leader || this.isBoss ? OFFICIAL_BARS.leaderBack : OFFICIAL_BARS.back;
+        this.hpBg.alpha = leader || this.isBoss ? 0.85 : 0.55;
+      } else {
+        this.hpBg.tint = COLORS.hpBack; this.hpBg.alpha = 1;
+        this.hpFill.tint = !this.isEnemy ? COLORS.hpAlly : this.isBoss ? COLORS.hpBoss : COLORS.hpEnemy;
+      }
     }
     // 业火 我执: her HP sits on the 1-HP floor and the damage past it fills a pool — the red bar over the drained green one
     const neg = showHp ? this.neg : 0;
@@ -2376,9 +2386,10 @@ export class UnitView {
       const k = ammo ? ammo[0] / ammo[1] : clamp(this.sp / this.spMax, 0, 1);
       ready = !active && k >= 0.999;
       sy = cy + bh / 2 + spH / 2 + 1.5;
-      this.spBg.position.set(x0 - 1, sy); this.spBg.width = bw + 2; this.spBg.height = spH + 2;
+      this.spBg.position.set(x0 - (off ? 0 : 1), sy); this.spBg.width = bw + (off ? 0 : 2); this.spBg.height = spH + (off ? 0 : 2);
+      this.spBg.tint = off ? OFFICIAL_BARS.back : COLORS.hpBack; this.spBg.alpha = off ? 0.55 : 1;
       this.spFill.position.set(x0, sy); this.spFill.width = bw * k; this.spFill.height = spH;
-      this.spFill.tint = (this.flags & UF.OVERHEATED) ? 0xf04444 : ammo ? COLORS.ammo : active ? COLORS.spActive : ready ? COLORS.spReady : COLORS.sp;
+      this.spFill.tint = (this.flags & UF.OVERHEATED) ? 0xf04444 : off ? (active ? OFFICIAL_BARS.skill : OFFICIAL_BARS.sp) : ammo ? COLORS.ammo : active ? COLORS.spActive : ready ? COLORS.spReady : COLORS.sp;
       const shownAmmo = ammo ? ((this.flags & UF.OVERDRIVE) ? ammo[1] / 2 : ammo[1]) : 0;
       if (shownAmmo > 1) {
         this.ammoDividers.lineStyle(Math.min(.7, bw / shownAmmo * .3), COLORS.hpBack, .9);
@@ -2389,7 +2400,7 @@ export class UnitView {
       }
       this._spY = sy;
     }
-    this.spGlow.visible = ready;
+    this.spGlow.visible = ready && !off;
     if (ready) {
       const pulse = 0.18 + 0.08 * Math.sin(t * 6);
       this.spGlow.position.set(x0 + bw, this._spY);
@@ -2400,7 +2411,7 @@ export class UnitView {
     if (this.chip) {
       const cs = clamp(s * (prep ? 0.24 : 0.19), 11, 28) / 44;
       this.chip.scale.set(cs);
-      this.chip.visible = this.alive;
+      this.chip.visible = this.alive && !(off && !prep);
       if (prep) this.chip.position.set(x, y - this.chip.height / 2 + 2);
       else this.chip.position.set(x0 - this.chip.width / 2 - 1, cy + (showSp ? spH / 2 : 0));
     }
@@ -3003,6 +3014,9 @@ const FA_C = { x: 0, y: 0, s: 0, depth: 0 };
 const LG_P = { x: 0, y: 0, s: 0, depth: 0 };
 const HUD_P = { x: 0, y: 0, s: 0, depth: 0 };
 const ICON_TMP = [];
+/** 设置「HP 바 표시 방식」 official: the client's bar colours (read off its battle screens): operator HP light blue, SP
+ *  yellow-green charging / amber while the skill runs, enemy HP orange, a leader's (悬赏 leaders, the bosses) red on grey. */
+const OFFICIAL_BARS = Object.freeze({ ally: 0x6cb2d2, sp: 0x8aa43f, skill: 0xc3991c, enemy: 0xd46c3a, leader: 0xcf2a33, back: 0x1c1c1c, leaderBack: 0x7d8088 });
 
 /**
  * Unit-layer zIndex of a unit / piece whose feet are at (x, y): farther rows first (so raised block rows, keyed by
