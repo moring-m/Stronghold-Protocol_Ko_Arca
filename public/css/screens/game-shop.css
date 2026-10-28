@@ -123,9 +123,12 @@
 /* the official module type icon (local-client art, DESIGN §13); the type text stays beside it */
 .scard__skill .scard__modicon { flex: none; width: .14rem; height: .14rem; object-fit: contain; }
 .scard__name { font-size: .19rem; font-weight: 900; letter-spacing: .04em; color: #fff; text-shadow: 0 1px 3px #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.scard__bonds { display: flex; flex-wrap: wrap; gap: .02rem .08rem; }
-.scard__bond { display: inline-flex; align-items: center; gap: .03rem; font-size: .13rem; color: var(--mint-400); }
-.scard__bond .bglyph { width: .18rem; height: .18rem; }
+/* the official autochess_shop_card_item's bond_list: one 18 px row per bond (a 22 px #b8b8b8 icon, the 14 px #b7b7b7
+   name), stacked bottom-left above the name */
+.scard__bonds { order: -1; display: flex; flex-direction: column; align-items: flex-start; gap: .01rem; }
+.scard__bond { display: inline-flex; align-items: center; gap: .04rem; height: .2rem; font-size: .14rem; color: #b7b7b7; text-shadow: 0 1px 2px #000; }
+.scard__bond .bglyph { width: .22rem; height: .22rem; }
+.scard__bond .bglyph img { filter: brightness(0) invert(.72); }
 .scard__bond.is-off { color: var(--text-dim); text-decoration: line-through; text-decoration-color: rgba(255, 84, 84, .6); } /* the mode never activates it (标准) */
 .scard__class { display: flex; align-items: center; gap: .05rem; font-size: .13rem; color: var(--text-lo); }
 .scard__prof { width: .18rem; height: .18rem; object-fit: contain; opacity: .85; }

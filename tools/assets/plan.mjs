@@ -114,7 +114,9 @@ export const UI_EXTRAS = (() => {
   const er = 'ui/autochess/[uc]autochessbattle/equipreplace/equip_replace_dialog/equip_replace_';
   for (const k of ['bg', 'arrow_head', 'arrow_line', 'avatart_bg', 'avatart_frame', 'close', 'replace_icon', 'opiton_bg']) L.push(['equipReplace', k, `${er}${k}.png`]);
   const bd = 'ui/autochess/[uc]autochessbattle/hud/dialog/autochess_hud_bond_detail_dialog/';
-  for (const k of ['active_icon', 'active_stack_bg', 'arrow', 'detail_bg', 'matte_circle', 'title_char_icon']) L.push(['bondDetail', k, `${bd}${k}.png`]);
+  for (const k of ['active_icon', 'active_stack_bg', 'arrow', 'detail_bg', 'matte_circle', 'title_char_icon', 'bond_active_bg', 'bond_inactive_bg', 'stack_bg']) L.push(['bondDetail', k, `${bd}${k}.png`]);
+  const bc = 'ui/autochess/[uc]autochessbattle/hud/autochess_hud_bond_char_item/';
+  for (const k of ['avatar_border', 'avatar_active_border']) L.push(['bondDetail', k, `${bc}${k}.png`]);
   const pr = 'ui/autochess/[uc]autochessbattle/prepready/';
   for (const k of ['cancel_bg', 'cancel_icon', 'player_bg', 'player_frame', 'player_ready', 'ready_bg', 'ready_frame', 'ready_icon']) L.push(['prepReady', k, `${pr}panel_prep_ready/${k}.png`]);
   L.push(['prepReady', 'countdown_arrow', `${pr}countdown_arrow.png`]);
