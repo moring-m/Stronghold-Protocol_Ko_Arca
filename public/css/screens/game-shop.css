@@ -312,8 +312,8 @@
 .obtn__cost b { transform: translateY(-.04rem); font-size: .19rem; line-height: 1; color: #ffc600; }
 .obtn__cost.is-poor { background-image: var(--sp-panel-cost-bg-2, none); }
 .obtn__cost.is-poor b { color: #c0c5c3; }
-.shopbar .obtn__cost--free { position: relative; width: .5rem; flex: none; height: .27rem; padding: 0; background: var(--sp-panel-cost-free, var(--mint-500)) center / 100% 100% no-repeat; }
-.obtn__cost--free b { position: absolute; right: .06rem; top: 50%; transform: translateY(-55%); font-size: .15rem; color: #fff; }
+.shopbar .obtn__cost--free { position: relative; width: .64rem; flex: none; height: .22rem; padding: 0; background: var(--sp-panel-cost-free, var(--mint-500)) center / 100% 100% no-repeat; }
+.obtn__cost--free b { position: absolute; right: .065rem; top: 50%; transform: translateY(-55%); font-size: .13rem; color: #fff; }
 .shopbar .scard.is-frozen .scard__body { background: linear-gradient(0deg, rgba(8, 11, 10, .45), transparent); }
 .shopbar .scard__ice { left: auto; right: .05rem; bottom: .05rem; transform: none; width: .26rem; height: .29rem; }
 /* both plates one size, as the official 128×55 buttons (their content centred; 解冻 is the longest label) */
