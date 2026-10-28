@@ -316,3 +316,8 @@
 .obtn__cost--free b { position: absolute; right: .08rem; top: 50%; transform: translateY(-55%); font-size: .15rem; color: #fff; }
 .shopbar .scard.is-frozen .scard__body { background: linear-gradient(0deg, rgba(8, 11, 10, .45), transparent); }
 .shopbar .scard__ice { left: auto; right: .05rem; bottom: .05rem; transform: none; width: .26rem; height: .29rem; }
+/* both plates one size, as the official 128×55 buttons (their content centred; 解冻 is the longest label) */
+.shopbar .obtn { width: 1.66rem; height: .55rem; justify-content: center; gap: .06rem; padding: 0 .06rem; }
+.shopbar .obtn { font-size: .17rem; letter-spacing: .02em; gap: .04rem; }
+.shopbar .obtn .toolbtn__img { width: .28rem; height: .28rem; }
+.shopbar .obtn kbd { margin-left: 0; }
