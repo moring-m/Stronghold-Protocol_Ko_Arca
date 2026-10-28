@@ -3295,5 +3295,12 @@
   "{0}단계로 선발": "Recruit at tier {0}",
   "진영 연동: {0}": "Faction link: {0}",
   "전략 연동: {0}": "Strategy link: {0}",
-  "필터 초기화": "Reset filters"
+  "필터 초기화": "Reset filters",
+  "선택": "Selected",
+  "단독": "Solo",
+  "연합 4인": "Alliance 4P",
+  "연합 8인": "Alliance 8P",
+  "참가 · 탐색": "Join · Browse",
+  "전체 방": "All rooms",
+  "공개 방 탐색": "Browse public rooms"
 }
