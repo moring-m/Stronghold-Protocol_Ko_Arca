@@ -36,21 +36,23 @@ import { store } from '../store.js';
 // module type of an elite card, with its official type icon when the local-client art has it).
 
 import { useEffect, useState } from '../../vendor/hooks.module.js';
-import { html, Icon, HexBadge, TierChip, Tooltip, MicroLabel } from './components.js';
-import { Img, BondGlyph, CoinGlyph, GIcon, RichText } from './gameComponents.js';
+import { html, Icon, TierChip, Tooltip, MicroLabel } from './components.js';
+import { Img, BondGlyph, GIcon } from './gameComponents.js';
 import { priceTone, mergeProgress, mergeTarget, shopBlockReason, chessLoadout, offerHeader, briefingBondTip } from './gameLogic.js';
 import { chessPortraitUrl, itemIconUrl, profIconUrl, uiUrl, moduleTypeIconUrl } from './assetUrls.js';
 import { matchData as data } from '../data.js';
+import { garrisonTypeIconKey } from './detailPanel.js';
 
 const cx = (...p) => p.flat().filter(Boolean).join(' ');
 
+/** The official price (autochess_shop_cost_item, 44×35): cost_bg_1 with the #ffc600 number, cost_bg_2 / #c0c5c3 while the funds
+ *  don't cover it; a discount / surcharge keeps its tone on the number (priceTone); a free card the FREE plate (cost_free). */
 function PriceHex({ slot, free, poor = false }) {
   const tone = priceTone(slot);
   const price = Number(slot?.price) || 0;
-  if (free || price === 0) return html`<span class="scard__free">FREE</span>`;
-  // like the original (img_bg_price_not_enough) the price turns grey while the funds don't cover it
-  return html`<${HexBadge} value=${price} tone=${poor ? 'dark' : tone} size="md" class=${cx('scard__price', poor && 'is-poor')}
-    title=${poor ? '资金不足' : tone === 'discount' ? `折扣价（原价 ${slot.basePrice}）` : tone === 'premium' ? `加价（原价 ${slot.basePrice}）` : '价格'} />`;
+  if (free || price === 0) return html`<span class="scard__free oc-cost oc-cost--free">FREE</span>`;
+  return html`<span class=${cx('scard__price', 'oc-cost', poor && 'is-poor', `oc-cost--${tone}`)}
+    title=${poor ? '资金不足' : tone === 'discount' ? `折扣价（原价 ${slot.basePrice}）` : tone === 'premium' ? `加价（原价 ${slot.basePrice}）` : '价格'}><b class="num">${price}</b></span>`;
 }
 
 /** Data lookups for shopBlockReason (full-hand purchases that complete a merge stay allowed). */
@@ -59,10 +61,10 @@ const LOOKUPS = { getChess: (id) => data.lookup('chess', id), getItem: (id) => d
 /** The official shop sprites (autochess_shop / _shop_card_item / _shop_cost_item) as CSS variables for game-shop.css
  *  (`--sp-<group>-<key>`); a sprite missing from the manifest leaves its variable unset and the CSS keeps the old look. */
 const SHOP_SPRITES = Object.freeze({
-  shopCard: ['bg_black', 'bg_common', 'repeat_line', 'frame_lv1', 'frame_lv2', 'frame_lv3', 'bg_doublecheck1', 'bg_doublecheck2', 'ice_matte', 'icon_ice', 'bg_empty', 'deco_item'],
+  shopCard: ['bg_black', 'bg_common', 'repeat_line', 'frame_lv1', 'frame_lv2', 'frame_lv3', 'bg_doublecheck1', 'bg_doublecheck2', 'ice_matte', 'icon_ice', 'bg_empty', 'deco_item', 'square_fx_1', 'icon_item', 'shadow', 'frame_outline'],
   shopPanel: ['refresh_bg_normal', 'bg_lock', 'frozen_bg_unselect', 'frozen_bg_normal', 'bg_money', 'bg_close', 'close_text_shadow', 'icon_x', 'upgrade_max',
     'upgrade_disable', 'check_grad', 'check_frame', 'check_arrow', 'deco_up', 'deco_down', 'frame', 'frame_glow', 'icon', 'level', 'stripe_line',
-    'shadow_total', 'shadow_right', 'cost_free', 'cost_bg_1', 'cost_bg_2', 'bg_open_1', 'bg_open_shadow'],
+    'shadow_total', 'shadow_right', 'cost_free', 'cost_bg_1', 'cost_bg_2', 'bg_open_1', 'bg_open_shadow', 'frozen_icon_lock', 'refresh_icon_lock'],
 });
 export function shopSpriteVars(m = data.get('assets')) {
   const out = [];
@@ -93,6 +95,7 @@ export const slotFrozen = (slot, toggle = false) => !!slot?.frozen || !!toggle;
 
 /** The armed (first-tapped) card's confirm strip: 确认购买 / 确认选择, or 无法购买 + why. */
 function ArmedTag({ reason, free }) {
+  // btn_double_check: group_able (bg_doublecheck1, #dcfff7) / group_disable (bg_doublecheck2, #e4e4e4) over the card's lower 125 px
   if (reason) return html`<span class="scard__confirm is-no" role="status"><b>无法购买</b><small>${reason}</small></span>`;
   return html`<span class="scard__confirm" role="status"><b>${free ? '确认选择' : '确认购买'}</b><small>再次点击</small></span>`;
 }
@@ -121,40 +124,44 @@ export function ChessCardView({ slot, idx, priv, frozen = false, reason = null, 
   const lo = c ? chessLoadout(c, priv?.loadout, LOOKUPS.getChess, {ops:priv?.ops ?? null,effects:data.get('effects')}) : null;
   const mod=lo?.module && !lo.module.none ? lo.module : null;
   const tap = () => { if (onTap) onTap(idx); else if (!disabled) onBuy(idx); else onDetail(slot.id, 'chess', hint); };
-  const name = c?.name || t('干员');
+  // group_frame: frame_lv1 (teal), frame_lv2 (gold: a copy already owned), frame_lv3 (orange: this purchase promotes)
   const frameLv = willMerge ? 3 : prog.copies > 0 ? 2 : 1;
-  const card = html`<button type="button" class=${cx('scard', `scard--t${tier}`, `scard--f${frameLv}`, favorite && 'is-favorite', recruit && 'is-recruit', frozen && 'is-frozen', disabled && 'is-disabled', willMerge && 'is-merge', armed && 'is-armed')}
+  // garrison_icon: the type of the operator's 特质 (garrisonTypeIcon, the large variant), at 35 %
+  const garrison = (c?.garrisonIds || []).map((id) => data.lookup('garrisons', id)).find((g) => g && !g.operatorTrait) || null;
+  const gIcon = garrison ? uiUrl(m, `garrisonTypeIcon/${garrisonTypeIconKey(garrison).replace(/^s_/, '')}`) : null;
+  const prof = m?.prof?.large?.[String(c?.profession || '').toLowerCase()] || profIconUrl(m, c?.profession);
+  const card = html`<button type="button" class=${cx('scard', 'oc', `scard--t${tier}`, `oc--f${frameLv}`, favorite && 'is-favorite', recruit && 'is-recruit', frozen && 'is-frozen', disabled && 'is-disabled', willMerge && 'is-merge', armed && 'is-armed')}
       data-shop-slot=${free ? undefined : idx} aria-keyshortcuts=${free ? undefined : hotkeyLabelOf('buy')}
       title=${free || reason ? undefined : t('购买鼠标指向的商品 · {key}', { key: hotkeyLabelOf('buy') })}
       onClick=${tap} onContextMenu=${(e) => { e.preventDefault(); onDetail(slot.id, 'chess', hint); }}
       aria-label=${`${c?.name || '干员'}${hidePrice ? '' : `，价格 ${slot.price}`}${armed ? (disabled ? '，无法购买' : '，再次点击确认') : ''}`} aria-pressed=${onTap ? String(!!armed) : undefined}>
-    <span class="scard__bg" aria-hidden="true"></span>
+    <span class="oc__bkg" aria-hidden="true"></span>
+    <span class="oc__char" aria-hidden="true"><${Img} src=${chessPortraitUrl(m, {...(lo?.record || c),appearanceResolved:!!priv?.loadout})} class="scard__art oc__portrait" /></span>
+    <span class="oc__bg" aria-hidden="true"></span>
+    ${gIcon ? html`<img class="oc__garrison" src=${gIcon} alt="" draggable=${false} />` : null}
+    <span class="oc__lines" aria-hidden="true"></span>
+    <span class="scard__bonds oc__bonds">
+      ${bonds.slice(0, 3).map((b) => {
+        const name = data.lookup('bonds', b)?.name || b;
+        const off = !!(offBonds && offBonds.has(b)); // a bond this mode never activates (gameLogic modeOffBonds)
+        return html`<span key=${b} class=${cx('scard__bond', off && 'is-off')} title=${off ? briefingBondTip(name, 'off') : undefined}><${BondGlyph} bondId=${b} /><span>${name}</span></span>`;
+      })}
+    </span>
+    <span class="oc__name">
+      <${Img} src=${prof} class="oc__prof" title=${PROF_NAME[c?.profession] || c?.profession} />
+      <span class="scard__name">${c?.name || slot.id}</span>
+      ${mod?.typeName ? html`<span class="scard__mod"><${Img} src=${moduleTypeIconUrl(data.get('local'), mod.typeName)} class="scard__modicon" />${mod.typeName}</span>` : null}
+    </span>
+    <span class="oc__square" aria-hidden="true"></span>
+    <span class="oc__frame" aria-hidden="true"></span>
+    ${willMerge ? html`<span class="scard__mergetag oc__triple" title=${hint} aria-label="可晋升"></span>` : null}
+    ${disabled && !armed ? html`<span class="oc__disable" aria-hidden="true"></span>` : null}
+    <span class="oc__tier"><${TierChip} tier=${tier} size="md" /></span>
     ${favorite?html`<span class="scard__favorite" title="선호 오퍼레이터" aria-label="선호 오퍼레이터">선호</span>`:null}
     ${recruit?html`<span class="scard__recruit" title="선발 오퍼레이터">선발</span>`:null}
-    <span class="scard__water" aria-hidden="true">${bonds[0] ? html`<${BondGlyph} bondId=${bonds[0]} />` : null}</span>
-    <${Img} src=${chessPortraitUrl(m, {...(lo?.record || c),appearanceResolved:!!priv?.loadout})} class="scard__art" />
-    <span class="scard__top">
-      <${TierChip} tier=${tier} size="md" />
-      ${hidePrice ? null : html`<${PriceHex} slot=${slot} free=${free} poor=${reason === '资金不足'} />`}
-      ${prog.copies > 0 ? html`<span class="scard__pips" title=${`已拥有 ${prog.copies}/${prog.need}`}>
-        ${Array.from({ length: prog.need }, (_, i) => html`<i key=${i} class=${i < prog.copies ? 'on' : ''}></i>`)}
-      </span>` : null}
-    </span>
-    <span class="scard__body">
-      <span class="scard__skill" title=${PROF_NAME[c?.profession] || c?.profession}><${Img} src=${m?.prof?.large?.[String(c?.profession || '').toLowerCase()] || profIconUrl(m,c?.profession)} class="scard__profession" />${mod?.typeName ? html`<span class="scard__mod"><${Img} src=${moduleTypeIconUrl(data.get('local'), mod.typeName)} class="scard__modicon" />${mod.typeName}</span>` : null}</span>
-      <span class="scard__name">${c?.name || slot.id}</span>
-      <span class="scard__bonds">
-        ${bonds.slice(0, 3).map((b) => {
-          const name = data.lookup('bonds', b)?.name || b;
-          const off = !!(offBonds && offBonds.has(b)); // a bond this mode never activates (gameLogic modeOffBonds)
-          return html`<span key=${b} class=${cx('scard__bond', off && 'is-off')} title=${off ? briefingBondTip(name, 'off') : undefined}><${BondGlyph} bondId=${b} /><span>${name}</span></span>`;
-        })}
-      </span>
-
-    </span>
-    ${willMerge ? html`<span class="scard__mergetag" title=${hint}>可晋升</span>` : null}
-    ${frozen ? html`<span class="scard__ice" aria-hidden="true"><${Icon} name="snow" /></span>` : null}
+    ${frozen ? html`<span class="scard__ice oc__frozen" aria-hidden="true"><i></i></span>` : null}
     ${armed ? html`<${ArmedTag} reason=${reason} free=${free} />` : null}
+    ${hidePrice ? null : html`<span class="oc__cost"><${PriceHex} slot=${slot} free=${free} poor=${reason === '资金不足'} /></span>`}
   </button>`;
   return reason && reason !== '已售出' && !armed ? html`<${Tooltip} text=${reason} block=${true} class="scard-wrap">${card}<//>` : card;
 }
@@ -174,31 +181,32 @@ export function ItemCardView({ slot, idx, frozen = false, reason = null, free = 
   const m = data.get('assets');
   const disabled = !!reason;
   const tap = () => { if (onTap) onTap(idx); else if (!disabled) onBuy(idx); else onDetail(slot.id, 'item'); };
-  const card = html`<button type="button" class=${cx('scard', 'scard--item', isFavorite('item',slot.id) && 'is-favorite', frozen && 'is-frozen', disabled && 'is-disabled', armed && 'is-armed')}
+  // group_equip: bg_deco (deco_item) behind the 93 px equipment, the name row with icon_item
+  const card = html`<button type="button" class=${cx('scard', 'oc', 'oc--item', 'oc--f1', 'scard--item', isFavorite('item',slot.id) && 'is-favorite', frozen && 'is-frozen', disabled && 'is-disabled', armed && 'is-armed')}
       data-shop-slot=${free ? undefined : idx} aria-keyshortcuts=${free ? undefined : hotkeyLabelOf('buy')}
       title=${free || reason ? undefined : t('购买鼠标指向的商品 · {key}', { key: hotkeyLabelOf('buy') })}
       onClick=${tap} onContextMenu=${(e) => { e.preventDefault(); onDetail(slot.id, 'item'); }}
       aria-label=${`${it?.name || '装备'}${hidePrice ? '' : `，价格 ${slot.price}`}${armed ? (disabled ? '，无法购买' : '，再次点击确认') : ''}`}
       aria-pressed=${onTap ? String(!!armed) : undefined}>
-    <span class="scard__bg" aria-hidden="true"></span>
+    <span class="oc__bkg" aria-hidden="true"></span>
+    <span class="oc__deco" aria-hidden="true"></span>
+    <span class="scard__itemart oc__equip"><${Img} src=${itemIconUrl(m, it)} fallback=${html`<${GIcon} name="bolt" />`} /></span>
+    <span class="oc__lines" aria-hidden="true"></span>
+    <span class="oc__name"><i class="oc__itemicon" aria-hidden="true"></i><span class="scard__name">${it?.name || slot.id}</span></span>
+    <span class="oc__frame" aria-hidden="true"></span>
+    ${disabled && !armed ? html`<span class="oc__disable" aria-hidden="true"></span>` : null}
+    <span class="oc__tier"><${TierChip} tier=${it?.tier ?? 1} size="md" /></span>
     ${isFavorite('item',slot.id)?html`<span class="scard__favorite" title="선호 장비" aria-label="선호 장비">선호</span>`:null}
-    <span class="scard__top">
-      <${TierChip} tier=${it?.tier ?? 1} size="md" />
-      ${hidePrice ? null : html`<${PriceHex} slot=${slot} free=${free} poor=${reason === '资金不足'} />`}
-    </span>
-    <span class="scard__itemart"><${Img} src=${itemIconUrl(m, it)} fallback=${html`<${GIcon} name="bolt" />`} /></span>
-    <span class="scard__body">
-      <span class="scard__name">${it?.name || slot.id}</span>
-      <span class="scard__idesc"><${RichText} text=${it?.descRaw || it?.desc || ''} /></span>
-    </span>
-    ${frozen ? html`<span class="scard__ice" aria-hidden="true"><${Icon} name="snow" /></span>` : null}
+    ${frozen ? html`<span class="scard__ice oc__frozen" aria-hidden="true"><i></i></span>` : null}
     ${armed ? html`<${ArmedTag} reason=${reason} free=${free} />` : null}
+    ${hidePrice ? null : html`<span class="oc__cost"><${PriceHex} slot=${slot} free=${free} poor=${reason === '资金不足'} /></span>`}
   </button>`;
   return reason && reason !== '已售出' && !armed ? html`<${Tooltip} text=${reason} block=${true} class="scard-wrap">${card}<//>` : card;
 }
 
 function SoldCard({ item = false }) {
-  return html`<div class=${cx('scard', 'scard--sold', item && 'scard--item')} aria-label="已售出">
+  // state_empty: bg_empty (its own [ NO INFO ]); the words stay for screen readers
+  return html`<div class=${cx('scard', 'oc', 'scard--sold', item && 'scard--item')} aria-label="已售出">
     <span class="scard__soldtxt"><${MicroLabel}>SOLD OUT</${MicroLabel}><span>${item ? '已购买' : '已招募'}</span></span>
   </div>`;
 }
@@ -210,24 +218,29 @@ function SoldCard({ item = false }) {
  */
 function EmptyCard({ item = false }) {
   // `scard--sold` too: the same inert frame (no hover lift, not a buyable card for every `:not(.scard--sold)` rule); `scard--empty` only restyles it
-  return html`<div class=${cx('scard', 'scard--sold', 'scard--empty', item && 'scard--item')} role="img" aria-label=${t('空栏位：刷新或下回合开始时补满')}
+  return html`<div class=${cx('scard', 'oc', 'scard--sold', 'scard--empty', item && 'scard--item')} role="img" aria-label=${t('空栏位：刷新或下回合开始时补满')}
     title=${t('空栏位：刷新或下回合开始时补满')}></div>`;
 }
 
+/** The official 调度中心 upgrade card (group_upgrade, 111×175): group_normal (#107463, repeat_line, deco_up / _down, the inner
+ *  LEVEL frame with its rook, stripe_line, the 56 px #57e8cb level, the 20 px tip, the cost above), its two-tap
+ *  root_double_check (check_grad, check_frame, check_arrow, text_double_check), group_max (upgrade_max, #679a90) and
+ *  group_disable (upgrade_disable, #b6b6b6 / #444). */
 function LevelCard({ shop, reason, armed = false, onTap, keyHint = 'D' }) {
   const lv = shop?.level ?? 1;
   const max = lv >= (shop?.maxLevel ?? 6);
   const price = shop?.upgradePrice ?? 0;
-  return html`<button type="button" class=${cx('lvcard', max && 'is-max', reason && 'is-disabled', armed && 'is-armed')} onClick=${() => !reason && onTap()}
+  const off = !max && !!reason;
+  return html`<button type="button" class=${cx('lvcard', 'olv', max && 'is-max', reason && 'is-disabled', armed && 'is-armed')} onClick=${() => !reason && onTap()}
       title=${reason || (armed ? `再次点击确认升级（${price} 资金）` : `升级调度中心（${price} 资金） · D`)} aria-disabled=${reason ? 'true' : 'false'}
       aria-pressed=${String(!!armed)}>
-    ${!max ? html`<${HexBadge} value=${price} tone=${reason && reason !== '调度中心已达最高等级' ? 'dark' : 'gold'} size="md" class="lvcard__price" />` : null}
-    <span class="lvcard__frame">
-      <span class="lvcard__micro">LEVEL</span>
-      <b class="lvcard__num num">${lv}</b>
-    </span>
-    <span class="lvcard__label">${max ? '已满级' : armed ? '确认升级' : '升级'}</span>
+    ${max || off ? null : html`<span class="olv__inner" aria-hidden="true"><i class="olv__innerbg"></i><i class="olv__icon"></i><i class="olv__frame"></i><i class="olv__level"></i><i class="olv__outline"></i></span>
+      <i class="olv__deco-up" aria-hidden="true"></i><i class="olv__deco-down" aria-hidden="true"></i><i class="olv__stripe" aria-hidden="true"></i>`}
+    ${armed ? html`<i class="olv__check" aria-hidden="true"></i><i class="olv__arrow" aria-hidden="true"></i>` : null}
+    <b class="lvcard__num olv__num num">${lv}</b>
+    <span class="lvcard__label olv__tip">${max ? '已满级' : armed ? '确认升级' : '升级'}</span>
     <kbd class="lvcard__key">${keyHint}</kbd>
+    ${!max ? html`<span class="lvcard__price olv__cost"><${PriceHex} slot=${{ price }} poor=${!!reason && reason !== '调度中心已达最高等级'} /></span>` : null}
   </button>`;
 }
 
@@ -367,25 +380,33 @@ function RegularShopBar({ priv, editable, collapsed, refreshBusy = false, onColl
   };
 
   if (collapsed) {
-    return html`<div class="shopbar-tab shopbar-tab--official" style=${shopSpriteVars()} ref=${barRef}>
-      <div class="shopbar-tab__funds"><${CoinGlyph} /><b class="num">${store.get().match.public?.practice?'∞':funds}</b></div>
-      <button type="button" class="shopbar-tab__btn" onClick=${() => onCollapse(false)}><${Icon} name="chevronLeft" />展开商店 <kbd>${keyLabel('collapseShop')}</kbd></button>
+    // folded: btn_open (bg_open 1 over bg_open_shadow, the 48 px #3bdfbe level on its LEVEL plate), the money above it
+    return html`<div class="shopbar-tab oshop-tab" style=${shopSpriteVars()} ref=${barRef}>
+      <div class="shopbar-tab__funds ofunds__money" title="目前资金"><b class="num">${store.get().match.public?.practice?'∞':funds}</b></div>
+      <button type="button" class="shopbar-tab__btn oopen" onClick=${() => onCollapse(false)} aria-label="展开商店">
+        <i class="oopen__shadow" aria-hidden="true"></i><i class="oopen__bg" aria-hidden="true"></i>
+        <b class="oopen__level num">${shop.level ?? 1}</b><kbd>${keyLabel('collapseShop')}</kbd>
+      </button>
     </div>`;
   }
 
-  return html`<section class=${cx('shopbar', 'shopbar--official', frozen && 'is-frozen', !editable && 'is-locked', showReward && 'has-reward', armed && 'has-armed', preferences.shopItemLeft && 'shopbar--item-left')} style=${shopSpriteVars()} ref=${barRef} aria-label="调度中心">
+  return html`<section class=${cx('shopbar', 'oshop', frozen && 'is-frozen', !editable && 'is-locked', showReward && 'has-reward', armed && 'has-armed', preferences.shopItemLeft && 'shopbar--item-left')} style=${shopSpriteVars()} ref=${barRef} aria-label="调度中心">
     <div class="shopbar__tools">
       <span class="shopbar__remain">剩余可放置角色：<b class=${cx('num', remaining === 0 && 't-orange')}>${remaining}</b></span>
       <${FavoritesButton}/>
-      <button type="button" class=${cx('toolbtn', 'toolbtn--ice', frozen && 'is-on')} disabled=${!!frzReason} onClick=${onFreeze}
+      <button type="button" class=${cx('toolbtn', 'toolbtn--ice', 'obtn', frozen && 'is-on')} disabled=${!!frzReason} onClick=${onFreeze}
         title=${frzReason || (frozen ? `解冻商店 · ${keyLabel('freeze')}` : `冻结商店（下回合保留） · ${keyLabel('freeze')}`)}>
-        <${Img} src=${uiUrl(data.get('assets'), frozen ? 'shopPanel/frozen_icon2' : 'shopPanel/frozen_icon')} class="toolbtn__img" fallback=${html`<${Icon} name="snow" />`} />
-        <span>${frozen ? '解冻' : '冻结'}</span><kbd>${keyLabel('freeze')}</kbd>
+        <i class="obtn__plate" aria-hidden="true"></i>
+        <${Img} src=${uiUrl(data.get('assets'), frzReason ? 'shopPanel/frozen_icon_lock' : frozen ? 'shopPanel/frozen_icon' : 'shopPanel/frozen_icon2')} class="toolbtn__img obtn__icon" fallback=${html`<${Icon} name="snow" />`} />
+        <span class="obtn__text">${frozen ? '解冻' : '冻结'}</span><kbd>${keyLabel('freeze')}</kbd>
       </button>
-      <button type="button" class="toolbtn toolbtn--amber" disabled=${!!refReason || refreshBusy} onClick=${onRefresh} title=${refReason || (refreshBusy ? t('正在刷新…') : t('刷新商店 · {key}', { key: keyLabel('refresh') }))}>
-        <${Img} src=${uiUrl(data.get('assets'), 'shopPanel/refresh_icon')} class="toolbtn__img" fallback=${html`<${Icon} name="refresh" />`} />
-        <span>${t('刷新')}</span>
-        ${free > 0 ? html`<span class="toolbtn__free">${t('免费 ×{free}', { free })}</span>` : html`<${HexBadge} value=${shop.refreshPrice ?? 1} tone=${refReason || refreshBusy ? 'dark' : 'gold'} size="sm" />`}
+      <button type="button" class="toolbtn toolbtn--amber obtn" disabled=${!!refReason || refreshBusy} onClick=${onRefresh} title=${refReason || (refreshBusy ? t('正在刷新…') : t('刷新商店 · {key}', { key: keyLabel('refresh') }))}>
+        <i class="obtn__plate" aria-hidden="true"></i>
+        <${Img} src=${uiUrl(data.get('assets'), refReason || refreshBusy ? 'shopPanel/refresh_icon_lock' : 'shopPanel/refresh_icon')} class="toolbtn__img obtn__icon" fallback=${html`<${Icon} name="refresh" />`} />
+        <span class="obtn__text">${t('刷新')}</span>
+        <span class="obtn__cost">${free > 0
+          ? html`<span class="toolbtn__free oc-cost oc-cost--free" title=${t('免费 ×{free}', { free })}><b class="num">${free}</b></span>`
+          : html`<${PriceHex} slot=${{ price: shop.refreshPrice ?? 1 }} poor=${!!refReason || refreshBusy} />`}</span>
         <kbd>${keyLabel('refresh')}</kbd>
       </button>
     </div>
@@ -413,13 +434,12 @@ function RegularShopBar({ priv, editable, collapsed, refreshBusy = false, onColl
           })
           : layout?.item===0?null:html`<${EmptyCard} item=${true} />`}
       </div>`}
-      <div class="funds">
-        <div class="funds__hex">
-          <${CoinGlyph} class="funds__coin" />
-          <b class="funds__num num">${store.get().match.public?.practice?'∞':funds}</b>
-        </div>
-        <span class="funds__label">目前资金</span>
-        <button type="button" class="funds__collapse" onClick=${() => onCollapse(true)}><${Icon} name="chevronLeft" />접기 <kbd>${keyLabel('collapseShop')}</kbd></button>
+      <div class="funds ofunds">
+        <div class="funds__hex ofunds__money" title="目前资金"><b class="funds__num num">${store.get().match.public?.practice?'∞':funds}</b></div>
+        <button type="button" class="funds__collapse oclose" onClick=${() => onCollapse(true)}>
+          <i class="oclose__shadow" aria-hidden="true"></i>
+          <span class="oclose__text">접기<i class="oclose__x" aria-hidden="true"></i></span><kbd>${keyLabel('collapseShop')}</kbd>
+        </button>
       </div>
     </div>
   </section>`;
