@@ -168,6 +168,12 @@ export function unitTuple(u, t) {
     if (!spMax) spMax = u.mem.skillCastDuration;
     sp = spMax * Math.max(0, Math.min(1, (u.mem.skillCastUntil - t) / u.mem.skillCastDuration));
   }
+  // a skill that waits for its next attack (古米 S1's heal, every pending-attack instant / charge skill): that attack's
+  // wait is its duration — the bar drains to the attack (u.atkCd), measured from the cast (skills.js pendingWait)
+  else if (sk && sk.active && !sk.isTimed && sk.pending && sk.pendingWait > 0) {
+    if (!spMax) spMax = sk.pendingWait;
+    sp = spMax * Math.max(0, Math.min(1, Math.max(u.atkCd || 0, sk.pendingWait - (t - (sk.pendingSince ?? t))) / sk.pendingWait));
+  }
   const doll = u.trait?.doll && u.findBuff('trait:substitute');
   if (doll) { spMax = doll.duration; sp = Math.max(0, doll.timeLeft); }
   const persona = u.mem.makoto;
