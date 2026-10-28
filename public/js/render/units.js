@@ -2390,13 +2390,15 @@ export class UnitView {
     let sy = 0;
     if (showSp) {
       const active = !!(this.flags & UF.SKILL) || this.form === 'doll' || /^makoto_(s[123]|change)/.test(this.form || '');
-      const k = ammo ? ammo[0] / ammo[1] : clamp(this.sp / this.spMax, 0, 1);
+      // a charge skill with a charge stored is ready (full), whatever the next charge's SP; while it runs, its duration
+      const stored = Array.isArray(this.charges) && Number(this.charges[0]) >= 1;
+      const k = ammo ? ammo[0] / ammo[1] : !active && stored ? 1 : clamp(this.sp / this.spMax, 0, 1);
       ready = !active && k >= 0.999;
       sy = cy + bh / 2 + spH / 2 + (off ? 0 : 1.5);
       this.spBg.position.set(x0 - (off ? 0 : 1), sy); this.spBg.width = bw + (off ? 0 : 2); this.spBg.height = spH + (off ? 0 : 2);
       this.spBg.tint = off ? OFFICIAL_BARS.back : COLORS.hpBack; this.spBg.alpha = off ? 0.55 : 1;
       this.spFill.position.set(x0, sy); this.spFill.width = bw * k; this.spFill.height = spH;
-      this.spFill.tint = (this.flags & UF.OVERHEATED) ? 0xf04444 : off ? (active ? OFFICIAL_BARS.skill : OFFICIAL_BARS.sp) : ammo ? COLORS.ammo : active ? COLORS.spActive : ready ? COLORS.spReady : COLORS.sp;
+      this.spFill.tint = (this.flags & UF.OVERHEATED) ? (off ? OFFICIAL_BARS.overload : 0xf04444) : off ? (active ? OFFICIAL_BARS.skill : OFFICIAL_BARS.sp) : ammo ? COLORS.ammo : active ? COLORS.spActive : ready ? COLORS.spReady : COLORS.sp;
       const shownAmmo = ammo ? ((this.flags & UF.OVERDRIVE) ? ammo[1] / 2 : ammo[1]) : 0;
       if (shownAmmo > 1) {
         this.ammoDividers.lineStyle(Math.min(.7, bw / shownAmmo * .3), COLORS.hpBack, .9);
@@ -3043,7 +3045,7 @@ const ICON_TMP = [];
 /** 设置「HP 바 표시 방식」 official: the client's bar colours (read off its battle screens): operator HP light blue, SP
  *  yellow-green charging / amber while the skill runs, enemy HP orange, a leader's (悬赏 leaders, the bosses) red on grey. */
 const OFFICIAL_BARS = Object.freeze({ elementAbove: 0.28, width: 0.9, fixedBossWidth: 4, hpH: 0.042, leaderH: 0.06, belowFeet: 0.28,
-  ally: 0x6cb2d2, sp: 0x8aa43f, skill: 0xc3991c, enemy: 0xd46c3a, leader: 0xcf2a33, back: 0x1c1c1c, leaderBack: 0x7d8088 });
+  ally: 0x6cb2d2, sp: 0x8aa43f, skill: 0xc3991c, overload: 0xb04516, enemy: 0xd46c3a, leader: 0xcf2a33, back: 0x1c1c1c, leaderBack: 0x7d8088 });
 
 /**
  * Unit-layer zIndex of a unit / piece whose feet are at (x, y): farther rows first (so raised block rows, keyed by

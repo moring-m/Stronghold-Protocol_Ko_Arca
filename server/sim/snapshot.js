@@ -143,8 +143,8 @@ export function animOf(u, t) {
   return ANIM.IDLE;
 }
 
-// PRTS 技能 §过载: each half has its own gauge; the second half is red.
-export function overdriveSkill(sk) { return !!sk && ['skchr_horn_2', 'skchr_horn_3', 'skchr_rockr_2'].includes(sk.id); }
+// PRTS 技能 §过载 (the skills whose text marks <$ba.overdrive>过载</>): each half has its own gauge; the second half is red.
+export function overdriveSkill(sk) { return !!sk && ['skchr_horn_2', 'skchr_horn_3', 'skchr_rockr_2', 'skchr_wisdel_2'].includes(sk.id); }
 function overdriveLeft(sk) { return sk.kind === 'ammo' ? sk.ammoLeft / Math.max(1, sk.ammoMax) : sk.timeLeft / Math.max(.01, sk.duration); }
 
 /** Snapshot tuple for one unit. */
