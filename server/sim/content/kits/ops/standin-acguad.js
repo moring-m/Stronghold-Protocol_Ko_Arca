@@ -31,7 +31,7 @@ export default {
     const layer = num(b3.atk_each_stack, 0), maxLayers = Math.max(1, Math.floor(num(b3.max_atk_stack_cnt, 8)));
     return {
       skills: {
-        [S1]: { kind: 'duration', mods: { atkPct: num(b1.atk) }, attack: { hitsFn: (battle) => (battle.rng.chance(doubleProb) ? 2 : 1) } },
+        [S1]: { kind: 'duration', mods: { atkPct: num(b1.atk) }, attack: { hitsFn: (battle) => (battle.rng.chance(doubleProb) ? 2 : 1), strikeGap: 0.1 } }, // mode S1 MultiMeleeAttack `_triggerDelta`
         [S2]: { kind: 'duration', mods: { defMul: 0, hpPct: num(b2.max_hp) }, attack: { atkScale: num(b2['attack@atk_scale'], 1) } },
         [S3]: {
           kind: 'duration',

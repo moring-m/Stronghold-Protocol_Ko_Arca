@@ -123,9 +123,12 @@
 /* the official module type icon (local-client art, DESIGN §13); the type text stays beside it */
 .scard__skill .scard__modicon { flex: none; width: .14rem; height: .14rem; object-fit: contain; }
 .scard__name { font-size: .19rem; font-weight: 900; letter-spacing: .04em; color: #fff; text-shadow: 0 1px 3px #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.scard__bonds { display: flex; flex-wrap: wrap; gap: .02rem .08rem; }
-.scard__bond { display: inline-flex; align-items: center; gap: .03rem; font-size: .13rem; color: var(--mint-400); }
-.scard__bond .bglyph { width: .18rem; height: .18rem; }
+/* the official autochess_shop_card_item's bond_list: one 18 px row per bond (a 22 px #b8b8b8 icon, the 14 px #b7b7b7
+   name), stacked bottom-left above the name */
+.scard__bonds { order: -1; display: flex; flex-direction: column; align-items: flex-start; gap: .01rem; }
+.scard__bond { display: inline-flex; align-items: center; gap: .04rem; height: .2rem; font-size: .14rem; color: #b7b7b7; text-shadow: 0 1px 2px #000; }
+.scard__bond .bglyph { width: .22rem; height: .22rem; }
+.scard__bond .bglyph img { filter: brightness(0) invert(.72); }
 .scard__bond.is-off { color: var(--text-dim); text-decoration: line-through; text-decoration-color: rgba(255, 84, 84, .6); } /* the mode never activates it (标准) */
 .scard__class { display: flex; align-items: center; gap: .05rem; font-size: .13rem; color: var(--text-lo); }
 .scard__prof { width: .18rem; height: .18rem; object-fit: contain; opacity: .85; }
@@ -277,3 +280,48 @@
   box-shadow:none;
   cursor:default;
 }
+
+/* ---- official parts (autochess_shop_card_item / autochess_shop; shopBar.js shopSpriteVars) ---------------------------- */
+/* root_tier: the 29 px chip 8.5 / 9.5 px into the 158 px card */
+.scard__top .tier { width: .29rem; height: .29rem; margin: .025rem 0 0 .025rem; }
+/* root_name: the class icon (16 px) before the 16 px white name; bond_list's rows above it */
+.scard__namerow { display: flex; align-items: center; gap: .05rem; min-width: 0; }
+.scard__namerow .scard__skill { position: relative; right: auto; top: auto; flex: none; width: .2rem; height: .2rem; background: none; border: 0; box-shadow: none; }
+.scard__namerow .scard__skill.is-custom { box-shadow: 0 0 0 1px var(--mint-400); }
+.scard__namerow .scard__mod { right: auto; left: 100%; bottom: auto; top: -.22rem; margin: 0; }
+.scard__namerow .scard__name { min-width: 0; font-size: .17rem; font-weight: 500; letter-spacing: 0; }
+/* state_fx_frozen: ice_matte (159×67) over the card's foot, icon_ice (31×34) 18 px up on it */
+.shopbar .scard.is-frozen::after { inset: auto 0 0 0; height: 38%; box-shadow: none; z-index: 1;
+  background: var(--sp-card-ice-matte, linear-gradient(0deg, rgba(159, 212, 255, .5), transparent)) center / 100% 100% no-repeat; }
+.shopbar .scard__ice { bottom: .02rem; width: .31rem; height: .34rem; background: none; border: 0; }
+.scard__iceicon { display: block; width: 100%; height: 100%; background: var(--sp-card-icon-ice, none) center / 100% 100% no-repeat; }
+/* 冻结 / 刷新: the official plates (frozen_bg_unselect → frozen_bg_normal while frozen, refresh_bg_normal, bg_lock when refused)
+   behind the whole button, the 31 px icons, 19 px dark text, the price on cost_bg_1 (cost_free while free refreshes last) */
+.shopbar .obtn { position: relative; isolation: isolate; height: .5rem; padding: 0 .14rem 0 .1rem; border: 0; background: none; box-shadow: none;
+  color: rgba(0, 0, 0, .88); font-size: .19rem; font-weight: 700; letter-spacing: .06em; }
+.shopbar .obtn__plate { position: absolute; z-index: -1; inset: -.02rem -.06rem -.1rem; pointer-events: none; background: var(--sp-panel-refresh-bg-normal, var(--amber)) center / 100% 100% no-repeat; }
+.shopbar .toolbtn--ice .obtn__plate { background: var(--sp-panel-frozen-bg-unselect, #bfe3f7) center / 100% 100% no-repeat; }
+.shopbar .toolbtn--ice.is-on .obtn__plate { background-image: var(--sp-panel-frozen-bg-normal, none); background-color: transparent; }
+.shopbar .obtn:disabled .obtn__plate { background: var(--sp-panel-bg-lock, #555) center / 100% 100% no-repeat; }
+.shopbar .obtn .toolbtn__img { width: .31rem; height: .31rem; }
+.shopbar .obtn:hover:not(:disabled), .shopbar .toolbtn--ice.is-on, .shopbar .toolbtn--ice.is-on:hover:not(:disabled) { background: none; box-shadow: none; color: rgba(0, 0, 0, .88); }
+.shopbar .obtn:hover:not(:disabled) { filter: brightness(1.06); }
+.shopbar .obtn:disabled { color: rgba(0, 0, 0, .7); }
+.shopbar .obtn kbd, .shopbar .toolbtn--ice.is-on kbd { color: rgba(0, 0, 0, .65) !important; border-color: rgba(0, 0, 0, .3) !important; background: rgba(255, 255, 255, .25) !important; }
+.obtn__cost { display: grid; place-items: center; width: .38rem; height: .3rem; letter-spacing: 0; background: var(--sp-panel-cost-bg-1, #000) center / 100% 100% no-repeat; }
+.obtn__cost b { transform: translateY(-.04rem); font-size: .19rem; line-height: 1; color: #ffc600; }
+.obtn__cost.is-poor { background-image: var(--sp-panel-cost-bg-2, none); }
+.obtn__cost.is-poor b { color: #c0c5c3; }
+.shopbar .obtn__cost--free { position: relative; width: .78rem; height: .27rem; padding: 0; background: var(--sp-panel-cost-free, var(--mint-500)) center / 100% 100% no-repeat; }
+.obtn__cost--free b { position: absolute; right: .08rem; top: 50%; transform: translateY(-55%); font-size: .15rem; color: #fff; }
+.shopbar .scard.is-frozen .scard__body { background: linear-gradient(0deg, rgba(8, 11, 10, .45), transparent); }
+.shopbar .scard__ice { left: auto; right: .05rem; bottom: .05rem; transform: none; width: .26rem; height: .29rem; }
+/* both plates one size, as the official 128×55 buttons (their content centred; 解冻 is the longest label) */
+.shopbar .obtn { width: 1.66rem; height: .55rem; justify-content: center; gap: .06rem; padding: 0 .06rem; }
+.shopbar .obtn { font-size: .17rem; letter-spacing: .02em; gap: .04rem; }
+.shopbar .obtn .toolbtn__img { width: .28rem; height: .28rem; }
+.shopbar .obtn kbd { margin-left: 0; }
+/* the plates' drawn part (x 11–138 of 147, y 2–56 of 77) covers the button box exactly; ★ takes the same height */
+.shopbar .obtn__plate { inset: auto; left: -8.66%; top: -3.7%; width: 115.75%; height: 142.6%; }
+.shopbar .shopbar__tools { align-items: center; }
+.shopbar .shopbar__tools .toolbtn--favorite, .shopbar .shopbar__tools .toolbtn--icon { height: .55rem; width: .55rem; }

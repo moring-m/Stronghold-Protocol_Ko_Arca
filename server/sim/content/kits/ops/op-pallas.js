@@ -30,8 +30,7 @@
 //   battle: by the owner's decision of 2026-10-04 (shared/highGround.js) only elite 歌蕾蒂娅 + HOK-Y may take a 高台, so a
 //   帕拉斯 piece stays on the melee tiles — an open question for the owner (DESIGN draft 0.2.0.o9), nothing in this kit.
 // - S1 胜利的连击 (AUTO, attack SP 3; data DEFAULT): the next attack strikes its target twice for atk_scale × ATK physical
-//   (skchr_pallas_1 `_additionalTimes` 1, `_triggerDelta` 0.1 s: the second strike 0.1 s after the first — both land in the
-//   attack here [ASSUMED: the 0.1 s is not modelled]); the instructor ×1.2 applies to each strike.
+//   (skchr_pallas_1 `_additionalTimes` 1, `_triggerDelta` 0.1 s: the second strike 0.1 s after the first, modelled by the profile's strikeGap).
 // - S2 信念的长鞭 (MANUAL, 20 / 22 s): attack range +ability_range_forward_extend tile forward (2-2 ⇒ 4 tiles: targeting
 //   rangeExtend, the card's live range follows), ATK +atk, every attack attack@buff_prob to stun its target attack@stun s.
 //   Its trigger is the data's DEFAULT: tools/build-data.mjs ATTACK_RANGE_CHANGE does not read "攻击范围向前延伸一格", so the
@@ -117,7 +116,7 @@ export default {
     };
     return {
       skills: {
-        [S1]: { kind: 'instant', attack: { atkScale: num(b1.atk_scale, 1), hits: 2 } },
+        [S1]: { kind: 'instant', attack: { atkScale: num(b1.atk_scale, 1), hits: 2, strikeGap: 0.1 } },
         [S2]: {
           kind: 'duration',
           mods: { atkPct: num(b2.atk) },

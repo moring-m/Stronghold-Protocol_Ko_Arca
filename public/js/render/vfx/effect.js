@@ -159,7 +159,7 @@ export function compileEffect(desc, lib = {}) {
         case 'FollowMountPoint': def.follow = { mount: num(f._mountPointType, 0) | 0, keepRot: on(f._keepOriginRotation), scale: on(f._followScale) }; break;
         case 'FollowOwner': case 'FollowOwnerRootTileHeight': case 'FollowTileHeight': if (!def.follow) def.follow = { mount: 0, keepRot: true, owner: true }; break;
         case 'FollowDirection': def.direction = { fourDir: on(f._useFourDir), leftIsDefault: on(f._leftIsDefault), reverseBack: on(f._reverseWhenFaceToBack) }; break;
-        case 'OnPlayEmitter': case 'OnPlayEmitterIf': def.onPlay.push({ keys: (Array.isArray(f._effects) ? f._effects : []).map((k) => String(k).toLowerCase()), delay: num(f._preDelay, 0), cond: b.class === 'OnPlayEmitterIf' ? f : null }); break;
+        case 'OnPlayEmitter': case 'OnPlayEmitterIf': def.onPlay.push({ keys: (Array.isArray(f._effects) ? f._effects : []).map((k) => String(k).toLowerCase()), delay: num(f._preDelay, 0), sourcePos: on(f._useSourceEffectPos), cond: b.class === 'OnPlayEmitterIf' ? f : null }); break;
         case 'OnFinishEmitter': def.onFinish.push(...(Array.isArray(f._effects) ? f._effects : []).map((k) => String(k).toLowerCase())); break;
         case 'SwitchableBackEffect': def.switchable = { ...(def.switchable || {}), back: f._backEffect ? String(f._backEffect).toLowerCase() : null }; break;
         case 'SwitchableRightEffect': def.switchable = { ...(def.switchable || {}), right: f._rightEffect ? String(f._rightEffect).toLowerCase() : null, reverse: on(f._reverseLeftRight) }; break;
@@ -235,6 +235,15 @@ export function compileEffect(desc, lib = {}) {
   // authored behind its unit: the root's `static_offset` node pushed into the board (z > 0) — see behindUnits
   const so = nodes.find((nd) => nd && nd.name === 'static_offset' && nd.parent === (Number.isInteger(desc?.root) ? desc.root : 0));
   def.back = !!so && Array.isArray(so.pos) && num(so.pos[2], 0) > 0;
+  // …or, of an effect spawned at the feet (FOOT_POINT / none), a renderer whose own node lies deeper in the board than the
+  // anchor (the sum of its chain's z > 0: 모스티마 스킨 S3's castle backdrop, z +0.07) — at the HIT / HEAD / Special
+  // points the anchor already stands in front of the model
+  def.nodeBack = new Uint8Array(n);
+  if (def.spawn === 0 || def.spawn === 1) for (let i = 0; i < n; i++) {
+    let z = 0;
+    for (let j = i; j >= 0; j = def.parent[j]) z += def.base[j * 10 + 2];
+    def.nodeBack[i] = z > 0.02 ? 1 : 0;
+  }
   def.loops = def.isLoop || def.ps.some((p) => p && p.looping && p.playOnAwake !== false) || def.animators.some((a) => def.clips[a.clip]?.loop);
   def.material = (i, lite) => {
     const list = lite ? def.lite : def.materials;
@@ -733,19 +742,19 @@ export class Effect {
         if (m0 && s.count > 0) {
           const meshData = r.mode === 'mesh' ? (r.mesh && this.lib ? this.lib.mesh(r.mesh) : null) : null;
           if (r.mode !== 'mesh' || meshData) {
-            sink(entry('ps', i, 0, m0, ov, r.order, r.layer, dist + r.fudge, behindUnits(r.layer, r.order, def.back) || (isFlatParticles(r, w, meshData) && nearGround), this, r.mode === 'mesh' ? r.mesh : null));
+            sink(entry('ps', i, 0, m0, ov, r.order, r.layer, dist + r.fudge, behindUnits(r.layer, r.order, def.back || def.nodeBack[i] === 1) || (isFlatParticles(r, w, meshData) && nearGround), this, r.mode === 'mesh' ? r.mesh : null));
           }
         }
         if (s.def.trail && r.mats[1] != null && (s.count > 0 || s.orphans.length)) {
           const m1 = def.material(r.mats[1], lite);
-          if (m1) sink(entry('trailmod', i, 0, m1, ov, r.order, r.layer, dist + r.fudge, behindUnits(r.layer, r.order, def.back), this, null));
+          if (m1) sink(entry('trailmod', i, 0, m1, ov, r.order, r.layer, dist + r.fudge, behindUnits(r.layer, r.order, def.back || def.nodeBack[i] === 1), this, null));
         }
       }
       const mr = def.mesh[i];
       if (mr && mr.enabled && mr.mesh && (this.rendOv.get(i)?.enabled ?? true)) {
         const md = this.lib ? this.lib.mesh(mr.mesh) : null;
         if (md && md.submeshes) {
-          const flat = behindUnits(mr.layer, mr.order, def.back) || (isFlatMesh(md, w) && nearGround);
+          const flat = behindUnits(mr.layer, mr.order, def.back || def.nodeBack[i] === 1) || (isFlatMesh(md, w) && nearGround);
           for (let k = 0; k < mr.mats.length; k++) {
             if (mr.mats[k] == null || !md.submeshes[k]) continue;
             const mat = def.material(mr.mats[k], lite);
@@ -760,7 +769,7 @@ export class Effect {
           for (let k = 0; k < sk.mats.length; k++) {
             if (sk.mats[k] == null || !md.submeshes[k]) continue;
             const mat = def.material(sk.mats[k], lite);
-            if (mat) sink(entry('skinned', i, k, mat, ov, sk.order, sk.layer, dist, behindUnits(sk.layer, sk.order, def.back), this, sk.mesh));
+            if (mat) sink(entry('skinned', i, k, mat, ov, sk.order, sk.layer, dist, behindUnits(sk.layer, sk.order, def.back || def.nodeBack[i] === 1), this, sk.mesh));
           }
         }
       }
@@ -768,7 +777,7 @@ export class Effect {
       if (tr && tr.enabled && tr.mats[0] != null) {
         const st = this.trails.get(i);
         const mat = st && st.n > 0 ? def.material(tr.mats[0], lite) : null;
-        if (mat) sink(entry('trail', i, 0, mat, ov, tr.order, tr.layer, dist, behindUnits(tr.layer, tr.order, def.back), this, null));
+        if (mat) sink(entry('trail', i, 0, mat, ov, tr.order, tr.layer, dist, behindUnits(tr.layer, tr.order, def.back || def.nodeBack[i] === 1), this, null));
       }
       const ln = def.line[i];
       // a world-space line's authored points are the editor's placeholders — fixed spots of the authoring scene (§33.6;
@@ -776,7 +785,7 @@ export class Effect {
       if (ln && ln.enabled && ln.mats[0] != null && (!ln.world || this.linePts.has(i))) {
         const pts = this.linePts.get(i) || ln.points;
         const mat = pts.length >= 2 ? def.material(ln.mats[0], lite) : null;
-        if (mat) sink(entry('line', i, 0, mat, ov, ln.order, ln.layer, dist, behindUnits(ln.layer, ln.order, def.back), this, null));
+        if (mat) sink(entry('line', i, 0, mat, ov, ln.order, ln.layer, dist, behindUnits(ln.layer, ln.order, def.back || def.nodeBack[i] === 1), this, null));
       }
     }
   }

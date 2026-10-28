@@ -814,6 +814,15 @@ export function doctorNo(id) {
  * Latency pill ("58ms"), coloured by research 06 §3.4 tiers (<60 mint, <200 amber, else red).
  * @param {{ ms?: number|null, online?: boolean, class?: string }} props
  */
+/** Players connected to the server, in the same pill style as the latency readout. */
+export function OnlinePill({ count, class: cls }) {
+  const ok = Number.isFinite(count);
+  return html`<span class=${cx('ping', 'ping--online', !ok && 'ping--off', cls)} title=${ok ? `접속 중 ${count}명` : '접속 인원 확인 중'} aria-label=${ok ? `접속 중 ${count}명` : '접속 인원 확인 중'}>
+    <${Icon} name="users" class="ping__icon" />
+    <span class="ping__value">${ok ? Math.min(99999, count) : '--'}</span><span class="ping__unit">명</span>
+  </span>`;
+}
+
 export function PingPill({ ms, online = true, class: cls }) {
   const ok = online && Number.isFinite(ms);
   const tier = !ok ? 'off' : ms < 60 ? 'low' : ms < 200 ? 'medium' : 'high';

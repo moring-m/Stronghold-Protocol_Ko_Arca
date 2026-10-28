@@ -23,14 +23,45 @@ import { useEffect, useRef } from '../../vendor/hooks.module.js';
 // the strip carries an amber "👁 name" tag (`owner`, the observing pill's spelling, research 09 §3.1) and amber rings,
 // the popup a "👁 name 的盟约" line; its member list reads the teammate's operators on the field (no hand: never sent).
 
-import { html, BondDisc, Icon, MicroLabel, Tooltip } from './components.js';
+import { html, Icon, MicroLabel, Tooltip } from './components.js';
 import { RichText, UnitThumb, BondGlyph, GIcon } from './gameComponents.js';
 import { sortBonds, bondMembers, nextThreshold, bondTier, harmonyMembers, HARMONY_BOND, memberHeadCount, briefingBondTip } from './gameLogic.js';
 import { formatBondEffect } from './richText.js';
-import { bondIconUrl } from './assetUrls.js';
+import { bondIconUrl, uiUrl } from './assetUrls.js';
 import { matchData as data } from '../data.js';
 
 const cx = (...p) => p.flat().filter(Boolean).join(' ');
+
+/** The official HUD bond board (autochess_hud_bond_item `bg`): `<thresholds>_<reached tier>` — 1_0 the grey ring of a bond
+ *  below its first threshold (no `<n>_0` exists), `<n>_<n>` the filled disc of a completed bond. */
+export function bondBoardKey(thresholds, tier) {
+  const n = Math.max(1, Math.min(4, thresholds | 0 || 1));
+  const t = Math.max(0, Math.min(n, tier | 0));
+  return t === 0 ? '1_0' : `${n}_${t}`;
+}
+
+/**
+ * One HUD bond in the official autochess_hud_bond_item layout (83×84 at the reference scale): the board ring
+ * (bondBoardKey), the bond's icon (36 px — black on a completed bond's filled disc, else light), the stack count on its
+ * black matte (matte_num) over the ring's foot, the name under it. Without the board sprites the CSS disc stands in.
+ */
+function HudBond({ name, icon, thresholds, tier, layers, active, disabled = false, open = false, onClick, title }) {
+  const m = data.get('assets');
+  const n = Math.max(1, Math.min(4, thresholds | 0 || 1));
+  const full = !disabled && (tier | 0) >= n;
+  const ring = uiUrl(m, `bondBoardIcon/${bondBoardKey(n, disabled ? 0 : tier)}`);
+  const matte = uiUrl(m, 'hudBondItem/matte_num');
+  return html`<button type="button" class=${cx('bond', 'hbond', active && 'is-active', full && 'is-full', disabled && 'is-disabled', open && 'is-open')}
+      onClick=${onClick} title=${title || name}>
+    <span class="hbond__board" aria-hidden="true">
+      ${ring ? html`<img class="hbond__ring" src=${ring} alt="" draggable=${false} />` : html`<span class="hbond__ring hbond__ring--css"></span>`}
+      ${icon ? html`<img class="hbond__icon" src=${icon} alt="" draggable=${false} />` : html`<span class="hbond__icon hbond__glyph">${(name || '?').trim().charAt(0)}</span>`}
+    </span>
+    ${layers != null ? html`<span class=${cx('bond__count', 'hbond__num', 'num', matte && 'has-matte')} style=${matte ? `background-image:url("${matte}")` : undefined}>${layers}</span>` : null}
+    ${disabled ? html`<span class="bond__ban" aria-label="禁用"><${Icon} name="close" /></span>` : null}
+    <span class="bond__name hbond__name">${name}</span>
+  </button>`;
+}
 
 /**
  * @param {{ bonds: any[], layersDisabled?: boolean, onOpen:(bondId:string)=>void, openId?: string|null, max?: number,
@@ -54,18 +85,16 @@ export function BondStrip({ bonds, layersDisabled = false, onOpen, openId = null
         const name = rec?.name || b.bondId;
         return html`<div key=${b.bondId} role="listitem" data-bond=${b.bondId} data-off="1"
             class=${cx('bslot', 'is-off', openId === b.bondId && 'is-open')}>
-          <${BondDisc} name=${name} icon=${bondIconUrl(m, b.bondId)} tier=${0} maxTier=${Math.max(1, th.length)} active=${false}
-            disabled=${true} ringGap=${12} size="sm" showName=${true} layersDisabled=${layersDisabled} onClick=${() => onOpen(b.bondId)}
-            title=${`${briefingBondTip(name, 'off')} · ${b.count ?? 0} 名成员`} />
+          <${HudBond} name=${name} icon=${bondIconUrl(m, b.bondId)} thresholds=${th.length} tier=${0} active=${false} disabled=${true}
+            open=${openId === b.bondId} onClick=${() => onOpen(b.bondId)} title=${`${briefingBondTip(name, 'off')} · ${b.count ?? 0} 名成员`} />
           <span class="bslot__count bslot__off">本局禁用</span>
         </div>`;
       }
       const next = nextThreshold(b.count ?? 0, th);
       return html`<div key=${b.bondId} role="listitem" data-bond=${b.bondId} data-harmony=${b.harmony > 0 ? b.harmony : null}
           class=${cx('bslot', b.active && 'is-active', openId === b.bondId && 'is-open')}>
-        <${BondDisc} name=${rec?.name || b.bondId} icon=${bondIconUrl(m, b.bondId)} layers=${rec?.noStack ? undefined : b.layers ?? 0}
-          tier=${b.tier ?? 0} maxTier=${Math.max(1, th.length)} active=${!!b.active} ringGap=${12} size="sm" showName=${true}
-          layersDisabled=${layersDisabled} onClick=${() => onOpen(b.bondId)}
+        <${HudBond} name=${rec?.name || b.bondId} icon=${bondIconUrl(m, b.bondId)} layers=${rec?.noStack ? undefined : b.layers ?? 0}
+          thresholds=${th.length} tier=${b.tier ?? 0} active=${!!b.active} open=${openId === b.bondId} onClick=${() => onOpen(b.bondId)}
           title=${`${rec?.name || b.bondId} ${b.count ?? 0}/${next ?? th[th.length - 1] ?? '-'}${b.harmony > 0 ? `（含调和 +${b.harmony}）` : ''}`} />
         <span class=${cx('bslot__count', 'num', next == null && 'is-max')}>${b.count ?? 0}<small>/${next ?? th[th.length - 1] ?? '-'}</small></span>
       </div>`;
@@ -108,19 +137,34 @@ export function BondPopup({ bondId, entry, priv, banned = [], onClose, onMember,
   const harmonyBy = harmony ? harmonyMembers(priv, getChess) : [];
   const harmonyName = data.lookup('bonds', HARMONY_BOND)?.name || '调和';
   const harmonyText = `${harmonyBy.length ? `${harmonyBy.map((x) => x.name).join('、')} 在场` : `${harmonyName}已激活`}：核心盟约激活人数 +${harmony}`;
-  return html`<div class=${cx('bpop', 'brackets', `bpop--${at}`, over && 'is-over', owner && 'is-other')} data-place=${at} data-owner=${owner || null}
-      role="dialog" aria-label=${owner ? `${owner} 的盟约：${b.name}` : `盟约：${b.name}`}>
+  // the official dialog's sprites (autochess_hud_bond_detail_dialog / _bond_char_item), handed to the CSS as variables
+  const m = data.get('assets');
+  const sprite = (k) => { const u = uiUrl(m, `bondDetail/${k}`); return u ? `url("${u}")` : null; };
+  const vars = Object.entries({ '--bd-bg': sprite('detail_bg'), '--bd-on': sprite('bond_active_bg'), '--bd-off': sprite('bond_inactive_bg'),
+    '--bd-stack': sprite('stack_bg'), '--bd-frame': sprite('avatar_border'), '--bd-frame-on': sprite('avatar_active_border'),
+    '--bd-people': sprite('title_char_icon'), '--bd-check': sprite('active_icon') }).filter(([, v]) => v).map(([k, v]) => `${k}:${v}`).join(';');
+  const ring = uiUrl(m, `bondBoardIcon/${bondBoardKey(th.length, tier)}`);
+  const icon = bondIconUrl(m, bondId);
+  return html`<div class=${cx('bpop', 'bpop--official', 'brackets', `bpop--${at}`, over && 'is-over', owner && 'is-other')} data-place=${at} data-owner=${owner || null}
+      style=${vars || undefined} role="dialog" aria-label=${owner ? `${owner} 的盟约：${b.name}` : `盟约：${b.name}`}>
     <button type="button" class="bpop__close" aria-label="关闭" onClick=${onClose}><${Icon} name="close" /></button>
     <header class="bpop__head">
-      <div class=${cx('bpop__disc', active && 'is-active')}><${BondGlyph} bondId=${bondId} /></div>
+      <div class=${cx('bpop__disc', active && 'is-active', ring && 'has-board', tier >= Math.max(1, Math.min(4, th.length)) && active && 'is-full')}>
+        ${ring ? html`<img class="bpop__board" src=${ring} alt="" draggable=${false} />` : null}
+        ${ring && icon ? html`<img class="bpop__icon" src=${icon} alt="" draggable=${false} />` : html`<${BondGlyph} bondId=${bondId} />`}
+      </div>
       <div class="bpop__titles">
         <${MicroLabel} tone="mint">${b.isCore ? 'CORE BOND // 核心盟约' : 'ADD-ON BOND // 附加盟约'}</${MicroLabel}>
         ${owner ? html`<span class="bpop__owner"><${GIcon} name="eye" /><b>${owner}</b> 的盟约</span>` : null}
         <h3 class="bpop__name">${b.name}</h3>
         <div class="bpop__facts">
-          ${off ? null : html`<span>在场 <b class="num">${count}</b>${next != null ? html`<small class="num">/${next}</small>` : null}${countsHand ? html`<small>（含整备区）</small>` : null}${harmony ? html`<small class="bpop__hnote" data-harmony=${harmony}>（含${harmonyName} +${harmony}）</small>` : null}</span>`}
-          ${b.noStack ? html`<span>层数不显示</span>` : html`<span>层数 <b class="num t-mint">${layers}</b></span>`}
-          <span class=${active ? 't-mint' : 't-lo'}>${active ? `已激活${th.length > 1 ? ` · ${tier} 阶` : ''}` : off ? '本局禁用' : '未激活'}</span>
+          <span class=${cx('bpop__pill', active ? 'is-on' : 'is-off')}>
+            <i class="bpop__people" aria-hidden="true"></i>
+            ${off ? null : html`<span>在场 <b class="num">${count}</b>${next != null ? html`<small class="num">/${next}</small>` : null}${countsHand ? html`<small>（含整备区）</small>` : null}${harmony ? html`<small class="bpop__hnote" data-harmony=${harmony}>（含${harmonyName} +${harmony}）</small>` : null}</span>`}
+            <span class=${cx('bpop__state', active ? 't-mint' : 't-lo')}>${active ? `已激活${th.length > 1 ? ` · ${tier} 阶` : ''}` : off ? '本局禁用' : '未激活'}</span>
+            ${active ? html`<i class="bpop__check" aria-hidden="true"></i>` : null}
+          </span>
+          ${b.noStack ? html`<span class="bpop__stack">层数不显示</span>` : html`<span class="bpop__stack">层数 <b class="num">${layers}</b></span>`}
         </div>
       </div>
     </header>

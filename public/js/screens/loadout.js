@@ -413,6 +413,7 @@ export function Filters({ m, filters, onFilters, bonds, listView, onView, preset
       </label>
       ${showChanged?html`<button type="button" class=${cx('lo-toggle', filters.changedOnly && 'is-on')} aria-pressed=${filters.changedOnly ? 'true' : 'false'}
         onClick=${() => set({ changedOnly: !filters.changedOnly })}><i class="lo-toggle__box"><${Icon} name="check" /></i>仅看已调整</button>`:null}
+      ${filters.tier||filters.prof||filters.bond||filters.query||filters.changedOnly?html`<button type="button" class="lo-chip lo-filter-reset" onClick=${()=>set({tier:null,prof:null,bond:null,query:'',changedOnly:false})}><${Icon} name="refresh"/>필터 초기화</button>`:null}
       ${onView?html`<button type="button" class="lo-chip lo-view-toggle" aria-pressed=${listView} onClick=${onView} title=${listView?'초상화 보기로 전환':'세로 목록 보기로 전환'}>${listView?'초상화 보기':'목록 보기'}</button>`:null}
     </div>
   </div>`;
@@ -533,7 +534,7 @@ function LoadoutScreen({ st }) {
     setEntries(next); loadoutStore.set({ sel: id });
     return true;
   };
-  const recruitControls=c=>html`<div class="lo-seg lo-recruit-choice" aria-label=${c.name+' 선발 단계'}>${[0,5,6].map(t=>html`<button type="button" disabled=${locked||(t===6&&c.recruitReserve)} aria-pressed=${t?selectedAt(c,t):!selectedTier(c)} class=${cx((t?selectedAt(c,t):!selectedTier(c))&&'is-on')} onClick=${()=>recruit(c,t)}>${t?html`<${TierChip} tier=${t} size="sm"/>`:'-'}</button>`)}</div>`;
+  const recruitControls=c=>html`<div class="lo-seg lo-recruit-choice" aria-label=${c.name+' 선발 단계'}>${[0,5,6].map(t=>html`<button type="button" disabled=${locked||(t===6&&c.recruitReserve)} aria-pressed=${t?selectedAt(c,t):!selectedTier(c)} class=${cx((t?selectedAt(c,t):!selectedTier(c))&&'is-on')} title=${t?`${t}단계로 선발`:'선발 안 함'} aria-label=${c.name+' '+(t?`${t}단계로 선발`:'선발 안 함')} onClick=${()=>recruit(c,t)}>${t?html`<${TierChip} tier=${t} size="sm"/>`:html`<span class="lo-recruit-choice__none">안 함</span>`}</button>`)}</div>`;
   const change = (patch) => { if (base) setEntries(setRecruitChoice(loadoutStore.get().entries, base, patch, getChess)); };
   const resetOne = () => {
     if (!base) return;

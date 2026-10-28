@@ -56,6 +56,21 @@ function PriceHex({ slot, free, poor = false }) {
 /** Data lookups for shopBlockReason (full-hand purchases that complete a merge stay allowed). */
 const LOOKUPS = { getChess: (id) => data.lookup('chess', id), getItem: (id) => data.lookup('items', id) };
 
+/** The official shop sprites the bar uses (autochess_shop_card_item's frost, autochess_shop's 冻结 / 刷新 plates and the cost
+ *  plate) as CSS variables for game-shop.css; a sprite missing from the manifest leaves its variable unset. */
+const SHOP_SPRITES = Object.freeze({
+  shopCard: ['ice_matte', 'icon_ice'],
+  shopPanel: ['refresh_bg_normal', 'bg_lock', 'frozen_bg_unselect', 'frozen_bg_normal', 'cost_bg_1', 'cost_bg_2', 'cost_free'],
+});
+export function shopSpriteVars(m = data.get('assets')) {
+  const out = [];
+  for (const [g, keys] of Object.entries(SHOP_SPRITES)) for (const k of keys) {
+    const u = uiUrl(m, `${g}/${k}`);
+    if (u) out.push(`--sp-${g === 'shopCard' ? 'card' : 'panel'}-${k.replace(/_/g, '-')}:url("${u}")`);
+  }
+  return out.join(';') || undefined;
+}
+
 /**
  * Where a merge-completing buy sends the elite (DESIGN §20.11), null when the card completes no merge: the 可晋升 tag's
  * title, and a line of the detail card the first tap opens — a touch screen never shows a title (QA 6b).
@@ -123,8 +138,10 @@ export function ChessCardView({ slot, idx, priv, frozen = false, reason = null, 
       </span>` : null}
     </span>
     <span class="scard__body">
-      <span class="scard__skill" title=${PROF_NAME[c?.profession] || c?.profession}><${Img} src=${m?.prof?.large?.[String(c?.profession || '').toLowerCase()] || profIconUrl(m,c?.profession)} class="scard__profession" />${mod?.typeName ? html`<span class="scard__mod"><${Img} src=${moduleTypeIconUrl(data.get('local'), mod.typeName)} class="scard__modicon" />${mod.typeName}</span>` : null}</span>
-      <span class="scard__name">${c?.name || slot.id}</span>
+      <span class="scard__namerow">
+        <span class="scard__skill" title=${PROF_NAME[c?.profession] || c?.profession}><${Img} src=${m?.prof?.large?.[String(c?.profession || '').toLowerCase()] || profIconUrl(m,c?.profession)} class="scard__profession" />${mod?.typeName ? html`<span class="scard__mod"><${Img} src=${moduleTypeIconUrl(data.get('local'), mod.typeName)} class="scard__modicon" />${mod.typeName}</span>` : null}</span>
+        <span class="scard__name">${c?.name || slot.id}</span>
+      </span>
       <span class="scard__bonds">
         ${bonds.slice(0, 3).map((b) => {
           const name = data.lookup('bonds', b)?.name || b;
@@ -135,7 +152,7 @@ export function ChessCardView({ slot, idx, priv, frozen = false, reason = null, 
 
     </span>
     ${willMerge ? html`<span class="scard__mergetag" title=${hint}>可晋升</span>` : null}
-    ${frozen ? html`<span class="scard__ice" aria-hidden="true"><${Icon} name="snow" /></span>` : null}
+    ${frozen ? html`<span class="scard__ice" aria-hidden="true"><i class="scard__iceicon"></i></span>` : null}
     ${armed ? html`<${ArmedTag} reason=${reason} free=${free} />` : null}
   </button>`;
   return reason && reason !== '已售出' && !armed ? html`<${Tooltip} text=${reason} block=${true} class="scard-wrap">${card}<//>` : card;
@@ -173,7 +190,7 @@ export function ItemCardView({ slot, idx, frozen = false, reason = null, free = 
       <span class="scard__name">${it?.name || slot.id}</span>
       <span class="scard__idesc"><${RichText} text=${it?.descRaw || it?.desc || ''} /></span>
     </span>
-    ${frozen ? html`<span class="scard__ice" aria-hidden="true"><${Icon} name="snow" /></span>` : null}
+    ${frozen ? html`<span class="scard__ice" aria-hidden="true"><i class="scard__iceicon"></i></span>` : null}
     ${armed ? html`<${ArmedTag} reason=${reason} free=${free} />` : null}
   </button>`;
   return reason && reason !== '已售出' && !armed ? html`<${Tooltip} text=${reason} block=${true} class="scard-wrap">${card}<//>` : card;
@@ -355,19 +372,23 @@ function RegularShopBar({ priv, editable, collapsed, refreshBusy = false, onColl
     </div>`;
   }
 
-  return html`<section class=${cx('shopbar', frozen && 'is-frozen', !editable && 'is-locked', showReward && 'has-reward', armed && 'has-armed', preferences.shopItemLeft && 'shopbar--item-left')} ref=${barRef} aria-label="调度中心">
+  return html`<section style=${shopSpriteVars()} class=${cx('shopbar', frozen && 'is-frozen', !editable && 'is-locked', showReward && 'has-reward', armed && 'has-armed', preferences.shopItemLeft && 'shopbar--item-left')} ref=${barRef} aria-label="调度中心">
     <div class="shopbar__tools">
       <span class="shopbar__remain">剩余可放置角色：<b class=${cx('num', remaining === 0 && 't-orange')}>${remaining}</b></span>
       <${FavoritesButton}/>
-      <button type="button" class=${cx('toolbtn', 'toolbtn--ice', frozen && 'is-on')} disabled=${!!frzReason} onClick=${onFreeze}
+      <button type="button" class=${cx('toolbtn', 'toolbtn--ice', 'obtn', frozen && 'is-on')} disabled=${!!frzReason} onClick=${onFreeze}
         title=${frzReason || (frozen ? `解冻商店 · ${keyLabel('freeze')}` : `冻结商店（下回合保留） · ${keyLabel('freeze')}`)}>
-        <${Img} src=${uiUrl(data.get('assets'), frozen ? 'shopPanel/frozen_icon2' : 'shopPanel/frozen_icon')} class="toolbtn__img" fallback=${html`<${Icon} name="snow" />`} />
+        <i class="obtn__plate" aria-hidden="true"></i>
+        <${Img} src=${uiUrl(data.get('assets'), frzReason ? 'shopPanel/frozen_icon_lock' : frozen ? 'shopPanel/frozen_icon' : 'shopPanel/frozen_icon2')} class="toolbtn__img" fallback=${html`<${Icon} name="snow" />`} />
         <span>${frozen ? '解冻' : '冻结'}</span><kbd>${keyLabel('freeze')}</kbd>
       </button>
-      <button type="button" class="toolbtn toolbtn--amber" disabled=${!!refReason || refreshBusy} onClick=${onRefresh} title=${refReason || (refreshBusy ? t('正在刷新…') : t('刷新商店 · {key}', { key: keyLabel('refresh') }))}>
-        <${Img} src=${uiUrl(data.get('assets'), 'shopPanel/refresh_icon')} class="toolbtn__img" fallback=${html`<${Icon} name="refresh" />`} />
+      <button type="button" class="toolbtn toolbtn--amber obtn" disabled=${!!refReason || refreshBusy} onClick=${onRefresh} title=${refReason || (refreshBusy ? t('正在刷新…') : t('刷新商店 · {key}', { key: keyLabel('refresh') }))}>
+        <i class="obtn__plate" aria-hidden="true"></i>
+        <${Img} src=${uiUrl(data.get('assets'), refReason || refreshBusy ? 'shopPanel/refresh_icon_lock' : 'shopPanel/refresh_icon')} class="toolbtn__img" fallback=${html`<${Icon} name="refresh" />`} />
         <span>${t('刷新')}</span>
-        ${free > 0 ? html`<span class="toolbtn__free">${t('免费 ×{free}', { free })}</span>` : html`<${HexBadge} value=${shop.refreshPrice ?? 1} tone=${refReason || refreshBusy ? 'dark' : 'gold'} size="sm" />`}
+        ${free > 0
+          ? html`<span class="toolbtn__free obtn__cost obtn__cost--free" title=${t('免费 ×{free}', { free })}><b class="num">${free}</b></span>`
+          : html`<span class=${cx('obtn__cost', (refReason || refreshBusy) && 'is-poor')}><b class="num">${shop.refreshPrice ?? 1}</b></span>`}
         <kbd>${keyLabel('refresh')}</kbd>
       </button>
     </div>

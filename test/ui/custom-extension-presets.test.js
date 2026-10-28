@@ -15,7 +15,7 @@ test('loading extension presets filters stale IDs without changing stored values
 
 test('built-in augment preset is copied, cannot be overwritten, and cannot be deleted',async()=>{
  const {builtinExtensionPresets,saveExtensionPresets,BUILTIN_AUGMENT_PRESET_ID}=await import('../../public/js/ui/customExtensionPresets.js');
- const preset=builtinExtensionPresets()[0];assert.equal(preset.builtIn,true);assert.equal(preset.selection.ruleValues.enemyHp,100);assert.equal(preset.selection.ruleValues.enemyHpByAugment,1);assert.equal(preset.selection.ruleValues.bossHpByAugment,1);
- preset.selection.ruleValues.enemyAtk=999;const saved=saveExtensionPresets([preset]);assert.equal(saved.find(p=>p.id===BUILTIN_AUGMENT_PRESET_ID).selection.ruleValues.enemyAtk,100);
- assert.ok(saveExtensionPresets([]).some(p=>p.id===BUILTIN_AUGMENT_PRESET_ID));assert.equal(normalizeExtensionPresets([preset]).length,0);
+ const preset=builtinExtensionPresets().find(p=>p.id===BUILTIN_AUGMENT_PRESET_ID);assert.deepEqual(builtinExtensionPresets().map(p=>p.name),['클래식','증강 모드']);assert.equal(preset.builtIn,true);assert.equal(preset.selection.ruleValues.enemyHp,100);assert.equal(preset.selection.ruleValues.enemyHpByAugment,1);assert.equal(preset.selection.ruleValues.bossHpByAugment,1);
+ preset.selection.ruleValues.enemyAtk=999;assert.equal(builtinExtensionPresets().find(p=>p.id===BUILTIN_AUGMENT_PRESET_ID).selection.ruleValues.enemyAtk,100);
+ assert.equal(saveExtensionPresets([preset]).length,0);assert.equal(normalizeExtensionPresets([preset]).length,0);
 });

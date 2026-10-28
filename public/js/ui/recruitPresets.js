@@ -1,6 +1,6 @@
 import {normalizePresetStrategies,completedStrategy} from '../../../shared/recruitPresetLinks.js';
 import {PresetLinks,PresetLinkIcons} from './presetLinks.js';
-import { PresetFiles } from './presetFiles.js';
+import { PresetManager, PresetNameField, PresetLinkChips } from './settingsFrame.js';
 import { html, Modal, Button } from './components.js';
 import { createStore, loadPref, savePref, useStore, store } from '../store.js';
 import { data } from '../data.js';
@@ -56,7 +56,7 @@ export function applyRecruitFaction(faction,{guardFaction=false}={}){
 })();
  const request={faction,id:linked?.id,seq,promise:null};request.promise=promise.finally(()=>{if(factionRequest===request)factionRequest=null;});factionRequest=request;return request.promise;
 }
-export function RecruitPresetButton({size='sm',class:cls=''}={}){return html`<${Button} variant="secondary" size=${size} class=${cls} icon="users" onClick=${()=>recruitPresetStore.set({open:true})}>선발 프리셋<//>`;}
+export function RecruitPresetButton({size='sm',class:cls=''}={}){const s=useStore(x=>x,Object.is,recruitPresetStore),p=s.presets.find(x=>x.id===s.active);return html`<${Button} variant="secondary" size=${size} class=${`lo-preset-button ${cls}`} icon="users" onClick=${()=>recruitPresetStore.set({open:true})}><span class="lo-preset-button__k">선발 프리셋</span>${p?html`<span class="lo-preset-button__v">${p.name}</span><${PresetLinkChips} preset=${p} manifest=${data.get('assets')}/>`:null}<//>`;}
 export function RecruitPresetsHost(){
  const s=useStore(x=>x,Object.is,recruitPresetStore),app=useStore(x=>x),[ready,setReady]=useState(false);
  useEffect(()=>{if(!s.open)return;let live=true;Promise.all(['chess','assets','bands'].map(k=>data.load(k))).then(()=>{if(live)setReady(true);}).catch(()=>{if(live)toast('선발 목록을 불러오지 못했습니다. 다시 열어주세요.','warn');});return()=>{live=false;};},[s.open]);
@@ -66,8 +66,8 @@ export function RecruitPresetsHost(){
  const create=()=>{const id=`recruit-${Date.now()}-${Math.random().toString(36).slice(2,7)}`;save({...s,active:id,presets:[...s.presets,{id,name:`선발 프리셋 ${s.presets.length+1}`,entries:capture()}]});};
  return html`<${Modal} class="favorites-modal recruit-presets-modal ui-editor" width="min(12rem,96vw)" open=${true} title="선발 오퍼레이터 프리셋" micro="RECRUIT PRESETS" onClose=${()=>recruitPresetStore.set({open:false})} actions=${html`<${Button} onClick=${()=>recruitPresetStore.set({open:false})}>닫기<//>`}>
  <p class="lo-note">현재 선발 구성과 스킬·모듈·스킨을 저장합니다. 전략 연동은 전략 선택 완료 시 적용됩니다. 직접 불러오기는 전략 선택 단계까지 가능합니다.</p>
- <div class="favorites-layout"><aside class="favorites-presets"><h3>프리셋 목록</h3><${PresetFiles} kind="stronghold.recruit-presets" state=${s} disabled=${!ready} onImport=${value=>save(normalizeRecruitPresets(value))}/><${Button} disabled=${!ready||s.presets.length>=30} onClick=${create}>현재 구성으로 새 프리셋<//><div class="favorites-preset-list">${s.presets.map(x=>html`<button type="button" class=${`favorites-preset ${s.active===x.id?'is-on':''}`} aria-pressed=${s.active===x.id} onClick=${()=>save({...s,active:x.id})}><strong class="preset-name-row"><span>${x.name}</span><${PresetLinkIcons} preset=${x} manifest=${data.get('assets')}/></strong></button>`)}</div></aside>
- <section class="favorites-editor">${p?html`<div class="favorites-toolbar favorites-titlebar"><input aria-label="선발 프리셋 이름" maxlength="40" value=${p.name} onInput=${e=>update({name:e.target.value})}/><${Button} onClick=${()=>save({...s,presets:s.presets.filter(x=>x.id!==p.id)})}>삭제<//></div>
+ <div class="favorites-layout"><${PresetManager} kind="stronghold.recruit-presets" state=${s} presets=${s.presets} active=${s.active} manifest=${data.get('assets')} disabled=${!ready} createLabel="현재 구성으로 새 프리셋" onSelect=${id=>save({...s,active:id})} onCreate=${create} onDuplicate=${x=>{const id=`recruit-${Date.now()}`;save({...s,active:id,presets:[...s.presets,{...x,id,faction:null,strategy:null,entries:{...x.entries},name:(x.name+' 복사').slice(0,40)}]});}} onDelete=${x=>save({...s,presets:s.presets.filter(y=>y.id!==x.id)})} onImport=${value=>save(normalizeRecruitPresets(value))}/>
+ <section class="favorites-editor">${p?html`<div class="favorites-toolbar favorites-titlebar"><${PresetNameField} preset=${p} label="선발 프리셋 이름" onRename=${name=>update({name})}/></div>
  <${PresetLinks} preset=${p} presets=${s.presets} onChange=${presets=>save({...s,presets})}/>
  <div class="favorites-toolbar"><${Button} disabled=${!ready} onClick=${()=>{update({entries:capture()});toast('현재 선발 구성을 저장했습니다.');}}>현재 구성 덮어쓰기<//><${Button} disabled=${locked||!ready} onClick=${()=>{const r=applyRecruitPreset(p.id);toast(r.ok?'선발 프리셋을 적용했습니다.':'선발 프리셋을 적용하지 못했습니다.',r.ok?'info':'warn');}}>불러오기<//></div>
  ${locked?html`<p class="lo-locknote">전략 선택 단계가 끝나 이번 판의 선발 구성을 변경할 수 없습니다.</p>`:null}

@@ -1377,6 +1377,10 @@ export const FX_BINDINGS = Object.freeze({
   // ('baseRange'), 麦克尼斯 S2 on her and her 结构性原理 ('modeLoop') — held until the skill ends
   skchr_horn_3: Object.freeze({ overloadFront: binding({ owner: 'id', keys: ['horn_skill_03_buff_02_03_front'], hold: 'fx', during: true, untilEnd: true, refresh: true }), overloadBack: binding({ owner: 'id', keys: ['horn_skill_03_buff_02_03_back'], hold: 'fx', during: true, untilEnd: true, refresh: true }) }),
   skchr_horn_2: Object.freeze({ overloadFront: binding({ owner: 'id', keys: ['horn_skill_02_buff_03_front'], hold: 'fx', during: true, untilEnd: true, refresh: true }), overloadBack: binding({ owner: 'id', keys: ['horn_skill_02_buff_03_back'], hold: 'fx', during: true, untilEnd: true, refresh: true }) }),
+  // 维什戴尔 S2 饱和复仇 过载 (op-wisdel.js: the kit's 'overload' on her at the skill's half, wisdel_s_2[overload_start]):
+  // its start burst and the overload loop held until the skill ends. Bound here so it never reaches the 驭械术士's
+  // funnel layer (FUNNEL_KINDS), which only draws floating units and left her overload without any look.
+  skchr_wisdel_2: Object.freeze({ overload: binding({ owner: 'id', keys: ['wisdel_skill_02_buff_02'], startKeys: Object.freeze(['wisdel_skill_02_overload_start']), hold: 'fx', during: true, untilEnd: true, refresh: true }) }),
   // 号角 S2 / S3 overload ([overload_switch_effect]: the back view when she faces up — CheckCharacterDefaultDirection UP —,
   // else the front): the kit's 'overloadBack' / 'overloadFront' as it starts, held until the skill ends
   skchr_mlyss_3: Object.freeze({ manifold: binding({ owner: 'skill', keys: ['token_10030_mlyss_wtrman_c2_skill_03_buff_01'], hold: 'fx', refresh: true }) }),
@@ -1648,7 +1652,7 @@ export function enemyCoverOf(unitKey, prefabKey, kind) {
 /** Every key a skill's bindings can play (preloading). */
 export function bindingKeys(idx, skillId) {
   const out = new Set();
-  for (const bind of Object.values(FX_BINDINGS[lc(skillId)] || {})) for (const k of bindingEffects(idx, bind)) out.add(k);
+  for (const bind of Object.values(FX_BINDINGS[lc(skillId)] || {})) for (const k of [...bindingEffects(idx, bind), ...(bind.startKeys || []).map(lc)]) if (k) out.add(k);
   return [...out];
 }
 

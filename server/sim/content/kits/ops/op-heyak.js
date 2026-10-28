@@ -31,7 +31,7 @@
 //   it fires at one target only it lifts it (浮空) `levitate` s — counted at the shot (PRTS 备注).
 // - S2 群星逶迤 (MANUAL, 16 s, data DEFAULT): each attack becomes SHOTS (9, the text's "9连发"; no blackboard key) shots of
 //   attack@atk_scale × ATK, each at a random enemy of her range (independent draws), each with attack@prob to lift it
-//   attack@levitate s [ASSUMED: the nine leave with the attack; the burst's spacing is not modelled].
+//   attack@levitate s; the nine go out 0.05 s apart (mode S2 MultiRangedAttack `_triggerDelta`).
 // - S3 博览者的狂语 (MANUAL, 45 s, data ACTIVE_RANGE on 3-10): attack range 3-10 while it runs, attack interval +1.4 s
 //   (base_attack_time, flat); each attack (an enemy in that range, her attack timer) releases three whirlwinds from the
 //   centre of her tile and the tiles left and right of it, each after its own random 0–0.3 s delay. A whirlwind flies
@@ -153,7 +153,7 @@ export default {
         },
         [S2]: {
           kind: 'duration',
-          attack: { atkScale: num(b2['attack@atk_scale'], 1) },
+          attack: { atkScale: num(b2['attack@atk_scale'], 1), staggerTargets: true, strikeGap: 0.05 }, // mode S2 MultiRangedAttack `_triggerDelta`
         },
         [S3]: {
           kind: 'duration',

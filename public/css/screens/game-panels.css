@@ -703,3 +703,34 @@ button.bpop__harmony:hover { border-style: solid; color: #fff; }
 .augment-selected .icon { width:14px; height:14px; }
 .augment-watch { display:flex; align-items:center; gap:10px; color:var(--mint-500); font-size:14px; }
 .augment-watch select { background:#10251f; color:#fff; border:1px solid var(--mint-500); padding:6px 12px; }
+
+/* ---- bond popup · the official autochess_hud_bond_detail_dialog (584×379 reference px): its textured panel, the
+   80 px board ring with the 36 px icon in the header, the 20 px #ececec name, the count pill on bond_active_bg (mint
+   people icon, ✓) or bond_inactive_bg (grey icon, red state), the stack pill on stack_bg at the top right, the members
+   framed by avatar_border / avatar_active_border. Sprites come in as variables (BondPopup); without them the old look. */
+.bpop--official { background: rgb(22, 22, 22) var(--bd-bg, none) center / cover no-repeat; border-color: rgba(255, 255, 255, .08); }
+.bpop--official .bpop__head { position: relative; align-items: flex-start; padding-right: .5rem; }
+.bpop--official .bpop__disc.has-board { position: relative; width: .86rem; height: .86rem; background: none; border: 0; box-shadow: none; }
+.bpop--official .bpop__board { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+.bpop--official .bpop__disc.is-full .bpop__board { transform: scale(1.1846); }
+.bpop--official .bpop__icon { position: absolute; left: 27.5%; top: 27.5%; width: 45%; height: 45%; object-fit: contain; filter: brightness(0) invert(.9); }
+.bpop--official .bpop__disc.is-full .bpop__icon { filter: brightness(0); }
+.bpop--official .bpop__name { font-size: calc(.26 * var(--t)); font-weight: 700; letter-spacing: .04em; color: #ececec; }
+.bpop--official .bpop__facts { flex-wrap: wrap; align-items: center; gap: .08rem; }
+.bpop__pill { display: inline-flex; align-items: center; gap: .06rem; min-height: .27rem; padding: 0 .1rem 0 .05rem;
+  background: rgba(90, 90, 90, .35) var(--bd-off, none) center / 100% 100% no-repeat; color: #fff; }
+.bpop__pill.is-on { background: rgba(10, 120, 90, .35) var(--bd-on, none) center / 100% 100% no-repeat; }
+.bpop__pill b { font-size: calc(.18 * var(--t)); }
+.bpop__people { width: .16rem; height: .18rem; flex: none; background: #b6b6b6; -webkit-mask: var(--bd-people, none) center / contain no-repeat; mask: var(--bd-people, none) center / contain no-repeat; }
+.bpop__pill.is-on .bpop__people { background: #00f0b4; }
+.bpop__pill.is-off .bpop__state { color: #fd6969; }
+.bpop__check { width: .18rem; height: .18rem; flex: none; background: var(--bd-check, none) center / contain no-repeat; }
+.bpop__stack { position: absolute; top: 0; right: .46rem; display: inline-flex; align-items: center; gap: .06rem; padding: .02rem .1rem;
+  color: #d0d0d0; font-size: calc(.15 * var(--t)); background: rgba(40, 40, 40, .9) var(--bd-stack, none) center / 100% 100% no-repeat; }
+.bpop__stack b { color: #fff; font-size: calc(.17 * var(--t)); }
+.bpop--official .bpop__member .uthumb { position: relative; }
+.bpop--official .bpop__member .uthumb::after { content: ''; position: absolute; inset: -6%; pointer-events: none; background: var(--bd-frame, none) center / 100% 100% no-repeat; }
+.bpop--official .bpop__member.is-on .uthumb::after { inset: -10%; background-image: var(--bd-frame-on, none); }
+.bpop--official .bpop__member.is-on .uthumb__art { border-color: transparent; box-shadow: none; }
+.bpop--official .bpop__mname { color: #fff; }
+.bpop--official .bpop__member:not(.is-on) .bpop__mname { color: rgba(255, 255, 255, .6); }
