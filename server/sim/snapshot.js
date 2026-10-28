@@ -168,6 +168,9 @@ export function unitTuple(u, t) {
     if (!spMax) spMax = u.mem.skillCastDuration;
     sp = spMax * Math.max(0, Math.min(1, (u.mem.skillCastUntil - t) / u.mem.skillCastDuration));
   }
+  // a skill that is on without a duration of its own (古米 S1's heal mode until her next attack, a charge skill's cast):
+  // the bar shows it on — full — not the next charge's SP
+  else if (sk && sk.active && !sk.isTimed && sk.kind !== 'passive' && sk.maxCharges > 1) sp = spMax;
   const doll = u.trait?.doll && u.findBuff('trait:substitute');
   if (doll) { spMax = doll.duration; sp = Math.max(0, doll.timeLeft); }
   const persona = u.mem.makoto;

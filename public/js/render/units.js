@@ -2410,6 +2410,7 @@ export class UnitView {
       this._spY = sy;
     }
     this.spGlow.visible = ready && !off;
+    this._updateChargeCount(showSp && !prep, off, x0, bw, sy, spH, y, s, t);
     if (ready) {
       const pulse = 0.18 + 0.08 * Math.sin(t * 6);
       this.spGlow.position.set(x0 + bw, this._spY);
@@ -2631,6 +2632,37 @@ export class UnitView {
    * `elementLeft()` on a dark track `h` px tall — white for the 元素值 left; in the element's colour, the disc pulsing
    * (clock `t`), while it refills over a 爆发冷却. Built on the first gauge, hidden while there is none.
    */
+  /**
+   * A charge skill's stored charges (b.snap `charges`, ≥ 1 stored): the client's counter — the number in a ring of amber
+   * dashes turning around it. Official HP bars: above the head (where the client draws it); else right of the SP bar's end,
+   * clear of the bars, the icons above them and the gauges below.
+   */
+  _updateChargeCount(show, off, x0, bw, sy, spH, headY, s, t) {
+    const n = show && Array.isArray(this.charges) && Number(this.charges[1]) > 1 ? Number(this.charges[0]) | 0 : 0;
+    let c = this._chargeCount;
+    if (n < 1) { if (c) c.root.visible = false; return; }
+    const P = this.P;
+    if (!c) {
+      const root = new P.Container(), ring = new P.Graphics();
+      const text = new P.Text('', { fontFamily: 'Bender, sans-serif', fontWeight: '700', fontSize: 30, fill: 0xffd23f, stroke: 0x1a1a1a, strokeThickness: 4 });
+      text.anchor.set(0.5);
+      // dashes on a 20-unit ring (drawn once, turned each frame)
+      ring.lineStyle(4, 0xffd23f, 1);
+      for (let i = 0; i < 6; i++) { const a0 = (i / 6) * Math.PI * 2, a1 = a0 + Math.PI * 2 / 6 * 0.62; ring.moveTo(Math.cos(a0) * 20, Math.sin(a0) * 20); ring.arc(0, 0, 20, a0, a1); }
+      root.addChild(ring, text);
+      c = this._chargeCount = { root, ring, text, n: -1 };
+      this.hud.addChild(root);
+    }
+    if (c.n !== n) { c.text.text = String(n); c.n = n; }
+    const d = off ? s * 0.26 : clamp(s * 0.2, 12, 22);
+    const k = d / 44;
+    c.root.scale.set(k);
+    c.ring.rotation = t * 1.6;
+    if (off) c.root.position.set(x0 + bw / 2, headY - d * 0.15);
+    else c.root.position.set(x0 + bw + d / 2 + 3, sy);
+    c.root.visible = true;
+  }
+
   /** `at` (HP bar style official): the client's gauge — its disc with a ring filling around it, left of the unit above
    *  the bars' left end (no bar). */
   _updateElementBar(show, x0, bw, top, h, s, t = 0, at = null) {
