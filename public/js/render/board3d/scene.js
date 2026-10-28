@@ -29,7 +29,7 @@ import { applyNativeStageBlend } from './materials.js';
 
 import { buildBoard, buildDeviceSlabs, objToBoard, boxProjectUV, ROWS, COLS, DEVICE_H, AREAS, heightOf } from './layout.js';
 import { surfaceUV } from './atlas.js';
-import { focusUniforms, addFocus, makeTexture, boardMaterial, glassMaterial, decalMaterial, pipeMaterial, unlitMaterial, gateMaterial, glowMaterial, waterMaterial, mireMaterial, infectionMaterial, infectionGlowMaterial, infectionRiseMaterial, smogMaterial, dashTexture, environmentMap, nativePhysicalLighting, addShadowContrast, sceneMaterial, sceneWaterMaterial, sceneEnvTexture, sceneWaterDecalMaterial, applyWaterMaterial, trapMaterial } from './materials.js';
+import { focusUniforms, addFocus, makeTexture, boardMaterial, glassMaterial, decalMaterial, pipeMaterial, unlitMaterial, gateMaterial, glowMaterial, waterMaterial, mireMaterial, infectionMaterial, infectionGlowMaterial, infectionRiseMaterial, thicketRiseMaterial, smogMaterial, dashTexture, environmentMap, nativePhysicalLighting, addShadowContrast, sceneMaterial, sceneWaterMaterial, sceneEnvTexture, sceneWaterDecalMaterial, applyWaterMaterial, trapMaterial } from './materials.js';
 import { syncThreeCamera } from '../projection.js';
 import { TILE_H } from '../style.js';
 import { mergeSceneChunks, sceneMaterialKey, sceneWaterInfo, isSceneWater, BOARD_THEMES } from './load.js';
@@ -414,6 +414,7 @@ export class BoardScene {
       infection: infectionMaterial(T, this.tex, this.focus),
       infectionGlow: infectionGlowMaterial(T, this.tex, this.focus),
       infectionRise: infectionRiseMaterial(T, this.focus),
+      thicketRise: thicketRiseMaterial(T, this.tex, this.focus),
       smog: smogMaterial(T, this.tex, this.focus),
       shadowCatcher: new T.ShadowMaterial({ opacity: 0.60, color: 0x000000 }),
     };
@@ -733,13 +734,18 @@ export class BoardScene {
   _buildThemeScenery(stage, board) {
     const scene = this._themeScenery(stage), b = board?.bounds;
     if (!scene || ![b?.x0, b?.x1, b?.y0, b?.y1].every(Number.isFinite)) return;
-    const cy = (b.y0 + b.y1) / 2, groups = new Map();
+    // anchored on the combat field (not on the built board, whose extent differs per view), so every view of the map
+    // shows the same surroundings: the boss arena's field is rows 2–5, the personal / cooperative field rows 9–12
+    const cy = stage.previewLayout && !stage.previewLayout.worldOffset ? 3.5 : 10.5, groups = new Map();
+    // one footprint for every view: the personal board's (rows 0–18 about its field, the board's columns), which holds
+    // the boss arena's and the cooperative board's — the surroundings keep one arrangement about the field
+    const f = { x0: b.x0, x1: b.x1, y0: cy - 11, y1: cy + 8.5 };
     for (const bucket of Object.values(scene.buckets)) {
       const source = this.originalMaterials[bucket.material];
       if (!source || !bucket.position?.length) continue;
       if (bucket.side === 'kit') continue;
       const position = Float32Array.from(bucket.position, (v, i) => v + (i % 3 === 0 ? (b.x0 + b.x1) / 2 : i % 3 === 1 ? cy : 0));
-      const over = (x, y) => x > b.x0 - 0.2 && x < b.x1 + 0.2 && y > b.y0 - 0.2 && y < b.y1 + 0.2;
+      const over = (x, y) => x > f.x0 - 0.2 && x < f.x1 + 0.2 && y > f.y0 - 0.2 && y < f.y1 + 0.2;
       let index = bucket.index;
       if (bucket.cut === 'terrain') {
         // the snow terrain stays whole (no hole): on the board's footprint it is pressed under the snow ground
@@ -754,8 +760,8 @@ export class BoardScene {
         for (let v = 0; v < position.length; v += 3) {
           x0 = Math.min(x0, position[v]); x1 = Math.max(x1, position[v]); y0 = Math.min(y0, position[v + 1]); y1 = Math.max(y1, position[v + 1]);
         }
-        if (x1 > b.x0 - 0.2 && x0 < b.x1 + 0.2 && y1 > b.y0 - 0.2 && y0 < b.y1 + 0.2) {
-          const moves = [[b.x0 - 0.2 - x1, 0], [b.x1 + 0.2 - x0, 0], [0, b.y0 - 0.2 - y1], [0, b.y1 + 0.2 - y0]];
+        if (x1 > f.x0 - 0.2 && x0 < f.x1 + 0.2 && y1 > f.y0 - 0.2 && y0 < f.y1 + 0.2) {
+          const moves = [[f.x0 - 0.2 - x1, 0], [f.x1 + 0.2 - x0, 0], [0, f.y0 - 0.2 - y1], [0, f.y1 + 0.2 - y0]];
           const [dx, dy] = moves.reduce((m, d) => (Math.abs(d[0] + d[1]) < Math.abs(m[0] + m[1]) ? d : m));
           for (let v = 0; v < position.length; v += 3) { position[v] += dx; position[v + 1] += dy; }
         }
@@ -793,23 +799,24 @@ export class BoardScene {
     const lists = new Map(), covered = new Set();
     for (const row of grid) for (const t of row) {
       if (!t.drawn) continue;
-      let role = theme.kit[t.glyph];
+      // a role, or several stacked (a slab and what lies on it); the preview pen's floor is plain snow
+      let set = t.glass ? ['ground'] : [].concat(theme.kit[t.glyph] || []);
       // a forbidden tile by a field is a rock heap — except the map characters' slots (Touch / reserve medic of the
       // 外勤医疗 strategy), which stay a flat block they stand on
-      if (t.glyph === '#' && !slots.has(`${t.r},${t.c}`) && [[0, 1], [0, -1], [1, 0], [-1, 0]].some(([dr, dc]) => FIELD.has(glyph(t.r + dr, t.c + dc)))) role = 'rocks';
-      const variants = role && roles[role];
-      if (!variants?.length) continue;
+      if (t.glyph === '#' && !slots.has(`${t.r},${t.c}`) && [[0, 1], [0, -1], [1, 0], [-1, 0]].some(([dr, dc]) => FIELD.has(glyph(t.r + dr, t.c + dc)))) set = ['rocks'];
+      if (!set.length || set.some((role) => !roles[role]?.length)) continue;
       const hash = (Math.imul(t.r + 1, 73856093) ^ Math.imul(t.c + 1, 19349663)) >>> 0;
-      const pick = variants[hash % variants.length];
-      // the fence is an open frame: the snow slab under it
-      const under = role === 'fence' && roles.ground?.length ? roles.ground[hash % roles.ground.length] : [];
-      for (const bucket of [...pick, ...under]) {
-        const h = role !== 'rocks' && !under.includes(bucket) && height[t.glyph], z0 = h ? top(pick) : 0;
-        const zs = h && z0 > 0.05 ? h / z0 : 1;
-        const position = Float32Array.from(bucket.position, (v, i) => (i % 3 === 0 ? v + t.c : i % 3 === 1 ? v + t.r : v * zs));
-        const key = `${bucket.material}|${bucket.lightMap || ''}`;
-        if (!lists.has(key)) lists.set(key, { bucket, list: [] });
-        lists.get(key).list.push({ ...bucket, position });
+      for (const role of set) {
+        const pick = roles[role][hash % roles[role].length];
+        for (const bucket of pick) {
+          // a single raised block takes the board's height of the glyph (units, map characters and benches stand on it)
+          const h = set.length === 1 && role !== 'rocks' && height[t.glyph], z0 = h ? top(pick) : 0;
+          const zs = h && z0 > 0.05 ? h / z0 : 1;
+          const position = Float32Array.from(bucket.position, (v, i) => (i % 3 === 0 ? v + t.c : i % 3 === 1 ? v + t.r : v * zs));
+          const key = `${bucket.material}|${bucket.lightMap || ''}`;
+          if (!lists.has(key)) lists.set(key, { bucket, list: [] });
+          lists.get(key).list.push({ ...bucket, position });
+        }
       }
       covered.add(`${t.r},${t.c}`);
     }
@@ -1138,8 +1145,10 @@ export class BoardScene {
     this._buildDevices(board);
     yield;
     this._buildGates(board);
-    if (!original) this._buildEdges(board);
-    this._buildThicket(board);
+    // the theme's original-quality map (its official surroundings loaded) draws no field edge, as the original maps
+    const themeOriginal = !!(themed && !original && this._themeScenery(stage));
+    if (!original && !themeOriginal) this._buildEdges(board);
+    this._buildThicket(board, themeOriginal);
     yield;
     this._buildTerrain(board);
     if (!this.official) this._buildBackground(board, themed && !original ? BOARD_THEMES[stage.boardTheme]?.backdrop || null : null);
@@ -1347,9 +1356,22 @@ export class BoardScene {
   }
 
   /** 덤불 frames (layout.js `thicket`): a pink glow strip along each side, the region's border wider. */
-  _buildThicket(board) {
+  /** Thicket (덤불) borders: pink strips; with `rise` (the original-quality snow map) a haze rising off them. */
+  _buildThicket(board, rise = false) {
     const list = board.thicket || [];
     if (!list.length) return;
+    if (rise) {
+      const pos = [], uv = [], idx = [], H = 0.36;
+      for (const s of list) {
+        const x0 = s.c - 0.5, x1 = s.c + 0.5, y0 = s.r - 0.5, y1 = s.r + 0.5, z = s.z;
+        const [a, b] = s.dir === 'S' ? [[x0, y0], [x1, y0]] : s.dir === 'N' ? [[x0, y1], [x1, y1]] : s.dir === 'E' ? [[x1, y0], [x1, y1]] : [[x0, y0], [x0, y1]];
+        const i = pos.length / 3;
+        pos.push(a[0], a[1], z, b[0], b[1], z, b[0], b[1], z + H, a[0], a[1], z + H);
+        uv.push(0, 0, 1, 0, 1, 1, 0, 1);
+        idx.push(i, i + 1, i + 2, i, i + 2, i + 3);
+      }
+      this.meshes.thicketRise = this._mesh({ position: new Float32Array(pos), normal: new Float32Array(pos.length), uv: new Float32Array(uv), color: null, index: new Uint16Array(idx) }, this.mat.thicketRise, { cast: false, receive: false, order: 4 });
+    }
     const pos = [], uv = [], idx = [];
     for (const s of list) {
       const w = s.outer ? 0.07 : 0.04, x0 = s.c - 0.5, x1 = s.c + 0.5, y0 = s.r - 0.5, y1 = s.r + 0.5, z = s.z + 0.008;
@@ -1620,7 +1642,7 @@ export class BoardScene {
     let flash = 0;
     for (let i = this.flashes.length - 1; i >= 0; i--) { const f = this.flashes[i]; f.t += dt; if (f.t > 1.2) this.flashes.splice(i, 1); else flash = Math.max(flash, 1 - f.t / 1.2); }
     for (const m of [this.mat.gateEndAdd, this.mat.gateEndAb]) if (m) m.uniforms.uFlash.value.setRGB(flash, flash * 0.12, flash * 0.1);
-    for (const k of ['water', 'mire', 'infection', 'infectionGlow', 'infectionRise', 'smog']) this.mat[k].uniforms.uTime.value = t;
+    for (const k of ['water', 'mire', 'infection', 'infectionGlow', 'infectionRise', 'thicketRise', 'smog']) this.mat[k].uniforms.uTime.value = t;
     for (const m of Object.values(this.originalMaterials)) if (m.uniforms?.uTime) m.uniforms.uTime.value = t;
     for (const k of ['water', 'mire', 'infection', 'smog']) this.mat[k].uniforms.uTime.value = t;
     if (this.official) for (const m of this.sceneWater || []) m.uniforms.uTime.value = t;

@@ -213,6 +213,8 @@ def role(pc):
         return None  # a slab resting on another piece (S_playground_stone8): it would float on its own
     if n.startswith('S_playground_import304'):
         return 'fence'
+    if n.startswith('S_common_nopass'):
+        return 'nopass'  # the no-deploy decal (a quad just over the ground): the works tiles
     if n.startswith('S_playground_fixhighground') or (n.startswith('S_playground_gird') and top > 0.3):
         return 'high'
     if n.startswith('S_playground_bake2'):

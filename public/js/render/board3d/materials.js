@@ -327,6 +327,31 @@ export function infectionRiseMaterial(THREE, focus) {
  ].join('\n'),transparent:true,depthWrite:false,side:THREE.DoubleSide,blending:THREE.NormalBlending});
 }
 
+/**
+ * Thicket (덤불) border on the original-quality snow map: a pink haze rising off the ground along the tiles' edges
+ * (vertical curtains, uv.x along the edge, uv.y up), broken up by the cloud noise drifting upward.
+ */
+export function thicketRiseMaterial(THREE, tex, focus) {
+  return new THREE.ShaderMaterial({
+    uniforms: { uTime: { value: 0 }, uNoise: { value: tex.noise || null }, ...focus },
+    vertexShader: TERRAIN_VERT,
+    fragmentShader: [
+      'uniform float uTime; uniform sampler2D uNoise;',
+      FOCUS_GLSL,
+      'varying vec2 vUv; varying vec3 vWorld;',
+      'void main() {',
+      '  vec2 p = vec2((vWorld.x + vWorld.y) * 0.9 + vUv.x * 0.35, vUv.y * 0.8 - uTime * 0.45);',
+      '  float n = texture2D(uNoise, p).r * 0.65 + texture2D(uNoise, p * 2.3 + vec2(0.0, -uTime * 0.3)).r * 0.55;',
+      '  float fade = (1.0 - smoothstep(0.0, 1.0, vUv.y)) * smoothstep(0.0, 0.08, vUv.y + 0.08);',
+      '  float a = smoothstep(0.35, 0.95, n + (1.0 - vUv.y) * 0.35) * fade * 0.85;',
+      '  gl_FragColor = vec4(vec3(1.0, 0.42, 0.62) * focusMask(vWorld.xy), a);',
+      '  #include <colorspace_fragment>',
+      '}',
+    ].join('\n'),
+    transparent: true, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending,
+  });
+}
+
 /** Smog: drifting exhaust haze (vertical billboards over the grilles). */
 export function smogMaterial(THREE, tex, focus) {
   const uniforms = { uTime: { value: 0 }, uNoise: { value: tex.noise || null }, ...focus };
