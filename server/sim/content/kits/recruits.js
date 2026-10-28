@@ -66,10 +66,13 @@ function skill(raw,s){
  if(cid==='char_4182_oblvns'){
   if(i===0)return{kind:'charges',onStart({battle,unit}){for(let n=0;n<8;n++)note(battle,unit,n===0?num(bb.atk_scale):num(bb[`atk_scale_${n+1}`]),'arts',false,n+1)}};
   if(i===1)return{kind:'instant',onStart({battle,unit}){if((battle._recruitFever?.value||0)>=450||battle.time<(battle._recruitFever?.until||0))return;unit.mem.sakikoOrgan=!unit.mem.sakikoOrgan;S.passiveBuff(battle,unit,'sakiko:instrument',unit.mem.sakikoOrgan?{aspd:num(bb['attack@attack_speed'])}:{atkPct:num(bb['attack@atk'])});unit.profile.dmgType=unit.mem.sakikoOrgan?'arts':'phys'}};
-  return duration(s,{targeting:{rangeGrid:s.rangeGrid},attack:{noAttack:true},onTick({battle,unit,dt}){unit.mem.sakikoSkillTick=(unit.mem.sakikoSkillTick||0)+dt;if(unit.mem.sakikoSkillTick>=unit.s.interval){unit.mem.sakikoSkillTick=0;for(const type of ['phys','arts'])for(let n=0;n<2;n++)note(battle,unit,num(bb['attack@atk_scale']),type,true)}}});
+  return duration(s,{targeting:{rangeGrid:s.rangeGrid},attack:{noAttack:true},onTick({battle,unit,dt}){unit.mem.sakikoSkillTick=(unit.mem.sakikoSkillTick||0)+dt;if(unit.mem.sakikoSkillTick>=unit.s.interval){unit.mem.sakikoSkillTick=0;for(const type of ['phys','arts'])for(let n=0;n<2;n++)laterNote(battle,unit,n*0.1,()=>note(battle,unit,num(bb['attack@atk_scale']),type,true))}}});
  }
  throw Error(`Unauthored recruit skill ${s.skillId}`);
 }
+// 连击间隔: S3's pair of notes and S2's fever second note go out `_triggerDelta` apart (char_4182_oblvns S3 MultiRangedAttack
+// +1 / 0.1 s, S2_Fever +1 / 0.2 s), a later one only while she stays on the field.
+function laterNote(b,u,delay,fn){if(!(delay>0))return fn();const seq=u.deploySeq;b.after(delay,()=>{if(u.alive&&u.deployed&&u.deploySeq===seq)fn()},{owner:u})}
 function note(b,u,scale=1,type='phys',high=false,ordinal=0){
  const projectile=sakikoNoteProjectile(u.def.raw.skill.index,u.skill.active,type,ordinal);
  b.fx('sakikoNoteSound',{id:u.id,x:u.x,y:u.y,projectile,phase:'launch'});
@@ -136,7 +139,7 @@ function kit(bb,raw){
    if(u.def.raw.skill.index===1)S.passiveBuff(b,u,'sakiko:instrument',{atkPct:num(u.skill.bb['attack@atk'])});
    b.on('skillStart',c=>{if(c.unit!==u||c.reason==='fever'||c.reason==='full-charge')return;if(fever.value>=450&&b.time>=fever.until){fever.value=0;fever.until=b.time+20;for(const a of b.allyUnits)if(a.def?.raw?.charId===cid&&a.skill.active&&a.skill.isTimed)a.mem.sakikoPausedSkill=a.skill.id;b.fx('buff',{id:u.id,x:u.x,y:u.y})}},{owner:u});
    b.on('damaged',c=>{if(c.source===u&&c.target?.side==='enemy'&&b.time>=fever.until)fever.value=Math.min(450,fever.value+num(t2.cnt,1))},{owner:u});
-   b.on('attack',c=>{if(c.attacker===u){note(b,u,1,u.mem.sakikoOrgan?'arts':'phys');if(u.def.raw.skill.index===1&&b.time<fever.until)note(b,u,1,u.profile.dmgType)}},{owner:u});
+   b.on('attack',c=>{if(c.attacker===u){note(b,u,1,u.mem.sakikoOrgan?'arts':'phys');if(u.def.raw.skill.index===1&&b.time<fever.until)laterNote(b,u,0.2,()=>note(b,u,1,u.profile.dmgType))}},{owner:u});
    b.on('fatal',c=>{if(c.unit===u&&u.skill.active&&u.def.raw.skill.index===2&&b.time<fever.until){c.prevented=true;u.hp=1;u.mem.sakikoDoom=true}},{owner:u});
    b.on('tick',({dt})=>{if(!up(u))return;if(u.mem.sakikoDoom&&b.time>=fever.until){b.loseHp(u,u.hp,{source:u,reason:'fever-end'});return;}
     advanceNotes(b,u,dt);

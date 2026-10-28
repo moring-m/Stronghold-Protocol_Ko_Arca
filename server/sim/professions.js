@@ -488,7 +488,7 @@ export const SUB = Object.freeze({
       const profile = info.profile || unit.profile, atk = info.atk ?? unit.s.atk;
       const n = Math.max(1, (profile.shockTimes ?? 2) - 1);
       for (let i = 1; i <= n; i++) {
-        battle.after(0.3 * i, () => {
+        battle.after((profile.shockGap ?? 0.3) * i, () => { // shockGap: a kit's official spacing (迷迭香 0.15)
           for (const e of battle.foesInRadius(info.x, info.y, profile.splashRadius || 1, true)) { // splash: 中点判定
             if (e.isFlying) continue;
             battle.dealDamage(unit, e, { amount: atk * (profile.atkScale ?? 1) * (profile.shockScale ?? 0.5), type: 'phys', isSplash: true, isSkill: !!info.isSkill, tags: ['aftershock', ...(profile.tags || [])] });

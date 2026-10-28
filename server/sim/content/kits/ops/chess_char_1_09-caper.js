@@ -15,7 +15,7 @@ export default {
     const t = talentBb(chess, 0);
     const near = num(traitBb(chess).atk_scale, 1);
     return {
-      skill: { kind: 'duration', mods: { atkPct: num(bb.atk) }, attack: { hits: Math.max(1, Math.floor(num(bb.cnt, 1))) } },
+      skill: { kind: 'duration', mods: { atkPct: num(bb.atk) }, attack: { hits: Math.max(1, Math.floor(num(bb.cnt, 1))), strikeGap: 0.1 } }, // the boomerangs 0.1 s apart (mode S2 MultiRangedAttack `_triggerDelta`)
       skills: { skchr_caper_1: { kind: 'instant', attack: { atkScale: num(skillBbOf(chess, 'skchr_caper_1').atk_scale, 1) } } },
       talents: [{ install(battle, unit) {
         onHitBy(battle, unit, ({ target, dmg }) => {

@@ -73,7 +73,7 @@ function angel2(bb, chess, def) {
       kind: 'ammo',
       ammo: Math.max(1, Math.floor(num(bb['attack@trigger_time'], 50))),
       mods: { atkPct: num(bb.atk) },
-      attack: { atkScale: num(bb['attack@atk_scale'], 1), hits: perAttack },
+      attack: { atkScale: num(bb['attack@atk_scale'], 1), hits: perAttack, strikeGap: 0.1 }, // mode S3 MultiRangedAttack `_triggerDelta`
       onStart({ battle, unit }) {
         if (unit.mem.angelCoord) placeCoord(battle, unit);
         const c = coord(battle, unit);

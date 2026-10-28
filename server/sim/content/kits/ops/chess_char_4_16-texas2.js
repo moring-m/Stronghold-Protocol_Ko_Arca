@@ -76,7 +76,7 @@ export default withDefaults({
         skchr_texas2_2: () => skill,
       }),
       // S2: 攻击变为二连击 while the passive lasts
-      trait: S2 ? { hitsFn: (b, u) => (u.skill?.active ? 2 : 1) } : undefined,
+      trait: S2 ? { hitsFn: (b, u) => (u.skill?.active ? 2 : 1), strikeGap: 0.1 } : undefined, // mode S2 MultiMeleeAttack `_triggerDelta` 0.1 s
       talents: [
         { install(battle, unit) { // 德克萨斯传统 (2nd half): first kill of each deployment ⇒ full heal + recast
           // (the passive's deploy burst runs inside skill.reset, BEFORE the `deploy` hook: the per-deployment state is

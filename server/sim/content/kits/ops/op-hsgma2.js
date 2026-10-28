@@ -93,7 +93,7 @@ export default {
     // this unit's attack overrides (the kit is built per unit): S2's throw turns into plain arts attacks after it lands,
     // S3's two hits become four in the 临死模式
     const s2Attack = { dmgType: 'arts' };
-    const s3Attack = { dmgType: 'arts', hits: 2 };
+    const s3Attack = { dmgType: 'arts', hits: 2, strikeGap: 0.1 }; // mode S3 / BeforeDead MultiMeleeAttack `_triggerDelta`
     const plainS2 = () => { delete s2Attack.hits; delete s2Attack.atkScale; delete s2Attack.hitAllBlocked; };
 
     /** S2: the shield's centre after `turned` degrees (row 0 is the bottom row: counter-clockwise = a growing angle). */

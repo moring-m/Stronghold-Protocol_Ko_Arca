@@ -199,10 +199,12 @@ test('S1 胜利的连击 (AUTO, attack SP 3, data DEFAULT): the next attack stri
     assert.deepEqual([u.skill.rule, u.skill.spType, u.skill.spCost, sk.initSp, sk.skillType, sk.bb.atk_scale], ['DEFAULT', 'attack', 3, 0, 'AUTO', elite ? 1.45 : 1.25], `T${tier}`);
     h.spawn('enemy_dummy', { pos: [10, 7] });
     assert.ok(h.runUntil(() => u.skill.activations === 1 && atkHits(h, u).some((c) => c.dmg.isSkill), 20), `T${tier}: cast on her 4th attack`);
+    h.run(0.2); // the second strike follows `_triggerDelta` 0.1 s later
     const sk1 = atkHits(h, u).filter((c) => c.dmg.isSkill);
     const id = sk1[0].dmg.attackId;
     const strikes = sk1.filter((c) => c.dmg.attackId === id);
     assert.equal(strikes.length, 2, `T${tier}: two strikes`);
+    approx(strikes[1].t - strikes[0].t, 0.1, `T${tier}: 0.1 s apart`, 0.05);
     for (const c of strikes) approx(c.amount, u.s.atk * sk.bb.atk_scale * traitScale(tier, elite, mod), `T${tier}: ${sk.bb.atk_scale * 100} % × 教官`);
     assert.equal(atkHits(h, u).filter((c) => c.dmg.attackId < id).length, 3, `T${tier}: after 3 plain attacks`);
     assert.equal(h.hooksOf('heal').filter((c) => c.source === u && c.target === u).length, atkHits(h, u).length, `T${tier}: one 女神的振奋 per strike`);

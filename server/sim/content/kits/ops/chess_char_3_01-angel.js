@@ -18,11 +18,12 @@ export default {
         kind: 'duration',
         trigger: d.skill?.index === 2 ? 'SP_FULL' : undefined,
         mods: { batPct: num(bb.base_attack_time) },
-        attack: { atkScale: num(bb['attack@atk_scale'], 1), hits: Math.max(1, Math.floor(num(bb['attack@times'], 1))) },
+        // the shots of one attack 0.05 s apart (mode S2-3 MultiRangedAttack `_triggerDelta`)
+        attack: { atkScale: num(bb['attack@atk_scale'], 1), hits: Math.max(1, Math.floor(num(bb['attack@times'], 1))), strikeGap: 0.05 },
       },
       skills: altSkills(chess, d, bb, {
         skchr_angel_1: (s) => ({ kind: instantKindOf(s), attack: { atkScale: num(s.bb.atk_scale, 1), hits: shots(s.bb.times) } }),
-        skchr_angel_2: (s) => ({ kind: 'duration', attack: { atkScale: num(s.bb['attack@atk_scale'], 1), hits: shots(s.bb['attack@times']) } }),
+        skchr_angel_2: (s) => ({ kind: 'duration', attack: { atkScale: num(s.bb['attack@atk_scale'], 1), hits: shots(s.bb['attack@times']), strikeGap: 0.05 } }),
       }),
       talents: [
         { install(battle, unit) { battle.addBuff(unit, { key: 'talent:angel_mag', mods: { aspd: num(t0.attack_speed) }, persist: true, allowDead: true }); } },

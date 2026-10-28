@@ -49,6 +49,7 @@ export default {
           targeting: { maxTargets: count(b3['attack@max_target'], 3) },
           attack: {
             hits: count(b3['attack@times'], 2),
+            strikeGap: 0.13, // mode S3 MultiRangedAttack `_triggerDelta`
             // the extra instance, after the attack's hits on that target (marked by the install's first-hit check)
             onEachHit({ battle, unit, target, kind }) {
               const due = unit.mem.acnipeExtra;

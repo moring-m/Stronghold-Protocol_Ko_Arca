@@ -346,20 +346,43 @@ export function performAttack(b, u, prof, targets, opts = null) {
   if (prof.releaseEnergy) b._ev(['energy',u.id,storedEnergy(u)]);
   for (let i = 0; i < targets.length; i++) {
     const t = targets[i];
-    b._ev(['atk', u.id, t.id, vis, !!prof.allInRange, ...(opts?.attackInterval>0?[opts.attackInterval]:[])]);
+    // (a gapped separate strike after the first sends its 'atk' when it goes out)
+    const gapped = prof.strikeGap > 0 && !(energy > 0) && !isHeal && !prof.deferHit;
+    if (!(gapped && (prof.separateStrikes || prof.staggerTargets) && i > 0)) b._ev(['atk', u.id, t.id, vis, !!prof.allInRange, ...(opts?.attackInterval>0?[opts.attackInterval]:[])]);
     if (prof.deferHit) continue; // authored attacks schedule their own landing damage
     if (isHeal) { doHeal(b, u, prof, t); continue; }
     const info = { isSkill, index: i, attackId, fortressMelee: !!prof._fortressMelee, energy: i === 0 ? energy : 0, atk: prof.tags?.includes('wisdel-s3') || (isSkill && u.skill?.pending && u.findBuff('bond:raidShip')) ? u.s.atk : undefined };
     const foe = t.side === 'enemy' || b.isAllyTarget(t);
-    if (ranged && foe && prof.projectile === 'boomerang') {
-      throwBoomerang(b, u, prof, t, info);
-    } else if (ranged && foe) {
-      const speed = PROJECTILE_SPEEDS[prof.projectile] ?? PROJECTILE_SPEED;
-      // projectiles land even if the shooter died meanwhile (damage is credited to it)
-      b.addProjectile({ from: u, target: t, speed, visual: prof.projectile, source: u, hitDead: prof.splashRadius > 0,
-        onHit: (c) => resolveHit(b, u, prof, c.target, info, c.x, c.y) });
+    // one shot / swing of this attack on t (a projectile at range, else the hit at once)
+    const fire = (tt, inf) => {
+      if (ranged && foe && prof.projectile === 'boomerang') {
+        throwBoomerang(b, u, prof, tt, inf);
+      } else if (ranged && foe) {
+        const speed = PROJECTILE_SPEEDS[prof.projectile] ?? PROJECTILE_SPEED;
+        // projectiles land even if the shooter died meanwhile (damage is credited to it)
+        b.addProjectile({ from: u, target: tt, speed, visual: prof.projectile, source: u, hitDead: prof.splashRadius > 0,
+          onHit: (c) => resolveHit(b, u, prof, c.target, inf, c.x, c.y) });
+      } else {
+        resolveHit(b, u, prof, tt, inf, tt.x, tt.y);
+      }
+    };
+    if (gapped) {
+      // 连击间隔 (the official Multi*Attack `_triggerDelta`): the strikes of one attack go out one after another, each its
+      // own shot — a separate-strike attack's k-th target, else this target's k-th hit — `strikeGap` s apart. A later
+      // strike needs its shooter still on the field and its target still alive [ASSUMED: the client's queued shots stop
+      // with the attacker; a dead target is not shot at again].
+      const each = prof.separateStrikes || prof.staggerTargets || strikeCount <= 1 ? [[i, info]] : Array.from({ length: strikeCount }, (_, h) => [h, { ...info, strikeHits: 1 }]);
+      const seq = u.deploySeq;
+      for (const [k, inf] of each) {
+        if (k === 0) { fire(t, inf); continue; }
+        b.after(k * prof.strikeGap, () => {
+          if (!u.alive || !u.deployed || u.deploySeq !== seq || !t.alive) return;
+          b._ev(['atk', u.id, t.id, vis, !!prof.allInRange]);
+          fire(t, inf);
+        }, { owner: u });
+      }
     } else {
-      resolveHit(b, u, prof, t, info, t.x, t.y);
+      fire(t, info);
     }
   }
   if (!targets.length && prof.allowEmptyAttack) b._ev(['atk', u.id, u.id, 'none', true]);
@@ -444,7 +467,7 @@ export function resolveHit(b, u, prof, target, info, x, y) {
     if (!attachedFunnel) mulT *= funnelMul;
     // (a count from a kit, a trait or text is capped here too: an attack of a target that takes no damage would otherwise
     // loop as often as it says — DESIGN §32.5; official counts stay far below PLUGIN_TIMES_MAX)
-    const hits = Math.min(PLUGIN_TIMES_MAX, prof.hitsFn ? prof.hitsFn(b, u, info) : Math.max(1, prof.hits || 1));
+    const hits = info.strikeHits ?? Math.min(PLUGIN_TIMES_MAX, prof.hitsFn ? prof.hitsFn(b, u, info) : Math.max(1, prof.hits || 1));
     // `hitDmgMul` (professions.js header): each instance's 伤害倍率 — the DamageInfo `mul`, after DEF / RES — and only the
     // first instance may give 受击回复 (砾's two 50 % hits, PRTS 砾 特性备注)
     const split = Number.isFinite(prof.hitDmgMul) && prof.hitDmgMul > 0 ? prof.hitDmgMul : null;

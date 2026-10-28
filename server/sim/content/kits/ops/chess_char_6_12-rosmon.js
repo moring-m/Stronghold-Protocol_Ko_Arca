@@ -45,6 +45,8 @@ function rosmon(bb, chess, def) {
   return {
     skills,
     install(battle, unit) {
+      // her aftershocks follow 0.15 s apart (mode Default / S2 / S3 MultiRangedAttack `_triggerDelta`; the 投掷手 default 0.3)
+      unit.profile.shockGap = 0.15;
       if (sid !== 'skchr_rosmon_3') return;
       battle.on('beforeAttack', (ctx) => { // "仅选择被阻挡的敌人作为目标"
         if (ctx.attacker !== unit || !unit.skill?.active) return;

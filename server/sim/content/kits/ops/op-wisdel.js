@@ -47,7 +47,7 @@
 //   at once. 过载 (ba.overdrive "技能持续拥有两段计量槽，技能进行到一半时触发额外效果": the second half, as 号角 S3 —
 //   OVERLOAD_AT): every attack becomes OVERLOAD_SHOTS rounds of attack@atk_scale_ol × ATK, each on a random enemy of her
 //   range (PRTS "过载模式下不再同时攻击3个目标，4次攻击分别随机索敌"; one draw per round, repeats allowed), the rounds of one
-//   attack at once [ASSUMED], their aftershocks at append_atk_scale × that ATK (PRTS S3 备注 "攻击倍率提升效果仅对普通攻击
+//   attack OVERLOAD_GAP apart (S2_Overload `_triggerDelta` 0.1 s), their aftershocks at append_atk_scale × that ATK (PRTS S3 备注 "攻击倍率提升效果仅对普通攻击
 //   与余震生效" read for the overload rounds too [ASSUMED]). Manual close: N/A in the auto battle.
 // - S3 爆裂黎明 (MANUAL, 6 发弹药 — attack@trigger_time, data SP_FULL from the official ALWAYS row): at once max_cnt shadows
 //   (the first one with `sp` SP: wisdel_s_3_token[add_sp] — PRTS "初始技力分别为3sp（优先召唤）与0sp"), then ATK +atk, attack
@@ -82,6 +82,8 @@ const SHADOW_CAP = 3;
 const OVERLOAD_AT = 0.5;
 /** "4连发". */
 const OVERLOAD_SHOTS = 4;
+/** 过载's rounds go out one after another (mode S2_Overload MultiRangedAttackWithResetSpellCnt `_triggerDelta`). */
+const OVERLOAD_GAP = 0.1;
 /** The shadow's x-5 (PRTS 魂灵之影 备注 "登场时给予自身及周围4格的其他我方单位迷彩"). */
 const X5 = Object.freeze([[1, 0], [0, -1], [0, 0], [0, 1], [-1, 0]]);
 const GROUND = Object.freeze({ canHitFly: false });
@@ -309,6 +311,7 @@ export default {
           ctx.targets = picks;
           // (a per-attack copy while the skill runs: its targeting override makes effectiveProfile copy the profile)
           ctx.profile.separateStrikes = true;
+          ctx.profile.strikeGap = OVERLOAD_GAP;
           ctx.profile.atkScale = ol;
           ctx.profile.afterHit = olShock;
         }, { owner: unit, priority: -100 });
