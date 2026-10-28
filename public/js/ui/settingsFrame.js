@@ -2,6 +2,12 @@ import { useEffect, useRef, useState } from '../../vendor/hooks.module.js';
 import { html, Button, Icon } from './components.js';
 import { PresetFiles } from './presetFiles.js';
 import { PresetLinkIcons } from './presetLinks.js';
+import { data } from '../data.js';
+import { tr } from '../i18n/i18n.js';
+import { chatFaction } from '../../../shared/chat.js';
+
+/** "염국 · 와파린" style summary of what a preset is linked to. */
+const linkText = (p) => [chatFaction(p.faction)?.name, data.lookup('bands', p.strategy)?.name].filter(Boolean).map((n) => tr(n)).join(' · ');
 
 /** Toggle rendered as a switch; keeps a real checkbox for forms, tests and screen readers. */
 export function Switch({ checked, disabled, label, onChange }) {
@@ -57,12 +63,12 @@ export function PresetManager({ kind, state, presets, active, manifest, disabled
     <${Button} icon="plus" disabled=${disabled || full} onClick=${onCreate}>${createLabel}<//>
     <${PresetFiles} kind=${kind} state=${state} disabled=${disabled} onImport=${onImport}/>
     <div class="favorites-preset-list" role="listbox" aria-label="프리셋 목록">${presets.map((x) => html`<div key=${x.id} class=${`preset-manager__row${active === x.id ? ' is-on' : ''}`}>
-      <button type="button" role="option" class=${`favorites-preset ${active === x.id ? 'is-on' : ''}`} aria-pressed=${active === x.id} aria-selected=${active === x.id} onClick=${() => onSelect(x.id)}><strong class="preset-name-row"><span>${x.name}</span><${PresetLinkIcons} preset=${x} manifest=${manifest}/></strong></button>
+      <button type="button" role="option" class=${`favorites-preset ${active === x.id ? 'is-on' : ''}`} aria-pressed=${active === x.id} aria-selected=${active === x.id} onClick=${() => onSelect(x.id)}><strong class="preset-name-row"><span>${x.name}</span></strong>${linkText(x)?html`<small class="preset-manager__links" title=${linkText(x)}><${PresetLinkIcons} preset=${x} manifest=${manifest}/><span>${linkText(x)}</span></small>`:null}</button>
       ${active === x.id ? html`<span class="preset-manager__tools">
-        <button type="button" class="preset-manager__tool" title="복제" aria-label=${x.name + ' 복제'} disabled=${disabled || full} onClick=${() => onDuplicate(x)}><${Icon} name="copy"/></button>
+        <button type="button" class="preset-manager__tool" title="복제" aria-label=${x.name + ' 복제'} disabled=${disabled || full} onClick=${() => onDuplicate(x)}><${Icon} name="copy"/>복제</button>
         ${confirm === x.id
-          ? html`<button type="button" class="preset-manager__tool is-danger is-confirm" aria-label=${x.name + ' 삭제 확인'} onClick=${() => { setConfirm(null); onDelete(x); }}>삭제?</button>`
-          : html`<button type="button" class="preset-manager__tool is-danger" title="삭제" aria-label=${x.name + ' 삭제'} disabled=${disabled} onClick=${() => setConfirm(x.id)}><${Icon} name="close"/></button>`}
+          ? html`<button type="button" class="preset-manager__tool is-danger is-confirm" aria-label=${x.name + ' 삭제 확인'} onClick=${() => { setConfirm(null); onDelete(x); }}>삭제 확인</button>`
+          : html`<button type="button" class="preset-manager__tool is-danger" title="삭제" aria-label=${x.name + ' 삭제'} disabled=${disabled} onClick=${() => setConfirm(x.id)}><${Icon} name="close"/>삭제</button>`}
       </span>` : null}
     </div>`)}${!presets.length ? html`<p class="preset-manager__empty">저장된 프리셋이 없습니다.</p>` : null}</div>
   </aside>`;

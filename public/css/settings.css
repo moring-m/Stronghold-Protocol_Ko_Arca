@@ -542,3 +542,19 @@
 .preset-name-field input { flex:1; border:0!important; background:transparent!important; font-size:max(.17rem,13px); padding:.07rem 0!important; }
 @media (max-width:760px){ .settings-head { flex-wrap:wrap; } .extensions-search { flex:0 0 100%; } .extension-bulk { margin-left:0; } }
 .preset-manager__tool .icon { width:14px; height:14px; }
+.extension-mode-loads { display:inline-flex; gap:.04rem; margin-left:auto; }
+.extension-mode-loads + .ui-menu { margin-left:.04rem; }
+.preset-manager__row > .favorites-preset { display:flex; flex-direction:column; justify-content:center; gap:2px; overflow:hidden; }
+.preset-manager__row .preset-name-row span { display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.preset-manager__links { display:flex!important; align-items:center; gap:4px; min-width:0; margin:0!important; color:var(--mint-400)!important; font-size:max(.12rem,10px); }
+.preset-manager__links > span:last-child { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.preset-manager__links .preset-faction-icon { width:16px; height:16px; }
+.preset-manager__tool { width:28px; }
+.preset-manager__row { flex-wrap:wrap; }
+.preset-manager__row > .favorites-preset { flex:1 0 100%; }
+.preset-manager__tools { flex:1 0 100%; }
+.preset-manager__tool,.preset-manager__tool.is-confirm { flex:1; width:auto; min-height:28px; display:inline-flex; align-items:center; justify-content:center; gap:4px; font:inherit; font-size:max(.13rem,11px); }
+.preset-manager__links .preset-link-icons { display:inline-flex; align-items:center; gap:2px; flex:none; }
+.preset-manager .favorites-preset:has(.preset-strategy-icon) { padding-right:.1rem; }
+.preset-manager__links .preset-link-icons > span:has(.preset-strategy-icon) { position:static; aspect-ratio:auto; }
+.preset-manager__links .preset-link-icons .preset-strategy-icon { width:16px; height:16px; border-radius:2px; }
