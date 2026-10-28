@@ -676,7 +676,10 @@ export class FxWiring {
     this._rotate(P, place, skin, pose);
     this._orient(def, place, pose, o, v);
     const stretchMul = effectStretchScale(lc(key), k);
-    const opts = { ...(stretchMul !== 1 ? { stretchMul } : {}), track: o.track || null, data: o.data ?? null, loop: !!o.loop, important: !!o.important, skip: o.skip > 0 ? o.skip : 0, speed: o.speed, owner: v, depthOwner:o.depthOwner ?? ((o.follow || o.stick || P.follow || P.keep) && v.root ? v : null) };
+    // a unit facing up (its back model) holds its weapon and muzzle behind its body: the effects of its strike (the
+    // attack's start / muzzle flash: `o.strike`) are drawn before its model, not over it; its buffs and auras stay over
+    const behindOwner = !!((o.strike || o.attackCast) && pose.back && v.root && !P.onGround && !o.front);
+    const opts = { ...(stretchMul !== 1 ? { stretchMul } : {}), track: o.track || null, data: o.data ?? null, loop: !!o.loop, important: !!o.important, skip: o.skip > 0 ? o.skip : 0, speed: o.speed, owner: v, depthOwner:o.depthOwner ?? ((o.follow || o.stick || P.follow || P.keep || behindOwner) && v.root ? v : null), behindOwner };
     // the owner each frame: FollowMountPoint keeps the effect on the unit's point (and its rotation), a held effect
     // moves with the unit (`keep`), FollowDirection turns it with the unit, PauseEffectIf hides it while the unit shows
     // a condition; a prefab with chained effects (OnPlayEmitter: system.js FxHandle._start hands them this track) has
@@ -888,7 +891,7 @@ export class FxWiring {
           // the rows of the strike sit where its attack clip poses the unit's points at the strike frame
           const h = onTarget
             ? this.playOn(k, tgt, { toward: beyond(src, tgt), flipFrom: src, skip, speed: info.speed })
-            : this.playOn(k, src, { toward: tgt, skip, speed: info.speed, strike: phase !== 'start', useFourDirectionalFace: !!e.useFourDirectionalFace });
+            : this.playOn(k, src, { toward: tgt, skip, speed: info.speed, strike: phase !== 'start', attackCast: true, useFourDirectionalFace: !!e.useFourDirectionalFace });
           // a looping row stops at its end event (the cast's end); so does a looping prefab on a one-shot row, which
           // would otherwise never end (known once loaded: decided when the time comes)
           if (h) {
