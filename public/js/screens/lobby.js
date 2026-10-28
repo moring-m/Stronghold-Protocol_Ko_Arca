@@ -395,7 +395,6 @@ export function LobbyScreen() {
       </div>
 `;
   if(publicOpen)return html`<${PublicRoomsScreen} headerLeft=${headerLeft(()=>setPublicOpen(false))} headerRight=${headerRight} onJoin=${join} onSpectate=${spectate}/>${sweepOpen?html`<${SweepReport} onClose=${()=>setSweepOpen(false)}/>`:null}`;
-  const summary=[roomMode==='solo'?'단독':roomMode==='coop'?'연합 4인':roomMode==='coop8'?'연합 8인':roomMode==='laboratory'?'실험실':'연습실',DIFFICULTY_NAMES[difficulty],...(['coop','coop8'].includes(roomMode)?[publicOn?'공개':'비공개']:[])];
   return html`<div class="screen lobby-screen">
     <header class="topbar app-topbar">
       ${headerLeft(backToTitle)}
@@ -411,9 +410,10 @@ export function LobbyScreen() {
         <div class="section-label"><span class="section-label__idx num">01</span>模拟方式<${MicroLabel}>MODE<//></div>
         <div class="mode-cards">
           ${MODE_CARDS.map((c) => html`<${ModeCard} key=${c.id} card=${c} selected=${roomMode === c.id || c.id==='coop'&&roomMode==='coop8'} onSelect=${pickMode} coopSize=${coopSize} onCoopSize=${n=>{setCoopSize(n);pickMode(n===8?'coop8':'coop');}} publicOn=${publicOn} onPublicChange=${on=>{setPublicOn(on);savePref('lobby.publicOn',on);}} />`)}
+          <button type="button" class="public-rooms-entry mode-card brackets" onClick=${()=>setPublicOpen(true)}><span class="mode-card__bg" aria-hidden="true"></span><span class="mode-card__icon"><${Icon} name="users"/></span><span class="mode-card__text"><${MicroLabel}>PUBLIC ROOMS<//><span class="mode-card__name">탐색</span><span class="mode-card__desc">공개된 연합 방에 참가하거나 관전합니다.</span></span><span class="public-rooms-entry__total"><span class="public-rooms-entry__stat"><small>참가 가능</small><span class="public-rooms-entry__count" aria-label="참가 가능한 방 수">${conn.status==='online'&&publicRoomCount!==null?publicRoomCount.joinable:'—'}</span></span><span class="public-rooms-entry__stat"><small>전체</small><span class="public-rooms-entry__all" aria-label="전체 방 수">${conn.status==='online'&&publicRoomCount!==null?publicRoomCount.total:'—'}</span></span></span></button>
         </div>
 
-        <div class="section-label lobby-join-label"><span class="section-label__idx section-label__idx--alt"><${Icon} name="key"/></span>참가 · 탐색<${MicroLabel}>JOIN OR BROWSE<//></div>
+        <div class="section-label"><span class="section-label__idx num">03</span>加入同盟<${MicroLabel}>JOIN WITH ALLIANCE KEY<//></div>
         <${Panel} class="join-panel" tone="amber">
           <div class="join-row">
             <${TextField} ascii=${true} size="code" icon="key" value=${code} placeholder="输入同盟密钥 / 粘贴邀请链接"
@@ -424,7 +424,6 @@ export function LobbyScreen() {
             <//>
           </div>
           <div class="join-foot">
-            <button type="button" class="public-rooms-entry" onClick=${()=>setPublicOpen(true)}><${Icon} name="users"/><span class="public-rooms-entry__label">공개 방 탐색</span><span class="public-rooms-entry__stat"><small>참가 가능</small><b class="public-rooms-entry__count num" aria-label="참가 가능한 방 수">${conn.status==='online'&&publicRoomCount!==null?publicRoomCount.joinable:'—'}</b></span><span class="public-rooms-entry__stat"><small>전체</small><b class="public-rooms-entry__all num" aria-label="전체 방 수">${conn.status==='online'&&publicRoomCount!==null?publicRoomCount.total:'—'}</b></span><${Icon} name="chevronRight"/></button>
             ${recent.length ? html`<span class="t-lo">最近的同盟</span>
               ${recent.map((c) => html`<button key=${c} type="button" class="code-chip num" title="填入密钥（不会直接加入）"
                 onClick=${() => setCode(c)}>${c}</button>`)}`
@@ -445,7 +444,6 @@ export function LobbyScreen() {
             <//>
           <//>
           <div class="create-box__hint">
-            <span class="create-box__summary" aria-live="polite"><span class="t-lo">선택</span>${summary.map((x,i)=>html`${i?html`<i aria-hidden="true">·</i>`:null}<b key=${x}>${x}</b>`)}</span>
             ${['laboratory','practice'].includes(roomMode)?html`<span>${roomMode==='practice'?'진입 후 라운드·전장·전략·적 특훈·맹약 밴을 선택합니다.':'진입 후 맵·보스·전략을 선택합니다.'}</span>`:online
               ? html`<span>${roomMode === 'solo' ? '创建后即可开始模拟' : '创建后可邀请好友或添加 AI 队友'}</span>`
               : html`<${Spinner} size="sm" label="CONNECTING" />`}
