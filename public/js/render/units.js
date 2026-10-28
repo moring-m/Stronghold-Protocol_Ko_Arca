@@ -2454,7 +2454,7 @@ export class UnitView {
     }
     const wolfH = this._updateWolfPips(showBars && !this.isEnemy && !!this.wolves, x0, gaugeTop + energyH, s);
     const coinH = this._updateCoins(showBars && !this.isEnemy && !!this.coins, x0, gaugeTop + energyH + wolfH, s);
-    this._updateElementBar(showBars && !!this.el, x0, bw, gaugeTop + energyH + wolfH + coinH + 1, spH, s, t, off ? { x: x0, y: cy - s * OFFICIAL_BARS.elementAbove } : null);
+    this._updateElementBar(showBars && !!this.el, x0, bw, gaugeTop + energyH + wolfH + coinH + 1, spH, s, t, official ? { x: x0, y: cy - s * OFFICIAL_BARS.elementAbove } : null);
     this._updateDownRing(!prep && !!this.down && !this.alive, x, this.screen.y - DOWN_LOOK.height * s, s, t);
     // blocked marker at the feet (enemies held by a blocker)
     const blocked = !prep && this.alive && this.isEnemy && (this.flags & UF.BLOCKED);
@@ -2628,7 +2628,7 @@ export class UnitView {
    * `elementLeft()` on a dark track `h` px tall — white for the 元素值 left; in the element's colour, the disc pulsing
    * (clock `t`), while it refills over a 爆发冷却. Built on the first gauge, hidden while there is none.
    */
-  /** `at` (HP bar style official): the client's gauge — its disc with a ring filling around it, left of the unit above
+  /** `at` (the official effects on — 设置「官方特效」, whatever the HP bar style): the client's gauge — its disc with a ring filling around it, left of the unit above
    *  the bars' left end (no bar). */
   _updateElementBar(show, x0, bw, top, h, s, t = 0, at = null) {
     let r = this._elBar;
