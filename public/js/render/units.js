@@ -2404,8 +2404,10 @@ export class UnitView {
       if (prep) this.chip.position.set(x, y - this.chip.height / 2 + 2);
       else this.chip.position.set(x0 - this.chip.width / 2 - 1, cy + (showSp ? spH / 2 : 0));
     }
-    // status icons row above the bars
-    const icons = this._iconKeys();
+    // status icons row above the bars; with the official effects on, a status the client shows with its own effect on the
+    // unit (generic.status: 隐匿, 晕眩, 冻结, 沉睡 … — render/vfx/wiring.js status loops) is that effect, not an icon
+    const official = !!(this.ctx.officialFor?.(this) ?? this.ctx.ofx?.active);
+    const icons = official && this.ctx.officialStatusKey ? this._iconKeys(Infinity).filter((k) => !this.ctx.officialStatusKey(k === 'invuln' ? 'invulnerable' : k)).slice(0, 4) : this._iconKeys();
     const isz = clamp(s * 0.26, 12, 26);
     const iy = cy - bh / 2 - isz / 2 - 3;
     for (let i = 0; i < this.icons.length; i++) {
