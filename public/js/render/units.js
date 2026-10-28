@@ -690,6 +690,8 @@ export class UnitView {
     // a leader drawn one way only, and its boss HUD beside the model (FIXED_FACING / BOSS_HUD_DX, GitHub #648)
     this.fixedFacing = (this.isEnemy && FIXED_FACING[info.defId]) || 0;
     this.hudDx = (this.isEnemy && BOSS_HUD_DX[info.defId]) || 0;
+    // a boss that does not walk (move speed ≤ 0.1: 盐风主教昆图斯, 假想敌：胄 …) — its official HP bar spans its body
+    { const ms = Number((ctx.lookupDef ? ctx.lookupDef(info) : null)?.stats?.moveSpeed); this.fixedBoss = this.isBoss && Number.isFinite(ms) && ms <= 0.1; }
     // enemies: the official prefab's size factor (1 for operators, summons and enemies at the standard size)
     this.modelK = this.isEnemy ? Number(info.modelScale)>0?Number(info.modelScale):enemyModelScale(ctx.lookupDef ? ctx.lookupDef(info) : null) : 1;
     this.isToken = info.kind === 'token';
@@ -2281,6 +2283,7 @@ export class UnitView {
     this.screen.top = by - headTiles * s;
     // the boss HUD `hudDx` tiles beside the model, where the official prefab puts it (BOSS_HUD_DX)
     const hx = this.hudDx ? cam.project(this.x + this.hudDx, this.y, this.z + this.hover + this.lift, HUD_P).x : bx;
+    this._feetY = by;
     this._updateHud(dt, s, hx, by - headTiles * s, alpha, t);
   }
 
@@ -2333,14 +2336,17 @@ export class UnitView {
     // 设置「HP 바 표시 방식」 official: the client's flat bars (OFFICIAL_BARS) — no frame, no tier chip in battle
     const off = this.ctx.settings?.hpBarStyle === 'official';
     const leader = off && this.isEnemy && !this.isBoss && this.info.tier >= 3;
-    const bw = clamp(s * (this.isBoss ? UNIT.bossBarWidth : UNIT.barWidth), 24, this.isBoss ? 260 : 96);
-    const bh = off ? clamp(s * (this.isBoss || leader ? 0.075 : 0.05), 2.5, this.isBoss ? 8 : 5) : clamp(s * (this.isBoss ? 0.09 : 0.065), 3, this.isBoss ? 9 : 6);
+    // official geometry (measured on the client's battle screens): the bars sit under the unit's feet, about a tile wide
+    // (a fixed boss — one that does not walk — spans its body: OFFICIAL_BARS.fixedBossWidth; a walking boss = a leader)
+    const fixedBoss = off && this.isBoss && this.fixedBoss;
+    const bw = off ? s * (fixedBoss ? OFFICIAL_BARS.fixedBossWidth : OFFICIAL_BARS.width) : clamp(s * (this.isBoss ? UNIT.bossBarWidth : UNIT.barWidth), 24, this.isBoss ? 260 : 96);
+    const bh = off ? Math.max(2.5, s * (this.isBoss || leader ? OFFICIAL_BARS.leaderH : OFFICIAL_BARS.hpH)) : clamp(s * (this.isBoss ? 0.09 : 0.065), 3, this.isBoss ? 9 : 6);
     // a knocked-down operator's HUD is its redeploy ring alone, drawn at full strength over the greyed model
     this.hud.alpha = this.down ? this.fadeIn : this.dying > 0 ? 0 : alpha;
     let sx = this.shake > 0 ? Math.sin(t * 90) * this.shake * 10 : 0;
     this.shake = Math.max(0, this.shake - dt);
     const x0 = x - bw / 2 + sx;
-    let cy = y - 4;
+    let cy = off ? (this._feetY ?? y) + s * OFFICIAL_BARS.belowFeet : y - 4;
     if(this.noteText){this.noteText.visible=showBars&&this.noteStacks>0;this.noteText.scale.set(clamp(s/90,.65,1));this.noteText.position.set(x0-1+18*clamp(s/90,.65,1),cy-3);this.noteIcon.visible=this.noteText.visible;this.noteIcon.width=this.noteIcon.height=16*clamp(s/90,.65,1);this.noteIcon.position.set(x0-1,cy-3);}
     // HP
     this.hpBg.visible = this.hpFill.visible = showHp;
@@ -2378,7 +2384,7 @@ export class UnitView {
     const showSp = showBars && !this.isEnemy && (this.spMax > 0 || !!ammo);
     this.spBg.visible = this.spFill.visible = showSp;
     this.ammoDividers.clear(); this.ammoDividers.visible = showSp && !!ammo;
-    const spH = Math.max(2, bh * 0.55);
+    const spH = off ? Math.max(2, s * OFFICIAL_BARS.spH) : Math.max(2, bh * 0.55);
     let ready = false;
     let sy = 0;
     if (showSp) {
@@ -2448,7 +2454,7 @@ export class UnitView {
     }
     const wolfH = this._updateWolfPips(showBars && !this.isEnemy && !!this.wolves, x0, gaugeTop + energyH, s);
     const coinH = this._updateCoins(showBars && !this.isEnemy && !!this.coins, x0, gaugeTop + energyH + wolfH, s);
-    this._updateElementBar(showBars && !!this.el, x0, bw, gaugeTop + energyH + wolfH + coinH + 1, spH, s, t);
+    this._updateElementBar(showBars && !!this.el, x0, bw, gaugeTop + energyH + wolfH + coinH + 1, spH, s, t, off ? { x: x0, y: cy - s * OFFICIAL_BARS.elementAbove } : null);
     this._updateDownRing(!prep && !!this.down && !this.alive, x, this.screen.y - DOWN_LOOK.height * s, s, t);
     // blocked marker at the feet (enemies held by a blocker)
     const blocked = !prep && this.alive && this.isEnemy && (this.flags & UF.BLOCKED);
@@ -2622,7 +2628,9 @@ export class UnitView {
    * `elementLeft()` on a dark track `h` px tall — white for the 元素值 left; in the element's colour, the disc pulsing
    * (clock `t`), while it refills over a 爆发冷却. Built on the first gauge, hidden while there is none.
    */
-  _updateElementBar(show, x0, bw, top, h, s, t = 0) {
+  /** `at` (HP bar style official): the client's gauge — its disc with a ring filling around it, left of the unit above
+   *  the bars' left end (no bar). */
+  _updateElementBar(show, x0, bw, top, h, s, t = 0, at = null) {
     let r = this._elBar;
     if (!show) { if (r) r.root.visible = false; return; }
     const tex = hudRings();
@@ -2638,6 +2646,23 @@ export class UnitView {
       this.hud.addChild(root);
     }
     const d = clamp(s * EL_BAR.icon, EL_BAR.min, EL_BAR.max) * (this.isEnemy ? EL_BAR.enemy : 1);
+    if (at) {
+      if (!r.ring) { r.ring = new this.P.Sprite(this.P.Texture.EMPTY); r.ring.anchor.set(0.5); r.root.addChild(r.ring); }
+      const k = this.elementLeft();
+      r.bg.visible = r.fill.visible = false; if (r.value) r.value.visible = false;
+      r.disc.texture = (this.isEnemy ? tex.discEnemy : tex.disc)[this.el] || tex.disc.burn;
+      r.disc.width = r.disc.height = d / HUD_DISC;
+      r.disc.position.set(at.x, at.y);
+      r.ring.texture = ringArc(clamp(k, 0, 1));
+      r.ring.tint = (ELEMENT_RING[this.el] || ELEMENT_RING.burn).tint;
+      r.ring.width = r.ring.height = d * 1.35 / HUD_DISC;
+      r.ring.position.set(at.x, at.y);
+      r.ring.visible = k > 0;
+      r.disc.alpha = this.elementCooling() ? EL_BAR.pulse + (1 - EL_BAR.pulse) * (0.5 + 0.5 * Math.cos(t * Math.PI * 2 * EL_BAR.pulseHz)) : 1;
+      r.root.visible = true;
+      return;
+    }
+    r.bg.visible = true; if (r.ring) r.ring.visible = false; if (r.value) r.value.visible = true;
     const cy = top + EL_BAR.gap + d / 2;
     r.disc.texture = (this.isEnemy ? tex.discEnemy : tex.disc)[this.el] || tex.disc.burn;
     r.disc.width = r.disc.height = d / HUD_DISC;   // the disc fills HUD_DISC of its atlas cell
@@ -3016,7 +3041,8 @@ const HUD_P = { x: 0, y: 0, s: 0, depth: 0 };
 const ICON_TMP = [];
 /** 设置「HP 바 표시 방식」 official: the client's bar colours (read off its battle screens): operator HP light blue, SP
  *  yellow-green charging / amber while the skill runs, enemy HP orange, a leader's (悬赏 leaders, the bosses) red on grey. */
-const OFFICIAL_BARS = Object.freeze({ ally: 0x6cb2d2, sp: 0x8aa43f, skill: 0xc3991c, enemy: 0xd46c3a, leader: 0xcf2a33, back: 0x1c1c1c, leaderBack: 0x7d8088 });
+const OFFICIAL_BARS = Object.freeze({ elementAbove: 0.28, width: 0.9, fixedBossWidth: 4, hpH: 0.042, leaderH: 0.06, spH: 0.034, belowFeet: 0.28,
+  ally: 0x6cb2d2, sp: 0x8aa43f, skill: 0xc3991c, enemy: 0xd46c3a, leader: 0xcf2a33, back: 0x1c1c1c, leaderBack: 0x7d8088 });
 
 /**
  * Unit-layer zIndex of a unit / piece whose feet are at (x, y): farther rows first (so raised block rows, keyed by
