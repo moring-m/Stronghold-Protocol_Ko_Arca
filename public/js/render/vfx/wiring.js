@@ -87,7 +87,9 @@ const ENEMY_AREA_FX = Object.freeze({
   mechBomb: Object.freeze({ skill: 'bomb[reborning]', telegraph: 'range', explode: null }),
   // “自在” 破桎而出 (ShieldBurst / ShieldBurstReborn): the barrier loops while it holds, its trigger effects at the burst;
   // its cross: the cross projectile's hit (enemy_xi_skill_01_hit) where it lands
-  breakFree: Object.freeze({ skill: ['shieldburstreborn', 'shieldburst'], telegraph: 'loop', explode: 'trigger' }),
+  // (the barrier loop is played on 自在 itself: its spawn location's Graphic tilt, following it, in its depth — at a bare
+  // board point it took no rotation and showed sheared under the camera)
+  breakFree: Object.freeze({ skill: ['shieldburstreborn', 'shieldburst'], telegraph: 'loop', explode: 'trigger', onUnit: true }),
   xiCross: Object.freeze({ projectile: 'projectile_enemy_xi_s', telegraph: 'onHit' }),
   // 鼠王 【唱沙】: its DriftSand skill's hit effects (the sand cross) on the target
   driftSand: Object.freeze({ skill: 'driftsand', telegraph: 'hit' }),
@@ -1904,7 +1906,9 @@ export class FxWiring {
       const keys = (roles && role ? roles[role] || [] : []).filter((k) => kind === 'telegraph' ? !spec.match || spec.match.test(k) : !spec.skip || !spec.skip.test(k));
       let drawn = false;
       for (const key of keys) {
-        const h = this.playOn(key, { x, y, z: 0 }, { loop: kind === 'telegraph', important: true });
+        const own = spec.onUnit && kind === 'telegraph' && src?.info && src.alive !== false;
+        const h = own ? this.playOn(key, src, { follow: true, loop: true, important: true, depthOwner: src, unitLayer: true })
+          : this.playOn(key, { x, y, z: 0 }, { loop: kind === 'telegraph', important: true });
         if (!h) continue;
         if (kind === 'telegraph') setTimeout0(this.ofx, h, Number(extra.dur) || 0);
         drawn = true;
