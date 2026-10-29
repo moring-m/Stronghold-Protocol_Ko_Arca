@@ -2083,7 +2083,8 @@ export class UnitView {
     placeOnGround(this.ctx, this.shadow, this.ctx.layers.shadow, this.y, shz);
     const sh = cam.project(visualX, this.y, shz, SH_P);
     this.shadow.position.set(sh.x, sh.y + s * STAND_DROP);   // under the feet (STAND_DROP)
-    const shw = s * (this.isBoss ? 1.35 : 0.78) / this.shadow.texture.width;
+    // the client's: a faint ellipse about half a tile across, centred on the feet
+    const shw = s * (this.isBoss ? 1.1 : 0.6) / this.shadow.texture.width;
     this.shadow.scale.set(shw, shw * (this.shadow.texture === shadowTexture() ? 1 : 1.05));
     this.shadow.alpha = this.ctx.settings?.shadows === false ? 0 : 0.5 * alpha * (this.lift > 0 ? 0.6 : 1);
 
@@ -2251,26 +2252,26 @@ export class UnitView {
     const wedge = this._showFacing !== undefined ? this._showFacing && this.prep : this.hasDir && this.info.kind !== 'device';
     if (wedge && this.alive) {
       if (!this.facingArrow) {
-        this.facingArrow = new P.Sprite(fxAtlas().tex.chevron);
-        this.facingArrow.anchor.set(0.5);
-        this.facingArrow.tint = 0xff9c33;
+        this.facingArrow = new P.Graphics();
         this.ctx.layers.groundFx.addChild(this.facingArrow);
       }
       placeOnGround(this.ctx, this.facingArrow, this.ctx.layers.groundFx, this.y, this.z);
-      // on the ground ring, 0.36 tile out along the deploy direction; rotated to the projected direction and
-      // foreshortened along it (the chevron texture points right: local x = the pointing axis)
-      const [sx, sy] = DIR_STEP[this.dir] || DIR_STEP.RIGHT;
-      const c0 = cam.project(this.x, this.y, this.z + 0.01, FA_C);
-      const fa = cam.project(this.x + 0.36 * sx, this.y + 0.36 * sy, this.z + 0.01, FA_P);
-      const vx = fa.x - c0.x, vy = fa.y - c0.y;
-      const len = Math.hypot(vx, vy) || 1;
-      this.facingArrow.visible = this.lift <= 0;
-      this.facingArrow.position.set(fa.x, fa.y);
-      this.facingArrow.rotation = Math.atan2(vy, vx);
-      const fs = (s * 0.22) / 64;
-      const along = clamp(len / (s * 0.36 || 1), 0.35, 1.2);
-      this.facingArrow.scale.set(fs * along, fs * (sy ? 1 : 0.8));
-      this.facingArrow.alpha = 0.9 * alpha;
+      // the client's deploy-direction mark (measured on its battle screen): a thin white ring about the unit on the
+      // ground (radius FACING.r tiles), an orange arc over its facing quarter and an orange arrowhead out of it
+      const g = this.facingArrow, [sx, sy] = DIR_STEP[this.dir] || DIR_STEP.RIGHT, z = this.z + 0.01;
+      const face = Math.atan2(sy, sx), pt = (a, r) => { const q = cam.project(this.x + Math.cos(a) * r, this.y + Math.sin(a) * r, z, FA_P); return { x: q.x, y: q.y }; };
+      const line = (from, to, r, w, color, a) => {
+        g.lineStyle(w, color, a);
+        for (let k = 0; k <= 24; k++) { const q = pt(from + ((to - from) * k) / 24, r); if (k) g.lineTo(q.x, q.y); else g.moveTo(q.x, q.y); }
+      };
+      g.clear();
+      g.visible = this.lift <= 0;
+      g.alpha = alpha;
+      line(0, Math.PI * 2, FACING.r, Math.max(1, s * 0.016), 0xffffff, 0.8);
+      line(face - FACING.arc, face + FACING.arc, FACING.r, Math.max(2, s * 0.05), 0xffa31a, 1);
+      const tip = pt(face, FACING.r + FACING.tip), l = pt(face - FACING.head, FACING.r - 0.02), r = pt(face + FACING.head, FACING.r - 0.02);
+      const c = pt(0, 0); g.tip = tip; g.pointing = Math.atan2(tip.y - c.y, tip.x - c.x);   // (read by tests)
+      g.lineStyle(0); g.beginFill(0xffa31a, 1); g.moveTo(tip.x, tip.y); g.lineTo(l.x, l.y); g.lineTo(r.x, r.y); g.closePath(); g.endFill();
     } else if (this.facingArrow) this.facingArrow.visible = false;
 
     // elite aura
@@ -2420,7 +2421,9 @@ export class UnitView {
       this.spBg.position.set(x0 - (off ? 0 : 1), sy); this.spBg.width = bw + (off ? 0 : 2); this.spBg.height = spH + (off ? 0 : 2);
       this.spBg.tint = off ? OFFICIAL_BARS.back : COLORS.hpBack; this.spBg.alpha = off ? 0.55 : 1;
       this.spFill.position.set(x0, sy); this.spFill.width = bw * k; this.spFill.height = spH;
-      this.spFill.tint = (this.flags & UF.OVERHEATED) ? (off ? OFFICIAL_BARS.overload : 0xf04444) : off ? (active ? OFFICIAL_BARS.skill : OFFICIAL_BARS.sp) : ammo ? COLORS.ammo : active ? COLORS.spActive : ready ? COLORS.spReady : COLORS.sp;
+      // ammo (and 琳琅诗怀雅's purse) keeps its colour whatever the skill flag says: a battle's end clears the flag while
+      // the rounds left still show
+      this.spFill.tint = (this.flags & UF.OVERHEATED) ? (off ? OFFICIAL_BARS.overload : 0xf04444) : ammo ? (off ? OFFICIAL_BARS.skill : COLORS.ammo) : off ? (active ? OFFICIAL_BARS.skill : OFFICIAL_BARS.sp) : active ? COLORS.spActive : ready ? COLORS.spReady : COLORS.sp;
       const shownAmmo = ammo ? ((this.flags & UF.OVERDRIVE) ? ammo[1] / 2 : ammo[1]) : 0;
       if (shownAmmo > 1) {
         this.ammoDividers.lineStyle(Math.min(.7, bw / shownAmmo * .3), COLORS.hpBack, .9);
@@ -3104,6 +3107,9 @@ export class UnitView {
 const SH_P = { x: 0, y: 0, s: 0, depth: 0 };
 const FA_P = { x: 0, y: 0, s: 0, depth: 0 };
 const FA_C = { x: 0, y: 0, s: 0, depth: 0 };
+/** The deploy-direction mark: ring radius, the orange arc's half-angle, the arrowhead's reach past the ring (tiles) and
+ * its base half-angle (radians). */
+const FACING = Object.freeze({ r: 0.36, arc: Math.PI / 4, tip: 0.15, head: 0.3 });
 const LG_P = { x: 0, y: 0, s: 0, depth: 0 };
 const HUD_P = { x: 0, y: 0, s: 0, depth: 0 };
 const ICON_TMP = [];
@@ -3198,8 +3204,8 @@ export class ItemView {
     this.root.alpha = this.dimmed ? 0.35 : 1;
     placeOnGround(this.ctx, this.shadow, this.ctx.layers.shadow, this.y, this.z);
     const sh = cam.project(this.x, this.y, this.z, SH_P);
-    this.shadow.position.set(sh.x, sh.y + sh.s * STAND_DROP);
-    this.shadow.scale.set((p.s * 0.48) / this.shadow.texture.width);
+    this.shadow.position.set(sh.x, sh.y);
+    this.shadow.scale.set((p.s * 0.55) / this.shadow.texture.width);
     this.shadow.alpha = 0.35;
     this.screen.top = lifted ? p.y - size / 2 : p.y - size;
   }

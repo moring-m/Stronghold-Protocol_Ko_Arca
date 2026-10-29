@@ -53,7 +53,7 @@ import { effectArtScale, effectStretchScale } from './artScale.js';
 import { costumeFor, costumeSkin, costumeEffect, costumeProjectile, costumePreloadKeys } from './costumes.js';
 import { GROUND_SPAWNS } from './effect.js';
 import { SkillFx, fitsAttack, pickGroup, formMode } from './skillfx.js';
-import { TalentFx } from './talentfx.js';
+import { TalentFx, SHIELD_TALENTS } from './talentfx.js';
 import { FunnelFx } from './funnelfx.js';
 import { YuWall, YU_WALL_SOURCE } from './yuwall.js';
 import { formModes } from './talents.js';
@@ -1693,6 +1693,8 @@ export class FxWiring {
     if (!on) { if (prev) { prev.stop(); this.loops.delete(slot); } return !!prev; }
     if (!this.ofx.active) return false;
     if (prev && prev.alive) return true;
+    // a unit whose talent draws its own shield (talentfx SHIELD_TALENTS) takes no generic one
+    if (name === 'shield' && [...SHIELD_TALENTS].some((k) => k.startsWith(`${this.unitKeyOf(v)}|`))) return false;
     const key = (name === 'shield' && this.ownShieldKey(v)) || this.statusKey(name);
     if (!key) return false;
     this.skills.status(v, lc(key));

@@ -113,19 +113,18 @@ describe('ground wedge "›" of prep board pieces', () => {
     v._showFacing = true;
     v.update(1 / 60, cam(), 0);
     assert.ok(v.facingArrow && v.facingArrow.visible, 'wedge shown');
-    const a = v.facingArrow.rotation;
-    const pos = { x: v.facingArrow.position.x, y: v.facingArrow.position.y };
+    const a = v.facingArrow.pointing;
+    const pos = v.facingArrow.tip;
     const c = cam().project(v.x, v.y, 0.01);
-    return { a, dx: pos.x - c.x, dy: pos.y - c.y, sx: v.facingArrow.scale.x, sy: v.facingArrow.scale.y };
+    return { a, dx: pos.x - c.x, dy: pos.y - c.y, len: Math.hypot(pos.x - c.x, pos.y - c.y) };
   };
-  test('points along the direction on screen (RIGHT → right, UP → up the board, …) and is foreshortened along it', () => {
+  test('the ring\'s arrowhead points along the direction on screen (RIGHT → right, UP → up the board, …) on the ground', () => {
     const r = angle('RIGHT'); const l = angle('LEFT'); const u = angle('UP'); const d = angle('DOWN');
     assert.ok(Math.abs(r.a) < 0.05 && r.dx > 0, `RIGHT (${r.a})`);
     assert.ok(Math.abs(Math.abs(l.a) - Math.PI) < 0.05 && l.dx < 0, `LEFT (${l.a})`);
     assert.ok(Math.abs(u.a + Math.PI / 2) < 0.05 && u.dy < 0, `UP points up the screen (${u.a})`);
     assert.ok(Math.abs(d.a - Math.PI / 2) < 0.05 && d.dy > 0, `DOWN (${d.a})`);
-    assert.ok(u.sx < r.sx, 'a vertical wedge is shorter along its axis (ground tilt)');
-    assert.ok(r.sx > 0 && l.sx > 0, 'no negative scale (rotation does the mirroring)');
+    assert.ok(u.len < r.len, 'the arrowhead lies on the tilted ground: shorter up the board than across it');
   });
   test('setDir re-points the wedge of a live piece', () => {
     const v = view({ dir: 'RIGHT' }, { prep: true }, store({ back: false }));
@@ -133,7 +132,7 @@ describe('ground wedge "›" of prep board pieces', () => {
     v.update(1 / 60, cam(), 0);
     v.setDir('LEFT');
     v.update(1 / 60, cam(), 1 / 60);
-    assert.ok(Math.abs(Math.abs(v.facingArrow.rotation) - Math.PI) < 0.05);
+    assert.ok(Math.abs(Math.abs(v.facingArrow.pointing) - Math.PI) < 0.05);
   });
 });
 
@@ -142,7 +141,7 @@ describe('ground wedge in combat (research 09 §1.2: "prep and combat") — revi
     const withDir = view({ dir: 'UP' }, {}, store({ back: false }));
     withDir.update(1 / 60, cam(), 0);
     assert.ok(withDir.facingArrow && withDir.facingArrow.visible, 'battle ally with dir: wedge');
-    assert.ok(Math.abs(withDir.facingArrow.rotation + Math.PI / 2) < 0.05, 'pointing UP');
+    assert.ok(Math.abs(withDir.facingArrow.pointing + Math.PI / 2) < 0.05, 'pointing UP');
     const legacy = view({ facing: 1 }, {}, store({ back: false }));
     legacy.update(1 / 60, cam(), 0);
     assert.ok(!legacy.facingArrow || !legacy.facingArrow.visible, 'no dir (legacy ±1 only): no wedge rather than a guessed RIGHT');
