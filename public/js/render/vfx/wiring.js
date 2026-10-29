@@ -708,7 +708,7 @@ export class FxWiring {
     // a unit facing up (its back model) holds its weapon and muzzle behind its body: the effects of its strike (the
     // attack's start / muzzle flash: `o.strike`) are drawn before its model, not over it; its buffs and auras stay over
     const behindOwner = !!((o.strike || o.attackCast) && pose.back && v.root && !P.onGround && !o.front);
-    const opts = { ...(stretchMul !== 1 ? { stretchMul } : {}), track: o.track || null, data: o.data ?? null, loop: !!o.loop, important: !!o.important, skip: o.skip > 0 ? o.skip : 0, speed: o.speed, owner: v, depthOwner:o.depthOwner ?? ((o.follow || o.stick || P.follow || P.keep || behindOwner) && v.root ? v : null), behindOwner };
+    const opts = { ...(stretchMul !== 1 ? { stretchMul } : {}), track: o.track || null, data: o.data ?? null, loop: !!o.loop, important: !!o.important, skip: o.skip > 0 ? o.skip : 0, speed: o.speed, owner: v, unitLayer: !!o.unitLayer, depthOwner:o.depthOwner ?? ((o.follow || o.stick || P.follow || P.keep || behindOwner) && v.root ? v : null), behindOwner };
     // the owner each frame: FollowMountPoint keeps the effect on the unit's point (and its rotation), a held effect
     // moves with the unit (`keep`), FollowDirection turns it with the unit, PauseEffectIf hides it while the unit shows
     // a condition; a prefab with chained effects (OnPlayEmitter: system.js FxHandle._start hands them this track) has
@@ -1720,7 +1720,7 @@ export class FxWiring {
     const key = own || (name === 'shield' && own === undefined ? this.statusKey(name) : name === 'shield' || name === 'barrier' ? null : this.statusKey(name));
     if (!key) return false;
     this.skills.status(v, lc(key));
-    const h = this.playOn(key, v, { follow: true, loop: true, important: true, depthOwner:v });
+    const h = this.playOn(key, v, { follow: true, loop: true, important: true, depthOwner:v, ...(own ? { unitLayer: true } : {}) });
     if (h) this.loops.set(slot, h);
     return !!h;
   }

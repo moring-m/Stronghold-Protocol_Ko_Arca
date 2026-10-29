@@ -40,3 +40,15 @@ test('stable attached layers avoid scene-tree mutations but still follow newly a
  fx.frameNo++;fx._prepare(renderer);assert.equal(writes,3);
  fx.effects=[];fx.frameNo++;fx._prepare(renderer);assert.equal(layer.destroyed,true);assert.deepEqual(owner.root.children,[model,hud]);
 });
+
+test("a unit's own shield loop draws its ground parts behind that unit, not in the board-wide ground pass",()=>{
+ const renderer={screen:{width:1280,height:720}},cam=presetCamera('normal',renderer.screen);
+ const fx=new OfficialFx({P:{Container,prototype:{}},renderer,cam:()=>cam,lib:{}});fx.glr={upload(){}};
+ Container.prototype.addChildAt=function(c,i){c.parent?.removeChild(c);this.children.splice(i,0,c);c.parent=this;};
+ const owner={root:new Container(),z:0},model={id:'model'};owner.root.addChild(model);
+ const mk=(id,unitLayer)=>({id,effect:{depthOwner:owner,unitLayer,build:()=>({kind:'ps',first:0,count:6})},ground:true,queue:3000,order:0,layer:0,dist:0,mat:{state:{}}});
+ const shield=mk('shield',true),aura=mk('aura',false);
+ fx.effects=[{gather(_b,sink){sink(shield);sink(aura);}}];fx._prepare(renderer);
+ assert.deepEqual(fx.unitBehindItems.get(owner).map(e=>e.id),['shield']);assert.deepEqual(fx.items.ground.map(e=>e.id),['aura']);
+ assert.equal(owner.root.children[0],fx.unitBehindLayers.get(owner));
+});

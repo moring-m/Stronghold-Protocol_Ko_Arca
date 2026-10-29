@@ -2728,7 +2728,7 @@ export class UnitView {
       this.hud.addChild(root);
     }
     // the official gauge is larger than the classic one (OFFICIAL_BARS.elementIcon)
-    const d = (at ? clamp(s * OFFICIAL_BARS.elementIcon, EL_BAR.min, OFFICIAL_BARS.elementMax) : clamp(s * EL_BAR.icon, EL_BAR.min, EL_BAR.max)) * (this.isEnemy ? EL_BAR.enemy : 1);
+    const d = (at ? clamp(s * OFFICIAL_BARS.elementIcon, EL_BAR.min, OFFICIAL_BARS.elementMax) : clamp(s * EL_BAR.icon, EL_BAR.min, EL_BAR.max) * (this.isEnemy ? EL_BAR.enemy : 1));
     if (at) {
       if (!r.ring) { r.ring = new this.P.Sprite(this.P.Texture.EMPTY); r.ring.anchor.set(0.5); r.root.addChild(r.ring); }
       const k = this.elementLeft();

@@ -378,7 +378,9 @@ export class OfficialFx {
       // a unit's effect on a raised tile: not cut by that tile's own block in the board's depth, and its ground parts
       // drawn behind the unit's body (the ground pass lies under the raised top the unit stands on)
       e.noDepth=(owner?.z||0)>0.05;
-      const raised=e.ground&&e.noDepth;
+      // a unit's 보호막 / 쉴드 loop (unitLayer): its back parts behind that unit's body, not in the board-wide ground pass
+      // under every unit (where a unit in front of it, or the next tile's body, covered it)
+      const raised=e.ground&&(e.noDepth||e.effect.unitLayer);
       if((!e.ground||raised)&&e.queue<4000&&owner?.root&&!owner.root.destroyed){
         const map=e.effect.behindOwner||raised?this.unitBehindItems:this.unitItems;
         let list=map.get(owner);if(!list){list=[];map.set(owner,list);}list.push(e);
@@ -508,6 +510,7 @@ export class FxHandle {
     fx.depthOwner = this.opts.depthOwner ?? null;
     // drawn inside the owner before its model (a unit facing up: its muzzle and weapon are behind its body)
     fx.behindOwner = !!this.opts.behindOwner;
+    fx.unitLayer = !!this.opts.unitLayer;
     fx.handle = this;
     // a one-shot nobody stops is capped: its authored duration (plus its linger), else ONE_SHOT_TTL; a looping prefab
     // nobody owns (the wiring stops it at its end event) ends after LOOP_TTL at the latest
@@ -521,7 +524,7 @@ export class FxHandle {
     // stops with it (OnFinishEmitter's start where it finished)
     this.children = [];
     const skip = Math.max(0, Number(this.opts.skip) || 0) + loadedLate;
-    const own = { track: this.opts.track, data: this.opts.data, loop: this.opts.loop, important: this.opts.important, owner: this.opts.owner, depthOwner:this.opts.depthOwner, behindOwner:this.opts.behindOwner, skip, speed: this.opts.speed, resolveKey: this.opts.resolveKey };
+    const own = { track: this.opts.track, data: this.opts.data, loop: this.opts.loop, important: this.opts.important, owner: this.opts.owner, depthOwner:this.opts.depthOwner, behindOwner:this.opts.behindOwner, unitLayer:this.opts.unitLayer, skip, speed: this.opts.speed, resolveKey: this.opts.resolveKey };
     // An effect played on a unit (the wiring's `playChild`) emits its chained keys as the client does: on the owner again —
     // the outfit's replacement, the facing variant, the key's own spawn location — unless `_useSourceEffectPos` keeps them
     // at this one (수르트 스킨 S3's sun: surtr_skill_03_buff_02 → _left/_right_*, at the feet, not on the weapon the buff
