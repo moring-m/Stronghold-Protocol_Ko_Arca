@@ -79,7 +79,7 @@ test('operator models and fallback portraits both keep their place on an attack'
     spine: { acquire: () => (ready ? Promise.resolve({ animations: [{ name: 'Idle' }, { name: 'Attack' }] }) : new Promise(() => {})), release() {} } };
   const make = () => new UnitView(fakeViewCtx(fake.P, { assets, cam: () => cam }), { id: 1, side: 'ally', kind: 'op', defId: 'c', spine: 'c', tier: 3, x: 4, y: 10, maxHp: 1000, dir: 'RIGHT' });
   const target = { x: 8, y: 12 };
-  const feet = cam.project(4, 10, 0);
+  const feet = cam.project(4, 10, -0.08);   // units stand STAND_SINK (0.08 tile) below the tile top (render/units.js)
   // no model (still loading): the operator portrait also stays fixed
   const d = make();
   d.update(1 / 60, cam, 0);

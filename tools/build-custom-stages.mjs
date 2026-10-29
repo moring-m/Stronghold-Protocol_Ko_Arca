@@ -51,7 +51,10 @@ function snowfield() {
   return {
     base: 'act1autochess_m02',
     id: 'custom_snowfield',
-    name: '설원 덤불 전장',
+    name: '설원',
+    // 차단 공사 (阻隔工事 crates): two per normal field on its hazard-framed column, off the enemy route (row 12); the boss field (rows 2–5) has none, as on the
+    // official maps
+    crates: [[10, 9], [11, 9], [10, 17], [11, 17]],
     boardTheme: 'snow',
     // the boss field's fence tiles (rows 3–4, cols 8 and 12): the cooperative defense keeps its wall there (render/pen.js)
     bossOnlyTiles: [[3, 8], [4, 8], [3, 12], [4, 12]],
@@ -78,7 +81,11 @@ for (const def of [snowfield()]) {
     // a custom stage joins a mode's pool only when the room picks it (shared/customExtensions.js)
     customExtension: { category: 'stages' },
     // the base's band / card devices (turrets, crates, platforms) sit on its own layout: only the field-wide ones stay
-    devices: structuredClone(base.devices || []).filter((d) => d.role === 'coldWind'), special: {},
+    devices: [
+      ...structuredClone(base.devices || []).filter((d) => d.role === 'coldWind'),
+      ...(def.crates || []).map((pos) => ({ ...structuredClone(base.devices.find((d) => d.role === 'crate')), pos, active: true, hidden: false })),
+    ],
+    special: {},
   };
   delete stage.legend;
   Object.assign(stage, computeGroundPaths(stage), { deployTiles: computeDeployTiles(stage) });

@@ -553,6 +553,10 @@ export function placeOnGround(ctx, obj, fallback, y, z) {
   if (obj.parent !== layer) layer.addChild(obj);
 }
 
+/** Units stand a little below the tile top's centre (operators and enemies alike, every map): the models read as
+ * standing in the tile rather than floating on its plane. */
+const STAND_SINK = 0.08;
+
 /** Standing height of a world point (tile top incl. raised devices); 0 off-grid / without a stage. */
 export function groundZ(ctx, x, y) {
   if (!ctx.heightAt) return 0;
@@ -1122,6 +1126,8 @@ export class UnitView {
 
   _buildHud() {
     const P = this.P, h = this.hud;
+    // official bars: a soft drop shadow behind the HP (+ SP) bars
+    this.barShadow = bar(P, h, 0x000000, 0.32); this.barShadow.visible = false;
     this.hpBg = bar(P, h, COLORS.hpBack, 1);
     this.hpGhost = bar(P, h, COLORS.hpGhost, 0.9);
     this.hpFill = bar(P, h, this.isEnemy ? (this.isBoss ? COLORS.hpBoss : COLORS.hpEnemy) : COLORS.hpAlly);
@@ -1938,7 +1944,7 @@ export class UnitView {
     if (Math.abs(this.waterSink - sinkTo) < .001) this.waterSink = sinkTo;
     this.placed = true;
     const visualX = this.x + (this.bossArea?.dx || 0);
-    const p = cam.project(visualX, this.y, this.z + this.hover + this.lift + this.waterSink, this.screen);
+    const p = cam.project(visualX, this.y, this.z - STAND_SINK + this.hover + this.lift + this.waterSink, this.screen);
     const s = p.s;
     // State effects follow the projected unit, including flying height, rather than the camera.
     const visualStates = this._iconKeys(Infinity).filter(k=>['freeze','cold','burn','poison','shield','refraction','stealth','stun','sleep','invuln','bind','slow','silence','fear','fragile','weaken','healFree','neural','necrosis'].includes(k));
@@ -2056,7 +2062,7 @@ export class UnitView {
     this.lunge = Math.max(0, this.lunge - dt * 5);
     const lx = this.lungeDir.x * lungeK, ly = this.lungeDir.y * lungeK;
     let bx = p.x, by = p.y;
-    if (lungeK) { const q = cam.project(this.x + lx, this.y + ly, this.z + this.hover + this.lift + this.waterSink, LG_P); bx = q.x; by = q.y; }
+    if (lungeK) { const q = cam.project(this.x + lx, this.y + ly, this.z - STAND_SINK + this.hover + this.lift + this.waterSink, LG_P); bx = q.x; by = q.y; }
     this.root.position.set(bx, by);
     if(this.corrosionFx){this.corrosionFx.visible=this.corrosionStacks>0&&this.alive&&!this.down;this.corrosionFx.scale.set(s/100);this.corrosionFx.alpha=.8+.12*Math.sin(t*2);}
     if(this.noteFx){this.noteFx.visible=this.noteStacks>0&&this.alive&&!this.down;this.noteFx.scale.set(s/100);this.noteFx.alpha=.85+.1*Math.sin(t*1.8);if(this.noteClef)this.noteClef.y=-12-3*Math.sin(t*1.8);}
@@ -2282,7 +2288,7 @@ export class UnitView {
     });
     this.screen.top = by - headTiles * s;
     // the boss HUD `hudDx` tiles beside the model, where the official prefab puts it (BOSS_HUD_DX)
-    const hx = this.hudDx ? cam.project(this.x + this.hudDx, this.y, this.z + this.hover + this.lift, HUD_P).x : bx;
+    const hx = this.hudDx ? cam.project(this.x + this.hudDx, this.y, this.z - STAND_SINK + this.hover + this.lift, HUD_P).x : bx;
     this._feetY = by;
     this._updateHud(dt, s, hx, by - headTiles * s, alpha, t);
   }
@@ -2467,6 +2473,15 @@ export class UnitView {
     }
     const wolfH = this._updateWolfPips(showBars && !this.isEnemy && !!this.wolves, x0, gaugeTop + energyH, s);
     const coinH = this._updateCoins(showBars && !this.isEnemy && !!this.coins, x0, gaugeTop + energyH + wolfH, s);
+    if (this.barShadow) {
+      const shadowH = (showHp ? bh : 0) + (showSp ? spH : 0);
+      this.barShadow.visible = off && shadowH > 0;
+      if (this.barShadow.visible) {
+        const top = showHp ? cy - bh / 2 : sy - spH / 2;
+        this.barShadow.position.set(x0 - 0.5 + s * 0.012, top + shadowH / 2 + s * 0.016);
+        this.barShadow.width = bw + 1; this.barShadow.height = shadowH + 1;
+      }
+    }
     this._updateElementBar(showBars && !!this.el, x0, bw, gaugeTop + energyH + wolfH + coinH + 1, spH, s, t, off ? { x: x0, y: cy - s * OFFICIAL_BARS.elementAbove } : null);
     this._updateDownRing(!prep && !!this.down && !this.alive, x, this.screen.y - DOWN_LOOK.height * s, s, t);
     // blocked marker at the feet (enemies held by a blocker)
@@ -3085,7 +3100,7 @@ const HUD_P = { x: 0, y: 0, s: 0, depth: 0 };
 const ICON_TMP = [];
 /** 设置「HP 바 표시 방식」 official: the client's bar colours (read off its battle screens): operator HP light blue, SP
  *  yellow-green charging / amber while the skill runs, enemy HP orange, a leader's (悬赏 leaders, the bosses) red on grey. */
-const OFFICIAL_BARS = Object.freeze({ elementAbove: 0.28, width: 0.9, fixedBossWidth: 4, hpH: 0.042, leaderH: 0.06, belowFeet: 0.28,
+const OFFICIAL_BARS = Object.freeze({ elementAbove: 0.28, width: 0.82, fixedBossWidth: 4, hpH: 0.05, leaderH: 0.068, belowFeet: 0.2,
   ally: 0x6cb2d2, sp: 0x8aa43f, skill: 0xc3991c, overload: 0xb04516, enemy: 0xd46c3a, leader: 0xcf2a33, back: 0x1c1c1c, leaderBack: 0x7d8088 });
 
 /**
