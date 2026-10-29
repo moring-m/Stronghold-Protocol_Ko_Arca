@@ -93,7 +93,7 @@ import { FORMS } from '../../../shared/animationForms.js';
 import { skillVisualTheme } from './skillVisualTheme.js';
 import { UF, ANIM } from '../../../shared/constants.js';
 import { SpineActor } from './spine.js';
-import { diamondTexture, shadowTexture, fxAtlas, tierChip, statusTexture, itemTexture, hudRings, ringArc, HUD_DISC, ELEMENT_RING, stealthMistTexture, downLabel } from './textures.js';
+import { diamondTexture, shadowTexture, fxAtlas, tierChip, statusTexture, itemTexture, hudRings, ringArc, thickRingArc, HUD_DISC, ELEMENT_RING, stealthMistTexture, downLabel } from './textures.js';
 import { COLORS, TIER_COLORS, ENEMY_FRAME, UNIT, PROJ, STAND_DROP, statusIconKey, statusIconSuppressed } from './style.js';
 import { drawCrate, rowDepthKey, ROW_KEY, deviceBoxOf, DEVICE_BOX } from './tiles.js';
 
@@ -2735,9 +2735,10 @@ export class UnitView {
       r.disc.texture = (this.isEnemy ? tex.discEnemy : tex.disc)[this.el] || tex.disc.burn;
       r.disc.width = r.disc.height = d / HUD_DISC;
       r.disc.position.set(at.x, at.y);
-      r.ring.texture = ringArc(clamp(k, 0, 1));
-      r.ring.tint = (ELEMENT_RING[this.el] || ELEMENT_RING.burn).tint;
-      r.ring.width = r.ring.height = d * 1.35 / HUD_DISC;
+      // the client's gauge: a thick arc right around the icon in a near-white tint of the element's colour
+      r.ring.texture = thickRingArc(clamp(k, 0, 1));
+      r.ring.tint = lightTint((ELEMENT_RING[this.el] || ELEMENT_RING.burn).tint, 0.6);
+      r.ring.width = r.ring.height = d / HUD_DISC;
       r.ring.position.set(at.x, at.y);
       r.ring.visible = k > 0;
       r.disc.alpha = this.elementCooling() ? EL_BAR.pulse + (1 - EL_BAR.pulse) * (0.5 + 0.5 * Math.cos(t * Math.PI * 2 * EL_BAR.pulseHz)) : 1;
@@ -3119,6 +3120,8 @@ export class UnitView {
 const SH_P = { x: 0, y: 0, s: 0, depth: 0 };
 const FA_P = { x: 0, y: 0, s: 0, depth: 0 };
 const FA_C = { x: 0, y: 0, s: 0, depth: 0 };
+/** `tint` mixed toward white by `k` (0 = the colour, 1 = white). */
+const lightTint = (tint, k) => { const m = (v) => Math.round(v + (255 - v) * k); return (m((tint >> 16) & 255) << 16) | (m((tint >> 8) & 255) << 8) | m(tint & 255); };
 /** The deploy-direction mark: ring radius, the orange arc's half-angle, the arrowhead's reach past the ring (tiles) and
  * its base half-angle (radians). */
 const FACING = Object.freeze({ r: 0.36, arc: Math.PI / 4, tip: 0.15, head: 0.3 });
