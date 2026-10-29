@@ -1563,7 +1563,8 @@ export async function createFieldView(host, options = {}) {
   function syncLeaderHits() {
     if (!tiles) return;
     const on = !!leader && !leaderHidden && mode === 'prep' && prepXf.kind === 'bossPrep' && [...hlReq.keys()].some((g) => RANGE_GROUPS.has(g));
-    if (on) tiles.setHighlights(leader.stand.tiles, LEADER_HIT_STYLE, LEADER_HIT_STYLE.group);
+    // (the official marks: the boss's tiles as red sliding bands, like a range)
+    if (on) tiles.setHighlights(leader.stand.tiles, LEADER_HIT_STYLE, LEADER_HIT_STYLE.group, { stripes: true, stripeColor: 0xe0302a });
     else tiles.clearHighlights(LEADER_HIT_STYLE.group);
   }
   /** The leader under a canvas point (its drawn body or hit area, like a battle enemy), or null. */

@@ -217,3 +217,8 @@ export const UNIT = Object.freeze({
   barWidth: 0.64,
   bossBarWidth: 2.2,
 });
+
+/** Units stand a little below the tile's centre on screen (operators and enemies alike, every map), as the client draws
+ * them: the feet about 0.16 of a tile under the projected centre (measured on its battle screen). The official effects
+ * on a unit follow the same point (vfx/wiring.js pose). */
+export const STAND_DROP = 0.16;

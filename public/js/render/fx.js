@@ -507,10 +507,14 @@ export class FxSystem {
 
   _proj(x, y, z, out = this._p) { return this.ctx.cam().project(x, y, z, out); }
 
-  /** Ground decals: on a raised top they are drawn with that block row (tiles.surfaceLayer), else in groundFx. */
-  _onGround(sp, y, z) {
+  /**
+   * Ground decals: on a raised top they are drawn with that block row (tiles.surfaceLayer), else in groundFx. A decal
+   * wider than its tile (radius `r` past half a tile) stays in groundFx: that row's layer would draw it over the units
+   * standing on the rows behind.
+   */
+  _onGround(sp, y, z, r = 0) {
     let layer = this.ctx.layers.groundFx;
-    if (z > 0.12 && this.ctx.surfaceLayer) layer = this.ctx.surfaceLayer(Math.round(y)) || layer;
+    if (z > 0.12 && r <= 0.55 && this.ctx.surfaceLayer) layer = this.ctx.surfaceLayer(Math.round(y)) || layer;
     if (sp.parent !== layer) layer.addChild(sp);
   }
 
@@ -1146,7 +1150,7 @@ export class FxSystem {
       const fade = Math.min(1, F.t / 0.12, (F.end - F.t) / FLAME_FADE);
       const flick = 0.82 + 0.18 * Math.sin(F.t * 23 + F.seed) * Math.sin(F.t * 7.3);
       // burning disc on the ground around the target
-      this._onGround(F.disc, F.y, F.z); this._onGround(F.edge, F.y, F.z);
+      this._onGround(F.disc, F.y, F.z, F.r); this._onGround(F.edge, F.y, F.z, F.r);
       cam.project(F.x, F.y, F.z + 0.02, p);
       cam.project(F.x, F.y + F.r, F.z + 0.02, q);
       const cx = p.x, cy = p.y, s = p.s;
@@ -2218,7 +2222,7 @@ export class FxSystem {
     disc.anchor.set(0.5); disc.blendMode = P.BLEND_MODES.ADD; disc.tint = tint;
     const edge = new P.Graphics();
     edge.blendMode = P.BLEND_MODES.NORMAL;
-    this._onGround(disc, y, z); this._onGround(edge, y, z);
+    this._onGround(disc, y, z, r); this._onGround(edge, y, z, r);
     const zn={disc,edge,x,y,z,r,tint,t:0,dur,warn,...options};this.zones.push(zn);
     if (this.zones.length > 24) this._freeZone(this.zones.shift());
     return zn;
@@ -2236,7 +2240,7 @@ export class FxSystem {
       zn.r+=Math.max(0,zn.grow||0)*dt;zn.x+=(zn.vx||0)*dt;zn.y+=(zn.vy||0)*dt;
       if(zn.bounds){zn.x=clamp(zn.x,zn.bounds.c0,zn.bounds.c1);zn.y=clamp(zn.y,zn.bounds.r0,zn.bounds.r1);}
       zn.z=this._groundZ(zn.x,zn.y);
-      this._onGround(zn.disc,zn.y,zn.z);this._onGround(zn.edge,zn.y,zn.z);
+      this._onGround(zn.disc,zn.y,zn.z,zn.r);this._onGround(zn.edge,zn.y,zn.z,zn.r);
       if(zn.themeInfo){zn.theme=skillRangeStyle(zn.themeInfo);zn.tint=zn.theme.color;zn.disc.tint=zn.tint;}
       const k = zn.t / zn.dur;
       const grow = Math.min(1, zn.t / 0.25);

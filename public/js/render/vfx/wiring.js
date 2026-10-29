@@ -54,6 +54,7 @@ import { costumeFor, costumeSkin, costumeEffect, costumeProjectile, costumePrelo
 import { GROUND_SPAWNS } from './effect.js';
 import { SkillFx, fitsAttack, pickGroup, formMode } from './skillfx.js';
 import { TalentFx } from './talentfx.js';
+import { STAND_DROP } from '../style.js';
 import { FunnelFx } from './funnelfx.js';
 import { YuWall, YU_WALL_SOURCE } from './yuwall.js';
 import { formModes } from './talents.js';
@@ -456,7 +457,19 @@ export class FxWiring {
    * BoneFollower points) and the camera's tilt (the plane the drawn model faces).
    */
   pose(v) {
-    return { x: v.x, y: v.y, z: (v.z || 0) + (v.hover || 0), left: (v.visFacing ?? v.facing ?? 1) < 0, back: typeof v._wantsBack === 'function' ? !!v._wantsBack() && !!v.entryBack : false, view: v, tilt: this._camTilt() };
+    const standShift = this._standShift(v);
+    return { x: v.x, y: v.y - standShift, standShift, z: (v.z || 0) + (v.hover || 0), left: (v.visFacing ?? v.facing ?? 1) < 0, back: typeof v._wantsBack === 'function' ? !!v._wantsBack() && !!v.entryBack : false, view: v, tilt: this._camTilt() };
+  }
+
+  /**
+   * How far toward the camera (board rows) a unit's effects move so they sit on its drawn feet: the models stand
+   * STAND_DROP of a tile under the tile's projected centre (units.js), on screen.
+   */
+  _standShift(v) {
+    const c = typeof this.ofx?.ctx?.cam === 'function' ? this.ofx.ctx.cam() : null;
+    if (!c?.project || !v?.info || !Number.isFinite(v.x) || !Number.isFinite(v.y)) return 0;
+    const z = v.z || 0, a = c.project(v.x, v.y, z), ay = a.y, s = a.s, by = c.project(v.x, v.y - 1, z).y;
+    return Math.abs(by - ay) > 1e-6 && s > 0 ? (s * STAND_DROP) / (by - ay) : 0;
   }
 
   /** The battle camera's tilt (degrees from straight down), or undefined (mounts.js SKELETON_TILT). */
@@ -686,7 +699,8 @@ export class FxWiring {
     const areaScale=effectArtScale(lc(key),k);
     const effectScale=typeof o.scale==='function'?()=>o.scale()*areaScale:o.scale!=null?o.scale*areaScale:areaScale!==1?areaScale:undefined;
     const ground = P.onGround ? effectGroundHeight(P.spawn, v, k) : (v.z || 0);
-    if (P.onGround) pos[2] = -ground;
+    // (a ground effect keeps the tile: only what stands on the unit follows its drawn feet)
+    if (P.onGround) { pos[2] = -ground; pos[1] += pose.standShift || 0; }
     const place = { pos, scale: typeof effectScale === 'function' ? effectScale() : effectScale, groundZ: -ground, yaw: 0, mirror: false, flipY: false, mountRot: null, rootRot: null };
     this._rotate(P, place, skin, pose);
     this._orient(def, place, pose, o, v);
@@ -745,12 +759,12 @@ export class FxWiring {
         const ground = G.onGround ? effectGroundHeight(G.spawn, v, fx.def?.key || k) : (v.z || 0);
         if (G.follow) {
           mountPoint(skin, G.follow.mount, p, fx.anchor);
-          if (G.onGround) fx.anchor[2] = -ground;
+          if (G.onGround) { fx.anchor[2] = -ground; fx.anchor[1] += p.standShift || 0; }
           fx.groundZ = -ground;
           if (Q.rotFollow && Q.loaded) fx.mountRot = mountRotation(skin, Q.rotKind, p, fx.mountRot || [0, 0, 0, 1]);
         } else if (stick && v.alive !== false) {
           const sp = spawnPoint(skin, G.spawn, p);
-          fx.anchor[0] = sp[0]; fx.anchor[1] = sp[1]; fx.anchor[2] = G.onGround ? -ground : sp[2];
+          fx.anchor[0] = sp[0]; fx.anchor[1] = sp[1] + (G.onGround ? p.standShift || 0 : 0); fx.anchor[2] = G.onGround ? -ground : sp[2];
           const offset=aromaOriginOffset(fx.def?.key || k,this._facing(v), G.spawn);fx.anchor[0]+=offset[0];fx.anchor[1]+=offset[1];
           fx.groundZ = -ground;
         } else if ((P.keep || Q.keep) && v.alive !== false) {
@@ -1720,8 +1734,12 @@ export class FxWiring {
    * themselves, undefined when it has none.
    */
   ownShieldKey(v) {
-    const uk = this.unitKeyOf(v);
-    if (!uk || !(uk in OWN_SHIELDS)) return undefined;
+    // the unit key, else its character / model id (a recruit chess or a skin names the same character), exact or as a
+    // prefix (char_4065_judge_epoque#33 → char_4065_judge)
+    const rec = v?.info ? this.opts.record?.(v.info) : null;
+    const ids = [this.unitKeyOf(v), rec?.charId, v?.info?.charId, v?.info?.spine, this.unitOf(v)?.charId].filter((x) => typeof x === 'string' && x).map(lc);
+    const uk = Object.keys(OWN_SHIELDS).find((k) => ids.some((id) => id === k || id.startsWith(`${k}_`) || id.startsWith(`${k}#`)));
+    if (!uk) return undefined;
     const base = OWN_SHIELDS[uk];
     if (!base) return null;
     const skin = /_([a-z]+)_(\d+)$/.exec(String(this.unitOf(v)?.skin || ''));

@@ -205,12 +205,12 @@ function drawLegacyStripes(g, cam, r, c, z, inset, lw, p) {
   g.lineStyle(0);
 }
 
-function drawStripes(g, cam, r, c, z, inset, phase, p) {
+function drawStripes(g, cam, r, c, z, inset, phase, p, color = RANGE_STRIPE.color) {
   g.lineStyle(0);
   for (const band of stripeBands(r, c, inset, phase)) {
     const pts = [];
     for (const [x, y] of band) { cam.project(x, y, z, p); pts.push(p.x, p.y); }
-    g.beginFill(RANGE_STRIPE.color, RANGE_STRIPE.alpha); g.drawPolygon(pts); g.endFill();
+    g.beginFill(color, RANGE_STRIPE.alpha); g.drawPolygon(pts); g.endFill();
   }
 }
 
@@ -557,7 +557,7 @@ export class TileField {
    */
   setHighlights(tiles, style = 'range', group, opts) {
     let st = typeof style === 'object' && style ? { ...HL_STYLES.range, ...style } : (HL_STYLES[style] || HL_STYLES.range);
-    if (opts && opts.stripes) st = { ...st, stripes: true };
+    if (opts && opts.stripes) st = { ...st, stripes: true, ...(opts.stripeColor != null ? { stripeColor: opts.stripeColor } : {}) };
     const key = group || (typeof style === 'object' && style?.group) || (typeof style === 'string' ? style : 'custom');
     const list = [];
     if (Array.isArray(tiles)) {
@@ -592,7 +592,7 @@ export class TileField {
       for (const [r, c] of tiles) {
         if (official && style.stripes) {
           this._stripesLive = true;
-          drawStripes(this.hlStripeGfx, cam, r, c, 0.012, inset, -((this.time * RANGE_STRIPE.speed) % RANGE_STRIPE.step), p);
+          drawStripes(this.hlStripeGfx, cam, r, c, 0.012, inset, -((this.time * RANGE_STRIPE.speed) % RANGE_STRIPE.step), p, style.stripeColor);
           continue;
         }
         const h = this.heightAt(r, c);
@@ -618,7 +618,7 @@ export class TileField {
         g.beginFill(style.color, style.fill);
         g.drawPolygon(pts);
         g.endFill();
-        if (style.stripes && !this.external) drawLegacyStripes(g, cam, r, c, z, inset, Math.max(1.5, sc * 0.05), p);
+        if (style.stripes && !style.stripeColor && !this.external) drawLegacyStripes(g, cam, r, c, z, inset, Math.max(1.5, sc * 0.05), p);
       }
     }
   }

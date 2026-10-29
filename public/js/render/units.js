@@ -94,7 +94,7 @@ import { skillVisualTheme } from './skillVisualTheme.js';
 import { UF, ANIM } from '../../../shared/constants.js';
 import { SpineActor } from './spine.js';
 import { diamondTexture, shadowTexture, fxAtlas, tierChip, statusTexture, itemTexture, hudRings, ringArc, HUD_DISC, ELEMENT_RING, stealthMistTexture, downLabel } from './textures.js';
-import { COLORS, TIER_COLORS, ENEMY_FRAME, UNIT, PROJ, statusIconKey, statusIconSuppressed } from './style.js';
+import { COLORS, TIER_COLORS, ENEMY_FRAME, UNIT, PROJ, STAND_DROP, statusIconKey, statusIconSuppressed } from './style.js';
 import { drawCrate, rowDepthKey, ROW_KEY, deviceBoxOf, DEVICE_BOX } from './tiles.js';
 
 // Art-directed operator colours, shared by skins; unknown operators use a
@@ -553,9 +553,6 @@ export function placeOnGround(ctx, obj, fallback, y, z) {
   if (obj.parent !== layer) layer.addChild(obj);
 }
 
-/** Units stand a little below the tile's centre on screen (operators and enemies alike, every map), as the client
- * draws them: the feet about 0.16 of a tile under the projected centre (measured on the client's battle screen). */
-const STAND_DROP = 0.16;
 
 /** Standing height of a world point (tile top incl. raised devices); 0 off-grid / without a stage. */
 export function groundZ(ctx, x, y) {
@@ -2091,7 +2088,7 @@ export class UnitView {
 
     this.snowFx.clear();
     if(this.alive && this.snowTiles.length){
-      placeOnGround(this.ctx,this.snowFx,this.ctx.layers.groundFx,this.y,this.z);
+      placeOnGround(this.ctx,this.snowFx,this.ctx.layers.groundFx,this.y,0);   // (the marks lie on the ground)
       for(const [r,c,n] of this.snowTiles){
         this.snowFx.lineStyle(Math.max(.6,s*.009),0xcceeff,.5);
         this.snowFx.beginFill(0xc5e9ff,Math.min(.35,.09+n*.04));
@@ -2158,23 +2155,35 @@ export class UnitView {
     }
     if(this.attackRange){
       const g=this.attackRange,r=Number(this.info.rangeRadius);g.clear();g.visible=this.ctx.settings?.unitRanges !== false && this.alive&&!this.down && !((this.ctx.officialFor?.(this) ?? this.ctx.ofx?.active) && /emppnt/.test(this.info.spine||this.info.defId||''));
+      for(const row of this.attackRangeRows?.values()||[]){row.clear();row.visible=false;}
       if(g.visible){
-        placeOnGround(this.ctx,g,this.ctx.layers.groundFx,this.y,this.z);
+        placeOnGround(this.ctx,g,this.ctx.layers.groundFx,this.y,0);
+        // on a raised top the outline lies at that height: each stretch goes with the block row it crosses (that row's
+        // surface layer), not all of it with the unit's own row, which would draw it over units standing behind
+        const raised=this.z>RAISED_Z;let line=null;
+        const rowOf=(y)=>{
+          if(!raised)return g;
+          const key=Math.round(y);let rg=(this.attackRangeRows||=new Map()).get(key);
+          if(!rg){rg=new this.P.Graphics();this.attackRangeRows.set(key,rg);}
+          if(!rg.visible){rg.visible=true;placeOnGround(this.ctx,rg,this.ctx.layers.groundFx,key,this.z);if(line)rg.lineStyle(...line);}
+          return rg;
+        };
+        const style=(...a)=>{line=a;g.lineStyle(...a);for(const rg of this.attackRangeRows?.values()||[])if(rg.visible)rg.lineStyle(...a);};
         const segment=(x0,y0,x1,y1)=>{
           const p=clipRangeSegment(this.ctx.rangeRect?.(),x0,y0,x1,y1);
           if(!p)return;
           const a=cam.project(p[0],p[1],this.z+.015),b=cam.project(p[2],p[3],this.z+.015);
-          g.moveTo(a.x,a.y);g.lineTo(b.x,b.y);
+          const rg=rowOf((p[1]+p[3])/2);rg.moveTo(a.x,a.y);rg.lineTo(b.x,b.y);
         };
         if(this.info.hitArea){
           const a=this.info.hitArea,x=this.x+(a.dx||0),y=this.y+(a.dy||0);
           const points=[[x-a.w/2,y-a.h/2],[x+a.w/2,y-a.h/2],[x+a.w/2,y+a.h/2],[x-a.w/2,y+a.h/2]];
-          g.lineStyle(2,0xff9c33,.8*alpha);
+          style(2,0xff9c33,.8*alpha);
           for(let i=0;i<4;i++)segment(...points[i],...points[(i+1)%4]);
         }else{
           const drone=/emppnt|ursus_drone/.test(this.info.spine||this.info.defId||'');
           const color=drone&&this.info.side==='enemy'?0xff654a:0x4ed8af;
-          g.lineStyle(1.5,color,(drone?.95:.65)*alpha);
+          style(1.5,color,(drone?.95:.65)*alpha);
           for(let i=0;i<96;i++){
             const a=i/96*Math.PI*2,b=(i+1)/96*Math.PI*2;
             segment(this.x+Math.cos(a)*r,this.y+Math.sin(a)*r,this.x+Math.cos(b)*r,this.y+Math.sin(b)*r);
@@ -3094,6 +3103,7 @@ export class UnitView {
     this._dropActor();
     this.shadow.destroy();
     if(this.attackRange)this.attackRange.destroy();
+    for(const row of this.attackRangeRows?.values()||[])row.destroy();this.attackRangeRows?.clear();
     this.snowFx?.destroy();
     if(this.skillZone)this.skillZone.destroy();
     for(const extra of this.skillZoneExtra.values())extra.destroy();this.skillZoneExtra.clear();
