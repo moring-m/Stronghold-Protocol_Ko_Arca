@@ -2083,7 +2083,7 @@ export class UnitView {
     placeOnGround(this.ctx, this.shadow, this.ctx.layers.shadow, this.y, shz);
     const sh = cam.project(visualX, this.y, shz, SH_P);
     this.shadow.position.set(sh.x, sh.y + s * STAND_DROP);   // under the feet (STAND_DROP)
-    const shw = s * (this.isBoss ? 1.6 : 0.95) / this.shadow.texture.width;
+    const shw = s * (this.isBoss ? 1.35 : 0.78) / this.shadow.texture.width;
     this.shadow.scale.set(shw, shw * (this.shadow.texture === shadowTexture() ? 1 : 1.05));
     this.shadow.alpha = this.ctx.settings?.shadows === false ? 0 : 0.5 * alpha * (this.lift > 0 ? 0.6 : 1);
 
@@ -2378,14 +2378,18 @@ export class UnitView {
     const neg = showHp ? this.neg : 0;
     this.negFill.visible = neg > 0;
     if (neg > 0) { this.negFill.position.set(x0, cy); this.negFill.width = bw * neg; this.negFill.height = bh; }
+    // the shield inside the HP bar, as the client draws it: a pale segment right after the HP fill; HP + shield past
+    // the max HP rescales the bar to their sum
     const shielded = showHp && this.shieldHp > 0;
     this.shieldBar.visible = !!shielded;
     if (shielded) {
-      const shieldH = Math.max(1.5, bh * 0.35);
-      // Sprite bars use a centred vertical anchor: leave a full pixel above the black HP frame.
-      this.shieldBar.position.set(x0, cy - (bh + 2) / 2 - 1 - shieldH / 2);
-      this.shieldBar.width = bw * clamp(this.shieldHp / this.maxHp, 0, 1);
-      this.shieldBar.height = shieldH;
+      const total = Math.max(this.maxHp, this.hp + this.shieldHp) || 1;
+      const hpW = bw * clamp(this.hp / total, 0, 1);
+      this.hpFill.width = hpW;
+      this.shieldBar.position.set(x0 + hpW, cy);
+      this.shieldBar.width = bw * clamp(this.shieldHp / total, 0, 1);
+      this.shieldBar.height = bh;
+      this.shieldBar.tint = 0xe6eef2; this.shieldBar.alpha = 0.92;
     }
     // SP
     const ammo = !this.isEnemy ? (this.ammo || ((this.flags & UF.SKILL) && this.ammoMax > 0 ? [this.ammoLeft, this.ammoMax] : null)) : null;
@@ -2481,8 +2485,8 @@ export class UnitView {
       this.barShadow.forEach((b, i) => {
         b.visible = off && shadowH > 0;
         if (!b.visible) return;
-        // measured on the client: a ~0.02-tile soft band, darkest just under and right of the bar
-        const pad = s * [0.02, 0.012, 0.006][i], ox = s * 0.006, oy = s * 0.008;
+        // measured on the client: a ~0.02-tile soft band centred on the bar
+        const pad = s * [0.02, 0.012, 0.006][i], ox = 0, oy = 0;
         b.position.set(x0 - pad + ox, top + shadowH / 2 + oy); b.width = bw + pad * 2; b.height = shadowH + pad * 2;
       });
     }
@@ -3184,6 +3188,7 @@ export class ItemView {
     const lifted = this.lift > 0;
     const p = cam.project(this.x, this.y, lifted ? this.z : this.z + this.lift + 0.12 + Math.sin(t * 2 + this.bob) * 0.03, this.screen);
     this.placed = true;
+    if (!lifted) p.y += p.s * STAND_DROP;   // on the ground: the units' standing height (STAND_DROP)
     this.root.position.set(p.x, p.y);
     this.root.zIndex = unitDepthKey(cam, this.x, this.y, this.lift);
     const size = p.s * 0.62;
@@ -3192,8 +3197,8 @@ export class ItemView {
     this.root.alpha = this.dimmed ? 0.35 : 1;
     placeOnGround(this.ctx, this.shadow, this.ctx.layers.shadow, this.y, this.z);
     const sh = cam.project(this.x, this.y, this.z, SH_P);
-    this.shadow.position.set(sh.x, sh.y);
-    this.shadow.scale.set((p.s * 0.55) / this.shadow.texture.width);
+    this.shadow.position.set(sh.x, sh.y + sh.s * STAND_DROP);
+    this.shadow.scale.set((p.s * 0.48) / this.shadow.texture.width);
     this.shadow.alpha = 0.35;
     this.screen.top = lifted ? p.y - size / 2 : p.y - size;
   }

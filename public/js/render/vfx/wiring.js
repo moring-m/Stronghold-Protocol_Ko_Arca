@@ -262,6 +262,13 @@ export function pickAttacks(a, kind, seed = 0, depth = 0, nth = 0, mem = null) {
  * @param {string} facing 'UP' | 'DOWN' | 'LEFT' | 'RIGHT'
  * @param {boolean} [variantsOnly]
  */
+/** Model id fragment → that unit's own shield prefab (fx index prefabs; a skin variant `<key>_<skin>#<n>` wins). */
+const OWN_SHIELDS = Object.freeze([
+  ['judge', 'judge_shield_all_01'], ['chen3', 'chen3_shield_buff_01'], ['svash2', 'svash2_skill_01_shield_01'],
+  ['catsld', 'token_cathy_catsld_shield_01'], ['achunt', 'enemy_achunt_shield'], ['actrpa', 'enemy_actrpa_shield'],
+  ['actrpb', 'enemy_actrpb_shield'], ['actrpc', 'enemy_actrpc_shield'], ['cbshld', 'enemy_cbshld_shield_01'],
+  ['crshd', 'enemy_crshd_shield_01'], ['duskld', 'enemy_duskld_shield'],
+]);
 const STATUS_FLAGS = [[UF.SHIELD,'shield'],[UF.INVULN,'invulnerable'],[UF.STEALTH,'stealth'],[UF.FROZEN,'freeze'],[UF.STUNNED,'stun'],[UF.SLEEP,'sleep'],[UF.COLD,'cold']];
 
 // Mode names as the prefabs spell them: S3, Sk3 (信仰搅拌机, 谬因), s3 (卡涅利安, 艾雅法拉 the 2nd, 凯尔希 the 2nd), default
@@ -1686,12 +1693,26 @@ export class FxWiring {
     if (!on) { if (prev) { prev.stop(); this.loops.delete(slot); } return !!prev; }
     if (!this.ofx.active) return false;
     if (prev && prev.alive) return true;
-    const key = this.statusKey(name);
+    const key = (name === 'shield' && this.ownShieldKey(v)) || this.statusKey(name);
     if (!key) return false;
     this.skills.status(v, lc(key));
     const h = this.playOn(key, v, { follow: true, loop: true, important: true, depthOwner:v });
     if (h) this.loops.set(slot, h);
     return !!h;
+  }
+
+  /**
+   * A unit's own shield prefab, where the client authors one (its skin's variant first): 斥罪's barrier, 赤霄·陈's
+   * shield buff, 维什戴尔's … — the generic common_shield_01 otherwise. Keyed by the unit's model (char / token / enemy).
+   */
+  ownShieldKey(v) {
+    const u = this.unitOf(v) || v;
+    const model = lc(String(u?.spine || v?.info?.spine || u?.defId || v?.info?.defId || ''));
+    const base = model && OWN_SHIELDS.find(([m]) => model.includes(m))?.[1];
+    if (!base) return null;
+    const skin = /_([a-z]+)_(\d+)$/.exec(String(u?.skin || ''));
+    for (const k of [skin && `${base}_${skin[1]}#${skin[2]}`, base]) if (k && this.ofx.lib.has(lc(k))) return lc(k);
+    return null;
   }
 
   /** Resolve the official prefab of a standard status; custom debuffs have no entry. */

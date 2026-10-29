@@ -35,7 +35,7 @@ import { t } from '../../../shared/i18n.js';
 
 import { useRef, useState } from '../../vendor/hooks.module.js';
 import { PHASE } from '../../../shared/constants.js';
-import { html, Button, Icon, PingPill, Countdown, Tooltip, MicroLabel, DifficultyTag, Modal, useTicker } from './components.js';
+import { html, Button, Icon, PingPill, FpsPill, Countdown, Tooltip, MicroLabel, DifficultyTag, Modal, useTicker } from './components.js';
 import { Sprite, LpTower, GIcon, LocalSprite } from './gameComponents.js';
 import { data, localAsset } from '../data.js';
 import { uiUrl } from './assetUrls.js';
@@ -471,6 +471,7 @@ export function currentPlayerLp(pub, priv, playerId) {
 export function TopBar({ battleEnd = null, pub, priv, conn, hud, total, drawer, onExit, onDrawer, onReady, readyBusy, readyCount, playerCount, pen = false, penAvail = false, onPen = () => {},
   config = null, frozenAt = null, pause = null, live = null, spectator = false,
   spectators = null, myId = null, isHost = false, onRemoveSpectator = null, watchedPlayerId = null, liveTeamLp = null, room = null }) {
+  const showFps = useSettings().showFps === true;
   const phase = pub?.phase;
   const boss = isBossPhase(phase);
   const playerId = spectator ? watchedPlayerId : myId;
@@ -505,6 +506,7 @@ export function TopBar({ battleEnd = null, pub, priv, conn, hud, total, drawer, 
       <div class="gtop__meta">
         <div class="gtop__net">
           <${PingPill} ms=${conn?.ping} online=${conn?.status === 'online'} />
+          ${showFps ? html`<${FpsPill} />` : null}
           <${SpectatorPill} spectators=${spectators} myId=${myId} isHost=${isHost} onRemove=${onRemoveSpectator} />
         </div>
         <div class="gtop__mode">${pub?.laboratory?html`<span class="t-mint">실험실</span>`:pub?.difficulty ? html`<${DifficultyTag} difficulty=${pub.difficulty} size="sm" />` : null}
