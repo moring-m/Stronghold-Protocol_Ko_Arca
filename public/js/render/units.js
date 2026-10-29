@@ -2392,7 +2392,8 @@ export class UnitView {
       this.shieldBar.tint = 0xe6eef2; this.shieldBar.alpha = 0.92;
     }
     // SP
-    const ammo = !this.isEnemy ? (this.ammo || ((this.flags & UF.SKILL) && this.ammoMax > 0 ? [this.ammoLeft, this.ammoMax] : null)) : null;
+    // 琳琅诗怀雅's skill purse reads as ammo (segments in the SP bar), as the client shows it
+    const ammo = !this.isEnemy ? (this.ammo || ((this.flags & UF.SKILL) && this.ammoMax > 0 ? [this.ammoLeft, this.ammoMax] : null) || (Array.isArray(this.coins) && this.coins[1] > 0 ? this.coins : null)) : null;
     const showSp = showBars && !this.isEnemy && (this.spMax > 0 || !!ammo);
     this.spBg.visible = this.spFill.visible = showSp;
     this.ammoDividers.clear(); this.ammoDividers.visible = showSp && !!ammo;
@@ -2478,7 +2479,7 @@ export class UnitView {
       this.energyText.position.set(x0 + this.energyText.width / 2, gaugeTop + energyH / 2);
     }
     const wolfH = this._updateWolfPips(showBars && !this.isEnemy && !!this.wolves, x0, gaugeTop + energyH, s);
-    const coinH = this._updateCoins(showBars && !this.isEnemy && !!this.coins, x0, gaugeTop + energyH + wolfH, s);
+    const coinH = this._updateCoins(false, x0, gaugeTop + energyH + wolfH, s);   // the purse is the SP bar's ammo now
     if (this.barShadow) {
       const shadowH = (showHp ? bh : 0) + (showSp ? spH : 0);
       const top = showHp ? cy - bh / 2 : sy - spH / 2;
