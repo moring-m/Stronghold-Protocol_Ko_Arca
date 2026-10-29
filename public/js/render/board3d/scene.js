@@ -600,7 +600,7 @@ export class BoardScene {
       const scratch=Object.assign(Object.create(Object.getPrototypeOf(this)),this,{
         root:new this.THREE.Group(),key:this.key.clone(),hemi:this.hemi.clone(),
         stage:null,stageKey:null,activeLayoutKey:null,meshes:{},lightmapMaterials:[],lightmapTextures:{},
-        layoutCache:new Map(),layoutCacheSize:0,staticCrates:[],destroyed:false,
+        layoutCache:new Map(),layoutCacheSize:0,staticCrates:[],destroyed:false,themeWaits:new Set(),
       });
       const steps=scratch._stageSteps(stage,area);
       try{
@@ -700,9 +700,7 @@ export class BoardScene {
     this.themeMats ||= {};
     if (name in this.themeMats) return this.themeMats[name];
     if (!(name in (this.pack.themes || {}))) {
-      (this.themeLoads ||= {})[name] ||= this.pack.loadTheme(name).then(() => {
-        if (!this.destroyed && this.stage?.boardTheme === name) { this.stageKey = null; this.setStage(this.stage); }
-      });
+      this._onThemeLoad(name, (this.themeLoads ||= {})[name] ||= this.pack.loadTheme(name), () => this.stage?.boardTheme === name);
       return null;
     }
     const img = this.pack.themes[name];
@@ -720,11 +718,25 @@ export class BoardScene {
     const id = BOARD_THEMES[stage?.boardTheme]?.scenery, original = this.pack?.original;
     if (!id || this.mapQuality === 'low' || !original?.loadStage) return null;
     if (original.scenes[id]) return original.scenes[id];
-    (this.themeLoads ||= {})[`scenery:${id}`] ||= original.loadStage(id).then((scene) => {
-      delete this.themeLoads[`scenery:${id}`];
-      if (scene && !this.destroyed && this.stage?.boardTheme === stage.boardTheme) { this.stageKey = null; this.setStage(this.stage); }
-    });
+    const loads = this.themeLoads ||= {}, key = `scenery:${id}`;
+    loads[key] ||= original.loadStage(id).finally(() => { delete loads[key]; });
+    this._onThemeLoad(key, loads[key], () => this.stage?.boardTheme === stage.boardTheme);
     return null;
+  }
+
+  /**
+   * Rebuild THIS scene once a shared theme load finishes. The load promise is shared with the idle prewarm's scratch
+   * copies, so each scene subscribes itself; otherwise a load a scratch copy started rebuilt only that copy and the
+   * visible field kept its plain board.
+   */
+  _onThemeLoad(key, promise, wanted) {
+    const waits = this.themeWaits ||= new Set();
+    if (waits.has(key)) return;
+    waits.add(key);
+    promise.then(() => {
+      waits.delete(key);
+      if (!this.destroyed && wanted()) { this.stageKey = null; this.setStage(this.stage); }
+    }, () => waits.delete(key));
   }
 
   /**
@@ -1155,7 +1167,7 @@ export class BoardScene {
     // the theme's original-quality map (its official surroundings loaded) draws no field edge, as the original maps
     const themeOriginal = !!(themed && !original && this._themeScenery(stage));
     if (!original && !themeOriginal) this._buildEdges(board);
-    this._buildThicket(board, themeOriginal);
+    this._buildThicket(board, this.mapQuality !== 'low');
     yield;
     this._buildTerrain(board);
     if (!this.official) this._buildBackground(board, themed && !original ? BOARD_THEMES[stage.boardTheme]?.backdrop || null : null);
@@ -1363,12 +1375,12 @@ export class BoardScene {
   }
 
   /** 덤불 frames (layout.js `thicket`): a pink glow strip along each side, the region's border wider. */
-  /** Thicket (덤불) borders: pink strips; with `rise` (the original-quality snow map) a haze rising off them. */
+  /** Thicket (덤불) borders: pink strips at 'low'; with `rise` (medium and above) only a noise curtain rising off them. */
   _buildThicket(board, rise = false) {
     const list = board.thicket || [];
     if (!list.length) return;
     if (rise) {
-      const pos = [], uv = [], idx = [], H = 0.36;
+      const pos = [], uv = [], idx = [], H = 0.5;
       for (const s of list) {
         const x0 = s.c - 0.5, x1 = s.c + 0.5, y0 = s.r - 0.5, y1 = s.r + 0.5, z = s.z;
         const [a, b] = s.dir === 'S' ? [[x0, y0], [x1, y0]] : s.dir === 'N' ? [[x0, y1], [x1, y1]] : s.dir === 'E' ? [[x1, y0], [x1, y1]] : [[x0, y0], [x0, y1]];
@@ -1378,6 +1390,7 @@ export class BoardScene {
         idx.push(i, i + 1, i + 2, i, i + 2, i + 3);
       }
       this.meshes.thicketRise = this._mesh({ position: new Float32Array(pos), normal: new Float32Array(pos.length), uv: new Float32Array(uv), color: null, index: new Uint16Array(idx) }, this.mat.thicketRise, { cast: false, receive: false, order: 4 });
+      return; // medium and above: the noise curtain alone, no border strips
     }
     const pos = [], uv = [], idx = [];
     for (const s of list) {
