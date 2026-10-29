@@ -1234,3 +1234,20 @@ test('凯瑟琳: a placed device serves the operator it faces and re-shields it 
   h.run(1.1);
   approx(ally.findBuff('cathy:shield')?.shield ?? 0, u.s.maxHp * tb.max_shield_ratio, 1e-6, 'full talent shield again');
 });
+
+test('歌蕾蒂娅 S3: no attacks while it runs (the client S3 mode has no attack ability), attacks again after it', () => {
+  const id = 'chess_char_4_12_a';
+  const g = makeBattle({ defs: { enemies: { enemy_dummy: dummy() } }, units: [{ chessId: id, row: 10, col: 3 }], timeLimit: 60 });
+  g.step();
+  const u = g.unit(id);
+  g.spawn('enemy_dummy', { pos: [10, 5] });
+  g.step();
+  let during = 0, after = 0;
+  g.b.on('hit', (c) => { if (c.source === u && c.dmg.isAttack) { if (u.skill.active) during++; else after++; } });
+  u.skill.activate('test', { free: true });
+  assert.equal(u.skill.id, 'skchr_glady_3');
+  g.runUntil(() => !u.skill.active, 40);
+  assert.equal(during, 0, 'no attack during S3');
+  g.run(5);
+  assert.ok(after > 0, 'attacks resume after S3');
+});

@@ -181,3 +181,15 @@ for(const kind of ['boss','hidden'])test(`Jesselton ${kind}: preview and live en
  const ps=m.order[0];ps.board.set('9,5',{...ps.newPiece('chess','chess_char_1_01_a'),dir:'RIGHT'});ps.recompute();m.endPrep();
  const b=createBattleFromSpec(m.fields[0].spec,new DataSource(m.data),{quiet:true});b.runToEnd(10);const u=b.allyUnits[0],e=b.enemies[0];assert.ok(u.alive);assert.ok(u.stats.attacks>0);assert.ok(b.sharedBoss.hp<b.sharedBoss.maxHp);assert.equal(e.stats.attacks,0);assert.equal(e.def.raw.staticBody,true);assert.equal(b.errorCount,0);
 });
+test('laboratory offers 拟态物质 and it always grants one more copy of its carrier',t=>{
+ const {m,ps}=create(t);
+ const chess=m.gd.raw.chess.chess_char_1_09_a||Object.values(m.gd.raw.chess).find(c=>c.visible&&!c.isHidden&&!c.isGolden&&ps.canRecruit(c.chessId));
+ assert.deepEqual(m.handle('local',{t:'g.labGain',kind:'chess',id:chess.chessId}),{ok:true});
+ const carrier=ps.hand.find(p=>p?.kind==='chess'&&p.id===chess.chessId);assert.ok(carrier);
+ assert.deepEqual(m.handle('local',{t:'g.labGain',kind:'item',id:'chess_item_5_05_e_a'}),{ok:true});
+ const item=ps.hand.find(p=>p?.kind==='item'&&p.id==='chess_item_5_05_e_a');assert.ok(item,'拟态物质 in the hand');
+ const copies=()=>[...ps.board.values(),...ps.hand,...ps.temp].filter(p=>p?.kind==='chess'&&m.gd.baseIdOf(p.id)===m.gd.baseIdOf(chess.chessId)).length;
+ const before=copies();
+ assert.deepEqual(m.handle('local',{t:'g.equip',itemUid:item.uid,targetUid:carrier.uid}),{ok:true});
+ assert.ok(copies()>before||ps.hand.some(p=>p?.kind==='chess'&&m.gd.isGolden(p.id)&&m.gd.baseIdOf(p.id)===m.gd.baseIdOf(chess.chessId)),'the carrier\'s own operator, not a random same-bond one');
+});

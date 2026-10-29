@@ -1370,7 +1370,7 @@ function drawElementGlyph(c, el, cx, cy, col) {
 export function hudRings() {
   if (_rings) return _rings;
   const P = PIXI();
-  const W = 8 * RC, rowsArc = Math.ceil((RING_STEPS + 1) / 8), H = (rowsArc + 2) * RC;
+  const W = 8 * RC, rowsArc = Math.ceil((RING_STEPS + 1) / 8), H = (rowsArc * 2 + 2) * RC;
   const canvas = makeCanvas(W, H);
   const c = canvas.getContext('2d');
   const cell = (i) => [(i % 8) * RC, Math.floor(i / 8) * RC];
@@ -1409,6 +1409,18 @@ export function hudRings() {
     c.fillStyle = g; c.beginPath(); c.arc(cx2, cy, RING_R + 3, 0, Math.PI * 2); c.fill();
     frames.downDisc = [x2, row];
   }
+  // the official HP bar's gauge (设置「HP 바 표시 방식」 공식): a thick plain arc hugging the disc, no dark edge (tinted
+  // by the element's light colour where it is drawn)
+  frames.thick = [];
+  const thickW = RC / 2 - DISC_R - 0.5, thickR = DISC_R + thickW / 2;
+  for (let k = 0; k <= RING_STEPS; k++) {
+    const x = (k % 8) * RC, y = row + 2 * RC + Math.floor(k / 8) * RC;
+    frames.thick.push([x, y]);
+    if (!k) continue;
+    const cx = x + RC / 2, cy = y + RC / 2, a0 = -Math.PI / 2, a1 = a0 + (Math.PI * 2 * k) / RING_STEPS;
+    c.lineCap = 'butt'; c.strokeStyle = '#ffffff'; c.lineWidth = thickW;
+    c.beginPath(); c.arc(cx, cy, thickR, a0, a1); c.stroke();
+  }
   // row B: enemy discs (element colour only)
   RING_KEYS.forEach((el, i) => {
     const x = i * RC, cx = x + RC / 2, cy = row + RC + RC / 2;
@@ -1421,12 +1433,22 @@ export function hudRings() {
   _rings = {
     base, canvas, size: RC,
     arcs: frames.arcs.map(tex),
+    thickArcs: frames.thick.map(tex),
     track: tex(frames.track),
     downDisc: tex(frames.downDisc),
     disc: Object.fromEntries(RING_KEYS.map((el) => [el, tex(frames['a:' + el])])),
     discEnemy: Object.fromEntries(RING_KEYS.map((el) => [el, tex(frames['e:' + el])])),
   };
   return _rings;
+}
+
+/** The thick arc hugging the disc (the official HP bar's element gauge), of a fraction 0..1 — as ringArc. */
+export function thickRingArc(frac) {
+  const r = hudRings();
+  const f = frac > 1 ? 1 : frac > 0 ? frac : 0;
+  let k = Math.round(f * RING_STEPS);
+  if (k === 0 && f > 0) k = 1;
+  return r.thickArcs[k];
 }
 
 /** Arc frame of a fraction 0..1 (rounded to the nearest step; a non-zero fraction never shows an empty ring). */

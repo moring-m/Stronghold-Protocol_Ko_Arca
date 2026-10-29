@@ -48,6 +48,9 @@ export default withDefaults({
       }),
       skill: {
         kind: 'duration',
+        // no attacks while it runs: the client's S3 mode (skchr_glady_3 → mode 2) has no attack ability, the tornado
+        // is her whole damage (official fx index units.char_474_glady.modes[2].attack: none)
+        attack: { noAttack: true },
         onStart({ battle, unit, skill }) {
           const foes = targetsInRange(battle, unit).sort((a, b) => bodyDist(b, unit.x, unit.y) - bodyDist(a, unit.x, unit.y) || a.id - b.id);
           const t = foes[0];
