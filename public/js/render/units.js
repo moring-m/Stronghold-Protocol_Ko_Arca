@@ -2469,7 +2469,8 @@ export class UnitView {
     for (let i = 0; i < this.icons.length; i++) {
       const ic = this.icons[i];
       const key = icons[i];
-      if (!key || !this.alive || prep) { ic.visible = false; continue; }
+      // (设置「HP 바 표시 방식」 공식: no icon row above the bars)
+      if (!key || !this.alive || prep || off) { ic.visible = false; continue; }
       const tex = statusTexture(key);
       if (!tex) { ic.visible = false; continue; }
       ic.texture = tex;
@@ -2504,7 +2505,7 @@ export class UnitView {
         b.position.set(x0 - pad + ox, top + shadowH / 2 + oy); b.width = bw + pad * 2; b.height = shadowH + pad * 2;
       });
     }
-    this._updateElementBar(showBars && !!this.el, x0, bw, gaugeTop + energyH + wolfH + coinH + 1, spH, s, t, off ? { x: x0, y: cy - s * OFFICIAL_BARS.elementAbove } : null);
+    this._updateElementBar(showBars && !!this.el, x0, bw, gaugeTop + energyH + wolfH + coinH + 1, spH, s, t, off ? { x: x + sx, y: cy - s * OFFICIAL_BARS.elementAbove } : null);   // (the gauge takes the icon row's place: centred)
     this._updateDownRing(!prep && !!this.down && !this.alive, x, this.screen.y - DOWN_LOOK.height * s, s, t);
     // blocked marker at the feet (enemies held by a blocker)
     const blocked = !prep && this.alive && this.isEnemy && (this.flags & UF.BLOCKED);
