@@ -132,7 +132,8 @@ test('hidden-layer bonds show activation and tiers without a stack badge or laye
     assert.ok(disc);
     assert.equal(disc.props.layers, undefined);
     assert.equal(disc.props.active, true);
-    assert.equal(disc.props.tier, 1);
+    // the board ring counts members toward the first threshold: an active bond shows it complete (its lit disc)
+    assert.equal(disc.props.tier, disc.props.thresholds);
   }
   const disc = [...walk(BondStrip({ bonds: [{ bondId: 'yanShip', count: 1, active: true, layers: 12 }], onOpen() {} }))]
     .find((v) => v.props?.name === DATA.bonds.yanShip.name);
