@@ -50,15 +50,11 @@ function HudBond({ name, icon, thresholds, tier, layers, active, disabled = fals
   const n = Math.max(1, Math.min(4, thresholds | 0 || 1));
   const full = !disabled && (tier | 0) >= n;
   const ring = uiUrl(m, `bondBoardIcon/${bondBoardKey(n, disabled ? 0 : tier)}`);
-  // an active bond below its top tier: its centre lights up as the completed board's does (the client's lit disc)
-  const lit = !disabled && !full && (tier | 0) >= 1;
-  const core = lit ? uiUrl(m, `bondBoardIcon/${bondBoardKey(n, n)}`) : null;
   const matte = uiUrl(m, 'hudBondItem/matte_num');
-  return html`<button type="button" class=${cx('bond', 'hbond', active && 'is-active', full && 'is-full', lit && 'is-lit', disabled && 'is-disabled', open && 'is-open')}
+  return html`<button type="button" class=${cx('bond', 'hbond', active && 'is-active', full && 'is-full', disabled && 'is-disabled', open && 'is-open')}
       onClick=${onClick} title=${title || name}>
     <span class="hbond__board" aria-hidden="true">
       ${ring ? html`<img class="hbond__ring" src=${ring} alt="" draggable=${false} />` : html`<span class="hbond__ring hbond__ring--css"></span>`}
-      ${core ? html`<img class="hbond__core" src=${core} alt="" draggable=${false} />` : null}
       ${icon ? html`<img class="hbond__icon" src=${icon} alt="" draggable=${false} />` : html`<span class="hbond__icon hbond__glyph">${(name || '?').trim().charAt(0)}</span>`}
     </span>
     ${layers != null ? html`<span class=${cx('bond__count', 'hbond__num', 'num', matte && 'has-matte')} style=${matte ? `background-image:url("${matte}")` : undefined}>${layers}</span>` : null}
@@ -149,16 +145,12 @@ export function BondPopup({ bondId, entry, priv, banned = [], onClose, onMember,
     '--bd-people': sprite('title_char_icon'), '--bd-check': sprite('active_icon') }).filter(([, v]) => v).map(([k, v]) => `${k}:${v}`).join(';');
   const ring = uiUrl(m, `bondBoardIcon/${bondBoardKey(th.length, tier)}`);
   const icon = bondIconUrl(m, bondId);
-  const topTier = Math.max(1, Math.min(4, th.length));
-  const lit = active && tier >= 1 && tier < topTier;
-  const core = lit ? uiUrl(m, `bondBoardIcon/${bondBoardKey(th.length, topTier)}`) : null;
   return html`<div class=${cx('bpop', 'bpop--official', 'brackets', `bpop--${at}`, over && 'is-over', owner && 'is-other')} data-place=${at} data-owner=${owner || null}
       style=${vars || undefined} role="dialog" aria-label=${owner ? `${owner} 的盟约：${b.name}` : `盟约：${b.name}`}>
     <button type="button" class="bpop__close" aria-label="关闭" onClick=${onClose}><${Icon} name="close" /></button>
     <header class="bpop__head">
-      <div class=${cx('bpop__disc', active && 'is-active', lit && 'is-lit', ring && 'has-board', tier >= Math.max(1, Math.min(4, th.length)) && active && 'is-full')}>
+      <div class=${cx('bpop__disc', active && 'is-active', ring && 'has-board', tier >= Math.max(1, Math.min(4, th.length)) && active && 'is-full')}>
         ${ring ? html`<img class="bpop__board" src=${ring} alt="" draggable=${false} />` : null}
-        ${core ? html`<img class="bpop__core" src=${core} alt="" draggable=${false} />` : null}
         ${ring && icon ? html`<img class="bpop__icon" src=${icon} alt="" draggable=${false} />` : html`<${BondGlyph} bondId=${bondId} />`}
       </div>
       <div class="bpop__titles">
