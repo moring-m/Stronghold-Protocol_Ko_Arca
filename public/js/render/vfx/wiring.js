@@ -1694,7 +1694,7 @@ export class FxWiring {
     if (!this.ofx.active) return false;
     if (prev && prev.alive) return true;
     // a unit whose talent draws its own shield (talentfx SHIELD_TALENTS) takes no generic one
-    if (name === 'shield' && [...SHIELD_TALENTS].some((k) => k.startsWith(`${this.unitKeyOf(v)}|`))) return false;
+    if (name === 'shield' && this.drawsOwnShield(v)) return false;
     const key = (name === 'shield' && this.ownShieldKey(v)) || this.statusKey(name);
     if (!key) return false;
     this.skills.status(v, lc(key));
@@ -1707,6 +1707,28 @@ export class FxWiring {
    * A unit's own shield prefab, where the client authors one (its skin's variant first): 斥罪's barrier, 赤霄·陈's
    * shield buff, 维什戴尔's … — the generic common_shield_01 otherwise. Keyed by the unit's model (char / token / enemy).
    */
+  /**
+   * Whether the unit's own fx already show its shield / 보호막, so the generic loop stays off: a talent loop of that kind
+   * (talentfx plays it; SHIELD_TALENTS, or a shield / barrier key or buff — 赤霄·陈, 斥罪, the cat shield, the 鼠王 …),
+   * or a skill running now whose fx carry one (左乐's S2 …).
+   */
+  drawsOwnShield(v) {
+    const uk = this.unitKeyOf(v);
+    if (!uk) return false;
+    let own = this.ownShieldCache?.get(uk);
+    if (own === undefined) {
+      const SH = /shield|barrier/i, u = this.idx?.units?.[uk];
+      const talent = [...SHIELD_TALENTS].some((k) => k.startsWith(`${uk}|`)) || Object.values(u?.talents || {}).some((t) => (t.uses || []).some((x) => x.role === 'loop' && SH.test(`${x.keys?.join(' ')} ${x.buff || ''}`)));
+      const name = uk.split('_').slice(2).join('_');
+      const skills = new Set(Object.entries(this.idx?.skills || {}).filter(([k, d]) => k.startsWith(`skchr_${name}_`) && (d.uses || []).some((x) => x.role === 'loop' && SH.test(`${x.keys?.join(' ')} ${x.buff || ''}`))).map(([k]) => k));
+      own = { talent, skills };
+      (this.ownShieldCache ||= new Map()).set(uk, own);
+    }
+    if (own.talent) return true;
+    const sk = this.skills.of(v)?.skillId;
+    return !!(sk && own.skills.has(sk) && ((v.flags || 0) & UF.SKILL));
+  }
+
   ownShieldKey(v) {
     const u = this.unitOf(v) || v;
     const model = lc(String(u?.spine || v?.info?.spine || u?.defId || v?.info?.defId || ''));

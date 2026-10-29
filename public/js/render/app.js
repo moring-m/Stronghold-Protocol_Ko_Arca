@@ -1659,7 +1659,7 @@ export async function createFieldView(host, options = {}) {
   /**
    * Draw a BOARD-space highlight group: range previews never light the bench / temp pads (rows 7–8: no battle
    * happens there), the prep field transform maps the tiles onto the boss field in the Final Assault prep, and the 2D
-   * board stripes range previews under the units (the 3D board uses the existing direction-wheel layer).
+   * and 3D boards stripe range previews under the units, as the client does.
    */
   function drawHighlight(list, style, group) {
     const key = hlKey(style, group);
@@ -1667,7 +1667,7 @@ export async function createFieldView(host, options = {}) {
     let t = tilesToDisp(IDENTITY, list);
     if (mode === 'prep' && prepXf !== IDENTITY) t = tilesToDisp(prepXf, t);
     if (range) t = t.filter(([r,c]) => rangeTileInside(ctx.rangeRect(),r,c));
-    tiles.setHighlights(t, style, key, { stripes: range && key !== 'rangeStand' && !board3d });
+    tiles.setHighlights(t, style, key, { stripes: range && key !== 'rangeStand' });
   }
   function clearHl(group) {
     if (group) hlReq.delete(group); else hlReq.clear();
@@ -1705,8 +1705,8 @@ export async function createFieldView(host, options = {}) {
     if (!dragState) return;
     const v = dragState.view;
     const item = v instanceof ItemView;
-    // Touch previews the legal tile. Mouse and pen models follow the pointer continuously.
-    const stand = item ? null : dragStandTile(p);
+    // 타일 자석 (설정 조작, on by default) previews the legal tile; off, the model follows the pointer continuously.
+    const stand = item ? null : dragStandTile(p, GEO, settings.tileMagnet !== false);
     if (stand) {
       const w = boardWorld(stand.row, stand.col, stand.bench);
       v.x = w.x; v.y = w.y; v.z = w.z;

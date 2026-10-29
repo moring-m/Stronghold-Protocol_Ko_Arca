@@ -392,6 +392,7 @@ export function SettingsModal({ open, onClose }) {
       <div class="set-row set-row--language"><span class="set-row__label">화면 언어</span><${LangButton} /></div>
       ${html`<${Choice} label=${mobileUiScaleText(getLang()).label} testId="mobile-ui-scale" value=${s.mobileUiScale} options=${MOBILE_UI_SCALES.map(v=>[v,Math.round(v*100)+'%'])} onChange=${v=>updateSettings({mobileUiScale:Number(v)})} /><p class="set-hint" data-i18n-skip>${mobileUiScaleText(getLang()).hint}</p>`}
       <${Toggle} label="배치 시 카메라 확대" value=${s.deployCameraZoom} onChange=${v=>updateSettings({deployCameraZoom:v})} />
+      <${Toggle} label=${t('타일 자석')} micro="TILE MAGNET" value=${s.tileMagnet} onChange=${v=>updateSettings({tileMagnet:v})} />
       <${Toggle} label="전투 통계" value=${s.combatMetrics} onChange=${v=>updateSettings({combatMetrics:v})} />
       <${Toggle} label="차지 캐스터 에너지" value=${s.mysticEnergy} onChange=${v=>updateSettings({mysticEnergy:v})} />
       <${Toggle} label="스킬 범위 표시" value=${s.skillRanges} onChange=${v=>updateSettings({skillRanges:v})} />

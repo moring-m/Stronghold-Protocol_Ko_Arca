@@ -79,7 +79,8 @@ void main(void) {
 }`;
 
 const HL_STYLES = {
-  legal: { color: COLORS.legal, fill: 0.26, line: 0.9 },
+  // the client's deployable tiles while a piece is dragged: an even green wash, no frame (measured on its screen)
+  legal: { color: 0x38a555, fill: 0.55, line: 0 },
   illegal: { color: COLORS.illegal, fill: 0.32, line: 0.95 },
   range: { color: COLORS.range, fill: 0.3, line: 0.85 },
   rangeStand: { color: COLORS.rangeStand, fill: 0.3, line: 0.9 },
@@ -158,32 +159,45 @@ export function parseStage(stage, band = [0, ROWS - 1], field = [0, 13]) {
 
 const hash2 = (r, c) => ((r * 73856093) ^ (c * 19349663)) >>> 0;
 
-/** Stripe spacing (tiles, along x) of striped range highlights. */
-const STRIPE_STEP = 0.2;
 /**
- * Diagonal stripes (world x − y = const, like the official striped range tiles) clipped to tile (r, c)'s top at
- * height z, drawn as light orange lines into `g`.
+ * The client's attack-range tiles: orange diagonal bands with clear gaps between (half of each period), sliding across
+ * the range over time (measured on its screen: one period ≈ 0.44 tile, about a period a second).
  */
-export function stripeSegments(r, c, inset = 0.05, step = STRIPE_STEP) {
-  const a = 0.5 - inset;
-  const x0 = c - a, x1 = c + a, y0 = r - a, y1 = r + a;
+const RANGE_STRIPE = Object.freeze({ step: 0.44, fill: 0.5, speed: 0.44, color: 0xd58619, alpha: 0.95 });
+
+/** Clip a convex polygon ([[x, y]]) to the half-plane a·(x, y) ≤ k. */
+function clipHalf(poly, ax, ay, k) {
   const out = [];
-  for (let d = (x0 - y1) + step / 2; d < x1 - y0; d += step) {
-    // points of x − y = d inside the square: x from max(x0, y0 + d) to min(x1, y1 + d)
-    const xa = Math.max(x0, y0 + d), xb = Math.min(x1, y1 + d);
-    if (xb - xa > 1e-4) out.push([xa, xa - d, xb, xb - d]);
+  for (let i = 0; i < poly.length; i++) {
+    const P = poly[i], Q = poly[(i + 1) % poly.length];
+    const fp = ax * P[0] + ay * P[1] - k, fq = ax * Q[0] + ay * Q[1] - k;
+    if (fp <= 0) out.push(P);
+    if ((fp < 0) !== (fq < 0) && fp !== fq) { const t = fp / (fp - fq); out.push([P[0] + (Q[0] - P[0]) * t, P[1] + (Q[1] - P[1]) * t]); }
   }
   return out;
 }
-function drawStripes(g, cam, r, c, z, inset, lw, p) {
-  g.lineStyle(lw, 0xffc27a, 0.55, 0.5);
-  for (const [xa, ya, xb, yb] of stripeSegments(r, c, inset)) {
-    cam.project(xa, ya, z, p);
-    g.moveTo(p.x, p.y);
-    cam.project(xb, yb, z, p);
-    g.lineTo(p.x, p.y);
+
+/**
+ * The range bands over tile (r, c)'s top: polygons of x − y ∈ [d, d + fill·step] for d on the global lattice offset by
+ * `phase` (tiles), so bands run on unbroken from tile to tile.
+ */
+export function stripeBands(r, c, inset = 0.05, phase = 0, step = RANGE_STRIPE.step, fill = RANGE_STRIPE.fill) {
+  const a = 0.5 - inset, sq = [[c - a, r - a], [c + a, r - a], [c + a, r + a], [c - a, r + a]];
+  const lo = (c - a) - (r + a), hi = (c + a) - (r - a), w = step * fill, out = [];
+  for (let d = Math.floor((lo - w - phase) / step) * step + phase; d < hi; d += step) {
+    const band = clipHalf(clipHalf(sq, 1, -1, d + w), -1, 1, -d);
+    if (band.length >= 3) out.push(band);
   }
+  return out;
+}
+
+function drawStripes(g, cam, r, c, z, inset, phase, p) {
   g.lineStyle(0);
+  for (const band of stripeBands(r, c, inset, phase)) {
+    const pts = [];
+    for (const [x, y] of band) { cam.project(x, y, z, p); pts.push(p.x, p.y); }
+    g.beginFill(RANGE_STRIPE.color, RANGE_STRIPE.alpha); g.drawPolygon(pts); g.endFill();
+  }
 }
 
 function variantMat(t) {
@@ -553,6 +567,9 @@ export class TileField {
     if (!cam || !this.highlights.size) return;
     const p = this._p;
     const inset = 0.05;
+    const striped = new Set();
+    for (const { tiles, style } of this.highlights.values()) if (style.stripes) for (const [r, c] of tiles) striped.add(r * 1000 + c);
+    this._stripesLive = striped.size > 0;
     for (const { tiles, style } of this.highlights.values()) {
       for (const [r, c] of tiles) {
         const h = this.heightAt(r, c);
@@ -574,11 +591,17 @@ export class TileField {
         }
         const sc = cam.scaleAt(c, r, z);
         const lw = Math.max(1.5, sc * 0.035);
-        g.lineStyle(lw, style.color, style.line, 0.5);
+        if (style.stripes) {
+          // the range bands alone (no frame, no fill: clear between the bands), sliding with time
+          drawStripes(g, cam, r, c, z, inset, -((this.time * RANGE_STRIPE.speed) % RANGE_STRIPE.step), p);
+          continue;
+        }
+        // a tile the range covers shows the range alone: the deployable wash stays off it
+        if (striped.has(r * 1000 + c)) continue;
+        if (style.line > 0) g.lineStyle(lw, style.color, style.line, 0.5); else g.lineStyle(0);
         g.beginFill(style.color, style.fill);
         g.drawPolygon(pts);
         g.endFill();
-        if (style.stripes) drawStripes(g, cam, r, c, z, inset, Math.max(1.5, sc * 0.05), p);
       }
     }
   }
@@ -696,6 +719,7 @@ export class TileField {
   /** Per-frame animation (dt seconds). */
   update(dt) {
     this.time += dt;
+    if (this._stripesLive) this._drawHighlights();   // the range bands slide
     const t = this.time;
     for (const a of this.animSprites) {
       const s = a.sprite, px = a.s || 40;
