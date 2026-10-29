@@ -193,6 +193,12 @@ export function stripeBands(r, c, inset = 0.05, phase = 0, step = RANGE_STRIPE.s
 
 function drawStripes(g, cam, r, c, z, inset, phase, p) {
   g.lineStyle(0);
+  // a raised top shows its bands where the ground's would fall on screen (a height reads as a shift up the board), so
+  // a range over a hill and the ground beside it runs as one unbroken pattern
+  if (z > 0.02) {
+    const y0 = cam.project(c, r, 0, p).y, yz = cam.project(c, r, z, p).y, y1 = cam.project(c, r + 1, 0, p).y;
+    if (Math.abs(y1 - y0) > 1e-6) phase += (yz - y0) / (y1 - y0);
+  }
   for (const band of stripeBands(r, c, inset, phase)) {
     const pts = [];
     for (const [x, y] of band) { cam.project(x, y, z, p); pts.push(p.x, p.y); }
@@ -566,7 +572,7 @@ export class TileField {
     const cam = this.cam;
     if (!cam || !this.highlights.size) return;
     const p = this._p;
-    const inset = 0.05;
+    const inset = 0;   // the client's tile marks fill the whole tile
     const striped = new Set();
     for (const { tiles, style } of this.highlights.values()) if (style.stripes) for (const [r, c] of tiles) striped.add(r * 1000 + c);
     this._stripesLive = striped.size > 0;

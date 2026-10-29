@@ -1696,8 +1696,6 @@ export async function createFieldView(host, options = {}) {
     dragState = { uid: p.uid, key, view: v, from: p.from, home: v._home || { x: v.x, y: v.y, z: v.z } };
     v.lift = 0.3;
     v._tween = null;
-    const t = pieceTile(p.piece);
-    if (t) drawHighlight([[t.row, t.col]], 'hover', 'dragFrom');
     drawHighlight(legalTiles(p.piece), 'legal', 'legal');
   }
 
@@ -1708,9 +1706,12 @@ export async function createFieldView(host, options = {}) {
     // 타일 자석 (설정 조작, on by default) previews the legal tile; off, the model follows the pointer continuously.
     const stand = item ? null : dragStandTile(p, GEO, settings.tileMagnet !== false);
     if (stand) {
+      // on the magnet tile the piece stands as deployed (the units' standing height), not held up
       const w = boardWorld(stand.row, stand.col, stand.bench);
       v.x = w.x; v.y = w.y; v.z = w.z;
+      if (!item) v.lift = 0;
     } else {
+      if (!item) v.lift = 0.3;
       // otherwise held under the pointer (the player still sees what they carry): a unit with its drawn (lifted) feet
       // DRAG_HOLD_TILES of its own px per tile below it (the scale at the pointer's ground, refined once at the feet), an
       // item plate centred on it
@@ -1732,7 +1733,8 @@ export async function createFieldView(host, options = {}) {
     if (p.target && p.target.area !== 'temp') {
       const r = p.target.area === 'board' ? p.target.row : GEO.HAND_ROW;
       const c = p.target.area === 'board' ? p.target.col : p.target.idx;
-      drawHighlight([[r, c]], p.legal ? 'target' : 'illegal', 'dragTarget');
+      // (a legal target shows the official marks alone — the green wash and the range — no frame of its own)
+      if (p.legal) clearHl('dragTarget'); else drawHighlight([[r, c]], 'illegal', 'dragTarget');
     } else clearHl('dragTarget');
   }
 

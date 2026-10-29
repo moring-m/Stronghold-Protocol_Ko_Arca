@@ -31,10 +31,6 @@ import { slotKey, lifeOf } from './skills.js';
 
 import { UF } from '../../../../shared/constants.js';
 
-/** Talents whose loop is the unit's own shield (the client creates that buff when the shield comes up): `unit|talent`.
- *  vfx/wiring.js then draws no generic shield on the unit. */
-export const SHIELD_TALENTS = new Set(['char_491_humus|1']);
-
 /** Battle seconds a held (non-oneshot) row of a talent's single cast lasts (SkillFx's SKILL_CAST_S). */
 export const TALENT_CAST_S = 0.6;
 /** Battle seconds a looping row of a triggered node lasts [ASSUMED: the trigger names no end]. */
@@ -343,8 +339,6 @@ export class TalentFx {
   /** Whether a binding is in force now (its loops play): passive and deploy while standing, toggles while they hold. */
   _inForce(U, b, v, now) {
     if (U.broken && /shield|barrier/i.test(b.key || '')) return false;
-    // a talent loop that is its unit's own shield (SHIELD_TALENTS) shows while a shield holds, not from the deploy
-    if (SHIELD_TALENTS.has(`${U.key}|${b.key}`)) return !!((v?.flags || 0) & UF.SHIELD) && this._modeOk(U, b);
     if (b.when === 'passive' || b.when === 'deploy') return this._modeOk(U, b);
     if (b.when === 'toggle') {
       if (!this._modeOk(U, b)) return false;

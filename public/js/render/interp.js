@@ -130,7 +130,7 @@ export function normalizeSnapshot(snap) {
   if(Array.isArray(snap.attackRanges))for(const [id,radius]of snap.attackRanges){const tu=units.get(id);if(tu&&Number.isFinite(radius)&&radius>0)tu[23]=radius;}
   if (Array.isArray(snap.shields)) for (const e of snap.shields) {
     const tu = units.get(e?.[0]);
-    if (tu && Number.isFinite(e[1]) && e[1] >= 0) tu[21] = e[1];
+    if (tu && Number.isFinite(e[1]) && e[1] >= 0) { tu[21] = e[1]; tu[25] = e[2] ? 1 : 0; }
   }
   if (Array.isArray(snap.ammo)) for (const e of snap.ammo) {
     const tu = units.get(e?.[0]);
@@ -437,6 +437,7 @@ export class SnapshotBuffer {
       o.states = a[15] ?? null;
       o.ammoLeft = a[13] ?? null; o.ammoMax = a[14] ?? 0;
       o.shieldHp = a[21] ?? 0;
+      o.barrier = a[25] === 1;
       o.airHeight = a[24] ?? null;
       o.modelScale = a[22] ?? 1;
       o.attackRangeRadius = a[23] ?? null;

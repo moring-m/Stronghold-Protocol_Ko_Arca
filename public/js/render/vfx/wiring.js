@@ -53,7 +53,7 @@ import { effectArtScale, effectStretchScale } from './artScale.js';
 import { costumeFor, costumeSkin, costumeEffect, costumeProjectile, costumePreloadKeys } from './costumes.js';
 import { GROUND_SPAWNS } from './effect.js';
 import { SkillFx, fitsAttack, pickGroup, formMode } from './skillfx.js';
-import { TalentFx, SHIELD_TALENTS } from './talentfx.js';
+import { TalentFx } from './talentfx.js';
 import { FunnelFx } from './funnelfx.js';
 import { YuWall, YU_WALL_SOURCE } from './yuwall.js';
 import { formModes } from './talents.js';
@@ -262,13 +262,21 @@ export function pickAttacks(a, kind, seed = 0, depth = 0, nth = 0, mem = null) {
  * @param {string} facing 'UP' | 'DOWN' | 'LEFT' | 'RIGHT'
  * @param {boolean} [variantsOnly]
  */
-/** Model id fragment → that unit's own shield prefab (fx index prefabs; a skin variant `<key>_<skin>#<n>` wins). */
-const OWN_SHIELDS = Object.freeze([
-  ['judge', 'judge_shield_all_01'], ['chen3', 'chen3_shield_buff_01'], ['svash2', 'svash2_skill_01_shield_01'],
-  ['catsld', 'token_cathy_catsld_shield_01'], ['achunt', 'enemy_achunt_shield'], ['actrpa', 'enemy_actrpa_shield'],
-  ['actrpb', 'enemy_actrpb_shield'], ['actrpc', 'enemy_actrpc_shield'], ['cbshld', 'enemy_cbshld_shield_01'],
-  ['crshd', 'enemy_crshd_shield_01'], ['duskld', 'enemy_duskld_shield'],
-]);
+/**
+ * A unit's own 보호막 / 쉴드 prefab (fx index), by its unit key (`char_…` / `enemy_…` / `token_…`); a skin variant
+ * `<key>_<skin>#<n>` wins. 보호막 (an HP shield) shows only with one of these; a 쉴드 (hit-negating) falls back to the
+ * generic common_shield_01. `null`: the unit's talents draw it themselves (泥岩's per-layer stack, talentfx).
+ */
+const OWN_SHIELDS = Object.freeze({
+  char_4065_judge: 'judge_shield_all_01', char_1050_chen3: 'chen3_shield_buff_01', char_491_humus: 'humus_buff_03',
+  char_1045_svash2: 'svash2_skill_01_shield_01', token_10041_cathy_catsld: 'token_cathy_catsld_shield_01',
+  char_311_mudrok: null,
+  enemy_9017_achunt: 'enemy_achunt_shield', enemy_9017_achunt_2: 'enemy_achunt_shield',
+  enemy_9018_actrpa: 'enemy_actrpa_shield', enemy_9019_actrpb: 'enemy_actrpb_shield', enemy_9020_actrpc: 'enemy_actrpc_shield',
+  enemy_1329_cbshld: 'enemy_cbshld_shield_01', enemy_1329_cbshld_2: 'enemy_cbshld_shield_01', enemy_10097_crshd: 'enemy_crshd_shield_01',
+  enemy_1292_duskld: 'enemy_duskld_shield', enemy_1249_lysdb_2: 'enemy_lysdb_attack_buff', enemy_1387_winshd: 'enemy_winshd_buff_01',
+  enemy_1509_mousek: 'mousek_buff_01_start', enemy_1511_mdrock: 'enemy_mdrock_skill_buff_01',
+});
 const STATUS_FLAGS = [[UF.SHIELD,'shield'],[UF.INVULN,'invulnerable'],[UF.STEALTH,'stealth'],[UF.FROZEN,'freeze'],[UF.STUNNED,'stun'],[UF.SLEEP,'sleep'],[UF.COLD,'cold']];
 
 // Mode names as the prefabs spell them: S3, Sk3 (信仰搅拌机, 谬因), s3 (卡涅利安, 艾雅法拉 the 2nd, 凯尔希 the 2nd), default
@@ -1693,9 +1701,9 @@ export class FxWiring {
     if (!on) { if (prev) { prev.stop(); this.loops.delete(slot); } return !!prev; }
     if (!this.ofx.active) return false;
     if (prev && prev.alive) return true;
-    // a unit whose talent draws its own shield (talentfx SHIELD_TALENTS) takes no generic one
-    if (name === 'shield' && this.drawsOwnShield(v)) return false;
-    const key = (name === 'shield' && this.ownShieldKey(v)) || this.statusKey(name);
+    // 보호막 / 쉴드: the unit's own prefab where it has one; a 쉴드 without one takes the generic loop, a 보호막 nothing
+    const own = name === 'shield' || name === 'barrier' ? this.ownShieldKey(v) : undefined;
+    const key = own || (name === 'shield' && own === undefined ? this.statusKey(name) : name === 'shield' || name === 'barrier' ? null : this.statusKey(name));
     if (!key) return false;
     this.skills.status(v, lc(key));
     const h = this.playOn(key, v, { follow: true, loop: true, important: true, depthOwner:v });
@@ -1708,35 +1716,17 @@ export class FxWiring {
    * shield buff, 维什戴尔's … — the generic common_shield_01 otherwise. Keyed by the unit's model (char / token / enemy).
    */
   /**
-   * Whether the unit's own fx already show its shield / 보호막, so the generic loop stays off: a talent loop of that kind
-   * (talentfx plays it; SHIELD_TALENTS, or a shield / barrier key or buff — 赤霄·陈, 斥罪, the cat shield, the 鼠王 …),
-   * or a skill running now whose fx carry one (左乐's S2 …).
+   * The unit's own 보호막 / 쉴드 prefab (OWN_SHIELDS, its skin's variant first): a key, null when its talents draw it
+   * themselves, undefined when it has none.
    */
-  drawsOwnShield(v) {
-    const uk = this.unitKeyOf(v);
-    if (!uk) return false;
-    let own = this.ownShieldCache?.get(uk);
-    if (own === undefined) {
-      const SH = /shield|barrier/i, u = this.idx?.units?.[uk];
-      const talent = [...SHIELD_TALENTS].some((k) => k.startsWith(`${uk}|`)) || Object.values(u?.talents || {}).some((t) => (t.uses || []).some((x) => x.role === 'loop' && SH.test(`${x.keys?.join(' ')} ${x.buff || ''}`)));
-      const name = uk.split('_').slice(2).join('_');
-      const skills = new Set(Object.entries(this.idx?.skills || {}).filter(([k, d]) => k.startsWith(`skchr_${name}_`) && (d.uses || []).some((x) => x.role === 'loop' && SH.test(`${x.keys?.join(' ')} ${x.buff || ''}`))).map(([k]) => k));
-      own = { talent, skills };
-      (this.ownShieldCache ||= new Map()).set(uk, own);
-    }
-    if (own.talent) return true;
-    const sk = this.skills.of(v)?.skillId;
-    return !!(sk && own.skills.has(sk) && ((v.flags || 0) & UF.SKILL));
-  }
-
   ownShieldKey(v) {
-    const u = this.unitOf(v) || v;
-    const model = lc(String(u?.spine || v?.info?.spine || u?.defId || v?.info?.defId || ''));
-    const base = model && OWN_SHIELDS.find(([m]) => model.includes(m))?.[1];
+    const uk = this.unitKeyOf(v);
+    if (!uk || !(uk in OWN_SHIELDS)) return undefined;
+    const base = OWN_SHIELDS[uk];
     if (!base) return null;
-    const skin = /_([a-z]+)_(\d+)$/.exec(String(u?.skin || ''));
+    const skin = /_([a-z]+)_(\d+)$/.exec(String(this.unitOf(v)?.skin || ''));
     for (const k of [skin && `${base}_${skin[1]}#${skin[2]}`, base]) if (k && this.ofx.lib.has(lc(k))) return lc(k);
-    return null;
+    return undefined;
   }
 
   /** Resolve the official prefab of a standard status; custom debuffs have no entry. */
@@ -1750,12 +1740,17 @@ export class FxWiring {
     const names=v._iconKeys?[...v._iconKeys(Infinity)]:[...(v.statuses||[])];
     const flags=v.flags||0;
     for(const [flag,name]of STATUS_FLAGS)if((!v._iconKeys||flag===UF.SHIELD)&&(flags&flag))names.push(name);
+    // 보호막 (an HP shield, any damage type: b.snap shields) and 쉴드 (hit-negating: layers, or the flag with no 보호막)
+    // are two statuses, both may hold at once
+    {const barrier=!!v.barrier||v.shieldHp>0,hits=v.layers>0||((flags&UF.SHIELD)&&!barrier);
+     for(let i=names.length-1;i>=0;i--)if(names[i]==='shield')names.splice(i,1);
+     if(hits)names.push('shield');if(barrier)names.push('barrier');}
     const previous=this.statusSeen.get(id);
     if(!names.length&&!previous)return;
     const current=new Set();
     if(!v.prep&&v.alive!==false&&!v.down)for(let name of names){
       if(name==='invuln')name='invulnerable';
-      if(!(v.isToken&&name==='invulnerable')&&this.statusKey(name))current.add(name);
+      if(!(v.isToken&&name==='invulnerable')&&(name==='barrier'?this.ownShieldKey(v):name==='shield'?this.ownShieldKey(v)!==null:this.statusKey(name)))current.add(name);
     }
     for(const name of previous||[])if(!current.has(name))this.status(v,name,false);
     for(const name of current)if(!previous?.has(name)||!this.loops.get(`${id}|${name}`)?.alive)this.status(v,name,true);

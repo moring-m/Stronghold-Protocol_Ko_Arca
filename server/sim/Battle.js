@@ -2745,8 +2745,10 @@ export class Battle {
     const ammoList = this.units.filter(u => u.alive && u.deployed && !u.hidden && u.skill?.active && u.skill.kind === 'ammo')
       .map(u => [u.id, Math.max(0, u.skill.ammoLeft), Math.max(1, u.skill.ammoMax || u.skill.ammo || 0, u.skill.ammoLeft)]);
     if (ammoList.length) snap.ammo = ammoList;
+    // the HP bar's 보호막: untyped shields only (a magic- / physical-only 屏障 — buff shieldType — shows no HP-bar segment)
     const shields = this.units.filter(u => u.alive && u.deployed && !u.hidden && u.s.shield > 0)
-      .map(u => [u.id, Math.ceil(u.s.shield)]);
+      .map(u => [u.id, Math.ceil(u.buffs.reduce((n, b) => n + (b.shield > 0 && !b.shieldType ? b.shield : 0), 0)), 1]);
+    // ([id, the HP-bar amount, 1 = a 보호막 of any type is up — the unit's own 보호막 effect shows])
     if (shields.length) snap.shields = shields;
     const modelScales=this.units.filter(u=>u.alive&&u.deployed&&!u.hidden&&Number.isFinite(u.mem.visualScale)).map(u=>[u.id,u.mem.visualScale]);
     if(modelScales.length)snap.modelScales=modelScales;
