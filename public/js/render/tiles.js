@@ -142,12 +142,6 @@ export function parseStage(stage, band = [0, ROWS - 1], field = [0, 13]) {
     t.alpha = t.dist === 0 ? 1 : t.dist === 1 ? 0.92 : 0.5;
     if (t.glyph === '#' && t.dist >= 2) t.mat = 'margin';
   }
-  // the snow battlefield (stage.boardTheme 'snow', board3d BOARD_THEMES): packed-snow ground and ice blocks; the
-  // no-deploy floor keeps its own surface so it stays distinguishable
-  if (stage?.boardTheme === 'snow') for (const row of grid) for (const t of row) {
-    if (t.mat === 'road' || t.mat === 'roadN') t.mat = 'snow';
-    else if (t.mat === 'wall') t.mat = 'ice';
-  }
   // high-ground plates: frame piece by connectivity (texture top = the tile's far edge)
   const wall = (r, c) => { const n = grid[r]?.[c]; return !!n && n.drawn && n.glyph === 'h'; };
   for (const row of grid) for (const t of row) {
