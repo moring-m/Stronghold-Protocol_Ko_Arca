@@ -375,8 +375,12 @@ export class OfficialFx {
       if (e.mat.state.zTest) depth = true;
       const owner=e.effect?.depthOwner;
       // Explicit Overlay materials retain their authored screen-wide priority.
-      if(!e.ground&&e.queue<4000&&owner?.root&&!owner.root.destroyed){
-        const map=e.effect.behindOwner?this.unitBehindItems:this.unitItems;
+      // a unit's effect on a raised tile: not cut by that tile's own block in the board's depth, and its ground parts
+      // drawn behind the unit's body (the ground pass lies under the raised top the unit stands on)
+      e.noDepth=(owner?.z||0)>0.05;
+      const raised=e.ground&&e.noDepth;
+      if((!e.ground||raised)&&e.queue<4000&&owner?.root&&!owner.root.destroyed){
+        const map=e.effect.behindOwner||raised?this.unitBehindItems:this.unitItems;
         let list=map.get(owner);if(!list){list=[];map.set(owner,list);}list.push(e);
       }else (e.ground ? g : o).push(e);
     };

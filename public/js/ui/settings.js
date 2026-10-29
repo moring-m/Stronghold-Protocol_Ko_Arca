@@ -406,6 +406,7 @@ export function SettingsModal({ open, onClose }) {
       </div>
       <${Toggle} label=${t('官方伤害数字')} micro="OFFICIAL NUMBERS" value=${s.officialDamageNumbers} onChange=${v=>updateSettings({officialDamageNumbers:v})}/>
       <${Choice} testId="hp-bar-style" label="HP 바 표시 방식" value=${s.hpBarStyle} options=${[['default','기본'],['official','공식']]} onChange=${v=>updateSettings({hpBarStyle:v})} />
+      <${Choice} testId="tile-mark-style" label=${t('타일 표시 방식')} value=${s.tileMarkStyle} options=${[['default',t('기본')],['official',t('공식')]]} onChange=${v=>updateSettings({tileMarkStyle:v})} />
       <${Toggle} label=${t('FPS 표시')} micro="SHOW FPS" value=${s.showFps} onChange=${v=>updateSettings({showFps:v})} />
       <p class="set-hint">공식: 원작 전투 화면의 HP·SP 바 색과 모양을 쓰고, 전투 중 HP 바 옆의 등급 표시를 숨깁니다.</p>
       <${Toggle} label=${t('弹药数量')} micro="AMMO COUNT" value=${s.ammoCount} onChange=${(v) => updateSettings({ ammoCount: v })} />

@@ -79,8 +79,9 @@ void main(void) {
 }`;
 
 const HL_STYLES = {
+  legal: { color: COLORS.legal, fill: 0.26, line: 0.9 },
   // the client's deployable tiles while a piece is dragged: an even green wash, no frame (measured on its screen)
-  legal: { color: 0x38a555, fill: 0.55, line: 0 },
+  officialLegal: { color: 0x38a555, fill: 0.55, line: 0 },
   illegal: { color: COLORS.illegal, fill: 0.32, line: 0.95 },
   range: { color: COLORS.range, fill: 0.3, line: 0.85 },
   rangeStand: { color: COLORS.rangeStand, fill: 0.3, line: 0.9 },
@@ -191,14 +192,21 @@ export function stripeBands(r, c, inset = 0.05, phase = 0, step = RANGE_STRIPE.s
   return out;
 }
 
+/** 设置 접근성「타일 표시 방식」 기본: the earlier light stripes over a range's fill (the 2D board only). */
+function drawLegacyStripes(g, cam, r, c, z, inset, lw, p) {
+  const a = 0.5 - inset, x0 = c - a, x1 = c + a, y0 = r - a, y1 = r + a, step = 0.2;
+  g.lineStyle(lw, 0xffc27a, 0.55, 0.5);
+  for (let d = (x0 - y1) + step / 2; d < x1 - y0; d += step) {
+    const xa = Math.max(x0, y0 + d), xb = Math.min(x1, y1 + d);
+    if (xb - xa <= 1e-4) continue;
+    cam.project(xa, xa - d, z, p); g.moveTo(p.x, p.y);
+    cam.project(xb, xb - d, z, p); g.lineTo(p.x, p.y);
+  }
+  g.lineStyle(0);
+}
+
 function drawStripes(g, cam, r, c, z, inset, phase, p) {
   g.lineStyle(0);
-  // a raised top shows its bands where the ground's would fall on screen (a height reads as a shift up the board), so
-  // a range over a hill and the ground beside it runs as one unbroken pattern
-  if (z > 0.02) {
-    const y0 = cam.project(c, r, 0, p).y, yz = cam.project(c, r, z, p).y, y1 = cam.project(c, r + 1, 0, p).y;
-    if (Math.abs(y1 - y0) > 1e-6) phase += (yz - y0) / (y1 - y0);
-  }
   for (const band of stripeBands(r, c, inset, phase)) {
     const pts = [];
     for (const [x, y] of band) { cam.project(x, y, z, p); pts.push(p.x, p.y); }
@@ -270,7 +278,9 @@ export class TileField {
     this.boxes = [];               // gate / objective wire boxes { r, c, gate, g } (in the unit layer)
     this.flowGfx = new P.Graphics();
     this.flowGfx.blendMode = P.BLEND_MODES.ADD;
-    layers.overlay.addChild(this.hlGfx, this.flowGfx);
+    // the official range bands: their own layer above the deployable / blocked marks (the green shows between them)
+    this.hlStripeGfx = new P.Graphics();
+    layers.overlay.addChild(this.hlGfx, this.hlStripeGfx, this.flowGfx);
     this.animLayer = new P.Container();
     layers.anim.addChild(this.animLayer);
     this.highlights = new Map();   // group → { tiles: [[r,c]], style }
@@ -567,17 +577,24 @@ export class TileField {
   }
 
   _drawHighlights() {
-    this.hlGfx.clear();
+    this.hlGfx.clear(); this.hlStripeGfx.clear();
     for (const s of this.rowSurfaces.values()) if (s._hl) s._hl.clear();
     const cam = this.cam;
+    this._stripesLive = false;
     if (!cam || !this.highlights.size) return;
     const p = this._p;
-    const inset = 0;   // the client's tile marks fill the whole tile
-    const striped = new Set();
-    for (const { tiles, style } of this.highlights.values()) if (style.stripes) for (const [r, c] of tiles) striped.add(r * 1000 + c);
-    this._stripesLive = striped.size > 0;
-    for (const { tiles, style } of this.highlights.values()) {
+    // 设置 접근성「타일 표시 방식」 공식: the client's marks fill the whole tile; the range is its sliding orange bands on
+    // their own layer above the other marks, all at the ground's height
+    const official = this.officialMarks === true;
+    const inset = official ? 0 : 0.05;
+    for (const { tiles, style: st } of this.highlights.values()) {
+      const style = official && st === HL_STYLES.legal ? HL_STYLES.officialLegal : st;
       for (const [r, c] of tiles) {
+        if (official && style.stripes) {
+          this._stripesLive = true;
+          drawStripes(this.hlStripeGfx, cam, r, c, 0.012, inset, -((this.time * RANGE_STRIPE.speed) % RANGE_STRIPE.step), p);
+          continue;
+        }
         const h = this.heightAt(r, c);
         let g = this.hlGfx;
         if (h > 1e-3) {
@@ -597,19 +614,20 @@ export class TileField {
         }
         const sc = cam.scaleAt(c, r, z);
         const lw = Math.max(1.5, sc * 0.035);
-        if (style.stripes) {
-          // the range bands alone (no frame, no fill: clear between the bands), sliding with time
-          drawStripes(g, cam, r, c, z, inset, -((this.time * RANGE_STRIPE.speed) % RANGE_STRIPE.step), p);
-          continue;
-        }
-        // a tile the range covers shows the range alone: the deployable wash stays off it
-        if (striped.has(r * 1000 + c)) continue;
         if (style.line > 0) g.lineStyle(lw, style.color, style.line, 0.5); else g.lineStyle(0);
         g.beginFill(style.color, style.fill);
         g.drawPolygon(pts);
         g.endFill();
+        if (style.stripes && !this.external) drawLegacyStripes(g, cam, r, c, z, inset, Math.max(1.5, sc * 0.05), p);
       }
     }
+  }
+
+  /** 设置 접근성「타일 표시 방식」: true = the client's official marks. */
+  setOfficialMarks(on) {
+    if (this.officialMarks === !!on) return;
+    this.officialMarks = !!on;
+    this._drawHighlights();
   }
 
   // ---- devices -------------------------------------------------------------------------------------------
@@ -852,7 +870,7 @@ export class TileField {
     this.meshes = []; this.rowMeshes.clear(); this.rowSurfaces.clear(); this.mesh = null; this.plane = null;
     for (const b of this.boxes) b.g.destroy();
     this.boxes = [];
-    this.hlGfx.destroy(); this.flowGfx.destroy(); this.animLayer.destroy();
+    this.hlGfx.destroy(); this.hlStripeGfx.destroy(); this.flowGfx.destroy(); this.animLayer.destroy();
   }
 }
 

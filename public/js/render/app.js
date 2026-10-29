@@ -679,6 +679,7 @@ export async function createFieldView(host, options = {}) {
   // replay's first landings together); a wish kept until the first gesture / audible SFX
   try { ctx.audio?.warmLandings?.(); } catch { /* the sound is optional */ }
   const tiles = new TileField({ ground: layers.ground, overlay: layers.overlay, props: layers.units, anim: layers.anim });
+  tiles.setOfficialMarks(settings.tileMarkStyle === 'official');
   setupCleanup.push(() => tiles.destroy());
   const fx = new FxSystem({
     P, layers, cam: () => cam, settings, assets, heightAt, redVignette: bg.red, surfaceLayer: ctx.surfaceLayer,
@@ -1696,6 +1697,9 @@ export async function createFieldView(host, options = {}) {
     dragState = { uid: p.uid, key, view: v, from: p.from, home: v._home || { x: v.x, y: v.y, z: v.z } };
     v.lift = 0.3;
     v._tween = null;
+    // (the official marks: no frame on the tile the piece came from)
+    const t = settings.tileMarkStyle === 'official' ? null : pieceTile(p.piece);
+    if (t) drawHighlight([[t.row, t.col]], 'hover', 'dragFrom');
     drawHighlight(legalTiles(p.piece), 'legal', 'legal');
   }
 
@@ -1734,7 +1738,7 @@ export async function createFieldView(host, options = {}) {
       const r = p.target.area === 'board' ? p.target.row : GEO.HAND_ROW;
       const c = p.target.area === 'board' ? p.target.col : p.target.idx;
       // (a legal target shows the official marks alone — the green wash and the range — no frame of its own)
-      if (p.legal) clearHl('dragTarget'); else drawHighlight([[r, c]], 'illegal', 'dragTarget');
+      if (p.legal && settings.tileMarkStyle === 'official') clearHl('dragTarget'); else drawHighlight([[r, c]], p.legal ? 'target' : 'illegal', 'dragTarget');
     } else clearHl('dragTarget');
   }
 
@@ -2710,6 +2714,7 @@ export async function createFieldView(host, options = {}) {
       Object.assign(settings,s);
       if(typeof s.officialDamageNumbers === 'boolean')settings.officialDamageNumbers=s.officialDamageNumbers;
       if (typeof s.ammoCount === 'boolean') settings.ammoCount = s.ammoCount;
+      tiles.setOfficialMarks(settings.tileMarkStyle === 'official');
       app.ticker.maxFPS = settings.frameLimit || 60;
       board3d?.setQuality?.(settings.shadows === false ? 'low' : 'high');
       if (previousMap !== (settings.mapQuality || 'high')) {

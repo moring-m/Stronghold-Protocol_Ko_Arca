@@ -3326,5 +3326,6 @@
   "적은 이 구역을 지나갈 수 있습니다": "Enemies can pass through this area",
   "설원": "Snowfield",
   "FPS 표시": "Show FPS",
-  "타일 자석": "Tile magnet"
+  "타일 자석": "Tile magnet",
+  "타일 표시 방식": "Tile mark style"
 }

@@ -1577,7 +1577,7 @@ export function shortcutBlocked(act, { modal = false, drawer = false } = {}) {
 
 // ---- settings ------------------------------------------------------------------------------------------------------
 
-export const DEFAULT_SETTINGS = Object.freeze({ keys: DEFAULT_HOTKEYS, shopItemLeft: true, hpBarStyle: 'default', bgm: 0.6, sfx: 0.8, voice: 0.6, voiceLanguage: 'kr', voiceOverrides: Object.freeze({}), textSize: 'sm', chatVolume: 0.5, chatSound: 'emote', chatSoundCustomized: false, chatFactionNotifications: false, chatCooldown: defaultChatCooldown('emote'), muted: false, damageNumbers: true, damageNumberMode: 'basic', officialDamageNumbers:false, ammoCount:false, showFps:false, combatMetrics:false, deployCameraZoom:true, tileMagnet:true, mysticEnergy:false, officialFx:'auto', quality: 'high', mapQuality: 'high', renderScale: 1, mobileUiScale: 1, effectsQuality: 'high', shadows: true, skillRanges: true, unitRanges: true, animationQuality: 'high', frameLimit: 60, adaptiveQuality: true });
+export const DEFAULT_SETTINGS = Object.freeze({ keys: DEFAULT_HOTKEYS, shopItemLeft: true, hpBarStyle: 'default', tileMarkStyle: 'default', bgm: 0.6, sfx: 0.8, voice: 0.6, voiceLanguage: 'kr', voiceOverrides: Object.freeze({}), textSize: 'sm', chatVolume: 0.5, chatSound: 'emote', chatSoundCustomized: false, chatFactionNotifications: false, chatCooldown: defaultChatCooldown('emote'), muted: false, damageNumbers: true, damageNumberMode: 'basic', officialDamageNumbers:false, ammoCount:false, showFps:false, combatMetrics:false, deployCameraZoom:true, tileMagnet:true, mysticEnergy:false, officialFx:'auto', quality: 'high', mapQuality: 'high', renderScale: 1, mobileUiScale: 1, effectsQuality: 'high', shadows: true, skillRanges: true, unitRanges: true, animationQuality: 'high', frameLimit: 60, adaptiveQuality: true });
 const QUALITIES = ['high', 'medium', 'low'];
 
 /**
@@ -1608,6 +1608,7 @@ export function sanitizeSettings(raw) {
     hpBarStyle:r.hpBarStyle==='official'?'official':'default',
     ammoCount:r.ammoCount===true,
     showFps:r.showFps===true,
+    tileMarkStyle:r.tileMarkStyle==='official'?'official':'default',
     tileMagnet:r.tileMagnet!==false,
     damageNumbers: damageNumberMode(r) !== 'none',
     damageNumberMode: DAMAGE_NUMBER_MODES.includes(r.damageNumberMode) || typeof r.damageNumbers === 'boolean' ? damageNumberMode(r) : DEFAULT_SETTINGS.damageNumberMode,
