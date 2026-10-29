@@ -753,11 +753,22 @@ export class BoardScene {
     // one footprint for every view: the personal board's (rows 0–18 about its field, the board's columns), which holds
     // the boss arena's and the cooperative board's — the surroundings keep one arrangement about the field
     const f = { x0: b.x0, x1: b.x1, y0: cy - 11, y1: cy + 8.5 };
+    const mx = (b.x0 + b.x1) / 2, wide = Math.max(1, (b.x1 - b.x0) / 22);
     for (const bucket of Object.values(scene.buckets)) {
       const source = this.originalMaterials[bucket.material];
       if (!source || !bucket.position?.length) continue;
       if (bucket.side === 'kit') continue;
-      const position = Float32Array.from(bucket.position, (v, i) => v + (i % 3 === 0 ? (b.x0 + b.x1) / 2 : i % 3 === 1 ? cy : 0));
+      const position = Float32Array.from(bucket.position, (v, i) => v + (i % 3 === 0 ? mx : i % 3 === 1 ? cy : 0));
+      // a wider board (the 8-player cooperative defense, 37 columns) than the authored ~21-column map: the ground is
+      // stretched sideways to span it; a piece keeps its shape and moves out with its centre
+      if (wide > 1) {
+        if (bucket.cut === 'terrain' || bucket.cut === 'none') for (let v = 0; v < position.length; v += 3) position[v] = mx + (position[v] - mx) * wide;
+        else {
+          let sx = 0; for (let v = 0; v < position.length; v += 3) sx += position[v];
+          const dx = (sx / (position.length / 3) - mx) * (wide - 1);
+          for (let v = 0; v < position.length; v += 3) position[v] += dx;
+        }
+      }
       const over = (x, y) => x > f.x0 - 0.2 && x < f.x1 + 0.2 && y > f.y0 - 0.2 && y < f.y1 + 0.2;
       let index = bucket.index;
       if (bucket.cut === 'terrain') {
