@@ -7,7 +7,8 @@ export function skillIsStance(sp, role) {
 // Keep their timing metadata; only the renderer suppresses per-attack restarts.
 export function skillIsContinuous(sp, role) {
   const key = sp?.skel || '';
-  const channels = {'char_388_mint':[1], 'char_291_aglina':[1], 'char_358_lisa':[2], 'char_1051_headb2':[2]};
+  // (歌蕾蒂娅 S3: her S3 mode has no attack — she holds Skill_3_Loop over the tornado while it runs)
+  const channels = {'char_388_mint':[1], 'char_291_aglina':[1], 'char_358_lisa':[2], 'char_1051_headb2':[2], 'char_474_glady':[2]};
   return skillIsStance(sp, role) || Object.entries(channels).some(([id, indices]) => key.includes(id) && indices.includes(role?.index) && role?.via !== 'attack' && !(role?.idle && role.idle !== role.loop));
 }
 // Explicit skill semantics; durations/names alone are not sufficient to classify a clip.
