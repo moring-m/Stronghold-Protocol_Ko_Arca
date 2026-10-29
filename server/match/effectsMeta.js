@@ -526,6 +526,7 @@ export function makeCtx(m, ps, source, hook, ev = null, preview = null) {
     difficulty: m.difficulty,
     isSolo: m.isSolo,
     isCoop: !m.isSolo,
+    laboratory: !!m.laboratory,
     data: gd.raw,
     gd,
     rng,

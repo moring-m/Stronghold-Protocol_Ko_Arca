@@ -145,7 +145,8 @@ const ITEM_HANDLERS = {
     onEquip(ctx, ev) {
       const base = ctx.gd.baseIdOf(ev.target.id);
       const owned = [...ctx.board(), ...ctx.hand(), ...ctx.temp()].filter((p) => p && p.kind === 'chess' && !ctx.gd.isGolden(p.id) && ctx.gd.baseIdOf(p.id) === base).length;
-      if (owned >= 2) {
+      // the laboratory (a free test bench): always the carrier's own operator, so a copy can be made at will
+      if (owned >= 2 || ctx.laboratory) {
         // This is a copy of an owned operator, so shared stock cannot change it into a same-bond reward.
         if (!ctx.grantChess(base, { requirePool: false })) toastNothing(ctx, ev);
         return;
