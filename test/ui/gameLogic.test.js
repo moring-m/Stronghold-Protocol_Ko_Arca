@@ -674,8 +674,9 @@ describe('special terrain tip', () => {
     const st = stages['act1autochess_m04'];
     const inf = at('act1autochess_m04', 'i');
     assert.ok(terrainInfo(inf.st, inf.row, inf.col), 'the stage does carry one tile that answers');
-    // every non-special glyph the stage uses: the bench, the blocked rows, road / floor, the fence, the separator…
-    for (const glyph of ['a', 'A', '#', 'X', 'r', 'f', 'b', 'h', 'p']) {
+    // every non-special glyph the stage uses: the bench, the blocked rows, road / floor, the separator… (the fence 'b'
+    // has its own tip, below)
+    for (const glyph of ['a', 'A', '#', 'X', 'r', 'f', 'h', 'p']) {
       let found = null;
       for (let row = 0; row < st.rows.length && !found; row++) {
         const col = st.rows[row].indexOf(glyph);
@@ -698,6 +699,9 @@ describe('special terrain tip', () => {
     assert.equal(terrainInfo({ rows: ['i'], tiles: { i: null } }, 0, 0), null);
     // …and a legend entry the mode never gave a tip (its own ordinary floor) is not a tip either
     assert.equal(terrainInfo({ rows: ['z'], tiles: { z: { tileKey: 'tile_floor', special: null } } }, 0, 0), null);
+    // the fence explains itself; the snow battlefield's no-deploy floor is its 차단 공사
+    assert.equal(terrainInfo({ rows: ['b'], tiles: { b: { tileKey: 'tile_fence_bound', special: null } } }, 0, 0)?.key, 'fence');
+    assert.equal(terrainInfo({ boardTheme: 'snow', rows: ['f'], tiles: { f: { tileKey: 'tile_floor', buildable: 'NONE', special: null } } }, 0, 0)?.key, 'blockade');
   });
 
   test('the facts come from the tile\'s own legend entry; missing terrain parameters never crash', () => {

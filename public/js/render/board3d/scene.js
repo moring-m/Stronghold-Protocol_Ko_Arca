@@ -761,8 +761,16 @@ export class BoardScene {
       const over = (x, y) => x > f.x0 - 0.2 && x < f.x1 + 0.2 && y > f.y0 - 0.2 && y < f.y1 + 0.2;
       let index = bucket.index;
       if (bucket.cut === 'terrain') {
-        // the snow terrain stays whole (no hole): on the board's footprint it is pressed under the snow ground
-        for (let v = 0; v < position.length; v += 3) if (over(position[v], position[v + 1])) position[v + 2] = Math.min(position[v + 2], -0.3);
+        // the snow terrain on the board's footprint is pressed under the snow ground; triangles wholly under drawn board
+        // tiles (the source level's own field, never seen) are dropped instead of drawn
+        const under = new Uint8Array(position.length / 3);
+        for (let v = 0; v < position.length; v += 3) if (over(position[v], position[v + 1])) {
+          position[v + 2] = Math.min(position[v + 2], -0.3);
+          under[v / 3] = board.grid?.[Math.round(position[v + 1])]?.[Math.round(position[v])]?.drawn ? 1 : 0;
+        }
+        const kept = [];
+        for (let i = 0; i < index.length; i += 3) if (!(under[index[i]] && under[index[i + 1]] && under[index[i + 2]])) kept.push(index[i], index[i + 1], index[i + 2]);
+        index = kept.length === index.length ? index : (index.constructor === Uint32Array || position.length / 3 > 65535 ? Uint32Array : Uint16Array).from(kept);
       } else if (bucket.cut === 'none') {
         // the land planes: the ground everywhere beyond the terrain, as authored
       } else {

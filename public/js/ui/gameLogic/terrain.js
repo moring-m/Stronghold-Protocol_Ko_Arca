@@ -69,6 +69,16 @@ const TERRAIN_TIPS = Object.freeze({
       t('은신 중에는 상대의 원거리 공격 대상으로 선택되지 않지만, 저지 중인 상대에게는 공격받습니다'),
     ],
   },
+  // 울타리 (tile_fence_bound): ground units cannot pass, operators deploy on it
+  fence: {
+    name: N_('울타리'), tag: N_('特殊地形'),
+    lines: () => [t('지상 적은 지나갈 수 없고, 비행 유닛만 통과합니다'), t('오퍼레이터는 이 위에 배치할 수 있습니다')],
+  },
+  // the snow battlefield's hazard-framed floor ('f', tile_floor with buildable NONE): 차단 공사
+  blockade: {
+    name: N_('차단 공사'), tag: N_('特殊地形'),
+    lines: () => [t('공사 중인 구역이라 오퍼레이터를 배치할 수 없습니다'), t('적은 이 구역을 지나갈 수 있습니다')],
+  },
   deepsea: {
     name: N_('深水区'), tag: N_('特殊地形'),
     lines: (st) => {
@@ -96,7 +106,7 @@ const TERRAIN_TIPS = Object.freeze({
 });
 
 /** Tile keys that carry a tip of their own although the legend gives them no `special` tag (gates, teleports). */
-const TIP_BY_TILEKEY = Object.freeze({ tile_start: 'start', tile_end: 'end', tile_telin: 'telin', tile_telout: 'telout' });
+const TIP_BY_TILEKEY = Object.freeze({ tile_start: 'start', tile_end: 'end', tile_telin: 'telin', tile_telout: 'telout', tile_fence_bound: 'fence', tile_fence: 'fence' });
 /** 深水区's own legend entry is the one tile whose mechanism overrides the level's buildableType (grid.js DEPLOY_REFUSED_TILES). */
 const BUILDABILITY = Object.freeze({ ALL: N_('可部署'), MELEE: N_('仅近战位可部署'), RANGED: N_('仅远程位可部署'), NONE: N_('不可部署') });
 
@@ -122,7 +132,9 @@ export function terrainInfo(stage, row, col) {
   const tiles = isObj(stage.tiles) ? stage.tiles : null;
   const tile = tiles ? tiles[line[col]] : null;
   if (!isObj(tile)) return null;
-  const key = tile.special || TIP_BY_TILEKEY[tile.tileKey] || null;
+  // the snow battlefield's no-deploy floor is its 차단 공사 (an ordinary floor elsewhere says nothing)
+  const blockade = stage.boardTheme === 'snow' && tile.tileKey === 'tile_floor' && tile.buildable === 'NONE';
+  const key = tile.special || TIP_BY_TILEKEY[tile.tileKey] || (blockade ? 'blockade' : null);
   const tip = key ? TERRAIN_TIPS[key] : null;
   if (!tip) return null;
   const facts = [];

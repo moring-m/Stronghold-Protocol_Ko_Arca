@@ -28,9 +28,10 @@ function snowfield() {
     'aaaaaaaaaa#aaaaaaaaaa',
     '###IAAAAA###AAAAAI###',
     `##E${L[9]}rOr${mirror(L[9])}E##`,
-    // the boss field: the two tiles left of the works (3,8) / (4,8) are a fence there (the owner's note), not a wall
-    `###${L[10].slice(0, 5)}bfff${mirror(L[10])}###`,
-    `###${L[11].slice(0, 5)}bfff${mirror(L[11])}###`,
+    // the boss field: the tiles either side of the works ((3,8) / (4,8) and (3,12) / (4,12)) are a fence there (the
+    // owner's notes), not a wall
+    `###${L[10].slice(0, 5)}bfffb${mirror(L[10]).slice(1)}###`,
+    `###${L[11].slice(0, 5)}bfffb${mirror(L[11]).slice(1)}###`,
     `###${L[12]}fOf${mirror(L[12])}###`,
     'XXXXXXXXXXXXXXXXXXXXX',
     'aaaaaaaaaa###########',
@@ -52,8 +53,8 @@ function snowfield() {
     id: 'custom_snowfield',
     name: '설원 덤불 전장',
     boardTheme: 'snow',
-    // the boss field's fence tiles (rows 3–4, col 8): the cooperative defense keeps its wall there (render/pen.js)
-    bossOnlyTiles: [[3, 8], [4, 8]],
+    // the boss field's fence tiles (rows 3–4, cols 8 and 12): the cooperative defense keeps its wall there (render/pen.js)
+    bossOnlyTiles: [[3, 8], [4, 8], [3, 12], [4, 12]],
     rows,
     tiles: {
       k: { tileKey: 'tile_custom_thicket', height: 'LOW', buildable: 'ALL', passable: 'ALL', groundPassable: true, flyPassable: true, special: 'thicket', bb: {} },
