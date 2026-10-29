@@ -132,8 +132,10 @@ export function terrainInfo(stage, row, col) {
   const tiles = isObj(stage.tiles) ? stage.tiles : null;
   const tile = tiles ? tiles[line[col]] : null;
   if (!isObj(tile)) return null;
-  // the snow battlefield's no-deploy floor is its 차단 공사 (an ordinary floor elsewhere says nothing)
-  const blockade = stage.boardTheme === 'snow' && tile.tileKey === 'tile_floor' && tile.buildable === 'NONE';
+  // the snow battlefield's 차단 공사: its no-deploy floor where a crate (阻隔工事) stands; the rest of that floor, and an
+  // ordinary floor elsewhere, says nothing
+  const blockade = stage.boardTheme === 'snow' && tile.tileKey === 'tile_floor' && tile.buildable === 'NONE'
+    && (stage.devices || []).some((d) => d?.role === 'crate' && d.pos?.[0] === row && d.pos?.[1] === col);
   const key = tile.special || TIP_BY_TILEKEY[tile.tileKey] || (blockade ? 'blockade' : null);
   const tip = key ? TERRAIN_TIPS[key] : null;
   if (!tip) return null;

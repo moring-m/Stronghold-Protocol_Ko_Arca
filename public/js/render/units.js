@@ -1128,7 +1128,7 @@ export class UnitView {
     const P = this.P, h = this.hud;
     // official bars: a soft drop shadow behind the HP (+ SP) bars
     // (three widening layers fake a blur: a dark halo around the whole bar, as the client draws it)
-    this.barShadow = [0.16, 0.16, 0.2].map((a) => { const b = bar(P, h, 0x000000, a); b.visible = false; return b; });
+    this.barShadow = [0.1, 0.12, 0.16].map((a) => { const b = bar(P, h, 0x000000, a); b.visible = false; return b; });
     this.hpBg = bar(P, h, COLORS.hpBack, 1);
     this.hpGhost = bar(P, h, COLORS.hpGhost, 0.9);
     this.hpFill = bar(P, h, this.isEnemy ? (this.isBoss ? COLORS.hpBoss : COLORS.hpEnemy) : COLORS.hpAlly);
@@ -2082,7 +2082,7 @@ export class UnitView {
     const shz=this.shadowZ??this.z;
     placeOnGround(this.ctx, this.shadow, this.ctx.layers.shadow, this.y, shz);
     const sh = cam.project(visualX, this.y, shz, SH_P);
-    this.shadow.position.set(sh.x, sh.y);
+    this.shadow.position.set(sh.x, sh.y + s * STAND_DROP);   // under the feet (STAND_DROP)
     const shw = s * (this.isBoss ? 1.6 : 0.95) / this.shadow.texture.width;
     this.shadow.scale.set(shw, shw * (this.shadow.texture === shadowTexture() ? 1 : 1.05));
     this.shadow.alpha = this.ctx.settings?.shadows === false ? 0 : 0.5 * alpha * (this.lift > 0 ? 0.6 : 1);
@@ -2481,8 +2481,9 @@ export class UnitView {
       this.barShadow.forEach((b, i) => {
         b.visible = off && shadowH > 0;
         if (!b.visible) return;
-        const pad = Math.max(1, s * 0.014) * (3 - i);
-        b.position.set(x0 - pad, top + shadowH / 2); b.width = bw + pad * 2; b.height = shadowH + pad * 2;
+        // measured on the client: a ~0.02-tile soft band, darkest just under and right of the bar
+        const pad = s * [0.02, 0.012, 0.006][i], ox = s * 0.006, oy = s * 0.008;
+        b.position.set(x0 - pad + ox, top + shadowH / 2 + oy); b.width = bw + pad * 2; b.height = shadowH + pad * 2;
       });
     }
     this._updateElementBar(showBars && !!this.el, x0, bw, gaugeTop + energyH + wolfH + coinH + 1, spH, s, t, off ? { x: x0, y: cy - s * OFFICIAL_BARS.elementAbove } : null);

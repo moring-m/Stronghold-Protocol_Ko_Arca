@@ -139,13 +139,14 @@ export function outsideTileAreas(holes) {
   return parts;
 }
 
-/** Row runs ({r0,r1,c0,c1}) of a classified grid's tiles not in `covered` ('r,c'), for surfaceForArea. */
+/** Row runs ({r0,r1,c0,c1}) of a classified grid's drawn tiles not in `covered` ('r,c'), for surfaceForArea. */
 function uncoveredRows(grid, covered) {
   const open = [];
   for (let r = 0; r < grid.length; r++) {
     const cols = grid[r].length;
     for (let c = 0, c0 = null; c <= cols; c++) {
-      const free = c < cols && !covered.has(`${r},${c}`);
+      // undrawn cells are not open: the edge tiles' outer skirts reach into them and would draw under the kit
+      const free = c < cols && grid[r][c]?.drawn && !covered.has(`${r},${c}`);
       if (free && c0 === null) c0 = c;
       else if (!free && c0 !== null) { open.push({ r0: r, r1: r, c0, c1: c - 1 }); c0 = null; }
     }
@@ -1065,7 +1066,9 @@ export class BoardScene {
       // the theme's official tile meshes on the tiles they cover; the procedural board keeps the others
       const covered=themed ? this._buildThemeKit(stage,fallback.grid) : null;
       const open=covered ? uncoveredRows(fallback.grid,covered) : null;
-      const buckets=Object.fromEntries(['board','glass','decal','pipe'].map(key=>[key,[open && fallback.buckets[key]?.index?.length ? surfaceForArea(fallback.buckets[key],open) : fallback.buckets[key]]]));
+      // (with the kit, only the uncovered tiles' own faces: the procedural board's outer skirts would draw a second map
+      // under the official one)
+      const buckets=Object.fromEntries(['board','glass','decal','pipe'].map(key=>[key,[open ? (open.length && fallback.buckets[key]?.index?.length ? surfaceForArea(fallback.buckets[key],open) : null) : fallback.buckets[key]].filter(Boolean)]));
       oppositeBorderRuns(cells,areas,{mirror:true}).forEach(({source,axis})=>{
         for(const key of Object.keys(buckets)){
           const geometry=fallback.buckets[key];
@@ -1074,7 +1077,7 @@ export class BoardScene {
           if(tile.index.length)buckets[key].push(reflectOppositeBorder(tile,axis));
         }
       });
-      for(const[key,list]of Object.entries(buckets))M[key]=this._mesh(mergeInto(list),key==='board'&&themed||this.mat[key],{cast:key!=='decal'});
+      for(const[key,list]of Object.entries(buckets))if(list.length)M[key]=this._mesh(mergeInto(list),key==='board'&&themed||this.mat[key],{cast:key!=='decal'});
     }
     if (themed && !original) this._buildThemeScenery(stage, board);
     if (original && !stage.coopEightStage && !['act2autochess_m01','act2autochess_m03'].includes(stage.id) && this.area.some(a=>a.c1>=20)) {

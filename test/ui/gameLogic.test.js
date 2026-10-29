@@ -701,7 +701,9 @@ describe('special terrain tip', () => {
     assert.equal(terrainInfo({ rows: ['z'], tiles: { z: { tileKey: 'tile_floor', special: null } } }, 0, 0), null);
     // the fence explains itself; the snow battlefield's no-deploy floor is its 차단 공사
     assert.equal(terrainInfo({ rows: ['b'], tiles: { b: { tileKey: 'tile_fence_bound', special: null } } }, 0, 0)?.key, 'fence');
-    assert.equal(terrainInfo({ boardTheme: 'snow', rows: ['f'], tiles: { f: { tileKey: 'tile_floor', buildable: 'NONE', special: null } } }, 0, 0)?.key, 'blockade');
+    const snowFloor = { boardTheme: 'snow', rows: ['ff'], tiles: { f: { tileKey: 'tile_floor', buildable: 'NONE', special: null } }, devices: [{ role: 'crate', pos: [0, 0] }] };
+    assert.equal(terrainInfo(snowFloor, 0, 0)?.key, 'blockade');
+    assert.equal(terrainInfo(snowFloor, 0, 1), null, 'the same floor without a crate');
   });
 
   test('the facts come from the tile\'s own legend entry; missing terrain parameters never crash', () => {
