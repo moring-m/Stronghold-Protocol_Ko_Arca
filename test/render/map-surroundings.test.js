@@ -6,7 +6,8 @@ import{borderCells,combatBorderAreas,oppositeBorderRuns,completeOppositeRuns,vac
 import{AREAS}from'../../public/js/render/board3d/layout.js';
 import{surfaceForArea,sceneryForArea,outsideTileAreas}from'../../public/js/render/board3d/scene.js';
 import{bossPenStage,cooperativeBossStage}from'../../public/js/render/pen.js';
-const stages=JSON.parse(readFileSync(new URL('../../data/stages.json',import.meta.url)));
+// the fork's custom battlefields (customExtension) have no native map file: the procedural board draws them
+const stages=Object.fromEntries(Object.entries(JSON.parse(readFileSync(new URL('../../data/stages.json',import.meta.url)))).filter(([,s])=>!s.customExtension));
 for(const[id,stage]of Object.entries(stages))test(`${id}: cooperative structure is the boss structure translated without simulation mutation`,()=>{
  const source=JSON.stringify(stage),boss=bossPenStage(stage),coop=cooperativeBossStage(stage);
  assert.notEqual(coop.structuralSource,boss);

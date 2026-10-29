@@ -54,6 +54,7 @@ import { costumeFor, costumeSkin, costumeEffect, costumeProjectile, costumePrelo
 import { GROUND_SPAWNS } from './effect.js';
 import { SkillFx, fitsAttack, pickGroup, formMode } from './skillfx.js';
 import { TalentFx } from './talentfx.js';
+import { STAND_DROP } from '../style.js';
 import { FunnelFx } from './funnelfx.js';
 import { YuWall, YU_WALL_SOURCE } from './yuwall.js';
 import { formModes } from './talents.js';
@@ -69,7 +70,48 @@ const ENEMY_ZONES = Object.freeze({
   enemy_1272_nhtank: ['pollution', 'projectile_enemy_nhtank_polluted', 'onReached'],
   enemy_1272_nhtank_2: ['pollution', 'projectile_enemy_nhtank_polluted', 'onReached'],
   enemy_9006_actoxi: ['poison', 'projectile_enemy_actoxi', 'onReached'],
+  // 集团军重型火炮's 【燃烧区域】: the shell's own hit effect (enemy_uacann_attack_hit_01: its ground fire lasts ~5 s) is the
+  // zone — the projectile already plays it where it lands, so the zone draws nothing more (`shown`)
+  enemy_10122_uacann: ['burning', 'projectile_enemy_uacann', 'onHit', 'shown'],
+  enemy_10122_uacann_2: ['burning', 'projectile_enemy_uacann', 'onHit', 'shown'],
 });
+
+/**
+ * Sim area fx (b.fx 'telegraph' / 'explode', extra.kind) drawn with the source unit's own skill effects (its skill's
+ * roles in the fx index) instead of the simple rings: { skill, telegraph: role played on the ground for the warning's
+ * duration, explode: role played once at the blast (null: the skill's start effect, cast with it, already holds it) }.
+ */
+const ENEMY_AREA_FX = Object.freeze({
+  // “巨大的丑东西” KO self-destruct (bomb[reborning]): mcmstr_die_01_range marks the area; mcmstr_die_01_start (cast at the
+  // KO with the skill) carries the blast
+  mechBomb: Object.freeze({ skill: 'bomb[reborning]', telegraph: 'range', explode: null }),
+  // “自在” 破桎而出 (ShieldBurst / ShieldBurstReborn): the barrier loops while it holds, its trigger effects at the burst;
+  // its cross: the cross projectile's hit (enemy_xi_skill_01_hit) where it lands
+  breakFree: Object.freeze({ skill: ['shieldburstreborn', 'shieldburst'], telegraph: 'loop', explode: 'trigger' }),
+  xiCross: Object.freeze({ projectile: 'projectile_enemy_xi_s', telegraph: 'onHit' }),
+  // 鼠王 【唱沙】: its DriftSand skill's hit effects (the sand cross) on the target
+  driftSand: Object.freeze({ skill: 'driftsand', telegraph: 'hit' }),
+  // 无畏者 冲锋: the range mark (dekght_skill_01_range) through the wind-up, its hit at the blow
+  chargeAttack: Object.freeze({ skill: 'chargeattack', telegraph: 'hit', match: /range/, explode: 'hit', skip: /range/ }),
+  // 无畏者·二 爆裂箭: the range mark (its trigger) through the delay; the blast is the arrow's
+  blastArrow: Object.freeze({ skill: 'tripleattack', telegraph: 'trigger', explode: null }),
+  // 庞贝 (RangeDamageAbility): its range effect at each pulse
+  selfBlast: Object.freeze({ ability: 'RangeDamageAbility', explode: 'range' }),
+  // 锏 CircleAttack / CircleAttack2 (blizzard, the HP-step clear): the skill's hit effects around it
+  blizzard: Object.freeze({ skill: ['circleattack2', 'circleattack'], explode: 'hit' }),
+  clearSp: Object.freeze({ skill: ['circleattack2', 'circleattack'], explode: 'hit' }),
+  // 乌顶巨角卢鲁 角力对决: its skill's hit at the clash
+  elkClash: Object.freeze({ skill: 'skill', explode: 'hit' }),
+});
+
+/** Sim 'beam' fx (b.fx 'beam', extra.kind) drawn on its target with the source's own effects. */
+const ENEMY_BEAM_FX = Object.freeze({
+  // 萨卡兹萨满 链式: the chain projectile's hit on each linked unit
+  chainBuff: Object.freeze({ projectile: 'projectile_enemy_smsha_s', role: 'onHit' }),
+  // 扎罗 溶血骇惧: the fear cage's end effects on each caged operator
+  fearCage: Object.freeze({ skill: 'fearcage', role: 'end' }),
+});
+
 
 /** Battle seconds a melee blow waits for its damage. */
 const MELEE_WINDOW = 0.4;
@@ -221,6 +263,21 @@ export function pickAttacks(a, kind, seed = 0, depth = 0, nth = 0, mem = null) {
  * @param {string} facing 'UP' | 'DOWN' | 'LEFT' | 'RIGHT'
  * @param {boolean} [variantsOnly]
  */
+/**
+ * A unit's own 보호막 / 쉴드 prefab (fx index), by its unit key (`char_…` / `enemy_…` / `token_…`); a skin variant
+ * `<key>_<skin>#<n>` wins. 보호막 (an HP shield) shows only with one of these; a 쉴드 (hit-negating) falls back to the
+ * generic common_shield_01. `null`: the unit's talents draw it themselves (泥岩's per-layer stack, talentfx).
+ */
+const OWN_SHIELDS = Object.freeze({
+  char_4065_judge: 'judge_shield_all_01', char_1050_chen3: 'chen3_shield_buff_01', char_491_humus: 'humus_buff_03',
+  char_1045_svash2: 'svash2_skill_01_shield_01', token_10041_cathy_catsld: 'token_cathy_catsld_shield_01',
+  char_311_mudrok: null,
+  enemy_9017_achunt: 'enemy_achunt_shield', enemy_9017_achunt_2: 'enemy_achunt_shield',
+  enemy_9018_actrpa: 'enemy_actrpa_shield', enemy_9019_actrpb: 'enemy_actrpb_shield', enemy_9020_actrpc: 'enemy_actrpc_shield',
+  enemy_1329_cbshld: 'enemy_cbshld_shield_01', enemy_1329_cbshld_2: 'enemy_cbshld_shield_01', enemy_10097_crshd: 'enemy_crshd_shield_01',
+  enemy_1292_duskld: 'enemy_duskld_shield', enemy_1249_lysdb_2: 'enemy_lysdb_attack_buff', enemy_1387_winshd: 'enemy_winshd_buff_01',
+  enemy_1509_mousek: 'mousek_buff_01_start', enemy_1511_mdrock: 'enemy_mdrock_skill_buff_01',
+});
 const STATUS_FLAGS = [[UF.SHIELD,'shield'],[UF.INVULN,'invulnerable'],[UF.STEALTH,'stealth'],[UF.FROZEN,'freeze'],[UF.STUNNED,'stun'],[UF.SLEEP,'sleep'],[UF.COLD,'cold']];
 
 // Mode names as the prefabs spell them: S3, Sk3 (信仰搅拌机, 谬因), s3 (卡涅利安, 艾雅法拉 the 2nd, 凯尔希 the 2nd), default
@@ -400,7 +457,19 @@ export class FxWiring {
    * BoneFollower points) and the camera's tilt (the plane the drawn model faces).
    */
   pose(v) {
-    return { x: v.x, y: v.y, z: (v.z || 0) + (v.hover || 0), left: (v.visFacing ?? v.facing ?? 1) < 0, back: typeof v._wantsBack === 'function' ? !!v._wantsBack() && !!v.entryBack : false, view: v, tilt: this._camTilt() };
+    const standShift = this._standShift(v);
+    return { x: v.x, y: v.y - standShift, standShift, z: (v.z || 0) + (v.hover || 0), left: (v.visFacing ?? v.facing ?? 1) < 0, back: typeof v._wantsBack === 'function' ? !!v._wantsBack() && !!v.entryBack : false, view: v, tilt: this._camTilt() };
+  }
+
+  /**
+   * How far toward the camera (board rows) a unit's effects move so they sit on its drawn feet: the models stand
+   * STAND_DROP of a tile under the tile's projected centre (units.js), on screen.
+   */
+  _standShift(v) {
+    const c = typeof this.ofx?.ctx?.cam === 'function' ? this.ofx.ctx.cam() : null;
+    if (!c?.project || !v?.info || !Number.isFinite(v.x) || !Number.isFinite(v.y)) return 0;
+    const z = v.z || 0, a = c.project(v.x, v.y, z), ay = a.y, s = a.s, by = c.project(v.x, v.y - 1, z).y;
+    return Math.abs(by - ay) > 1e-6 && s > 0 ? (s * STAND_DROP) / (by - ay) : 0;
   }
 
   /** The battle camera's tilt (degrees from straight down), or undefined (mounts.js SKELETON_TILT). */
@@ -630,12 +699,16 @@ export class FxWiring {
     const areaScale=effectArtScale(lc(key),k);
     const effectScale=typeof o.scale==='function'?()=>o.scale()*areaScale:o.scale!=null?o.scale*areaScale:areaScale!==1?areaScale:undefined;
     const ground = P.onGround ? effectGroundHeight(P.spawn, v, k) : (v.z || 0);
-    if (P.onGround) pos[2] = -ground;
+    // (a ground effect keeps the tile: only what stands on the unit follows its drawn feet)
+    if (P.onGround) { pos[2] = -ground; pos[1] += pose.standShift || 0; }
     const place = { pos, scale: typeof effectScale === 'function' ? effectScale() : effectScale, groundZ: -ground, yaw: 0, mirror: false, flipY: false, mountRot: null, rootRot: null };
     this._rotate(P, place, skin, pose);
     this._orient(def, place, pose, o, v);
     const stretchMul = effectStretchScale(lc(key), k);
-    const opts = { ...(stretchMul !== 1 ? { stretchMul } : {}), track: o.track || null, data: o.data ?? null, loop: !!o.loop, important: !!o.important, skip: o.skip > 0 ? o.skip : 0, speed: o.speed, owner: v, depthOwner:o.depthOwner ?? ((o.follow || o.stick || P.follow || P.keep) && v.root ? v : null) };
+    // a unit facing up (its back model) holds its weapon and muzzle behind its body: the effects of its strike (the
+    // attack's start / muzzle flash: `o.strike`) are drawn before its model, not over it; its buffs and auras stay over
+    const behindOwner = !!((o.strike || o.attackCast) && pose.back && v.root && !P.onGround && !o.front);
+    const opts = { ...(stretchMul !== 1 ? { stretchMul } : {}), track: o.track || null, data: o.data ?? null, loop: !!o.loop, important: !!o.important, skip: o.skip > 0 ? o.skip : 0, speed: o.speed, owner: v, depthOwner:o.depthOwner ?? ((o.follow || o.stick || P.follow || P.keep || behindOwner) && v.root ? v : null), behindOwner };
     // the owner each frame: FollowMountPoint keeps the effect on the unit's point (and its rotation), a held effect
     // moves with the unit (`keep`), FollowDirection turns it with the unit, PauseEffectIf hides it while the unit shows
     // a condition; a prefab with chained effects (OnPlayEmitter: system.js FxHandle._start hands them this track) has
@@ -686,12 +759,12 @@ export class FxWiring {
         const ground = G.onGround ? effectGroundHeight(G.spawn, v, fx.def?.key || k) : (v.z || 0);
         if (G.follow) {
           mountPoint(skin, G.follow.mount, p, fx.anchor);
-          if (G.onGround) fx.anchor[2] = -ground;
+          if (G.onGround) { fx.anchor[2] = -ground; fx.anchor[1] += p.standShift || 0; }
           fx.groundZ = -ground;
           if (Q.rotFollow && Q.loaded) fx.mountRot = mountRotation(skin, Q.rotKind, p, fx.mountRot || [0, 0, 0, 1]);
         } else if (stick && v.alive !== false) {
           const sp = spawnPoint(skin, G.spawn, p);
-          fx.anchor[0] = sp[0]; fx.anchor[1] = sp[1]; fx.anchor[2] = G.onGround ? -ground : sp[2];
+          fx.anchor[0] = sp[0]; fx.anchor[1] = sp[1] + (G.onGround ? p.standShift || 0 : 0); fx.anchor[2] = G.onGround ? -ground : sp[2];
           const offset=aromaOriginOffset(fx.def?.key || k,this._facing(v), G.spawn);fx.anchor[0]+=offset[0];fx.anchor[1]+=offset[1];
           fx.groundZ = -ground;
         } else if ((P.keep || Q.keep) && v.alive !== false) {
@@ -847,7 +920,7 @@ export class FxWiring {
           // the rows of the strike sit where its attack clip poses the unit's points at the strike frame
           const h = onTarget
             ? this.playOn(k, tgt, { toward: beyond(src, tgt), flipFrom: src, skip, speed: info.speed })
-            : this.playOn(k, src, { toward: tgt, skip, speed: info.speed, strike: phase !== 'start', useFourDirectionalFace: !!e.useFourDirectionalFace });
+            : this.playOn(k, src, { toward: tgt, skip, speed: info.speed, strike: phase !== 'start', attackCast: true, useFourDirectionalFace: !!e.useFourDirectionalFace });
           // a looping row stops at its end event (the cast's end); so does a looping prefab on a one-shot row, which
           // would otherwise never end (known once loaded: decided when the time comes)
           if (h) {
@@ -1642,12 +1715,36 @@ export class FxWiring {
     if (!on) { if (prev) { prev.stop(); this.loops.delete(slot); } return !!prev; }
     if (!this.ofx.active) return false;
     if (prev && prev.alive) return true;
-    const key = this.statusKey(name);
+    // 보호막 / 쉴드: the unit's own prefab where it has one; a 쉴드 without one takes the generic loop, a 보호막 nothing
+    const own = name === 'shield' || name === 'barrier' ? this.ownShieldKey(v) : undefined;
+    const key = own || (name === 'shield' && own === undefined ? this.statusKey(name) : name === 'shield' || name === 'barrier' ? null : this.statusKey(name));
     if (!key) return false;
     this.skills.status(v, lc(key));
     const h = this.playOn(key, v, { follow: true, loop: true, important: true, depthOwner:v });
     if (h) this.loops.set(slot, h);
     return !!h;
+  }
+
+  /**
+   * A unit's own shield prefab, where the client authors one (its skin's variant first): 斥罪's barrier, 赤霄·陈's
+   * shield buff, 维什戴尔's … — the generic common_shield_01 otherwise. Keyed by the unit's model (char / token / enemy).
+   */
+  /**
+   * The unit's own 보호막 / 쉴드 prefab (OWN_SHIELDS, its skin's variant first): a key, null when its talents draw it
+   * themselves, undefined when it has none.
+   */
+  ownShieldKey(v) {
+    // the unit key, else its character / model id (a recruit chess or a skin names the same character), exact or as a
+    // prefix (char_4065_judge_epoque#33 → char_4065_judge)
+    const rec = v?.info ? this.opts.record?.(v.info) : null;
+    const ids = [this.unitKeyOf(v), rec?.charId, v?.info?.charId, v?.info?.spine, this.unitOf(v)?.charId].filter((x) => typeof x === 'string' && x).map(lc);
+    const uk = Object.keys(OWN_SHIELDS).find((k) => ids.some((id) => id === k || id.startsWith(`${k}_`) || id.startsWith(`${k}#`)));
+    if (!uk) return undefined;
+    const base = OWN_SHIELDS[uk];
+    if (!base) return null;
+    const skin = /_([a-z]+)_(\d+)$/.exec(String(this.unitOf(v)?.skin || ''));
+    for (const k of [skin && `${base}_${skin[1]}#${skin[2]}`, base]) if (k && this.ofx.lib.has(lc(k))) return lc(k);
+    return undefined;
   }
 
   /** Resolve the official prefab of a standard status; custom debuffs have no entry. */
@@ -1661,16 +1758,26 @@ export class FxWiring {
     const names=v._iconKeys?[...v._iconKeys(Infinity)]:[...(v.statuses||[])];
     const flags=v.flags||0;
     for(const [flag,name]of STATUS_FLAGS)if((!v._iconKeys||flag===UF.SHIELD)&&(flags&flag))names.push(name);
+    // 보호막 (an HP shield, any damage type: b.snap shields) and 쉴드 (hit-negating: layers, or the flag with no 보호막)
+    // are two statuses, both may hold at once
+    {const barrier=!!v.barrier||v.shieldHp>0,hits=v.layers>0||((flags&UF.SHIELD)&&!barrier);
+     for(let i=names.length-1;i>=0;i--)if(names[i]==='shield')names.splice(i,1);
+     if(hits)names.push('shield');if(barrier)names.push('barrier');}
     const previous=this.statusSeen.get(id);
     if(!names.length&&!previous)return;
     const current=new Set();
     if(!v.prep&&v.alive!==false&&!v.down)for(let name of names){
       if(name==='invuln')name='invulnerable';
-      if(!(v.isToken&&name==='invulnerable')&&this.statusKey(name))current.add(name);
+      if(!(v.isToken&&name==='invulnerable')&&(name==='barrier'?this.ownShieldKey(v):name==='shield'?this.ownShieldKey(v)!==null:this.statusKey(name)))current.add(name);
     }
     for(const name of previous||[])if(!current.has(name))this.status(v,name,false);
     for(const name of current)if(!previous?.has(name)||!this.loops.get(`${id}|${name}`)?.alive)this.status(v,name,true);
     if(current.size)this.statusSeen.set(id,current);else this.statusSeen.delete(id);
+    // a 보호막 prefab with level clips (斥罪's judge_shield_all_01: SetAnimatorIntByBuffStackCnt 'level' — level 0 shows
+    // nothing) follows the barrier: 1 while it holds, 2 from half her max HP [ASSUMED: the client's stack thresholds are
+    // not in the extracted data]
+    const bh=this.loops.get(`${id}|barrier`);
+    if(bh?.effect?.setLevel){const hp=Number(v.shieldHp)||0,max=Number(v.maxHp)||0;bh.effect.setLevel(hp>0&&max>0&&hp>=max*.5?2:1);}
   }
 
   /** Stop every loop of a unit (it died / left): its status loops, its skill / charge loops, the skills' loops on it. */
@@ -1774,10 +1881,41 @@ export class FxWiring {
       }
       Object.assign(wave,{x,y,dr:Number(extra.dr)||0,dc:Number(extra.dc)||0,at:this.ofx.time});return true;
     }
+    // W (enemy_1504_cqbw) 【C4】: projectile_enemy_cqbw_s1's charge on its target while the fuse burns
+    // (enemy_cqbw_skill_01_buff), then its reached effect (enemy_cqbw_skill_02_hit) for the blast
+    if ((kind === 'telegraph' || kind === 'explode') && extra?.kind === 'c4' && this.ofx.active) {
+      const proj = this.idx.projectiles?.projectile_enemy_cqbw_s1;
+      const key = kind === 'telegraph' ? proj?.effects?.find((k) => /_buff$/.test(k)) : proj?.onReached?.[0];
+      const h = key ? this.playOn(key, { x, y, z: 0 }, { loop: kind === 'telegraph', important: true }) : null;
+      if (h) { if (kind === 'telegraph') setTimeout0(this.ofx, h, Number(extra.dur) || 0); return true; }
+    }
+    if (kind === 'beam' && ENEMY_BEAM_FX[extra?.kind] && this.ofx.active) {
+      const spec = ENEMY_BEAM_FX[extra.kind], src = this.view(extra.from), to = this.view(extra.to);
+      const keys = to ? this._enemyRoles(src ? this.unitOf(src) : null, spec)?.[spec.role] || [] : [];
+      let drawn = false;
+      for (const key of keys) if (this.playOn(key, to, { important: true })) drawn = true;
+      if (drawn) return true;
+    }
+    if ((kind === 'telegraph' || kind === 'explode') && ENEMY_AREA_FX[extra?.kind] && this.ofx.active) {
+      const spec = ENEMY_AREA_FX[extra.kind], src = this.view(extra.id), unit = src ? this.unitOf(src) : null;
+      const roles = this._enemyRoles(unit, spec);
+      const role = spec[kind];
+      if (roles && role === null) return true;
+      const keys = (roles && role ? roles[role] || [] : []).filter((k) => kind === 'telegraph' ? !spec.match || spec.match.test(k) : !spec.skip || !spec.skip.test(k));
+      let drawn = false;
+      for (const key of keys) {
+        const h = this.playOn(key, { x, y, z: 0 }, { loop: kind === 'telegraph', important: true });
+        if (!h) continue;
+        if (kind === 'telegraph') setTimeout0(this.ofx, h, Number(extra.dur) || 0);
+        drawn = true;
+      }
+      if (drawn) return true;
+    }
     if (kind === 'zone' && this.ofx.active) {
       const zone = ENEMY_ZONES[extra?.sourceDef];
       if (zone && extra.kind === zone[0] && Number(extra.dur) > 0) {
         const keys = this.idx.projectiles?.[zone[1]]?.[zone[2]] || [];
+        if (zone[3] === 'shown' && keys.length) return true;
         // A detached ground anchor survives the source's death/removal. Each cloud has
         // its own lifetime; overlapping clouds must not replace one another.
         const at = { x, y, z: 0 };
@@ -1814,6 +1952,17 @@ export class FxWiring {
     // the floating units stand for the kit's 'drone' / 'drones' / 'droneLock' / 'overload' (render/vfx/funnelfx.js)
     const f = this.funnels.simFx(kind, x, y, extra);
     return this.skills.simFx(kind, x, y, extra) || t || f;
+  }
+
+  /** Effect roles of a unit's skill / ability / projectile named by an ENEMY_AREA_FX / ENEMY_BEAM_FX spec (null: none). */
+  _enemyRoles(unit, spec) {
+    if (spec.projectile) {
+      const p = this.idx?.projectiles?.[spec.projectile];
+      return p ? { onHit: p.onHit || [], onReached: p.onReached || [] } : null;
+    }
+    if (!unit) return null;
+    if (spec.ability) return (unit.abilities || []).find((a) => a.name === spec.ability)?.roles || null;
+    return [].concat(spec.skill).map((n) => unit.skills?.[n]).find(Boolean)?.roles || null;
   }
 
   /** b.ev 'die': the unit's own death effect or the generic one. */

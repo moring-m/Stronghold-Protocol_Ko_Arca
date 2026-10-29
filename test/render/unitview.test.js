@@ -553,11 +553,14 @@ test('mystic charge count initializes a real HUD text and clears in preparation'
  v.prep=true;v.setEnergy(1);assert.equal(v.energyText.visible,false);
 });
 
-test('HP shield bar reflects remaining shield HP instead of an always-full status strip',()=>{
- const v=view({maxHp:1000});v.shieldHp=250;v.update(.016,cam(),0);
- assert.equal(v.shieldBar.visible,true);assert.equal(v.shieldBar.tint,0xffffff);assert.equal(v.shieldBar.alpha,1);
- assert.ok(v.shieldBar.position.y+v.shieldBar.height/2 < v.hpBg.position.y-v.hpBg.height/2,'shield stays above the HP frame');assert.ok(Math.abs(v.shieldBar.width/(v.hpBg.width-2)-.25)<1e-6);
- v.shieldHp=100;v.update(.016,cam(),1);assert.ok(Math.abs(v.shieldBar.width/(v.hpBg.width-2)-.1)<1e-6);
+test('the shield sits inside the HP bar right after the HP fill, sized by the remaining shield HP',()=>{
+ const v=view({maxHp:1000});v.hp=600;v.shieldHp=250;v.update(.016,cam(),0);
+ assert.equal(v.shieldBar.visible,true);
+ assert.ok(Math.abs(v.shieldBar.position.y-v.hpFill.position.y)<1e-6,'same row as the HP fill');
+ assert.ok(Math.abs(v.shieldBar.position.x-(v.hpFill.position.x+v.hpFill.width))<1e-6,'starts where the HP ends');
+ assert.ok(Math.abs(v.shieldBar.width/v.hpFill.width-250/600)<1e-6);
+ // HP + shield past the max HP rescales the bar to their sum
+ v.hp=1000;v.shieldHp=1000;v.update(.016,cam(),1);assert.ok(Math.abs(v.shieldBar.width/v.hpFill.width-1)<1e-6);
  v.shieldHp=0;v.flags=32;v.update(.016,cam(),2);assert.equal(v.shieldBar.visible,false);v.destroy();
 });
 

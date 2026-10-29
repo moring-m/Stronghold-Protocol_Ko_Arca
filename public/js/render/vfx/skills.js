@@ -551,8 +551,8 @@ export const COND_BUFFS = Object.freeze({
   // common loop) [ASSUMED: also before the first cast]
   'sbell2_s[idle_effect]': Object.freeze({ whileOff: ['sbell2_idle'] }),
   'nasti_s1[effect_manager]': Object.freeze({ whileOff: ['nasti_skill_01_common_buff_01'] }),
-  // 卡夫卡 S1: its SP ratio test (≥ 0) always passes — the loop shows while the passive is equipped
-  'caper_s_1[effect_trigger]': Object.freeze({ always: ['caper_skill_01_buff'] }),
+  // 跃跃 S1: the loop belongs to the cast (the effect_trigger fires with the skill); it ends with it instead of staying
+  'caper_s_1[effect_trigger]': Object.freeze({ on: ['caper_skill_01_buff'], charged: ['caper_skill_01_buff'], full: ['caper_skill_01_buff'], ready: ['caper_skill_01_buff'] }),
   'monstr_s_1[ready]': Object.freeze({ byCharges: true, full: ['monstr_skill_01_buff'], ready: ['monstr_skill_01_buff'] }),
   'leizi2_s_1[effect_controller]': Object.freeze({ byCharges: true, counts: Object.freeze({ 1: ['leizi2_skill_01_buff_01'], 2: ['leizi2_skill_01_buff_01', 'leizi2_skill_01_buff_02'], 3: ['leizi2_skill_01_buff_01', 'leizi2_skill_01_buff_02', 'leizi2_skill_01_buff_03'] }),
     full: ['leizi2_skill_01_buff_01', 'leizi2_skill_01_buff_02'], ready: ['leizi2_skill_01_buff_01'] }),

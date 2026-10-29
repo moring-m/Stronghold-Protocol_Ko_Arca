@@ -823,6 +823,25 @@ export function OnlinePill({ count, class: cls }) {
   </span>`;
 }
 
+/** Frames per second, in the latency pill's style (设置 접근성 「FPS 표시」): measured from requestAnimationFrame. */
+export function FpsPill({ class: cls }) {
+  const [fps, setFps] = useState(null);
+  useEffect(() => {
+    let raf = 0, frames = 0, since = performance.now();
+    const tick = (now) => {
+      frames++;
+      if (now - since >= 500) { setFps(Math.round((frames * 1000) / (now - since))); frames = 0; since = now; }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+  const tier = fps === null ? 'off' : fps >= 50 ? 'low' : fps >= 30 ? 'medium' : 'high';
+  return html`<span class=${cx('ping', 'ping--fps', `ping--${tier}`, cls)} title="FPS">
+    <span class="ping__value">${fps === null ? '--' : Math.min(999, fps)}</span><span class="ping__unit">fps</span>
+  </span>`;
+}
+
 export function PingPill({ ms, online = true, class: cls }) {
   const ok = online && Number.isFinite(ms);
   const tier = !ok ? 'off' : ms < 60 ? 'low' : ms < 200 ? 'medium' : 'high';

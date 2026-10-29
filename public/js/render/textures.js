@@ -60,6 +60,8 @@ export const MATERIALS = [
   'crateSide', 'crateTop', 'blowerTop', 'sealed', 'turretTop', 'platformTop',
   // the enemy preview pen: glossy glass panes in a hazard frame (render/pen.js, research 09 §2.1 screenshot)
   'penGlass',
+  // the snow battlefield (tiles.js parseStage, stage.boardTheme 'snow'): packed snow, ice block top / face
+  'snow', 'snow2', 'ice', 'iceSide',
 ];
 
 /** Art layers of materials the crop table (tiles.json) may not describe yet: the board atlas' glass hatch + a glaze. */
@@ -281,6 +283,27 @@ const MAT_DRAW = {
     ctx.fillStyle = 'rgba(0,0,0,0.25)';
     for (let k = 1; k < 3; k++) ctx.fillRect(x + (s * k) / 3, y + 6, 2, s - 6);
     speckle(ctx, x, y + 6, s, s - 6, r, 120, ['rgba(255,255,255,0.05)', 'rgba(0,0,0,0.08)']);
+  },
+  snow(ctx, x, y, s, r) {
+    bevelTile(ctx, x, y, s, { light: '#e4ebf0', dark: '#c9d3da', seamColor: '#6f7c86', hi: 'rgba(255,255,255,0.6)', lo: 'rgba(60,80,96,0.22)' });
+    speckle(ctx, x + 4, y + 4, s - 8, s - 8, r, 220, ['rgba(255,255,255,0.35)', 'rgba(90,110,130,0.10)']);
+  },
+  snow2(ctx, x, y, s, r) { MAT_DRAW.snow(ctx, x, y, s, r); cracks(ctx, x, y, s, r, 2, 'rgba(70,95,115,0.16)'); },
+  ice(ctx, x, y, s, r) {
+    bevelTile(ctx, x, y, s, { light: '#dfe8f0', dark: '#c3d0dc', seamColor: '#4a5868', hi: 'rgba(255,255,255,0.7)', bevel: 3.5 });
+    const g = ctx.createRadialGradient(x + s / 2, y + s / 2, s * 0.08, x + s / 2, y + s / 2, s * 0.42);
+    g.addColorStop(0, '#2c3350'); g.addColorStop(1, 'rgba(60,70,104,0.55)');
+    ctx.fillStyle = g; ctx.fillRect(x + s * 0.14, y + s * 0.14, s * 0.72, s * 0.72);
+    speckle(ctx, x + s * 0.14, y + s * 0.14, s * 0.72, s * 0.72, r, 140, ['rgba(200,215,240,0.16)', 'rgba(0,0,0,0.12)']);
+  },
+  iceSide(ctx, x, y, s, r) {
+    const g = ctx.createLinearGradient(x, y, x, y + s);
+    g.addColorStop(0, '#4a5462'); g.addColorStop(1, '#1d2229');
+    ctx.fillStyle = g; ctx.fillRect(x, y, s, s);
+    ctx.fillStyle = 'rgba(235,242,250,0.75)'; ctx.fillRect(x, y, s, 6);
+    ctx.fillStyle = 'rgba(0,0,0,0.25)';
+    for (let k = 1; k < 4; k++) ctx.fillRect(x + (s * k) / 4 + (r() - 0.5) * 8, y + 6, 2, s - 6);
+    speckle(ctx, x, y + 6, s, s - 6, r, 120, ['rgba(180,200,230,0.08)', 'rgba(0,0,0,0.1)']);
   },
   forbid(ctx, x, y, s, r) { forbidBase(ctx, x, y, s, r, false); },
   forbid2(ctx, x, y, s, r) { forbidBase(ctx, x, y, s, r, true); },

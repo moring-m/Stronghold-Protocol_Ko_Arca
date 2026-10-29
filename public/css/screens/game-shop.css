@@ -312,12 +312,15 @@
 .obtn__cost b { transform: translateY(-.04rem); font-size: .19rem; line-height: 1; color: #ffc600; }
 .obtn__cost.is-poor { background-image: var(--sp-panel-cost-bg-2, none); }
 .obtn__cost.is-poor b { color: #c0c5c3; }
-.shopbar .obtn__cost--free { position: relative; width: .78rem; height: .27rem; padding: 0; background: var(--sp-panel-cost-free, var(--mint-500)) center / 100% 100% no-repeat; }
+/* free refreshes: the official cost_free badge (its own 2.9:1 shape) centred on the button's top edge, half outside it */
+.shopbar .obtn__cost--free { position: absolute; left: 50%; top: 0; transform: translate(-50%, -50%); z-index: 1; width: .78rem; height: .27rem; padding: 0; background: var(--sp-panel-cost-free, var(--mint-500)) center / 100% 100% no-repeat; }
 .obtn__cost--free b { position: absolute; right: .08rem; top: 50%; transform: translateY(-55%); font-size: .15rem; color: #fff; }
 .shopbar .scard.is-frozen .scard__body { background: linear-gradient(0deg, rgba(8, 11, 10, .45), transparent); }
 .shopbar .scard__ice { left: auto; right: .05rem; bottom: .05rem; transform: none; width: .26rem; height: .29rem; }
 /* both plates one size, as the official 128×55 buttons (their content centred; 解冻 is the longest label) */
 .shopbar .obtn { width: 1.66rem; height: .55rem; justify-content: center; gap: .06rem; padding: 0 .06rem; }
+/* the label never wraps */
+.shopbar .obtn > span:not([class]) { white-space: nowrap; }
 .shopbar .obtn { font-size: .17rem; letter-spacing: .02em; gap: .04rem; }
 .shopbar .obtn .toolbtn__img { width: .28rem; height: .28rem; }
 .shopbar .obtn kbd { margin-left: 0; }

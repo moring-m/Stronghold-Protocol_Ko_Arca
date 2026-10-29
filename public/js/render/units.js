@@ -94,7 +94,7 @@ import { skillVisualTheme } from './skillVisualTheme.js';
 import { UF, ANIM } from '../../../shared/constants.js';
 import { SpineActor } from './spine.js';
 import { diamondTexture, shadowTexture, fxAtlas, tierChip, statusTexture, itemTexture, hudRings, ringArc, HUD_DISC, ELEMENT_RING, stealthMistTexture, downLabel } from './textures.js';
-import { COLORS, TIER_COLORS, ENEMY_FRAME, UNIT, PROJ, statusIconKey, statusIconSuppressed } from './style.js';
+import { COLORS, TIER_COLORS, ENEMY_FRAME, UNIT, PROJ, STAND_DROP, statusIconKey, statusIconSuppressed } from './style.js';
 import { drawCrate, rowDepthKey, ROW_KEY, deviceBoxOf, DEVICE_BOX } from './tiles.js';
 
 // Art-directed operator colours, shared by skins; unknown operators use a
@@ -553,6 +553,7 @@ export function placeOnGround(ctx, obj, fallback, y, z) {
   if (obj.parent !== layer) layer.addChild(obj);
 }
 
+
 /** Standing height of a world point (tile top incl. raised devices); 0 off-grid / without a stage. */
 export function groundZ(ctx, x, y) {
   if (!ctx.heightAt) return 0;
@@ -690,6 +691,8 @@ export class UnitView {
     // a leader drawn one way only, and its boss HUD beside the model (FIXED_FACING / BOSS_HUD_DX, GitHub #648)
     this.fixedFacing = (this.isEnemy && FIXED_FACING[info.defId]) || 0;
     this.hudDx = (this.isEnemy && BOSS_HUD_DX[info.defId]) || 0;
+    // a boss that does not walk (move speed ≤ 0.1: 盐风主教昆图斯, 假想敌：胄 …) — its official HP bar spans its body
+    { const ms = Number((ctx.lookupDef ? ctx.lookupDef(info) : null)?.stats?.moveSpeed); this.fixedBoss = this.isBoss && Number.isFinite(ms) && ms <= 0.1; }
     // enemies: the official prefab's size factor (1 for operators, summons and enemies at the standard size)
     this.modelK = this.isEnemy ? Number(info.modelScale)>0?Number(info.modelScale):enemyModelScale(ctx.lookupDef ? ctx.lookupDef(info) : null) : 1;
     this.isToken = info.kind === 'token';
@@ -1120,6 +1123,9 @@ export class UnitView {
 
   _buildHud() {
     const P = this.P, h = this.hud;
+    // official bars: a soft drop shadow behind the HP (+ SP) bars
+    // (three widening layers fake a blur: a dark halo around the whole bar, as the client draws it)
+    this.barShadow = [0.1, 0.12, 0.16].map((a) => { const b = bar(P, h, 0x000000, a); b.visible = false; return b; });
     this.hpBg = bar(P, h, COLORS.hpBack, 1);
     this.hpGhost = bar(P, h, COLORS.hpGhost, 0.9);
     this.hpFill = bar(P, h, this.isEnemy ? (this.isBoss ? COLORS.hpBoss : COLORS.hpEnemy) : COLORS.hpAlly);
@@ -1262,6 +1268,7 @@ export class UnitView {
     this.hp = hp;
     this.sp = s.sp; this.spMax = s.spMax;
     this.shieldHp = Math.max(0, s.shieldHp || 0);
+    this.barrier = !!s.barrier || this.shieldHp > 0;   // a 보호막 of any type is up (b.snap shields)
     if(this.info.defId==='token_custom_ursus_drone'){
       this.modelK=s.modelScale??1;
       if(s.attackRangeRadius>0)this.info.rangeRadius=s.attackRangeRadius;
@@ -1938,6 +1945,7 @@ export class UnitView {
     const visualX = this.x + (this.bossArea?.dx || 0);
     const p = cam.project(visualX, this.y, this.z + this.hover + this.lift + this.waterSink, this.screen);
     const s = p.s;
+    p.y += s * STAND_DROP;
     // State effects follow the projected unit, including flying height, rather than the camera.
     const visualStates = this._iconKeys(Infinity).filter(k=>['freeze','cold','burn','poison','shield','refraction','stealth','stun','sleep','invuln','bind','slow','silence','fear','fragile','weaken','healFree','neural','necrosis'].includes(k));
     if ((this.flags & UF.SHIELD) && !visualStates.includes('shield')) visualStates.push('shield');
@@ -2054,7 +2062,7 @@ export class UnitView {
     this.lunge = Math.max(0, this.lunge - dt * 5);
     const lx = this.lungeDir.x * lungeK, ly = this.lungeDir.y * lungeK;
     let bx = p.x, by = p.y;
-    if (lungeK) { const q = cam.project(this.x + lx, this.y + ly, this.z + this.hover + this.lift + this.waterSink, LG_P); bx = q.x; by = q.y; }
+    if (lungeK) { const q = cam.project(this.x + lx, this.y + ly, this.z + this.hover + this.lift + this.waterSink, LG_P); bx = q.x; by = q.y + s * STAND_DROP; }
     this.root.position.set(bx, by);
     if(this.corrosionFx){this.corrosionFx.visible=this.corrosionStacks>0&&this.alive&&!this.down;this.corrosionFx.scale.set(s/100);this.corrosionFx.alpha=.8+.12*Math.sin(t*2);}
     if(this.noteFx){this.noteFx.visible=this.noteStacks>0&&this.alive&&!this.down;this.noteFx.scale.set(s/100);this.noteFx.alpha=.85+.1*Math.sin(t*1.8);if(this.noteClef)this.noteClef.y=-12-3*Math.sin(t*1.8);}
@@ -2072,14 +2080,15 @@ export class UnitView {
     const shz=this.shadowZ??this.z;
     placeOnGround(this.ctx, this.shadow, this.ctx.layers.shadow, this.y, shz);
     const sh = cam.project(visualX, this.y, shz, SH_P);
-    this.shadow.position.set(sh.x, sh.y);
-    const shw = s * (this.isBoss ? 1.6 : 0.95) / this.shadow.texture.width;
+    this.shadow.position.set(sh.x, sh.y + s * STAND_DROP);   // under the feet (STAND_DROP)
+    // the client's: a faint ellipse about half a tile across, centred on the feet
+    const shw = s * (this.isBoss ? 1.1 : 0.6) / this.shadow.texture.width;
     this.shadow.scale.set(shw, shw * (this.shadow.texture === shadowTexture() ? 1 : 1.05));
     this.shadow.alpha = this.ctx.settings?.shadows === false ? 0 : 0.5 * alpha * (this.lift > 0 ? 0.6 : 1);
 
     this.snowFx.clear();
     if(this.alive && this.snowTiles.length){
-      placeOnGround(this.ctx,this.snowFx,this.ctx.layers.groundFx,this.y,this.z);
+      placeOnGround(this.ctx,this.snowFx,this.ctx.layers.groundFx,this.y,0);   // (the marks lie on the ground)
       for(const [r,c,n] of this.snowTiles){
         this.snowFx.lineStyle(Math.max(.6,s*.009),0xcceeff,.5);
         this.snowFx.beginFill(0xc5e9ff,Math.min(.35,.09+n*.04));
@@ -2146,23 +2155,35 @@ export class UnitView {
     }
     if(this.attackRange){
       const g=this.attackRange,r=Number(this.info.rangeRadius);g.clear();g.visible=this.ctx.settings?.unitRanges !== false && this.alive&&!this.down && !((this.ctx.officialFor?.(this) ?? this.ctx.ofx?.active) && /emppnt/.test(this.info.spine||this.info.defId||''));
+      for(const row of this.attackRangeRows?.values()||[]){row.clear();row.visible=false;}
       if(g.visible){
-        placeOnGround(this.ctx,g,this.ctx.layers.groundFx,this.y,this.z);
+        placeOnGround(this.ctx,g,this.ctx.layers.groundFx,this.y,0);
+        // on a raised top the outline lies at that height: each stretch goes with the block row it crosses (that row's
+        // surface layer), not all of it with the unit's own row, which would draw it over units standing behind
+        const raised=this.z>RAISED_Z;let line=null;
+        const rowOf=(y)=>{
+          if(!raised)return g;
+          const key=Math.round(y);let rg=(this.attackRangeRows||=new Map()).get(key);
+          if(!rg){rg=new this.P.Graphics();this.attackRangeRows.set(key,rg);}
+          if(!rg.visible){rg.visible=true;placeOnGround(this.ctx,rg,this.ctx.layers.groundFx,key,this.z);if(line)rg.lineStyle(...line);}
+          return rg;
+        };
+        const style=(...a)=>{line=a;g.lineStyle(...a);for(const rg of this.attackRangeRows?.values()||[])if(rg.visible)rg.lineStyle(...a);};
         const segment=(x0,y0,x1,y1)=>{
           const p=clipRangeSegment(this.ctx.rangeRect?.(),x0,y0,x1,y1);
           if(!p)return;
           const a=cam.project(p[0],p[1],this.z+.015),b=cam.project(p[2],p[3],this.z+.015);
-          g.moveTo(a.x,a.y);g.lineTo(b.x,b.y);
+          const rg=rowOf((p[1]+p[3])/2);rg.moveTo(a.x,a.y);rg.lineTo(b.x,b.y);
         };
         if(this.info.hitArea){
           const a=this.info.hitArea,x=this.x+(a.dx||0),y=this.y+(a.dy||0);
           const points=[[x-a.w/2,y-a.h/2],[x+a.w/2,y-a.h/2],[x+a.w/2,y+a.h/2],[x-a.w/2,y+a.h/2]];
-          g.lineStyle(2,0xff9c33,.8*alpha);
+          style(2,0xff9c33,.8*alpha);
           for(let i=0;i<4;i++)segment(...points[i],...points[(i+1)%4]);
         }else{
           const drone=/emppnt|ursus_drone/.test(this.info.spine||this.info.defId||'');
           const color=drone&&this.info.side==='enemy'?0xff654a:0x4ed8af;
-          g.lineStyle(1.5,color,(drone?.95:.65)*alpha);
+          style(1.5,color,(drone?.95:.65)*alpha);
           for(let i=0;i<96;i++){
             const a=i/96*Math.PI*2,b=(i+1)/96*Math.PI*2;
             segment(this.x+Math.cos(a)*r,this.y+Math.sin(a)*r,this.x+Math.cos(b)*r,this.y+Math.sin(b)*r);
@@ -2241,26 +2262,26 @@ export class UnitView {
     const wedge = this._showFacing !== undefined ? this._showFacing && this.prep : this.hasDir && this.info.kind !== 'device';
     if (wedge && this.alive) {
       if (!this.facingArrow) {
-        this.facingArrow = new P.Sprite(fxAtlas().tex.chevron);
-        this.facingArrow.anchor.set(0.5);
-        this.facingArrow.tint = 0xff9c33;
+        this.facingArrow = new P.Graphics();
         this.ctx.layers.groundFx.addChild(this.facingArrow);
       }
       placeOnGround(this.ctx, this.facingArrow, this.ctx.layers.groundFx, this.y, this.z);
-      // on the ground ring, 0.36 tile out along the deploy direction; rotated to the projected direction and
-      // foreshortened along it (the chevron texture points right: local x = the pointing axis)
-      const [sx, sy] = DIR_STEP[this.dir] || DIR_STEP.RIGHT;
-      const c0 = cam.project(this.x, this.y, this.z + 0.01, FA_C);
-      const fa = cam.project(this.x + 0.36 * sx, this.y + 0.36 * sy, this.z + 0.01, FA_P);
-      const vx = fa.x - c0.x, vy = fa.y - c0.y;
-      const len = Math.hypot(vx, vy) || 1;
-      this.facingArrow.visible = this.lift <= 0;
-      this.facingArrow.position.set(fa.x, fa.y);
-      this.facingArrow.rotation = Math.atan2(vy, vx);
-      const fs = (s * 0.22) / 64;
-      const along = clamp(len / (s * 0.36 || 1), 0.35, 1.2);
-      this.facingArrow.scale.set(fs * along, fs * (sy ? 1 : 0.8));
-      this.facingArrow.alpha = 0.9 * alpha;
+      // the client's deploy-direction mark (measured on its battle screen): a thin white ring about the unit on the
+      // ground (radius FACING.r tiles), an orange arc over its facing quarter and an orange arrowhead out of it
+      const g = this.facingArrow, [sx, sy] = DIR_STEP[this.dir] || DIR_STEP.RIGHT, z = this.z + 0.01;
+      const face = Math.atan2(sy, sx), pt = (a, r) => { const q = cam.project(this.x + Math.cos(a) * r, this.y + Math.sin(a) * r, z, FA_P); return { x: q.x, y: q.y }; };
+      const line = (from, to, r, w, color, a) => {
+        g.lineStyle(w, color, a);
+        for (let k = 0; k <= 24; k++) { const q = pt(from + ((to - from) * k) / 24, r); if (k) g.lineTo(q.x, q.y); else g.moveTo(q.x, q.y); }
+      };
+      g.clear();
+      g.visible = this.lift <= 0;
+      g.alpha = alpha;
+      line(0, Math.PI * 2, FACING.r, Math.max(1, s * 0.016), 0xffffff, 0.8);
+      line(face - FACING.arc, face + FACING.arc, FACING.r, Math.max(2, s * 0.05), 0xffa31a, 1);
+      const tip = pt(face, FACING.r + FACING.tip), l = pt(face - FACING.head, FACING.r - 0.02), r = pt(face + FACING.head, FACING.r - 0.02);
+      const c = pt(0, 0); g.tip = tip; g.pointing = Math.atan2(tip.y - c.y, tip.x - c.x);   // (read by tests)
+      g.lineStyle(0); g.beginFill(0xffa31a, 1); g.moveTo(tip.x, tip.y); g.lineTo(l.x, l.y); g.lineTo(r.x, r.y); g.closePath(); g.endFill();
     } else if (this.facingArrow) this.facingArrow.visible = false;
 
     // elite aura
@@ -2281,6 +2302,7 @@ export class UnitView {
     this.screen.top = by - headTiles * s;
     // the boss HUD `hudDx` tiles beside the model, where the official prefab puts it (BOSS_HUD_DX)
     const hx = this.hudDx ? cam.project(this.x + this.hudDx, this.y, this.z + this.hover + this.lift, HUD_P).x : bx;
+    this._feetY = by;
     this._updateHud(dt, s, hx, by - headTiles * s, alpha, t);
   }
 
@@ -2330,55 +2352,88 @@ export class UnitView {
 
     const damaged = this.hp < this.maxHp - 0.5;
     const showHp = showBars && !(this.isToken && (this.flags & UF.INVULN)) && (!this.isEnemy || damaged || this.isBoss || this.shieldHp > 0 || this.noteStacks > 0) && !NO_HP_BAR.has(this.info.defId);
-    const bw = clamp(s * (this.isBoss ? UNIT.bossBarWidth : UNIT.barWidth), 24, this.isBoss ? 260 : 96);
-    const bh = clamp(s * (this.isBoss ? 0.09 : 0.065), 3, this.isBoss ? 9 : 6);
+    // 设置「HP 바 표시 방식」 official: the client's flat bars (OFFICIAL_BARS) — no frame, no tier chip in battle
+    const off = this.ctx.settings?.hpBarStyle === 'official';
+    const leader = off && this.isEnemy && !this.isBoss && this.info.tier >= 3;
+    // official geometry (measured on the client's battle screens): the bars sit under the unit's feet, about a tile wide
+    // (a fixed boss — one that does not walk — spans its body: OFFICIAL_BARS.fixedBossWidth; a walking boss = a leader)
+    const fixedBoss = off && this.isBoss && this.fixedBoss;
+    const bw = off ? s * (fixedBoss ? OFFICIAL_BARS.fixedBossWidth : OFFICIAL_BARS.width) : clamp(s * (this.isBoss ? UNIT.bossBarWidth : UNIT.barWidth), 24, this.isBoss ? 260 : 96);
+    const bh = off ? Math.max(2.5, s * (this.isBoss || leader ? OFFICIAL_BARS.leaderH : OFFICIAL_BARS.hpH)) : clamp(s * (this.isBoss ? 0.09 : 0.065), 3, this.isBoss ? 9 : 6);
     // a knocked-down operator's HUD is its redeploy ring alone, drawn at full strength over the greyed model
     this.hud.alpha = this.down ? this.fadeIn : this.dying > 0 ? 0 : alpha;
     let sx = this.shake > 0 ? Math.sin(t * 90) * this.shake * 10 : 0;
     this.shake = Math.max(0, this.shake - dt);
     const x0 = x - bw / 2 + sx;
-    let cy = y - 4;
+    let cy = off ? (this._feetY ?? y) + s * OFFICIAL_BARS.belowFeet : y - 4;
     if(this.noteText){this.noteText.visible=showBars&&this.noteStacks>0;this.noteText.scale.set(clamp(s/90,.65,1));this.noteText.position.set(x0-1+18*clamp(s/90,.65,1),cy-3);this.noteIcon.visible=this.noteText.visible;this.noteIcon.width=this.noteIcon.height=16*clamp(s/90,.65,1);this.noteIcon.position.set(x0-1,cy-3);}
     // HP
     this.hpBg.visible = this.hpFill.visible = showHp;
-    this.hpGhost.visible = showHp && this.ghostHp > this.hp + .5;
+    this.hpGhost.visible = showHp && !off && this.ghostHp > this.hp + .5;
     if (showHp) {
       const k = this.maxHp > 0 ? clamp(this.hp / this.maxHp, 0, 1) : 0;
       const g = this.maxHp > 0 ? clamp(this.ghostHp / this.maxHp, 0, 1) : 0;
       this.hpGhost.position.set(x0, cy); this.hpGhost.width = bw * g; this.hpGhost.height = bh;
-      this.hpBg.position.set(x0 - 1, cy); this.hpBg.width = bw + 2; this.hpBg.height = bh + 2;
+      this.hpBg.position.set(x0 - (off ? 0 : 1), cy); this.hpBg.width = bw + (off ? 0 : 2); this.hpBg.height = bh + (off ? 0 : 2);
       this.hpFill.position.set(x0, cy); this.hpFill.width = bw * k; this.hpFill.height = bh;
-      if (!this.isEnemy) this.hpFill.tint = COLORS.hpAlly;
+      if (off) {
+        this.hpFill.tint = !this.isEnemy ? OFFICIAL_BARS.ally : this.isBoss || leader ? OFFICIAL_BARS.leader : OFFICIAL_BARS.enemy;
+        this.hpBg.tint = leader || this.isBoss ? OFFICIAL_BARS.leaderBack : OFFICIAL_BARS.back;
+        this.hpBg.alpha = leader || this.isBoss ? 0.85 : 0.55;
+      } else {
+        this.hpBg.tint = COLORS.hpBack; this.hpBg.alpha = 1;
+        this.hpFill.tint = !this.isEnemy ? COLORS.hpAlly : this.isBoss ? COLORS.hpBoss : COLORS.hpEnemy;
+      }
     }
     // 业火 我执: her HP sits on the 1-HP floor and the damage past it fills a pool — the red bar over the drained green one
     const neg = showHp ? this.neg : 0;
     this.negFill.visible = neg > 0;
     if (neg > 0) { this.negFill.position.set(x0, cy); this.negFill.width = bw * neg; this.negFill.height = bh; }
+    // the shield inside the HP bar, as the client draws it: a pale segment right after the HP fill; HP + shield past
+    // the max HP rescales the bar to their sum
     const shielded = showHp && this.shieldHp > 0;
     this.shieldBar.visible = !!shielded;
     if (shielded) {
-      const shieldH = Math.max(1.5, bh * 0.35);
-      // Sprite bars use a centred vertical anchor: leave a full pixel above the black HP frame.
-      this.shieldBar.position.set(x0, cy - (bh + 2) / 2 - 1 - shieldH / 2);
-      this.shieldBar.width = bw * clamp(this.shieldHp / this.maxHp, 0, 1);
-      this.shieldBar.height = shieldH;
+      const total = Math.max(this.maxHp, this.hp + this.shieldHp) || 1;
+      const hpW = bw * clamp(this.hp / total, 0, 1);
+      this.hpFill.width = hpW;
+      this.shieldBar.position.set(x0 + hpW, cy);
+      this.shieldBar.width = bw * clamp(this.shieldHp / total, 0, 1);
+      this.shieldBar.height = bh;
+      this.shieldBar.tint = 0xe6eef2; this.shieldBar.alpha = 0.92;
     }
     // SP
-    const ammo = !this.isEnemy ? (this.ammo || ((this.flags & UF.SKILL) && this.ammoMax > 0 ? [this.ammoLeft, this.ammoMax] : null)) : null;
+    // 琳琅诗怀雅's skill purse reads as ammo (segments in the SP bar), as the client shows it
+    const ammo = !this.isEnemy ? (this.ammo || ((this.flags & UF.SKILL) && this.ammoMax > 0 ? [this.ammoLeft, this.ammoMax] : null) || (Array.isArray(this.coins) && this.coins[1] > 0 ? this.coins : null)) : null;
     const showSp = showBars && !this.isEnemy && (this.spMax > 0 || !!ammo);
     this.spBg.visible = this.spFill.visible = showSp;
     this.ammoDividers.clear(); this.ammoDividers.visible = showSp && !!ammo;
-    const spH = Math.max(2, bh * 0.55);
+    // official: the SP bar is the HP bar's height, right under it (no gap)
+    const spH = off ? bh : Math.max(2, bh * 0.55);
     let ready = false;
     let sy = 0;
     if (showSp) {
-      const active = !!(this.flags & UF.SKILL) || this.form === 'doll' || /^makoto_(s[123]|change)/.test(this.form || '');
-      const k = ammo ? ammo[0] / ammo[1] : clamp(this.sp / this.spMax, 0, 1);
+      let active = !!(this.flags & UF.SKILL) || this.form === 'doll' || /^makoto_(s[123]|change)/.test(this.form || '');
+      // a skill that waited for its next attack (b.snap: full while it waits) ends as that attack starts: its duration is
+      // the attack's animation — the bar drains over the clip that plays now
+      const A = this.actor;
+      if (this._wasSkill && !active && this._lastSpK > 0.95 && A && A.mode === 'attack' && A.clock < A.attackUntil) this._skillHold = { until: A.attackUntil, total: Math.max(0.05, A.attackUntil - A.clock) };
+      this._wasSkill = active;
+      const hold = !active && this._skillHold && A && A.clock < this._skillHold.until ? this._skillHold : null;
+      if (!hold) this._skillHold = null;
+      if (hold) active = true;
+      // a charge skill with a charge stored is ready (full), whatever the next charge's SP; while it runs, its duration
+      const stored = Array.isArray(this.charges) && Number(this.charges[0]) >= 1;
+      const k = hold ? clamp((hold.until - A.clock) / hold.total, 0, 1) : ammo ? ammo[0] / ammo[1] : !active && stored ? 1 : clamp(this.sp / this.spMax, 0, 1);
+      if (!hold) this._lastSpK = k;
       ready = !active && k >= 0.999;
-      sy = cy + bh / 2 + spH / 2 + 1.5;
-      this.spBg.position.set(x0 - 1, sy); this.spBg.width = bw + 2; this.spBg.height = spH + 2;
+      sy = cy + bh / 2 + spH / 2 + (off ? 0 : 1.5);
+      this.spBg.position.set(x0 - (off ? 0 : 1), sy); this.spBg.width = bw + (off ? 0 : 2); this.spBg.height = spH + (off ? 0 : 2);
+      this.spBg.tint = off ? OFFICIAL_BARS.back : COLORS.hpBack; this.spBg.alpha = off ? 0.55 : 1;
       this.spFill.position.set(x0, sy); this.spFill.width = bw * k; this.spFill.height = spH;
-      this.spFill.tint = (this.flags & UF.OVERHEATED) ? 0xf04444 : ammo ? COLORS.ammo : active ? COLORS.spActive : ready ? COLORS.spReady : COLORS.sp;
+      // ammo (and 琳琅诗怀雅's purse) keeps its colour whatever the skill flag says: a battle's end clears the flag while
+      // the rounds left still show
+      this.spFill.tint = (this.flags & UF.OVERHEATED) ? (off ? OFFICIAL_BARS.overload : 0xf04444) : ammo ? (off ? OFFICIAL_BARS.skill : COLORS.ammo) : off ? (active ? OFFICIAL_BARS.skill : OFFICIAL_BARS.sp) : active ? COLORS.spActive : ready ? COLORS.spReady : COLORS.sp;
       const shownAmmo = ammo ? ((this.flags & UF.OVERDRIVE) ? ammo[1] / 2 : ammo[1]) : 0;
       if (shownAmmo > 1) {
         this.ammoDividers.lineStyle(Math.min(.7, bw / shownAmmo * .3), COLORS.hpBack, .9);
@@ -2389,7 +2444,8 @@ export class UnitView {
       }
       this._spY = sy;
     }
-    this.spGlow.visible = ready;
+    this.spGlow.visible = ready && !off;
+    this._updateChargeCount(showSp && !prep, off, x0, bw, sy, spH, y, s, t);
     if (ready) {
       const pulse = 0.18 + 0.08 * Math.sin(t * 6);
       this.spGlow.position.set(x0 + bw, this._spY);
@@ -2400,18 +2456,21 @@ export class UnitView {
     if (this.chip) {
       const cs = clamp(s * (prep ? 0.24 : 0.19), 11, 28) / 44;
       this.chip.scale.set(cs);
-      this.chip.visible = this.alive;
+      this.chip.visible = this.alive && !(off && !prep);
       if (prep) this.chip.position.set(x, y - this.chip.height / 2 + 2);
       else this.chip.position.set(x0 - this.chip.width / 2 - 1, cy + (showSp ? spH / 2 : 0));
     }
-    // status icons row above the bars
-    const icons = this._iconKeys();
-    const isz = clamp(s * 0.26, 12, 26);
+    // status icons row above the bars; with the official effects on, a status the client shows with its own effect on the
+    // unit (generic.status: 隐匿, 晕眩, 冻结, 沉睡 … — render/vfx/wiring.js status loops) is that effect, not an icon
+    const official = !!(this.ctx.officialFor?.(this) ?? this.ctx.ofx?.active);
+    const icons = official && this.ctx.officialStatusKey ? this._iconKeys(Infinity).filter((k) => !this.ctx.officialStatusKey(k === 'invuln' ? 'invulnerable' : k)).slice(0, 4) : this._iconKeys();
+    const isz = clamp(s * 0.22, 10, 22);
     const iy = cy - bh / 2 - isz / 2 - 3;
     for (let i = 0; i < this.icons.length; i++) {
       const ic = this.icons[i];
       const key = icons[i];
-      if (!key || !this.alive || prep) { ic.visible = false; continue; }
+      // (设置「HP 바 표시 방식」 공식: no icon row above the bars)
+      if (!key || !this.alive || prep || off) { ic.visible = false; continue; }
       const tex = statusTexture(key);
       if (!tex) { ic.visible = false; continue; }
       ic.texture = tex;
@@ -2434,8 +2493,19 @@ export class UnitView {
       this.energyText.position.set(x0 + this.energyText.width / 2, gaugeTop + energyH / 2);
     }
     const wolfH = this._updateWolfPips(showBars && !this.isEnemy && !!this.wolves, x0, gaugeTop + energyH, s);
-    const coinH = this._updateCoins(showBars && !this.isEnemy && !!this.coins, x0, gaugeTop + energyH + wolfH, s);
-    this._updateElementBar(showBars && !!this.el, x0, bw, gaugeTop + energyH + wolfH + coinH + 1, spH, s, t);
+    const coinH = this._updateCoins(false, x0, gaugeTop + energyH + wolfH, s);   // the purse is the SP bar's ammo now
+    if (this.barShadow) {
+      const shadowH = (showHp ? bh : 0) + (showSp ? spH : 0);
+      const top = showHp ? cy - bh / 2 : sy - spH / 2;
+      this.barShadow.forEach((b, i) => {
+        b.visible = off && shadowH > 0;
+        if (!b.visible) return;
+        // measured on the client: a ~0.02-tile soft band centred on the bar
+        const pad = s * [0.02, 0.012, 0.006][i], ox = 0, oy = 0;
+        b.position.set(x0 - pad + ox, top + shadowH / 2 + oy); b.width = bw + pad * 2; b.height = shadowH + pad * 2;
+      });
+    }
+    this._updateElementBar(showBars && !!this.el, x0, bw, gaugeTop + energyH + wolfH + coinH + 1, spH, s, t, off ? { x: x + sx, y: cy - s * OFFICIAL_BARS.elementAbove } : null);   // (the gauge takes the icon row's place: centred)
     this._updateDownRing(!prep && !!this.down && !this.alive, x, this.screen.y - DOWN_LOOK.height * s, s, t);
     // blocked marker at the feet (enemies held by a blocker)
     const blocked = !prep && this.alive && this.isEnemy && (this.flags & UF.BLOCKED);
@@ -2609,7 +2679,40 @@ export class UnitView {
    * `elementLeft()` on a dark track `h` px tall — white for the 元素值 left; in the element's colour, the disc pulsing
    * (clock `t`), while it refills over a 爆发冷却. Built on the first gauge, hidden while there is none.
    */
-  _updateElementBar(show, x0, bw, top, h, s, t = 0) {
+  /**
+   * A charge skill's stored charges (b.snap `charges`, ≥ 1 stored): the client's counter — the number in a ring of amber
+   * dashes turning around it. Official HP bars: above the head (where the client draws it); else right of the SP bar's end,
+   * clear of the bars, the icons above them and the gauges below.
+   */
+  _updateChargeCount(show, off, x0, bw, sy, spH, headY, s, t) {
+    const n = show && Array.isArray(this.charges) && Number(this.charges[1]) > 1 ? Number(this.charges[0]) | 0 : 0;
+    let c = this._chargeCount;
+    if (n < 1) { if (c) c.root.visible = false; return; }
+    const P = this.P;
+    if (!c) {
+      const root = new P.Container(), ring = new P.Graphics();
+      const text = new P.Text('', { fontFamily: 'Bender, sans-serif', fontWeight: '700', fontSize: 30, fill: 0xffd23f, stroke: 0x1a1a1a, strokeThickness: 4 });
+      text.anchor.set(0.5);
+      // dashes on a 20-unit ring (drawn once, turned each frame)
+      ring.lineStyle(4, 0xffd23f, 1);
+      for (let i = 0; i < 6; i++) { const a0 = (i / 6) * Math.PI * 2, a1 = a0 + Math.PI * 2 / 6 * 0.62; ring.moveTo(Math.cos(a0) * 20, Math.sin(a0) * 20); ring.arc(0, 0, 20, a0, a1); }
+      root.addChild(ring, text);
+      c = this._chargeCount = { root, ring, text, n: -1 };
+      this.hud.addChild(root);
+    }
+    if (c.n !== n) { c.text.text = String(n); c.n = n; }
+    const d = off ? s * 0.26 : clamp(s * 0.2, 12, 22);
+    const k = d / 44;
+    c.root.scale.set(k);
+    c.ring.rotation = t * 1.6;
+    if (off) c.root.position.set(x0 + bw / 2, headY - d * 0.15);
+    else c.root.position.set(x0 + bw + d / 2 + 3, sy);
+    c.root.visible = true;
+  }
+
+  /** `at` (HP bar style official): the client's gauge — its disc with a ring filling around it, left of the unit above
+   *  the bars' left end (no bar). */
+  _updateElementBar(show, x0, bw, top, h, s, t = 0, at = null) {
     let r = this._elBar;
     if (!show) { if (r) r.root.visible = false; return; }
     const tex = hudRings();
@@ -2625,6 +2728,23 @@ export class UnitView {
       this.hud.addChild(root);
     }
     const d = clamp(s * EL_BAR.icon, EL_BAR.min, EL_BAR.max) * (this.isEnemy ? EL_BAR.enemy : 1);
+    if (at) {
+      if (!r.ring) { r.ring = new this.P.Sprite(this.P.Texture.EMPTY); r.ring.anchor.set(0.5); r.root.addChild(r.ring); }
+      const k = this.elementLeft();
+      r.bg.visible = r.fill.visible = false; if (r.value) r.value.visible = false;
+      r.disc.texture = (this.isEnemy ? tex.discEnemy : tex.disc)[this.el] || tex.disc.burn;
+      r.disc.width = r.disc.height = d / HUD_DISC;
+      r.disc.position.set(at.x, at.y);
+      r.ring.texture = ringArc(clamp(k, 0, 1));
+      r.ring.tint = (ELEMENT_RING[this.el] || ELEMENT_RING.burn).tint;
+      r.ring.width = r.ring.height = d * 1.35 / HUD_DISC;
+      r.ring.position.set(at.x, at.y);
+      r.ring.visible = k > 0;
+      r.disc.alpha = this.elementCooling() ? EL_BAR.pulse + (1 - EL_BAR.pulse) * (0.5 + 0.5 * Math.cos(t * Math.PI * 2 * EL_BAR.pulseHz)) : 1;
+      r.root.visible = true;
+      return;
+    }
+    r.bg.visible = true; if (r.ring) r.ring.visible = false; if (r.value) r.value.visible = true;
     const cy = top + EL_BAR.gap + d / 2;
     r.disc.texture = (this.isEnemy ? tex.discEnemy : tex.disc)[this.el] || tex.disc.burn;
     r.disc.width = r.disc.height = d / HUD_DISC;   // the disc fills HUD_DISC of its atlas cell
@@ -2984,6 +3104,7 @@ export class UnitView {
     this._dropActor();
     this.shadow.destroy();
     if(this.attackRange)this.attackRange.destroy();
+    for(const row of this.attackRangeRows?.values()||[])row.destroy();this.attackRangeRows?.clear();
     this.snowFx?.destroy();
     if(this.skillZone)this.skillZone.destroy();
     for(const extra of this.skillZoneExtra.values())extra.destroy();this.skillZoneExtra.clear();
@@ -2998,9 +3119,16 @@ export class UnitView {
 const SH_P = { x: 0, y: 0, s: 0, depth: 0 };
 const FA_P = { x: 0, y: 0, s: 0, depth: 0 };
 const FA_C = { x: 0, y: 0, s: 0, depth: 0 };
+/** The deploy-direction mark: ring radius, the orange arc's half-angle, the arrowhead's reach past the ring (tiles) and
+ * its base half-angle (radians). */
+const FACING = Object.freeze({ r: 0.36, arc: Math.PI / 4, tip: 0.15, head: 0.3 });
 const LG_P = { x: 0, y: 0, s: 0, depth: 0 };
 const HUD_P = { x: 0, y: 0, s: 0, depth: 0 };
 const ICON_TMP = [];
+/** 设置「HP 바 표시 방식」 official: the client's bar colours (read off its battle screens): operator HP light blue, SP
+ *  yellow-green charging / amber while the skill runs, enemy HP orange, a leader's (悬赏 leaders, the bosses) red on grey. */
+const OFFICIAL_BARS = Object.freeze({ elementAbove: 0.28, width: 0.74, fixedBossWidth: 4, hpH: 0.042, leaderH: 0.06, belowFeet: 0.16,
+  ally: 0x6cb2d2, sp: 0x8aa43f, skill: 0xc3991c, overload: 0xb04516, enemy: 0xd46c3a, leader: 0xcf2a33, back: 0x1c1c1c, leaderBack: 0x7d8088 });
 
 /**
  * Unit-layer zIndex of a unit / piece whose feet are at (x, y): farther rows first (so raised block rows, keyed by
@@ -3079,6 +3207,7 @@ export class ItemView {
     const lifted = this.lift > 0;
     const p = cam.project(this.x, this.y, lifted ? this.z : this.z + this.lift + 0.12 + Math.sin(t * 2 + this.bob) * 0.03, this.screen);
     this.placed = true;
+    if (!lifted) p.y += p.s * STAND_DROP;   // on the ground: the units' standing height (STAND_DROP)
     this.root.position.set(p.x, p.y);
     this.root.zIndex = unitDepthKey(cam, this.x, this.y, this.lift);
     const size = p.s * 0.62;

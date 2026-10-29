@@ -42,9 +42,11 @@ const num = (v, d = 0) => (typeof v === 'number' && Number.isFinite(v) ? v : (ty
 /** ASPD blackboard values: a fraction (|v| < 1, e.g. −0.6 / −0.05) is ×100 ASPD, otherwise flat (+20). */
 const aspdOf = (v) => (Math.abs(v) < 1 ? v * 100 : v);
 
-export const TERRAIN = Object.freeze({ mire: 1, smog: 2, deepsea: 3, infection: 4 });
-const TERRAIN_NAME = ['', 'mire', 'smog', 'deepsea', 'infection'];
-const BUFF = { 1: 'terrain:mire', 2: 'terrain:smog', 3: 'terrain:deepsea', 4: 'terrain:infection' };
+// thicket (덤불, the fork's custom 설원 battlefield, tile_custom_thicket): 隐匿 for every unit on it — the operators deployed
+// there and the enemies walking in (the owner's design, not an official tile)
+export const TERRAIN = Object.freeze({ mire: 1, smog: 2, deepsea: 3, infection: 4, thicket: 5 });
+const TERRAIN_NAME = ['', 'mire', 'smog', 'deepsea', 'infection', 'thicket'];
+const BUFF = { 1: 'terrain:mire', 2: 'terrain:smog', 3: 'terrain:deepsea', 4: 'terrain:infection', 5: 'terrain:thicket' };
 const AIRFLOW = 'terrain:airflow';
 const CRATE_KEY = 'trap_1105_accrate';
 const TURRET_KEY = 'trap_1104_aclasert';
@@ -359,7 +361,7 @@ function enterTerrain(battle, st, u, code) {
   m.mireStacks = 0;
   m.mireTriggers = 0;
   if (!code) return;
-  if (code === TERRAIN.smog) battle.addBuff(u, { key: BUFF[code], flags: { stealth: true } });
+  if (code === TERRAIN.smog || code === TERRAIN.thicket) battle.addBuff(u, { key: BUFF[code], flags: { stealth: true } });
   else if (code === TERRAIN.deepsea) {
     const D = st.deepsea;
     battle.addBuff(u, { key: BUFF[code], mods: { aspd: D.aspd, moveMul: D.moveMul }, interval: 1, onTick: deepWaterDamage(battle, D.damage) });

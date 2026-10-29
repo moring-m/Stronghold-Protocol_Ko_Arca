@@ -1337,6 +1337,17 @@ test('smog protects allies from splash and ground-zone damage, but not direct bl
   assert.ok(h.b.dealDamage(e,u,{amount:100,type:'phys',isAttack:true}) > 0);
 });
 
+test('덤불 (custom_snowfield thicket): 隐匿 for the operator deployed on it and the enemy standing in it; none off it', REAL, () => {
+  const h = makeBattle({ stageId: 'custom_snowfield', defs: { chess: { test_guard: guard() }, enemies: { enemy_dummy: dummy(), enemy_off: dummy({ key: 'enemy_off' }) } },
+    units: [{ chessId: 'test_guard', row: 11, col: 7, uid: 1 }], enemies: [{ key: 'enemy_dummy', pos: [9, 7] }, { key: 'enemy_off', pos: [12, 6] }], autoFinish: false });
+  h.step();
+  const u = h.unit(1), e = h.enemy('enemy_dummy'), off = h.enemy('enemy_off');
+  assert.equal(terrainAt(h.b, 11, 7), 'thicket');
+  assert.ok(u.findBuff('terrain:thicket') && u.s.flags.stealth, 'the operator on it');
+  assert.ok(e.findBuff('terrain:thicket') && e.s.flags.stealth, 'the enemy in it');
+  assert.equal(off.findBuff('terrain:thicket'), null, 'an enemy off it');
+});
+
 test('Yan dragon acquires enemies inside its circular range even across rounded tile boundaries', REAL, () => {
   const h = makeBattle({ defs: { enemies: { enemy_dummy: dummy() } }, units: [], enemies: [{ key:'enemy_dummy',pos:[11.89,6.89] }], autoFinish:false });
   h.step();

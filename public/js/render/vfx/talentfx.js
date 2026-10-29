@@ -28,6 +28,7 @@
 
 import { talentBindings, toggleOn, triggerKinds, bindable, bindingKeys, nodeUses } from './talents.js';
 import { slotKey, lifeOf } from './skills.js';
+
 import { UF } from '../../../../shared/constants.js';
 
 /** Battle seconds a held (non-oneshot) row of a talent's single cast lasts (SkillFx's SKILL_CAST_S). */

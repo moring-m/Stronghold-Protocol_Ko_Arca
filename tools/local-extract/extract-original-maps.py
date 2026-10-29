@@ -180,7 +180,7 @@ for rec in materials.values():
 used_textures={name for name in group if '-rgbm-v1' in name}
 used_textures|={ref['name'] for rec in materials.values() for slot,ref in rec['textures'].items() if slot in ('_MainTex','_EmissionMap','_BumpMap','_MetallicGlossMap','_FlowMap','_BumpMapDetail','_FoamMask','_FoamTex','_DissolveTex','_CausticsTex','_WaterNoiseTex')}
 group={name:rec for name,rec in group.items() if rec['kind']!='Texture2D' or name in used_textures}
-path=out/'materials-v13.json';path.write_text(json.dumps(finite_json(materials),separators=(',',':'),allow_nan=False));register('materials',path,'original-unity-materials')
+path=out/'materials-v14.json';path.write_text(json.dumps(finite_json(materials),separators=(',',':'),allow_nan=False));register('materials',path,'original-unity-materials')
 manifest['groups']['map/original']=group;manifest['count']=sum(map(len,manifest['groups'].values()))
 manifest['originalMaps']={'repository':'ArknightsAssets/ArknightsAssets2','indexCommit':'7ddea107cef9ab24d55052f36bf984fcd1bff9ed','versionId':'26-04-14-11-12-01_cf554f','stages':report}
 if verify:

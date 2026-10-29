@@ -679,6 +679,7 @@ export async function createFieldView(host, options = {}) {
   // replay's first landings together); a wish kept until the first gesture / audible SFX
   try { ctx.audio?.warmLandings?.(); } catch { /* the sound is optional */ }
   const tiles = new TileField({ ground: layers.ground, overlay: layers.overlay, props: layers.units, anim: layers.anim });
+  tiles.setOfficialMarks(settings.tileMarkStyle === 'official');
   setupCleanup.push(() => tiles.destroy());
   const fx = new FxSystem({
     P, layers, cam: () => cam, settings, assets, heightAt, redVignette: bg.red, surfaceLayer: ctx.surfaceLayer,
@@ -753,6 +754,8 @@ export async function createFieldView(host, options = {}) {
   /** The stage's official scene, once loaded (the procedural board shows meanwhile and when there is none). */
   function useOfficialScene(st) {
     if (st?.coopEightStage || st?.previewLayout) return;
+    // 맵 품질 '낮음' (단순 3D): the simple procedural board only — the official scene pack is the original map's mesh
+    if (settings.mapQuality === 'low') return;
     const id = st && typeof st.id === 'string' ? st.id : '';
     if (!id || !board3d) return;
     loadScenePack(assets, id).then((scene) => {
@@ -1560,7 +1563,8 @@ export async function createFieldView(host, options = {}) {
   function syncLeaderHits() {
     if (!tiles) return;
     const on = !!leader && !leaderHidden && mode === 'prep' && prepXf.kind === 'bossPrep' && [...hlReq.keys()].some((g) => RANGE_GROUPS.has(g));
-    if (on) tiles.setHighlights(leader.stand.tiles, LEADER_HIT_STYLE, LEADER_HIT_STYLE.group);
+    // (the official marks: the boss's tiles as red sliding bands, like a range)
+    if (on) tiles.setHighlights(leader.stand.tiles, LEADER_HIT_STYLE, LEADER_HIT_STYLE.group, { stripes: true, stripeColor: 0xe0302a });
     else tiles.clearHighlights(LEADER_HIT_STYLE.group);
   }
   /** The leader under a canvas point (its drawn body or hit area, like a battle enemy), or null. */
@@ -1657,7 +1661,7 @@ export async function createFieldView(host, options = {}) {
   /**
    * Draw a BOARD-space highlight group: range previews never light the bench / temp pads (rows 7–8: no battle
    * happens there), the prep field transform maps the tiles onto the boss field in the Final Assault prep, and the 2D
-   * board stripes range previews under the units (the 3D board uses the existing direction-wheel layer).
+   * and 3D boards stripe range previews under the units, as the client does.
    */
   function drawHighlight(list, style, group) {
     const key = hlKey(style, group);
@@ -1665,7 +1669,7 @@ export async function createFieldView(host, options = {}) {
     let t = tilesToDisp(IDENTITY, list);
     if (mode === 'prep' && prepXf !== IDENTITY) t = tilesToDisp(prepXf, t);
     if (range) t = t.filter(([r,c]) => rangeTileInside(ctx.rangeRect(),r,c));
-    tiles.setHighlights(t, style, key, { stripes: range && key !== 'rangeStand' && !board3d });
+    tiles.setHighlights(t, style, key, { stripes: range && key !== 'rangeStand' });
   }
   function clearHl(group) {
     if (group) hlReq.delete(group); else hlReq.clear();
@@ -1694,7 +1698,8 @@ export async function createFieldView(host, options = {}) {
     dragState = { uid: p.uid, key, view: v, from: p.from, home: v._home || { x: v.x, y: v.y, z: v.z } };
     v.lift = 0.3;
     v._tween = null;
-    const t = pieceTile(p.piece);
+    // (the official marks: no frame on the tile the piece came from)
+    const t = settings.tileMarkStyle === 'official' ? null : pieceTile(p.piece);
     if (t) drawHighlight([[t.row, t.col]], 'hover', 'dragFrom');
     drawHighlight(legalTiles(p.piece), 'legal', 'legal');
   }
@@ -1703,12 +1708,15 @@ export async function createFieldView(host, options = {}) {
     if (!dragState) return;
     const v = dragState.view;
     const item = v instanceof ItemView;
-    // Touch previews the legal tile. Mouse and pen models follow the pointer continuously.
-    const stand = item ? null : dragStandTile(p);
+    // 타일 자석 (설정 조작, on by default) previews the legal tile; off, the model follows the pointer continuously.
+    const stand = item ? null : dragStandTile(p, GEO, settings.tileMagnet !== false);
     if (stand) {
+      // on the magnet tile the piece stands as deployed (the units' standing height), not held up
       const w = boardWorld(stand.row, stand.col, stand.bench);
       v.x = w.x; v.y = w.y; v.z = w.z;
+      if (!item) v.lift = 0;
     } else {
+      if (!item) v.lift = 0.3;
       // otherwise held under the pointer (the player still sees what they carry): a unit with its drawn (lifted) feet
       // DRAG_HOLD_TILES of its own px per tile below it (the scale at the pointer's ground, refined once at the feet), an
       // item plate centred on it
@@ -1730,7 +1738,8 @@ export async function createFieldView(host, options = {}) {
     if (p.target && p.target.area !== 'temp') {
       const r = p.target.area === 'board' ? p.target.row : GEO.HAND_ROW;
       const c = p.target.area === 'board' ? p.target.col : p.target.idx;
-      drawHighlight([[r, c]], p.legal ? 'target' : 'illegal', 'dragTarget');
+      // (a legal target shows the official marks alone — the green wash and the range — no frame of its own)
+      if (p.legal && settings.tileMarkStyle === 'official') clearHl('dragTarget'); else drawHighlight([[r, c]], p.legal ? 'target' : 'illegal', 'dragTarget');
     } else clearHl('dragTarget');
   }
 
@@ -2706,6 +2715,7 @@ export async function createFieldView(host, options = {}) {
       Object.assign(settings,s);
       if(typeof s.officialDamageNumbers === 'boolean')settings.officialDamageNumbers=s.officialDamageNumbers;
       if (typeof s.ammoCount === 'boolean') settings.ammoCount = s.ammoCount;
+      tiles.setOfficialMarks(settings.tileMarkStyle === 'official');
       app.ticker.maxFPS = settings.frameLimit || 60;
       board3d?.setQuality?.(settings.shadows === false ? 'low' : 'high');
       if (previousMap !== (settings.mapQuality || 'high')) {

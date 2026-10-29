@@ -40,6 +40,13 @@ export function bondBoardKey(thresholds, tier) {
   return t === 0 ? '1_0' : `${n}_${t}`;
 }
 
+/** The board ring's lit segments count members toward the bond's FIRST threshold (not the reached tier): `<first
+ *  threshold>_<members, capped>`, the full lit disc once that first threshold is met (the bond is active). */
+export function bondBoardProgress(th, count, active) {
+  const n = Math.max(1, Math.min(4, Number(th?.[0]) || 1));
+  return { n, t: active ? n : Math.max(0, Math.min(n, count | 0)) };
+}
+
 /**
  * One HUD bond in the official autochess_hud_bond_item layout (83×84 at the reference scale): the board ring
  * (bondBoardKey), the bond's icon (36 px — black on a completed bond's filled disc, else light), the stack count on its
@@ -85,7 +92,7 @@ export function BondStrip({ bonds, layersDisabled = false, onOpen, openId = null
         const name = rec?.name || b.bondId;
         return html`<div key=${b.bondId} role="listitem" data-bond=${b.bondId} data-off="1"
             class=${cx('bslot', 'is-off', openId === b.bondId && 'is-open')}>
-          <${HudBond} name=${name} icon=${bondIconUrl(m, b.bondId)} thresholds=${th.length} tier=${0} active=${false} disabled=${true}
+          <${HudBond} name=${name} icon=${bondIconUrl(m, b.bondId)} thresholds=${bondBoardProgress(th, 0, false).n} tier=${0} active=${false} disabled=${true}
             open=${openId === b.bondId} onClick=${() => onOpen(b.bondId)} title=${`${briefingBondTip(name, 'off')} · ${b.count ?? 0} 名成员`} />
           <span class="bslot__count bslot__off">本局禁用</span>
         </div>`;
@@ -94,7 +101,7 @@ export function BondStrip({ bonds, layersDisabled = false, onOpen, openId = null
       return html`<div key=${b.bondId} role="listitem" data-bond=${b.bondId} data-harmony=${b.harmony > 0 ? b.harmony : null}
           class=${cx('bslot', b.active && 'is-active', openId === b.bondId && 'is-open')}>
         <${HudBond} name=${rec?.name || b.bondId} icon=${bondIconUrl(m, b.bondId)} layers=${rec?.noStack ? undefined : b.layers ?? 0}
-          thresholds=${th.length} tier=${b.tier ?? 0} active=${!!b.active} open=${openId === b.bondId} onClick=${() => onOpen(b.bondId)}
+          thresholds=${bondBoardProgress(th, b.count ?? 0, !!b.active).n} tier=${bondBoardProgress(th, b.count ?? 0, !!b.active).t} active=${!!b.active} open=${openId === b.bondId} onClick=${() => onOpen(b.bondId)}
           title=${`${rec?.name || b.bondId} ${b.count ?? 0}/${next ?? th[th.length - 1] ?? '-'}${b.harmony > 0 ? `（含调和 +${b.harmony}）` : ''}`} />
         <span class=${cx('bslot__count', 'num', next == null && 'is-max')}>${b.count ?? 0}<small>/${next ?? th[th.length - 1] ?? '-'}</small></span>
       </div>`;
@@ -143,13 +150,14 @@ export function BondPopup({ bondId, entry, priv, banned = [], onClose, onMember,
   const vars = Object.entries({ '--bd-bg': sprite('detail_bg'), '--bd-on': sprite('bond_active_bg'), '--bd-off': sprite('bond_inactive_bg'),
     '--bd-stack': sprite('stack_bg'), '--bd-frame': sprite('avatar_border'), '--bd-frame-on': sprite('avatar_active_border'),
     '--bd-people': sprite('title_char_icon'), '--bd-check': sprite('active_icon') }).filter(([, v]) => v).map(([k, v]) => `${k}:${v}`).join(';');
-  const ring = uiUrl(m, `bondBoardIcon/${bondBoardKey(th.length, tier)}`);
+  const board = bondBoardProgress(th, off ? 0 : count, active);
+  const ring = uiUrl(m, `bondBoardIcon/${bondBoardKey(board.n, board.t)}`);
   const icon = bondIconUrl(m, bondId);
   return html`<div class=${cx('bpop', 'bpop--official', 'brackets', `bpop--${at}`, over && 'is-over', owner && 'is-other')} data-place=${at} data-owner=${owner || null}
       style=${vars || undefined} role="dialog" aria-label=${owner ? `${owner} 的盟约：${b.name}` : `盟约：${b.name}`}>
     <button type="button" class="bpop__close" aria-label="关闭" onClick=${onClose}><${Icon} name="close" /></button>
     <header class="bpop__head">
-      <div class=${cx('bpop__disc', active && 'is-active', ring && 'has-board', tier >= Math.max(1, Math.min(4, th.length)) && active && 'is-full')}>
+      <div class=${cx('bpop__disc', active && 'is-active', ring && 'has-board', active && 'is-full')}>
         ${ring ? html`<img class="bpop__board" src=${ring} alt="" draggable=${false} />` : null}
         ${ring && icon ? html`<img class="bpop__icon" src=${icon} alt="" draggable=${false} />` : html`<${BondGlyph} bondId=${bondId} />`}
       </div>

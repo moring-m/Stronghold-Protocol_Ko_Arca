@@ -392,6 +392,7 @@ export function SettingsModal({ open, onClose }) {
       <div class="set-row set-row--language"><span class="set-row__label">화면 언어</span><${LangButton} /></div>
       ${html`<${Choice} label=${mobileUiScaleText(getLang()).label} testId="mobile-ui-scale" value=${s.mobileUiScale} options=${MOBILE_UI_SCALES.map(v=>[v,Math.round(v*100)+'%'])} onChange=${v=>updateSettings({mobileUiScale:Number(v)})} /><p class="set-hint" data-i18n-skip>${mobileUiScaleText(getLang()).hint}</p>`}
       <${Toggle} label="배치 시 카메라 확대" value=${s.deployCameraZoom} onChange=${v=>updateSettings({deployCameraZoom:v})} />
+      <${Toggle} label=${t('타일 자석')} micro="TILE MAGNET" value=${s.tileMagnet} onChange=${v=>updateSettings({tileMagnet:v})} />
       <${Toggle} label="전투 통계" value=${s.combatMetrics} onChange=${v=>updateSettings({combatMetrics:v})} />
       <${Toggle} label="차지 캐스터 에너지" value=${s.mysticEnergy} onChange=${v=>updateSettings({mysticEnergy:v})} />
       <${Toggle} label="스킬 범위 표시" value=${s.skillRanges} onChange=${v=>updateSettings({skillRanges:v})} />
@@ -404,6 +405,10 @@ export function SettingsModal({ open, onClose }) {
         </div>
       </div>
       <${Toggle} label=${t('官方伤害数字')} micro="OFFICIAL NUMBERS" value=${s.officialDamageNumbers} onChange=${v=>updateSettings({officialDamageNumbers:v})}/>
+      <${Choice} testId="hp-bar-style" label="HP 바 표시 방식" value=${s.hpBarStyle} options=${[['default','기본'],['official','공식']]} onChange=${v=>updateSettings({hpBarStyle:v})} />
+      <${Choice} testId="tile-mark-style" label=${t('타일 표시 방식')} value=${s.tileMarkStyle} options=${[['default',t('기본')],['official',t('공식')]]} onChange=${v=>updateSettings({tileMarkStyle:v})} />
+      <${Toggle} label=${t('FPS 표시')} micro="SHOW FPS" value=${s.showFps} onChange=${v=>updateSettings({showFps:v})} />
+      <p class="set-hint">공식: 원작 전투 화면의 HP·SP 바 색과 모양을 쓰고, 전투 중 HP 바 옆의 등급 표시를 숨깁니다.</p>
       <${Toggle} label=${t('弹药数量')} micro="AMMO COUNT" value=${s.ammoCount} onChange=${(v) => updateSettings({ ammoCount: v })} />
       <p class="set-hint">${t('弹药类技能开启时，在弹药条下方显示剩余弹药 / 总弹药数（如 13/14）。官方界面没有这个数字。')}</p>
       <p class="set-hint" data-i18n-skip>합산: 연속 피해를 묶어 표시 · 모두: 타격마다 표시 · 기본: 명일방주의 붉은 대미지 표시 판정(예상 피해의 1.5배 이상)을 적용합니다.</p>

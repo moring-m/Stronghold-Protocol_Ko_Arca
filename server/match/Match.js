@@ -667,7 +667,7 @@ export class Match {
   _resync(ps) {
     const playerId = ps.playerId;
     this.sendTo(playerId, this.publicView());
-    if(ps.spectator&&this.augments.enabled)this.sendTo(playerId,this.augments.spectatorView(ps));
+    if((ps.spectator||(!ps.isBot&&ps.alive===false))&&this.augments.enabled)this.sendTo(playerId,this.augments.spectatorView(ps)); // eliminated: as a spectator seat
     this.sendTo(playerId, {t:'m.chatHistory',messages:this.chatHistory,faction:ps.chatFaction});
     if (!this.ended) {
       if (!ps.spectator) {

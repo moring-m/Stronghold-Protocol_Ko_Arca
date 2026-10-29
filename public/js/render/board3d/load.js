@@ -74,6 +74,26 @@ export const PACK_IMAGES = Object.freeze({
   crate: ['mesh/trap_110', 'TX_trap_1105_accrate'],
 });
 
+/**
+ * Per-stage board atlases (stage.boardTheme): the same UV layout as TX_autochessi_D/_N/_M_rough/_E with themed cells
+ * (tools/local-extract/compose-snowfield-atlas.py). Loaded on demand by pack.loadTheme, only for the stages using them.
+ */
+export const BOARD_THEMES = Object.freeze({
+  snow: Object.freeze({
+    D: ['map/snowfield', 'TX_snowfield_D'], N: ['map/snowfield', 'TX_snowfield_N_rgb'], R: ['map/snowfield', 'TX_snowfield_M_rough'],
+    E: ['map/snowfield', 'TX_snowfield_E'],
+    // the ground far below: the blue-grey of the official snow scenes' distance
+    backdrop: [0.42, 0.5, 0.6],
+    // map/original scene of the surroundings (tools/local-extract/compose-snowfield-scene.py; level_main_08-01)
+    scenery: 'snowfield-scenery',
+    light: Object.freeze({ color: 0xe6e8ec, intensity: 1.55, hemi: 0.42 }),
+    haze: 0x7f90a6,
+    // tile glyph → official tile mesh role(s) of that scene's kit, stacked ('#' : 'rocks' next to a field tile, else 'dirt';
+    // the preview pen's floor: 'ground')
+    kit: Object.freeze({ r: 'ground', k: 'ground', S: 'ground', E: 'ground', I: 'ground', O: 'ground', R: 'ground', h: 'high', b: ['ground', 'fence'], f: ['ground', 'nopass'], p: 'ground', a: 'iceblock', A: 'dirt', X: 'block', '#': 'dirt' }),
+  }),
+});
+
 export const PACK_MESHES = Object.freeze({
   crate: ['mesh/trap_110', 'trap_1105_accrate'],
   box: ['mesh/s_common_box_01', 'pCube2'],
@@ -198,7 +218,26 @@ export function loadBoardPack(assets, { native = true } = {}) {
       const m = text ? parseObj(text) : null;
       if (m) meshes.gate[slot] = { mesh: m, material: rec && Array.isArray(rec.materials) ? rec.materials[0] || null : null };
     }));
+    const themes = {}, themePending = {};
+    /** Images of a board theme ({ D, N?, R?, E? }), or null when the manifest does not list it. */
+    const loadTheme = (name) => {
+      const spec = BOARD_THEMES[name];
+      if (!spec) return Promise.resolve(null);
+      if (name in themes) return Promise.resolve(themes[name]);
+      return themePending[name] ||= (async () => {
+        const out = {};
+        await Promise.all(Object.entries(spec).filter(([, v]) => Array.isArray(v) && typeof v[0] === 'string').map(async ([k, [g, n]]) => {
+          const u = url(g, n);
+          const img = u ? await assets.image(u, { retry: true }).catch(() => null) : null;
+          if (img && (img.width || img.naturalWidth) > 0) out[k] = img;
+        }));
+        themes[name] = out.D ? out : null;
+        delete themePending[name];
+        return themes[name];
+      })();
+    };
     return {
+      themes, loadTheme,
       key: `${dUrl}#${tiles?.version || 0}`,
       images, meshes, original, tiles: isObj(tiles) ? tiles : null, uv: resolveUvTable(isObj(tiles) ? tiles : null),
       materials: { theme: isObj(theme) ? theme : null, fx: isObj(fxMats) ? fxMats : null },

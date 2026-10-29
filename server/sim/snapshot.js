@@ -143,8 +143,8 @@ export function animOf(u, t) {
   return ANIM.IDLE;
 }
 
-// PRTS 技能 §过载: each half has its own gauge; the second half is red.
-export function overdriveSkill(sk) { return !!sk && ['skchr_horn_2', 'skchr_horn_3', 'skchr_rockr_2'].includes(sk.id); }
+// PRTS 技能 §过载 (the skills whose text marks <$ba.overdrive>过载</>): each half has its own gauge; the second half is red.
+export function overdriveSkill(sk) { return !!sk && ['skchr_horn_2', 'skchr_horn_3', 'skchr_rockr_2', 'skchr_wisdel_2'].includes(sk.id); }
 function overdriveLeft(sk) { return sk.kind === 'ammo' ? sk.ammoLeft / Math.max(1, sk.ammoMax) : sk.timeLeft / Math.max(.01, sk.duration); }
 
 /** Snapshot tuple for one unit. */
@@ -168,6 +168,9 @@ export function unitTuple(u, t) {
     if (!spMax) spMax = u.mem.skillCastDuration;
     sp = spMax * Math.max(0, Math.min(1, (u.mem.skillCastUntil - t) / u.mem.skillCastDuration));
   }
+  // a skill that waits for its next attack (古米 S1's heal, every pending-attack instant / charge skill): full until that
+  // attack — whose animation is the skill's duration (the renderer drains the bar over it: units.js _skillHold)
+  else if (sk && sk.active && !sk.isTimed && sk.pending) sp = spMax;
   const doll = u.trait?.doll && u.findBuff('trait:substitute');
   if (doll) { spMax = doll.duration; sp = Math.max(0, doll.timeLeft); }
   const persona = u.mem.makoto;

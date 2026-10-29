@@ -53,12 +53,14 @@ test('coin balance is snapshot-owned: preserves zero, rejects malformed entries 
   assert.equal(b.sample(1).get(1).coins, null);
 });
 
-test('the coin HUD shows balance/cap and does not leave a stale label when its snapshot entry disappears', () => {
+test('the purse reads as ammo in the SP bar (balance / cap segments), no separate coin HUD, gone with its snapshot entry', () => {
   const v = view();
   try {
-    v.sync(sample({ coins: [0, 10] }), 0); v.update(0.02, cam(), 0);
-    assert.equal(v.coinHud?.text.text, '0/10'); assert.equal(v.coinHud.root.visible, true);
-    v.sync(sample(), 1); v.update(0.02, cam(), 1); assert.equal(v.coinHud.root.visible, false);
+    v.sync(sample({ coins: [4, 10] }), 0); v.update(0.02, cam(), 0);
+    assert.ok(!v.coinHud?.root.visible, 'no coin HUD');
+    assert.equal(v.spFill.visible, true); assert.equal(v.ammoDividers.visible, true);
+    assert.ok(Math.abs(v.spFill.width / (v.spBg.width - 2) - 0.4) < 1e-6);
+    v.sync(sample(), 1); v.update(0.02, cam(), 1); assert.equal(v.ammoDividers.visible, false);
   } finally { v.destroy(); }
 });
 

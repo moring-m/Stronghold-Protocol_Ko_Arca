@@ -89,8 +89,9 @@ export function resolveDrop(p) {
  * the pointer. As in the official deploy drag (the owner's recording of 2026-10-09) the model stands on the tile the
  * finger is on, and moving within that tile leaves it where it is. app.js never snaps an item plate.
  */
-export function dragStandTile(move, geo = GEO) {
-  if (move?.pointerType !== 'touch') return null;
+export function dragStandTile(move, geo = GEO, magnet = move?.pointerType === 'touch') {
+  // 设置 조작「타일 자석」: the carried piece sits on the legal tile under the pointer, whatever the pointer
+  if (!magnet) return null;
   const t = move && move.legal === true ? move.target : null;
   if (!t) return null;
   if (t.area === 'board' && Number.isInteger(t.row) && Number.isInteger(t.col)) return { row: t.row, col: t.col, bench: false };

@@ -80,6 +80,8 @@ void main(void) {
 
 const HL_STYLES = {
   legal: { color: COLORS.legal, fill: 0.26, line: 0.9 },
+  // the client's deployable tiles while a piece is dragged: an even green wash, no frame (measured on its screen)
+  officialLegal: { color: 0x38a555, fill: 0.55, line: 0 },
   illegal: { color: COLORS.illegal, fill: 0.32, line: 0.95 },
   range: { color: COLORS.range, fill: 0.3, line: 0.85 },
   rangeStand: { color: COLORS.rangeStand, fill: 0.3, line: 0.9 },
@@ -90,7 +92,7 @@ const HL_STYLES = {
 
 const SIDE_MAT = {
   wall: 'wallSide', forbid: 'forbidSide', forbid2: 'forbidSide', sep: 'sepSide', hand: 'benchSide', temp: 'benchSideTemp',
-  fence: 'fenceSide', margin: 'forbidSide',
+  fence: 'fenceSide', margin: 'forbidSide', ice: 'iceSide',
 };
 
 /**
@@ -145,7 +147,7 @@ export function parseStage(stage, band = [0, ROWS - 1], field = [0, 13]) {
   // high-ground plates: frame piece by connectivity (texture top = the tile's far edge)
   const wall = (r, c) => { const n = grid[r]?.[c]; return !!n && n.drawn && n.glyph === 'h'; };
   for (const row of grid) for (const t of row) {
-    if (t.glyph !== 'h' || !t.drawn) continue;
+    if (t.glyph !== 'h' || !t.drawn || t.mat === 'ice') continue;
     const L = wall(t.r, t.c - 1), Rt = wall(t.r, t.c + 1);
     if (L || Rt) t.top = L && Rt ? 'wallM' : Rt ? 'wallL' : 'wallR';
     else {
@@ -158,32 +160,58 @@ export function parseStage(stage, band = [0, ROWS - 1], field = [0, 13]) {
 
 const hash2 = (r, c) => ((r * 73856093) ^ (c * 19349663)) >>> 0;
 
-/** Stripe spacing (tiles, along x) of striped range highlights. */
-const STRIPE_STEP = 0.2;
 /**
- * Diagonal stripes (world x − y = const, like the official striped range tiles) clipped to tile (r, c)'s top at
- * height z, drawn as light orange lines into `g`.
+ * The client's attack-range tiles: orange diagonal bands with clear gaps between (half of each period), sliding across
+ * the range over time (measured on its screen: one period ≈ 0.44 tile, about a period a second).
  */
-export function stripeSegments(r, c, inset = 0.05, step = STRIPE_STEP) {
-  const a = 0.5 - inset;
-  const x0 = c - a, x1 = c + a, y0 = r - a, y1 = r + a;
+const RANGE_STRIPE = Object.freeze({ step: 0.44, fill: 0.5, speed: 0.44, color: 0xd58619, alpha: 0.95 });
+
+/** Clip a convex polygon ([[x, y]]) to the half-plane a·(x, y) ≤ k. */
+function clipHalf(poly, ax, ay, k) {
   const out = [];
-  for (let d = (x0 - y1) + step / 2; d < x1 - y0; d += step) {
-    // points of x − y = d inside the square: x from max(x0, y0 + d) to min(x1, y1 + d)
-    const xa = Math.max(x0, y0 + d), xb = Math.min(x1, y1 + d);
-    if (xb - xa > 1e-4) out.push([xa, xa - d, xb, xb - d]);
+  for (let i = 0; i < poly.length; i++) {
+    const P = poly[i], Q = poly[(i + 1) % poly.length];
+    const fp = ax * P[0] + ay * P[1] - k, fq = ax * Q[0] + ay * Q[1] - k;
+    if (fp <= 0) out.push(P);
+    if ((fp < 0) !== (fq < 0) && fp !== fq) { const t = fp / (fp - fq); out.push([P[0] + (Q[0] - P[0]) * t, P[1] + (Q[1] - P[1]) * t]); }
   }
   return out;
 }
-function drawStripes(g, cam, r, c, z, inset, lw, p) {
+
+/**
+ * The range bands over tile (r, c)'s top: polygons of x − y ∈ [d, d + fill·step] for d on the global lattice offset by
+ * `phase` (tiles), so bands run on unbroken from tile to tile.
+ */
+export function stripeBands(r, c, inset = 0.05, phase = 0, step = RANGE_STRIPE.step, fill = RANGE_STRIPE.fill) {
+  const a = 0.5 - inset, sq = [[c - a, r - a], [c + a, r - a], [c + a, r + a], [c - a, r + a]];
+  const lo = (c - a) - (r + a), hi = (c + a) - (r - a), w = step * fill, out = [];
+  for (let d = Math.floor((lo - w - phase) / step) * step + phase; d < hi; d += step) {
+    const band = clipHalf(clipHalf(sq, 1, -1, d + w), -1, 1, -d);
+    if (band.length >= 3) out.push(band);
+  }
+  return out;
+}
+
+/** 设置 접근성「타일 표시 방식」 기본: the earlier light stripes over a range's fill (the 2D board only). */
+function drawLegacyStripes(g, cam, r, c, z, inset, lw, p) {
+  const a = 0.5 - inset, x0 = c - a, x1 = c + a, y0 = r - a, y1 = r + a, step = 0.2;
   g.lineStyle(lw, 0xffc27a, 0.55, 0.5);
-  for (const [xa, ya, xb, yb] of stripeSegments(r, c, inset)) {
-    cam.project(xa, ya, z, p);
-    g.moveTo(p.x, p.y);
-    cam.project(xb, yb, z, p);
-    g.lineTo(p.x, p.y);
+  for (let d = (x0 - y1) + step / 2; d < x1 - y0; d += step) {
+    const xa = Math.max(x0, y0 + d), xb = Math.min(x1, y1 + d);
+    if (xb - xa <= 1e-4) continue;
+    cam.project(xa, xa - d, z, p); g.moveTo(p.x, p.y);
+    cam.project(xb, xb - d, z, p); g.lineTo(p.x, p.y);
   }
   g.lineStyle(0);
+}
+
+function drawStripes(g, cam, r, c, z, inset, phase, p, color = RANGE_STRIPE.color) {
+  g.lineStyle(0);
+  for (const band of stripeBands(r, c, inset, phase)) {
+    const pts = [];
+    for (const [x, y] of band) { cam.project(x, y, z, p); pts.push(p.x, p.y); }
+    g.beginFill(color, RANGE_STRIPE.alpha); g.drawPolygon(pts); g.endFill();
+  }
 }
 
 function variantMat(t) {
@@ -193,6 +221,7 @@ function variantMat(t) {
     case 'road': return h < 3 ? 'road' : h < 5 ? 'road2' : 'road3';
     case 'roadN': return h < 4 ? 'roadN' : 'roadN2';
     case 'floor': return h < 4 ? 'floor' : 'floor2';
+    case 'snow': return h < 4 ? 'snow' : 'snow2';
     case 'forbid': return h < 4 ? 'forbid' : 'forbid2';
     // 活性源石: the same material twice (the second mirrored), so a field of it does not repeat one pattern
     // (textures.js originiumOverlay — the palette and recipe match the 3D board's shader, GitHub #184)
@@ -249,7 +278,9 @@ export class TileField {
     this.boxes = [];               // gate / objective wire boxes { r, c, gate, g } (in the unit layer)
     this.flowGfx = new P.Graphics();
     this.flowGfx.blendMode = P.BLEND_MODES.ADD;
-    layers.overlay.addChild(this.hlGfx, this.flowGfx);
+    // the official range bands: their own layer above the deployable / blocked marks (the green shows between them)
+    this.hlStripeGfx = new P.Graphics();
+    layers.overlay.addChild(this.hlGfx, this.hlStripeGfx, this.flowGfx);
     this.animLayer = new P.Container();
     layers.anim.addChild(this.animLayer);
     this.highlights = new Map();   // group → { tiles: [[r,c]], style }
@@ -526,7 +557,7 @@ export class TileField {
    */
   setHighlights(tiles, style = 'range', group, opts) {
     let st = typeof style === 'object' && style ? { ...HL_STYLES.range, ...style } : (HL_STYLES[style] || HL_STYLES.range);
-    if (opts && opts.stripes) st = { ...st, stripes: true };
+    if (opts && opts.stripes) st = { ...st, stripes: true, ...(opts.stripeColor != null ? { stripeColor: opts.stripeColor } : {}) };
     const key = group || (typeof style === 'object' && style?.group) || (typeof style === 'string' ? style : 'custom');
     const list = [];
     if (Array.isArray(tiles)) {
@@ -546,14 +577,24 @@ export class TileField {
   }
 
   _drawHighlights() {
-    this.hlGfx.clear();
+    this.hlGfx.clear(); this.hlStripeGfx.clear();
     for (const s of this.rowSurfaces.values()) if (s._hl) s._hl.clear();
     const cam = this.cam;
+    this._stripesLive = false;
     if (!cam || !this.highlights.size) return;
     const p = this._p;
-    const inset = 0.05;
-    for (const { tiles, style } of this.highlights.values()) {
+    // 设置 접근성「타일 표시 방식」 공식: the client's marks fill the whole tile; the range is its sliding orange bands on
+    // their own layer above the other marks, all at the ground's height
+    const official = this.officialMarks === true;
+    const inset = official ? 0 : 0.05;
+    for (const { tiles, style: st } of this.highlights.values()) {
+      const style = official && st === HL_STYLES.legal ? HL_STYLES.officialLegal : st;
       for (const [r, c] of tiles) {
+        if (official && style.stripes) {
+          this._stripesLive = true;
+          drawStripes(this.hlStripeGfx, cam, r, c, 0.012, inset, -((this.time * RANGE_STRIPE.speed) % RANGE_STRIPE.step), p, style.stripeColor);
+          continue;
+        }
         const h = this.heightAt(r, c);
         let g = this.hlGfx;
         if (h > 1e-3) {
@@ -573,13 +614,20 @@ export class TileField {
         }
         const sc = cam.scaleAt(c, r, z);
         const lw = Math.max(1.5, sc * 0.035);
-        g.lineStyle(lw, style.color, style.line, 0.5);
+        if (style.line > 0) g.lineStyle(lw, style.color, style.line, 0.5); else g.lineStyle(0);
         g.beginFill(style.color, style.fill);
         g.drawPolygon(pts);
         g.endFill();
-        if (style.stripes) drawStripes(g, cam, r, c, z, inset, Math.max(1.5, sc * 0.05), p);
+        if (style.stripes && !style.stripeColor && !this.external) drawLegacyStripes(g, cam, r, c, z, inset, Math.max(1.5, sc * 0.05), p);
       }
     }
+  }
+
+  /** 设置 접근성「타일 표시 방식」: true = the client's official marks. */
+  setOfficialMarks(on) {
+    if (this.officialMarks === !!on) return;
+    this.officialMarks = !!on;
+    this._drawHighlights();
   }
 
   // ---- devices -------------------------------------------------------------------------------------------
@@ -695,6 +743,7 @@ export class TileField {
   /** Per-frame animation (dt seconds). */
   update(dt) {
     this.time += dt;
+    if (this._stripesLive) this._drawHighlights();   // the range bands slide
     const t = this.time;
     for (const a of this.animSprites) {
       const s = a.sprite, px = a.s || 40;
@@ -729,6 +778,12 @@ export class TileField {
   _buildBoxes() {
     for (const b of this.boxes) b.g.destroy();
     this.boxes = [];
+    // 덤불 (thicket 'k') frames on the 2D board (the 3D board draws its own: board3d/scene.js _buildThicket)
+    this.thicketG?.destroy();
+    this.thicketG = null;
+    this.thicketTiles = [];
+    for (let r = 0; r < this.grid.length; r++) for (let c = 0; c < this.grid[0].length; c++) if (this.grid[r][c].drawn && this.grid[r][c].glyph === 'k') this.thicketTiles.push([r, c]);
+    if (this.thicketTiles.length) { this.thicketG = new this.P.Graphics(); this.thicketG.zIndex = -1e6; this.layers.props.addChild(this.thicketG); }
     // the field's gates / objectives, and the enemy preview pen's two gates (the red cubes behind which the next
     // round's enemies wait) whenever the pen's rows are drawn — the prep and pen cameras (render/app/view.js bandFor),
     // also as dim scenery
@@ -749,6 +804,18 @@ export class TileField {
     const cam = this.cam;
     if (!cam) return;
     const t = this.time;
+    if (this.thicketG) {
+      const g = this.thicketG;
+      g.clear();
+      g.visible = !this.external;
+      if (g.visible) for (const [r, c] of this.thicketTiles) {
+        const k = boxCorners(cam, c, r, 0.01, 0.94, 0);
+        g.lineStyle(Math.max(1.5, cam.scaleAt(c, r, 0) * 0.05), 0xff7f6a, 0.95);
+        g.beginFill(0xff7f6a, 0.08);
+        g.drawPolygon([...k.b0, ...k.b1, ...k.b2, ...k.b3]);
+        g.endFill();
+      }
+    }
     for (const { r, c, gate, g } of this.boxes) {
       g.clear();
       // just in front of its row's blocks, behind the units standing in the gate
@@ -803,7 +870,7 @@ export class TileField {
     this.meshes = []; this.rowMeshes.clear(); this.rowSurfaces.clear(); this.mesh = null; this.plane = null;
     for (const b of this.boxes) b.g.destroy();
     this.boxes = [];
-    this.hlGfx.destroy(); this.flowGfx.destroy(); this.animLayer.destroy();
+    this.hlGfx.destroy(); this.hlStripeGfx.destroy(); this.flowGfx.destroy(); this.animLayer.destroy();
   }
 }
 

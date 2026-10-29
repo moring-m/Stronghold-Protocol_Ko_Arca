@@ -99,7 +99,7 @@ function kitLeaderMisc(key, ab, e) {
           a.held = (a.held || 0) + dt;
           if (a.held + 1e-9 < (T(ab, 'rangedamage.interval') ?? 10)) return;
           a.held = 0;
-          b.fx('explode', { x: e2.x, y: e2.y, r: POMPEII_BLAST_RADIUS, kind: 'selfBlast' });
+          b.fx('explode', { x: e2.x, y: e2.y, r: POMPEII_BLAST_RADIUS, kind: 'selfBlast', id: e2.id });
           for (const u of areaAllies(b, e2, e2.x, e2.y, POMPEII_BLAST_RADIUS)) if (!u.isFlying) hurt(b, e2, u, T(ab, 'rangedamage.attack@damage') ?? 0, 'arts', { tags: ['splash'] });
         },
       }];
@@ -182,7 +182,7 @@ function kitLeaderMisc(key, ab, e) {
           b.fx('telegraph', { x: cc, y: r, r: 1, dur, kind: 'chargeAttack', tiles: 'plus', id: e2.id });
           b.after(dur, () => {
             if (!e2.alive || e2.s.flags.stun) return;
-            b.fx('explode', { x: cc, y: r, r: 1, kind: 'chargeAttack', tiles: 'plus' });
+            b.fx('explode', { x: cc, y: r, r: 1, kind: 'chargeAttack', tiles: 'plus', id: e2.id });
             for (const u of areaAlliesInTiles(b, e2, r, cc, 'plus', 1)) hurt(b, e2, u, e2.s.atk * (s.bb['dekght[aoe].atk_scale'] ?? s.bb.atk_scale ?? 1), 'phys');
           }, { owner: e2 });
         }, { cond: (b, e2) => !!(e2.blockedBy && e2.blockedBy.alive), turn: attackSkillOf(key, 'ChargeAttack', false) })];   // its blocker: the swing's turn
@@ -198,7 +198,7 @@ function kitLeaderMisc(key, ab, e) {
           b.fx('telegraph', { x: cc, y: r, r: 1, dur: delay, kind: 'blastArrow', tiles: 'plus', id: e2.id });
           b.after(delay, () => {
             if (!e2.alive) return;
-            b.fx('explode', { x: cc, y: r, r: 1, kind: 'blastArrow', tiles: 'plus' });
+            b.fx('explode', { x: cc, y: r, r: 1, kind: 'blastArrow', tiles: 'plus', id: e2.id });
             // "对主目标造成法术普通伤害，对溅射目标造成法术溅射伤害": the arrow's target + the 周围四格 (an area)
             for (const u of targetAndArea(t, areaAlliesInTiles(b, e2, r, cc, 'plus', 1))) hurt(b, e2, u, e2.s.atk * scale, 'arts');
           }, { owner: e2 });
@@ -734,7 +734,7 @@ function kitElk(ab) {
       if (e.s.flags.stun || !ch.t.alive || e.blockedBy !== ch.t) { stop(b, e); b.fx('phase', { x: e.x, y: e.y, id: e.id, kind: 'chargeBroken' }); return; }
       if (b.time + 1e-9 < ch.until || unbalancedNow(b, e)) return;   // a 失衡 that did not move it holds the clash (no skill meanwhile)
       stop(b, e);
-      b.fx('explode', { x: ch.t.x, y: ch.t.y, r: 0.5, kind: 'elkClash' });
+      b.fx('explode', { x: ch.t.x, y: ch.t.y, r: 0.5, kind: 'elkClash', id: e.id });
       hurt(b, e, ch.t, e.s.atk * ((s && s.bb.atk_scale_s) ?? 1) * ELK_FAIL_SCALE, 'phys');
       const st = T(ab, 'data.attack@fail_duration') ?? 0;
       if (ch.t.alive && st > 0) b.applyStatus(ch.t, 'stun', { duration: st, source: e });

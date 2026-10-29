@@ -30,13 +30,14 @@ export const GLYPH = Object.freeze({
   g: { mat: 'smog', h: null },
   d: { mat: 'deepsea', h: null },
   i: { mat: 'infection', h: null },
+  k: { mat: 'road', h: null },   // 덤불 (thicket): road ground, the pink frame drawn on top (board3d / tiles.js)
 });
 
 /** tileKey (when a stage uses glyphs outside the legend) → glyph. */
 export const TILEKEY_GLYPH = Object.freeze({
   tile_forbidden: '#', tile_road: 'r', tile_floor: 'f', tile_wall: 'h', tile_fence_bound: 'b', tile_fence: 'b',
   tile_achand: 'a', tile_start: 'S', tile_end: 'E', tile_telin: 'I', tile_telout: 'O', tile_mire: 'm',
-  tile_smog: 'g', tile_deepsea: 'd', tile_infection: 'i', tile_grass: 'r', tile_hole: '#',
+  tile_smog: 'g', tile_deepsea: 'd', tile_infection: 'i', tile_grass: 'r', tile_hole: '#', tile_custom_thicket: 'k',
 });
 
 export const COLORS = Object.freeze({
@@ -216,3 +217,8 @@ export const UNIT = Object.freeze({
   barWidth: 0.64,
   bossBarWidth: 2.2,
 });
+
+/** Units stand a little below the tile's centre on screen (operators and enemies alike, every map), as the client draws
+ * them: the feet about 0.16 of a tile under the projected centre (measured on its battle screen). The official effects
+ * on a unit follow the same point (vfx/wiring.js pose). */
+export const STAND_DROP = 0.16;

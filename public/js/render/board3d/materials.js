@@ -327,6 +327,36 @@ export function infectionRiseMaterial(THREE, focus) {
  ].join('\n'),transparent:true,depthWrite:false,side:THREE.DoubleSide,blending:THREE.NormalBlending});
 }
 
+/**
+ * Thicket (덤불) border on the original-quality snow map: a pink haze rising off the ground along the tiles' edges
+ * (vertical curtains, uv.x along the edge, uv.y up), broken up by the cloud noise drifting upward.
+ */
+export function thicketRiseMaterial(THREE, tex, focus) {
+  return new THREE.ShaderMaterial({
+    uniforms: { uTime: { value: 0 }, uNoise: { value: tex.noise || null }, ...focus },
+    vertexShader: TERRAIN_VERT,
+    fragmentShader: [
+      'uniform float uTime; uniform sampler2D uNoise;',
+      FOCUS_GLSL,
+      'varying vec2 vUv; varying vec3 vWorld;',
+      'void main() {',
+      '  float t = uTime;',
+      '  vec2 p = vec2((vWorld.x + vWorld.y) * 0.9 + vUv.x * 0.35, vUv.y * 0.9 - t * 0.5);',
+      '  float n = texture2D(uNoise, p).r * 0.5 + texture2D(uNoise, p * 2.7 + vec2(t * 0.07, -t * 0.35)).r * 0.33',
+      '    + texture2D(uNoise, p * 6.1 + vec2(-t * 0.11, -t * 0.9)).r * 0.22;',
+      '  float grain = fract(sin(dot(floor(vec2(vUv.x * 64.0 + vWorld.x * 7.0, vUv.y * 48.0) + floor(t * 18.0) * 3.1), vec2(12.9898, 78.233))) * 43758.5453);',
+      '  n = n * 0.82 + grain * 0.3;',
+      '  float fade = (1.0 - smoothstep(0.55, 1.0, vUv.y)) * smoothstep(0.0, 0.06, vUv.y);',
+      '  float a = smoothstep(0.4, 0.62, n + (1.0 - vUv.y) * 0.2) * fade * 0.92;',
+      '  vec3 col = mix(vec3(1.0, 0.36, 0.62), vec3(0.62, 0.3, 1.0), smoothstep(0.42, 0.58, vUv.y));',
+      '  gl_FragColor = vec4(col * (0.7 + grain * 0.45) * focusMask(vWorld.xy), a);',
+      '  #include <colorspace_fragment>',
+      '}',
+    ].join('\n'),
+    transparent: true, depthWrite: false, side: THREE.DoubleSide, blending: THREE.NormalBlending,
+  });
+}
+
 /** Smog: drifting exhaust haze (vertical billboards over the grilles). */
 export function smogMaterial(THREE, tex, focus) {
   const uniforms = { uTime: { value: 0 }, uNoise: { value: tex.noise || null }, ...focus };

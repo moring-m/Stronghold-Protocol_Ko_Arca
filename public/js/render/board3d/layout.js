@@ -159,8 +159,10 @@ export function uvAt(uv, fx, fy) {
  * tint, side (side panel surface) }`. Tolerant of malformed stages (missing rows → forbidden). `area` = the built
  * areas (inclusive tile rects, see AREAS): content outside them is not built, like the client which only builds the
  * areas of the current phase (configBlackBoard leftNormal / rightNormal / leftBoss / rightBoss + the preview pen).
+ * `theme` = the board atlas theme in use (load.js BOARD_THEMES; its extra surfaces exist in that atlas only).
  */
-export function classifyStage(stage, area = null) {
+export function classifyStage(stage, area = null, theme = null) {
+  const snow = theme === 'snow';
   const rows = Array.isArray(stage?.rows) ? stage.rows : [];
   const ROWS=Math.max(19,rows.length),COLS=Math.max(21,...rows.map(r=>r.length));
   const pen = parsePenRect(stage?.config?.enemy_place_rect) || PEN_RECT;
@@ -204,6 +206,7 @@ export function classifyStage(stage, area = null) {
         t.glass = t.r >= pen.r0 && t.r <= pen.r1 && t.c >= pen.c0 && t.c <= pen.c1;
         break;
       case 'b': t.rot = (h % 4) * 90; break;
+      case 'k': t.rot = (h % 4) * 90; t.flipX = ((h >> 3) & 1) === 1; break;
       case 'S': t.surf = 'concreteArrow'; break;
       case 'E': t.surf = 'ringHatch'; break;
       case 'I': case 'O': t.surf = 'lift'; t.rot = t.glyph === 'O' ? 180 : 0; break;
@@ -220,6 +223,12 @@ export function classifyStage(stage, area = null) {
       case '#': t.surf = 'hatch'; t.rot = (h & 1) ? 90 : 0; t.tint = [0.34, 0.36, 0.39]; t.side = 'graySide'; t.sideTint = [0.52, 0.55, 0.58]; break;
       case 'X': t.surf = 'hatch'; t.tint = [0.36, 0.38, 0.41]; t.side = (t.c % 5 === 2) ? 'evacPanel' : 'restPanel'; t.sideTint = [0.8, 0.82, 0.86]; break;
       default: break;
+    }
+    // the snow battlefield's atlas (load.js BOARD_THEMES): dirt-rimmed snow blocks for the forbidden tiles and separators
+    // the Final Assault benches' plain plates (rows 0–1): snow slabs, not the dark concrete
+    if (snow && (t.glyph === 'a' || t.glyph === 'A') && t.r <= 1) t.tint = [0.86, 0.9, 0.95];
+    if (snow && (t.glyph === '#' || t.glyph === 'X')) {
+      t.surf = 'snowRock'; t.rot = (h % 4) * 90; t.tint = [1, 1, 1]; t.side = 'graySide'; t.sideTint = [0.8, 0.84, 0.9];
     }
   }
   // high-ground plates by connectivity (texture top = the tile's far edge)
@@ -335,7 +344,7 @@ function sideFace(g, uvTable, surfName, dir, x0, x1, y0, y1, zb, zt, colBottom, 
 export function buildBoard(stage, opts = {}) {
   const uvTable = opts.uv || null;
   const UVT = uvTable || Object.fromEntries(Object.entries(SURFACES).map(([k, v]) => [k, { ...v, rect: [...v.rect] }]));
-  const grid = classifyStage(stage, opts.area || null);
+  const grid = classifyStage(stage, opts.area || null, opts.theme || null);
   const ROWS=grid.length,COLS=grid[0].length;
   const at = (r, c) => grid[r]?.[c] || null;
   const topZ = (t) => (t.glyph === 'd' ? -BASIN : t.h);
@@ -445,6 +454,16 @@ export function buildBoard(stage, opts = {}) {
     if (E && !S && !N && (r % 2 === 0)) corner(x1 - e, y0, `${r},${c},em`);
   }
 
+  // 덤불 (thicket 'k'): a glowing pink frame on every cell — its outer border and the seams between its cells (a shared
+  // seam once: the S / W side always, the N / E side only on the region's border)
+  const thicket = [];
+  const isK = (r, c) => { const n = at(r, c); return !!n && n.drawn && n.glyph === 'k'; };
+  for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+    if (!isK(r, c)) continue;
+    const z = topZ(grid[r][c]);
+    for (const [dir, dx, dy] of DIRS) if (dir === 'S' || dir === 'W' || !isK(r + dy, c + dx)) thicket.push({ r, c, dir, z, outer: !isK(r + dy, c + dx) });
+  }
+
   // cyan field edge: emissive strips along the play areas' outer border (the official boundary glow)
   const edges = [];
   const zone = (t) => !!t && t.drawn && t.content && t.glyph !== 'a' && t.glyph !== 'A';
@@ -485,7 +504,7 @@ export function buildBoard(stage, opts = {}) {
   }
 
   return {
-    grid, gates, devices, terrain, edges,
+    grid, gates, devices, terrain, edges, thicket,
     buckets: { board: board.finish(), decal: decal.finish(), pipe: pipe.finish(), glass: glass.finish(), raised: raised.finish(), raisedDecal: raisedDecal.finish() },
     bounds: { x0: minX, x1: maxX, y0: minY, y1: maxY },
     stats: { tiles: grid.flat().filter((t) => t.drawn).length, vertices: board.vertexCount + decal.vertexCount + pipe.vertexCount },

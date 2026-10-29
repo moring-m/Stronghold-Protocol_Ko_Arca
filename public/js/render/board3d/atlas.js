@@ -39,6 +39,8 @@ export const SURFACES = Object.freeze({
   slats: S('D', [1036, 480, 404, 216]),
   mech: S('D', [1088, 708, 356, 310]),
   steel: S('D', [12, 776, 196, 196]),
+  // themed atlases only (load.js BOARD_THEMES: a free cell of TX_autochessi_D): the snow battlefield's raised snow block top
+  snowRock: S('D', [1792, 0, 256, 256]),
   // high ground (gold-framed plates; texture top = the tile's far edge)
   plateL: S('D', [0, 0, 256, 256]),
   plateM: S('D', [256, 0, 256, 256]),

@@ -759,6 +759,7 @@
 .ff-tile--smog { background: linear-gradient(180deg, #4a4a52, #3a3a42); }
 .ff-tile--deep { background: linear-gradient(180deg, #1e3a52, #173045); }
 .ff-tile--infect { background: linear-gradient(180deg, #4a2a3a, #3a2030); }
+.ff-tile--thicket { background: #3a4446; box-shadow: inset 0 0 0 2px #ff7f6a; }
 .ff-tile.is-legal { box-shadow: inset 0 0 0 2px rgba(89, 244, 202, .8), inset 0 0 calc(var(--tile) * .4) rgba(23, 249, 183, .3); }
 .ff-tile.is-illegal { box-shadow: inset 0 0 0 2px rgba(255, 84, 84, .5); }
 .ff-tile.is-range { box-shadow: inset 0 0 0 2px rgba(246, 163, 41, .7); }
@@ -1018,3 +1019,7 @@
 .combat-metrics__list { flex:1 0 auto; overflow:visible; }
 .combat-metrics__density { flex:0 0 auto; }
 .combat-metrics__filters { padding-bottom:8px; flex-wrap:wrap; }
+/* the × on the 已淘汰 notices (they cover the field; closing hides them for the rest of the match) */
+.gm__dead-close,.chud__close { pointer-events:auto; display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; margin-left:.08rem; padding:0; border:1px solid currentColor; border-radius:50%; background:rgba(0,0,0,.35); color:inherit; font-size:16px; line-height:1; cursor:pointer; opacity:.85; }
+.gm__dead-close:hover,.chud__close:hover { opacity:1; background:rgba(255,84,84,.2); }
+.gm__dead,.chud__msg--dead { pointer-events:auto; }

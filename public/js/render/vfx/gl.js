@@ -354,7 +354,8 @@ export class FxGL {
           lastOv = ov;
         }
       }
-      const st = mat.state;
+      // an effect on a unit standing on a raised tile ignores the board's depth: its own block would cut it
+      const st = it.noDepth && mat.state.zTest ? (mat._noDepthState ||= { ...mat.state, zTest: 0, zWrite: false }) : mat.state;
       if (st !== lastState) { this._state(st, mat.family); lastState = st; }
       if (kind === 'quad') {
         gl.bindVertexArray(this.quadVao);

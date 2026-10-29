@@ -10,5 +10,6 @@ export const MAP_PREVIEWS = {
   "act2autochess_m01": "/previews/maps/act2autochess_m01.jpg?v=024a-20261011",
   "act2autochess_m02": "/previews/maps/act2autochess_m02.jpg?v=024a-20261011",
   "act2autochess_m03": "/previews/maps/act2autochess_m03.jpg?v=024a-20261011",
-  "act2autochess_m04": "/previews/maps/act2autochess_m04.jpg?v=024a-20261011"
+  "act2autochess_m04": "/previews/maps/act2autochess_m04.jpg?v=024a-20261011",
+  "custom_snowfield": "/previews/maps/custom_snowfield.jpg?v=20261029b"
 };

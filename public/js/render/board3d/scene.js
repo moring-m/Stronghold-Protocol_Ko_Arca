@@ -29,9 +29,10 @@ import { applyNativeStageBlend } from './materials.js';
 
 import { buildBoard, buildDeviceSlabs, objToBoard, boxProjectUV, ROWS, COLS, DEVICE_H, AREAS, heightOf } from './layout.js';
 import { surfaceUV } from './atlas.js';
-import { focusUniforms, addFocus, makeTexture, boardMaterial, glassMaterial, decalMaterial, pipeMaterial, unlitMaterial, gateMaterial, glowMaterial, waterMaterial, mireMaterial, infectionMaterial, infectionGlowMaterial, infectionRiseMaterial, smogMaterial, dashTexture, environmentMap, nativePhysicalLighting, addShadowContrast, sceneMaterial, sceneWaterMaterial, sceneEnvTexture, sceneWaterDecalMaterial, applyWaterMaterial, trapMaterial } from './materials.js';
+import { focusUniforms, addFocus, makeTexture, boardMaterial, glassMaterial, decalMaterial, pipeMaterial, unlitMaterial, gateMaterial, glowMaterial, waterMaterial, mireMaterial, infectionMaterial, infectionGlowMaterial, infectionRiseMaterial, thicketRiseMaterial, smogMaterial, dashTexture, environmentMap, nativePhysicalLighting, addShadowContrast, sceneMaterial, sceneWaterMaterial, sceneEnvTexture, sceneWaterDecalMaterial, applyWaterMaterial, trapMaterial } from './materials.js';
 import { syncThreeCamera } from '../projection.js';
-import { mergeSceneChunks, sceneMaterialKey, sceneWaterInfo, isSceneWater } from './load.js';
+import { TILE_H } from '../style.js';
+import { mergeSceneChunks, sceneMaterialKey, sceneWaterInfo, isSceneWater, BOARD_THEMES } from './load.js';
 
 /** Lighting rig (tuned against the official screenshots: bright even tops, darker sides, soft shadows). */
 export const LIGHTING = Object.freeze({
@@ -136,6 +137,21 @@ export function outsideTileAreas(holes) {
     return [{...a,r1:r0-1},{...a,r0:r1+1},{r0,r1,c0:a.c0,c1:c0-1},{r0,r1,c0:c1+1,c1:a.c1}].filter(b=>b.r0<=b.r1&&b.c0<=b.c1);
   });
   return parts;
+}
+
+/** Row runs ({r0,r1,c0,c1}) of a classified grid's drawn tiles not in `covered` ('r,c'), for surfaceForArea. */
+function uncoveredRows(grid, covered) {
+  const open = [];
+  for (let r = 0; r < grid.length; r++) {
+    const cols = grid[r].length;
+    for (let c = 0, c0 = null; c <= cols; c++) {
+      // undrawn cells are not open: the edge tiles' outer skirts reach into them and would draw under the kit
+      const free = c < cols && grid[r][c]?.drawn && !covered.has(`${r},${c}`);
+      if (free && c0 === null) c0 = c;
+      else if (!free && c0 !== null) { open.push({ r0: r, r1: r, c0, c1: c - 1 }); c0 = null; }
+    }
+  }
+  return open;
 }
 
 export function surfaceForArea(src, areas) {
@@ -399,6 +415,7 @@ export class BoardScene {
       infection: infectionMaterial(T, this.tex, this.focus),
       infectionGlow: infectionGlowMaterial(T, this.tex, this.focus),
       infectionRise: infectionRiseMaterial(T, this.focus),
+      thicketRise: thicketRiseMaterial(T, this.tex, this.focus),
       smog: smogMaterial(T, this.tex, this.focus),
       shadowCatcher: new T.ShadowMaterial({ opacity: 0.60, color: 0x000000 }),
     };
@@ -584,7 +601,7 @@ export class BoardScene {
       const scratch=Object.assign(Object.create(Object.getPrototypeOf(this)),this,{
         root:new this.THREE.Group(),key:this.key.clone(),hemi:this.hemi.clone(),
         stage:null,stageKey:null,activeLayoutKey:null,meshes:{},lightmapMaterials:[],lightmapTextures:{},
-        layoutCache:new Map(),layoutCacheSize:0,staticCrates:[],destroyed:false,
+        layoutCache:new Map(),layoutCacheSize:0,staticCrates:[],destroyed:false,themeWaits:new Set(),
       });
       const steps=scratch._stageSteps(stage,area);
       try{
@@ -673,6 +690,201 @@ export class BoardScene {
   }
 
   /** Rebuild everything for a stage (no-op when the same stage object/grid is set again). */
+  /**
+   * Board material of a stage's themed atlas (stage.boardTheme, load.js BOARD_THEMES), or null while it loads / when the
+   * manifest does not list it (the stock MT_autochess atlas then stands in). A finished load rebuilds the stage.
+   */
+  _themeMaterial(stage) {
+    const name = stage.boardTheme;
+    // 'low' (단순 3D) keeps the one simple board style of every map: no theme atlas, surroundings, light or haze
+    if (!name || !this.pack?.loadTheme || this.mapQuality === 'low') return null;
+    this.themeMats ||= {};
+    if (name in this.themeMats) return this.themeMats[name];
+    if (!(name in (this.pack.themes || {}))) {
+      this._onThemeLoad(name, (this.themeLoads ||= {})[name] ||= this.pack.loadTheme(name), () => this.stage?.boardTheme === name);
+      return null;
+    }
+    const img = this.pack.themes[name];
+    if (!img) return (this.themeMats[name] = null);
+    const T = this.THREE, aniso = Math.min(8, this.renderer.capabilities?.getMaxAnisotropy?.() || 1);
+    const tex = { ...this.tex, D: makeTexture(T, img.D, { aniso }), N: makeTexture(T, img.N, { srgb: false, aniso }) || this.tex.N, R: makeTexture(T, img.R, { srgb: false, aniso }) || this.tex.R, E: makeTexture(T, img.E, { aniso }) || this.tex.E };
+    return (this.themeMats[name] = boardMaterial(T, tex, this.focus, { emissive: LIGHTING.emissive, roughness: LIGHTING.roughness }));
+  }
+
+  /**
+   * The decoded scenery scene of a stage's board theme (BOARD_THEMES[theme].scenery, compose-snowfield-scene.py), or
+   * null while it loads / when absent / at 'low' quality (no original map meshes there). A finished load rebuilds.
+   */
+  _themeScenery(stage) {
+    const id = BOARD_THEMES[stage?.boardTheme]?.scenery, original = this.pack?.original;
+    if (!id || this.mapQuality === 'low' || !original?.loadStage) return null;
+    if (original.scenes[id]) return original.scenes[id];
+    const loads = this.themeLoads ||= {}, key = `scenery:${id}`;
+    loads[key] ||= original.loadStage(id).finally(() => { delete loads[key]; });
+    this._onThemeLoad(key, loads[key], () => this.stage?.boardTheme === stage.boardTheme);
+    return null;
+  }
+
+  /**
+   * Rebuild THIS scene once a shared theme load finishes. The load promise is shared with the idle prewarm's scratch
+   * copies, so each scene subscribes itself; otherwise a load a scratch copy started rebuilt only that copy and the
+   * visible field kept its plain board.
+   */
+  _onThemeLoad(key, promise, wanted) {
+    const waits = this.themeWaits ||= new Set();
+    if (waits.has(key)) return;
+    waits.add(key);
+    promise.then(() => {
+      waits.delete(key);
+      if (!this.destroyed && wanted()) { this.stageKey = null; this.setStage(this.stage); }
+    }, () => waits.delete(key));
+  }
+
+  /**
+   * The theme's surroundings ('around' buckets) about the built board's centre, as authored: the land planes, the terrain
+   * pressed under the board's footprint and the pieces moved just clear of it — so no field, bench or preview pen is covered
+   * in any mode, and nothing lies open between the board and its surroundings.
+   */
+  _buildThemeScenery(stage, board) {
+    const scene = this._themeScenery(stage), b = board?.bounds;
+    if (!scene || ![b?.x0, b?.x1, b?.y0, b?.y1].every(Number.isFinite)) return;
+    // anchored on the combat field (not on the built board, whose extent differs per view), so every view of the map
+    // shows the same surroundings: the boss arena's field is rows 2–5, the personal / cooperative field rows 9–12
+    const cy = stage.previewLayout && !stage.previewLayout.worldOffset ? 3.5 : 10.5, groups = new Map();
+    // one footprint for every view: the personal board's (rows 0–18 about its field, the board's columns), which holds
+    // the boss arena's and the cooperative board's — the surroundings keep one arrangement about the field
+    const f = { x0: b.x0, x1: b.x1, y0: cy - 11, y1: cy + 8.5 };
+    const mx = (b.x0 + b.x1) / 2, wide = Math.max(1, (b.x1 - b.x0) / 22);
+    for (const bucket of Object.values(scene.buckets)) {
+      const source = this.originalMaterials[bucket.material];
+      if (!source || !bucket.position?.length) continue;
+      if (bucket.side === 'kit') continue;
+      const position = Float32Array.from(bucket.position, (v, i) => v + (i % 3 === 0 ? mx : i % 3 === 1 ? cy : 0));
+      // a wider board (the 8-player cooperative defense, 37 columns) than the authored ~21-column map: the ground is
+      // stretched sideways to span it; a piece keeps its shape and moves out with its centre
+      if (wide > 1) {
+        if (bucket.cut === 'terrain' || bucket.cut === 'none') for (let v = 0; v < position.length; v += 3) position[v] = mx + (position[v] - mx) * wide;
+        else {
+          let sx = 0; for (let v = 0; v < position.length; v += 3) sx += position[v];
+          const dx = (sx / (position.length / 3) - mx) * (wide - 1);
+          for (let v = 0; v < position.length; v += 3) position[v] += dx;
+        }
+      }
+      const over = (x, y) => x > f.x0 - 0.2 && x < f.x1 + 0.2 && y > f.y0 - 0.2 && y < f.y1 + 0.2;
+      let index = bucket.index;
+      if (bucket.cut === 'terrain') {
+        // the snow terrain on the board's footprint is pressed under the snow ground; triangles wholly under drawn board
+        // tiles (the source level's own field, never seen) are dropped instead of drawn
+        const under = new Uint8Array(position.length / 3);
+        for (let v = 0; v < position.length; v += 3) if (over(position[v], position[v + 1])) {
+          position[v + 2] = Math.min(position[v + 2], -0.3);
+          under[v / 3] = board.grid?.[Math.round(position[v + 1])]?.[Math.round(position[v])]?.drawn ? 1 : 0;
+        }
+        const kept = [];
+        for (let i = 0; i < index.length; i += 3) if (!(under[index[i]] && under[index[i + 1]] && under[index[i + 2]])) kept.push(index[i], index[i + 1], index[i + 2]);
+        index = kept.length === index.length ? index : (index.constructor === Uint32Array || position.length / 3 > 65535 ? Uint32Array : Uint16Array).from(kept);
+      } else if (bucket.cut === 'none') {
+        // the land planes: the ground everywhere beyond the terrain, as authored
+      } else {
+        // a whole piece reaching over the board moves out by the shortest way that clears it (left, right, front or
+        // back), so the surroundings keep their authored arrangement and hug the board without standing on a field,
+        // a bench or the preview pen
+        let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+        for (let v = 0; v < position.length; v += 3) {
+          x0 = Math.min(x0, position[v]); x1 = Math.max(x1, position[v]); y0 = Math.min(y0, position[v + 1]); y1 = Math.max(y1, position[v + 1]);
+        }
+        if (x1 > f.x0 - 0.2 && x0 < f.x1 + 0.2 && y1 > f.y0 - 0.2 && y0 < f.y1 + 0.2) {
+          const moves = [[f.x0 - 0.2 - x1, 0], [f.x1 + 0.2 - x0, 0], [0, f.y0 - 0.2 - y1], [0, f.y1 + 0.2 - y0]];
+          const [dx, dy] = moves.reduce((m, d) => (Math.abs(d[0] + d[1]) < Math.abs(m[0] + m[1]) ? d : m));
+          for (let v = 0; v < position.length; v += 3) { position[v] += dx; position[v + 1] += dy; }
+        }
+      }
+      if (!index.length) continue;
+      const material = this._lightmapped(source, bucket.material, bucket.lightMap);
+      const group = groups.get(material) || [];
+      group.push({ ...bucket, position, index });
+      groups.set(material, group);
+    }
+    let n = 0;
+    for (const [material, list] of groups) this.meshes[`scenery:${n++}`] = this._mesh({ ...mergeInto(list), color: null }, material, { cast: true });
+  }
+
+  /**
+   * The theme's tile kit (BOARD_THEMES[theme].kit; the scenery scene's 'kit' buckets): each drawn tile whose glyph has a
+   * role gets one variant of the official tile mesh of that role, picked by a tile hash. Returns the covered tiles
+   * ('r,c'), or null while the scene loads (the procedural board then covers everything).
+   */
+  _buildThemeKit(stage, grid) {
+    const theme = BOARD_THEMES[stage.boardTheme], scene = this._themeScenery(stage);
+    if (!theme?.kit || !scene || !Array.isArray(grid)) return null;
+    const roles = {};
+    for (const bucket of Object.values(scene.buckets)) {
+      if (bucket.side !== 'kit' || !this.originalMaterials[bucket.material]) continue;
+      ((roles[bucket.role] ||= [])[bucket.variant] ||= []).push(bucket);
+    }
+    for (const k of Object.keys(roles)) roles[k] = roles[k].filter(Boolean);
+    const FIELD = new Set(['r', 'k', 'h', 'f', 'b', 'S', 'E', 'O', 'R']);
+    const glyph = (r, c) => grid[r]?.[c]?.glyph;
+    const slots = new Set((stage.mapChars || []).map((m) => `${m.pos?.[0]},${m.pos?.[1]}`));
+    // raised kit blocks take the height the board gives the glyph (units, map characters and benches stand on it)
+    const height = { '#': TILE_H.forbid, a: TILE_H.bench, A: TILE_H.bench, X: TILE_H.sep, h: TILE_H.wall };
+    const top = (list) => list.reduce((m, bucket) => { for (let i = 2; i < bucket.position.length; i += 3) m = Math.max(m, bucket.position[i]); return m; }, 0);
+    const lists = new Map(), covered = new Set();
+    for (const row of grid) for (const t of row) {
+      if (!t.drawn) continue;
+      // a role, or several stacked (a slab and what lies on it); the preview pen's floor is plain snow
+      let set = t.glass ? ['ground'] : [].concat(theme.kit[t.glyph] || []);
+      // a forbidden tile by a field is a rock heap — except the map characters' slots (Touch / reserve medic of the
+      // 外勤医疗 strategy), which stay a flat block they stand on
+      if (t.glyph === '#' && !slots.has(`${t.r},${t.c}`) && [[0, 1], [0, -1], [1, 0], [-1, 0]].some(([dr, dc]) => FIELD.has(glyph(t.r + dr, t.c + dc)))) set = ['rocks'];
+      if (!set.length || set.some((role) => !roles[role]?.length)) continue;
+      const hash = (Math.imul(t.r + 1, 73856093) ^ Math.imul(t.c + 1, 19349663)) >>> 0;
+      for (const role of set) {
+        const pick = roles[role][hash % roles[role].length];
+        for (const bucket of pick) {
+          // a single raised block takes the board's height of the glyph (units, map characters and benches stand on it)
+          const h = set.length === 1 && role !== 'rocks' && height[t.glyph], z0 = h ? top(pick) : 0;
+          const zs = h && z0 > 0.05 ? h / z0 : 1;
+          const position = Float32Array.from(bucket.position, (v, i) => (i % 3 === 0 ? v + t.c : i % 3 === 1 ? v + t.r : v * zs));
+          const key = `${bucket.material}|${bucket.lightMap || ''}`;
+          if (!lists.has(key)) lists.set(key, { bucket, list: [] });
+          lists.get(key).list.push({ ...bucket, position });
+        }
+      }
+      covered.add(`${t.r},${t.c}`);
+    }
+    for (const [key, { bucket, list }] of lists) {
+      const source = this.originalMaterials[bucket.material];
+      this.meshes[`kit:${key}`] = this._mesh({ ...mergeInto(list), color: null }, this._lightmapped(source, bucket.material, bucket.lightMap), { cast: true });
+    }
+    return covered;
+  }
+
+  /** A native material with a baked RGBM lightmap on uv1 (as the original scenes' buckets), cached per pair. */
+  _lightmapped(source, sourceName, name) {
+    const image = name && this.pack?.original?.images?.[name];
+    if (!image) return source;
+    const cache = this.themeLightMaterials ||= new Map(), key = `${sourceName}|${name}`;
+    if (cache.has(key)) return cache.get(key);
+    const T = this.THREE, nativeGamma = source.userData.nativeGamma;
+    const tex = makeTexture(T, image, { srgb: !nativeGamma });
+    tex.channel = 1;
+    const material = source.clone();
+    material.lightMap = tex;
+    // the procedural board's key / hemisphere lights stay on (unlike a native scene's own lighting): part of the bake
+    material.lightMapIntensity = (nativeGamma ? 1 : Math.PI) * 0.6;
+    const sourceCompile = source.onBeforeCompile;
+    material.onBeforeCompile = (shader) => {
+      sourceCompile(shader);
+      shader.fragmentShader = shader.fragmentShader.replace('#include <lights_fragment_maps>', T.ShaderChunk.lights_fragment_maps.replace(
+        'lightMapTexel.rgb * lightMapIntensity',
+        nativeGamma ? 'lightMapTexel.rgb * (5.0 * lightMapTexel.a) * lightMapIntensity' : 'lightMapTexel.rgb * (pow(5.0, 2.2) * pow(lightMapTexel.a, 2.2)) * lightMapIntensity'));
+    };
+    material.customProgramCacheKey = () => nativeGamma ? 'sp-focus-native-gamma-rgbm5' : 'sp-focus-unity-rgbm5';
+    cache.set(key, material);
+    return material;
+  }
+
   setStage(stage, area) {
     for(const ignored of this._stageSteps(stage,area)) { /* foreground builds remain immediate */ }
   }
@@ -685,8 +897,10 @@ export class BoardScene {
     const native = this.mapQuality !== 'low' && stage ? this.pack?.original?.scenes?.[stage.originalStageId || stage.id] : null;
     const nativeReady = native && Object.keys(native.buckets).length > 0
       && Object.entries(native.buckets).every(([k,g]) => this.originalMaterials[g.material || k]);
-    const official = stage && !nativeReady ? this.scenePacks.get(stage.id) || null : null;
-    const key = stage ? `${stage.id || ''}|${official ? official.key : ''}|${stage.previewLayout ? stage.previewLayout.worldOffset || 0 : 'native'}|${(stage.rows || []).join('/')}|${JSON.stringify((stage.devices || []).map((d) => [d.key, d.pos, d.active, d.dir]))}` : '';
+    // 'low' (단순 3D) never draws the official scene pack (the original map's mesh): the procedural board stands alone
+    const official = stage && !nativeReady && this.mapQuality !== 'low' ? this.scenePacks.get(stage.id) || null : null;
+    const themed = stage ? this._themeMaterial(stage) : null;
+    const key = stage ? `${stage.id || ''}|${official ? official.key : ''}|${themed ? stage.boardTheme + (this._themeScenery(stage) ? '+scenery' : '') : ''}|${stage.previewLayout ? stage.previewLayout.worldOffset || 0 : 'native'}|${(stage.rows || []).join('/')}|${JSON.stringify((stage.devices || []).map((d) => [d.key, d.pos, d.active, d.dir]))}` : '';
     if (key === this.stageKey) return;
     const layoutKey=stage ? `${key}|${this.areaKey}|${this.mapQuality}|${!!this.pack?.original?.scenes?.[stage.originalStageId || stage.id]}` : null;
     const cached=this.layoutCache.get(layoutKey);
@@ -701,6 +915,8 @@ export class BoardScene {
       for(const child of cached.children)this.root.add(child);
       for(const prop of ['meshes','board','staticCrates','lightmapMaterials','lightmapTextures','originalStage','stageLightDir','official','sceneWater'])this[prop]=cached[prop];
       this.key.intensity=cached.keyIntensity;this.key.color.copy(cached.keyColor);this.hemi.intensity=cached.hemiIntensity;
+      const haze=themed && !cached.originalStage ? BOARD_THEMES[stage.boardTheme]?.haze ?? null : null;
+      this.scene.fog?.color.setHex(haze ?? LIGHTING.fog.color);this.renderer.setClearColor?.(haze ?? LIGHTING.clear);
       this._applyActiveWater();
       this._fitShadow(this.board);this._rebuildCrates();
       this.renderer.shadowMap.needsUpdate=true;this.layoutCacheHits++;
@@ -717,7 +933,7 @@ export class BoardScene {
     yield;
     const worldOffset=stage.previewLayout?.worldOffset || 0;
     const structuralStage=stage.structuralSource || stage;
-    const board = buildBoard(stage, { uv: this.pack?.uv || null, area: this.area, platformMesh: !!this.platformGeometry() });
+    const board = buildBoard(stage, { uv: this.pack?.uv || null, area: this.area, platformMesh: !!this.platformGeometry(), theme: themed ? stage.boardTheme : null });
     this.board = board;
     const M = this.meshes = {};
     this.official = !stage.coopEightStage && !stage.previewLayout && official && this._buildScene(official) ? official : null;
@@ -741,6 +957,14 @@ export class BoardScene {
     this.key.intensity = original?.lighting?.intensity != null ? original.lighting.intensity * LIGHTING.nativeDirectGain : LIGHTING.key.intensity;
     if (original?.lighting?.color) this.key.color.setRGB(...original.lighting.color);
     else this.key.color.setHex(LIGHTING.key.color);
+    // a board theme's own light (the snow field: a cool, softer key under an overcast sky)
+    // a board theme's own light (the snow field: a cool, softer key under an overcast sky)
+    const themeLight = themed && !original ? BOARD_THEMES[stage.boardTheme]?.light : null;
+    if (themeLight) { this.key.color.setHex(themeLight.color); this.key.intensity = themeLight.intensity; this.hemi.intensity = themeLight.hemi; }
+    // the distance fades into the theme's haze (the snow field's blue-grey) instead of the dark void
+    const haze = themed && !original ? BOARD_THEMES[stage.boardTheme]?.haze ?? null : null;
+    this.scene.fog?.color.setHex(haze ?? LIGHTING.fog.color);
+    this.renderer.setClearColor?.(haze ?? LIGHTING.clear);
     const nativeLightMaterials=new Map();
     if (original) {
       for (const [material, sourceGeometry] of Object.entries(original.buckets)) {
@@ -836,10 +1060,15 @@ export class BoardScene {
         yield;
       }
     } else if (!this.official) {
-      const fallback=stage.previewLayout ? buildBoard(structuralStage,{uv:this.pack?.uv || null,area:[...AREAS.boss,{r0:7,r1:11,c0:6,c1:14}]}) : board;
+      const fallback=stage.previewLayout ? buildBoard(structuralStage,{uv:this.pack?.uv || null,area:[...AREAS.boss,{r0:7,r1:11,c0:6,c1:14}],theme:themed ? stage.boardTheme : null}) : board;
       const areas=stage.previewLayout ? [{r0:0,r1:5,c0:0,c1:20}] : combatBorderAreas(stage,this.area);
       const cells=stage.previewLayout ? vacantBorderCells(borderCells(structuralStage,areas),[fallback.buckets.board]) : [];
-      const buckets=Object.fromEntries(['board','glass','decal','pipe'].map(key=>[key,[fallback.buckets[key]]]));
+      // the theme's official tile meshes on the tiles they cover; the procedural board keeps the others
+      const covered=themed ? this._buildThemeKit(stage,fallback.grid) : null;
+      const open=covered ? uncoveredRows(fallback.grid,covered) : null;
+      // (with the kit, only the uncovered tiles' own faces: the procedural board's outer skirts would draw a second map
+      // under the official one)
+      const buckets=Object.fromEntries(['board','glass','decal','pipe'].map(key=>[key,[open ? (open.length && fallback.buckets[key]?.index?.length ? surfaceForArea(fallback.buckets[key],open) : null) : fallback.buckets[key]].filter(Boolean)]));
       oppositeBorderRuns(cells,areas,{mirror:true}).forEach(({source,axis})=>{
         for(const key of Object.keys(buckets)){
           const geometry=fallback.buckets[key];
@@ -848,8 +1077,9 @@ export class BoardScene {
           if(tile.index.length)buckets[key].push(reflectOppositeBorder(tile,axis));
         }
       });
-      for(const[key,list]of Object.entries(buckets))M[key]=this._mesh(mergeInto(list),this.mat[key],{cast:key!=='decal'});
+      for(const[key,list]of Object.entries(buckets))if(list.length)M[key]=this._mesh(mergeInto(list),key==='board'&&themed||this.mat[key],{cast:key!=='decal'});
     }
+    if (themed && !original) this._buildThemeScenery(stage, board);
     if (original && !stage.coopEightStage && !['act2autochess_m01','act2autochess_m03'].includes(stage.id) && this.area.some(a=>a.c1>=20)) {
       // The sand island has a water notch outside its right rim. Extend the
       // opposite authored hill strip only into uncovered cells; keep the sea
@@ -947,18 +1177,22 @@ export class BoardScene {
 
     // Apply the same translation to every native structural mesh, including
     // copied supports and the preview pen. Devices retain gameplay positions.
-    if(worldOffset)for(const mesh of Object.values(M)) {
-      if(mesh?.position && mesh!==M.deviceSlabs && mesh!==M.deviceDecals){ mesh.position.y+=worldOffset; mesh.updateMatrix(); }
+    // (the theme's surroundings are laid about the displayed board already: they stay)
+    if(worldOffset)for(const [name,mesh] of Object.entries(M)) {
+      if(mesh?.position && mesh!==M.deviceSlabs && mesh!==M.deviceDecals && !name.startsWith('scenery:')){ mesh.position.y+=worldOffset; mesh.updateMatrix(); }
     }
     if(original)this._batchNativeMeshes();
     yield;
     this._buildDevices(board);
     yield;
     this._buildGates(board);
-    if (!original) this._buildEdges(board);
+    // the theme's original-quality map (its official surroundings loaded) draws no field edge, as the original maps
+    const themeOriginal = !!(themed && !original && this._themeScenery(stage));
+    if (!original && !themeOriginal) this._buildEdges(board);
+    this._buildThicket(board, this.mapQuality !== 'low');
     yield;
     this._buildTerrain(board);
-    if (!this.official) this._buildBackground(board);
+    if (!this.official) this._buildBackground(board, themed && !original ? BOARD_THEMES[stage.boardTheme]?.backdrop || null : null);
     this._fitShadow(board);
     this.renderer.shadowMap.needsUpdate = true;
   }
@@ -1162,6 +1396,44 @@ export class BoardScene {
     if (endAb.length) this.meshes.gateEndAb = this._mesh(mergeInto(endAb), this.mat.gateEndAb, { ...opt, order: 4 });
   }
 
+  /** 덤불 frames (layout.js `thicket`): a pink glow strip along each side, the region's border wider. */
+  /** Thicket (덤불) borders: pink strips at 'low'; with `rise` (medium and above) only a noise curtain rising off them. */
+  _buildThicket(board, rise = false) {
+    const list = board.thicket || [];
+    if (!list.length) return;
+    if (rise) {
+      const pos = [], uv = [], idx = [], H = 0.5;
+      for (const s of list) {
+        const x0 = s.c - 0.5, x1 = s.c + 0.5, y0 = s.r - 0.5, y1 = s.r + 0.5, z = s.z;
+        const [a, b] = s.dir === 'S' ? [[x0, y0], [x1, y0]] : s.dir === 'N' ? [[x0, y1], [x1, y1]] : s.dir === 'E' ? [[x1, y0], [x1, y1]] : [[x0, y0], [x0, y1]];
+        const i = pos.length / 3;
+        pos.push(a[0], a[1], z, b[0], b[1], z, b[0], b[1], z + H, a[0], a[1], z + H);
+        uv.push(0, 0, 1, 0, 1, 1, 0, 1);
+        idx.push(i, i + 1, i + 2, i, i + 2, i + 3);
+      }
+      this.meshes.thicketRise = this._mesh({ position: new Float32Array(pos), normal: new Float32Array(pos.length), uv: new Float32Array(uv), color: null, index: new Uint16Array(idx) }, this.mat.thicketRise, { cast: false, receive: false, order: 4 });
+      return; // medium and above: the noise curtain alone, no border strips
+    }
+    const pos = [], uv = [], idx = [];
+    for (const s of list) {
+      const w = s.outer ? 0.07 : 0.04, x0 = s.c - 0.5, x1 = s.c + 0.5, y0 = s.r - 0.5, y1 = s.r + 0.5, z = s.z + 0.008;
+      let q;
+      switch (s.dir) {
+        case 'S': q = [[x0, y0, z], [x1, y0, z], [x1, y0 + w, z], [x0, y0 + w, z]]; break;
+        case 'N': q = [[x0, y1 - w, z], [x1, y1 - w, z], [x1, y1, z], [x0, y1, z]]; break;
+        case 'E': q = [[x1 - w, y0, z], [x1, y0, z], [x1, y1, z], [x1 - w, y1, z]]; break;
+        default: q = [[x0, y0, z], [x0 + w, y0, z], [x0 + w, y1, z], [x0, y1, z]]; break;
+      }
+      const b = pos.length / 3;
+      for (const p of q) pos.push(...p);
+      uv.push(0, 0, 1, 0, 1, 1, 0, 1);
+      idx.push(b, b + 1, b + 2, b, b + 2, b + 3);
+    }
+    const nrm = new Float32Array(pos.length); for (let i = 2; i < nrm.length; i += 3) nrm[i] = 1;
+    this.mat.thicket ||= new this.THREE.MeshBasicMaterial({ color: 0xff7f6a, transparent: true, opacity: 0.95, depthWrite: false, side: this.THREE.DoubleSide, fog: false, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3 });
+    this.meshes.thicket = this._mesh({ position: new Float32Array(pos), normal: nrm, uv: new Float32Array(uv), color: null, index: new Uint16Array(idx) }, this.mat.thicket, { cast: false, receive: false, order: 3 });
+  }
+
   _buildEdges(board) {
     const pos = [], uv = [], idx = [];
     const w = 0.085, e = 0.018;
@@ -1254,7 +1526,8 @@ export class BoardScene {
     }
   }
 
-  _buildBackground(board) {
+  /** The ground far below the island; `tint` (a composed scene's land colour, rgb 0..1) replaces the backdrop art. */
+  _buildBackground(board, tint = null) {
     const T = this.THREE;
     const B = LIGHTING.bg;
     const cx = ((board.grid?.[0]?.length ?? COLS) - 1) / 2, cy = ((board.grid?.length ?? ROWS) - 1) / 2;
@@ -1269,7 +1542,8 @@ export class BoardScene {
       const ix = placed.index;
       for (let i = 0; i < ix.length; i += 3) { const t = ix[i + 1]; ix[i + 1] = ix[i + 2]; ix[i + 2] = t; }
     }
-    this.meshes.bg = this._mesh({ ...placed, color: null }, this.mat.bg, { cast: false, receive: false, order: -2 });
+    const material = Array.isArray(tint) ? (this.mat.backdrop ||= new T.MeshBasicMaterial({ color: new T.Color(...tint).multiplyScalar(B.dim) })) : this.mat.bg;
+    this.meshes.bg = this._mesh({ ...placed, color: null }, material, { cast: false, receive: false, order: -2 });
     // the key light's shadow of the island on the ground far below (S_Background_shadow's role)
     const s = B.size;
     const q = { position: new Float32Array([cx - s / 2, cy - s / 2, B.z + 0.02, cx + s / 2, cy - s / 2, B.z + 0.02, cx + s / 2, cy + s / 2, B.z + 0.02, cx - s / 2, cy + s / 2, B.z + 0.02]), normal: new Float32Array([0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1]), uv: new Float32Array([0, 0, 1, 0, 1, 1, 0, 1]), color: null, index: new Uint16Array([0, 1, 2, 0, 2, 3]) };
@@ -1410,7 +1684,7 @@ export class BoardScene {
     let flash = 0;
     for (let i = this.flashes.length - 1; i >= 0; i--) { const f = this.flashes[i]; f.t += dt; if (f.t > 1.2) this.flashes.splice(i, 1); else flash = Math.max(flash, 1 - f.t / 1.2); }
     for (const m of [this.mat.gateEndAdd, this.mat.gateEndAb]) if (m) m.uniforms.uFlash.value.setRGB(flash, flash * 0.12, flash * 0.1);
-    for (const k of ['water', 'mire', 'infection', 'infectionGlow', 'infectionRise', 'smog']) this.mat[k].uniforms.uTime.value = t;
+    for (const k of ['water', 'mire', 'infection', 'infectionGlow', 'infectionRise', 'thicketRise', 'smog']) this.mat[k].uniforms.uTime.value = t;
     for (const m of Object.values(this.originalMaterials)) if (m.uniforms?.uTime) m.uniforms.uTime.value = t;
     for (const k of ['water', 'mire', 'infection', 'smog']) this.mat[k].uniforms.uTime.value = t;
     if (this.official) for (const m of this.sceneWater || []) m.uniforms.uTime.value = t;
@@ -1437,6 +1711,8 @@ export class BoardScene {
     this.scenePacks.clear();
     this.mat.edge?.map?.dispose?.(); // canvas dash texture (not in this.tex)
     for (const m of Object.values(this.mat)) m?.dispose?.();
+    for (const m of this.themeLightMaterials?.values() || []) { m.lightMap?.dispose(); m.dispose(); }
+    for (const m of Object.values(this.themeMats || {})) { if (m) { for (const t of [m.map, m.normalMap, m.roughnessMap, m.emissiveMap]) if (!Object.values(this.tex).includes(t)) t?.dispose(); m.dispose(); } }
     for (const t of Object.values(this.tex)) t?.dispose?.();
     for (const m of Object.values(this.originalMaterials)) m?.dispose?.();
     for (const t of Object.values(this.originalTextures)) t?.dispose?.();

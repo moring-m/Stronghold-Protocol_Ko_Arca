@@ -139,6 +139,8 @@ export class OfficialFx {
     this.items = { ground: [], over: [] };
     this.unitItems = new Map();
     this.unitLayers = new Map();
+    this.unitBehindItems = new Map();
+    this.unitBehindLayers = new Map();
     this.needDepth = false;
     this.particles = 0;
     this.dropped = 0;
@@ -335,6 +337,7 @@ export class OfficialFx {
     this.items.ground.length = 0;
     this.items.over.length = 0;
     this.unitItems.clear();for(const layer of this.unitLayers.values())if(!layer.destroyed)layer.destroy?.();this.unitLayers.clear();
+    this.unitBehindItems.clear();for(const layer of this.unitBehindLayers.values())if(!layer.destroyed)layer.destroy?.();this.unitBehindLayers.clear();
     this.fd.reset();
     this.prepared = -1;
     this.depthDone = -1;
@@ -365,14 +368,20 @@ export class OfficialFx {
     const g = this.items.ground, o = this.items.over;
     g.length = 0; o.length = 0;
     this.unitItems.clear();
+    this.unitBehindItems.clear();
     let seq = 0, depth = false;
     const sink = (e) => {
       e.seq = seq++;
       if (e.mat.state.zTest) depth = true;
       const owner=e.effect?.depthOwner;
       // Explicit Overlay materials retain their authored screen-wide priority.
-      if(!e.ground&&e.queue<4000&&owner?.root&&!owner.root.destroyed){
-        let list=this.unitItems.get(owner);if(!list){list=[];this.unitItems.set(owner,list);}list.push(e);
+      // a unit's effect on a raised tile: not cut by that tile's own block in the board's depth, and its ground parts
+      // drawn behind the unit's body (the ground pass lies under the raised top the unit stands on)
+      e.noDepth=(owner?.z||0)>0.05;
+      const raised=e.ground&&e.noDepth;
+      if((!e.ground||raised)&&e.queue<4000&&owner?.root&&!owner.root.destroyed){
+        const map=e.effect.behindOwner||raised?this.unitBehindItems:this.unitItems;
+        let list=map.get(owner);if(!list){list=[];map.set(owner,list);}list.push(e);
       }else (e.ground ? g : o).push(e);
     };
     for (const fx of this.effects) fx.gather(basis, sink);
@@ -388,9 +397,16 @@ export class OfficialFx {
       if(layer.parent!==owner.root || !children || children[children.length-1]!==layer)owner.root.addChild(layer);
     }
     for(const [owner,layer]of this.unitLayers)if(!this.unitItems.has(owner)||owner.root?.destroyed){if(!layer.destroyed)layer.destroy?.();this.unitLayers.delete(owner);}
+    // behind the model: the first child of the unit (drawn before its body)
+    for(const [owner,list]of this.unitBehindItems){
+      list.sort(byUnityOrder);let layer=this.unitBehindLayers.get(owner);
+      if(!layer||layer.destroyed){layer=new this.P.Container();layer._render=renderer=>this.renderPass('over',renderer,owner,true);this.unitBehindLayers.set(owner,layer);}
+      if(layer.parent!==owner.root||owner.root.children?.[0]!==layer)owner.root.addChildAt(layer,0);
+    }
+    for(const [owner,layer]of this.unitBehindLayers)if(!this.unitBehindItems.has(owner)||owner.root?.destroyed){if(!layer.destroyed)layer.destroy?.();this.unitBehindLayers.delete(owner);}
     // geometry in draw order: neighbours of one material and kind become one draw (their ranges are contiguous)
     const frameNo = this.frameNo;
-    for (const list of [g, o,...this.unitItems.values()]) {
+    for (const list of [g, o,...this.unitItems.values(),...this.unitBehindItems.values()]) {
       let w = 0, prev = null;
       for (const e of list) {
         const r = e.effect.build(e, basis, fd, frameNo);
@@ -408,7 +424,7 @@ export class OfficialFx {
   }
 
   /** Draw one pass from inside Pixi's render (see the header). */
-  renderPass(pass, renderer, owner = null) {
+  renderPass(pass, renderer, owner = null, behind = false) {
     if (!this.active || (!this.effects.length && !this.warmQueue.length)) return;
     const gl = renderer.gl;
     if (!this.glr) {
@@ -423,7 +439,7 @@ export class OfficialFx {
     try {
       if (pass === 'ground' || this.prepared !== this.frameNo) this._warmStep();
       if (this.prepared !== this.frameNo) this._prepare(renderer);
-      const items = owner ? this.unitItems.get(owner)||[] : this.items[pass];
+      const items = owner ? (behind ? this.unitBehindItems : this.unitItems).get(owner)||[] : this.items[pass];
       if (this.needDepth && this.depthDone !== this.frameNo) { this.glr.depthPrepass(this.vpB); this.depthDone = this.frameNo; }
       if (items.length) this.glr.draw(items, { vp: this.vpU, cam: this.camU, time: this.time, half: this.lite, pass: this.frameNo * 2 + (pass === 'over' ? 1 : 0) });
     } catch (err) {
@@ -490,6 +506,8 @@ export class FxHandle {
     fx.stretchMul = this.opts.stretchMul > 0 ? this.opts.stretchMul : 1;
     fx.owner = this.opts.owner ?? null;
     fx.depthOwner = this.opts.depthOwner ?? null;
+    // drawn inside the owner before its model (a unit facing up: its muzzle and weapon are behind its body)
+    fx.behindOwner = !!this.opts.behindOwner;
     fx.handle = this;
     // a one-shot nobody stops is capped: its authored duration (plus its linger), else ONE_SHOT_TTL; a looping prefab
     // nobody owns (the wiring stops it at its end event) ends after LOOP_TTL at the latest
@@ -503,7 +521,7 @@ export class FxHandle {
     // stops with it (OnFinishEmitter's start where it finished)
     this.children = [];
     const skip = Math.max(0, Number(this.opts.skip) || 0) + loadedLate;
-    const own = { track: this.opts.track, data: this.opts.data, loop: this.opts.loop, important: this.opts.important, owner: this.opts.owner, depthOwner:this.opts.depthOwner, skip, speed: this.opts.speed, resolveKey: this.opts.resolveKey };
+    const own = { track: this.opts.track, data: this.opts.data, loop: this.opts.loop, important: this.opts.important, owner: this.opts.owner, depthOwner:this.opts.depthOwner, behindOwner:this.opts.behindOwner, skip, speed: this.opts.speed, resolveKey: this.opts.resolveKey };
     // An effect played on a unit (the wiring's `playChild`) emits its chained keys as the client does: on the owner again —
     // the outfit's replacement, the facing variant, the key's own spawn location — unless `_useSourceEffectPos` keeps them
     // at this one (수르트 스킨 S3's sun: surtr_skill_03_buff_02 → _left/_right_*, at the feet, not on the weapon the buff

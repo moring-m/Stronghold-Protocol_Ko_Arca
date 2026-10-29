@@ -19,10 +19,15 @@ import { settingsStore } from '/js/ui/settings.js';
 import { awayStore } from '/js/ui/matchChrome.js';
 import { GAME_FILES } from '/js/ui/gameComponents.js';
 import { PHASE, GEO } from '/shared/constants.js';
+import { EIGHT_UNITE_RECT, eightUniteStageId } from '/shared/cooperativeEight.js';
 
 const params = new URLSearchParams(location.search);
 const SHOT = params.get('shot') === '1';
 const VARIANTS = new Set((params.get('variant') || '').split(',').filter(Boolean));
+/** ?stage=<id>: the battlefield to show (default 战场#05 下半). */
+const STAGE_ID = params.get('stage') || 'act2autochess_m01';
+/** ?coop8=1: the cooperative defense phase on the four-field board of the 8-player mode (shared/cooperativeEight.js). */
+const COOP8 = params.get('coop8') === '1';
 
 // ---- deterministic rng ----------------------------------------------------------------------------------
 let seed = 20260927;
@@ -119,7 +124,7 @@ function pushPublic() {
 function buildState() {
   uidSeq = 100;
   seed = 20260927;
-  const stage = data.lookup('stages', 'act2autochess_m01');
+  const stage = data.lookup('stages', STAGE_ID);
   const melee = stage.deployTiles.normal.melee.slice();
   const ranged = stage.deployTiles.normal.rangedOnly.slice();
   const bonds = data.list('bonds');
@@ -206,7 +211,7 @@ function buildState() {
 
   const pub = {
     phase: PHASE.PREP, round: 6, lastRound: 14, bossRound: 14, hiddenRound: 15, deadline: Date.now() + 74000, serverNow: Date.now(), modeId: 'mode_multi_hard', difficulty: 'HARD',
-    stageId: 'act2autochess_m01', factions: ['FLY', 'TIMES', 'SPECIAL'], disabledBonds: [...disabled], bannedChess: banned, bossId: 'boss_5',
+    stageId: STAGE_ID, ...(STAGE_ID.startsWith('custom_') ? { customExtensions: { bonds: [], stages: [STAGE_ID] } } : {}), factions: ['FLY', 'TIMES', 'SPECIAL'], disabledBonds: [...disabled], bannedChess: banned, bossId: 'boss_5',
     hiddenBossId: 'boss_8', teamLp: null, bossHp: null, draft: null, sp: null, players, fields: [],
   };
   if (VARIANTS.has('boss') || VARIANTS.has('bossR')) pub.round = pub.bossRound;
@@ -416,7 +421,7 @@ function startCombat(phase) {
   } else if (phase === PHASE.UNITE) {
     kind = 'unite';
     fields = [{ fieldId: 'u', kind: 'unite', players: ['p1', 'ai_2'], live: true }];
-    rect = { ...GEO.UNITE_RECT };
+    rect = COOP8 ? { ...EIGHT_UNITE_RECT } : { ...GEO.UNITE_RECT };
   } else {
     kind = 'normal';
     fields = pub.players.map((p) => ({ fieldId: `n:${p.playerId}`, kind: 'normal', players: [p.playerId], live: true }));
@@ -458,7 +463,7 @@ function startCombat(phase) {
     const e = data.lookup('enemies', bossRec.enemyKey);
     enemies.push({ id: id++, kind: 'enemy', side: 'enemy', ownerId: ME, defId: bossRec.enemyKey, name: bossRec.name, spine: bossRec.enemyKey, avatar: bossRec.enemyKey, x: 10, y: 3, facing: -1, maxHp: e?.stats?.maxHp || 1e5, hp: (e?.stats?.maxHp || 1e5) * 0.62, spawnAt: 0, dir: 0, boss: true, dead: false });
   }
-  const field = { fieldId, kind, rect, stageId: pub.stageId, units: units.map((u) => ({ ...u })) };
+  const field = { fieldId, kind, rect, stageId: COOP8 && kind === 'unite' ? eightUniteStageId(pub.stageId) : pub.stageId, units: units.map((u) => ({ ...u })) };
   store.patch('match', { field });
   const allyState = units.map((u) => ({ ...u, hp: u.maxHp * (0.55 + rnd() * 0.45), sp: rnd() * 20, spMax: 20 }));
   const t0 = performance.now();

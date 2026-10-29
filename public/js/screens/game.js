@@ -246,6 +246,8 @@ function MatchScreen() {
   const emotes = useStore((s) => s.emotes);
   const roomSolo = useStore((s) => s.room?.mode === 'solo');
   const spectator = useStore((s) => isSpectating(s.room, s.me.playerId));
+  // the bottom 已淘汰 notices can be closed (they cover the field); kept closed for the rest of the match
+  const [deadNoteHidden, setDeadNoteHidden] = useState(false);
   const userSettings = useSettings();
   const practice=useStore(s=>!!s.room?.practice);
   const metricsSetting = userSettings.combatMetrics === true||practice;
@@ -1747,13 +1749,13 @@ function MatchScreen() {
 
       <${TeamPanel} pub=${pub} myId=${myId} watching=${watchingNow} bubbles=${bubbles} onWatch=${watchPlayer} cap=${gd.config?.lpCapPerRound ?? 10} uniteLocal=${uniteLocal} normalLeaks=${battleState?.leaks}
         self=${Number.isFinite(priv?.lp) ? { lp: priv.lp, pending: liveLpNow.pending, unite: liveLpNow.unite, left: liveLpNow.left } : null}
-        observe=${cc ? { canObserve: (p) => observeTarget(p, pub, myId, { observing: watchingOther, ownDone: localDone }), observing: watchingOther, onBack: backHome } : null} />
+        observe=${cc ? { canObserve: (p) => observeTarget(p, pub, myId, { observing: watchingOther, ownDone: localDone }), observing: watchingOther, onBack: alive ? backHome : null } : null} />
 
       <div class="gm__effects"><${EffectsList} augmentsOnly=${true} pub=${pub} ownerId=${strip.ownerId||myId}/><${EffectsList} pub=${pub} ownerId=${strip.ownerId||myId} effects=${watchingOther && field ? (field.effects ?? null) : priv?.effects} /></div>
 
       ${watchingOther && !combat && !prepLayers.length ? html`<div class="gm__watching" role="status">
         <${GIcon} name="eye" /><span data-i18n-ctx="watching">正在查看 <b>${watchedName}</b>的阵地（只读）</span>
-        ${spectator ? null : html`<${Button} size="sm" variant="primary" icon="back" onClick=${() => watchPlayer({ playerId: myId })}>返回自己<//>`}
+        ${spectator || !alive ? null : html`<${Button} size="sm" variant="primary" icon="back" onClick=${() => watchPlayer({ playerId: myId })}>返回自己<//>`}
       </div>` : null}
 
       ${showShop ? html`<${ShopBar} priv=${priv} editable=${editable} collapsed=${barCollapsed} refreshBusy=${refreshBusy} onCollapse=${setCollapsed}
@@ -1772,10 +1774,10 @@ function MatchScreen() {
         onWatch=${watchField} client=${{ layers: prepLayers, layer: prepOwnerId, onLayer: pid => watchPlayer({playerId:pid}) }} />` : null}
 
       ${combat || mode === 'settle' ? html`<${CombatHud} pub=${pub} myId=${myId} watching=${watchingNow} hud=${hud} myDone=${!!myDone && alive}
-        spectating=${!alive} spectator=${spectator} onWatch=${watchField}
+        spectating=${!alive} spectator=${spectator} onWatch=${watchField} deadHidden=${deadNoteHidden} onHideDead=${() => setDeadNoteHidden(true)}
         client=${cc || layers.length ? { progress, observing: observingName ? { name: observingName } : null, onBack: alive ? backHome : null, layers, layer, onLayer: setLayer, onLayerStep: delta => setLayer(previous => {const i=Math.max(0,layers.findIndex(x=>x.key===previous));return layers[Math.max(0,Math.min(layers.length-1,i+delta))].key;}) } : null} />` : null}
 
-      ${!spectator && showDeadPill(alive, phase) ? html`<div class="gm__dead" role="status"><${Icon} name="close" />你已被淘汰 · 可继续观战队友</div>` : null}
+      ${!spectator && !deadNoteHidden && showDeadPill(alive, phase) ? html`<div class="gm__dead" role="status"><${Icon} name="close" />你已被淘汰 · 可继续观战队友<button type="button" class="gm__dead-close" aria-label="안내 닫기" title="안내 닫기" onClick=${() => setDeadNoteHidden(true)}>×</button></div>` : null}
 
 
       <${Ticker} />
