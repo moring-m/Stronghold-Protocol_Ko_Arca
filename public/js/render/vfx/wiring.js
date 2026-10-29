@@ -1773,6 +1773,11 @@ export class FxWiring {
     for(const name of previous||[])if(!current.has(name))this.status(v,name,false);
     for(const name of current)if(!previous?.has(name)||!this.loops.get(`${id}|${name}`)?.alive)this.status(v,name,true);
     if(current.size)this.statusSeen.set(id,current);else this.statusSeen.delete(id);
+    // a 보호막 prefab with level clips (斥罪's judge_shield_all_01: SetAnimatorIntByBuffStackCnt 'level' — level 0 shows
+    // nothing) follows the barrier: 1 while it holds, 2 from half her max HP [ASSUMED: the client's stack thresholds are
+    // not in the extracted data]
+    const bh=this.loops.get(`${id}|barrier`);
+    if(bh?.effect?.setLevel){const hp=Number(v.shieldHp)||0,max=Number(v.maxHp)||0;bh.effect.setLevel(hp>0&&max>0&&hp>=max*.5?2:1);}
   }
 
   /** Stop every loop of a unit (it died / left): its status loops, its skill / charge loops, the skills' loops on it. */

@@ -136,7 +136,13 @@ export function compileEffect(desc, lib = {}) {
         world: on(r.m_UseWorldSpace), loop: on(r.m_Loop), params: trailParams(r.m_Parameters), order: num(r.m_SortingOrder, 0), layer: num(r.m_SortingLayer, 0),
         mats: Array.isArray(r.materials) ? r.materials : [] };
     }
-    if (nd.animator && on(nd.animator.enabled ?? true) && nd.animator.default != null) def.animators.push({ node: i, clip: nd.animator.default });
+    if (nd.animator && on(nd.animator.enabled ?? true) && nd.animator.default != null) {
+      // an animator whose clips are levels (…_level0_… / _level1_ …: the client's SetAnimatorIntByBuffStackCnt 'level')
+      // plays the clip of the effect's `level` (Effect.level) when one is set
+      const levels = {};
+      for (const ci of nd.animator.clips || []) { const m = /level(\d+)/i.exec(desc?.clips?.[ci]?.name || ''); if (m) levels[+m[1]] = ci; }
+      def.animators.push({ node: i, clip: nd.animator.default, levels: Object.keys(levels).length ? levels : null });
+    }
     else if (nd.animation && on(nd.animation.enabled ?? true) && nd.animation.default != null && (nd.animation.playAutomatically ?? true)) def.animators.push({ node: i, clip: nd.animation.default });
     for (const b of Array.isArray(nd.behaviours) ? nd.behaviours : []) {
       if (!b || b.enabled === false) continue;
@@ -403,6 +409,17 @@ export class Effect {
    * when its particles are gone; `_inactiveOnFinish` hides at once — a projectile's body (崖心's hook, 灰毫's shell)
    * while its trail fades through `_delayToFinish` —; `hit` also hides `_inactiveOnHit`.
    */
+  /** The clip an animator plays now: its level's clip while `level` is set (see the animator's `levels`). */
+  _clipOf(a) { return a.levels && this.level != null && a.levels[this.level] != null ? a.levels[this.level] : a.clip; }
+
+  /** Set the level an animator's level clips follow (null: its default clip); a change restarts the clip. */
+  setLevel(n) {
+    const next = Number.isInteger(n) ? n : null;
+    if (next === this.level) return;
+    this.level = next;
+    this.levelAt = this.ctime ?? null;
+  }
+
   stop(o = {}) {
     if (this.state === 'done') return;
     for (const nd of this.def.inactiveOnFinish) { this.forcedOff[nd] = 1; this.act[nd] = 0; }
@@ -509,8 +526,8 @@ export class Effect {
     // clips (from their node's activation), behaviours
     for (const a of def.animators) {
       if (!this.hier[a.node]) continue;
-      const c = def.clips[a.clip];
-      if (c) sampleClip(c, ct - Math.max(0, this.actAt[a.node]), this._sink());
+      const c = def.clips[this._clipOf(a)];
+      if (c) sampleClip(c, ct - Math.max(0, a.levels && this.levelAt != null ? Math.max(this.levelAt, this.actAt[a.node]) : this.actAt[a.node]), this._sink());
     }
     // a clip may have toggled nodes: recompute activity
     if (def.animators.length) {
@@ -694,7 +711,7 @@ export class Effect {
     if (!busy) for (const [nd, d] of def.fxDelay) if (!this.forcedOff[nd] && ct < d) { busy = true; break; }
     if (!busy && this.state === 'play') {
       for (const a of def.animators) {
-        const c = def.clips[a.clip];
+        const c = def.clips[this._clipOf(a)];
         if (!c) continue;
         if (c.loop) { busy = true; break; }
         if (this.hier[a.node] && ct - Math.max(0, this.actAt[a.node]) < c.length) { busy = true; break; }
