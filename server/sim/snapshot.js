@@ -122,7 +122,10 @@ export function flagsOf(u, t = u.skill?.battle?.time || 0) {
   if (u.skill && ((u.skill.active && u.skill.kind !== 'passive') || t < (u.mem.skillCastUntil || 0))) bits |= UF.SKILL;
   if (overdriveSkill(u.skill) && u.skill.active) {
     bits |= UF.OVERDRIVE;
-    if (overdriveLeft(u.skill) <= .5 + 1e-9) bits |= UF.OVERHEATED;
+    // 过载: the kit's own overload phase where it keeps one (号角 S3 after its main time, 洛洛 S2 at rockOverAt, 维什戴尔 S2),
+    // else the second half of the duration / ammo
+    const m = u.mem || {};
+    if (m.overload || m.rockOver || m.wisdelOverload || overdriveLeft(u.skill) <= .5 + 1e-9) bits |= UF.OVERHEATED;
   }
   if (u.s.shield > 0 || u.buffs.some((b) => b.shieldHits > 0) || u.mem?.ab?.hitShield > 0 || u.mem?.ab?.list?.some(a => a.visualBarrier && a.left > 0)) bits |= UF.SHIELD;
   if (f.invulnerable) bits |= UF.INVULN;

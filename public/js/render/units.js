@@ -2359,7 +2359,7 @@ export class UnitView {
     // (a fixed boss — one that does not walk — spans its body: OFFICIAL_BARS.fixedBossWidth; a walking boss = a leader)
     const fixedBoss = off && this.isBoss && this.fixedBoss;
     const bw = off ? s * (fixedBoss ? OFFICIAL_BARS.fixedBossWidth : OFFICIAL_BARS.width) : clamp(s * (this.isBoss ? UNIT.bossBarWidth : UNIT.barWidth), 24, this.isBoss ? 260 : 96);
-    const bh = off ? Math.max(2.5, s * (fixedBoss || leader ? OFFICIAL_BARS.leaderH : OFFICIAL_BARS.hpH)) : clamp(s * (this.isBoss ? 0.09 : 0.065), 3, this.isBoss ? 9 : 6);
+    const bh = off ? Math.max(2.5, s * (fixedBoss ? OFFICIAL_BARS.leaderH : OFFICIAL_BARS.hpH)) : clamp(s * (this.isBoss ? 0.09 : 0.065), 3, this.isBoss ? 9 : 6);
     // a knocked-down operator's HUD is its redeploy ring alone, drawn at full strength over the greyed model
     this.hud.alpha = this.down ? this.fadeIn : this.dying > 0 ? 0 : alpha;
     let sx = this.shake > 0 ? Math.sin(t * 90) * this.shake * 10 : 0;
