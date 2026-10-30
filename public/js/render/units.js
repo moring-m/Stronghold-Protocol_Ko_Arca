@@ -2359,7 +2359,7 @@ export class UnitView {
     // (a fixed boss — one that does not walk — spans its body: OFFICIAL_BARS.fixedBossWidth; a walking boss = a leader)
     const fixedBoss = off && this.isBoss && this.fixedBoss;
     const bw = off ? s * (fixedBoss ? OFFICIAL_BARS.fixedBossWidth : OFFICIAL_BARS.width) : clamp(s * (this.isBoss ? UNIT.bossBarWidth : UNIT.barWidth), 24, this.isBoss ? 260 : 96);
-    const bh = off ? Math.max(2.5, s * (this.isBoss || leader ? OFFICIAL_BARS.leaderH : OFFICIAL_BARS.hpH)) : clamp(s * (this.isBoss ? 0.09 : 0.065), 3, this.isBoss ? 9 : 6);
+    const bh = off ? Math.max(2.5, s * (fixedBoss ? OFFICIAL_BARS.leaderH : OFFICIAL_BARS.hpH)) : clamp(s * (this.isBoss ? 0.09 : 0.065), 3, this.isBoss ? 9 : 6);
     // a knocked-down operator's HUD is its redeploy ring alone, drawn at full strength over the greyed model
     this.hud.alpha = this.down ? this.fadeIn : this.dying > 0 ? 0 : alpha;
     let sx = this.shake > 0 ? Math.sin(t * 90) * this.shake * 10 : 0;
@@ -2378,8 +2378,8 @@ export class UnitView {
       this.hpFill.position.set(x0, cy); this.hpFill.width = bw * k; this.hpFill.height = bh;
       if (off) {
         this.hpFill.tint = !this.isEnemy ? OFFICIAL_BARS.ally : this.isBoss || leader ? OFFICIAL_BARS.leader : OFFICIAL_BARS.enemy;
-        this.hpBg.tint = leader || this.isBoss ? OFFICIAL_BARS.leaderBack : OFFICIAL_BARS.back;
-        this.hpBg.alpha = leader || this.isBoss ? 0.85 : 0.55;
+        // every bar on the one dark back (a walking boss: an ordinary bar's thickness too)
+        this.hpBg.tint = OFFICIAL_BARS.back; this.hpBg.alpha = 0.55;
       } else {
         this.hpBg.tint = COLORS.hpBack; this.hpBg.alpha = 1;
         this.hpFill.tint = !this.isEnemy ? COLORS.hpAlly : this.isBoss ? COLORS.hpBoss : COLORS.hpEnemy;
@@ -2727,7 +2727,8 @@ export class UnitView {
       r = this._elBar = { root, disc, bg, fill };
       this.hud.addChild(root);
     }
-    const d = clamp(s * EL_BAR.icon, EL_BAR.min, EL_BAR.max) * (this.isEnemy ? EL_BAR.enemy : 1);
+    // the official gauge is larger than the classic one (OFFICIAL_BARS.elementIcon)
+    const d = (at ? clamp(s * OFFICIAL_BARS.elementIcon, EL_BAR.min, OFFICIAL_BARS.elementMax) : clamp(s * EL_BAR.icon, EL_BAR.min, EL_BAR.max) * (this.isEnemy ? EL_BAR.enemy : 1));
     if (at) {
       if (!r.ring) { r.ring = new this.P.Sprite(this.P.Texture.EMPTY); r.ring.anchor.set(0.5); r.root.addChild(r.ring); }
       const k = this.elementLeft();
@@ -3130,8 +3131,8 @@ const HUD_P = { x: 0, y: 0, s: 0, depth: 0 };
 const ICON_TMP = [];
 /** 设置「HP 바 표시 방식」 official: the client's bar colours (read off its battle screens): operator HP light blue, SP
  *  yellow-green charging / amber while the skill runs, enemy HP orange, a leader's (悬赏 leaders, the bosses) red on grey. */
-const OFFICIAL_BARS = Object.freeze({ elementAbove: 0.28, width: 0.74, fixedBossWidth: 4, hpH: 0.042, leaderH: 0.06, belowFeet: 0.16,
-  ally: 0x6cb2d2, sp: 0x8aa43f, skill: 0xc3991c, overload: 0xb04516, enemy: 0xd46c3a, leader: 0xcf2a33, back: 0x1c1c1c, leaderBack: 0x7d8088 });
+const OFFICIAL_BARS = Object.freeze({ elementAbove: 0.17, elementIcon: 0.25, elementMax: 26, width: 0.74, fixedBossWidth: 4, hpH: 0.042, leaderH: 0.06, belowFeet: 0.16,
+  ally: 0x6cb2d2, sp: 0x8aa43f, skill: 0xc3991c, overload: 0xb04516, enemy: 0xd46c3a, leader: 0xcf2a33, back: 0x1c1c1c });
 
 /**
  * Unit-layer zIndex of a unit / piece whose feet are at (x, y): farther rows first (so raised block rows, keyed by

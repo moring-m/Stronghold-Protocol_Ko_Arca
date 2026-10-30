@@ -87,7 +87,9 @@ const ENEMY_AREA_FX = Object.freeze({
   mechBomb: Object.freeze({ skill: 'bomb[reborning]', telegraph: 'range', explode: null }),
   // “自在” 破桎而出 (ShieldBurst / ShieldBurstReborn): the barrier loops while it holds, its trigger effects at the burst;
   // its cross: the cross projectile's hit (enemy_xi_skill_01_hit) where it lands
-  breakFree: Object.freeze({ skill: ['shieldburstreborn', 'shieldburst'], telegraph: 'loop', explode: 'trigger' }),
+  // (the barrier loop is played on 自在 itself: its spawn location's Graphic tilt, following it, in its depth — at a bare
+  // board point it took no rotation and showed sheared under the camera)
+  breakFree: Object.freeze({ skill: ['shieldburstreborn', 'shieldburst'], telegraph: 'loop', explode: 'trigger', onUnit: true }),
   xiCross: Object.freeze({ projectile: 'projectile_enemy_xi_s', telegraph: 'onHit' }),
   // 鼠王 【唱沙】: its DriftSand skill's hit effects (the sand cross) on the target
   driftSand: Object.freeze({ skill: 'driftsand', telegraph: 'hit' }),
@@ -708,7 +710,7 @@ export class FxWiring {
     // a unit facing up (its back model) holds its weapon and muzzle behind its body: the effects of its strike (the
     // attack's start / muzzle flash: `o.strike`) are drawn before its model, not over it; its buffs and auras stay over
     const behindOwner = !!((o.strike || o.attackCast) && pose.back && v.root && !P.onGround && !o.front);
-    const opts = { ...(stretchMul !== 1 ? { stretchMul } : {}), track: o.track || null, data: o.data ?? null, loop: !!o.loop, important: !!o.important, skip: o.skip > 0 ? o.skip : 0, speed: o.speed, owner: v, depthOwner:o.depthOwner ?? ((o.follow || o.stick || P.follow || P.keep || behindOwner) && v.root ? v : null), behindOwner };
+    const opts = { ...(stretchMul !== 1 ? { stretchMul } : {}), track: o.track || null, data: o.data ?? null, loop: !!o.loop, important: !!o.important, skip: o.skip > 0 ? o.skip : 0, speed: o.speed, owner: v, unitLayer: !!o.unitLayer, depthOwner:o.depthOwner ?? ((o.follow || o.stick || P.follow || P.keep || behindOwner) && v.root ? v : null), behindOwner };
     // the owner each frame: FollowMountPoint keeps the effect on the unit's point (and its rotation), a held effect
     // moves with the unit (`keep`), FollowDirection turns it with the unit, PauseEffectIf hides it while the unit shows
     // a condition; a prefab with chained effects (OnPlayEmitter: system.js FxHandle._start hands them this track) has
@@ -1720,7 +1722,7 @@ export class FxWiring {
     const key = own || (name === 'shield' && own === undefined ? this.statusKey(name) : name === 'shield' || name === 'barrier' ? null : this.statusKey(name));
     if (!key) return false;
     this.skills.status(v, lc(key));
-    const h = this.playOn(key, v, { follow: true, loop: true, important: true, depthOwner:v });
+    const h = this.playOn(key, v, { follow: true, loop: true, important: true, depthOwner:v, ...(own ? { unitLayer: true } : {}) });
     if (h) this.loops.set(slot, h);
     return !!h;
   }
@@ -1904,7 +1906,9 @@ export class FxWiring {
       const keys = (roles && role ? roles[role] || [] : []).filter((k) => kind === 'telegraph' ? !spec.match || spec.match.test(k) : !spec.skip || !spec.skip.test(k));
       let drawn = false;
       for (const key of keys) {
-        const h = this.playOn(key, { x, y, z: 0 }, { loop: kind === 'telegraph', important: true });
+        const own = spec.onUnit && kind === 'telegraph' && src?.info && src.alive !== false;
+        const h = own ? this.playOn(key, src, { follow: true, loop: true, important: true, depthOwner: src, unitLayer: true })
+          : this.playOn(key, { x, y, z: 0 }, { loop: kind === 'telegraph', important: true });
         if (!h) continue;
         if (kind === 'telegraph') setTimeout0(this.ofx, h, Number(extra.dur) || 0);
         drawn = true;
