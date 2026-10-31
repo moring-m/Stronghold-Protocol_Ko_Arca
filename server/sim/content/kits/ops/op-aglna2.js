@@ -263,7 +263,7 @@ export default {
           const hi = num(t0.atk_scale_hi), lo = num(t0.atk_scale_lo), mass = num(t0.mass_level, 3);
           const extra = (target, dmg) => {
             if (!up(unit) || !target || target.side !== 'enemy' || !target.alive || !hasHp(target) || !dmg) return;
-            if (dmg.type === 'element' || dmg.type === 'elemental' || (dmg.tags && (dmg.tags.includes(TAG_EXTRA) || dmg.tags.includes('dot')))) return;
+            if (dmg.type === 'element' || dmg.type === 'elemental' || (dmg.tags && (dmg.tags.includes(TAG_EXTRA) || dmg.tags.includes('dot') || dmg.tags.includes('item')))) return;   // an item's added damage (天马之枪's true damage) is 附加伤害 too: each fed the other with no end
             const s = target.weight <= mass ? hi : lo;
             if (s > 0) battle.dealDamage(unit, target, { amount: unit.s.atk * s, type: 'arts', tags: ['talent', TAG_EXTRA] });
           };
