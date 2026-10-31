@@ -544,7 +544,7 @@ export class SkillRuntime {
     }
     if (!this.healSkill && u.profile?.fortress) {
       // The branch's own-tile melee range also satisfies the basic cast condition for unblockable fragments.
-      const here = [u.tileR * COLS + u.tileC];
+      const here = [u.tileR * (b.grid?.cols ?? COLS) + u.tileC];
       if (b.enemiesInKeys(here, u, u.profile).length > 0 || this._allyTargetIn(here)) return true;
     }
     // the enemies a unit blocks are always its targets (Battle.blockedTargets), in range or not — PRTS 卫戍协议/帮助

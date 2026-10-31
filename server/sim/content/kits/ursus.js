@@ -43,7 +43,7 @@ export function imperialPlatforms(b,u,x,y,{radius=1,depth=0,multiplier=1,bind=0,
  for(let r=Math.floor(y-radius);r<=Math.ceil(y+radius);r++)for(let c=Math.floor(x-radius);c<=Math.ceil(x+radius);c++)if(hypot(c-x,r-y)<=radius+1e-9&&high(r,c))queue.push([r,c,0]);
  let hits=0;
  for(let i=0;i<queue.length;i++){
-  const [r,c,d]=queue[i],key=r*S.COLS+c;if(seen.has(key))continue;seen.add(key);hits++;
+  const [r,c,d]=queue[i],key=r*(b.grid?.cols??S.COLS)+c;if(seen.has(key))continue;seen.add(key);hits++;
   for(const [dr,dc]of [[1,0],[-1,0],[0,1],[0,-1]]){
    const rr=r+dr,cc=c+dc;
    for(const e of b.enemies)if(up(e)&&!e.isFlying&&!e.s.flags.untargetable&&!e.s.flags.sleep&&S.bodyOnTile(e,rr,cc)){
@@ -144,8 +144,8 @@ function kit(bb,raw,def){
     b.on('beforeAttack',c=>{if(c.attacker===u){const center=c.targets[0],radius=u.skill.active&&u.skill.id==='skchr_headb2_3'?2:num(tb['attack@ability_range_radius'],1);c.profile.atkScale=(u.skill.active?num(u.skill.bb.atk_scale,1):1)*(center&&b.enemiesInRadius(center.x,center.y,radius).length>=num(tb.cnt,Infinity)?num(tb.atk_scale_e,1):1)}},{owner:u});
     u.profile.splashScale=num(tb['attack@atk_scale_2'],.5)*num(t.damage_scale,1);
     b.on('attack',c=>{if(c.attacker!==u)return;const s3=u.skill.active&&u.skill.id==='skchr_headb2_3',sk=u.skill.bb;
-     const key=u.rangeKeys.find(k=>k!==u.tileR*S.COLS+u.tileC);
-     const centers=c.targets.length?c.targets:(s3&&key!=null?[{x:key%S.COLS,y:Math.floor(key/S.COLS)}]:[]);
+     const W=b.grid?.cols??S.COLS,key=u.rangeKeys.find(k=>k!==u.tileR*W+u.tileC);
+     const centers=c.targets.length?c.targets:(s3&&key!=null?[{x:key%W,y:Math.floor(key/W)}]:[]);
      for(const e of centers)imperialPlatforms(b,u,e.x,e.y,{radius:s3?2:num(tb['attack@ability_range_radius'],1),depth:s3?num(u.mem.zimaStrikes)+1:0,multiplier:s3?num(sk.splash_atk_scale_bonus,1):1,bind:s3?num(sk.unmovable):0,sp:u.skill.id==='skchr_headb2_2'?num(sk.sp_per_highland):0});
     },{owner:u});
    }
