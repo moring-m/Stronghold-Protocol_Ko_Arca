@@ -2802,7 +2802,8 @@ export class UnitView {
       r.res = res;
       r.text.texture = downLabel(label, counting ? '#ffffff' : '#' + color.toString(16).padStart(6, '0'), res);
     }
-    const d = clamp(s * DOWN_LOOK.size, 22, 52);
+    // a share of the tile like the bars and the model (no pixel floor / cap: it kept one size at every camera distance)
+    const d = s * DOWN_LOOK.size;
     const k = d / tex.size;
     r.disc.scale.set(k); r.track.scale.set(k); r.arc.scale.set(k);
     r.text.scale.set((d * (label.length > 2 ? 0.34 : 0.44)) / 32);
