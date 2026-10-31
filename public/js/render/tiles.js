@@ -81,7 +81,7 @@ void main(void) {
 const HL_STYLES = {
   legal: { color: COLORS.legal, fill: 0.26, line: 0.9 },
   // the client's deployable tiles while a piece is dragged: an even green wash, no frame (measured on its screen)
-  officialLegal: { color: 0x38a555, fill: 0.55, line: 0 },
+  officialLegal: { color: 0x7fd23a, fill: 0.55, line: 0 },
   illegal: { color: COLORS.illegal, fill: 0.32, line: 0.95 },
   range: { color: COLORS.range, fill: 0.3, line: 0.85 },
   rangeStand: { color: COLORS.rangeStand, fill: 0.3, line: 0.9 },
@@ -164,7 +164,7 @@ const hash2 = (r, c) => ((r * 73856093) ^ (c * 19349663)) >>> 0;
  * The client's attack-range tiles: orange diagonal bands with clear gaps between (half of each period), sliding across
  * the range over time (measured on its screen: one period ≈ 0.44 tile, about a period a second).
  */
-const RANGE_STRIPE = Object.freeze({ step: 0.44, fill: 0.5, speed: 0.44, color: 0xd58619, alpha: 0.95, overlap: 0xa8420c });
+const RANGE_STRIPE = Object.freeze({ step: 0.44, fill: 0.5, speed: 0.44, color: 0xf0921c, alpha: 0.95, overlap: 0xb8480e });
 
 /** Clip a convex polygon ([[x, y]]) to the half-plane a·(x, y) ≤ k. */
 function clipHalf(poly, ax, ay, k) {
@@ -581,7 +581,7 @@ export class TileField {
     for (const s of this.rowSurfaces.values()) if (s._hl) s._hl.clear();
     const cam = this.cam;
     this._stripesLive = false;
-    if (!cam || !this.highlights.size) return;
+    if (!cam || !this.highlights.size) { this.markSink?.([]); return; }
     const p = this._p;
     // 设置 접근성「타일 표시 방식」 공식: the client's marks fill the whole tile; the range is its sliding orange bands on
     // their own layer above the other marks, all at the ground's height
@@ -595,6 +595,31 @@ export class TileField {
       for (const k of own) if (boss.has(k)) (both ||= new Set()).add(k);
     }
     const drawn = both ? new Set() : null;
+    // the 3D board (official marks): the fills and bands go on the tiles' own surfaces (render/board3d BoardScene.setMarks)
+    if (official && this.markSink) {
+      const fills = [], bands = new Map();
+      for (const { tiles, style: st } of this.highlights.values()) {
+        const style = st === HL_STYLES.legal ? HL_STYLES.officialLegal : st;
+        if (style.stripes) {
+          for (const [r, c] of tiles) {
+            const k = r * 100 + c, color = both?.has(k) ? RANGE_STRIPE.overlap : style.stripeColor ?? RANGE_STRIPE.color;
+            if (!bands.has(color)) bands.set(color, new Map());
+            bands.get(color).set(k, [r, c]);
+          }
+        } else if (style === HL_STYLES.officialLegal) fills.push({ tiles: tiles.map(([r, c]) => [r, c]), color: style.color, alpha: style.fill });
+      }
+      // a dual tile goes in its dark band only
+      if (both) for (const [color, m] of bands) if (color !== RANGE_STRIPE.overlap) for (const k of both) m.delete(k);
+      this.markSink([...fills, ...[...bands].map(([color, m]) => ({ tiles: [...m.values()], color, alpha: RANGE_STRIPE.alpha, stripes: true }))]);
+      // the rest (hover, target, illegal …) stays in the overlay
+      for (const { tiles, style: st } of this.highlights.values()) {
+        const style = st === HL_STYLES.legal ? HL_STYLES.officialLegal : st;
+        if (style.stripes || style === HL_STYLES.officialLegal) continue;
+        this._drawPlain(tiles, style, inset, p, cam);
+      }
+      return;
+    }
+    if (this.markSink) this.markSink([]);
     for (const { tiles, style: st } of this.highlights.values()) {
       const style = official && st === HL_STYLES.legal ? HL_STYLES.officialLegal : st;
       for (const [r, c] of tiles) {
@@ -630,6 +655,27 @@ export class TileField {
         g.endFill();
         if (style.stripes && !style.stripeColor && !this.external) drawLegacyStripes(g, cam, r, c, z, inset, Math.max(1.5, sc * 0.05), p);
       }
+    }
+  }
+
+  /** One highlight group drawn plainly in the overlay (fill + frame on each tile's top). */
+  _drawPlain(tiles, style, inset, p, cam) {
+    for (const [r, c] of tiles) {
+      const h = this.heightAt(r, c);
+      let g = this.hlGfx;
+      if (h > 1e-3) {
+        const s = this.surfaceLayer(r);
+        if (s) { if (!s._hl) { s._hl = new this.P.Graphics(); s.addChildAt(s._hl, 0); } g = s._hl; }
+      }
+      const z = h + 0.012;
+      const cs = [c - 0.5 + inset, r + 0.5 - inset, c + 0.5 - inset, r + 0.5 - inset, c + 0.5 - inset, r - 0.5 + inset, c - 0.5 + inset, r - 0.5 + inset];
+      const pts = new Array(8);
+      for (let k = 0; k < 4; k++) { cam.project(cs[k * 2], cs[k * 2 + 1], z, p); pts[k * 2] = p.x; pts[k * 2 + 1] = p.y; }
+      const lw = Math.max(1.5, cam.scaleAt(c, r, z) * 0.035);
+      if (style.line > 0) g.lineStyle(lw, style.color, style.line, 0.5); else g.lineStyle(0);
+      g.beginFill(style.color, style.fill);
+      g.drawPolygon(pts);
+      g.endFill();
     }
   }
 
