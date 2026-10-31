@@ -648,3 +648,14 @@ test('invulnerable summons hide HP and invulnerability while ordinary units reta
   v.flags=0;v.update(1/60,cam(),2);assert.equal(v.hpBg.visible,true);v.destroy();
  }
 });
+
+test("an operator's 起飞 lifts its model alone: the HP bar keeps its ground place", async () => {
+ const {UF,ANIM}=await import('../../shared/constants.js');
+ const camera=presetCamera('normal',{width:1600,height:900});
+ const mk=(flags)=>{const v=view({settings:undefined});v.ctx.settings={hpBarStyle:'official'};const s={id:1,x:5,y:12,hp:1000,maxHp:1000,sp:0,spMax:0,anim:ANIM.IDLE,flags};v.sync(s,0);for(let i=0;i<60;i++)v.update(1/60,camera,i/60);return v;};
+ const ground=mk(0),air=mk(UF.FLYING);
+ assert.ok(air.hover>0,'airborne');
+ assert.ok(air.root.y<ground.root.y-1,'the model is up');
+ assert.ok(Math.abs(air.hpBg.y-ground.hpBg.y)<0.5,`the bar stays (${air.hpBg.y} vs ${ground.hpBg.y})`);
+ ground.destroy();air.destroy();
+});

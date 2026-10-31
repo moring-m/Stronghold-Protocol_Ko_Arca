@@ -2302,8 +2302,11 @@ export class UnitView {
     this.screen.top = by - headTiles * s;
     // the boss HUD `hudDx` tiles beside the model, where the official prefab puts it (BOSS_HUD_DX)
     const hx = this.hudDx ? cam.project(this.x + this.hudDx, this.y, this.z + this.hover + this.lift, HUD_P).x : bx;
-    this._feetY = by;
-    this._updateHud(dt, s, hx, by - headTiles * s, alpha, t);
+    // an operator's 起飞 lifts the model alone: its bars stay where it stands
+    let hy = by, hs = s;
+    if (!this.isEnemy && this.hover > 1e-3) { const q = cam.project(visualX, this.y, this.z + this.lift + this.waterSink, HUD_P); hs = q.s; hy = q.y + hs * STAND_DROP; }
+    this._feetY = hy;
+    this._updateHud(dt, hs, hx, hy - headTiles * hs, alpha, t);
   }
 
   /**
