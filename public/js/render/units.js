@@ -2302,8 +2302,11 @@ export class UnitView {
     this.screen.top = by - headTiles * s;
     // the boss HUD `hudDx` tiles beside the model, where the official prefab puts it (BOSS_HUD_DX)
     const hx = this.hudDx ? cam.project(this.x + this.hudDx, this.y, this.z + this.hover + this.lift, HUD_P).x : bx;
-    this._feetY = by;
-    this._updateHud(dt, s, hx, by - headTiles * s, alpha, t);
+    // an operator's 起飞 lifts the model alone: its bars stay where it stands
+    let hy = by, hs = s;
+    if (!this.isEnemy && this.hover > 1e-3) { const q = cam.project(visualX, this.y, this.z + this.lift + this.waterSink, HUD_P); hs = q.s; hy = q.y + hs * STAND_DROP; }
+    this._feetY = hy;
+    this._updateHud(dt, hs, hx, hy - headTiles * hs, alpha, t);
   }
 
   /**
@@ -2727,8 +2730,9 @@ export class UnitView {
       r = this._elBar = { root, disc, bg, fill };
       this.hud.addChild(root);
     }
-    // the official gauge is larger than the classic one (OFFICIAL_BARS.elementIcon)
-    const d = (at ? clamp(s * OFFICIAL_BARS.elementIcon, EL_BAR.min, OFFICIAL_BARS.elementMax) : clamp(s * EL_BAR.icon, EL_BAR.min, EL_BAR.max) * (this.isEnemy ? EL_BAR.enemy : 1));
+    // the official gauge: a fixed share of the tile, like the official bars it sits on (no pixel floor / cap: those made it
+    // jump against the bar as the camera zoomed)
+    const d = (at ? s * OFFICIAL_BARS.elementIcon : clamp(s * EL_BAR.icon, EL_BAR.min, EL_BAR.max) * (this.isEnemy ? EL_BAR.enemy : 1));
     if (at) {
       if (!r.ring) { r.ring = new this.P.Sprite(this.P.Texture.EMPTY); r.ring.anchor.set(0.5); r.root.addChild(r.ring); }
       const k = this.elementLeft();
@@ -2801,7 +2805,8 @@ export class UnitView {
       r.res = res;
       r.text.texture = downLabel(label, counting ? '#ffffff' : '#' + color.toString(16).padStart(6, '0'), res);
     }
-    const d = clamp(s * DOWN_LOOK.size, 22, 52);
+    // a share of the tile like the bars and the model (no pixel floor / cap: it kept one size at every camera distance)
+    const d = s * DOWN_LOOK.size;
     const k = d / tex.size;
     r.disc.scale.set(k); r.track.scale.set(k); r.arc.scale.set(k);
     r.text.scale.set((d * (label.length > 2 ? 0.34 : 0.44)) / 32);
@@ -3131,7 +3136,7 @@ const HUD_P = { x: 0, y: 0, s: 0, depth: 0 };
 const ICON_TMP = [];
 /** 设置「HP 바 표시 방식」 official: the client's bar colours (read off its battle screens): operator HP light blue, SP
  *  yellow-green charging / amber while the skill runs, enemy HP orange, a leader's (悬赏 leaders, the bosses) red on grey. */
-const OFFICIAL_BARS = Object.freeze({ elementAbove: 0.17, elementIcon: 0.25, elementMax: 26, width: 0.74, fixedBossWidth: 4, hpH: 0.042, leaderH: 0.06, belowFeet: 0.16,
+const OFFICIAL_BARS = Object.freeze({ elementAbove: 0.17, elementIcon: 0.25, width: 0.74, fixedBossWidth: 4, hpH: 0.042, leaderH: 0.06, belowFeet: 0.16,
   ally: 0x6cb2d2, sp: 0x8aa43f, skill: 0xc3991c, overload: 0xb04516, enemy: 0xd46c3a, leader: 0xcf2a33, back: 0x1c1c1c });
 
 /**

@@ -2446,5 +2446,19 @@ export const AUGMENT_SOURCES = [
   "side": "ally",
   "description": "전장에 배치된 모든 오퍼레이터를 한 단계 높은 무작위 정예화 오퍼레이터로 교체",
   "notes": "획득 판정이 아니며, 위치와 방향이 동일하게 배치되어야 하고, 장비를 그대로 승계"
+ },
+ {
+  "source": 183,
+  "identity": 183,
+  "grade": "prism",
+  "name": "빈도",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "enemy",
+  "description": "적이 사망 시 목제 인장 2기 소환",
+  "notes": "이 효과를 포함해서 사망 시 소환되는 타수몹에는 적용되지 않음 (예: 홍목 인장, 소설 두루마리 등)"
  }
 ];

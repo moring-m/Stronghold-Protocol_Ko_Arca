@@ -1,5 +1,6 @@
 import { attackClipTiming } from '../../../shared/attackTiming.js';
 import { weaknessRetype } from './items/battle.js';
+import { spawnChildren } from './enemies/helpers.js';
 export function install(b){
  const state=b.flags.augments;if(!state)return;
  const empty=[],allied=Object.fromEntries(Object.entries(state.allies||{}).map(([id,cards])=>[id,cards.map(a=>a.effect)])),enemyEffects=(state.enemies||[]).map(a=>a.effect);
@@ -100,6 +101,12 @@ export function install(b){
   const u=c.source,t=c.target;if(u?.side!=='ally'||u.kind!=='op'||t?.side!=='enemy'||!(c.amount>0)||!t.alive)return;
   const e=forUnit(u).find(e=>e.kind==='corrosion');if(!e)return;
   const n=t.mem.augmentCorrosion=Math.min(50,(t.mem.augmentCorrosion||0)+1),scale=1-Math.min(e.cap,n*e.perHit);add(t,'corrosion',{defMul:scale,resMul:scale});
+ });
+ // 빈도: a knocked-out enemy leaves 木制瑞印 behind — never one of the 打击数 (hit-count) enemies, the seals included
+ const seals=enemyEffects.filter(e=>e.kind==='deathSeals');
+ if(seals.length)b.on('death',({unit:u,reason})=>{
+  if(reason!=='killed'||u.side!=='enemy'||u.s.flags.hitCount||u.s.flags.hitCountArts)return;
+  for(const e of seals)spawnChildren(b,u,e.key,e.count);
  });
  // Initial units are configured before deploy; deploy also handles spawned tokens, enemies and redeployments.
  for(const u of b.allyUnits)if(u.deployed)initialize(u);

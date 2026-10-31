@@ -334,7 +334,9 @@ export function performAttack(b, u, prof, targets, opts = null) {
     u.mem.engaged = true;
     b._ev(['engage', u.id]);
   }
-  const ranged = !prof._fortressMelee && prof.attack === 'ranged' && prof.projectile && prof.projectile !== 'none' && prof.projectile !== 'beam';
+  // `projectileHit` (tiles/s): a melee-class unit whose client attack is a RangedAttack all the same (予愿安洁莉娜's airborne
+  // skills: projectile_chr_aglna2_s* at speed 10) — its damage lands with the shot, not as it leaves
+  const ranged = !prof._fortressMelee && ((prof.attack === 'ranged' && prof.projectile && prof.projectile !== 'none' && prof.projectile !== 'beam') || prof.projectileHit > 0);
   const vis = prof._fortressMelee ? 'none' : (prof.visualProjectile || prof.projectile || 'none');
   const energy = !isHeal && prof.releaseEnergy ? prof.releaseEnergy(b, u) : 0;
   const strikeCount = prof.hitsFn ? prof.hitsFn(b, u, { isSkill, energy: 0 }) : Math.max(1, prof.hits || 1);
@@ -358,9 +360,9 @@ export function performAttack(b, u, prof, targets, opts = null) {
       if (ranged && foe && prof.projectile === 'boomerang') {
         throwBoomerang(b, u, prof, tt, inf);
       } else if (ranged && foe) {
-        const speed = PROJECTILE_SPEEDS[prof.projectile] ?? PROJECTILE_SPEED;
+        const speed = prof.projectileHit > 0 ? prof.projectileHit : PROJECTILE_SPEEDS[prof.projectile] ?? PROJECTILE_SPEED;
         // projectiles land even if the shooter died meanwhile (damage is credited to it)
-        b.addProjectile({ from: u, target: tt, speed, visual: prof.projectile, source: u, hitDead: prof.splashRadius > 0,
+        b.addProjectile({ from: u, target: tt, speed, visual: prof.visualProjectile || prof.projectile, source: u, hitDead: prof.splashRadius > 0,
           onHit: (c) => resolveHit(b, u, prof, c.target, inf, c.x, c.y) });
       } else {
         resolveHit(b, u, prof, tt, inf, tt.x, tt.y);

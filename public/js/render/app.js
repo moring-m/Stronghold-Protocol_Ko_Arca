@@ -782,6 +782,7 @@ export async function createFieldView(host, options = {}) {
       b.mapQuality = settings.mapQuality || 'high';
       b.setQuality(settings.shadows === false ? 'low' : 'high');
       tiles.setExternal(true);
+      tiles.markSink = (groups) => b.setMarks(groups);   // official marks on the tiles' own surfaces
       backdrop.visible = false;
       b.setArea(viewBoardArea(viewKind(camKind, camOpts)));
       if (stageRec) { b.setStage(visualStage(),stageRec.coopEightStage?[{r0:6,r1:13,c0:0,c1:36}]:undefined);warmStageLayouts();useOfficialScene(visualStage()); }
@@ -805,6 +806,7 @@ export async function createFieldView(host, options = {}) {
     try { b?.destroy(); } catch { /* ignore */ }
     try { board3dCanvas?.remove(); } catch { /* ignore */ }
     board3dCanvas = null;
+    tiles.markSink = null;
     if (!destroyed) {
       tiles.setExternal(false); backdrop.visible = true; tiles.project(cam, true);
       for (const [g, r] of hlReq) drawHighlight(r.tiles, r.style, g);

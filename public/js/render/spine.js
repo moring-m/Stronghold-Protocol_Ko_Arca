@@ -538,6 +538,7 @@ export class SpineActor {
     if (end && this.has(end.clip) && end.in > 0) {
       this.endClip = end.clip;
       this.endAt = this.clock + Math.max(0, end.in - this.dur(end.clip));
+      this.endBy = this.clock + end.in;   // a closing clip longer than the wait plays faster to end with it
       this.endRoles = end.roles || null;
     }
     if (transition?.sequence?.length && this._changeSequence(transition.sequence, transition.elapsed || 0)) return;
@@ -597,13 +598,15 @@ export class SpineActor {
   }
 
   /** Play a form's transition clip once; attacks and the resting state wait for it (mode 'change'). */
-  _change(clip) {
+  _change(clip, by = null) {
     this.changeSequence = null;
     if (this.mode !== 'change') this.stunWanted = this.mode === 'stun';
     this.frozen = false;
     this.mode = 'change';
-    this._play(clip, false, { mix: 0.08 });
-    this.changeUntil = this.clock + this.dur(clip);
+    const d = this.dur(clip), left = by != null ? by - this.clock : Infinity;
+    const timeScale = left > 0.05 && d > left ? d / left : 1;
+    this._play(clip, false, { mix: 0.08, timeScale });
+    this.changeUntil = this.clock + d / timeScale;
   }
 
   /** Authored form transitions are consecutive one-shots, never an idle loop or an extra exit. */
@@ -1194,7 +1197,7 @@ export class SpineActor {
       const clip = this.endClip;
       this.endClip = null;
       if (this.endRoles) this.roles = { ...this._baseRoles(), ...this.endRoles };
-      if (!this.dead) this._change(clip);
+      if (!this.dead) this._change(clip, this.endBy);
     }
     if (this.windUntil != null && this.clock >= this.windUntil) {
       // a compressed wind-up reached its strike frame: back to the rhythm speed (attack() also does it)

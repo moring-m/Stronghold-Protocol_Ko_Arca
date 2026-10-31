@@ -549,6 +549,11 @@ export function garrisonTexts(chess,getGarrison,translate=tr) {
     const k=keys[index];
     // A combined description may repeat a complete opening clause in another record.
     if(k && keys.some(other=>other.startsWith(k) && /^[,，;（(]/.test(other.slice(k.length)))) continue;
+    // A record whose whole effect is a clause of another record with the same trigger (流星: 「造成的伤害变为弱点伤害」
+    // inside 「攻击力和生命值+50%，造成的伤害变为弱点伤害」); their explanatory brackets are translated differently.
+    const core=t=>{const m=t.match(/^(<[^>]+>)(.*)$/);return m?[m[1],m[2].replace(/[（(][^）)]*[）)]/g,'')]:[null,null];};
+    const [trig,body]=core(k);
+    if(trig && body && body.length>=6 && keys.some((other,j)=>j!==index && other!==k && core(other)[0]===trig && core(other)[1].length>body.length && core(other)[1].includes(body))) continue;
     // Some records describe both rest boundaries; another record repeats just one boundary.
     // Compare each independent trigger, preserving any trigger that has not been shown yet.
     const prefix=line.match(/^(?:<(?:휴식 기간 진입 시|휴식 기간 종료 시)>\s*)+/)?.[0];

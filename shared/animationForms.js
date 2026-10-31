@@ -95,6 +95,12 @@ export const FORMS = Object.freeze({
   enemy_1525_blkswb: rebirth('Revive1', 'Revive2', 'Revive3', withoutSkill(clipSet('B_Idle', 'B_Move', 'B_Die', 'B_Attack'))),
   enemy_1535_wlfmster: rebirth('A_revive_1', 'A_revive_2', 'A_revive_3', clipSet('B_Idle', 'B_Move', 'B_Die', 'B_Attack')),
   enemy_1539_reid: rebirth('Revive_Begin', 'Revive_Loop', 'Revive_End'),
+  // “自在”: its one 重生 clip Revive_01 (5.333 s) over the 5 s 重生 (reborn.duration), sped up to end with it — it walked
+  // on through the clip's last third of a second
+  enemy_1517_xi: Object.freeze({
+    reborn: Object.freeze({ change: null, end: 'Revive_01', next: 'form2', roles: Object.freeze({ idle: 'Revive_01', deploy: 'Revive_01', move: loop('Revive_01'), stun: loop('Revive_01'), attack: null, skill: null }) }),
+    form2: Object.freeze({ change: null, roles: Object.freeze({}) }),
+  }),
   // “巨大的丑东西”: the mech's 重生 is the self-destruct and the 大祭司 bird's ejection (Revive), then the bird's own clips
   enemy_1512_mcmstr: (() => {
     const BIRD = Object.freeze({ ...withoutSkill(clipSet('Idle_2', 'Move_2', 'Die')), attackDown: null, stun: loop('Stun_2') });

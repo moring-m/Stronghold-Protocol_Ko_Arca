@@ -76,6 +76,19 @@ const ENEMY_ZONES = Object.freeze({
   enemy_10122_uacann_2: ['burning', 'projectile_enemy_uacann', 'onHit', 'shown'],
 });
 
+const GROUND_HITS = new WeakMap();
+/** The onHit keys of the ENEMY_ZONES projectiles whose hit effect is the zone itself ('shown'), lower case. */
+function groundHitKeys(idx) {
+  if (!idx) return new Set();
+  let set = GROUND_HITS.get(idx);
+  if (!set) {
+    set = new Set();
+    for (const z of Object.values(ENEMY_ZONES)) if (z[3] === 'shown') for (const k of idx.projectiles?.[z[1]]?.[z[2]] || []) set.add(lc(k));
+    GROUND_HITS.set(idx, set);
+  }
+  return set;
+}
+
 /**
  * Sim area fx (b.fx 'telegraph' / 'explode', extra.kind) drawn with the source unit's own skill effects (its skill's
  * roles in the fx index) instead of the simple rings: { skill, telegraph: role played on the ground for the warning's
@@ -102,6 +115,8 @@ const ENEMY_AREA_FX = Object.freeze({
   // 锏 CircleAttack / CircleAttack2 (blizzard, the HP-step clear): the skill's hit effects around it
   blizzard: Object.freeze({ skill: ['circleattack2', 'circleattack'], explode: 'hit' }),
   clearSp: Object.freeze({ skill: ['circleattack2', 'circleattack'], explode: 'hit' }),
+  // 清明 / 堂皇 辉光照耀 (InvisibleShield): its range effect (enemy_sfden_skill_range_01) instead of the plain ring
+  invisShield: Object.freeze({ skill: 'invisibleshield', telegraph: 'start' }),
   // 乌顶巨角卢鲁 角力对决: its skill's hit at the clash
   elkClash: Object.freeze({ skill: 'skill', explode: 'hit' }),
 });
@@ -1511,7 +1526,13 @@ export class FxWiring {
     const go = () => {
       const now = this.ofx.time;
       if (tgt && !tgt.destroyed) {
-        for (const k of proj.onHit || []) this.playOn(k, tgt, {flipFrom:src});
+        // a shell whose hit is a ground zone (ENEMY_ZONES 'shown': 集团军重型火炮's 【燃烧区域】 fire) lands on the ground where it
+        // hit, not on the target's HitPoint (it stood at chest height, inside the model)
+        const ground = groundHitKeys(this.idx);
+        for (const k of proj.onHit || []) {
+          if (ground.has(lc(k))) this.playOn(k, { x: tgt.x, y: tgt.y, z: tgt.z || 0 }, { important: true });
+          else this.playOn(k, tgt, {flipFrom:src});
+        }
         if (rows) {
           const own = new Set((proj.onHit || []).map(lc));
           for (const h of rows) if (!own.has(lc(h.k))) this.playOn(h.k, tgt, { flipFrom: src || undefined, toward: h.along && src ? beyond(src, tgt) : undefined });

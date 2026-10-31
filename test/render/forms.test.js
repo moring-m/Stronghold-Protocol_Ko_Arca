@@ -251,6 +251,21 @@ describe('逐火 embers and the 再生 puppet (user report after 0.1.0, #8)', ()
   });
 });
 
+test('“自在”: its Revive_01 (longer than the 5 s 重生) plays at once and faster, over by the time it walks again', async () => {
+  const id = 'enemy_1517_xi', anims = assets.enemies[id].spine.animations;
+  assert.ok(anims.Revive_01 > 5, 'the clip outlasts the 重生');
+  const v = await enemy(id);
+  v.setForm('reborn', { dur: 5 });
+  frames(v, 2);
+  assert.equal(clip(v), 'Revive_01');
+  frames(v, Math.round(4.9 * 60));
+  assert.equal(clip(v), 'Revive_01', 'still standing up');
+  frames(v, 12);
+  v.setForm('form2');
+  v.sync(sample(0, ANIM.MOVE), 6);
+  assert.equal(clip(v), 'Move', 'the clip is over when the 重生 ends');
+});
+
 describe('the leaders\' 重生 and 守墓石像 (audit of the knock-out forms after report #5)', () => {
   const REBIRTH = {
     enemy_1525_blkswb: ['Revive1', 'Revive2', 'Revive3', 'B_Idle', 'B_Die'],

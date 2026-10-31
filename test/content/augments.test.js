@@ -207,3 +207,14 @@ test('enemy prism stealth affects all normal and cooperative fields but excludes
  const card=createAugmentCatalog(data,4).find(a=>a.name==='은신'&&a.side==='enemy');assert.ok(card);assert.equal(card.grade,'prism');assert.ok(createAugmentCatalog(data,7).some(a=>a.id===card.id));assert.ok(!createAugmentCatalog(data,10).some(a=>a.id===card.id));
  for(const kind of ['normal','unite','boss']){const {h,e}=fixture({kind,enemies:[card]});assert.equal(!!e.s.flags.stealth,kind!=='boss');const spawned=h.spawn('enemy_test',{pos:[10,6]});assert.equal(!!spawned.s.flags.stealth,kind!=='boss');}
 });
+test('빈도: a killed enemy leaves two 木制瑞印; a hit-count enemy (the seals included) leaves none',()=>{
+ const seal='enemy_1196_msfyin';
+ const h=makeBattle({defs:{chess:{op:chessRec({id:'op',stats:{atk:1e6,maxHp:1000,aspd:100,bat:1}})},enemies:{enemy_test:enemyRec({key:'enemy_test',hp:10,speed:0}),[seal]:enemyRec({key:seal,hp:1e9,speed:0})}},content:'none',extraContent:[{install}],
+  units:[{chessId:'op',row:10,col:4}],enemies:[{key:'enemy_test',pos:[10,5]}],flags:{augments:{allies:{p1:[]},enemies:[item(find('빈도','enemy'))]}},autoFinish:false});
+ h.run(3);
+ const seals=()=>h.b.enemies.filter(e=>e.defId===seal);
+ assert.equal(seals().length,2,'two seals');
+ const op=h.unit('op');for(const s of seals()){h.b.addBuff(s,{key:'t:hc',flags:{hitCount:true}});s.hp=1;h.b.dealDamage(op,s,{amount:1e12,type:'true'});}
+ h.run(1);
+ assert.equal(h.b.enemies.filter(e=>e.defId===seal&&e.alive).length,0,'no seals from seals');
+});

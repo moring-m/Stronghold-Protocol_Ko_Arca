@@ -123,15 +123,16 @@ export function bodyInRange(u, keys) {
   const has = typeof keys.has === 'function' ? (k) => keys.has(k) : (k) => keys.includes(k);
   if (u.hitArea || u.side === 'ally') { for (const k of bodyKeys(u)) if (has(k)) return true; return false; }
   // colliderKeys without its array (kits call this per enemy on every aura tick)
-  const rho = ENEMY_COLLIDER_RADIUS, x = u.x, y = u.y;
-  const r0 = Math.max(0, Math.floor(y - rho + 0.5 + 1e-9)), r1 = Math.min(ROWS - 1, Math.ceil(y + rho - 0.5 - 1e-9));
-  const c0 = Math.max(0, Math.floor(x - rho + 0.5 + 1e-9)), c1 = Math.min(COLS - 1, Math.ceil(x + rho - 0.5 - 1e-9));
+  // the battle's own grid size (the 8-player 联防 field is 37 columns wide): the fixed 21 keyed its tiles wrong there
+  const rho = ENEMY_COLLIDER_RADIUS, x = u.x, y = u.y, rows = u.battle?.grid?.rows ?? ROWS, cols = u.battle?.grid?.cols ?? COLS;
+  const r0 = Math.max(0, Math.floor(y - rho + 0.5 + 1e-9)), r1 = Math.min(rows - 1, Math.ceil(y + rho - 0.5 - 1e-9));
+  const c0 = Math.max(0, Math.floor(x - rho + 0.5 + 1e-9)), c1 = Math.min(cols - 1, Math.ceil(x + rho - 0.5 - 1e-9));
   for (let r = r0; r <= r1; r++) {
     const dy = y < r - 0.5 ? r - 0.5 - y : y > r + 0.5 ? y - r - 0.5 : 0;
     for (let c = c0; c <= c1; c++) {
       const dx = x < c - 0.5 ? c - 0.5 - x : x > c + 0.5 ? x - c - 0.5 : 0;
       if (dx > 0 && dy > 0 && dx * dx + dy * dy >= rho * rho) continue;
-      if (has(r * COLS + c)) return true;
+      if (has(r * cols + c)) return true;
     }
   }
   return false;
@@ -139,8 +140,9 @@ export function bodyInRange(u, keys) {
 
 /** Is the unit in the range of the single tile (r, c) — its collider overlaps it (bodyInRange)? False off the grid. */
 export function bodyInRangeTile(u, r, c) {
-  if (!u || r < 0 || r >= ROWS || c < 0 || c >= COLS) return false;
-  return colliderKeys(u).includes(r * COLS + c);
+  const rows = u?.battle?.grid?.rows ?? ROWS, cols = u?.battle?.grid?.cols ?? COLS;
+  if (!u || r < 0 || r >= rows || c < 0 || c >= cols) return false;
+  return colliderKeys(u).includes(r * cols + c);
 }
 
 /** Distance (tiles) from point (x, y) to the unit's body: its position, or its rectangle (0 inside). */

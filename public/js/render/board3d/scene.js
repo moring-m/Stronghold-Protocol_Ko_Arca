@@ -336,6 +336,9 @@ export function extendPlane(src, cx, cy, k = 1) {
 /** Quarter turns (counter-clockwise about +z) that point the wind device's outlet (−x in the mesh) along `dir`. */
 export const DIR_TURNS = Object.freeze({ LEFT: 0, DOWN: 1, RIGHT: 2, UP: 3 });
 
+/** The official range bands (tiles: period, lit share, slide per second), as the 2D layer's RANGE_STRIPE. */
+const MARK_STRIPE = Object.freeze({ step: 0.44, fill: 0.5, speed: 0.44 });
+
 export class BoardScene {
   /**
    * @param {any} THREE three.js module
@@ -554,6 +557,10 @@ export class BoardScene {
       ch.traverse?.((o) => { if (o.geometry) o.geometry.dispose(); });
     }
     this.meshes = {};
+    // the drag marks sit on the old tiles' heights: redrawn with the next setMarks
+    const marks = this._marksKey ? JSON.parse(this._marksKey) : null;
+    this._marksKey = null; this._markHeights?.clear();
+    if (marks) this._pendingMarks = marks;
   }
 
   _disposeLayout(layout) {
@@ -1627,6 +1634,55 @@ export class BoardScene {
   }
 
   /** Red leak flash on the objective box at (r, c). */
+  /**
+   * 设置 접근성「타일 표시 방식」 공식 on the 3D board: the drag marks drawn on the tiles' own top surfaces (in the board's
+   * depth, under the units of the Pixi layer) — `groups` [{ tiles: [[r, c]], color, alpha, stripes }]: an even fill, or
+   * the range's sliding diagonal bands (MARK_STRIPE). [] clears.
+   */
+  setMarks(groups = []) {
+    const T = this.THREE;
+    const key = JSON.stringify(groups);
+    if (key === this._marksKey) return;
+    this._marksKey = key;
+    for (const m of this._marks || []) { this.scene.remove(m); m.geometry.dispose(); m.material.dispose(); }
+    this._marks = [];
+    const board = this.board;
+    if (!board) return;
+    const hc = this._markHeights ||= new Map();
+    if (this._markHeightsBoard !== board) { hc.clear(); this._markHeightsBoard = board; }
+    const top = (r, c) => { const k = r * 100 + c; if (!hc.has(k)) hc.set(k, this._nativeTileHeight(board, r, c) ?? 0); return hc.get(k); };
+    groups.forEach((g, gi) => {
+      if (!g?.tiles?.length) return;
+      const pos = [], idx = [];
+      for (const [r, c] of g.tiles) {
+        const z = top(r, c) + 0.004, b = pos.length / 3;
+        pos.push(c - 0.5, r - 0.5, z, c + 0.5, r - 0.5, z, c + 0.5, r + 0.5, z, c - 0.5, r + 0.5, z);
+        idx.push(b, b + 1, b + 2, b, b + 2, b + 3);
+      }
+      const geo = new T.BufferGeometry();
+      geo.setAttribute('position', new T.Float32BufferAttribute(pos, 3));
+      geo.setIndex(idx);
+      const mat = new T.ShaderMaterial({
+        uniforms: { uColor: { value: new T.Color().setHex(g.color, T.LinearSRGBColorSpace ?? undefined) }, uAlpha: { value: g.alpha ?? 1 }, uStripes: { value: g.stripes ? 1 : 0 },
+          uTime: { value: this.time || 0 }, uStep: { value: MARK_STRIPE.step }, uFill: { value: MARK_STRIPE.fill }, uSpeed: { value: MARK_STRIPE.speed } },
+        vertexShader: 'varying vec2 vW; void main(){ vW = position.xy; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+        fragmentShader: [
+          'uniform vec3 uColor; uniform float uAlpha, uStripes, uTime, uStep, uFill, uSpeed; varying vec2 vW;',
+          'void main(){',
+          '  if (uStripes > 0.5) { float d = fract((vW.x + vW.y) / uStep - uTime * uSpeed / uStep); if (d > uFill) discard; }',
+          '  gl_FragColor = vec4(uColor, uAlpha);',
+          '}',
+        ].join('\n'),
+        transparent: true, depthWrite: false, side: T.DoubleSide, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4,
+      });
+      const mesh = new T.Mesh(geo, mat);
+      mesh.renderOrder = 20 + gi;
+      mesh.frustumCulled = false;
+      this.scene.add(mesh);
+      this._marks.push(mesh);
+    });
+  }
+
   flashObjective(r, c) {
     this.flashes.push({ r, c, t: 0 });
     if (this.flashes.length > 8) this.flashes.shift();
@@ -1688,6 +1744,8 @@ export class BoardScene {
     for (const m of Object.values(this.originalMaterials)) if (m.uniforms?.uTime) m.uniforms.uTime.value = t;
     for (const k of ['water', 'mire', 'infection', 'smog']) this.mat[k].uniforms.uTime.value = t;
     if (this.official) for (const m of this.sceneWater || []) m.uniforms.uTime.value = t;
+    if (this._pendingMarks && this.board) { const m = this._pendingMarks; this._pendingMarks = null; this.setMarks(m); }
+    for (const m of this._marks || []) m.material.uniforms.uTime.value = t;
     this.renderer.render(this.scene, this.camera);
     this.frames++;
     if (t0) this.lastMs = this.lastMs * 0.9 + ((typeof performance !== 'undefined' ? performance.now() : t0) - t0) * 0.1;

@@ -77,6 +77,8 @@ const X4 = Object.freeze([[1, -1], [1, 0], [1, 1], [0, -1], [0, 0], [0, 1], [-1,
 const ANY = Object.freeze({ canHitFly: true });
 /** S2's sweep (PRTS 备注; projectile_chr_aglna2_s2_fly `_speed` 6, `_distanceMax` 4). */
 const GLIDE_SPEED = 6, GLIDE_DIST = 4, GLIDE_HALF_WIDTH = 1.5, GLIDE_HALF_THICK = 0.65;
+/** Her shots' speed (projectile_chr_aglna2 and _s1 / _s2 / _s3 AdvancedMovement `_speed` 10): the damage lands with them. */
+const SHOT_SPEED = 10;
 /** S3's flight speed (projectile_chr_aglna2_s3_fly `_finalSpeed` 2) [ASSUMED constant]. */
 const MOVE_SPEED = 2;
 /** S3's move check (aglna2_s_3[mode] / the flight's `_selectorRefreshInterval`). */
@@ -205,12 +207,14 @@ export default {
     }
 
     return {
-      trait: { blockFly: false },   // the profession's permanent air block: only while airborne here
+      // the profession's permanent air block: only while airborne here; her ground attack is the client's RangedAttack too
+      // (projectile_chr_aglna2, speed 10): it lands with the shot
+      trait: { blockFly: false, visualProjectile: 'arrow', projectileHit: SHOT_SPEED },
       skills: {
         [S1]: {
           kind: 'duration', activateOnDeploy: true, spCost: 0, spType: 'none', trigger: 'NEVER',
           mods: { atkPct: num(b1.atk) }, flags: LIFTOFF,
-          attack: { visualProjectile: 'arrow' },
+          attack: { visualProjectile: 'arrow', projectileHit: SHOT_SPEED },
           targeting: { rangeGrid: r1?.rangeGrid ?? null, maxTargets: Math.max(1, Math.floor(num(b1['attack@max_target'], 1))) },
           onStart({ battle, unit }) { takeOff(battle, unit); },
           onEnd({ battle, unit }) { land(battle, unit); },
@@ -219,7 +223,7 @@ export default {
           kind: 'duration',
           mods: { atkPct: num(b2.atk), batPct: batMod(b2.base_attack_time, chess) }, flags: LIFTOFF,
           targeting: { rangeGrid: r2?.rangeGrid ?? null, maxTargets: Math.max(1, Math.floor(num(b2['attack@max_target'], 1))) },
-          attack: { dmgType: 'arts', visualProjectile: 'bolt' },
+          attack: { dmgType: 'arts', visualProjectile: 'bolt', projectileHit: SHOT_SPEED },
           onStart({ battle, unit }) {
             takeOff(battle, unit);
             const chant = num(b2.chant_duration);
@@ -235,7 +239,7 @@ export default {
           ammo: Math.max(1, Math.floor(num(b3['attack@trigger_time'], 1))),
           mods: { atkPct: num(b3.atk) }, flags: LIFTOFF,
           targeting: s3Targeting,
-          attack: { atkScale: num(b3['attack@atk_scale'], 1), visualProjectile: 'arrow' },
+          attack: { atkScale: num(b3['attack@atk_scale'], 1), visualProjectile: 'arrow', projectileHit: SHOT_SPEED },
           onStart({ battle, unit, skill }) {
             takeOff(battle, unit);
             st = { r0: unit.tileR, c0: unit.tileC, dir0: unit.dir, act: skill.activations, flight: null, marker: null };
@@ -263,7 +267,7 @@ export default {
           const hi = num(t0.atk_scale_hi), lo = num(t0.atk_scale_lo), mass = num(t0.mass_level, 3);
           const extra = (target, dmg) => {
             if (!up(unit) || !target || target.side !== 'enemy' || !target.alive || !hasHp(target) || !dmg) return;
-            if (dmg.type === 'element' || dmg.type === 'elemental' || (dmg.tags && (dmg.tags.includes(TAG_EXTRA) || dmg.tags.includes('dot')))) return;
+            if (dmg.type === 'element' || dmg.type === 'elemental' || (dmg.tags && (dmg.tags.includes(TAG_EXTRA) || dmg.tags.includes('dot') || dmg.tags.includes('item')))) return;   // an item's added damage (天马之枪's true damage) is 附加伤害 too: each fed the other with no end
             const s = target.weight <= mass ? hi : lo;
             if (s > 0) battle.dealDamage(unit, target, { amount: unit.s.atk * s, type: 'arts', tags: ['talent', TAG_EXTRA] });
           };
