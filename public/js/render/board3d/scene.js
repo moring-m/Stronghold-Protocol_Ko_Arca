@@ -1650,7 +1650,8 @@ export class BoardScene {
     if (!board) return;
     const hc = this._markHeights ||= new Map();
     if (this._markHeightsBoard !== board) { hc.clear(); this._markHeightsBoard = board; }
-    const top = (r, c) => { const k = r * 100 + c; if (!hc.has(k)) hc.set(k, this._nativeTileHeight(board, r, c) ?? 0); return hc.get(k); };
+    // never under the ground's level: a flooded tile's sunken basin (침수 구역) shows its marks at the ground's height
+    const top = (r, c) => { const k = r * 100 + c; if (!hc.has(k)) hc.set(k, Math.max(0, this._nativeTileHeight(board, r, c) ?? 0)); return hc.get(k); };
     groups.forEach((g, gi) => {
       if (!g?.tiles?.length) return;
       const pos = [], idx = [];
