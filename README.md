@@ -2,7 +2,7 @@
 
 > 현재 본 Readme의 번역은 GPT에 의해 생성되었습니다. 추후 수정/검수가 필요합니다.
 
-![version](https://img.shields.io/badge/version-0.3.3f2-2ea44f)
+![version](https://img.shields.io/badge/version-0.3.3f3-2ea44f)
 ![license](https://img.shields.io/badge/code%20license-GPL--3.0--or--later-blue)
 ![node](https://img.shields.io/badge/node-22%20%7C%2024-339933)
 
