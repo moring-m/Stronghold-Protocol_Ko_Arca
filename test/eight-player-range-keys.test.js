@@ -32,3 +32,10 @@ for (const owner of [0, 3]) test(`8-player 联防 field ${owner}: 菲莱 S2's �
   assert.ok(u.skill.active || u.skill.sp < u.skill.spCost, 'cast');
   assert.ok(e.elem.apoptosis > 0, '凋亡 gauge');
 });
+
+test('8-player 联防 act2 m01: every one of the four fields keeps its two blowers (on its bottom border row 13)', () => {
+  const s = eightUniteStage(DATA.stages.act2autochess_m01);
+  const blowers = s.devices.filter((d) => d.role === 'blower' && d.pos[0] === 13).map((d) => d.pos[1]);
+  for (let f = 0; f < 4; f++) assert.equal(blowers.filter((c) => c >= 2 + 8 * f && c <= 9 + 8 * f).length, 2, `field ${f}`);
+  assert.equal(new Set(s.devices.map((d) => d.alias)).size, s.devices.length, 'unique aliases');
+});
