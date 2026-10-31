@@ -26,7 +26,8 @@ const HAS_INDEX = existsSync(INDEX);
 const LOOPING = new Set(['wisdel_skill_02_buff_02', 'ymgtop_spin', 'enemy_nhpbr_attack_range', 'enemy_nhtank_attack_range', 'enemy_actoxi_idle', 'enemy_wintun_range', 'dsubrl_aura', 'cjhot_aura',
   'enemy_cjhot_debuff', 'horn_skill_01_hit_02_buff', 'skadi2_skill_03_buff', 'svrash_skill_02_buff', 'tinman_skill_01_range_01', 'sleach_skill_02_flag_01',
   'sleach_skill_02_ground_01', 'sleach_skill_03_flag_01', 'sleach_skill_03_range_loop_01', 'thumpy_skill_03_range_01', 'enemy_xi_skill_02_buff']);
-const KEYS = [...LOOPING, 'mousek_skill_02_range', 'mousek_skill_02_start', 'bombd_cast', 'enemy_dsubrl_attack_hit', 'horn_skill_01_hit_02', 'g_hit', 'g_enemy', 'g_heal',
+const EXTRA_KEYS = ['enemy_sfden_skill_range_01'];
+const KEYS = [...LOOPING, ...EXTRA_KEYS, 'mousek_skill_02_range', 'mousek_skill_02_start', 'bombd_cast', 'enemy_dsubrl_attack_hit', 'horn_skill_01_hit_02', 'g_hit', 'g_enemy', 'g_heal',
   'tank_shell_hit', 'sleach_skill_03_range_start_01', 'chen2_skill_02_range_01', 'wisdel_skill_02_overload_start'];
 const GROUND = new Set(['enemy_nhpbr_attack_range', 'enemy_nhtank_attack_range', 'enemy_actoxi_idle', 'enemy_wintun_range', 'mousek_skill_02_range']);
 
@@ -45,6 +46,8 @@ function makeIndex({ installed = KEYS } = {}) {
       enemy_1517_xi: enemy({ skills: { shieldburst: { rootClass: 'EnemySkill', rootAbility: 'MeleeAttack', projectiles: [], mode: null, roles: { loop: ['enemy_xi_skill_02_buff'] }, uses: [
         { role: 'loop', keys: ['enemy_xi_skill_02_buff'], from: 'test', node: 'ShieldBurst' },
       ] } } }),
+      // 清明: 辉光照耀's range effect
+      enemy_1209_sfden: enemy({ skills: { invisibleshield: { rootClass: 'EnemySkill', rootAbility: 'AnimatedActionToOwnerAbility', projectiles: [], mode: null, roles: { start: ['enemy_sfden_skill_range_01'] }, uses: [] } } }),
       enemy_9006_actoxi: enemy({ projectiles: ['projectile_enemy_actoxi'] }),
       enemy_10044_wintun: enemy({ skills: { blockedboom: { rootClass: 'EnemySkill', rootAbility: 'ProjectileToTileAbility', projectiles: ['projectile_enemy_wintun_range'], mode: null, uses: [] } } }),
       // 鼠王 【沙狱】: a RangedAttack-rooted skill — its cast row on the boss, its castTarget row (the sandstorm) on the target
@@ -345,6 +348,14 @@ describe("an enemy aura's tick", () => {
     ofx.time += AURA_HOLD_S + 0.05; frame();
     assert.ok(!h.alive, 'it left the aura (or the aura ended)');
     assert.equal(w.simFx('explode', 3, 9, { r: 1.6, kind: 'boil' }), false, 'a boil nowhere near one');
+  });
+
+  test("清明: 辉光照耀's veil draws its official range effect, not the procedural ring", async () => {
+    const { w, view, frame, handles } = await setup();
+    const e = view(1, 'enemy_1209_sfden', 8);
+    w.spawned(e); frame();
+    assert.equal(w.simFx('telegraph', 8, 9, { r: 2, kind: 'invisShield', id: 1 }), true);
+    assert.equal(live(handles, 'enemy_sfden_skill_range_01').length, 1);
   });
 
   test("“自在”: 破桎而出's barrier loop is drawn on the boss itself (following it, in its depth), not at a bare board point", async () => {

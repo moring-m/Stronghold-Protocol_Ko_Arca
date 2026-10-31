@@ -102,6 +102,8 @@ const ENEMY_AREA_FX = Object.freeze({
   // 锏 CircleAttack / CircleAttack2 (blizzard, the HP-step clear): the skill's hit effects around it
   blizzard: Object.freeze({ skill: ['circleattack2', 'circleattack'], explode: 'hit' }),
   clearSp: Object.freeze({ skill: ['circleattack2', 'circleattack'], explode: 'hit' }),
+  // 清明 / 堂皇 辉光照耀 (InvisibleShield): its range effect (enemy_sfden_skill_range_01) instead of the plain ring
+  invisShield: Object.freeze({ skill: 'invisibleshield', telegraph: 'start' }),
   // 乌顶巨角卢鲁 角力对决: its skill's hit at the clash
   elkClash: Object.freeze({ skill: 'skill', explode: 'hit' }),
 });
