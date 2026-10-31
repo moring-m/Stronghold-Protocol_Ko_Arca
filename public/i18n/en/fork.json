@@ -3327,5 +3327,8 @@
   "설원": "Snowfield",
   "FPS 표시": "Show FPS",
   "타일 자석": "Tile magnet",
-  "타일 표시 방식": "Tile mark style"
+  "타일 표시 방식": "Tile mark style",
+  "빈도": "Frequency",
+  "적이 사망 시 목제 인장 2기 소환": "When an enemy dies, summons 2 Wooden Seals",
+  "이 효과를 포함해서 사망 시 소환되는 타수몹에는 적용되지 않음 (예: 홍목 인장, 소설 두루마리 등)": "Does not apply to hit-count enemies summoned on death, including those from this effect (e.g. Mahogany Seal, Novel Scroll)"
 }
