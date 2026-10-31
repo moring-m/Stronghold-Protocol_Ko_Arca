@@ -17,3 +17,15 @@ test('予愿安洁莉娜: a skill shot at a target 3 tiles off hits ~0.3 s after
   assert.ok(atks.length && hits.length, `attacks ${atks.length}, hits ${hits.length}`);
   assert.ok(hits[0] - atks[0] > 0.12, `the hit waits for the shot (${atks[0]} → ${hits[0]})`);
 });
+
+test('予愿安洁莉娜: her ground attack (S3 not cast) also waits for its shot', () => {
+  const h = makeBattle({ defs: { enemies: { e: enemyRec({ key: 'e', hp: 1e9, speed: 0, atk: 0 }) } },
+    units: [{ chessId: AG, row: 10, col: 3, dir: 'RIGHT' }], enemies: [{ key: 'e', pos: [10, 4] }], autoFinish: false, timeLimit: 60 });
+  const u = h.unit(AG), atks = [], hits = [];
+  h.b.on('attack', (c) => { if (c.attacker === u) atks.push(h.b.time); });
+  h.b.on('damaged', (c) => { if (c.source === u && !(c.dmg?.tags || []).includes('aglna2:extra')) hits.push(h.b.time); });
+  h.run(5);
+  assert.ok(!u.skill.active, 'on the ground');
+  assert.ok(atks.length && hits.length, `attacks ${atks.length}, hits ${hits.length}`);
+  assert.ok(hits[0] - atks[0] > 0.05, `the hit waits for the shot (${atks[0]} → ${hits[0]})`);
+});

@@ -77,7 +77,7 @@ const X4 = Object.freeze([[1, -1], [1, 0], [1, 1], [0, -1], [0, 0], [0, 1], [-1,
 const ANY = Object.freeze({ canHitFly: true });
 /** S2's sweep (PRTS 备注; projectile_chr_aglna2_s2_fly `_speed` 6, `_distanceMax` 4). */
 const GLIDE_SPEED = 6, GLIDE_DIST = 4, GLIDE_HALF_WIDTH = 1.5, GLIDE_HALF_THICK = 0.65;
-/** Her skill shots' speed (projectile_chr_aglna2_s1 / _s2 / _s3 AdvancedMovement `_speed` 10): the damage lands with them. */
+/** Her shots' speed (projectile_chr_aglna2 and _s1 / _s2 / _s3 AdvancedMovement `_speed` 10): the damage lands with them. */
 const SHOT_SPEED = 10;
 /** S3's flight speed (projectile_chr_aglna2_s3_fly `_finalSpeed` 2) [ASSUMED constant]. */
 const MOVE_SPEED = 2;
@@ -207,7 +207,9 @@ export default {
     }
 
     return {
-      trait: { blockFly: false },   // the profession's permanent air block: only while airborne here
+      // the profession's permanent air block: only while airborne here; her ground attack is the client's RangedAttack too
+      // (projectile_chr_aglna2, speed 10): it lands with the shot
+      trait: { blockFly: false, visualProjectile: 'arrow', projectileHit: SHOT_SPEED },
       skills: {
         [S1]: {
           kind: 'duration', activateOnDeploy: true, spCost: 0, spType: 'none', trigger: 'NEVER',
