@@ -267,7 +267,7 @@ export function FacingWheel({ view, row, col, grid, name = '', onPreview, onComm
   return html`<div class=${cx('fwheel', drag && 'is-pressed', dir && `is-${dir.toLowerCase()}`)} role="dialog" aria-label=${`选择${name ? `「${name}」的` : ''}朝向`}
       onPointerDown=${onDown} onPointerMove=${onMove} onPointerUp=${onUp} onPointerCancel=${onPointerCancel}
       onContextMenu=${(e) => { e.preventDefault(); onCancel(); }}>
-    ${g ? html`<${Stripes} tiles=${tiles} view=${view} row=${row} col=${col} />` : null}
+    ${g && settingsStore.get().tileMarkStyle !== 'official' ? html`<${Stripes} tiles=${tiles} view=${view} row=${row} col=${col} />` : null}
     ${g ? html`<div class="fwheel__dia" style=${`left:${g.x/zoom}px;top:${g.y/zoom}px;width:${box/zoom}px;height:${box/zoom}px`}>
       <svg class="fwheel__svg" viewBox="-110 -110 220 220" aria-hidden="true">
         <path class="fwheel__outer" d="M0 -100 L100 0 L0 100 L-100 0 Z" />
@@ -297,6 +297,7 @@ function useRangeHighlight(view, grid, row, col, dir) {
 }
 
 /**
+ * (设置 접근성「타일 표시 방식」 공식: none — the render view's own sliding bands are the range.)
  * Where the striped range layer goes (client geometry is shared): with the 3D board on, UNDER the transparent Pixi
  * canvas and above the three.js board canvas — the units stand on the stripes like in the original. Otherwise (2D
  * board: the Pixi canvas is opaque; DOM fallback) the stripes are an overlay above the field and skip the piece's

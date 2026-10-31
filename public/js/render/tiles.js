@@ -164,7 +164,7 @@ const hash2 = (r, c) => ((r * 73856093) ^ (c * 19349663)) >>> 0;
  * The client's attack-range tiles: orange diagonal bands with clear gaps between (half of each period), sliding across
  * the range over time (measured on its screen: one period ≈ 0.44 tile, about a period a second).
  */
-const RANGE_STRIPE = Object.freeze({ step: 0.44, fill: 0.5, speed: 0.44, color: 0xd58619, alpha: 0.95 });
+const RANGE_STRIPE = Object.freeze({ step: 0.44, fill: 0.5, speed: 0.44, color: 0xd58619, alpha: 0.95, overlap: 0xa8420c });
 
 /** Clip a convex polygon ([[x, y]]) to the half-plane a·(x, y) ≤ k. */
 function clipHalf(poly, ax, ay, k) {
@@ -587,12 +587,22 @@ export class TileField {
     // their own layer above the other marks, all at the ground's height
     const official = this.officialMarks === true;
     const inset = official ? 0 : 0.05;
+    // a tile under both a unit's range and a fixed boss's (red) range: one band in a dark orange (RANGE_STRIPE.overlap)
+    let both = null;
+    if (official) {
+      const own = new Set(), boss = new Set();
+      for (const { tiles, style } of this.highlights.values()) if (style.stripes) for (const [r, c] of tiles) (style.stripeColor != null ? boss : own).add(r * 100 + c);
+      for (const k of own) if (boss.has(k)) (both ||= new Set()).add(k);
+    }
+    const drawn = both ? new Set() : null;
     for (const { tiles, style: st } of this.highlights.values()) {
       const style = official && st === HL_STYLES.legal ? HL_STYLES.officialLegal : st;
       for (const [r, c] of tiles) {
         if (official && style.stripes) {
           this._stripesLive = true;
-          drawStripes(this.hlStripeGfx, cam, r, c, 0.012, inset, -((this.time * RANGE_STRIPE.speed) % RANGE_STRIPE.step), p, style.stripeColor);
+          const k = r * 100 + c, dual = both?.has(k);
+          if (dual) { if (drawn.has(k)) continue; drawn.add(k); }
+          drawStripes(this.hlStripeGfx, cam, r, c, 0.012, inset, -((this.time * RANGE_STRIPE.speed) % RANGE_STRIPE.step), p, dual ? RANGE_STRIPE.overlap : style.stripeColor);
           continue;
         }
         const h = this.heightAt(r, c);
