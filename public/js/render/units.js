@@ -2732,7 +2732,8 @@ export class UnitView {
     }
     // the official gauge: a fixed share of the tile, like the official bars it sits on (no pixel floor / cap: those made it
     // jump against the bar as the camera zoomed)
-    const d = (at ? s * OFFICIAL_BARS.elementIcon : clamp(s * EL_BAR.icon, EL_BAR.min, EL_BAR.max) * (this.isEnemy ? EL_BAR.enemy : 1));
+    // (the official gauge: capped at the size agreed on for the normal camera — a close camera (联防) made it far larger)
+    const d = (at ? Math.min(s * OFFICIAL_BARS.elementIcon, OFFICIAL_BARS.elementMax) : clamp(s * EL_BAR.icon, EL_BAR.min, EL_BAR.max) * (this.isEnemy ? EL_BAR.enemy : 1));
     if (at) {
       if (!r.ring) { r.ring = new this.P.Sprite(this.P.Texture.EMPTY); r.ring.anchor.set(0.5); r.root.addChild(r.ring); }
       const k = this.elementLeft();
@@ -2741,12 +2742,15 @@ export class UnitView {
       r.disc.width = r.disc.height = d / HUD_DISC;
       r.disc.position.set(at.x, at.y);
       // the client's gauge: a thick arc right around the icon in a near-white tint of the element's colour
+      // recovering (爆发冷却): from empty, a dark ring filling the other way round
+      const cooling = this.elementCooling(), base = (ELEMENT_RING[this.el] || ELEMENT_RING.burn).tint;
       r.ring.texture = thickRingArc(clamp(k, 0, 1));
-      r.ring.tint = lightTint((ELEMENT_RING[this.el] || ELEMENT_RING.burn).tint, 0.6);
+      r.ring.tint = cooling ? darkTint(base, 0.55) : lightTint(base, 0.6);
       r.ring.width = r.ring.height = d / HUD_DISC;
+      r.ring.scale.x = (cooling ? -1 : 1) * Math.abs(r.ring.scale.x);   // (Pixi's width setter keeps the sign)
       r.ring.position.set(at.x, at.y);
       r.ring.visible = k > 0;
-      r.disc.alpha = this.elementCooling() ? EL_BAR.pulse + (1 - EL_BAR.pulse) * (0.5 + 0.5 * Math.cos(t * Math.PI * 2 * EL_BAR.pulseHz)) : 1;
+      r.disc.alpha = 1;
       r.root.visible = true;
       return;
     }
@@ -3128,6 +3132,7 @@ const FA_P = { x: 0, y: 0, s: 0, depth: 0 };
 const FA_C = { x: 0, y: 0, s: 0, depth: 0 };
 /** `tint` mixed toward white by `k` (0 = the colour, 1 = white). */
 const lightTint = (tint, k) => { const m = (v) => Math.round(v + (255 - v) * k); return (m((tint >> 16) & 255) << 16) | (m((tint >> 8) & 255) << 8) | m(tint & 255); };
+const darkTint = (tint, k) => { const m = (v) => Math.round(v * (1 - k)); return (m((tint >> 16) & 255) << 16) | (m((tint >> 8) & 255) << 8) | m(tint & 255); };
 /** The deploy-direction mark: ring radius, the orange arc's half-angle, the arrowhead's reach past the ring (tiles) and
  * its base half-angle (radians). */
 const FACING = Object.freeze({ r: 0.36, arc: Math.PI / 4, tip: 0.15, head: 0.3 });
@@ -3136,7 +3141,7 @@ const HUD_P = { x: 0, y: 0, s: 0, depth: 0 };
 const ICON_TMP = [];
 /** 设置「HP 바 표시 방식」 official: the client's bar colours (read off its battle screens): operator HP light blue, SP
  *  yellow-green charging / amber while the skill runs, enemy HP orange, a leader's (悬赏 leaders, the bosses) red on grey. */
-const OFFICIAL_BARS = Object.freeze({ elementAbove: 0.17, elementIcon: 0.25, width: 0.74, fixedBossWidth: 4, hpH: 0.042, leaderH: 0.06, belowFeet: 0.16,
+const OFFICIAL_BARS = Object.freeze({ elementAbove: 0.17, elementIcon: 0.25, elementMax: 26, width: 0.74, fixedBossWidth: 4, hpH: 0.042, leaderH: 0.06, belowFeet: 0.16,
   ally: 0x6cb2d2, sp: 0x8aa43f, skill: 0xc3991c, overload: 0xb04516, enemy: 0xd46c3a, leader: 0xcf2a33, back: 0x1c1c1c });
 
 /**
