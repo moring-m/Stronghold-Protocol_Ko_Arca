@@ -574,13 +574,6 @@ select option, select optgroup { background-color: var(--bg-2, var(--surf-2, #11
 :root[data-ui-light] .profile-faction { background: #1d2126; }
 :root[data-ui-light] .game-chat__preview { text-shadow: 0 0 3px rgba(255, 255, 255, .95), 0 0 6px rgba(255, 255, 255, .8); }
 
-/* UI themes: the match settlement (screens/settle.js) is drawn with the official dark settlement sprites — it keeps its
-   own dark backdrop and the default dark tokens under every theme (the themes made the screen transparent over their
-   background art, and light themes turned its surfaces and ink light); the theme's accent colours stay */
-:root[data-ui-theme] .screen.settle:not(.gm) {
-  --surf-0: initial; --surf-0-rgb: initial; --surf-1: initial; --surf-1-rgb: initial; --surf-2: initial; --surf-2-rgb: initial;
-  --surf-3: initial; --surf-hi: initial; --ink-hi: initial; --ink-md: initial; --ink-lo: initial; --ink-rgb: initial; --dim-rgb: initial;
-  --text-hi: #f2f2f2; --text-md: #c3cbc7; --text-lo: #8a948f; --text-dim: #5d6863;
-  --line: #2f3a35; --line-2: #3e4b45; --line-3: #58675f; --bg-0: #0c0f0e; --bg-1: #141816; --shade-rgb: 8, 11, 10;
-  background: #040606; color: #eef3f1; color-scheme: dark;
-}
+/* UI themes: the match settlement shows the theme's background art — the official terrain and its target point (the
+   centre image) are left out, the rest of the page keeps the theme's colours */
+:root[data-ui-theme] .settle :is(.sself__bg, .starget, .srays) { display: none; }
