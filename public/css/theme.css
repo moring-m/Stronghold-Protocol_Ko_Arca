@@ -588,3 +588,12 @@ select option, select optgroup { background-color: var(--bg-2, var(--surf-2, #11
 :root[data-ui-theme] .settle .slv__exp b { color: var(--mint-500); }
 :root[data-ui-theme] .settle :is(.slv__up, .slv__max) { background: var(--mint-500); color: var(--text-on-mint); }
 :root[data-ui-light] .settle :is(.slv__lvimg, .slv__slash) { filter: invert(1) brightness(.35); }
+/* (the other settlement pages too: the radar intro, the 同盟 team page — its terrain sprite left out like the self page's
+   — and 数据详情 show the theme's backdrop instead of their dark official faces) */
+:root[data-ui-theme] .settle .steam__bg { background: repeating-linear-gradient(0deg, rgba(var(--accent-rgb), .04) 0 1px, transparent 1px 4px); }
+:root[data-ui-theme] .settle .steam__bg .sprite { display: none; }
+:root[data-ui-theme] .settle .sintro { background: rgba(var(--bg-0-rgb, 12, 15, 14), .9); }
+:root[data-ui-theme] .settle .settle__detail { background: rgba(var(--bg-0-rgb, 12, 15, 14), .94); }
+:root[data-ui-theme] .settle .tcard:not(.is-fail) .tcard__rounds { background: var(--mint-500); box-shadow: inset 0 0 0 1px var(--mint-400); }
+:root[data-ui-theme] .settle .tcard:not(.is-fail) .tcard__rounds :is(span, b) { color: var(--text-on-mint); }
+:root[data-ui-theme] .settle .tcard.is-fail .tcard__rounds span { color: #f3dcd9; }
