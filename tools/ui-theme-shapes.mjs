@@ -125,7 +125,8 @@ ${S} .hbond.is-full .hbond__icon:not(.hbond__glyph) { filter: brightness(0) inve
 ${S} .section-label { width: fit-content; padding: .04rem .3rem; color: #fff; font-style: italic; font-weight: 900; -webkit-text-stroke: .5px #12345a; text-shadow: .02rem .02rem 0 #12345a;
   background: radial-gradient(circle, rgba(255, 255, 255, .22) 1px, transparent 1.6px) 0 0 / 5px 5px, linear-gradient(90deg, #1f5fa8, #2a70c0);
   clip-path: polygon(.1rem 0, 100% 0, calc(100% - .1rem) 100%, 0 100%); }
-${S} :is(.panel, .modal__box, .bpop, .dpanel) { border: 0; border-radius: 0; background: radial-gradient(circle, rgba(255, 255, 255, .5) 1px, transparent 1.6px) 0 0 / 6px 6px, linear-gradient(180deg, #fdd552, #f9c330); box-shadow: .05rem .05rem 0 #f19b48, 0 .06rem .2rem rgba(60, 50, 20, .18); }
+// (a light face in the yellow frame: a solid-yellow face hid the light theme's white / blue / gold ink on every panel and modal)
+${S} :is(.panel, .modal__box, .bpop, .dpanel) { border: .03rem solid #fcce46; border-radius: 0; background: radial-gradient(circle, rgba(252, 206, 70, .22) 1px, transparent 1.6px) 0 0 / 6px 6px, linear-gradient(180deg, #fffdf5, #fff7dc); box-shadow: .05rem .05rem 0 #f19b48, 0 .06rem .2rem rgba(60, 50, 20, .18); }
 ${S} :is(.panel, .modal__box, .bpop, .dpanel) :is(.panel__body, .modal__body) { color: #24241f; }
 ${S} :is(.mode-card, .seat) { border: .03rem solid #fcce46; box-shadow: .04rem .04rem 0 #f19b48; }
 ${NO_RING(S)}
