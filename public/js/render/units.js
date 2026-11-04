@@ -1663,7 +1663,7 @@ export class UnitView {
 
   onHit() { this.flash = 1; }
 
-  setSkill(on) {
+  setSkill(on, speed = 1) {
     if (this.imp) this.imp.dirty=true;
     this.flags = on ? this.flags | UF.SKILL : this.flags & ~UF.SKILL;
     if (on) this.statuses.add('skill'); else {
@@ -1673,7 +1673,7 @@ export class UnitView {
       for (const extra of this.skillZoneExtra.values()) { extra.clear(); extra.visible = false; }
     }
     if(this.isEnemy&&on&&this.actor?.roles.skill?.via==='attack')this.actor.skillOn=true;
-    else if (this.actor) this.actor.setSkill(on,{instant:this.isEnemy || this.info.skillDuration===0 && !this.info.skillNextAttack});
+    else if (this.actor) this.actor.setSkill(on,{instant:this.isEnemy || this.info.skillDuration===0 && !this.info.skillNextAttack, speed});
     if (this._skillFacesFront()) {
       const d = this._skillFaceDur(!on);
       if (d > 0) this._faceHold = Math.max(this._faceHold, d);

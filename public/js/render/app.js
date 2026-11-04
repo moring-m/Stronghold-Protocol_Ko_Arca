@@ -2182,7 +2182,7 @@ export async function createFieldView(host, options = {}) {
       // activation burst and aura when the official layer shows the skill
       case 'skill': {
         const v = views.get(e[1]);
-        if (v) { v.setSkill?.(!!e[2]); const official=pluginFx.skill(v,!!e[2]) || wiring.skill(v, !!e[2], e[3]);if(!e[2] || (!ctx.officialFor(v)&&!official))fx.skill(v,!!e[2]); }
+        if (v) { v.setSkill?.(!!e[2], Number(e[3]?.speed) || 1); const official=pluginFx.skill(v,!!e[2]) || wiring.skill(v, !!e[2], e[3]);if(!e[2] || (!ctx.officialFor(v)&&!official))fx.skill(v,!!e[2]); }
         break;
       }
       case 'skillImpact': { const v = views.get(e[1]); if (v) wiring.skillImpact(v); break; }

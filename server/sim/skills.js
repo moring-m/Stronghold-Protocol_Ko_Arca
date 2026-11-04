@@ -612,8 +612,12 @@ export class SkillRuntime {
       // (a targeting-only instant skill must still switch to its skill range for the pending attack)
       if (this.spec.mods || this.spec.flags || this.spec.targeting) this._applyMods();
     }
-    const cast = !this.isTimed ? skillImpactTiming(u) : null;
-    b._ev(cast ? ['skill', u.id, 1, { cast: true }] : ['skill', u.id, 1]);
+    let cast = !this.isTimed ? skillImpactTiming(u) : null;
+    // custom rule skillMotionAspd: a cast with a fixed motion (IMPACT_CAST_SKILLS) plays at the unit's attack speed
+    // (ASPD / 100) like its attacks — the skills whose motion already follows the attack interval are not touched
+    const castSpeed = cast && b.data?.raw?.config?.customRules?.skillMotionAspd ? Math.max(.2, Math.min(6, (Number(u.s.aspd) || 100) / 100)) : 1;
+    if (castSpeed !== 1) cast = { ...cast, dur: cast.dur / castSpeed, hit: cast.hit / castSpeed };
+    b._ev(cast ? ['skill', u.id, 1, castSpeed !== 1 ? { cast: true, speed: castSpeed } : { cast: true }] : ['skill', u.id, 1]);
     u.skillAnimUntil = b.time + SKILL_ANIM_WINDOW;
     // 蓄力: after the kit's onStart (it reads the stored charges to pick the charged effect) all the SP is spent
     const spendAll = () => { if (chargedCast) { this.charges = 0; this.sp = 0; } };

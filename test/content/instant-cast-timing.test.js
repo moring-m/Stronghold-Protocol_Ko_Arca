@@ -56,3 +56,18 @@ test('each reviewed independent cast defers its effect once until its own hit, w
  }
  console.log(`Timed effect audit: ${count} operator/skill configurations`);
 });
+
+test('custom rule skillMotionAspd: a fixed-motion cast plays at ASPD / 100; off, the authored timing stays', () => {
+ for (const on of [false, true]) {
+  const {h,u}=battle('chess_char_3_10_a',0),timing=skillImpactTiming(u);
+  h.b.data.raw = { ...(h.b.data.raw || {}), config: { ...(h.b.data.raw?.config || {}), customRules: on ? { skillMotionAspd: true } : {} } };
+  u.s.aspd = 200;
+  const t=h.b.time;
+  assert.ok(u.skill.activate());
+  const dur = on ? timing.dur / 2 : timing.dur;
+  assert.ok(Math.abs(u.mem.skillCastDuration - dur) < 1e-9, `cast duration ${u.mem.skillCastDuration} vs ${dur}`);
+  assert.ok(Math.abs(u.mem.skillCastUntil - (t + dur)) < 1e-9, 'the cast window ends at the scaled length');
+  assert.ok(Math.abs(u.skillAnimUntil - (t + dur)) < 1e-9, 'the client is told the scaled skill window');
+  assert.deepEqual(h.b.errors,[]);
+ }
+});

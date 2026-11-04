@@ -1037,7 +1037,7 @@ export class SpineActor {
   }
 
   /** Skill active flag changed. */
-  setSkill(on, {instant=false} = {}) {
+  setSkill(on, {instant=false, speed=1} = {}) {
     on = !!on;
     if (on === this.skillOn || this.dead) return;
     this.skillOn = on;
@@ -1066,9 +1066,11 @@ export class SpineActor {
     }
     if (on && instant && sk && (!sk.via || sk.via==='attack') && this.has(sk.loop)) {
       this.mode='skillCast';
-      this._play(sk.begin || sk.loop,false,{mix:.12});
-      if(sk.begin)this._queue(sk.loop,false);
-      this.skillCastUntil=this.clock+(sk.begin?this.dur(sk.begin):0)+this.dur(sk.loop);
+      // (custom rule skillMotionAspd: the sim's cast speed — 1 otherwise)
+      const ts=Math.max(.2,Math.min(6,Number(speed)||1));
+      this._play(sk.begin || sk.loop,false,{mix:.12,timeScale:ts});
+      if(sk.begin)this._queue(sk.loop,false,ts);
+      this.skillCastUntil=this.clock+((sk.begin?this.dur(sk.begin):0)+this.dur(sk.loop))/ts;
       return;
     }
     if (on && this.has(sk?.activation) && (this.mode === 'base' || this.mode === 'attackRest')) {
