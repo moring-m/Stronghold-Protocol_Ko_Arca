@@ -155,7 +155,7 @@
 :root[data-ui-theme="ss-mendacium"] .bond-ring { display: block; position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: 1; }
 :root[data-ui-theme="ss-mendacium"] .bond:not(.hbond) .bond-ring { inset: calc(var(--disc) * -.04); width: calc(100% + var(--disc) * .08); height: calc(100% + var(--disc) * .08); }
 :root[data-ui-theme="ss-mendacium"] .bond-ring { transform: scaleX(-1); }
-:root[data-ui-theme="ss-mendacium"] .bond-ring path { d: path("M64.28 15.5L84.5 35.72L84.5 64.28L64.28 84.5L35.72 84.5L15.5 64.28L15.5 35.72L35.72 15.5Z"); fill: none; stroke-width: 5.6; stroke-linejoin: round; stroke: var(--hb-ring-off, rgba(140, 140, 140, .6)); filter: drop-shadow(0 0 1px rgba(0, 0, 0, .85)); }
+:root[data-ui-theme="ss-mendacium"] .bond-ring path { d: path("M35.72 15.5L64.28 15.5L84.5 35.72L84.5 64.28L64.28 84.5L35.72 84.5L15.5 64.28L15.5 35.72Z"); fill: none; stroke-width: 5.6; stroke-linejoin: round; stroke: var(--hb-ring-off, rgba(140, 140, 140, .6)); filter: drop-shadow(0 0 1px rgba(0, 0, 0, .85)); }
 :root[data-ui-theme="ss-mendacium"] .bond-ring path.on { stroke: var(--hb-ring-on, var(--mint-400)); filter: drop-shadow(0 0 calc(2.5 * var(--u)) var(--hb-ring-on, var(--mint-400))) drop-shadow(0 0 1px rgba(0, 0, 0, .6)); }
 :root[data-ui-theme="ss-mendacium"] .hbond.is-full .bond-ring path.on, :root[data-ui-theme="ss-mendacium"] .bond:not(.hbond).is-active .bond-ring path.on { stroke: var(--hb-ring-full, var(--hb-ring-on, var(--mint-400))); }
 :root[data-ui-theme="ss-mendacium"] .hbond__icon { left: 27.5%; top: 27.5%; width: 45%; height: 45%; }

@@ -378,7 +378,14 @@ function markerRules(id, S) {
     half = Math.min(34, Math.max(27.5, 24.5 / inr));
   }
   const pin = 50 - half, k = half / 50, rk = k + .14, rin = 50 - 50 * rk;
-  const ring = g === 'circle' ? 'M50 14.7A35.3 35.3 0 1 1 49.99 14.7Z' : 'M' + g.map(at(rk, rin)).map((p) => p.join(' ')).join('L') + 'Z';
+  // (whatever order an outline is listed in: clockwise, from its top-centre vertex — so the mirrored ring fills from the left)
+  let o = g === 'circle' ? null : g.slice();
+  if (o) {
+    if (o.reduce((s, a, i) => { const b = o[(i + 1) % o.length]; return s + (a[0] * b[1] - b[0] * a[1]); }, 0) < 0) o.reverse();
+    const top = o.reduce((best, p, i) => (p[1] < o[best][1] - .01 || (Math.abs(p[1] - o[best][1]) <= .01 && Math.abs(p[0] - 50) < Math.abs(o[best][0] - 50)) ? i : best), 0);
+    o = o.slice(top).concat(o.slice(0, top));
+  }
+  const ring = g === 'circle' ? 'M50 14.7A35.3 35.3 0 1 1 49.99 14.7Z' : 'M' + o.map(at(rk, rin)).map((p) => p.join(' ')).join('L') + 'Z';
   const mk = g === 'circle' ? 'inset: 18.5%; border-radius: 50%; clip-path: none; transform: none;'
     : `inset: ${f1(pin)}%; border-radius: 0; transform: none; clip-path: polygon(${g.map((p) => `${f1(p[0])}% ${f1(p[1])}%`).join(', ')});`;
   // (the ring is the only outline: the marker's own inset borders made a doubled, thick edge)
