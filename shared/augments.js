@@ -3,6 +3,25 @@ import {AUGMENT_SOURCES} from './augmentSources.js';
 import {AUGMENT_ICON_ASSIGNMENTS} from './augmentIcons.js';
 import {CHAT_FACTIONS} from './chat.js';
 export const AUGMENT_ROUNDS=Object.freeze([4,7,10]);
+/**
+ * Custom augment schedule (rule values augmentFirstRound / augmentInterval / augmentCount; defaults 4 / 3 / 3 = 4·7·10):
+ * the rounds an augment is offered, below the boss round.
+ */
+export function augmentScheduleRounds(settings={},bossRound=Infinity){
+ const first=Math.max(1,Math.trunc(Number(settings.augmentFirstRound)||4)),step=Math.max(1,Math.trunc(Number(settings.augmentInterval)||3)),count=Math.max(0,Math.trunc(Number(settings.augmentCount??3)));
+ const out=[];for(let i=0;i<count;i++){const r=first+i*step;if(r>=bossRound)break;out.push(r);}return out;
+}
+/** The original augment round whose pool an offer at `round` draws from: the first of 4·7·10 at or after it (the last past 10) —
+ * a 7-round augment can come at rounds 5–7, a 4-round one at rounds 1–4. */
+export function augmentPoolRound(round){return AUGMENT_ROUNDS.find(r=>r>=round)??AUGMENT_ROUNDS[AUGMENT_ROUNDS.length-1];}
+/** Effect kinds the battle itself reads (server/sim/content/augments.js): the only augments that can be active from the start. */
+export const COMBAT_AUGMENT_KINDS=Object.freeze(new Set(['stats','normalEnemy','alliedDebuff','alliedDrain','artsDamage','attackHeal','corrosion','deathSeals','deployAspd','device','elemental','enemyStealth','equipmentAtk','extraAttack','kjerag','regen','shields','silenceImmune','skillAspd','skillAtk','skillSp','spCost','statusDuration','stealth','trueDamage','weakness']));
+/** Every combat augment of a side across all rounds (custom options defaultAllyAugments / defaultEnemyAugments). */
+export function combatAugmentCatalog(data,side){
+ const seen=new Map();
+ for(const r of AUGMENT_ROUNDS)for(const a of createAugmentCatalog(data,r))if(a.side===side&&COMBAT_AUGMENT_KINDS.has(a.effect?.kind)&&!seen.has(a.id))seen.set(a.id,a);
+ return [...seen.values()];
+}
 export const AUGMENT_GRADES=Object.freeze({silver:{name:'실버',probability:.2,color:'#b9c8cd'},gold:{name:'골드',probability:.5,color:'#efc866'},prism:{name:'프리즘',probability:.3,color:'#bf9bf4'}});
 export function rollAugmentGrade(rng,history=[],weights={silver:2,gold:5,prism:3}){const silver=history.slice(-2).length===2&&history.slice(-2).every(g=>g==='silver')?0:weights.silver,gold=weights.gold,prism=weights.prism,total=silver+gold+prism;if(!total)return 'gold';const value=rng()*total;return value<silver?'silver':value<silver+gold?'gold':'prism';}
 const BASIC_NAMES={...Object.fromEntries(CHAT_FACTIONS.map(f=>[f.bondId,f.name])),skillfulShip:'기민',deputShip:'조력',visiShip:'예견',miraShip:'기적',investShip:'투자자',maniShip:'조화',soloShip:'독행',suntShip:'궁극기',steadShip:'고수',indomShip:'불굴',preciShip:'정밀',swiftShip:'신속',arcaneShip:'아케인',raidShip:'기습'};
@@ -97,7 +116,7 @@ export function recordAugments(raw){
  const text=(v,max)=>typeof v==='string'?v.slice(0,max):'';
  const history=(Array.isArray(raw.history)?raw.history:[]).filter(g=>Object.hasOwn(AUGMENT_GRADES,g)).slice(0,3);
  const picks=(Array.isArray(raw.picks)?raw.picks:[]).slice(0,32).flatMap(p=>{
-  const a=p?.augment;if(!AUGMENT_ROUNDS.includes(p?.round)||!a||!Object.hasOwn(AUGMENT_GRADES,a.grade)||!['ally','enemy'].includes(p.side))return [];
+  const a=p?.augment;if(!(Number.isInteger(p?.round)&&p.round>=1&&p.round<=200)||!a||!Object.hasOwn(AUGMENT_GRADES,a.grade)||!['ally','enemy'].includes(p.side))return [];
   return [{round:p.round,grade:a.grade,side:p.side,playerId:text(p.playerId,128),augment:{id:text(a.id,128),name:text(a.name,80),grade:a.grade,side:p.side,description:text(a.description,2048),iconBond:/^[A-Za-z0-9_]+$/.test(a.iconBond||"")?text(a.iconBond,64):null,icon:typeof a.icon==='string'&&/^\/assets\/custom\/augments\/[A-Za-z0-9_-]+\.png$/.test(a.icon)?a.icon:null}}];
  });return {history,picks};
 }

@@ -210,10 +210,21 @@ test('enemy prism stealth affects all normal and cooperative fields but excludes
 test('빈도: a killed enemy leaves two 木制瑞印; a hit-count enemy (the seals included) leaves none',()=>{
  const seal='enemy_1196_msfyin';
  const h=makeBattle({defs:{chess:{op:chessRec({id:'op',stats:{atk:1e6,maxHp:1000,aspd:100,bat:1}})},enemies:{enemy_test:enemyRec({key:'enemy_test',hp:10,speed:0}),[seal]:enemyRec({key:seal,hp:1e9,speed:0})}},content:'none',extraContent:[{install}],
-  units:[{chessId:'op',row:10,col:4}],enemies:[{key:'enemy_test',pos:[10,5]}],flags:{augments:{allies:{p1:[]},enemies:[item(find('빈도','enemy'))]}},autoFinish:false});
+  units:[{chessId:'op',row:10,col:4}],enemies:[{key:'enemy_test',pos:[10,5]}],flags:{augments:{allies:{p1:[]},enemies:[item(find('빈도 II','enemy'))]}},autoFinish:false});
  h.run(3);
  const seals=()=>h.b.enemies.filter(e=>e.defId===seal);
  assert.equal(seals().length,2,'two seals');
+ const op=h.unit('op');for(const s of seals()){h.b.addBuff(s,{key:'t:hc',flags:{hitCount:true}});s.hp=1;h.b.dealDamage(op,s,{amount:1e12,type:'true'});}
+ h.run(1);
+ assert.equal(h.b.enemies.filter(e=>e.defId===seal&&e.alive).length,0,'no seals from seals');
+});
+test('빈도 I (gold): a killed enemy leaves one 木制瑞印',()=>{
+ const seal='enemy_1196_msfyin';
+ const h=makeBattle({defs:{chess:{op:chessRec({id:'op',stats:{atk:1e6,maxHp:1000,aspd:100,bat:1}})},enemies:{enemy_test:enemyRec({key:'enemy_test',hp:10,speed:0}),[seal]:enemyRec({key:seal,hp:1e9,speed:0})}},content:'none',extraContent:[{install}],
+  units:[{chessId:'op',row:10,col:4}],enemies:[{key:'enemy_test',pos:[10,5]}],flags:{augments:{allies:{p1:[]},enemies:[item(find('빈도 I','enemy'))]}},autoFinish:false});
+ h.run(3);
+ const seals=()=>h.b.enemies.filter(e=>e.defId===seal);
+ assert.equal(seals().length,1,'one seal');
  const op=h.unit('op');for(const s of seals()){h.b.addBuff(s,{key:'t:hc',flags:{hitCount:true}});s.hp=1;h.b.dealDamage(op,s,{amount:1e12,type:'true'});}
  h.run(1);
  assert.equal(h.b.enemies.filter(e=>e.defId===seal&&e.alive).length,0,'no seals from seals');

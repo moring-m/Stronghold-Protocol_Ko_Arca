@@ -3,13 +3,13 @@ export const LANGUAGE_PACKS = {
   "en": [
     {
       "path": "/i18n/en/audit.json",
-      "bytes": 3208838,
-      "hash": "69cdc9dfc0a6ceebbc5491c41080efd4f1eb166a6d06a7c26e2a423eafc554a8"
+      "bytes": 3211311,
+      "hash": "cd73412b9898a25be4cd7b1a884cfbcd7bbcf5dab48f04f1c278e2fef33d5f86"
     },
     {
       "path": "/i18n/en/fork.json",
-      "bytes": 307073,
-      "hash": "9ba1670bd9cf23abc0d917ee08ca8df5a14bc42a2afd76afff76000878076ed7"
+      "bytes": 307504,
+      "hash": "cabb0ac7c3cb1c873d7a926a7c7b12a971527fa1eae892e69e11c294786fd4f9"
     },
     {
       "path": "/i18n/ko/compiled.json",
@@ -30,13 +30,13 @@ export const LANGUAGE_PACKS = {
   "ja": [
     {
       "path": "/i18n/ja/audit.json",
-      "bytes": 3489471,
-      "hash": "4f73c3e2014b9479abeb51c5176ebbd8879a574bbef79b3fbbd549373541f9ea"
+      "bytes": 3492220,
+      "hash": "9bf23996da2385d42ef72fc3a2abe2a39fdd82ba932fa2bed0d1692a1e1a7902"
     },
     {
       "path": "/i18n/ja/fork.json",
-      "bytes": 331055,
-      "hash": "27ecd0b8d08b1bb0bbaf88f09c1f71c4b9ab93c6a31247988e9e7db83386ff49"
+      "bytes": 331492,
+      "hash": "c727c95ba97867bb7a274fb152a50192f61fe791d8bbf2a401c4cae532bf201f"
     },
     {
       "path": "/i18n/ko/compiled.json",
@@ -55,13 +55,13 @@ export const LANGUAGE_PACKS = {
     },
     {
       "path": "/i18n/en/audit.json",
-      "bytes": 3208838,
-      "hash": "69cdc9dfc0a6ceebbc5491c41080efd4f1eb166a6d06a7c26e2a423eafc554a8"
+      "bytes": 3211311,
+      "hash": "cd73412b9898a25be4cd7b1a884cfbcd7bbcf5dab48f04f1c278e2fef33d5f86"
     },
     {
       "path": "/i18n/en/fork.json",
-      "bytes": 307073,
-      "hash": "9ba1670bd9cf23abc0d917ee08ca8df5a14bc42a2afd76afff76000878076ed7"
+      "bytes": 307504,
+      "hash": "cabb0ac7c3cb1c873d7a926a7c7b12a971527fa1eae892e69e11c294786fd4f9"
     },
     {
       "path": "/i18n/en.json",
@@ -77,13 +77,13 @@ export const LANGUAGE_PACKS = {
   "zh": [
     {
       "path": "/i18n/zh/audit.json",
-      "bytes": 965386,
-      "hash": "4cc3cae83e2369c5b474e467c96da90d56a758d24279792c3deccc7a29d07b30"
+      "bytes": 967852,
+      "hash": "e4c521d17e5b3c245355a9a8417fec3987081e52053a79069449c944b0c6f92d"
     },
     {
       "path": "/i18n/zh/fork.json",
-      "bytes": 306861,
-      "hash": "8c6993cacbe9c60a6700b1d9971b7cc98de31f21bf1a4eefade4325457ee11f0"
+      "bytes": 307277,
+      "hash": "5788196180c3a3e82eeee4f207bfb51a9708aa65c9bafcc2c4e805e15de48056"
     },
     {
       "path": "/i18n/ko/compiled.json",

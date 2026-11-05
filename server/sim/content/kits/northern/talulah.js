@@ -1,5 +1,6 @@
 // PRTS 塔露拉 + local char_4247_oxi data, 2026-11-01. All tunable values are blackboard values.
 import {acquireTargets} from '../../../ai.js';
+import {skillMotionSpeed} from '../../../motionSpeed.js';
 import {dirVec} from '../../../dir.js';
 import {canTargetEnemy} from '../../../targeting.js';
 import {alive,num,talentBb,keyOf,fx,groundProfile,inCells} from './common.js';
@@ -100,7 +101,7 @@ export function talulahKit(_bb,raw){
    for(const [key,end]of st.fields)if(end<=b.time)st.fields.delete(key);
    st.fieldClock+=dt;const iv=num(trail.field_interval,.3);
    if(st.fieldClock+1e-9>=iv){st.fieldClock-=iv;for(const e of inCells(b,u,st.fields.keys()))b.dealDamage(u,e,{amount:u.s.atk*num(trail.field_atk_scale),type:'arts',isSkill:false,tags:['talulah-trail','dot']});}
-   if(raw.skill.index===2&&u.skill.active&&u.canAct){const phase=u.skill.timeLeft<=st.waveDuration/2?1:0;if(phase&&!st.wavePhase)fx(b,u,'talulahOverdrive');st.wavePhase=phase;st.waveClock+=dt;const interval=num(st.wavePhase?bb.overload_interval:bb.normal_interval);if(st.waveClock+1e-9>=interval){st.waveClock-=interval;wave();}}
+   if(raw.skill.index===2&&u.skill.active&&u.canAct){const phase=u.skill.timeLeft<=st.waveDuration/2?1:0;if(phase&&!st.wavePhase)fx(b,u,'talulahOverdrive');st.wavePhase=phase;st.waveClock+=dt;const interval=num(st.wavePhase?bb.overload_interval:bb.normal_interval)/skillMotionSpeed(b,u);if(st.waveClock+1e-9>=interval){st.waveClock-=interval;wave();}}
    advanceWaves(dt);
   },{owner:u});
   b.on('deploy',c=>{if(c.unit===u){st.arcane=0;st.attackArcane=0;st.lastAttack=b.time;st.arcaneClock=0;st.stacks=[];st.counterAt=-Infinity;st.waveClock=0;}},{owner:u});

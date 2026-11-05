@@ -139,7 +139,7 @@
 :root[data-ui-theme="f-ursus"] .bond-ring { display: block; position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: 1; }
 :root[data-ui-theme="f-ursus"] .bond:not(.hbond) .bond-ring { inset: calc(var(--disc) * -.04); width: calc(100% + var(--disc) * .08); height: calc(100% + var(--disc) * .08); }
 :root[data-ui-theme="f-ursus"] .bond-ring { transform: scaleX(-1); }
-:root[data-ui-theme="f-ursus"] .bond-ring path { d: path("M15.16 15.16L44.43 15.16L50 19.34L55.57 15.16L84.84 15.16L84.84 44.43L80.66 50L84.84 55.57L84.84 84.84L55.57 84.84L50 80.66L44.43 84.84L15.16 84.84L15.16 55.57L19.34 50L15.16 44.43Z"); fill: none; stroke-width: 5.6; stroke-linejoin: round; stroke: var(--hb-ring-off, rgba(140, 140, 140, .6)); filter: drop-shadow(0 0 1px rgba(0, 0, 0, .85)); }
+:root[data-ui-theme="f-ursus"] .bond-ring path { d: path("M44.43 15.16L50 19.34L55.57 15.16L84.84 15.16L84.84 44.43L80.66 50L84.84 55.57L84.84 84.84L55.57 84.84L50 80.66L44.43 84.84L15.16 84.84L15.16 55.57L19.34 50L15.16 44.43L15.16 15.16Z"); fill: none; stroke-width: 5.6; stroke-linejoin: round; stroke: var(--hb-ring-off, rgba(140, 140, 140, .6)); filter: drop-shadow(0 0 1px rgba(0, 0, 0, .85)); }
 :root[data-ui-theme="f-ursus"] .bond-ring path.on { stroke: var(--hb-ring-on, var(--mint-400)); filter: drop-shadow(0 0 calc(2.5 * var(--u)) var(--hb-ring-on, var(--mint-400))) drop-shadow(0 0 1px rgba(0, 0, 0, .6)); }
 :root[data-ui-theme="f-ursus"] .hbond.is-full .bond-ring path.on, :root[data-ui-theme="f-ursus"] .bond:not(.hbond).is-active .bond-ring path.on { stroke: var(--hb-ring-full, var(--hb-ring-on, var(--mint-400))); }
 :root[data-ui-theme="f-ursus"] .hbond__icon { left: 27.5%; top: 27.5%; width: 45%; height: 45%; }

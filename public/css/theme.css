@@ -573,3 +573,27 @@ select option, select optgroup { background-color: var(--bg-2, var(--surf-2, #11
    --surf-2 it vanished), and the chat preview's lines take a light halo instead of the black shadow under dark ink */
 :root[data-ui-light] .profile-faction { background: #1d2126; }
 :root[data-ui-light] .game-chat__preview { text-shadow: 0 0 3px rgba(255, 255, 255, .95), 0 0 6px rgba(255, 255, 255, .8); }
+
+/* UI themes: the match settlement shows the theme's background art — the official terrain and its target point (the
+   centre image) are left out, the rest of the page keeps the theme's colours */
+:root[data-ui-theme] .settle :is(.sself__bg, .starget, .srays) { display: none; }
+/* (the level bar's band: the theme's panel face and accent line instead of the dark official strip; its text in the
+   theme's ink, its fill in the accent) */
+:root[data-ui-theme] .settle .settle__barbg { background: linear-gradient(180deg, rgba(var(--bg-1-rgb, 20, 24, 22), .92), rgba(var(--bg-0-rgb, 12, 15, 14), .96) 40%); border-top: 2px solid var(--mint-500); box-shadow: 0 -1px 0 rgba(var(--accent-rgb, 51, 220, 174), .35); }
+:root[data-ui-theme] .settle .settle__barbg .sprite { display: none; }
+:root[data-ui-theme] .settle .slv__lv small, :root[data-ui-theme] .settle .slv__exp { color: var(--text-md); }
+:root[data-ui-theme] .settle .slv__lv b { color: var(--text-hi); }
+:root[data-ui-theme] .settle .slv__bar { background: rgba(var(--accent-rgb, 51, 220, 174), .16); box-shadow: inset 0 0 0 1px var(--line-2); }
+:root[data-ui-theme] .settle .slv__bar i { background: linear-gradient(90deg, var(--mint-400), var(--mint-500)); box-shadow: 0 0 .08rem rgba(var(--accent-rgb, 51, 220, 174), .5); }
+:root[data-ui-theme] .settle .slv__exp b { color: var(--mint-500); }
+:root[data-ui-theme] .settle :is(.slv__up, .slv__max) { background: var(--mint-500); color: var(--text-on-mint); }
+:root[data-ui-light] .settle :is(.slv__lvimg, .slv__slash) { filter: invert(1) brightness(.35); }
+/* (the other settlement pages too: the radar intro, the 同盟 team page — its terrain sprite left out like the self page's
+   — and 数据详情 show the theme's backdrop instead of their dark official faces) */
+:root[data-ui-theme] .settle .steam__bg { background: repeating-linear-gradient(0deg, rgba(var(--accent-rgb), .04) 0 1px, transparent 1px 4px); }
+:root[data-ui-theme] .settle .steam__bg .sprite { display: none; }
+:root[data-ui-theme] .settle .sintro { background: rgba(var(--bg-0-rgb, 12, 15, 14), .9); }
+:root[data-ui-theme] .settle .settle__detail { background: rgba(var(--bg-0-rgb, 12, 15, 14), .94); }
+:root[data-ui-theme] .settle .tcard:not(.is-fail) .tcard__rounds { background: var(--mint-500); box-shadow: inset 0 0 0 1px var(--mint-400); }
+:root[data-ui-theme] .settle .tcard:not(.is-fail) .tcard__rounds :is(span, b) { color: var(--text-on-mint); }
+:root[data-ui-theme] .settle .tcard.is-fail .tcard__rounds span { color: #f3dcd9; }

@@ -97,9 +97,9 @@
 .set-category .set-row select { grid-column:2 / 4; justify-self:end; width:2.6rem; max-width:100%; min-height:.36rem; padding:.05rem .08rem; color:var(--ink-hi, #e2efea); background:var(--bg-tint); border:1px solid #46594f; }
 @media (max-width:600px) and (orientation:portrait) {
   .modal__box.settings-modal { width:calc(calc(100 * var(--ui-vw, 1vw)) - 24px)!important; max-height:calc(calc(100 * var(--ui-dvh, 1dvh)) - 24px); font-size:14px; }
-  .modal__box.settings-modal .modal__body { padding:12px; }
-  .modal__box.settings-modal .modal__title { font-size:18px; }
-  .modal__box.settings-modal .modal__actions .btn { font-size:12px; min-height:32px; }
+  .modal__box.settings-modal > .modal__body { padding:12px; }
+  .modal__box.settings-modal > .modal__title { font-size:18px; }
+  .modal__box.settings-modal > .modal__actions .btn { font-size:12px; min-height:32px; }
   .set-categories { gap:4px; padding:6px 0; }
   .set-categories button { min-height:36px; font-size:12px; padding:6px 2px; }
   .set-category { gap:12px; }
@@ -115,7 +115,7 @@
   .set-category .set-row--chat-sound select { grid-column:1; }}
 
 /* Keep settings tabs outside the scrolling content, including its top padding. */
-.settings-modal .modal__body { display:flex; flex-direction:column; min-height:0; overflow:hidden; }
+.settings-modal > .modal__body { display:flex; flex-direction:column; min-height:0; overflow:hidden; }
 .settings-modal .set-categories { position:static; flex-shrink:0; }
 .settings-modal .set-list { min-height:0; overflow-y:auto; overscroll-behavior:contain; }
 

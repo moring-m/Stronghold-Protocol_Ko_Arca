@@ -1,5 +1,6 @@
 // Makoto's persona state is independent of the instant skill's active flag.
 import {attackClipTiming} from '../../../../shared/attackTiming.js';
+import {skillMotionSpeed} from '../../motionSpeed.js';
 import {weaknessRetype} from '../items/battle.js';
 import {talentBb,traitBb,num} from './tier1.js';
 const alive=u=>u?.alive&&u.deployed&&!u.hidden;
@@ -22,7 +23,10 @@ export function makotoKit(_bb,raw){
   },{owner:u});
   const valid=token=>alive(u)&&st.token===token;
   const fx=(kind,extra={})=>b.fx(kind,{id:u.id,x:u.x,y:u.y,...extra});
-  const form=(value,duration=Math.max(0,st.until-b.time))=>{u.form=value;fx('substitute',{form:value,dur:duration});};
+  // (custom rule skillMotionAspd: the persona switches play at her attack speed — each switch takes the speed at its start
+  // and scales its motion, its protection and the strikes inside it; the persona's own duration is not a motion)
+  const ms=()=>skillMotionSpeed(b,u);
+  const form=(value,duration=Math.max(0,st.until-b.time),speed=1)=>{u.form=value;fx('substitute',{form:value,dur:duration,...(speed!==1?{speed}:{})});};
   const enemies=()=>b.enemiesInKeys(u.rangeKeys,u,{...u.profile,canHitFly:true,groundOnly:false});
   const allies=()=>b.injuredAlliesInKeys(u.rangeKeys,u).filter(a=>!a.s.flags.healFree&&!a.s.flags.noHeal&&!a.profile?.noHeal);
   const clearAura=()=>{for(const a of b.allyUnits)b.removeBuff(a,`makoto:dodge:${u.id}`);};
@@ -38,46 +42,46 @@ export function makotoKit(_bb,raw){
    delete u.profile.heal;
    u.rangeGrid=AREA;b._refreshRange(u);
    b.addBuff(u,{key:MARK,mods:{atkPct:num(t.atk)+num(tb.atk),hpPct:num(t.max_hp_t1)+num(tb.max_hp),batPct:num(t.base_attack_time)/u.base.bat,aspd:phase==='s3a'?num(bb['talent@attack_speed']):0,blockCnt:phase==='s3b'?num(bb['attack@block_cnt'],2)-u.base.blockCnt:-99},flags:{noSp:true,silence:true,...(phase==='s3b'?{disarm:true}:{})}});
-   u.markDirty();form('makoto_'+phase);u.atkCd=0;
+   u.markDirty();form('makoto_'+phase,undefined,st.phase==='entering'?st.motionSpeed||1:1);u.atkCd=0;
   };
   const healWave=()=>{
    const targets=allies().slice(0,num(bb['attack@max_target_heal'],4)),token=st.token;
-   b.after(.5,()=>{if(!valid(token)||st.phase!=='s3b')return;for(const a of targets)if(alive(a))b.heal(u,a,u.s.atk*num(bb['attack@heal_scale']));fx('makotoHeal',{targets:targets.filter(alive).map(a=>a.id)});},{owner:u});
+   b.after(.5/ms(),()=>{if(!valid(token)||st.phase!=='s3b')return;for(const a of targets)if(alive(a))b.heal(u,a,u.s.atk*num(bb['attack@heal_scale']));fx('makotoHeal',{targets:targets.filter(alive).map(a=>a.id)});},{owner:u});
   };
   st.recast=()=>{
    if(index!==2||st.phase!=='s3a'||u.trait.dollSwitching||!alive(u))return false;
    // Both personas consume the same deadline, including this transition.
-   st.phase='changing';form('makoto_change',1.5);transition(1.5,()=>{stance('s3b');fx('makotoPersonaReady');fx('makotoHealRange');healWave();st.healAt=b.time+1;});return true;
+   st.phase='changing';const k=ms();form('makoto_change',1.5/k,k);transition(1.5/k,()=>{stance('s3b');fx('makotoPersonaReady');fx('makotoHealRange');healWave();st.healAt=b.time+1;});return true;
   };
   const restore=()=>{
    clearAura();b.removeBuff(u,MARK);b.removeBuff(u,SWITCH);u.profile={...normal};delete u.profile.heal;u.rangeGrid=normalGrid;b._refreshRange(u);u.trait.doll=false;u.trait.dollSwitching=false;u.form=null;st.phase=null;st.attempted.clear();u.markDirty();
   };
   const allOutAttack=()=>{
-   fx('makotoAllOutStart');
-   st.token++;clearAura();b.removeBuff(u,MARK);u.profile={...normal};u.rangeGrid=normalGrid;b._refreshRange(u);u.markDirty();st.phase='total';u.trait.doll=false;form('makoto_total');
-   b.addBuff(u,{key:SWITCH,duration:1.6,flags:{invulnerable:true,noSp:true,disarm:true,silence:true}});u.trait.dollSwitching=true;const token=st.token;
+   fx('makotoAllOutStart');const k=ms();
+   st.token++;clearAura();b.removeBuff(u,MARK);u.profile={...normal};u.rangeGrid=normalGrid;b._refreshRange(u);u.markDirty();st.phase='total';u.trait.doll=false;form('makoto_total',undefined,k);
+   b.addBuff(u,{key:SWITCH,duration:1.6/k,flags:{invulnerable:true,noSp:true,disarm:true,silence:true}});u.trait.dollSwitching=true;const token=st.token;
    // All-out attacks use base form stats; other Makoto leaders never respond to this one.
-   b.after(.167,()=>{if(valid(token))fx('makotoAllOutFlash');},{owner:u});
+   b.after(.167/k,()=>{if(valid(token))fx('makotoAllOutFlash');},{owner:u});
    const members=b.allyUnits.filter(a=>alive(a)&&(a===u||(a.def?.raw?.teamId==='sees'&&a.def.raw.charId!==raw.charId)));
-   b.after(.3,()=>{if(!valid(token))return;const amount=u.s.atk*num(total.atk_scale,4.3);
+   b.after(.3/k,()=>{if(!valid(token))return;const amount=u.s.atk*num(total.atk_scale,4.3);
     for(const member of members){if(!alive(member))continue;if(member!==u&&b.time<(member.mem.seesReadyAt||0))continue;member.mem.seesReadyAt=b.time+1.6;
      const keys=new Set(AREA.map(([r,c])=>(member.tileR+r)*(b.grid.cols)+(member.tileC+c)));
      for(const e of b.enemiesInKeys([...keys],u,{canHitFly:true,groundOnly:false}))b.dealDamage(u,e,{amount,type:'true',isSkill:false,tags:['makoto-total']});}
     fx('makotoAllOut',{members:members.filter(alive).map(a=>a.id)});
    },{owner:u});
-   b.after(1.6,()=>{if(!valid(token))return;restore();u.atkCd=0;st.recoveryUntil=0;u.hp=u.s.maxHp;fx('swap',{form:null});},{owner:u});
+   b.after(1.6/k,()=>{if(!valid(token))return;restore();u.atkCd=0;st.recoveryUntil=0;u.hp=u.s.maxHp;fx('swap',{form:null});},{owner:u});
   };
   const totalAttack=()=>{
    const phase=st.phase==='changing'?'s3b':st.phase;
    st.phase='exiting';clearAura();b.removeBuff(u,MARK);u.trait.doll=false;
    u.profile={...normal};u.rangeGrid=normalGrid;b._refreshRange(u);u.markDirty();
-   form('makoto_exit_'+phase,1);transition(1,allOutAttack);
+   const k=ms();form('makoto_exit_'+phase,1/k,k);transition(1/k,allOutAttack);
   };
   st.enter=()=>{
-   if(st.phase||!alive(u))return false;st.token++;st.phase='entering';st.duration=num(tb.duration,20);st.readyAt=b.time+2;st.until=st.readyAt+st.duration;st.attempted.clear();
+   if(st.phase||!alive(u))return false;st.token++;st.phase='entering';const k=ms();st.motionSpeed=k;st.duration=num(tb.duration,20);st.readyAt=b.time+2/k;st.until=st.readyAt+st.duration;st.attempted.clear();
    // Only base -> persona activates T1's entry slow.
    for(const e of enemies())if(num(t.sluggish)>0)b.applyStatus(e,'sluggish',{duration:num(t.sluggish),source:u});
-   const phase=index===0?'s1':index===1?'s2':'s3a';stance(phase);transition(2,()=>{st.phase=phase;fx('makotoPersonaReady');if(phase==='s2'||phase==='s3a')fx('makotoAttackRange');});
+   const phase=index===0?'s1':index===1?'s2':'s3a';stance(phase);transition(2/k,()=>{st.phase=phase;fx('makotoPersonaReady');if(phase==='s2'||phase==='s3a')fx('makotoAttackRange');});
    b.releaseBlocked(u);b.emit('dollSwap',{unit:u,form:'doll'});return true;
   };
   // SP/skill automation never flips S3 persona; only lethal damage may do so.

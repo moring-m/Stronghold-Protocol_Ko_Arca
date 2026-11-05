@@ -159,3 +159,19 @@ test('S3 dodge aura refreshes an existing buff without rebuilding unchanged stat
   h.run(u.mem.makoto.until-h.b.time+.1);assert.equal(u.findBuff(key),null);assert.equal(u.s.dodgePhys||0,0);
  }finally{setGameData(null)}
 });
+
+test('custom rule skillMotionAspd: her persona switches play at ASPD / 100 (entry, persona change); off, they keep their time', () => {
+ setGameData(data);try{
+  for (const on of [false, true]) {
+   const h=combat(),u=h.unit(id());
+   h.b.data.raw={...(h.b.data.raw||{}),config:{...(h.b.data.raw?.config||{}),customRules:on?{skillMotionAspd:true}:{}}};
+   u.s.aspd=200;const t=h.b.time;
+   u.mem.makoto.enter();
+   assert.ok(Math.abs(u.mem.makoto.readyAt-(t+(on?1:2)))<1e-9,'the entry switch takes 2 s / speed');
+   h.run(on?1.05:2.05);assert.equal(u.trait.dollSwitching,false,'the switch protection ends with the motion');
+   u.s.aspd=200;h.b.loseHp(u,u.hp+100,{source:null});assert.equal(u.mem.makoto.phase,'changing');
+   h.run(on?.8:1.55);assert.equal(u.mem.makoto.phase,'s3b','the persona change takes 1.5 s / speed');
+   assert.equal(h.b.errorCount,0);
+  }
+ }finally{setGameData(null)}
+});

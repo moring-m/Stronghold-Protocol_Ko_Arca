@@ -1190,6 +1190,7 @@ export class Match {
     }
     if (this.offers.length) v.offers = this.offerViews();
     if(this.augments.enabled)v.augments=this.augments.publicView();
+    { const d=this.augments.defaultView(); if(d) v.defaultAugments=d; }
     if (this.phase === PHASE.SP_DRAFT && this.sp) {
       const s = this.sp;
       v.sp = {
@@ -2425,7 +2426,7 @@ if (this.test === true) {
 
   /** Construct a battle; a constructor failure yields a finished stand-in (clean result) and is logged. */
   newBattle(opts,{preview=false}={}) {
-    const full = { data: this.ds, content: this.battleContent, logger: preview?{}:this.log,quiet:preview, ...opts,flags:{...opts.flags,...(this.augments.enabled?{augments:this.augments.battleState()}: {})} };
+    const full = { data: this.ds, content: this.battleContent, logger: preview?{}:this.log,quiet:preview, ...opts,flags:{...opts.flags,...(this.augments.active()?{augments:this.augments.battleState()}: {})} };
     try {
       return new this.BattleClass(full);
     } catch (e) {
@@ -2654,7 +2655,7 @@ if (this.test === true) {
     const seq = `${this.battlePrefix}.${this.round}.${++this._battleSeq}`;
     // protocol ids are ≤ 64 chars (shared/protocol.js isId): the field id is informational, the sequence is unique
     const battleId = seq.length + 1 + String(fieldId).length <= 64 ? `${seq}.${fieldId}` : seq;
-    const spec = buildBattleSpec({ ...opts, flags: {...opts.flags, ...(this.augments.enabled?{augments:this.augments.battleState()}:{}), customFactions:this.customFactions,customExtensions:this.customExtensions}, battleId, fieldId, kind, content: this.battleContent, boss, morphPairing: ruleOption(this.rules, 'morphPairing'), cs:this.cs, vs:this.vs });
+    const spec = buildBattleSpec({ ...opts, flags: {...opts.flags, ...(this.augments.active()?{augments:this.augments.battleState()}:{}), customFactions:this.customFactions,customExtensions:this.customExtensions}, battleId, fieldId, kind, content: this.battleContent, boss, morphPairing: ruleOption(this.rules, 'morphPairing'), cs:this.cs, vs:this.vs });
     let total = 0;
     for (const x of spec.spawns) if (x && x.tag !== 'boss' && x.tag !== 'part' && x.countInTotal !== false) total += Math.max(1, Math.floor(Number(x.count) || 1));
     return {

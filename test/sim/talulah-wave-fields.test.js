@@ -47,3 +47,19 @@ test('retreating the caster does not freeze or erase an already-fired projectile
 for(const dir of ['UP','DOWN','LEFT','RIGHT'])test(`Talulah ${dir}: first volley spawns on activation, second volley waits the normal interval`,()=>{
  const {h,u}=fire({dir,over:false});const born=h.eventsOf('fx').filter(e=>e[1]==='talulahWave');assert.ok(born.length);assert.equal(u.mem.talulah.waveSerial,1);assert.ok(born.every(e=>Math.abs(e[4].born-h.b.time)<1e-9));const interval=Number(u.skill.bb.normal_interval);h.run(interval-.1);assert.equal(u.mem.talulah.waveSerial,1);h.run(.2);assert.equal(u.mem.talulah.waveSerial,2);
 });
+
+test('custom rule skillMotionAspd: S3 fires its waves at the normal interval / (ASPD / 100); off, at the authored interval', () => {
+ const counts = {};
+ for (const on of [false, true]) {
+  const h=makeBattle({data,stage:data.stages.custom_snowfield,kind:'unite',units:[{chessId:id,row:10,col:10,dir:'UP',skillIndex:2}],enemies:[],autoFinish:false,timeLimit:120});
+  h.b.data.raw={...(h.b.data.raw||{}),config:{...(h.b.data.raw?.config||{}),customRules:on?{skillMotionAspd:true}:{}}};
+  h.run(1.2);const u=h.unit(id);u.skill.gainSp(1000);assert.ok(u.skill.activate('test'));
+  const iv=Number(u.skill.bb.normal_interval),before=u.mem.talulah.waveSerial;
+  // within the first (normal) half: 4 authored intervals
+  const run=Math.min(u.skill.duration*.45,iv*4+.01);
+  for(let t=0;t<run;t+=h.b.dt){u.s.aspd=200;h.step();}
+  counts[on]=u.mem.talulah.waveSerial-before;
+  assert.deepEqual(h.b.errors,[]);
+ }
+ assert.ok(counts[true] >= counts[false] * 2 - 1, `twice the waves at ASPD 200: ${counts[false]} -> ${counts[true]}`);
+});
