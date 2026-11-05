@@ -2445,7 +2445,9 @@ export async function createFieldView(host, options = {}) {
     if (Number.isFinite(dtRaw) && dtRaw > 0 && !globalThis.document?.hidden) frameMs = frameMs * 0.9 + Math.min(dtRaw, 5) * 1000 * 0.1;
     fps = 1000 / Math.max(1, frameMs);
     adaptLoad(dtRaw);
-    vp.width = Math.max(1, host.clientWidth || 1); vp.height = Math.max(1, host.clientHeight || 1);
+    // (the host's size comes from resize(), which the ResizeObserver calls: reading clientWidth here every frame forced a
+    // synchronous layout whenever the UI had changed the DOM earlier in the frame)
+    if (!ro) { vp.width = Math.max(1, host.clientWidth || 1); vp.height = Math.max(1, host.clientHeight || 1); }
     clock += dt;
     if ((globalThis.devicePixelRatio || 1) !== lastDpr) { lastDpr = globalThis.devicePixelRatio || 1; resize(); }
     try {
@@ -2534,6 +2536,7 @@ export async function createFieldView(host, options = {}) {
   function resize() {
     if (destroyed) return;
     const sz = size();
+    vp.width = sz.width; vp.height = sz.height;
     const res = dpr();
     if (app.renderer.resolution !== res) app.renderer.resolution = res;
     impostors.setResolution?.(res);
