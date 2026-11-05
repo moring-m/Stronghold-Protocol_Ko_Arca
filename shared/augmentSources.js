@@ -2451,7 +2451,7 @@ export const AUGMENT_SOURCES = [
   "source": 183,
   "identity": 183,
   "grade": "prism",
-  "name": "빈도",
+  "name": "빈도 II",
   "rounds": [
    4,
    7,
@@ -2459,6 +2459,20 @@ export const AUGMENT_SOURCES = [
   ],
   "side": "enemy",
   "description": "적이 사망 시 목제 인장 2기 소환",
+  "notes": "이 효과를 포함해서 사망 시 소환되는 타수몹에는 적용되지 않음 (예: 홍목 인장, 소설 두루마리 등)"
+ },
+ {
+  "source": 184,
+  "identity": 184,
+  "grade": "gold",
+  "name": "빈도 I",
+  "rounds": [
+   4,
+   7,
+   10
+  ],
+  "side": "enemy",
+  "description": "적이 사망 시 목제 인장 1기 소환",
   "notes": "이 효과를 포함해서 사망 시 소환되는 타수몹에는 적용되지 않음 (예: 홍목 인장, 소설 두루마리 등)"
  }
 ];

@@ -62,3 +62,13 @@ test('default augments reach the battle from round 1 without augment mode, and a
   on.round = 4; on.augments.current = { grade: ally.grade };
   assert.ok(!on.augments.catalog('ally', on.players.get('p0')).some((a) => a.id === ally.id), 'a default augment is not offered again');
 });
+
+test('game info: m.public defaultAugments only when default augments are chosen', (t) => {
+  const ally = combatAugmentCatalog(data, 'ally')[0];
+  const off = match(t, { rules: [] });
+  assert.equal(off.publicView().defaultAugments, undefined, 'no tab without default augments');
+  const on = match(t, { rules: [], defaultAllyAugments: [ally.id] });
+  const v = on.publicView().defaultAugments;
+  assert.deepEqual(v.allies.map((a) => a.id), [ally.id]); assert.deepEqual(v.enemies, []);
+  assert.equal(on.publicView().augments, undefined, 'augment mode stays off');
+});

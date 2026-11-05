@@ -19,6 +19,8 @@ export class AugmentMode {
  active(){return this.enabled||this.defaultAllies.length>0||this.defaultEnemies.length>0;}
  allyEffectsOf(id){return [...this.defaultAllies,...(this.allies.get(id)||[])];}
  allEnemies(){return [...this.defaultEnemies,...this.enemies];}
+ /** The custom options' default augments for the game-info tab (m.public defaultAugments), or null when none are chosen. */
+ defaultView(){return this.defaultAllies.length||this.defaultEnemies.length?{allies:this.defaultAllies.map(augmentView),enemies:this.defaultEnemies.map(augmentView)}:null;}
  voting(){return this.current?.side==='enemy'&&this.settings.augmentEnemyVote>0;}
  voters(){return this.m.alivePlayers().filter(p=>!p.left);}
  operatorAvailable(id,ps){return !!this.m.gd.chess(id)&&!this.m.bannedChess.includes(this.m.gd.baseIdOf(id))&&(!ps||ps.canRecruit(id));}

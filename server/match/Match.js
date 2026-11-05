@@ -1190,6 +1190,7 @@ export class Match {
     }
     if (this.offers.length) v.offers = this.offerViews();
     if(this.augments.enabled)v.augments=this.augments.publicView();
+    { const d=this.augments.defaultView(); if(d) v.defaultAugments=d; }
     if (this.phase === PHASE.SP_DRAFT && this.sp) {
       const s = this.sp;
       v.sp = {
