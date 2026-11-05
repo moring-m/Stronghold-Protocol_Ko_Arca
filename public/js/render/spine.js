@@ -541,6 +541,7 @@ export class SpineActor {
       this.endBy = this.clock + end.in;   // a closing clip longer than the wait plays faster to end with it
       this.endRoles = end.roles || null;
     }
+    this.changeSpeed = Math.max(.2, Math.min(6, Number(transition?.speed) || 1));
     if (transition?.sequence?.length && this._changeSequence(transition.sequence, transition.elapsed || 0)) return;
     if (change && this.has(change)) this._change(change);
     else if (this.mode === 'base') this._play(this._baseName(), true);
@@ -603,24 +604,25 @@ export class SpineActor {
     if (this.mode !== 'change') this.stunWanted = this.mode === 'stun';
     this.frozen = false;
     this.mode = 'change';
-    const d = this.dur(clip), left = by != null ? by - this.clock : Infinity;
-    const timeScale = left > 0.05 && d > left ? d / left : 1;
+    const d = this.dur(clip) / (this.changeSpeed || 1), left = by != null ? by - this.clock : Infinity;
+    const timeScale = (left > 0.05 && d > left ? d / left : 1) * (this.changeSpeed || 1);
     this._play(clip, false, { mix: 0.08, timeScale });
-    this.changeUntil = this.clock + d / timeScale;
+    this.changeUntil = this.clock + this.dur(clip) / timeScale;
   }
 
   /** Authored form transitions are consecutive one-shots, never an idle loop or an extra exit. */
   _changeSequence(clips, elapsed = 0) {
     if (!clips.every(clip => this.has(clip))) return false;
+    const sp = this.changeSpeed || 1;
     let at = this.clock - Math.max(0, elapsed);
-    const sequence = clips.map(clip => { const segment = { clip, start: at, end: at + this.dur(clip) }; at = segment.end; return segment; });
+    const sequence = clips.map(clip => { const segment = { clip, start: at, end: at + this.dur(clip) / sp }; at = segment.end; return segment; });
     const current = sequence.find(s => this.clock < s.end - 1e-9);
     if (!current) { this.mode = 'base'; this.changeSequence = null; this._play(this._baseName(), true); return true; }
     this._change(current.clip);
     this.changeSequence = sequence;
     this.changeUntil = at;
     const track = this.spine.state.tracks[0];
-    if (track) track.trackTime = Math.max(0, this.clock - current.start);
+    if (track) track.trackTime = Math.max(0, this.clock - current.start) * sp;
     return true;
   }
 
@@ -1304,7 +1306,7 @@ export class SpineActor {
       case 'change':
         if (this.changeSequence) {
           const segment = this.changeSequence.find(s => this.clock < s.end - 1e-9);
-          if (segment && this.current !== segment.clip) this._play(segment.clip, false, { start: Math.max(0, this.clock - segment.start), mix: 0 });
+          if (segment && this.current !== segment.clip) this._play(segment.clip, false, { start: Math.max(0, this.clock - segment.start) * (this.changeSpeed || 1), mix: 0, timeScale: this.changeSpeed || 1 });
         }
         if (this.clock >= this.changeUntil) {
           this.changeSequence = null;

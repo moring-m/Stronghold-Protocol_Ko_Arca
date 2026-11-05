@@ -1,5 +1,6 @@
 import { skillImpactTiming } from '../../shared/attackTiming.js';
 import { showsSkillArea, skillAreaKeys } from './skillArea.js';
+import { skillMotionSpeed } from './motionSpeed.js';
 // server/sim/skills.js — skill runtime: SP, charges, trigger rules, kinds, SkillSpec interpretation (DESIGN §5.6).
 //
 // SP types: 'time' (+spRecovery/s), 'attack' (+1 per attack), 'hurt' (+1 per hit taken), 'none'.
@@ -615,7 +616,7 @@ export class SkillRuntime {
     let cast = !this.isTimed ? skillImpactTiming(u) : null;
     // custom rule skillMotionAspd: a cast with a fixed motion (IMPACT_CAST_SKILLS) plays at the unit's attack speed
     // (ASPD / 100) like its attacks — the skills whose motion already follows the attack interval are not touched
-    const castSpeed = cast && b.data?.raw?.config?.customRules?.skillMotionAspd ? Math.max(.2, Math.min(6, (Number(u.s.aspd) || 100) / 100)) : 1;
+    const castSpeed = cast ? skillMotionSpeed(b, u) : 1;
     if (castSpeed !== 1) cast = { ...cast, dur: cast.dur / castSpeed, hit: cast.hit / castSpeed };
     b._ev(cast ? ['skill', u.id, 1, castSpeed !== 1 ? { cast: true, speed: castSpeed } : { cast: true }] : ['skill', u.id, 1]);
     u.skillAnimUntil = b.time + SKILL_ANIM_WINDOW;

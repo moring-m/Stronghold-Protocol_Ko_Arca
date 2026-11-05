@@ -1023,7 +1023,8 @@ export class UnitView {
         const resume=this.info.charId==='char_4217_makoto'&&this._formElapsed!=null;
         const elapsed=resume?this._formElapsed:0;
         const change=resume&&f.change&&elapsed<this.actor.dur(f.change)?f.change:null;
-        this.actor.setForm(f.roles,change,null,resume?{sequence:f.sequence||[f.change].filter(Boolean),elapsed}:null);
+        const sp=this._formSpeed||1;
+        this.actor.setForm(f.roles,change,null,resume?{sequence:f.sequence||[f.change].filter(Boolean),elapsed:elapsed/sp,speed:sp}:null);
       }
       // replay current state (a dead model resumes its Die clip where it would be — a knocked-down one holds its end)
       if (!this.alive) {
@@ -1105,7 +1106,7 @@ export class UnitView {
     const prev = this._formSpec();
     this.form = k;
     this.info.form = k;
-    if(this.info.charId==='char_4217_makoto'){this._makotoAttackPlayback=null;this._formElapsed=k?Math.max(0,Number(fx?.late)||0):null;this._modelDirty=true;}
+    if(this.info.charId==='char_4217_makoto'){this._makotoAttackPlayback=null;this._formSpeed=Math.max(.2,Math.min(6,Number(fx?.speed)||1));this._formElapsed=k?Math.max(0,Number(fx?.late)||0)*this._formSpeed:null;this._modelDirty=true;}
     if (this.imp) this.imp.dirty=true;
     const f = this._formSpec();
     if (!this.actor) return;
@@ -1115,7 +1116,9 @@ export class UnitView {
     // an fx handed out late (render/app.js: a stall, a hidden tab) skips a change clip that would already have ended
     const late = fx && Number(fx.late) > 0 ? Number(fx.late) : 0;
     const change = f && f.change && !(late > 0 && late >= (this.actor.dur?.(f.change) ?? Infinity)) ? f.change : null;
-    if (f) this.actor.setForm(f.roles, change, f.end && dur > 0 ? { clip: f.end, in: dur, roles: next } : null, f.sequence ? {sequence:f.sequence,elapsed:late} : null);
+    // (custom rule skillMotionAspd: a switch at the sim's speed — fx.speed, 1 otherwise)
+    const speed = Math.max(.2, Math.min(6, Number(fx?.speed) || 1));
+    if (f) this.actor.setForm(f.roles, change, f.end && dur > 0 ? { clip: f.end, in: dur, roles: next } : null, f.sequence ? {sequence:f.sequence,elapsed:late,speed} : {speed});
     else if (prev) this.actor.setForm(null, prev.leave && !(late > 0 && late >= (this.actor.dur?.(prev.leave) ?? Infinity)) ? prev.leave : null, null, fx && this.info.charId==='char_4217_makoto' ? {complete:true} : null);
   }
 
@@ -1877,7 +1880,7 @@ export class UnitView {
     if (this.destroyed) return;
     this._syncMoteRing();
     this._updateHpTrail(dt);
-    if(this._formElapsed!=null)this._formElapsed+=dt*(this.ctx.animRate?.()||1);
+    if(this._formElapsed!=null)this._formElapsed+=dt*(this.ctx.animRate?.()||1)*(this._formSpeed||1);
     if(this.info.charId==='char_4217_makoto'&&this.dir==='UP')this._modelDirty=true;
     if(this._pendingDeployElapsed != null)this._pendingDeployElapsed += dt*(this.ctx.animRate?.() || 1);
     // a displacement's slide (slideTo): held where it stood until the snapshot with the destination is shown, then

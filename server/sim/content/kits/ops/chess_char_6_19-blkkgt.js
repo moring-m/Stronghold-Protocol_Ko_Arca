@@ -2,6 +2,7 @@
 // Conventions of the tier-6 kits: ../shared/tier6.js; kit contract and rules: ../README.md.
 
 import { sortEnemyTargets, canTargetEnemy } from '../../../targeting.js';
+import { skillMotionSpeed } from '../../../motionSpeed.js';
 import { num, tbb, textCount, live, ANY, enemiesIn, instantKind, pullToward } from '../shared/tier6.js';
 
 // S3's finisher clip (Skill_3_End 1.567 s) after its OnAttack (0.333 s): no normal attack until it ends
@@ -94,8 +95,12 @@ function blkkgt(bb, chess, def) {
       // Protection covers the repeated slashes, not the recovery before the finisher.
       // Ending it only in onEnd lets immediate recasts join into uninterrupted invulnerability.
       onStart({ battle, unit }) {
-        unit.mem.dgb = { n: 1, acc: 0, pacc: 0 };
-        battle.addBuff(unit, { key: 'blkkgt:slashes', duration: (slashes - 1) * iv + .05, flags: { invulnerable: true }, visible: true, source: unit });
+        // (custom rule skillMotionAspd: the slashes follow her attack speed — the same count, sooner; the skill and its
+        // protection shorten with them)
+        const siv = iv / skillMotionSpeed(battle, unit);
+        unit.mem.dgb = { n: 1, acc: 0, pacc: 0, iv: siv };
+        if (siv !== iv && unit.skill?.active) unit.skill.timeLeft = slashes * siv;
+        battle.addBuff(unit, { key: 'blkkgt:slashes', duration: (slashes - 1) * siv + .05, flags: { invulnerable: true }, visible: true, source: unit });
         slash(battle, unit, num(bb.d_atk_scale, 1));
       },
       onTick({ battle, unit, dt }) {
@@ -103,7 +108,7 @@ function blkkgt(bb, chess, def) {
         if (!m) return;
         m.acc += dt;
         m.pacc += dt;
-        while (m.acc + 1e-9 >= iv && m.n < slashes) { m.acc -= iv; m.n++; slash(battle, unit, num(bb.d_atk_scale, 1)); } // loop-cap: interval floored and textCount total-times
+        while (m.acc + 1e-9 >= m.iv && m.n < slashes) { m.acc -= m.iv; m.n++; slash(battle, unit, num(bb.d_atk_scale, 1)); } // loop-cap: interval floored and textCount total-times
         if (m.n >= slashes) battle.removeBuff(unit, 'blkkgt:slashes');
         if (m.pacc + 1e-9 >= pullIv) { m.pacc -= pullIv; pull(battle, unit, num(bb.p_force)); }
       },

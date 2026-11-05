@@ -3,6 +3,7 @@
 
 import { absoluteRangeKeys, canTargetEnemy } from '../../../targeting.js';
 import { CHAIN_RADIUS } from '../../../constants.js';
+import { skillMotionSpeed } from '../../../motionSpeed.js';
 import { bodyDist, bodyInRange } from '../../../body.js';
 import { num, bv, tbb, live, ANY, enemiesIn, batOf, N4, aura } from '../shared/tier6.js';
 import { powi } from '../../../detmath.js';
@@ -77,7 +78,8 @@ function pasngr(bb, chess, def) {
         // 判定中心所在格: the tile of the target's centre (the rounding of body.js posKey); fixed for the storm's 4 s
         const cx = Math.round(tgt.x), cy = Math.round(tgt.y);
         const zoneKeys = absoluteRangeKeys(STORM_GRID, cy, cx, 1, 0, battle.grid);
-        const dur = num(bb.duration, 4), iv = Math.max(0.1, num(bb.interval, 0.5)), scale = num(bb.atk_scale, 1);
+        // (custom rule skillMotionAspd: the strike interval follows his attack speed — more strikes in the same 4 s)
+        const dur = num(bb.duration, 4), iv = Math.max(0.1, num(bb.interval, 0.5)) / skillMotionSpeed(battle, unit), scale = num(bb.atk_scale, 1);
         const n = Math.max(1, Math.round(dur / iv));
         battle.fx('storm', { x: cx, y: cy, id: unit.id, duration: dur, r: STORM_FX_RADIUS });
         let k = 0;
