@@ -10,7 +10,7 @@ test('selected augments appear in the effects column by owner, grade and target 
 test('augments retain bounded choices in saved history and replay results without executable effects',()=>{
  const augment=augmentView(c),history={history:['silver'],picks:[{round:4,grade:'silver',side:'ally',playerId:'p',augment}]};
  const record=normalizeRecord({id:'r',players:[{playerId:'p',name:'박사',stats:{}}],augments:history});assert.deepEqual(record.augments,recordAugments(history));assert.deepEqual(recordToResult(record).augments,record.augments);
- const malformed=recordAugments({history:['bad'],picks:[{round:99,side:'ally',augment},{round:4,side:'ally',augment:{...augment,effect:()=>{},icon:'https://evil.invalid/x'},playerId:'p'}]});assert.deepEqual(malformed.history,[]);assert.equal(malformed.picks.length,1);assert.equal(malformed.picks[0].augment.icon,null);assert.equal(malformed.picks[0].augment.effect,undefined);
+ const malformed=recordAugments({history:['bad'],picks:[{round:0,side:'ally',augment},{round:4,side:'ally',augment:{...augment,effect:()=>{},icon:'https://evil.invalid/x'},playerId:'p'}]});assert.deepEqual(malformed.history,[]);assert.equal(malformed.picks.length,1);assert.equal(malformed.picks[0].augment.icon,null);assert.equal(malformed.picks[0].augment.effect,undefined);
 });
 test('all dynamically expanded augment labels use Korean bond names',()=>{
  for(const round of [4,7,10])for(const a of createAugmentCatalog(data,round))assert.ok(!/[一-鿿]/.test(a.name+a.description),a.name);
