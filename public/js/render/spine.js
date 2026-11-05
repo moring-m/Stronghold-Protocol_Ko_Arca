@@ -541,7 +541,7 @@ export class SpineActor {
       this.endBy = this.clock + end.in;   // a closing clip longer than the wait plays faster to end with it
       this.endRoles = end.roles || null;
     }
-    this.changeSpeed = Math.max(.2, Math.min(6, Number(transition?.speed) || 1));
+    this.changeSpeed = Math.max(.2, Math.min(30, Number(transition?.speed) || 1));
     if (transition?.sequence?.length && this._changeSequence(transition.sequence, transition.elapsed || 0)) return;
     if (change && this.has(change)) this._change(change);
     else if (this.mode === 'base') this._play(this._baseName(), true);
@@ -1069,7 +1069,7 @@ export class SpineActor {
     if (on && instant && sk && (!sk.via || sk.via==='attack') && this.has(sk.loop)) {
       this.mode='skillCast';
       // (custom rule skillMotionAspd: the sim's cast speed — 1 otherwise)
-      const ts=Math.max(.2,Math.min(6,Number(speed)||1));
+      const ts=Math.max(.2,Math.min(30,Number(speed)||1));
       this._play(sk.begin || sk.loop,false,{mix:.12,timeScale:ts});
       if(sk.begin)this._queue(sk.loop,false,ts);
       this.skillCastUntil=this.clock+((sk.begin?this.dur(sk.begin):0)+this.dur(sk.loop))/ts;

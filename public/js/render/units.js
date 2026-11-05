@@ -1106,7 +1106,7 @@ export class UnitView {
     const prev = this._formSpec();
     this.form = k;
     this.info.form = k;
-    if(this.info.charId==='char_4217_makoto'){this._makotoAttackPlayback=null;this._formSpeed=Math.max(.2,Math.min(6,Number(fx?.speed)||1));this._formElapsed=k?Math.max(0,Number(fx?.late)||0)*this._formSpeed:null;this._modelDirty=true;}
+    if(this.info.charId==='char_4217_makoto'){this._makotoAttackPlayback=null;this._formSpeed=Math.max(.2,Math.min(30,Number(fx?.speed)||1));this._formElapsed=k?Math.max(0,Number(fx?.late)||0)*this._formSpeed:null;this._modelDirty=true;}
     if (this.imp) this.imp.dirty=true;
     const f = this._formSpec();
     if (!this.actor) return;
@@ -1117,7 +1117,7 @@ export class UnitView {
     const late = fx && Number(fx.late) > 0 ? Number(fx.late) : 0;
     const change = f && f.change && !(late > 0 && late >= (this.actor.dur?.(f.change) ?? Infinity)) ? f.change : null;
     // (custom rule skillMotionAspd: a switch at the sim's speed — fx.speed, 1 otherwise)
-    const speed = Math.max(.2, Math.min(6, Number(fx?.speed) || 1));
+    const speed = Math.max(.2, Math.min(30, Number(fx?.speed) || 1));
     if (f) this.actor.setForm(f.roles, change, f.end && dur > 0 ? { clip: f.end, in: dur, roles: next } : null, f.sequence ? {sequence:f.sequence,elapsed:late,speed} : {speed});
     else if (prev) this.actor.setForm(null, prev.leave && !(late > 0 && late >= (this.actor.dur?.(prev.leave) ?? Infinity)) ? prev.leave : null, null, fx && this.info.charId==='char_4217_makoto' ? {complete:true} : null);
   }

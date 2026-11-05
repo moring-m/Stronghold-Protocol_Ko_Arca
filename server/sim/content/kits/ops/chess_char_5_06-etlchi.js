@@ -2,6 +2,7 @@
 // Conventions of the tier-5 kits: ../shared/tier5.js; kit contract and rules: ../README.md.
 
 import { mitigate } from '../../../damage.js';
+import { skillMotionSpeed } from '../../../motionSpeed.js';
 import { RING1, num, on, talent, talentRec, skillGrid, mods, dist, lazySkills, instantKind } from '../shared/tier5.js';
 
 /** 隐德来希 S3 "每次攻击对心烛至少造成35%攻击力的伤害". */
@@ -39,7 +40,8 @@ export default {
             for (const a of unit.mem.sickles) battle.fx('aoe', { x: a.x, y: a.y, id: unit.id, r: RING1, skill: 'etlchiSickle' });
           },
           onTick({ battle, unit, dt }) {
-            const iv = Math.max(0.1, num(bb.interval, 0.5));
+            // (custom rule skillMotionAspd: the sickles strike every interval / (ASPD / 100) — they replace her attacks)
+            const iv = Math.max(0.1, num(bb.interval, 0.5)) / skillMotionSpeed(battle, unit);
             unit.mem.sickleAcc += dt;
             while (unit.mem.sickleAcc >= iv - 1e-9) { // loop-cap: interval floored before the loop
               unit.mem.sickleAcc -= iv;
