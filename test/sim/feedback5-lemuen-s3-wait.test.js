@@ -105,3 +105,17 @@ test('the last enemy dies while she waits: the battle ends cleared, nothing more
   assert.deepEqual(h.b.contentErrors ?? [], []);
   checkInvariants(h.b);
 });
+
+test('custom rule skillMotionAspd: S3 locks one bullet every aim_interval / (ASPD / 100); off, every aim_interval', () => {
+  const spans = {};
+  for (const on of [false, true]) {
+    const { h, u } = lemuen([{ key: 'enemy_dummy', pos: [10, 5] }]);
+    h.b.data.raw = { ...(h.b.data.raw || {}), config: { ...(h.b.data.raw?.config || {}), customRules: on ? { skillMotionAspd: true } : {} } };
+    assert.ok(h.runUntil(() => u.skill.active, 5), 'S3 cast');
+    const full = u.skill.ammoMax, t0 = h.b.time;
+    assert.ok(h.runUntil(() => { u.s.aspd = 200; return u.skill.ammoLeft <= full - 3; }, 10), 'three locks');
+    spans[on] = h.b.time - t0;
+    checkInvariants(h.b);
+  }
+  assert.ok(Math.abs(spans[true] - spans[false] / 2) < 0.12, `half the time at ASPD 200: ${spans[false].toFixed(2)} -> ${spans[true].toFixed(2)}`);
+});
