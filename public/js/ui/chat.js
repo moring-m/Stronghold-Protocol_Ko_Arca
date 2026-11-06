@@ -6,12 +6,18 @@ import { data, useData } from '../data.js';
 import { bondIconUrl } from './assetUrls.js';
 import { RestartVoteControls } from './restartVote.js';
 import { html } from './components.js';
+import { tr } from '../i18n/i18n.js';
 import { store, useStore, loadPref, savePref } from '../store.js';
 import { net } from '../net.js';
 import { audio } from '../audio.js';
 import { settingsStore, SettingsModal } from './settings.js';
 import { toastError } from './toasts.js';
 import { CHAT_MAX_LENGTH, CHAT_FACTIONS, chatFaction, normalizeChatText } from '../../../shared/chat.js';
+
+/** A server system line (점검 안내): fixed Korean text the page translates, then the owner's own note as written. */
+function systemLine(m, style = null) {
+  return html`<p key=${m.id} class="is-system" style=${style}><strong>${tr('시스템')}</strong><span>${tr(m.text)}${m.detail ? html` <span class="game-chat__detail">${m.detail}</span>` : null}</span></p>`;
+}
 
 export function ChatPanel({room = false, docked = false}) {
   useData('assets');
@@ -141,7 +147,7 @@ export function ChatPanel({room = false, docked = false}) {
         ${faction ? html`<button type="button" class="game-chat__faction-clear" disabled=${sending || !online} onClick=${() => selectFaction(null)}>진영 선택 취소</button>` : null}
       </div>` : null}
       <div class="game-chat__messages" ref=${list} onScroll=${e => { const el=e.currentTarget; followLatest.current=el.scrollHeight-el.clientHeight-el.scrollTop <= 24; }} role="log" aria-live="polite" aria-relevant="additions" data-i18n-skip>
-        ${!messages.length ? html`<p class="game-chat__empty">같은 방의 참가자에게 메시지를 보내세요.</p>` : messages.map((m) => html`<p key=${m.id} class=${m.playerId === store.get().me.playerId ? 'is-own' : ''}><strong>${m.name}${m.spectator ? html`<span class="game-chat__spectator">(관전자)</span>` : null}${chatFaction(m.faction) ? html`<span class="game-chat__faction" style=${{ color: chatFaction(m.faction).color }}>(${m.faction})</span>` : null}</strong><span>${m.text}</span></p>`)}
+        ${!messages.length ? html`<p class="game-chat__empty">같은 방의 참가자에게 메시지를 보내세요.</p>` : messages.map((m) => m.kind === 'system' ? systemLine(m) : html`<p key=${m.id} class=${m.playerId === store.get().me.playerId ? 'is-own' : ''}><strong>${m.name}${m.spectator ? html`<span class="game-chat__spectator">(관전자)</span>` : null}${chatFaction(m.faction) ? html`<span class="game-chat__faction" style=${{ color: chatFaction(m.faction).color }}>(${m.faction})</span>` : null}</strong><span>${m.text}</span></p>`)}
       </div>
       <form onSubmit=${send}>
         <input ref=${input} type="text" aria-label="채팅 메시지" placeholder=${!online ? '연결이 끊겼습니다' : '메시지 입력…'}
@@ -150,7 +156,7 @@ export function ChatPanel({room = false, docked = false}) {
         <button type="submit" disabled=${sending || !online || !normalizeChatText(text)}>전송</button>
       </form>
     </section>` : previewVisible && messages.length ? html`<div class="game-chat__preview" aria-label="최근 채팅" data-i18n-skip>
-      ${messages.slice(-3).map((m, i, recent) => html`<p key=${m.id} style=${{opacity: [1, .6, .25][recent.length - 1 - i]}}>
+      ${messages.slice(-3).map((m, i, recent) => m.kind === 'system' ? systemLine(m, {opacity: [1, .6, .25][recent.length - 1 - i]}) : html`<p key=${m.id} style=${{opacity: [1, .6, .25][recent.length - 1 - i]}}>
         <strong>${m.name}${m.spectator ? html`<span class="game-chat__spectator">(관전자)</span>` : null}${chatFaction(m.faction) ? html`<span class="game-chat__faction" style=${{color:chatFaction(m.faction).color}}>(${m.faction})</span>` : null}</strong><span>${m.text}</span>
       </p>`)}
     </div>` : null}

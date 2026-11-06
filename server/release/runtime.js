@@ -2,6 +2,7 @@
 import { sendSession } from '../net.js';
 import { createRetirement } from './retirement.js';
 import { timingSafeEqual } from 'node:crypto';
+import { Maintenance } from '../maintenance.js';
 export function authorized(req, token) {
   const value = req.headers.authorization || "",
     expected = `Bearer ${token}`;
@@ -33,6 +34,11 @@ export function workerControls(lobby, { release, token, network }) {
     notify: text => {for(const session of lobby.registry.byPlayerId.values())sendSession(session,{t:'m.toast',text,kind:'warn',ttl:10000});},
     expire: () => {lobby.draining=true;lobby.shutdown('version_retired');network?.close();},
   });
+  const maintenance = new Maintenance({
+    broadcast: notice => {for(const session of lobby.registry.byPlayerId.values())sendSession(session,{t:'sys.maintenance',notice});},
+    chat: (text, detail) => lobby.systemChat(text, detail),
+  });
+  lobby.maintenance = maintenance;
   const handler = async (req, res) => {
     const path = new URL(req.url, "http://worker").pathname;
     if (!path.startsWith("/__release/")) return false;
@@ -63,6 +69,15 @@ export function workerControls(lobby, { release, token, network }) {
       json(res, 200, { draining: lobby.draining });
       return true;
     }
+    if (path === "/__release/maintenance") {
+      if (req.method === "GET") { json(res, 200, { notice: maintenance.view() }); return true; }
+      if (req.method !== "POST") { json(res, 405, { error: "POST required" }); return true; }
+      let input;
+      try { input = await body(req); } catch { json(res, 400, { error: "Invalid body" }); return true; }
+      const r = input && input.clear === true ? maintenance.clear() : maintenance.set(input);
+      json(res, r.ok ? 200 : 400, r.ok ? { notice: r.notice } : { error: r.error });
+      return true;
+    }
     if(path==='/__release/shutdown' && req.method==='POST'){
       if(!lobby.draining){json(res,409,{error:'Cannot shut down active release'});return true;}
       retire.stop();lobby.shutdown('version_retired');network?.close();json(res,200,{closed:true});return true;
@@ -70,6 +85,6 @@ export function workerControls(lobby, { release, token, network }) {
     json(res, 404, { error: "Not found" });
     return true;
   };
-  handler.close=()=>retire.stop();
+  handler.close=()=>{retire.stop();maintenance.close();};
   return handler;
 }

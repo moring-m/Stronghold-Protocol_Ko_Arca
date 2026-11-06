@@ -54,6 +54,7 @@ import { render } from '../vendor/preact.module.js';
 import { useErrorBoundary } from '../vendor/hooks.module.js';
 import { html, UiHosts, Button, MicroLabel, closeAllDialogs } from './ui/components.js';
 import { ConnectionBanner } from './ui/connBanner.js';
+import { MaintenanceBanner, maintenanceNotice } from './ui/maintenanceBanner.js';
 import { ToastHost, toast, toastError, describeError } from './ui/toasts.js';
 import { net, identity, NetError } from './net.js';
 import { store, useStore, emptyMatch, selectRoute, sessionResetNotice, isSpectating } from './store.js';
@@ -201,6 +202,7 @@ function onWelcome(msg) {
     installedPlugins: pluginCount(msg.content),
     installedNotices: msg.content?.notices === true,
     testMode: msg.testMode === true,
+    maintenance: maintenanceNotice(msg.maintenance),
   });
   welcomeAt = Date.now();
 
@@ -316,10 +318,13 @@ function wireNet() {
     store.set((s) => ({ emotes: [...s.emotes.slice(-(EMOTE_KEEP - 1)), { seq: ++seq, playerId: msg.playerId, id: msg.id, at: Date.now() }] }));
   });
   net.on('m.chat', (msg) => {
+    // a system line (점검 안내) has no player: it touches neither the faction map nor the own faction
+    const player = typeof msg.playerId === 'string';
     store.set((s) => ({ chat: [...s.chat.filter((m) => m.id !== msg.id), payload(msg)].slice(-CHAT_HISTORY_LIMIT),
-      chatFactions: { ...s.chatFactions, [msg.playerId]: msg.faction ?? null },
-      chatFaction: msg.playerId === s.me.playerId ? msg.faction ?? null : s.chatFaction }));
+      ...(player ? { chatFactions: { ...s.chatFactions, [msg.playerId]: msg.faction ?? null },
+        chatFaction: msg.playerId === s.me.playerId ? msg.faction ?? null : s.chatFaction } : {}) }));
   });
+  net.on('sys.maintenance', (msg) => store.set({ maintenance: maintenanceNotice(msg.notice) }));
   net.on('m.chatHistory', (msg) => {
     if (Array.isArray(msg.messages)) store.set({ chat: msg.messages.slice(-CHAT_HISTORY_LIMIT), chatFactions: msg.factions || Object.fromEntries(msg.messages.map(m => [m.playerId, m.faction ?? null])), chatFaction: msg.faction ?? msg.factions?.[store.get().me.playerId] ?? null });
   });
@@ -374,6 +379,7 @@ function App() {
     <div class="app-bg" aria-hidden="true"></div>
     ${error ? html`<${ScreenCrashed} error=${error} reset=${resetError} />` : html`<${Screen} key=${route} />`}
     <${TrustedNotice} />
+    <${MaintenanceBanner} />
     <${ConnectionBanner} />
     <${ToastHost} />
     <${UiHosts} />

@@ -120,3 +120,7 @@
 .game-chat--room .game-chat__panel > header strong { flex-shrink:0; font-size:12px; }
 .game-chat--room .game-chat__faction-toggle { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:12px; }
 .game-chat--room .game-chat__panel { box-sizing:border-box; }
+/* system lines (점검 안내, ui/chat.js systemLine) */
+.game-chat__messages p.is-system strong, .game-chat__preview p.is-system strong { color: #f0be3c; }
+.game-chat__messages p.is-system > span, .game-chat__preview p.is-system > span { color: #f6d98a; }
+.game-chat__detail { opacity: .85; }

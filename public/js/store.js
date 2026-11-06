@@ -86,6 +86,8 @@ export const initialState = Object.freeze({
   room: null,
   // welcome.testMode (DESIGN §34.8). The server omits the key when the switch is off; the client cannot set it.
   testMode: false,
+  // 점검 안내 (server/maintenance.js): welcome.maintenance, then sys.maintenance updates; null when none
+  maintenance: null,
   match: emptyMatch(),
   ticker: [],
   emotes: [],

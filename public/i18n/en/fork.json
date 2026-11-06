@@ -3654,5 +3654,12 @@
   "<전투 중> 아군 [우르수스] 오퍼레이터가 스킬을 발동할 때마다 활성화된 [우르수스] 맹약의 중첩 수 +3 (전투당 최대 7회 발동)": "<In battle> Whenever an allied [Ursus] Operator activates a skill, active [Ursus] Alliance stacks +3 (up to 7 times per battle)",
   "<전투 중> 아군 [우르수스] 오퍼레이터가 스킬을 발동할 때마다 활성화된 [우르수스] 맹약의 중첩 수 <@ba.vup>+3</> (전투당 최대 7회 발동)": "<In battle> Whenever an allied [Ursus] Operator activates a skill, active [Ursus] Alliance stacks <@ba.vup>+3</> (up to 7 times per battle)",
   "<전투 중> 아군 [우르수스] 오퍼레이터가 스킬을 발동할 때마다 활성화된 [우르수스] 맹약의 중첩 수 +6 (전투당 최대 7회 발동)": "<In battle> Whenever an allied [Ursus] Operator activates a skill, active [Ursus] Alliance stacks +6 (up to 7 times per battle)",
-  "<전투 중> 아군 [우르수스] 오퍼레이터가 스킬을 발동할 때마다 활성화된 [우르수스] 맹약의 중첩 수 <@ba.vup>+6</> (전투당 최대 7회 발동)": "<In battle> Whenever an allied [Ursus] Operator activates a skill, active [Ursus] Alliance stacks <@ba.vup>+6</> (up to 7 times per battle)"
+  "<전투 중> 아군 [우르수스] 오퍼레이터가 스킬을 발동할 때마다 활성화된 [우르수스] 맹약의 중첩 수 <@ba.vup>+6</> (전투당 최대 7회 발동)": "<In battle> Whenever an allied [Ursus] Operator activates a skill, active [Ursus] Alliance stacks <@ba.vup>+6</> (up to 7 times per battle)",
+  "점검 중": "Under Maintenance",
+  "점검 예정": "Scheduled Maintenance",
+  "시작까지": "Starts in",
+  "점검 안내 닫기": "Close maintenance notice",
+  "시스템": "System",
+  "서버 점검이 {0}분 후 시작됩니다.": "Server maintenance starts in {0} min.",
+  "서버 점검이 시작되었습니다.": "Server maintenance has started."
 }
