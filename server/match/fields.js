@@ -513,6 +513,19 @@ function derivedKeys(gd, key) {
   return list;
 }
 
+/** 빈도 seals the spec's enemy augments spawn on a kill: Map(seal key → seals per kill). */
+function augmentSeals(spec) {
+  const out = new Map();
+  const list = spec && spec.flags && spec.flags.augments && Array.isArray(spec.flags.augments.enemies) ? spec.flags.augments.enemies : [];
+  for (const a of list) {
+    const e = a && a.effect;
+    if (!e || e.kind !== 'deathSeals' || typeof e.key !== 'string') continue;
+    const n = Math.max(0, Math.min(20, Math.floor(Number(e.count) || 0)));
+    if (n > 0) out.set(e.key, (out.get(e.key) || 0) + n);
+  }
+  return out;
+}
+
 /**
  * How many `child` enemies one `parent` can leave behind, when its data says so: a talent naming the child
  * (`<X>.enemy_key`) with a count (`<X>.cnt`, e.g. 磨砻 DeadSpawn 2, 烹泉 4, 沉沙's unconsumed blades ≤ 4) or without one
@@ -662,6 +675,10 @@ export function specBounds(spec, gd = null) {
   const derived = new Set();
   for (const k of keyCounts.keys()) for (const d of derivedKeys(gd, k)) derived.add(d);
   const maxTotal = spawnCount * 4 + 100;
+  // 빈도 (enemy augment deathSeals): every killed non-hit-count enemy — a scheduled one or its child — leaves `count`
+  // seals (server/sim/content/augments.js), so the seals are content spawns of every spawn in the spec
+  const seals = augmentSeals(spec);
+  for (const [key] of seals) { derived.add(key); for (const d of derivedKeys(gd, key)) derived.add(d); }
   // 联防: `${childKey}|${sourcePlayerId}` → how many content-spawned children the enemies that leaker sent in can leave
   // (offspringPerParent per parent; maxTotal when the data gives no bound) — a reported child must belong to a leaker
   // whose own enemies can have produced it, including a child marked `uniteRuntime` (which is not billed)
@@ -673,6 +690,13 @@ export function specBounds(spec, gd = null) {
       const per = offspringPerParent(gd, s.enemyKey, d);
       const ks = `${d}|${s.sourcePlayerId}`;
       derivedSourceCounts.set(ks, Math.min(maxTotal, (derivedSourceCounts.get(ks) || 0) + (per == null ? maxTotal : n * per)));
+    }
+    // 빈도 seals: the parent and each of its children can leave them (a child count without a data bound: maxTotal)
+    let bodies = n;
+    for (const d of derivedKeys(gd, s.enemyKey)) { const per = offspringPerParent(gd, s.enemyKey, d); bodies += per == null ? maxTotal : n * per; }
+    for (const [key, per] of seals) {
+      const ks = `${key}|${s.sourcePlayerId}`;
+      derivedSourceCounts.set(ks, Math.min(maxTotal, (derivedSourceCounts.get(ks) || 0) + bodies * per));
     }
   }
   for (const k of keyCounts.keys()) {
@@ -834,7 +858,8 @@ export function validateClientResult(spec, raw, { gd = null } = {}) {
         const cands = spawnMods.get(key) || [];
         const match = cands.find((s) => sameMods(s.mods ?? null, l.mods ?? null)) || null;
         const src = match || cands[0] || null;
-        const parent = match ? null : (spec.spawns || []).find((s) => s && typeof s.enemyKey === 'string' && derivedKeys(gd, s.enemyKey).includes(key)
+        const sealKey = augmentSeals(spec).has(key);
+        const parent = match ? null : (spec.spawns || []).find((s) => s && typeof s.enemyKey === 'string' && (sealKey || derivedKeys(gd, s.enemyKey).includes(key))
           && (sameMods(s.mods ?? null, l.mods ?? null) || sameMods(offspringMods(s.mods), l.mods ?? null))) || null;
         const modsOf = (s) => (s && s.mods ? { ...s.mods } : null);
         const mods = match ? modsOf(match) : parent ? offspringMods(parent.mods) : modsOf(src);
