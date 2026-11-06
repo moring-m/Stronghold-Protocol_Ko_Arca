@@ -954,7 +954,7 @@ export class Battle {
     const now = this.time + 1e-9;
     while (this._pending.length && this._pending[0].time <= now) { // loop-cap: pending spawn queue
       const p = this._pending.shift();
-      this._safe(() => this.spawnEnemy(p.enemyKey, { ...p, _precounted: p.precounted }), 'spawnEnemy');
+      this._safe(() => this.spawnEnemy(p.enemyKey, { ...p, _precounted: p.precounted, _scheduled: true }), 'spawnEnemy');
     }
   }
 
@@ -1061,6 +1061,10 @@ export class Battle {
       if (end) e.route.legs.push({ t: 'move', r: end[0], c: end[1], final: true });
     }
     e.counted = opts.countInTotal ?? (!def.notCountInTotal && e.tag !== 'boss' && e.tag !== 'part');
+    // 联防: only the enemies the escaped wave sent in (the stage queue above, `_scheduled`) bill the leaker. A child or summon
+    // born while the field runs (빈도's 木制瑞印, a split, a summon) never crossed the leaker's goal: unite.js uniteSurvivors
+    // and spec.js uniteLeft skip it.
+    if (this.kind === 'unite' && !opts._scheduled) e.uniteRuntime = true;
     // inTotal (the HUD capsule's own counter, DESIGN §14): only an enemy the stage scheduled (`_queueSpawn`, which
     // pre-counts it) — or, for future content, an explicit `opts.inTotal: true` — and that counts. Everything spawned
     // while the battle runs (a split child, a summon — bosses included —, a part, a 变身 copy) stays out of the capsule's
@@ -1354,7 +1358,7 @@ export class Battle {
     const owner = timeout ? e.ownerId : this._ownerForTile([Math.round(e.y), Math.round(e.x)]) ?? e.ownerId;
     const pp = this._pp(owner) ?? this._pp(e.ownerId);
     if (pp) {
-      pp.leaked.push({ enemyKey: e.defId, mods: e.mods ?? null, lpr: e.lpr ?? 1, sourcePlayerId: e.sourcePlayerId ?? e.ownerId, tag: e.tag ?? null, counted: !!e.counted || e.isBoss, boss: e.isBoss || undefined, spawned: true, entered: !timeout, ...(this.syncPools && e.syncKey ? { syncKey: e.syncKey } : null) });
+      pp.leaked.push({ enemyKey: e.defId, mods: e.mods ?? null, lpr: e.lpr ?? 1, sourcePlayerId: e.sourcePlayerId ?? e.ownerId, tag: e.tag ?? null, counted: !!e.counted || e.isBoss, boss: e.isBoss || undefined, spawned: true, entered: !timeout, ...(e.uniteRuntime ? { uniteRuntime: true } : null), ...(this.syncPools && e.syncKey ? { syncKey: e.syncKey } : null) });
       if (e.counted || e.isBoss) pp.perfect = false;
     }
     if (e.counted) this.leakedCount++;
