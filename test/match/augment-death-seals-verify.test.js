@@ -1,0 +1,22 @@
+import {test}from 'node:test';import assert from 'node:assert/strict';
+import {DATA,makeMatch}from './harness.js';
+import {buildBattleSpec,createBattleFromSpec,compactResult}from '../../server/sim/spec.js';
+import {validateClientResult}from '../../server/match/fields.js';
+import {planUnite}from '../../server/match/unite.js';
+const aug={augments:{allies:{},enemies:[{effect:{kind:'deathSeals',key:'enemy_1196_msfyin',count:2}}]}};
+const killFirst=(b,at)=>{let k=0;while(!b.finished&&b.time<240){b.step();const e=b.enemies.find(e=>e.defId==='enemy_1007_slime'&&e.alive);if(e&&!k&&b.time>at){b.kill(e);k=1;}}};
+test('빈도 seals that leak pass client-result verification in a normal battle and the following 联防',t=>{
+ const h=makeMatch({mode:'coop',humans:4});t.after(()=>h.m.dispose());const m=h.m;m.round=3;
+ const spec=buildBattleSpec({stageId:m.stageId,kind:'normal',timeLimit:60,players:[{playerId:'p_0',units:[],bonds:{}}],spawns:[{time:0,enemyKey:'enemy_1007_slime',mods:{}}],flags:aug});
+ const b=createBattleFromSpec(spec,DATA,{quiet:true});killFirst(b,1);
+ assert.equal(b.result().perPlayer.p_0.leaked.filter(l=>l.enemyKey==='enemy_1196_msfyin').length,2);
+ const c=validateClientResult(spec,compactResult(b.result()),{gd:m.gd});assert.ok(c.ok,c.reason);
+ const b2=createBattleFromSpec(spec,DATA,{quiet:true});while(!b2.finished&&b2.time<90)b2.step();
+ const c2=validateClientResult(spec,compactResult(b2.result()),{gd:m.gd});assert.ok(c2.ok,c2.reason);
+ m.lastResults=new Map(m.order.map((p,i)=>[p.playerId,i===0?c2.result.perPlayer.p_0:{leaked:[],perfect:true,unitsEnd:[]}]));
+ const opts=m._uniteOpts(planUnite(m,m.lastResults),240);const us=buildBattleSpec({...opts,flags:{...opts.flags,...aug}});
+ const ub=createBattleFromSpec(us,m.data,{quiet:true});killFirst(ub,4);
+ const leaks=Object.values(ub.result().perPlayer).flatMap(p=>p.leaked).filter(l=>l.enemyKey==='enemy_1196_msfyin');
+ assert.equal(leaks.length,2);
+ const c3=validateClientResult(us,compactResult(ub.result()),{gd:m.gd});assert.ok(c3.ok,c3.reason);
+});
