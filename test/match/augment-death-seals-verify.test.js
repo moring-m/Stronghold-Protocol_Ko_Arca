@@ -20,3 +20,18 @@ test('빈도 seals that leak pass client-result verification in a normal battle 
  assert.equal(leaks.length,2);
  const c3=validateClientResult(us,compactResult(ub.result()),{gd:m.gd});assert.ok(c3.ok,c3.reason);
 });
+import {uniteSurvivors}from '../../server/match/unite.js';
+test('빈도 seals born on the 联防 field do not bill the leaker who sent their parent',t=>{
+ const h=makeMatch({mode:'coop',humans:4});t.after(()=>h.m.dispose());const m=h.m;m.round=3;
+ const spec=buildBattleSpec({stageId:m.stageId,kind:'normal',timeLimit:60,players:[{playerId:'p_0',units:[],bonds:{}}],spawns:[{time:0,enemyKey:'enemy_1007_slime',mods:{}}],flags:aug});
+ const b=createBattleFromSpec(spec,DATA,{quiet:true});while(!b.finished&&b.time<90)b.step();
+ const c=validateClientResult(spec,compactResult(b.result()),{gd:m.gd});assert.ok(c.ok,c.reason);
+ m.lastResults=new Map(m.order.map((p,i)=>[p.playerId,i===0?c.result.perPlayer.p_0:{leaked:[],perfect:true,unitsEnd:[]}]));
+ const plan=planUnite(m,m.lastResults);const opts=m._uniteOpts(plan,240);const us=buildBattleSpec({...opts,flags:{...opts.flags,...aug}});
+ const ub=createBattleFromSpec(us,m.data,{quiet:true});killFirst(ub,4);
+ const seals=Object.values(ub.result().perPlayer).flatMap(p=>p.leaked).filter(l=>l.enemyKey==='enemy_1196_msfyin');
+ assert.equal(seals.length,2);assert.ok(seals.every(l=>l.uniteRuntime===true));
+ assert.equal(uniteSurvivors(plan,ub.result()).get('p_0')||0,0,'raw result');
+ const v=validateClientResult(us,compactResult(ub.result()),{gd:m.gd});assert.ok(v.ok,v.reason);
+ assert.equal(uniteSurvivors(plan,v.result).get('p_0')||0,0,'verified result');
+});
