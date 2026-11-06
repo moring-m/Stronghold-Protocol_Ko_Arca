@@ -81,9 +81,9 @@ export function install(b){
  b.on('beforeStatus',c=>{if(c.source?.side==='enemy'&&c.target?.side==='ally'&&Number.isFinite(c.duration))for(const e of enemyEffects)if(e.kind==='statusDuration')c.duration*=e.multiplier;});
  b.on('attack',({attacker:u,attackInterval,targets=[]})=>{
   if(u.side!=='ally'||!u.alive)return;
-  if(u.kind==='op')for(const e of forUnit(u))if(e.kind==='kjerag')for(const target of targets)if(target?.alive&&target.side==='enemy'&&b.rng()<e.chance)b.applyStatus(target,'cold',{duration:e.duration,source:u});
+  if(u.kind==='op'){const ks=forUnit(u).filter(e=>e.kind==='kjerag');if(ks.length)for(const target of targets){if(!target?.alive||target.side!=='enemy')continue;let hit=null;for(const e of ks)if(b.rng()<e.chance&&(!hit||e.duration>hit.duration))hit=e;if(hit)b.applyStatus(target,'cold',{duration:hit.duration,source:u});}}
   if(u.kind==='op')for(const effect of forUnit(u))if(effect.kind==='attackHeal')b.heal(u,u,effect.amount,{self:true});
-  const e=forUnit(u).find(e=>e.kind==='extraAttack');if(!e||u.profile?.heal||b.rng()>=e.probability)return;
+  const extras=forUnit(u).filter(e=>e.kind==='extraAttack');if(!extras.length||u.profile?.heal)return;let any=false;for(const e of extras)if(b.rng()<e.probability)any=true;if(!any)return;
   const clip=attackClipTiming(u),interval=attackInterval||u.s.interval;
   const speed=clip?.dur>0?(attackInterval?clip.dur/interval:Math.max(1,Math.min(4,clip.dur/Math.max(.08,interval)))):1;
   const recovery=clip?.dur>0?Math.max(0,clip.dur-clip.hit)/speed:interval/2;
