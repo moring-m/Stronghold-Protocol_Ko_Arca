@@ -112,7 +112,9 @@ export function install(battle){
     drone.mem.visualScale=.85*(1+.002*growthLayers);
     drone.mem.attackRangeRadius=DRONE_RANGE*(1+.001*growthLayers);
     drone.profile.visibleRangeRadius=drone.mem.attackRangeRadius;
-    const atkFlat=six()?members.filter(u=>u.alive&&u.deployed&&!u.hidden).reduce((sum,u)=>sum+u.s.atk,0)*(.1+.00015*layers):0;
+    // (distinct [Ursus] operators: one per character — its strongest copy on the field — like the 6-member count)
+    const distinct=new Map();for(const u of members)if(u.alive&&u.deployed&&!u.hidden){const k=u.def?.charId||u.def?.raw?.charId||u.defId;if(!distinct.has(k)||distinct.get(k)<u.s.atk)distinct.set(k,u.s.atk);}
+    const atkFlat=six()?[...distinct.values()].reduce((sum,a)=>sum+a,0)*(.1+.00015*layers):0;
     const aspd=six()?50:0,old=drone.findBuff('bond:ursus:drone');
     if(old?.mods?.atkPct!==bonus||old?.mods?.hpPct!==hpBonus||old?.mods?.atkFlat!==atkFlat||old?.mods?.aspd!==aspd)
      S.passiveBuff(battle,drone,'bond:ursus:drone',S.directMods({atk:bonus,hp:hpBonus},{atkFlat,aspd}));
@@ -126,6 +128,16 @@ export function install(battle){
    refresh();
   },{once:true});
   battle.on('deploy',refresh);
+  // 비헌터 (custom_ursus_deploy): <배치 시> activated [Ursus]/[Raid] layers +count each, at most 8 times per battle
+  const deployUsed=new Map();
+  battle.on('deploy',({unit:u,move})=>{
+   if(move||u?.ownerId!==pid||u.kind!=='op')return;
+   const g=u.def?.raw?.customTrait||S.gameData().garrisons?.[u.def?.raw?.garrisonIds?.[0]];
+   if(g?.effectKey!=='custom_ursus_deploy')return;
+   const used=deployUsed.get(u.id)||0;if(used>=(g.bb?.max_trigger_count??8))return;
+   const gained=S.gainLayers(battle,{playerId:pid,bonds:['ursusShip','raidShip'],n:g.bb?.count??4,source:u,reason:'ursus:trait'});
+   if(gained>0)deployUsed.set(u.id,used+1);
+  },{owner:`ursus:deploy:${pid}`});
   battle.on('tick',()=>{
    refresh();
    if(!six()||!drone?.alive||!drone.deployed)return;

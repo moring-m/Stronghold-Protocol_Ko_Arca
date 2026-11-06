@@ -25,13 +25,15 @@ test('independent notes last five seconds, merge equal-frame stacks, do not recu
  h.b.dealDamage(h.u,h.e,{amount:1,type:'arts'});h.run(4);
  assert.equal(h.b.leithanien.liveStacks,1);h.run(1.1);assert.equal(h.b.leithanien.liveStacks,0);assert.equal(h.b.leithanien.applications,2);assert.equal(h.b.snapshot().noteStacks[h.e.id],undefined);assert.equal(h.b.errorCount,0);
 });
-test('six synergy extends each duration by ten seconds + one per twenty-five layers and weakens enemy damage',()=>{
+test('six synergy extends each duration by ten seconds + one per twenty-five layers and gives Leithanien operators ATK +40%',()=>{
  const h=setup(6,30);h.b.dealDamage(h.u,h.e,{amount:1,type:'arts'});
  assert.equal(h.b.leithanien.heap[0].end-h.b.time,11);
  const below=setup(6,24);below.b.dealDamage(below.u,below.e,{amount:1,type:'arts'});assert.equal(below.b.leithanien.heap[0].end-below.b.time,10);
- const hp=h.u.hp;h.b.dealDamage(h.e,h.u,{amount:100,type:'true'});assert.equal(hp-h.u.hp,75);const hpDot=h.u.hp;h.b.dealDamage(h.e,h.u,{amount:100,type:'true',sourceless:true});assert.equal(hpDot-h.u.hp,75);
- h.run(11.1);const hp2=h.u.hp;h.b.dealDamage(h.e,h.u,{amount:100,type:'true'});assert.equal(hp2-h.u.hp,100);
- assert.ok(Math.abs(h.hooksOf('damaged').find(c=>c.dmg.tags.includes('leithanien:note')).amount-81.3)<1e-6);assert.equal(h.b.errorCount,0);
+ // (0.3.3j2: noted enemies no longer deal 25% less damage; the six bonus is ATK +40% on the Leithanien operators)
+ const hp=h.u.hp;h.b.dealDamage(h.e,h.u,{amount:100,type:'true'});assert.equal(hp-h.u.hp,100);
+ assert.ok(h.u.findBuff('leithanien:six:atk'));assert.ok(Math.abs(h.u.s.atk-140)<1e-9,`ATK ${h.u.s.atk}`);
+ const three=setup(3,30);assert.ok(!three.u.findBuff('leithanien:six:atk'),'no ATK bonus below six members');
+ h.run(1.1);assert.ok(Math.abs(h.hooksOf('damaged').find(c=>c.dmg.tags.includes('leithanien:note')).amount-(80+140*.013))<1e-6);assert.equal(h.b.errorCount,0);
 });
 test('faction content is opt-in and each custom core adds exactly one ban',()=>{
  const base=applyCustomExtensions(data,{bonds:[],stages:[]});assert.ok(!base.bonds.leithanienShip);assert.ok(!base.items.chess_item_custom_leithanien_bell_a);assert.ok(!base.bands.band_custom_leithanien_witchking);assert.ok(!base.choices.cards.tactic.some(c=>c.effectId==='allybuff_custom_leithanien_oath'));
@@ -108,7 +110,7 @@ test('Leithanien description displays the current attack coefficient scaling',()
 
  test('notes suppress floating damage numbers while retaining caster statistics',()=>{
  const h=setup(6,30);h.b.dealDamage(h.u,h.e,{amount:1,type:'arts'});const before=h.eventsOf('dmg').length;h.run(1.1);
- assert.equal(h.eventsOf('dmg').length,before);assert.ok(Math.abs(h.u.stats.noteDamage-81.3)<1e-6);
+ assert.equal(h.eventsOf('dmg').length,before);assert.ok(Math.abs(h.u.stats.noteDamage-(80+140*.013))<1e-6,'six members: ATK +40% (100 → 140)');
  const bond=data.bonds.leithanienShip;assert.ok(richTextPlain(formatBondEffect(bond,90,6)).includes('13초간'));assert.ok(bond.descRaw.includes('<@ba.vup>속세의 음</>'));
  });
 test('Ebenholz uses one/two percent attack per three Leithanien layers',()=>{

@@ -57,7 +57,8 @@ test('Beehunter replaces Absinthe with complete resources and two independent tr
   assert.deepEqual(c.bonds,['ursusShip','raidShip']);assert.equal(c.skill.index,1);
   if(suffix==='b')assert.ok(c.modules.some(m=>m.uniEquipId==='uniequip_002_brownb'));assert.ok(c.skins.length>0);
   assert.equal(c.garrisonIds.length,2);
-  assert.match(g[c.garrisonIds[0]].description ?? JSON.stringify(g[c.garrisonIds[0]]),/맹약 활성화 불필요/);
+  // 0.3.3j2: <배치 시> activated [Ursus]/[Raid] +4 / +8, at most eight times per battle (was <획득 시> +5 / +10)
+  const trait=g[c.garrisonIds[0]];assert.match(trait.desc,/^<배치 시> 활성화된 \[우르수스\]\/\[기습\] 맹약의 중첩 수 \+(4|8) \(전투당 최대 8회 발동\)$/);assert.equal(trait.effectKey,'custom_ursus_deploy');assert.equal(trait.bb.count,suffix==='b'?8:4);
   assert.match(JSON.stringify(g[c.garrisonIds[1]]),/act1autochess_gar_eff_chaos/);
   assert.ok(chess[`chess_custom_ursus_helage_${suffix}`].bonds.includes('indomShip'));
  }
