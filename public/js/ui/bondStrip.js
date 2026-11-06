@@ -243,7 +243,9 @@ export function FitBondStrip({ folded = false, children }) {
     };
     fit();const observer=new ResizeObserver(fit);observer.observe(outer);observer.observe(inner);
     return()=>observer.disconnect();
-  },[children]);
+    // (once per mount: the observer refits on every size change — a bond added or removed changes the strip's width. With
+    // [children] it re-ran on every render of the game screen, re-reading the slots' layout and rewriting the variables)
+  },[]);
   const down=e=>{
     if(folded||!host.current?.classList.contains('is-scrollable')||e.button!==0)return;
     drag.current={id:e.pointerId,x:e.clientX,left:windowRef.current.scrollLeft,moved:false};

@@ -21,6 +21,8 @@ export function install(b){
   if(u.kind!=='op')return;
   const g=trait(u);if(g?.effectKey==='custom_leithanien_deploy')S.passiveBuff(b,u,'leithanien:trait:redeploy',{redeployMul:g.bb.redeployMul??.5});const layers=S.bondLayers(b,u.ownerId,BOND);
   if(g?.effectKey==='custom_leithanien_hp'||g?.effectKey==='custom_leithanien_atk')S.passiveBuff(b,u,'leithanien:trait:stats',S.directMods({[g.effectKey.endsWith('_hp')?'hp':'atk']:Math.floor(layers/3)*g.bb.count}));
+  // 6 different [Leithanien] operators: their ATK +40% (until 0.3.3j2 the noted enemies dealt 25% less damage)
+  if(S.isMember(b,u,BOND)){const on=six(b,u),old=u.findBuff('leithanien:six:atk');if(on&&!old)S.passiveBuff(b,u,'leithanien:six:atk',S.directMods({atk:.4}));else if(!on&&old)b.removeBuff(u,'leithanien:six:atk');}
   const score=u.items?.find(id=>id.startsWith('chess_item_custom_leithanien_score_'));
   if(score)S.passiveBuff(b,u,'leithanien:score:arts',{artsDealtMul:score.endsWith('_b')?1.6:1.4});
  };
@@ -37,7 +39,7 @@ export function install(b){
   // A single target marker, refreshed only when its expiry extends.
   const old=t.findBuff('leithanien:note');
   if(!old||old.timeLeft<duration)b.addBuff(t,{key:'leithanien:note',duration,refresh:'replace',source:u});
-  if(!augment&&six(b,u)){t.mem.leithanienWeakenUntil=Math.max(t.mem.leithanienWeakenUntil||0,end);
+  if(!augment&&six(b,u)){
    const slow=t.findBuff('leithanien:slow');if(!slow||slow.timeLeft<duration)b.addBuff(t,{key:'leithanien:slow',duration,refresh:'replace',mods:{moveMul:.75},source:u});
   }
 
@@ -48,7 +50,6 @@ export function install(b){
   const k=u.id+':damageHits',n=(counts.get(k)||0)+1;counts.set(k,n);
   if(n%8===0){add(u,[BOND,'kazimierzShip'],trait(u).bb.count,10,'damageGain');add(u,['skillfulShip'],trait(u).bb.skillfulCount,10,'damageSkillfulGain');}
  });
- b.on('hit',c=>{const source=c.source||c.credit;if(source?.side==='enemy'&&(source.mem.leithanienWeakenUntil||0)>b.time)c.dmg.mul*=.75;});
  b.on('tick',()=>{
   const sums=new Map();
   while(heap.length&&heap[0].next<=b.time+1e-8){
@@ -67,7 +68,8 @@ export function install(b){
   const shared=members().some(a=>a.ownerId===u.ownerId&&field(a)&&has(a,'score')&&has(a,'bell'));
   if(has(u,'score')||shared)for(const e of b.enemies)apply(u,e);
  });
- b.on('deploy',({unit:u,move})=>{refresh(u);if(!move&&trait(u)?.effectKey==='custom_leithanien_deploy')add(u,[BOND,'raidShip'],trait(u).bb.count,8,'deploy');});
+ b.on('deploy',({unit:u,move})=>{for(const a of b.allyUnits)if(a.ownerId===u.ownerId)refresh(a);if(!move&&trait(u)?.effectKey==='custom_leithanien_deploy')add(u,[BOND,'raidShip'],trait(u).bb.count,8,'deploy');});
+ b.on('death',({unit:u})=>{if(u?.side==='ally')b.after(0,()=>{for(const a of b.allyUnits)if(a.ownerId===u.ownerId&&a!==u)refresh(a);});});
  b.on('layerGain',({playerId,bondId})=>{if(bondId===BOND)b.after(0,()=>{for(const u of b.allyUnits)if(u.ownerId===playerId)refresh(u);});});
  b.on('damaged',({target,type,dmg,amount})=>{if(type!=='element'||dmg?.element!=='necrosis'||!(amount>0))return;for(const u of members())if(field(u)&&trait(u)?.effectKey==='custom_leithanien_burst'&&S.inRange(u,target)){add(u,[BOND],trait(u).bb.count,5,'burst');add(u,['arcaneShip'],trait(u).bb.arcaneCount,5,'burstArcane');}});
  b.on('kill',({killer:u,victim})=>{if(victim?.side==='enemy'&&trait(u)?.effectKey==='custom_leithanien_kill'){const k=u.id+':kill',used=counts.get(k)||0;if(used>=5)return;let gained=S.gainLayers(b,{playerId:u.ownerId,bonds:[BOND],n:trait(u).bb.count,source:u});gained+=S.gainLayers(b,{playerId:u.ownerId,bonds:['swiftShip'],n:trait(u).bb.swiftCount??trait(u).bb.count,source:u});if(gained>0)counts.set(k,used+1);}});

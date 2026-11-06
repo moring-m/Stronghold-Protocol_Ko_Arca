@@ -597,3 +597,10 @@ select option, select optgroup { background-color: var(--bg-2, var(--surf-2, #11
 :root[data-ui-theme] .settle .tcard:not(.is-fail) .tcard__rounds { background: var(--mint-500); box-shadow: inset 0 0 0 1px var(--mint-400); }
 :root[data-ui-theme] .settle .tcard:not(.is-fail) .tcard__rounds :is(span, b) { color: var(--text-on-mint); }
 :root[data-ui-theme] .settle .tcard.is-fail .tcard__rounds span { color: #f3dcd9; }
+
+/* light UI themes: the bond popup's people pill keeps the official dark pill sprite — its count and state in light ink
+   (the theme's dark ink and accent sank into the dark green) */
+:root[data-ui-light] .bpop__pill { color: #eef4f1; }
+:root[data-ui-light] .bpop__pill :is(b, small, span) { color: inherit; }
+:root[data-ui-light] .bpop__pill.is-on .bpop__state { color: #6ff0c8; }
+:root[data-ui-light] .bpop__stack, :root[data-ui-light] .bpop__stack b { color: #f4f6f5; }
