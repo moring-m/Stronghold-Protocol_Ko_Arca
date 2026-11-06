@@ -46,3 +46,12 @@ test('Ursus 6: the drone adds the ATK of each different Ursus operator once (two
  assert.ok(Math.abs(buff.mods.atkFlat-expected)<1e-6,`${buff.mods.atkFlat} vs ${expected}`);
  setGameData(null);
 });
+
+test('Leto trait: an allied Ursus skill gives active Ursus +3 / +6, at most seven times per battle',()=>{
+ for(const [suffix,n] of [['a',3],['b',6]]){
+  const id=`chess_custom_ursus_leto_${suffix}`,h=ursusBattle([{chessId:id,row:10,col:3}],{ursusShip:{active:true,count:3,tier:1,layers:0}});
+  h.run(.2);const u=h.unit(id),p=h.b.getPlayer(u.ownerId),before=p.bonds.ursusShip.layers;
+  for(let i=0;i<10;i++)h.b.emit('skillStart',{unit:u,skill:u.skill,reason:'test'});
+  assert.equal(p.bonds.ursusShip.layers-before,n*7);setGameData(null);
+ }
+});

@@ -50,12 +50,12 @@ export async function buildUrsus(){
   const id=`chess_custom_ursus_${o.key}_${suffix}`,r=generated[id];
   if(!r?.stats || !r.skill)throw Error(`Incomplete generated operator ${id}`);
   r.name=o.name;localizeOperator(r,korean,a.charChessDataDict[id].status);chess[id]=r;
-  const elite=suffix==='b', count=o.key==='turdus'?(elite?6:3):o.key==='leto'?(elite?4:2):elite?4:2;
+  const elite=suffix==='b', count=o.key==='turdus'?(elite?6:3):o.key==='leto'?(elite?6:3):elite?4:2;
   let source,desc;
   if(o.trait==='power'){source='garrison_100_a';desc=`[우르수스] 맹약이 3회 중첩할 때마다 공격 속도 +${elite?4:2}`}
   else if(o.trait==='scale'){source='garrison_100_a';desc=`[우르수스]/[정밀] 맹약이 3회 중첩할 때마다 공격력 +${elite?2:1}%`}
   else if(o.trait==='slowedDeaths'){source='garrison_42_a';desc=`<전투 중> 범위 내 정지 상태의 적이 사망할 때마다 활성화된 [우르수스]/[정밀] 맹약의 중첩 수 +${count} (전투당 최대 8회 발동)`}
-  else if(o.key==='leto'){source='garrison_42_a';desc=`<전투 중> 아군 [우르수스] 오퍼레이터가 스킬을 발동할 때마다 활성화된 [우르수스] 맹약의 중첩 수 +${count} (전투당 최대 8회 발동)`}
+  else if(o.key==='leto'){source='garrison_42_a';desc=`<전투 중> 아군 [우르수스] 오퍼레이터가 스킬을 발동할 때마다 활성화된 [우르수스] 맹약의 중첩 수 +${count} (전투당 최대 7회 발동)`}
   else if(o.trait==='all'){source='garrison_80_a';desc=`<휴식 기간 진입 시> 자신의 활성화된 맹약 중첩 수 +${count}`}
   else if(o.trait==='gainWeakness'){source='garrison_35_a';desc=`<배치 시> 활성화된 [우르수스]/[기습] 맹약의 중첩 수 +${elite?8:4} (전투당 최대 8회 발동)`}
   else if(o.key==='botany'){source='garrison_42_a';desc=`<전투 중> 스킬 처음 발동 시 활성화된 [우르수스] 맹약의 중첩 수 +${elite?14:7}`}
@@ -68,7 +68,7 @@ export async function buildUrsus(){
    // 비헌터: <배치 시> on every deploy, server/sim/content/ursus.js custom_ursus_deploy (at most 8 per battle)
    if(o.trait==='gainWeakness'){Object.assign(e,{eventType:'BATTLE',eventTypeDesc:'作战能力',eventTypeIcon:'icon_battle',effectType:'GAIN_BUFF',effectKey:'custom_ursus_deploy',bb:{count:elite?8:4,max_trigger_count:8}});delete e.bbStr;return;}
    if(o.trait==='slowedDeaths'){e.effectKey='custom_ursus_slowed_death';if(e.bbStr)Object.assign(e.bbStr,{key:'custom_ursus_slowed_death',bond_type:'bond_by_id',bond_id:'ursusShip,preciShip',bond_add_type:'by_count'});if(e.bb)Object.assign(e.bb,{bond_add_count:count,preci_add_count:count,max_add_count_per_battle:count*8,max_trigger_count:8});return;}
-   if(o.key==='leto'){e.effectKey='custom_ursus_ally_skill';if(e.bbStr)Object.assign(e.bbStr,{key:'custom_ursus_ally_skill',bond_id:'ursusShip'});if(e.bb)Object.assign(e.bb,{bond_add_count:count,max_add_count_per_battle:count*8,max_trigger_count:8});return;}
+   if(o.key==='leto'){e.effectKey='custom_ursus_ally_skill';if(e.bbStr)Object.assign(e.bbStr,{key:'custom_ursus_ally_skill',bond_id:'ursusShip'});if(e.bb)Object.assign(e.bb,{bond_add_count:count,max_add_count_per_battle:count*7,max_trigger_count:7});return;}
    if(e.bb){if(o.trait==='power')Object.assign(e.bb,{divide_num:3,atk:0,max_hp:0,attack_speed:elite?4:2});else if(o.trait==='scale')e.bb.atk=elite?.02:.01;else e.bb.count=o.key==='botany'?(elite?12:6):o.trait==='ursusStart'?(elite?12:6):count;}
    if(e.bbStr){if(o.trait==='power')e.bbStr.bond_id='ursusShip';else if(o.key==='botany')e.bbStr.bond='ursusShip,miraShip';else if(o.trait==='scale')e.bbStr.bond_id='ursusShip,preciShip';else if(['ursus','ursusStart','swift'].includes(o.trait))e.bbStr.bond=o.trait==='swift'?'swiftShip':'ursusShip';}
    if(o.trait==='ursusStart'){e.eventType='SERVER_PREP_START';e.eventTypes=['SERVER_PREP_START','SERVER_PREP_FIN'];}
