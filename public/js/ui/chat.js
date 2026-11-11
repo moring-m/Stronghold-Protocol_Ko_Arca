@@ -1,5 +1,4 @@
 import { applyFavoriteFaction } from './favorites.js';
-import { applyRecruitFaction } from './recruitPresets.js';
 import { toast } from './toasts.js';
 import { useEffect, useLayoutEffect, useRef, useState } from '../../vendor/hooks.module.js';
 import { data, useData } from '../data.js';
@@ -86,8 +85,7 @@ export function ChatPanel({room = false, docked = false}) {
     try {
       await net.request('g.chatFaction', { faction: value });
       const favorite=applyFavoriteFaction(value);
-      const recruit=await applyRecruitFaction(value);
-      if(favorite||recruit)toast([favorite&&`선호: ${favorite}`,recruit&&`선발: ${recruit}`].filter(Boolean).join(' · ')+' 적용');
+      if(favorite)toast(`선호: ${favorite} 적용`);
       setChoosingFaction(false);
       input.current?.focus();
     } catch (error) { toastError(error); }

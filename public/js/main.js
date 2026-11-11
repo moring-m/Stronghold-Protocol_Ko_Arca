@@ -3,7 +3,6 @@ import { lazyComponent, loadScreenStyles } from './ui/lazyComponent.js';
 import { loadoutStore } from './ui/loadoutSync.js';
 import { statsStore } from './ui/statsEntry.js';
 import { favoritesStore } from './ui/favorites.js';
-import { recruitPresetStore } from './ui/recruitPresets.js';
 // Keep transport listeners eager: reconnecting directly into combat must never lose b.start.
 import './battle/runner.js';
 const StatsHost=lazyComponent(()=>Promise.all([import('./screens/stats.js'),loadScreenStyles(['/css/screens/stats.css','/css/screens/result.css'])]).then(([module])=>module),'StatsHost');
@@ -372,7 +371,6 @@ function App() {
   const loadoutOpen=useStore(s=>s.open,Object.is,loadoutStore);
   const statsOpen=useStore(s=>s.open,Object.is,statsStore);
   const favoritesOpen=useStore(s=>s.open,Object.is,favoritesStore);
-  const recruitPresetsOpen=useStore(s=>s.open,Object.is,recruitPresetStore);
   const [error, resetError] = useErrorBoundary((err) => console.error('[ui] screen crashed', err));
   const Screen = SCREENS[route] || LobbyScreen;
   return html`<div class="app-root">
@@ -384,7 +382,7 @@ function App() {
     <${ToastHost} />
     <${UiHosts} />
     <${GuideHost} />
-    ${loadoutOpen||favoritesOpen||recruitPresetsOpen?html`<${LoadoutHost} />`:null}
+    ${loadoutOpen||favoritesOpen?html`<${LoadoutHost} />`:null}
     ${statsOpen?html`<${StatsHost} />`:null}
   </div>`;
 }

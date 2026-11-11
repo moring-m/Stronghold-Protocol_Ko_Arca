@@ -39,7 +39,6 @@ test('initial screen defers combat and editors, then room and overlay entry load
   await page.evaluate(async()=>{(await import('/js/ui/loadoutSync.js')).openLoadout();});await page.waitForSelector('.lo-card');await page.waitForFunction(()=>document.documentElement.classList.contains('sp-loadout-open'));await page.click('.lo-back');await returned();
   await page.evaluate(async()=>{(await import('/js/ui/loadoutSync.js')).openLoadout();});await page.waitForSelector('.lo-card');await page.waitForFunction(()=>document.documentElement.classList.contains('sp-loadout-open'));await page.keyboard.press('Escape');await returned();
   await page.evaluate(async()=>{(await import('/js/ui/favorites.js')).favoritesStore.set({open:true});});await page.waitForSelector('.favorites-modal');await page.evaluate(async()=>{(await import('/js/ui/favorites.js')).favoritesStore.set({open:false});});await returned();
-  await page.evaluate(async()=>{(await import('/js/ui/recruitPresets.js')).recruitPresetStore.set({open:true});});await page.waitForSelector('.recruit-presets-modal');await page.evaluate(async()=>{(await import('/js/ui/recruitPresets.js')).recruitPresetStore.set({open:false});});await returned();
   await page.evaluate(()=>{__SP__.net.setName('로딩테스트');});
   await page.waitForFunction(()=>__SP__.store.get().connection.status==='online');
   assert.match(await page.evaluate(()=>__SP__.store.get().content?.vanilla),/^[a-f0-9]{64}$/,'welcome publishes the content identity before a battle can start');

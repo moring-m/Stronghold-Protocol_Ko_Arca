@@ -374,7 +374,7 @@ export class PlayerState {
   canRecruit(id) {
     const c = this.gd.chess(id);
     const base=c?.baseId || c?.chessId;
-    return !!c && !this.m.customExtensions?.bannedOperators?.includes(base) && (!c.optionalRecruit || (!this.m.bannedChess?.includes(base) && this.loadout?.[base]?.selected === true));
+    return !!c && !this.m.customExtensions?.bannedOperators?.includes(base) && (!c.optionalRecruit || (!this.m.bannedChess?.includes(base) && !!this.recruitPicks?.has(base)));
   }
 
   loadoutFor(chessRecord) {

@@ -2,7 +2,6 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {bindPresetFaction,normalizePresetFactions,canApplyRecruitPreset,replaceRecruitEntries} from '../../public/js/ui/factionPresetModel.js';
 import {normalizeFavorites,favoritesStore,applyFavoriteFaction,isFavorite} from '../../public/js/ui/favorites.js';
-import {normalizeRecruitPresets,recruitPresetStore,applyRecruitPreset} from '../../public/js/ui/recruitPresets.js';
 import {loadoutStore} from '../../public/js/ui/loadoutSync.js';
 
 test('a faction has one preset owner; relinking releases the old owner',()=>{
@@ -25,28 +24,6 @@ test('recruit preset replaces recruit settings only; absent picks clear and unav
  assert.deepEqual(out,{standard:{skill:1},old:{skin:'old'},next:{selected:true,skill:2,skin:'new'},unreleased:{selected:true}});
  assert.deepEqual(replaceRecruitEntries(out,{},id=>records[id]),{standard:{skill:1},old:{skin:'old'},next:{skill:2,skin:'new'}});
 });
-test('recruit presets lock after strategy selection including final result and unknown match phases',()=>{
- assert.ok(canApplyRecruitPreset({}));
- for(const phase of ['LOBBY','INFO_CHECK','BAND_DRAFT'])assert.ok(canApplyRecruitPreset({room:{inMatch:true},match:{public:{phase}}}));
- for(const phase of ['BATTLE_CHECK','PREP','COMBAT','RESULT',null])assert.equal(canApplyRecruitPreset({room:{inMatch:true},match:{public:{phase}}}),false);
-});
-test('locked manual apply changes neither stored loadout nor active recruit preset',()=>{
- const r=recruitPresetStore.get(),l=loadoutStore.get();try{
- recruitPresetStore.set(normalizeRecruitPresets({active:'a',presets:[{id:'a',entries:{}},{id:'b',entries:{}}]}));loadoutStore.set({entries:{standard:{skill:2}}});
- assert.deepEqual(applyRecruitPreset('b',{room:{inMatch:true},match:{public:{phase:'PREP'}}}),{ok:false,locked:true});
- assert.deepEqual(loadoutStore.get().entries,{standard:{skill:2}});assert.equal(recruitPresetStore.get().active,'a');
- }finally{recruitPresetStore.set(r);loadoutStore.set(l);}
-});
-
-test('an obsolete nonempty preset cannot silently clear the current loadout',()=>{
- const r=recruitPresetStore.get(),l=loadoutStore.get();try{
- recruitPresetStore.set(normalizeRecruitPresets({active:'a',presets:[{id:'a',entries:{}},{id:'stale',entries:{missing:{selected:true}}}]}));
- loadoutStore.set({entries:{existing:{selected:true}}});
- const result=applyRecruitPreset('stale',{});assert.equal(result.ok,false);
- assert.deepEqual(loadoutStore.get().entries,{existing:{selected:true}});assert.equal(recruitPresetStore.get().active,'a');
- }finally{recruitPresetStore.set(r);loadoutStore.set(l);}
-});
-
 test('recruit preset activation respects current operator skills including returning to default',()=>{
  const get=id=>({optionalRecruit:true,visible:true});
  assert.deepEqual(replaceRecruitEntries({op:{skill:1}},{op:{selected:true}},get),{op:{skill:1,selected:true}});
@@ -76,17 +53,6 @@ test('duplicate preset IDs retain separate faction links and activate the matchi
   for(const other of ['yan','leithanien','ursus'].filter(x=>x!==op))assert.equal(isFavorite('chess',other,()=>null),false);
  }
  }finally{favoritesStore.set(before);}
-});
-
-test('recruit presets also repair duplicate IDs without moving links or dropping entries',()=>{
- const raw={active:'same',presets:[{id:'same',faction:'염국',entries:{yan:{selected:true}}},{id:'same',faction:'라이타니엔',entries:{leithanien:{selected:true}}}]};
- const next=normalizeRecruitPresets(raw);
- const own=next.presets.filter(p=>!p.builtin);
- assert.equal(next.presets[0].id,'default');assert.deepEqual(next.presets[0].entries,{});
- assert.notEqual(own[0].id,own[1].id);
- assert.deepEqual(own.map(p=>p.faction),['염국','라이타니엔']);
- assert.deepEqual(own.map(p=>p.entries),raw.presets.map(p=>p.entries));
- assert.deepEqual(normalizeRecruitPresets(next),next);
 });
 
 test('the fixed 기본 preset never takes a faction link',()=>{
