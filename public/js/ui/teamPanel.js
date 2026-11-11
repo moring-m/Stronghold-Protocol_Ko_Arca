@@ -29,6 +29,7 @@ import { STATUS_META, sortedPlayers } from './gameLogic.js';
 import { MissTag, uniteRemaining } from './hud.js';
 import { sameFieldmates } from '../battle/observe.js';
 import { localAsset } from '../data.js';
+import { TeamOverview, TeamOverviewButton } from './teamOverview.js';
 
 const cx = (...p) => p.flat().filter(Boolean).join(' ');
 
@@ -123,6 +124,7 @@ export function rowLpTip(lp, cap = 10) {
  */
 export function TeamPanel({ pub, myId, watching, bubbles, onWatch, compact = false, observe = null, self: selfLive = null, spMarks = null, cap = 10, uniteLocal = null, normalLeaks = null }) {
   const [openPid, setOpenPid] = useState(null);
+  const [overview, setOverview] = useState(false);
   // the playerId whose avatar just called onWatch, so the other click of a double-click does not open the view again
   const askedAt = useRef(/** @type {{ id: string|null, at: number }} */ ({ id: null, at: 0 }));
   const phaseKey = `${pub?.phase}:${pub?.round}`;
@@ -157,6 +159,8 @@ export function TeamPanel({ pub, myId, watching, bubbles, onWatch, compact = fal
     setOpenPid((cur) => (cur === p.playerId ? null : p.playerId));
   };
   return html`<aside class=${cx('team', compact && 'team--compact',pub?.players?.length>4&&'team--eight')} aria-label="同盟成员">
+    ${players.length > 1 ? html`<${TeamOverviewButton} onOpen=${() => setOverview(true)} />` : null}
+    <${TeamOverview} open=${overview} onClose=${() => setOverview(false)} pub=${pub} myId=${myId} />
     ${players.map((p) => {
       const self = p.playerId === myId;
       const status = p.alive === false ? 'dead' : p.status;

@@ -3661,5 +3661,8 @@
   "점검 안내 닫기": "Close maintenance notice",
   "시스템": "System",
   "서버 점검이 {0}분 후 시작됩니다.": "Server maintenance starts in {0} min.",
-  "서버 점검이 시작되었습니다.": "Server maintenance has started."
+  "서버 점검이 시작되었습니다.": "Server maintenance has started.",
+  "팀 전체 보기": "Team Overview",
+  "배치 없음": "No units",
+  "탈락": "Eliminated"
 }

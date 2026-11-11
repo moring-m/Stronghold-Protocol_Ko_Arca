@@ -1148,6 +1148,8 @@ export class Match {
         // m.result's own bonds, so their layers would only cost every m.public bytes for the rest of the match
         // (the mode-off bonds with members included, `off: true`, as in m.private — bondsMeta.offBondCounts)
         bonds: ps.alive ? bondList(this.gd, ps.bondsView(), { off: offBondCounts(this.gd, ps) }) : [],
+        // 팀 전체 보기 (ui/teamOverview.js): the operators on the board, in board order — [] once eliminated
+        lineup: ps.alive ? boardOrder(ps.board).filter((x) => x.piece.kind === 'chess').map(({ piece }) => ({ id: piece.id, items: (piece.items || []).length })) : [],
         fieldId: this.fieldOf(ps),
         status: this.statusOf(ps),
         autoplay: ps.autoplay,
