@@ -51,35 +51,35 @@ export function RecruitPickScreen() {
     send(next, false);
   };
   const players = sortedPlayers(pub);
-  return html`<div class="screen rpick">
+  return html`<div class="screen rsel">
     <div class="brief__bg" aria-hidden="true"></div>
     <${StepHeader} step=${3} of=${3} title="선발 선택" micro="RECRUIT // SELECTION" pub=${pub}
       total=${phaseTotalSeconds(pub, gd.config) ?? 30} onExit=${() => setExit(true)} />
-    <main class="rpick__main">
-      <aside class="rpick__players" aria-label="참가자">
-        ${players.map((p) => html`<div key=${p.playerId} class=${cx('rpick__player', p.playerId === myId && 'is-self')}>
+    <main class="rsel__main">
+      <aside class="rsel__players" aria-label="참가자">
+        ${players.map((p) => html`<div key=${p.playerId} class=${cx('rsel__player', p.playerId === myId && 'is-self')}>
           <${PlayerAvatar} player=${p} self=${p.playerId === myId} size="sm" />
-          <span class="rpick__pname">${p.name || '박사'}</span>
-          ${p.status === 'ready' ? html`<span class="rpick__state is-done"><${Icon} name="check" />완료</span>` : html`<span class="rpick__state">선택 중…</span>`}
+          <span class="rsel__pname">${p.name || '박사'}</span>
+          ${p.status === 'ready' ? html`<span class="rsel__state is-done"><${Icon} name="check" />완료</span>` : html`<span class="rsel__state">선택 중…</span>`}
         </div>`)}
       </aside>
-      <section class="rpick__body">
-        <p class="rpick__hint"><${Icon} name="info" />후보 중 각 단계에서 최대 ${RECRUIT_PICKS}명을 선발합니다. 선발한 오퍼레이터만 본인의 모집·보상에 등장합니다.</p>
+      <section class="rsel__body">
+        <p class="rsel__hint"><${Icon} name="info" /><span>${`후보 중 각 단계에서 최대 ${RECRUIT_PICKS}명을 선발합니다. 선발한 오퍼레이터만 본인의 모집·보상에 등장합니다.`}</span></p>
         ${!candidates.length ? html`<p class="t-dim">선발 후보가 없습니다. 다른 참가자를 기다리는 중입니다.</p>` : RECRUIT_TIERS.map((t) => {
           const list = candidates.filter((id) => getChess(id)?.tier === t);
           const n = picks.filter((id) => getChess(id)?.tier === t).length;
-          return html`<div key=${t} class="rpick__tier">
-            <h2 class="brief-h"><span>${t}단계</span><b class="num rpick__count">${n}/${RECRUIT_PICKS}</b><${MicroLabel}>TIER ${t}</${MicroLabel}></h2>
-            ${list.length ? html`<div class="rpick__grid" role="listbox" aria-multiselectable="true" aria-label=${t + '단계 선발 후보'}>
+          return html`<div key=${t} class="rsel__tier">
+            <h2 class="brief-h"><span>${t + '단계'}</span><b class="num rsel__count">${n}/${RECRUIT_PICKS}</b><${MicroLabel}>TIER ${t}</${MicroLabel}></h2>
+            ${list.length ? html`<div class="rsel__grid" role="listbox" aria-multiselectable="true" aria-label=${t + '단계 선발 후보'}>
               ${list.map((id) => {
                 const c = getChess(id);
                 const on = picks.includes(id);
                 const full = !on && togglePick(picks, id, candidates, getChess) === picks;
                 return html`<button key=${id} type="button" role="option" aria-selected=${on} disabled=${busy || ready || full}
-                    class=${cx('rpick__card', on && 'is-on', full && 'is-full')} onClick=${() => tap(id)}>
+                    class=${cx('rsel__card', on && 'is-on', full && 'is-full')} onClick=${() => tap(id)}>
                   <${UnitThumb} kind="chess" id=${id} size="lg" />
-                  <span class="rpick__name">${c?.name || id}</span>
-                  ${on ? html`<span class="rpick__mark"><${Icon} name="check" /></span>` : null}
+                  <span class="rsel__name">${c?.name || id}</span>
+                  ${on ? html`<span class="rsel__mark"><${Icon} name="check" /></span>` : null}
                 </button>`;
               })}
             </div>` : html`<p class="t-dim">이 단계의 후보가 없습니다.</p>`}
@@ -87,7 +87,7 @@ export function RecruitPickScreen() {
         })}
       </section>
     </main>
-    <footer class="rpick__foot">
+    <footer class="rsel__foot">
       ${ready ? html`<${Button} variant="secondary" size="lg" icon="refresh" disabled=${busy} onClick=${() => send(picks, false)}>다시 선택<//>`
         : html`<${Button} variant="primary" size="lg" icon="check" disabled=${busy || !candidates.length} onClick=${() => send(picks, true)}>선택 완료<//>`}
     </footer>
