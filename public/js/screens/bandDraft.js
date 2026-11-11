@@ -27,6 +27,7 @@ import { StepHeader, ExitModal } from '../ui/matchChrome.js';
 import { LoadoutButton } from '../ui/loadoutEntry.js';
 import { RecruitPresetButton } from '../ui/recruitPresets.js';
 import { MatchInfoDialog, matchInfoModel } from '../ui/matchInfo.js';
+import { BriefingOverview } from './briefing.js';
 import { actions, act } from '../ui/gameActions.js';
 import { normalizeDraft, sortedPlayers } from '../ui/gameLogic.js';
 import { useStore } from '../store.js';
@@ -285,7 +286,7 @@ export function BandDraftScreen() {
           </div>`;
         })}
         <${Button} variant="secondary" icon="search" block=${true} class="draft-order__info" data-testid="match-info-open"
-          aria-haspopup="dialog" onClick=${() => setInfoOpen(true)}>查看禁用盟约与干员<//>
+          aria-haspopup="dialog" onClick=${() => setInfoOpen(true)}>시뮬레이션 정보 보기<//>
         ${!solo ? html`<p class="draft-order__tip" data-testid="draft-tip">${draftTip({ timed, turnSeconds: turnLen, autoName: myPick ? null : autoName, selected: autoId === sel })}</p>` : null}
       </aside>
 
@@ -334,7 +335,7 @@ export function BandDraftScreen() {
     </main>
     ${solo ? null : html`<${ChatPanel} />`}
     <${ExitModal} open=${exit} onClose=${() => setExit(false)} solo=${solo} />
-    <${MatchInfoDialog} open=${infoOpen} onClose=${() => setInfoOpen(false)} model=${info}
+    <${MatchInfoDialog} open=${infoOpen} onClose=${() => setInfoOpen(false)} model=${info} overview=${html`<${BriefingOverview} pub=${pub} />`}
       status=${infoStatus ? html`<span class=${cx('minfo-dlg__turn', `is-${infoStatus.tone}`)}>
         <${Icon} name=${infoStatus.tone === 'mint' ? 'check' : 'hourglass'} />${infoStatus.text}${infoStatus.secs != null ? html`<b class="num">${infoStatus.secs}s</b>` : null}
       </span>` : null} />

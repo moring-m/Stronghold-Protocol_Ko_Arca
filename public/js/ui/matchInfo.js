@@ -152,10 +152,10 @@ export function MatchInfo({ model }) {
  * closes. `status` (the caller's line, e.g. the draft's turn and countdown) sits left of 关闭.
  * @param {{ open: boolean, onClose: Function, model: MatchInfoModel|null, status?: any }} props
  */
-export function MatchInfoDialog({ open, onClose, model, status = null }) {
-  return html`<${Modal} open=${open && !!model} onClose=${onClose} title="本局信息" micro="MATCH INFO // BONDS & BANNED OPERATORS" class="minfo-dlg"
+export function MatchInfoDialog({ open, onClose, model, status = null, overview = null }) {
+  return html`<${Modal} open=${open && !!model} onClose=${onClose} title=${overview ? '시뮬레이션 정보' : '本局信息'} micro=${overview ? 'SIMULATION INFO' : 'MATCH INFO // BONDS & BANNED OPERATORS'} class=${cx('minfo-dlg', overview && 'minfo-dlg--full')}
     actions=${html`${status ? html`<div class="minfo-dlg__status" data-testid="match-info-status">${status}</div>` : null}
       <${Button} variant="secondary" icon="close" data-autofocus data-testid="match-info-close" onClick=${onClose}>关闭<//>`}>
-    ${open && model ? html`<${MatchInfo} model=${model} />` : null}
+    ${open && model ? (overview ? html`<div class="minfo-dlg__cols"><div class="minfo-dlg__left">${overview}</div><div class="minfo-dlg__right"><${MatchInfo} model=${model} /></div></div>` : html`<${MatchInfo} model=${model} />`) : null}
   <//>`;
 }

@@ -3664,5 +3664,7 @@
   "서버 점검이 시작되었습니다.": "Server maintenance has started.",
   "팀 전체 보기": "Team Overview",
   "배치 없음": "No units",
-  "탈락": "Eliminated"
+  "탈락": "Eliminated",
+  "시뮬레이션 정보 보기": "View Simulation Info",
+  "시뮬레이션 정보": "Simulation Info"
 }

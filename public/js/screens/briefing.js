@@ -40,15 +40,6 @@ export function BriefingScreen() {
   const readyN = players.filter((p) => p.ready).length;
   const mode = gd.config?.modes?.[pub.modeId];
   const info = matchInfoModel(pub, { bonds: gd.list('bonds'), chess: gd.chess, mode });
-  const boss = pub.bossId ? gd.boss(pub.bossId) : null;
-  const bossEnemy = boss ? gd.enemy(boss.enemyKey) : null;
-  const stage = pub.stageId ? gd.stage(pub.stageId) : null;
-  // the mode's battlefield pool (config.json modes[].stages): 标准 is always 战场#01, 险境+ draw one at random
-  const poolN = Array.isArray(mode?.stages) ? mode.stages.length : 0;
-  const pool = poolN > 1 ? `战场随机（共${poolN}张）` : poolN === 1 ? '战场固定' : '';
-  const types = factionTypes(pub.factions);
-  const factions = gd.factions?.types || {};
-  const m = gd.m;
 
   const ready = async () => {
     if (busy || me?.ready) return;
@@ -64,6 +55,45 @@ export function BriefingScreen() {
     <${UnofficialMark} room=${room} class="brief__modmark" />
     <main class="brief__main">
       <section class="brief__left">
+        <${BriefingOverview} pub=${pub} />
+      </section>
+      <section class="brief__right">
+        <${MatchInfo} model=${info} />
+      </section>
+    </main>
+    <footer class="brief__foot">
+      <div class="brief__reroll-group"><${SetupReroll} pub=${pub} />
+      <span>리롤 ${room?.rerollLimit === -1 ? '무제한' : `${Math.max(0, (room?.rerollLimit ?? 0) - (room?.rerollsUsed ?? 0))}회 남음`}</span></div>
+      <${LoadoutButton} from="briefing" size="lg" class="brief-loadout" />
+      <div class="brief-ready">
+        <span class="brief-ready__txt">已就绪 <b class="num">${readyN}</b><span class="num">/${players.length}</span></span>
+        <span class="brief-ready__pips">${players.map((p) => html`<i key=${p.playerId} class=${cx(p.ready && 'on', p.playerId === myId && 'me')} title=${p.name}><${Icon} name="user" /></i>`)}</span>
+      </div>
+      <${Button} variant="primary" size="xl" icon=${me?.ready ? 'check' : me ? 'play' : 'eye'} active=${!!me?.ready} loading=${busy}
+        disabled=${!!me?.ready || !me || !!pub.rerollVote} onClick=${ready}>${me?.ready ? '已就绪' : me ? '准备就绪' : '观战中'}<//>
+    </footer>
+    ${solo ? null : html`<${ChatPanel} />`}
+    <${ExitModal} open=${exit} onClose=${() => setExit(false)} solo=${solo} />
+  </div>`;
+}
+
+/**
+ * The briefing's left column — the enemy leader, the battlefield (name, pool, map image) and the 特训 factions — shared
+ * with the strategy draft's 시뮬레이션 정보 dialog (screens/bandDraft.js).
+ */
+export function BriefingOverview({ pub }) {
+  const gd = useGameData();
+  if (!pub) return null;
+  const mode = gd.config?.modes?.[pub.modeId];
+  const boss = pub.bossId ? gd.boss(pub.bossId) : null;
+  const bossEnemy = boss ? gd.enemy(boss.enemyKey) : null;
+  const stage = pub.stageId ? gd.stage(pub.stageId) : null;
+  const poolN = Array.isArray(mode?.stages) ? mode.stages.length : 0;
+  const pool = poolN > 1 ? `战场随机（共${poolN}张）` : poolN === 1 ? '战场固定' : '';
+  const types = factionTypes(pub.factions);
+  const factions = gd.factions?.types || {};
+  const m = gd.m;
+  return html`<div class="brief-overview">
         <div class="brief-boss brackets">
           <${MicroLabel} tone="gold">ENEMY LEADER // 敌方领袖</${MicroLabel}>
           <div class="brief-boss__art">
@@ -91,23 +121,5 @@ export function BriefingScreen() {
             <span class="brief-faction__text"><b>${factions[t]?.name || t}</b><${RichText} text=${factions[t]?.descRaw || factions[t]?.desc || ''} /></span>
           </div>`) : html`<p class="t-dim">本局没有特训敌人</p>`}
         </div>
-      </section>
-      <section class="brief__right">
-        <${MatchInfo} model=${info} />
-      </section>
-    </main>
-    <footer class="brief__foot">
-      <div class="brief__reroll-group"><${SetupReroll} pub=${pub} />
-      <span>리롤 ${room?.rerollLimit === -1 ? '무제한' : `${Math.max(0, (room?.rerollLimit ?? 0) - (room?.rerollsUsed ?? 0))}회 남음`}</span></div>
-      <${LoadoutButton} from="briefing" size="lg" class="brief-loadout" />
-      <div class="brief-ready">
-        <span class="brief-ready__txt">已就绪 <b class="num">${readyN}</b><span class="num">/${players.length}</span></span>
-        <span class="brief-ready__pips">${players.map((p) => html`<i key=${p.playerId} class=${cx(p.ready && 'on', p.playerId === myId && 'me')} title=${p.name}><${Icon} name="user" /></i>`)}</span>
-      </div>
-      <${Button} variant="primary" size="xl" icon=${me?.ready ? 'check' : me ? 'play' : 'eye'} active=${!!me?.ready} loading=${busy}
-        disabled=${!!me?.ready || !me || !!pub.rerollVote} onClick=${ready}>${me?.ready ? '已就绪' : me ? '准备就绪' : '观战中'}<//>
-    </footer>
-    ${solo ? null : html`<${ChatPanel} />`}
-    <${ExitModal} open=${exit} onClose=${() => setExit(false)} solo=${solo} />
   </div>`;
 }

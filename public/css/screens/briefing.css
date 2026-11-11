@@ -38,6 +38,7 @@
 .brief__modmark { position: relative; z-index: 2; align-self: flex-start; margin: .06rem .5rem 0; }
 .brief__left { display: flex; flex-direction: column; gap: .2rem; min-height: 0; overflow: auto; padding-right: .06rem; }
 .brief__left > * { flex-shrink: 0; }
+.brief__left > .brief-overview { display: contents; }
 .brief__right { display: flex; flex-direction: column; gap: .2rem; min-height: 0; overflow: auto; padding-right: .06rem; }
 
 .brief-boss {
