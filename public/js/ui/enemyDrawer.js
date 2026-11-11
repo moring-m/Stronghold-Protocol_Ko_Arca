@@ -32,7 +32,9 @@ function EnemiesTab({ pub, priv, onEnemy }) {
   const types = factionTypes(pub?.factions);
   const f = data.get('factions')?.types || {};
   const total = rows.reduce((s, r) => s + r.count, 0);
-  const boss = null;
+  // the final assault's leader (m.public bossId) — never the hidden core's (hiddenBossId stays secret)
+  const bossRec = pub?.bossId ? data.lookup('bosses', pub.bossId) : null;
+  const boss = bossRec && bossRec.enemyKey ? { ...bossRec, name: bossRec.name || data.lookup('enemies', bossRec.enemyKey)?.name || '' } : null;
   return html`<div class="edrawer__body">
     <div class="edrawer__sum">
       <span>第 <b class="num">${pub?.round ?? '-'}</b> 回合 · 即将迎击 <b class="num t-orange">${total}</b> 名敌人</span>
@@ -54,11 +56,13 @@ function EnemiesTab({ pub, priv, onEnemy }) {
         <b class="erow__count num">×${r.count}</b>
       </button>`)}
     </div>` : html`<p class="edrawer__empty"><${GIcon} name="target" />暂无敌方情报</p>`}
-    ${boss ? html`<div class="eboss">
+    ${boss ? html`<button type="button" class="eboss" onClick=${() => onEnemy(boss.enemyKey, 1)}>
       <${UnitThumb} kind="enemy" id=${boss.enemyKey} size="md" />
-      <div><${MicroLabel} tone="gold">ENEMY LEADER // 敌方领袖</${MicroLabel}><b>${boss.name}</b>
-        <span class="t-lo">第 ${data.get('config')?.modes?.[pub.modeId]?.bossRound ?? pub.lastRound ?? 14} 回合 · 最终攻势</span></div>
-    </div>` : null}
+      <div class="eboss__text"><${MicroLabel} tone="gold">ENEMY LEADER // 敌方领袖</${MicroLabel}><b>${boss.name}</b>
+        <span class="t-lo">第 ${pub.bossRound ?? data.get('config')?.modes?.[pub.modeId]?.bossRound ?? pub.lastRound ?? 14} 回合 · 最终攻势</span>
+        ${Array.isArray(boss.abilities) && boss.abilities.length ? html`<ul class="eboss__abil">${boss.abilities.map((a, i) => html`<li key=${i}><${RichText} text=${a} /></li>`)}</ul>` : null}
+      </div>
+    </button>` : null}
   </div>`;
 }
 
