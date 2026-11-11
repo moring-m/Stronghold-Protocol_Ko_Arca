@@ -13,3 +13,11 @@ export const MAP_PREVIEWS = {
   "act2autochess_m04": "/previews/maps/act2autochess_m04.jpg?v=024a-20261011",
   "custom_snowfield": "/previews/maps/custom_snowfield.jpg?v=20261029b"
 };
+
+/** The captured map image of a stage id (its base id for a co-op / eight-player variant), or null. */
+export function mapPreviewUrl(stageId) {
+  if (typeof stageId !== 'string' || !stageId) return null;
+  if (MAP_PREVIEWS[stageId]) return MAP_PREVIEWS[stageId];
+  const base = Object.keys(MAP_PREVIEWS).find((k) => stageId.startsWith(k));
+  return base ? MAP_PREVIEWS[base] : null;
+}

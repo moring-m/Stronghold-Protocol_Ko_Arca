@@ -18,6 +18,7 @@ import { actions } from '../ui/gameActions.js';
 import { factionTypes, sortedPlayers, phaseTotalSeconds } from '../ui/gameLogic.js';
 import { enemyIconUrl, factionIconUrl } from '../ui/assetUrls.js';
 import { useStore } from '../store.js';
+import { mapPreviewUrl } from '../ui/mapPreviews.js';
 
 const cx = (...p) => p.flat().filter(Boolean).join(' ');
 
@@ -82,6 +83,7 @@ export function BriefingScreen() {
           <span class="brief-stage__k"><${MicroLabel}>BATTLEFIELD</${MicroLabel}>${pool ? html`<span class="brief-stage__pool">${pool}</span>` : null}</span>
           <span class="brief-stage__name"><${Icon} name="rook" />${stage?.name || pub.stageId || '—'}</span>
         </div>
+        ${mapPreviewUrl(pub.stageId) ? html`<div class="brief-map"><img src=${mapPreviewUrl(pub.stageId)} alt=${stage?.name || ''} loading="lazy" onError=${(e) => { e.currentTarget.parentElement.hidden = true; }} /></div>` : null}
         <div class="brief-factions">
           <h3 class="brief-h"><span>特训敌人</span><${MicroLabel}>SPECIAL ENEMIES</${MicroLabel}></h3>
           ${types.length ? types.map((t) => html`<div key=${t} class="brief-faction">
