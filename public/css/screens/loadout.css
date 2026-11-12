@@ -627,7 +627,8 @@
 @media (max-height:520px) { .lo-top { padding:0 10px; gap:8px; } .lo-top__title, .lo-title-tabs button { font-size:14px; letter-spacing:.02em; } .lo-top__icon { width:14px; height:14px; } .lo-top__right { gap:4px; } .lo .lo-top__right .btn { padding:0 6px; font-size:11px; } }
 /* 선발 후보 rows: name + quick skill / module + remove, one compact line each (overrides the older tall slot rules) */
 .lo-rchips { display:grid; grid-template-columns:minmax(0,1fr); gap:4px; }
-.lo-recruit-selected .lo-rchips .lo-row { height:auto; min-height:36px; padding:3px 6px; gap:6px; grid-template-columns:minmax(0,1fr) auto auto 22px; grid-template-rows:auto; }
+.lo-recruit-selected .lo-rchips .lo-row { height:auto; min-height:36px; padding:3px 6px; gap:6px; grid-template-columns:minmax(0,1fr) 88px 88px 22px; grid-template-rows:auto; }
+.lo-recruit-selected .lo-rchips :is(.lo-row__skills,.lo-row__modules) { justify-content:flex-start; }
 .lo-recruit-selected .lo-rchips .lo-row > * { grid-row:auto; grid-column:auto; }
 .lo-recruit-selected .lo-rchips .lo-row__portrait { width:26px; height:26px; }
 .lo-recruit-selected .lo-rchips .lo-recruit-remove { width:22px; }
