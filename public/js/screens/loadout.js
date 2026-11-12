@@ -1,7 +1,7 @@
 import { useDocClass } from '../ui/device.js';
 import { statsPreview, LoadoutStats } from '../ui/loadoutStats.js';
 import { OperatorVoice } from '../ui/operatorVoice.js';
-import { RecruitPresetButton, RecruitPresetsHost } from '../ui/recruitPresets.js';
+import { RECRUIT_CANDIDATES, RECRUIT_PICKS } from '../../../shared/recruitPick.js';
 
 
 
@@ -528,7 +528,7 @@ function LoadoutScreen({ st }) {
     const id = c.chessId.replace(/_[56]_a$/, `_${tier || 5}_a`);
     const check = checkLoadout(next, getChess);
     if (!check.ok) {
-      toast(check.detail?.includes('최대 2명') ? '각 단계는 최대 2명까지 선발할 수 있습니다.' : '선발 설정을 확인하지 못했습니다. 오퍼레이터 데이터를 다시 불러와 주세요.', 'warn');
+      toast(check.detail?.includes(`최대 ${RECRUIT_CANDIDATES}명`) ? `각 단계는 최대 ${RECRUIT_CANDIDATES}명까지 선발 후보로 지정할 수 있습니다.` : '선발 설정을 확인하지 못했습니다. 오퍼레이터 데이터를 다시 불러와 주세요.', 'warn');
       return;
     }
     setEntries(next); loadoutStore.set({ sel: id });
@@ -643,12 +643,8 @@ function LoadoutScreen({ st }) {
     <p class=${cx('lo-note', locked && 'is-locked')}><${Icon} name="info" />${locked ? '本局的调配已锁定（确认本局信息后无法修改），修改将在下一局生效' : fromText}</p>
     ${!ready ? html`<div class="lo-loading"><${Spinner} size="sm" />正在载入干员数据（打开页面后仅载入一次）…</div>` : html`<main class=${cx('lo-body', listView&&'lo-body--list',narrowDetail && 'is-detail')}>
       <section class="lo-roster" style=${`--lo-name-length:${nameLength}`} id="lo-roster-panel" role="tabpanel" aria-labelledby=${`lo-tab-${tab}`}>
-        ${html`<${Filters} m=${m} filters=${st.filters} bonds=${bonds} presetAction=${tab==='recruits'?html`<${RecruitPresetButton}/>`:html`<${FavoritesButton} view="editor"/>`} listView=${listView} onView=${()=>{savePref("loadout.listView",!listView);setListView(!listView);setNarrowDetail(false);}} onFilters=${(filters) => loadoutStore.set({ filters })} />`}${tab === 'recruits' ? html`<div class="lo-recruit-note">
-          <div class="lo-recruit-selected">${[5,6].map(t=>html`<section class=${`lo-recruit-selected__tier lo-recruit-selected__tier--${t}`} aria-label=${t+'단계 선발'}><h2>${t}단계 <b class="num">${candidates.filter(c=>selectedAt(c,t)).length}/2</b></h2>${[0,1].map(i=>{
-            const c=candidates.filter(c=>selectedAt(c,t))[i];
-            const selected=c&&getChess(c.chessId.replace(/_[56]_a$/,`_${t}_a`));
-            return selected?html`<${RosterRow} m=${m} chess=${selected} golden=${selected.goldenId?getChess(selected.goldenId):null} entries=${st.entries} selected=${selected.chessId===selId} onPick=${pick} tier=${t} locked=${locked} getBond=${getBond} recruitControl=${html`<button class="lo-recruit-remove" type="button" disabled=${locked} title="선발 해제" aria-label=${selected.name+' '+t+'단계 선발 해제'} onClick=${()=>recruit(selected,t)}><${Icon} name="close"/></button>`} onChange=${patch=>setEntries(setRecruitChoice(loadoutStore.get().entries,selected,patch,getChess))}/>`:html`<button type="button" class="lo-recruit-selected__empty" disabled=${locked} aria-label=${t+'단계 선발 '+(i+1)+' 선택'} onClick=${()=>{setRecruitQuery('');setRecruitPicker(t);}}><${Icon} name="plus"/><span>선발 ${i+1}</span></button>`;
-          })}</section>`)}</div><p>선발한 오퍼레이터만 본인의 모집·보상에 등장합니다. 특질은 없습니다. 원형 오퍼레이터는 각 단계에 한 번씩 선발할 수 있습니다.</p></div>` : null}
+        ${html`<${Filters} m=${m} filters=${st.filters} bonds=${bonds} presetAction=${tab==='recruits'?null:html`<${FavoritesButton} view="editor"/>`} listView=${listView} onView=${()=>{savePref("loadout.listView",!listView);setListView(!listView);setNarrowDetail(false);}} onFilters=${(filters) => loadoutStore.set({ filters })} />`}${tab === 'recruits' ? html`<div class="lo-recruit-note">
+          <div class="lo-recruit-selected">${[5,6].map(t=>{const list=candidates.filter(c=>selectedAt(c,t)).map(c=>getChess(c.chessId.replace(/_[56]_a$/,`_${t}_a`))).filter(Boolean);return html`<section class=${`lo-recruit-selected__tier lo-recruit-selected__tier--${t}`} aria-label=${t+'단계 선발 후보'}><h2>${t + '단계 후보'} <b class="num">${list.length}/${RECRUIT_CANDIDATES}</b></h2><div class="lo-rchips">${list.map(c=>html`<${RosterRow} key=${c.chessId} m=${m} chess=${c} golden=${c.goldenId?getChess(c.goldenId):null} entries=${st.entries} selected=${c.chessId===selId} onPick=${pick} tier=${t} locked=${locked} getBond=${getBond} recruitControl=${html`<button class="lo-recruit-remove" type="button" disabled=${locked} title="후보 해제" aria-label=${c.name+' '+t+'단계 후보 해제'} onClick=${()=>recruit(c,t)}><${Icon} name="close"/></button>`} onChange=${patch=>setEntries(setRecruitChoice(loadoutStore.get().entries,c,patch,getChess))}/>`)}${list.length<RECRUIT_CANDIDATES?html`<button type="button" class="lo-rchip lo-rchip--add" disabled=${locked} aria-label=${t+'단계 후보 추가'} onClick=${()=>{setRecruitQuery('');setRecruitPicker(t);}}><${Icon} name="plus"/><span>추가</span></button>`:null}</div></section>`;})}</div><p>${`각 단계에 최대 ${RECRUIT_CANDIDATES}명까지 선발 후보로 지정합니다. 전략 선택 후 선발 선택 단계에서 후보 중 단계별 최대 ${RECRUIT_PICKS}명을 고르며, 고른 오퍼레이터만 본인의 모집·보상에 등장합니다. 특질은 없습니다. 원형 오퍼레이터는 각 단계에 한 번씩 지정할 수 있습니다.`}</p></div>` : null}
         ${listView?html`<div class="lo-list-header" ref=${listHeaderRef}><div class="lo-list-heading" aria-hidden="true"><span>오퍼레이터</span><span>직군</span><span>맹약</span><span>스킬</span><span>모듈</span>${tab==='recruits'?html`<span>선발</span>`:null}</div></div>`:null}
         <div class=${cx('lo-grid', tab === 'recruits' && 'lo-grid--recruits',listView&&'lo-grid--list')} role="listbox" aria-label="干员列表" ref=${gridRef} onScroll=${e=>{if(listHeaderRef.current)listHeaderRef.current.scrollLeft=e.currentTarget.scrollLeft;}}>
           ${list.length ? list.map((c) => html`<div class=${cx('lo-roster-entry',tab === 'recruits' && 'lo-recruit-card')} key=${c.chessId}>
@@ -716,7 +712,7 @@ export function LoadoutHost() {
     wasInMatch.current = inMatch;
   }, [phase, inMatch, st.open]);
   useDocClass('sp-loadout-open', st.open);
-  return html`<${Fragment}>${st.open ? html`<${LoadoutScreen} st=${st} />` : null}<${FavoritesHost}/><${RecruitPresetsHost}/><//>`;
+  return html`<${Fragment}>${st.open ? html`<${LoadoutScreen} st=${st} />` : null}<${FavoritesHost}/><//>`;
 }
 
 /**

@@ -1,4 +1,6 @@
-import {replaceRecruitEntries} from '../../shared/recruitPresetLinks.js';
+import { recruitCandidates, checkRecruitPicks } from '../../shared/recruitPick.js';
+/** 선발 선택 time when config.timers.recruitPick is not set (seconds). */
+const RECRUIT_PICK_SECONDS = 30;
 import {normalizeGameplayMode,gameplayExtensions} from '../../shared/gameplayModes.js';
 import { ruleOption } from '../../shared/plugins/rules.js';
 import { MatchOffers as UpstreamFallback18 } from './match/offers.js';
@@ -1033,7 +1035,9 @@ export class Match {
     let view;
     try { view = ps.privateView(); } catch (e) { this.reportError('privateView', e); return; }
     if(this.augments.enabled)view.augments=this.augments.privateView(ps);
-    if(ps.strategyPresetApplied)view.strategyPresetApplied=ps.strategyPresetApplied;
+    // 선발 (shared/recruitPick.js): the picked recruits; during 선발 선택 also the candidates and whether this player is done
+    view.selectedRecruits = ps.recruitPicks ? [...ps.recruitPicks] : [];
+    if (this.phase === PHASE.RECRUIT_PICK) view.recruit = { candidates: this.recruitCandidatesOf(ps), ready: !!ps.recruitReady };
     const json = JSON.stringify(view);
     if (!force && json === ps._lastPriv) return;
     ps._lastPriv = json;
@@ -1076,6 +1080,7 @@ export class Match {
       case PHASE.BAND_DRAFT:
         if (this.draft && this.draft.picks[ps.playerId]) return 'ready';
         return this.draft && this.draftTurn() === ps.playerId ? 'deciding' : 'acting';
+      case PHASE.RECRUIT_PICK: return ps.recruitReady ? 'ready' : 'deciding';
       case PHASE.SP_DRAFT:
         if(this.augments.current)return this.augments.current.side==='ally'?(this.augments.current.slots.get(ps.playerId)?.picked!=null?'ready':'deciding'):(this.augments.host()===ps.playerId?'deciding':'acting');
         if (this.sp && this.sp.picks[ps.playerId] != null) return 'ready';
@@ -1137,7 +1142,7 @@ export class Match {
         alive: ps.alive,
         lp: Math.max(0, ps.lp),
         bandId: ps.bandId,
-        selectedRecruits: Object.entries(ps.loadout || {}).filter(([, e]) => e.selected === true).map(([id]) => id),
+        selectedRecruits: ps.recruitPicks ? [...ps.recruitPicks] : [],
         shopLevel: ps.shop.level,
         boardCount: ps.deployCount,
         ready: this.phase === PHASE.INFO_CHECK ? ps.infoReady : ps.ready,
@@ -1148,6 +1153,8 @@ export class Match {
         // m.result's own bonds, so their layers would only cost every m.public bytes for the rest of the match
         // (the mode-off bonds with members included, `off: true`, as in m.private — bondsMeta.offBondCounts)
         bonds: ps.alive ? bondList(this.gd, ps.bondsView(), { off: offBondCounts(this.gd, ps) }) : [],
+        // 팀 전체 보기 (ui/teamOverview.js): the operators on the board, in board order — [] once eliminated
+        lineup: ps.alive ? boardOrder(ps.board).filter((x) => x.piece.kind === 'chess').map(({ piece }) => ({ id: piece.id, items: (piece.items || []).length })) : [],
         fieldId: this.fieldOf(ps),
         status: this.statusOf(ps),
         autoplay: ps.autoplay,
@@ -1387,6 +1394,7 @@ if (this.test === true) {
 
   _handle(ps, msg) {
     switch (msg.t) {
+      case 'g.recruitPick': return this.recruitPick(ps, msg);
       case 'g.infoReady':
         if (this.phase !== PHASE.INFO_CHECK) return fail(ERR.WRONG_PHASE);
         if (this.setupVote) return fail(ERR.WRONG_PHASE);
@@ -1964,13 +1972,46 @@ if (this.test === true) {
       const id=this.rngDraft.pick(eligible);if(!id)throw new Error('No strategy available for random assignment');
       used.add(id);this.draft.picks[pid]=ps.bandId=id;ps.randomBandBonus=5;ps.lp=this.gd.startLp(id)+ps.randomBandBonus;this.markPrivate(ps);
     }
-    for(const ps of this.order){
-      const preset=ps.strategyPresets?.[ps.bandId];if(!preset||ps.isBot)continue;
-      const next=replaceRecruitEntries(ps.loadout,preset,id=>this.gd.chess(id));
-      if(Object.keys(preset).length&&!Object.entries(next).some(([id,e])=>e.selected&&this.gd.chess(id)?.optionalRecruit))continue;
-      if(this.setLoadout(ps.playerId,next).ok){ps.strategyPresetApplied=ps.bandId;this.markPrivate(ps);}
-    }
     void timeout;
+    this.enterRecruitPick();
+  }
+
+  // ===================================================================================================
+  // RECRUIT_PICK (선발 선택, shared/recruitPick.js): each player picks ≤ 2 per tier from their own candidates
+
+  /** The candidates of a player (loadout `selected` entries), [] for a bot or a banned / unknown operator. */
+  recruitCandidatesOf(ps) {
+    if (!ps || ps.isBot) return [];
+    return recruitCandidates(ps.loadout, (id) => this.gd.chess(id)).filter((id) => !this.bannedChess?.includes(id) && !this.customExtensions?.bannedOperators?.includes(id));
+  }
+
+  enterRecruitPick() {
+    for (const ps of this.order) { ps.recruitPicks = new Set(); ps.recruitReady = !ps.alive || !!ps.autoplay || this.recruitCandidatesOf(ps).length === 0; }
+    // nobody has a candidate: no phase at all
+    if (this.order.every((ps) => ps.recruitReady)) { this.enterBattleCheck(); return; }
+    this.phase = PHASE.RECRUIT_PICK;
+    const secs = Number(this.gd.config.timers?.recruitPick) > 0 ? Number(this.gd.config.timers.recruitPick) : RECRUIT_PICK_SECONDS;
+    this.setDeadline(this.soloUntimed ? 0 : secs, () => this.finishRecruitPick());
+    for (const ps of this.order) this.markPrivate(ps);
+    this.markPublic();
+  }
+
+  recruitPick(ps, { picks, ready }) {
+    if (this.phase !== PHASE.RECRUIT_PICK) return fail(ERR.WRONG_PHASE);
+    if (ps.recruitReady && !ready) ps.recruitReady = false;
+    const r = checkRecruitPicks(picks, this.recruitCandidatesOf(ps), (id) => this.gd.chess(id));
+    if (!r.ok) return fail(ERR.BAD_TARGET, r.detail);
+    ps.recruitPicks = new Set(r.picks);
+    ps.recruitReady = !!ready;
+    this.markPrivate(ps);
+    this.markPublic();
+    if (this.order.every((p) => p.recruitReady || !p.alive || p.isBot || p.left)) this.later(0, () => { if (this.phase === PHASE.RECRUIT_PICK) this.finishRecruitPick(); });
+    return OK;
+  }
+
+  finishRecruitPick() {
+    if (this.phase !== PHASE.RECRUIT_PICK) return;
+    for (const ps of this.order) { ps.recruitReady = true; this.markPrivate(ps); }
     this.enterBattleCheck();
   }
 

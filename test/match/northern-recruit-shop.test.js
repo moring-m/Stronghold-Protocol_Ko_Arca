@@ -9,7 +9,7 @@ for(const tier of [5,6])test(`each coop player can roll their selected tier-${ti
  try{
   h.m.phase=PHASE.BAND_DRAFT;h.m.bannedChess=[];
   const ids=['talulah','territoriya','toska','makoto'].map(name=>`chess_custom_recruit_${name}_${tier}_a`);
-  const players=ids.map((id,i)=>{const ps=h.ps('p_'+i);assert.equal(h.m.setLoadout(ps.playerId,{[id]:{selected:true}}).ok,true);ps.shop.level=tier;return ps;});
+  const players=ids.map((id,i)=>{const ps=h.ps('p_'+i);assert.equal(h.m.setLoadout(ps.playerId,{[id]:{selected:true}}).ok,true);ps.recruitPicks=new Set([id]);ps.shop.level=tier;return ps;});
   const weights=[];
   for(const [i,ps]of players.entries()){
    for(const [j,id]of ids.entries())assert.equal(ps.pool.has(id),i===j);

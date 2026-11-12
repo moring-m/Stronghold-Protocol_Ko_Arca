@@ -58,6 +58,7 @@ import { createStudio } from './studio/index.js';
 import { MIME, COMPRESSIBLE, acceptsGzip, pickEncoding, parseRange } from './http/files.js';
 import { BUILD_INPUTS, computeBuildTag, buildTag, resetBuildTag } from './http/buildTag.js';
 import { createRequestHandler } from './http/routes.js';
+import { localMaintenanceControl } from './maintenanceControl.js';
 import { createTrafficCounter } from './http/traffic.js';
 import { createAssetIndex } from './http/assetIndex.js';
 import { createManifestViews } from './http/assetViews.js';
@@ -140,6 +141,8 @@ export async function startServer(opts = {}) {
     return {...stats,phase:[...phases].sort().join('+')||'idle',rehearsals};
   }});
   const releaseControl=release?workerControls(lobby,{release,token:releaseToken,network}):null;
+  // 점검 안내 without the release gateway (local / single-process servers): this machine only, no forwarded client
+  const localMaintenance=release?null:localMaintenanceControl(lobby,registry);
   const serveStatic = createStaticHandler({ publicDir, dataDir, sharedDir, simDir, packsDir, pluginsDir, packs, content, log, assetIndex, views, visual, contents });
   // the plugin studio (DESIGN §32.9): its page and API for this machine and the local network; it watches plugins/ only
   // once it is used (hot reload), and rooms whose host is the author or alone follow a plugin's changes by themselves
@@ -152,7 +155,7 @@ export async function startServer(opts = {}) {
   buildTag();
 
   const traffic = createTrafficCounter();
-  const server = http.createServer(createRequestHandler({ serveStatic, csp: process.env.SP_CSP === 'off' ? null : siteCsp(publicDir,{release}), health: { startedAt, network, registry, lobby, content, traffic, assetIndex, views, trusted:trustedRuntime?.health }, log, trustProxy: network.opts.trustProxy, studio, trustedRuntime, handleRequest: async(req,res)=>{if(releaseControl&&await releaseControl(req,res))return true;if(opts.handleRequest){res.setHeader('Service-Worker-Allowed','/');return await opts.handleRequest(req,res);}return false;} }));
+  const server = http.createServer(createRequestHandler({ serveStatic, csp: process.env.SP_CSP === 'off' ? null : siteCsp(publicDir,{release}), health: { startedAt, network, registry, lobby, content, traffic, assetIndex, views, trusted:trustedRuntime?.health }, log, trustProxy: network.opts.trustProxy, studio, trustedRuntime, handleRequest: async(req,res)=>{if(releaseControl&&await releaseControl(req,res))return true;if(localMaintenance&&await localMaintenance(req,res))return true;if(opts.handleRequest){res.setHeader('Service-Worker-Allowed','/');return await opts.handleRequest(req,res);}return false;} }));
   server.on('clientError', answerClientError);
   const wss = attachWebSocket(server, { network, log, traffic });
 
@@ -216,7 +219,7 @@ export async function startServer(opts = {}) {
   async function close() {
     if (closing) return closing;
     closing = (async () => {
-      releaseControl?.close?.();
+      releaseControl?.close?.();localMaintenance?.close?.();
       try { lobby.shutdown('shutdown'); } catch (e) { log.error('[shutdown] lobby', e); }
       try { hosts.close(); } catch (e) { log.error('[shutdown] match hosts', e); }
       eventLoop?.close();

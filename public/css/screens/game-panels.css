@@ -269,6 +269,10 @@ button.bpop__harmony:hover { border-style: solid; color: var(--ink-hi, #fff); }
 .etag--faction { border: 1px solid rgba(246, 163, 41, .5); color: var(--amber); font-weight: 500; }
 .eboss { display: flex; gap: .12rem; align-items: center; padding: .1rem .12rem; border: 1px solid rgba(255, 110, 40, .45); background: linear-gradient(90deg, rgba(232, 90, 26, .14), transparent); }
 .eboss > div { display: flex; flex-direction: column; gap: .02rem; }
+button.eboss { width: 100%; margin-top: .12rem; text-align: left; color: inherit; font: inherit; cursor: pointer; }
+button.eboss:hover { border-color: rgba(255, 110, 40, .8); }
+.eboss__abil { margin: .04rem 0 0; padding-left: .16rem; font-size: calc(.13 * var(--t)); color: var(--text-lo); }
+.eboss__abil li + li { margin-top: .02rem; }
 .eboss b { font-size: calc(.19 * var(--t)); }
 .eboss .t-lo { font-size: calc(.13 * var(--t)); }
 .iband { display: flex; gap: .12rem; align-items: flex-start; padding: .1rem; background: rgba(var(--accent-rgb),.05); border: 1px solid var(--mint-800); }

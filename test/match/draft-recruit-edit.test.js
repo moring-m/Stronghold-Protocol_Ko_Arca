@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {DATA,makeMatch} from './harness.js';
 import {PHASE} from '../../shared/constants.js';
 
-test('draft recruit edits replace personal eligibility before the first shop opens',()=>{
+test('recruit picks (not candidates) set personal eligibility before the first shop opens',()=>{
  const data=structuredClone(DATA);
  const base=Object.values(data.chess).find(c=>c.visible&&!c.isGolden&&c.tier===5&&!c.isDiy&&!c.isHidden&&c.bonds?.some(id=>!['emptyShip'].includes(id)));
  base.bonds=['emptyShip'];
@@ -14,9 +14,13 @@ test('draft recruit edits replace personal eligibility before the first shop ope
   h.m.phase=PHASE.BAND_DRAFT;
   const ps=h.ps('p_0');
   assert.equal(ps.canRecruit(base.chessId),false);
+  // a candidate alone is not a recruit: only a 선발 선택 pick is (shared/recruitPick.js)
   assert.equal(h.m.setLoadout('p_0',{[base.chessId]:{selected:true}}).ok,true);
+  assert.equal(ps.canRecruit(base.chessId),false);
+  h.m.phase=PHASE.RECRUIT_PICK;
+  assert.equal(h.m.recruitPick(ps,{picks:[base.chessId],ready:false}).ok,true);
   assert.equal(ps.canRecruit(base.chessId),true);
-  assert.equal(h.m.setLoadout('p_0',{}).ok,true);
+  assert.equal(h.m.recruitPick(ps,{picks:[],ready:false}).ok,true);
   assert.equal(ps.canRecruit(base.chessId),false);
  }finally{h.m.dispose();}
 });

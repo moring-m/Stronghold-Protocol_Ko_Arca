@@ -1024,3 +1024,29 @@
 .gm__dead-close,.chud__close { pointer-events:auto; display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; margin-left:.08rem; padding:0; border:1px solid currentColor; border-radius:50%; background:rgba(var(--dim-rgb, 0, 0, 0), .35); color:inherit; font-size:16px; line-height:1; cursor:pointer; opacity:.85; }
 .gm__dead-close:hover,.chud__close:hover { opacity:1; background:rgba(255,84,84,.2); }
 .gm__dead,.chud__msg--dead { pointer-events:auto; }
+
+/* ---- team overview (ui/teamOverview.js) ------------------------------------------------------------------- */
+.team__overview-btn {
+  pointer-events: auto; align-self: flex-start; display: grid; place-items: center; width: .36rem; height: .36rem; padding: 0;
+  background: rgba(var(--shade-rgb), .78); border: 1px solid var(--line-2); color: var(--text-lo); cursor: pointer;
+}
+.team__overview-btn:hover { color: var(--mint-400); border-color: var(--mint-700); }
+.team__overview-btn .icon { width: .2rem; height: .2rem; }
+.tov { display: flex; flex-direction: column; gap: .08rem; max-height: min(70vh, 6.4rem); overflow-y: auto; }
+.tov__row { display: grid; grid-template-columns: 1.7rem minmax(0, 1fr) minmax(0, 1.25fr); align-items: center; gap: .14rem;
+  padding: .08rem .12rem; background: rgba(var(--shade-rgb), .55); border: 1px solid var(--line-1); }
+.tov__row.is-self { border-color: var(--mint-800); }
+.tov__row.is-dead { opacity: .5; }
+.tov__who { display: flex; align-items: center; gap: .08rem; min-width: 0; }
+.tov__name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-hi); font-size: calc(.15 * var(--t)); }
+.tov__bonds { display: flex; flex-wrap: wrap; gap: .06rem; }
+.tov__bond { display: inline-flex; flex-direction: column; align-items: center; min-width: .5rem; color: var(--text-lo); font-size: calc(.12 * var(--t)); }
+.tov__bond .bglyph { width: .34rem; height: .34rem; }
+.tov__bond b { color: var(--text-hi); font-size: calc(.14 * var(--t)); line-height: 1; }
+.tov__bond small { font-size: calc(.11 * var(--t)); white-space: nowrap; }
+.tov__bond.is-on b { color: var(--mint-400); }
+.tov__bond:not(.is-on) { opacity: .6; }
+.tov__lineup { display: flex; flex-wrap: wrap; gap: .04rem; }
+.tov__items { position: absolute; right: 1px; bottom: 1px; min-width: .14rem; padding: 0 .02rem; background: rgba(0,0,0,.75); color: #fff; font-size: .1rem; text-align: center; }
+.tov__none { color: var(--text-dim); font-size: calc(.13 * var(--t)); }
+@media (max-width: 560px) { .tov__row { grid-template-columns: 1fr; } }

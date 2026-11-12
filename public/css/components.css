@@ -895,6 +895,33 @@
 .conn-banner .icon { width: .22rem; height: .22rem; color: var(--orange-hi); }
 .conn-banner__sub { color: var(--text-lo); font-family: var(--font-num); font-size: calc(.15 * var(--t)); }
 
+/* ---- maintenance notice (ui/maintenanceBanner.js) ------------------------------------------------------
+   Top centre; in a match under the top capsule like the connection banner, which then moves below it. While it
+   shows, html.sp-maint moves the toasts below it. */
+.maint-banner {
+  position: fixed; left: 50%; top: calc(.12rem + var(--sa-t, 0px)); transform: translateX(-50%);
+  z-index: var(--z-conn); display: flex; align-items: center; flex-wrap: wrap; justify-content: center; gap: .04rem .12rem;
+  max-width: calc(100vw - .32rem); padding: .07rem .1rem .07rem .16rem;
+  background: rgba(var(--surf-1-rgb, 24, 12, 8), .94); border: 1px solid rgba(240, 190, 60, .6);
+  box-shadow: 0 .08rem .3rem rgba(0, 0, 0, .6); color: var(--text-hi); font-size: calc(.15 * var(--t));
+  animation: conn-in var(--t-med) var(--ease-out);
+}
+.maint-banner.is-active { border-color: rgba(232, 90, 26, .8); }
+.maint-banner .icon { width: .2rem; height: .2rem; color: #f0be3c; flex: none; }
+.maint-banner.is-active .icon { color: var(--orange-hi); }
+.maint-banner__time, .maint-banner__left b { font-family: var(--font-num); }
+.maint-banner__left { color: var(--text-lo); }
+.maint-banner__left b { color: var(--text-hi); font-weight: 600; }
+.maint-banner__msg { color: var(--text-lo); overflow-wrap: anywhere; }
+.maint-banner__close { display: grid; place-items: center; width: .26rem; height: .26rem; padding: 0; border: 0; background: none; color: var(--text-lo); cursor: pointer; }
+.maint-banner__close:hover { color: var(--text-hi); }
+.maint-banner__close .icon { color: inherit; width: .16rem; height: .16rem; }
+.sp-maint .toast-host { top: calc(.62rem + var(--sa-t, 0px)); }
+.sp-in-match .maint-banner { top: calc(1.34rem + var(--sa-t, 0px)); }
+.sp-in-match.sp-maint .conn-banner { top: calc(1.84rem + var(--sa-t, 0px)); }
+.sp-in-match.sp-maint .toast-host { top: calc(1.84rem + var(--sa-t, 0px)); }
+.sp-in-match.sp-maint.sp-conn .toast-host { top: calc(2.5rem + var(--sa-t, 0px)); }
+
 /* ---- misc shared bits ------------------------------------------------------------------------------ */
 .kv { display: flex; align-items: baseline; gap: .08rem; }
 .kv__k { color: var(--text-lo); font-size: calc(.14 * var(--t)); }

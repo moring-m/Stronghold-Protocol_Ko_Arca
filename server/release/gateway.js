@@ -8,6 +8,7 @@ import { pipeline } from 'node:stream';
 import { authorized, json, body } from './runtime.js';
 import { RELEASE_RETENTION_MS, retainedDeadline } from '../../shared/releaseRetirement.js';
 import { transform } from './transform.js';
+import { normalizeMaintenance } from '../maintenance.js';
 export async function startGateway({
   port = 3000,
   host = "127.0.0.1",
@@ -44,6 +45,7 @@ export async function startGateway({
     fs.writeFileSync(temp, JSON.stringify(state), { mode: 0o600 });
     fs.renameSync(temp, stateFile);
   };
+  const activeMaintenance = () => state.maintenance && state.maintenance.end > now() ? state.maintenance : null;
   async function control(id, action = "status", input) {
     const r = state.releases[id];
     if (!r) throw Error("Unknown release");
@@ -159,6 +161,26 @@ export async function startGateway({
       json(res, 200, { current: state.current, workers });
       return;
     }
+    // 점검 안내: kept in the state file and sent to every worker (and to a worker registered later)
+    if (url.pathname === "/__roll/admin/maintenance") {
+      if (req.method === "GET") { json(res, 200, { notice: activeMaintenance() }); return; }
+      if (req.method !== "POST") { json(res, 405, { error: "POST required" }); return; }
+      let input;
+      try { input = await body(req); } catch { json(res, 400, { error: "Invalid body" }); return; }
+      if (!(input && input.clear === true)) {
+        const r = normalizeMaintenance(input, now());
+        if (!r.ok) { json(res, 400, { error: r.error }); return; }
+        state.maintenance = r.notice;
+      } else delete state.maintenance;
+      save();
+      const workers = {};
+      for (const id of Object.keys(state.releases)) {
+        try { workers[id] = await control(id, "maintenance", state.maintenance || { clear: true }); }
+        catch (e) { workers[id] = { error: String(e?.message || e) }; }
+      }
+      json(res, 200, { notice: state.maintenance || null, workers });
+      return;
+    }
     if (req.method !== "POST") {
       json(res, 405, { error: "POST required" });
       return;
@@ -201,6 +223,8 @@ export async function startGateway({
           throw Error("Worker prefix mismatch");
         state.releases[id].retirementNotices=!!worker.retirementNotices;
         save();
+        const notice = activeMaintenance();
+        if (notice) await control(id, "maintenance", notice).catch(() => {});
       } catch (e) {
         delete state.releases[id];
         throw e;

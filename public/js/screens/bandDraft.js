@@ -25,8 +25,8 @@ import { html, Button, Icon, MicroLabel, useTicker, secondsLeft } from '../ui/co
 import { useGameData, BandIcon, RichText, PlayerAvatar, LpTower, Sprite } from '../ui/gameComponents.js';
 import { StepHeader, ExitModal } from '../ui/matchChrome.js';
 import { LoadoutButton } from '../ui/loadoutEntry.js';
-import { RecruitPresetButton } from '../ui/recruitPresets.js';
 import { MatchInfoDialog, matchInfoModel } from '../ui/matchInfo.js';
+import { BriefingOverview } from './briefing.js';
 import { actions, act } from '../ui/gameActions.js';
 import { normalizeDraft, sortedPlayers } from '../ui/gameLogic.js';
 import { useStore } from '../store.js';
@@ -262,7 +262,7 @@ export function BandDraftScreen() {
       total=${clock ? clock.total : null} onExit=${() => setExit(true)} />
     <main class="draft__main">
       <aside class="draft-order">
-        <div class="draft-order__settings"><${LoadoutButton} from="bandDraft" class="draft-order__loadout" /><${RecruitPresetButton} size="md"/></div>
+        <div class="draft-order__settings"><${LoadoutButton} from="bandDraft" class="draft-order__loadout" /></div>
         <h3 class="brief-h"><span>${solo ? '独立模拟' : '决策顺序'}</span><${MicroLabel}>${solo ? 'FREE PICK' : 'RANDOM ORDER'}</${MicroLabel}></h3>
         ${(solo ? players.filter((p) => p.playerId === myId) : draft.order.map((pid) => players.find((p) => p.playerId === pid)).filter(Boolean)).map((p, i) => {
           const picked = draft.picks.get(p.playerId) || (p.playerId === myId ? myPick : p.bandId) || null;
@@ -285,7 +285,7 @@ export function BandDraftScreen() {
           </div>`;
         })}
         <${Button} variant="secondary" icon="search" block=${true} class="draft-order__info" data-testid="match-info-open"
-          aria-haspopup="dialog" onClick=${() => setInfoOpen(true)}>查看禁用盟约与干员<//>
+          aria-haspopup="dialog" onClick=${() => setInfoOpen(true)}>시뮬레이션 정보 보기<//>
         ${!solo ? html`<p class="draft-order__tip" data-testid="draft-tip">${draftTip({ timed, turnSeconds: turnLen, autoName: myPick ? null : autoName, selected: autoId === sel })}</p>` : null}
       </aside>
 
@@ -334,7 +334,7 @@ export function BandDraftScreen() {
     </main>
     ${solo ? null : html`<${ChatPanel} />`}
     <${ExitModal} open=${exit} onClose=${() => setExit(false)} solo=${solo} />
-    <${MatchInfoDialog} open=${infoOpen} onClose=${() => setInfoOpen(false)} model=${info}
+    <${MatchInfoDialog} open=${infoOpen} onClose=${() => setInfoOpen(false)} model=${info} overview=${html`<${BriefingOverview} pub=${pub} />`}
       status=${infoStatus ? html`<span class=${cx('minfo-dlg__turn', `is-${infoStatus.tone}`)}>
         <${Icon} name=${infoStatus.tone === 'mint' ? 'check' : 'hourglass'} />${infoStatus.text}${infoStatus.secs != null ? html`<b class="num">${infoStatus.secs}s</b>` : null}
       </span>` : null} />

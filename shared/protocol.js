@@ -1,3 +1,4 @@
+import { RECRUIT_CANDIDATES } from './recruitPick.js';
 import {isRoomTitle} from './roomTitle.js';
 import {isGameplayMode} from './gameplayModes.js';
 import {COMBAT_METRICS} from './combatStats.js';
@@ -165,7 +166,7 @@ export function checkLoadout(entries, getChess) {
     }
     if (e.selected !== undefined && !base.optionalRecruit) return {error:'BAD_TARGET',detail:'not an optional recruit'};
     if (e.selected) {
-      if (![5,6].includes(base.tier) || ++tierCounts[base.tier] > 2 || selectedChars.has(base.recruitPrototype ? `${base.charId}:${base.tier}` : base.charId)) return {error:'BAD_TARGET',detail:'최대 2명씩, 동일 오퍼레이터 중복 선발 불가'};
+      if (![5,6].includes(base.tier) || ++tierCounts[base.tier] > RECRUIT_CANDIDATES || selectedChars.has(base.recruitPrototype ? `${base.charId}:${base.tier}` : base.charId)) return {error:'BAD_TARGET',detail:`최대 ${RECRUIT_CANDIDATES}명씩, 동일 오퍼레이터 중복 선발 불가`};
       selectedChars.add(base.recruitPrototype ? `${base.charId}:${base.tier}` : base.charId);
     }
     const golden = base.goldenId ? getChess(base.goldenId) || null : null;
@@ -576,6 +577,8 @@ export const C2S = {
   'room.contentReady': { cs: isContentHash, ok: isBool, $optional: ['ok'] },
 
   // match
+  // 선발 선택 (RECRUIT_PICK, shared/recruitPick.js): the picks so far, and whether the player is done
+  'g.recruitPick': { picks: (v) => Array.isArray(v) && v.length <= 4 && v.every(isId), ready: (v) => typeof v === 'boolean' },
   'g.infoReady': { matchNo: optional((v) => isInt(v, 1)), setupRevision: optional((v)=>isInt(v,0,2**31)) },
   'g.rerollVote': {voteId:(v)=>isInt(v,1,2**31),agree:isBool},
   'g.band': { bandId: isId },

@@ -140,3 +140,9 @@
 .draft-order__settings > .btn { flex:1 1 120px; min-width:0; min-height:36px; height:auto; padding:8px; font-size:max(calc(.16 * var(--t)),12px); white-space:nowrap; }
 
 .draft-order__settings > .btn { letter-spacing:0; gap:4px; padding:6px; }
+/* 시뮬레이션 정보 (the draft's dialog with the briefing's overview beside the bonds and bans) */
+.modal__box.minfo-dlg--full { width: min(max(17rem, 760px), calc(calc(100 * var(--ui-vw, 1vw)) - .6rem - var(--sa-l, 0px) - var(--sa-r, 0px))); }
+.minfo-dlg__cols { display: grid; grid-template-columns: minmax(0, 5.2fr) minmax(0, 9fr); gap: .24rem; align-items: start; }
+.minfo-dlg__left .brief-overview { display: flex; flex-direction: column; gap: .16rem; }
+.minfo-dlg__right { display: flex; flex-direction: column; gap: max(.16rem, 6px); min-width: 0; }
+@media (max-width: 560px) { .minfo-dlg__cols { grid-template-columns: 1fr; } }

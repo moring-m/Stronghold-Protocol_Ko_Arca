@@ -1569,7 +1569,21 @@ export class Lobby {
     }
     // Omitted when the switch is off, so a welcome from a normal server stays identical.
     if (this.testEnabled === true) info.testMode = true;
+    // 점검 안내 (server/maintenance.js): only while one is set
+    const maintenance = this.maintenance?.view?.();
+    if (maintenance) info.maintenance = maintenance;
     return info;
+  }
+
+  /** A system chat line in every room (점검 안내): kept in the room's history like any other line. */
+  systemChat(text, detail = '') {
+    for (const room of this.rooms.values()) {
+      if (room.disposed || !room.chatHistory) continue;
+      const message = { id: ++room.chatSequence, playerId: null, name: '시스템', faction: null, text, ...(detail ? { detail } : {}), kind: 'system', at: this.now() };
+      room.chatHistory.push(message);
+      if (room.chatHistory.length > CHAT_HISTORY_LIMIT) room.chatHistory.shift();
+      this.broadcastRoom(room, { t: 'm.chat', ...message });
+    }
   }
 
   // ---------------------------------------------------------------------------------------------------

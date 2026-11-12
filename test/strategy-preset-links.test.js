@@ -20,21 +20,6 @@ test('favorites activate at confirmed strategy completion, not preview or draft;
   store.set(base);store.set({match:{...base.match,public:{...base.match.public,phase:'BATTLE_CHECK'}}});assert.equal(favoritesStore.get().active,'linked','a new draft in the same room re-applies the link');
  }finally{store.set(previous);favoritesStore.set(old);}
 });
-for(const how of ['manual','timeout','random'])test(`recruit strategy preset applies before loadout lock (${how})`,t=>{
- const h=makeMatch({mode:'solo',humans:1,seed:71,instant:false}).start();t.after(()=>h.m.dispose());
- h.drive(()=>h.m.phase==='BAND_DRAFT',{ready:false});const m=h.m,ps=m.players.get('p_0');
- const recruit=Object.values(m.gd.raw.chess).find(c=>c.optionalRecruit&&c.visible&&!c.isGolden&&c.tier===6);assert.ok(recruit);
- const band=m.gd.bandIds().find(id=>id!=='band_random');
- const initial=ps.loadout;ps.strategyPresets=how==='random'?Object.fromEntries(m.gd.bandIds().filter(id=>id!=='band_random').map(id=>[id,{[recruit.chessId]:{selected:true}}])):{[band]:{[recruit.chessId]:{selected:true}}};
- assert.equal(ps.loadout,initial);
- if(how==='manual')assert.ok(m.handle(ps.playerId,{t:'g.band',bandId:band}).ok);
- else if(how==='random')assert.ok(m.handle(ps.playerId,{t:'g.band',bandId:'band_random'}).ok);
- else {m.draft.focus.set(ps.playerId,band);m.draft.untimed=false;m.startDraftTurn();}
- h.run(()=>m.phase==='BATTLE_CHECK',{maxSteps:1000});
- assert.equal(m.phase,'BATTLE_CHECK');assert.equal(ps.loadout[recruit.chessId]?.selected,true);assert.equal(ps.strategyPresetApplied,ps.bandId);
- assert.equal(m.setLoadout(ps.playerId,{}).error,'WRONG_PHASE','ordinary edits still lock after strategy selection');
-});
-
 test('strategy recruit links are validated, stored before joining and carried to the room seat',async t=>{
  const {startServer}=await import('../server/index.js'),{TestClient}=await import('./helpers/wsClient.js'),{getData}=await import('../server/data.js');
  const srv=await startServer({port:0,host:'127.0.0.1',quiet:true,assetIndex:false,heavyBurst:20});t.after(()=>srv.close());
