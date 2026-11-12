@@ -157,4 +157,6 @@
 .rsel__mark { position: absolute; top: .05rem; right: .05rem; display: grid; place-items: center; width: .24rem; height: .24rem; border-radius: 50%; background: var(--mint-500); color: #062; }
 .rsel__mark .icon { width: .16rem; height: .16rem; }
 .rsel__foot { position: relative; z-index: 1; display: flex; justify-content: flex-end; padding: .14rem .5rem .24rem; }
-@media (max-width: 900px) { .rsel__main { grid-template-columns: 1fr; } .rsel__players { flex-direction: row; flex-wrap: wrap; } .rsel__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 900px) { .rsel__main { grid-template-columns: 1fr; gap: .16rem; } .rsel__players { flex-direction: row; flex-wrap: wrap; } }
+@media (max-height: 520px) { .rsel__card { padding: .06rem .04rem; } .rsel__card .uthumb--lg { --ut: .72rem; } .rsel__body { gap: .12rem; padding-bottom: .9rem; } }
+@media (max-width: 560px) { .rsel__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }

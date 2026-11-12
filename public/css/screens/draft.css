@@ -145,4 +145,4 @@
 .minfo-dlg__cols { display: grid; grid-template-columns: minmax(0, 5.2fr) minmax(0, 9fr); gap: .24rem; align-items: start; }
 .minfo-dlg__left .brief-overview { display: flex; flex-direction: column; gap: .16rem; }
 .minfo-dlg__right { display: flex; flex-direction: column; gap: max(.16rem, 6px); min-width: 0; }
-@media (max-width: 760px) { .minfo-dlg__cols { grid-template-columns: 1fr; } }
+@media (max-width: 560px) { .minfo-dlg__cols { grid-template-columns: 1fr; } }

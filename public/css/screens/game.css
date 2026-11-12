@@ -1049,4 +1049,4 @@
 .tov__lineup { display: flex; flex-wrap: wrap; gap: .04rem; }
 .tov__items { position: absolute; right: 1px; bottom: 1px; min-width: .14rem; padding: 0 .02rem; background: rgba(0,0,0,.75); color: #fff; font-size: .1rem; text-align: center; }
 .tov__none { color: var(--text-dim); font-size: calc(.13 * var(--t)); }
-@media (max-width: 760px) { .tov__row { grid-template-columns: 1fr; } }
+@media (max-width: 560px) { .tov__row { grid-template-columns: 1fr; } }
