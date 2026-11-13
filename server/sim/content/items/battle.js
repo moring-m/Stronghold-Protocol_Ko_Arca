@@ -98,6 +98,7 @@ function statMods(p) {
 // ---- hammers (蒸汽之心) — derived from data: hammer records carry bbStr.big_hammer on their special buff
 const STEAM_KEY = 'chess_item_6_05_e';
 const STEAM_BUFF = 'act1autochess_equip_acarm079_global_buff';
+const STEAM_EFFECT = 'eff_acarm079';
 function hammerTypeOf(p) {
   if (!p) return null;
   if (p.damage_scale != null) return 'burn';
