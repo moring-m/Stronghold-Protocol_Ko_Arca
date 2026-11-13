@@ -52,7 +52,7 @@ import { createRng } from './rng.js';
 import { Grid } from './grid.js';
 import { Unit } from './units.js';
 import { makeBuff, STATUS, RESIST_STATUSES } from './buffs.js';
-import { dealDamage as pipeDamage, heal as pipeHeal, applyHpLoss, makeDamageInfo, reduceElement, palsyBuff, elementView, capBossDamage } from './damage.js';
+import { dealDamage as pipeDamage, heal as pipeHeal, applyHpLoss, makeDamageInfo, reduceElement, palsyBuff, elementView, capBossDamage, mitigate } from './damage.js';
 import { absoluteRangeKeys, canTargetEnemy, extendedGrid, evadesGround, enemyStealthed, stealthOffKey } from './targeting.js';
 import { bodyKeys, bodyInKeys, bodyInRadius } from './body.js';
 import { normDir, mirrorDir, localOrder, localBefore } from './dir.js';
@@ -1863,12 +1863,51 @@ export class Battle {
   // =============================================================================================================
   // damage / heal
 
+  // Upstream's object requests (the season kits: dealDamage({ source, target, amount, type, … })) map onto the fork's
+  // positional pipeline; a positional call is unchanged.
   dealDamage(source, target, dmg) {
+    if (arguments.length === 1 && source && typeof source === 'object' && 'target' in source) {
+      const { source: src = null, target: tgt, credit, ...rest } = source;
+      if (!tgt) return 0;
+      if (src == null && credit !== undefined) return this.loseHpRequest({ ...rest, source: credit, target: tgt, sourceless: true }, rest.type ?? 'phys');
+      return this.dealDamage(src, tgt, rest);
+    }
     try { return pipeDamage(this, source, target, dmg); } catch (e) { this._internalError('dealDamage', e); return 0; }
   }
 
   heal(source, target, amount, opts = {}) {
+    if (arguments.length === 1 && source && typeof source === 'object' && 'target' in source) {
+      const { source: src = null, target: tgt, amount: n, ...rest } = source;
+      return this.heal(src, tgt, n, rest);
+    }
     try { return pipeHeal(this, source, target, amount, opts); } catch (e) { this._internalError('heal', e); return 0; }
+  }
+
+  /** 元素损伤 (upstream dealElementDamage({ source, target, amount, element })): the fork's 'element' damage type. */
+  dealElementDamage(request) {
+    const { source = null, target, ...rest } = request || {};
+    if (!target) return 0;
+    return this.dealDamage(source, target, { ...rest, type: 'element' });
+  }
+
+  /** Element recovery (upstream healElement): the fork's reduceElement. */
+  healElement(target, amount = undefined, element = null) {
+    if (arguments.length === 1 && target && typeof target === 'object' && 'target' in target) return reduceElement(target.target, target.amount, target.element ?? null);
+    return reduceElement(target, amount, element);
+  }
+
+  /** 流失 (upstream dealHPLose): a request object or the positional (target, amount, opts); 'true' damage by default. */
+  dealHPLose(target, amount = undefined, opts = {}) {
+    if (arguments.length === 1 && target && typeof target === 'object' && 'target' in target) return this.loseHpRequest(target, 'true');
+    return this.loseHp(target, amount, opts);
+  }
+
+  /** A request-shaped HP loss; 'phys' / 'arts' are mitigated by the target's DEF / RES first (upstream attack/health.js). */
+  loseHpRequest(req, defType) {
+    const { target, amount, type = defType, source = null, silent = false, tags = null, origin = null, sourceless = false, noHitLimit = false } = req;
+    let n = Number(amount) || 0;
+    if (type === 'phys' || type === 'arts') n = mitigate(n, type, target);
+    return this.loseHp(target, n, { source, silent, tags, from: origin, sourceless, noHitLimit });
   }
 
   /**

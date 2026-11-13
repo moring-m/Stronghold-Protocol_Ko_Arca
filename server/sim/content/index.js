@@ -134,6 +134,11 @@ export function officialKitKey(def, data, { kits = KITS, kitCharIds = KIT_CHAR_I
  */
 function registeredKit(def, reg) {
   if (!def || !reg) return undefined;
+  // another season's build: its chess ids name other operators, so the official kit is chosen by charId (upstream)
+  if (reg === KITS && isVersionData()) {
+    const key = officialKitKey(def);
+    return key == null ? undefined : KITS[key];
+  }
   if (isOtherBody(def) || def.raw?.optionalRecruit || def.raw?.customKit) return Object.prototype.hasOwnProperty.call(reg, def.charId) ? reg[def.charId] : undefined;
   const bare = String(def.baseId ?? def.id ?? '').replace(/_[ab]$/, '');
   return [def.baseId, def.id, bare].map(k => Object.hasOwn(reg, k) ? reg[k] : undefined).find(Boolean);
@@ -142,7 +147,8 @@ function registeredKit(def, reg) {
 /** Official kit key or file stem; no path supplied by a plugin is ever imported. */
 export function officialKit(ref) {
   if (Object.hasOwn(KITS, ref)) return KITS[ref];
-  const file = Object.values(KIT_REGISTRY.KIT_FILES || {}).flat().concat(KIT_REGISTRY.STANDIN_KIT_FILES || [], KIT_REGISTRY.OPERATOR_KIT_FILES || [])
+  const file = Object.values(KIT_REGISTRY.KIT_FILES || {}).flat().concat(KIT_REGISTRY.STANDIN_KIT_FILES || [], KIT_REGISTRY.OPERATOR_KIT_FILES || [],
+    KIT_REGISTRY.VERSION_KIT_FILES || [], KIT_REGISTRY.DIY_BORROW_KIT_FILES || [])
     .find(f => f.replace(/\.js$/, '') === ref);
   if (!file) return undefined;
   const stem = file.replace(/\.js$/, '');

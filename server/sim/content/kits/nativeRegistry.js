@@ -506,3 +506,6 @@ export const KITTED_CHARS = Object.freeze([...new Set([
   ...GENERIC_KIT_CHARS, ...Object.keys(STANDIN_KITS), ...Object.keys(OPERATOR_KITS),
   ...DIY_BORROW_CHARS.filter((c) => Object.hasOwn(DIY_BORROW_KITS, c)),
 ])]);
+
+/** The fork reads the merged registry as this module's default export (content/index.js TIERS). */
+export default KITS;
