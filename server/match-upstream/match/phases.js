@@ -7,7 +7,7 @@
 import { PHASE, ERR } from '../../../shared/constants.js';
 import { buildNormalWave, buildBossWave } from '../waves.js';
 import { pairPlayers, bossPairSalt } from '../finalAssault.js';
-import { createRng, deriveSeed } from '../../sim/rng.js';
+import { createRng, deriveSeed } from '../../sim-upstream/rng.js';
 import { OK, fail, DELAYS, BAND_TURN_SECONDS } from './common.js';
 import { SharedPool, bannedChessForBonds } from '../pool.js';
 import { botPickBondGroup } from '../botBondGroups.js';

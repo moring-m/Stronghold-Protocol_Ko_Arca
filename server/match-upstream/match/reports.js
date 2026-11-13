@@ -6,7 +6,7 @@
 
 import { ERR } from '../../../shared/constants.js';
 import { HeadlessJob, syntheticResult, validateClientResult, HARD_CAP_SECONDS } from '../fields.js';
-import { resultDigest, compactResult as compactForVerify } from '../../sim/spec.js';
+import { resultDigest, compactResult as compactForVerify } from '../../sim-upstream/spec.js';
 import { testSlice } from '../testTrace.js';
 import { OK, fail } from './common.js';
 

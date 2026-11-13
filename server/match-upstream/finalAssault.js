@@ -36,8 +36,8 @@
 //     co-op 1200) and team LP > minTeamLpExclusive (1, so at least 2 left: PRTS's user-contributed 「剩余生命值 > 1」,
 //     which the community's measurement 路标月报#2 matches — GitHub #645).
 
-import { BOSS_ROW_OFFSET, COLS, BOSS_POOL_MIN_HP } from '../sim/constants.js';
-import { mirrorDir, normDir } from '../sim/dir.js';
+import { BOSS_ROW_OFFSET, COLS, BOSS_POOL_MIN_HP } from '../sim-upstream/constants.js';
+import { mirrorDir, normDir } from '../sim-upstream/dir.js';
 import { bossPoolShareOf } from './gamedata.js';
 
 /**

@@ -1,4 +1,5 @@
 import {attachAttackTimings} from '../../../shared/attackTiming.js';
+import { versionById } from '../../../shared/versions.js';
 // Browser/Worker engine loader. Workers receive data and never fetch it (DESIGN §32.11).
 export const SIM_DATA_FILES = Object.freeze(['chess', 'enemies', 'tokens', 'stages', 'waves', 'bonds', 'items', 'garrisons', 'bands', 'effects', 'assets', 'backups']);
 
@@ -22,7 +23,9 @@ function deepFreeze(root) {
  */
 let loadedScripts = false, loadedTraits = false, traitInstaller = null;
 export async function loadBrowserSim({ base = '/sim/', dataBase = '/data/', fetchFn = (...a) => globalThis.fetch(...a), data = null, cs = null, bounds = null,
-  scripts = [], hashInput = null, nativeVerified = false, deferScripts = false, traitRuntimeVerified = null, reuse = null, reuseOwner = null } = {}) {
+  scripts = [], hashInput = null, nativeVerified = false, deferScripts = false, traitRuntimeVerified = null, reuse = null, reuseOwner = null, version = null } = {}) {
+  // a 규정(规程) season's battles run upstream's simulation (server/sim-upstream/, served at /sim-upstream/), as on the server
+  if (base === '/sim/' && versionById(version)?.family === 'regulation') base = '/sim-upstream/';
   const original = typeof reuse === 'function' && typeof reuseOwner === 'function' ? () => reuseOwner() === null : null;
   const release=globalThis.__SP_RELEASE || new URL(import.meta.url).searchParams.get('release');
   const pin = value => { if(!release || /^file:/.test(String(value)))return value;const u=new URL(value,globalThis.location.href);if(u.origin===globalThis.location.origin)u.searchParams.set('release',release);return u.href;};

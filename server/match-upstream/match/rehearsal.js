@@ -22,7 +22,7 @@
 // Installed on Match.prototype by server/match/Match.js (a method container: never instantiated; `this` is the match).
 
 import { DEFAULT_VERSION } from '../../../shared/versions.js';
-import { buildBattleSpec } from '../../sim/spec.js';
+import { buildBattleSpec } from '../../sim-upstream/spec.js';
 import { createDelegatedRehearsalJob } from '../bot.js';
 import { morphBattleOpt } from '../../../shared/plugins/rules.js';
 

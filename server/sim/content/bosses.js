@@ -1280,10 +1280,3 @@ export const BOSS_KITS = Object.freeze({
   enemy_9033_acdeer: kitDeer,          // boss_7 “萨米的意志”
 });
 export const BOSS_KEYS = Object.freeze(Object.keys(BOSS_KITS));
-
-
-/**
- * Self-bound leaders whose area strike hits a random operator within the leader's rangeRadius and the four tiles beside
- * it — 阿利斯泰尔's 【王权号令】 (kitLion decree). The bots space their units against it (server/match/bot.js, DESIGN §37.64).
- */
-export const PLUS_STRIKE = Object.freeze(['enemy_9032_aclionk']);

@@ -31,9 +31,9 @@
 //   uniteBillBounds(spawns, gd)            联防: per leaker, the live ×N clamp — what the escaped wave sent in
 //                                          (keySourceCounts only; settlement bills that same set)
 //   syntheticResult(players, progress)     stand-in when a boss field's client never reported
-import { TICK, SNAPSHOT_EVERY } from '../sim/constants.js';
+import { TICK, SNAPSHOT_EVERY } from '../sim-upstream/constants.js';
 import { layerGainRoom } from '../../shared/constants.js';
-import { uniteLeft } from '../sim/spec.js';
+import { uniteLeft } from '../sim-upstream/spec.js';
 import { diyTokenOwner, diyRecordOf } from '../../shared/diy.js';
 import { requiresTraitLayerAuthority } from './operatorTraits.js';
 

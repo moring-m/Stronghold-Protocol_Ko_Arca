@@ -43,14 +43,14 @@ import { dispatchOperatorTraits, operatorTraitHandler } from './operatorTraits.j
 import { itemKey } from './gamedata.js';
 import { boardOrder, parseKey, tileKey } from './board.js';
 import { pieceBonds as bondsOfPiece } from './bondsMeta.js';
-import { charge } from '../sim/content/dsl/budget.js';
-import { registerExtensionMeta, extensionMetaOwner } from '../sim/content/extensions.js';
-import { registerAllMeta } from '../sim/content/index.js';
+import { charge } from '../sim-upstream/content/dsl/budget.js';
+import { registerExtensionMeta, extensionMetaOwner } from '../sim-upstream/content/extensions.js';
+import { registerAllMeta } from '../sim-upstream/content/index.js';
 import { registerBuiltins } from './builtinMeta.js';
 import { msg, dn } from '../../shared/i18n.js';
 import { onGiftTicker } from './botEmotes.js';
 import { previewContext } from './preview.js';
-import { deriveSeed } from '../sim/rng.js';
+import { deriveSeed } from '../sim-upstream/rng.js';
 import { commandMetaHandler, openSkillChangeDraft } from './bandCommands.js';
 
 export const HOOKS = Object.freeze([

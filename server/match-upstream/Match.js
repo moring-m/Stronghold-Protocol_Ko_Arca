@@ -225,9 +225,9 @@
 import { PHASE, modeIdFor } from '../../shared/constants.js';
 import { isContentHash } from '../../shared/plugins/identity.js';
 import { DEFAULT_VERSION, versionById } from '../../shared/versions.js';
-import { Battle } from '../sim/Battle.js';
-import { DataSource } from '../sim/simdata.js';
-import { createRng, deriveSeed } from '../sim/rng.js';
+import { Battle } from '../sim-upstream/Battle.js';
+import { DataSource } from '../sim-upstream/simdata.js';
+import { createRng, deriveSeed } from '../sim-upstream/rng.js';
 import { GameData } from './gamedata.js';
 import { RealScheduler } from './scheduler.js';
 import { SharedPool, SharedItemPool, drawDisabledBonds } from './pool.js';

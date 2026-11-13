@@ -7,7 +7,7 @@
 import { requiresTraitLayerAuthority } from '../operatorTraits.js';
 import { PHASE } from '../../../shared/constants.js';
 import { DeadBattle, syntheticResult, RESULT_GRACE_MS, HARD_CAP_SECONDS, HeadlessJob } from '../fields.js';
-import { buildBattleSpec, createBattleFromSpec } from '../../sim/spec.js';
+import { buildBattleSpec, createBattleFromSpec } from '../../sim-upstream/spec.js';
 import { testSlice } from '../testTrace.js';
 import { morphBattleOpt } from '../../../shared/plugins/rules.js';
 

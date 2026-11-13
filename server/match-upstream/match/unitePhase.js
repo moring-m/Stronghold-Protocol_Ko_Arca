@@ -4,10 +4,10 @@
 // Installed on Match.prototype by server/match/Match.js (a method container: never instantiated; `this` is the match).
 
 import { PHASE, GEO } from '../../../shared/constants.js';
-import { deriveSeed } from '../../sim/rng.js';
+import { deriveSeed } from '../../sim-upstream/rng.js';
 import { uniteBattleOpts, uniteSurvivors } from '../unite.js';
 import { FieldRunner, timelineAt, uniteBillBounds } from '../fields.js';
-import { uniteLeft } from '../../sim/spec.js';
+import { uniteLeft } from '../../sim-upstream/spec.js';
 import { FLOW_TICKER_PRIORITY, DELAYS } from './common.js';
 import { msg } from '../../../shared/i18n.js';
 import { onStartUnite } from '../botEmotes.js';

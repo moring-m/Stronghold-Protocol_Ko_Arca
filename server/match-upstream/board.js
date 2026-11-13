@@ -39,8 +39,8 @@
 
 import { GEO } from '../../shared/constants.js';
 import { meleeOnHighGround } from '../../shared/highGround.js';
-import { DEFAULT_DIR, isDir, rotateOffset } from '../sim/dir.js';
-import { BOSS_ROW_OFFSET, COLS } from '../sim/constants.js';
+import { DEFAULT_DIR, isDir, rotateOffset } from '../sim-upstream/dir.js';
+import { BOSS_ROW_OFFSET, COLS } from '../sim-upstream/constants.js';
 
 export const FIELD = GEO.FIELD; // { r0: 9, r1: 12, c0: 2, c1: 10 }
 export const tileKey = (r, c) => `${r},${c}`;

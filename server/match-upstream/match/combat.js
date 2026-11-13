@@ -4,7 +4,7 @@
 // Installed on Match.prototype by server/match/Match.js (a method container: never instantiated; `this` is the match).
 
 import { PHASE, GEO } from '../../../shared/constants.js';
-import { deriveSeed } from '../../sim/rng.js';
+import { deriveSeed } from '../../sim-upstream/rng.js';
 import { withBounties } from '../waves.js';
 import { planUnite } from '../unite.js';
 import { FieldRunner, DeadBattle } from '../fields.js';

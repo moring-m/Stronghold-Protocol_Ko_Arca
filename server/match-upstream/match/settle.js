@@ -9,7 +9,7 @@ import { buildResult } from '../results.js';
 import { FLOW_TICKER_PRIORITY, DELAYS } from './common.js';
 import { msg } from '../../../shared/i18n.js';
 import { onSettle, resetRoundCounters } from '../botEmotes.js';
-import { creditedKillsOf } from '../../sim/spec.js';
+import { creditedKillsOf } from '../../sim-upstream/spec.js';
 
 export class MatchSettle {
   settle(plan, uniteResult) {

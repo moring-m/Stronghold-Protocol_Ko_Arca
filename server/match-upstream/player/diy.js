@@ -45,7 +45,7 @@
 // Installed on PlayerState.prototype by server/match/PlayerState.js (a method container: never instantiated; `this` is
 // the player state).
 
-import { KITTED_CHARS } from '../../sim/content/kits/index.js';
+import { KITTED_CHARS } from '../../sim-upstream/content/kits/index.js';
 import { checkDiyPicks } from '../../../shared/protocol.js';
 import { diyRecord, diySlot, diyTokenOwner, diyPool, diySlotIds, isPrototypePick } from '../../../shared/diy.js';
 import { diyBringCap } from '../../../shared/diyBring.js';

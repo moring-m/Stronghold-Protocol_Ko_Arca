@@ -10,9 +10,9 @@
 // and leaves a pre-set income alone when the condition does not match — the shape of 老鲤's give_coin_in_round,
 // which does not call addFunds. [ASSUMED] `if.round` is an integer compared with `ctx.round`.
 
-import { validateDsl, formatProblems } from '../sim/content/dsl/validate.js';
-import { evalCond, resolveValue } from '../sim/content/dsl/vocab.js';
-import { hostPluginId } from '../sim/content/dsl/compile.js';
+import { validateDsl, formatProblems } from '../sim-upstream/content/dsl/validate.js';
+import { evalCond, resolveValue } from '../sim-upstream/content/dsl/vocab.js';
+import { hostPluginId } from '../sim-upstream/content/dsl/compile.js';
 
 const EFFECT_KEY_RE = /^effect:[A-Za-z0-9_-]{1,64}:[A-Za-z0-9_\-.:#]+$/;
 

@@ -8,7 +8,7 @@ import { ERR, GEO } from '../../../shared/constants.js';
 import { chessIsDiy, itemForbidsDiy } from '../../../shared/itemRules.js';
 import { morphSlotPolicy, ruleOption } from '../../../shared/plugins/rules.js';
 import { tileKey, inField, parseDir, freeSlot } from '../board.js';
-import { offsetTile } from '../../sim/dir.js';
+import { offsetTile } from '../../sim-upstream/dir.js';
 import { itemKey } from '../gamedata.js';
 import { OK, fail } from './common.js';
 

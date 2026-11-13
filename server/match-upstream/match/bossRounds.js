@@ -6,8 +6,8 @@
 // Installed on Match.prototype by server/match/Match.js (a method container: never instantiated; `this` is the match).
 
 import { PHASE, GEO } from '../../../shared/constants.js';
-import { createRng, deriveSeed } from '../../sim/rng.js';
-import { creditedKillsOf } from '../../sim/spec.js';
+import { createRng, deriveSeed } from '../../sim-upstream/rng.js';
+import { creditedKillsOf } from '../../sim-upstream/spec.js';
 import { buildBossWave, bountySpawns } from '../waves.js';
 import { pairPlayers, bossPairSalt, bossPoolHp, SharedBossPool, CreditPool, hiddenEligible, BOSS_HIT_STEPS } from '../finalAssault.js';
 import { cleanLeaderOps, syncFieldLeaderOps, leaderTopRows, regulationLeaderRank } from '../leaderRank.js';

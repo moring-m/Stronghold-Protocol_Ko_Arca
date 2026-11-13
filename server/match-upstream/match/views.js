@@ -13,7 +13,7 @@ import { cardView } from '../choices.js';
 import { bountySpawns, previewOf } from '../waves.js';
 import { timelineAt } from '../fields.js';
 import { bossFieldPlacement } from '../finalAssault.js';
-import { battleProgress } from '../../sim/spec.js';
+import { battleProgress } from '../../sim-upstream/spec.js';
 
 /** Milliseconds since the match started. A stamp before the start, or a bad stamp, is 0. The stored log keeps the epoch. */
 function auditClock(at, startedAt) {

@@ -5,7 +5,7 @@
 // (a cancelled or rejected vote does not give the cooldown back); a connection's starts also draw from its heavy bucket.
 // Installed on Match.prototype like the other method containers. The lobby only refuses spectators and absent seats.
 import { PHASE, ERR, SETUP_REROLL_COOLDOWN_MS as REROLL_COOLDOWN_MS } from '../../../shared/constants.js';
-import { createRng, deriveSeed } from '../../sim/rng.js';
+import { createRng, deriveSeed } from '../../sim-upstream/rng.js';
 import { setupMatchWaves } from '../waves.js';
 import { drawDisabledBonds, SharedPool } from '../pool.js';
 import { OK, fail } from './common.js';

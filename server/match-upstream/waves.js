@@ -37,7 +37,7 @@
 // `lazerd` (else action 0); owner k starts 0.5·k s after the action, units step min(max(W/M, 0.05·W), 5 s) with M the
 // largest owner group (client `_CalculateActionPredelayConsiderUid`, decoded).
 
-import { createRng, deriveSeed } from '../sim/rng.js';
+import { createRng, deriveSeed } from '../sim-upstream/rng.js';
 import { PLUGIN_ACTION_UNITS } from '../../shared/plugins/limits.js';
 import { gateOf } from '../../shared/constants.js';
 

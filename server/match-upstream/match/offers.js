@@ -3,7 +3,7 @@
 // Strict majority resolves the rest with that fallback. quorum:none never gates the phase.
 import { ERR } from '../../../shared/constants.js';
 import { offerAt, offersAt } from '../../../shared/plugins/offers.js';
-import { createRng, deriveSeed } from '../../sim/rng.js';
+import { createRng, deriveSeed } from '../../sim-upstream/rng.js';
 import { OK, fail } from './common.js';
 
 export const OFFER_CLOSED = Object.freeze(['settled', 'timeout', 'none']);

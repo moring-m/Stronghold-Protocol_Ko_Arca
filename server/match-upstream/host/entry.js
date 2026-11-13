@@ -162,7 +162,7 @@ async function boot() {
       if (viaWorker || !process.permission || process.env.SP_PLUGIN_SCRIPTS !== 'sandbox') throw new Error('PLUGIN_SANDBOX_DISABLED');
       const sandboxModule = await import('../../../shared/plugins/sandbox.js');
       await sandboxModule.initializeSandbox({ loadSES: () => import('ses') });
-      await import('../../sim/spec.js');
+      await import('../../sim-upstream/spec.js');
       const { parse } = await import('acorn');
       await sandboxModule.installSandboxScripts(scripts, { hashInput, parse, log: log.info });
     } else await loadScripts(scripts, { hashInput, log: log.info });

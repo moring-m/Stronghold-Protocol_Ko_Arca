@@ -272,6 +272,3 @@ export function batMod(v, chess = null, desc = '') {
 }
 /** "周围8格" = Chebyshev ring 1 ⇒ Euclidean radius covering the 8 neighbours. */
 export const RING1 = 1.5;
-
-/** The upstream name of byEnemyAttack (these injury effects do not require an attack action). */
-export const byEnemyDamage = byEnemyAttack;

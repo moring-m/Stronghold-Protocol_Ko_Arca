@@ -6,7 +6,7 @@
 
 import { unitStatsEntry } from '../../../shared/protocol.js';
 import { PHASE, ERR, EMOTES, EMOTE_COOLDOWN_MS, GEO } from '../../../shared/constants.js';
-import { deriveSeed } from '../../sim/rng.js';
+import { deriveSeed } from '../../sim-upstream/rng.js';
 import { OK, fail } from './common.js';
 import { onHumanEmote } from '../botEmotes.js';
 

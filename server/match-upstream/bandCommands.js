@@ -5,7 +5,7 @@
 
 import { ERR } from '../../shared/constants.js';
 import { fieldTile, inField, tileKey } from './board.js';
-import { bandMetaHandler } from '../sim/content/bands/meta.js';
+import { bandMetaHandler } from '../sim-upstream/content/bands/meta.js';
 import { commandPlan, commandPassive } from './bandCommandEffects.js';
 import { OK, fail } from './player/common.js';
 

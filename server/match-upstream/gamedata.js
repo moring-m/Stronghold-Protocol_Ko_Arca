@@ -12,7 +12,7 @@
 // that still carries them is ignored).
 
 import { getConfig, getMode } from '../data.js';
-import { isShopItem } from '../sim/simdata.js';
+import { isShopItem } from '../sim-upstream/simdata.js';
 import { mergeData } from '../../shared/plugins/dataUtils.js';
 import { standInRecord } from '../../shared/standIn.js';
 import { MAX_OFFER_SLOTS } from './player/common.js';

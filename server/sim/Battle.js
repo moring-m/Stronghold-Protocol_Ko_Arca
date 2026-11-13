@@ -1,5 +1,4 @@
 import {BattleQueries as MergeBattle0} from './battle/queries.js';
-import {BattleLeaderHits as MergeBattle1} from './battle/leaderHits.js';
 import {ammoView,mysticView,layerView,chargeView} from './snapshot.js';
 import {noteAttackCommit} from './ai.js';
 import {ENEMY_COLLIDER_RADIUS} from './constants.js';
@@ -52,7 +51,7 @@ import { createRng } from './rng.js';
 import { Grid } from './grid.js';
 import { Unit } from './units.js';
 import { makeBuff, STATUS, RESIST_STATUSES } from './buffs.js';
-import { dealDamage as pipeDamage, heal as pipeHeal, applyHpLoss, makeDamageInfo, reduceElement, palsyBuff, elementView, capBossDamage, mitigate } from './damage.js';
+import { dealDamage as pipeDamage, heal as pipeHeal, applyHpLoss, makeDamageInfo, reduceElement, palsyBuff, elementView, capBossDamage } from './damage.js';
 import { absoluteRangeKeys, canTargetEnemy, extendedGrid, evadesGround, enemyStealthed, stealthOffKey } from './targeting.js';
 import { bodyKeys, bodyInKeys, bodyInRadius } from './body.js';
 import { normDir, mirrorDir, localOrder, localBefore } from './dir.js';
@@ -262,7 +261,7 @@ export class Battle {
       layerGains: {}, coins: 0, damageDealt: 0, bossDamage: 0, healingDone: 0, deaths: 0, unitsEnd: [], unitStats: [],
     };
     const late = [];
-    for (const u of [...(p.units ?? []), ...(p.commandReserves ?? [])]) {
+    for (const u of p.units ?? []) {
       try {
         const unit = this._createAllyFromInput(ps, u);
         if (unit && unit.kind === 'token' && !unit.ownerUnit && u.ownerUid != null) late.push([unit, u]);
@@ -326,32 +325,6 @@ export class Battle {
     return ps && ps.mirror && !abs && ps.coords !== 'field' ? mirrorDir(d) : d;
   }
 
-  /**
-   * Field an operator that was not on the board (规程 bench switch: 卡西米尔 melee piece, 阿戈尔 any piece).
-   * Field tiles, like spawnToken. Does not spend the match hand. Refuses a tile outside the rect, a living unit
-   * (`unitAt`) or a knocked-out operator (`downOn`). `opts.loadout` is getChess's loadout (null = the record's
-   * default); `opts.stats` overwrite base stats before setup. Returns the operator, or null.
-   */
-  spawnOperator(playerId, chessId, row, col, opts = {}) {
-    if (!Number.isInteger(row) || !Number.isInteger(col) || !this.grid.inRect(row, col)) return null;
-    if (this.unitAt(row, col) || this.downOn(row, col)) return null;
-    const ps = this.getPlayer(playerId);
-    if (!ps) return null;
-    const def = this.data.getChess(chessId, opts.loadout ?? null);
-    if (!def) { this.log(`unknown chess ${chessId}`); return null; }
-    const dir = opts.dir != null ? normDir(opts.dir) : ps.dir;
-    const u = this._makeAlly(ps, def, 'op', row, col, { uid: opts.uid ?? null, dir });
-    if (opts.stats) for (const [k, v] of Object.entries(opts.stats)) if (Number.isFinite(v)) u.base[k] = v;
-    if (Array.isArray(opts.items)) u.items = opts.items.slice();
-    this._setupUnit(u, opts.kit ?? null);
-    if (!this._deploy(u, { initial: false })) {
-      u.removed = true;
-      this.offOwner(u);
-      return null;
-    }
-    return u;
-  }
-
   _createAllyFromInput(ps, inp) {
     // coerce (a string row would otherwise concatenate: "10" + -7 → "10-7"); non-integers never deploy
     const row = Number(inp.row), col = Number(inp.col);
@@ -381,15 +354,7 @@ export class Battle {
     if (def.raw?.isDiy && !def.diyFor) { this.log(`自选 slot ${inp.chessId} without a pick`); return null; }
     const u = this._makeAlly(ps, def, 'op', r, c, { uid: inp.uid, dir });
     u.placementOrder = Number.isFinite(inp.placementOrder) ? inp.placementOrder : null;
-    // 规程 command reserves (upstream battle/players.js): fielded later by their command, never on their own
-    if (inp.commandReserveFor != null) {
-      u.commandReserveFor = inp.commandReserveFor;
-      u.deferDeploy = true;
-      u.respawnAt = Infinity;
-    }
-    if (inp.commandLayerCapBonus > 0) u.commandLayerCapBonus = inp.commandLayerCapBonus;
     u.items = [...(inp.items ?? [])];
-    if (inp.itemProgress) u.itemProgress = inp.itemProgress.map(p => ({ ...p }));
     u.carry = inp.carryState ?? null;
     // 练度 (自持有, 0.2.2): the owned operator's ×ATK / ×DEF / ×max HP (units.js Πmul) — never a 补位 stand-in's nor a
     // prototype 自选 pick's (another character than the one the player owns)
@@ -1863,51 +1828,12 @@ export class Battle {
   // =============================================================================================================
   // damage / heal
 
-  // Upstream's object requests (the season kits: dealDamage({ source, target, amount, type, … })) map onto the fork's
-  // positional pipeline; a positional call is unchanged.
   dealDamage(source, target, dmg) {
-    if (arguments.length === 1 && source && typeof source === 'object' && 'target' in source) {
-      const { source: src = null, target: tgt, credit, ...rest } = source;
-      if (!tgt) return 0;
-      if (src == null && credit !== undefined) return this.loseHpRequest({ ...rest, source: credit, target: tgt, sourceless: true }, rest.type ?? 'phys');
-      return this.dealDamage(src, tgt, rest);
-    }
     try { return pipeDamage(this, source, target, dmg); } catch (e) { this._internalError('dealDamage', e); return 0; }
   }
 
   heal(source, target, amount, opts = {}) {
-    if (arguments.length === 1 && source && typeof source === 'object' && 'target' in source) {
-      const { source: src = null, target: tgt, amount: n, ...rest } = source;
-      return this.heal(src, tgt, n, rest);
-    }
     try { return pipeHeal(this, source, target, amount, opts); } catch (e) { this._internalError('heal', e); return 0; }
-  }
-
-  /** 元素损伤 (upstream dealElementDamage({ source, target, amount, element })): the fork's 'element' damage type. */
-  dealElementDamage(request) {
-    const { source = null, target, ...rest } = request || {};
-    if (!target) return 0;
-    return this.dealDamage(source, target, { ...rest, type: 'element' });
-  }
-
-  /** Element recovery (upstream healElement): the fork's reduceElement. */
-  healElement(target, amount = undefined, element = null) {
-    if (arguments.length === 1 && target && typeof target === 'object' && 'target' in target) return reduceElement(target.target, target.amount, target.element ?? null);
-    return reduceElement(target, amount, element);
-  }
-
-  /** 流失 (upstream dealHPLose): a request object or the positional (target, amount, opts); 'true' damage by default. */
-  dealHPLose(target, amount = undefined, opts = {}) {
-    if (arguments.length === 1 && target && typeof target === 'object' && 'target' in target) return this.loseHpRequest(target, 'true');
-    return this.loseHp(target, amount, opts);
-  }
-
-  /** A request-shaped HP loss; 'phys' / 'arts' are mitigated by the target's DEF / RES first (upstream attack/health.js). */
-  loseHpRequest(req, defType) {
-    const { target, amount, type = defType, source = null, silent = false, tags = null, origin = null, sourceless = false, noHitLimit = false } = req;
-    let n = Number(amount) || 0;
-    if (type === 'phys' || type === 'arts') n = mitigate(n, type, target);
-    return this.loseHp(target, n, { source, silent, tags, from: origin, sourceless, noHitLimit });
   }
 
   /**
@@ -2359,11 +2285,6 @@ export class Battle {
    */
   moveRedeploy(unit, r, c, { clearSp = false } = {}) {
     if (!this.relocate(unit, r, c)) return false;
-    // #903: a 【移动】 is a retreat and redeploy (PRTS 术语释义「移动」), so the element gauges reset like a real deployment
-    // and an element burst's lock goes with them; the other buffs stay (DESIGN §22.3)
-    for (const b of unit.buffs.filter((x) => x.flags && x.flags.burstLock)) this.removeBuff(unit, b);
-    unit.elem.burn = unit.elem.neural = unit.elem.necrosis = unit.elem.apoptosis = unit.elem.erosion = 0;
-    unit.markDirty();
     unit.deploySeq = ++this._deploySeq;
     unit.aggroSeq = unit.deploySeq;
     unit.deployedAt = this.time;
@@ -2664,39 +2585,11 @@ export class Battle {
     return set;
   }
 
-  // Optional source is presentation attribution; the return value and DP arithmetic stay unchanged.
-  addDp(playerId, n, source = null) {
+  addDp(playerId, n) {
     const ps = this.getPlayer(playerId);
     if (!ps || !Number.isFinite(n)) return 0;
-    const before = ps.dp;
     ps.dp = Math.max(0, Math.min(this.flags.dpMax, ps.dp + n));
-    const reason = source?.def?.subProf;
-    if ((n > 0 && ['agent', 'charger', 'pioneer'].includes(reason)) || (n < 0 && reason === 'merchant')) {
-      this.resourceNumber(source, 'cost', ps.dp - before, reason);
-    }
     return ps.dp;
-  }
-
-  /** Settled display-only resource receipt. Live render hosts opt in; headless/golden runs need no extra events. */
-  resourceNumber(unit, resource, amount, reason) {
-    if (!this.opts?.resourceNumbers || !unit?.alive || !unit.deployed || unit.hidden || !Number.isFinite(amount) || amount === 0) return;
-    this._ev(['resource', unit.id, resource, amount, reason]);
-  }
-
-  /**
-   * Temporary bond layers (规程). Not written into layerGains and not announced on `layerGain`, so a garrison extra
-   * does not recurse. No-op when gains are disabled (联防 / boss / hidden) and for a non-positive amount.
-   */
-  addTempLayers(playerId, bondId, n) {
-    if (!this.flags.layerGainsEnabled || !(n > 0) || !Number.isFinite(n) || playerId == null) return 0;
-    if (typeof bondId !== 'string' || !bondId) return 0;
-    const pp = this._pp(playerId);
-    if (!pp) return 0;
-    const add = Math.min(1e4, Math.floor(n));
-    if (!(add > 0)) return 0;
-    if (!pp.tempLayerGains) pp.tempLayerGains = {};
-    pp.tempLayerGains[bondId] = Math.min(1e4, (pp.tempLayerGains[bondId] ?? 0) + add);
-    return add;
   }
 
   /**
@@ -3108,4 +3001,4 @@ export class Battle {
 
 export default Battle;
 
-for(const methods of [MergeBattle0,MergeBattle1])for(const key of Reflect.ownKeys(methods.prototype)){if(key!=='constructor'&&!Object.hasOwn(Battle.prototype,key))Object.defineProperty(Battle.prototype,key,Object.getOwnPropertyDescriptor(methods.prototype,key));}
+for(const methods of [MergeBattle0])for(const key of Reflect.ownKeys(methods.prototype)){if(key!=='constructor'&&!Object.hasOwn(Battle.prototype,key))Object.defineProperty(Battle.prototype,key,Object.getOwnPropertyDescriptor(methods.prototype,key));}
