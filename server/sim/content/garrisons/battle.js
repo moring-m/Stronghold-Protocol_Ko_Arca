@@ -36,15 +36,10 @@
 //                       ignore and dealt/taken multipliers; a tie keeps the type).
 //   NONE                风丸 "2 copies merge" — prep rule (chess.upgradeNum 2), nothing in battle.
 //
-<<<<<<< ours
-// Hooks: priority 0, except 弱点伤害 (hit, WEAKNESS_PRIORITY −10: decided on the final amount after the ATK
-// multipliers). install() registers nothing when no operator carries an IN_BATTLE garrison.
-=======
 // Hooks: priority 0, except 弱点伤害 (damageCalculate, WEAKNESS_PRIORITY −10: decided on the final amount after the ATK
 // multipliers). install() always stores a late-install hook (a summon's own IN_BATTLE traits); it registers no
 // listeners when nobody carries one. 规程·序列Ⅰ keys live in garrisons/regulation.js and are spread in first.
 // A garrison_trigger_buff row runs its child (runChild) and does not also add its own layers.
->>>>>>> theirs
 
 import * as S from '../support/index.js';
 import { mitigate } from '../../damage.js';
@@ -146,25 +141,14 @@ export function install(battle) {
 
   const all = [];
   const add = (unit, g, grantedBy = null) => {
-<<<<<<< ours
-    let set = owned.get(unit);
-    if (!set) { set = new Set(); owned.set(unit, set); }
-    const instanceKey=grantedBy?`grant:${grantedBy.unit.id}:${grantedBy.gid}:${g.garrisonId}`:`native:${g.garrisonId}`;
-    if(set.has(instanceKey)||(grantedBy?.unit===unit&&set.has(`native:${g.garrisonId}`)))return null;
-    set.add(instanceKey);
-    const bb = g.bb || {};
-    const cap = S.num(bb.max_add_count_per_battle, 0) > 0 ? S.num(bb.max_add_count_per_battle) : Infinity;
-    const it = {
-      unit, g, gid: g.garrisonId, key: g.effectKey, bb, bbStr: g.bbStr || {}, grantedBy,
-      cap, capKey: `gar:${g.garrisonId}:${unit.id}:${instanceKey}`, cnt: 0, k: -1,
-    };
-=======
     let set = battle._garOwned.get(unit);
     if (!set) { set = new Set(); battle._garOwned.set(unit, set); }
-    if (set.has(g.garrisonId)) return null;
-    set.add(g.garrisonId);
+    // one instance per source (the fork): a native garrison and each grant that copies it are separate instances
+    const instanceKey = grantedBy ? `grant:${grantedBy.unit.id}:${grantedBy.gid}:${g.garrisonId}` : `native:${g.garrisonId}`;
+    if (set.has(instanceKey) || (grantedBy?.unit === unit && set.has(`native:${g.garrisonId}`))) return null;
+    set.add(instanceKey);
     const it = makeInstance(unit, g, grantedBy);
->>>>>>> theirs
+    it.capKey = `gar:${g.garrisonId}:${unit.id}:${instanceKey}`;
     all.push(it);
     battle._garInstances.push(it);
     return it;
@@ -268,17 +252,13 @@ function conditionMet(battle, it) {
 }
 
 /** Fire a layer-gain garrison instance. Returns the layers added. */
-<<<<<<< ours
 export function fireGain(battle, it, override = null) {
-=======
-export function fireGain(battle, it) {
   // A trigger-buff wrapper only runs its child. Default data has no garrison_trigger_buff rows.
   if (it.bbStr.garrison_type === 'garrison_trigger_buff') {
     if (!conditionMet(battle, it)) return 0;
     runChild(battle, it);
     return 0;
   }
->>>>>>> theirs
   if (!conditionMet(battle, it)) return 0;
   const bonds = override?.bonds || targetBonds(battle, it);
   if (!bonds.length) return 0;
@@ -327,7 +307,6 @@ function ammoScope(it, u) {
 }
 
 const INSTALLERS = {
-<<<<<<< ours
   custom_ursus_slowed_death(battle,list){
     battle.on('death',({unit:target,reason})=>{
       // AK's 停顿 (정지) is distinct from stun/freeze and ordinary movement reductions.
@@ -346,7 +325,9 @@ const INSTALLERS = {
       if(!S.isOp(unit)||!S.onField(unit)||!S.unitBonds(unit).includes('ursusShip'))return;
       for(const it of list)if(S.onField(it.unit)&&it.unit.ownerId===unit.ownerId&&(it.cnt||0)<S.num(it.bb.max_trigger_count,8)){
         if(fireGain(battle,it)>0)it.cnt=(it.cnt||0)+1;
-=======
+      }
+    });
+  },
   ...REGULATION_INSTALLERS,
   act1autochess_gar_event_recoverhp_enemy_abflag_inrange(battle, list) {
     battle.on('statusApplied', ({ target, status, entered }) => {
@@ -357,7 +338,6 @@ const INSTALLERS = {
         for (let i = 0; i < 3; i++) battle.after(i, () => {
           if (S.onField(it.unit)) battle.heal({ source: it.unit, target: it.unit, amount: it.unit.s.maxHp * S.num(it.bb.hp_ratio) });
         });
->>>>>>> theirs
       }
     });
   },

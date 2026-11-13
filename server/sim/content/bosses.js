@@ -72,16 +72,12 @@ import { MOVE_SCALE, MAX_ALIVE_ENEMIES } from '../constants.js';
 import { aggroCmp, areaSelectable } from '../targeting.js';
 import { compileRoute } from '../ai.js';
 import { normalizeRoute } from '../simdata.js';
-<<<<<<< ours
-import { ensureInstalled, attackTurnSkill, abOf, attach, T, elem, hurt, targetsNear, allTargets, byPriority, areaAllies, areaAlliesInTiles, fieldAllies, remainingRoute, stayRoute, stepToward, setHits, hitCount, lpLoss, blinkForward, canCast, unbalancedNow, absorbArts, nthOf, castSlot } from './enemies.js';
-=======
 import {
   ensureInstalled, abOf, attach, T, elem, hurt, targetsNear, allTargets, byPriority, areaAllies, areaAlliesInTiles, fieldAllies,
   remainingRoute, stayRoute, stepToward, setHits, hitCount, lpLoss, blinkForward, canCast, unbalancedNow, nthOf,
   castSlot, attackTurnSkill,
 } from './enemies.js';
 import { REGULATION_BOSS_KITS } from './regulation-bosses.js';
->>>>>>> theirs
 import { hypot, powi } from '../detmath.js';
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -517,11 +513,7 @@ function kitShell(ab, e) {
   const stun = T(ab, 'killed.duration') ?? 0, dot = T(ab, 'killed.value') ?? 0;
   return [{
     spawn(b, e2) {
-<<<<<<< ours
       setHits(e2, e2.def.maxHp); hitCount(b, e2, true);                      // Fixed hit count; round HP scaling affects ordinary summons only.
-=======
-      setHits(e2, tokenHits(b, e2)); hitCount(b, e2, true);                   // 需要数次攻击击倒 (× the round's HP: summonMods, tokenHits)
->>>>>>> theirs
       b.addBuff(e2, { key: 'boss:shellGuard', persist: true, flags: { noDisplace: true } }); // 失衡免疫 (PRTS 天赋; also 静态刚体)
     },
     tick(b, e2, a, dt) {
@@ -877,11 +869,7 @@ function kitEcho(ab, e) {
   const s = ab.sk.Skill;
   return [
     {
-<<<<<<< ours
       spawn(b, e2) { setHits(e2, e2.def.maxHp); hitCount(b, e2, true); e2.blockWeight = ECHO_BLOCK_WEIGHT; setEchoForm(b, e2, 'dark'); }, // Fixed hit count, independent of summon HP scaling.
-=======
-      spawn(b, e2) { setHits(e2, tokenHits(b, e2)); hitCount(b, e2, true); e2.blockWeight = ECHO_BLOCK_WEIGHT; setEchoForm(b, e2, 'dark'); }, // hits × the round's HP (summonMods, tokenHits)
->>>>>>> theirs
       taken(c, b, e2) { const s = c.source || c.credit; if (s && s.side === 'ally') echoHit(b, e2); }, // 受到伤害时以自身为中心造成一次范围伤害 (a 无来源 burst too)
     },
     s && {
