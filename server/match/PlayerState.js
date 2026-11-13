@@ -1,18 +1,15 @@
 import { ruleOption } from '../../shared/plugins/rules.js';
-import { DiyStock } from './player/diy.js';
-import { PlayerAcquire } from './player/acquire.js';
-import { PlayerEconomy } from './player/economy.js';
+import { DiyStock } from './player-fork/diy.js';
+import { PlayerAcquire } from './player-fork/acquire.js';
+import { PlayerEconomy } from './player-fork/economy.js';
 import { hasTraitFor } from './operatorTraits.js';
 
-import {PlayerBasics as MergePlayer0} from './player/basics.js';
-import {PlayerDiy as MergePlayer1} from './player/diy.js';
-import {PlayerItems as MergePlayer2} from './player/items.js';
-import {PlayerPieces as MergePlayer3} from './player/pieces.js';
-import {PlayerPlacement as MergePlayer4} from './player/placement.js';
-import {PlayerRound as MergePlayer5} from './player/round.js';
-import {PlayerPrep as MergePlayer6} from './player/prep.js';
-import {PlayerViews as MergePlayer7} from './player/views.js';
-import {PlayerCommands as MergePlayer8} from './player/commands.js';
+import {PlayerBasics as MergePlayer0} from './player-fork/basics.js';
+import {PlayerDiy as MergePlayer1} from './player-fork/diy.js';
+import {PlayerItems as MergePlayer2} from './player-fork/items.js';
+import {PlayerPieces as MergePlayer3} from './player-fork/pieces.js';
+import {PlayerPlacement as MergePlayer4} from './player-fork/placement.js';
+import {PlayerRound as MergePlayer5} from './player-fork/round.js';
 import {msg,dn} from './../../shared/i18n.js';
 import {checkNotOwned,charPotentialChanges} from './../../shared/protocol.js';
 import {augmentEffectEntries} from '../../shared/augments.js';
@@ -2016,6 +2013,6 @@ export class PlayerState {
 
 export { FIELD };
 
-for(const methods of [MergePlayer0,MergePlayer1,MergePlayer2,MergePlayer3,MergePlayer4,MergePlayer5,MergePlayer6,MergePlayer7,MergePlayer8])for(const key of Reflect.ownKeys(methods.prototype)){if(key!=='constructor'&&!Object.hasOwn(PlayerState.prototype,key))Object.defineProperty(PlayerState.prototype,key,Object.getOwnPropertyDescriptor(methods.prototype,key));}
+for(const methods of [MergePlayer0,MergePlayer1,MergePlayer2,MergePlayer3,MergePlayer4,MergePlayer5])for(const key of Reflect.ownKeys(methods.prototype)){if(key!=='constructor'&&!Object.hasOwn(PlayerState.prototype,key))Object.defineProperty(PlayerState.prototype,key,Object.getOwnPropertyDescriptor(methods.prototype,key));}
 
 for(const methods of [PlayerAcquire,PlayerEconomy])for(const key of Reflect.ownKeys(methods.prototype)){if(key!=='constructor'&&!Object.hasOwn(PlayerState.prototype,key))Object.defineProperty(PlayerState.prototype,key,Object.getOwnPropertyDescriptor(methods.prototype,key));}

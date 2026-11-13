@@ -4,25 +4,25 @@ import { recruitCandidates, checkRecruitPicks } from '../../shared/recruitPick.j
 const RECRUIT_PICK_SECONDS = 30;
 import {normalizeGameplayMode,gameplayExtensions} from '../../shared/gameplayModes.js';
 import { ruleOption } from '../../shared/plugins/rules.js';
-import { MatchOffers as UpstreamFallback18 } from './match/offers.js';
-import { MatchTestCommands as UpstreamFallback17 } from './match/testCommands.js';
-import { MatchSettle as UpstreamFallback16 } from './match/settle.js';
-import { MatchBoss as UpstreamFallback15 } from './match/bossRounds.js';
-import { MatchUnite as UpstreamFallback14 } from './match/unitePhase.js';
-import { MatchReports as UpstreamFallback13 } from './match/reports.js';
-import { MatchClientCombat as UpstreamFallback12 } from './match/clientCombat.js';
-import { MatchCombat as UpstreamFallback11 } from './match/combat.js';
-import { MatchPrep as UpstreamFallback10 } from './match/prep.js';
-import { MatchSpDraft as UpstreamFallback9 } from './match/spDraft.js';
-import { MatchSetupVote as UpstreamFallback8 } from './match/setupVote.js';
-import { MatchPhases as UpstreamFallback7 } from './match/phases.js';
-import { MatchPause as UpstreamFallback6 } from './match/pause.js';
-import { MatchIntents as UpstreamFallback5 } from './match/intents.js';
-import { MatchWatch as UpstreamFallback4 } from './match/watch.js';
-import { MatchViews as UpstreamFallback3 } from './match/views.js';
-import { MatchMessaging as UpstreamFallback2 } from './match/messaging.js';
-import { MatchInfra as UpstreamFallback1 } from './match/infra.js';
-import { MatchPlatform as UpstreamFallback0 } from './match/platform.js';
+import { MatchOffers as UpstreamFallback18 } from './match-fork/offers.js';
+import { MatchTestCommands as UpstreamFallback17 } from './match-fork/testCommands.js';
+import { MatchSettle as UpstreamFallback16 } from './match-fork/settle.js';
+import { MatchBoss as UpstreamFallback15 } from './match-fork/bossRounds.js';
+import { MatchUnite as UpstreamFallback14 } from './match-fork/unitePhase.js';
+import { MatchReports as UpstreamFallback13 } from './match-fork/reports.js';
+import { MatchClientCombat as UpstreamFallback12 } from './match-fork/clientCombat.js';
+import { MatchCombat as UpstreamFallback11 } from './match-fork/combat.js';
+import { MatchPrep as UpstreamFallback10 } from './match-fork/prep.js';
+import { MatchSpDraft as UpstreamFallback9 } from './match-fork/spDraft.js';
+import { MatchSetupVote as UpstreamFallback8 } from './match-fork/setupVote.js';
+import { MatchPhases as UpstreamFallback7 } from './match-fork/phases.js';
+import { MatchPause as UpstreamFallback6 } from './match-fork/pause.js';
+import { MatchIntents as UpstreamFallback5 } from './match-fork/intents.js';
+import { MatchWatch as UpstreamFallback4 } from './match-fork/watch.js';
+import { MatchViews as UpstreamFallback3 } from './match-fork/views.js';
+import { MatchMessaging as UpstreamFallback2 } from './match-fork/messaging.js';
+import { MatchInfra as UpstreamFallback1 } from './match-fork/infra.js';
+import { MatchPlatform as UpstreamFallback0 } from './match-fork/platform.js';
 function auditClock(at, startedAt) {
   const stamp = Number(at);
   const start = Number(startedAt);
@@ -31,26 +31,26 @@ function auditClock(at, startedAt) {
 }
 import { TEST_PUBLIC_LOG } from '../../shared/testMode.js';
 import { requiresTraitLayerAuthority } from './operatorTraits.js';
-import {MatchOffers} from './match/offers.js';
-import {MatchTestCommands} from './match/testCommands.js';
+import {MatchOffers} from './match-fork/offers.js';
+import {MatchTestCommands} from './match-fork/testCommands.js';
 import {testSlice,installTestTrace} from './testTrace.js';
 
-import {MatchRehearsal as MergeMatch0} from './match/rehearsal.js';
-import {MatchSetupVote as MergeMatch1} from './match/setupVote.js';
-import {MatchViews as MergeMatch2} from './match/views.js';
-import {MatchWatch as MergeMatch3} from './match/watch.js';
+import {MatchRehearsal as MergeMatch0} from './match-fork/rehearsal.js';
+import {MatchSetupVote as MergeMatch1} from './match-fork/setupVote.js';
+import {MatchViews as MergeMatch2} from './match-fork/views.js';
+import {MatchWatch as MergeMatch3} from './match-fork/watch.js';
 import {creditedKillsOf} from './../sim/spec.js';
 import {previewPlayer} from './preview.js';
 import {wireMessage} from './../../shared/i18n.js';
 import {createDelegatedRehearsalJob} from './bot.js';
 import {bossFieldPlacement} from './finalAssault.js';
 import {isContentHash} from '../../shared/plugins/identity.js';
-import {MatchRehearsal,REHEARSAL_ANSWER_MS} from './match/rehearsal.js';
+import {MatchRehearsal,REHEARSAL_ANSWER_MS} from './match-fork/rehearsal.js';
 const envBotRehearsal = () => String(env('SP_BOT_REHEARSAL') || '').trim().toLowerCase() === 'host';
 import {AugmentMode} from './augments.js';
 import {RANDOM_BAND_ID} from '../../shared/randomBand.js';
 import {EIGHT_UNITE_RECT,eightUniteStageId} from '../../shared/cooperativeEight.js';
-import { MatchSetupVote } from './match/setupVote.js';
+import { MatchSetupVote } from './match-fork/setupVote.js';
 import { onHumanEmote, onSettle, resetRoundCounters, onPickCard, onStartUnite } from './botEmotes.js';
 import {recordCombatField} from './combatHistory.js';
 
@@ -286,24 +286,24 @@ import { botPrepBeginSteps, botPrepEndSteps, botPickBand, botPickCard } from './
 
 import { getBotStrategy, getBotStrategySeats } from './botStrategies.js';
 
-import { MatchPlatform } from './match/platform.js';
-import { MatchInfra } from './match/infra.js';
-import { MatchMessaging } from './match/messaging.js';
-import { MatchViews } from './match/views.js';
-import { MatchWatch } from './match/watch.js';
-import { MatchIntents } from './match/intents.js';
-import { MatchPause } from './match/pause.js';
-import { MatchPhases } from './match/phases.js';
+import { MatchPlatform } from './match-fork/platform.js';
+import { MatchInfra } from './match-fork/infra.js';
+import { MatchMessaging } from './match-fork/messaging.js';
+import { MatchViews } from './match-fork/views.js';
+import { MatchWatch } from './match-fork/watch.js';
+import { MatchIntents } from './match-fork/intents.js';
+import { MatchPause } from './match-fork/pause.js';
+import { MatchPhases } from './match-fork/phases.js';
 
-import { MatchSpDraft } from './match/spDraft.js';
-import { MatchPrep } from './match/prep.js';
-import { MatchCombat } from './match/combat.js';
-import { MatchClientCombat } from './match/clientCombat.js';
+import { MatchSpDraft } from './match-fork/spDraft.js';
+import { MatchPrep } from './match-fork/prep.js';
+import { MatchCombat } from './match-fork/combat.js';
+import { MatchClientCombat } from './match-fork/clientCombat.js';
 
-import { MatchReports } from './match/reports.js';
-import { MatchUnite } from './match/unitePhase.js';
-import { MatchBoss } from './match/bossRounds.js';
-import { MatchSettle } from './match/settle.js';
+import { MatchReports } from './match-fork/reports.js';
+import { MatchUnite } from './match-fork/unitePhase.js';
+import { MatchBoss } from './match-fork/bossRounds.js';
+import { MatchSettle } from './match-fork/settle.js';
 
 
 
