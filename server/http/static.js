@@ -127,13 +127,15 @@ const CS_FILE = /^\/cs\/([0-9a-f]{16})\/([A-Za-z0-9._\/-]{1,200})$/;
  *   assetIndex?: ReturnType<typeof import('./assetIndex.js').createAssetIndex> | null,
  *   views?: ReturnType<typeof import('./assetViews.js').createManifestViews> | null,
  *   visual?: ReturnType<typeof createVisualSets> | null,
- *   contents?: ReturnType<typeof import('../plugins/contentSets.js').createContentSets> | null }} dirs
+ *   contents?: ReturnType<typeof import('../plugins/contentSets.js').createContentSets> | null,
+ *   versions?: { file: (cs16: string, rel: string) => ({ body: Buffer, sha256: string, type: string } | null), servedDirs: () => string[] } | null }} dirs
  *   packs: the server's plugin registry (default: one over publicDir, dataDir, packsDir and pluginsDir — ROOT/packs, and
  *   the plugins/ folder beside packsDir); content: the vanilla content (default: computed from simDir, sharedDir and
  *   dataDir on first use); assetIndex / views: the content hashes and the served manifests (none: plain URLs,
  *   size-mtime ETags); visual: the visual sets (default: one over the registry — a registry of 0.2.0's shape has none:
  *   /vs/ and /p/ answer 404); contents: the content sets with gameplay plugins (DESIGN §32.6; none: only the vanilla
- *   set's /cs/ manifest)
+ *   set's /cs/ manifest); versions: the official versions this server enables (server/versions.js; none: /data/versions/ is
+ *   never served)
  * @returns {(req: import('node:http').IncomingMessage, res: import('node:http').ServerResponse, rawPath: string, query: string) => Promise<void>}
  */
 export function createStaticHandler({ publicDir, dataDir, sharedDir, simDir = path.join(ROOT, 'server', 'sim'), packsDir = path.join(ROOT, 'packs'),
@@ -217,10 +219,12 @@ export function createStaticHandler({ publicDir, dataDir, sharedDir, simDir = pa
     if (decoded.startsWith('/cs/')) {
       const c = vanillaContent();
       if (decoded !== `/cs/${csUrlPart(c.cs)}/index.json`) {
-        // a content set with gameplay plugins (DESIGN §32.6, server/plugins/contentSets.js): its manifest and its patched
-        // data files — a URL naming its content, so cached for good; 404 for a set this server does not keep
+        // an official version's manifest and bounds (DESIGN §35.23, server/versions.js), else a content set with gameplay
+        // plugins (DESIGN §32.6, server/plugins/contentSets.js): its manifest and its patched data files — a URL naming
+        // its content, so cached for good; 404 for a set this server does not keep
         const m = CS_FILE.exec(decoded);
-        const f = m && contents && !m[2].split('/').some((s) => s === '' || s === '.' || s === '..' || s.startsWith('.')) ? contents.file(m[1], m[2]) : null;
+        const safe = !!m && !m[2].split('/').some((s) => s === '' || s === '.' || s === '..' || s.startsWith('.'));
+        const f = safe && m ? (versions?.file(m[1], m[2]) || (contents ? contents.file(m[1], m[2]) : null)) : null;
         if (!f) { sendError(req, res, 404, '页面不存在 · Not found', decoded.length <= 200 ? decoded : ''); return; }
         await serveBuffer(req, res, { body: f.body, hash: `cs-${m[1]}-${(f.sha256 || 'index').slice(0, 8)}`, type: f.type || MIME['.json'], cacheControl: IMMUTABLE_JSON, key: `cs:${decoded}`, cache: gzipCache });
         return;

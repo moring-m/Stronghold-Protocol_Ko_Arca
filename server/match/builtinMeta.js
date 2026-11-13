@@ -56,7 +56,7 @@ function rollSameBond(ctx, bonds, maxTier, exclude = null) {
 }
 
 /** 信标: the living teammate (not the caller) with the most members of `bonds` ("相应盟约人数最多"), ties at random; null without one. */
-function mostBondMate(ctx, bonds) {
+function mostBondMate(ctx, bonds, minCount = 0) {
   const mates = ctx.teammates();
   if (!mates.length) return null;
   let best = -1;
@@ -65,7 +65,7 @@ function mostBondMate(ctx, bonds) {
     const score = bonds.reduce((s, b) => s + t.bondCount(b), 0);
     if (score > best) { best = score; pick = [t]; } else if (score === best) pick.push(t);
   }
-  return ctx.rng.pick(pick) || null;
+  return best >= minCount ? ctx.rng.pick(pick) || null : null;
 }
 
 const ITEM_HANDLERS = {
@@ -143,9 +143,6 @@ const ITEM_HANDLERS = {
       ctx.promote(holder.uid);
     },
   },
-  // 拟态物质 「若已拥有至少2名该初始干员，则再获得1名该初始干员；否则随机获得1名同盟约初始干员」: the 否则 is the owned < 2
-  // case only. The original experiment BV1eLXXBqEgF (3:00) distinguishes this item from pool-weighted grants:
-  // it samples eligible operator identities and can grant beyond stock. All obtained copies still occupy the pool.
   use_equip_reward_char_chess: {
     onEquip(ctx, ev) {
       const base = ctx.gd.baseIdOf(ev.target.id);

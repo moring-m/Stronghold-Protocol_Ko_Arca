@@ -483,11 +483,11 @@ export function pickUnitSfx(banks, opts = {}) {
   const own = (p) => (p?.length && ok(p) ? p : null);
   // operators: the plain ability of either event before any numbered variant
   const plain = opts.operator ? exact('ON_ABILITY_START') ?? exact('ON_ABILITY_ON') : null;
-  const attack = plain
+  const attack = plain ?? mode0('ON_ABILITY_START') ?? mode0('ON_ABILITY_ON')
     ?? firstMatching(banks, 'ON_ABILITY_START', ['attack', 'combat'], ok)
     ?? firstMatching(banks, 'ON_ABILITY_ON', ['attack', 'combat'], ok)
     ?? own(proj.born) ?? attackLike('ON_ABILITY_START') ?? attackLike('ON_ABILITY_ON');
-  const hit = firstMatching(banks, 'ON_ABILITY_HIT', ['attack', 'combat'], ok) ?? own(proj.hit) ?? attackLike('ON_ABILITY_HIT');
+  const hit = mode0('ON_ABILITY_HIT') ?? firstMatching(banks, 'ON_ABILITY_HIT', ['attack', 'combat'], ok) ?? own(proj.hit) ?? attackLike('ON_ABILITY_HIT');
   if (attack) out.attack = attack;
   if (hit) out.hit = hit;
   if (banks.get('ON_UNIT_DEAD')?.length) out.die = banks.get('ON_UNIT_DEAD');

@@ -1,5 +1,4 @@
 // server/match/invariants.js — engine invariants (DESIGN §11) as a non-throwing check. Used by the test harness
-// (i18n-ignore-file: developer reports in English with the game's terms, never shown to players — docs/I18N.md)
 // (test/match/harness.js checkInvariants asserts the list is empty) and by tools/matchrun.mjs --check sweeps.
 //
 // collectViolations(m) → string[] (empty when every invariant holds):
@@ -52,9 +51,6 @@ export function collectViolations(m, { limit = 25 } = {}) {
 
   for (const ps of m.players.values()) {
     const id = ps.playerId;
-    // the player's view of the data (its slotted 自选 slots are its operators) and the copies its 自选 pieces hold
-    const pgd = ps.gd || gd;
-    const diyHeld = new Map();
     if (!Number.isInteger(ps.funds) || ps.funds < 0) fail(`${id}: funds ${ps.funds}`);
     if (!Number.isInteger(ps.pendingFunds) || ps.pendingFunds < 0) fail(`${id}: pendingFunds ${ps.pendingFunds}`);
     if (!Number.isFinite(ps.lp)) fail(`${id}: lp ${ps.lp}`);
@@ -143,9 +139,6 @@ export function collectViolations(m, { limit = 25 } = {}) {
       // a "只能部署在召唤者攻击范围内" summon inside its owner's attack range (PlayerState.summonRange: a pure read)
       const range = p.kind === 'token' && typeof ps.summonRange === 'function' ? ps.summonRange(p) : null;
       if (range && !range.has(k)) fail(`${id}: ${p.id} on ${k}, outside its owner's attack range`);
-      // an outside-bound summon (战术锚点, PlayerState.summonExcluded) outside it
-      const out = p.kind === 'token' && typeof ps.summonExcluded === 'function' ? ps.summonExcluded(p) : null;
-      if (out && out.has(k)) fail(`${id}: ${p.id} on ${k}, inside its owner's attack range`);
       if (p.kind === 'chess') deployed++;
     }
     if (deployed > ps.deployCap) fail(`${id}: ${deployed} chess deployed > cap ${ps.deployCap}`);
@@ -170,7 +163,7 @@ export function collectViolations(m, { limit = 25 } = {}) {
     } catch (e) {
       fail(`${id}: computeBonds threw ${e && e.message}`);
     }
-    for (const [base, e] of ps.pool?.personal || []) {
+    for (const [base, e] of ps.pool.personal || []) {
       const owned = all.filter(p => p.kind === 'chess' && gd.baseIdOf(p.id) === base).reduce((n,p) => n + (p.poolCopies || 0),0);
       if (!Number.isInteger(e.left) || e.left > e.cap || e.left + owned !== e.cap) fail(`${id}: recruit stock ${base}: ${e.left} + ${owned} != ${e.cap}`);
     }
@@ -183,24 +176,15 @@ export function collectViolations(m, { limit = 25 } = {}) {
         if (s.kind === 'chess' ? !gd.chess(s.id) : !gd.item(s.id)) fail(`${id}: shop slot ${i} unknown ${s.kind} ${s.id}`);
         if (!Number.isInteger(s.basePrice) || s.basePrice < 0) fail(`${id}: shop slot ${i} basePrice ${s.basePrice}`);
         if (s.kind === 'chess' && banned.has(gd.baseIdOf(s.id))) fail(`${id}: banned chess ${s.id} in the shop`);
-        if (s.kind === 'chess' && gd.chess(s.id)?.isDiy && !(ps.diyStock && ps.diyStock.has(gd.baseIdOf(s.id)))) fail(`${id}: 自选 slot ${s.id} in the shop without its stock`);
       });
       for (const o of ps.offers) {
         for (const s of o.slots || []) {
           if (s.kind === 'item' ? !gd.item(s.id) : !gd.chess(s.id)) fail(`${id}: bad reward slot ${s.kind} ${s.id}`);
           if (s.kind !== 'item' && banned.has(gd.baseIdOf(s.id)) && o.source === 'merge') fail(`${id}: banned chess ${s.id} offered as a merge reward`);
-          if (s.kind !== 'item' && gd.chess(s.id)?.isDiy && !(ps.diyStock && ps.diyStock.has(gd.baseIdOf(s.id)))) fail(`${id}: 自选 slot ${s.id} offered without its stock`);
         }
         if (!o.slots || !o.slots.length || o.slots.length > 6) fail(`${id}: reward offer with ${o.slots && o.slots.length} slots`);
       }
     }
-    // 自选 stock accounting (player/diy.js): left + held == cap per slotted slot; a slot without stock holds nothing
-    for (const [base, e] of ps.diyStock ? ps.diyStock.entries : []) {
-      if (!(Number.isInteger(e.left) && e.left <= e.cap)) fail(`${id}: 自选 stock ${base}: balance ${e.left} cap ${e.cap}`);
-      const h = diyHeld.get(base) || 0;
-      if (e.left + h !== e.cap) fail(`${id}: 自选 stock ${base}: left ${e.left} + held ${h} != cap ${e.cap}`);
-    }
-    for (const [base, n] of diyHeld) if (!(ps.diyStock && ps.diyStock.has(base)) && n !== 0) fail(`${id}: 自选 slot ${base} without stock holds ${n} copies`);
   }
 
   // shared pool accounting

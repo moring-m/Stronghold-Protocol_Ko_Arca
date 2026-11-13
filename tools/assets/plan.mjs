@@ -727,7 +727,6 @@ export function buildPlan({ assets07, ops03, enemies05, maps05, audio, modelsDat
     prep: flatBgm(bgmLeaf('sys.ON_ACTIVITY_LOADED.act2autochess')),
     combat: flatBgm(bgmLeaf('battle.ON_GAME_READY.act1autochess_shop')),
     boss: flatBgm(bgmLeaf('battle.ON_GAME_READY.rglk1phantomcastle')),
-    ...(combatAlts.length ? { combatAlts } : {}),
     ...(unite ? { unite } : {}),
     ...(combatAlts.length===2 ? { combatAlts } : {}),
   };
@@ -797,8 +796,6 @@ export function buildPlan({ assets07, ops03, enemies05, maps05, audio, modelsDat
   // The three prep-only slots (干员报到 gacha / 编入队伍 squad / 任命队长 squadFirst) are NOT planned by default: the
   // client never requests them, and downloading them adds 360 files / 19.3 MB to every `npm run assets` — pass --voice-all for
   // the complete official set (`voiceSlots: null`, reviewer note on the voice PR).
-  // `audio.voiceJp` (VOICE_JP_LANG): the same slots and lines in the Japanese dub, a second tree beside the Chinese one
-  // (the owner's request of 2026-10-08) — same file names, `audio/voice/jp/`.
   const voiceSlotsByChar = indexVoice(charword, VOICE_ID_LANG, voiceSlots);
   // `dirOf` (VOICE_OPTIONAL_TREES native): the operator's own-language folder, or nothing when it has no such dub
   const voiceTree = (lang, dirOf = null) => {

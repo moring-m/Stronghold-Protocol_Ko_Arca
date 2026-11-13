@@ -13,7 +13,7 @@
 // Decisions (documented, see research 02 §4 / 03 §5.5):
 //   * "同一行有3名干员" / "同一行每有1名干员" count the trait's owner (board chess of that row, self included).
 //   * POSITION "使自身及身后/身前一格干员的已激活盟约分别各层数+N": per target operator (a shared bond gets +N twice).
-//   * 瑰盐 "优先…更靠上的和更靠右的": highest row first (DESIGN §3.1: row 0 is the bottom), then highest column.
+//   * 瑰盐 "优先…更靠上的和更靠右的": highest row first (DESIGN §3: row 0 is the bottom), then highest column.
 //   * 购买价格为N (SERVER_CHESS_PRICE): bb.price is a discount off the tier price — 至简 (Ⅲ, 3) has 2 → 1, 红豆 (Ⅰ, 2)
 //     has 1 → 1, exactly the N both official texts give (user playtest #5: 至简 costs 1). The dispatcher runs it before
 //     every other onPrice modifier, so 远见's discount (to 0 at 150 layers since 0.1.3) and strategy caps act on the
@@ -26,10 +26,6 @@
 //     merge or in-place promotion grants the elite its own first refresh; a re-bought copy also starts fresh.
 //     "本回合每刷新过1次" (SERVER_ADD_REFRESH_CNT_MULTIPLIER_BOND_LAYER, 阿罗玛 / 安洁莉娜 / 售出时)
 //     fires on another event and reads the player's refreshes of the round (roundStats), like 本回合每获得过 / 每花费.
-//
-// 规程·序列Ⅰ adds effect keys the default tables do not have (sell price, special refresh, battle-fin conversion).
-// A `max` on SERVER_ADD_BOND_METHOD / SERVER_ADD_BOND_ROUND_COIN_COST clamps only when that blackboard field is present,
-// so 盟约 rows without it keep today's amount. Behaviour is keyed by effectKey, never by garrison id.
 
 import { metaBonds, frontPiece, behindPiece, distinctTiers } from '../support/meta.js';
 
@@ -404,7 +400,7 @@ export function triggerGainEffects(ctx, piece) {
 
 // 铃兰 60_a: "<进入休整期时>触发身前一格的其他干员的“获得时”类效果" (scope front)
 // 瑰盐 82: "<售出时>触发场上一名拥有“休整期结束时”的干员的特质（优先触发部署位置更靠上的和更靠右的）" (scope farright).
-// DESIGN §3.1: row 0 is the bottom, so "更靠上" = the highest row; then the highest column ("更靠右").
+// DESIGN §3: row 0 is the bottom, so "更靠上" = the highest row; then the highest column ("更靠右").
 H.SERVER_TRIGGER_ANOTHER = {
   run(ctx) {
     const { bbStr } = ctx.source;

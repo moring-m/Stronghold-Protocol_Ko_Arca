@@ -2,16 +2,10 @@
 // Conventions of the tier-5 kits: ../shared/tier5.js; kit contract and rules: ../README.md.
 
 import { num, on, talent, batPct, mods, inFaction, isOp, selectedId, lazySkills, skillRange } from '../shared/tier5.js';
+
 import { damageApplyWay } from '../../../attack.js';
 
 const isLaterano = (u) => inFaction(u, 'lateranoShip', ['laterano']);
-
-/** Enemy `e` attacks `t` in melee (not a ranged shot), mirroring ai.js enemyAttack. */
-function meleeAttacker(e, t) {
-  const melee = e.profile?.melee ?? e.def?.applyWay === 'MELEE';
-  const r = num(e.base?.rangeRadius, 0);
-  return melee || !(r > 0) || (e.blockedBy === t && r < 1);
-}
 
 export default {
   // ---------------------------------------------------------------------------------------------------------------
@@ -116,17 +110,6 @@ export default {
             battle.addBuff(unit, { key: 'excu2:verdict', refresh: 'stack', maxStacks: Math.max(1, num(bb['attack@max_stack_cnt'], 30)), mods: mods({ atkPct: num(bb['attack@atk']) }) });
           }, { owner: unit });
         }
-        if (sid && sid !== 'skchr_excu2_2') return;
-        // S2: melee attacks dodged with `prob`, each dodge refills ammo
-        battle.on('hit', (c) => {
-          if (c.target !== unit || !unit.skill?.active || !c.source || c.source.side !== 'enemy' || !c.dmg.isAttack) return;
-          if (!meleeAttacker(c.source, unit) || !(prob > 0) || !battle.rng.chance(prob)) return;
-          c.dmg.cancel = true;
-          battle.fx('dodge', { x: unit.x, y: unit.y, id: unit.id });
-          // a dodge like the engine's (listeners of the `dodge` hook — items/bonds — see it too)
-          if (battle.hasHook('dodge')) battle.emit('dodge', { source: c.source, target: unit, dmg: c.dmg });
-          unit.skill.addAmmo(refill);
-        }, { owner: unit });
       },
     };
   },

@@ -20,7 +20,8 @@
 // When the worker stops — it crashed, ran out of memory, or the watchdog terminated it after its heartbeats stopped
 // (server/match/host/index.js) — or the match could not be created there, every pending request is answered INTERNAL,
 // the room's members are told (an m.toast, a message id) and onEnd({ reason, detail }) returns the room to its lobby
-// (`reason`: 'plugin-crash' | 'plugin-hang' | 'plugin-start'). A request the worker leaves unanswered for
+// (`reason`: 'plugin-crash' | 'plugin-hang' | 'plugin-start'; a match of an official version's host — DESIGN §35.23 —
+// 'version-crash' | 'version-hang' | 'version-start', told with the version msgids). A request the worker leaves unanswered for
 // REQUEST_TIMEOUT_MS is answered INTERNAL too (a living worker never takes that long: the watchdog acts first).
 
 import { ERR } from '../../../shared/constants.js';
@@ -31,8 +32,9 @@ import { validHostMessage } from './ipc.js';
 export const REQUEST_TIMEOUT_MS = 15_000;
 
 /**
- * What the room is told when its match ends because of its plugins (a message id, shared/i18n.js msg).
- * @param {string} reason 'plugin-crash' | 'plugin-hang' | 'plugin-start'
+ * What the room is told when its match ends because of its plugins, or of its official version's host (a message id,
+ * shared/i18n.js msg).
+ * @param {string} reason 'plugin-crash' | 'plugin-hang' | 'plugin-start' | 'version-crash' | 'version-hang' | 'version-start'
  */
 export function crashMessage(reason) {
   if (reason === 'version-hang') return msg('本局模拟长时间无响应，已结束');
@@ -193,7 +195,7 @@ export class MatchProxy {
     if (m.type === 'send') { try { this.opts.send(m.playerId, m.msg); } catch (e) { this.log.error?.(`[match ${this.roomCode}] send failed`, e); } return; }
     if (m.type === 'broadcast') { try { this.opts.broadcast(m.msg); } catch (e) { this.log.error?.(`[match ${this.roomCode}] broadcast failed`, e); } return; }
     if (m.type === 'end') { this._end(m.summary ?? null); return; }
-    if (m.type === 'failed') { this.crash('plugin-start', m.error); }
+    if (m.type === 'failed') { this.crash(/** @type {any} */ (this.host).kind === 'version' ? 'version-start' : 'plugin-start', m.error); }
   }
 
   /**
@@ -215,7 +217,8 @@ export class MatchProxy {
 
   /**
    * The worker stopped (or could not create the match): pending requests answered, the room told, the match over.
-   * @param {'plugin-crash' | 'plugin-hang' | 'plugin-start'} reason @param {string} [detail]
+   * @param {string} reason 'plugin-crash' | 'plugin-hang' | 'plugin-start' | 'version-crash' | 'version-hang' | 'version-start'
+   * @param {string} [detail]
    */
   crash(reason, detail = '') {
     this.forgotten = true; // the worker is gone: nothing more to route (the host already dropped its matches)

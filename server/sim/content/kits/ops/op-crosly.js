@@ -108,8 +108,8 @@ function smokeHit(battle, st, ctx) {
     if (d.attackId) st.last.set(e, { id: d.attackId, miss });
   }
   if (!miss) return;
-  d.cancel = true;
-  ctx.stopPropagation = true;
+  const cancelled = cancelDamage(d, 'miss');
+  if (cancelled) ctx.stopPropagation = true;
   if (ctx.target) battle.fx('dodge', { x: ctx.target.x, y: ctx.target.y, id: ctx.target.id });
 }
 

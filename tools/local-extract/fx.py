@@ -2642,7 +2642,8 @@ def projectile_entries(shared, proj_roots, eff, keys, out=None):
         key = pk(key)
         if key is None or key in projectiles or depth > 3:
             return
-        entry = {'main': None, 'lifeTime': None, 'movement': None, 'behaviours': []}
+        # Per-record marker: add-only runs can retain legacy records in the same index.
+        entry = {'rolesVersion': 1, 'main': None, 'lifeTime': None, 'movement': None, 'behaviours': []}
         projectiles[key] = entry
         strings, stack = set(), [proj_roots[key]]
         while stack:
@@ -3256,7 +3257,7 @@ def _read_json(path):
 
 
 def export_fx(ab_root, out_root, manifest, log, selection='sample', keys=None, jobs=None, root=None, fx_manifest=None,
-              texture_format='webp'):
+              texture_format='webp', add_only=False):
     """The fx run (extract.py --only fx): writes <out_root>/fx/** and `fx_manifest` (default <root>/data/local-fx.json:
     the groups FX_GROUPS, every file); returns the number of files written. `manifest` (the groups of
     data/local-assets.json) gets nothing: extract.py drops the fx groups an earlier run left there (ran_groups). A
@@ -3333,7 +3334,7 @@ def export_fx(ab_root, out_root, manifest, log, selection='sample', keys=None, j
                 for line in lines:
                     log(line)
             named = {r for e in entries.values() for r in e.get('refs', [])}
-            todo = {k for k in named if k in eff and k not in done}
+            todo = {k for k in named if k in eff and k not in done and k not in existing_prefabs}
     timings['prefabs'] = time.time() - t0
 
     summaries = {k: {f: v[f] for f in ('file', 'bundle', 'nodes', 'particleSystems', 'liveParticles', 'duration', 'looping', 'refs',
@@ -3348,14 +3349,20 @@ def export_fx(ab_root, out_root, manifest, log, selection='sample', keys=None, j
         'fx/mesh': {k: {'path': url(v['file']), 'kind': 'FxMesh', 'verts': v['verts']} for k, v in meshes.items()},
     }
     tex_all, set_name = dict(textures), 'keys' if keys else selection
-    prev = _read_json(out / 'index.json') if keys else None
+    prev = previous if add_only else _read_json(out / 'index.json') if keys else None
     if isinstance(prev, dict) and prev.get('format') == 'fx-index' and prev.get('version') == INDEX_VERSION:
         # a --fx-keys run: these prefabs replace their earlier copies; the earlier set's units, skills, prefabs stay
-        units, projectiles, skills, skins = (prev.get(x) or {} for x in ('units', 'projectiles', 'skills', 'skins'))
+        if add_only:
+            units, projectiles, skills, skins = ({**v, **(prev.get(k) or {})} for k, v in
+                                               zip(('units', 'projectiles', 'skills', 'skins'), (units, projectiles, skills, skins)))
+        else:
+            units, projectiles, skills, skins = (prev.get(x) or {} for x in ('units', 'projectiles', 'skills', 'skins'))
         summaries = {**(prev.get('prefabs') or {}), **summaries}
-        tex_all = {**((_read_json(out / 'textures.json') or {}).get('textures') or {}), **textures}
+        old_textures = (_read_json(out / 'textures.json') or {}).get('textures') or {}
+        tex_all = {**textures, **old_textures} if add_only else {**old_textures, **textures}
         old_groups = (_read_json(fx_manifest) or {}).get('groups') or {}
-        groups = {g: {**(old_groups.get(g) or {}), **v} for g, v in groups.items()}
+        groups = {g: ({**v, **(old_groups.get(g) or {})} if add_only else {**(old_groups.get(g) or {}), **v})
+                  for g, v in groups.items()}
         set_name = prev.get('set') or set_name
     groups = {'fx': {'index': {'path': url('index.json'), 'kind': 'FxIndex', 'version': INDEX_VERSION, 'set': set_name,
                                'prefabs': len(summaries)},
@@ -3376,7 +3383,7 @@ def export_fx(ab_root, out_root, manifest, log, selection='sample', keys=None, j
                                           'client': client_version(ab_root), 'set': set_name, 'count': count,
                                           'groups': groups}, ensure_ascii=False, separators=(',', ':')).encode('utf-8'))
     total = 3 + len(entries) + len(meshes) + sum(1 + (1 if v.get('half') else 0) for v in textures.values())
-    if not keys:                                              # a full set: drop files an earlier run left behind
+    if not keys and not add_only:                             # a full set: drop files an earlier run left behind
         keep = {out / 'index.json', out / 'textures.json'} | {out / v['file'] for v in entries.values()}
         keep |= {out / v['file'] for v in meshes.values()} | {out / v['file'] for v in textures.values()}
         keep |= {out / v['half'] for v in textures.values() if v.get('half')}

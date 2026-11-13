@@ -101,8 +101,11 @@ export function assetIndexOptionsFrom(opts, publicDir) {
   return { cacheFile, ...(Number.isFinite(o.delayMs) ? { delayMs: o.delayMs } : {}) };
 }
 
-/** net.js Network options out of the startServer() options; `trustProxy` falls back to TRUST_PROXY. */
-export function netOptionsFrom(opts) {
+/**
+ * net.js Network options out of the startServer() options; `trustProxy` falls back to TRUST_PROXY.
+ * @param {Record<string, any>} opts @param {{ warn?: (m: string) => void } | null} [log] the server logger, for a junk SP_MAX_*
+ */
+export function netOptionsFrom(opts, log = null) {
   const netOptions = {};
   for (const k of NET_OPTION_KEYS) {
     if (opts[k] != null) netOptions[k] = opts[k];
@@ -113,7 +116,30 @@ export function netOptionsFrom(opts) {
   return netOptions;
 }
 
-/** lobby.js Lobby options out of the startServer() options. */
+/**
+ * A fixed alliance key passed to one server instance: four letters or digits, upper-cased, or null for the random
+ * code every room gets. `--room-code` (server/index.js) and startServer({ roomCode }) share this parser; a blank value
+ * means random. Anything else is refused at boot instead of silently falling back to random — a private server that
+ * expects the same key should not start with a different one. There is no environment variable: the value lives only
+ * in the process that was started with it, so stopping the server ends it.
+ * @param {unknown} v
+ * @returns {string | null}
+ * @throws {RangeError} a value that is neither blank nor ROOM_CODE_LEN letters or digits
+ */
+export function parseRoomCode(v) {
+  const s = String(v ?? '').trim();
+  if (!s) return null;
+  const code = s.toUpperCase();
+  if (code.length !== ROOM_CODE_LEN || !/^[A-Z0-9]+$/.test(code)) {
+    throw new RangeError(`invalid fixed alliance key: use ${ROOM_CODE_LEN} letters or digits (A-Z, 0-9)`);
+  }
+  return code;
+}
+
+/**
+ * lobby.js Lobby options out of the startServer() options.
+ * @param {Record<string, any>} opts @param {{ warn?: (m: string) => void } | null} [log] the server logger, for a junk SP_MAX_*
+ */
 export function lobbyOptionsFrom(opts, log = null) {
   const lobbyOptions = {};
   for (const k of LOBBY_OPTION_KEYS) {
@@ -199,7 +225,7 @@ export function versionsFrom(opts, log = null) {
   const envDefault = String(process.env.SP_VERSION_DEFAULT ?? '').trim();
   const want = o.default != null ? String(o.default).trim() : (envDefault || null);
   // unset: the lobby preselects the running season (LOBBY_DEFAULT_VERSION) when enabled, else 第二期下半, else the first
-  let def = want ?? [DEFAULT_VERSION, LOBBY_DEFAULT_VERSION].find((id) => enabled.includes(id)) ?? enabled[0];
+  let def = want ?? [LOBBY_DEFAULT_VERSION, DEFAULT_VERSION].find((id) => enabled.includes(id)) ?? enabled[0];
   if (!enabled.includes(def)) {
     log?.warn?.(`[versions] default version "${def}" is not enabled, using ${enabled[0]}`);
     def = enabled[0];
@@ -231,25 +257,4 @@ export function makeLogger(quiet) {
     error: (...a) => console.error(...a),
     debug: process.env.DEBUG ? (...a) => console.debug(...a) : () => {},
   };
-}
-
-
-/**
- * A fixed alliance key passed to one server instance: four letters or digits, upper-cased, or null for the random
- * code every room gets. `--room-code` (server/index.js) and startServer({ roomCode }) share this parser; a blank value
- * means random. Anything else is refused at boot instead of silently falling back to random — a private server that
- * expects the same key should not start with a different one. There is no environment variable: the value lives only
- * in the process that was started with it, so stopping the server ends it.
- * @param {unknown} v
- * @returns {string | null}
- * @throws {RangeError} a value that is neither blank nor ROOM_CODE_LEN letters or digits
- */
-export function parseRoomCode(v) {
-  const s = String(v ?? '').trim();
-  if (!s) return null;
-  const code = s.toUpperCase();
-  if (code.length !== ROOM_CODE_LEN || !/^[A-Z0-9]+$/.test(code)) {
-    throw new RangeError(`invalid fixed alliance key: use ${ROOM_CODE_LEN} letters or digits (A-Z, 0-9)`);
-  }
-  return code;
 }

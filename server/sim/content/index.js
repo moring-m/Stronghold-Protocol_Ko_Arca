@@ -64,10 +64,6 @@ export const KITS = Object.freeze(Object.assign({}, ...TIERS.map((m) => (m && m.
 /** Domain modules in install order: tokens, devices, enemies, bosses, bonds, garrisons, items, bands, choices. */
 export const MODULES = Object.freeze(DOMAIN_NAMES.map((n, i) => [n, DOMAINS[i]]));
 
-/**
- * Whether `def` is a 补位 stand-in: a chess fielded with another character's body (simdata getStandIn — `standInFor` =
- * the replaced operator's charId, `charId` = the stand-in's, which differ).
- */
 export function isStandInDef(def) {
   return !!(def && def.standInFor && def.charId && def.charId !== def.standInFor);
 }
@@ -130,15 +126,11 @@ export function officialKitKey(def, data, { kits = KITS, kitCharIds = KIT_CHAR_I
  * The kit builder of an operator def in `reg` ({ [key]: (bb, chess, def) => Kit }), or undefined. A stand-in's and a
  * 自选 piece's kit is keyed by its charId (`char_609_acguad`, `char_112_siege`) and by nothing else: the chess id it keeps
  * names the replaced operator's kit (a DIY slot has none). Any other def: baseId (`…_a`, data/SIM.md), the exact id, or
- * the suffix-less id of DESIGN §5.6's example.
+ * the suffix-less id of DESIGN §5.6's example. The official registry (KITS) goes through officialKitKey, which also
+ * checks the operator; EXTENSIONS and injected Battle opts.kits keep the plain lookup.
  */
 function registeredKit(def, reg) {
   if (!def || !reg) return undefined;
-  // another season's build: its chess ids name other operators, so the official kit is chosen by charId (upstream)
-  if (reg === KITS && isVersionData()) {
-    const key = officialKitKey(def);
-    return key == null ? undefined : KITS[key];
-  }
   if (isOtherBody(def) || def.raw?.optionalRecruit || def.raw?.customKit) return Object.prototype.hasOwnProperty.call(reg, def.charId) ? reg[def.charId] : undefined;
   const bare = String(def.baseId ?? def.id ?? '').replace(/_[ab]$/, '');
   return [def.baseId, def.id, bare].map(k => Object.hasOwn(reg, k) ? reg[k] : undefined).find(Boolean);
@@ -147,13 +139,14 @@ function registeredKit(def, reg) {
 /** Official kit key or file stem; no path supplied by a plugin is ever imported. */
 export function officialKit(ref) {
   if (Object.hasOwn(KITS, ref)) return KITS[ref];
-  const file = Object.values(KIT_REGISTRY.KIT_FILES || {}).flat().concat(KIT_REGISTRY.STANDIN_KIT_FILES || [], KIT_REGISTRY.OPERATOR_KIT_FILES || [],
-    KIT_REGISTRY.VERSION_KIT_FILES || [], KIT_REGISTRY.DIY_BORROW_KIT_FILES || [])
-    .find(f => f.replace(/\.js$/, '') === ref);
+  const file = Object.values(KIT_REGISTRY.KIT_FILES || {}).flat().concat(
+    KIT_REGISTRY.STANDIN_KIT_FILES || [], KIT_REGISTRY.OPERATOR_KIT_FILES || [],
+    KIT_REGISTRY.VERSION_KIT_FILES || [], KIT_REGISTRY.DIY_BORROW_KIT_FILES || [],
+  ).find(f => f.replace(/\.js$/, '') === ref);
   if (!file) return undefined;
   const stem = file.replace(/\.js$/, '');
   if (stem.startsWith('chess_')) return KITS[stem.split('-')[0] + '_a'];
-  const code = stem.replace(/^(op|standin)-/, '');
+  const code = stem.replace(/^(op|standin|ver)-/, '');
   return Object.entries(KITS).find(([k]) => k.startsWith('char_') && k.endsWith('_' + code))?.[1];
 }
 

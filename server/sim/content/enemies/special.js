@@ -283,11 +283,6 @@ function catapultVolley(ab, b, e, aim) {
 // ---------------------------------------------------------------------------------------------------------------
 // this family's part of KITS (content/enemies.js spreads the parts in this order)
 
-/**
- * 心虚设计师: while a living blocker stands off the same column, the front is that side; otherwise the walk
- * (faceMove). The unit's `dir` and the display-only snapshot `face` use the same sign, so the model turns with the
- * cut. A blocker on the same column keeps the last sign [ASSUMED: PRTS names the front, not a same-column tie].
- */
 function faceCrshd(b, e, a) {
   const blk = e.blockedBy;
   let sign = null;
@@ -454,8 +449,6 @@ export const SPECIAL_KITS = Object.freeze({
     return [{
       sil: true,                                                     // silenced: the barrel is kept (and its speed) until an unsilenced attack
       spawn(b, e) { b.addBuff(e, { key: 'ab:barrel', persist: true, mods: { moveMul: T(ab, '1.move_speed') ?? 1 } }); },
-      // the barrel blow is its BlockedBoom: the skill slot for the client (castSlot, display only)
-      before(c, b, e, a) { if (!a.done) castSlot(b, e, ab.sk.BlockedBoom); },
       hitOut(c, b, e, a) { if (!a.done && c.dmg.isAttack) c.dmg.amount *= s.blockee_atk_scale ?? 1; },
       attack(c, b, e, a) {
         if (a.done) return;
@@ -479,7 +472,6 @@ export const SPECIAL_KITS = Object.freeze({
     tick(b, e, a) {
       a.n = (a.n ?? 0) + 1;
       if (a.n > 5) return;
-      castSlot(b, e, ab.sk.ForeverEnhance);   // each enhancement is its ForeverEnhance (display only)
       const s = ab.sk.ForeverEnhance ? ab.sk.ForeverEnhance.bb : {};
       const anim=e.def.raw?.abilityAnimations?.ForeverEnhance;
       e.mem.abilityAnimUntil=b.time+(anim?.duration || 1);
@@ -553,10 +545,5 @@ export const SPECIAL_KITS = Object.freeze({
         }});
       });
     },
-    attack(c, b, e) {
-      catapultVolley(ab, b, e, e.mem.catapultAim || { target: null, x: e.x, y: e.y });
-    },
-    // a follow-up stone is itself an attack, so `dealt` runs again; the tag keeps it from starting another volley
-    dealt(c) { if (c.dmg?.tags?.includes(CATAPULT_STONE)) return; },
   }],
 });

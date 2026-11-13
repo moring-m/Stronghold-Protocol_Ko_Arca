@@ -1,17 +1,44 @@
-// server/sim/battle/combat.js — Battle methods: damage, heal and HP loss (the guarded entry points of the damage.js
+// server/sim/battle/combat.js — Battle methods: damage, heal and HP loss (the guarded entry points of the attack.js
 // pipeline), projectiles and forced attacks (ai.js performAttack).
 // Installed on Battle.prototype by server/sim/Battle.js (a method container: never instantiated; `this` is the battle).
 
 import { dealDamage as pipeDamage, heal as pipeHeal, applyHpLoss, makeDamageInfo, reduceElement, capBossDamage } from '../damage.js';
 import { effectiveProfile, performAttack, acquireTargets } from '../ai.js';
+import * as attack from '../attack.js';
+import { legacyDamage } from '../attack/legacy.js';
+import { legacyHeal } from '../attack/legacy.js';
 
 export class BattleCombat {
-  dealDamage(source, target, dmg) {
-    try { return pipeDamage(this, source, target, dmg); } catch (e) { this._internalError('dealDamage', e); return 0; }
+  /** @overload
+   * @param {import('../../../types/attack.js').DamageRequest} request
+   * @returns {number}
+   */
+  /** Legacy positional signature; prefer dealDamage({source, target, amount, type, credit}).
+   * @overload
+   * @param {object|null} source
+   * @param {object} target
+   * @param {object} dmg
+   * @param {object} [opts]
+   * @returns {number}
+   */
+  dealDamage(source, target = undefined, dmg = undefined, opts = {}) {
+    try { return arguments.length === 1 ? attack.dealDamage(this, source) : legacyDamage(this, source, target, dmg, opts); } catch (e) { this._internalError('dealDamage', e); return 0; }
   }
 
-  heal(source, target, amount, opts = {}) {
-    try { return pipeHeal(this, source, target, amount, opts); } catch (e) { this._internalError('heal', e); return 0; }
+  /** @overload
+   * @param {import('../../../types/attack.js').HealRequest} request
+   * @returns {number}
+   */
+  /** Legacy positional signature; prefer heal({source, target, amount, mode}).
+   * @overload
+   * @param {object|null} source
+   * @param {object} target
+   * @param {number} amount
+   * @param {object} [opts]
+   * @returns {number}
+   */
+  heal(source, target = undefined, amount = undefined, opts = {}) {
+    try { return arguments.length === 1 ? attack.heal(this, source) : legacyHeal(this, source, target, amount, opts); } catch (e) { this._internalError('heal', e); return 0; }
   }
 
   /**
@@ -33,9 +60,12 @@ export class BattleCombat {
     return applyHpLoss(this, source, target, amount, { type: 'true', tags: t, noSp: true, silent, origin: from ?? null, sourceless: !!sourceless || !!(from && from.sourceless) });
   }
 
-  reduceElement(target, amount, element = null) { return reduceElement(target, amount, element); }
+  /** @deprecated Use dealHPLose. */
+  loseHp(target, amount, opts = {}) { return this.dealHPLose(target, amount, opts); }
+  /** @deprecated Use healElement. */
+  reduceElement(target, amount, element = null) { return this.healElement(target, amount, element); }
 
-  makeDamage(d) { return makeDamageInfo(d); }
+  makeDamage(d) { return attack.makeDamageInfo(d); }
 
   addProjectile(p) { return this.projectiles.add(p); }
 

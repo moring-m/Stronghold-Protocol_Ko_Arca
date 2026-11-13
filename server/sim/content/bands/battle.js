@@ -282,7 +282,7 @@ export function isMapCharBuff(b) {
 
 /** Does this band have a battle part? */
 export function hasBattlePart(bandId) {
-  return buffsOf(bandRecord(bandId)).some((b) => (b.bbKey && BY_KEY[b.bbKey]) || b.key === 'auto_chess_change_map');
+  return buffsOf(bandRecord(bandId)).some((b) => (b.bbKey && BY_KEY[b.bbKey]) || isMapCharBuff(b));
 }
 
 export function install(battle) {

@@ -1228,7 +1228,7 @@ function yanyouFallbackDef(battle) {
  *   * every damage it deals adds burn = ATK × 2.ep_damage_ratio (20 %: "自身造成伤害时，附加攻击力20%的灼燃损伤"; the
  *     official 下半 notice: "祛恶之焰附带的灼燃损伤调整为基于炎佑的攻击力") — normal attacks AND flame ticks;
  *   * 元素脆弱 aura: enemies within YANYOU_FRAGILE_RADIUS (1.5, PRTS "自身<固定半径>半径1.5范围内") take 元素伤害 (burst
- *     damage) × 2.damage_scale (1.2) — not the gauge fill (damage.js);
+ *     damage) × 2.damage_scale (1.2) — not the gauge fill (attack/element.js);
  *   * immune to element damage ("即将受到元素损伤前取消此元素损伤");
  *   * 祛恶之焰 [模式乙] (the 炎 bond's mode, Skill_2; cooldown / initCooldown 15, atk_scale 0.6, hit_duration 20,
  *     range_radius 1.0): "触发索敌和普通攻击相同：锁定1个目标持续施法，最多持续20秒，每秒对目标周围半径1.0范围内的所有
@@ -1263,7 +1263,8 @@ function yanyouKit(bb, raw) {
   const sk = skills.find((s) => s.prefabKey === 'Skill_2') ?? skills.find((s) => s.prefabKey === 'Skill') ?? skills[0] ?? {};
   const maxTargets = Math.max(1, Math.floor(num(tal['1.attack@max_target'], 1)));
   const epRatio = num(tal['2.ep_damage_ratio'], 0);
-  const fragMul = num(tal['2.damage_scale'], 1);
+  // V1_1 text promises 15% 元素脆弱; [ASSUMED] the older ep_damage_scale names the same HP-damage multiplier.
+  const fragMul = num(tal['2.damage_scale'] ?? tal['2.ep_damage_scale'], 1);
   const radius = num(raw?.stats?.rangeRadius, 0) > 0 ? num(raw.stats.rangeRadius, 0) : 2;
   const targetsInRadius = (battle, unit) => {
     const targets = battle.enemies.filter(e => canTargetEnemy(unit, e, YANYOU_PROFILE) && bodyDist(e, unit.x, unit.y) <= radius + 1e-9);
@@ -1812,7 +1813,10 @@ export function install(battle) {
       }
     }
     if (!kitGeneric) continue;
-    if (toks.includes(TOKEN_IDS.duskDragon) && base === 'chess_char_5_12') {
+    // 夕: chess_char_5_12, or on another version's build by charId (上半 gives chess_char_5_12 to 林) and an official
+    // chess only (a plugin chess_x_ record keeps its own kit's behaviour)
+    const isDusk = isVersionData() ? owner.def?.charId === DUSK_CHAR && isOfficialId('chess', base) : base === 'chess_char_5_12';
+    if (toks.includes(TOKEN_IDS.duskDragon) && isDusk) {
       const life = num(owner.def?.talents?.find((t) => t.tokenKey === TOKEN_IDS.duskDragon)?.bb?.['attack@tokenduration'], 0);
       battle.on('deploy', (ctx) => { if (ctx.unit === owner) owner.mem.duskPending = true; }, { owner });
       battle.on('attack', (ctx) => {

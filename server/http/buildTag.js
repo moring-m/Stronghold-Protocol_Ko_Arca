@@ -35,8 +35,11 @@ const VERSIONS_BUILD_DIR = 'data/versions';
 /** @type {{ tag: string|null }|null} */
 let buildCache = null;
 
-/** Every file under `abs` (or `abs` itself), as `[relative path, size, mtimeMs]`, sorted by path. Missing → []. */
-function buildEntries(abs, rel, out) {
+/**
+ * Every file under `abs` (or `abs` itself), as `[relative path, size, mtimeMs]`, sorted by path. Missing → [].
+ * @param {string} abs @param {string} rel @param {any[]} out @param {Set<string>} served the served data/versions children
+ */
+function buildEntries(abs, rel, out, served) {
   let stat;
   try { stat = fs.statSync(abs); } catch { return; }
   if (stat.isFile()) { out.push([rel, stat.size, stat.mtimeMs]); return; }
@@ -47,15 +50,25 @@ function buildEntries(abs, rel, out) {
     if (isIgnoredBuildName(d.name)) continue;
     const child = path.join(abs, d.name);
     const childRel = rel ? `${rel}/${d.name}` : d.name;
-    if (d.isDirectory()) buildEntries(child, childRel, out);
+    if (d.isDirectory()) {
+      if (rel === VERSIONS_BUILD_DIR && !served.has(childRel)) continue;
+      buildEntries(child, childRel, out, served);
+    }
     else if (d.isFile()) { try { const s = fs.statSync(child); out.push([childRel, s.size, s.mtimeMs]); } catch { /* ignore */ } }
   }
 }
 
-/** Short hash of the served browser runtime (size + mtime of every BUILD_INPUTS file); null when nothing is readable. */
-export function computeBuildTag(root = ROOT) {
+/**
+ * Short hash of the served browser runtime (size + mtime of every BUILD_INPUTS file); null when nothing is readable.
+ * @param {string} [root]
+ * @param {{ servedVersionDirs?: string[] }} [opts] the absolute data/versions/<slug>/ directories this process serves
+ */
+export function computeBuildTag(root = ROOT, { servedVersionDirs = [] } = {}) {
   const out = [];
-  for (const rel of BUILD_INPUTS) buildEntries(path.join(root, rel), rel, out);
+  const versionsAbs = path.join(root, ...VERSIONS_BUILD_DIR.split('/'));
+  const served = new Set(servedVersionDirs.map((d) => path.relative(versionsAbs, path.resolve(d)))
+    .filter((r) => r && !r.startsWith('..') && !path.isAbsolute(r) && !r.includes(path.sep)).map((r) => `${VERSIONS_BUILD_DIR}/${r}`));
+  for (const rel of BUILD_INPUTS) buildEntries(path.join(root, rel), rel, out, served);
   if (!out.length) return null;
   out.sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0));
   const h = createHash('sha1');
@@ -70,8 +83,8 @@ export function computeBuildTag(root = ROOT) {
  * @param {string} [root] used by the first call only (tests)
  * @param {{ servedVersionDirs?: string[] }} [opts] used by the first call only (computeBuildTag)
  */
-export function buildTag(root = ROOT) {
-  if (buildCache === null) buildCache = { tag: computeBuildTag(root) };
+export function buildTag(root = ROOT, opts = {}) {
+  if (buildCache === null) buildCache = { tag: computeBuildTag(root, opts) };
   return buildCache.tag;
 }
 

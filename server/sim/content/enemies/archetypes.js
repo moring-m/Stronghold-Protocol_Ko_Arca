@@ -273,7 +273,6 @@ const selfFear = (ab) => ({
  */
 function prisoner(ab, { freeAll = false } = {}) {
   const t = (k) => T(ab, k) ?? 0;
-  const times = Math.max(1, Math.round(T(ab, 'confinement.times') ?? 4));
   const liberate = (b, e, a) => {
     if (a.free || !e.alive) return;
     a.free = true;
@@ -435,20 +434,19 @@ function artsBarrier(amount, { key = 'ab:artsBarrier', whileUp = null } = {}) {
     refresh(b, e, a) {
       a.left = amount;
       b.fx('phase', { x: e.x, y: e.y, id: e.id, kind: 'artsBarrier', value: amount });
-      if (whileUp) b.addBuff(e, { key, persist: true, visible: true, mods: whileUp });
+      b.addBuff(e, { key, persist: true, visible: true, mods: whileUp, injury(c) {
+        if (c.type !== 'arts' || !(a.left > 0)) return;
+        const take = Math.min(a.left, c.amount);
+        a.left -= take;
+        c.amount -= take;
+        if (a.left > 1e-6) return;
+        a.left = 0;
+        b.fx('shieldBreak', { x: e.x, y: e.y, id: e.id });
+        // Remove HP-changing bonuses after the breaking instance, even if a later effect dodges its overflow.
+        c.defer(() => b.removeBuff(e, c.buff));
+      } });
     },
     spawn(b, e, a) { if (amount > 0) a.refresh(b, e, a); },
-    hitIn(c, b, e, a) {
-      if (!(a.left > 0)) return;
-      a.left -= absorbArts(c, a.left);
-      if (a.left > 1e-6) return;
-      a.left = 0;
-      b.fx('shieldBreak', { x: e.x, y: e.y, id: e.id });
-      // the bonus it grants ends once the overflow of the breaking hit has landed (never before: an HP bonus removed
-      // first would rescale HP and make the overflow count twice)
-      if (c.dmg.cancel) b.removeBuff(e, key); else a.breaking = true;
-    },
-    taken(c, b, e, a) { if (a.breaking) { a.breaking = false; b.removeBuff(e, key); } },
   };
 }
 

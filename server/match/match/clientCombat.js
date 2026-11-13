@@ -6,7 +6,7 @@
 
 import { requiresTraitLayerAuthority } from '../operatorTraits.js';
 import { PHASE } from '../../../shared/constants.js';
-import { DeadBattle, syntheticResult, RESULT_GRACE_MS, HARD_CAP_SECONDS, HeadlessJob } from '../fields.js';
+import { timelineAt, DeadBattle, syntheticResult, RESULT_GRACE_MS, HARD_CAP_SECONDS, HeadlessJob } from '../fields.js';
 import { buildBattleSpec, createBattleFromSpec } from '../../sim/spec.js';
 import { testSlice } from '../testTrace.js';
 import { morphBattleOpt } from '../../../shared/plugins/rules.js';
@@ -214,6 +214,7 @@ export class MatchClientCombat {
     const tick = () => {
       this._progressTimer = null;
       if (!this.fields.some((f) => f.cc && f.mode === 'server' && !f.done && f.timeline)) return;
+      for(const f of this.fields)if(f.kind==='normal'||f.kind==='unite'){const sample=timelineAt(f.timeline||[],this._fieldElapsed(f));this.augments.creditLeaks(f,sample?.[5]);}
       this.markPublic();
       this._progressTimer = this.later(1000, tick);
     };
@@ -223,6 +224,7 @@ export class MatchClientCombat {
   /** A field has its final result. */
   _fieldDone(f) {
     if (!f || f.done) return;
+    this.augments.creditResult(f);
     f.done = true;
     f.live = false;
     this._clearFieldTimers(f);

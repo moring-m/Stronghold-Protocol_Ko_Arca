@@ -128,9 +128,6 @@ export class Session {
     /** @type {Readonly<Record<string, string>> | null} chosen operator skins (lobby-owned, docs/SKINS.md): keyed by
      * charId; PUBLIC, unlike the loadout (a teammate sees your skin through Match.publicView().players[].skins) */
     this.skins = null;
-    /** @type {string | null} 名片干员 (lobby-owned, PR #643 split 6): the charId whose portrait fills this player's seat card in
-     * the waiting room; PUBLIC (room.state seats[].card), cosmetic */
-    this.card = null;
     /** @type {string} client address of the latest connection (logging) */
     this.addr = '?';
     /** @type {string | null} per-network limit key of the latest connection (null = not limited), see clientAddress */
@@ -311,10 +308,18 @@ export const isDroppable = (msg) => !!msg && msg.t === 'b.snap';
  * @param {string | null} [encoded] bytes a caller already produced; must be this message when it is a state kind
  * @returns {boolean}
  */
-export function send(ws, msg) {
-  const data = encode(msg);
+export function send(ws, msg, encoded = null) {
+  const bytes = encoded == null ? encode(msg) : encoded;
+  if (bytes == null) return false;
+  // state kinds go through the delta transport: it owns the per-connection baseline, so commit() only runs after the
+  // frame was really queued (a dropped or terminated socket must not advance it).
+  const frame = prepareStateFrame(ws, msg, bytes);
+  // Pre-encoded bytes that are not a JSON object cannot be a baseline: fall back to the full frame encoded here.
+  const data = frame.usable ? frame.data : encode(msg);
   if (data == null) return false;
-  return sendRaw(ws, data, { droppable: isDroppable(msg) });
+  const ok = sendRaw(ws, data, { droppable: isDroppable(msg) });
+  if (ok && frame.usable) frame.commit();
+  return ok;
 }
 
 /**
@@ -323,9 +328,10 @@ export function send(ws, msg) {
  * @param {object} msg
  * @returns {boolean}
  */
-export function sendSession(session, msg) {
+export function sendSession(session, msg, encoded = null) {
   if (!session || !session.connected) return false;
-  return send(session.ws, msg);
+  setStateDeltaRoom(session.ws, session.roomCode ?? null);
+  return send(session.ws, msg, encoded);
 }
 
 /** @param {unknown} rid */

@@ -72,7 +72,7 @@
 import { canTargetEnemy, enemyStealthed, extendedGrid } from '../../../targeting.js';
 import { normDir, rotateOffset, localOrder, localBefore } from '../../../dir.js';
 import { bodyKeys, bodyInRange } from '../../../body.js';
-import { applyRedirectCut, isHpLoss, redirectShare } from '../../../damage.js';
+import { isHpLoss, reserveTransfer } from '../../../attack.js';
 import { BOSS_ROW_OFFSET } from '../../../constants.js';
 import { GEO } from '../../../../../shared/constants.js';
 import {
@@ -138,7 +138,7 @@ function applyPassives(battle, st) {
     const mods = directMods({ atk: num(bb.base_atk) + num(bb.atk_per_stack) * L(battle, st, ID.preci) });
     if (wide) { mods.defIgnorePct = num(bb.power_def_penetrate); mods.resIgnorePct = num(bb.power_magic_resist_penetrate); }
     for (const u of st.ops) {
-      if (st.members[ID.preci].has(u) || (wide && u.def?.position === 'RANGED')) passiveBuff(battle, u, KEY.preci, mods);
+      if (isFirstPeriod() ? u.def?.position === 'RANGED' : st.members[ID.preci].has(u) || (wide && u.def?.position === 'RANGED')) passiveBuff(battle, u, KEY.preci, mods);
     }
   }
   if (t[ID.stead]) {
@@ -183,7 +183,7 @@ function applyPassives(battle, st) {
     const lv = L(battle, st, ID.skillful);
     const v = num(bb.base_attack_speed) + num(bb.attack_speed_per_stack) * lv;
     if (!st.auraMods || st.auraMods.aspd !== v) st.auraMods = { aspd: v };
-    st.auraWide = lv >= num(bb.power_bond_stack_cnt, Infinity);
+    st.auraWide = isFirstPeriod() || lv >= num(bb.power_bond_stack_cnt, Infinity);
   }
 }
 
@@ -205,7 +205,7 @@ function applyStatic(battle, st) {
     const taken = Math.max(0, 1 - num(bb.damage_resistance));
     for (const u of st.ops) {
       passiveBuff(battle, u, KEY.empty, { physTakenMul: taken, artsTakenMul: taken });
-      if (st.members[ID.empty].has(u)) {
+      if (isFirstPeriod() || st.members[ID.empty].has(u)) {
         passiveBuff(battle, u, KEY.emptyDmg, { dmgDealtMul: num(isElite(u) ? bb.damage_scale_extra : bb.damage_scale_normal, 1) });
       }
     }
@@ -407,11 +407,6 @@ function raidTargets(battle, u, pid, { taunt = false } = {}) {
   return list;
 }
 
-/**
- * The block pass has not run yet this tick (the poll is in the scheduled phase, and `_deploy` clears `blocking`).
- * Refresh contact the same way `updateEnemy` does before an enemy moves: an enemy already on this tile is blocked
- * now, so a revive does not treat that tile as empty and jump away.
- */
 function raidRefreshContact(battle, u) {
   for (const e of battle.enemies) {
     if (!e.alive || e.blockedBy || e.hidden) continue;
@@ -426,8 +421,6 @@ function raidPoll(battle, st) {
   let targets = null, taunted = null; // the player's candidates (raidTargets), shared by its members until a jump changes the field
   for (const u of st.members[ID.raid]) {
     if (!onField(u) || !u.canAct) continue;
-    // Maintainer 2026-10-10: one fresh target check after revival when unblocked, even with enemies in attack range.
-    // Ordinary later polls retain their original empty-range rule and distance order. A Raid jump cannot arm another check.
     const revived = u.mem.raidReviveSeq === u.deploySeq;
     if (revived) { u.mem.raidReviveSeq = 0; raidRefreshContact(battle, u); }
     if (revived && u.blocking.some(e => e.alive && e.blockedBy === u)) continue;
@@ -550,8 +543,6 @@ export function install(battle) {
     if (raid.length) {
       battle.on('deploy', c => {
         const u = c.unit;
-        // Only a revive: the previous exit was a knock-out and the operator is back before its respawn timer.
-        // A retreat (宴 / 史尔特尔 / 伊内丝 / 耀骑士临光), a move, a timer redeploy and the initial deploy stay on the old poll.
         if (!u || c.initial || c.move || u.removeReason !== 'killed' || !(u.respawnAt > battle.time + 1e-9)) return;
         if (raid.some(st => st.members[ID.raid].has(u))) u.mem.raidReviveSeq = u.deploySeq;
       });
@@ -636,21 +627,19 @@ export function install(battle) {
   const stead = has(ID.stead, 2);
   const arcane = has(ID.arcane);
   if (stead) {
-    battle.on('hit', (c) => {
+    battle.on('hpDamage', (c) => {
       const t = c.target, dmg = c.dmg;
-      if (!t || t.side !== 'ally' || t.kind !== 'op' || !dmg || dmg.cancel || dmg.steadShare || dmg.steadCut
-        || dmg.tags?.includes('bond:stead:share') || dmg.type === 'element') return;
+      if (!t || t.side !== 'ally' || t.kind !== 'op' || dmg.tags?.includes('bond:stead:share')) return;
       const st = byPid[t.ownerId];
       if (!st || (st.tiers[ID.stead] ?? 0) < 2 || st.members[ID.stead].has(t)) return;
-      let any = false;
-      for (const m of st.members[ID.stead]) if (onField(m)) { any = true; break; }
-      if (!any) return;
+      const members = [...st.members[ID.stead]].filter(onField);
+      if (!members.length) return;
       const ratio = Math.max(0, Math.min(1, num(st.bb[ID.stead].damage_resistance)));
-      if (!(ratio > 0) || ratio >= 1) return;
-      // Both redirects take their share from the pre-redirect hit (applyRedirectCut). The victim keeps the rest.
-      applyRedirectCut(dmg, ratio);
-      dmg.steadCut = ratio;
-    }, { priority: -20 });
+      reserveTransfer(c, ratio, 'bond:stead:share', (amount, tags) => {
+        for (const m of members) battle.dealDamage({ source: null, target: m, amount: amount / members.length,
+          type: 'true', dodgeMode: 'ignore', calculation: 'resolved', tags });
+      });
+    }, { priority: -2000 }); // [ASSUMED] existing parallel-share contract with Skadi; research 12.
   }
   if (stead || arcane) {
     battle.on('damaged', (c) => {
@@ -660,27 +649,9 @@ export function install(battle) {
         if (!stead || t.kind !== 'op') return;
         const st = byPid[t.ownerId];
         if (!st || (st.tiers[ID.stead] ?? 0) < 2) return;
-        if (dmg.steadCut) {
-          const ratio = dmg.steadCut;
-          dmg.steadCut = 0;
-          const share = redirectShare(num(c.amount), ratio, dmg.redirectCuts);
-          if (!(share > 0)) return;
-          const on = [];
-          for (const m of st.members[ID.stead]) if (onField(m)) on.push(m);
-          // the share is already mitigated and already carries the attacker's damage multipliers: deal it sourceless
-          // (the member's own damage-taken modifiers and shields still apply), never re-scaled by the attacker
-          for (const m of on) {
-            // Preserve sharing ancestry across Skadi's redirect, so neither sharing effect revisits its own output.
-            const d = battle.makeDamage({ amount: share / on.length, type: 'true', canDodge: false,
-              tags: ['bond:stead:share', ...(dmg.tags?.includes('transfer') ? ['transfer'] : [])] });
-            d.steadShare = true;
-            battle.dealDamage(null, m, d);
-          }
-          return;
-        }
         // a 流失 never uses a thorn chance (PRTS 作战机制 "生命流失不会触发反伤"); 无来源 damage does, hitting nobody (备注
         // "可被无来源伤害消耗反伤机会")
-        if (dmg.steadShare || dmg.steadThorn || c.type === 'element' || isHpLoss(dmg) || !st.members[ID.stead].has(t)) return;
+        if (dmg.tags?.includes('bond:stead:share') || dmg.steadThorn || c.type === 'element' || isHpLoss(dmg) || !st.members[ID.stead].has(t)) return;
         const bb = st.bb[ID.stead];
         // Season one has damage sharing, without a retaliation clause: emit no zero-damage hit either.
         if (bb.base_damage_value == null && bb.damage_value_per_stack == null) return;
@@ -695,7 +666,7 @@ export function install(battle) {
         const d = battle.makeDamage({ amount: num(bb.base_damage_value) + num(bb.damage_value_per_stack) * L(battle, st, ID.stead), type: 'arts', canDodge: false, sourceless: true });
         d.steadThorn = true;
         battle.dealDamage(t, src, d);
-        if (src.alive) battle.applyStatus(src, 'fragile', { duration: num(bb['weak[limit]'], 5), value: num(bb.damage_scale, 1) - 1, source: t });
+        if (src.alive && bb.damage_scale != null) battle.applyStatus(src, 'fragile', { duration: num(bb['weak[limit]'], 5), value: num(bb.damage_scale, 1) - 1, source: t });
         return;
       }
       if (!arcane || t.side !== 'enemy' || !t.alive) return;

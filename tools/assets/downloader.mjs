@@ -45,7 +45,6 @@ export class Downloader {
    * @param {number} [o.retries]
    * @param {number} [o.timeoutMs]
    * @param {boolean} [o.force] re-download even when files exist
-   * @param {boolean} [o.keepExisting] never re-download or rewrite an existing file (a checkout sharing public/assets)
    * @param {(msg:string)=>void} [o.log]
    * @param {typeof fetch} [o.fetchImpl]
    * @param {number} [o.backoffMs] base retry delay (doubles per attempt)
@@ -102,7 +101,6 @@ export class Downloader {
     let st;
     try { st = await stat(abs); } catch { return -1; }
     if (!st.isFile() || st.size <= 0) return -1;
-    if (this.keepExisting) return st.size;
     const led = this.ledger.files[job.rel];
     if (job.mutable) {
       // Post-processed files (atlases) change size; validate content instead.
@@ -192,7 +190,6 @@ export class Downloader {
         this.ledger.files[job.rel] = verifiedSource
           ? { url, bytes: r.buf.length, blob: verifiedSource.blob, commit: verifiedSource.commit }
           : { url: src, bytes: r.buf.length };
-        this.written.add(job.rel);
         this.dirty++;
         const sizeChanged = !!(job.bytes && job.bytes !== r.buf.length && !job.mutable);
         return { status: 'ok', bytes: r.buf.length, url: src, sizeChanged };

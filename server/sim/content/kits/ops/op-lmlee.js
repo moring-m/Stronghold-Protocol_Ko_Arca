@@ -42,7 +42,7 @@
 import { num, talentBb, moduleBb, skillRec, statBuff, up } from '../shared/tier1.js';
 import { absoluteRangeKeys } from '../../../targeting.js';
 import { bodyInRange } from '../../../body.js';
-import { isHpLoss } from '../../../damage.js';
+import { isHpLoss } from '../../../attack.js';
 import { acquireTargets, effectiveProfile } from '../../../ai.js';
 
 const S1 = 'skchr_lmlee_1';
@@ -223,22 +223,7 @@ export default {
             }
           }, { owner: unit, priority: 5 });
         }
-        if (sid === S3) {
-          // "有55%概率闪避来自范围外的物理或法术伤害" (the source's position now; 无来源 = from outside)
-          const p = num(b3.prob);
-          if (p > 0) {
-            battle.on('hit', (ctx) => {
-              const d = ctx.dmg;
-              if (ctx.target !== unit || !unit.skill?.active || !d || d.cancel || !d.canDodge || (d.type !== 'phys' && d.type !== 'arts')) return;
-              const src = ctx.source;
-              if (src && bodyInRange(src, unit.rangeKeySet ?? new Set(unit.rangeKeys ?? []))) return;
-              if (battle.rng() >= p) return;
-              d.cancel = true;
-              battle.fx('dodge', { x: unit.x, y: unit.y, id: unit.id });
-              if (battle.hasHook('dodge')) battle.emit('dodge', { source: ctx.credit ?? src, target: unit, dmg: d });
-            }, { owner: unit, priority: -50 });
-          }
-        }
+
       },
     };
   },
