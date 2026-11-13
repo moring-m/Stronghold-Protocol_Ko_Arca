@@ -1,4 +1,5 @@
 import {BattleQueries as MergeBattle0} from './battle/queries.js';
+import {BattleLeaderHits as MergeBattle1} from './battle/leaderHits.js';
 import {ammoView,mysticView,layerView,chargeView} from './snapshot.js';
 import {noteAttackCommit} from './ai.js';
 import {ENEMY_COLLIDER_RADIUS} from './constants.js';
@@ -43,36 +44,10 @@ import { installTraitAttackSpeed } from './content/traitMods.js';
 //   `abs: true` on a unit (or player `coords: 'field'`) = field tiles (and field directions).
 // Robustness: every content callback and every step phase is wrapped; errors are logged once per key and the
 // battle continues. After MAX_INTERNAL_ERRORS the battle force-ends as a timeout.
-<<<<<<< ours
 
 import {visibleSkillAreaKeys} from './skillArea.js';
 import { TICK, ROWS, COLS, BLOCK_RADIUS_SQ, DP_DEFAULTS, DOWN_STATE, FORCED_EXIT, MAX_BATTLE_TIME, MAX_INTERNAL_ERRORS, COLD_FREEZE_DURATION, OBSTACLE_DEVICES, EVENT_BUFFER_CAP, BOSS_ROW_OFFSET, MAX_HOOK_DEPTH, MAX_ALIVE_ENEMIES, LEVITATE_HALF_WEIGHT, RESIST_DEFAULT, PUSH_TILES, PUSH_TILES_EFFECT, PULL_WEAK_SHARE, PULL_CRAWL, PULL_ORIGIN, PULL_STOP_RADIUS, PUSH_DIRECTIONAL_MIN_DIST, AUTO_OP_COOLDOWN, STEALTH_RESTORE } from './constants.js';
 import { GEO, layerGainRoom } from '../../shared/constants.js';
-=======
-//
-// Code layout: this file keeps the constructor (fields, players, spawn queue, content install); the methods live in
-// server/sim/battle/, one module per concern, and are installed on Battle.prototype below in a fixed order, with the
-// descriptors of class methods (non-enumerable; `this` is the battle, subclasses and `super` calls work as before):
-//   players.js       board → field tiles / directions, ally creation, kit / profile / skill setup
-//   lifecycle.js     start (the battle-start deployment), step (the tick order above), end checks, BattleResult
-//   hooks.js         hook bus (on / off / emit), timers (after / every), content-callback isolation and errors
-//   spawns.js        spawn queue, routes, spawnEnemy; hidden enemies, boss pool sync, field clamp, list compaction
-//   deploy.js        deploy, kill, retreat, removal bookkeeping, redeploys, leaks
-//   blocking.js      contact blocking, block release, the 隐匿 switch-off after a block
-//   status.js        buffs, catalogue statuses (抵抗, 寒冷 → 冻结, 诱导, 恐惧 …), "同名效果取最高", the buff tick
-//   combat.js        damage / heal / HP loss (the attack.js pipeline), projectiles, forced attacks
-//   queries.js       enemy tile index, unit queries (tiles, grid, radius, selectability), players, range rebuilds
-//   summons.js       tokens (summons), devices, stage devices
-//   tiles.js         obstacles, relocation / 【移动】, knocked-out bodies, reserved tiles, tactical points, ground paths
-//   displacement.js  push / pull / displace (受力等级 = force − weight); pushTiles
-//   economy.js       DP, IN_BATTLE bond layers, bounty coins
-//   events.js        client events, snapshot, field meta, fx, the sim log
-//   leaderHits.js    per-operator damage taken off the current leader pool (boss / hidden only; not in BattleResult)
-//   util.js          fin / clone
-
-import { TICK, ROWS, COLS, DP_DEFAULTS, MAX_HOOK_DEPTH, AUTO_OP_COOLDOWN } from './constants.js';
-import { GEO } from '../../shared/constants.js';
->>>>>>> theirs
 import { createRng } from './rng.js';
 import { Grid } from './grid.js';
 import { Unit } from './units.js';
@@ -82,7 +57,6 @@ import { absoluteRangeKeys, canTargetEnemy, extendedGrid, evadesGround, enemySte
 import { bodyKeys, bodyInKeys, bodyInRadius } from './body.js';
 import { normDir, mirrorDir, localOrder, localBefore } from './dir.js';
 import { ProjectileSystem } from './projectiles.js';
-<<<<<<< ours
 import { stampFear } from './fear.js';
 import { SkillRuntime } from './skills.js';
 import {attackClipTiming} from '../../shared/attackTiming.js';
@@ -91,28 +65,6 @@ import { resolveProfile } from './professions.js';
 import { unitInfo, snapshotUnits, storedEnergy } from './snapshot.js';
 import { toDataSource, normalizeRoute, normalizeStage, normalizeToken, normalizeEnemy } from './simdata.js';
 import { installContent, setupUnitKit } from './content/index.js';
-=======
-import { remainingDistance } from './ai.js';
-import { toDataSource, normalizeRoute, normalizeStage } from './simdata.js';
-import { installContent } from './content/index.js';
-import { BattlePlayers } from './battle/players.js';
-import { BattleLifecycle } from './battle/lifecycle.js';
-import { BattleHooks } from './battle/hooks.js';
-import { BattleSpawns } from './battle/spawns.js';
-import { BattleDeploy } from './battle/deploy.js';
-import { BattleBlocking } from './battle/blocking.js';
-import { BattleStatus } from './battle/status.js';
-import { BattleCombat } from './battle/combat.js';
-import { BattleQueries } from './battle/queries.js';
-import { BattleSummons } from './battle/summons.js';
-import { BattleTiles } from './battle/tiles.js';
-import { BattleDisplacement } from './battle/displacement.js';
-import { BattleEconomy } from './battle/economy.js';
-import { BattleEvents } from './battle/events.js';
-import { BattleLeaderHits } from './battle/leaderHits.js';
-
-export { pushTiles } from './battle/displacement.js';
->>>>>>> theirs
 
 const DEFAULT_RECTS = { normal: GEO.NORMAL_RECT, unite: GEO.UNITE_RECT, boss: GEO.BOSS_RECT, hidden: GEO.BOSS_RECT };
 let hookSeq = 0;
@@ -310,7 +262,7 @@ export class Battle {
       layerGains: {}, coins: 0, damageDealt: 0, bossDamage: 0, healingDone: 0, deaths: 0, unitsEnd: [], unitStats: [],
     };
     const late = [];
-    for (const u of p.units ?? []) {
+    for (const u of [...(p.units ?? []), ...(p.commandReserves ?? [])]) {
       try {
         const unit = this._createAllyFromInput(ps, u);
         if (unit && unit.kind === 'token' && !unit.ownerUnit && u.ownerUid != null) late.push([unit, u]);
@@ -374,6 +326,32 @@ export class Battle {
     return ps && ps.mirror && !abs && ps.coords !== 'field' ? mirrorDir(d) : d;
   }
 
+  /**
+   * Field an operator that was not on the board (规程 bench switch: 卡西米尔 melee piece, 阿戈尔 any piece).
+   * Field tiles, like spawnToken. Does not spend the match hand. Refuses a tile outside the rect, a living unit
+   * (`unitAt`) or a knocked-out operator (`downOn`). `opts.loadout` is getChess's loadout (null = the record's
+   * default); `opts.stats` overwrite base stats before setup. Returns the operator, or null.
+   */
+  spawnOperator(playerId, chessId, row, col, opts = {}) {
+    if (!Number.isInteger(row) || !Number.isInteger(col) || !this.grid.inRect(row, col)) return null;
+    if (this.unitAt(row, col) || this.downOn(row, col)) return null;
+    const ps = this.getPlayer(playerId);
+    if (!ps) return null;
+    const def = this.data.getChess(chessId, opts.loadout ?? null);
+    if (!def) { this.log(`unknown chess ${chessId}`); return null; }
+    const dir = opts.dir != null ? normDir(opts.dir) : ps.dir;
+    const u = this._makeAlly(ps, def, 'op', row, col, { uid: opts.uid ?? null, dir });
+    if (opts.stats) for (const [k, v] of Object.entries(opts.stats)) if (Number.isFinite(v)) u.base[k] = v;
+    if (Array.isArray(opts.items)) u.items = opts.items.slice();
+    this._setupUnit(u, opts.kit ?? null);
+    if (!this._deploy(u, { initial: false })) {
+      u.removed = true;
+      this.offOwner(u);
+      return null;
+    }
+    return u;
+  }
+
   _createAllyFromInput(ps, inp) {
     // coerce (a string row would otherwise concatenate: "10" + -7 → "10-7"); non-integers never deploy
     const row = Number(inp.row), col = Number(inp.col);
@@ -403,7 +381,15 @@ export class Battle {
     if (def.raw?.isDiy && !def.diyFor) { this.log(`自选 slot ${inp.chessId} without a pick`); return null; }
     const u = this._makeAlly(ps, def, 'op', r, c, { uid: inp.uid, dir });
     u.placementOrder = Number.isFinite(inp.placementOrder) ? inp.placementOrder : null;
+    // 规程 command reserves (upstream battle/players.js): fielded later by their command, never on their own
+    if (inp.commandReserveFor != null) {
+      u.commandReserveFor = inp.commandReserveFor;
+      u.deferDeploy = true;
+      u.respawnAt = Infinity;
+    }
+    if (inp.commandLayerCapBonus > 0) u.commandLayerCapBonus = inp.commandLayerCapBonus;
     u.items = [...(inp.items ?? [])];
+    if (inp.itemProgress) u.itemProgress = inp.itemProgress.map(p => ({ ...p }));
     u.carry = inp.carryState ?? null;
     // 练度 (自持有, 0.2.2): the owned operator's ×ATK / ×DEF / ×max HP (units.js Πmul) — never a 补位 stand-in's nor a
     // prototype 自选 pick's (another character than the one the player owns)
@@ -2334,6 +2320,11 @@ export class Battle {
    */
   moveRedeploy(unit, r, c, { clearSp = false } = {}) {
     if (!this.relocate(unit, r, c)) return false;
+    // #903: a 【移动】 is a retreat and redeploy (PRTS 术语释义「移动」), so the element gauges reset like a real deployment
+    // and an element burst's lock goes with them; the other buffs stay (DESIGN §22.3)
+    for (const b of unit.buffs.filter((x) => x.flags && x.flags.burstLock)) this.removeBuff(unit, b);
+    unit.elem.burn = unit.elem.neural = unit.elem.necrosis = unit.elem.apoptosis = unit.elem.erosion = 0;
+    unit.markDirty();
     unit.deploySeq = ++this._deploySeq;
     unit.aggroSeq = unit.deploySeq;
     unit.deployedAt = this.time;
@@ -2634,11 +2625,39 @@ export class Battle {
     return set;
   }
 
-  addDp(playerId, n) {
+  // Optional source is presentation attribution; the return value and DP arithmetic stay unchanged.
+  addDp(playerId, n, source = null) {
     const ps = this.getPlayer(playerId);
     if (!ps || !Number.isFinite(n)) return 0;
+    const before = ps.dp;
     ps.dp = Math.max(0, Math.min(this.flags.dpMax, ps.dp + n));
+    const reason = source?.def?.subProf;
+    if ((n > 0 && ['agent', 'charger', 'pioneer'].includes(reason)) || (n < 0 && reason === 'merchant')) {
+      this.resourceNumber(source, 'cost', ps.dp - before, reason);
+    }
     return ps.dp;
+  }
+
+  /** Settled display-only resource receipt. Live render hosts opt in; headless/golden runs need no extra events. */
+  resourceNumber(unit, resource, amount, reason) {
+    if (!this.opts?.resourceNumbers || !unit?.alive || !unit.deployed || unit.hidden || !Number.isFinite(amount) || amount === 0) return;
+    this._ev(['resource', unit.id, resource, amount, reason]);
+  }
+
+  /**
+   * Temporary bond layers (规程). Not written into layerGains and not announced on `layerGain`, so a garrison extra
+   * does not recurse. No-op when gains are disabled (联防 / boss / hidden) and for a non-positive amount.
+   */
+  addTempLayers(playerId, bondId, n) {
+    if (!this.flags.layerGainsEnabled || !(n > 0) || !Number.isFinite(n) || playerId == null) return 0;
+    if (typeof bondId !== 'string' || !bondId) return 0;
+    const pp = this._pp(playerId);
+    if (!pp) return 0;
+    const add = Math.min(1e4, Math.floor(n));
+    if (!(add > 0)) return 0;
+    if (!pp.tempLayerGains) pp.tempLayerGains = {};
+    pp.tempLayerGains[bondId] = Math.min(1e4, (pp.tempLayerGains[bondId] ?? 0) + add);
+    return add;
   }
 
   /**
@@ -2931,7 +2950,6 @@ export class Battle {
     return `Battle<${this.kind} seed=${this.seed} t=${this.time.toFixed(2)} units=${this.units.length}${this.finished ? ' ' + this.reason : ''}>`;
   }
 
-<<<<<<< ours
   // exposed for ai/content convenience
 
   /**
@@ -3046,17 +3064,9 @@ export class Battle {
     const out = [];
     for (const a of set) if (a.alive && a.deployed && !a.hidden && (a.x - x) * (a.x - x) + (a.y - y) * (a.y - y) <= r2) out.push(a);
     return out;
-=======
-// the method modules, in this order (a name defined twice is an error, never a silent override)
-for (const part of [BattlePlayers, BattleLifecycle, BattleHooks, BattleSpawns, BattleDeploy, BattleBlocking, BattleStatus, BattleCombat, BattleQueries, BattleSummons, BattleTiles, BattleDisplacement, BattleEconomy, BattleEvents, BattleLeaderHits]) {
-  for (const key of Reflect.ownKeys(part.prototype)) {
-    if (key === 'constructor') continue;
-    if (Object.prototype.hasOwnProperty.call(Battle.prototype, key)) throw new Error(`Battle.${String(key)} is defined twice`);
-    Object.defineProperty(Battle.prototype, key, Object.getOwnPropertyDescriptor(part.prototype, key));
->>>>>>> theirs
   }
 }
 
 export default Battle;
 
-for(const methods of [MergeBattle0])for(const key of Reflect.ownKeys(methods.prototype)){if(key!=='constructor'&&!Object.hasOwn(Battle.prototype,key))Object.defineProperty(Battle.prototype,key,Object.getOwnPropertyDescriptor(methods.prototype,key));}
+for(const methods of [MergeBattle0,MergeBattle1])for(const key of Reflect.ownKeys(methods.prototype)){if(key!=='constructor'&&!Object.hasOwn(Battle.prototype,key))Object.defineProperty(Battle.prototype,key,Object.getOwnPropertyDescriptor(methods.prototype,key));}
