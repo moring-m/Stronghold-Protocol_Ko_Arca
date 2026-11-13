@@ -36,6 +36,7 @@
 // Prep-only bands (economy / shop / grants / layers at prep end or round start) live in bands/meta.js.
 
 import { num, buffsOf, bandRecord, isOp, onField, isElite, tierOf, unitBonds, activeBondIds, playerOps, passiveBuff, fxOn, matchBands, gainLayers, alliesAround, N4, baseChessId, isGroundOp, directMods } from '../support/index.js';
+import { isVersionData } from '../support/index.js';
 import { weaknessRetype, addShieldLayer, reviveNow } from '../items/battle.js';
 import { spawnMapChar } from '../tokens.js';
 import { installCommandMarks } from './commands.js';
@@ -171,10 +172,7 @@ const BY_KEY = {
     battle.on('hit', (c) => {
       const s = c.source;
       if (!isOp(s) || s.ownerId !== ps.playerId || !c.target || c.target.side !== 'enemy') return;
-<<<<<<< ours
-=======
       if (isVersionData() && battle.data.raw.config?.version?.family !== 'regulation' && s.def?.position !== 'RANGED') return;
->>>>>>> theirs
       weaknessRetype(c.dmg, s, c.target);
     }, { priority: 5 });
   },
@@ -271,15 +269,11 @@ export function hasBattlePart(bandId) {
 }
 
 export function install(battle) {
-<<<<<<< ours
-  for (const ps of battle.players) for(const [index,bandId] of [ps.bandId,...(battle.data.raw?.config?.commonBands||[])].entries()) {
-    if(!bandId)continue;
-    const band = bandRecord(bandId);
-=======
-  for (const ps of battle.players) {
-    const band = ps.input.commandEffectId ? battle.data.raw.effects?.[ps.input.commandEffectId]
-      : ps.bandId ? bandRecord(ps.bandId) : null;
->>>>>>> theirs
+  // the player's own source (a 规程 command effect, else its strategy), then the room's 공통 적용 전략 (the fork, `:common` keys)
+  for (const ps of battle.players) for (const [index, [band, bandId]] of [
+    [ps.input.commandEffectId ? battle.data.raw.effects?.[ps.input.commandEffectId] : ps.bandId ? bandRecord(ps.bandId) : null, ps.input.commandEffectId || ps.bandId],
+    ...(battle.data.raw?.config?.commonBands || []).map((id) => [bandRecord(id), id]),
+  ].entries()) {
     if (!band) continue;
     for (const b of buffsOf(band)) {
       const f = b.bbKey ? BY_KEY[b.bbKey] : null;
