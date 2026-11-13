@@ -9,6 +9,17 @@ import * as KIT_REGISTRY from './kits/nativeRegistry.js';
 //   a faulty content module is logged and skipped, never crashing the battle.
 // setupUnitKit(battle, unit, mode) — resolves a unit's Kit: kits[baseChessId]?.(bb, chess, def) ?? generic.
 //   Battle opts.kits ({ [baseChessId]: kitFn }) take precedence (tests / sandboxes).
+//   On another official version's build (support isVersionData: config.version) an official kit is checked against the
+//   operator it was written for (officialKitKey, kits/index.js KIT_CHAR_IDS): that version gives some chess ids to
+//   other operators, whose kit is then found by charId (the tier kit of the record's tier, else a 自选 op-* kit), or
+//   none (generic). The default data and the plugin content sets built on it keep the by-id lookup (DESIGN §35.22.3).
+//   补位 stand-ins (isStandInDef: the def of simdata getStandIn — the chess's ids, another character's body): the kit is
+//   kits[def.charId] (the stand-in's own, kits/ops/standin-<codename>.js), never the chess id's — that is the replaced
+//   operator's kit; without one, the generic kit plus the talents it can apply exactly (generic.js genericTalents).
+//   A stand-in has no default skill: its kit authors every skill it supports in `skills` (selectSkillSpec).
+//   自选 pieces (isDiyDef: the def of simdata getDiy — a DIY slot's ids, the picked operator's body) take their kit the
+//   same way: kits[def.charId] (an owned 6★'s kits/ops/op-<codename>.js, a prototype's standin-<codename>.js), else the
+//   generic kit plus genericTalents; no default skill either (the pick chooses any of the three).
 //   Operator loadouts (DESIGN §16): the def is resolved for the unit's selected skill / module (simdata getChess), so
 //   the kit receives `chess.skill` = the SELECTED skill record and `bb` = its blackboard (talents / trait / module of
 //   the selected module). Kit contract (backward compatible): `{ skill?, skills?: { [skillId]: SkillSpec }, talents,
@@ -27,6 +38,8 @@ import { compileDsl } from './dsl/compile.js';
 import { validateSkillSpec, matchesSchema, MODS_SCHEMA } from '../../../shared/plugins/skillSpec.js';
 import { withUnitLoadouts } from '../simdata.js';
 import { isPotential } from '../../../shared/potential.js';
+import { RECORD_MAPS } from '../../../shared/plugins/dataUtils.js';
+import { isVersionData } from './support/index.js';
 
 // Content files are loaded with guarded dynamic imports: a module that fails to load (syntax error, throwing
 // top-level code, missing file) is logged and replaced by an empty module instead of breaking the server.
@@ -51,6 +64,10 @@ export const KITS = Object.freeze(Object.assign({}, ...TIERS.map((m) => (m && m.
 /** Domain modules in install order: tokens, devices, enemies, bosses, bonds, garrisons, items, bands, choices. */
 export const MODULES = Object.freeze(DOMAIN_NAMES.map((n, i) => [n, DOMAINS[i]]));
 
+/**
+ * Whether `def` is a 补位 stand-in: a chess fielded with another character's body (simdata getStandIn — `standInFor` =
+ * the replaced operator's charId, `charId` = the stand-in's, which differ).
+ */
 export function isStandInDef(def) {
   return !!(def && def.standInFor && def.charId && def.charId !== def.standInFor);
 }
@@ -65,6 +82,49 @@ export function isDiyDef(def) {
 
 /** A def whose body is another character than its chess id names (补位 stand-in, 自选 piece): its kit is keyed by charId. */
 const isOtherBody = (def) => isStandInDef(def) || isDiyDef(def);
+
+/** Tier kit key → the charId it was written for (kits/index.js). */
+const KIT_CHAR_IDS = KIT_REGISTRY.KIT_CHAR_IDS ?? Object.freeze({});
+/** charId → its tier kit keys, in KIT_FILES order (kits/index.js). */
+const TIER_KIT_KEYS_BY_CHAR = KIT_REGISTRY.TIER_KIT_KEYS_BY_CHAR ?? Object.freeze({});
+const tierOfKitKey = (key) => Number(/^chess_char_(\d+)_/.exec(key)?.[1]);
+/** A plugin's chess record (shared/plugins/dataUtils.js RECORD_MAPS: chess_x_ ids). */
+const isPluginChess = (id) => String(id ?? '').startsWith(`${RECORD_MAPS.chess[0]}_`);
+
+/**
+ * The official kit of operator `charId`: its tier kit of `tier`, else its first tier kit, else a kit registered under
+ * the charId itself (a 自选 op-* or stand-in kit), else null.
+ */
+function kitKeyForChar(charId, tier, kits = KITS, tierKeys = TIER_KIT_KEYS_BY_CHAR) {
+  const keys = tierKeys[charId];
+  if (keys?.length) return keys.find((k) => tierOfKitKey(k) === tier) ?? keys[0];
+  return Object.hasOwn(kits, charId) ? charId : null;
+}
+
+/**
+ * The key of `def`'s kit in KITS, or null (generic). A stand-in's and a 自选 piece's: its charId (isOtherBody), on every
+ * data (a version's 自选 pick borrows its tier kit under the charId: kits/index.js DIY_BORROW_CHARS). Any
+ * other def: the kit of its id (baseId, the exact id, or the suffix-less id). On another version's build (`data`
+ * carries config.version; default: the loaded data) that kit counts only when it was written for the def's charId
+ * (KIT_CHAR_IDS), else the kit is found by its charId (kitKeyForChar); a chess whose own kit was written for its
+ * operator but failed to load stays generic, as on the default data. Only an official record with a real charId takes
+ * that path: test fixtures (charId defaults to the chess id) and plugin chess (chess_x_ ids; forgeImport leaves `kitRef`
+ * out on purpose to keep the generic kit) keep the by-id lookup. The default data and the plugin content sets built on
+ * it keep the by-id lookup of before versions M0 (test/versions-keying.test.js). `registries` replaces the official
+ * registries (KITS, KIT_CHAR_IDS, TIER_KIT_KEYS_BY_CHAR) for tests only, e.g. to model a kit file that failed to load.
+ */
+export function officialKitKey(def, data, { kits = KITS, kitCharIds = KIT_CHAR_IDS, tierKeys = TIER_KIT_KEYS_BY_CHAR } = {}) {
+  if (!def) return null;
+  if (isOtherBody(def)) return Object.hasOwn(kits, def.charId) ? def.charId : null;
+  const bare = String(def.baseId ?? def.id ?? '').replace(/_[ab]$/, '');
+  const byId = [def.baseId, def.id, bare].find((k) => k != null && Object.hasOwn(kits, k) && kits[k]) ?? null;
+  if (!isVersionData(data)) return byId;
+  const real = typeof def.charId === 'string' && def.charId.startsWith('char_') && !def.charId.startsWith('char_x_') ? def.charId : null;
+  if (!real || isPluginChess(def.baseId ?? def.id)) return byId;
+  if (byId && (kitCharIds[byId] ?? real) === real) return byId;
+  if (!byId && kitCharIds[`${bare}_a`] === real) return null;
+  return kitKeyForChar(real, def.tier, kits, tierKeys);
+}
 
 /**
  * The kit builder of an operator def in `reg` ({ [key]: (bb, chess, def) => Kit }), or undefined. A stand-in's and a

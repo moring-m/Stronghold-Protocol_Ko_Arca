@@ -79,6 +79,7 @@ import {
 } from './enemies.js';
 import { REGULATION_BOSS_KITS } from './regulation-bosses.js';
 import { hypot, powi } from '../detmath.js';
+import { damageAttackType, isHpLoss } from '../attack.js';
 
 // ---------------------------------------------------------------------------------------------------------------
 // constants
@@ -738,6 +739,20 @@ function kitSpring(ab, e) {
     b.fx('phase', { x: e.x, y: e.y, id: e.id, kind: `spring_${kind}` });
   };
   const drop = (b) => { P.up = false; P.downAt = b.time; b.removeBuff(e, 'boss:springShield'); b.fx('shieldBreak', { x: e.x, y: e.y, id: e.id }); };
+  const transfer = (b, c) => {
+    if (!(c.amount > 0) || c.cancelled || isHpLoss(c.dmg) || c.dmg?.tags?.includes(SPRING_SHARE_TAG)) return;
+    const credited = c.source || c.credit;
+    const credit = credited?.side === 'ally' ? credited : null;
+    // 仇恨值最高 (PRTS): the official BossSelector's logic is not in our data, so the hatred order is the engine's targeting
+    // one (targeting.js aggroCmp: taunt, then the latest arrival) applied to the guns — [ASSUMED] for enemy guns and ties.
+    const g = b.enemies.filter(o => o.alive && isGun(o)).sort(aggroCmp)[0];
+    const amount = c.amount * PART_TRANSFER;
+    if (g) b.dealHPLose({ source: null, credit, target: g, amount, origin: c.dmg });
+    // [ASSUMED] Preserve the project's equal split to other springs; PRTS explicitly specifies only the gun.
+    const others = b.enemies.filter(o => o.alive && o !== e && isSpring(o));
+    for (const target of others) b.dealHPLose({ source: null, credit, target, amount: amount / others.length,
+      origin: c.dmg, tags: [SPRING_SHARE_TAG] });
+  };
   const sk = ab.sk['1'];
   return [
     {

@@ -4,8 +4,16 @@
 //   * TRUST_PROXY ('auto' default: honour CF-Connecting-IP / X-Real-IP / X-Forwarded-For only from loopback/private
 //     peers such as a local cloudflared; '1' always; '0' never) → net.js trustProxy;
 //   * DEBUG → the console logger's debug level;
+//   * SP_MAX_ROOMS, SP_MAX_ROOMS_PER_ADDR, SP_MAX_MATCHES_PER_ADDR, SP_MAX_CONNECTIONS and SP_MAX_CONNECTIONS_PER_ADDR
+//     override the room / match / socket caps. A global cap of 0 (SP_MAX_ROOMS, SP_MAX_CONNECTIONS) rejects everything,
+//     a per-network cap of 0 (the _PER_ADDR ones) is unlimited; a value that is not a non-negative integer is ignored
+//     with a warning when the server starts, and an explicit startServer() option still wins over the environment;
 //   * SP_ASSET_INDEX=0 (or the `assetIndex: false` option) → no content-hash index: plain asset URLs, size-mtime ETags
 //     (assetIndex.js); the index of the default public/ persists in .cache/asset-hashes.json;
+//   * SP_VERSIONS ('all' or a comma list of shared/versions.js ids), SP_VERSION_DEFAULT and SP_MAX_VERSION_HOSTS (or the
+//     `versions: { enabled, default, maxHosts }` option, which wins) → the official versions this server offers
+//     (DESIGN §35.23, versionsFrom): every registry id unless one of them narrows the list (SP_VERSIONS=act2autochess
+//     is 第二期下半 alone, the switch off);
 //   * the served directories (public/, data/, shared/, the content packs' packs/ and the plugins' plugins/ of this
 //     repository unless the options name others), and which startServer() options are handed on to net.js Network and
 //     lobby.js Lobby.
@@ -111,6 +119,11 @@ export function lobbyOptionsFrom(opts) {
   for (const k of LOBBY_OPTION_KEYS) {
     if (opts[k] != null) lobbyOptions[k] = opts[k];
   }
+  applyEnvLimits(lobbyOptions, LOBBY_LIMIT_ENV, log);
+  // Per instance only: startServer({ roomCode }) or the --room-code argument parsed by server/index.js. No environment
+  // variable is read here, so a stop / restart without the argument is random again.
+  const roomCode = parseRoomCode(opts.roomCode);
+  if (roomCode) lobbyOptions.roomCode = roomCode;
   return lobbyOptions;
 }
 

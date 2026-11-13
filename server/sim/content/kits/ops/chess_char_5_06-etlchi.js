@@ -28,6 +28,7 @@ export default {
     const candleKey = talentRec(chess, 2)?.bbStr?.take_extra_enemy_key ?? CANDLE_KEY;
     const aroundN = (battle, a) => battle.foesInRadius(a.x, a.y, RING1).length;
     return {
+      trait: { selfHealFilter: dmg => damageAttackType(dmg) !== 'BUFF' },
       skills: lazySkills({
         skchr_etlchi_1: () => ({ kind: instantKind(chess, def), attack: { atkScale: num(bb.atk_scale, 1), hits: 2 } }),
         skchr_etlchi_2: () => ({

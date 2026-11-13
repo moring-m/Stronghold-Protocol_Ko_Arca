@@ -35,6 +35,7 @@ import { pathToFileURL } from 'node:url';
 import { getData, setData } from '../../data.js';
 import { installOfficialBounds } from '../../../shared/plugins/officialBounds.js';
 import { contentHashOf } from '../../../shared/plugins/identity.js';
+import { DEFAULT_VERSION, versionOfData } from '../../../shared/versions.js';
 
 /** A worker thread (parentPort), else a child process (its IPC channel). */
 const viaWorker = !!parentPort;
@@ -201,6 +202,7 @@ function plain(r) {
 function diag(match) {
   return {
     phase: match.phase ?? null, round: match.round ?? null, ended: !!match.ended, cs: match.cs ?? null, modeId: match.modeId ?? null,
+    version: versionOfData(installed),
     errorCount: match.errorCount ?? 0, errors: (match.errors || []).slice(0, 3).map((e) => String(e?.label || e?.message || e).slice(0, 200)),
     verifyStats: match.verifyStats ? { ...match.verifyStats } : null, simErrors: match.simErrors ?? 0,
     fields: Array.isArray(match.fields) ? match.fields.map((f) => ({ fieldId: f.fieldId, kind: f.kind, players: Array.isArray(f.players) ? [...f.players] : [], mode: f.mode ?? null,
@@ -209,6 +211,13 @@ function diag(match) {
 }
 
 function create(matchId, opts) {
+  // an official version's match runs on that version's data only (DESIGN §35.23): never another version's data set
+  const want = typeof opts.version === 'string' ? opts.version : DEFAULT_VERSION;
+  if (want !== versionOfData(installed)) {
+    log.error(`[host] match ${matchId} asks for version ${want}, this host runs ${versionOfData(installed)}`);
+    post({ type: 'failed', matchId, error: `version ${want} is not this host's (${versionOfData(installed)})` });
+    return;
+  }
   const sched = options.virtualTime && VirtualScheduler ? new VirtualScheduler({ start: Date.now() }) : null;
   let match;
   try {

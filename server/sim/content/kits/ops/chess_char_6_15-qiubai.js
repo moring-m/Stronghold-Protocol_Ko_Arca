@@ -2,6 +2,8 @@
 // Conventions of the tier-6 kits: ../shared/tier6.js; kit contract and rules: ../README.md.
 
 import { num, tbb, textCount, enemiesIn, skillGridOf, aura } from '../shared/tier6.js';
+import { hasHp } from '../../../attack.js';
+import { installLordArtsAddition } from '../shared/lord.js';
 
 // ------------------------------------------------------------------------------------------------------------------
 // 仇白 chess_char_6_15 (领主) — S3 问雪; 入隙; 落英; module 雪浸过的斗笠
@@ -12,6 +14,7 @@ function qiubai(bb, chess, def) {
   const skillGrid = def?.skill?.rangeGrid?.length ? def.skill.rangeGrid : null;
   const gapScale = t0.atk_scale_t != null ? num(t0.atk_scale_t) : num(t0.atk_scale), bothMul = t0.atk_scale_t != null ? num(t0.value, 1) : 1;
   const modArts = num(tb.atk_scale_m);
+  const gapKey = t0.atk_scale_t != null ? 'qiubai_e_002_t[damage]' : 'qiubai_talent_1[damage]';
   // module 欲雪时: 落英 "首次命中敌人时提升至100%且束缚时间提升至3秒" (duration_advanced); trait "攻击范围内存在2名及以上敌人时
   // 攻击速度+12" (talent-0 part cnt / attack_speed)
   const firstBind = num(t1.duration_advanced), hitOnce = new WeakSet();

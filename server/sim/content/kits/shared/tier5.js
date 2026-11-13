@@ -39,6 +39,7 @@
 import { bodyInRange } from '../../../body.js';
 import { absoluteRangeKeys, sortEnemyTargets } from '../../../targeting.js';
 import { hypot } from '../../../detmath.js';
+import { isVersionData } from '../../tokens.js';
 
 // ---- text-only constants (the official blackboards carry no key for these) --------------------------------------
 /** 华法琳 S1 "只当目标生命值不满一半时才会触发"; 塞雷娅 S1 "血量小于等于一半"; 山 module "生命值高于50%时". */
@@ -49,6 +50,9 @@ const HALF_HP = 0.5;
  * null in the official data — she is NOT an Abyssal Hunter for these talents.
  */
 const ABYSSAL = new Set(['char_143_ghost', 'char_263_skadi', 'char_474_glady', 'char_4145_ulpia', 'char_1023_ghost2']);
+const ABYSSAL_VERSION = new Set([...ABYSSAL, 'char_218_cuttle']);
+/** The 深海猎人 list of `data` (default: the loaded data). */
+export const abyssalOf = (data) => (isVersionData(data) ? ABYSSAL_VERSION : ABYSSAL);
 /** Never auto-fires (CUSTOM_RANGE with an empty trigger grid): the kit activates the skill itself. */
 const NEVER = Object.freeze({ rule: 'CUSTOM_RANGE', grid: Object.freeze([]) });
 const AURA_IV = 0.25;

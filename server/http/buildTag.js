@@ -25,6 +25,13 @@ export const BUILD_INPUTS = Object.freeze(['public/index.html', 'public/js', 'pu
 /** Names the static server never serves: dot files (`.DS_Store`, `.main.js.swp`) and editor backups (`main.js~`). */
 const isIgnoredBuildName = (name) => name.startsWith('.') || name.endsWith('~');
 
+/**
+ * Trees under BUILD_INPUTS the browser is served only in part: the official versions' data (DESIGN §35.22, §35.23) — a
+ * child of data/versions/ counts only when this process serves it (`servedVersionDirs`: the enabled versions'
+ * directories, server/versions.js), so rebuilding a version the server does not offer is no new build.
+ */
+const VERSIONS_BUILD_DIR = 'data/versions';
+
 /** @type {{ tag: string|null }|null} */
 let buildCache = null;
 
@@ -61,6 +68,7 @@ export function computeBuildTag(root = ROOT) {
  * process is actually serving, every update restarts the server (DEPLOY.md), and re-reading the tree on a timer would
  * let a half-finished deploy — or a file that changed while the process kept running — move the tag under a page.
  * @param {string} [root] used by the first call only (tests)
+ * @param {{ servedVersionDirs?: string[] }} [opts] used by the first call only (computeBuildTag)
  */
 export function buildTag(root = ROOT) {
   if (buildCache === null) buildCache = { tag: computeBuildTag(root) };

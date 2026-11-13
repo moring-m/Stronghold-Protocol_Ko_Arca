@@ -39,6 +39,7 @@ export class PlayerItems {
     if (!rec || rec.itemType !== 'EQUIP') return fail(ERR.BAD_TARGET, 'not equipment');
     const tloc = this.find(targetUid);
     if (!tloc || tloc.piece.kind !== 'chess' || tloc.area === 'equipped') return fail(ERR.BAD_TARGET);
+    if (this.gd.config.version?.rules?.benchEquip === false && tloc.area !== 'board') return fail(ERR.BAD_TARGET);
     const item = iloc.piece;
     const target = tloc.piece;
     // Before anything moves: 信标's text (and any other item whose official sentence says so) cannot go on a 自选 piece.

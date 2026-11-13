@@ -82,6 +82,8 @@ export const byEnemyAttack = (ctx) => {
   if (!s || s.side !== 'enemy' || !d || d.sourceless || ctx.type === 'element' || isHpLoss(d)) return false;
   return !(Array.isArray(d.tags) && (d.tags.includes('counter') || d.tags.includes('reflect')));
 };
+/** The upstream name: these injury effects do not require an attack action. */
+export const byEnemyDamage = byEnemyAttack;
 /**
  * `damaged` ctx of a damage that removed HP and can give 受击回复 SP — the engine's rule (damage.js applyHpLoss: not a 流失
  * (`noSp`, Battle.loseHp), not an element 损伤), whatever its source: an attack, a zone, the 无来源 源石溶剂 tick.
@@ -285,11 +287,3 @@ export function batMod(v, chess = null, desc = '') {
 }
 /** "周围8格" = Chebyshev ring 1 ⇒ Euclidean radius covering the 8 neighbours. */
 export const RING1 = 1.5;
-
-
-/** Ordinary HP injury from an actual enemy source; action flags and descriptive tags do not select it. */
-export const byEnemyDamage = (ctx) => {
-  const source = ctx.source, dmg = ctx.dmg;
-  return !!source && source.side === 'enemy' && !!dmg && !dmg.sourceless
-    && ctx.type !== 'element' && !isHpLoss(dmg);
-};

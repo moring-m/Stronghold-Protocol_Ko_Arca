@@ -28,10 +28,12 @@ export default {
             const x = tgt ? tgt.x : unit.x + unit.fwd[1], y = tgt ? tgt.y : unit.y + unit.fwd[0];
             const atk = unit.s.atk;
             const n = Math.max(1, Math.round(dur / STEP)), per = Math.max(1, Math.round(1 / STEP));
+            const zoneKey = `tinman:zone:${unit.id}:${unit.mem.tinZoneSeq = (unit.mem.tinZoneSeq ?? 0) + 1}`;
             let i = 0;
             unit.mem.tinZones = (unit.mem.tinZones ?? 0) + 1;
             battle.fx('zone', { x, y, radius, dur, id: unit.id, skill: 'tinman1' });
             battle.every(STEP, (b, sc) => {
+              sync();
               const pulse = i % per === 0;
               for (const e of b.foesInRadius(x, y, radius)) {
                 if (e.isFlying || e.s.flags.untargetable) continue;

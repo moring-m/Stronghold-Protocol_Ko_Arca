@@ -85,6 +85,7 @@ const SILENCE_SLACK = 0.1;
 const AIR = Object.freeze({ canHitFly: true });
 const DASH_KEY = 'skill:chen3:dash';
 const AFTER_KEY = 'skill:chen3:respawn';
+const EVADE_KEY = 'talent:chen3:evade';
 
 const bbOf = (chess, id) => skillRec(chess, id)?.bb ?? {};
 /** Absolute tile keys of a skill range at the unit's tile and facing (a 技能范围 ignores 攻击距离). */

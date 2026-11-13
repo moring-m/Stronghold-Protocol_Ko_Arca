@@ -29,6 +29,12 @@
 //   decision of 2026-10-14, after the review).
 //   stats() → { workers, matches, transport } (/healthz); close() terminates every worker (server shutdown).
 //
+// Official versions (DESIGN §35.23, M1; option `kind: 'version'`): the same hosts run a non-default official version's
+//   matches (server/index.js builds a second pool over server/versions.js — one host per version `cs`, counted apart
+//   from the plugin hosts: `maxWorkers` is the server's maxHosts). Its log lines say `[versions]` and name the version;
+//   its matches end with 'version-crash' / 'version-hang' / 'version-start' (proxy.js: the version msgids), and a full
+//   pool refuses with INTERNAL 'version hosts busy'. The same defaults (idle 10 min).
+//
 // Options (startServer `matchHost`): transport, maxWorkers (default: the content-set limit, 4), heartbeatMs, watchdogMs,
 // idleMs, resourceLimits, matchOptions (JSON-safe Match options every hosted match gets — the e2e and host tests scale
 // the timers with it), and for tests only: matchModule (a module whose `Match` replaces server/match/Match.js in the
@@ -70,6 +76,12 @@ export class HostError extends Error {
  */
 export function createMatchHosts({ contents, log = noopLog, options = {} }) {
   const o = { ...HOST_DEFAULTS, ...options };
+  const versionKind = o.kind === 'version';
+  /** the log prefix and the stop reasons of this pool's hosts (the header) */
+  const P = versionKind ? '[versions]' : '[plugins]';
+  const R = versionKind
+    ? { crash: 'version-crash', hang: 'version-hang', start: 'version-start' }
+    : { crash: 'plugin-crash', hang: 'plugin-hang', start: 'plugin-start' };
   /** @type {Map<string, WorkerHost>} by cs */
   const hosts = new Map();
   let seq = 0;
@@ -81,6 +93,7 @@ export function createMatchHosts({ contents, log = noopLog, options = {} }) {
       this.cs = cs;
       this.tag = `[cs:${csUrlPart(cs).slice(0, 8)}]`;
       const set = contents.get(cs);
+      this.tag = versionKind && set?.name ? `[${set.name}]` : `[cs:${csUrlPart(cs).slice(0, 8)}]`;
       const files = set ? contents.dataBytes(cs) : null;
       if (!set || !files) throw new HostError(ERR.INTERNAL, `the content set ${csUrlPart(cs)} is not kept by this server`);
       const scripts = set.scripts || [];
@@ -215,6 +228,7 @@ export function createMatchHosts({ contents, log = noopLog, options = {} }) {
     if (hosts.size >= o.maxWorkers) {
       const idle = [...hosts.values()].find((h) => !h.matches.size);
       if (idle) idle.stop(null, 'room for another content set');
+      else if (versionKind) throw new HostError(ERR.INTERNAL, 'version hosts busy');
       else throw new HostError(ERR.PLUGIN_BUSY, `${hosts.size} match hosts run (limit ${o.maxWorkers})`);
     }
     const h = new WorkerHost(cs);

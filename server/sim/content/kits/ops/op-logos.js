@@ -71,6 +71,7 @@ const enemyShots = (battle) => (battle.projectiles?.list ?? []).filter((p) => p 
 function slowShots(battle, unit, scale) {
   const set = unit.rangeKeySet;
   for (const p of enemyShots(battle)) {
+    if (!p.speedChangeable) continue;
     let s = SLOWED.get(p);
     if (set && set.has(tileOf(p))) {
       if (!s) { s = { orig: p.speed, by: new Set() }; SLOWED.set(p, s); }
@@ -265,6 +266,7 @@ export default {
           }, { owner: unit });
         }
         // CCR-Y: a normal-attack (or 语汇演化) hit on an elite / leader enemy gives SP
+        // [ASSUMED] Keep legacy zero/full-shield trigger behavior until the native Y event is established.
         const sp = num(tb.sp);
         if (sp > 0) {
           battle.on('damaged', (ctx) => {

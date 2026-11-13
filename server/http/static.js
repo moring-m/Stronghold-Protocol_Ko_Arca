@@ -25,6 +25,12 @@
 //                cached for good — for this server's vanilla `cs` (its first 16 hex digits) and, from P1c (DESIGN §32.6),
 //                a content set with gameplay plugins a room uses or used lately (server/plugins/contentSets.js: the same
 //                shape with `vanilla: false`, its plugins, settings and modes)
+//     /cs/<cs16>/index.json, /cs/<cs16>/bounds/official.json of an official version this server enables (DESIGN §35.23,
+//                server/versions.js file): its manifest (`version`, data URLs under /data/versions/<slug>/) and its
+//                official-bounds snapshot, cached for good
+//     /data/versions/<slug>/<file>.json → another official version's data — only an enabled version's directory
+//                (versions.servedDirs(); the real path decides, in any spelling); `?v=` immutable like /data/. Every other
+//                path under data/versions/ is a 404, as before M1
 //     /cs/<cs16>/data/<file>.json, /cs/<cs16>/i18n/<lang>.json → a data or translation file that content set changed,
 //                its served bytes from memory (cached for good; every other file of the set is named by its plain
 //                /data/…?v=<8 hex> URL in the manifest)
@@ -151,6 +157,21 @@ export function createStaticHandler({ publicDir, dataDir, sharedDir, simDir = pa
   const studioRealPath = async () => {
     if (studioReal === undefined) studioReal = await fsp.realpath(path.join(path.resolve(publicDir), 'studio')).catch(() => null);
     return studioReal;
+  };
+  // another official version's data (data/versions/<slug>/, DESIGN §35.22, §35.23): the release carries every version,
+  // but only the directories of the versions this server enables are served (versions.servedDirs()); the on-disk path
+  // decides (case-insensitive disks, Windows short names), as for the studio below
+  let versionsReal = null;
+  /** @type {string[] | null} the real paths of the served version directories */
+  let servedReal = null;
+  /** Is `abs` another version's data that may not be served (under data/versions/, outside every served directory)? */
+  const isVersionData = async (abs) => {
+    versionsReal ||= await fsp.realpath(path.join(path.resolve(dataDir), 'versions')).catch(() => null);
+    if (!versionsReal) return false;
+    const real = await fsp.realpath(abs).catch(() => null);
+    if (!real || !real.startsWith(versionsReal + path.sep)) return false;
+    servedReal ||= (await Promise.all((versions?.servedDirs() || []).map((d) => fsp.realpath(d).catch(() => null)))).filter((d) => typeof d === 'string');
+    return !servedReal.some((d) => real.startsWith(d + path.sep));
   };
   const shimBody = Buffer.from(DATA_SHIM_JS);
   const shimTag = `"shim-${shimBody.length.toString(16)}"`;
@@ -317,6 +338,9 @@ export function createStaticHandler({ publicDir, dataDir, sharedDir, simDir = pa
         // the on-disk name decides (case-insensitive file systems, Windows 8.3 short names like NODEDA~1.JS)
         const real = await fsp.realpath(absPath);
         if (mount.deny.has(path.basename(real).toLowerCase())) throw Object.assign(new Error('private'), { code: 'ENOENT' });
+      }
+      if (mount.name === 'data' && segments.length > 1 && await isVersionData(absPath)) {
+        throw Object.assign(new Error('version data'), { code: 'ENOENT' });
       }
     } catch (e) {
       if (e && e.code === 'ENOENT' && mount.name === 'data' && segments.length === 1 && LOCAL_ART_MANIFESTS.has(segments[0])) {

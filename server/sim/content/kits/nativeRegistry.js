@@ -457,10 +457,26 @@ async function loadKitFile(file) {
 const MODULES = await Promise.all(KIT_FILES.map((group) => Promise.all(group.map(loadKitFile))));
 const STANDIN_MODULES = await Promise.all(STANDIN_KIT_FILES.map(loadKitFile));
 const OPERATOR_MODULES = await Promise.all(OPERATOR_KIT_FILES.map(loadKitFile));
+const VERSION_MODULES = await Promise.all(VERSION_KIT_FILES.map(loadKitFile));
+const DIY_MODULES = await Promise.all(DIY_BORROW_KIT_FILES.map(loadKitFile));
 const registryOf = (m) => (m && m.default && typeof m.default === 'object' ? m.default : {});
 
 /** The registry of each tier group (index 0 = tier 1): baseChessId → kit builder, in KIT_FILES order. */
 export const TIER_KITS = Object.freeze(MODULES.map((group) => Object.assign({}, ...group.map(registryOf))));
+
+/**
+ * charId → the tier kit keys written for it whose file loaded, in KIT_FILES order (the 8 operators V2_2 re-tiered — 锡人,
+ * 耶拉, 录武官, 白面鸮, 百炼嘉维尔, 魔王, 华法琳, 妮芙; DESIGN §35.22.4 — have one kit per tier they appear at).
+ */
+export const TIER_KIT_KEYS_BY_CHAR = (() => {
+  const out = {};
+  for (const reg of TIER_KITS) for (const key of Object.keys(reg)) {
+    const charId = KIT_CHAR_IDS[key];
+    if (charId) (out[charId] ??= []).push(key);
+  }
+  for (const keys of Object.values(out)) Object.freeze(keys);
+  return Object.freeze(out);
+})();
 
 /** The 补位 stand-in kits: stand-in charId → kit builder, in STANDIN_KIT_FILES order. */
 export const STANDIN_KITS = Object.freeze(Object.assign({}, ...STANDIN_MODULES.map(registryOf)));
@@ -468,17 +484,25 @@ export const STANDIN_KITS = Object.freeze(Object.assign({}, ...STANDIN_MODULES.m
 /** The 自选 operator kits: owned-6★ charId → kit builder, in OPERATOR_KIT_FILES order. */
 export const OPERATOR_KITS = Object.freeze(Object.assign({}, ...OPERATOR_MODULES.map(registryOf)));
 
+/** 第一期 charId kits (`ops/ver-*.js` except ver-diy), in VERSION_KIT_FILES order. Not part of KITTED_CHARS. */
+export const VERSION_KITS = Object.freeze(Object.assign({}, ...VERSION_MODULES.map(registryOf)));
+
+/** Borrowed 自选 kits (`ops/ver-diy.js`): charId → builder, in DIY_BORROW_CHARS order. */
+export const DIY_BORROW_KITS = Object.freeze(Object.assign({}, ...DIY_MODULES.map(registryOf)));
+
 /**
  * The merged kit registry: baseChessId → (bb, chess, def) => Kit, tier 1 … tier 6, then the stand-ins' charIds, then
- * the 自选 operators' charIds.
+ * the 自选 operators' charIds, then the version charId kits, then the borrowed 自选 charIds.
  */
-export const KITS = Object.freeze(Object.assign({}, ...TIER_KITS, STANDIN_KITS, OPERATOR_KITS));
+export const KITS = Object.freeze(Object.assign({}, ...TIER_KITS, STANDIN_KITS, OPERATOR_KITS, VERSION_KITS, DIY_BORROW_KITS));
 
 /**
  * Every character a 自选 pick may field with a faithful kit: the 预备干员 (GENERIC_KIT_CHARS), the stand-ins with a kit
- * file and the operators of OPERATOR_KIT_FILES whose file loaded. The `kitted` option of shared/diy.js diyPool /
+ * file, the operators of OPERATOR_KIT_FILES whose file loaded, and the borrowed 自选 charIds whose file loaded
+ * (DIY_BORROW_CHARS). The 19 version shop kits are not here. The `kitted` option of shared/diy.js diyPool /
  * validateDiyPicks.
  */
-export const KITTED_CHARS = Object.freeze([...new Set([...GENERIC_KIT_CHARS, ...Object.keys(STANDIN_KITS), ...Object.keys(OPERATOR_KITS)])]);
-
-export default KITS;
+export const KITTED_CHARS = Object.freeze([...new Set([
+  ...GENERIC_KIT_CHARS, ...Object.keys(STANDIN_KITS), ...Object.keys(OPERATOR_KITS),
+  ...DIY_BORROW_CHARS.filter((c) => Object.hasOwn(DIY_BORROW_KITS, c)),
+])]);

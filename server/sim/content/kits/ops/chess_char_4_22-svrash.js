@@ -44,6 +44,12 @@ export default withDefaults({
           if (c.source !== unit || !c.dmg?.isAttack || c.type !== 'phys' || !c.target.alive || c.target.side !== 'enemy') return;
           battle.dealDamage(unit, c.target, { amount: unit.s.atk * m, type: 'arts', tags: ['module'] });
         }, { owner: unit });
+        installLordArtsAddition(battle, unit, c => {
+          // S1 can finish before its projectile lands; its retained flags identify the skill attack.
+          const skillAttack = c.dmg.isAttack && c.dmg.isSkill;
+          const skillScale = unit.skill && (unit.skill.active || skillAttack) ? num(unit.skill.bb.atk_scale, 1) : 1;
+          return moduleArts * skillScale * (eliteOrBoss(c.target) ? eliteScale : 1);
+        });
       },
     };
   },

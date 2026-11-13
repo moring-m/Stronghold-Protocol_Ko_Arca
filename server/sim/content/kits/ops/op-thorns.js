@@ -142,6 +142,32 @@ export default {
           kind: 'duration',
           mods: { atkPct: num(b2.atk), defPct: num(b2.def) },
           attack: { noAttack: true },     // 停止攻击
+          onStart({ battle, unit }) {
+            const cd = num(b2.cooldown, 0.8), n = Math.max(1, Math.floor(num(b2.max_target, 4)));
+            // [ASSUMED] Literal-zero requests retain the simulator's shared injury dispatch policy.
+            battle.addBuff(unit, { key: 'skill:thorns:spikes',
+              observeInjury(c) {
+                const sk = unit.skill;
+                if (c.target !== unit || !sk || !sk.active || !up(unit) || !unit.canAct || !normalHitFromEnemy(c)) return;
+                if (battle.time < unit.mem.thornsSpikeAt + cd - 1e-9) return;
+                unit.mem.thornsSpikeAt = battle.time;
+                const seq = unit.deploySeq, act = sk.activations;
+                battle.after(SPIKE_DELAY, () => {
+                  if (!up(unit) || unit.deploySeq !== seq || !unit.canAct || !unit.skill?.active || unit.skill.activations !== act) return;
+                  const list = battle.enemiesInKeys(absoluteRangeKeys(grid2, unit.tileR, unit.tileC, unit.dir, 0), unit, AIR);
+                  sortEnemyTargets(battle, unit, list, null);
+                  const targets = list.slice(0, n);
+                  if (!targets.length) return;
+                  battle.fx('thorns', { x: unit.x, y: unit.y, id: unit.id, n: targets.length });
+                  for (const e of targets) {
+                    if (!e.alive) continue;
+                    battle.dealDamage(unit, e, { amount: unit.s.atk * rangedScale * unit.s.atkScaleMul, type: 'phys', isSkill: true, tags: ['skill', 'thorns:spike'] });
+                  }
+                }, { owner: unit });
+              },
+            });
+          },
+          onEnd({ battle, unit }) { battle.removeBuff(unit, 'skill:thorns:spikes'); },
         },
         [S3]: {
           kind: 'toggle',
@@ -190,6 +216,7 @@ export default {
         } },
       ],
       install(battle, unit) {
+        installLordArtsAddition(battle, unit, loreX, ['module', 'addition', 'thorns:lorx']);
         // S3: the use count restarts with every deployment (PRTS "每次部署棘刺时，重新计算该技能的使用次数")
         battle.on('deploy', (c) => { if (c.unit === unit) unit.mem.thornsS3Uses = 0; }, { owner: unit });
         // LOR-Δ: 神经损伤 = ep_damage_ratio × the HP damage of every damage instance he deals

@@ -544,7 +544,6 @@ export function makeCtx(m, ps, source, hook, ev = null, preview = null) {
     lp: () => ps.lp,
     alive: () => ps.alive,
     bandId: () => source.kind==='band'?source.bandId:ps.bandId,
-    commandEffectId: ps.command?.currentEffectId ?? null,
     teamMedicGranted: () => m.teamMedicGranted(),
     shopLevel: () => ps.shop.level,
     bond: (id) => (ps.bonds[id] ? { ...ps.bonds[id] } : null),

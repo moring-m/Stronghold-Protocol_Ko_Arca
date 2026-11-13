@@ -241,6 +241,10 @@ function setFortressMelee(prof, state, v) {
   if (state) state.fortressMelee = v; else prof._fortressMelee = v;
 }
 
+/**
+ * Collect targets for an ally with profile `prof`. `state` (optional) receives the fortress switch instead of it being
+ * written on `prof`: `{fortressMelee}` — a caller that must not touch the live profile passes a scratch object.
+ */
 export function acquireTargets(b, u, prof, state = null) {
   if (typeof prof.acquireTargets === 'function') return prof.acquireTargets(b,u);
   // a heal attack (医师 / 群愈师 / 疗养师 / 链愈师 / 行医, a skill attack turned into a heal) selects injured allies only,

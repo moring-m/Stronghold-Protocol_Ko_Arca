@@ -4,6 +4,7 @@
 import { bodyDist } from '../../../body.js';
 import { AURA, num, tbb, moduleBb, grid, batFlat, enemyHasTag, targetsInRange, whileDeployed, pulse, alt, instantKind, pullToFront, withDefaults } from '../shared/tier4.js';
 import { hypot } from '../../../detmath.js';
+import { abyssalOf } from '../shared/tier5.js';
 
 const ABYSSAL = new Set(['char_143_ghost', 'char_263_skadi', 'char_474_glady', 'char_4145_ulpia', 'char_1023_ghost2']);
 const isAbyssal = (u) => u?.def?.raw?.groupId === 'abyssal' || ABYSSAL.has(u?.def?.charId ?? u?.def?.raw?.charId);

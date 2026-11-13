@@ -37,6 +37,8 @@
 // moves, so 缪尔赛思's 「在第1回合开始时」 and the texts with no time (「第3回合获得」, 「每5回合获得」) follow their key [ASSUMED]. A
 // 机变 round (config spRounds) meets 老鲤 / 昆图斯 at R3 and the even-round ones (杜宾, 松桐, 娜仁图亚) at R6 of NORMAL; elsewhere
 // only the order around the round start changes. "回合开始时" (余, 铃兰) and 哈洛德's gain_bond_char_per_round stay onRoundStart.
+// The operators' 「<进入休整期时>」 traits (SERVER_PREP_START garrisons) run on onPrepStart too (effectsMeta.js GARRISON_HOOK,
+// DESIGN §35.53), after the strategy's grants of that dispatch (global → band → bonds → garrisons).
 
 import { GEO, gateOf } from '../../../../shared/constants.js';
 import { bbCap } from '../../../../shared/plugins/officialBounds.js';
@@ -612,4 +614,14 @@ export function registerMeta(registry) {
     if (h) registry.band(id, h);
   }
   registry.global('bands_ducklord', duckGlobal);
+  registry.global('bands_devices', {
+    onRoundStart(ctx) {
+      for (const holder of [ctx, ...ctx.teammates()]) {
+        for (const b of buffsOf(bandRecord(holder.bandId()))) {
+          if (b.key !== 'auto_chess_change_map') continue;
+          for (const [alias, on] of Object.entries(b.p)) if (alias.startsWith('trap_') && alias.includes('#')) ctx.setDeviceActive(alias, !!on);
+        }
+      }
+    },
+  });
 }

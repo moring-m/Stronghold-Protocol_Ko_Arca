@@ -104,6 +104,22 @@ export function abOf(b, e) {
   return e.mem.ab;
 }
 
+/** Native ordinary-priority phys/arts count shield; repeated grants keep the held instance and stronger count. */
+export function grantHitShield(battle, enemy, count) {
+  if (!Number.isFinite(count) || !(count > 0)) return null;
+  const key = 'ab:hitShield';
+  const held = enemy.findBuff(key);
+  if (held) {
+    held.shieldHits = Math.max(held.shieldHits, count);
+    enemy.markDirty();
+    return held;
+  }
+  return battle.addBuff(enemy, { key, shieldHits: count, shieldType: ['phys', 'arts'],
+    onRemove({ buff }) {
+      if (!(buff.shieldHits > 0)) battle.fx('shieldBreak', { x: enemy.x, y: enemy.y, id: enemy.id });
+    } });
+}
+
 /**
  * A display-only client event: enemy `e` uses its skill `s` (an `ab.sk` entry) — ['cast', id, slot] with the slot of
  * its data record's skills[] (`s.slot`) and, when the skill's blackboard has one, its `duration` (render/app.js: the
@@ -308,11 +324,11 @@ function modsWithoutBounty(mods) {
 export function spawnChildren(b, parent, key, n, opts = {}) {
   const out = [];
   const route = opts.route ?? remainingRoute(parent);
-  const mods = offspringMods(opts.mods ?? parent.mods);
   // A death spawn during 联防 is not another bounty phase and cannot bill the original leaker's LP.
   const bountyDeath = !parent.alive && (parent.bounty || parent.mods?.bountyId || parent.mods?.bountyCoins);
   const countInTotal = opts.countInTotal ?? (b.kind === 'unite' && (bountyDeath || parent.counted === false) ? false : undefined);
   const cnt = Math.max(0, Math.min(20, Math.floor(n)));
+  const mods = modsWithoutBounty(opts.mods ?? parent.mods ?? null);
   for (let i = 0; i < cnt; i++) {
     const off = cnt > 1 ? (i - (cnt - 1) / 2) * 0.2 : 0;
     const pos = opts.pos ?? [parent.y, parent.x + off];

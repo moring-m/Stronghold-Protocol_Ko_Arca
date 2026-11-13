@@ -60,12 +60,30 @@ export default withDefaults({
         attack: { noAttack: true },                 // 停止主动攻击敌人 (ammo is spent by counters)
         onStart({ battle, unit }) {
           unit.mem.counterReady = -Infinity;
+          battle.addBuff(unit, { key: 'rmixer:counter', tags: ['skill'], observeInjury(c) {
+            const d = c.dmg;
+            if (!S3 || !unit.canAct || unit.s.flags.disarm || !skillActive(unit) || !d || c.type === 'element') return;
+            if (isHpLoss(d)) return;
+            if (battle.time < (unit.mem.counterReady ?? -Infinity) - 1e-9) return;
+            const list = targetsInRange(battle, unit);
+            const i = c.source ? list.indexOf(c.source) : -1;
+            if (i > 0) { list.splice(i, 1); list.unshift(c.source); }
+            const targets = list.slice(0, counterMax);
+            unit.mem.counterReady = battle.time + unit.s.interval * counterRatio;
+            unit.mem.inCounter = true;
+            try {
+              if (targets.length) battle.forceAttack(unit, targets);
+              else { unit.stats.attacks++; unit.skill.onAttackPerformed([], true); } // a counter into nothing: its bullet goes
+            } finally { unit.mem.inCounter = false; }
+            battle.fx('counter', { x: unit.x, y: unit.y, id: unit.id, n: targets.length });
+          } });
           for (const a of battle.allies(unit.ownerId)) {
             if (a === unit || a.kind !== 'op' || nationOf(a) !== 'laterano') continue;
             if (a.skill && a.skill.active && a.skill.kind === 'ammo') { a.skill.addAmmo(num(bb.ammo, 0)); battle.fx('reload', { x: a.x, y: a.y, id: a.id, n: num(bb.ammo, 0) }); }
           }
           battle.fx('sermon', { x: unit.x, y: unit.y, id: unit.id });
         },
+        onEnd({ battle, unit }) { battle.removeBuff(unit, 'rmixer:counter'); },
       },
       talents: [
         { install(battle, unit) { // 扫射迎宾仪礼: every damage dealt → DEF +30 / ASPD +3 for 10 s, ≤ 3 stacks

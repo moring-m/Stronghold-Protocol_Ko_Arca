@@ -648,8 +648,17 @@ export function buildPlan({ assets07, ops03, enemies05, maps05, audio, modelsDat
   }
   const items = {};
   for (const [trapId, it] of Object.entries(assets07?.items || {})) items[trapId] = leaf(alt(`item/${trapId}.png`, it.icon?.url, it.icon?.bytes));
+  for (const [id, b] of Object.entries(extraBonds)) if (!bonds[id] && b.iconId) {
+    bonds[id] = leaf(alt(`bond/${id}.png`, joinUrl(RAW.aa2, `ui/autochess/[uc]autochesscommon/arts/bondicon/${b.iconId.toLowerCase()}.png`)));
+  }
+  for (const id of Object.keys(extraItems)) if (!items[id]) {
+    items[id] = leaf(alt(`item/${id}.png`, joinUrl(RAW.aa2, `ui/autochess/[uc]autochesscommon/arts/shopitemicon/${id}.png`)));
+  }
   const bands = {};
   for (const [bandId, b] of Object.entries(assets07?.bands || {})) bands[bandId] = leaf(alt(`band/${bandId}.png`, b.icon?.url, b.icon?.bytes));
+  for (const [bandId, b] of Object.entries(extraBands)) if (!bands[bandId] && b.iconId) {
+    bands[bandId] = leaf(alt(`band/${bandId}.png`, joinUrl(RAW.aa2, `ui/autochess/[uc]autochesscommon/arts/bandicon/${b.iconId}.png`)));
+  }
 
   // --- professions ----------------------------------------------------------
   const prof = { icon: {}, large: {}, battlecard: {}, sub: {} };
@@ -718,6 +727,7 @@ export function buildPlan({ assets07, ops03, enemies05, maps05, audio, modelsDat
     prep: flatBgm(bgmLeaf('sys.ON_ACTIVITY_LOADED.act2autochess')),
     combat: flatBgm(bgmLeaf('battle.ON_GAME_READY.act1autochess_shop')),
     boss: flatBgm(bgmLeaf('battle.ON_GAME_READY.rglk1phantomcastle')),
+    ...(combatAlts.length ? { combatAlts } : {}),
     ...(unite ? { unite } : {}),
     ...(combatAlts.length===2 ? { combatAlts } : {}),
   };
@@ -787,6 +797,8 @@ export function buildPlan({ assets07, ops03, enemies05, maps05, audio, modelsDat
   // The three prep-only slots (干员报到 gacha / 编入队伍 squad / 任命队长 squadFirst) are NOT planned by default: the
   // client never requests them, and downloading them adds 360 files / 19.3 MB to every `npm run assets` — pass --voice-all for
   // the complete official set (`voiceSlots: null`, reviewer note on the voice PR).
+  // `audio.voiceJp` (VOICE_JP_LANG): the same slots and lines in the Japanese dub, a second tree beside the Chinese one
+  // (the owner's request of 2026-10-08) — same file names, `audio/voice/jp/`.
   const voiceSlotsByChar = indexVoice(charword, VOICE_ID_LANG, voiceSlots);
   // `dirOf` (VOICE_OPTIONAL_TREES native): the operator's own-language folder, or nothing when it has no such dub
   const voiceTree = (lang, dirOf = null) => {

@@ -32,8 +32,11 @@ export function tinmanKit(bb, chess, def) {
         const atk = unit.s.atk;
         unit.mem.tinZones = (unit.mem.tinZones ?? 0) + 1;
         const regenKey = `tinman:zone:${unit.id}:${unit.mem.tinZoneSeq = (unit.mem.tinZoneSeq ?? 0) + 1}`;
+        const sync = startTinmanCoverage(battle, unit, { key: regenKey, x, y, radius, duration: dur,
+          mul: wither, regen: atk * healRatio });
         makeZone(battle, unit, {
           x, y, radius, duration: dur, skill: 'tinman', onPulse(b) {
+            sync();
             for (const e of b.foesInRadius(x, y, radius)) {
               if (e.isFlying || e.s.flags.untargetable) continue;
               if (wither > 1) b.addBuff(e, { key: witherKey, duration: 1.05, data: { mul: wither }, source: unit });

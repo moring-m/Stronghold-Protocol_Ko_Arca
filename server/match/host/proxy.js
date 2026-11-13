@@ -35,6 +35,9 @@ export const REQUEST_TIMEOUT_MS = 15_000;
  * @param {string} reason 'plugin-crash' | 'plugin-hang' | 'plugin-start'
  */
 export function crashMessage(reason) {
+  if (reason === 'version-hang') return msg('本局模拟长时间无响应，已结束');
+  if (reason === 'version-start') return msg('该版本的模拟无法启动');
+  if (reason === 'version-crash') return msg('本局模拟出错，已结束');
   if (reason === 'plugin-hang') return msg('房间的插件内容长时间无响应，本局模拟已结束');
   if (reason === 'plugin-start') return msg('房间的插件内容无法启动模拟');
   return msg('房间的插件内容出错，本局模拟已结束');

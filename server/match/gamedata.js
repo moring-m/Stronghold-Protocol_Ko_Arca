@@ -60,6 +60,34 @@ export const DEFAULTS = Object.freeze({
 /** Game seconds per real second of a battle (forced 2×): combat limits in data are real seconds (combatTimeLimit). */
 export const COMBAT_TIME_SCALE = 2;
 
+/**
+ * Multiplier of bloodPoint[difficulty] for the shared leader pool (DESIGN §20.10, §25.13.4), from config bossHpScale —
+ * each key from the mode's entry first, then the global one; the defaults are the current rule:
+ *   solo   `solo` (1: the table value — one player's share);
+ *   co-op  `perPlayer` true (the owner's decision of 2026-10-06, adopting PR #209 by @qingjingshenghuo): `coop` (1) × the
+ *          players alive when the fight starts — bots and AI 托管 seats count, eliminated and departed seats do not —
+ *          at most `aliveFull` (4); a count left out means a full team;
+ *          `perPlayer` false: the fixed pool of 0.1.x (「保持固定血量」, restorable with `solo` 0.25): `coop` whatever the
+ *          count, × min(alive, aliveFull) / aliveFull with `aliveScaling`.
+ * @param {object|null|undefined} modeScale config.modes[modeId].bossHpScale
+ * @param {object|null|undefined} cfgScale config.bossHpScale
+ * @param {boolean} isSolo
+ * @param {number} [aliveCount] alive players at the Final Assault / Hidden Core start (co-op)
+ * @returns {number}
+ */
+export function bossPoolShareOf(modeScale, cfgScale, isSolo, aliveCount) {
+  const ms = modeScale && typeof modeScale === 'object' ? modeScale : {};
+  const cs = cfgScale && typeof cfgScale === 'object' ? cfgScale : {};
+  const pick = (k, d) => (Number.isFinite(ms[k]) && ms[k] > 0 ? ms[k] : Number.isFinite(cs[k]) && cs[k] > 0 ? cs[k] : d);
+  const flag = (k, d) => (typeof ms[k] === 'boolean' ? ms[k] : typeof cs[k] === 'boolean' ? cs[k] : d);
+  if (isSolo) return pick('solo', 1);
+  const full = Math.max(1, Math.floor(pick('aliveFull', 4)));
+  const n = Number(aliveCount);
+  const alive = Number.isFinite(n) && n >= 1 ? Math.min(full, Math.floor(n)) : full;
+  if (flag('perPlayer', true)) return pick('coop', 1) * alive;
+  return pick('coop', 1) * (flag('aliveScaling', false) ? alive / full : 1);
+}
+
 /** Strip the _a/_b suffix of an item id (the registry key of an item family). */
 export const itemKey = (id) => (typeof id === 'string' ? id.replace(/_[ab]$/, '') : '');
 
@@ -115,6 +143,8 @@ export class GameData {
     this.inactiveEnemies = new Set(Array.isArray(this.mode.inactiveEnemyKeys) ? this.mode.inactiveEnemyKeys : []);
     /** data/tuning.json (titles only, see the header) */
     this.tuning = this.raw.tuning && typeof this.raw.tuning === 'object' ? this.raw.tuning : {};
+    /** standIn memo: chess id → composed 补位 record | null */
+    this._standIns = new Map();
   }
 
   /**
@@ -190,6 +220,26 @@ export class GameData {
   token(id) { return own(this.raw.tokens, id); }
   get choices() { return this.raw.choices && typeof this.raw.choices === 'object' ? this.raw.choices : {}; }
   get factions() { return this.raw.factions && typeof this.raw.factions === 'object' ? this.raw.factions : {}; }
+
+  /**
+   * The 补位 record of chess `id` (normal or elite; DATA.md §18): shared/standIn.js standInRecord over data/backups.json
+   * — the chess's identity (ids, tier, bonds, 特质, price, merge) with its official stand-in's body (stats, range, skills
+   * with the backup skill as the default, talents, module, art, `standInFor`). Null for a PRESET / 自选 chess, an unknown
+   * id or data without backups.json. Memoized (frozen records).
+   * @param {string} id
+   * @returns {object|null}
+   */
+  standIn(id) {
+    if (typeof id !== 'string') return null;
+    if (this._standIns.has(id)) return this._standIns.get(id);
+    const c = this.chess(id);
+    const backups = this.raw.backups && typeof this.raw.backups === 'object' ? this.raw.backups : null;
+    let rec;
+    try { rec = c && backups ? standInRecord(c, backups) : null; } catch { rec = null; }
+    if (rec) Object.freeze(rec);
+    this._standIns.set(id, rec);
+    return rec;
+  }
 
   /** Normal (base) chess id of a chess id (golden → base). */
   baseIdOf(id) {

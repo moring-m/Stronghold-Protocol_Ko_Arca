@@ -38,6 +38,7 @@ function kitBlades(ab) {
       a.used++;
       b.addBuff(e, { key: 'ab:blade', refresh: 'stack', stacks: 1, maxStacks: Math.max(1, cnt), mods: { atkPct: atk }, persist: true, visible: true });
     },
+    tick(b, e, a) { if (a.clearCd) { a.clearCd = false; e.atkCd = 0; } },
     death(c, b, e, a) { if (c.reason === 'killed' && key) spawnChildren(b, e, key, Math.max(1, cnt + add * a.used)); },
   }];
 }

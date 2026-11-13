@@ -101,6 +101,8 @@ function yu(bb, chess, def) {
             if (!e.alive) continue;
             if (sc > 0) battle.dealDamage(unit, e, { amount: unit.s.atk * sc, type: 'arts', tags: ['talent'] });
             if (er > 0) elementDmg(battle, unit, e, 'burn', unit.s.atk * er, ['talent']);
+            if (sc > 0 && e.alive) battle.dealDamage({ source: unit, target: e, amount: unit.s.atk * sc, type: 'arts',
+              attackType: 'BUFF', applyWay: 'MELEE', calculation: 'precomputed', tags: ['talent', 'dot'] });
           }
         });
       } },

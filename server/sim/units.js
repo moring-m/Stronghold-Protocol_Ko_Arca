@@ -195,6 +195,7 @@ export class Unit {
       artsDealtMul: m('artsDealtMul'),
       dmgTakenMul: m('dmgTakenMul'),
       physTakenMul: m('physTakenMul'),
+      artsAttackAddition: a('artsAttackAddition'),
       artsTakenMul: m('artsTakenMul'),
       trueTakenMul: m('trueTakenMul'),
       elemTakenMul: m('elemTakenMul'),           // 元素损伤倍率: element gauge fills (damage.js applyElement)
@@ -210,6 +211,9 @@ export class Unit {
       flags: flags || EMPTY,
     };
     s.flags.stun = !!(flags.stun || flags.freeze || flags.sleep || flags.levitate);
+    // the renderer's pacing hint (server/sim/battle/events.js _emitRateChanges): this unit's own attack interval moved,
+    // so a 'rate' event has to go out — set here instead of comparing every unit's stats on every tick
+    if (!this._s || Math.abs(this._s.interval - s.interval) > 1e-9) this._rateDirty = true;
     this._s = s;
     this._flyS = null; // drop the cached answer's reference to the previous stats object
     this._dirty = false;
@@ -264,6 +268,9 @@ export class Unit {
   isOp() { return this.kind === 'op'; }
   isEnemy() { return this.side === 'enemy'; }
   isAlly() { return this.side === 'ally'; }
+
+  /** Entity class, independent of team: enemy-record allies such as 炎佑 retain enemy element rules. */
+  get isEnemyEntity() { return this.kind === 'enemy' || String(this.defId).startsWith('enemy_'); }
 
   /** Element gauge capacity: 1000, leaders (enemy rank BOSS) 2000 (official "·我方" burst terms). */
   get gaugeMax() {

@@ -117,6 +117,8 @@ export class MatchSetupVote {
     this.setupRevision++;
     this.onSetupRerolled?.();
     this.setupVote = null;
+    // A completed reroll is a new opening, so every seat gets a fresh chance to ask for another one.
+    this._rerollStartAt.clear();
     this.enterInfoCheck();
     return OK;
   }

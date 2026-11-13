@@ -75,6 +75,7 @@ export class RehearsalScore {
     const pp = r && !r.synthetic && r.perPlayer && r.perPlayer[this.playerId];
     if (!pp) return false;
     const leaks = (pp.leaked || []).filter((l) => l && l.counted !== false).length;
+    const boss = Math.max(0, Number(pp.bossDamage) || 0);
     const score = -leaks * 1000 + (pp.killed || 0) - candidateIndex * 0.01;
     // §37.37: the layers the battle gained (its 特质 and bonds, `layerGains`) break a leak and leader-damage tie
     const gain = Object.values(pp.layerGains || {}).reduce((s, n) => s + (Number(n) || 0), 0);
@@ -128,6 +129,14 @@ export class RehearsalRun {
   constructor(candidates, playerId, cap, { onError = null } = {}) {
     this.candidates = candidates;
     this.cap = cap;
+    if (!Number.isInteger(stage) || stage < 0 || stage > 8
+      || !Number.isSafeInteger(tickBudget) || tickBudget < 0) throw new RangeError('Invalid rehearsal limits');
+    this.stage = stage;
+    this.tickBudget = tickBudget;
+    this.totalTicks = 0;
+    this.completed = 0;
+    this.zeroComplete = false;
+    this.stopReason = null;
     this.score = new RehearsalScore(playerId);
     this.onError = onError;
     this.index = 0;
@@ -158,6 +167,13 @@ export class RehearsalRun {
       // a candidate that ended mid-slice (finished, cap, or beaten at a 64-tick check that skipped the budget test):
       // check the budget before building and stepping the next one
       if (outOfBudget && worked && outOfBudget()) { this.spent = n; return false; }
+      if (!this.current && ((this.stage && this.index >= this.stage && this.zeroComplete)
+        || (this.tickBudget && this.totalTicks >= this.tickBudget))) {
+        this.stopReason = this.zeroComplete && this.index >= this.stage ? 'zero' : 'budget';
+        this.candidates.fill(null, this.index);
+        this.spent = n;
+        return true;
+      }
       try {
         // the candidate of this turn, built when the first slice reaches it: its construction is part of the sliced
         // work, and the battle stays in `this.current` for the slices that continue it
@@ -189,6 +205,7 @@ export class RehearsalRun {
       this.index++;
       this.ticks = 0;
     }
+    this.stopReason ||= 'exhausted';
     this.spent = n;
     return true;
   }

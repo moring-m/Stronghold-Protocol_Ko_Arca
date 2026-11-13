@@ -58,6 +58,14 @@ export default {
       skill: {
         kind: 'ammo', ammo: num(bb['attack@trigger_time'], 12),
         mods: mods({ atkPct: num(bb.atk), defPct: num(bb.def), blockCnt: num(bb.block_cnt) }),
+        onStart({ battle, unit }) {
+          // PRTS: +2000, enemy-source melee-route damage; all four HP damage types can be dodged.
+          battle.addBuff(unit, { key: 'excu2:meleeDodge', injuryPriority: 2000, tags: ['skill'], injury(c) {
+            if (c.source?.side !== 'enemy' || damageApplyWay(c.dmg) === 'RANGED') return;
+            if (c.dodge(prob)) unit.skill.addAmmo(refill);
+          } });
+        },
+        onEnd({ battle, unit }) { battle.removeBuff(unit, 'excu2:meleeDodge'); },
       },
       // REA-Y: its trait part is DISPLAY-only (official battle_equip_table uniequip_003_excu2: target DISPLAY, the ASPD
       // text "{value}" = 12; the ASPD rider itself is the talent −1 part). data/chess.json merges that display blackboard

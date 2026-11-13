@@ -273,6 +273,7 @@ const selfFear = (ab) => ({
  */
 function prisoner(ab, { freeAll = false } = {}) {
   const t = (k) => T(ab, k) ?? 0;
+  const times = Math.max(1, Math.round(T(ab, 'confinement.times') ?? 4));
   const liberate = (b, e, a) => {
     if (a.free || !e.alive) return;
     a.free = true;

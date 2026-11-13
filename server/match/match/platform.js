@@ -134,6 +134,11 @@ export class MatchPlatform {
     return OK;
   }
 
+  /** Host-only asynchronous input, journalled by testTrace; never a C2S message. */
+  externalReply(id, reply, failed) {
+    this.guard(() => this.externalAI?.receive(id, reply, failed));
+  }
+
   /**
    * room.loadout during the match (DESIGN §16): only while INFO_CHECK runs (the briefing's 干员调配 entry); the lobby
    * already checked it against the data (PlayerState.setLoadout re-checks it). `ops` (0.2.2): the per-operator 潜能 /
@@ -248,6 +253,8 @@ export class MatchPlatform {
     this.guard(() => {
       ps.left = true;
       this.cancelSetupVote();
+      // A seat that is gone for good takes its reroll cooldown with it (it cannot ask again in this match anyway).
+      this._rerollStartAt.delete(playerId);
       ps.connected = false;
       ps.autoplay = false;
       this.watchers.delete(playerId);
@@ -319,6 +326,7 @@ export class MatchPlatform {
   dispose() {
     if (this.disposed) return;
     this.disposed = true;
+    this.externalAI?.close();
     if (this.runner) { try { this.runner.stop(); } catch { /* ignore */ } }
     this._stopClientCombat();
     this._cancelRehearsal();

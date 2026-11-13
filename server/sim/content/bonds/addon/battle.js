@@ -157,6 +157,8 @@ function applyPassives(battle, st) {
     const milestone = num(bb.power_bond_stack_cnt, Infinity);
     if (lv >= milestone) {
       const mods = { aspd: num(bb.power_attack_speed) };
+      if (bb.power_cost_scale != null) mods.costMul = num(bb.power_cost_scale, 1);
+      if (bb.power_respawn_time != null) mods.redeployMul = num(bb.power_respawn_time, 1);
       for (const u of st.ops) passiveBuff(battle, u, KEY.raidAspd, mods);
       if (!st.raidMilestone) { st.raidMilestone = true; for (const u of st.members[ID.raid]) if (onField(u)) { fxOn(battle, 'bondMilestone', u, KEY.raid, 'aspd'); break; } }
     }
@@ -405,6 +407,11 @@ function raidTargets(battle, u, pid, { taunt = false } = {}) {
   return list;
 }
 
+/**
+ * The block pass has not run yet this tick (the poll is in the scheduled phase, and `_deploy` clears `blocking`).
+ * Refresh contact the same way `updateEnemy` does before an enemy moves: an enemy already on this tile is blocked
+ * now, so a revive does not treat that tile as empty and jump away.
+ */
 function raidRefreshContact(battle, u) {
   for (const e of battle.enemies) {
     if (!e.alive || e.blockedBy || e.hidden) continue;
@@ -419,6 +426,8 @@ function raidPoll(battle, st) {
   let targets = null, taunted = null; // the player's candidates (raidTargets), shared by its members until a jump changes the field
   for (const u of st.members[ID.raid]) {
     if (!onField(u) || !u.canAct) continue;
+    // Maintainer 2026-10-10: one fresh target check after revival when unblocked, even with enemies in attack range.
+    // Ordinary later polls retain their original empty-range rule and distance order. A Raid jump cannot arm another check.
     const revived = u.mem.raidReviveSeq === u.deploySeq;
     if (revived) { u.mem.raidReviveSeq = 0; raidRefreshContact(battle, u); }
     if (revived && u.blocking.some(e => e.alive && e.blockedBy === u)) continue;
@@ -489,6 +498,15 @@ export function install(battle) {
   for (const st of states) { byPid[st.pid] = st; applyPassives(battle, st); applyStatic(battle, st); }
   const has = (id, tier = 1) => states.some((st) => (st.tiers[id] ?? 0) >= tier);
 
+  if (states.some((st) => st.tiers[ID.preci] >= 2 && num(st.bb[ID.preci]?.silence) > 0)) {
+    battle.on('attack', ({ attacker, targets }) => {
+      const st = attacker && byPid[attacker.ownerId];
+      if (!st || st.tiers[ID.preci] < 2 || attacker.def?.position !== 'RANGED') return;
+      const duration = num(st.bb[ID.preci]?.silence);
+      if (duration > 0) for (const target of targets) if (target?.side === 'enemy' && target.alive) battle.applyStatus(target, 'silence', { duration, source: attacker });
+    });
+  }
+
   // live layers
   if (states.some((st) => Object.keys(st.tiers).some((id) => LAYERED.has(id)))) {
     battle.on('layerGain', (c) => {
@@ -532,6 +550,8 @@ export function install(battle) {
     if (raid.length) {
       battle.on('deploy', c => {
         const u = c.unit;
+        // Only a revive: the previous exit was a knock-out and the operator is back before its respawn timer.
+        // A retreat (宴 / 史尔特尔 / 伊内丝 / 耀骑士临光), a move, a timer redeploy and the initial deploy stay on the old poll.
         if (!u || c.initial || c.move || u.removeReason !== 'killed' || !(u.respawnAt > battle.time + 1e-9)) return;
         if (raid.some(st => st.members[ID.raid].has(u))) u.mem.raidReviveSeq = u.deploySeq;
       });
@@ -662,6 +682,8 @@ export function install(battle) {
         // "可被无来源伤害消耗反伤机会")
         if (dmg.steadShare || dmg.steadThorn || c.type === 'element' || isHpLoss(dmg) || !st.members[ID.stead].has(t)) return;
         const bb = st.bb[ID.stead];
+        // Season one has damage sharing, without a retaliation clause: emit no zero-damage hit either.
+        if (bb.base_damage_value == null && bb.damage_value_per_stack == null) return;
         const last = t.mem[STEAD_CD] ?? -Infinity;
         if (battle.time - last < num(bb.cd_duration) - 1e-9) return;
         t.mem[STEAD_CD] = battle.time;

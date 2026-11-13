@@ -41,6 +41,7 @@ import { spawnYanyou } from '../tokens.js';
 import { kjeragColdWind } from '../devices.js';
 import * as items from '../items.js';
 import { FORCED_EXIT } from '../../constants.js';
+import { damageAttackType, isHpLoss } from '../../attack.js';
 import { msg } from '../../../../shared/i18n.js';
 import { bbCap } from '../../../../shared/plugins/officialBounds.js';
 import { textFinite } from '../../../../shared/plugins/textNumber.js';
@@ -344,6 +345,25 @@ function installLaterano(battle, pid, bb, members) {
 const boardCol = (u) => (u.player && u.player.mirror ? -u.tileC : u.tileC);
 const egirOrder = (a, b) => boardCol(a) - boardCol(b) || b.tileR - a.tileR || a.id - b.id;
 
+// 5-tier revives of the battle-start devour's knock-outs: the player's scan 「检测左下到右上哪些鱼睡着了给他复活」 (a
+// community report the owner relayed on 2026-10-07, DESIGN §25.22.5) — on the player's own board as the player sees it:
+// row 0 is the bottom of the screen (render/projection.js: nearest the camera), col 0 its left; a mirrored player from its
+// own left, the field's right, as egirOrder. [ASSUMED] the columns from the left, bottom first inside a column (the
+// act-2 positional orders — the deployment and egirOrder — go column by column from the left). The other reading, the
+// rows from the bottom with left first inside a row (act 1's deployment order), is
+// `a.tileR - b.tileR || boardCol(a) - boardCol(b) || a.id - b.id`; test/content/bonds_core.test.js '阿戈尔 5 (community
+// report, 2026-10-07) step 3: …' pins this one (its layout leaves a different member down under each reading).
+const egirReviveScan = (a, b) => boardCol(a) - boardCol(b) || a.tileR - b.tileR || a.id - b.id;
+
+/**
+ * The battle-start devour window, shared by every player's 阿戈尔 on the field: `passes` = devour passes still to run
+ * (one per player with the bond active, counted at install), `depth` > 0 while one resolves, `flush` = the 5-tier
+ * players' revive batches, run once the last pass is over.
+ */
+function egirStart(battle) {
+  return S.battleStore(battle, 'bonds:egir:start', () => ({ passes: 0, depth: 0, flush: [] }));
+}
+
 /**
  * 联防: an operator forced out at the deployment (carry.down, Battle.start, before battleStart) still stands on its
  * deploy position. It still participates in the devour.
@@ -401,6 +421,9 @@ function devour(battle, pid, bb, members) {
   const markedBy = new Map(); // marker → [targets]
   const marks = [];
   for (const m of order) {
+    const trench = S.itemsOf(m).map((id) => S.buffParams(S.itemRecord(id), 'act1autochess_equip_acarm078_global_buff')).find(Boolean);
+    const targets = (u) => S.itemsOf(u).some((id) => S.buffParams(S.itemRecord(id), 'act1autochess_equip_acarm078_global_buff'))
+      ? S.N4.map(([dr, dc]) => opAtTile(u.tileR + dr, u.tileC + dc)).filter(Boolean) : [opAtTile(...S.frontTile(u))].filter(Boolean);
     const mine = [];
     const seen = new Set([m]);
     const queue = [m];
@@ -419,6 +442,10 @@ function devour(battle, pid, bb, members) {
     let atk = 0, block = 0;
     for (const t of mine) { atk += num(t.base.atk, 0); block += num(t.base.blockCnt, 0); marks.push([m, t]); }
     const mods = {};
+    if (trench && S.itemsOf(m).some((id) => id.replace(/_[ab]$/, '') === trench.equip_chess_id)) {
+      // [ASSUMED] "等量生命值" uses the victims' base max HP, matching the devour's base ATK/block inheritance.
+      mods.hpFlat = mine.reduce((n, t) => n + num(t.base.maxHp), 0);
+    }
     if (atk > 0) mods.atkFinal = atk; // 最终加算 (units.js _recalc)
     if (block > 0) mods.blockCnt = block;
     if (Object.keys(mods).length) {
@@ -452,6 +479,11 @@ function devour(battle, pid, bb, members) {
 }
 
 function installEgir(battle, pid, bb, members, opts = {}) {
+  // HP (every tier): a match-long buff put on the members when the battle is built, so each one is deployed with it
+  // (Battle._deploy: full HP of the raised max HP) and the battle-start devour finds it — the community report's step 1,
+  // 「第一步给所有鱼加盟约的血量」 (DESIGN §25.22.5: an elite 深巡, 2904 HP and DEF 655, loses 5000 − 655 = 4345 to a mark and
+  // stands from 15 layers on, 2904 × 1.50 = 4356). The layers the devour adds raise it one tick later (onLayers; the HP
+  // ratio is kept).
   const apply = () => {
     const mods = S.directMods({ hp: num(bb.base_max_hp, 0) + num(bb.max_hp_per_stack, 0) * S.bondLayers(battle, pid, 'egirShip') });
     for (const u of members) S.passiveBuff(battle, u, 'bond:egir', mods);

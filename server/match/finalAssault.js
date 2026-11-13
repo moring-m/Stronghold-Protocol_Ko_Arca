@@ -36,6 +36,7 @@ import { createRng } from '../sim/rng.js';
 
 import { BOSS_ROW_OFFSET, COLS, BOSS_POOL_MIN_HP } from '../sim/constants.js';
 import { mirrorDir, normDir } from '../sim/dir.js';
+import { bossPoolShareOf } from './gamedata.js';
 
 /**
  * BOSS_HIT ticker thresholds (activity_table autoChessData.broadcastList comment_boss_hit_1..3, paramList 0.2 / 0.5 /
@@ -56,11 +57,6 @@ export function bossFieldPlacement(side, row, col, dir = 'RIGHT') {
 }
 
 /** Seeded initial pairing; `previous` carries player-id pairs through prep, combat and Hidden Core. */
-/** The pairing seed's salt: the hidden round past the boss round draws its own pairs (upstream). */
-export function bossPairSalt(gd, round) {
-  return round === gd.hiddenRound && round !== gd.bossRound ? `boss-pairs:${round}` : 'boss-pairs';
-}
-
 export function pairPlayers(alive, rng = createRng(0), previous = null) {
   const sorted = alive.slice().sort((a, b) => a.seat - b.seat);
   const groups = [];
@@ -170,4 +166,13 @@ export class CreditPool {
     if (dealt > 0 && this.onCredit) { try { this.onCredit(playerId, dealt); } catch { /* reported by the caller */ } }
     return dealt;
   }
+}
+
+
+/**
+ * The seed salt of a boss round's pairing draw: the Final Assault's 'boss-pairs' (unchanged since 0.2.5), the Hidden
+ * Core its own `boss-pairs:<round>` — it draws pairs and sides anew (GitHub #845, DESIGN §35.27).
+ */
+export function bossPairSalt(gd, round) {
+  return round === gd.hiddenRound && round !== gd.bossRound ? `boss-pairs:${round}` : 'boss-pairs';
 }

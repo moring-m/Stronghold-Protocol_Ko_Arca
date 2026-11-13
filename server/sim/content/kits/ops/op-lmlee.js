@@ -114,6 +114,14 @@ export default {
           trigger: { rule: 'SP_FULL' },
           mods: { atkPct: num(b3.atk), defPct: num(b3.def), taunt: num(b3.taunt_level) },
           targeting: { rangeGrid: s3?.rangeGrid ?? X4 },
+      onStart({ battle, unit }) {
+        battle.addBuff(unit, { key: 'lmlee:outsideDodge', tags: ['skill'], injury(c) {
+          if (c.type !== 'phys' && c.type !== 'arts') return;
+          if (c.source && bodyInRange(c.source, unit.rangeKeySet ?? new Set(unit.rangeKeys ?? []))) return;
+          c.dodge(num(b3.prob));
+        } });
+      },
+      onEnd({ battle, unit }) { battle.removeBuff(unit, 'lmlee:outsideDodge'); },
           attack: {
             // "攻击小力度推开范围内除当前目标外的敌人"
             onHit({ battle, unit, target }) {

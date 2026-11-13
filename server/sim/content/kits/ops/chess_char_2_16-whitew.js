@@ -23,6 +23,7 @@ export default {
     }
     return {
       trait,
+      install(battle, unit) { installLordArtsAddition(battle, unit, num(tb.atk_scale_m)); },
       skill: { kind: 'duration', mods: { atkPct: num(bb.atk) }, targeting: { maxTargets: 2 }, attack: { dmgType: 'arts', dmgMul: () => 1 } },
       skills: {
         skchr_whitew_1: {

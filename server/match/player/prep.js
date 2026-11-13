@@ -7,6 +7,7 @@
 import { ERR, PHASE } from '../../../shared/constants.js';
 import { freeSlot } from '../board.js';
 import { OK, fail } from './common.js';
+import { isMutationCell } from '../../sim/content/support/index.js';
 
 export class PlayerPrep {
   _gate({ allowWhenReady = false } = {}) {

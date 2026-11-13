@@ -161,6 +161,35 @@ ENEMY_SPINES = ['enemy_1305_mhslim', 'enemy_1305_mhslim_2']
 ENEMY_ART = 'refs/arts/enm_art_*.ab'
 ENEMY_SPINE_SUB = 'spine/enemy'
 
+# Token (summon) battle Spine models that no community dump carries: fexli/ArknightsResource has most of the 自选
+# summons (data/backups.json `tokens`) only as skin variants or not at all, so tools/fetch-assets.mjs reports "missing
+# skel" for them and the client drew the avatar diamond. Every token of data/tokens.json and data/backups.json whose
+# battle prefab draws a Spine model and that has no web model (audited 2026-10-06 against both local installs). Read from
+# the battle token packs (dyn/battle/prefabs/[uc]tokens/<id>.prefab): the SkeletonDataAsset of the prefab's Spine
+# renderer — of a directional token (FaceSwitcher with Front / Back / Down renderers, each its own skeleton under the
+# same name) the Front one, the model the fetched tokens use too (plan.mjs: Spine/ or Front/) — with its skeleton,
+# atlas and page textures as in ENEMY_SPINES. The Windows build carries every one (pkgrps/btl_pfb_tokens_0/4/5.ab; the
+# iOS build lacks btl_pfb_tokens_0, and its pages are ASTC rather than BC7). Output: spine/token/<id>/ (manifest group
+# spine/token/<id>); the client draws the model when the group lists every file of data/assets.json
+# tokens[id].spineLocal (metadata in tools/assets/local-token-spines.json, `node tools/fetch-assets.mjs --local-spines`).
+# Not here: the tokens whose prefab draws nothing (an EmptyAnimator in place of the Spine renderer, displayType HIDDEN
+# or an effect only, and no avatar in either install's asset index) — 乌尔比安's 从不混淆的方向, 圣聆初雪's frozen
+# protection point, 酒神's 迷狂牢笼, 贝洛内's 牵绊, 予愿安洁莉娜's “一会儿见！” (token_10039 / 10058 / 10055 / 10065 / 10071).
+TOKEN_SPINES = [
+    'token_10002_kalts_mon3tr', 'token_10003_cgbird_bird', 'token_10005_mgllan_drone1', 'token_10005_mgllan_drone2',
+    'token_10005_mgllan_drone3', 'token_10007_phatom_twin', 'token_10008_cqbw_box', 'token_10009_weedy_cannon',
+    'token_10020_ling_soul1', 'token_10020_ling_soul2', 'token_10020_ling_soul3', 'token_10024_ebnhlz_rcube',
+    'token_10025_doroth_recttp', 'token_10026_bgsnow_subbow', 'token_10027_ironmn_pile1', 'token_10027_ironmn_pile2',
+    'token_10027_ironmn_pile3', 'token_10029_slent2_protrb', 'token_10031_swire2_gdtrap', 'token_10032_jesca2_jckshd', 'token_10034_ray_sndbst',
+    'token_10035_wisdel_wward', 'token_10041_cathy_catsld', 'token_10043_necras_skeltn', 'token_10050_monstr_prosts',
+    'token_10051_radian_tower1', 'token_10052_radian_tower2', 'token_10053_radian_tower3', 'token_10054_phatm2_encdool',
+    'token_10057_svash2_eagle1', 'token_10057_svash2_eagle2', 'token_10057_svash2_eagle3', 'token_10059_nasti_nstdef',
+    'token_10060_nasti_nstchr', 'token_10061_nasti_nstbld', 'token_10064_wang_stone1', 'token_10066_closur_ourbase',
+    'token_10068_kalts2_mtship', 'token_10069_mcnist_mcgraf', 'token_10070_aphris_pc',
+]
+TOKEN_PACKS = 'pkgrps/btl_pfb_tokens_*.ab'
+TOKEN_SPINE_SUB = 'spine/token'
+
 # Derived three.js maps: (output subdir, source texture, kind, output name). 'normal_rg' rebuilds Z of a two-channel
 # (BC5 or DXT5nm) normal map into an RGB tangent-space map; 'rough_from_gloss' turns Unity's metallic/gloss map
 # (smoothness in A) into a roughness (G) / metalness (B) map. Written after the job that exported the source texture.
@@ -242,6 +271,11 @@ def only_prefix(prefix):
     return {'enemy': 'spine/enemy', 'token': 'spine/token'}.get(prefix, prefix)
 
 
+def names_sub(only, sub):
+    """A prefix names this output directory or one of its parents."""
+    return any(sub == only_prefix(p) or sub.startswith(only_prefix(p) + '/') for p in only)
+
+
 def wants_sub(only, sub):
     """Include parent jobs when selecting an individual model below them."""
     return not only or names_sub(only, sub) or any(only_prefix(p).startswith(sub + '/') for p in only)
@@ -257,6 +291,74 @@ def enemy_spine_id(container, wanted):
     SkeletonData.asset) when it is one of `wanted`, else None."""
     m = re.search(r'/Enemies/Spines/(?:[^/]+/)+([^/]+)_SkeletonData\.asset$', container or '', re.I)
     return m.group(1) if m and m.group(1) in wanted else None
+
+
+def token_prefab_id(container, wanted):
+    """The token id of a battle token prefab container path (dyn/battle/prefabs/[uc]tokens/<id>.prefab) when it is one
+    of `wanted`, else None (a skin's prefab lives under battle/prefabs/skins/character/…)."""
+    m = re.search(r'(?:^|/)battle/prefabs/(?:\[uc\])?tokens/([^/]+)\.prefab$', container or '', re.I)
+    return m.group(1) if m and m.group(1) in wanted else None
+
+
+def spine_ids(only, sub, ids):
+    """The ids of a Spine model list (ENEMY_SPINES / TOKEN_SPINES, written to `<sub>/<id>`) that run under --only: all of
+    them with no prefix, `sub` or the short form of it (`enemy` / `token`) or a parent of it; else those whose output dir
+    is a prefix or below one."""
+    if not wants_sub(only, sub):
+        return []
+    if not only or names_sub(only, sub):
+        return list(ids)
+    return [i for i in ids if any(f'{sub}/{i}' == p.rstrip('/') or f'{sub}/{i}'.startswith(p.rstrip('/') + '/')
+                                  for p in only)]
+
+
+def prefab_spine_nodes(root, objects):
+    """The Spine renderers of a prefab, depth first: [(GameObject name, active, skeletonDataAsset PPtr)] for every
+    MonoBehaviour holding a `skeletonDataAsset` (Spine's SkeletonAnimation). `root` is the root GameObject's type tree,
+    `objects` the bundle's {path id: object}; references into other bundles are skipped."""
+    out = []
+
+    def local(pptr):
+        return objects.get(pptr.get('m_PathID')) if pptr and not pptr.get('m_FileID') else None
+
+    def walk(go, active, depth):
+        tr, refs = None, []
+        for c in go.get('m_Component') or []:
+            o = local(c.get('component'))
+            if o is None:
+                continue
+            try:
+                if o.type.name == 'Transform':
+                    tr = o.read_typetree()
+                elif o.type.name == 'MonoBehaviour':
+                    sda = o.read_typetree().get('skeletonDataAsset')
+                    if sda and sda.get('m_PathID'):
+                        refs.append(sda)
+            except Exception:  # a script without a readable type tree is no Spine renderer we could use
+                continue
+        active = active and bool(go.get('m_IsActive', 1))
+        out.extend((go.get('m_Name') or '', active, ref) for ref in refs)
+        if tr is None or depth >= 12:
+            return
+        for ch in tr.get('m_Children') or []:
+            t = local(ch)
+            g = local(t.read_typetree().get('m_GameObject')) if t is not None else None
+            if g is not None:
+                walk(g.read_typetree(), active, depth + 1)
+
+    walk(root, True, 0)
+    return out
+
+
+def pick_spine_node(nodes):
+    """The renderer the remake draws among prefab_spine_nodes: of a directional token (a FaceSwitcher with Front / Back /
+    Down renderers) the Front one, else one named Spine, else the first — active renderers first; None when empty."""
+    live = [n for n in nodes if n[1]] or list(nodes)
+    for want in ('Front', 'Spine'):
+        hit = next((n for n in live if n[0] == want), None)
+        if hit:
+            return hit
+    return live[0] if live else None
 
 
 def _num(v, nd=6):
@@ -613,6 +715,7 @@ def normalize_atlas(text, sizes):
         while j < n and lines[j].strip() and not lines[j][:1].isspace() and ':' in lines[j]:
             fields.append(lines[j])
             j += 1
+        fields = [f for f in fields if f.split(':', 1)[0].strip() != 'pma']
         keys = [f.split(':', 1)[0].strip() for f in fields]
         size = sizes.get(name)
         if size:
@@ -828,9 +931,6 @@ def main():
     ap.add_argument('--webp', action='store_true',
                     help='only write the WebP copies of the board textures and the guide pages from the PNGs already '
                          'under --out and list them in the manifest (needs Pillow, not the client)')
-    ap.add_argument('--themes', action='append', default=[], metavar='DIR',
-                    help='AB root of the official in-match UI themes (repeatable). Used only with --only theme. '
-                         'Searched before --game')
     args = ap.parse_args()
 
     if args.print_jobs:
@@ -854,49 +954,26 @@ def main():
                           'scenes': {'sub': scenes.SCENE_SUB, 'tex': scenes.TEX_SUB,
                                      'version': scenes.SCENE_EXTRACT_VERSION,
                                      'stages': [{'id': sid, 'bundle': scenes.scene_bundle(sid), 'deps': deps}
-                                                for sid, deps in scenes.SCENES]},
-                          'regulationScenes': {'sub': scenes.SCENE_SUB, 'tex': scenes.TEX_SUB,
-                                               'stages': [{'id': sid,
-                                                           'prefabs': [regulation_scenes.prefab_rel(sid, p) for p in (1, 2, 3)],
-                                                           'deps': list(regulation_scenes.STAGE_DEPS[sid])}
-                                                          for sid in regulation_scenes.REGULATION_IDS]},
-                          'themes': {'sub': autochess_themes.THEME_SUB, 'optIn': True, 'spTheme': autochess_themes.SP_THEME,
-                                     'version': autochess_themes.DATA_VERSION,
-                                     'ids': list(autochess_themes.THEME_IDS)}},
+                                                for sid, deps in scenes.SCENES]}},
                          ensure_ascii=False))
         return 0
     if args.webp:
         return webp_only(Path(args.out), Path(args.manifest), print)
 
-    ab_root = locate_client(args.game)
-    theme_ids = autochess_themes.selected_ids(args.only)
-    if (not ab_root or not ab_root.exists()) and theme_ids and args.themes:
-        return extract(args, None)
+    ab_root = Path(args.game) if args.game else next((p for p in CANDIDATES if p.exists()), None)
     if not ab_root or not ab_root.exists():
         print('No Arknights install found. Pass --game <AssetBundle root>.', file=sys.stderr)
         return 2
-    with client_bundles(ab_root) as active_root:
-        return extract(args, active_root)
-
-
-def extract(args, ab_root):
-    theme_ids = autochess_themes.selected_ids(args.only)
-    client = ab_root is not None
-    jobs = select_jobs(args.only) if client else []
-    enemy_ids = spine_ids(args.only, ENEMY_SPINE_SUB, ENEMY_SPINES) if client else []
-    token_ids = spine_ids(args.only, TOKEN_SPINE_SUB, TOKEN_SPINES) if client else []
-    stage_ids = scene_ids(args.only) if client else []
-    reg_ids = regulation_ids(args.only) if client else []
-    fx_on = fx_selected(args.only) if client else False
+    jobs = select_jobs(args.only)
+    enemy_ids = spine_ids(args.only, ENEMY_SPINE_SUB, ENEMY_SPINES)
+    token_ids = spine_ids(args.only, TOKEN_SPINE_SUB, TOKEN_SPINES)
+    stage_ids = scene_ids(args.only)
+    fx_on = fx_selected(args.only)
     # §34.28: a normal full run is not consent for optional plugin art. --only plugin-art is explicit too.
-    art_on = client and wants_sub(args.only, operators.SUB) and (bool(args.only) or args.plugin_art)
+    art_on = wants_sub(args.only, operators.SUB) and (bool(args.only) or args.plugin_art)
     art_ids = spine_ids(args.only, operators.SUB, operators.references(Path(args.plugin_root))) if art_on else []
-    versions_on = client and (not args.only or 'versions' in args.only)
-    if not jobs and not enemy_ids and not token_ids and not stage_ids and not reg_ids and not fx_on and not art_on and not versions_on and not theme_ids:
+    if not jobs and not enemy_ids and not token_ids and not stage_ids and not fx_on and not art_on:
         print(f'--only {args.only}: no job matches', file=sys.stderr)
-        return 2
-    if theme_ids and not args.themes:
-        print('--only theme needs --themes <backup or AssetBundle root>', file=sys.stderr)
         return 2
     out_root = Path(args.out)
     out_root.mkdir(parents=True, exist_ok=True)
@@ -905,8 +982,7 @@ def extract(args, ab_root):
     if art_ids:
         chars, n = operators.export(ab_root, out_root, manifest, print, art_ids)
         total += n
-    if client:
-        print(f'AB root: {ab_root}')
+    print(f'AB root: {ab_root}')
     for job in jobs:
         total += export_bundle(ab_root, job, out_root, manifest, print)
     if enemy_ids:
@@ -917,18 +993,9 @@ def extract(args, ab_root):
         keys = [k.strip().lower() for k in args.fx_keys.split(',') if k.strip()]
         total += fx.export_fx(ab_root, out_root, manifest, print, selection=args.fx_set, keys=keys or None,
                               jobs=args.fx_jobs or None, root=ROOT,
-                              fx_manifest=Path(args.manifest).with_name(fx.FX_MANIFEST), texture_format=args.fx_texture_format,
-                              add_only=args.fx_add_only)
-    if stage_ids or reg_ids:
-        roots = scene_roots(ab_root, args.scenes)
-        if stage_ids:
-            total += export_scenes(ab_root, out_root, manifest, print, stage_ids, roots)
-        if reg_ids:
-            total += regulation_scenes.export_regulation(
-                ab_root, out_root, manifest, print, reg_ids, roots, material_info, dep_bundles(ab_root, {'Material'}))
-    if theme_ids:
-        total += autochess_themes.export_themes(
-            args.themes, out_root, manifest, print, theme_ids, ROOT, game_root=ab_root)
+                              fx_manifest=Path(args.manifest).with_name(fx.FX_MANIFEST), texture_format=args.fx_texture_format)
+    if stage_ids:
+        total += export_scenes(ab_root, out_root, manifest, print, stage_ids, scene_roots(ab_root, args.scenes))
     old, old_chars = {}, {}
     if Path(args.manifest).exists():
         try:
@@ -1142,6 +1209,159 @@ def export_token_spines(ab_root, out_root, manifest, log, ids=None):
     for tid in sorted(wanted):
         log(f'skip (not found) token Spine {tid}')
     return n
+
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument('--game', help='install directory or AssetBundle root (…/AB/Windows or PlayCover …/Documents/Bundles)')
+    ap.add_argument('--out', default=str(ROOT / 'public/assets/local'))
+    ap.add_argument('--manifest', default=str(ROOT / 'data/local-assets.json'))
+    ap.add_argument('--plugin-root', default=str(ROOT), help='installation whose plugin JSON and roster are scanned')
+    ap.add_argument('--plugin-art', action='store_true', help='explicitly include referenced official operator art in a full run')
+    ap.add_argument('--only', action='append', default=[], metavar='SUBDIR',
+                    help='only run the jobs whose output subdir this prefix names (repeatable), e.g. emoticon, enemy or '
+                         'spine/token')
+    ap.add_argument('--scenes', action='append', default=[], metavar='DIR',
+                    help='an AB root holding the battlefield scene bundles of an in-season version (repeatable; '
+                         'searched after --game and before .cache/official-scenes/*)')
+    ap.add_argument('--print-jobs', action='store_true', help='print the job table as JSON and exit')
+    ap.add_argument('--fx-set', choices=('sample', 'used'), default='sample',
+                    help='with --only fx: the Phase 1a sample (default) or every effect the mode\'s units reference')
+    ap.add_argument('--fx-keys', default='', metavar='K1,K2',
+                    help='with --only fx: export only these effect prefabs (comma-separated keys)')
+    ap.add_argument('--fx-jobs', type=int, default=0, metavar='N', help='with --only fx: worker processes (default up to 8)')
+    ap.add_argument('--fx-add-only', action='store_true',
+                    help='extract only units/prefabs missing from the current fx index; preserve the existing set')
+    ap.add_argument('--fx-texture-format', choices=('webp', 'png'), default='webp',
+                    help='with --only fx: WebP quality 90 textures (default) or lossless PNG')
+    ap.add_argument('--webp', action='store_true',
+                    help='only write the WebP copies of the board textures and the guide pages from the PNGs already '
+                         'under --out and list them in the manifest (needs Pillow, not the client)')
+    ap.add_argument('--themes', action='append', default=[], metavar='DIR',
+                    help='AB root of the official in-match UI themes (repeatable). Used only with --only theme. '
+                         'Searched before --game')
+    args = ap.parse_args()
+
+    if args.print_jobs:
+        jobs = [{'bundle': rel, 'sub': sub, 'kinds': sorted(kinds), 'keep': keep.pattern if keep else None}
+                for rel, sub, kinds, keep in map(job_parts, JOBS)]
+        derived = [{'sub': sub, 'from': src, 'derive': kind, 'name': name} for sub, src, kind, name in DERIVED]
+        webp = [{'sub': sub, 'name': name, 'mode': mode} for sub, name, mode in WEBP]
+        print(json.dumps({'emoteThemes': [{'themeId': t, 'dir': d} for t, d in EMOTE_THEMES], 'jobs': jobs,
+                          'derived': derived, 'webp': webp,
+                          'guideWebp': {'sub': GUIDE_WEBP_SUB, 'mode': GUIDE_WEBP_MODE,
+                                        'options': GUIDE_WEBP_OPTIONS[GUIDE_WEBP_MODE]},
+                          'enemySpines': {'bundles': ENEMY_ART, 'sub': ENEMY_SPINE_SUB, 'ids': ENEMY_SPINES},
+                          'tokenSpines': {'bundles': TOKEN_PACKS, 'sub': TOKEN_SPINE_SUB, 'ids': TOKEN_SPINES},
+                          'expectedGroups': expected_local_groups(),
+                          'fx': {'sub': fx.FX_SUB, 'groups': list(fx.FX_GROUPS), 'version': fx.FORMAT_VERSION,
+                                 'indexVersion': fx.INDEX_VERSION, 'meshVersion': fx.MESH_VERSION,
+                                 'manifestVersion': fx.MANIFEST_VERSION, 'optIn': True,
+                                 'textureFormat': args.fx_texture_format, 'textureFormats': ['webp', 'png'],
+                                 'sample': {'keys': fx.FX_SAMPLE_KEYS, 'units': fx.FX_SAMPLE_UNITS,
+                                            'coverage': fx.FX_COVERAGE_KEYS}},
+                          'scenes': {'sub': scenes.SCENE_SUB, 'tex': scenes.TEX_SUB,
+                                     'version': scenes.SCENE_EXTRACT_VERSION,
+                                     'stages': [{'id': sid, 'bundle': scenes.scene_bundle(sid), 'deps': deps}
+                                                for sid, deps in scenes.SCENES]},
+                          'regulationScenes': {'sub': scenes.SCENE_SUB, 'tex': scenes.TEX_SUB,
+                                               'stages': [{'id': sid,
+                                                           'prefabs': [regulation_scenes.prefab_rel(sid, p) for p in (1, 2, 3)],
+                                                           'deps': list(regulation_scenes.STAGE_DEPS[sid])}
+                                                          for sid in regulation_scenes.REGULATION_IDS]},
+                          'themes': {'sub': autochess_themes.THEME_SUB, 'optIn': True, 'spTheme': autochess_themes.SP_THEME,
+                                     'version': autochess_themes.DATA_VERSION,
+                                     'ids': list(autochess_themes.THEME_IDS)}},
+                         ensure_ascii=False))
+        return 0
+    if args.webp:
+        return webp_only(Path(args.out), Path(args.manifest), print)
+
+    ab_root = locate_client(args.game)
+    theme_ids = autochess_themes.selected_ids(args.only)
+    if (not ab_root or not ab_root.exists()) and theme_ids and args.themes:
+        return extract(args, None)
+    if not ab_root or not ab_root.exists():
+        print('No Arknights install found. Pass --game <install directory or AssetBundle root>.', file=sys.stderr)
+        return 2
+    with client_bundles(ab_root) as active_root:
+        return extract(args, active_root)
+
+
+def extract(args, ab_root):
+    theme_ids = autochess_themes.selected_ids(args.only)
+    client = ab_root is not None
+    jobs = select_jobs(args.only) if client else []
+    enemy_ids = spine_ids(args.only, ENEMY_SPINE_SUB, ENEMY_SPINES) if client else []
+    token_ids = spine_ids(args.only, TOKEN_SPINE_SUB, TOKEN_SPINES) if client else []
+    stage_ids = scene_ids(args.only) if client else []
+    reg_ids = regulation_ids(args.only) if client else []
+    fx_on = fx_selected(args.only) if client else False
+    # §34.28: a normal full run is not consent for optional plugin art. --only plugin-art is explicit too.
+    art_on = client and wants_sub(args.only, operators.SUB) and (bool(args.only) or args.plugin_art)
+    art_ids = spine_ids(args.only, operators.SUB, operators.references(Path(args.plugin_root))) if art_on else []
+    versions_on = client and (not args.only or 'versions' in args.only)
+    if not jobs and not enemy_ids and not token_ids and not stage_ids and not reg_ids and not fx_on and not art_on and not versions_on and not theme_ids:
+        print(f'--only {args.only}: no job matches', file=sys.stderr)
+        return 2
+    if theme_ids and not args.themes:
+        print('--only theme needs --themes <backup or AssetBundle root>', file=sys.stderr)
+        return 2
+    out_root = Path(args.out)
+    out_root.mkdir(parents=True, exist_ok=True)
+    manifest, total = {}, 0
+    chars = {}
+    if versions_on:
+        total += versions.export(ab_root, out_root, manifest, print, ROOT)
+    if art_ids:
+        chars, n = operators.export(ab_root, out_root, manifest, print, art_ids)
+        total += n
+    if client:
+        print(f'AB root: {ab_root}')
+    for job in jobs:
+        total += export_bundle(ab_root, job, out_root, manifest, print)
+    if enemy_ids:
+        total += export_enemy_spines(ab_root, out_root, manifest, print, enemy_ids)
+    if token_ids:
+        total += export_token_spines(ab_root, out_root, manifest, print, token_ids)
+    if fx_on:
+        keys = [k.strip().lower() for k in args.fx_keys.split(',') if k.strip()]
+        total += fx.export_fx(ab_root, out_root, manifest, print, selection=args.fx_set, keys=keys or None,
+                              jobs=args.fx_jobs or None, root=ROOT,
+                              fx_manifest=Path(args.manifest).with_name(fx.FX_MANIFEST), texture_format=args.fx_texture_format,
+                              add_only=args.fx_add_only)
+    if stage_ids or reg_ids:
+        roots = scene_roots(ab_root, args.scenes)
+        if stage_ids:
+            total += export_scenes(ab_root, out_root, manifest, print, stage_ids, roots)
+        if reg_ids:
+            total += regulation_scenes.export_regulation(
+                ab_root, out_root, manifest, print, reg_ids, roots, material_info, dep_bundles(ab_root, {'Material'}))
+    if theme_ids:
+        total += autochess_themes.export_themes(
+            args.themes, out_root, manifest, print, theme_ids, ROOT, game_root=ab_root)
+    old, old_chars = {}, {}
+    if Path(args.manifest).exists():
+        try:
+            previous = json.loads(Path(args.manifest).read_text(encoding='utf-8'))
+            old_chars = previous.get('chars') or {}
+            old = previous.get('groups') or {}
+            if not args.only:
+                old = {g: v for g, v in old.items() if g.startswith(('char/', 'spine/char/'))}
+        except (OSError, ValueError) as e:
+            print(f'warn: previous manifest unreadable ({e}); writing only the re-extracted groups', file=sys.stderr)
+    # Partial sprite packs keep previously extracted pictures, just as merge_chars keeps their URLs.
+    for group in manifest:
+        if group.startswith('char/'):
+            manifest[group] = {**old.get(group, {}), **manifest[group]}
+    groups = merge_manifest(old, manifest, ran_groups(old, manifest, fx_on))  # a missing bundle keeps its previous group
+    count = sum(len(v) for v in groups.values())
+    doc = {'version': 1, 'source': 'local-client', 'count': count, 'groups': groups}
+    if old_chars or chars:
+        doc['chars'] = operators.merge_chars(old_chars, chars)
+    Path(args.manifest).write_text(json.dumps(doc, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+    print(f'done: {total} files extracted, manifest {args.manifest} ({count} entries)')
+    return 0 if total else 1
 
 
 if __name__ == '__main__':

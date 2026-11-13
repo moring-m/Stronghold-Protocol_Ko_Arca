@@ -2985,6 +2985,8 @@ def crawl_units(ab_root, cabs, unit_ids, gd, eff, enemy_idx, token_idx, log):
                     projectile(x)
             code = uid.split('_', 2)[2] if uid.startswith('char_') else None
             sids = set(gd['skills'].get(uid, [])) | set((gd.get('tokenSkills') or {}).get(uid, []))
+            overrides = (gd.get('skillOverrides') or {}).get(uid) or {}
+            sids.update(overrides.values())
             if code:
                 sids |= {k for k in skill_roots if k.startswith(f'skchr_{code}_')}
             sids = {skill(sid) for sid in sorted(sids)} - {None}
@@ -2995,6 +2997,13 @@ def crawl_units(ab_root, cabs, unit_ids, gd, eff, enemy_idx, token_idx, log):
                     skills[sid]['mode'] = names.index(f's{m.group(1)}')
                     skills[sid]['modeBy'] = 'name'
             u['skills'] = {sid: skills[sid] for sid in sorted(sids) if sid in skills}
+            # character_table.skills[].overridePrefabKey is an operator-local art override (e.g. 万顷 S1).
+            # Keep it local: a shared skcom_* id must never change another operator's skill presentation.
+            for alias, target in overrides.items():
+                target = skill_key(target)
+                if target in skills:
+                    u['skills'][alias] = skills[target]
+                    u.setdefault('skillAliases', {})[alias] = target
             # an enemy's own skills (their nodes in its prefab; keys like `1` repeat across enemies: not in index.skills)
             for key, entry in sorted(enemy_skills(env, found_skills).items()):
                 u['skills'].setdefault(key, entry)
@@ -3162,10 +3171,22 @@ def game_data(root):
             if sid:
                 skills.setdefault(cid, set()).add(sid)
     return {'chars': chars, 'skills': {k: sorted(v) for k, v in skills.items()}, 'enemies': sorted(enemies), 'tokens': toks,
+            'skillOverrides': skill_overrides(chars, char_table),
             'tokenSkills': token_skills,
             'talentKeys': talent_keys(chars + toks, char_table,
                                       load_excel('battle_equip_table.json'), load_excel('uniequip_table.json')),
             'enemyTalentKeys': {k: enemy_talent_prefixes(v) for k, v in enemies.items() if isinstance(v, dict)}}
+
+
+def skill_overrides(ids, char_table):
+    """Official per-operator prefab overrides, keyed as the runtime's skillIdsOf (lowercase, no [rank] suffix)."""
+    out = {}
+    for uid in ids:
+        for row in (char_table.get(uid) or {}).get('skills') or []:
+            if row.get('skillId') and row.get('overridePrefabKey'):
+                alias = re.sub(r'\[\d+\]$', '', row['skillId'].lower())
+                out.setdefault(uid, {})[alias] = row['overridePrefabKey'].lower()
+    return out
 
 
 def talent_keys(ids, char_table, equip_table, uniequip_table):
@@ -3248,6 +3269,9 @@ def export_fx(ab_root, out_root, manifest, log, selection='sample', keys=None, j
     jobs = max(1, jobs or min(8, os.cpu_count() or 2))
     out = Path(out_root) / FX_SUB
     out.mkdir(parents=True, exist_ok=True)
+    previous = _read_json(out / 'index.json') if add_only else None
+    if add_only and previous and (previous.get('format') != 'fx-index' or previous.get('version') != INDEX_VERSION):
+        raise ValueError('--fx-add-only requires a current fx index')
     timings = {}
 
     t0 = time.time()
@@ -3264,6 +3288,8 @@ def export_fx(ab_root, out_root, manifest, log, selection='sample', keys=None, j
         unit_ids = list(FX_SAMPLE_UNITS)
     else:
         unit_ids = gd['chars'] + gd['enemies'] + gd['tokens']
+    if add_only:
+        unit_ids = [uid for uid in unit_ids if uid not in ((previous or {}).get('units') or {})]
     enemy_idx = container_index(ab_root, (ENEMY_GLOB,), root / '.cache/fx/enemies.json', jobs, log) \
         if any(u.startswith('enemy_') for u in unit_ids) else {}
     token_idx = container_index(ab_root, (TOKEN_GLOB,), root / '.cache/fx/tokens.json', jobs, log) \
@@ -3281,6 +3307,8 @@ def export_fx(ab_root, out_root, manifest, log, selection='sample', keys=None, j
     for k in missing:
         log(f'  skip (no such effect prefab in this client) {k}')
     wanted -= set(missing)
+    existing_prefabs = set((previous or {}).get('prefabs') or {})
+    wanted -= existing_prefabs
 
     # -- descriptors, textures, meshes; then the keys the exported behaviours name (variants by facing, chained
     #    effects), until nothing new is named

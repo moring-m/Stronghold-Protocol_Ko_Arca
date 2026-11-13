@@ -120,6 +120,17 @@ export default {
           kind: 'toggle', trigger: { rule: 'SP_FULL' },
           mods: nz({ atkPct: num(b1.atk), defPct: num(b1.def) }),
           attack: { dmgType: 'arts' },
+          onStart({ battle, unit }) {
+            battle.addBuff(unit, { key: 'hsgma2:karma', tags: ['skill'], observeInjury(c) {
+              const src = c.source;
+              if (!unit.alive || !byEnemyDamage(c) || !src.alive) return;
+              battle.dealDamage({ source: unit, target: src, amount: unit.s.atk * num(b1.atk_scale), type: 'arts',
+                attackType: 'NORMAL', applyWay: 'NONE', calculation: 'precomputed',
+                isSkill: true, ignoreSelect: true, tags: ['skill', 'counter'] });
+              battle.fx('counter', { x: src.x, y: src.y, id: unit.id });
+            } });
+          },
+          onEnd({ battle, unit }) { battle.removeBuff(unit, 'hsgma2:karma'); },
         },
         [S2]: {
           kind: 'duration', duration: S2_CAP,
@@ -275,6 +286,7 @@ export default {
         // AST-X 无迹: her attack damage ⇒ +atk_scale × ATK arts (附加伤害); an enemy damage instance she takes (the official
         // hsgma2_e_003_tr_take: ON_TAKE_DAMAGE from the other side) ⇒ atk_scale × ATK arts back
         const astx = num(tb.atk_scale);
+        const moduleAffecting = () => !!unit.skill?.active || !!unit.mem.hsDying;
         if (astx > 0) {
           battle.on('damaged', (c) => {
             const t = c.target;

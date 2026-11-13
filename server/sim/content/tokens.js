@@ -202,6 +202,8 @@ const ownerOf = (u) => (u.ownerUnit && u.ownerUnit.side === 'ally' ? u.ownerUnit
  */
 const managed = (u) => !!(u.ownerUnit && u.ownerUnit.kit && u.ownerUnit.kit.generic !== true);
 const baseKey = (id) => String(id ?? '').replace(/_[ab]$/, '');
+/** 夕 (char_2015_dusk): her generic-kit fallback summons 小自在 at the first target (install). */
+const DUSK_CHAR = 'char_2015_dusk';
 
 function onDeploy(battle, unit, fn, priority = 0) {
   battle.on('deploy', (ctx) => { if (ctx.unit === unit) fn(ctx); }, { owner: unit, priority });

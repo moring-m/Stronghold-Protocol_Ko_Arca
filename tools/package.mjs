@@ -34,6 +34,16 @@
 // Left out: test/ except test/helpers/battleHarness.js, the maintainer tools (build-data, golden, botbench, i18n, check-imports, this file …),
 // scripts/make-windows-bundle.mjs, the other docs (DESIGN, SIM, the research notes, docs/img …), public/dev/, handoff/,
 // .github/, types/, lint / editor / Docker files (Docker builds from a git clone).
+// Also left out, by the maintainer's decision of 2026-10-23 (§35.66): the external-AI / LLM integration. The explicit
+// list is LLM_RELEASE_EXCLUDE in server/match/llmRelease.js (re-exported below). A release tree gets
+// server/release-without-llm and the server then ignores external-AI settings. The #673 framework and the built-in
+// bots stay, including server/match/aiPlan.js and server/match/aiEconomy.js (no host ships with them).
+//   server/match/externalAI.js, server/match/externalConfig.js, server/match/aiDigest.js
+//   server/ai/transport.js, knowledge.js, playbook.js, strategy.js, strategy-community.js,
+//     community-candidates.js, cycle-candidates.js, cycles.js
+//   docs/AI-STRATEGY.md, docs/EXTERNAL_AI.md, docs/EXTERNAL_AI_ZH.md
+//   tools/ai/   (the example agent and its knowledge / context / plan / playbook tools)
+//   test/fixtures/llm-advisor.json
 //
 // Checks, all of them in --dry-run too (which writes nothing): the refusal list below; every relative import of a
 // shipped module and every `node <file>` of the player npm scripts resolves to a shipped file; a full zip has every file
@@ -95,6 +105,11 @@ import {
   APPLIED_FILE, MANIFEST_FILE, UPDATE_FILE, affectsRuntime, digestFile, inManifest, isSetupArt, listedArtFiles,
   parseManifest, parseUpdate, pathProblem, removalProblem,
 } from '../server/update.js';
+// The one list of LLM paths a release must not contain, and the marker a release tree carries (§35.66).
+import {
+  LLM_RELEASE_EXCLUDE, LLM_RELEASE_MARKER, LLM_RELEASE_MARKER_TEXT, isLlmReleasePath, omitLlmFromRelease,
+} from '../server/match/llmRelease.js';
+export { LLM_RELEASE_EXCLUDE, LLM_RELEASE_MARKER, LLM_RELEASE_MARKER_TEXT, isLlmReleasePath, omitLlmFromRelease };
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 /** The one folder inside both zips (DEPLOY §1.1: "解压后把里面的 Stronghold-Protocol 文件夹放到…"). */
@@ -212,6 +227,8 @@ export function isJunk(rel) {
 export function isPlayerFile(rel) {
   const p = posixRel(rel);
   if (!p || isRefused(p) || isJunk(p) || p === 'data/local-assets.json' || p === 'data/local-fx.json' || p === GENERATED_PACK_INDEX) return false;
+  // The marker is generated into the stage. The LLM paths stay on dev even if a later allowlist would have taken them.
+  if (p === LLM_RELEASE_MARKER || isLlmReleasePath(p)) return false;
   if (NOT_TRACKED_SHIP.some((d) => p.startsWith(d))) return false;
   if (isPluginResource(p) || AUTHOR_TEST_FILES.includes(p)) return true;
   if (RUNTIME_DIRS.some((d) => p.startsWith(d)) || PLAYER_TOOL_DIRS.some((d) => p.startsWith(d))) return true;
@@ -762,6 +779,12 @@ function makeStage(root, p, stage, { install, env, log }) {
   if (generated.has(GENERATED_PACK_INDEX)) {
     const index = writePackIndex(stage, path.join(stage, GENERATED_PACK_INDEX));
     log(`${GENERATED_PACK_INDEX}: ${index.packs.map((x) => `${x.type} ${x.id}`).join(', ') || 'no pack'}`);
+  }
+  if (generated.has(LLM_RELEASE_MARKER)) {
+    const marker = path.join(stage, LLM_RELEASE_MARKER);
+    fs.mkdirSync(path.dirname(marker), { recursive: true });
+    fs.writeFileSync(marker, LLM_RELEASE_MARKER_TEXT);
+    log(`${LLM_RELEASE_MARKER}: external AI stays off this package`);
   }
   if (install) {
     log('npm ci --omit=dev …');

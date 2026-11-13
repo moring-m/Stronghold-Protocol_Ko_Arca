@@ -141,6 +141,7 @@ export function buildDeployMap(stage, { deviceOverrides = {}, tileOverrides = {}
  * @param {object|null} rec
  */
 export function positionClass(rec) {
+  if (rec && rec.rangedTilesOnly === true) return 'high';
   return meleeOnHighGround(rec) ? 'all' : basePositionClass(rec);
 }
 
@@ -173,6 +174,7 @@ export function canPlace(map, pos, r, c) {
   const cls = map.get(tileKey(r, c));
   if (!cls) return false;
   if (pos === 'melee') return cls === 'melee';
+  if (pos === 'high') return cls === 'ranged';
   return true; // ranged / all: melee tiles and ranged tiles
 }
 

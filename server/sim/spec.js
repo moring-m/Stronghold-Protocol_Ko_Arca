@@ -46,6 +46,7 @@ import { DataSource, toDataSource, withUnitLoadouts } from './simdata.js';
 import { isPotential, isCultivate } from '../../shared/potential.js';
 import { isContentHash } from '../../shared/plugins/identity.js';
 import { BOSS_POOL_MIN_HP } from './constants.js';
+import { DEFAULT_VERSION, versionById, versionOfData } from '../../shared/versions.js';
 
 export const SPEC_VERSION = 1;
 
@@ -66,6 +67,7 @@ const specReplacer = (k, v) => (typeof v === 'number' && !Number.isFinite(v) ? (
  * @returns {object} a fresh JSON-safe object
  */
 export function buildBattleSpec(o = {}) {
+  if (o.version != null && !versionById(o.version)) throw new RangeError(`Unknown battle version ${o.version}`);
   const bossLike = o.kind === 'boss' || o.kind === 'hidden';
   const tl = Number(o.timeLimit);
   const spec = {
@@ -93,6 +95,7 @@ export function buildBattleSpec(o = {}) {
     // the content set the battle runs on and the art it was drawn with (header): not read by the sim
     ...(isContentHash(o.cs) ? { cs: o.cs } : {}),
     ...(isContentHash(o.vs) ? { vs: o.vs } : {}),
+    ...(o.version && o.version !== DEFAULT_VERSION ? { version: o.version } : {}),
     // morphPairing plus only. An official spec grows no key (identity and extra-field tests).
     ...(o.morphPairing === 'plus' ? { morphPairing: 'plus' } : {}),
     // 동기화 시뮬레이션: the field's scheduled enemies share their HP with the other fields (syncPools.js)
@@ -387,7 +390,6 @@ export function resultDigest(result) {
       Math.round(Number(p.damageDealt) || 0), Math.round(Number(p.bossDamage) || 0),
       (Array.isArray(p.unitsEnd) ? p.unitsEnd : []).map((u) => [u && u.uid, r4(u && u.hpPct), r4(u && u.sp), !!(u && u.alive),
         ...(u?.egirDevour?.processed ? [[r4(u.egirDevour.atkFinal ?? u.egirDevour.atkFlat), r4(u.egirDevour.blockCnt), u.egirDevour.revives, !!u.egirDevour.revived]] : [])]),
-      ...(p.commandChests ? [p.commandChests.map(c => [c.id, c.alive])] : []),
     ];
     // Optional. A result with no temporary layers keeps the same tuple length as before 规程.
     const tg = p.tempLayerGains && typeof p.tempLayerGains === 'object' ? p.tempLayerGains : null;
