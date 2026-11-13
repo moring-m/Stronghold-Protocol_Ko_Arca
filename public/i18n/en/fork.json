@@ -3690,5 +3690,19 @@
   "금지된 맹약의 오퍼레이터입니다": "This operator belongs to a banned bond",
   "핵심 맹약 그룹 선택": "Choose a core bond group",
   "고른 그룹의 핵심 맹약만 이번 시뮬레이션에 등장합니다. 고르지 않으면 첫 번째 그룹으로 진행합니다.": "Only the chosen group's core bonds appear in this simulation. Without a choice, the first group plays.",
-  "그룹": "Group"
+  "그룹": "Group",
+  "전략 명령": "Strategy command",
+  "재사용 대기": "Cooldown",
+  "라운드": " rounds",
+  "남은 횟수": "Uses left",
+  "사용": "Use",
+  "상점": "Shop",
+  "타일": "Tile",
+  "명령 선택": "Choose a command",
+  "아직 해금되지 않았습니다": "Not unlocked yet",
+  "상시 효과": "Passive",
+  "재사용 대기 중": "On cooldown",
+  "사용 횟수를 모두 썼습니다": "No uses left",
+  "특별 모집 중에는 사용할 수 없습니다": "Unavailable during a special recruit",
+  "자금이 부족합니다": "Not enough funds"
 }

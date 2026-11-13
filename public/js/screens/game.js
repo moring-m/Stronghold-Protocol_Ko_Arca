@@ -136,6 +136,7 @@ import { toast } from '../ui/toasts.js';
 import { LoadoutButton } from './loadout.js';
 import { BriefingScreen } from './briefing.js';
 import { DiyCheckScreen } from './diyCheck.js';
+import { CommandPanel } from '../ui/commandPanel.js';
 import { BandDraftScreen } from './bandDraft.js';
 import { RecruitPickScreen } from './recruitPick.js';
 import { ResultScreen } from './settle.js';
@@ -1763,6 +1764,7 @@ function MatchScreen() {
         ${spectator || !alive ? null : html`<${Button} size="sm" variant="primary" icon="back" onClick=${() => watchPlayer({ playerId: myId })}>返回自己<//>`}
       </div>` : null}
 
+      ${showShop ? html`<${CommandPanel} priv=${priv} editable=${editable} />` : null}
       ${showShop ? html`<${ShopBar} priv=${priv} editable=${editable} collapsed=${barCollapsed} refreshBusy=${refreshBusy} onCollapse=${setCollapsed}
         barRef=${barRef} offBonds=${offBonds}
         onBuy=${buy} onLevel=${() => actions.levelUp()} onRefresh=${() => actions.refresh()} onFreeze=${() => actions.freeze()}

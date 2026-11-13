@@ -1064,3 +1064,20 @@
 .brief-group__bond { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; }
 .brief-group__bond .bond-glyph, .brief-group__bond svg, .brief-group__bond img { width: 22px; height: 22px; }
 @media (max-width: 560px) { .brief-groups__row { grid-template-columns: 1fr; } }
+
+/* 전략 명령 (규정 시즌, ui/commandPanel.js): a folded button above the shop that opens the command's card */
+.cmdp { position: absolute; right: 24px; bottom: 196px; z-index: 30; max-width: min(360px, calc(100vw - 32px)); }
+.cmdp__head { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; color: inherit; font: inherit; font-weight: 700;
+  background: rgba(10, 22, 20, .88); border: 1px solid var(--mint-400, #5fd3b6); cursor: pointer; }
+.cmdp__cost { margin-left: 4px; color: var(--gold-400, #f0c35a); }
+.cmdp__badge { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: #e0524a; color: #fff; font-size: 12px; }
+.cmdp__body { margin-top: 6px; padding: 10px 12px; background: rgba(10, 22, 20, .94); border: 1px solid var(--line-2); display: grid; gap: 8px; }
+.cmdp__desc { font-size: 13px; line-height: 1.5; }
+.cmdp__meta { display: flex; flex-wrap: wrap; gap: 10px; font-size: 12px; color: var(--text-2, #9fb7b0); }
+.cmdp__why { color: #f09a8a; }
+.cmdp__acts, .cmdp__draft { display: grid; gap: 6px; }
+.cmdp__targets { display: flex; flex-wrap: wrap; gap: 6px; max-height: 160px; overflow: auto; }
+.cmdp__card { display: flex; justify-content: space-between; gap: 8px; padding: 8px; text-align: left; color: inherit; font: inherit; font-size: 13px;
+  background: rgba(var(--dim-rgb, 0, 0, 0), .35); border: 1px solid var(--line-2); cursor: pointer; }
+.cmdp__card:hover { border-color: var(--mint-400, #5fd3b6); }
+@media (max-width: 560px) { .cmdp { right: 8px; bottom: 150px; } }

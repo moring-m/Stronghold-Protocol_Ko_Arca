@@ -81,6 +81,7 @@ export const actions = {
   bondGroup: (idx, setupRevision) => act('g.bondGroup', { idx, setupRevision }, { sfx: 'confirm' }),
   diyBring: (slots) => act('g.diyBring', { slots }, { sfx: 'confirm' }),
   command: (effectId, target = {}) => act('g.command', { effectId, target }, { sfx: 'confirm' }),
+  commandChoice: (choiceId, idx) => act('g.commandChoice', { choiceId, idx }, { sfx: 'confirm' }),
   infoReady: (setupRevision = 0) => act('g.infoReady', { matchNo: store.get().room?.matchNo, setupRevision }),
   rerollSetup: (setupRevision)=>act('room.rerollSetup',{setupRevision},{sfx:'confirm'}),
   rerollVote: (voteId,agree)=>act('g.rerollVote',{voteId,agree}),
