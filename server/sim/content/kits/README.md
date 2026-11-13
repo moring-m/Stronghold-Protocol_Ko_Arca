@@ -9,11 +9,7 @@ operators, the self-select 6★ operators, contributions from GitHub issue #136 
 
 | path | what |
 |---|---|
-<<<<<<< ours
-| `index.js` | the registry: `KIT_FILES` lists every kit file, grouped by tier, `STANDIN_KIT_FILES` the 补位 stand-in kits and `OPERATOR_KIT_FILES` the 自选 operator kits; `KITS` (base chess id → kit builder, then stand-in charId → kit builder, then operator charId → kit builder), `TIER_KITS` (one registry per tier group), `STANDIN_KITS`, `OPERATOR_KITS` and `KITTED_CHARS` (who a 自选 slot may field) are built from them |
-=======
 | `index.js` | the registry: `KIT_FILES` lists every kit file, grouped by tier, `STANDIN_KIT_FILES` the 补位 stand-in kits, `OPERATOR_KIT_FILES` the 自选 operator kits, `VERSION_KIT_FILES` the 第一期 charId kits and `DIY_BORROW_KIT_FILES` the borrowed 自选 kits (`ops/ver-diy.js`); `KITS` (base chess id → kit builder, then stand-in charId, then operator charId, then version charId, then borrowed 自选 charId), `TIER_KITS`, `STANDIN_KITS`, `OPERATOR_KITS`, `VERSION_KITS`, `DIY_BORROW_KITS` and `KITTED_CHARS` (who a 自选 slot may field) are built from them; `KIT_CHAR_IDS` names the charId each tier kit was written for (`TIER_KIT_KEYS_BY_CHAR` is its reverse). `PENDING_DIY_KIT_CHARS` is empty. `PENDING_KIT_CHARS` names the operators who still have no kit |
->>>>>>> theirs
 | `ops/<chessId>-<codename>.js` | one kit per file, with the helpers and constants only that kit uses |
 | `ops/standin-<codename>.js` | one 补位 stand-in kit per file (below: "Stand-in kits") |
 | `ops/op-<codename>.js` | one 自选 operator kit per file (below: "How to add an operator (自选)") |
@@ -25,8 +21,6 @@ operators, the self-select 6★ operators, contributions from GitHub issue #136 
 id), else the generic kit built from the skill blackboard (`content/generic.js`, docs/SIM.md §7.4). A 补位 stand-in's
 and a 自选 piece's kit is `KITS[def.charId]` and nothing else (`content/index.js kitOf`): it keeps the chess's (the DIY
 slot's) ids, which name the replaced operator's kit (a slot has none).
-<<<<<<< ours
-=======
 On another official version's build the by-id kit is used only when `KIT_CHAR_IDS` names the record's charId (official
 versions M0, 0.3.2, DESIGN §35.22): that version may give chess ids to other operators (第一期, 盟约·上半, does), whose kit
 is then found by charId (`content/index.js officialKitKey`, docs/SIM.md §7.2). The default data keeps the by-id lookup.
@@ -42,7 +36,6 @@ the 缪尔赛思 kit's `rhineOf` do; a kit shares an existing list rather than c
 also counts 淬羽赫默 on `rhineOf` [ASSUMED]: she is a shop chess there and stays off the covenant lists. `test/versions-keying.test.js`
 `GROUPS` pins the 深海猎人 and 莱茵生命 members each data directory sees (`STUDENTS` and `SUI` are complete on every build;
 docs/SIM.md §7.2, DESIGN §35.22.4).
->>>>>>> theirs
 
 ## Naming
 

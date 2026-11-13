@@ -1,16 +1,16 @@
-export const ENEMY_SKILL_ROLES = {"enemy_1511_mdrock":{"skill":{"begin":null,"loop":"Skill_2","end":null,"index":0,"idle":null},"skills":{"0":{"begin":null,"loop":"Skill_2","end":null,"index":0,"idle":null},"1":{"begin":null,"loop":"Skill_1","end":null,"index":1,"idle":null}}},"enemy_1517_xi":{"skill":{"begin":null,"loop":"Skill_01_02","end":null,"index":0,"idle":null},"skills":{"0":{"begin":null,"loop":"Skill_01_02","end":null,"index":0,"idle":null},"1":{"begin":"Skill_02_Begin","loop":"Skill_02_Loop","end":"Skill_02_End","index":1,"idle":null},"2":{"begin":"Skill_02_Begin","loop":"Skill_02_Loop","end":"Skill_02_End","index":2,"idle":null}}},"enemy_9014_acstma":{"skill":{"begin":null,"loop":"Launch_Begin","end":null,"index":0,"idle":null},"skills":{"0":{"begin":null,"loop":"Launch_Begin","end":null,"index":0,"idle":null},"1":{"begin":null,"loop":"Back_End","end":null,"index":1,"idle":null}}},"enemy_9015_acstmb":{"skill":{"begin":null,"loop":"Launch_Begin","end":null,"index":0,"idle":null},"skills":{"0":{"begin":null,"loop":"Launch_Begin","end":null,"index":0,"idle":null},"1":{"begin":null,"loop":"Back_End","end":null,"index":1,"idle":null}}},"enemy_1525_blkswb":{"skill":{"begin":null,"loop":"A_Attack","end":null,"via":"attack","index":0,"idle":null},"skills":{"0":{"begin":null,"loop":"A_Skill2","end":null,"index":0,"idle":null},"1":{"begin":null,"loop":"A_Attack","end":null,"index":1,"idle":null,"via":"attack"},"2":{"begin":null,"loop":"B_Skill2","end":null,"index":2,"idle":null},"3":{"begin":null,"loop":"B_Attack","end":null,"index":3,"idle":null,"via":"attack"}}},"enemy_1516_jakill":{"skill":{"begin":null,"loop":"C1_Attack","end":null,"via":"attack","index":0,"idle":null},"skills":{"0":{"begin":null,"loop":"C1_Skill","end":null,"index":0,"idle":null,"strike":true},"1":{"begin":null,"loop":"C2_Skill","end":null,"index":1,"idle":null,"strike":true}}},"enemy_9019_actrpb":{"skill":{"begin":null,"loop":"Attack","end":null,"via":"attack","index":0,"idle":null},"skills":{"0":{"begin":null,"loop":"Skill_b","end":null,"index":0,"idle":null,"strike":true}}},"enemy_9020_actrpc":{"skill":{"begin":null,"loop":"Attack","end":null,"via":"attack","index":0,"idle":null},"skills":{"0":{"begin":null,"loop":"Skill_c","end":null,"index":0,"idle":null,"strike":true}}},"enemy_9013_acstmk":{"skill":{"begin":null,"loop":"Skill_1","end":null,"index":0,"idle":null},"skills":{"0":{"begin":null,"loop":"Skill_1","end":null,"index":0,"idle":null},"1":{"begin":null,"loop":"Skill_3","end":null,"index":1,"idle":null},"2":{"begin":null,"loop":"Revive","end":null,"index":2,"idle":null}}},"enemy_9013_acstmk_2":{"skill":{"begin":null,"loop":"Skill_1","end":null,"index":0,"idle":null},"skills":{"0":{"begin":null,"loop":"Skill_1","end":null,"index":0,"idle":null},"1":{"begin":null,"loop":"Skill_3","end":null,"index":1,"idle":null},"2":{"begin":null,"loop":"Revive","end":null,"index":2,"idle":null}}},"enemy_9032_aclionk":{"skill":{"begin":null,"loop":"Skill_1","end":null,"index":0,"idle":null},"skills":{"0":{"begin":null,"loop":"Skill_1","end":null,"index":0,"idle":null},"1":{"begin":null,"loop":"Skill_2","end":null,"index":1,"idle":null},"2":{"begin":null,"loop":"Skill_2","end":null,"index":2,"idle":null},"3":{"begin":null,"loop":"Skill_1","end":null,"index":3,"idle":null},"4":{"begin":null,"loop":"Skill_3","end":null,"index":4,"idle":null}}}};
-import {quintusRoles} from '../../shared/quintus.js';
 // Spine model pipeline: download skel/atlas/page PNGs, fetch extra atlas pages,
 // normalize atlases (size:/pma:), parse skeletons and resolve animation roles.
 // Produces the per-model `spine` entries of data/assets.json.
 //
-// Enemy models that no dump carries but the local client has (tools/local-extract/
-// extract.py ENEMY_SPINES → public/assets/local/spine/enemy/<id>/, optional and
-// git-ignored) are an overlay, never the manifest's `spine`: their metadata lives
-// in the committed tools/assets/local-enemy-spines.json (loadLocalEnemySpines),
+// Enemy and token models that no dump carries but the local client has (tools/local-extract/
+// extract.py ENEMY_SPINES → public/assets/local/spine/enemy/<id>/, TOKEN_SPINES →
+// public/assets/local/spine/token/<id>/; optional and git-ignored) are an overlay, never
+// the manifest's `spine`: their metadata lives in the committed
+// tools/assets/local-enemy-spines.json / local-token-spines.json (loadLocalSpines),
 // refreshed from the extracted files by `fetch-assets --local-spines`
-// (findLocalEnemyModels + localEnemySpineMeta, read only), so data/assets.json
-// is the same with or without the extraction (ASSETS.md "Enemy aliases").
+// (findLocalEnemyModels / findLocalTokenModels + localSpineMeta, read only), so
+// data/assets.json is the same with or without the extraction (ASSETS.md "Enemy aliases",
+// "Token models from the local client").
 
 import { readFile, readdir, writeFile, stat, rename, mkdir, unlink } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
@@ -26,20 +26,26 @@ async function fileStat(p) { try { const s = await stat(p); return s.isFile() ? 
 export const LOCAL_ENEMY_SPINE_DIR = 'local/spine/enemy/';
 /** Its data/local-assets.json group of an enemy (`spine/enemy/<id>`; the client resolves the file names through it). */
 export const localEnemySpineGroup = (id) => `spine/enemy/${id}`;
+/** Where tools/local-extract/extract.py writes token (summon) Spine models, under public/assets. */
+export const LOCAL_TOKEN_SPINE_DIR = 'local/spine/token/';
+/** Its data/local-assets.json group of a token (`spine/token/<id>`). */
+export const localTokenSpineGroup = (id) => `spine/token/${id}`;
 
 /**
- * Enemy Spine models extracted from the local client (tools/local-extract/extract.py ENEMY_SPINES): every
- * `local/spine/enemy/<enemyId>/` holding a skeleton, the atlas of the same stem and at least one page PNG.
+ * Spine models extracted from the local client under `base` (a LOCAL_*_SPINE_DIR): every `<base><id>/` whose id matches
+ * `idRe` holding a skeleton, the atlas of the same stem and at least one page PNG.
  * @param {string} root absolute public/assets directory
+ * @param {string} base model folder under root, with a trailing slash
+ * @param {RegExp} idRe the ids to take
  * @returns {Promise<Record<string, { dir: string, skel: string, atlas: string, pngs: string[] }>>} paths relative to root
  */
-export async function findLocalEnemyModels(root) {
+async function findLocalModels(root, base, idRe) {
   const out = {};
   let ids = [];
-  try { ids = (await readdir(join(root, LOCAL_ENEMY_SPINE_DIR), { withFileTypes: true })).filter((d) => d.isDirectory()).map((d) => d.name); } catch { return out; }
+  try { ids = (await readdir(join(root, base), { withFileTypes: true })).filter((d) => d.isDirectory()).map((d) => d.name); } catch { return out; }
   for (const id of ids.sort()) {
-    if (!/^enemy_\d+_[a-z0-9_]+$/i.test(id)) continue;
-    const dir = `${LOCAL_ENEMY_SPINE_DIR}${id}/`;
+    if (!idRe.test(id)) continue;
+    const dir = `${base}${id}/`;
     let files = [];
     try { files = (await readdir(join(root, dir))).sort(); } catch { continue; }
     const skel = files.find((f) => f.endsWith('.skel'));
@@ -52,16 +58,61 @@ export async function findLocalEnemyModels(root) {
 }
 
 /**
- * @typedef {{ skel: string, atlas: string, textures: string[], pma: boolean, anims: any, animations: Record<string, number>,
- *   events: string[], hits: Record<string, number[]>, bounds: any }} LocalSpineMeta file names relative to the model's
- *   data/local-assets.json group (localEnemySpineGroup), the rest as a manifest SpineEntry
+ * Enemy Spine models extracted from the local client (tools/local-extract/extract.py ENEMY_SPINES): every
+ * `local/spine/enemy/<enemyId>/` holding a skeleton, the atlas of the same stem and at least one page PNG.
+ * @param {string} root absolute public/assets directory
  */
+export const findLocalEnemyModels = (root) => findLocalModels(root, LOCAL_ENEMY_SPINE_DIR, /^enemy_\d+_[a-z0-9_]+$/i);
+/**
+ * Token Spine models extracted from the local client (tools/local-extract/extract.py TOKEN_SPINES): every
+ * `local/spine/token/<tokenId>/` holding a skeleton, the atlas of the same stem and at least one page PNG.
+ * @param {string} root absolute public/assets directory
+ */
+export const findLocalTokenModels = (root) => findLocalModels(root, LOCAL_TOKEN_SPINE_DIR, /^token_\d+_[a-z0-9_]+$/i);
 
 /**
-<<<<<<< ours
- * Spine metadata of the extracted enemy models (findLocalEnemyModels), parsed like processModels does — but read only:
- * the atlas is sized / pma-normalized in memory (extract.py already writes it so), nothing on disk changes.
-=======
+ * @typedef {{ skel: string, atlas: string, textures: string[], pma: boolean, anims: any, animations: Record<string, number>,
+ *   events: string[], hits: Record<string, number[]>, bounds: any }} LocalSpineMeta file names relative to the model's
+ *   data/local-assets.json group (localEnemySpineGroup / localTokenSpineGroup), the rest as a manifest SpineEntry
+ */
+
+const clipOf = (loop, via) => (via ? { begin: null, loop, end: null, via } : { begin: null, loop, end: null });
+/**
+ * Role fixes of local models whose clip names the resolver (tools/assets/anim-roles.mjs, by name) cannot read: model id →
+ * roles replacing the resolved ones (the others are kept); localSpineMeta applies them, so the committed metadata carries
+ * them. A fix naming a clip the skeleton lacks is dropped and reported.
+ * - 电弧's 戴乌 (token_10051_radian_tower1): its clips are C_Skill1_Start / _Idle / _Attack / _Die beside a 0 s C_Default
+ *   pose, which the resolver took for its idle, deploy and attack;
+ * - 酒神's 本能的召唤 (token_10054_phatm2_encdool): Start, Loop (5 s), End and a 0 s Default — idle on the Loop and the
+ *   End as it goes [ASSUMED: by the clip names];
+ * - 白铁's 白铁™多功能平台 (token_10027_ironmn_pile1 / pile2): Start, Idle, End — the End as it goes [ASSUMED: by the
+ *   clip name; the resolver finds no Die clip];
+ * - 凯尔希·思衡托's 战术锚点 (token_10068_kalts2_mtship): its Start / Idle / Die clips hide its one attachment (the official
+ *   battle shows the anchor through other means), so it would be an empty tile; it stays on the 0 s Default pose, the
+ *   skeleton's own white anchor mark, and fades out as it goes [ASSUMED].
+ */
+export const LOCAL_SPINE_ROLES = Object.freeze({
+  token_10051_radian_tower1: {
+    idle: 'C_Skill1_Idle', deploy: 'C_Skill1_Start', attack: clipOf('C_Skill1_Attack'),
+    skill: { ...clipOf('C_Skill1_Attack', 'attack'), index: 0, idle: null }, die: 'C_Skill1_Die',
+  },
+  token_10054_phatm2_encdool: {
+    idle: 'Loop', attack: clipOf('Loop', 'idle'), skill: { ...clipOf('Loop', 'attack'), index: 0, idle: null }, die: 'End',
+  },
+  token_10027_ironmn_pile1: { die: 'End' },
+  token_10027_ironmn_pile2: { die: 'End' },
+  token_10068_kalts2_mtship: {
+    idle: 'Default', deploy: 'Default', attack: clipOf('Default', 'idle'), skill: { ...clipOf('Default', 'attack'), index: 0, idle: null },
+    die: null,
+  },
+});
+
+/** The confined clips of 普通囚犯 / 老练囚犯: their grey *3 set (PREFAB_SPINE_ROLES). */
+const PRISONER_GREY_3 = Object.freeze({
+  idle: 'Idle3', deploy: 'Idle3', attack: clipOf('Attack3'), skill: { ...clipOf('Attack3', 'attack'), index: 0, idle: null },
+  die: 'Die3', move: clipOf('Move3'),
+});
+/**
  * Role fixes of web models (enemies from their official battle prefabs; operators by character id) for skeletons whose clip
  * names mislead the resolver (by name): model id → roles replacing the resolved ones (the others are kept); processModels applies them, so
  * data/assets.json carries them. A fix naming a clip the skeleton lacks is dropped and reported. Source: the prefab's
@@ -184,12 +235,11 @@ export function applyRoleFix(roles, fix, durations) {
  * (a straight-page extraction writes none), nothing on disk changes.
  * Roles are resolved for skill index 0 (an enemy also for its numbered skill clips), like the web enemy and token models,
  * then LOCAL_SPINE_ROLES applied.
->>>>>>> theirs
  * @param {string} root absolute public/assets directory
  * @param {Record<string, { dir: string, skel: string, atlas: string, pngs: string[] }>} found
  * @returns {Promise<{ meta: Record<string, LocalSpineMeta>, problems: string[] }>}
  */
-export async function localEnemySpineMeta(root, found) {
+export async function localSpineMeta(root, found) {
   const meta = {};
   const problems = [];
   const base = (rel) => rel.slice(rel.lastIndexOf('/') + 1);
@@ -203,16 +253,18 @@ export async function localEnemySpineMeta(root, found) {
         if (!sz) throw new Error(`invalid page ${page}`);
         sizes.set(page, sz);
       }
-      const norm = normalizeAtlas(text, { pageSize: (p) => sizes.get(p) || null, pma: true });
+      const norm = normalizeAtlas(text, { pageSize: (p) => sizes.get(p) || null });
       if (norm.missingSize.length) throw new Error(`cannot size pages ${norm.missingSize.join(',')}`);
       const info = atlasInfo(norm.text);
       if (!info.pages.length) throw new Error('atlas without pages');
       const sk = parseSkel(await readFile(join(root, m.skel)), info.regions);
       if (!sk.animations.length) throw new Error('skeleton has no animations');
       if (sk.missingRegions?.length) problems.push(`${id}: ${sk.missingRegions.length} attachment(s) not in atlas (e.g. ${sk.missingRegions[0]})`);
+      const fixed = applyRoleFix(resolveRoles(sk.animations, { skillIndices: [0], numberedSkills: id.startsWith('enemy_'), durations: sk.durations }), LOCAL_SPINE_ROLES[id], sk.durations);
+      if (fixed.missing.length) problems.push(`${id}: role fix not applied (clip missing) for ${fixed.missing.join(', ')}`);
       meta[id] = {
-        skel: base(m.skel), atlas: base(m.atlas), textures: info.pages, pma: true,
-        anims: resolveRoles(sk.animations, { skillIndices: [0], durations: sk.durations }),
+        skel: base(m.skel), atlas: base(m.atlas), textures: info.pages, pma: info.hasPma,
+        anims: fixed.roles,
         animations: sk.durations, events: sk.events, hits: sk.hits, bounds: sk.bounds,
       };
     } catch (e) {
@@ -221,21 +273,28 @@ export async function localEnemySpineMeta(root, found) {
   }
   return { meta, problems };
 }
+/** The enemy models' name for localSpineMeta (one parse for every local model). */
+export const localEnemySpineMeta = localSpineMeta;
 
 /** Committed metadata of the local-client enemy models: tools/assets/local-enemy-spines.json. */
 export const LOCAL_ENEMY_SPINES_FILE = 'tools/assets/local-enemy-spines.json';
+/** Committed metadata of the local-client token models: tools/assets/local-token-spines.json. */
+export const LOCAL_TOKEN_SPINES_FILE = 'tools/assets/local-token-spines.json';
 
 /**
- * The `models` of tools/assets/local-enemy-spines.json (enemyId → LocalSpineMeta); {} when the file is missing or bad.
+ * The `models` of a committed local-model metadata file (LOCAL_ENEMY_SPINES_FILE / LOCAL_TOKEN_SPINES_FILE: id →
+ * LocalSpineMeta); {} when the file is missing or bad.
  * @param {string} path absolute path of the file
  * @returns {Promise<Record<string, LocalSpineMeta>>}
  */
-export async function loadLocalEnemySpines(path) {
+export async function loadLocalSpines(path) {
   try {
     const j = JSON.parse(await readFile(path, 'utf8'));
     return j && typeof j.models === 'object' && j.models && !Array.isArray(j.models) ? j.models : {};
   } catch { return {}; }
 }
+/** loadLocalSpines of tools/assets/local-enemy-spines.json (the enemies' name for it). */
+export const loadLocalEnemySpines = loadLocalSpines;
 
 /**
  * @typedef {{ skel: string, atlas: string, textures: string[], pma: boolean, anims: any,
@@ -250,10 +309,12 @@ export async function loadLocalEnemySpines(path) {
  * @param {import('./downloader.mjs').Downloader} o.dl
  * @param {string} o.cachePath parse cache JSON path
  * @param {boolean} [o.download] false = only post-process what is on disk
+ * @param {(rel: string) => boolean} [o.writable] whether a file on disk may be rewritten (normalized atlas) or deleted
+ *   (corrupt skeleton); fetch-assets --add-only allows only the files this run downloaded
  * @param {(m:string)=>void} [o.log]
  * @returns {Promise<{ entries: Map<string, SpineEntry>, problems: string[] }>}
  */
-export async function processModels(models, { root, dl, cachePath, download = true, log = console.log }) {
+export async function processModels(models, { root, dl, cachePath, download = true, writable = () => true, log = console.log }) {
   const problems = [];
   const list = [...models.values()];
   const available = (rel) => !dl?.verifier || dl.accepted.has(rel);
@@ -316,6 +377,7 @@ export async function processModels(models, { root, dl, cachePath, download = tr
     const norm = normalizeAtlas(atlasText, { pageSize: (p) => sizes.get(p) || null, pma: !!m.pma, renamePage: (p) => safeName(p) });
     if (norm.missingSize.length) { problems.push(`${m.key}: cannot size pages ${norm.missingSize.join(',')}`); continue; }
     if (norm.changed) {
+      if (!writable(m.atlas.rel)) { problems.push(`${m.key}: atlas needs normalizing, left as it is (an existing file)`); continue; }
       await writeFile(atlasAbs + '.tmp', norm.text);
       await rename(atlasAbs + '.tmp', atlasAbs);
     }
@@ -332,6 +394,7 @@ export async function processModels(models, { root, dl, cachePath, download = tr
       } catch (e) {
         // A corrupt skeleton would otherwise be kept forever (its size matches the ledger):
         // delete it and forget it so the next online run downloads it again.
+        if (!writable(m.skel.rel)) { problems.push(`${m.key}: skel parse failed (${e.message}); an existing file, left as it is`); continue; }
         problems.push(`${m.key}: skel parse failed (${e.message}); deleted, re-run to re-download`);
         try { await unlink(skelAbs); } catch { /* ignore */ }
         if (dl?.ledger?.files) delete dl.ledger.files[m.skel.rel];
@@ -342,9 +405,13 @@ export async function processModels(models, { root, dl, cachePath, download = tr
     nextCache[m.skel.rel] = { key: ck, info: sk };
     if (sk.missingRegions?.length) problems.push(`${m.key}: ${sk.missingRegions.length} attachment(s) not in atlas (e.g. ${sk.missingRegions[0]})`);
     if (!sk.animations.length) { problems.push(`${m.key}: skeleton has no animations`); continue; }
-    let anims = resolveRoles(sk.animations, { skillIndices: m.skillIndices, numberedSkills: String(m.key).startsWith('enemy_'), durations: sk.durations });
-    if(ENEMY_SKILL_ROLES[m.key])anims=applyRoleFix(anims,ENEMY_SKILL_ROLES[m.key],sk.durations).roles;
-    if(m.key==='enemy_1521_dslily')anims=quintusRoles(anims,sk.durations);
+    const key = String(m.key);
+    const id = key.startsWith('enemy:') ? key.slice('enemy:'.length) : key.startsWith('op:') ? key.split(':')[1] : null; // op:<char>:front|back
+    // an enemy's numbered skill clips are resolved too (anims.skills: the clip of each skill slot it casts, PR #275);
+    // operators keep the pool's indices (their equipped skill picks among them)
+    const fixed = applyRoleFix(resolveRoles(sk.animations, { skillIndices: m.skillIndices, numberedSkills: key.startsWith('enemy:'), durations: sk.durations }), id ? PREFAB_SPINE_ROLES[id] : undefined, sk.durations);
+    if (fixed.missing.length) problems.push(`${m.key}: role fix not applied (clip missing) for ${fixed.missing.join(', ')}`);
+    const anims = fixed.roles;
     entries.set(m.key, {
       skel: assetUrl(m.skel.rel),
       atlas: assetUrl(m.atlas.rel),
@@ -371,19 +438,4 @@ export async function processModels(models, { root, dl, cachePath, download = tr
   if (ledgerDirty && dl?.saveLedger) { try { await dl.saveLedger(); } catch { /* next run re-validates */ } }
   log(`[spine] models ok=${entries.size}/${list.length} (parsed ${parsed}, cached ${cached})`);
   return { entries, problems };
-}
-
-export function applyRoleFix(roles, fix, durations) {
-  if (!fix) return { roles, missing: [] };
-  const out = { ...roles };
-  const missing = [];
-  const has = (n) => n == null || Object.hasOwn(durations || {}, n);
-  const clipOk = (c) => !!c && typeof c === 'object' && [c.begin, c.loop, c.end, c.idle].every(has);
-  for (const [role, v] of Object.entries(fix)) {
-    // a clip name, a clip, null (no such role) — or for `skills` a map slot → clip, every slot's clips checked
-    const ok = typeof v === 'string' ? has(v) : v == null ? true : role === 'skills' ? Object.values(v).every(clipOk) : clipOk(v);
-    if (ok) out[role] = v;
-    else missing.push(role);
-  }
-  return { roles: out, missing };
 }

@@ -46,13 +46,9 @@
 // Damage / healing sums are rounded to integers and HP to 2 decimals (float dust from a reassociated sum is not a
 // gameplay change; anything that changes a fight changes the snapshot hashes too).
 
-<<<<<<< ours
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
-=======
 import { toolVersion } from './versions/runtime.mjs';
 import { DEFAULT_VERSION, officialModeId, versionById, versionSlug } from '../shared/versions.js';
 import { readFileSync, writeFileSync, mkdirSync, writeSync } from 'node:fs';
->>>>>>> theirs
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { dirname, join } from 'node:path';
 import { availableParallelism } from 'node:os';
@@ -78,9 +74,6 @@ const QUIET = Object.freeze({ warn() {}, error() {}, info() {}, log() {}, debug(
 const data = getData({ log: QUIET });
 const ds = new DataSource(data, null); // what Match and browsers use (no research fallback)
 const gdCache = new Map();
-<<<<<<< ours
-const gdFor = (modeId) => { let g = gdCache.get(modeId); if (!g) { g = new GameData(data, modeId); gdCache.set(modeId, g); } return g; };
-=======
 // a mode the version lacks: its official mode of that type and difficulty (规程's solo ladder: 险境 → 规程等级5,
 // shared/versions.js officialModeId), else 终极 → 绝境 (第一期 / 第二期上半 have no 终极)
 const availableMode = (modeId) => {
@@ -89,7 +82,6 @@ const availableMode = (modeId) => {
   return (m && officialModeId(data.config, m[1] === 'single' ? 'solo' : 'coop', m[2].toUpperCase())) || modeId.replace('_abyss', '_hard');
 };
 const gdFor = (modeId) => { modeId = availableMode(modeId); let g = gdCache.get(modeId); if (!g) { g = new GameData(data, modeId); gdCache.set(modeId, g); } return g; };
->>>>>>> theirs
 const byId = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
 
 // ---------------------------------------------------------------------------------------------------------------

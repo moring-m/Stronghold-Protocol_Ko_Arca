@@ -382,13 +382,6 @@ export function collectEnemyIds({ assets07, enemies05, maps05, ops03 }) {
  * @param {Record<string, import('./spine.mjs').LocalSpineMeta>} [p.localEnemySpines] metadata of the enemy models the
  *   local client has (the committed tools/assets/local-enemy-spines.json, never the disk): each planned enemy listed
  *   gets `spineLocal` = { group: 'spine/enemy/<id>', ...meta } beside its web `spine`
-<<<<<<< ours
- * @returns {{ template: any, models: Map<string, any>, notes: string[] }}
- */
-export function buildPlan({ assets07, ops03, enemies05, maps05, audio, modelsData, charword = null, voiceLang = 'cn', charModes = null,
-  voiceSlots = VOICE_BATTLE_SLOTS, voiceJp = true, optionalVoice = false, statsTemplate = [],
-  extraEnemyIds = [], extraTokenIds = [], extraHandbook = {}, localEnemySpines = {}, extraOperators = {} }) {
-=======
  * @param {Record<string, import('./spine.mjs').LocalSpineMeta>} [p.localTokenSpines] the same for the token (summon)
  *   models (tools/assets/local-token-spines.json): each planned token listed gets `spineLocal` = { group:
  *   'spine/token/<id>', ...meta } beside its web `spine`, if any (most have none: the client drew the avatar)
@@ -411,7 +404,6 @@ export function buildPlan({ assets07, ops03, enemies05, maps05, audio, modelsDat
   extraEnemyIds = [], extraTokenIds = [], extraHandbook = {}, localEnemySpines = {}, localTokenSpines = {}, extraOperators = {},
   moduleTypes = [], statsTemplate = [], charModes = null, extraBands = {}, extraItems = {}, extraBonds = {},
   seasonMusic = null }) {
->>>>>>> theirs
   const notes = [];
   /** @type {Map<string, any>} */
   const models = new Map();
