@@ -4,11 +4,7 @@
 // list (shared/plugins/order.js), then split by class. The lobby (server/lobby.js setPlugins) asks it and holds what it
 // answers:
 //
-<<<<<<< ours
-//   resolve(ids, { scope, settings, replacing }) → { ok: true, set: { cs, vs?, plugins: [{ id, version, class, hash,
-=======
 //   resolve(ids, { scope, settings, replacing, version }) → { ok: true, set: { cs, vs?, plugins: [{ id, version, class, hash,
->>>>>>> theirs
 //     auto? }], warnings, bytes, dataBytes?, modes?, kitted? } } | { error, detail }
 //     `cs` the content set's (a room with content plugins) or none (cosmetic plugins only: the room's cs stays the vanilla
 //     one); `plugins` in load order; `warnings` the visual set's (override, app) plus `app` for a gameplay plugin made
@@ -19,11 +15,7 @@
 //     server owner's policy: rooms off / fixed, not in `allow`, the class off), PLUGIN_DEPENDENCY / PLUGIN_CONFLICT (the
 //     load order), PLUGIN_INCOMPATIBLE (a gameplay plugin made for other game versions or another plugin API — unless
 //     the policy allows it), PLUGIN_LIMIT (the visual set's art limits), PLUGIN_BUSY (one content set more than the
-<<<<<<< ours
-//     server runs at once).
-=======
 //     server runs at once), VERSION_UNSUPPORTED (a gameplay plugin in the closed list does not declare the room's official version).
->>>>>>> theirs
 //   hold / release (vs), holdContent / releaseContent (cs), onStale, unofficial — the visual and content sets'.
 //   defaults() → the ids a new room starts with (the policy's `default`; [] for the original game); fixed() → those ids
 //   when every room must play them (rooms: fixed), else null.
@@ -52,16 +44,10 @@ export function createRoomSets({ registry, visual, contents, policy }) {
 
   /**
    * @param {string[]} ids
-<<<<<<< ours
-   * @param {{ scope?: 'room', settings?: Record<string, Record<string, unknown>>, replacing?: { cs?: string } | null }} [opts]
-   */
-  function resolve(ids, { scope = 'room', settings = {}, replacing = null } = {}) {
-=======
    * @param {{ scope?: 'room', settings?: Record<string, Record<string, unknown>>, replacing?: { cs?: string } | null,
    *   version?: string }} [opts] the official version whose data the room plays
    */
   function resolve(ids, { scope = 'room', settings = {}, replacing = null, version = DEFAULT_VERSION } = {}) {
->>>>>>> theirs
     const pol = policy?.get();
     if (pol && pol.rooms === 'off') return { error: ERR.PLUGIN_BLOCKED, detail: 'this server\'s rooms play the original game (plugins/config.json rooms: off)' };
     if (pol && pol.rooms === 'fixed') {
@@ -82,11 +68,8 @@ export function createRoomSets({ registry, visual, contents, policy }) {
     const r = resolvePluginOrder(ids, lookup);
     if ('error' in r) return { error: ERR[r.error] || ERR.BAD_MSG, detail: r.detail };
     const entries = r.order.map((id) => registry.plugin(id));
-<<<<<<< ours
-=======
     const unsupported = entries.find((p) => !pluginSupportsVersion(p.manifest, version));
     if (unsupported) return { error: ERR.VERSION_UNSUPPORTED, detail: `${unsupported.id} does not declare support for ${version} in versions (absent means act2autochess only)` };
->>>>>>> theirs
     // the art: every cosmetic plugin, and a content plugin's own `assets` (its operators' art: the registry reads it as a
     // visual snapshot like a cosmetic plugin's; DESIGN §32.5) — one visual set
     const cosmeticIds = entries.filter((p) => p.class === 'cosmetic' || (['content','script','trusted'].includes(p.class) && p.visual)).map((p) => p.id);

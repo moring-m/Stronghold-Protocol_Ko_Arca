@@ -371,3 +371,13 @@ function appendFactionBounds(data, vanilla, bad) {
   const officialWeight = maxOf(vEntries.map((e) => e.weight));
   for (const [id, e] of Object.entries(isPlain(f.entries) ? f.entries : {})) if (isPlain(e)) check(`factions.entries.${id}.weight`, 'factions.entries.weight', e.weight, officialWeight);
 }
+
+
+/**
+ * The snapshot of `data`'s official maxima (exportOfficialBounds of a fresh scan) — an official version's own bounds
+ * (DESIGN §35.23: its match host and its pages install them). Never reads or fills the cache.
+ * @param {object} data
+ */
+export function officialBoundsOf(data) {
+  return exportOfficialBounds(scan(data));
+}

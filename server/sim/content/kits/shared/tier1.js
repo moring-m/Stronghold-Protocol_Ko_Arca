@@ -285,3 +285,11 @@ export function batMod(v, chess = null, desc = '') {
 }
 /** "周围8格" = Chebyshev ring 1 ⇒ Euclidean radius covering the 8 neighbours. */
 export const RING1 = 1.5;
+
+
+/** Ordinary HP injury from an actual enemy source; action flags and descriptive tags do not select it. */
+export const byEnemyDamage = (ctx) => {
+  const source = ctx.source, dmg = ctx.dmg;
+  return !!source && source.side === 'enemy' && !!dmg && !dmg.sourceless
+    && ctx.type !== 'element' && !isHpLoss(dmg);
+};

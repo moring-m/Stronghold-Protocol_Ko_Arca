@@ -162,13 +162,6 @@ export class MatchPhases {
       if (this.phase !== PHASE.BAND_DRAFT || token !== this._turnToken) return;
       const ps = this.players.get(this.draftTurn());
       if (!ps || !ps.botControlled) return;
-<<<<<<< ours
-      // a strategy a teammate already took is not selectable (队友已选): the bot re-draws, else the first free one
-      let id = botPickBand(this, ps);
-      for (let k = 0; k < 8 && this.bandTaken(id, ps.playerId); k++) id = botPickBand(this, ps);
-      if (this.bandTaken(id, ps.playerId)) id = this.gd.bandIds().find((b) => !this.bandTaken(b, ps.playerId)) || id;
-      this._applyBand(ps, id, { dedupe: true });
-=======
       // a co-op seat gone before its pick has no game of its own to play: whatever strategy plays the AI seats, it drafts
       // by the team's rule (botPickBand's departedWeight: Touch while nobody else holds it, never 歌利亚; §37.65)
       const bot = !this.isSolo && ps.alive === false ? LEGACY_BOT : this.botFor(ps);
@@ -183,7 +176,6 @@ export class MatchPhases {
         valid: () => this.phase === PHASE.BAND_DRAFT && token === this._turnToken,
         complete: () => token !== this._turnToken || !!this.draft?.picks[ps.playerId], fallback })) return;
       fallback();
->>>>>>> theirs
     });
   }
 

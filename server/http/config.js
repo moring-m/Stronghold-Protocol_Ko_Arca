@@ -12,12 +12,9 @@
 
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-<<<<<<< ours
-=======
 import { ROOM_CODE_LEN } from '../../shared/constants.js';
 
 import { DEFAULT_VERSION, LOBBY_DEFAULT_VERSION, VERSIONS, versionById } from '../../shared/versions.js';
->>>>>>> theirs
 
 /** Repository root. */
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -117,8 +114,6 @@ export function lobbyOptionsFrom(opts) {
   return lobbyOptions;
 }
 
-<<<<<<< ours
-=======
 /** Socket caps that SP_MAX_CONNECTIONS / SP_MAX_CONNECTIONS_PER_ADDR may override (net.js). */
 const NET_LIMIT_ENV = [['maxConnections', 'SP_MAX_CONNECTIONS'], ['maxConnectionsPerAddr', 'SP_MAX_CONNECTIONS_PER_ADDR'], ['maxOnline', 'SP_MAX_ONLINE']];
 /** Room / match caps that SP_MAX_ROOMS / SP_MAX_ROOMS_PER_ADDR / SP_MAX_MATCHES_PER_ADDR may override (lobby.js). */
@@ -206,7 +201,6 @@ export function versionsFrom(opts, log = null) {
   return { enabled, default: def, maxHosts };
 }
 
->>>>>>> theirs
 /** TRUST_PROXY env → net.js trustProxy ('auto' unless explicitly on/off). @param {string | undefined} v */
 export function parseTrustProxy(v) {
   const s = String(v ?? '').trim().toLowerCase();
@@ -224,4 +218,25 @@ export function makeLogger(quiet) {
     error: (...a) => console.error(...a),
     debug: process.env.DEBUG ? (...a) => console.debug(...a) : () => {},
   };
+}
+
+
+/**
+ * A fixed alliance key passed to one server instance: four letters or digits, upper-cased, or null for the random
+ * code every room gets. `--room-code` (server/index.js) and startServer({ roomCode }) share this parser; a blank value
+ * means random. Anything else is refused at boot instead of silently falling back to random — a private server that
+ * expects the same key should not start with a different one. There is no environment variable: the value lives only
+ * in the process that was started with it, so stopping the server ends it.
+ * @param {unknown} v
+ * @returns {string | null}
+ * @throws {RangeError} a value that is neither blank nor ROOM_CODE_LEN letters or digits
+ */
+export function parseRoomCode(v) {
+  const s = String(v ?? '').trim();
+  if (!s) return null;
+  const code = s.toUpperCase();
+  if (code.length !== ROOM_CODE_LEN || !/^[A-Z0-9]+$/.test(code)) {
+    throw new RangeError(`invalid fixed alliance key: use ${ROOM_CODE_LEN} letters or digits (A-Z, 0-9)`);
+  }
+  return code;
 }

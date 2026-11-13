@@ -7,12 +7,8 @@ import {isDiyModule} from './diy.js';
 import { extensionSelectionShape } from './customExtensions.js';
 // Every client→server message is `{ t, rid?, ...fields }`. Unknown `t` or invalid fields ⇒ ERR.BAD_MSG.
 
-<<<<<<< ours
-import { DIFFICULTIES, NAME_MAX_LEN, ROOM_CODE_LEN, MAX_SEATS, EMOTES, GEO, isSpectatorCap } from './constants.js';
+import { DIFFICULTIES, NAME_MAX_LEN, ROOM_CODE_LEN, MAX_SEATS, EMOTES, GEO, isSpectatorCap, REHEARSAL_MAX_CANDIDATES } from './constants.js';
 import { normalizeChatText, chatFaction } from './chat.js';
-=======
-import { DIFFICULTIES, NAME_MAX_LEN, ROOM_CODE_LEN, MAX_SEATS, EMOTES, GEO, REHEARSAL_MAX_CANDIDATES } from './constants.js';
->>>>>>> theirs
 import { isDroppableChess } from './standIn.js';
 import { diySlotIds, validateDiyPicks } from './diy.js';
 import { cultivatedStats, isPotential, isCultivate, POTENTIAL_DEFAULT, CULTIVATE_DEFAULT, hasPotentialData } from './potential.js';
@@ -42,14 +38,11 @@ const isMap = (v, max, key, val) => {
 };
 const isList = (v, max, item) => Array.isArray(v) && v.length <= max && v.every(item);
 const isScalar = (v) => isStr(v, 64) || isNum(v) || isBool(v);
-<<<<<<< ours
-=======
 /** An official version id (shared/versions.js: the activity id, `@<sub-version>` for a sub-version) — structural only; the lobby answers VERSION_UNKNOWN for one this server does not enable (DESIGN §35.23). */
 export const isVersionId = (v) => typeof v === 'string' && v.length <= 40 && /^[a-z0-9]{1,32}(?:@[A-Za-z0-9_]{1,16})?$/.test(v);
 const isPeerDescription = (v) => isPlain(v) && (v.type === 'offer' || v.type === 'answer') && isStr(v.sdp, 16 * 1024);
 const isPeerCandidate = (v) => isPlain(v) && isStr(v.candidate, 2048)
   && (v.sdpMid === null || isStr(v.sdpMid, 256)) && (v.sdpMLineIndex === null || isInt(v.sdpMLineIndex, 0, 65535));
->>>>>>> theirs
 
 // ---- client-side combat (DESIGN §14): b.progress / b.result payloads -------------------------------------------
 
@@ -534,24 +527,11 @@ export const C2S = {
   hello: { name: (v) => isStr(v, NAME_MAX_LEN) && v.trim().length > 0, token: (v) => v == null || isStr(v, 64), version: (v) => v == null || isInt(v, 0, 1e6),
     noReplace: isBool, claimAt: (v) => isNum(v, 0, Number.MAX_SAFE_INTEGER), $optional: ['token', 'version', 'noReplace', 'claimAt'] },
   ping: { c: (v) => typeof v === 'number' && Number.isFinite(v) },
-<<<<<<< ours
-  'room.create': { titleLocale:v=>['ko','en','ja','zh'].includes(v),isPublic:v=>typeof v==='boolean',title:isRoomTitle, gameplayMode:isGameplayMode, mode: (v) => v === 'solo' || v === 'coop' || v === 'coop8', sync: (v) => v === true, difficulty: (v) => DIFFICULTIES.includes(v), spectators: isSpectatorCap, customExtensions: extensionSelectionShape, test: (v) => v === true, $optional: ['spectators','customExtensions','test','gameplayMode','title','titleLocale','isPublic','sync'] },
+  'room.create': { titleLocale:v=>['ko','en','ja','zh'].includes(v),isPublic:v=>typeof v==='boolean',title:isRoomTitle, gameplayMode:isGameplayMode, mode: (v) => v === 'solo' || v === 'coop' || v === 'coop8', sync: (v) => v === true, difficulty: (v) => DIFFICULTIES.includes(v), spectators: isSpectatorCap, customExtensions: extensionSelectionShape, test: (v) => v === true, version: isVersionId, soloUnlimited: isBool, modeId: isId, $optional: ['spectators','customExtensions','test','gameplayMode','title','titleLocale','isPublic','sync','version','soloUnlimited','modeId'] },
   'room.join': { testAck: (v) => v === true, $optional: ['testAck'], code: (v) => isStr(v, ROOM_CODE_LEN + 2) && /^[A-Za-z0-9]+$/.test(v) },
-=======
-  // test: only the literal true (DESIGN §34.8). Omit it for a normal room — `false` is a bad field, so a
-  // string cannot sneak in as "not a test". The server still refuses it unless SP_TEST_MODE is on.
-  // difficulty: may be left out — the room starts at the server's default (server/lobby.js DEFAULT_DIFFICULTY) and the
-  // host changes it in the room (room.setDifficulty), as in the event's 联合模拟; a value given must be a difficulty.
-  // soloUnlimited: the timed-solo opt-out 「不限时」 (DESIGN §35.23.10). Optional, and only the literal boolean —
-  // the server applies `true` solely to a solo room of a version whose solo is timed, and ignores it otherwise, so a
-  // default create stays the message it was.
-  // modeId: an official mode of a laddered version's room mode (规程's solo: 极速模拟 / 规程等级 n); ignored elsewhere
-  'room.create': { mode: (v) => v === 'solo' || v === 'coop', difficulty: (v) => DIFFICULTIES.includes(v), test: (v) => v === true, version: isVersionId, soloUnlimited: isBool, modeId: isId, $optional: ['test', 'difficulty', 'version', 'soloUnlimited', 'modeId'] },
-  'room.join': { $optional: ['testAck'], testAck: (v) => v === true, code: (v) => isStr(v, ROOM_CODE_LEN + 2) && /^[A-Za-z0-9]+$/.test(v) },
   'p2p.enable': { enabled: isBool },
   'p2p.signal': { epoch: isId, to: isId, description: isPeerDescription, candidate: isPeerCandidate, $optional: ['description', 'candidate'] },
   'p2p.ready': { epoch: isId, ready: isBool, seq: (v) => Number.isSafeInteger(v) && v >= 0 },
->>>>>>> theirs
   'room.leave': {},
   'room.commend': {playerId:isId,matchNo:(v)=>isInt(v,1,2**31)},
   'room.ready': { ready: isBool },
@@ -606,6 +586,7 @@ export const C2S = {
   // official mode of the room's type (the one of a difficulty: it sets the difficulty) or a mode a plugin of the room's
   // content set provides (room.state.content.modes; room.state.content.modeId while it is chosen)
   'room.setMode': { modeId: isId },
+  'room.proposeVersion': { version: isVersionId },
   // the page has loaded and checked the room's content set (DESIGN §32.6): `cs` = the room.state.content.cs it checked —
   // every data file's bytes against /cs/<cs16>/index.json, that manifest's composition against `cs`; `ok: false` = it
   // could not (the seat shows it). A room with gameplay plugins starts only once every player's page sent it for its cs
@@ -613,16 +594,11 @@ export const C2S = {
   'room.contentReady': { cs: isContentHash, ok: isBool, $optional: ['ok'] },
 
   // match
-<<<<<<< ours
   // 선발 선택 (RECRUIT_PICK, shared/recruitPick.js): the picks so far, and whether the player is done
   'g.recruitPick': { picks: (v) => Array.isArray(v) && v.length <= 4 && v.every(isId), ready: (v) => typeof v === 'boolean' },
+  'g.bondGroup': { idx: (v) => isInt(v, 0, 1), setupRevision: (v) => isInt(v, 0, 2 ** 31) },
   'g.infoReady': { matchNo: optional((v) => isInt(v, 1)), setupRevision: optional((v)=>isInt(v,0,2**31)) },
   'g.rerollVote': {voteId:(v)=>isInt(v,1,2**31),agree:isBool},
-=======
-  'g.bondGroup': { idx: (v) => isInt(v, 0, 1), setupRevision: (v) => isInt(v, 0, 2 ** 31) },
-  'g.infoReady': { setupRevision: (v) => isInt(v, 0, 2 ** 31), $optional: ['setupRevision'] },
-  'g.rerollVote': { voteId: (v) => isInt(v, 1, 2 ** 31), agree: isBool },
->>>>>>> theirs
   'g.band': { bandId: isId },
   // 规程 选择自编: the slots this match brings (0–2 per tier). Shape only; the match re-checks caps, bans and the roster.
   'g.diyBring': { slots: (v) => isList(v, DIY_LIMITS.slots, isId) },
@@ -694,18 +670,14 @@ export const C2S = {
     left: (v) => isMap(v, RESULT_LIMITS.players, isId, (x) => isInt(x, 0, 1e5)),
     leaksCountBy: (v) => isMap(v, RESULT_LIMITS.players, isId, (x) => isInt(x, 0, 1e5)),
     leaksBy: (v) => isMap(v, RESULT_LIMITS.players, isId, (x) => isNum(x, 0, 1e6)),
-<<<<<<< ours
     // 동기화 시뮬레이션: each shared enemy's cumulative damage on this field and its max HP (syncKey → number), the
     // shared enemies that reached this field's goal (server/sim/syncPools.js LocalSyncPools.report, Battle.syncLeaks)
     syncDmg: (v) => isMap(v, SYNC_KEYS, isId, (x) => isNum(x, 0, BIG)),
     syncMax: (v) => isMap(v, SYNC_KEYS, isId, (x) => isNum(x, 0, BIG)),
     syncHeal: (v) => isMap(v, SYNC_KEYS, isId, (x) => isNum(x, 0, BIG)),
     syncLeaks: (v) => Array.isArray(v) && v.length <= SYNC_KEYS && v.every((l) => isPlain(l) && isId(l.key) && isNum(l.lpr, 0, 1000)),
-    $optional: ['resolved', 'leaks', 'bossDmg', 'by', 'done', 'left', 'leaksBy', 'leaksCountBy', 'syncDmg', 'syncMax', 'syncHeal', 'syncLeaks'],
-=======
     ops: (v) => isList(v, LEADER_OPS_MAX, isLeaderOp),
-    $optional: ['resolved', 'leaks', 'bossDmg', 'by', 'done', 'left', 'leaksBy', 'ops'],
->>>>>>> theirs
+    $optional: ['resolved', 'leaks', 'bossDmg', 'by', 'done', 'left', 'leaksBy', 'leaksCountBy', 'syncDmg', 'syncMax', 'syncHeal', 'syncLeaks', 'ops'],
   },
   // `cs` (DESIGN §32, optional): the content hash the reporting browser ran the battle on — its spec's `cs`. In a room
   // with gameplay plugins (P1c, DESIGN §32.6) the match refuses a result without it or with another one (and runs the
@@ -778,8 +750,6 @@ export function validateC2S(msg) {
 export const EV = Object.freeze({
   SPAWN: 'spawn', ATK_START: 'atkStart', ATK_RETARGET: 'atkRetarget', ATK_CANCEL: 'atkCancel', ATK: 'atk', DMG: 'dmg', HEAL: 'heal', SKILL: 'skill', SKILL_IMPACT: 'skillImpact', ENGAGE: 'engage', DIE: 'die', LEAK: 'leak',
   STATUS: 'status', FX: 'fx', LAYER: 'layer', BOUNTY: 'bounty', DEPLOY: 'deploy', CAST: 'cast',
-<<<<<<< ours
-=======
   // ['rate', id, seconds] - the unit's OWN attack interval (`u.s.interval`, buffs and skills included) changed. Sent
   // once per change: the FIRST value travels in the spawn UnitInfo (`atkInterval`) and is not repeated, and a change is
   // never swallowed by that seed; an event's value outranks the spawn-time UnitInfo for the rest of the battle (ordinary
@@ -789,7 +759,6 @@ export const EV = Object.freeze({
   RATE: 'rate',
   // ['resource', id, 'cost'|'sp', actual signed delta, source reason]: optional live-display receipts (#657).
   RESOURCE: 'resource',
->>>>>>> theirs
 });
 
 /**

@@ -41,7 +41,17 @@ export function drawDisabledBonds(gd, rng, policy = {}) {
   });
   const core = eligible.filter((b) => gd.bond(b).isCore);
   const addon = eligible.filter((b) => !gd.bond(b).isCore);
-<<<<<<< ours
+  if (gd.regulationBondDraw) {
+    // Solo: two groups of half the core bonds (owner's level 1: 4 + 4; recordings: 规程等级1 / 极速 4 + 4, 规程等级20 5 + 5);
+    // an odd leftover stays active. Co-op greys the profile's `bans.core` (recordings 2026-11-12: 标准 0 of 8 in two
+    // matches of BV11NW869ELq, 险境 / 绝境 / 终极 5 of 10); LOCAL training keeps its configured counts too.
+    const half = Math.floor(core.length / 2);
+    const shuffled = sample(core, core.length, rng);
+    const choice = gd.isSolo ? { groups: [shuffled.slice(0, half), shuffled.slice(half, half * 2)], picked: null } : null;
+    const coreOff = choice ? [] : shuffled.slice(0, nCore);
+    const drawn = [...coreOff, ...sample(addon, nAddon, rng)].sort();
+    return { drawn, staticOff, banned: bannedChessForBonds(gd, drawn, staticOff, explicitBans), ...(choice ? { choice } : {}) };
+  }
   const extraCore = ['ursusShip','leithanienShip'].filter(id=>core.includes(id)).length;
   const forced = core.filter(id=>(policy.forcedBonds||[]).includes(id));
   const protectedIds = new Set(policy.protectedBonds||[]);
@@ -54,38 +64,22 @@ export function drawDisabledBonds(gd, rng, policy = {}) {
   const auxQuota=Math.min(Math.max(nAddon,forcedAux.length),addon.length);
   const auxDraw=[...forcedAux,...sample(addon.filter(id=>!forcedAux.includes(id)&&!protectedAux.has(id)),Math.max(0,auxQuota-forcedAux.length),rng)];
   drawn.push(...auxDraw);drawn.sort();
+  return { drawn, staticOff, banned: bannedChessForBonds(gd, drawn, staticOff, explicitBans) };
+}
+
+/** Shared by the initial draw and a solo group's choice; no RNG or stock is consumed. Explicit bans (the fork) lead. */
+export function bannedChessForBonds(gd, drawn, staticOff, explicitBans = new Set()) {
   const off = new Set([...drawn, ...staticOff]);
   const banned = [...explicitBans];
   for (const id of gd.visibleChess) {
+    if (explicitBans.has(id)) continue;
     const c = gd.chess(id);
     const allBonds = Array.isArray(c.bonds) ? c.bonds : [];
     // Personal recruitment does not bypass core bans; auxiliary bonds cannot rescue a banned single-core recruit.
-    const cores = c.optionalRecruit ? allBonds.filter(b => gd.bond(b)?.isCore) : [];
-    const bonds = cores.length ? cores : allBonds;
-    if (!explicitBans.has(id) && bonds.length > 0 && bonds.every((b) => off.has(b))) banned.push(id);
+    const cores = !gd.regulationBondDraw && c.optionalRecruit ? allBonds.filter(b => gd.bond(b)?.isCore) : [];
+    if (cores.length ? cores.every((b) => off.has(b)) : gd.bondsExclude(c, off)) banned.push(id);
   }
-  return { drawn, staticOff, banned };
-=======
-  if (gd.regulationBondDraw) {
-    // Solo: two groups of half the core bonds (owner's level 1: 4 + 4; recordings: 规程等级1 / 极速 4 + 4, 规程等级20 5 + 5);
-    // an odd leftover stays active. Co-op greys the profile's `bans.core` (recordings 2026-11-12: 标准 0 of 8 in two
-    // matches of BV11NW869ELq, 险境 / 绝境 / 终极 5 of 10); LOCAL training keeps its configured counts too.
-    const half = Math.floor(core.length / 2);
-    const shuffled = sample(core, core.length, rng);
-    const choice = gd.isSolo ? { groups: [shuffled.slice(0, half), shuffled.slice(half, half * 2)], picked: null } : null;
-    const coreOff = choice ? [] : shuffled.slice(0, nCore);
-    const drawn = [...coreOff, ...sample(addon, nAddon, rng)].sort();
-    return { drawn, staticOff, banned: bannedChessForBonds(gd, drawn, staticOff), ...(choice ? { choice } : {}) };
-  }
-  const drawn = [...sample(core, nCore, rng), ...sample(addon, nAddon, rng)].sort();
-  return { drawn, staticOff, banned: bannedChessForBonds(gd, drawn, staticOff) };
-}
-
-/** Shared by the initial draw and a solo group's choice; no RNG or stock is consumed. */
-export function bannedChessForBonds(gd, drawn, staticOff) {
-  const off = new Set([...drawn, ...staticOff]);
-  return gd.visibleChess.filter(id => gd.bondsExclude(gd.chess(id), off));
->>>>>>> theirs
+  return banned;
 }
 
 function sample(arr, n, rng) {

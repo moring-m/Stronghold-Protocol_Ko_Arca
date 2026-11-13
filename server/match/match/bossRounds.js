@@ -9,12 +9,8 @@ import { PHASE, GEO } from '../../../shared/constants.js';
 import { createRng, deriveSeed } from '../../sim/rng.js';
 import { creditedKillsOf } from '../../sim/spec.js';
 import { buildBossWave, bountySpawns } from '../waves.js';
-<<<<<<< ours
-import { pairPlayers, bossPoolHp, SharedBossPool, CreditPool, hiddenEligible, BOSS_HIT_STEPS } from '../finalAssault.js';
-=======
 import { pairPlayers, bossPairSalt, bossPoolHp, SharedBossPool, CreditPool, hiddenEligible, BOSS_HIT_STEPS } from '../finalAssault.js';
 import { cleanLeaderOps, syncFieldLeaderOps, leaderTopRows, regulationLeaderRank } from '../leaderRank.js';
->>>>>>> theirs
 import { FieldRunner, HeadlessPacer, syntheticResult, BOSS_SILENCE_MS, CATCHUP_TICKS_PER_INTERVAL } from '../fields.js';
 import { FLOW_TICKER_PRIORITY, BOSS_CLOCK_MS, DELAYS } from './common.js';
 
@@ -69,15 +65,11 @@ export class MatchBoss {
       },
     });
     this.bossPool = pool;
-<<<<<<< ours
-    const groups = pairPlayers(alive, createRng(deriveSeed(this.seed, 'boss-pairs')), this.bossPairs);
-=======
     // 规程 only: the operator tally lives on this pool. A new pool (the hidden round) starts empty.
     // 盟约 keeps the pool without the map, so m.public grows no field. [ASSUMED] the ranking is not in 盟约 recordings.
     if (regulationLeaderRank(this.gd)) pool.ops = new Map();
     // the round's plan (_planBossWaves: the Hidden Core's own draw, GitHub #845); a departure since keeps intact pairs
     const groups = pairPlayers(alive, createRng(deriveSeed(this.seed, bossPairSalt(this.gd, this.round))), this.bossPairs);
->>>>>>> theirs
     this.bossPairs = groups.map(g => g.map(p => p.playerId));
     const reuse = this.bossWaves && this.bossWaves.length === groups.length && this.bossWaves.every((w, i) => w.players.join() === groups[i].map((p) => p.playerId).join());
     this.fields = groups.map((g, i) => {

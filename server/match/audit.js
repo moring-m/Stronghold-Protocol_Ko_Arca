@@ -67,11 +67,7 @@ export function attachAudit(m, { invariants = true, limit = 200 } = {}) {
     audit.checks++;
     try { fn(); } catch (e) { fail(`audit ${label} threw: ${e && e.message}`); }
   };
-<<<<<<< ours
-  const carries = (ps) => gd.keepsFunds(ps.bandId);
-=======
   const carries = (ps) => keepsFunds(ps);
->>>>>>> theirs
   const wrap = (obj, name, around) => {
     const orig = obj[name];
     if (typeof orig !== 'function') return;
@@ -315,13 +311,9 @@ export function attachAudit(m, { invariants = true, limit = 200 } = {}) {
     check('bands', () => {
       for (const ps of m.order) {
         if (!ps.bandId || !gd.bandAllowed(ps.bandId)) fail(`${ps.playerId}: band ${ps.bandId} not allowed`);
-<<<<<<< ours
-        if (ps.lp !== gd.startLp(ps.bandId)+(ps.randomBandBonus||0)) fail(`${ps.playerId}: LP ${ps.lp} != totalHp ${gd.startLp(ps.bandId)} of ${ps.bandId}`);
-=======
-        // a seat gone before its pick keeps the 0 LP it left with (§37.65)
-        if (!ps.alive) { if (ps.lp !== 0) fail(`${ps.playerId}: LP ${ps.lp} of a departed seat`); continue; }
-        if (ps.lp !== gd.startLp(ps.bandId)) fail(`${ps.playerId}: LP ${ps.lp} != totalHp ${gd.startLp(ps.bandId)} of ${ps.bandId}`);
->>>>>>> theirs
+          // a seat gone before its pick keeps the 0 LP it left with (§37.65)
+          if (!ps.alive) { if (ps.lp !== 0) fail(`${ps.playerId}: LP ${ps.lp} of a departed seat`); continue; }
+          if (ps.lp !== gd.startLp(ps.bandId)+(ps.randomBandBonus||0)) fail(`${ps.playerId}: LP ${ps.lp} != totalHp ${gd.startLp(ps.bandId)} of ${ps.bandId}`);
       }
       expectDeadline(gd.timer('battleCheck'), 'BATTLE_CHECK', { silentSolo: true });
     });

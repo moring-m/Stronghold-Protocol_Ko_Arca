@@ -10,7 +10,6 @@ import { createRng } from '../sim/rng.js';
 //     RIGHT side (the sim mirrors the right side: board col c → field col 20 − c with the piece direction RIGHT ↔
 //     LEFT, UP / DOWN unchanged (DESIGN §3, research 09 §1.2 ConvertChessPositionInfoToBossMap); board rows 9–12 →
 //     boss rows 2–5, sim/constants BOSS_ROW_OFFSET). `bossFieldPlacement` gives that mapping for UIs / tools.
-<<<<<<< ours
 //   * Shared boss HP pool (DESIGN §20.10, GameData.bossPoolShare): one pool shared by every boss field (official tip
 //     "所有人将一起对敌方领袖造成伤害"); co-op = bloodPoint[difficulty] whatever the number of alive players (notice 5114's
 //     "敌方领袖的总生命值不变" is about the mirrored copies of a pair field sharing it, not about that number); config
@@ -19,19 +18,6 @@ import { createRng } from '../sim/rng.js';
 //   * Overtime: bossTurnHpReduceTime counts REAL seconds like the level's 120 s maxPlayTime (which runs out first; the
 //     battle goes on): from 150 real s (300 game s on the 2× field clock) the team loses bossOvertimeDrainPerSec (1) LP
 //     per real second (gamedata.js bossOvertimeDue); m.public.deadline = the 120 s countdown, m.public.overtimeAt = the
-=======
-//   * Shared boss HP pool (DESIGN §20.10, §25.13.4, gamedata.js bossPoolShareOf): one pool shared by every boss field
-//     (official tip "所有人将一起对敌方领袖造成伤害"; notice 5114's "敌方领袖的总生命值不变" is about the mirrored copies of
-//     a pair field sharing it) = bloodPoint[difficulty] × the players alive when the fight starts (bots and AI 托管 seats
-//     count, eliminated and departed seats do not; solo × 1) — the owner's decision of 2026-10-06, adopting PR #209 by
-//     @qingjingshenghuo, which replaces the fixed pool of 「保持固定血量」 (config bossHpScale perPlayer false / solo 0.25
-//     restores it); × the tuning bossHpMul when data/tuning.json still has one (docs/BALANCE.md); bosses are never scaled
-//     by enemyScale and their parts / escorts keep their own HP.
-//   * Overtime: REAL seconds. Without AI teammates (solo bots included), drain starts at the visible 120 s deadline;
-//     teams with AI teammates retain the official bossTurnHpReduceTime grace to 150 s (history §29.1, maintainer
-//     decision). The team loses bossOvertimeDrainPerSec (1) LP per real second (gamedata.js bossOvertimeDue);
-//     m.public.deadline = the 120 s countdown, m.public.overtimeAt = the
->>>>>>> theirs
 //     drain start. Minion / boss leaks cost their `lpr`; team LP 0 ⇒ defeat (all fields force-ended; PRTS 卫戍协议：盟约 下半
 //     "…使目标生命值扣除至0，则无视倒计时直接失败"); pool 0 ⇒ victory. The first of the two the server registers decides
 //     (Match._finalEnding): a report that arrives after the team LP ran out credits nothing (user playtest #6 item 5).
@@ -70,6 +56,11 @@ export function bossFieldPlacement(side, row, col, dir = 'RIGHT') {
 }
 
 /** Seeded initial pairing; `previous` carries player-id pairs through prep, combat and Hidden Core. */
+/** The pairing seed's salt: the hidden round past the boss round draws its own pairs (upstream). */
+export function bossPairSalt(gd, round) {
+  return round === gd.hiddenRound && round !== gd.bossRound ? `boss-pairs:${round}` : 'boss-pairs';
+}
+
 export function pairPlayers(alive, rng = createRng(0), previous = null) {
   const sorted = alive.slice().sort((a, b) => a.seat - b.seat);
   const groups = [];

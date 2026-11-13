@@ -252,20 +252,13 @@ export class EffectDispatcher {
       // 1. globals
       for (const [key, h] of reg.globals()) this._call(ps, key, h, hook, { kind: 'global', key }, ev);
       // 2. band
-<<<<<<< ours
       // Personal and common strategies are separate effect sources, even when
-      // they select the same strategy (e.g. two Quintus cells at round three).
+      // they select the same strategy (e.g. two Quintus cells at round three). A 规程 command replaces the own band.
       for(const [index,bandId] of [ps.bandId,...(this.m.gd.config.commonBands||[])].entries()) {
         if(!bandId)continue;
         const key = `band:${bandId}`;
-        const h = reg.get(key) ?? reg.get(`band:${this.m.gd.band(bandId)?.effectRef}`);
+        const h = (index===0 ? commandMetaHandler(ps) : null) ?? reg.get(key) ?? reg.get(`band:${this.m.gd.band(bandId)?.effectRef}`);
         if (h) this._call(ps, key, h, hook, { kind: 'band', key, common:index>0, bandId, band: this.m.gd.band(bandId) }, ev);
-=======
-      if (ps.bandId) {
-        const key = `band:${ps.bandId}`;
-        const h = commandMetaHandler(ps) ?? reg.get(key) ?? reg.get(`band:${this.m.gd.band(ps.bandId)?.effectRef}`);
-        if (h) this._call(ps, key, h, hook, { kind: 'band', key, bandId: ps.bandId, band: this.m.gd.band(ps.bandId) }, ev);
->>>>>>> theirs
       }
       // 3. bonds
       for (const bondId of this.m.gd.bondIds) {
@@ -365,11 +358,7 @@ export class EffectDispatcher {
       if (ev && ev.slot && ev.slot.kind === 'chess') run({ uid: 0, kind: 'chess', id: ev.slot.id, items: [] }, 'shop');
       return;
     }
-<<<<<<< ours
-    if (hook !== 'onRoundStart' && hook !== 'onPrepStart' && hook !== 'onPrepEnd' && hook !== 'onRefresh') return;
-=======
     if (hook !== 'onPrepStart' && hook !== 'onRoundStart' && hook !== 'onPrepEnd' && hook !== 'onRefresh' && hook !== 'onBattleResult') return;
->>>>>>> theirs
     if (refreshed) {
       for (const { piece, area } of refreshed) {
         const loc = ps.find(piece.uid);
@@ -554,12 +543,8 @@ export function makeCtx(m, ps, source, hook, ev = null, preview = null) {
     funds: () => ps.funds,
     lp: () => ps.lp,
     alive: () => ps.alive,
-<<<<<<< ours
     bandId: () => source.kind==='band'?source.bandId:ps.bandId,
-=======
-    bandId: () => ps.bandId,
     commandEffectId: ps.command?.currentEffectId ?? null,
->>>>>>> theirs
     teamMedicGranted: () => m.teamMedicGranted(),
     shopLevel: () => ps.shop.level,
     bond: (id) => (ps.bonds[id] ? { ...ps.bonds[id] } : null),

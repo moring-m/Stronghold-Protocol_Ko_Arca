@@ -180,13 +180,10 @@ const ITEM_HANDLERS = {
     onEquip(ctx, ev) {
       const target = ctx.piece(ev.target.uid);
       if (!target) return;
-<<<<<<< ours
       if(ctx.gd.chess(target.id)?.optionalRecruit){ev.error='BAD_TARGET';ev.detail='선발 오퍼레이터에게는 비콘을 사용할 수 없습니다.';ev.keep=true;return;}
-=======
       // Official text ends 「无法装备给自编干员」. Refuse before the carrier is destroyed (the equip gate does this
       // first; this is the same backstop as the act1 and 规程 beacon keys).
       if (chessIsDiy(ctx.chessRecord(target.id))) { ev.error = 'BAD_TARGET'; ev.detail = 'diy'; return; }
->>>>>>> theirs
       const tier = ctx.gd.tierOf(target.id);
       const n = Math.max(1, int(paramsOf(ctx, ev.item).refresh_cnt, 2));
       const bonds = ctx.pieceBonds(target.uid);
@@ -218,8 +215,6 @@ const ITEM_HANDLERS = {
       }
     },
   },
-<<<<<<< ours
-=======
   sell_char_count_gain_equip_owner_original: {
     onSold(ctx) {
       const { piece, holder } = ctx.source;
@@ -254,7 +249,6 @@ const ITEM_HANDLERS = {
       }
     },
   },
->>>>>>> theirs
   // 突变细胞 "战斗结束后，装备者替换为高一阶的随机干员": PRTS 卫戍协议：盟约 下半/PRTS盟约记录 备注 "生效时，原干员销毁，获得
   // 一名高一阶的随机初始干员（最高六阶）" — the carrier (deployed or on the bench) is destroyed and a random NORMAL operator
   // one tier higher (at most 6; an elite carrier too) is gained like any gained operator: into the 整备区 (overflow temp),

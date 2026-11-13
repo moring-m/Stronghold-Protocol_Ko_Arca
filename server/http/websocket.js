@@ -26,11 +26,11 @@ export const WS_MAX_PAYLOAD = 2 * 1024 * 1024;
  *   gameplay plugins plays in (DESIGN §32.6)
  * @returns {{ registry: SessionRegistry, lobby: Lobby, network: Network }}
  */
-export function createSessionStack(opts, { data, log, content = null, plugins = null, hosts = null }) {
+export function createSessionStack(opts, { data, log, content = null, plugins = null, hosts = null, versions = null, versionHosts = null, simPool = null }) {
   const netOptions = netOptionsFrom(opts);
   const registry = new SessionRegistry({ reconnectWindowMs: netOptions.reconnectWindowMs ?? NET_DEFAULTS.reconnectWindowMs });
   const lobbyOptions = lobbyOptionsFrom(opts);
-  const lobby = new Lobby({ registry, log, MatchClass: opts.MatchClass, getData: () => data, seedFn: opts.seedFn, content, plugins, hosts, options: lobbyOptions });
+  const lobby = new Lobby({ registry, log, MatchClass: opts.MatchClass, getData: () => data, seedFn: opts.seedFn, content, plugins, hosts, versions, versionHosts, simPool, options: lobbyOptions });
   const network = new Network({ registry, handler: lobby, log, options: netOptions });
   return { registry, lobby, network };
 }

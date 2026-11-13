@@ -144,8 +144,6 @@ export class MatchOffers {
     w.picks.set(ps.playerId, { idx, timeout: true });
   }
 
-<<<<<<< ours
-=======
   _offerBot(ps, w) {
     const fallback = () => {
       this._offerDefault(ps, w);
@@ -157,7 +155,6 @@ export class MatchOffers {
     this._offerDefault(ps, w);
   }
 
->>>>>>> theirs
   _offerSettleIfDone(w) {
     if (w.closed) return;
     const total = this._offerParticipants(w).length;

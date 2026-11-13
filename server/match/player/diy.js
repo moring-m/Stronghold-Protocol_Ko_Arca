@@ -1,7 +1,3 @@
-import {KITTED_CHARS} from "../../sim/content/kits/index.js";
-import {checkDiyPicks} from "../../../shared/protocol.js";
-import {diyRecord} from "../../../shared/diy.js";
-import {diySlot} from "../../../shared/diy.js";
 // server/match/player/diy.js — PlayerState methods: 自选编队 (0.2.0 DIY; research 0.2.0 §2, the owner's decisions of
 // 2026-10-05) — the human's picks for the four DIY slots and what a slotted operator changes in the player's own state.
 //   * setDiy: the seat's picks when the match started (seats[].diy, server/lobby.js room.diy), re-checked against this
@@ -49,8 +45,6 @@ import {diySlot} from "../../../shared/diy.js";
 // Installed on PlayerState.prototype by server/match/PlayerState.js (a method container: never instantiated; `this` is
 // the player state).
 
-<<<<<<< ours
-=======
 import { KITTED_CHARS } from '../../sim/content/kits/index.js';
 import { checkDiyPicks } from '../../../shared/protocol.js';
 import { diyRecord, diySlot, diyTokenOwner, diyPool, diySlotIds, isPrototypePick } from '../../../shared/diy.js';
@@ -78,13 +72,44 @@ export class DiyStock {
     /** @type {Map<string, { cap: number, left: number, tier: number, shopLevel: number }>} */
     this.entries = new Map();
   }
->>>>>>> theirs
 
+  has(baseId) { return this.entries.has(baseId); }
+  cap(baseId) { return this.entries.get(baseId)?.cap ?? 0; }
+  left(baseId) { return Math.max(0, this.entries.get(baseId)?.left ?? 0); }
 
-import { atPotential } from '../../../shared/potential.js';
-import { diyTokenOwner } from '../../../shared/diy.js';
-const posIntOr=(v,d)=>Number.isInteger(v)&&v>0?v:d;
-const isObj=v=>!!v&&typeof v==='object'&&!Array.isArray(v);
+  /** Take up to n copies; returns the number taken (0 for a base id without stock). */
+  take(baseId, n = 1, { overdraw = false } = {}) {
+    const e = this.entries.get(baseId);
+    if (!e || !(n > 0)) return 0;
+    const k = overdraw ? Math.floor(n) : Math.min(Math.max(0, e.left), Math.floor(n));
+    e.left -= k;
+    return k;
+  }
+
+  /** Return n copies (clamped at the cap); returns the number returned. */
+  give(baseId, n = 1) {
+    const e = this.entries.get(baseId);
+    if (!e || !(n > 0)) return 0;
+    const k = Math.min(e.cap - e.left, Math.floor(n));
+    e.left += k;
+    return k;
+  }
+
+  /** { baseId: left } (tests / diagnostics). */
+  snapshot() {
+    const o = {};
+    for (const [id, e] of this.entries) o[id] = Math.max(0, e.left);
+    return o;
+  }
+}
+
+/**
+ * The player's view of the match's GameData (see the header): `records` maps the ids of the slotted slots (normal and
+ * elite) to their composed 自选 records; every other lookup is the match's own.
+ * @param {import('../gamedata.js').GameData} gd
+ * @param {Map<string, object>} records
+ * @returns {import('../gamedata.js').GameData}
+ */
 export function diyGameData(gd, records) {
   const view = Object.create(gd);
   const backups = isObj(gd.raw && gd.raw.backups) ? gd.raw.backups : null;
@@ -293,41 +318,5 @@ export class PlayerDiy {
   diyPickOf(id) {
     const rec = this._diyRecords && typeof id === 'string' ? this._diyRecords.get(id) : null;
     return rec ? this.diy[rec.diyFor] ?? null : null;
-  }
-}
-
-export class DiyStock {
-  constructor() {
-    /** @type {Map<string, { cap: number, left: number, tier: number, shopLevel: number }>} */
-    this.entries = new Map();
-  }
-
-  has(baseId) { return this.entries.has(baseId); }
-  cap(baseId) { return this.entries.get(baseId)?.cap ?? 0; }
-  left(baseId) { return Math.max(0, this.entries.get(baseId)?.left ?? 0); }
-
-  /** Take up to n copies; returns the number taken (0 for a base id without stock). */
-  take(baseId, n = 1, { overdraw = false } = {}) {
-    const e = this.entries.get(baseId);
-    if (!e || !(n > 0)) return 0;
-    const k = overdraw ? Math.floor(n) : Math.min(Math.max(0, e.left), Math.floor(n));
-    e.left -= k;
-    return k;
-  }
-
-  /** Return n copies (clamped at the cap); returns the number returned. */
-  give(baseId, n = 1) {
-    const e = this.entries.get(baseId);
-    if (!e || !(n > 0)) return 0;
-    const k = Math.min(e.cap - e.left, Math.floor(n));
-    e.left += k;
-    return k;
-  }
-
-  /** { baseId: left } (tests / diagnostics). */
-  snapshot() {
-    const o = {};
-    for (const [id, e] of this.entries) o[id] = Math.max(0, e.left);
-    return o;
   }
 }

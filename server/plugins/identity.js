@@ -140,3 +140,27 @@ export function contentIndexOf(content) {
     sim: content.sim, simFiles: { ...content.simFiles }, data, plugins: [], settings: {},
   };
 }
+
+
+/**
+ * The content of an official version (DESIGN §35.23, M1): the vanilla content's code (`app`, `sim`, `simFiles` — the
+ * browser runs the same sim) with the version's own data files (gameplayDataFiles of its directory: the 16 gameplay
+ * tables, no art manifest) and `cs = contentHashOf({ app, sim, data })`. Hashes the bytes only (no JSON parse). No index:
+ * server/versions.js writes it (contentIndexOf with the version's URL and bounds). Null when the directory has no data file.
+ * @param {{ vanilla: VanillaContent, dataDir: string, dataUrl: string, version: string, hash?: (bytes: Buffer) => string,
+ *   log?: { warn: Function } }} opts dataDir: the version's directory; dataUrl: its URL prefix ('/data/versions/<slug>/')
+ * @returns {(Omit<VanillaContent, 'index'> & { version: string, dataUrl: string }) | null}
+ */
+export function versionContentOf({ vanilla, dataDir, dataUrl, version, hash = nodeSha256, log = noopLog }) {
+  /** @type {VanillaContent['data']} */
+  const data = {};
+  for (const f of gameplayDataFiles(dataDir)) {
+    try {
+      const buf = fs.readFileSync(f.abs);
+      data[f.name] = { file: f.file, sha256: hash(buf), bytes: buf.length };
+    } catch (e) { log.warn(`[versions] cannot read ${version} ${f.file}: ${e?.code || e?.message || e}`); }
+  }
+  if (!Object.keys(data).length) return null;
+  const cs = contentHashOf({ app: vanilla.app, sim: vanilla.sim, data: Object.fromEntries(Object.entries(data).map(([k, v]) => [k, v.sha256])) });
+  return { cs, app: vanilla.app, vanilla: true, sim: vanilla.sim, simFiles: { ...vanilla.simFiles }, data, version, dataUrl };
+}

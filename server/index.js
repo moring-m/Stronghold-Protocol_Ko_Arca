@@ -41,13 +41,13 @@ import { workerControls } from './release/runtime.js';
 import http from 'node:http';
 import path from 'node:path';
 import { getData, loadData } from './data.js';
-<<<<<<< ours
-import { ROOT, listenAddress, bindCandidates, serveDirs, makeLogger, parseTrustProxy, assetIndexOptionsFrom } from './http/config.js';
-=======
 import { getBotStrategy, getBotStrategySeats } from './match/botStrategies.js';
 import { noteLlmIgnored, releaseIgnoresExternalAi, validateExternalConfig } from './match/llmGate.js';
 import { ROOT, listenAddress, bindCandidates, serveDirs, makeLogger, parseTrustProxy, assetIndexOptionsFrom, versionsFrom, parseRoomCode } from './http/config.js';
->>>>>>> theirs
+import { createVersionSets } from './versions.js';
+import { versionById } from '../shared/versions.js';
+import { t } from '../shared/i18n.js';
+import { createRoomWorkerPool } from './workers/roomPool.js';
 import { WS_MAX_PAYLOAD, createSessionStack, attachWebSocket } from './http/websocket.js';
 import { siteCsp } from './http/csp.js';
 import { DATA_SHIM_JS, createStaticHandler } from './http/static.js';
@@ -104,8 +104,6 @@ export {
  *                     close: () => Promise<void> }>}
  */
 export async function startServer(opts = {}) {
-<<<<<<< ours
-=======
   // A release ignores external-AI settings (one log line) and keeps the built-in bot (§35.66).
   // An unknown strategy id still fails here, before data is loaded or the port is opened.
   const log = opts.log || makeLogger(!!opts.quiet);
@@ -122,9 +120,7 @@ export async function startServer(opts = {}) {
   } catch (cause) {
     throw new Error(`Invalid SP_BOT_STRATEGY_SEATS: ${cause.message}. Unset SP_BOT_STRATEGY_SEATS to use SP_BOT_STRATEGY for every seat.`, { cause });
   }
->>>>>>> theirs
   const { port, host } = listenAddress(opts);
-  const log = opts.log || makeLogger(!!opts.quiet);
   const { publicDir, dataDir, sharedDir, packsDir, pluginsDir } = serveDirs(opts);
   const simDir = path.join(ROOT, 'server', 'sim');
 
@@ -160,8 +156,14 @@ export async function startServer(opts = {}) {
   // an out-of-memory abort in a worker thread ends the whole server)
   const transport = String(process.env.SP_MATCH_HOST || '').trim().toLowerCase() === 'worker' ? 'worker' : 'process';
   const hosts = createMatchHosts({ contents, log, options: { transport, maxWorkers: Math.max(1, policy.get().maxSets), ...(opts.matchHost || {}) } });
-<<<<<<< ours
-  const { registry, lobby, network } = createSessionStack(opts, { data, log, content, plugins: roomSets, hosts });
+  // the official versions (DESIGN §35.23, M1): which ones, their content, and — only when one beyond 第二期下半 is
+  // enabled — the match hosts their rooms play in (counted apart from the plugin hosts)
+  const versionHosts = versions.nonDefault.length
+    ? createMatchHosts({ contents: versions, log, options: { transport, ...(opts.matchHost || {}), kind: 'version', maxWorkers: Math.max(1, versionCfg.maxHosts) } })
+    : null;
+  log.info(`[versions] enabled: ${versions.ids.map((id) => `${id} (${t(/** @type {any} */ (versionById(id)).label)}${id === versions.defaultId ? ', default' : ''})`).join(', ')}`);
+  const simPool = createRoomWorkerPool({ data });
+  const { registry, lobby, network } = createSessionStack(opts, { data, log, content, plugins: roomSets, hosts, versions, versionHosts, simPool });
   // Opt-in diagnostics: bounded local logs, no extra simulation worker or public health fields.
   const eventLoop = createEventLoopMonitor({log,windowMs:opts.loopSample?.windowMs,counts:()=>{
     const stats=lobby.stats(),phases=new Set();let rehearsals=0;
@@ -171,37 +173,7 @@ export async function startServer(opts = {}) {
   const releaseControl=release?workerControls(lobby,{release,token:releaseToken,network}):null;
   // 점검 안내 without the release gateway (local / single-process servers): this machine only, no forwarded client
   const localMaintenance=release?null:localMaintenanceControl(lobby,registry);
-  const serveStatic = createStaticHandler({ publicDir, dataDir, sharedDir, simDir, packsDir, pluginsDir, packs, content, log, assetIndex, views, visual, contents });
-=======
-  // the official versions (DESIGN §35.23, M1): which ones (the option, else SP_VERSIONS …), their content, and — only
-  // when one beyond 第二期下半 is enabled — the match hosts their rooms play in (counted apart from the plugin hosts)
-  // (the test options of matchHost apply to both pools, but never the version pool's kind or its own SP_MAX_VERSION_HOSTS)
-  const versionHosts = versions.nonDefault.length
-    ? createMatchHosts({ contents: versions, log, options: { transport, ...(opts.matchHost || {}), kind: 'version', maxWorkers: Math.max(1, versionCfg.maxHosts) } })
-    : null;
-  log.info(`[versions] enabled: ${versions.ids.map((id) => `${id} (${t(/** @type {any} */ (versionById(id)).label)}${id === versions.defaultId ? ', default' : ''})`).join(', ')}`);
-  const simPool = createRoomWorkerPool({ data });
-  const { registry, lobby, network } = createSessionStack(opts, { data, log, content, plugins: roomSets, hosts, versions, versionHosts, simPool });
-  // Main-thread event-loop delay sampling (server/health/eventLoop.js): opt-in with SP_LOOP_SAMPLE=1, no worker pool involved, and a
-  // LOCAL log line per window (`[loop] p50=… p95=… p99=… max=… cpu=… mem=… rooms=… humans=… phase=…`) — deliberately not
-  // part of /healthz. This is what tells an operator whether a stall is the rehearsal / battle slice or something else.
-  const eventLoop = createEventLoopMonitor({
-    log,
-    windowMs: opts.loopSample?.windowMs,
-    counts: () => {
-      const s = lobby.stats();
-      const phases = new Set();
-      let rehearsals = 0;
-      for (const room of lobby.rooms.values()) {
-        if (room.match?.phase) phases.add(room.match.phase);
-        rehearsals += room.match?._rehearsalTasks?.size || 0;
-      }
-      return { rooms: s.rooms, matches: s.matches, humans: s.humans, spectators: s.spectators,
-        phase: [...phases].sort().join('+') || 'idle', rehearsals };
-    },
-  });
   const serveStatic = createStaticHandler({ publicDir, dataDir, sharedDir, simDir, packsDir, pluginsDir, packs, content, log, assetIndex, views, visual, contents, versions });
->>>>>>> theirs
   // the plugin studio (DESIGN §32.9): its page and API for this machine and the local network; it watches plugins/ only
   // once it is used (hot reload), and rooms whose host is the author or alone follow a plugin's changes by themselves
   const studio = opts.studio === false ? null : createStudio({ publicDir, pluginsDir, dataDir, registry: packs, lobby, sessions: registry, log, fetch: opts.fetch });

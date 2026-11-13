@@ -26,13 +26,10 @@ export const roomSeatCap = mode => mode === 'solo' ? 1 : mode === 'coop8' ? 8 : 
  * Cooperative rooms always allow up to eight spectators. The legacy create field remains range-validated
  * for old clients but no longer changes or disables cooperative spectator seats. Solo rooms have no spectators.
  */
-<<<<<<< ours
 export const MAX_SPECTATORS = 8;
 export const MAX_SPECTATOR_SEATS = 8;
 /** Legacy request validation; cooperative rooms always use MAX_SPECTATOR_SEATS. */
 export const isSpectatorCap = (v) => Number.isInteger(v) && v >= 0 && v <= MAX_SPECTATOR_SEATS;
-=======
-export const MAX_SPECTATORS = 2;
 /**
  * The most candidate layouts one bot prep rehearses (server/match/bot.js arrangeSteps): up to 8 of its own plus the
  * other lineups' (Final Assault damage lineups and spaced plans, co-op alternatives); a delegated rehearsal's answer
@@ -44,7 +41,6 @@ export const REHEARSAL_MAX_CANDIDATES = 16;
  * client's refusal toast (ui/toasts.js) names the server's value (server/match/match/setupVote.js).
  */
 export const SETUP_REROLL_COOLDOWN_MS = 30_000;
->>>>>>> theirs
 export const ROOM_CODE_LEN = 4;
 export const NAME_MAX_LEN = 12;
 
@@ -60,11 +56,8 @@ export const PHASE = Object.freeze({
   LOBBY: 'LOBBY',
   INFO_CHECK: 'INFO_CHECK',
   BAND_DRAFT: 'BAND_DRAFT',
-<<<<<<< ours
   RECRUIT_PICK: 'RECRUIT_PICK',
-=======
   CUSTOM_CHECK: 'CUSTOM_CHECK',
->>>>>>> theirs
   BATTLE_CHECK: 'BATTLE_CHECK',
   ROUND_START: 'ROUND_START',
   SP_DRAFT: 'SP_DRAFT',
@@ -78,15 +71,9 @@ export const PHASE = Object.freeze({
 });
 
 export const PHASE_NAMES = {
-<<<<<<< ours
-  LOBBY: '等待中', INFO_CHECK: '确认本局信息', BAND_DRAFT: '选择策略', RECRUIT_PICK: '선발 선택', BATTLE_CHECK: '协议启动',
-  ROUND_START: '回合开始', SP_DRAFT: '机变阶段', PREP: '休整期', COMBAT: '作战中', UNITE: '联防阶段',
-  SETTLE: '结算', FINAL_ASSAULT: '最终攻势', HIDDEN_CORE: '隐秘核心', RESULT: '模拟结束',
-=======
-  LOBBY: N_('等待中'), INFO_CHECK: N_('确认本局信息'), BAND_DRAFT: N_('选择策略'), CUSTOM_CHECK: N_('选择自编'), BATTLE_CHECK: N_('协议启动'),
+  LOBBY: N_('等待中'), INFO_CHECK: N_('确认本局信息'), BAND_DRAFT: N_('选择策略'), RECRUIT_PICK: '선발 선택', CUSTOM_CHECK: N_('选择自编'), BATTLE_CHECK: N_('协议启动'),
   ROUND_START: N_('回合开始'), SP_DRAFT: N_('机变阶段'), PREP: N_('休整期'), COMBAT: N_('作战中'), UNITE: N_('联防阶段'),
   SETTLE: N_('结算'), FINAL_ASSAULT: N_('最终攻势'), HIDDEN_CORE: N_('隐秘核心'), RESULT: N_('模拟结束'),
->>>>>>> theirs
 };
 
 // Board geometry on the 19x21 stage grid (row 0 = bottom). See DESIGN §3.
@@ -257,12 +244,9 @@ export const ERR_TEXT = {
   TEST_CONFIRM: N_('这是测试房间，不计入任何记录。确认加入？'),
   TEST_DISABLED: N_('测试模式未开启'),
   TEST_FORBIDDEN: N_('这不是测试房间'),
-<<<<<<< ours
-=======
   VERSION_UNKNOWN: N_('本服务器没有启用该版本'),
   VERSION_UNSUPPORTED: N_('该版本不能用于当前房间，请检查模拟方式与插件支持的版本'),
   VERSION_VOTE: N_('切换版本投票进行中，请等投票结束'),
->>>>>>> theirs
 };
 
 // ---- Emotes (交流, research 09 §4) -----------------------------------------------------------------------------
