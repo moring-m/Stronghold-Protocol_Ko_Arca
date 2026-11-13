@@ -9,7 +9,7 @@ import path from 'node:path';
 import { Match } from '../../server/match/Match.js';
 import { VirtualScheduler, RealScheduler } from '../../server/match/scheduler.js';
 import { getData } from '../../server/data.js';
-import { llmIntegrationEnabledNow } from '../../server/match/llmGate.js';
+import { llmIntegrationEnabledNow } from '../../server/match-upstream/llmGate.js';
 import { traceLayers } from './layer-trace.mjs';
 import { runMatch } from './run-match.mjs';
 import { seatDir, writeJSON, publish, readJSON } from './manual-files.mjs';

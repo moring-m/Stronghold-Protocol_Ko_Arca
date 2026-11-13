@@ -6,7 +6,7 @@ import { appendFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
 import { httpDecision, safeHeaders } from '../../server/ai/transport.js';
-import { validPlan } from '../../server/match/aiPlan.js';
+import { validPlan } from '../../server/match-upstream/aiPlan.js';
 import { compactDigest, compactChoices, continuity, focusPlan, mainAtFive, bandTable, draftDigest } from './llm-context.mjs';
 import { filterKeep, repairPlan, shortText } from './llm-plan.mjs';
 import { slimKnowledge } from './llm-knowledge.mjs';

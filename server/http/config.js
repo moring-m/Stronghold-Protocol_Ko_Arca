@@ -224,8 +224,8 @@ export function versionsFrom(opts, log = null) {
   const enabled = VERSIONS.map((v) => v.id).filter((id) => ids.includes(id));
   const envDefault = String(process.env.SP_VERSION_DEFAULT ?? '').trim();
   const want = o.default != null ? String(o.default).trim() : (envDefault || null);
-  // unset: the lobby preselects the running season (LOBBY_DEFAULT_VERSION) when enabled, else 第二期下半, else the first
-  let def = want ?? [LOBBY_DEFAULT_VERSION, DEFAULT_VERSION].find((id) => enabled.includes(id)) ?? enabled[0];
+  // unset: the fork plays 맹약 第二期下半 by default (rooms choose another season themselves), else the first
+  let def = want ?? [DEFAULT_VERSION, LOBBY_DEFAULT_VERSION].find((id) => enabled.includes(id)) ?? enabled[0];
   if (!enabled.includes(def)) {
     log?.warn?.(`[versions] default version "${def}" is not enabled, using ${enabled[0]}`);
     def = enabled[0];

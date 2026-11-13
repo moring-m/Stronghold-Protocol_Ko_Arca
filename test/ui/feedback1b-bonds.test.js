@@ -118,33 +118,7 @@ test('the game screen hands the mode-disabled set to the shop bar, the detail ca
   assert.match(src, /const offBonds = modeOffBonds\(getMode\(pub\?\.modeId\)\)/);
   assert.match(src, /<\$\{ShopBar\}[\s\S]*?offBonds=\$\{offBonds\}/);
   assert.match(src, /<\$\{DetailPanel\}[\s\S]*?offBonds=\$\{offBonds\}/);
-  assert.match(src, /<\$\{bondOpen\?\.from === 'info' \? MatchBondDialog : BondPopup\}[\s\S]*?off=\$\{offBonds\.has\(bondPop\.bondId\)\}/);
-});
-
-test('the bond popup closes on outside presses, while its own region and toggle triggers handle themselves', () => {
-  const src = read('public/js/screens/game.js');
-  assert.match(src, /const screen = hudElRef\.current\?\.parentElement/);
-  assert.match(src, /if \(!live\.current\.bondOpen \|\| e\.target\?\.closest\?\.\('\.bpop, \.bslot, \.dbond, \.ibond'\)\) return;\s+setBondOpen\(null\)/);
-  assert.match(src, /screen\.addEventListener\('pointerdown', onDown, true\)/);
-  assert.match(src, /screen\.removeEventListener\('pointerdown', onDown, true\)/);
-});
-
-test('hidden-layer bonds show activation and tiers without a stack badge or layer count', () => {
-  for (const bondId of ['maniShip', 'emptyShip', 'soloShip', 'suntShip']) {
-    const entry = { bondId, active: true, count: 2, tier: 1, layers: 99 };
-    const pop = BondPopup({ bondId, entry, priv: { board: [], hand: [] }, onClose() {} });
-    assert.match(textOf(pop), /层数不显示/);
-    assert.doesNotMatch(textOf(pop), /99|99 层/);
-    const strip = BondStrip({ bonds: [entry], onOpen() {} });
-    const disc = [...walk(strip)].find((v) => v.props?.name === DATA.bonds[bondId].name);
-    assert.ok(disc);
-    assert.equal(disc.props.layers, undefined);
-    assert.equal(disc.props.active, true);
-    assert.equal(disc.props.tier, 1);
-  }
-  const disc = [...walk(BondStrip({ bonds: [{ bondId: 'yanShip', active: true, layers: 12 }], onOpen() {} }))]
-    .find((v) => v.props?.name === DATA.bonds.yanShip.name);
-  assert.equal(disc.props.layers, 12, 'stacking bonds keep their badge');
+  assert.match(src, /<\$\{BondPopup\}[\s\S]*?off=\$\{offBonds\.has\(bondPop\.bondId\)\}/);
 });
 
 test('hidden-layer bonds show activation and tiers without a stack badge or layer count', () => {

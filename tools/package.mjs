@@ -35,9 +35,9 @@
 // scripts/make-windows-bundle.mjs, the other docs (DESIGN, SIM, the research notes, docs/img …), public/dev/, handoff/,
 // .github/, types/, lint / editor / Docker files (Docker builds from a git clone).
 // Also left out, by the maintainer's decision of 2026-10-23 (§35.66): the external-AI / LLM integration. The explicit
-// list is LLM_RELEASE_EXCLUDE in server/match/llmRelease.js (re-exported below). A release tree gets
+// list is LLM_RELEASE_EXCLUDE in server/match-upstream/llmRelease.js (re-exported below). A release tree gets
 // server/release-without-llm and the server then ignores external-AI settings. The #673 framework and the built-in
-// bots stay, including server/match/aiPlan.js and server/match/aiEconomy.js (no host ships with them).
+// bots stay, including server/match-upstream/aiPlan.js and server/match/aiEconomy.js (no host ships with them).
 //   server/match/externalAI.js, server/match/externalConfig.js, server/match/aiDigest.js
 //   server/ai/transport.js, knowledge.js, playbook.js, strategy.js, strategy-community.js,
 //     community-candidates.js, cycle-candidates.js, cycles.js
@@ -108,7 +108,7 @@ import {
 // The one list of LLM paths a release must not contain, and the marker a release tree carries (§35.66).
 import {
   LLM_RELEASE_EXCLUDE, LLM_RELEASE_MARKER, LLM_RELEASE_MARKER_TEXT, isLlmReleasePath, omitLlmFromRelease,
-} from '../server/match/llmRelease.js';
+} from '../server/match-upstream/llmRelease.js';
 export { LLM_RELEASE_EXCLUDE, LLM_RELEASE_MARKER, LLM_RELEASE_MARKER_TEXT, isLlmReleasePath, omitLlmFromRelease };
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');

@@ -1,15 +1,15 @@
 import { ruleOption } from '../../shared/plugins/rules.js';
-import { DiyStock } from './player-fork/diy.js';
-import { PlayerAcquire } from './player-fork/acquire.js';
-import { PlayerEconomy } from './player-fork/economy.js';
+import { DiyStock } from './player/diy.js';
+import { PlayerAcquire } from './player/acquire.js';
+import { PlayerEconomy } from './player/economy.js';
 import { hasTraitFor } from './operatorTraits.js';
 
-import {PlayerBasics as MergePlayer0} from './player-fork/basics.js';
-import {PlayerDiy as MergePlayer1} from './player-fork/diy.js';
-import {PlayerItems as MergePlayer2} from './player-fork/items.js';
-import {PlayerPieces as MergePlayer3} from './player-fork/pieces.js';
-import {PlayerPlacement as MergePlayer4} from './player-fork/placement.js';
-import {PlayerRound as MergePlayer5} from './player-fork/round.js';
+import {PlayerBasics as MergePlayer0} from './player/basics.js';
+import {PlayerDiy as MergePlayer1} from './player/diy.js';
+import {PlayerItems as MergePlayer2} from './player/items.js';
+import {PlayerPieces as MergePlayer3} from './player/pieces.js';
+import {PlayerPlacement as MergePlayer4} from './player/placement.js';
+import {PlayerRound as MergePlayer5} from './player/round.js';
 import {msg,dn} from './../../shared/i18n.js';
 import {checkNotOwned,charPotentialChanges} from './../../shared/protocol.js';
 import {augmentEffectEntries} from '../../shared/augments.js';
@@ -89,8 +89,6 @@ import { bountyCard } from './choices.js';
 //     SETTLE (battle-result grants, merges, returned equipment) or at the next round start / 机变 stays visible and
 //     usable (move to a free hand slot, place, equip, destroy, sell) through the NEXT prep — nothing is destroyed before
 //     the player saw it in a prep ("处于临时整备区的调度资源，在进入下一回合后会自动销毁").
-//     With config.version.rules.equipHand (规程), hand holds characters/summons only and temp[0..4] is permanent
-//     equipment storage. Hidden temp[5..] alone blocks Ready and expires; see pieces.js and docs/META.md.
 //   * Board: own region rows 9–12 × cols 2–10, legality from the stage legend (board.js); deploy cap 8 (+effects);
 //     tokens (placeable summons) don't use deploy slots. Board↔hand swaps are always allowed. In a boss round the
 //     legality reads the player's half of the boss field (Match.deployFieldOf → board.js field 'bossL' / 'bossR',
@@ -185,10 +183,6 @@ export class PlayerState {
     this.alive = true;
     this.lp = 0;
     this.bandId = null;
-    this.command = null;
-    this.commandMarks = [];
-    this.commandDrafts = [];
-    this.commandDiscounts = [];
     this.funds = 0;
     this.pendingFunds = 0;
     this.ready = false;
@@ -207,29 +201,11 @@ export class PlayerState {
     this.standIns = Object.freeze([]);
     this._standInSet = new Set();
     if (!this.isBot && seat.notOwned) this.setNotOwned(seat.notOwned);
-    /**
-     * 自选编队 (0.2.0): the slotted picks { [slotBaseId]: { charId, skillIndex, uniEquipId } } — the seat's when the match
-     * started, re-checked; frozen; {} = none (bots have no lobby roster). setDiy makes `this.gd` the player's data view.
-     */
     this.diy = Object.freeze({});
     this._diyRecords = new Map();
     this.diyStock = new DiyStock();
     this.diyBanned = Object.freeze([]);
-    /**
-     * 选择自编 confirmation: null until the player confirms; an array afterwards (possibly empty = 禁用自选).
-     * A season without the step leaves it null and stocks every legal lobby slot.
-     * @type {string[]|null}
-     */
-    this.diyBring = null;
-    // A modded room's content list (Match.diyKitted) is what the lobby already accepted. Without it setDiy
-    // keeps the vanilla kit list and drops a plugin operator with no error (checkDiyPicks is lenient).
-    // Bots have no lobby roster; 规程 synthesizes one at 选择自编. They read a human's composed records once setDiy
-    // succeeds (bot.js chessRec).
-    if (!this.isBot && seat.diy) this.setDiy(seat.diy, this.m.diyKitted ? { kitted: this.m.diyKitted } : undefined);
-    /** 皮肤 (docs/SKINS.md): frozen `{ [charId]: skinId }`, {} = every operator on its default model. Unlike the
-     * loadout these are PUBLIC (a teammate sees your skin), so they travel in Match.publicView().players[]. */
-    this.skins = Object.freeze({});
-    if (!this.isBot && seat.skins) this.setSkins(seat.skins);
+    if (!this.isBot && seat.diy) this.setDiy(seat.diy, this.m.diyKitted ? {kitted:this.m.diyKitted} : undefined);
     this.shop = { level: 1, upgradePrice: this.gd.upgradeBase(1) ?? 0, slots: [], frozen: false, freeRefreshes: 0 };
     /** reward offers queue (merge rewards, special refreshes): { tier, source, label, slots: [{ kind, id, price, sold }] } */
     this.offers = [];

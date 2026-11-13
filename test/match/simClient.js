@@ -18,7 +18,6 @@ import assert from 'node:assert/strict';
 import { createBattleFromSpec, compactResult, battleProgress, attachLpMeter } from '../../server/sim/spec.js';
 import { RehearsalRun } from '../../server/sim/rehearsal.js';
 import { validateC2S } from '../../shared/protocol.js';
-import { leaderOpsFromBattle } from '../../shared/leaderOps.js';
 import { TICK } from '../../server/sim/constants.js';
 
 const SLICE_MS = 250;
@@ -139,8 +138,6 @@ export class SimClient {
       msg.leaks = e.meter.lp;
       msg.bossDmg = pool && Number.isFinite(pool.cum) ? pool.cum : 0;
       if (pool && pool.byPlayer) msg.by = { ...pool.byPlayer };
-      const ops = leaderOpsFromBattle(e.battle);
-      if (ops) msg.ops = ops;
     } else {
       msg.leaks = p.leaks;
       // 联防: the leakers' enemies still standing (like public/js/battle/runner.js)

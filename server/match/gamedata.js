@@ -7,8 +7,8 @@ import { atPotential } from '../../shared/potential.js';
 // key is missing, so a partial data set (tests, data being regenerated) still yields a working match.
 //
 // No custom balance (DESIGN §14 corrections, research 08 §6): enemy numbers are the official ones — the PRTS
-// per-round enemyScale table of data/config.json, the leader pool = bloodPoint per player alive at the fight's start
-// (bossPoolShareOf). data/tuning.json only overrides result titles:
+// per-round enemyScale table of data/config.json, the leader pool = bloodPoint. data/tuning.json only overrides result
+// titles:
 //   titles[titleId]                                                { stat?, rule? } merged over config.titles
 // (the former enemyHpMul / enemyAtkMul / enemySpeedMul / bossHpMul / flyPlaceholders knobs were removed; a tuning file
 // that still carries them is ignored).
@@ -18,7 +18,6 @@ import { isShopItem } from '../sim/simdata.js';
 import { mergeData } from '../../shared/plugins/dataUtils.js';
 import { standInRecord } from '../../shared/standIn.js';
 import { MAX_OFFER_SLOTS } from './player/common.js';
-import { diyBringLimitsOf } from '../../shared/diyBring.js';
 
 const own = (map, id) => (map && typeof map === 'object' && typeof id === 'string' && Object.hasOwn(map, id) && map[id] && typeof map[id] === 'object' ? map[id] : null);
 const numOr = (v, d) => (typeof v === 'number' && Number.isFinite(v) ? v : d);
@@ -59,34 +58,6 @@ export const DEFAULTS = Object.freeze({
 
 /** Game seconds per real second of a battle (forced 2×): combat limits in data are real seconds (combatTimeLimit). */
 export const COMBAT_TIME_SCALE = 2;
-
-/**
- * Multiplier of bloodPoint[difficulty] for the shared leader pool (DESIGN §20.10, §25.13.4), from config bossHpScale —
- * each key from the mode's entry first, then the global one; the defaults are the current rule:
- *   solo   `solo` (1: the table value — one player's share);
- *   co-op  `perPlayer` true (the owner's decision of 2026-10-06, adopting PR #209 by @qingjingshenghuo): `coop` (1) × the
- *          players alive when the fight starts — bots and AI 托管 seats count, eliminated and departed seats do not —
- *          at most `aliveFull` (4); a count left out means a full team;
- *          `perPlayer` false: the fixed pool of 0.1.x (「保持固定血量」, restorable with `solo` 0.25): `coop` whatever the
- *          count, × min(alive, aliveFull) / aliveFull with `aliveScaling`.
- * @param {object|null|undefined} modeScale config.modes[modeId].bossHpScale
- * @param {object|null|undefined} cfgScale config.bossHpScale
- * @param {boolean} isSolo
- * @param {number} [aliveCount] alive players at the Final Assault / Hidden Core start (co-op)
- * @returns {number}
- */
-export function bossPoolShareOf(modeScale, cfgScale, isSolo, aliveCount) {
-  const ms = modeScale && typeof modeScale === 'object' ? modeScale : {};
-  const cs = cfgScale && typeof cfgScale === 'object' ? cfgScale : {};
-  const pick = (k, d) => (Number.isFinite(ms[k]) && ms[k] > 0 ? ms[k] : Number.isFinite(cs[k]) && cs[k] > 0 ? cs[k] : d);
-  const flag = (k, d) => (typeof ms[k] === 'boolean' ? ms[k] : typeof cs[k] === 'boolean' ? cs[k] : d);
-  if (isSolo) return pick('solo', 1);
-  const full = Math.max(1, Math.floor(pick('aliveFull', 4)));
-  const n = Number(aliveCount);
-  const alive = Number.isFinite(n) && n >= 1 ? Math.min(full, Math.floor(n)) : full;
-  if (flag('perPlayer', true)) return pick('coop', 1) * alive;
-  return pick('coop', 1) * (flag('aliveScaling', false) ? alive / full : 1);
-}
 
 /** Strip the _a/_b suffix of an item id (the registry key of an item family). */
 export const itemKey = (id) => (typeof id === 'string' ? id.replace(/_[ab]$/, '') : '');
@@ -143,8 +114,6 @@ export class GameData {
     this.inactiveEnemies = new Set(Array.isArray(this.mode.inactiveEnemyKeys) ? this.mode.inactiveEnemyKeys : []);
     /** data/tuning.json (titles only, see the header) */
     this.tuning = this.raw.tuning && typeof this.raw.tuning === 'object' ? this.raw.tuning : {};
-    /** standIn memo: chess id → composed 补位 record | null */
-    this._standIns = new Map();
   }
 
   /**
@@ -167,9 +136,7 @@ export class GameData {
   bossPoolHp(bossId, aliveCount) {
     const boss = this.boss(bossId);
     const diff = this.difficulty;
-    // 规程 lists the pool per mode (bloodByMode: 规程等级 1–20 share a difficulty, not a pool); 盟约 per difficulty
-    let base = Number.isFinite(boss?.bloodByMode?.[this.modeId]) ? boss.bloodByMode[this.modeId] : null;
-    if (base == null && boss && boss.bloodPoint && Number.isFinite(boss.bloodPoint[diff])) base = boss.bloodPoint[diff];
+    let base = boss && boss.bloodPoint && Number.isFinite(boss.bloodPoint[diff]) ? boss.bloodPoint[diff] : null;
     if (base == null && boss && boss.bloodPoint) base = Object.values(boss.bloodPoint).find((v) => Number.isFinite(v)) ?? null;
     if (base == null) base = 500000;
     return Math.max(1, Math.round(base * this.bossPoolShare(aliveCount) * (this.config.customRules?.bossHp??100)/100));
@@ -220,26 +187,6 @@ export class GameData {
   token(id) { return own(this.raw.tokens, id); }
   get choices() { return this.raw.choices && typeof this.raw.choices === 'object' ? this.raw.choices : {}; }
   get factions() { return this.raw.factions && typeof this.raw.factions === 'object' ? this.raw.factions : {}; }
-
-  /**
-   * The 补位 record of chess `id` (normal or elite; DATA.md §18): shared/standIn.js standInRecord over data/backups.json
-   * — the chess's identity (ids, tier, bonds, 特质, price, merge) with its official stand-in's body (stats, range, skills
-   * with the backup skill as the default, talents, module, art, `standInFor`). Null for a PRESET / 自选 chess, an unknown
-   * id or data without backups.json. Memoized (frozen records).
-   * @param {string} id
-   * @returns {object|null}
-   */
-  standIn(id) {
-    if (typeof id !== 'string') return null;
-    if (this._standIns.has(id)) return this._standIns.get(id);
-    const c = this.chess(id);
-    const backups = this.raw.backups && typeof this.raw.backups === 'object' ? this.raw.backups : null;
-    let rec;
-    try { rec = c && backups ? standInRecord(c, backups) : null; } catch { rec = null; }
-    if (rec) Object.freeze(rec);
-    this._standIns.set(id, rec);
-    return rec;
-  }
 
   /** Normal (base) chess id of a chess id (golden → base). */
   baseIdOf(id) {
@@ -311,8 +258,6 @@ export class GameData {
   get itemMergeCount() { return posIntOr(this.economy.itemMergeCount, DEFAULTS.itemMergeCount); }
   keepsFunds(bandId){return [bandId,...(this.config.commonBands||[])].some(id=>this.leftoverKeptBands.includes(id));}
   get leftoverKeptBands() {
-    if (this.raw.config?.version) return Object.values(this.raw.bands || {})
-      .filter(b => b.buffs?.some(buff => buff.key === 'coin_carry_over')).map(b => b.bandId);
     const ids = Array.isArray(this.economy.leftoverFundsKeptByBands) ? this.economy.leftoverFundsKeptByBands : DEFAULTS.leftoverFundsKeptByBands;
     const extra = Object.values(this.raw.bands || {}).filter(b => b.effectRef && ids.includes(b.effectRef)).map(b => b.bandId);
     return extra.length ? [...ids, ...extra] : ids;
@@ -462,8 +407,7 @@ export class GameData {
   }
 
   /**
-   * Official enemy multipliers of round r (config enemyScale: the PRTS stack table × the season's effect values, 终极 急行军
-   * from R3 — ×1.15 on 下半, ×1.30 on 规程; tools/build-data.mjs enemyStepsOf). `supplyHpMul`
+   * Official enemy multipliers of round r (config enemyScale: the PRTS table + 终极 speed ×1.15 from R3). `supplyHpMul`
    * (only when ≠ 1: co-op 终极 R5–R15) = the share of hpMul from 补给线 / 补给线II (config `supplyHp`), effects whose
    * `enemy_exclude` leaves out the 14 器物 keys; hit-count enemies retain their fixed count independently of HP multipliers.
    */
@@ -534,34 +478,6 @@ export class GameData {
       difficulties: Array.isArray(h.difficulties) ? h.difficulties : DEFAULTS.hiddenCore.difficulties,
     };
   }
-  get regulationBondDraw() { return this.config.version?.rules?.bondDraw === 'regulation'; }
-
-  /** Per-tier 选择自编 caps, or null when this data has no CUSTOM_CHECK step and limit map. */
-  get diyBringLimits() { return diyBringLimitsOf(this.config); }
-
-  /** Official seconds of 选择自编 (enterSteps CUSTOM_CHECK `time`; 30 on 规程). */
-  customCheckSeconds() {
-    const steps = this.config?.timers?.enterSteps;
-    const step = Array.isArray(steps) ? steps.find((s) => s && s.step === 'CUSTOM_CHECK') : null;
-    const t = step && Number(step.time);
-    return Number.isFinite(t) && t > 0 ? t : 30;
-  }
-
-  /**
-   * Whether an operator stays out of this match. Covenant: every bond of it is off. Regulation: an operator with a core
-   * bond follows its core bonds only and is out when they are all grey; one without a core bond is out when all its
-   * add-ons are (the tutorial: a grey core keeps its members out of the shop, add-ons only when all of an operator's
-   * add-ons are grey). Owner's official play, 2026-11-13: a lit core bond never loses a member — grey add-ons never take
-   * out an operator of a lit core. The same holds for the six operators of two or three core bonds (复奏, 哈洛德, 卡涅利安,
-   * 薇薇安娜, 烛煌, 锏): out only when all their cores are grey (owner, 2026-11-13: one core bond not banned keeps them).
-   */
-  bondsExclude(rec, off) {
-    const bonds = Array.isArray(rec?.bonds) ? rec.bonds : [];
-    if (!this.regulationBondDraw) return bonds.length > 0 && bonds.every(b => off.has(b));
-    const core = bonds.filter(b => this.bond(b)?.isCore);
-    return (core.length ? core : bonds).length > 0 && (core.length ? core : bonds).every(b => off.has(b));
-  }
-
   bans(difficulty) {
     const b = this.config.bans && this.config.bans[difficulty];
     const d = DEFAULTS.bans[difficulty] || { core: 0, addon: 0 };
@@ -587,8 +503,6 @@ export class GameData {
     if(bandId!==RANDOM_BAND_ID&&!own(this.raw.bands,bandId))return false;
     const b = this.band(bandId);
     if (!b) return false;
-    // 规程 turns a band off per mode (bands.json inactiveModeIds: 30 strategies are not offered in 极速模拟)
-    if (Array.isArray(b.inactiveModeIds) && b.inactiveModeIds.includes(this.modeId)) return false;
     const list = Array.isArray(b.modeTypeList) ? b.modeTypeList : null;
     if (!list) return true;
     return list.includes(this.isSolo ? 'SINGLE' : 'MULTI');

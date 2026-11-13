@@ -35,7 +35,7 @@ globalThis.fetch = async (url) => {
   }
 };
 
-const { ChoiceView, ChoicePill, spTap, armedCard, cardPickable } = await import('../../public/js/ui/choiceOverlay.js');
+const { ChoiceView, spTap, armedCard, cardPickable } = await import('../../public/js/ui/choiceOverlay.js');
 const { ChessDetail, ItemDetail, statTone, liveStat } = await import('../../public/js/ui/detailPanel.js');
 const { Button } = await import('../../public/js/ui/components.js');
 const { data } = await import('../../public/js/data.js');
@@ -121,26 +121,6 @@ describe('2: 机变 cards take two taps (select → confirm), like buying in the
     assert.match(textOf(idle.find((n) => hasClass(n, 'spov__sub'))), /点击卡牌选中，再次点击确认/);
   });
 
-  test('收起 / 展开 (official 机密商店): the view offers 收起 only with onCollapse; the pill reopens it and glows on my turn', () => {
-    const plain = [...walk(ChoiceView({ pub: { players: [] }, sp: sp(), ...me }))];
-    assert.ok(!plain.some((n) => hasClass(n, 'spov__collapse')), 'no handler, no button');
-    let collapsed = 0;
-    const nodes = [...walk(ChoiceView({ pub: { players: [] }, sp: sp(), ...me, onCollapse: () => { collapsed++; } }))];
-    const btn = nodes.find((n) => hasClass(n, 'spov__collapse'));
-    assert.ok(btn, '收起 shown');
-    assert.equal(textOf(btn.props.children), '收起');
-    btn.props.onClick();
-    assert.equal(collapsed, 1);
-    let opened = 0;
-    const pill = ChoicePill({ sp: sp(), ...me, onExpand: () => { opened++; } });
-    assert.ok(hasClass(pill, 'spov-pill') && hasClass(pill, 'is-turn'), 'my turn: highlighted');
-    assert.match(textOf(pill.props.children), /展开/);
-    pill.props.onClick();
-    assert.equal(opened, 1);
-    assert.ok(!hasClass(ChoicePill({ sp: sp({ turnPid: 'p2' }), ...me, onExpand() {} }), 'is-turn'), 'not my turn: plain');
-    assert.ok(!hasClass(ChoicePill({ sp: sp({ pickOf: new Map([['me', 0]]) }), ...me, onExpand() {} }), 'is-turn'), 'picked: plain');
-  });
-
   test('3: an untimed 机变 (solo, a single human) shows no clock and says so; a timed one keeps its countdown', () => {
     const timed = [...walk(ChoiceView({ pub: { players: [], deadline: Date.now() + 9000 }, sp: sp(), ...me }))];
     assert.ok(timed.some((n) => n.type?.name === 'Countdown'));
@@ -150,33 +130,11 @@ describe('2: 机变 cards take two taps (select → confirm), like buying in the
     assert.match(textOf(lone.find((n) => hasClass(n, 'spov__sub'))), /无时间限制/);
   });
 
-  test('教鞭 ChoiceView: personal heading, no global order or turn; timing follows PREP deadline', () => {
-    const s = sp({ name: '教鞭 · 战术特训', desc: '请选择一项战术特训', cards: sp().cards.slice(0, 2) });
-    for (const [solo, deadline] of [[false, 0], [true, 123456]]) {
-      let confirmed = false;
-      const v = ChoiceView({ pub: { players: [{ playerId: 'me', name: 'Me' }, { playerId: 'p2', name: 'P2' }], deadline }, sp: s,
-        ...me, solo, personal: true, armed: 0, total: 74, onConfirm: () => { confirmed = true; } });
-      const nodes = [...walk(v)];
-      assert.equal(v.props['aria-label'], '教鞭选择');
-      assert.ok(!nodes.some((n) => hasClass(n, 'spov__order')));
-      assert.doesNotMatch(textOf(v), /机变阶段|当前轮到|正在决策/);
-      const clock = nodes.find((n) => n.type?.name === 'Countdown');
-      assert.equal(!!clock, deadline > 0);
-      if (clock) { assert.equal(clock.props.deadline, deadline); assert.equal(clock.props.total, 74); }
-      assert.match(textOf(nodes.find((n) => hasClass(n, 'spov__sub'))), deadline ? /休整期结束时未选择将自动选定/ : /无时间限制/);
-      const btn = nodes.find((n) => n.type === Button);
-      btn.props.onClick();
-      assert.ok(confirmed);
-      assert.match(btn.props.title, /确认选择「A」/);
-      assert.match(nodes.find((n) => hasClass(n, 'spcard')).props.title, /^A\na$/);
-    }
-  });
-
   test('the overlay keeps the selection itself and drops it on Esc / a tap elsewhere (source contract)', () => {
     const src = read('public/js/ui/choiceOverlay.js');
     assert.match(src, /export function ChoiceOverlay\(props\) \{[\s\S]*useState\(null\)[\s\S]*armedCard\(sel, sp/);
     assert.match(src, /e\.key === 'Escape'/);
-    assert.match(src, /closest\('\.spcard, \.spov__confirm, \.spov__collapse'\)/);
+    assert.match(src, /closest\('\.spcard, \.spov__confirm'\)/);
     const css = read('public/css/screens/game-panels.css');
     assert.match(css, /\.spcard\.is-armed/);
     assert.match(css, /\.spcard__confirm \{/);
@@ -265,7 +223,7 @@ describe('7: the detail card shows live stats against the base', () => {
     assert.match(src, /battleRunner\.unitStats\(uid, fid\)/);
     assert.match(src, /live=\$\{liveStats\}/);
     const panel = read('public/js/ui/detailPanel.js');
-    assert.match(panel, /useTicker\(detail && \(getter \|\| bondTimers\) \? 250 : 0\)/, 'a getter is re-read 4× a second');
+    assert.match(panel, /useTicker\(detail && getter \? 250 : 0\)/, 'a getter is re-read 4× a second');
     // an own board piece's card opened in prep and left open into the battle turns live (its unit found by uid)
     assert.match(src, /battleRunner\.unitIdOf\(pieceUid, myId, fid\)/);
   });

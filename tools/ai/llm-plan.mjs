@@ -1,7 +1,7 @@
 // §35.11. [ASSUMED] Local repair policy for this example only. Server validPlan and human validators stay strict.
 // Round 65 ("the bot is the floor, the LLM overrides"): the built-in bot executes every plan and an empty plan plays like
 // it, so the repair also removes the overrides the bots measured as harmful (L6, refresh caps, shop equipment, wide keeps).
-import { validPlan } from '../../server/match/aiPlan.js';
+import { validPlan } from '../../server/match-upstream/aiPlan.js';
 import { LEVEL_CAP } from '../../server/ai/strategy.js';
 const object = x => !!x && typeof x === 'object' && !Array.isArray(x);
 export const shortText = (s, max = 360) => typeof s === 'string' ? s.replace(/\s+/g, ' ').trim().slice(0, max) : '';

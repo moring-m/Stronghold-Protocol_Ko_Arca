@@ -1,28 +1,29 @@
-import { Match as UpstreamMatch } from './UpstreamMatch.js';
+import { Match as UpstreamMatch } from '../match-upstream/Match.js';
+import { versionById } from '../../shared/versions.js';
 import { recruitCandidates, checkRecruitPicks } from '../../shared/recruitPick.js';
 /** 선발 선택 time when config.timers.recruitPick is not set (seconds). */
 const RECRUIT_PICK_SECONDS = 30;
 import {normalizeGameplayMode,gameplayExtensions} from '../../shared/gameplayModes.js';
 import { ruleOption } from '../../shared/plugins/rules.js';
-import { MatchOffers as UpstreamFallback18 } from './match-fork/offers.js';
-import { MatchTestCommands as UpstreamFallback17 } from './match-fork/testCommands.js';
-import { MatchSettle as UpstreamFallback16 } from './match-fork/settle.js';
-import { MatchBoss as UpstreamFallback15 } from './match-fork/bossRounds.js';
-import { MatchUnite as UpstreamFallback14 } from './match-fork/unitePhase.js';
-import { MatchReports as UpstreamFallback13 } from './match-fork/reports.js';
-import { MatchClientCombat as UpstreamFallback12 } from './match-fork/clientCombat.js';
-import { MatchCombat as UpstreamFallback11 } from './match-fork/combat.js';
-import { MatchPrep as UpstreamFallback10 } from './match-fork/prep.js';
-import { MatchSpDraft as UpstreamFallback9 } from './match-fork/spDraft.js';
-import { MatchSetupVote as UpstreamFallback8 } from './match-fork/setupVote.js';
-import { MatchPhases as UpstreamFallback7 } from './match-fork/phases.js';
-import { MatchPause as UpstreamFallback6 } from './match-fork/pause.js';
-import { MatchIntents as UpstreamFallback5 } from './match-fork/intents.js';
-import { MatchWatch as UpstreamFallback4 } from './match-fork/watch.js';
-import { MatchViews as UpstreamFallback3 } from './match-fork/views.js';
-import { MatchMessaging as UpstreamFallback2 } from './match-fork/messaging.js';
-import { MatchInfra as UpstreamFallback1 } from './match-fork/infra.js';
-import { MatchPlatform as UpstreamFallback0 } from './match-fork/platform.js';
+import { MatchOffers as UpstreamFallback18 } from './match/offers.js';
+import { MatchTestCommands as UpstreamFallback17 } from './match/testCommands.js';
+import { MatchSettle as UpstreamFallback16 } from './match/settle.js';
+import { MatchBoss as UpstreamFallback15 } from './match/bossRounds.js';
+import { MatchUnite as UpstreamFallback14 } from './match/unitePhase.js';
+import { MatchReports as UpstreamFallback13 } from './match/reports.js';
+import { MatchClientCombat as UpstreamFallback12 } from './match/clientCombat.js';
+import { MatchCombat as UpstreamFallback11 } from './match/combat.js';
+import { MatchPrep as UpstreamFallback10 } from './match/prep.js';
+import { MatchSpDraft as UpstreamFallback9 } from './match/spDraft.js';
+import { MatchSetupVote as UpstreamFallback8 } from './match/setupVote.js';
+import { MatchPhases as UpstreamFallback7 } from './match/phases.js';
+import { MatchPause as UpstreamFallback6 } from './match/pause.js';
+import { MatchIntents as UpstreamFallback5 } from './match/intents.js';
+import { MatchWatch as UpstreamFallback4 } from './match/watch.js';
+import { MatchViews as UpstreamFallback3 } from './match/views.js';
+import { MatchMessaging as UpstreamFallback2 } from './match/messaging.js';
+import { MatchInfra as UpstreamFallback1 } from './match/infra.js';
+import { MatchPlatform as UpstreamFallback0 } from './match/platform.js';
 function auditClock(at, startedAt) {
   const stamp = Number(at);
   const start = Number(startedAt);
@@ -31,26 +32,26 @@ function auditClock(at, startedAt) {
 }
 import { TEST_PUBLIC_LOG } from '../../shared/testMode.js';
 import { requiresTraitLayerAuthority } from './operatorTraits.js';
-import {MatchOffers} from './match-fork/offers.js';
-import {MatchTestCommands} from './match-fork/testCommands.js';
+import {MatchOffers} from './match/offers.js';
+import {MatchTestCommands} from './match/testCommands.js';
 import {testSlice,installTestTrace} from './testTrace.js';
 
-import {MatchRehearsal as MergeMatch0} from './match-fork/rehearsal.js';
-import {MatchSetupVote as MergeMatch1} from './match-fork/setupVote.js';
-import {MatchViews as MergeMatch2} from './match-fork/views.js';
-import {MatchWatch as MergeMatch3} from './match-fork/watch.js';
+import {MatchRehearsal as MergeMatch0} from './match/rehearsal.js';
+import {MatchSetupVote as MergeMatch1} from './match/setupVote.js';
+import {MatchViews as MergeMatch2} from './match/views.js';
+import {MatchWatch as MergeMatch3} from './match/watch.js';
 import {creditedKillsOf} from './../sim/spec.js';
 import {previewPlayer} from './preview.js';
 import {wireMessage} from './../../shared/i18n.js';
 import {createDelegatedRehearsalJob} from './bot.js';
 import {bossFieldPlacement} from './finalAssault.js';
 import {isContentHash} from '../../shared/plugins/identity.js';
-import {MatchRehearsal,REHEARSAL_ANSWER_MS} from './match-fork/rehearsal.js';
+import {MatchRehearsal,REHEARSAL_ANSWER_MS} from './match/rehearsal.js';
 const envBotRehearsal = () => String(env('SP_BOT_REHEARSAL') || '').trim().toLowerCase() === 'host';
 import {AugmentMode} from './augments.js';
 import {RANDOM_BAND_ID} from '../../shared/randomBand.js';
 import {EIGHT_UNITE_RECT,eightUniteStageId} from '../../shared/cooperativeEight.js';
-import { MatchSetupVote } from './match-fork/setupVote.js';
+import { MatchSetupVote } from './match/setupVote.js';
 import { onHumanEmote, onSettle, resetRoundCounters, onPickCard, onStartUnite } from './botEmotes.js';
 import {recordCombatField} from './combatHistory.js';
 
@@ -92,18 +93,6 @@ import { modeExtensionSelection, applyCustomExtensions, normalizeCustomExtension
 //                    Bot playerIds start with 'ai_'. Seat indexes may have gaps (e.g. seats 0 and 2).
 //                    `loadout` (DESIGN §16, optional): the human's operator loadout, already checked by the lobby
 //                    (shared/protocol.js checkLoadout); PlayerState re-checks it against opts.data and ignores it for bots.
-//                    `ops` (0.2.2, optional): the human's per-operator 潜能 / 练度 (checkLoadoutOps; missing = 潜能 6, 精英2
-//                    Lv.60 — the owner's decision of 2026-10-08), re-checked and changed like the loadout (INFO_CHECK);
-//                    bots fight with the defaults.
-//                    `notOwned` (0.2.0 补位, optional): the base chess ids the human marked as not owned (干员持有) — fixed
-//                    for the match; those chess fight as their stand-ins (PlayerState setNotOwned; bots own everything).
-//                    `diy` (0.2.0 自选编队, optional): the human's 自选 picks (shared/protocol.js checkDiyPicks) — fixed for
-//                    the match; the slotted operators join the human's own shop (PlayerState setDiy / initDiyStock).
-//                    A version with diyBringLimits waits for 选择自编 and stocks only the confirmed slots.
-//   opts.kitted      string[] (optional)        the operators a 自选 slot may field in this room (the content set's
-//                                              list, lobby.kittedFor). Absent on a vanilla match, so setDiy keeps
-//                                              KITTED_CHARS and a normal match stays byte-identical. A modded room
-//                                              always passes it (local match, match host, test journal / replay).
 //   opts.spectators  string[] (optional)        the room's spectator seats (remake feature, community report #26;
 //                                              server/lobby.js): never players — see addSpectator below
 //   opts.seed        uint32                     master seed for all match randomness
@@ -128,14 +117,6 @@ import { modeExtensionSelection, applyCustomExtensions, normalizeCustomExtension
 //   → { ok: true }          platform turns into onLeave). Return { error: ERR code (shared/constants.js),
 //   | { error, detail? }    detail?: string } to reject. Must not throw (if it does, the platform logs and
 //                           replies ERR.INTERNAL). Replies ('ok'/'error' with rid) are sent by the platform.
-// aiHandoverView()          Spectator AI handover, read by the lobby (in-process or through the version match
-//   → { ok: true, ... }     host). Phase, round, ended, disposed, emergencyFrozen, and per player isBot / left /
-//                           alive / autoplay. funds and pieceUids ride along so a test can see the inherited
-//                           inventory; the lobby does not vote on them. Same { error, detail } refusal as handle.
-// acceptAiHandover(botId, name) → { ok: true } | { error, detail? }
-//                           Match half of inheriting that bot seat: cancel its prep token and its rehearsal only,
-//                           clear bot/autoplay, set the spectator's name, loneHuman, aiTakeoverRound. The lobby
-//                           rebinds the session, seat and token. A version match host answers this like handle.
 // onDisconnect(playerId)    A human's socket dropped. The seat is kept; apply the auto-play policy.
 // onReconnect(playerId)     The human is back (new socket with its token) or re-sent hello on a live socket
 //                           (a resync request). May be called without a preceding onDisconnect. Resend full
@@ -201,12 +182,9 @@ import { modeExtensionSelection, applyCustomExtensions, normalizeCustomExtension
 //   opts.BattleClass   Battle implementation (default server/sim/Battle.js; tests inject test/match/fakeBattle.js)
 //   opts.battleContent 'full' | 'generic' | 'none' (sim content mode, default 'full')
 //   opts.timerScale    multiplier on every real-time phase timer (default 1)
-//   opts.combatSpeed   game seconds per real second while battles run in real time (default 2, the forced 2×)
-//   opts.botRehearsal  candidate layouts a bot simulates per prep before placing (default 6, 0 = heuristic only;
+//   opts.combatSpeed   explicit tool/test speed override; defaults: normal/unite 2×, boss/hidden 1×
+//   opts.botRehearsal  candidate layouts a bot simulates per prep before placing (default 3, 0 = heuristic only;
 //                      a whole battle per candidate: ~20–300 ms of CPU each, see server/match/bot.js createRehearsal)
-//   opts.botStrategy  a registered ID or trusted server-side strategy object; defaults to SP_BOT_STRATEGY / 'legacy'
-//   opts.botStrategySeats  per-seat overrides { [seat 0..3]: ID | object } or 'seat:id,…'; defaults to
-//                      SP_BOT_STRATEGY_SEATS (none); a seat not listed plays opts.botStrategy (getBotStrategySeats)
 //   opts.botSliceMs    wall-clock ms of rehearsal per scheduler callback (default 8 with a real scheduler, unbounded
 //                      with a virtual one); the rest runs in later callbacks (scheduleBotPrep)
 //   opts.headlessSliceMs  wall-clock ms per callback of a server-run normal / 联防 field (client-side combat: bots,
@@ -229,39 +207,6 @@ import { modeExtensionSelection, applyCustomExtensions, normalizeCustomExtension
 import { C2S, unitStatsEntry } from '../../shared/protocol.js';
 import { normalizeChatText, chatFaction, CHAT_HISTORY_LIMIT, CHAT_COOLDOWN_MS } from '../../shared/chat.js';
 import { PHASE, ERR, EMOTES, EMOTE_COOLDOWN_MS, GEO, modeIdFor, layerGainRoom } from '../../shared/constants.js';
-//
-// Code layout: this file keeps the constructor (options, seats, the per-match setup, the state fields); the methods
-// live in server/match/match/, one module per concern, and are installed on Match.prototype below in a fixed order,
-// with the descriptors of class methods (non-enumerable; `this` is the match, subclasses and `super` calls work as
-// before):
-//   platform.js      the interface above: start, handle, setLoadout, disconnect / reconnect / resync, leave, dispose
-//   infra.js         error isolation, timers and the phase deadline, player lists, bonds in the pool, deploy field,
-//                    meta dispatch
-//   messaging.js     send / broadcast / toasts / tickers, dirty marks, flush (m.private per player, m.public throttled)
-//   views.js         m.public (statuses, field progress, pendingLp / uniteLeft), the nextEnemies preview, the prep
-//                    scout's m.field
-//   watch.js         spectator seats, g.watch, who is shown which field, resend on reconnect, prep-scout pushes
-//   intents.js       the g.* / b.* router, emotes, AI 托管, g.unitStats
-//   pause.js         the solo pause
-//   phases.js        INFO_CHECK, BAND_DRAFT (the strategy draft), CUSTOM_CHECK (选择自编, when diyBringLimits is set), BATTLE_CHECK, ROUND_START
-//   spDraft.js       SP_DRAFT (机变) and the rolls the meta effects ask for (bounties, item ids, pools)
-//   prep.js          PREP: its start, the AI seats' sliced preps, Ready, the deadline, its end
-//   combat.js        battle construction, COMBAT (both modes), the per-field results, then 联防 or SETTLE
-//   clientCombat.js  client-side combat bookkeeping: field records, the field clock, authority, b.start, result
-//                    deadlines and releases, server runs, field completion
-//   rehearsal.js     the bot layout rehearsal delegated to the current host's browser: the b.rehearsal task, its answer,
-//                    its timeout and the server takeover (DESIGN §14)
-//   reports.js       b.progress / b.result (validation, held boss results), SP_VERIFY
-//   unitePhase.js    联防 (UNITE) in both modes and the leakers' live counts
-//   bossRounds.js    FINAL_ASSAULT / HIDDEN_CORE: boss fields, the shared pool, plausibility budgets, the boss clock,
-//                    b.pool, the merged team LP, overtime, bounties after a boss field
-//   settle.js        SETTLE and RESULT
-//   common.js        what the modules share (FLOW_TICKER_PRIORITY, DELAYS, BAND_TURN_SECONDS — re-exported here, OK,
-//                    fail, BOSS_CLOCK_MS)
-
-
-
-import { DEFAULT_VERSION, versionById } from '../../shared/versions.js';
 import { Battle } from '../sim/Battle.js';
 import { DataSource } from '../sim/simdata.js';
 import { createRng, deriveSeed } from '../sim/rng.js';
@@ -284,39 +229,7 @@ import { FieldSyncPools, LocalSyncPools } from '../sim/syncPools.js';
 import { buildResult } from './results.js';
 import { botPrepBeginSteps, botPrepEndSteps, botPickBand, botPickCard } from './bot.js';
 
-import { getBotStrategy, getBotStrategySeats } from './botStrategies.js';
-
-import { MatchPlatform } from './match-fork/platform.js';
-import { MatchInfra } from './match-fork/infra.js';
-import { MatchMessaging } from './match-fork/messaging.js';
-import { MatchViews } from './match-fork/views.js';
-import { MatchWatch } from './match-fork/watch.js';
-import { MatchIntents } from './match-fork/intents.js';
-import { MatchPause } from './match-fork/pause.js';
-import { MatchPhases } from './match-fork/phases.js';
-
-import { MatchSpDraft } from './match-fork/spDraft.js';
-import { MatchPrep } from './match-fork/prep.js';
-import { MatchCombat } from './match-fork/combat.js';
-import { MatchClientCombat } from './match-fork/clientCombat.js';
-
-import { MatchReports } from './match-fork/reports.js';
-import { MatchUnite } from './match-fork/unitePhase.js';
-import { MatchBoss } from './match-fork/bossRounds.js';
-import { MatchSettle } from './match-fork/settle.js';
-
-
-
-import { createExternalAI } from './llmGate.js';
-
-
-/**
- * §37.47 [ASSUMED]: 6 (was 3) — every distinct layout variant of a normal round (the positional plan and the five
- * REHEARSAL_VARIANTS; 8 rehearsed exactly the same games). In one rehearsal of six the winner was past the third candidate
- * (终极 solo, 419 rehearsals: hold 8 and kill 3 won 12 %); 终极 1–320 solo +2.19 ± 0.90, co-op +5.60 ± 1.65 (wins 73 → 92),
- * for about a third more rehearsal time per prep. More layouts only in the Final Assault changed nothing.
- */
-const BOT_REHEARSAL_DEFAULT = 6;
+const BOT_REHEARSAL_DEFAULT = 3;
 /** Wall-clock ms of bot layout rehearsal per scheduler callback (real time; virtual time runs it in one go). */
 const BOT_SLICE_MS = 8;
 /**
@@ -399,9 +312,8 @@ export class Match {
 
   /** @param {object} opts see MATCH INTERFACE above */
   constructor(opts) {
-    // 규정(规程) seasons play upstream's whole match flow (선택자편, 핵심 맹약 그룹, 전략 명령 …): the fork's methods below
-    // are written for the 맹약 seasons only
-    // (a subclass — the match host's ContentMatch, a test's — gets the upstream match too; its constructor goes on with it)
+    // 규정(规程) seasons play upstream's whole match (server/match-upstream/: 선택자편, 핵심 맹약 그룹, 전략 명령 …); this
+    // class is the 맹약 seasons'. A subclass (the match host's ContentMatch, a test's) gets the upstream match too.
     if (versionById(opts?.version)?.family === 'regulation' || opts?.data?.config?.version?.family === 'regulation') return new UpstreamMatch(opts);
     if (!opts || !Array.isArray(opts.seats) || opts.seats.length === 0) throw new TypeError('Match: seats required');
     if (typeof opts.send !== 'function' || typeof opts.broadcast !== 'function' || typeof opts.onEnd !== 'function') {
@@ -471,9 +383,6 @@ export class Match {
     this._combatSpeedOverride = Number.isFinite(opts.combatSpeed) && opts.combatSpeed > 0 ? Math.min(opts.combatSpeed, 200) : null;
     /** layouts a bot rehearses per prep with the real simulation (bot.js; 0 = heuristic placement only) */
     this.botRehearsal = Number.isInteger(opts.botRehearsal) && opts.botRehearsal >= 0 ? Math.min(opts.botRehearsal, 8) : BOT_REHEARSAL_DEFAULT;
-    this.bot = getBotStrategy(opts.botStrategy ?? env('SP_BOT_STRATEGY'));
-    /** per-seat overrides of this.bot (seat → strategy; empty by default — botFor) */
-    this.seatBots = getBotStrategySeats(opts.botStrategySeats ?? env('SP_BOT_STRATEGY_SEATS'));
     /** wall-clock budget of one rehearsal slice (scheduleBotPrep) */
     this.botSliceMs = Number.isFinite(opts.botSliceMs) && opts.botSliceMs > 0 ? opts.botSliceMs : this.sched.virtual ? Infinity : BOT_SLICE_MS;
     /**
@@ -589,15 +498,11 @@ export class Match {
     this.bossId = setup.bossId;
     this.hiddenBossId = setup.hiddenBossId;
     const bans = drawDisabledBonds(this.gd, this.rngSetup, {...this.customExtensions,mode:this.mode});
-    this.bondChoice = bans.choice ?? null;
     this.disabledBonds = bans.drawn;
     this.staticInactiveBonds = bans.staticOff;
     this.bannedChess = bans.banned;
     this.pool = new SharedPool(this.gd, { banned: bans.banned });
     this.itemPool = new SharedItemPool(this.gd, () => this.order);
-    // Each human's 自选 stock uses the same exclusion rule (player/diy.js initDiyStock), without randomness.
-    // A bring-limited season stocks nothing until 选择自编 confirms; diyBanned is still the bond-excluded slots.
-    // Solo regulation's provisional stocks are rebuilt when its INFO_CHECK group choice settles.
     const off = new Set([...bans.drawn, ...bans.staticOff]);
     for (const ps of this.order) ps.initDiyStock(off);
 

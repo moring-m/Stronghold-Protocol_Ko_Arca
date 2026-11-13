@@ -42,7 +42,7 @@ import { Worker, isMainThread, parentPort, workerData } from 'node:worker_thread
 import { traceLayers } from './ai/layer-trace.mjs';
 import { runMatch, strategyMetrics, aggregateStrategies } from './ai/run-match.mjs';
 import { Match } from '../server/match/Match.js';
-import { defineBotStrategy } from '../server/match/botStrategyContract.js';
+import { defineBotStrategy } from '../server/match-upstream/botStrategyContract.js';
 import { VirtualScheduler } from '../server/match/scheduler.js';
 import { getData } from '../server/data.js';
 
