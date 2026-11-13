@@ -12,6 +12,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { Client, ROOT, sleep, hasChrome, startRealServer, problemsOf } from '../e2e/client.mjs';
+import { cultivateMul, CULTIVATE_DEFAULT } from '../../shared/potential.js';
 
 const ENABLED = process.env.SP_E2E === '1' && hasChrome() && existsSync(path.join(ROOT, 'public/assets'));
 const BASE = 'chess_char_1_19_a';
@@ -44,10 +45,7 @@ describe('DESIGN §16 — a teammate\'s unit shows its owner\'s loadout (real se
     try {
       await host.open();
       await host.enter('凯尔希');
-      await host.click('.mode-card', '同盟模拟');
-      await host.click('.diff-card', '标准模拟');
-      await host.click('.create-box button', '创建同盟');
-      const room = (await host.waitFor((s) => !!s.room?.code, 'room created')).room;
+      const room = await host.createCoop();
       await guest.open(`?room=${room.code}`);
       await guest.enter('阿米娅');
       await guest.waitFor((s) => s.room?.code === room.code, 'guest joined');
@@ -58,9 +56,14 @@ describe('DESIGN §16 — a teammate\'s unit shows its owner\'s loadout (real se
       await guest.click('.lo-search input');
       await guest.page.keyboard.type('野鬃');
       await guest.page.waitForFunction(() => document.querySelectorAll('.lo-card').length === 1, { timeout: 5000 });
-      await guest.click('.lo-card');
-      await guest.click('.lo-detail .lo-skill[data-skill="0"]');
-      await guest.click('.lo-detail .lo-mod[data-module="none"]');
+      await guest.click('.lo-card__pick');
+      // the row's quick choices (0.2.2: the roster is one list, a row per operator with its skills and the elite's
+      // modules; the detail's own module cards sit below the fold) — the row and the detail agree on S1 + 不装备
+      await guest.click('.lo-card .lo-q--skill[data-skill="0"]');
+      await guest.click('.lo-card .lo-q--mod[data-module="none"]');
+      await guest.page.waitForFunction(() => document.querySelector('.lo-card .lo-q--skill[data-skill="0"]')?.getAttribute('aria-pressed') === 'true'
+        && document.querySelector('.lo-card .lo-q--mod[data-module="none"]')?.getAttribute('aria-pressed') === 'true'
+        && document.querySelector('.lo-detail .lo-skill.is-on[data-skill="0"]') && document.querySelector('.lo-detail .lo-mod.is-on[data-module="none"]'), { timeout: 3000 });
       await guest.page.waitForFunction(() => /已同步/.test(document.querySelector('.lo-sync')?.textContent || ''), { timeout: 8000 });
       await guest.page.keyboard.press('Escape');
       await guest.page.waitForFunction(() => !document.querySelector('.lo'), { timeout: 3000 });
@@ -144,7 +147,10 @@ describe('DESIGN §16 — a teammate\'s unit shows its owner\'s loadout (real se
       assert.ok(card.skill.includes(s1.name) && card.tag, `teammate card: ${s1.name} 已调配 (${JSON.stringify(card)})`);
       assert.ok(!card.skill.includes(sDef.name), 'not the default skill');
       assert.ok(card.none && card.module.includes('未装备模组'), `teammate card: 未装备模组 (${JSON.stringify(card)})`);
-      assert.equal(card.stats['攻击'], String(rec.statsBase.atk), `teammate card ATK without the module (${JSON.stringify(card.stats)})`);
+      // the card reads the unit's own numbers: the 练度 multiplier on (0.2.2: the default 精英阶段2-60级, shared/potential.js)
+      const mul = cultivateMul(JSON.parse(readFileSync(path.join(ROOT, 'data/effects.json'), 'utf8')), CULTIVATE_DEFAULT);
+      assert.ok(mul, 'the default 练度 has its multipliers');
+      assert.equal(card.stats['攻击'], String(Math.round(rec.statsBase.atk * mul.atk)), `teammate card ATK without the module (${JSON.stringify(card.stats)})`);
       assert.deepEqual(problemsOf([host, guest]), []);
     } finally {
       for (const c of [host, guest]) if (c.problems.length) console.log(c.label, c.problems.slice(0, 20).join('\n'));

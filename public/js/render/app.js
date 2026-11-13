@@ -146,7 +146,12 @@ import { loadoutRecord, resolveRecordLoadout } from '../../../shared/loadoutReco
 // `assets` may be the store from public/js/assets.js or the raw /data/assets.json manifest (it is wrapped);
 // `data` is the client data store (public/js/data.js: lookup(file, id)) or plain { chess, tokens, items, enemies } maps.
 
+<<<<<<< ours
 import { observedBenchExtras } from '../battle/observedBench.js';
+=======
+import { pieceItemProgress } from '../itemProgress.js';
+import { attackRateEvents } from './attackRate.js';
+>>>>>>> theirs
 import { GEO, ANIM } from '../../../shared/constants.js';
 import { fxForm } from '../../../shared/protocol.js';
 import { Camera, presetCamera, lerpCamera, easeInOutCubic, pickTile, normRect } from './projection.js';
@@ -481,7 +486,7 @@ export function releaseGl(renderer) {
  * @param {HTMLElement} host
  * @param {{ data?: any, assets?: any, audio?: any, settings?: { damageNumbers?: boolean, officialDamageNumbers?: boolean, ammoEnergyCount?: boolean, otherSkins?: boolean, quality?: string }, signal?: AbortSignal,
  *           padding?: object|((kind:string, size:{width:number,height:number}) => object),
- *           hud?: {top:number,bottom:number}|((kind:'prep'|'bossPrep', size:{width:number,height:number}, o:{shop:boolean}) => {top:number,bottom:number}|null) }} [opts]
+ *           hud?: {top:number,bottom:number}|((kind:'prep'|'bossPrep', size:{width:number,height:number}, o:{shop:boolean|'partial'}) => {top:number,bottom:number}|null) }} [opts]
  *   settings.otherSkins (docs/SKINS.md, default on): draw the appearance another player chose. The player the view
  *   belongs to says who is "other" — `view.setMe(store.get().me.playerId)`, ui/fieldHost.js mounts it before the first
  *   board arrives.
@@ -923,9 +928,15 @@ export async function createFieldView(host, options = {}) {
     // — `shop: false` (the folded shop, public issue #5) = the official shop-collapsed camera, clear of the folded
     // shop's HUD band (re-evaluated on resize: camOpts keep the flag)
     const vk = viewKind(kind, o); // (a 'prep' camera on the boss rows = the Final Assault prep)
+<<<<<<< ours
     const camera = presetCamera(k, { width: sz.width, height: sz.height, padding: o.padding || defaultPadding(k, sz) }, {
       rect, rows:stageRec?.rows?.length,cols:stageRec?.rows?.[0]?.length, side: o.side, half: !!o.half, shop: o.shop, fit: !!o.fit || !!stageRec?.coopEightStage, observedBench: !!o.observedBench, config: stageRec?.config || null,
       hud: hudBands(vk, sz, { shop: o.shop !== false }),
+=======
+    return presetCamera(k, { width: sz.width, height: sz.height, padding: o.padding || defaultPadding(k, sz) }, {
+      rect, side: o.side, half: !!o.half, shop: o.shop, fit: !!o.fit, config: stageRec?.config || null,
+      hud: hudBands(vk, sz, { shop: o.shop ?? true }),
+>>>>>>> theirs
     });
     if (k === 'pen' && bossPreview()) { camera.ty -= visualStage()?.previewLayout?.offset || 0; camera.update(); }
     // HUD clearance includes the back row's operator heads; do not pan upward after fitting it.
@@ -1132,7 +1143,11 @@ export async function createFieldView(host, options = {}) {
     }
     if (kind === 'token') {
       const rec = data.token(piece.id);
-      return { kind: 'token', side: 'ally', defId: piece.id, spine: rec?.assets?.spine || piece.id, avatar: rec?.assets?.avatar || piece.id, tier: piece.tier || 1, golden: false, dir };
+      return { kind: 'token', side: 'ally', defId: piece.id, spine: rec?.assets?.spine || piece.id, avatar: rec?.assets?.avatar || piece.id,
+        tier: piece.tier || 1, golden: false, dir,
+        // 召唤物皮肤 (docs/SKINS.md): the outfit of the operator that owns this summon, published on the piece by the
+        // server (prep board, hand, 临时整备区); assets.js reads tokens[<token id>].skins[skin] from the composed manifest
+        skin: piece.skin || null };
     }
     const original = data.chess(piece.id);
     const selected = resolveLoadout(lastPrep?.ps?.loadout,original,id=>data.chess(id));
@@ -1333,6 +1348,7 @@ export async function createFieldView(host, options = {}) {
       v.dimmed = false;
       if (info.kind === 'item' && v.setIcon) v.setIcon(info.icon); // an icon the manifest named late (onAssets)
       if (v.setCount) v.setCount(e.piece.kind === 'token' ? e.piece.count : 0);
+      if (v.setItemProgress) v.setItemProgress(pieceItemProgress(e.piece));
       if (v.setItems) v.setItems(Array.isArray(e.piece.items) ? e.piece.items.map((it) => { const r = data.item(it?.id); return assets.itemIcon ? assets.itemIcon(r ? { trapId: r.trapId, iconId: r.iconId } : it?.id) : null; }) : []);
       v._showFacing = e.area === 'board';
       // the stored facing (a piece held by the direction step shows the wheel's preview instead)
@@ -1423,7 +1439,7 @@ export async function createFieldView(host, options = {}) {
       const sig = `${info.defId}|${info.golden ? 1 : 0}|${info.spine || ''}|${info.skin || ''}|${info.x},${info.y}|${info.dir || ''}|${(info.items || []).join(',')}`;
       let v = views.get(info.id);
       if (v && v._sig !== sig) { dropView(info.id); v = null; }
-      if (v) continue;
+      if (v) { v.info.itemProgress = info.itemProgress; v.setItemProgress?.(info.itemProgress); continue; }
       v = new UnitView(ctx, { ...info, maxHp: 1 }, { prep: true });
       v._sig = sig;
       v.setWorld(info.x, info.y, heightAt(info.y, info.x));
@@ -1740,11 +1756,18 @@ export async function createFieldView(host, options = {}) {
       }
     }
     // the drop target (p.target, highlighted) is the tile under the pointer
+<<<<<<< ours
     if (p.target && p.target.area !== 'temp') {
       const r = p.target.area === 'board' ? p.target.row : GEO.HAND_ROW;
       const c = p.target.area === 'board' ? p.target.col : p.target.idx;
       // (a legal target shows the official marks alone — the green wash and the range — no frame of its own)
       if (p.legal && settings.tileMarkStyle === 'official') clearHl('dragTarget'); else drawHighlight([[r, c]], p.legal ? 'target' : 'illegal', 'dragTarget');
+=======
+    if (p.target && (p.target.area !== 'temp' || p.legal)) {
+      const r = p.target.area === 'board' ? p.target.row : p.target.area === 'temp' ? GEO.TEMP_ROW : GEO.HAND_ROW;
+      const c = p.target.area === 'board' ? p.target.col : p.target.area === 'temp' ? GEO.TEMP_C0 + p.target.idx : p.target.idx;
+      drawHighlight([[r, c]], p.legal ? 'target' : 'illegal', 'dragTarget');
+>>>>>>> theirs
     } else clearHl('dragTarget');
   }
 
@@ -1752,9 +1775,10 @@ export async function createFieldView(host, options = {}) {
     if (!dragState) return;
     const v = dragState.view;
     const t = p.target;
-    if (t && (t.area === 'board' || t.area === 'hand')) {
-      const row = t.area === 'board' ? t.row : GEO.HAND_ROW, col = t.area === 'board' ? t.col : t.idx;
-      const w = boardWorld(row, col, t.area === 'hand');
+    if (t && (t.area === 'board' || t.area === 'hand' || t.area === 'temp')) {
+      const row = t.area === 'board' ? t.row : t.area === 'temp' ? GEO.TEMP_ROW : GEO.HAND_ROW;
+      const col = t.area === 'board' ? t.col : t.area === 'temp' ? GEO.TEMP_C0 + t.idx : t.idx;
+      const w = boardWorld(row, col, t.area !== 'board');
       v._tween = { fx: v.x, fy: v.y, fz: v.z, tx: w.x, ty: w.y, tz: w.z, t: 0 };
       pending.set(dragState.key, { t: performance.now(), view: v, board: t.area === 'board' ? { row, col } : null });
     } else {
@@ -1974,6 +1998,10 @@ export async function createFieldView(host, options = {}) {
     let skin = info.sourceSkin === undefined ? info.skin : info.sourceSkin;
     if (info.kind === 'op' && playerSkins.has(info.ownerId)) {
       skin = playerSkins.get(info.ownerId)[info.diy?.charId || info.spine] || null;
+    } else if (info.kind === 'token' && info.ownerCharId && playerSkins.has(info.ownerId)) {
+      // 召唤物皮肤 (docs/SKINS.md): a summon wears the outfit of the operator that owns it, so the owner's current choice
+      // is read the same live way; no choice (the owner wears the default) draws the summon's own model.
+      skin = playerSkins.get(info.ownerId)[info.ownerCharId] || null;
     }
     if (!skin) return null;
     if (info.ownerId == null || !myId || info.ownerId === myId) return skin;
@@ -2118,6 +2146,7 @@ export async function createFieldView(host, options = {}) {
 
   function handleEvent(e, now) {
     switch (e[0]) {
+      case 'resource': fx.resourceNumber(views.get(e[1]), e); break;
       case 'spawn': {
         const info = applyInfo(e[1]);
         if (!info) break;

@@ -23,6 +23,8 @@ import { getData } from '../../server/data.js';
 import { FIELD, canPlace, placeClass, positionClass, tileKey } from '../../server/match/board.js';
 import { FakeBattle } from './fakeBattle.js';
 import { GEO } from '../../shared/constants.js';
+import { diySlot, diySlotIds } from '../../shared/diy.js';
+import { defaultDiyBring } from '../../shared/diyBring.js';
 import { collectViolations } from '../../server/match/invariants.js';
 import { attachSimClients } from './simClient.js';
 import { morphSlotPolicy, ruleOption } from '../../shared/plugins/rules.js';
@@ -56,7 +58,11 @@ export function makeMatch(o = {}) {
     if (o.script) FakeBattle.script = o.script;
   }
   h.m = new Match({
+<<<<<<< ours
     roomCode: 'TEST', sync:o.sync, kitted:o.kitted, test:o.test, journal:o.journal, testModeGate:o.testModeGate, rules:o.rules, aiPicksLast: o.aiPicksLast, customFactions:o.customFactions, customExtensions:o.customExtensions, mode, difficulty, seats, spectators: o.spectators, seed: o.seed ?? 1, matchNo: o.matchNo, data: o.data ?? DATA, log,
+=======
+    roomCode: 'TEST', mode, difficulty, modeId: o.modeId, seats, spectators: o.spectators, seed: o.seed ?? 1, matchNo: o.matchNo, data: o.data ?? DATA, log,
+>>>>>>> theirs
     send: (id, msg) => {
       for (const fn of h.onSend) fn(id, msg);
       if (msg.t === 'b.snap' || msg.t === 'b.ev') { h.frames++; if (!captureFrames) return true; }
@@ -75,6 +81,13 @@ export function makeMatch(o = {}) {
     // bot layout rehearsal (extra simulated battles per bot prep) is off unless a test asks for it: it multiplies the
     // simulation work of full-match suites; test/match/bot.test.js covers it
     botRehearsal: o.botRehearsal ?? 0,
+<<<<<<< ours
+=======
+    botStrategy: o.botStrategy,
+    botStrategySeats: o.botStrategySeats,
+    externalAI: o.externalAI,
+    externalReplay: o.externalReplay,
+>>>>>>> theirs
     botSliceMs: o.botSliceMs,
     hostId: Object.hasOwn(o, 'hostId') ? o.hostId : seats.find(s=>!s.isBot)?.playerId,
     botRehearsalDelegate: o.botRehearsalDelegate,
@@ -123,7 +136,24 @@ export function makeMatch(o = {}) {
         if (ps.isBot || ps.left) continue;
         if (m.phase === 'INFO_CHECK' && !ps.infoReady) m.handle(ps.playerId, { t: 'g.infoReady' });
         if (m.phase === 'BAND_DRAFT' && m.draftTurn() === ps.playerId) m.handle(ps.playerId, { t: 'g.band', bandId: band });
+<<<<<<< ours
         if (m.phase === 'RECRUIT_PICK' && !ps.recruitReady) m.handle(ps.playerId, { t: 'g.recruitPick', picks: [...(ps.recruitPicks || [])], ready: true });
+=======
+        if (m.phase === 'CUSTOM_CHECK' && ps.diyBring == null) {
+          const bundle = m.gd.raw;
+          const off = new Set([...m.disabledBonds, ...m.staticInactiveBonds]);
+          const banned = [];
+          for (const slotId of Object.keys(ps.diy || {})) {
+            const rec = ps._diyRecords.get(slotId);
+            if (rec && m.gd.bondsExclude(rec, off)) banned.push(slotId);
+          }
+          const slots = defaultDiyBring(diySlotIds(bundle), {
+            roster: ps.diy || {}, banned, limits: m.gd.diyBringLimits,
+            tierOf: (id) => diySlot(id, bundle)?.tier ?? null,
+          });
+          m.handle(ps.playerId, { t: 'g.diyBring', slots });
+        }
+>>>>>>> theirs
         if (m.phase === 'SP_DRAFT' && m.spTurn() === ps.playerId) {
           const idx = m.sp.cards.map((c) => c.idx).find((k) => m.sp.taken[k] == null);
           if (idx != null) m.handle(ps.playerId, { t: 'g.choice', idx });

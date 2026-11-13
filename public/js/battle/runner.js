@@ -93,6 +93,7 @@ import { data as gameData } from '../data.js';
 import { InPageSimHost, WorkerSimHost } from './simHost.js';
 import { trackCombat, combineCombat, prepLayerRecords } from './metrics.js';
 import { t } from '../../../shared/i18n.js';
+import { leaderOpsFromBattle } from '../../../shared/leaderOps.js';
 export { loadBrowserSim, SIM_DATA_FILES } from './simLoader.js';
 
 const TICK = 1 / 30;
@@ -528,6 +529,9 @@ export function createBattleRunner(deps) {
         for (const pid of Object.keys(pool.byPlayer).slice(0, 8)) by[pid] = pool.byPlayer[pid];
         msg.by = by;
       }
+      // cumulative per-operator damage (规程). Omitted when empty so an older message shape stays valid.
+      const ops = leaderOpsFromBattle(e.battle);
+      if (ops) msg.ops = ops;
     } else {
       msg.leaks = Math.min(1e6, p.leaks);
       if(p.leaksCountBy)msg.leaksCountBy=p.leaksCountBy;
@@ -981,15 +985,20 @@ export function createBattleRunner(deps) {
       const round = Number(pub?.round) || 0;
       // a fresh match (m.public gone), a rewound round or a return to a lobby-like phase resets the combat totals
       const resetMetrics = (!pub && lastPhase != null) || round < lastRound
+<<<<<<< ours
         || (pub?.phase !== lastPhase && ['LOBBY', 'INFO_CHECK', 'BAND_DRAFT', 'BATTLE_CHECK'].includes(pub?.phase));
       if (resetMetrics) {combatHistory.clear();practiceEpochs.clear();}
+=======
+        || (pub?.phase !== lastPhase && ['LOBBY', 'INFO_CHECK', 'BAND_DRAFT', 'CUSTOM_CHECK', 'BATTLE_CHECK'].includes(pub?.phase));
+      if (resetMetrics) forgetCombat();
+>>>>>>> theirs
       lastRound = round;
       // solo pause (DESIGN §14): the local battle clocks follow m.public.paused
       setPaused(!!(pub && pub.paused));
       const phase = pub ? pub.phase : null;
       if (phase === lastPhase && !resetMetrics) return;
       lastPhase = phase;
-      if (!phase || ['PREP', 'ROUND_START', 'SP_DRAFT', 'RESULT', 'LOBBY', 'INFO_CHECK', 'BAND_DRAFT', 'BATTLE_CHECK'].includes(phase)) {
+      if (!phase || ['PREP', 'ROUND_START', 'SP_DRAFT', 'RESULT', 'LOBBY', 'INFO_CHECK', 'BAND_DRAFT', 'CUSTOM_CHECK', 'BATTLE_CHECK'].includes(phase)) {
         if (entries.size || pending.size) clear({ keepMetrics: !resetMetrics });
       }
       // warm the simulation up as soon as a match runs (the first b.start then starts at once) — on the room's content set

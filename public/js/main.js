@@ -45,10 +45,15 @@ import { recordError, installTrafficMeter } from './diag.js';
 // checks a room's content set and makes it the data every screen and the battle runner read.
 
 // Polyfills first (older Safari / Firefox ESR): every module evaluated after this one sees them.
+<<<<<<< ours
 
 import { installButtonFocusRelease } from './ui/buttonFocus.js';
 // 한글 패치: 첫 렌더 전에 한국어 사전을 불러오고 DOM 번역기를 건다 (top-level await).
 import {lang as displayLang} from './i18n/i18n.js';
+=======
+import './ui/compat.js';
+import { ReleaseNotesHost } from './ui/releaseNotes.js';
+>>>>>>> theirs
 import { render } from '../vendor/preact.module.js';
 import { useErrorBoundary } from '../vendor/hooks.module.js';
 import { html, UiHosts, Button, MicroLabel, closeAllDialogs } from './ui/components.js';
@@ -77,6 +82,10 @@ import { initLang, useLang, tickerText } from './ui/lang.js';
 import { N_, translateWire } from '../../shared/i18n.js';
 import { installContent, installContentSet } from './content.js';
 import { cosmetics } from './cosmetics.js';
+<<<<<<< ours
+=======
+import { sanitizeVersions, roomVersion, isDefaultVersion, matchFrameVersion, musicSeason, seasonOf, startupVersion, REGULATION_SEASON } from './versions.js';
+>>>>>>> theirs
 
 const RESTORE_GRACE_MS = 1500;
 const JOIN_DELAY_MS = 350;
@@ -382,8 +391,15 @@ function App() {
     <${ToastHost} />
     <${UiHosts} />
     <${GuideHost} />
+<<<<<<< ours
     ${loadoutOpen||favoritesOpen?html`<${LoadoutHost} />`:null}
     ${statsOpen?html`<${StatsHost} />`:null}
+=======
+    <${ReleaseNotesHost} />
+    <${LoadoutHost} />
+    <${StatsHost} />
+    <${VoteOverOverlays} />
+>>>>>>> theirs
   </div>`;
 }
 
@@ -460,7 +476,11 @@ async function boot() {
   net.attachBrowserHooks();
   // Audio: unlock on first gesture, BGM follows the route / match phase (js/audio.js).
   // a cosmetic plugin's sound that will not load falls back like its art (content.js, DESIGN §32 P1a)
+<<<<<<< ours
   installAudio({ getOperator:id=>data.lookup('chess',id), getManifest: () => data.get('assets'), subscribe: store.subscribe, getState: store.get, selectRoute, settings: settingsStore.get(),
+=======
+  installAudio({ getManifest: () => data.get('assets'), subscribe: store.subscribe, getState: store.get, selectRoute, seasonOf: musicSeason, settings: settingsStore.get(),
+>>>>>>> theirs
     onFailed: (url) => cosmetics.fail(url) });
   // …and the music follows the art: the screen's track again when the cosmetic layers change its URLs
   cosmetics.subscribe(() => audio.refreshBgm());
@@ -482,6 +502,7 @@ async function boot() {
     splash.classList.add('is-done');
     setTimeout(() => splash.remove(), 300);
   }
+<<<<<<< ours
   globalThis.__SP__ = { store, net, data, version: 1 };
   globalThis.performance?.mark?.('sp-ui-ready');
   globalThis.__SP_UI_READY__=true;
@@ -497,6 +518,15 @@ async function boot() {
   // Optional local art follows the first UI paint too.
   if(typeof requestIdleCallback==='function')requestIdleCallback(()=>data.load('local').catch(()=>{}),{timeout:2500});
   else setTimeout(()=>data.load('local').catch(()=>{}),300);
+=======
+  // the event's entry animation before the title screen (ui/entryFilm.js); never over a restored match. `entryFilm`
+  // settles once the film has decided: its overlay is up by then, or none comes this page load (the browser tests get
+  // past it before their first click: test/e2e/client.mjs passEntryFilm)
+  const entryFilm = import('./ui/entryFilm.js')
+    .then((m) => m.playEntryFilm({ skip: () => selectRoute(store.get()) === 'game' || seasonOf(startupVersion(store.get())) === REGULATION_SEASON }))
+    .catch((err) => console.warn('[app] entry film unavailable', err));
+  globalThis.__SP__ = { store, net, data, entryFilm, version: 1 };
+>>>>>>> theirs
   // A page keeps the modules it imported at load time for its whole lifetime, so a deploy cannot reach an open tab
   // (ui/buildGuard.js): keep rolling-release rooms through waiting, combat, settlement and reconnect.
   // A newer build only reloads automatically once the player leaves the room. Retirement expiry is enforced separately.

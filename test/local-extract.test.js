@@ -1,7 +1,9 @@
 // tools/local-extract/extract.py (DESIGN §13 / §15): the job table, the manifest merge of --only, and the helpers that
 // summarise Materials (map/<theme>/materials.json) and GameObjects (mesh/<bundle>/prefab.json) for the official 3D
-// board, and enemy_scales.py's table of the official enemy model sizes (build-data MODEL_SCALES). The Python helpers
-// run without UnityPy (duck-typed fakes); the real-output checks skip when nothing was extracted on this machine.
+// board, the token Spine models (TOKEN_SPINES: the Front renderer of each battle token prefab, the merged pages), and
+// enemy_scales.py's table of the official enemy model sizes (build-data MODEL_SCALES). The Python helpers run without
+// UnityPy (duck-typed fakes; merge_alpha needs Pillow); the real-output checks skip when nothing was extracted on this
+// machine. The token models' manifest side: test/local-token-models.test.js.
 
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
@@ -25,6 +27,77 @@ function py(code) {
 }
 
 describe('extract.py helpers (no UnityPy needed)', { skip: !PY && 'no python3' }, () => {
+  test('Windows hot updates select installed current bundles, retain base dependencies and exclude stale copies', () => {
+    const out = py(`
+import tempfile
+from pathlib import Path
+from bundles import client_bundles
+with tempfile.TemporaryDirectory() as tmp:
+    data = Path(tmp) / 'Arknights_Data'
+    base = data / 'StreamingAssets/AB/Windows'
+    hot = data / 'PersistentData/Bundles'
+    def put(root, name, value):
+        p = root / name
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(value)
+    def index(root, name, version, records):
+        put(root, name, json.dumps({'versionId': version, 'manifestName': 'current.idx', 'manifestVersion': 'V1',
+                                   'abInfos': [{'name': n, 'hash': h} for n,h in records]}))
+    old = [('ui/shared.ab','old'), ('refs/dependency.ab','same'), ('ui/missing.ab','old'), ('ui/removed.ab','old')]
+    new = [('ui/shared.ab','new'), ('refs/dependency.ab','same'), ('ui/missing.ab','new'), ('ui/new.ab','new')]
+    index(base, 'hot_update_list.json', '26-10-20', old)
+    index(hot, 'hot_update_list.json', '26-11-06', new)
+    index(hot, 'persistent_res_list.json', '26-11-06', [('ui/shared.ab','new'), ('ui/missing.ab','old'), ('ui/new.ab','new')])
+    for n,h in old: put(base, n, h)
+    for n,h in [('ui/shared.ab','new'), ('ui/missing.ab','old'), ('ui/new.ab','new')]: put(hot, n, h)
+    # Filesystem dates do not decide which release a bundle belongs to.
+    import os
+    os.utime(hot/'ui/shared.ab', (1,1))
+    with client_bundles(base, lambda line: None) as active:
+        result = {p.relative_to(active).as_posix(): p.read_text() for p in active.rglob('*.ab')}
+        assert json.loads((active/'hot_update_list.json').read_text())['versionId'] == '26-11-06'
+        temporary = active
+    assert not temporary.exists()
+    assert (base/'ui/shared.ab').read_text() == 'old'
+    assert (hot/'ui/shared.ab').read_text() == 'new'
+    index(base, 'hot_update_list.json', '26-12-01', old)
+    with client_bundles(base) as active: assert active == base.resolve()
+    with client_bundles(Path(tmp)/'archive') as active: assert active == (Path(tmp)/'archive').resolve()
+    print(json.dumps(result))
+`);
+    assert.deepEqual(out, { 'ui/shared.ab': 'new', 'ui/new.ab': 'new', 'refs/dependency.ab': 'same' });
+  });
+
+  test('local audio resolves packed WAV container names and publishes missing MP3s without replacing existing files', () => {
+    const out = py(`
+import tempfile, types
+from pathlib import Path
+from unittest.mock import patch
+import versions
+clip = NS(m_Name='P_Atk_Test', samples={'test.wav': b'decoded wave'})
+obj = NS(type=NS(name='AudioClip'), read=lambda: clip)
+env = NS(container={'dyn/audio/sound_beta_2/player/p_atk/p_atk_test.wav': obj}, objects=[obj])
+sys.modules['UnityPy'] = NS(load=lambda path: env)
+with tempfile.TemporaryDirectory() as tmp:
+    root = Path(tmp); ab = root/'bundles'; stage=root/'stage'; stage.mkdir()
+    pack=ab/'audio/sound_beta_2/player/p_atk_1.ab'; pack.parent.mkdir(parents=True); pack.write_bytes(b'pack')
+    jobs=[{'bundle':'audio/sound_beta_2/player/p_atk/p_atk_test.ab','clip':'p_atk_test',
+           'source':'dyn/audio/sound_beta_2/player/p_atk/p_atk_test.ogg','path':'audio/sfx/test.mp3'}]
+    def encode(args, **kwargs):
+        assert kwargs['input'] == b'decoded wave'
+        Path(args[-1]).write_bytes(b'encoded mp3')
+    with patch.object(versions.shutil,'which',return_value='ffmpeg'), patch.object(versions.subprocess,'run',side_effect=encode):
+        count=versions.export_audio(ab,stage,root/'assets',jobs,lambda line:None)
+        target=root/'assets/audio/sfx/test.mp3'
+        assert target.read_bytes()==b'encoded mp3'
+        target.write_bytes(b'keep earlier audio')
+        assert versions.export_audio(ab,stage,root/'assets',jobs,lambda line:None)==0
+        assert target.read_bytes()==b'keep earlier audio'
+    print(json.dumps({'added':count}))
+`);
+    assert.deepEqual(out, { added: 1 });
+  });
+
   test('job table: map themes export Materials, the board meshes are exported with their prefab', () => {
     const r = spawnSync(PY, [path.join(TOOL, 'extract.py'), '--print-jobs'], { encoding: 'utf8', env: ENV });
     assert.equal(r.status, 0, r.stderr);
@@ -39,6 +112,112 @@ describe('extract.py helpers (no UnityPy needed)', { skip: !PY && 'no python3' }
     ]);
     for (const j of mesh) assert.deepEqual(j.kinds, ['GameObject', 'Material', 'Mesh', 'Texture2D']);
     assert.equal(new Set(jobs.map((j) => j.sub)).size, jobs.length, 'one output dir per job');
+  });
+
+  test('job table: the token Spine models (TOKEN_SPINES) come from the battle token packs into spine/token/<id>; no plain job writes under spine/', () => {
+    const r = spawnSync(PY, [path.join(TOOL, 'extract.py'), '--print-jobs'], { encoding: 'utf8', env: ENV });
+    assert.equal(r.status, 0, r.stderr);
+    const { jobs, tokenSpines, enemySpines } = JSON.parse(r.stdout);
+    assert.equal(tokenSpines.bundles, 'pkgrps/btl_pfb_tokens_*.ab');
+    assert.equal(tokenSpines.sub, 'spine/token');
+    assert.equal(enemySpines.sub, 'spine/enemy');
+    // every listed id is a token of the game data without a web model (data/assets.json tokens[id].spine), sorted, unique
+    const ids = tokenSpines.ids;
+    assert.equal(ids.length, 40);
+    assert.deepEqual([...ids].sort(), ids);
+    assert.equal(new Set(ids).size, ids.length);
+    const tokens = JSON.parse(readFileSync(path.join(ROOT, 'data/tokens.json'), 'utf8'));
+    const backups = JSON.parse(readFileSync(path.join(ROOT, 'data/backups.json'), 'utf8'));
+    const web = JSON.parse(readFileSync(path.join(ROOT, 'data/assets.json'), 'utf8')).tokens;
+    for (const id of ids) {
+      assert.ok(tokens[id] || backups.tokens[id], `${id}: a token of the game data`);
+      if (id === 'token_10031_swire2_gdtrap') assert.ok(web[id]?.spine, 'champagne has a web skin fallback');
+      else assert.equal(web[id]?.spine, undefined, `${id}: no web model`);
+    }
+    // the 自选 summons whose prefab draws nothing (an EmptyAnimator: displayType HIDDEN / an effect) are left out
+    for (const id of ['token_10039_ulpia_block', 'token_10055_phatm2_mndclv', 'token_10058_sbell2_icetgt', 'token_10065_demetr_dmtpos',
+      'token_10071_aglna2_agairp']) assert.ok(!ids.includes(id), id);
+    assert.ok(!jobs.some((j) => j.sub.startsWith('spine/')), 'the old skinpack job of 乌尔比安\'s block extracted nothing (its skin prefab holds no art)');
+  });
+
+  test('token helpers: prefab container ids, --only selection of model ids, the Front renderer, atlas page names', () => {
+    const out = py(`
+W = {'token_10009_weedy_cannon', 'token_10002_kalts_mon3tr'}
+ids = ['token_a', 'token_b']
+nodes = [('Back', True, {'m_PathID': 2}), ('Front', True, {'m_PathID': 1}), ('Down', True, {'m_PathID': 3})]
+print(json.dumps({
+  'ids': [e.token_prefab_id(c, W) for c in ['dyn/battle/prefabs/[uc]tokens/token_10009_weedy_cannon.prefab',
+    'battle/prefabs/tokens/token_10002_kalts_mon3tr.prefab',
+    'dyn/battle/prefabs/skins/character/token_10002_kalts_mon3tr/token_10002_kalts_mon3tr_boc#6.prefab',
+    'dyn/battle/prefabs/[uc]tokens/token_10000_silent_healrb.prefab', None]],
+  'only': [e.spine_ids(o, 'spine/token', ids) for o in ([], ['spine'], ['spine/token'], ['spine/token/token_b'], ['spine/enemy'], ['map'])],
+  'jobs': {p: [j[1] for j in e.select_jobs([p])] for p in ['enemy', 'token', 'fx', 'common', 'spine/enemy', 'spine/token', 'ui/outer/some_sprite']},
+  'short': [e.spine_ids(o, 'spine/token', ids) for o in (['enemy'], ['token'], ['nope'])],
+  'shortEnemy': [e.spine_ids(o, 'spine/enemy', ['enemy_a']) for o in (['enemy'], ['spine/enemy'])],
+  'pick': [e.pick_spine_node(nodes)[0], e.pick_spine_node([('Spine', True, {}), ('X', True, {})])[0],
+           e.pick_spine_node([('Front', False, {}), ('Other', True, {})])[0], e.pick_spine_node([('A', False, {})])[0], e.pick_spine_node([])],
+  'pages': e.atlas_pages('\\ntoken_x.png\\nsize: 64,64\\nformat: RGBA8888\\nC_Body\\n  rotate: false\\n  xy: 2, 2\\n\\ntoken_x2.png\\nsize: 32,32\\nC_Leg\\n  xy: 0, 0\\n'),
+}))`);
+    assert.deepEqual(out.ids, ['token_10009_weedy_cannon', 'token_10002_kalts_mon3tr', null, null, null]);
+    assert.deepEqual(out.only, [['token_a', 'token_b'], ['token_a', 'token_b'], ['token_a', 'token_b'], ['token_b'], [], []]);
+    // the short form the usage line documents: `--only enemy` selects the enemy list and `--only token` this one, not
+    // an empty selection (a prefix naming nothing stays empty: neither list nor job)
+    assert.deepEqual(out.short, [[], ['token_a', 'token_b'], []]);
+    assert.deepEqual(out.jobs.enemy, out.jobs['spine/enemy']);
+    assert.deepEqual(out.jobs.token, out.jobs['spine/token']);
+    assert.ok(out.jobs['ui/outer/some_sprite'].includes('ui/outer'));
+    assert.ok(!out.jobs.fx.includes('map/fx'));
+    assert.ok(!out.jobs.common.includes('ui/common') && !out.jobs.common.includes('map/common'));
+    assert.deepEqual(out.shortEnemy, [['enemy_a'], ['enemy_a']]);
+    assert.deepEqual(out.pick, ['Front', 'Spine', 'Other', 'A', null]);
+    assert.deepEqual(out.pages, ['token_x.png', 'token_x2.png']);
+  });
+
+  test('prefab_spine_nodes: the SkeletonAnimation renderers of a prefab tree, depth first, inactive branches marked', () => {
+    // a directional token prefab: Graphic / DefaultSkin / FaceSwitcher / {Front, Back} (each with its own skeleton), an
+    // inactive Spare renderer, a component in another bundle (m_FileID ≠ 0) and a MonoBehaviour without a type tree
+    const out = py(`
+class O:
+    def __init__(self, kind, tree=None, err=False): self.type, self._t, self._e = NS(name=kind), tree, err
+    def read_typetree(self):
+        if self._e: raise ValueError('no type tree')
+        return self._t
+objs = {}
+def go(pid, name, kids=(), sda=None, active=1):
+    tr = 100 + pid
+    comps = [{'component': {'m_FileID': 0, 'm_PathID': tr}}]
+    objs[tr] = O('Transform', {'m_Children': [{'m_FileID': 0, 'm_PathID': 100 + k} for k in kids], 'm_GameObject': {'m_FileID': 0, 'm_PathID': pid}})
+    if sda is not None:
+        objs[200 + pid] = O('MonoBehaviour', {'skeletonDataAsset': {'m_FileID': 0, 'm_PathID': sda}})
+        comps.append({'component': {'m_FileID': 0, 'm_PathID': 200 + pid}})
+    objs[pid] = O('GameObject', {'m_Name': name, 'm_IsActive': active, 'm_Component': comps})
+go(1, 'token_x', kids=(2, 7))
+go(2, 'Graphic', kids=(3,))
+go(3, 'FaceSwitcher', kids=(4, 5, 6))
+go(4, 'Front', sda=41)
+go(5, 'Back', sda=51)
+go(6, 'Spare', sda=61, active=0)
+go(7, 'Modes')
+objs[107]._t['m_Children'] = []
+objs[1]._t['m_Component'] += [{'component': {'m_FileID': 3, 'm_PathID': 999}}, {'component': {'m_FileID': 0, 'm_PathID': 300}}]
+objs[300] = O('MonoBehaviour', err=True)
+nodes = e.prefab_spine_nodes(objs[1].read_typetree(), objs)
+print(json.dumps({'nodes': [[n, a, r['m_PathID']] for n, a, r in nodes], 'pick': e.pick_spine_node(nodes)[2]['m_PathID']}))`);
+    assert.deepEqual(out.nodes, [['Front', true, 41], ['Back', true, 51], ['Spare', false, 61]]);
+    assert.equal(out.pick, 41, 'the Front skeleton (the fetched tokens use Front / Spine too)');
+  });
+
+  test('merge_alpha: the [alpha] texture as A, else the page\'s own alpha; the main RGB stays straight (never clamped to A)', { skip: spawnSync(PY, ['-c', 'import PIL']).status !== 0 && 'no Pillow' }, () => {
+    const out = py(`
+from PIL import Image
+rgb = Image.new('RGB', (2, 1)); rgb.putdata([(200, 100, 50), (90, 90, 90)])
+alpha = Image.new('RGB', (2, 1)); alpha.putdata([(128, 128, 128), (255, 255, 255)])
+rgba = Image.new('RGBA', (2, 1)); rgba.putdata([(60, 200, 10, 100), (0, 0, 0, 0)])
+print(json.dumps({'split': list(e.merge_alpha(rgb, alpha).getdata()), 'own': list(e.merge_alpha(rgba, None).getdata()),
+  'opaque': list(e.merge_alpha(rgb, None).getdata())}))`);
+    assert.deepEqual(out.split, [[200, 100, 50, 128], [90, 90, 90, 255]], 'A from the [alpha] texture, the main RGB as it is');
+    assert.deepEqual(out.own, [[60, 200, 10, 100], [0, 0, 0, 0]], 'an RGBA page keeps its own alpha and RGB (the newer tokens: _UseAlphaTex 0)');
+    assert.deepEqual(out.opaque, [[200, 100, 50, 255], [90, 90, 90, 255]], 'no alpha anywhere: opaque');
   });
 
   test('material_info: textures by name with tiling, floats, colours, sorted keywords; unresolvable refs → null', () => {

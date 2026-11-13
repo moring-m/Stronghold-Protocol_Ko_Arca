@@ -24,6 +24,7 @@ import { kindOf } from './formats.mjs';
 import { pickUnitSfx, assignSkillModeSfx, UI_SFX, BATTLE_SFX, resolveSpec, indexVoice, nativeVoiceDirs, VOICE_DIRS, VOICE_CUSTOM_DIR, VOICE_BATTLE_SLOTS } from './audio.mjs';
 import { literal } from './manifest.mjs';
 import { EMOTE_CATALOG } from '../../shared/constants.js';
+import { DEFAULT_VERSION } from '../../shared/versions.js';
 
 /**
  * The voice slots are read from the zh_CN charword table, whose voiceIds are always `CN_*`: the other dubs
@@ -233,14 +234,16 @@ function walkKeys(node, add) {
  * @returns {Map<string, number[]>}
  */
 export function patternOperator(id, x = {}) {
+  // skin_table.buildinPatchMap: medic Amiya's only default skin is char_1037_amiya3#2.
+  const baseE2 = id === 'char_1037_amiya3';
   const sp = (side) => {
     const b = `${RAW.fexli}spine/${id}/${id}/${side}/${id}`;
     return { skel: `${b}.skel`, atlas: `${b}.atlas`, png: `${b}.png` };
   };
   return {
     name: x.name ?? null, subProfessionId: x.subProfessionId ?? null, nationId: x.nationId ?? null, chess: [],
-    avatar: { e0e1: { url: `${RAW.yuanyan}avatar/${id}.png` }, e2: { url: `${RAW.yuanyan}avatar/${id}_2.png` } },
-    portrait: { e0e1: { url: `${RAW.yuanyan}portrait/${id}_1.png` }, e2: { url: `${RAW.yuanyan}portrait/${id}_2.png` } },
+    avatar: { e0e1: { url: `${RAW.yuanyan}avatar/${id}${baseE2 ? '_2' : ''}.png` }, e2: { url: `${RAW.yuanyan}avatar/${id}_2.png` } },
+    portrait: { e0e1: { url: `${RAW.yuanyan}portrait/${id}_${baseE2 ? '2' : '1'}.png` }, e2: { url: `${RAW.yuanyan}portrait/${id}_2.png` } },
     skills: (x.skills || []).map((s) => ({
       index: s.index, skillId: s.skillId, iconId: s.iconId || s.skillId,
       icon: { url: `${RAW.yuanyan}skill/skill_icon_${encodeURIComponent(s.iconId || s.skillId)}.png` },
@@ -379,11 +382,36 @@ export function collectEnemyIds({ assets07, enemies05, maps05, ops03 }) {
  * @param {Record<string, import('./spine.mjs').LocalSpineMeta>} [p.localEnemySpines] metadata of the enemy models the
  *   local client has (the committed tools/assets/local-enemy-spines.json, never the disk): each planned enemy listed
  *   gets `spineLocal` = { group: 'spine/enemy/<id>', ...meta } beside its web `spine`
+<<<<<<< ours
  * @returns {{ template: any, models: Map<string, any>, notes: string[] }}
  */
 export function buildPlan({ assets07, ops03, enemies05, maps05, audio, modelsData, charword = null, voiceLang = 'cn', charModes = null,
   voiceSlots = VOICE_BATTLE_SLOTS, voiceJp = true, optionalVoice = false, statsTemplate = [],
   extraEnemyIds = [], extraTokenIds = [], extraHandbook = {}, localEnemySpines = {}, extraOperators = {} }) {
+=======
+ * @param {Record<string, import('./spine.mjs').LocalSpineMeta>} [p.localTokenSpines] the same for the token (summon)
+ *   models (tools/assets/local-token-spines.json): each planned token listed gets `spineLocal` = { group:
+ *   'spine/token/<id>', ...meta } beside its web `spine`, if any (most have none: the client drew the avatar)
+ * @param {Record<string, any>} [p.extraOperators] charId → { subProfessionId, nationId, skills: [{ index, skillId, iconId }] }
+ *   of characters research 07 does not list (the 自选 owned-6★ picks, data/backups.json `units`): planned like the pool
+ *   operators from patternOperator
+ * @param {string[]} [p.moduleTypes] module type icon ids (`typeIcon`, e.g. 'sol-x') → manifest `modules[typeIcon]`, the
+ *   official type icon (arts/ui/uniequiptype) the 干员调配 / 自选 module tiles draw when the local-client art lacks it
+ * @param {Array<{name:string,rel:string,urls:string[],kind:string}>} [p.statsTemplate] official statistics UI assets
+ * @param {Map<string, {modes:{name:string}[], skillMode:Map<string, number|null>}>|null} [p.charModes]
+ *   from {@link charModesFromIndex} (the local fx index). Absent: skill attack slots stay on the filename letter.
+ * @param {{ seasons?: Record<string, { combat?: { early: string, late: string }, bosses?: Record<string, string>, unite?: string|null, notes?: string[] }> }|null} [p.seasonMusic]
+ *   bank names per season (`seasonMusicSpec` in tools/assets/versions.mjs). Absent: no `audio.seasons` — the default
+ *   season stays the top-level `audio.bgm` / `audio.bossBgm`, and a plan that does not ask for seasons keeps that
+ *   object's keys. The default season is never written under `seasons` even if the spec names it.
+ * @returns {{ template: any, models: Map<string, any>, notes: string[] }}
+ */
+export function buildPlan({ assets07, ops03, enemies05, maps05, audio, modelsData, charword = null, voiceLang = 'cn',
+  voiceJp = true, voiceSlots = VOICE_BATTLE_SLOTS, optionalVoice = false,
+  extraEnemyIds = [], extraTokenIds = [], extraHandbook = {}, localEnemySpines = {}, localTokenSpines = {}, extraOperators = {},
+  moduleTypes = [], statsTemplate = [], charModes = null, extraBands = {}, extraItems = {}, extraBonds = {},
+  seasonMusic = null }) {
+>>>>>>> theirs
   const notes = [];
   /** @type {Map<string, any>} */
   const models = new Map();
@@ -433,9 +461,10 @@ export function buildPlan({ assets07, ops03, enemies05, maps05, audio, modelsDat
     const idx0 = skillIdx.get(id) || [0];
     const idx = [...idx0, ...(o.skills || []).map((k) => k.index).filter((i) => Number.isInteger(i) && i >= 0 && !idx0.includes(i)).sort((a, b) => a - b)];
     const c = {};
-    c.avatar = leaf(alt(`char/avatar/${id}.png`, o.avatar?.e0e1?.url, o.avatar?.e0e1?.bytes));
+    const baseE2 = id === 'char_1037_amiya3'; // the default patch skin above, including non-golden chess
+    c.avatar = leaf(alt(`char/avatar/${id}${baseE2 ? '_2' : ''}.png`, o.avatar?.e0e1?.url, o.avatar?.e0e1?.bytes));
     if (o.avatar?.e2?.url) c.avatarE2 = leaf(alt(`char/avatar/${id}_2.png`, o.avatar.e2.url, o.avatar.e2.bytes));
-    c.portrait = leaf(alt(`char/portrait/${id}_1.png`, o.portrait?.e0e1?.url, o.portrait?.e0e1?.bytes));
+    c.portrait = leaf(alt(`char/portrait/${id}_${baseE2 ? '2' : '1'}.png`, o.portrait?.e0e1?.url, o.portrait?.e0e1?.bytes));
     if (o.portrait?.e2?.url) c.portraitE2 = leaf(alt(`char/portrait/${id}_2.png`, o.portrait.e2.url, o.portrait.e2.bytes));
     c.spine = {};
     const front = fexliModel(`op:${id}:front`, 'op', `spine/op/${id}/front/`, o.battleSpine?.front, idx);
@@ -708,6 +737,50 @@ export function buildPlan({ assets07, ops03, enemies05, maps05, audio, modelsDat
       if (m && !bossBgm[m[1]] && !String(u).startsWith('mode_training')) bossBgm[m[1]] = flatBgm(bgmLeaf(`battle.ON_GAME_READY.${lv.bgm}`));
     }
   }
+  // Other seasons (第一期, 规程, …). The default season is the top-level `bgm` / `bossBgm` above and is not repeated
+  // here, so an older client and an older manifest keep working. Banks come from seasonMusicSpec (the versions'
+  // waves.json `bgm`, each level's official bgmEvent). A missing lobby bank is not a note: the key is optional.
+  let seasons = null;
+  if (seasonMusic && typeof seasonMusic.seasons === 'object' && seasonMusic.seasons) {
+    const built = {};
+    for (const [season, spec] of Object.entries(seasonMusic.seasons)) {
+      if (season === DEFAULT_VERSION || !spec || typeof spec !== 'object' || Array.isArray(spec)) continue;
+      for (const note of Array.isArray(spec.notes) ? spec.notes : []) if (typeof note === 'string' && note) notes.push(note);
+      const slotBgm = {};
+      const lobbyName = `sys.ON_ACTIVITY_LOADED.${season}`;
+      if (audio.bgm(lobbyName)?.loop) {
+        const lobby = flatBgm(bgmLeaf(lobbyName));
+        if (lobby) slotBgm.lobby = lobby;
+      }
+      const combat = spec.combat;
+      if (combat && typeof combat.late === 'string' && combat.late && typeof combat.early === 'string' && combat.early) {
+        const late = flatBgm(bgmLeaf(`battle.ON_GAME_READY.${combat.late}`));
+        const early = flatBgm(bgmLeaf(`battle.ON_GAME_READY.${combat.early}`));
+        // Both or neither. One missing bank must not shift the indexes (0 = rounds 8+, 1 = rounds 1–7).
+        if (late && early) slotBgm.combatAlts = [late, early];
+      }
+      if (spec.unite === null) {
+        // [ASSUMED] Escaped levels that name no bgmEvent (第一期) keep the round's 开战 music. An explicit null, not a
+        // missing key: a missing key would fall back to the default season's 联防 track. literal() so resolveTemplate
+        // keeps the null — a plain null node is dropped.
+        slotBgm.unite = literal(null);
+      } else if (typeof spec.unite === 'string' && spec.unite) {
+        const uniteTrack = flatBgm(bgmLeaf(`battle.ON_GAME_READY.${spec.unite}`));
+        if (uniteTrack) slotBgm.unite = uniteTrack;
+      }
+      const slotBoss = {};
+      const bossIds = Object.keys(spec.bosses || {}).filter((id) => /^boss_\d+$/.test(id))
+        .sort((a, b) => a.localeCompare(b, 'en', { numeric: true }));
+      for (const id of bossIds) {
+        const name = spec.bosses[id];
+        if (typeof name !== 'string' || !name) continue;
+        const bossTrack = flatBgm(bgmLeaf(`battle.ON_GAME_READY.${name}`));
+        if (bossTrack) slotBoss[id] = bossTrack;
+      }
+      if (Object.keys(slotBgm).length || Object.keys(slotBoss).length) built[season] = { bgm: slotBgm, bossBgm: slotBoss };
+    }
+    if (Object.keys(built).length) seasons = built;
+  }
   const sfxUi = {};
   for (const [name, spec] of Object.entries(UI_SFX)) { const l = soundLeaf(resolveSpec(spec, audio.bank)); if (l) sfxUi[name] = l; else notes.push(`UI SFX ${name}: no sound`); }
   const sfxBattle = {};
@@ -766,6 +839,7 @@ export function buildPlan({ assets07, ops03, enemies05, maps05, audio, modelsDat
     audio: {
       bgm,
       bossBgm: Object.fromEntries(Object.entries(bossBgm).sort(([a], [b]) => a.localeCompare(b, 'en', { numeric: true }))),
+      ...(seasons ? { seasons } : {}),
       voice,
       ...(voiceJp ? { voiceJp: voiceTree(VOICE_JP_LANG) } : {}),
       ...optionalTrees,

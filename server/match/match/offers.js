@@ -144,6 +144,20 @@ export class MatchOffers {
     w.picks.set(ps.playerId, { idx, timeout: true });
   }
 
+<<<<<<< ours
+=======
+  _offerBot(ps, w) {
+    const fallback = () => {
+      this._offerDefault(ps, w);
+      this._offerSettleIfDone(w);
+      this._offerProgress();
+    };
+    if (this.botFor(ps).decide?.(this, ps, { kind: 'offer', key: `offer:${w.seq}`, deadline: w.deadline,
+      valid: () => !w.closed && !w.picks.has(ps.playerId), complete: () => w.picks.has(ps.playerId), fallback })) return;
+    this._offerDefault(ps, w);
+  }
+
+>>>>>>> theirs
   _offerSettleIfDone(w) {
     if (w.closed) return;
     const total = this._offerParticipants(w).length;

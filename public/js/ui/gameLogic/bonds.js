@@ -2,7 +2,7 @@
 
 import { int, isObj } from './shared.js';
 import { diyPicks } from './diy.js';
-import { t } from '../../../../shared/i18n.js';
+import { t, N_ } from '../../../../shared/i18n.js';
 import { grantedBondsByMorph } from '../../../../shared/plugins/rules.js';
 
 
@@ -321,13 +321,23 @@ export function disabledBondSets(pub, staticInactive = []) {
   return { drawn, off };
 }
 
+// the official briefing's line under 核心盟约 (2026-11 规程 recordings: 规程等级1, 极速模拟, 规程等级20)
+export const BOND_GROUP_HINT = N_('请选择一组在本次模拟中激活的盟约，未被选择的盟约将不会出现在本次模拟中');
+// our wording of the rule (server/match/gamedata.js bondsExclude): the tutorial's grey core, the owner's lit core (2026-11-13)
+export const REGULATION_BOND_LEGEND = N_('灰色核心盟约的干员无法出现，同时属于亮着的核心盟约的除外；没有核心盟约的干员，附加盟约全部置灰时无法出现');
+// the chip on a 规程 briefing header (2026-11 recordings). The longer sentence stays the chip's title.
+export const REGULATION_LEGEND_CHIP = N_('部分盟约所含干员阵容不完整');
+
 /**
  * Briefing tooltip of a bond disc.
  * @param {string} name
  * @param {'off'|'drawn'|null} state from disabledBondSets
  * @param {number} bannedN banned operators of the bond
+ * @param {boolean} regulationCore whether this is a regulation core bond
  */
-export function briefingBondTip(name, state, bannedN = 0) {
+export function briefingBondTip(name, state, bannedN = 0, regulationCore = false) {
+  // 规程: a grey core keeps only the operators that also belong to a lit core (server gamedata bondsExclude, §37.142)
+  if (state && regulationCore) return t(N_('{name}：该核心盟约的干员无法出现，同属亮着的核心盟约的除外'), { name });
   if (state === 'off') return t('{name}：本局禁用（该盟约不会激活）', { name });
   if (state === 'drawn' || bannedN > 0) return bannedN ? t('{name}：部分盟约所含干员阵容不完整（{bannedN} 名干员无法出现）', { name, bannedN }) : t('{name}：部分盟约所含干员阵容不完整', { name });
   return name;

@@ -1,0 +1,166 @@
+# 상류 0.3.4(规程) 병합 진행 상황
+
+기준: 상류 0.3.3(upstream/master f07b8965)을 병합 기준으로 한 3-way. 아래 파일은 아직 충돌 표시(<<<<<<< ours)가 남아 있거나 상류에서 삭제된 파일이다.
+
+| 충돌 수 | 포크 변경 줄 | 상류 변경 줄 | 파일 |
+|---|---|---|---|
+| 50 | 987 | 2777 | `server/match/bot.js` |
+| 29 | 1200 | 309 | `server/lobby.js` |
+| 22 | 792 | 192 | `public/js/screens/game.js` |
+| 17 | 1138 | 441 | `tools/build-data.mjs` |
+| 13 | 799 | 108 | `public/js/screens/room.js` |
+| 12 | 220 | 269 | `public/js/ui/shopBar.js` |
+| 11 | 821 | 140 | `public/js/screens/lobby.js` |
+| 10 | 28 | 28 | `test/setup-local-freshness.test.js` |
+| 10 | 160 | 139 | `public/js/screens/sweep.js` |
+| 9 | 700 | 227 | `public/js/audio.js` |
+| 9 | 475 | 49 | `public/js/ui/detailPanel.js` |
+| 9 | 258 | 90 | `public/js/ui/hud.js` |
+| 9 | 204 | 610 | `public/i18n/ko.json` |
+| 7 | 3876 | 33 | `server/match/Match.js` |
+| 7 | 288 | 40 | `public/js/ui/bondStrip.js` |
+| 7 | 107 | 39 | `public/js/render/vfx/system.js` |
+| 6 | 93 | 42 | `public/js/ui/enemyDrawer.js` |
+| 6 | 87 | 38 | `public/js/ui/fallbackField.js` |
+| 6 | 72 | 55 | `public/js/screens/title.js` |
+| 6 | 63 | 191 | `public/js/ui/matchInfo.js` |
+| 6 | 523 | 113 | `public/css/screens/game-panels.css` |
+| 6 | 492 | 69 | `public/js/ui/settings.js` |
+| 6 | 151 | 53 | `shared/protocol.js` |
+| 6 | 1004 | 72 | `public/css/screens/room.css` |
+| 5 | 63 | 40 | `server/sim/rehearsal.js` |
+| 5 | 409 | 34 | `public/js/screens/bandDraft.js` |
+| 5 | 349 | 468 | `server/sim/content/items/battle.js` |
+| 5 | 274 | 45 | `public/css/screens/sweep.css` |
+| 5 | 240 | 14 | `public/js/main.js` |
+| 5 | 207 | 99 | `server/sim/content/bonds/core.js` |
+| 5 | 111 | 31 | `public/js/screens/briefing.js` |
+| 4 | 853 | 64 | `public/css/screens/game.css` |
+| 4 | 642 | 115 | `tools/local-extract/extract.py` |
+| 4 | 531 | 28 | `test/content/bonds_core.test.js` |
+| 4 | 44 | 69 | `test/ui/asset-download.browser.test.js` |
+| 4 | 205 | 134 | `test/ui/match-info.test.js` |
+| 4 | 1945 | 23 | `server/match/PlayerState.js` |
+| 4 | 170 | 35 | `shared/constants.js` |
+| 4 | 15 | 35 | `server/plugins/roomSets.js` |
+| 4 | 130 | 132 | `server/sim/content/garrisons/battle.js` |
+| 3 | 921 | 32 | `public/js/render/app.js` |
+| 3 | 90 | 22 | `public/js/net.js` |
+| 3 | 78 | 48 | `server/match/effectsMeta.js` |
+| 3 | 49 | 19 | `test/match/harness.js` |
+| 3 | 325 | 12 | `tools/fetch-assets.mjs` |
+| 3 | 2913 | 4 | `server/sim/Battle.js` |
+| 3 | 17 | 28 | `server/match/match/prep.js` |
+| 3 | 168 | 29 | `server/sim/content/bosses.js` |
+| 3 | 1421 | 50 | `public/js/render/units.js` |
+| 3 | 133 | 14 | `server/index.js` |
+| 3 | 126 | 7 | `test/lobby.test.js` |
+| 3 | 12 | 14 | `public/js/ui/pluginPanel.js` |
+| 2 | 97 | 64 | `public/js/ui/choiceOverlay.js` |
+| 2 | 88 | 7 | `public/js/ui/screenFit.js` |
+| 2 | 81 | 68 | `public/css/screens/title.css` |
+| 2 | 78 | 10 | `test/ui/watch-bonds.test.js` |
+| 2 | 70 | 26 | `public/js/ui/matchChrome.js` |
+| 2 | 67 | 3 | `public/index.html` |
+| 2 | 63 | 216 | `server/match/builtinMeta.js` |
+| 2 | 62 | 9 | `public/js/ui/effectsList.js` |
+| 2 | 55 | 17 | `server/sim/content/bands/battle.js` |
+| 2 | 5 | 51 | `server/match/match/bossRounds.js` |
+| 2 | 481 | 23 | `public/js/ui/loadoutSync.js` |
+| 2 | 48 | 20 | `test/ui/followup-023.e2e.test.js` |
+| 2 | 450 | 15 | `public/css/screens/draft.css` |
+| 2 | 40 | 26 | `server/match/audit.js` |
+| 2 | 383 | 10 | `tools/golden.mjs` |
+| 2 | 38 | 13 | `test/full-potential.test.js` |
+| 2 | 358 | 51 | `test/ui/gameLogic.test.js` |
+| 2 | 335 | 43 | `public/js/ui/components.js` |
+| 2 | 28 | 12 | `server/sim/content/kits/README.md` |
+| 2 | 26 | 6 | `test/ui/issue602-deploy-fold.test.js` |
+| 2 | 236 | 160 | `public/i18n/en.json` |
+| 2 | 213 | 160 | `public/i18n/zh-TW.json` |
+| 2 | 204 | 160 | `public/i18n/ja.json` |
+| 2 | 196 | 8 | `public/css/screens/game-shop.css` |
+| 2 | 182 | 12 | `public/js/content.js` |
+| 2 | 17 | 32 | `test/sim/rehearsal.test.js` |
+| 2 | 159 | 5 | `server/sim/skills.js` |
+| 2 | 141 | 9 | `server/http/config.js` |
+| 2 | 13 | 8 | `server/match/match/spDraft.js` |
+| 2 | 123 | 20 | `public/js/ui/gameComponents.js` |
+| 2 | 1205 | 8 | `public/js/screens/loadout.js` |
+| 2 | 111 | 7 | `server/sim/grid.js` |
+| 1 | 997 | 9 | `public/css/screens/loadout.css` |
+| 1 | 97 | 97 | `server/match/player/diy.js` |
+| 1 | 93 | 23 | `public/js/ui/gameLogic/settings.js` |
+| 1 | 91 | 7 | `test/ui/text-scale.e2e.test.js` |
+| 1 | 9 | 2 | `test/ui/teammate-band.test.js` |
+| 1 | 9 | 15 | `public/js/screens/cultivation.js` |
+| 1 | 85 | 29 | `server/match/pool.js` |
+| 1 | 83 | 7 | `server/sim/content/tokens.js` |
+| 1 | 82 | 38 | `public/js/assets.js` |
+| 1 | 73 | 69 | `server/sim/content/bands/meta.js` |
+| 1 | 7 | 12 | `test/audio-pools-data.test.js` |
+| 1 | 69 | 256 | `server/sim/content/garrisons/meta.js` |
+| 1 | 644 | 254 | `test/ui/audio.test.js` |
+| 1 | 634 | 2 | `public/js/render/vfx/wiring.js` |
+| 1 | 6 | 3 | `server/match/testTrace.js` |
+| 1 | 6 | 10 | `public/js/render/app/windup.js` |
+| 1 | 571 | 95 | `public/css/components.css` |
+| 1 | 56 | 9 | `public/js/ui/operatorVoice.js` |
+| 1 | 56 | 18 | `server/sim/content/devices.js` |
+| 1 | 46 | 10 | `public/js/ui/skins.js` |
+| 1 | 458 | 75 | `server/sim/content/kits/index.js` |
+| 1 | 44 | 18 | `server/sim/spec.js` |
+| 1 | 42 | 55 | `test/e2e/client.mjs` |
+| 1 | 41 | 11 | `server/match/finalAssault.js` |
+| 1 | 41 | 11 | `public/js/ui/fieldHost.js` |
+| 1 | 40 | 2 | `test/ui/text-scale.test.js` |
+| 1 | 40 | 184 | `server/match/match/phases.js` |
+| 1 | 4 | 4 | `test/ui/morph-bonds.test.js` |
+| 1 | 4 | 24 | `server/sim/content/kits/ops/chess_char_6_16-halo2.js` |
+| 1 | 38 | 16 | `public/js/ui/underframe.js` |
+| 1 | 368 | 12 | `server/sim/ai.js` |
+| 1 | 36 | 8 | `server/sim/content/kits/ops/chess_char_4_19-flamtl.js` |
+| 1 | 345 | 137 | `public/css/screens/briefing.css` |
+| 1 | 32 | 8 | `public/js/render/projection.js` |
+| 1 | 3 | 51 | `public/js/ui/assetDownload.js` |
+| 1 | 29 | 19 | `test/ui/bandDraft.test.js` |
+| 1 | 28 | 6 | `public/js/ui/gameActions.js` |
+| 1 | 27 | 54 | `server/sim/content/kits/ops/chess_char_6_11-mlyss.js` |
+| 1 | 247 | 14 | `tools/assets/spine.mjs` |
+| 1 | 245 | 3 | `test/ui/screen-fit.e2e.test.js` |
+| 1 | 240 | 8 | `public/js/battle/runner.js` |
+| 1 | 218 | 15 | `test/assets.test.js` |
+| 1 | 20 | 81 | `test/sim/feedback3-ulpia-move.test.js` |
+| 1 | 2 | 2 | `test/ui/prep-bench.test.js` |
+| 1 | 2 | 2 | `data/tokens.json` |
+| 1 | 2 | 2 | `data/chess.json` |
+| 1 | 2 | 2 | `data/backups.json` |
+| 1 | 2 | 2 | `data/assets.json` |
+| 1 | 1846 | 2 | `public/js/ui/gameLogic.js` |
+| 1 | 182 | 25 | `server/sim/content/bonds/addon/battle.js` |
+| 1 | 18 | 20 | `test/i18n.test.js` |
+| 1 | 1586 | 133 | `public/css/screens/lobby.css` |
+| 1 | 157 | 7 | `test/docs-consistency.test.js` |
+| 1 | 15 | 3 | `server/match/testReplay.js` |
+| 1 | 15 | 2 | `server/match/match/offers.js` |
+| 1 | 14 | 123 | `test/ui/audio-pools.test.js` |
+| 1 | 136 | 16 | `public/js/screens/settle.js` |
+| 1 | 13 | 75 | `server/match/match/platform.js` |
+| 1 | 13 | 4 | `public/js/ui/toasts.js` |
+| 1 | 122 | 114 | `test/match/bot-smarter.test.js` |
+| 1 | 109 | 9 | `public/js/render/board3d/load.js` |
+| 1 | 108 | 6 | `server/sim/snapshot.js` |
+| 1 | 105 | 23 | `public/dev/game-mock.js` |
+| 1 | 103 | 2 | `public/js/render/interp.js` |
+| 1 | 102 | 64 | `tools/assets/plan.mjs` |
+| 1 | 101 | 19 | `server/sim/content/enemies.js` |
+| 1 | 10 | 152 | `test/ui/asset-download.test.js` |
+
+상류에서 삭제됐지만 포크에 남은 파일:
+- modify/delete o=1 t=0 b=0 server/sim/content/kits/tier1.js
+- modify/delete o=1 t=0 b=0 server/sim/content/kits/tier2.js
+- modify/delete o=1 t=0 b=0 server/sim/content/kits/tier3.js
+- modify/delete o=1 t=0 b=0 server/sim/content/kits/tier4.js
+- modify/delete o=1 t=0 b=0 server/sim/content/kits/tier5.js
+- modify/delete o=1 t=0 b=0 server/sim/content/kits/tier6.js
+- modify/delete o=1 t=0 b=0 server/sim/damage.js

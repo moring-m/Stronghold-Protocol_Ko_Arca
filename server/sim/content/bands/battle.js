@@ -38,6 +38,7 @@
 import { num, buffsOf, bandRecord, isOp, onField, isElite, tierOf, unitBonds, activeBondIds, playerOps, passiveBuff, fxOn, matchBands, gainLayers, alliesAround, N4, baseChessId, isGroundOp, directMods } from '../support/index.js';
 import { weaknessRetype, addShieldLayer, reviveNow } from '../items/battle.js';
 import { spawnMapChar } from '../tokens.js';
+import { installCommandMarks } from './commands.js';
 
 export const AMEDIC_BAND = 'band_amedic';
 /** 'fatal' priority of 埃芒加德: after the operators' own items (PRIO_REVIVE / PRIO_RESPAWN) and every talent / skill saver. */
@@ -50,6 +51,13 @@ const deployedOps = (battle, pid) => playerOps(battle, pid, { fieldOnly: true })
 // band buff behaviours: (battle, ps, params, bandId)
 
 const BY_KEY = {
+  attr_common_global_buff(battle, ps, p, bandId) {
+    if (!ps.input.commandEffectId && battle.data.raw.config?.version?.family !== 'regulation') return;
+    for (const u of playerOps(battle, ps.playerId)) {
+      if (p.filter_autochess_golden && !isElite(u)) continue;
+      passiveBuff(battle, u, `${keyOf(bandId)}:attributes`, { ...directMods({ atk: num(p.atk), hp: num(p.max_hp) }), aspd: num(p.attack_speed) });
+    }
+  },
   // 阿米娅 众志合一
   act1autochess_band2_buff(battle, ps, p, bandId) {
     const n = activeBondIds(battle, ps.playerId).length;
@@ -163,6 +171,10 @@ const BY_KEY = {
     battle.on('hit', (c) => {
       const s = c.source;
       if (!isOp(s) || s.ownerId !== ps.playerId || !c.target || c.target.side !== 'enemy') return;
+<<<<<<< ours
+=======
+      if (isVersionData() && battle.data.raw.config?.version?.family !== 'regulation' && s.def?.position !== 'RANGED') return;
+>>>>>>> theirs
       weaknessRetype(c.dmg, s, c.target);
     }, { priority: 5 });
   },
@@ -226,7 +238,8 @@ export function amedicCharsFor(elites, variants = amedicVariants()) {
 function installMapChars(battle) {
   const variants = amedicVariants();
   if (!variants.length) return;
-  const holders = battle.players.filter((ps) => matchBands(battle, ps.playerId).includes(AMEDIC_BAND));
+  const holders = battle.players.filter((ps) => matchBands(battle, ps.playerId).includes(AMEDIC_BAND)
+    && (!ps.input.commandEffectId || buffsOf(battle.data.raw.effects?.[ps.input.commandEffectId]).some(isMapCharBuff)));
   if (!holders.length) return;
   battle.on('battleStart', () => {
     const chars = [];
@@ -258,9 +271,15 @@ export function hasBattlePart(bandId) {
 }
 
 export function install(battle) {
+<<<<<<< ours
   for (const ps of battle.players) for(const [index,bandId] of [ps.bandId,...(battle.data.raw?.config?.commonBands||[])].entries()) {
     if(!bandId)continue;
     const band = bandRecord(bandId);
+=======
+  for (const ps of battle.players) {
+    const band = ps.input.commandEffectId ? battle.data.raw.effects?.[ps.input.commandEffectId]
+      : ps.bandId ? bandRecord(ps.bandId) : null;
+>>>>>>> theirs
     if (!band) continue;
     for (const b of buffsOf(band)) {
       const f = b.bbKey ? BY_KEY[b.bbKey] : null;
@@ -269,4 +288,5 @@ export function install(battle) {
     }
   }
   installMapChars(battle);
+  installCommandMarks(battle);
 }

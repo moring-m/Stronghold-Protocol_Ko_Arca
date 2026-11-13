@@ -1,6 +1,7 @@
 // Local listening preference, shared by roster and DIY details; deliberately absent from room.loadout.
 // Korean/Japanese choices remain available while the manifest loads. Missing Korean lines fall back to Japanese.
 import { html } from './components.js';
+import { ComboBox } from './comboBox.js';
 import { useSettings, updateSettings } from './settings.js';
 import { t } from '../../../shared/i18n.js';
 import { audio } from '../audio.js';
@@ -43,10 +44,14 @@ export function OperatorVoice({ charId }) {
   };
   return html`<label class="lo-voice" data-voice-char=${charId}>
     <span>${t('此干员语音')}</span>
-    <span class="lo-select"><select aria-label=${t('此干员语音')} value=${value} onChange=${(e) => change(e.currentTarget.value)}>
-      ${options.map((o) => html`<option key=${o.value} value=${o.value}>${o.label}</option>`)}
-    </select></span>
+    <span class="lo-select"><${ComboBox} label=${t('此干员语音')} value=${value}
+      options=${options.map((o) => ({ value: o.value, label: o.label }))}
+      onChange=${(e) => change(e.currentTarget.value)} /></span>
     <button type="button" class="lo-voice__preview" onClick=${preview}>${t('试听')}</button>
+<<<<<<< ours
     <small>${'이 브라우저에 저장됩니다. 없는 한국어 음성은 일본어로 재생합니다.'}</small>
+=======
+    <small>${t('仅保存在此浏览器。未把中文列入下载时，缺句不再请求中文。')}</small>
+>>>>>>> theirs
   </label>`;
 }

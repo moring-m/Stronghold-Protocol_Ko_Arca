@@ -43,10 +43,36 @@ import { installTraitAttackSpeed } from './content/traitMods.js';
 //   `abs: true` on a unit (or player `coords: 'field'`) = field tiles (and field directions).
 // Robustness: every content callback and every step phase is wrapped; errors are logged once per key and the
 // battle continues. After MAX_INTERNAL_ERRORS the battle force-ends as a timeout.
+<<<<<<< ours
 
 import {visibleSkillAreaKeys} from './skillArea.js';
 import { TICK, ROWS, COLS, BLOCK_RADIUS_SQ, DP_DEFAULTS, DOWN_STATE, FORCED_EXIT, MAX_BATTLE_TIME, MAX_INTERNAL_ERRORS, COLD_FREEZE_DURATION, OBSTACLE_DEVICES, EVENT_BUFFER_CAP, BOSS_ROW_OFFSET, MAX_HOOK_DEPTH, MAX_ALIVE_ENEMIES, LEVITATE_HALF_WEIGHT, RESIST_DEFAULT, PUSH_TILES, PUSH_TILES_EFFECT, PULL_WEAK_SHARE, PULL_CRAWL, PULL_ORIGIN, PULL_STOP_RADIUS, PUSH_DIRECTIONAL_MIN_DIST, AUTO_OP_COOLDOWN, STEALTH_RESTORE } from './constants.js';
 import { GEO, layerGainRoom } from '../../shared/constants.js';
+=======
+//
+// Code layout: this file keeps the constructor (fields, players, spawn queue, content install); the methods live in
+// server/sim/battle/, one module per concern, and are installed on Battle.prototype below in a fixed order, with the
+// descriptors of class methods (non-enumerable; `this` is the battle, subclasses and `super` calls work as before):
+//   players.js       board → field tiles / directions, ally creation, kit / profile / skill setup
+//   lifecycle.js     start (the battle-start deployment), step (the tick order above), end checks, BattleResult
+//   hooks.js         hook bus (on / off / emit), timers (after / every), content-callback isolation and errors
+//   spawns.js        spawn queue, routes, spawnEnemy; hidden enemies, boss pool sync, field clamp, list compaction
+//   deploy.js        deploy, kill, retreat, removal bookkeeping, redeploys, leaks
+//   blocking.js      contact blocking, block release, the 隐匿 switch-off after a block
+//   status.js        buffs, catalogue statuses (抵抗, 寒冷 → 冻结, 诱导, 恐惧 …), "同名效果取最高", the buff tick
+//   combat.js        damage / heal / HP loss (the attack.js pipeline), projectiles, forced attacks
+//   queries.js       enemy tile index, unit queries (tiles, grid, radius, selectability), players, range rebuilds
+//   summons.js       tokens (summons), devices, stage devices
+//   tiles.js         obstacles, relocation / 【移动】, knocked-out bodies, reserved tiles, tactical points, ground paths
+//   displacement.js  push / pull / displace (受力等级 = force − weight); pushTiles
+//   economy.js       DP, IN_BATTLE bond layers, bounty coins
+//   events.js        client events, snapshot, field meta, fx, the sim log
+//   leaderHits.js    per-operator damage taken off the current leader pool (boss / hidden only; not in BattleResult)
+//   util.js          fin / clone
+
+import { TICK, ROWS, COLS, DP_DEFAULTS, MAX_HOOK_DEPTH, AUTO_OP_COOLDOWN } from './constants.js';
+import { GEO } from '../../shared/constants.js';
+>>>>>>> theirs
 import { createRng } from './rng.js';
 import { Grid } from './grid.js';
 import { Unit } from './units.js';
@@ -56,6 +82,7 @@ import { absoluteRangeKeys, canTargetEnemy, extendedGrid, evadesGround, enemySte
 import { bodyKeys, bodyInKeys, bodyInRadius } from './body.js';
 import { normDir, mirrorDir, localOrder, localBefore } from './dir.js';
 import { ProjectileSystem } from './projectiles.js';
+<<<<<<< ours
 import { stampFear } from './fear.js';
 import { SkillRuntime } from './skills.js';
 import {attackClipTiming} from '../../shared/attackTiming.js';
@@ -64,6 +91,28 @@ import { resolveProfile } from './professions.js';
 import { unitInfo, snapshotUnits, storedEnergy } from './snapshot.js';
 import { toDataSource, normalizeRoute, normalizeStage, normalizeToken, normalizeEnemy } from './simdata.js';
 import { installContent, setupUnitKit } from './content/index.js';
+=======
+import { remainingDistance } from './ai.js';
+import { toDataSource, normalizeRoute, normalizeStage } from './simdata.js';
+import { installContent } from './content/index.js';
+import { BattlePlayers } from './battle/players.js';
+import { BattleLifecycle } from './battle/lifecycle.js';
+import { BattleHooks } from './battle/hooks.js';
+import { BattleSpawns } from './battle/spawns.js';
+import { BattleDeploy } from './battle/deploy.js';
+import { BattleBlocking } from './battle/blocking.js';
+import { BattleStatus } from './battle/status.js';
+import { BattleCombat } from './battle/combat.js';
+import { BattleQueries } from './battle/queries.js';
+import { BattleSummons } from './battle/summons.js';
+import { BattleTiles } from './battle/tiles.js';
+import { BattleDisplacement } from './battle/displacement.js';
+import { BattleEconomy } from './battle/economy.js';
+import { BattleEvents } from './battle/events.js';
+import { BattleLeaderHits } from './battle/leaderHits.js';
+
+export { pushTiles } from './battle/displacement.js';
+>>>>>>> theirs
 
 const DEFAULT_RECTS = { normal: GEO.NORMAL_RECT, unite: GEO.UNITE_RECT, boss: GEO.BOSS_RECT, hidden: GEO.BOSS_RECT };
 let hookSeq = 0;
@@ -2882,6 +2931,7 @@ export class Battle {
     return `Battle<${this.kind} seed=${this.seed} t=${this.time.toFixed(2)} units=${this.units.length}${this.finished ? ' ' + this.reason : ''}>`;
   }
 
+<<<<<<< ours
   // exposed for ai/content convenience
 
   /**
@@ -2996,6 +3046,14 @@ export class Battle {
     const out = [];
     for (const a of set) if (a.alive && a.deployed && !a.hidden && (a.x - x) * (a.x - x) + (a.y - y) * (a.y - y) <= r2) out.push(a);
     return out;
+=======
+// the method modules, in this order (a name defined twice is an error, never a silent override)
+for (const part of [BattlePlayers, BattleLifecycle, BattleHooks, BattleSpawns, BattleDeploy, BattleBlocking, BattleStatus, BattleCombat, BattleQueries, BattleSummons, BattleTiles, BattleDisplacement, BattleEconomy, BattleEvents, BattleLeaderHits]) {
+  for (const key of Reflect.ownKeys(part.prototype)) {
+    if (key === 'constructor') continue;
+    if (Object.prototype.hasOwnProperty.call(Battle.prototype, key)) throw new Error(`Battle.${String(key)} is defined twice`);
+    Object.defineProperty(Battle.prototype, key, Object.getOwnPropertyDescriptor(part.prototype, key));
+>>>>>>> theirs
   }
 }
 

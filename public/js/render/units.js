@@ -88,9 +88,14 @@ import { unlimitedSkillRange } from '../../../shared/skillRangeDisplay.js';
 // screen rect for tooltips and overlays (view.pieceScreenRect). A dragged (lifted) item plate is drawn centred on its
 // ground point, i.e. on the pointer (render/app.js).
 
+<<<<<<< ours
 
 import { FORMS } from '../../../shared/animationForms.js';
 import { skillVisualTheme } from './skillVisualTheme.js';
+=======
+import { progressLabel } from '../itemProgress.js';
+import { MoteRing } from './motes.js';
+>>>>>>> theirs
 import { UF, ANIM } from '../../../shared/constants.js';
 import { SpineActor } from './spine.js';
 import { diamondTexture, shadowTexture, fxAtlas, tierChip, statusTexture, itemTexture, hudRings, ringArc, thickRingArc, HUD_DISC, ELEMENT_RING, stealthMistTexture, downLabel } from './textures.js';
@@ -1166,6 +1171,24 @@ export class UnitView {
     this.countText = null;
     this.ammoText = null;          // 设置「弹药数量」: the magazine's count under the ammo bar (_updateAmmoCount)
     this.itemPips = [];
+    this.itemProgressText = null;
+    this.setItemProgress(this.info.itemProgress);
+  }
+
+  /** Equipment's prep-side progress, below the carrier's feet in prep and combat. */
+  setItemProgress(rows) {
+    const label = (rows || []).map(progressLabel).filter(Boolean).join('\n');
+    if (!label) {
+      if (this.itemProgressText) { this.itemProgressText.text = ''; this.itemProgressText.visible = false; }
+      return;
+    }
+    if (!this.itemProgressText) {
+      this.itemProgressText = new this.P.Text('', { fontFamily: 'Bender, Oxanium, sans-serif', fontSize: 16, fontWeight: '700', fill: '#4ed8af', stroke: '#0b0f0e', strokeThickness: 4, align: 'center' });
+      this.itemProgressText.anchor.set(0.5, 0);
+      this.hud.addChild(this.itemProgressText);
+    }
+    if (this.itemProgressText.text !== label) this.itemProgressText.text = label;
+    this.itemProgressText.visible = true;
   }
 
   /** Show a stack count (token stacks in the hand) — BitmapText-free: a tiny canvas-less chip via Text. */
@@ -1576,7 +1599,12 @@ export class UnitView {
       }
       this.lastAtk = now;
     }
+<<<<<<< ours
     if(!this.hasAttackInterval && !allInRange)this.faceTarget(target);
+=======
+    // operators keep their deploy direction (research 09 §1.2); an enemy turns toward the target
+    this._faceAttack(target);
+>>>>>>> theirs
     if (target) {
       const dx = target.x - this.x, dy = target.y - this.y, len = Math.hypot(dx, dy) || 1;
       this.lungeDir.x = dx / len; this.lungeDir.y = dy / len;
@@ -1589,18 +1617,36 @@ export class UnitView {
   }
 
   /**
+   * Face this attack's target. An enemy turns when the target is not straight ahead (|dx| > 0.1); an operator keeps
+   * its deploy direction (research 09 §1.2). The wind-up uses the same rule the moment its clip starts (GitHub #869):
+   * the strike used to be the first time the model turned, so a blocker redeployed behind a walking enemy was swung
+   * at while the model still faced the old walk.
+   */
+  _faceAttack(target) {
+    if (!target || !this.isEnemy) return;
+    const dx = target.x - this.x;
+    if (Math.abs(dx) > 0.1) this.visFacing = dx < 0 ? -1 : 1;
+  }
+
+  /**
    * An attack by this unit is `lead` game seconds ahead in the snapshot buffer: start the Spine attack wind-up now
    * so the strike frame lines up with the attack. True once started (then stop calling for that attack). `kind` = the
-   * 'atk' projKind (a one-off cast winds up at the clip's own speed).
+   * 'atk' projKind (a one-off cast winds up at the clip's own speed). `target` = that attack's view: the model faces
+   * it as the clip starts, by the same rule as onAttack.
    */
+<<<<<<< ours
   windUp(lead, kind, castSlot = null, interval = null) {
     if(Number.isFinite(interval)&&interval>0){this.atkInterval=interval;this.hasAttackInterval=true;}
+=======
+  windUp(lead, kind, castSlot = null, interval = this.atkInterval, target = null) {
+>>>>>>> theirs
     if (!this.alive || !this.actor || !this.spineReady) return false;
     this._attackForm(kind);
     this._selectMakotoAttack();
     this.actor.castStrike?.(this._strikeClip(castSlot));
     const ok = this.actor.windUp(this.atkInterval, lead, !!PROJ[kind]?.once);
     if (!ok) this.actor.castStrike?.(null);
+    else this._faceAttack(target);
     if (ok && this.imp) this.imp.dirty = true;
     return ok;
   }
@@ -2533,6 +2579,11 @@ export class UnitView {
       pip.width = pip.height = ps;
       pip.position.set(this.screen.x - s * 0.36 + i * (ps + 1), this.screen.y - s * 0.05);
       pip.visible = this.alive;
+    }
+    if (this.itemProgressText) {
+      this.itemProgressText.visible = this.alive && !!this.itemProgressText.text;
+      this.itemProgressText.scale.set(clamp(s * 0.2, 10, 16) / 16);
+      this.itemProgressText.position.set(this.screen.x, this.screen.y + s * 0.14);
     }
   }
 

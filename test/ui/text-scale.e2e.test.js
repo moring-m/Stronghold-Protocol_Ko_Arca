@@ -6,6 +6,7 @@
 // the modal's rem-sized box and — through the dev mock's 休整期 screen — the field host, the canvas and the shop bar stay
 // exactly where they were. Static counterpart: test/ui/text-scale.test.js.
 
+import { seedReleaseRead } from '../helpers/releaseNotes.js';
 import { test, describe, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
@@ -49,7 +50,12 @@ describe('文字大小 on a phone (headless Chrome)', { skip: !ENABLED && 'set S
     page.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resource|Refused to apply style|Spine: error in texture loader/.test(m.text())) problems.push(`console: ${m.text()}`); });
     page.on('pageerror', (e) => problems.push(`pageerror: ${e.message}`));
     if (seed && textSize) await seedSettings(page, textSize);
+<<<<<<< ours
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+=======
+    await seedReleaseRead(page);
+    await page.goto(url, { waitUntil: 'networkidle0', timeout: 60000 });
+>>>>>>> theirs
     return { page, problems };
   }
 
@@ -70,8 +76,9 @@ describe('文字大小 on a phone (headless Chrome)', { skip: !ENABLED && 'set S
     }
     return {
       root: parseFloat(getComputedStyle(document.documentElement).fontSize),
-      label: px('.set-row__label'),
-      micro: px('.set-row__label .micro'),
+      // a row's label (round 72 put the section captions — also .set-row__label — above the first row)
+      label: px('.set-row .set-row__label'),
+      micro: px('.set-row .set-row__label .micro'),
       modalWidth: box ? Math.round(box.width) : null,
       bodyOverflowX: body ? body.scrollWidth - body.clientWidth : null,
       outRight: Math.round(outRight),

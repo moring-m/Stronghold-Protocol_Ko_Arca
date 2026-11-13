@@ -215,8 +215,13 @@ describe('文字大小: the CSS text root', () => {
     const byRel = new Map(sheets.map((s) => [s.rel, s.src]));
     const samples = [
       ['components.css', /\.btn \{[^}]*font-size: calc\(\.18 \* var\(--t\)\)/s],
+<<<<<<< ours
       ['settings.css', /\.set-row__label \{[^}]*font-size: calc\(\.18 \* var\(--t\)\)/s],
       ['screens/game-panels.css', /\.dtext \{ font-size: calc\(\.15 \* var\(--t\)\); line-height: 1\.65;/],
+=======
+      ['screens/game.css', /\.set-row__label \{[^}]*font-size: calc\(\.18 \* var\(--t\)\)/s],
+      ['screens/game-panels.css', /\.dtext \{ font-size: max\(calc\(\.15 \* var\(--t\)\), 12px\); line-height: 1\.65;/],
+>>>>>>> theirs
       ['screens/guide.css', /\.guide__tips li \{ font-size: calc\(\.18 \* var\(--t\)\)/],
       ['screens/lobby.css', /\.mode-card__desc/, ],
     ];

@@ -558,7 +558,14 @@ board than the anchor (`pos` z > 0; 50 prefabs of the used set — auras, the `*
 facing up) puts the effect farther from the camera than the unit's tilted body, which lies at its feet's depth, so
 Unity draws it first (0.3.1: 瑕光 S3's horses, wings and halo, z +0.23 and 0.5–1.1 tiles behind her feet, covered her);
 a `static_offset` pulled forward (z < 0) or at 0 keeps the flat rule [ASSUMED: the units' renderers sort at their
-feet's depth; an effect whose depth comes from its children's positions alone is not judged].
+feet's depth; an effect whose depth comes from its children's positions alone is not generally judged].
+The verified exception is 魔王 S3's `cetsyr_skill_03_buff_01` / `beijing_01`: its +0.104 depth belongs to a nested
+`scale` helper while `static_offset` is zero. This standing background must not use the global ground pass: raised
+2D tile rows share the unit layer and would cover it. Only this mesh uses an owner-local `unitBack` draw node at
+the start of `UnitView.root`, sorting after that owner's platform and before its body. Each owner's items are sorted
+and batched independently; finished effects and destroyed owners release the node. Its authored order 0 and its
+siblings' original pass remain unchanged [ASSUMED: a scoped painter-order mapping, not full Unity distance sorting;
+history 0.3.4 §37.106].
 
 ### 33.7 Materials (`descriptor.materials[]`)
 
@@ -1371,7 +1378,8 @@ index.json — version 1 and the version 2 fields (§33.12, §33.15; Phase 3c) �
   while the unit stands, IMMEDIATELY once), a husk's revival ('revived') its ManualTriggerRebornTalent's `_effects`;
   then `reborn.mode`'s attacks; null — the sim fx its `triggers` name (a fatal blow, ON_BEFORE_TRY_SET_HP_ZERO:
   'substitute' / 'undying'; a stand-in buff's ON_BUFF_FINISH: 'swap' / 'dollEnd'; ON_SKILL_START: the skill's start;
-  ON_OWNER_BORN: the deploy), its rows once (a loop for 3 s [ASSUMED]); `attack` — only where a kit fx marks the
+  ON_OWNER_BORN: the deploy; the one point strike, `talents.js POINT_TRIGGERS`: 新约能天使's `angel2_t_1[target]` → the
+  sim's talent 'airstrike' fx, its attack plan's first hit group at the fx's spot — PR #861, 0.3.4 §37.19), its rows once (a loop for 3 s [ASSUMED]); `attack` — only where a kit fx marks the
   talent's attack ('extraAttack': 守林人's 受选之人 — the attack's casts on the owner, its hits on that attack's target), else
   nothing (8 roster nodes). The forms' modes come from the data (`talents.js formModes`: a RebornTalent's 'form2' →
   `reborn.mode`, a husk's modes, a 傀儡师's 'doll' → the mode its fatal-blow node switches to — 风丸 → Stand, whose attack

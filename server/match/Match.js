@@ -91,6 +91,21 @@ import { modeExtensionSelection, applyCustomExtensions, normalizeCustomExtension
 //                    Bot playerIds start with 'ai_'. Seat indexes may have gaps (e.g. seats 0 and 2).
 //                    `loadout` (DESIGN §16, optional): the human's operator loadout, already checked by the lobby
 //                    (shared/protocol.js checkLoadout); PlayerState re-checks it against opts.data and ignores it for bots.
+<<<<<<< ours
+=======
+//                    `ops` (0.2.2, optional): the human's per-operator 潜能 / 练度 (checkLoadoutOps; missing = 潜能 6, 精英2
+//                    Lv.60 — the owner's decision of 2026-10-08), re-checked and changed like the loadout (INFO_CHECK);
+//                    bots fight with the defaults.
+//                    `notOwned` (0.2.0 补位, optional): the base chess ids the human marked as not owned (干员持有) — fixed
+//                    for the match; those chess fight as their stand-ins (PlayerState setNotOwned; bots own everything).
+//                    `diy` (0.2.0 自选编队, optional): the human's 自选 picks (shared/protocol.js checkDiyPicks) — fixed for
+//                    the match; the slotted operators join the human's own shop (PlayerState setDiy / initDiyStock).
+//                    A version with diyBringLimits waits for 选择自编 and stocks only the confirmed slots.
+//   opts.kitted      string[] (optional)        the operators a 自选 slot may field in this room (the content set's
+//                                              list, lobby.kittedFor). Absent on a vanilla match, so setDiy keeps
+//                                              KITTED_CHARS and a normal match stays byte-identical. A modded room
+//                                              always passes it (local match, match host, test journal / replay).
+>>>>>>> theirs
 //   opts.spectators  string[] (optional)        the room's spectator seats (remake feature, community report #26;
 //                                              server/lobby.js): never players — see addSpectator below
 //   opts.seed        uint32                     master seed for all match randomness
@@ -115,6 +130,14 @@ import { modeExtensionSelection, applyCustomExtensions, normalizeCustomExtension
 //   → { ok: true }          platform turns into onLeave). Return { error: ERR code (shared/constants.js),
 //   | { error, detail? }    detail?: string } to reject. Must not throw (if it does, the platform logs and
 //                           replies ERR.INTERNAL). Replies ('ok'/'error' with rid) are sent by the platform.
+// aiHandoverView()          Spectator AI handover, read by the lobby (in-process or through the version match
+//   → { ok: true, ... }     host). Phase, round, ended, disposed, emergencyFrozen, and per player isBot / left /
+//                           alive / autoplay. funds and pieceUids ride along so a test can see the inherited
+//                           inventory; the lobby does not vote on them. Same { error, detail } refusal as handle.
+// acceptAiHandover(botId, name) → { ok: true } | { error, detail? }
+//                           Match half of inheriting that bot seat: cancel its prep token and its rehearsal only,
+//                           clear bot/autoplay, set the spectator's name, loneHuman, aiTakeoverRound. The lobby
+//                           rebinds the session, seat and token. A version match host answers this like handle.
 // onDisconnect(playerId)    A human's socket dropped. The seat is kept; apply the auto-play policy.
 // onReconnect(playerId)     The human is back (new socket with its token) or re-sent hello on a live socket
 //                           (a resync request). May be called without a preceding onDisconnect. Resend full
@@ -180,9 +203,18 @@ import { modeExtensionSelection, applyCustomExtensions, normalizeCustomExtension
 //   opts.BattleClass   Battle implementation (default server/sim/Battle.js; tests inject test/match/fakeBattle.js)
 //   opts.battleContent 'full' | 'generic' | 'none' (sim content mode, default 'full')
 //   opts.timerScale    multiplier on every real-time phase timer (default 1)
+<<<<<<< ours
 //   opts.combatSpeed   explicit tool/test speed override; defaults: normal/unite 2×, boss/hidden 1×
 //   opts.botRehearsal  candidate layouts a bot simulates per prep before placing (default 3, 0 = heuristic only;
 //                      a whole battle per candidate: ~20–300 ms of CPU each, see server/match/bot.js createRehearsal)
+=======
+//   opts.combatSpeed   game seconds per real second while battles run in real time (default 2, the forced 2×)
+//   opts.botRehearsal  candidate layouts a bot simulates per prep before placing (default 6, 0 = heuristic only;
+//                      a whole battle per candidate: ~20–300 ms of CPU each, see server/match/bot.js createRehearsal)
+//   opts.botStrategy  a registered ID or trusted server-side strategy object; defaults to SP_BOT_STRATEGY / 'legacy'
+//   opts.botStrategySeats  per-seat overrides { [seat 0..3]: ID | object } or 'seat:id,…'; defaults to
+//                      SP_BOT_STRATEGY_SEATS (none); a seat not listed plays opts.botStrategy (getBotStrategySeats)
+>>>>>>> theirs
 //   opts.botSliceMs    wall-clock ms of rehearsal per scheduler callback (default 8 with a real scheduler, unbounded
 //                      with a virtual one); the rest runs in later callbacks (scheduleBotPrep)
 //   opts.headlessSliceMs  wall-clock ms per callback of a server-run normal / 联防 field (client-side combat: bots,
@@ -201,10 +233,46 @@ import { modeExtensionSelection, applyCustomExtensions, normalizeCustomExtension
 //     copy the seat holds returns to the shared pool at once, the seat leaves the round loop, the Final Assault
 //     pairing and the boss pool; its own running normal battle is force-ended. The seat shows status 'left'. When no
 //     human is left at all the match ends ('abandoned'); when nobody alive is left it ends as 'eliminated'.
+<<<<<<< ours
 
 import { C2S, unitStatsEntry } from '../../shared/protocol.js';
 import { normalizeChatText, chatFaction, CHAT_HISTORY_LIMIT, CHAT_COOLDOWN_MS } from '../../shared/chat.js';
 import { PHASE, ERR, EMOTES, EMOTE_COOLDOWN_MS, GEO, modeIdFor, layerGainRoom } from '../../shared/constants.js';
+=======
+//
+// Code layout: this file keeps the constructor (options, seats, the per-match setup, the state fields); the methods
+// live in server/match/match/, one module per concern, and are installed on Match.prototype below in a fixed order,
+// with the descriptors of class methods (non-enumerable; `this` is the match, subclasses and `super` calls work as
+// before):
+//   platform.js      the interface above: start, handle, setLoadout, disconnect / reconnect / resync, leave, dispose
+//   infra.js         error isolation, timers and the phase deadline, player lists, bonds in the pool, deploy field,
+//                    meta dispatch
+//   messaging.js     send / broadcast / toasts / tickers, dirty marks, flush (m.private per player, m.public throttled)
+//   views.js         m.public (statuses, field progress, pendingLp / uniteLeft), the nextEnemies preview, the prep
+//                    scout's m.field
+//   watch.js         spectator seats, g.watch, who is shown which field, resend on reconnect, prep-scout pushes
+//   intents.js       the g.* / b.* router, emotes, AI 托管, g.unitStats
+//   pause.js         the solo pause
+//   phases.js        INFO_CHECK, BAND_DRAFT (the strategy draft), CUSTOM_CHECK (选择自编, when diyBringLimits is set), BATTLE_CHECK, ROUND_START
+//   spDraft.js       SP_DRAFT (机变) and the rolls the meta effects ask for (bounties, item ids, pools)
+//   prep.js          PREP: its start, the AI seats' sliced preps, Ready, the deadline, its end
+//   combat.js        battle construction, COMBAT (both modes), the per-field results, then 联防 or SETTLE
+//   clientCombat.js  client-side combat bookkeeping: field records, the field clock, authority, b.start, result
+//                    deadlines and releases, server runs, field completion
+//   rehearsal.js     the bot layout rehearsal delegated to the current host's browser: the b.rehearsal task, its answer,
+//                    its timeout and the server takeover (DESIGN §14)
+//   reports.js       b.progress / b.result (validation, held boss results), SP_VERIFY
+//   unitePhase.js    联防 (UNITE) in both modes and the leakers' live counts
+//   bossRounds.js    FINAL_ASSAULT / HIDDEN_CORE: boss fields, the shared pool, plausibility budgets, the boss clock,
+//                    b.pool, the merged team LP, overtime, bounties after a boss field
+//   settle.js        SETTLE and RESULT
+//   common.js        what the modules share (FLOW_TICKER_PRIORITY, DELAYS, BAND_TURN_SECONDS — re-exported here, OK,
+//                    fail, BOSS_CLOCK_MS)
+
+import { PHASE, modeIdFor } from '../../shared/constants.js';
+import { isContentHash } from '../../shared/plugins/identity.js';
+import { DEFAULT_VERSION, versionById } from '../../shared/versions.js';
+>>>>>>> theirs
 import { Battle } from '../sim/Battle.js';
 import { DataSource } from '../sim/simdata.js';
 import { createRng, deriveSeed } from '../sim/rng.js';
@@ -215,6 +283,7 @@ import { PlayerState } from './PlayerState.js';
 import { buildDeployMap, boardOrder, pieceDir, fieldTile } from './board.js';
 import { bondList, offBondCounts } from './bondsMeta.js';
 import { EffectDispatcher, getDefaultRegistry } from './effectsMeta.js';
+<<<<<<< ours
 import { generateDraft, applyCard, cardView, bountyBattles, isMultiRoundBounty } from './choices.js';
 import { setupMatchWaves, buildNormalWave, buildBossWave, bountySpawns, withBounties, previewOf, weightedPick } from './waves.js';
 import { planUnite, uniteBattleOpts, uniteSurvivors } from './unite.js';
@@ -226,8 +295,43 @@ import { syncSpawns, syncCredit, syncNoteLeaks, syncLeakLoss, syncMessage } from
 import { FieldSyncPools, LocalSyncPools } from '../sim/syncPools.js';
 import { buildResult } from './results.js';
 import { botPrepBeginSteps, botPrepEndSteps, botPickBand, botPickCard } from './bot.js';
+=======
+import { setupMatchWaves } from './waves.js';
+import { getBotStrategy, getBotStrategySeats } from './botStrategies.js';
+import { GAME_SPEED, HEADLESS_SLICE_MS } from './fields.js';
+import { MatchPlatform } from './match/platform.js';
+import { MatchInfra } from './match/infra.js';
+import { MatchMessaging } from './match/messaging.js';
+import { MatchViews } from './match/views.js';
+import { MatchWatch } from './match/watch.js';
+import { MatchIntents } from './match/intents.js';
+import { MatchPause } from './match/pause.js';
+import { MatchPhases } from './match/phases.js';
+import { MatchSetupVote } from './match/setupVote.js';
+import { MatchSpDraft } from './match/spDraft.js';
+import { MatchPrep } from './match/prep.js';
+import { MatchCombat } from './match/combat.js';
+import { MatchClientCombat } from './match/clientCombat.js';
+import { MatchRehearsal, REHEARSAL_ANSWER_MS } from './match/rehearsal.js';
+import { MatchReports } from './match/reports.js';
+import { MatchUnite } from './match/unitePhase.js';
+import { MatchBoss } from './match/bossRounds.js';
+import { MatchSettle } from './match/settle.js';
+import { installTestTrace } from './testTrace.js';
+import { MatchTestCommands } from './match/testCommands.js';
+import { MatchOffers } from './match/offers.js';
+import { createExternalAI } from './llmGate.js';
 
-const BOT_REHEARSAL_DEFAULT = 3;
+export { FLOW_TICKER_PRIORITY, DELAYS, BAND_TURN_SECONDS } from './match/common.js';
+>>>>>>> theirs
+
+/**
+ * §37.47 [ASSUMED]: 6 (was 3) — every distinct layout variant of a normal round (the positional plan and the five
+ * REHEARSAL_VARIANTS; 8 rehearsed exactly the same games). In one rehearsal of six the winner was past the third candidate
+ * (终极 solo, 419 rehearsals: hold 8 and kill 3 won 12 %); 终极 1–320 solo +2.19 ± 0.90, co-op +5.60 ± 1.65 (wins 73 → 92),
+ * for about a third more rehearsal time per prep. More layouts only in the Final Assault changed nothing.
+ */
+const BOT_REHEARSAL_DEFAULT = 6;
 /** Wall-clock ms of bot layout rehearsal per scheduler callback (real time; virtual time runs it in one go). */
 const BOT_SLICE_MS = 8;
 /**
@@ -378,6 +482,12 @@ export class Match {
     this._combatSpeedOverride = Number.isFinite(opts.combatSpeed) && opts.combatSpeed > 0 ? Math.min(opts.combatSpeed, 200) : null;
     /** layouts a bot rehearses per prep with the real simulation (bot.js; 0 = heuristic placement only) */
     this.botRehearsal = Number.isInteger(opts.botRehearsal) && opts.botRehearsal >= 0 ? Math.min(opts.botRehearsal, 8) : BOT_REHEARSAL_DEFAULT;
+<<<<<<< ours
+=======
+    this.bot = getBotStrategy(opts.botStrategy ?? env('SP_BOT_STRATEGY'));
+    /** per-seat overrides of this.bot (seat → strategy; empty by default — botFor) */
+    this.seatBots = getBotStrategySeats(opts.botStrategySeats ?? env('SP_BOT_STRATEGY_SEATS'));
+>>>>>>> theirs
     /** wall-clock budget of one rehearsal slice (scheduleBotPrep) */
     this.botSliceMs = Number.isFinite(opts.botSliceMs) && opts.botSliceMs > 0 ? opts.botSliceMs : this.sched.virtual ? Infinity : BOT_SLICE_MS;
     /**
@@ -492,12 +602,23 @@ export class Match {
     this.factions = setup.factions;
     this.bossId = setup.bossId;
     this.hiddenBossId = setup.hiddenBossId;
+<<<<<<< ours
     const bans = drawDisabledBonds(this.gd, this.rngSetup, {...this.customExtensions,mode:this.mode});
+=======
+    const bans = drawDisabledBonds(this.gd, this.rngSetup);
+    this.bondChoice = bans.choice ?? null;
+>>>>>>> theirs
     this.disabledBonds = bans.drawn;
     this.staticInactiveBonds = bans.staticOff;
     this.bannedChess = bans.banned;
     this.pool = new SharedPool(this.gd, { banned: bans.banned });
     this.itemPool = new SharedItemPool(this.gd, () => this.order);
+<<<<<<< ours
+=======
+    // Each human's 自选 stock uses the same exclusion rule (player/diy.js initDiyStock), without randomness.
+    // A bring-limited season stocks nothing until 选择自编 confirms; diyBanned is still the bond-excluded slots.
+    // Solo regulation's provisional stocks are rebuilt when its INFO_CHECK group choice settles.
+>>>>>>> theirs
     const off = new Set([...bans.drawn, ...bans.staticOff]);
     for (const ps of this.order) ps.initDiyStock(off);
 

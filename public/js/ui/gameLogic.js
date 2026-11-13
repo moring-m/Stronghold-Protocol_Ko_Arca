@@ -37,6 +37,7 @@ import { DAMAGE_NUMBER_MODES, damageNumberMode } from '../../../shared/damageDis
 //   (summons don't use a slot, research 00 §8 #11). Only PREP, alive and not-ready players may edit.
 //   A board piece dropped on its own tile is legal ('orient'): the direction wheel re-orients it in place
 //   (research 09 §1.2); board drops of units go through the wheel before g.move {uid, to, dir} (ui/facing.js).
+<<<<<<< ours
 
 import { sanitizeVoiceOverrides } from '../voicePrefs.js';
 export const TEXT_SIZES=Object.freeze(['sm','md','lg','xl']);
@@ -1840,3 +1841,31 @@ export {standInIds,fieldsStandIn,cardStandIn,memberStandIn,standInGetter,deploye
 export {diyPicks,diyRecordFor,unitPick,diyGetter,pickGetter,isDiyRecord,diyBannedPieces} from './gameLogic/diy.js';
 
 export {deployZoomStep,deployZoomRemember,prepDeployCamera} from './gameLogic/camera.js';
+=======
+//
+// The bodies live in public/js/ui/gameLogic/*.js. Every name this file exported before the split is
+// re-exported below, so existing imports keep working.
+
+export { clamp, tileKey } from './gameLogic/shared.js';
+export { phaseMode, isCombatPhase, showDeadPill, isBossPhase, pregameStepCount, pregameStepIndex } from './gameLogic/phases.js';
+export { prepCamera, prepCameraFor, foldCamera, deployFoldsShop, deployZoomStep, deployZoomRemember, prepDeployCamera, deployFieldOf, fieldTile, boardTileOf, ownerBandId, teamFrameIds } from './gameLogic/camera.js';
+export { phaseBanner, prepCapsuleLabel, countdownState, phaseTotalSeconds, deployOrder, roundStartReplay } from './gameLogic/phases.js';
+export { RESULT_BOX_MS, ownRoundLoss, battleOverSfx, roundResultBox, uniteResultBox, battleResultBox } from './gameLogic/phases.js';
+export { STATUS_META } from './gameLogic/format.js';
+export { sortedPlayers } from './gameLogic/shared.js';
+export { ownFieldId, homeFieldId, cycleField, watchTarget, switcherLabel, fieldLabel, activeBubbles } from './gameLogic/watch.js';
+export { sortBonds, bondTier, nextThreshold, grantedBonds, pieceBondIds, morphPairings, HARMONY_BOND, harmonyMembers, bondMembers, memberHeadCount, bannedPerBond, disabledBondSets, briefingBondTip, modeOffBonds, bandOffBonds, bandOffLine } from './gameLogic/bonds.js';
+export { priceTone, mergeProgress, mergeTarget, handFull, completesMerge, offerHeader, shopBlockReason, readyFundsPrompt, readyShopFold } from './gameLogic/shop.js';
+export { deploySets, stageOverrides, deployMap, effectiveStage, indexPieces, placementContext, piecePosition, tileAllows, summonRange, summonExcluded, canPlace, equipReplaces, equipMerges, boardTargets, dropIntent, dropFailureReason } from './gameLogic/placement.js';
+export { terrainInfo, deviceInfo, deviceTipAt, noteDeviceUnits, deviceUnitsForEntry } from './gameLogic/terrain.js';
+export { normalizeDraft, normalizeSp, normalizePersonalChoice, heldDraftPub } from './gameLogic/draft.js';
+export { groupEnemies, PEN, penZoneTiles, penPlacement, previewEnemyKey, factionTypes } from './gameLogic/enemies.js';
+export { snapHud, bossFrac, bossPctText, hasFlag, UF, attackInterval, fmtNum, rangeGridBox } from './gameLogic/format.js';
+export { shortcutFor, closesOnFieldPress, shortcutBlocked, prepShortcutsSuspended, HOTKEY_ACTIONS, DEFAULT_HOTKEYS, isBindableCode, hotkeyLabel, sanitizeHotkeys, rebindHotkey, isDefaultHotkeys, hotkeyOf, actionForKey, captureHotkey, facingSwallows, facingEnter } from './gameLogic/shortcuts.js';
+export { DEFAULT_SETTINGS, VOICE_LANGS, TEXT_SIZES, sanitizeSettings } from './gameLogic/settings.js';
+export { normalizeResult } from './gameLogic/result.js';
+export { chessLoadout, unitLoadout, unitCultivation } from './gameLogic/loadout.js';
+export { standInIds, fieldsStandIn, standInOf, ownStandIn, cardStandIn, memberStandIn, standInGetter, standInLoadout, deployedRecord, deployedModuleId, standInLabel, standInForText, standInTip } from './gameLogic/standIn.js';
+export { diyPicks, ownDiyPick, diyRecordFor, ownDiyRecord, cardDiy, unitPick, diyGetter, pickGetter, isDiyRecord, diyBannedPieces } from './gameLogic/diy.js';
+export { panelSide, panelSlots, PANEL_RIGHT_GAP, PANEL_RIGHT_BOTTOM, PANEL_RIGHT_BOTTOM_SHOP, BPOP, bondPopupPlace } from './gameLogic/panel.js';
+>>>>>>> theirs

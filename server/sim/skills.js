@@ -368,7 +368,11 @@ export class SkillRuntime {
       if (this.charges >= this.maxCharges && this.sp >= cost) return 0;
     }
     if (cost <= 0) return 0; // free skills never recharge (see reset)
+<<<<<<< ours
     const before = this.charges >= this.maxCharges ? this.maxCharges * cost : this.charges * cost + this.sp;
+=======
+    const before = this.spTotal;
+>>>>>>> theirs
     this.sp += amt;
     // within 1e-9 of the cost is the cost (the timer tolerance of `timeLeft` below; PR #402): 300 time gains of 1/30 SP
     // add up to 9.999999999999975 in floating point, which held a 10-SP charge one tick
@@ -378,10 +382,17 @@ export class SkillRuntime {
       else this.sp = cost;
     }
     if (this.charges >= this.maxCharges) this.sp = cost;
+<<<<<<< ours
     const after = this.charges >= this.maxCharges ? this.maxCharges * cost : this.charges * cost + this.sp;
     const recovered = Math.max(0,after-before);
     if (!silent && recovered > 0 && !['time','attack','hurt','init'].includes(reason))
       b.fx('spRecovered',{id:this.unit.id,x:this.unit.x,y:this.unit.y,n:recovered});
+=======
+    // #657: only extra recovery, after hooks, charge rollover and the cap; never the mutable spGain request.
+    if (reason === 'bond' || reason === 'talent' || reason === 'skill') {
+      b.resourceNumber?.(this.unit, 'sp', this.spTotal - before, reason);
+    }
+>>>>>>> theirs
     return amt;
   }
 

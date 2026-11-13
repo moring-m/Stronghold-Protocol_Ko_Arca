@@ -181,7 +181,31 @@ export function standInRec(chessId, sel = {}, data = getDefaultSource()) {
 
 function buildData(defs) {
   if (!defs) return getDefaultSource();
-  return new DataSource({ chess: defs.chess ?? {}, enemies: defs.enemies ?? {}, tokens: defs.tokens ?? {}, stages: defs.stages ?? {}, waves: defs.waves ?? {} }, getDefaultSource());
+  return new DataSource({ chess: defs.chess ?? {}, enemies: defs.enemies ?? {}, tokens: defs.tokens ?? {}, stages: defs.stages ?? {}, waves: defs.waves ?? {}, ...(defs.effects ? { effects: defs.effects } : {}) }, getDefaultSource());
+}
+
+/**
+ * A harness `units[]` entry with `diy` → its PlayerBattleInput fields: `chessId` = the slot's normal or elite id, `diy` =
+ * the pick ({ charId, skillIndex, uniEquipId } as given). Other entries unchanged.
+ */
+function diyEntry(u, data = getDefaultSource()) {
+  if (!u || !u.diy || typeof u.diy !== 'object') return u;
+  const slots = data.rawBackups?.()?.diy?.slots ?? {};
+  const { slot, ...pick } = u.diy;
+  const base = typeof slot === 'number' ? Object.keys(slots).find((id) => slots[id].tier === slot) : slot;
+  if (!base || !slots[base]) throw new Error(`diy: unknown slot ${slot}`);
+  const { elite, ...rest } = u;
+  return { ...rest, chessId: elite ? slots[base].goldenId : base, diy: pick };
+}
+
+/** `units[].standIn` objects → the composed records for `defs.chess` (null when there are none). */
+function standInDefs(units) {
+  let out = null;
+  for (const u of units ?? []) {
+    if (!u || !u.standIn || typeof u.standIn !== 'object') continue;
+    (out ??= {})[u.chessId] = standInRec(u.chessId, u.standIn);
+  }
+  return out;
 }
 
 /**

@@ -18,6 +18,7 @@ import { isShopItem } from '../sim/simdata.js';
 import { mergeData } from '../../shared/plugins/dataUtils.js';
 import { standInRecord } from '../../shared/standIn.js';
 import { MAX_OFFER_SLOTS } from './player/common.js';
+import { diyBringLimitsOf } from '../../shared/diyBring.js';
 
 const own = (map, id) => (map && typeof map === 'object' && typeof id === 'string' && Object.hasOwn(map, id) && map[id] && typeof map[id] === 'object' ? map[id] : null);
 const numOr = (v, d) => (typeof v === 'number' && Number.isFinite(v) ? v : d);
@@ -136,7 +137,9 @@ export class GameData {
   bossPoolHp(bossId, aliveCount) {
     const boss = this.boss(bossId);
     const diff = this.difficulty;
-    let base = boss && boss.bloodPoint && Number.isFinite(boss.bloodPoint[diff]) ? boss.bloodPoint[diff] : null;
+    // 规程 lists the pool per mode (bloodByMode: 规程等级 1–20 share a difficulty, not a pool); 盟约 per difficulty
+    let base = Number.isFinite(boss?.bloodByMode?.[this.modeId]) ? boss.bloodByMode[this.modeId] : null;
+    if (base == null && boss && boss.bloodPoint && Number.isFinite(boss.bloodPoint[diff])) base = boss.bloodPoint[diff];
     if (base == null && boss && boss.bloodPoint) base = Object.values(boss.bloodPoint).find((v) => Number.isFinite(v)) ?? null;
     if (base == null) base = 500000;
     return Math.max(1, Math.round(base * this.bossPoolShare(aliveCount) * (this.config.customRules?.bossHp??100)/100));
@@ -258,6 +261,8 @@ export class GameData {
   get itemMergeCount() { return posIntOr(this.economy.itemMergeCount, DEFAULTS.itemMergeCount); }
   keepsFunds(bandId){return [bandId,...(this.config.commonBands||[])].some(id=>this.leftoverKeptBands.includes(id));}
   get leftoverKeptBands() {
+    if (this.raw.config?.version) return Object.values(this.raw.bands || {})
+      .filter(b => b.buffs?.some(buff => buff.key === 'coin_carry_over')).map(b => b.bandId);
     const ids = Array.isArray(this.economy.leftoverFundsKeptByBands) ? this.economy.leftoverFundsKeptByBands : DEFAULTS.leftoverFundsKeptByBands;
     const extra = Object.values(this.raw.bands || {}).filter(b => b.effectRef && ids.includes(b.effectRef)).map(b => b.bandId);
     return extra.length ? [...ids, ...extra] : ids;
@@ -407,7 +412,8 @@ export class GameData {
   }
 
   /**
-   * Official enemy multipliers of round r (config enemyScale: the PRTS table + 终极 speed ×1.15 from R3). `supplyHpMul`
+   * Official enemy multipliers of round r (config enemyScale: the PRTS stack table × the season's effect values, 终极 急行军
+   * from R3 — ×1.15 on 下半, ×1.30 on 规程; tools/build-data.mjs enemyStepsOf). `supplyHpMul`
    * (only when ≠ 1: co-op 终极 R5–R15) = the share of hpMul from 补给线 / 补给线II (config `supplyHp`), effects whose
    * `enemy_exclude` leaves out the 14 器物 keys; hit-count enemies retain their fixed count independently of HP multipliers.
    */
@@ -478,6 +484,34 @@ export class GameData {
       difficulties: Array.isArray(h.difficulties) ? h.difficulties : DEFAULTS.hiddenCore.difficulties,
     };
   }
+  get regulationBondDraw() { return this.config.version?.rules?.bondDraw === 'regulation'; }
+
+  /** Per-tier 选择自编 caps, or null when this data has no CUSTOM_CHECK step and limit map. */
+  get diyBringLimits() { return diyBringLimitsOf(this.config); }
+
+  /** Official seconds of 选择自编 (enterSteps CUSTOM_CHECK `time`; 30 on 规程). */
+  customCheckSeconds() {
+    const steps = this.config?.timers?.enterSteps;
+    const step = Array.isArray(steps) ? steps.find((s) => s && s.step === 'CUSTOM_CHECK') : null;
+    const t = step && Number(step.time);
+    return Number.isFinite(t) && t > 0 ? t : 30;
+  }
+
+  /**
+   * Whether an operator stays out of this match. Covenant: every bond of it is off. Regulation: an operator with a core
+   * bond follows its core bonds only and is out when they are all grey; one without a core bond is out when all its
+   * add-ons are (the tutorial: a grey core keeps its members out of the shop, add-ons only when all of an operator's
+   * add-ons are grey). Owner's official play, 2026-11-13: a lit core bond never loses a member — grey add-ons never take
+   * out an operator of a lit core. The same holds for the six operators of two or three core bonds (复奏, 哈洛德, 卡涅利安,
+   * 薇薇安娜, 烛煌, 锏): out only when all their cores are grey (owner, 2026-11-13: one core bond not banned keeps them).
+   */
+  bondsExclude(rec, off) {
+    const bonds = Array.isArray(rec?.bonds) ? rec.bonds : [];
+    if (!this.regulationBondDraw) return bonds.length > 0 && bonds.every(b => off.has(b));
+    const core = bonds.filter(b => this.bond(b)?.isCore);
+    return (core.length ? core : bonds).length > 0 && (core.length ? core : bonds).every(b => off.has(b));
+  }
+
   bans(difficulty) {
     const b = this.config.bans && this.config.bans[difficulty];
     const d = DEFAULTS.bans[difficulty] || { core: 0, addon: 0 };
@@ -503,6 +537,8 @@ export class GameData {
     if(bandId!==RANDOM_BAND_ID&&!own(this.raw.bands,bandId))return false;
     const b = this.band(bandId);
     if (!b) return false;
+    // 规程 turns a band off per mode (bands.json inactiveModeIds: 30 strategies are not offered in 极速模拟)
+    if (Array.isArray(b.inactiveModeIds) && b.inactiveModeIds.includes(this.modeId)) return false;
     const list = Array.isArray(b.modeTypeList) ? b.modeTypeList : null;
     if (!list) return true;
     return list.includes(this.isSolo ? 'SINGLE' : 'MULTI');

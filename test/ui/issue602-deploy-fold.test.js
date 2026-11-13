@@ -226,12 +226,18 @@ describe('game.js wiring', () => {
   test('deployFold is derived from the interaction state on the own editable prep board, never written into `collapsed`', () => {
     assert.match(game, /const deployFold = deployFoldsShop\(\{\n\s+ownPrep: !!view && viewModeRef\.current === 'prep' && showPrep, editable, pen, drag: !!drag, facing: !!facing,\n\s+enabled: playerSettings\.prepDeployFold !== false,\n\s+\}\);/);
     // the player's own state feeds the camera state only ORed with the temporary fold (pen behavior untouched)
+<<<<<<< ours
     assert.match(game, /const shopFolded = showShop && \(pen \? penRef\.current\.collapsed : \(collapsed \|\| \(deployFold && deployCameraZoom\)\)\);/);
     assert.match(game, /const barCollapsed = collapsed \|\| deployFold;/);
+=======
+    assert.match(game, /const shopFolded = showShop && \(pen \? penRef\.current\.collapsed : \(collapsed \|\| deployFold\)\);/);
+    assert.match(game, /const barCollapsed = collapsed \|\| \(deployFold && !deployPartial\);/);
+>>>>>>> theirs
     // nothing ever persists the temporary fold as the player's 收起/展开 state
     assert.doesNotMatch(game, /setCollapsed\(\s*(?:deployFold|barCollapsed)\b/);
   });
 
+<<<<<<< ours
   test('the camera effect zooms on pickup before the hand-made fold logic, and both fold flights use the short duration', () => {
     const branch = game.indexOf('if (deployFold && deployCameraZoom) {');
     assert.ok(branch > 0, 'the deployFold branch exists');
@@ -241,6 +247,14 @@ describe('game.js wiring', () => {
     const effectEnd = game.indexOf('}, [view, deployFold, deployCameraZoom, shopFolded, showPrep, pen, !!drag, !!facing, prepCamKey]);', branch);
     assert.ok(foldCall > branch && effectEnd > foldCall, 'branch first, foldCamera after, deployFold in the deps');
     // the zoom is a quick flight (a hand-made 收起 / 准备就绪 fold flies the same way), never a generic 750 ms one
+=======
+  test('the camera effect zooms on pickup and restores through prepDeployCamera, on the short flight', () => {
+    assert.match(game, /const step = deployZoomStep\(deployZoomedRef\.current, deployFold\);\n\s+const next = prepDeployCamera\(\{\n\s+pub, myId, deployFold, partial: deployPartial, releaseDeploy: step\.release, folded: shopFolded,\n\s+ownPrep: !!view && viewModeRef\.current === 'prep' && showPrep,\n\s+pen, busy: !!drag \|\| !!facing, current: camRef\.current,\n\s+\}\);\n\s+\/\/ a null release because the pen is open stays owed; a null only because the camera already\n\s+\/\/ matches the player's fold spends it\. \[ASSUMED\]\n\s+deployZoomedRef\.current = deployZoomRemember\(step, \{ next, pen \}\);/);
+    assert.doesNotMatch(game, /deployZoomedRef\.current = step\.zoomed/);
+    const call = game.indexOf('const next = prepDeployCamera({');
+    const effectEnd = game.indexOf('}, [view, deployFold, deployPartial, shopFolded, showPrep, pen, !!drag, !!facing, prepCamKey]);', call);
+    assert.ok(call > 0 && effectEnd > call, 'deployFold stays in the effect deps');
+>>>>>>> theirs
     assert.equal(FOLD_CAMERA_MS < CAMERA_MS, true, `${FOLD_CAMERA_MS} ms is shorter than the ${CAMERA_MS} ms camera flight`);
     assert.equal((game.match(/ms: FOLD_CAMERA_MS/g) || []).length, 1, 'the pickup zoom and the fold / unfold restore share one flight');
     assert.match(game, /import \{ FOLD_CAMERA_MS \} from '\.\.\/render\/app\/tune\.js';/);

@@ -150,3 +150,19 @@ test('team recommendations are restricted to live human teammates', async () => 
     assert.equal(canCommend(r,sender,target,live),false);
   assert.equal(canCommend({...r,matchNo:null},'me','peer',true),false);
 });
+
+test('the mode tag names 规程\'s solo ladder like the official settlement (规程等级20), other modes by difficulty', async () => {
+  await data.loadAll('config');
+  const regulation = JSON.parse(readFileSync(path.join(ROOT, 'data/versions/act3autochess-v3_1/config.json'), 'utf8'));
+  assert.equal(S.modePillName({ difficulty: 'ABYSS', modeId: 'mode_multi_abyss' }), '终极模拟');
+  assert.equal(S.modePillName({ difficulty: 'HARD' }), '绝境模拟');
+  data.setView('config', () => regulation);
+  try {
+    assert.equal(S.modePillName({ difficulty: 'ABYSS', modeId: 'mode_single_20' }), '规程等级20');
+    assert.equal(S.modePillName({ difficulty: 'FAST', modeId: 'mode_single_funny' }), '极速模拟');
+    assert.equal(S.modePillName({ difficulty: 'ABYSS', modeId: 'mode_multi_abyss' }), '终极模拟');
+    assert.equal(S.modePillName({ difficulty: null, modeId: 'mode_single_20' }), '');
+  } finally {
+    data.setView('config', null);
+  }
+});

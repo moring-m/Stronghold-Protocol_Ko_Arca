@@ -24,19 +24,34 @@ import { useEffect, useMemo, useRef, useState } from '../../vendor/hooks.module.
 import { html, Button, Icon, MicroLabel, useTicker, secondsLeft } from '../ui/components.js';
 import { useGameData, BandIcon, RichText, PlayerAvatar, LpTower, Sprite } from '../ui/gameComponents.js';
 import { StepHeader, ExitModal } from '../ui/matchChrome.js';
+<<<<<<< ours
 import { LoadoutButton } from '../ui/loadoutEntry.js';
 import { MatchInfoDialog, matchInfoModel } from '../ui/matchInfo.js';
 import { BriefingOverview } from './briefing.js';
+=======
+import { MatchInfoDialog, matchInfoModel, MatchBondDialog, regulationCoreAbsent } from '../ui/matchInfo.js';
+import { MatchEnemies } from '../ui/matchEnemies.js';
+>>>>>>> theirs
 import { actions, act } from '../ui/gameActions.js';
-import { normalizeDraft, sortedPlayers } from '../ui/gameLogic.js';
+import { normalizeDraft, sortedPlayers, pregameStepCount, pregameStepIndex } from '../ui/gameLogic.js';
 import { useStore } from '../store.js';
 import { audio } from '../audio.js';
 import { TurnBanner } from '../ui/turnBanner.js';
 import { bootArtReady } from '../ui/protocolBoot.js';
 import { reducedMotion } from '../ui/device.js';
 import { modeOffBonds, bandOffBonds, bandOffLine } from '../ui/gameLogic.js';
+<<<<<<< ours
+=======
+import { t, tParts, tName, N_ } from '../../../shared/i18n.js';
+>>>>>>> theirs
 
 const cx = (...p) => p.flat().filter(Boolean).join(' ');
+
+/** 规程's strategy sections (activity_table bandDataListDict bandType) in the draft grid, with the official captions. */
+const BAND_SECTIONS = Object.freeze({
+  GENERAL: Object.freeze({ id: 'general', name: N_('泛用型策略'), icon: 'crown' }),
+  BONDRELEVANT: Object.freeze({ id: 'bond', name: N_('盟约型策略'), icon: 'link' }),
+});
 
 /** 本局禁用 on a strategy card whose bonds `names` the mode switches off (bandOffBonds); nothing otherwise. */
 export function BandOffTag({ names = [] }) {
@@ -180,6 +195,8 @@ export function BandDraftScreen() {
   const [exit, setExit] = useState(false);
   const [skipped, setSkipped] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
+  const [bondId, setBondId] = useState(null);
+  useEffect(() => { setBondId(null); }, [infoOpen]);
 
   const mode = gd.config?.modes?.[pub?.modeId];
   const offBonds = modeOffBonds(mode); // the bonds this mode never activates (标准: 10 of 23)
@@ -256,10 +273,71 @@ export function BandDraftScreen() {
   const infoStatus = infoOpen ? draftInfoStatus({ myPick, pickName: myPick ? gd.band(myPick)?.name : null, myTurn, turnName, secs: turnSecs,
     waiting: !solo && !draft.done }) : null;
 
+<<<<<<< ours
   return html`<div class="screen draft">
     <div class="brief__bg" aria-hidden="true"></div>
     <${StepHeader} step=${2} of=${2} title="选择策略" micro="STRATEGY // BAND CHECK" pub=${clock ? { ...pub, deadline: clock.deadline } : { ...pub, deadline: 0 }}
       total=${clock ? clock.total : null} onExit=${() => setExit(true)} />
+=======
+  // 名片干员 art of the order rows (as on the room's seat cards: the doctor's pick, else one chosen by the player id), in
+  // the doctor's outfit for that operator (B6 picture-only outfits, docs/SKINS.md; the maintainer's decision 4 of 2026-10-21
+  // for the seat cards; ui/seatArt.js seatCardSkin): one's own choice at once, a teammate's from the match's public
+  // players (m.public.players[].skins), none for another seat while 「显示其他玩家的皮肤」 is off, the default art when the
+  // outfit's pictures are not here (chessPortraitUrl) — or fail to load (the row falls back to them: §35.51)
+  // (gd.backups: the room version's 自选编队 pool joins the card list, as on the room's seat cards)
+  const cards = useMemo(() => cardContext(cardOperators(gd.list('chess'), gd.backups), { pending: !gd.backups }), [gd.ready, gd.backups]);
+  const myCard = useStore((s) => s[CARD_KEY], Object.is, cardStore);
+  const localSkins = useStore((s) => s[SKINS_KEY], Object.is, skinsStore);
+  const otherSkins = useStore((s) => s.otherSkins !== false, Object.is, settingsStore);
+  const artOf = (p) => {
+    if (p.isBot) return null;
+    const seat = (Array.isArray(roomSeats) && roomSeats.find((x) => x && x.playerId === p.playerId)) || { playerId: p.playerId };
+    const op = seatOperator(seat, cards, { myId, myCard });
+    const skin = op ? seatCardSkin(p, op.chess.charId, { myId, localSkins, players, otherSkins }) : null;
+    return op ? [chessPortraitUrl(data.get('assets'), op.chess, { skin }), skin ? chessPortraitUrl(data.get('assets'), op.chess) : null] : null;
+  };
+  // this browser's records (up to the stats store's size): read once, after the screen and its entry are up, not while
+  // it mounts
+  const [local, setLocal] = useState(NO_RECORDS);
+  useEffect(() => {
+    const later = globalThis.requestIdleCallback ? (fn) => globalThis.requestIdleCallback(fn, { timeout: 1200 }) : (fn) => setTimeout(fn, 300);
+    const cancel = globalThis.cancelIdleCallback && globalThis.requestIdleCallback ? (id) => globalThis.cancelIdleCallback(id) : (id) => clearTimeout(id);
+    const id = later(() => setLocal(draftRecords(peekStatsRecords(), data.get('bands'))));
+    return () => cancel(id);
+  }, []);
+  const myMedal = useMemo(() => {
+    const medal = trophyMedalOf(local.trophies, gd.config?.trophies?.medals);
+    return medal ? uiUrl(data.get('assets'), `medalIcon/${medal.iconId}`) : null;
+  }, [gd.ready, local]);
+
+  // what the right side shows: 已选定策略 after my pick, else the detail pane once opened, else only the wall
+  const allPicked = !!draft.done || (draft.order.length > 0 && draft.order.every((pid) => draft.picks.has(pid)));
+  const view = peek ? 'detail' : inOrder && myPick ? 'done' : open && band ? 'detail' : 'grid';
+  const shownBand = peek ? gd.band(peek) : band;
+  const rows = solo ? players.filter((p) => p.playerId === myId) : draft.order.map((pid) => players.find((p) => p.playerId === pid)).filter(Boolean);
+
+  const head = allPicked ? html`<div class="dturn is-done"><span class="dturn__txt"><b>${t('策略选择完成')}</b><span>${t('正在进入模拟…')}</span></span><${Icon} name="hourglass" class="dturn__glass" /></div>`
+    : myTurn ? html`<div class="dturn is-turn">
+        <span class="dturn__go"><${Sprite} k="bandChoose/youturn_finger" class="dturn__finger" fallback=${html`<${Icon} name="chevronLeft" class="dturn__finger" />`} />
+          <b>${t('请选择策略')}</b></span>
+        ${!solo ? html`<button type="button" class="draft-skip" disabled=${!canSkip || !!busy} aria-busy=${busy === 'skip' ? 'true' : undefined} onClick=${skip}
+            title=${skipsLeft > 0 ? t('跳过本轮，稍后再选') : t('跳过次数已用完')}>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 19v-5a7 7 0 0 1 7-7h7V3.5L22.5 9 17 14.5V11h-7a3 3 0 0 0-3 3v5z" /></svg>
+          <span>${skipsLeft > 0 ? t('跳过选择') : t('无法跳过')}</span></button>` : null}
+      </div>`
+    : turnName ? html`<div class="dturn"><span class="dturn__txt"><b>${turnName}</b><span>${t('正在选择策略…')}</span></span><${Icon} name="hourglass" class="dturn__glass" /></div>`
+    : null;
+
+  // held after the draft (the server is already in BATTLE_CHECK): only to look at — 离开, 本局信息 and the 🔍 boxes would
+  // open dialogs the match screen tears down a moment later
+  return html`<div class=${cx('screen draft', `draft--${view}`, held && 'is-held', head && 'has-status')} inert=${held ? true : undefined} aria-busy=${held ? 'true' : undefined}>
+    <div class="brief__bg" aria-hidden="true"></div>
+    <${StepHeader} step=${pregameStepIndex(gd.config, 'BAND_CHECK')} of=${pregameStepCount(gd.config)} title=${t('选择策略')} micro="STRATEGY // BAND CHECK" pub=${clock ? { ...pub, deadline: clock.deadline } : { ...pub, deadline: 0 }}
+      total=${clock ? clock.total : null} onExit=${() => setExit(true)}
+      extra=${html`<button type="button" class="stephead__info" data-testid="match-info-open" aria-haspopup="dialog" onClick=${() => setInfoOpen(true)}
+        title=${t('本局信息')}><${Icon} name="search" /><span>${t('本局信息')}</span></button>`}
+      status=${head} />
+>>>>>>> theirs
     <main class="draft__main">
       <aside class="draft-order">
         <div class="draft-order__settings"><${LoadoutButton} from="bandDraft" class="draft-order__loadout" /></div>
@@ -289,6 +367,7 @@ export function BandDraftScreen() {
         ${!solo ? html`<p class="draft-order__tip" data-testid="draft-tip">${draftTip({ timed, turnSeconds: turnLen, autoName: myPick ? null : autoName, selected: autoId === sel })}</p>` : null}
       </aside>
 
+<<<<<<< ours
       <section class="draft-grid" role="listbox" aria-label="策略">
         ${bands.map((b) => {
           const who = pickers.get(b.bandId) || [];
@@ -311,6 +390,55 @@ export function BandDraftScreen() {
         ${band ? html`
           <div class="draft-detail__art">
             <${BandIcon} bandId=${band.bandId} size="xl" />
+=======
+      ${view === 'done' ? html`<section class="draft-done" key=${myPick} aria-live="polite">
+          <div class="draft-done__art"><${BandIcon} bandId=${myPick} size="xl" /></div>
+          <div class="draft-done__head">
+            <span class="draft-tag">STRATEGY</span>
+            <h2 class="draft-done__title">${t('已选定策略')}</h2>
+            <b class="draft-done__name">${gd.band(myPick)?.name || ''}</b>
+          </div>
+          <div class="draft-done__hp">${t('初始生命值')}<b class="num">${gd.band(myPick)?.totalHp ?? '--'}</b></div>
+          ${gd.band(myPick) ? html`<${BandText} band=${gd.band(myPick)} class="draft-done__desc" />` : null}
+          <p class="draft-detail__status t-mint"><${Icon} name="check" />${t('已选择「{name}」', { name: gd.band(myPick)?.name || '' })}${!solo && !allPicked ? t('，等待其他博士') : ''}</p>
+        </section>` : html`
+        <section class="draft-grid" role="listbox" aria-label=${t('策略')}>
+          ${bands.flatMap((b, i) => {
+            // 规程 sorts its strategies into 泛用型策略 (bandType GENERAL) and 盟约型策略 (BONDRELEVANT), each under a header,
+            // as the official draft shows them (BV11NW869ELq part 4 0:28, BV13LWM6BEvY match 1 1:36); a version without
+            // bandType has no header
+            const sec = BAND_SECTIONS[b.bandType];
+            const head = sec && bands[i - 1]?.bandType !== b.bandType
+              ? [html`<div key=${`sec-${b.bandType}`} class="draft-grid__sec" role="presentation" data-testid=${`band-section-${sec.id}`}><${Icon} name=${sec.icon} /><span>${t(sec.name)}</span></div>`] : [];
+            const isTaken = taken.has(b.bandId);
+            const offNames = bandOffBonds(b, offBonds).map((id) => gd.bond(id)?.name || id); // 本局禁用 (still selectable)
+            const on = view === 'detail' && !peek && sel === b.bandId;
+            const badged = local.badges.has(b.bandId); // (the count is the detail pane's 已通过模拟 N 次)
+            return [...head, html`<button key=${b.bandId} type="button" role="option" aria-selected=${on ? 'true' : 'false'} data-band=${b.bandId}
+                aria-disabled=${isTaken ? 'true' : 'false'} title=${isTaken ? t('已被选择') : offNames.length ? bandOffLine(offNames) : b.name}
+                class=${cx('dband', on && 'is-sel', myPick === b.bandId && 'is-mine', isTaken && 'is-taken', offNames.length && 'is-off')} style=${`--n:${Math.min(i, 15)}`}
+                onClick=${() => pickTile(b.bandId)}>
+              <span class="dband__frame"><${BandIcon} bandId=${b.bandId} size="lg" /></span>
+              <span class="dband__name">${b.name}</span>
+              ${badged ? html`<span class="dband__badge" data-testid="band-badge" aria-hidden="true">
+                <${Sprite} k="statistics/strategyBadge" class="dband__badge-art" fallback=${html`<span class="dband__medal"><${Icon} name="rook" /></span>`} /></span>` : null}
+              <${BandOffTag} names=${offNames} />
+              ${isTaken ? html`<span class="dband__taken">${t('已被选择')}</span>` : null}
+              ${on ? html`<span class="dband__selmark" aria-hidden="true">SELECTED</span>` : null}
+            </button>`];
+          })}
+        </section>
+        ${view === 'detail' && shownBand ? html`<aside class="draft-detail" key="detail">
+          <div class="draft-detail__body" key=${shownBand.bandId}>
+            <div class="draft-detail__art"><${BandIcon} bandId=${shownBand.bandId} size="xl" /></div>
+            ${local.won[shownBand.bandId] ? html`<span class="draft-detail__medal">${t('已通过模拟{n}次', { n: local.won[shownBand.bandId] })}</span>` : null}
+            <div class="draft-detail__hp">${t('初始生命值')}<b class="num">${shownBand.totalHp ?? '--'}</b></div>
+            <span class="draft-tag">STRATEGY</span>
+            <h2 class="draft-detail__name">${shownBand.name}</h2>
+            <${BandOffNote} names=${bandOffBonds(shownBand, offBonds).map((id) => gd.bond(id)?.name || id)} />
+            <span class="draft-tag">INTRO</span>
+            <div class="draft-detail__eff"><${BandText} band=${shownBand} class="draft-detail__desc" /></div>
+>>>>>>> theirs
           </div>
           <div class="draft-detail__hp"><span>初始生命值</span><${LpTower} value=${band.totalHp} size="lg" /></div>
           <h2 class="draft-detail__name">${band.name}</h2>
@@ -334,10 +462,16 @@ export function BandDraftScreen() {
     </main>
     ${solo ? null : html`<${ChatPanel} />`}
     <${ExitModal} open=${exit} onClose=${() => setExit(false)} solo=${solo} />
+<<<<<<< ours
     <${MatchInfoDialog} open=${infoOpen} onClose=${() => setInfoOpen(false)} model=${info} overview=${html`<${BriefingOverview} pub=${pub} />`}
+=======
+    <${MatchInfoDialog} open=${infoOpen} onClose=${() => setInfoOpen(false)} model=${info} onBond=${setBondId}
+      enemies=${infoOpen ? html`<${MatchEnemies} pub=${pub} gd=${gd} idScope="minfo" />` : null}
+>>>>>>> theirs
       status=${infoStatus ? html`<span class=${cx('minfo-dlg__turn', `is-${infoStatus.tone}`)}>
         <${Icon} name=${infoStatus.tone === 'mint' ? 'check' : 'hourglass'} />${infoStatus.text}${infoStatus.secs != null ? html`<b class="num">${infoStatus.secs}s</b>` : null}
       </span>` : null} />
+    <${MatchBondDialog} bondId=${infoOpen ? bondId : null} onClose=${() => setBondId(null)} priv=${priv} banned=${info?.banned} off=${!!info?.sets.off.has(bondId)} coreAbsent=${regulationCoreAbsent(info, bondId)} />
     ${turnBanner ? html`<${TurnBanner} key=${turnBanner} onDone=${() => setTurnBanner(0)} />` : null}
   </div>`;
 }

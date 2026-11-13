@@ -261,7 +261,23 @@ function installPrefSync({ net, timers, target, notify, key, stateKey, msgType, 
   });
   // a match leaving INFO_CHECK locks the loadout; a new match (the room back in LOBBY / a new INFO_CHECK) accepts it again
   const offRoom = net.on('room.state', (msg) => { if (msg && !msg.inMatch && target.get()[stateKey] === 'locked') { lastSent = null; schedule(); } });
+<<<<<<< ours
   // the room's content set arrived or went (DESIGN §32.6): sent again, checked against the data the room plays now
+=======
+  // entering a room (DESIGN §35.23) after the lobby could not send them (another version on screen there): sent now.
+  // (A room of another version sends them once its content arrives — below —; otherwise the server keeps the session's
+  // copy, and five settings sent at every room entry would spend the server's heavy-message budget an edit needs.)
+  let roomCode = app?.get?.()?.room?.code ?? null;
+  const offApp = app?.subscribe ? app.subscribe((s) => {
+    const code = s?.room?.code ?? null;
+    if (code === roomCode) return;
+    roomCode = code;
+    // at once, not debounced: 开始模拟 right after the room appears must not overtake it (same socket ⇒ ordered)
+    if (code && gated) { revision++; lastSent = null; T.clearTimeout(timer); timer = null; void flush(); }
+  }) : null;
+  // the room's content set arrived or went (DESIGN §32.6): sent again, checked against the data the room plays now (a
+  // setting that is not seat-bound only when its payload changed: `seatBound`)
+>>>>>>> theirs
   let contentKey = content ? `${content.get().cs}|${content.get().status}` : '';
   const offContent = content ? content.subscribe((c) => {
     const k = `${c.cs}|${c.status}`;
@@ -376,7 +392,52 @@ export function installSkinsSync({ net, timers, target = skinsStore, notify } = 
   return installPrefSync({
     net, timers, target, notify, key: SKINS_KEY, stateKey: SKINS_SYNC_KEY, msgType: 'room.skins', field: 'skins', tag: 'skins',
     lockedText: N_('这台服务器不接受皮肤选择，只有本机保存'),
+<<<<<<< ours
     prepare: async () => parseStoredSkins(target.get()[SKINS_KEY]),
+=======
+    async prepare() {
+      const all = parseStoredSkins(target.get()[SKINS_KEY]);
+      if (!Object.keys(all).length) return all; // nothing to filter: no data download for it
+      const ids = await operators();
+      return ids ? Object.fromEntries(Object.entries(all).filter(([id]) => ids.has(id))) : all;
+    },
+  });
+}
+
+/**
+ * Wire the 名片干员 sync once (PR #643 split 6, ui/seatArt.js): `room.card { charId }` after every welcome, every pick
+ * and whenever the room's content set arrives or goes — the server keeps it on the session, so it follows the player
+ * into every room (server/lobby.js card / humanSeat), and the room sees it as room.state seats[].card. The list is the
+ * room's picker's (ui/seatArt.js cardOperators): the visible chess operators plus the room version's 自选编队 pool (#877).
+ * A pick the data shown now does not list (a plugin operator, the room left) goes out as '' (默认), as one's own card
+ * draws it; the pref
+ * keeps it. The engine retries RATE / TIMEOUT / OFFLINE (review fix of PR #813: the room's own effect gave up after
+ * them, so teammates kept the old card); BAD_MSG is final ('error', logged).
+ * @param {{ net: any, timers?: { setTimeout: Function, clearTimeout: Function }, target?: ReturnType<typeof createStore>,
+ *   getChessReady?: () => Promise<any>, getBackupsReady?: () => Promise<any>, listChess?: () => any[],
+ *   listBackups?: () => any, notify?: (text: string) => void, content?: any }} deps
+ */
+export function installCardSync({ net, timers, target = cardStore, getChessReady, getBackupsReady, listChess, listBackups, notify, content = appContentSet, app = store, gate = null } = {}) {
+  const ready = getChessReady || (() => data.load('chess'));
+  const readyBackups = getBackupsReady || (() => data.load('backups'));
+  const list = listChess || (() => data.list('chess'));
+  const backupsOf = listBackups || (() => data.get('backups'));
+  return installPrefSync({
+    net, timers, target, notify, key: CARD_KEY, stateKey: CARD_SYNC_KEY, msgType: 'room.card', field: null, tag: 'card',
+    lockedText: null, // room.card has no phase gate: never WRONG_PHASE / ROOM_STARTED
+    content, app, gate, seatBound: false,
+    async prepare() {
+      const want = target.get()[CARD_KEY];
+      if (!want) return { charId: '' };
+      if (await ready() == null) return null;
+      // a chess operator needs nothing more: the common pick goes out before backups.json is asked for
+      if (cardOperators(list()).some((c) => c.charId === want)) return { charId: want };
+      // 自选编队 operator (#877): no chess record of its own, listed only through backups.diy.ownedPool — the same list
+      // the room's picker draws (cardOperators(chess, backups)), so a pool pick goes out as itself, never as 默认
+      if ((await readyBackups()) == null) return null;
+      return { charId: cardOperators(list(), backupsOf()).some((c) => c.charId === want) ? want : '' };
+    },
+>>>>>>> theirs
   });
 }
 

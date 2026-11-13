@@ -9,7 +9,7 @@
 //
 //     /assets/audio/bgm/act1.mp3   →   /media/bgm/act1
 //
-// `server/index.js` resolves /media/… back to the real file under public/assets/audio and still answers with
+// `server/http/media.js` resolves /media/… back to the real file under public/assets/audio and still answers with
 // `Content-Type: audio/mpeg` + range support; Web Audio sniffs the container, so the URL is all the same to it.
 // A served manifest's content-hashed URL keeps its segment (shared/assetPaths.js; host bandwidth, layer 1):
 //
