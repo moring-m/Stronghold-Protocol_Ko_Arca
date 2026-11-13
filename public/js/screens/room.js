@@ -29,6 +29,8 @@ import { DIFFICULTIES, DIFFICULTY_NAMES, DIFFICULTY_COLORS, MAX_SEATS, roomSeatC
 import { html, Button, Icon, MicroLabel, PingPill, AvatarFrame, DifficultyTag, DifficultyIcon, Tooltip, confirmDialog, doctorNo, Modal } from '../ui/components.js';
 import { toast, toastError } from '../ui/toasts.js';
 import { tr } from '../i18n/i18n.js';
+import { roomVersion, versionLabel, ladderModes, DEFAULT_VERSION } from '../versions.js';
+import { getConfig } from '../data.js';
 import { copyText } from '../ui/clipboard.js';
 import { FactionBadge } from '../ui/chatFaction.js';
 import { PatchNotesButton } from '../ui/patchNotes.js';
@@ -234,6 +236,31 @@ function DifficultyPicker({ room, isHost, busy, onPick }) {
   </div>`;
 }
 
+/**
+ * The room's season (welcome.versions) and, on a laddered season (규정 단독: 规程等级 1–20 / 极速模拟), its level. The host
+ * switches the season (room.proposeVersion) and the level (room.setMode); everybody else sees them. Only solo and 4-seat
+ * co-op rooms play another season.
+ */
+function SeasonPicker({ room, isHost, busy, run }) {
+  const versions = useStore((s) => s.versions);
+  const current = roomVersion(room);
+  const config = getConfig();
+  const ladderMode = room.mode === 'solo' || room.mode === 'coop' ? room.mode : null;
+  const ladder = ladderMode && current !== DEFAULT_VERSION ? ladderModes(config, ladderMode) : null;
+  const canSwitch = isHost && Array.isArray(versions) && versions.length > 1 && (room.mode === 'solo' || room.mode === 'coop') && !room.sync;
+  if (!canSwitch && current === DEFAULT_VERSION) return null;
+  return html`<div class="dpick season-pick" data-testid="season-pick">
+    ${canSwitch ? versions.map((v) => html`<button key=${v.id} type="button" role="radio" aria-checked=${current === v.id ? 'true' : 'false'}
+        class=${`dpick__opt${current === v.id ? ' is-active' : ''}`} disabled=${!!busy}
+        onClick=${() => current !== v.id && run('season', () => net.request('room.proposeVersion', { version: v.id }))}>${t(v.label)}</button>`)
+      : html`<span class="dpick__opt is-active">${versionLabel(current)}</span>`}
+    ${ladder ? html`<select class="season-pick__level" aria-label=${t('규정 등급')} disabled=${!isHost || !!busy} value=${room.modeId || ''}
+        onChange=${(e) => run('season', () => net.request('room.setMode', { modeId: e.currentTarget.value }))}>
+      ${ladder.map((m) => html`<option key=${m.id} value=${m.id}>${m.name || m.id}</option>`)}
+    </select>` : null}
+  </div>`;
+}
+
 /** The 「AI 队友最后选择」 switch (co-op): the host toggles it, everybody else sees its state. */
 function AiLastToggle({ option, busy, onToggle }) {
   if (!option) return null;
@@ -421,6 +448,7 @@ export function RoomScreen() {
         <div class="room-bar__difficulty">
           <span class="room-bar__label">模拟难度<${MicroLabel}>DIFFICULTY<//></span>
           <${DifficultyPicker} room=${room} isHost=${facts.isHost} busy=${busy} onPick=${setDifficulty} />
+          <${SeasonPicker} room=${room} isHost=${facts.isHost} busy=${busy} run=${run} />
         </div>
         <div class="room-bar__reroll">
           <span class="room-bar__label">리롤 횟수<${MicroLabel}>REROLL LIMIT<//></span>

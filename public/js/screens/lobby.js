@@ -33,6 +33,7 @@ import { net, identity } from '../net.js';
 import { store, useStore, shallowEqual, loadPref, savePref } from '../store.js';
 import { getConfig, getMode, getStage, useData } from '../data.js';
 import { loadCustomExtensionPrefs } from '../ui/customExtensionPrefs.js';
+import { lobbyVersion, setLobbyVersion, DEFAULT_VERSION } from '../versions.js';
 
 /** Official mode texts (activity_table act2autochess.modeDataDict), fallback when config.json is absent. */
 export const MODE_TEXT = {
@@ -328,6 +329,11 @@ export function LobbyScreen() {
 
   const pickMode = (m) => { setRoomMode(m); savePref('lobby.mode', m); };
   const pickDifficulty = (d) => { setDifficulty(d); savePref('lobby.difficulty', d); };
+  // 시즌 (welcome.versions): the default 맹약 season, or another one; only solo and 4-seat co-op rooms play another season
+  const versions = useStore((s) => s.versions);
+  const season = useStore((s) => lobbyVersion(s));
+  const seasonModes = ['solo', 'coop'];
+  const seasonFor = (mode) => (seasonModes.includes(mode) ? season : DEFAULT_VERSION);
 
   const run = async (kind, fn) => {
     if (inFlight.current) return;
@@ -342,6 +348,7 @@ export function LobbyScreen() {
   const create = () => ['laboratory','practice'].includes(roomMode) ? store.patch('ui', { laboratorySetup: { difficulty,practice:roomMode==='practice' } }) : run('create',()=>net.request('room.create',{
     // 동기화 시뮬레이션: an alliance room (4 / 8 seats) with the sync rules
     mode:syncMode(roomMode)?roomMode.replace('sync','coop'):roomMode,difficulty,gameplayMode:'custom',titleLocale:lang,
+    ...(seasonFor(roomMode)!==DEFAULT_VERSION?{version:seasonFor(roomMode)}:{}),
     customExtensions:loadCustomExtensionPrefs(),
     ...(syncMode(roomMode)?{sync:true}:{}),
     ...(['coop','coop8','sync','sync8'].includes(roomMode)?{isPublic:publicOn,spectators:MAX_SPECTATOR_SEATS}:{})
@@ -457,6 +464,9 @@ export function LobbyScreen() {
           </div>
         </div>
         <div class="lg-diff">
+        ${Array.isArray(versions) && versions.length > 1 && seasonModes.includes(roomMode) ? html`<div class="diff-tabs season-tabs" role="radiogroup" aria-label=${t('시즌')} data-testid="season-tabs">
+          ${versions.map((v) => html`<button key=${v.id} type="button" role="radio" aria-checked=${season === v.id} class=${`diff-tab season-tab${season === v.id ? ' is-selected' : ''}`} onClick=${() => setLobbyVersion(v.id)}><span>${t(v.label)}</span></button>`)}
+        </div>` : null}
         <div class="diff-tabs" role="radiogroup" aria-label="난이도">
           ${DIFFICULTIES.map((d) => html`<button key=${d} type="button" role="radio" aria-checked=${difficulty === d} class=${`diff-tab${difficulty === d ? ' is-selected' : ''}`} style=${`--d-color:${DIFFICULTY_COLORS[d]}`} onClick=${() => pickDifficulty(d)}><${DifficultyIcon} difficulty=${d} class="diff-tab__glyph" /><span>${t(DIFFICULTY_NAMES[d]||'').replace(/\s*시뮬레이션$/,'')}</span></button>`)}
         </div>

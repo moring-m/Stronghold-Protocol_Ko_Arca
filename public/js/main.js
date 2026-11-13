@@ -76,6 +76,7 @@ import { installRehearsal } from './battle/rehearsal.js';
 import { initLang, useLang, tickerText } from './ui/lang.js';
 import { N_, translateWire } from '../../shared/i18n.js';
 import { installContent, installContentSet } from './content.js';
+import { sanitizeVersions } from './versions.js';
 import { cosmetics } from './cosmetics.js';
 
 const RESTORE_GRACE_MS = 1500;
@@ -202,6 +203,8 @@ function onWelcome(msg) {
     installedNotices: msg.content?.notices === true,
     testMode: msg.testMode === true,
     maintenance: maintenanceNotice(msg.maintenance),
+    // the seasons the server enables (welcome.versions; absent: only the default season — versions.js)
+    versions: sanitizeVersions(msg.versions),
   });
   welcomeAt = Date.now();
 
