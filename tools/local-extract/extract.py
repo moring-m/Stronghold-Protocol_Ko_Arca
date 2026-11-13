@@ -81,12 +81,9 @@ import scenes  # noqa: E402  (the battlefield scene table and exporter; imports 
 import regulation_scenes  # noqa: E402  (规程 piece prefabs → the same scene/ group; no UnityPy at import)
 import fx  # noqa: E402  (the official battle effects, DESIGN §33; imports UnityPy only when it runs)
 import operators  # noqa: E402 (installed plugin operators' optional official art, §34.28)
-<<<<<<< ours
-=======
 import versions  # noqa: E402 (the official-version roster's missing presentation art)
 import autochess_themes  # noqa: E402 (official in-match UI themes; UnityPy only when a theme run executes)
 from bundles import client_bundles  # noqa: E402 (Windows hot updates over the packaged client)
->>>>>>> theirs
 
 ROOT = Path(__file__).resolve().parents[2]
 HOME = Path.home()
@@ -871,14 +868,10 @@ def main():
     if args.webp:
         return webp_only(Path(args.out), Path(args.manifest), print)
 
-<<<<<<< ours
-    ab_root = Path(args.game) if args.game else next((p for p in CANDIDATES if p.exists()), None)
-=======
     ab_root = locate_client(args.game)
     theme_ids = autochess_themes.selected_ids(args.only)
     if (not ab_root or not ab_root.exists()) and theme_ids and args.themes:
         return extract(args, None)
->>>>>>> theirs
     if not ab_root or not ab_root.exists():
         print('No Arknights install found. Pass --game <AssetBundle root>.', file=sys.stderr)
         return 2
@@ -898,12 +891,8 @@ def extract(args, ab_root):
     # §34.28: a normal full run is not consent for optional plugin art. --only plugin-art is explicit too.
     art_on = client and wants_sub(args.only, operators.SUB) and (bool(args.only) or args.plugin_art)
     art_ids = spine_ids(args.only, operators.SUB, operators.references(Path(args.plugin_root))) if art_on else []
-<<<<<<< ours
-    if not jobs and not enemy_ids and not token_ids and not stage_ids and not fx_on and not art_on:
-=======
     versions_on = client and (not args.only or 'versions' in args.only)
     if not jobs and not enemy_ids and not token_ids and not stage_ids and not reg_ids and not fx_on and not art_on and not versions_on and not theme_ids:
->>>>>>> theirs
         print(f'--only {args.only}: no job matches', file=sys.stderr)
         return 2
     if theme_ids and not args.themes:
@@ -928,11 +917,6 @@ def extract(args, ab_root):
         keys = [k.strip().lower() for k in args.fx_keys.split(',') if k.strip()]
         total += fx.export_fx(ab_root, out_root, manifest, print, selection=args.fx_set, keys=keys or None,
                               jobs=args.fx_jobs or None, root=ROOT,
-<<<<<<< ours
-                              fx_manifest=Path(args.manifest).with_name(fx.FX_MANIFEST), texture_format=args.fx_texture_format)
-    if stage_ids:
-        total += export_scenes(ab_root, out_root, manifest, print, stage_ids, scene_roots(ab_root, args.scenes))
-=======
                               fx_manifest=Path(args.manifest).with_name(fx.FX_MANIFEST), texture_format=args.fx_texture_format,
                               add_only=args.fx_add_only)
     if stage_ids or reg_ids:
@@ -945,7 +929,6 @@ def extract(args, ab_root):
     if theme_ids:
         total += autochess_themes.export_themes(
             args.themes, out_root, manifest, print, theme_ids, ROOT, game_root=ab_root)
->>>>>>> theirs
     old, old_chars = {}, {}
     if Path(args.manifest).exists():
         try:

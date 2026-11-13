@@ -20,13 +20,9 @@ import { MEASURED_STOCK } from '../shared/stockRules.js';
 //
 // Official files are cached under <repo>/.cache/gamedata/<repo path> (e.g. excel/activity_table.json)
 // and downloaded from https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/master/zh_CN/gamedata/
-<<<<<<< ours
-// when missing. Research files are optional inputs: when absent, research-only fields fall back to
-=======
 // when missing; a version pinned to a commit uses .cache/gamedata@<sha>/ and …/ArknightsGameData/<sha>/zh_CN/gamedata/, or
 // the mirror its profile names (`source`, tools/versions/sources.mjs: .cache/gamedata@aa-<sha>/, normalised on load into
 // Kengxxiao's shape). Research files are optional inputs: when absent, research-only fields fall back to
->>>>>>> theirs
 // documented defaults and a warning is printed.
 //
 // Determinism: the output depends only on the input files (object keys are emitted in a stable
@@ -48,27 +44,19 @@ import { bandBondIds } from '../shared/bandBonds.js';
 import { statusKey, composeUnitRecord } from '../shared/standIn.js';
 import { FULL_RANK, atRank, stripPotential } from '../shared/potential.js';
 import { createOfficialUnitBuilders } from '../server/plugins/officialUnitBuilder.js';
-<<<<<<< ours
-=======
 import { DEFAULT_VERSION, VERSIONS } from '../shared/versions.js';
 import { itemTextForbidsDiy } from '../shared/itemRules.js';
 import { loadProfile, pinnedShaOf, tableSpecError, TABLE_NAMES } from './versions/profiles.mjs';
 import { applyAdapters } from './versions/adapters.mjs';
 import { normalizeMirror, sourceOfProfile } from './versions/sources.mjs';
 import { composeRegulationStage, placeRegulationTemplate } from './versions/layouts.mjs';
->>>>>>> theirs
 
 // ===== CLI & IO ==================================================================================
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const RESEARCH_DIR = join(ROOT, 'docs', 'research');
 const GAMEDATA_URL = 'https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/master/zh_CN/gamedata/';
-<<<<<<< ours
-const SEASON = 'act2autochess';
-const USAGE = 'usage: node tools/build-data.mjs [--refresh | --offline] [--out <dir>] [--cache <dir>] [--report <file>] [--quiet] [--no-research] [--force]';
-=======
 const USAGE = 'usage: node tools/build-data.mjs [--version <id>] [--refresh | --offline] [--out <dir>] [--cache <dir>] [--report <file>] [--quiet] [--no-research] [--force]';
->>>>>>> theirs
 
 /**
  * Parse the command line strictly (unknown options and missing values are errors, so a typo can
@@ -107,8 +95,6 @@ try {
   process.exit(2);
 }
 const CACHE_DIR = OPTS.cache;
-<<<<<<< ours
-=======
 // the version this run builds: its registry entry and its build profile (tools/versions/<slug>.mjs)
 const { entry: VERSION, profile: PROFILE, slug: VERSION_SLUG } = await loadProfile(OPTS.version ?? DEFAULT_VERSION);
 const IS_DEFAULT = VERSION.id === DEFAULT_VERSION;
@@ -169,7 +155,6 @@ async function resolveOne(name) {
   return { builtin: false, value };
 }
 const RESOLVED = Object.fromEntries(await Promise.all(TABLE_NAMES.map(async (n) => [n, await resolveOne(n)])));
->>>>>>> theirs
 
 const log = (...a) => { if (!OPTS.quiet) console.log(...a); };
 const warnings = [];
@@ -222,17 +207,6 @@ async function ensureGamedata(rel) {
 /** Load (and cache in memory) an official gamedata JSON file, as the profile's source gives it; a mirror file is
  * normalised into Kengxxiao's shape first (tools/versions/sources.mjs normalizeMirror). */
 const jsonCache = new Map();
-<<<<<<< ours
-async function loadGamedata(rel) {
-  if (jsonCache.has(rel)) return jsonCache.get(rel);
-  const abs = await ensureGamedata(rel);
-  const obj = JSON.parse(await readFile(abs, 'utf8'));
-  jsonCache.set(rel, obj);
-  return obj;
-}
-
-/** Load an optional research JSON (docs/research/<name>); returns null when absent/unreadable. */
-=======
 async function loadGamedata(rel, profile = PROFILE) {
   const src = sourceOf(rel, profile);
   const key = `${src.cacheDir}/${rel}`;
@@ -282,7 +256,6 @@ function referenceFiles(rel) {
  * Load an optional research JSON (docs/research/<name>); returns null when absent/unreadable. A non-default version reads
  * its own copy from its profile's research directory when there is one, else docs/research/ [ASSUMED] with a warning.
  */
->>>>>>> theirs
 async function loadResearch(name) {
   if (OPTS.noResearch) return null;
   const abs = join(RESEARCH_DIR, name);
@@ -490,11 +463,6 @@ export async function loadContext({ operatorsOnly = false } = {}) {
     loadGamedata('excel/enemy_handbook_table.json'),
     loadGamedata('levels/enemydata/enemy_database.json'),
   ]);
-<<<<<<< ours
-  const act = activity?.activity?.AUTOCHESS_SEASON?.[SEASON];
-  const ac = activity?.autoChessData;
-  if (!act || !ac) throw new Error('activity_table has no act2autochess / autoChessData section');
-=======
   // the season's tables: activity.AUTOCHESS_SEASON[season] (盟约), or the path a profile names in `section` (规程:
   // activity.AUTOCHESS.act3autochess.V3_1, one entry per sub-version)
   const act = PROFILE.section ? PROFILE.section.reduce((o, k) => o?.[k], activity?.activity) : activity?.activity?.AUTOCHESS_SEASON?.[PROFILE.season];
@@ -502,7 +470,6 @@ export async function loadContext({ operatorsOnly = false } = {}) {
   if (!act || !ac) throw new Error(`activity_table has no ${PROFILE.section ? PROFILE.section.join('.') : PROFILE.season} / autoChessData section`);
   // an older table into the shape this build reads (tools/versions/adapters.mjs); never for the default version
   if (!IS_DEFAULT) applyAdapters(act, PROFILE.adapters);
->>>>>>> theirs
 
   // A templated operator (规程's chess_char_5_26: charId char_002_amiya + tmplId char_1037_amiya3, 阿米娅's 医疗 form) is
   // built as its template: char_patch_table's patchChars holds the template as a character record of its own (skills,
@@ -542,10 +509,7 @@ export async function loadContext({ operatorsOnly = false } = {}) {
   if (enemyDataLevelId) levelSrc.set(enemyDataLevelId, ac.constData.enemyDataLevelId);
   const levels = {};
   // Sequential download to stay polite to GitHub; cached files load instantly.
-<<<<<<< ours
   for (const id of (operatorsOnly ? [] : [...levelSrc.keys()].sort(naturalCmp))) levels[id] = await loadGamedata(levelPath(levelSrc.get(id)));
-=======
-  for (const id of [...levelSrc.keys()].sort(naturalCmp)) levels[id] = await loadGamedata(levelPath(levelSrc.get(id)));
   // 规程 builds every player's field in one scene: its stages are an atlas of three pieces and its round templates the
   // road only — both become the 盟约 19×21 level here (tools/versions/layouts.mjs), so nothing after this line differs
   if (PROFILE.layout === 'regulation') {
@@ -557,7 +521,6 @@ export async function loadContext({ operatorsOnly = false } = {}) {
       } else levels[id] = placeRegulationTemplate(levels[id]);
     }
   } else if (PROFILE.layout !== undefined) throw new Error(`unknown layout ${PROFILE.layout}`);
->>>>>>> theirs
 
   const research = {
     core: await loadResearch('01-core-data.json'),
@@ -2062,10 +2025,6 @@ function buildItems(ctx, effects) {
     const ri = researchItems.get(baseId);
     const isGolden = !!t.isGolden;
     const upgradeNum = t.upgradeNum;
-<<<<<<< ours
-    const excluded = Object.hasOwn(SHOP_EXCLUDED_ITEMS, baseId) ? SHOP_EXCLUDED_ITEMS[baseId] : null;
-    const rule = Object.hasOwn(ITEM_RULES, baseId) ? ITEM_RULES[baseId] : null;
-=======
     const normalEffect = act.trapChessDataDict[baseId]?.effectId ?? null;
     const excluded = normalEffect && Object.hasOwn(SHOP_EXCLUDED_ITEMS, normalEffect) ? SHOP_EXCLUDED_ITEMS[normalEffect] : null;
     const rule = normalEffect && Object.hasOwn(ITEM_RULES, normalEffect) ? ITEM_RULES[normalEffect] : null;
@@ -2077,7 +2036,6 @@ function buildItems(ctx, effects) {
     // whose traps never set canFuse stays byte-identical.
     const fuse = t.canFuse === true && t.fuseWith && t.fuseResult
       ? { canFuse: true, fuseWith: t.fuseWith, fuseResult: t.fuseResult } : null;
->>>>>>> theirs
     out[chessId] = {
       id: chessId, baseId, goldenId: shop?.goldenItemId || null, isGolden,
       trapId: t.charId, iconId: t.charId, identifier: t.identifier,
@@ -3427,17 +3385,12 @@ function buildChoices(ctx, effects, items, chess) {
     let draftExcluded = bountyDraftExclusion(e, main);
     if (draftExcluded === 'hidden' && !/鸭爵|高普尼克|流泪小子|圆仔/.test(e.name || '')) warn(`bounty ${e.effectId} "${e.name}": expected one of the 鸭爵 set`);
     let draftPool = bountyDraftPool(e, main, draftExcluded);
-<<<<<<< ours
-    // a boss bounty is offered only through a seen R9 group (BOUNTY_BOSS_GROUPS)
-    if (draftPool === 'boss' && !BOUNTY_BOSS_GROUPS.some((g) => g.cards.includes(e.effectId))) draftPool = null;
-=======
     // a boss bounty is offered only through a seen R9 group of THIS version (the 下半 constants, or the profile's
     // bountyDrafts). A version that leaves the table out does not gate: its draft is uniform.
     if (useTable('bountyDrafts')) {
       const bossGroups = RESOLVED.bountyDrafts.builtin ? BOUNTY_BOSS_GROUPS : RESOLVED.bountyDrafts.value.bossGroups;
       if (draftPool === 'boss' && !bossGroups.some((g) => g.cards.includes(e.effectId))) draftPool = null;
     }
->>>>>>> theirs
     if (!draftExcluded && !draftPool) draftExcluded = 'unseen';
     const sm = /^enemyeffect_(\d+)_\d+$/.exec(e.effectId);
     bounty.push({
@@ -3450,19 +3403,6 @@ function buildChoices(ctx, effects, items, chess) {
   // the official draft structures (see BOUNTY_INITIAL_SETS) only name cards of their own kind
   const bountyById = new Map(bounty.map((c) => [c.effectId, c]));
   const checkKind = (ids, kind, what) => { for (const id of ids) if (bountyById.get(id)?.draftPool !== kind) warn(`bounty draft ${what}: ${id} is not a "${kind}" card`); };
-<<<<<<< ours
-  for (const s of BOUNTY_INITIAL_SETS) checkKind(s.cards, 'initial', 'R3 set');
-  for (const g of BOUNTY_BOSS_GROUPS) checkKind(g.cards, 'boss', 'R9 group');
-  for (const g of BOUNTY_HUNTER_GROUPS) checkKind(g.cards, 'hunter', 'R11 group');
-  for (const g of [...BOUNTY_INITIAL_SETS, ...BOUNTY_BOSS_GROUPS, ...BOUNTY_HUNTER_GROUPS]) {
-    if (new Set(g.cards).size !== g.cards.length) warn(`bounty draft group ${g.cards.join(' ')}: a card twice`);
-    if (g.hits && g.hits.length !== g.cards.length) warn(`bounty draft group ${g.cards.join(' ')}: hits do not match the cards`);
-  }
-  for (const s of BOUNTY_INITIAL_SETS) if (s.cards.map((id) => bountyById.get(id)?.tier).sort().join('') !== '111223') warn(`bounty draft R3 set ${s.cards.join(' ')}: not I I I II II III`);
-  for (const g of BOUNTY_HUNTER_GROUPS) {
-    const giants = g.cards.filter((id) => bountyById.get(id)?.tier === 3).length;
-    if (giants > 1 || g.cards.length + (g.open || 0) !== BOUNTY_HUNTER_RULE.size) warn(`bounty draft R11 group ${g.cards.join(' ')}: not ${BOUNTY_HUNTER_RULE.size} cards with at most one giant`);
-=======
   if (useTable('bountyDrafts')) {
     const custom = RESOLVED.bountyDrafts.builtin ? null : RESOLVED.bountyDrafts.value;
     const initialSets = custom ? custom.initialSets : BOUNTY_INITIAL_SETS;
@@ -3487,7 +3427,6 @@ function buildChoices(ctx, effects, items, chess) {
     } else if (!Array.isArray(hunterRule.onePerSeries) || !Number.isInteger(hunterRule.size)) {
       warn('bounty draft R11 rule: size and onePerSeries are required');
     }
->>>>>>> theirs
   }
   // the R11 rule draws over the R11 cards by tier: III the giants, II / I the rest
   const hunterTier = (t) => bounty.filter((c) => c.draftPool === 'hunter' && c.tier === t).map((c) => c.effectId);
@@ -3576,16 +3515,11 @@ function buildChoices(ctx, effects, items, chess) {
     },
     cards: { bounty, tactic },
     // the official 悬赏决策 structures by kind (tools/build-data.mjs BOUNTY_INITIAL_SETS; `seen` = the match numbers of
-<<<<<<< ours
-    // test/fixtures/official-bounty-drafts.json; `slots` = the official events, the unseen ones built by `rule`)
-    bountyDrafts: {
-=======
     // test/fixtures/official-bounty-drafts.json; `slots` = the official events, the unseen ones built by `rule`).
     // A version whose profile leaves a table out omits its key (the match draws uniformly) [ASSUMED]. A profile that
     // names its own table (RESOLVED, not builtin) is written with the same key order; the 下半 object below is the
     // one a default rebuild stringifies.
     ...useTable('bountyDrafts') && { bountyDrafts: RESOLVED.bountyDrafts.builtin ? {
->>>>>>> theirs
       initial: {
         events: eventsOf('bounty', (e) => bountyEventRe.initial.test(e.id) && !e.solo), slots: eventsOf('bounty', (e) => bountyEventRe.initial.test(e.id) && !e.solo).length,
         pick: 'slot', groups: BOUNTY_INITIAL_SETS, rule: BOUNTY_INITIAL_RULE, count: 6,
@@ -3604,12 +3538,6 @@ function buildChoices(ctx, effects, items, chess) {
         rule: { ...BOUNTY_HUNTER_RULE, giants: hunterTier(3), cards: [...hunterTier(2), ...hunterTier(1)] }, count: 6,
         assumed: ['one of the 7 seen lists, picked uniformly (which of the 15 events R11 fires is open)', 'card weights 1 + hits', 'the `open` cards built by `rule`'],
       },
-<<<<<<< ours
-    },
-    // the official 机密商店 (SHOP_DRAFT) at `rounds`: `slots` tier → weight (`coin` = 盟约之币), each drawn on its own;
-    // `itemWeights` = 1 + the official cards an item showed on (other shop items 1)
-    shopDraft: {
-=======
     } : {
       initial: {
         events: eventsOf('bounty', (e) => bountyEventRe.initial.test(e.id) && !e.solo), slots: eventsOf('bounty', (e) => bountyEventRe.initial.test(e.id) && !e.solo).length,
@@ -3631,17 +3559,10 @@ function buildChoices(ctx, effects, items, chess) {
     // the official 机密商店 (SHOP_DRAFT, or the profile's shopDraft) at `rounds`: `slots` tier → weight (`coin` = 盟约之币),
     // each drawn on its own; `itemWeights` = 1 + the official cards an item showed on (other shop items 1)
     ...useTable('shopDraft') && { shopDraft: RESOLVED.shopDraft.builtin ? {
->>>>>>> theirs
       rounds: SHOP_DRAFT.rounds, slots: SHOP_DRAFT.slots, coin: itemByName(SHOP_DRAFT.coin),
       itemWeights: Object.fromEntries(Object.entries(SHOP_DRAFT.seen).filter(([n]) => n !== SHOP_DRAFT.coin).map(([n, k]) => [itemByName(n), 1 + k]).sort((a, b) => naturalCmp(a[0], b[0]))),
       seen: SHOP_DRAFT.matches, count: 6,
       assumed: ['the slot split', 'item weights 1 + seen', 'solo shows 3 of the 6', 'other rounds (标准 / 险境) keep the previous draw: tiers I–VI with replacement'],
-<<<<<<< ours
-    },
-    // the official 战术决策 (TACTIC_DRAFT) at `rounds`: each card drawn on its own (with replacement) from the cards.tactic
-    // entries of `kinds`, by `weights` (1 + the official cards it showed on; other cards of those kinds 1)
-    tacticDraft: {
-=======
     } : {
       rounds: RESOLVED.shopDraft.value.rounds, slots: RESOLVED.shopDraft.value.slots, coin: itemByName(RESOLVED.shopDraft.value.coin),
       itemWeights: Object.fromEntries(Object.entries(RESOLVED.shopDraft.value.seen).filter(([n]) => n !== RESOLVED.shopDraft.value.coin).map(([n, k]) => [itemByName(n), 1 + k]).sort((a, b) => naturalCmp(a[0], b[0]))),
@@ -3651,21 +3572,16 @@ function buildChoices(ctx, effects, items, chess) {
     // the official 战术决策 (TACTIC_DRAFT, or the profile's tacticDraft) at `rounds`: each card drawn on its own
     // (with replacement) from the cards.tactic entries of `kinds`, by `weights` (1 + the cards it showed on)
     ...useTable('tacticDraft') && { tacticDraft: RESOLVED.tacticDraft.builtin ? {
->>>>>>> theirs
       rounds: TACTIC_DRAFT.rounds, kinds: TACTIC_DRAFT.kinds,
       weights: Object.fromEntries(Object.entries(TACTIC_DRAFT.seen).map(([n, k]) => [tacticByName(n), 1 + k]).filter(([id]) => id).sort((a, b) => naturalCmp(a[0], b[0]))),
       seen: TACTIC_DRAFT.matches, count: 6,
       assumed: ['card weights 1 + seen', 'independent draws (no slot structure)', 'no terrain card at R11', 'solo shows 3', 'other rounds (标准 / 险境) keep every card, uniform, with replacement'],
-<<<<<<< ours
-    },
-=======
     } : {
       rounds: RESOLVED.tacticDraft.value.rounds, kinds: RESOLVED.tacticDraft.value.kinds,
       weights: Object.fromEntries(Object.entries(RESOLVED.tacticDraft.value.seen).map(([n, k]) => [tacticByName(n, RESOLVED.tacticDraft.value), 1 + k]).filter(([id]) => id).sort((a, b) => naturalCmp(a[0], b[0]))),
       seen: RESOLVED.tacticDraft.value.matches, count: 6,
       assumed: RESOLVED.tacticDraft.value.assumed,
     } },
->>>>>>> theirs
     schedule,
     pools: {
       pool_equip_normal: { kind: 'equip', rule: 'shopEligible', maxTier: 'shopLevel', assumed: true },
@@ -3791,8 +3707,6 @@ function dailyMission(c) {
  */
 function buildConfig(ctx, waves, stages, bands) {
   const { act, ac } = ctx;
-<<<<<<< ours
-=======
   // a mode's active bonds, the ones the season loads: 规程's 入门协议 (mode_training_2) lists 拉特兰 lateranoShip, which
   // its tutorial overrides (trainingData) bring and act3autochess does not load [ASSUMED: left out]
   const seasonBonds = (modeId, ids) => ids.filter((id) => act.bondInfoDict?.[id] || (warn(`mode ${modeId}: active bond ${id} is not a bond of the season, left out`), false));
@@ -3813,7 +3727,6 @@ function buildConfig(ctx, waves, stages, bands) {
     ? stockByName(items, { 简易通讯机: 5, 蜂鸣器: 6, 防暴盾: 6, 浓缩嗅盐: 6,
       寻呼模块: 7, 伪装服: 7, 拉特兰桥夹: 7, 商业包装方案: 2 })
     : stockByName(items, RESOLVED.stock.value.items);
->>>>>>> theirs
   const addendum = ctx.research.core?._criticAddendum || {};
   const multipliers = addendum.enemyStatMultipliers || DEFAULT_ENEMY_MULTIPLIERS;
   if (!addendum.enemyStatMultipliers) warn('config: using built-in enemy multiplier table (research 01 _criticAddendum missing)');
@@ -4241,12 +4154,6 @@ async function main() {
   const choices = buildChoices(ctx, effects, items, chess);
   // the bonds each strategy is built around (DESIGN §21.26): the bot skips, and the strategy draft marks 本局禁用, a band
   // whose bond the mode switches off
-<<<<<<< ours
-  for (const b of Object.values(bands)) b.bondIds = bandBondIds(b, { bonds, pools: choices.pools });
-  const config = buildConfig(ctx, waves, stages, bands);
-  attachAttackTimings({ chess, enemies, tokens }, ctx.manifest);
-  const files = { config, chess, bonds, garrisons, items, bands, effects, choices, enemies, factions, waves, stages, bosses, tokens };
-=======
   // 规程 also lists the bond outright (relateBondList): 歌蕾蒂娅 / 耶拉 / 裁度 / 引星棘刺 name theirs nowhere in their text
   // or blackboards, so the union keeps both, in bonds.json order
   const bondOrder = Array.isArray(bonds) ? bonds.map((x) => x.bondId) : Object.keys(bonds);
@@ -4257,7 +4164,6 @@ async function main() {
   }
   const config = buildConfig(ctx, waves, stages, bands, chess, items);
   const files = { config, chess, bonds, garrisons, items, bands, effects, choices, enemies, factions, waves, stages, bosses, tokens, backups };
->>>>>>> theirs
 
   // the unit forms rebuild every PRESET chess at every rank (before the annotation: each pass as built)
   const errors = [...validateAll(files), ...passes.flatMap((p) => checkUnitFormParity(p.ctx, p.chess).map((e) => `${e} (potential rank ${p.ctx.potRank})`))];
@@ -4270,15 +4176,11 @@ async function main() {
     sizes[name] = Buffer.byteLength(texts[name]);
     total += sizes[name];
   }
-<<<<<<< ours
-  if (total > 6 * 1024 * 1024) errors.push(`total data size ${total} exceeds 6 MB`);
-=======
   const maxMB = PROFILE.expect.maxMB ?? 6; // per version; 规程's larger season is allowed 7 (its profile)
   if (total > maxMB * 1024 * 1024) errors.push(`total data size ${total} exceeds ${maxMB} MB`);
   // another version carries a byte copy of the hand-maintained data/tuning.json: a gameplay file that loadData and the
   // content hash read with the rest of a data directory [ASSUMED] the same tuning for every version
   const extra = IS_DEFAULT ? {} : { tuning: await readFile(join(ROOT, 'data', 'tuning.json')) };
->>>>>>> theirs
   // Integrity errors keep the previous (valid) output untouched unless --force.
   const write = !errors.length || OPTS.force;
   if (write) {
