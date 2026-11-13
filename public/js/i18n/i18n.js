@@ -27,7 +27,7 @@ let TRIGGER = /[一-鿿。，、；：？！（）]/;
 const PUNCT = { '。': '. ', '，': ', ', '、': ', ', '；': '; ', '：': ': ', '？': '? ', '！': '! ', '（': '(', '）': ')' };
 /** 한자가 남지 않은 문장의 전각 문장부호를 한국어식으로. */
 const fixPunct = (s) => (CJK.test(s) ? s : s.replace(/[。，、；：？！（）]/g, (c) => PUNCT[c]).replace(/ {2,}/g, ' ').replace(/ ([)\]」』])/g, '$1'));
-const FILES = ['audit', 'official', 'data', 'manual', 'ui', 'patterns'];
+const FILES = ['audit', 'official', 'data', 'regulation', 'manual', 'ui', 'patterns'];
 const ATTRS = ['title', 'placeholder', 'aria-label', 'alt'];
 const CACHE_MAX = 20000;
 
