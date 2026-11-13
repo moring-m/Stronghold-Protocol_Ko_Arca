@@ -6,7 +6,7 @@
 
 import { requiresTraitLayerAuthority } from '../operatorTraits.js';
 import { PHASE } from '../../../shared/constants.js';
-import { timelineAt, DeadBattle, syntheticResult, RESULT_GRACE_MS, HARD_CAP_SECONDS, HeadlessJob } from '../fields.js';
+import { DeadBattle, syntheticResult, RESULT_GRACE_MS, HARD_CAP_SECONDS, HeadlessJob } from '../fields.js';
 import { buildBattleSpec, createBattleFromSpec } from '../../sim/spec.js';
 import { testSlice } from '../testTrace.js';
 import { morphBattleOpt } from '../../../shared/plugins/rules.js';
@@ -40,7 +40,7 @@ export class MatchClientCombat {
     const seq = `${this.battlePrefix}.${this.round}.${++this._battleSeq}`;
     // protocol ids are ≤ 64 chars (shared/protocol.js isId): the field id is informational, the sequence is unique
     const battleId = seq.length + 1 + String(fieldId).length <= 64 ? `${seq}.${fieldId}` : seq;
-    const spec = buildBattleSpec({ ...opts, ...morphBattleOpt(this.rules), battleId, fieldId, kind, content: this.battleContent, boss, cs: this.cs, vs: this.vs });
+    const spec = buildBattleSpec({ ...opts, ...morphBattleOpt(this.rules), battleId, fieldId, kind, content: this.battleContent, boss, cs: this.cs, vs: this.vs, version: this.data.config?.version?.id });
     let total = 0;
     for (const x of spec.spawns) if (x && x.tag !== 'boss' && x.tag !== 'part' && x.countInTotal !== false) total += Math.max(1, Math.floor(Number(x.count) || 1));
     return {
@@ -214,7 +214,6 @@ export class MatchClientCombat {
     const tick = () => {
       this._progressTimer = null;
       if (!this.fields.some((f) => f.cc && f.mode === 'server' && !f.done && f.timeline)) return;
-      for(const f of this.fields)if(f.kind==='normal'||f.kind==='unite'){const sample=timelineAt(f.timeline||[],this._fieldElapsed(f));this.augments.creditLeaks(f,sample?.[5]);}
       this.markPublic();
       this._progressTimer = this.later(1000, tick);
     };
@@ -224,7 +223,6 @@ export class MatchClientCombat {
   /** A field has its final result. */
   _fieldDone(f) {
     if (!f || f.done) return;
-    this.augments.creditResult(f);
     f.done = true;
     f.live = false;
     this._clearFieldTimers(f);

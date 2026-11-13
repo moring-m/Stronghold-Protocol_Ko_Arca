@@ -494,8 +494,8 @@ function applyDefault(m, ps, card) {
         const gain = Math.min(PLUGIN_GAIN_COUNT_MAX, count);
         for (let i = 0; i < gain; i++) {
           const extra = typeof ps.diyStockEntries === 'function' ? ps.diyStockEntries() : null;
-          const id = ps.pool.roll(m.rngMeta, { maxTier: Math.max(1, ps.shop.level), filter: cid => ps.canRecruit(cid) && hasBond(cid), extra })
-            || ps.pool.roll(m.rngMeta, { maxTier: 6, filter: cid => ps.canRecruit(cid) && hasBond(cid), extra });
+          const id = (ps.pool ?? m.pool).roll(m.rngMeta, { maxTier: Math.max(1, ps.shop.level), filter: cid => ps.canRecruit(cid) && hasBond(cid), extra })
+            || (ps.pool ?? m.pool).roll(m.rngMeta, { maxTier: 6, filter: cid => ps.canRecruit(cid) && hasBond(cid), extra });
           if (id) ps.acquireChess(id, { source: 'choice' });
         }
         handled = true;

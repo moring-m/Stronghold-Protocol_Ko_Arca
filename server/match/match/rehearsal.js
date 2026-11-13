@@ -37,12 +37,12 @@ export class MatchRehearsal {
   /**
    * Offer one bot prep's layout rehearsal to the current host.
    * @param {{ ps: import('../PlayerState.js').PlayerState, chosen: any[], plans: Array<Map<number, string>>,
-   *   inputs: object[] }} o the candidate plans and, per candidate, the preview battle options the server would build
+   *   inputs: object[], limits?: { stage: number, tickBudget: number } }} o the candidate plans and, per candidate, the preview battle options the server would build
    *   its own `Battle` from (server/match/bot.js candidateOpts)
    * @returns {null | ReturnType<typeof createDelegatedRehearsalJob>} the job to drive, or null when the server should
    *   rehearse the candidates itself (delegation off, no host to ask, or the frame could not be sent)
    */
-  delegateRehearsal({ ps, chosen, plans, inputs }) {
+  delegateRehearsal({ ps, chosen, plans, inputs, cap = null, limits = null }) {
     if (!this.botRehearsalDelegate || this.disposed || this.ended) return null;
     // A gameplay-plugin room (requireCs) runs in a match host on that room's content set. The host browser only has
     // the official data pack and must not load the room's scripts or spend a different script budget, so the server
@@ -55,21 +55,21 @@ export class MatchRehearsal {
     if (!ps.isBot) return null;
     const host = this.hostId ? this.players.get(this.hostId) : null;
     if (!host || host.isBot || host.left || !host.connected) return null;
-    const job = createDelegatedRehearsalJob(this, ps, chosen, plans, inputs);
+    const job = createDelegatedRehearsalJob(this, ps, chosen, plans, inputs, cap, limits);
     const task = {
       // protocol ids are ≤ 64 chars (shared/protocol.js isId): prefix, round, seat and a per-match counter
       id: `${this.battlePrefix}.${this.round}.${ps.seat}.${++this._rehearsalSeq}`,
-      job, executor: host.playerId, timer: null,
+      playerId: ps.playerId, job, executor: host.playerId, timer: null,
     };
     // the candidates as the JSON the browser simulates — the same preview inputs the server would build, so both
     // sides compare the same battles. No `cs`: a missing hash means the official data. A spec that names a content
     // set is refused by the page (public/js/battle/rehearsal.js); plugin rooms never get here (requireCs above).
-    const specs = inputs.map((o) => buildBattleSpec({ ...o, content: this.battleContent, ...morphBattleOpt(this.rules) }));
+    const specs = inputs.map((o) => buildBattleSpec({ ...o, content: this.battleContent, ...morphBattleOpt(this.rules), version: this.data.config?.version?.id }));
     // registered (and timed) before the frame goes out: an answer can only name a task the server already holds, and one
     // that comes back with the frame itself cannot race the timeout being armed
     this._rehearsalTasks.set(task.id, task);
     task.timer = this.later(this.scaled(this.botRehearsalDelegateMs), () => this._rehearsalTimeout(task));
-    if (!this.sendTo(task.executor, { t: 'b.rehearsal', taskId: task.id, playerId: ps.playerId, cap: job.cap, specs })) {
+    if (!this.sendTo(task.executor, { t: 'b.rehearsal', taskId: task.id, playerId: ps.playerId, cap: job.cap, specs, ...(limits ? { limits } : {}) })) {
       this._dropRehearsalTask(task);
       return null;
     }
@@ -192,7 +192,11 @@ export class MatchRehearsal {
   }
 
   _cancelRehearsal() {
-    for (const task of [...this._rehearsalTasks.values()]) this._dropRehearsalTask(task, !this.disposed);
+    for (const task of [...this._rehearsalTasks.values()]) {
+      // A pool task is cancelled locally even in a disposed match: no frame is involved (the host is not told
+      // anything there), and its thread must stop stepping once no match is waiting for the pick.
+      this._dropRehearsalTask(task, !this.disposed || task.kind === 'pool');
+    }
   }
 
   /** Run a delegated rehearsal on the server instead: the job resumes locally, the task is dead (its answers ignored). */

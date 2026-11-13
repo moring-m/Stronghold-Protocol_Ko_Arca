@@ -8,7 +8,6 @@ import { PHASE, ERR } from '../../../shared/constants.js';
 import { generateDraft, applyCard, bountyBattles, isMultiRoundBounty, bountyCard } from '../choices.js';
 import { onPickCard } from '../botEmotes.js';
 import { weightedPick } from '../waves.js';
-import { botPickCard } from '../bot.js';
 import { OK, fail, DELAYS } from './common.js';
 
 /** Cards of the personal choice (PRTS 卫戍协议：盟约 下半 §法术 教鞭: "于3个战术特训的悬赏任务中选择一项"). */
@@ -54,7 +53,7 @@ export class MatchSpDraft {
     const token = ++this._turnToken;
     if (!s.untimed) {
       const first = s.idx === 0;
-      const secs = first ? this.gd.timer('spFirst') : this.gd.timer('spTurn');
+      const secs = this.isSolo && this.gd.config.version?.rules?.soloTimed ? 150 : first ? this.gd.timer('spFirst') : this.gd.timer('spTurn');
       this.setDeadline(secs, () => {
         if (this.phase !== PHASE.SP_DRAFT || token !== this._turnToken) return;
         const ps = this.players.get(this.spTurn());
@@ -239,14 +238,12 @@ export class MatchSpDraft {
       return id ? { kind: 'item', id } : null;
     }
     if (p.kind !== 'chess') return null;
-    if (typeof p.bond === 'string' && !this.bondLive(p.bond)) return null;
     const rng = this.rngMeta;
     const free = (id) => {
       if (typeof id !== 'string' || !this.gd.chess(id)) return false;
       const rec = typeof chessOf === 'function' ? chessOf(id) : this.gd.chess(id);
       if (this.chessExcluded(rec)) return false;
       const base = this.gd.baseIdOf(id);
-      if (this.bannedChess.includes(base)) return false;
       return !this.pool.has(base) || this.pool.left(base) > 0;
     };
     let id = null;

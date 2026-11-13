@@ -27,7 +27,7 @@ export class MatchOffers {
       }
       this.offerWin.push(w);
       this._offerTimers.set(w, this.later(this.scaled(offer.windowSec * 1000), () => this._offerDeadline(w)));
-      for (const ps of alive) if (ps.botControlled) this._offerDefault(ps, w);
+      for (const ps of alive) if (ps.botControlled) this._offerBot(ps, w);
       this._offerSettleIfDone(w);
     }
     this._offerProgress();
@@ -180,7 +180,7 @@ export class MatchOffers {
   /** Autoplay and departed seats cannot leave a window stalled. */
   offersChanged() {
     for (const w of this.offerWin) {
-      for (const ps of this._offerWaiting(w)) if (ps.botControlled) this._offerDefault(ps, w);
+      for (const ps of this._offerWaiting(w)) if (ps.botControlled) this._offerBot(ps, w);
       this._offerSettleIfDone(w);
     }
     this._offerProgress();

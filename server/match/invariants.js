@@ -170,7 +170,7 @@ export function collectViolations(m, { limit = 25 } = {}) {
     } catch (e) {
       fail(`${id}: computeBonds threw ${e && e.message}`);
     }
-    for (const [base, e] of ps.pool.personal || []) {
+    for (const [base, e] of ps.pool?.personal || []) {
       const owned = all.filter(p => p.kind === 'chess' && gd.baseIdOf(p.id) === base).reduce((n,p) => n + (p.poolCopies || 0),0);
       if (!Number.isInteger(e.left) || e.left > e.cap || e.left + owned !== e.cap) fail(`${id}: recruit stock ${base}: ${e.left} + ${owned} != ${e.cap}`);
     }
