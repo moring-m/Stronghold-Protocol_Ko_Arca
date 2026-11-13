@@ -50,3 +50,13 @@ test('personal and common Amiya apply separate battle buffs',()=>{
  const raw=applyCustomExtensions(DATA,{bonds:[],stages:[],commonBands:['band_amiya']});raw.chess={...raw.chess,test:chessRec({id:'test',stats:{atk:100},skill:null})};
  const h=makeBattle({data:raw,units:[{chessId:'test',row:10,col:4}],bandId:'band_amiya',bonds:Object.fromEntries(['yanShip','swiftShip','arcaneShip'].map(id=>[id,{active:true,count:3,tier:1,layers:0}])),autoFinish:false});h.run(.1);assert.equal(h.unit('test').s.atk,140);assert.equal(h.b.errorCount,0);
 });
+
+test('a common strategy with less than the default HP does not lower the starting HP; one with more adds its bonus', (t) => {
+  for (const [cb, want] of [[['band_amiya'], 28], [['band_duyaoy'], 29], [['band_amiya', 'band_duyaoy'], 29]]) {
+    const h = makeMatch({ mode: 'solo', humans: 1, customExtensions: { bonds: [], stages: [], commonBands: cb } }).start();
+    try {
+      h.drive(() => h.m.phase === 'BATTLE_CHECK' || h.m.phase === 'PREP');
+      assert.equal(h.ps('p_0').lp, want, JSON.stringify(cb));
+    } finally { h.m.dispose(); }
+  }
+});

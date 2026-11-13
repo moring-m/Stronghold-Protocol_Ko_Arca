@@ -513,7 +513,8 @@ export class GameData {
   startLp(bandId) {
     const b = this.band(bandId);
     const hp = b && Number.isInteger(b.totalHp) && b.totalHp > 0 ? b.totalHp : this.defaultStartLp;
-    const extra = (this.config.commonBands || []).reduce((n,id)=>{const h=this.band(id)?.totalHp;return n+(Number.isInteger(h)&&h>0?h-this.defaultStartLp:0);},0);
+    // a common strategy adds its extra starting HP only: one with less than the default never lowers the start
+    const extra = (this.config.commonBands || []).reduce((n,id)=>{const h=this.band(id)?.totalHp;return n+(Number.isInteger(h)&&h>this.defaultStartLp?h-this.defaultStartLp:0);},0);
     return Math.max(1,hp+extra);
   }
 
