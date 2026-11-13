@@ -530,6 +530,8 @@ export const matchData = {
   get(name) {
     const raw = data.get(name), pub = store.get().match?.public;
     if (!raw || !pub || !['chess','bonds','items','bands','bosses','stages','config','enemies'].includes(name)) return raw;
+    // another season's data (규정): the fork's custom factions / extensions are 맹약-only (its ursusShip / leithanienShip are official bonds there)
+    if (data.get('config')?.version) return raw;
     const selection={bonds:pub.customFactions?['ursus']:[],stages:[],...pub.customExtensions};
     const names=['chess','bonds','items','bands','bosses','stages','config','enemies'];
     const all=Object.fromEntries(names.map(k=>[k,data.get(k)||{}]));

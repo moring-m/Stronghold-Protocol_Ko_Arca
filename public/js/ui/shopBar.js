@@ -114,7 +114,7 @@ export function ChessCardView({ slot, idx, priv, frozen = false, reason = null, 
   const prog = mergeProgress(priv, slot.id, (id) => data.lookup('chess', id));
   const hint = mergeHint(priv, slot.id);
   const willMerge = !!hint;
-  const bonds = (Array.isArray(c?.bonds) ? c.bonds : []).filter(b=>b!=='ursusShip' || store.get().match.public?.customFactions);
+  const bonds = (Array.isArray(c?.bonds) ? c.bonds : []).filter(b=>b!=='ursusShip' || store.get().match.public?.customFactions || !!data.get('config')?.version);
   const disabled = !!reason;
   const lo = c ? chessLoadout(c, priv?.loadout, LOOKUPS.getChess, {ops:priv?.ops ?? null,effects:data.get('effects')}) : null;
   const mod=lo?.module && !lo.module.none ? lo.module : null;

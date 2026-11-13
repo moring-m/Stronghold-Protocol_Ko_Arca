@@ -392,7 +392,7 @@ export function ChessDetail({ chess, piece, unit, snapHp, editable, onSell, bond
   // teammate's unit's UnitInfo items, a bond popup 同构 row's wearer's)
   const carried = piece ? items : (Array.isArray(unitItems) ? unitItems : []);
   const getItem = (id) => data.lookup('items', id);
-  const bondIds = pieceBondIds(c, carried, getItem).filter(id => id !== 'ursusShip' || store.get().match.public?.customFactions === true);
+  const bondIds = pieceBondIds(c, carried, getItem).filter(id => id !== 'ursusShip' || store.get().match.public?.customFactions === true || !!data.get('config')?.version);
   const grantedIds = bondIds.filter((b) => !(Array.isArray(c.bonds) && c.bonds.includes(b)));
   const sell = c.sellPrice ?? 1;
   const blocks = {};
