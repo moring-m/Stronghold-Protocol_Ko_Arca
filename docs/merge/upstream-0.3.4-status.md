@@ -15,7 +15,7 @@
 |---|---|---|
 | 매치 진행 | `server/match/` = 포크 그대로 | `server/match-upstream/` = 원본 `server/match/` 그대로. 포크 `Match` 생성자가 규정 시즌(opts.version 또는 data.config.version.family)이면 원본 `Match`를 만든다 |
 | 봇 | 포크 `server/match/bot.js` | 원본 봇(`match-upstream/bot.js`, 전략 선택기 포함) |
-| 전투 시뮬레이션 | `server/sim/` = 포크 그대로 | 같은 포크 엔진 + 연결점: 원본 키트(`kits/ops/ver-*.js`, `nativeRegistry.js`의 VERSION_KITS), 다른 시즌 데이터일 때 charId 기준 키트 선택(`content/index.js`), 장비 효과는 원본 BY_EFFECT(`items/battle.js`), 원본 요청형 API 어댑터(`Battle.js` dealDamage/heal/dealHPLose/healElement/dealElementDamage) |
+| 전투 시뮬레이션 | `server/sim/` = 포크 그대로 | `server/sim-upstream/` = 원본 `server/sim` 그대로(브라우저는 `/sim-upstream/`, `public/js/battle/simLoader.js`가 시즌으로 고름) |
 | 데이터 | `data/*.json` = 포크 그대로 | `data/versions/<slug>/` (원본) |
 | 로비 | 포크 로비 + 시즌 이식(room.version·modeId, room.create {version, modeId}, room.proposeVersion = 즉시 전환, 규정 등급 room.setMode) | 다른 시즌 방의 매치는 시즌 매치 호스트(별도 프로세스)에서 실행 |
 | 클라이언트 | 포크 UI | 같은 포크 UI + 시즌 데이터 로딩(`public/js/content.js`·`versions.js`는 원본), 핵심 맹약 그룹 선택(브리핑), 선택자편 화면(`screens/diyCheck.js`), 전략 명령 패널(`ui/commandPanel.js`) |
@@ -29,7 +29,7 @@
 ## 남은 작업
 
 1. 시즌 아트 교체: 원본의 공식 스킨 팩은 사용자 PC의 게임 클라이언트에서 `tools/local-extract/autochess_themes.py`로 추출해야 한다. 이 환경에는 원본 클라이언트가 없어 추출·리소스 저장소 업로드를 못 했다. 포크 UI 테마(`public/js/ui/uiThemes.js`)에 규정/맹약 시즌 아트 테마로 넣는 작업이 남음.
-2. 규정 시즌 전투 정확도: 포크 전투 엔진(포크 `damage.js` 파이프라인)으로 원본 키트를 돌리므로 일부 규정 키트·맹약·장비 테스트가 다르다(원본 `attack.js` 엔진 전용 동작). 규정 전용 콘텐츠에서 차이가 나는 부분을 하나씩 포팅해야 한다.
-3. 규정 시즌 데이터 번역: 규정 전용 맹약·오퍼레이터 이름 일부가 중국어로 나온다(포크 한국어 데이터 사전에 없음).
+2. (해결) 규정 시즌 전투는 원본 코드 그대로 실행 — 원본 규정 테스트(경로만 바꿔 실행) 228개 중 227개 통과.
+3. (해결) 규정 데이터 한국어 `public/i18n/ko/regulation.json`: 공식 KR 테이블(오퍼레이터·스킬·재능·모듈·적, CN 문장이 데이터와 정확히 일치할 때만) → arknights1234.github.io(전략·맹약·장비 이름과 효과) → 기존 번역 패턴 → 미출시 항목 직접 번역(비공식). 데이터 문자열 13,008개 중 12,804개. 나무위키는 자동 접근이 차단(403)되어 참조하지 못함.
 4. 규정 장비 줄(8번째 줄 5칸) 표시 확인, 브라우저 전투 단계 확인.
 5. 패치노트·버전(0.3.4a), 원본 테스트 정리, 리소스 저장소.

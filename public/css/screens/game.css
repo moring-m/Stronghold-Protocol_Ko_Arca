@@ -1066,12 +1066,12 @@
 @media (max-width: 560px) { .brief-groups__row { grid-template-columns: 1fr; } }
 
 /* 전략 명령 (규정 시즌, ui/commandPanel.js): a folded button above the shop that opens the command's card */
-.cmdp { position: absolute; right: 24px; bottom: 196px; z-index: 30; max-width: min(360px, calc(100vw - 32px)); }
+.cmdp { position: absolute; right: 24px; bottom: 236px; z-index: 30; max-width: min(360px, calc(100vw - 32px)); }
 .cmdp__head { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; color: inherit; font: inherit; font-weight: 700;
   background: rgba(10, 22, 20, .88); border: 1px solid var(--mint-400, #5fd3b6); cursor: pointer; }
 .cmdp__cost { margin-left: 4px; color: var(--gold-400, #f0c35a); }
 .cmdp__badge { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: #e0524a; color: #fff; font-size: 12px; }
-.cmdp__body { margin-top: 6px; padding: 10px 12px; background: rgba(10, 22, 20, .94); border: 1px solid var(--line-2); display: grid; gap: 8px; }
+.cmdp__body { position: absolute; right: 0; bottom: calc(100% + 6px); width: min(360px, calc(100vw - 32px)); padding: 10px 12px; background: rgba(10, 22, 20, .94); border: 1px solid var(--line-2); display: grid; gap: 8px; }
 .cmdp__desc { font-size: 13px; line-height: 1.5; }
 .cmdp__meta { display: flex; flex-wrap: wrap; gap: 10px; font-size: 12px; color: var(--text-2, #9fb7b0); }
 .cmdp__why { color: #f09a8a; }
@@ -1080,4 +1080,18 @@
 .cmdp__card { display: flex; justify-content: space-between; gap: 8px; padding: 8px; text-align: left; color: inherit; font: inherit; font-size: 13px;
   background: rgba(var(--dim-rgb, 0, 0, 0), .35); border: 1px solid var(--line-2); cursor: pointer; }
 .cmdp__card:hover { border-color: var(--mint-400, #5fd3b6); }
-@media (max-width: 560px) { .cmdp { right: 8px; bottom: 150px; } }
+@media (max-width: 560px) { .cmdp { right: 8px; bottom: 190px; } }
+/* short screens (phones in landscape): the command card and the bond groups stay compact */
+@media (max-height: 500px) {
+  .cmdp { bottom: 132px; right: 10px; }
+  .cmdp__head { padding: 3px 8px; font-size: 11px; }
+  .cmdp__body { width: min(300px, calc(100vw - 24px)); max-height: 52vh; overflow: auto; padding: 6px 8px; gap: 5px; }
+  .cmdp__desc, .cmdp__card { font-size: 10px; line-height: 1.4; }
+  .cmdp__meta { font-size: 10px; }
+  .brief-groups { margin-bottom: 6px; }
+  .brief-groups__hint { display: none; }
+  .brief-group { padding: 5px 8px; gap: 4px; }
+  .brief-group__label { font-size: 11px; }
+  .brief-group__bond { font-size: 10px; gap: 2px; }
+  .brief-group__bond .bond-glyph, .brief-group__bond svg, .brief-group__bond img { width: 14px; height: 14px; }
+}
