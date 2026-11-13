@@ -363,18 +363,11 @@ function chaliceShare(b, c) {
     if (!o.alive || o === t || o.defId !== 'enemy_1430_lrrook' || !o.mem.ab) continue;
     const a = o.mem.ab.list[0];
     if (!a || !(a.share > 0) || hypot(o.x - t.x, o.y - t.y) > a.r) continue;
-<<<<<<< ours
-    const part = c.dmg.amount * a.share;
-    c.dmg.amount -= part;
-    // a 无来源 burst's share stays 无来源, credited like the burst (damage.js)
-    b.dealDamage(c.dmg.sourceless ? c.credit : c.source, o, { amount: part, type: c.dmg.type, canDodge: false, sourceless: c.dmg.sourceless, tags: [...(c.dmg.tags || []), 'chalice'] });
-=======
     const kept = c.dmg.amount * a.share;
     const part = c.dmg.amount - kept;
     c.dmg.amount = kept;
     // a 无来源 burst's share stays 无来源, credited like the burst (attack/element.js)
     b.dealDamage(c.dmg.sourceless ? c.credit : c.source, o, { amount: part, type: 'true', canDodge: false, sourceless: c.dmg.sourceless, tags: [...(c.dmg.tags || []), 'chalice'] });
->>>>>>> theirs
     break;
   }
 }

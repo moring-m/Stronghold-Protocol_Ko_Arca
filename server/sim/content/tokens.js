@@ -101,15 +101,12 @@ import { SKILL_SUMMON_START_DEPLOY } from '../../../shared/constants.js';
 import { hypot } from '../detmath.js';
 import { atPotential } from '../../../shared/potential.js';
 import { textFinite } from '../../../shared/plugins/textNumber.js';
-<<<<<<< ours
-=======
 import { isOfficialId, isVersionData, gameData } from './support/index.js';
 
 // Re-exported for the kits, which never import an index module (test/content/kits_layout.test.js): the group lists that
 // grow on another version's build only (DESIGN §35.22.4). `gameData` is the loaded object `isVersionData()` reads when
 // a kit calls it with no argument.
 export { isVersionData, gameData };
->>>>>>> theirs
 
 const num = (v, d = 0) => (typeof v === 'number' && Number.isFinite(v) ? v : (typeof v === 'string' && v.trim() !== '' && Number.isFinite(+v) ? +v : d));
 const GRID_3X3 = Object.freeze([[1, -1], [1, 0], [1, 1], [0, -1], [0, 0], [0, 1], [-1, -1], [-1, 0], [-1, 1]]);

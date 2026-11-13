@@ -75,15 +75,11 @@ import { bodyKeys, bodyInRange } from '../../../body.js';
 import { applyRedirectCut, isHpLoss, redirectShare } from '../../../damage.js';
 import { BOSS_ROW_OFFSET } from '../../../constants.js';
 import { GEO } from '../../../../../shared/constants.js';
-<<<<<<< ours
-import { num, bondRecord, buffParams, bondTier, bondLayers, isMember, isElite, isGroundOp, onField, playerOps, passiveBuff, fxOn, N4, N8, directMods, COLS } from '../../support/index.js';
-=======
 import {
   num, bondRecord, buffParams, bondTier, bondLayers, isMember, isElite, isGroundOp, onField, playerOps, passiveBuff,
   fxOn, N4, N8, directMods, COLS, isFirstPeriod,
 } from '../../support/index.js';
 import { installArcaneExtra, arcaneRider } from '../regulation.js';
->>>>>>> theirs
 
 export const ID = Object.freeze({
   preci: 'preciShip', swift: 'swiftShip', skillful: 'skillfulShip', arcane: 'arcaneShip', stead: 'steadShip',

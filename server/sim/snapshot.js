@@ -91,14 +91,11 @@ export function unitInfo(u) {
     // an ally operator's equipped item ids (display: a 变形同构体 wearer counts for the bond it grants — the bond popup's
     // member list and the detail card's bond chips of a teammate's unit)
     items: u.side === 'ally' && u.kind === 'op' && Array.isArray(u.items) && u.items.length ? [...u.items] : undefined,
-<<<<<<< ours
     optionalRecruit: !!d.raw?.optionalRecruit || !!d.optionalRecruit,
     energy: u.profile?.storeEnergy ? storedEnergy(u) : undefined,
     energyMax: u.profile?.storeEnergy ? u.profile.storeMax ?? 3 : undefined,
     profession: d.profession, subProf: d.subProf, attackType: u.dmgType,
-=======
     itemProgress: u.itemProgress?.map(p => ({ ...p })),
->>>>>>> theirs
     // 补位: the replaced operator's charId when the chess fights as its stand-in (spine / avatar are the stand-in's; the
     // detail card composes the stand-in record, shared/standIn.js standInRecord)
     standInFor: u.side === 'ally' && u.kind === 'op' && typeof d.standInFor === 'string' ? d.standInFor : undefined,

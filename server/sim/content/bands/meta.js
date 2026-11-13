@@ -563,33 +563,19 @@ export function duckReplace(ctx, spawns, p, ownerPlayerId, { routes = null, side
 const duckGlobal = {
   onBattleStart(ctx, ev) {
     if (!ev || !DUCK_KINDS.has(ev.kind) || !Array.isArray(ev.spawns)) return;
-<<<<<<< ours
-    // Team effects must include common sources even when nobody personally picked the band.
-    const sources = [ctx.bandId(), ...ctx.teammates().map(t=>t.bandId()), ...(ctx.gd.config.commonBands || [])].sort();
-    // Each copy draws from the still-unreplaced canonical wave. Per-player bounties must not shift it.
-    const base=(ev.waveSpawns||ev.spawns).filter(s=>!notOwn(s)).map(s=>({...s}));
-    for (const [index,id] of sources.entries()) {
-      if ((ctx.gd.band(id)?.effectRef ?? id) !== DUCK_BAND) continue;
-      const p = duckParams(id);
-      if (!p || ctx.round < int(p.round, 1)) continue;
-      const rng = typeof ctx.seedFor === 'function' ? createRng(ctx.seedFor(`duck:${ctx.round}:${index}`)) : ctx.rng;
-      const picks=duckPicks(ctx.gd,rng,base,p,{routes:ev.routes,side:ev.side});
-      applyDuckPicks(ev.spawns,picks,ctx.playerId);
-      applyDuckPicks(base,picks,ctx.playerId);
-    }
-=======
-    const holder = [ctx, ...ctx.teammates()].find(t => duckParams(t.bandId(), t.commandEffectId));
-    if (!holder) return;
-    const p = duckParams(holder.bandId(), holder.commandEffectId);
-    if (!p || ctx.round < int(p.round, 1)) return;
-    // one draw per round for every player (GitHub #839): its own stream from the match seed — no player's meta stream,
-    // the same in the stats preview and the bot rehearsals — on the wave before the player's bounties (ev.waveSpawns);
-    // the kind from the player's own stream
-    const seeded = typeof ctx.seedFor === 'function';
-    const rng = seeded ? createRng(ctx.seedFor(`duck:${ctx.round}`)) : ctx.rng;
-    const typeRng = seeded ? createRng(ctx.seedFor(`duck:${ctx.round}:${ctx.playerId}`)) : rng;
-    duckReplace(ctx, ev.spawns, p, ctx.playerId, { routes: ev.routes, side: ev.side, leader: ev.kind !== 'normal', base: ev.waveSpawns, rng, typeRng });
->>>>>>> theirs
+      // the holder: a player (or teammate) with the strategy, else the room's 공통 적용 전략 (config.commonBands, the fork)
+      const holder = [ctx, ...ctx.teammates()].find(t => duckParams(t.bandId(), t.commandEffectId));
+      const commonId = holder ? null : (ctx.gd.config.commonBands || []).find((id) => (ctx.gd.band(id)?.effectRef ?? id) === DUCK_BAND && duckParams(id));
+      if (!holder && !commonId) return;
+      const p = holder ? duckParams(holder.bandId(), holder.commandEffectId) : duckParams(commonId);
+      if (!p || ctx.round < int(p.round, 1)) return;
+      // one draw per round for every player (GitHub #839): its own stream from the match seed — no player's meta stream,
+      // the same in the stats preview and the bot rehearsals — on the wave before the player's bounties (ev.waveSpawns);
+      // the kind from the player's own stream
+      const seeded = typeof ctx.seedFor === 'function';
+      const rng = seeded ? createRng(ctx.seedFor(`duck:${ctx.round}`)) : ctx.rng;
+      const typeRng = seeded ? createRng(ctx.seedFor(`duck:${ctx.round}:${ctx.playerId}`)) : rng;
+      duckReplace(ctx, ev.spawns, p, ctx.playerId, { routes: ev.routes, side: ev.side, leader: ev.kind !== 'normal', base: ev.waveSpawns, rng, typeRng });
   },
 };
 

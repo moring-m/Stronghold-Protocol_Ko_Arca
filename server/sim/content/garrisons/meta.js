@@ -133,13 +133,9 @@ H.SERVER_ADD_BOND_METHOD = {
       case 'hand_count': addAll(ctx, bonds, capped(ctx.hand().filter((p) => p && p.kind === 'chess').length * multi), ra); break;
       case 'same_row': addAll(ctx, bonds, capped(sameRowCount(ctx, me) * multi), ra); break;
       case 'same_bond_diff_lv':
-<<<<<<< ours
-        for (const b of bonds) addAll(ctx, [b], distinctTiers(ctx, (p) => metaBonds(ctx, p).includes(b)).size * multi, ra);
-=======
         // V1's garrison_53 text names both bonds although its blackboard names only Victoria.
         if (ctx.data.config?.season === 'act1autochess' && /^garrison_53_[ab]$/.test(ctx.source.garrisonId)) bonds.push('miraShip');
         for (const b of bonds) addAll(ctx, [b], capped(distinctTiers(ctx, (p) => metaBonds(ctx, p).includes(b)).size * multi), ra);
->>>>>>> theirs
         break;
       default: break;
     }

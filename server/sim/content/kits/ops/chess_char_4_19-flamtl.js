@@ -24,15 +24,10 @@ export default withDefaults({
           kind: 'instant',
           trigger: 'SP_FULL',
           onStart({ battle, unit }) {
-<<<<<<< ours
-            battle.addDp(unit.ownerId, num(bb.cost, 6));
-            battle.addBuff(unit, { key: 'flamtl:evade', visible: true });
-=======
             battle.addDp(unit.ownerId, num(bb.cost, 6), unit);
             battle.addBuff(unit, { key: 'flamtl:evade', visible: true, injury(c) {
         if (c.type === 'phys' && c.dmg.isAttack && c.source?.side === 'enemy' && c.dodge()) battle.removeBuff(unit, c.buff);
       } });
->>>>>>> theirs
             battle.fx('dp', { x: unit.x, y: unit.y, id: unit.id, n: num(bb.cost, 6) });
           },
         }),

@@ -46,17 +46,11 @@ const num = (v, d = 0) => (typeof v === 'number' && Number.isFinite(v) ? v : (ty
 /** ASPD blackboard values: a fraction (|v| < 1, e.g. −0.6 / −0.05) is ×100 ASPD, otherwise flat (+20). */
 const aspdOf = (v) => (Math.abs(v) < 1 ? v * 100 : v);
 
-<<<<<<< ours
 // thicket (덤불, the fork's custom 설원 battlefield, tile_custom_thicket): 隐匿 for every unit on it — the operators deployed
-// there and the enemies walking in (the owner's design, not an official tile)
-export const TERRAIN = Object.freeze({ mire: 1, smog: 2, deepsea: 3, infection: 4, thicket: 5 });
-const TERRAIN_NAME = ['', 'mire', 'smog', 'deepsea', 'infection', 'thicket'];
-const BUFF = { 1: 'terrain:mire', 2: 'terrain:smog', 3: 'terrain:deepsea', 4: 'terrain:infection', 5: 'terrain:thicket' };
-=======
-export const TERRAIN = Object.freeze({ mire: 1, smog: 2, deepsea: 3, infection: 4, speedup: 5 });
-const TERRAIN_NAME = ['', 'mire', 'smog', 'deepsea', 'infection', 'speedup'];
-const BUFF = { 1: 'terrain:mire', 2: 'terrain:smog', 3: 'terrain:deepsea', 4: 'terrain:infection', 5: 'terrain:speedup' };
->>>>>>> theirs
+// there and the enemies walking in (the owner's design, not an official tile). Code 6: 5 is the official speedup tile.
+export const TERRAIN = Object.freeze({ mire: 1, smog: 2, deepsea: 3, infection: 4, speedup: 5, thicket: 6 });
+const TERRAIN_NAME = ['', 'mire', 'smog', 'deepsea', 'infection', 'speedup', 'thicket'];
+const BUFF = { 1: 'terrain:mire', 2: 'terrain:smog', 3: 'terrain:deepsea', 4: 'terrain:infection', 5: 'terrain:speedup', 6: 'terrain:thicket' };
 const AIRFLOW = 'terrain:airflow';
 const CRATE_KEY = 'trap_1105_accrate';
 const TURRET_KEY = 'trap_1104_aclasert';

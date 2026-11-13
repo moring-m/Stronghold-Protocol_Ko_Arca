@@ -3,14 +3,10 @@
 
 import { canTargetEnemy } from '../../../targeting.js';
 import { bodyDist, bodyInRange } from '../../../body.js';
-<<<<<<< ours
-import { num, bv, tbb, moduleBb, live, ANY, enemiesIn, onDefaultSkill, selectedSkill, batOf, pullToward, aura } from '../shared/tier6.js';
-=======
 import {
   num, bv, tbb, moduleBb, live, ANY, enemiesIn, onDefaultSkill, selectedSkill, batOf, pullToward, aura, N4,
 } from '../shared/tier6.js';
 import { alliesInGridOf, holdArcane, spTimeBonus } from '../shared/tier1.js';
->>>>>>> theirs
 
 // ------------------------------------------------------------------------------------------------------------------
 // 溯光星源 chess_char_6_16 (凝滞师) — S3 并流连锁; 数据建模; 能源解析

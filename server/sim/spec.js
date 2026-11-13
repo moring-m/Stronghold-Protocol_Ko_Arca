@@ -385,13 +385,9 @@ export function resultDigest(result) {
       // whether the 联防 bills the leak, so a client must not be able to report it differently from the re-simulation
       (Array.isArray(p.leaked) ? p.leaked : []).map((l) => `${l && l.enemyKey}|${l && l.counted === false ? 0 : 1}|${l && l.uniteRuntime ? 'x' : ''}|${(l && l.sourcePlayerId) || ''}|${modsKey(l && l.mods)}`).sort(),
       Math.round(Number(p.damageDealt) || 0), Math.round(Number(p.bossDamage) || 0),
-<<<<<<< ours
       (Array.isArray(p.unitsEnd) ? p.unitsEnd : []).map((u) => [u && u.uid, r4(u && u.hpPct), r4(u && u.sp), !!(u && u.alive),
         ...(u?.egirDevour?.processed ? [[r4(u.egirDevour.atkFinal ?? u.egirDevour.atkFlat), r4(u.egirDevour.blockCnt), u.egirDevour.revives, !!u.egirDevour.revived]] : [])]),
-=======
-      (Array.isArray(p.unitsEnd) ? p.unitsEnd : []).map((u) => [u && u.uid, r4(u && u.hpPct), r4(u && u.sp), !!(u && u.alive)]),
       ...(p.commandChests ? [p.commandChests.map(c => [c.id, c.alive])] : []),
->>>>>>> theirs
     ];
     // Optional. A result with no temporary layers keeps the same tuple length as before 规程.
     const tg = p.tempLayerGains && typeof p.tempLayerGains === 'object' ? p.tempLayerGains : null;

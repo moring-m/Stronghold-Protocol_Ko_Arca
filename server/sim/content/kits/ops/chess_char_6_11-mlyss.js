@@ -1,13 +1,6 @@
 // server/sim/content/kits/ops/chess_char_6_11-mlyss.js — 缪尔赛思 (char_249_mlyss) kit, tier 6.
 // Conventions of the tier-6 kits: ../shared/tier6.js; kit contract and rules: ../README.md.
 
-<<<<<<< ours
-import { num, bv, tbb, tdesc, moduleBb, parseN, live, isTok, onDefaultSkill, selectedSkill, AROUND8, N4, bstate, bestTile, pullToward } from '../shared/tier6.js';
-import { holdProtect } from '../shared/tier1.js';
-
-/** 莱茵生命 (character_table groupId "rhine") members of this season's pool (checked against the official table). */
-const RHINE = new Set(['char_108_silent', 'char_128_plosis', 'char_202_demkni', 'char_249_mlyss', 'char_1047_halo2']);
-=======
 import { bodyInRange } from '../../../body.js';
 import {
   num, bv, tbb, tdesc, moduleBb, parseN, live, isTok, onDefaultSkill, selectedSkill, AROUND8, N4, bstate, bestTile,
@@ -36,7 +29,6 @@ export const rhineOf = (data) => {
 };
 /** A 莱茵生命 member of the loaded data's list: 开源节流's SP on copy and on deploy, and its cost cut. */
 export const isRhine = (u) => rhineOf().has(u?.def?.charId);
->>>>>>> theirs
 
 // ------------------------------------------------------------------------------------------------------------------
 // 缪尔赛思 chess_char_6_11 (战术家) — S3 浅层非熵适应; 净水即生命 (流形); 开源节流; module 梳妆流形
