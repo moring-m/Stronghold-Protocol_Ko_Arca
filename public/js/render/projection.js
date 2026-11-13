@@ -458,7 +458,6 @@ export function presetCamera(kind, viewport, options) {
     const key = table[side];
     const cfg = opts.config && typeof opts.config === 'object' ? opts.config : null;
     let param = (cfg && parseCameraParam(cfg[key])) || parseCameraParam(OFFICIAL_PARAMS[key]);
-<<<<<<< ours
     // Boss prep's right-hand source offset overshoots the mirrored left field.
     // Use the same optics and a world-space reflection about the board centre,
     // including observed boss benches that use this preparation preset.
@@ -466,13 +465,6 @@ export function presetCamera(kind, viewport, options) {
       const leftKey = table.L;
       const left = (cfg && parseCameraParam(cfg[leftKey])) || parseCameraParam(OFFICIAL_PARAMS[leftKey]);
       param = [-left[0], left[1], left[2], left[3]];
-=======
-    if (opts.shop === 'partial' && preset.officialNoShop) {
-      const closedKey = preset.officialNoShop[side];
-      const closed = (cfg && parseCameraParam(cfg[closedKey])) || parseCameraParam(OFFICIAL_PARAMS[closedKey]);
-      // [ASSUMED] #692: halfway between official open/folded offsets; the official client has no middle level.
-      param = param.map((n, i) => (n + closed[i]) / 2);
->>>>>>> theirs
     }
     const cam = officialCamera(param, { width: W, height: H }, opts);
     return observedPreset.keep && opts.hud ? clearHud(cam, opts.hud, observedPreset.keep, { width: W, height: H }) : cam;

@@ -21,12 +21,7 @@ import { damageNumberMode, showDamageNumber, roundedDamageNumber } from '../../.
 // A tap on the ground itself emits tileClick { row, col } like render/app.js does, so a special terrain tile
 // explains itself on this board too (GitHub issue #184).
 
-<<<<<<< ours
 import { observedBenchExtras } from '../battle/observedBench.js';
-=======
-import { resourceFloat } from '../render/resourceNumbers.js';
-import { pieceItemProgress, progressLabel } from '../itemProgress.js';
->>>>>>> theirs
 import { render } from '../../vendor/preact.module.js';
 import { html, TierChip } from './components.js';
 import { GEO } from '../../../shared/constants.js';
@@ -42,16 +37,7 @@ function unitArt(m, info) {
   const id = info?.avatar || info?.defId;
   if (!m || !id) return null;
   if (info.side === 'enemy' || String(id).startsWith('enemy_')) return enemyIconUrl(m, id);
-  if (String(id).startsWith('token_')) {
-    // 召唤物皮肤 (docs/SKINS.md): the same switch as an operator's: another seat's outfit is hidden when off. With its
-    // owner's operator known (UnitInfo ownerCharId, #876) the summon follows that operator's CURRENT outfit like the Pixi
-    // board does — the spawn-time info.skin missed a change made during the battle (round-54 audit)
-    const mine = info.ownerId == null || info.ownerId === appearance.myId;
-    const skin = info.ownerCharId && info.ownerId != null
-      ? ownerSkin(info.ownerCharId, { ...appearance, ownerId: info.ownerId, skin: info.skin })
-      : (mine || appearance.otherSkins !== false ? info.skin : null);
-    return tokenAvatarUrl(m, id, { skin });
-  }
+  if (String(id).startsWith('token_')) return tokenAvatarUrl(m, id);
   // Same golden rule as chessAvatarUrl: a character-key avatar uses avatarE2 on a golden piece.
   return chessAvatarUrl(m, { isGolden: !!info.golden, assets: { avatar: id } });
 }
@@ -85,11 +71,7 @@ export function fallbackTileClass(stage, row, col) {
  */
 export function fallbackFloat(e, settings) {
   if (!settings?.damageNumbers || !Array.isArray(e)) return null;
-<<<<<<< ours
   if (e[0] === 'dmg' && e[4]?.blocked === 'invulnerable') return null;
-=======
-  if (e[0] === 'resource') return resourceFloat(e, settings);
->>>>>>> theirs
   if (settings.officialDamageNumbers === true) {
     if (e[0] === 'fx' && e[1] === 'dodge' && e[4] && e[4].num === 'm') return { id: e[4].id, text: 'MISS', type: 'miss' };
     if (e[0] !== 'dmg' || (e[4] !== 'r' && e[4]?.officialMark !== 'r')) return null;
@@ -111,7 +93,6 @@ export function fallbackFloat(e, settings) {
  */
 export function createFallbackView(host, opts = {}) {
   const dataStore = opts.data;
-  const equipHand = () => dataStore?.get?.('config')?.version?.rules?.equipHand === true;
   const m = () => opts.assets || dataStore?.get?.('assets') || null;
   const lookup = (file, id) => dataStore?.lookup?.(file, id) ?? null;
   const listeners = new Map();
@@ -146,13 +127,8 @@ export function createFallbackView(host, opts = {}) {
     const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 100;
     const r = st.rect;
     const cols = r.c1 - r.c0 + 1;
-<<<<<<< ours
     const prep = st.mode === 'prep' || !!st.observedBench;
     const hasTemp = prep && (st.observedBench?.tempPieces || st.priv?.temp || []).some(Boolean);
-=======
-    const prep = st.mode === 'prep';
-    const hasTemp = prep && (equipHand() || (Array.isArray(st.priv?.temp) && st.priv.temp.some(Boolean)));
->>>>>>> theirs
     const rows = r.r1 - r.r0 + 1 + (prep ? 2.6 + (hasTemp ? 1.2 : 0) : 0); // + gap + hand (+ temp) rows
     // keep clear of the HUD: top bar + bond strip above, shop bar (prep) / switcher (combat) below
     const top0 = rem * 2.0;
@@ -175,30 +151,8 @@ export function createFallbackView(host, opts = {}) {
   function pieceArt(p) {
     const mm = m();
     if (p.kind === 'item') return itemIconUrl(mm, lookup('items', p.id));
-<<<<<<< ours
     if (p.kind === 'token') return tokenAvatarUrl(mm, p.id);
     return chessAvatarUrl(mm, lookup('chess', p.id));
-=======
-    // 召唤物皮肤 (docs/SKINS.md): the summon wears its owner's outfit; 设置「显示其他玩家的皮肤」 off hides another
-    // seat's outfit
-    if (p.kind === 'token') {
-      const own = (st.priv?.playerId ?? st.myId) === st.myId || st.settings?.otherSkins !== false;
-      return tokenAvatarUrl(mm, p.id, { skin: own ? p.skin : null });
-    }
-    const chess = lookup('chess', p.id);
-    const body = ownSi(chess) || ownDiy(chess) || chess;
-    const skin = ownerSkin(body?.charId, { ownerId: st.priv?.playerId ?? st.myId, skin: p.skin,
-      myId: st.myId, players: st.players, otherSkins: st.settings.otherSkins });
-    return chessAvatarUrl(mm, body, { skin });
-  }
-  /** 0.2.0 补位: the player's own piece of a chess it does not own is its stand-in, bench and board alike (render/app.js pieceInfo) */
-  function ownSi(chess) {
-    return chess ? ownStandIn(chess, st.priv, dataStore?.get?.('backups') ?? null) : null;
-  }
-  /** 0.2.0 自选编队: the player's own piece of a DIY slot it filled is its operator (gameLogic ownDiyRecord) */
-  function ownDiy(chess) {
-    return chess ? ownDiyRecord(chess, st.priv, { chess: dataStore?.get?.('chess') ?? null, backups: dataStore?.get?.('backups') ?? null }) : null;
->>>>>>> theirs
   }
   function pieceName(p) {
     if (p.kind === 'item') return lookup('items', p.id)?.name || '道具';
@@ -222,14 +176,8 @@ export function createFallbackView(host, opts = {}) {
       ${tier && p.kind !== 'token' ? html`<${TierChip} tier=${tier} golden=${golden} size="sm" class="ff-piece__tier" />` : null}
       ${p.kind === 'chess' && Array.isArray(p.items) && p.items.length ? html`<div class="ff-piece__items">${p.items.slice(0, 2).map((it) => html`<i key=${it.uid}></i>`)}</div>` : null}
       ${p.kind === 'token' && p.count > 1 ? html`<b class="ff-piece__count">×${p.count}</b>` : null}
-      <${EquipmentProgress} rows=${pieceItemProgress(p)} />
       ${wedge ? html`<i class="ff-piece__dir" aria-hidden="true"></i>` : null}
     </div>`;
-  }
-
-  function EquipmentProgress({ rows }) {
-    const labels = (rows || []).map(progressLabel).filter(Boolean);
-    return labels.length ? html`<span class="ff-progress">${labels.map((label, i) => html`<span key=${i}>${label}</span>`)}</span>` : null;
   }
 
   function onDown(e, p) {
@@ -249,7 +197,6 @@ export function createFallbackView(host, opts = {}) {
       if (!t) continue;
       if (t.dataset.drop === 'board') return { area: 'board', row: Number(t.dataset.row), col: Number(t.dataset.col) };
       if (t.dataset.drop === 'hand') return { area: 'hand', idx: Number(t.dataset.idx) };
-      if (equipHand() && t.dataset.drop === 'temp') return { area: 'temp', idx: Number(t.dataset.idx) };
     }
     return { area: 'outside', clientX, clientY };
   }
@@ -329,12 +276,7 @@ export function createFallbackView(host, opts = {}) {
         onPointerDown=${(e) => { if (e.button === 0) emit('pieceClick', { unitId: id, uid: info.uid ?? null, unit: info, button: 0, clientX: e.clientX, clientY: e.clientY }); }}
         onContextMenu=${(e) => { e.preventDefault(); emit('pieceClick', { unitId: id, uid: info.uid ?? null, unit: info, button: 2, clientX: e.clientX, clientY: e.clientY }); }}>
       <div class="ff-unit__art">${src ? html`<img src=${src} alt="" draggable=${false} />` : html`<span>${[...(info.name || '?')][0]}</span>`}</div>
-<<<<<<< ours
       <div class="ff-unit__bars"><i class="hp" style=${`width:${hpPct}%`}></i>${!enemy && spMax > 0 ? html`<i class="sp" style=${`width:${spPct}%;${hasFlag(flags, UF.OVERHEATED) ? 'background:#f04444' : ''}`}></i>` : null}</div>
-=======
-      <div class="ff-unit__bars"><i class="hp" style=${`width:${hpPct}%`}></i>${!enemy && spMax > 0 ? html`<i class="sp" style=${`width:${spPct}%`}></i>` : null}</div>
-      ${!dead ? html`<${EquipmentProgress} rows=${info.itemProgress} />` : null}
->>>>>>> theirs
     </div>`;
   }
 
@@ -411,7 +353,7 @@ export function createFallbackView(host, opts = {}) {
       for (const u of Array.isArray(benchState.prepMapChars) ? benchState.prepMapChars : []) {
         if (!u || !Number.isInteger(u.x) || !Number.isInteger(u.y) || typeof u.defId !== 'string') continue;
         const pos = tilePos(L, u.y, u.x);
-        const src = (u.kind === 'enemy' || String(u.defId).startsWith('enemy_')) ? enemyIconUrl(m(), u.defId) : tokenAvatarUrl(m(), u.defId);
+        const src = tokenAvatarUrl(m(), u.defId);
         pieces.push(html`<div key=${`map:${u.uid}`} class="ff-piece ff-piece--token ff-piece--map-char"
             style=${`transform:translate(${pos.x}px,${pos.y}px);width:${L.tile}px;height:${L.tile}px`}
             onPointerDown=${(e) => { if (e.button === 0) emit('pieceClick', { unit: u, unitId: null, uid: u.uid, prepMapChar: true, button: 0, clientX: e.clientX, clientY: e.clientY }); }}
@@ -433,16 +375,11 @@ export function createFallbackView(host, opts = {}) {
         const p = benchState.hand?.[i];
         if (p) { const hp = heldPos(p) || pos; pieces.push(html`<${Piece} key=${p.uid} p=${p} x=${hp.x} y=${hp.y} L=${L} area="hand" />`); }
       }
-<<<<<<< ours
       const temp = Array.isArray(benchState.temp) ? benchState.temp : [];
       if (temp.some(Boolean)) {
-=======
-      const temp = Array.isArray(st.priv.temp) ? st.priv.temp : [];
-      if (equipHand() || temp.some(Boolean)) {
->>>>>>> theirs
         for (let i = 0; i < GEO.TEMP_SIZE; i++) {
           const pos = tempPos(L, i);
-          hand.push(html`<div key=${`t${i}`} class="ff-slot ff-slot--temp" data-drop=${equipHand() ? 'temp' : undefined} data-idx=${i} style=${`transform:translate(${pos.x}px,${pos.y}px);width:${L.tile}px;height:${L.tile}px`}></div>`);
+          hand.push(html`<div key=${`t${i}`} class="ff-slot ff-slot--temp" style=${`transform:translate(${pos.x}px,${pos.y}px);width:${L.tile}px;height:${L.tile}px`}></div>`);
           const p = temp[i];
           if (p) { const hp = heldPos(p) || pos; pieces.push(html`<${Piece} key=${p.uid} p=${p} x=${hp.x} y=${hp.y} L=${L} area="temp" />`); }
         }

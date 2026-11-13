@@ -40,17 +40,10 @@ import { checkLoadout } from '../../../shared/protocol.js';
 
 import { useEffect, useMemo, useRef, useState } from '../../vendor/hooks.module.js';
 import { html, Icon, MicroLabel, Button, TierChip, TextField, Countdown, Spinner, confirmDialog, hasDeadline, Modal, Fragment } from '../ui/components.js';
-<<<<<<< ours
 import { Img, RichText, UnitThumb, BondGlyph } from '../ui/gameComponents.js';
 import { chessAvatarUrl, chessPortraitUrl, subProfIconUrl, profIconUrl, bondIconUrl, moduleTypeIconUrl } from '../ui/assetUrls.js';
 import { chessStatsBlock, traitText, chessTalents } from '../ui/detailPanel.js';
 import { chessLoadout } from '../ui/gameLogic.js';
-=======
-import { ComboBox } from '../ui/comboBox.js';
-import { OperatorImage, Img, UnitThumb, PromotionIcon } from '../ui/gameComponents.js';
-import { profGlyphUrl, subProfIconUrl, bondIconUrl, uiUrl } from '../ui/assetUrls.js';
-import { GarrisonBlock } from '../ui/detailPanel.js';
->>>>>>> theirs
 import { data, useData, localAsset, DATA_FILES } from '../data.js';
 import { useStore, loadPref, savePref } from '../store.js';
 import { PHASE } from '../../../shared/constants.js';
@@ -412,18 +405,11 @@ export function Filters({ m, filters, onFilters, bonds, listView, onView, preset
           <${Img} src=${profGlyphUrl(m, p)} class="lo-chip__icon lo-profglyph" fallback=${html`<${Icon} name="user"/>`} /></button>`)}
       </div>
       <label class="lo-select">
-<<<<<<< ours
         <span class="lo-select__k">盟约</span>
         <select value=${filters.bond || ''} onChange=${(e) => set({ bond: e.currentTarget.value || null })} aria-label="按盟约筛选">
           <option value="">全部盟约</option>
           ${bonds.map((b) => html`<option key=${b.bondId} value=${b.bondId}>${b.name}</option>`)}
         </select>
-=======
-        <span class="lo-select__k">${t('盟约')}</span>
-        <${ComboBox} label=${t('按盟约筛选')} value=${filters.bond || ''}
-          options=${[{ value: '', label: t('全部盟约') }, ...bonds.map((b) => ({ value: b.bondId, label: b.name }))]}
-          onChange=${(e) => set({ bond: e.currentTarget.value || null })} />
->>>>>>> theirs
       </label>
       ${showChanged?html`<button type="button" class=${cx('lo-toggle', filters.changedOnly && 'is-on')} aria-pressed=${filters.changedOnly ? 'true' : 'false'}
         onClick=${() => set({ changedOnly: !filters.changedOnly })}><i class="lo-toggle__box"><${Icon} name="check" /></i>仅看已调整</button>`:null}

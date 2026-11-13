@@ -521,10 +521,6 @@
 .effect--band { border-color: var(--mint-800); }
 .effect--team { border-color: rgba(var(--accent-rgb),.6); }
 .effect__n { position: absolute; right: -.05rem; bottom: -.05rem; min-width: .2rem; font-size: .12rem; line-height: 1.4; text-align: center; background: var(--gold); color: #1d1400; padding: 0 .03rem; }
-.effect__progress { position: absolute; right: calc(100% + .08rem); top: 50%; transform: translateY(-50%); padding: .04rem .08rem; border: 1px solid var(--mint-800); background: rgba(8, 11, 10, .85); color: var(--mint-400); font-size: max(calc(.16 * var(--t)), 10px); line-height: 1.2; white-space: nowrap; pointer-events: none; }
-.strategy-progress { display: flex; flex-direction: column; gap: .03rem; margin-top: .06rem; }
-.strategy-progress p { display: flex; align-items: baseline; gap: .08rem; margin: 0; color: var(--text-lo); font-size: max(calc(.14 * var(--t)), 10px); line-height: 1.5; }
-.strategy-progress strong { color: var(--mint-400); white-space: nowrap; }
 .efftip { display: flex; flex-direction: column; gap: .04rem; max-width: 3.6rem; }
 .efftip b { font-size: .17rem; color: var(--mint-400); }
 .efftip__kind { font-size: .12rem; color: var(--text-dim); }
@@ -699,43 +695,8 @@
   display: flex; flex-direction: column; align-items: center; gap: .04rem; min-width: max(.92rem,84px); min-height: 112px; padding: .14rem .18rem;
   background: rgba(var(--shade-rgb),.85); border: 1px solid var(--line-2); border-right: 3px solid var(--mint-500);
 }
-<<<<<<< ours
 .dpbox__icon { width: max(.32rem,28px); height: max(.32rem,28px); color: var(--mint-500); }
 .dpbox b { font-size: max(.46rem,34px); line-height: 1; color: var(--ink-hi, #fff); }
-=======
-.dpbox__icon { width: .26rem; height: .26rem; color: var(--mint-500); }
-.dpbox b { font-size: .34rem; line-height: 1; color: #fff; }
-/* 规程 leader ranking (ui/leaderRank.js). .gm__hud is pointer-events: none, so the panel opts back in.
-   Top clears the ticker (bottom 1.3rem) and the overtime-grown top bar (~1.38rem). Right sits just left of the
-   effects column (right .3rem + width .5rem). The bottom stops .7rem above the screen's middle, which clears the
-   DP box (its half-height is under that). Width stays right of the team dock (--dock-team-right: 2.8rem).
-   Three rows plus the toggle have to fit a ~81px band on a 375px-tall phone, so the row and the toggle are
-   smaller than a 44px touch target. [ASSUMED] during a leader fight the plugin slot yields the upper right and
-   sits below the DP box — its max box otherwise reaches this panel on a phone. */
-.ldmg {
-  position: absolute; z-index: 5;
-  right: .92rem;
-  top: 1.95rem;
-  width: min(2.2rem, calc(100vw - 3.4rem - .92rem - .3rem));
-  max-height: calc(50% - 1.95rem - .7rem);
-  display: flex; flex-direction: column; align-items: stretch; gap: .04rem;
-  padding: .04rem; pointer-events: auto; overflow: hidden;
-  background: rgba(8, 11, 10, .85); border: 1px solid var(--line-2);
-}
-.ldmg__toggle {
-  min-height: .32rem; padding: 0 .06rem; align-self: flex-end;
-  background: none; border: 0; color: var(--text-md); font-size: calc(.14 * var(--t)); cursor: pointer;
-}
-.ldmg__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .02rem; min-height: 0; }
-.ldmg__row { min-height: .34rem; display: flex; align-items: center; gap: .04rem; min-width: 0; }
-.ldmg__name {
-  flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  font-size: calc(.13 * var(--t)); color: var(--text-hi);
-}
-.ldmg__share { flex: 0 0 auto; display: flex; align-items: center; gap: .02rem; color: var(--gold); font-size: calc(.13 * var(--t)); }
-.ldmg__share .icon { width: .16rem; height: .16rem; }
-.gm.is-boss .gm__ui-slot { bottom: .3rem; max-height: calc(50% - 1.2rem); }
->>>>>>> theirs
 .chud__bottom { position: absolute; left: 50%; bottom: .3rem; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: .12rem; pointer-events: none; }
 .chud__bottom > * { pointer-events: auto; }
 .chud__msg {
@@ -775,115 +736,6 @@
 .chud__layers.is-observing { gap: .1rem; padding-right: .08rem; border-color: rgba(246, 163, 41, .55); }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-<<<<<<< ours
-=======
-/* ---- settings modal ------------------------------------------------------------------------------------------------ */
-/* the 设置 trigger of the lobby and the room (ui/settings.js SettingsButton, GitHub #238): the 玩法说明 button's twin; its gear sits
-   inside the label, so the label lays glyph and text out like the button itself */
-.settings-btn .btn__label { display: inline-flex; align-items: center; gap: .1rem; }
-.settings-btn .btn__icon { color: var(--mint-500); }
-/* square (the lobby's gear alone): the label box drops out so the gear sizes and centres against the button, like an `icon` */
-.settings-btn.btn--square .btn__label { display: contents; }
-.settings-btn.btn--square .btn__icon { width: 62%; height: 62%; } /* the gear glyph is drawn smaller in its box than the book */
-.set-list { display: flex; flex-direction: column; gap: .16rem; padding-top: .06rem; }
-.set-row { display: grid; grid-template-columns: minmax(0, 3.3rem) minmax(0, 1fr) auto; align-items: center; gap: .18rem; min-height: .44rem; }
-/* 语言 sits under its section caption, so the five endonyms use the whole row */
-.set-row--lang > .lang-toggle { grid-column: 1 / -1; justify-self: stretch; max-width: 100%; }
-.set-row--lang .set-seg { width: 100%; }
-/* The label column may shrink (the label wraps) instead of pushing its control out of the modal: at 设置 →「文字大小」
-   大 / 特大 a phone's label (a Chinese name plus its Latin micro label) is wider than 3.3rem at 1rem = 40 px. */
-.set-row__label { display: flex; flex-wrap: wrap; align-items: center; gap: .1rem; font-size: calc(.18 * var(--t)); color: var(--text-hi); }
-.set-row__label .icon { width: .2rem; height: .2rem; color: var(--mint-500); }
-.set-row__label .micro { margin-left: .04rem; }
-/* a floor, not a fixed width: the %. value grows with the text step (20 px on a phone, 3 digits at 特大) */
-.set-row__val { min-width: .5rem; text-align: right; font-size: calc(.2 * var(--t)); color: var(--mint-400); }
-.set-range {
-  -webkit-appearance: none; appearance: none; width: 100%; height: .08rem; background: linear-gradient(90deg, var(--mint-500) var(--pct), #0a0d0c var(--pct));
-  border: 1px solid var(--line-2); outline: none; cursor: pointer;
-}
-.set-range::-webkit-slider-thumb { -webkit-appearance: none; width: .2rem; height: .26rem; background: var(--mint-400); clip-path: polygon(50% 0, 100% 30%, 100% 100%, 0 100%, 0 30%); cursor: grab; }
-.set-range::-moz-range-thumb { width: .2rem; height: .26rem; background: var(--mint-400); border: 0; }
-.set-toggle { grid-column: 2 / 4; justify-self: start; display: flex; align-items: center; gap: .1rem; height: .38rem; padding: 0 .14rem 0 .06rem; background: #0a0d0c; border: 1px solid var(--line-2); color: var(--text-lo); font-size: calc(.15 * var(--t)); }
-.set-toggle i { width: .46rem; height: .24rem; background: var(--bg-3); position: relative; transition: background var(--t-fast); }
-.set-toggle i::after { content: ''; position: absolute; left: .03rem; top: .03rem; width: .18rem; height: .18rem; background: var(--text-lo); transition: transform var(--t-fast), background var(--t-fast); }
-.set-toggle.is-on { color: var(--mint-400); border-color: var(--mint-700); }
-.set-toggle.is-on i { background: var(--mint-800); }
-.set-toggle.is-on i::after { transform: translateX(.22rem); background: var(--mint-400); }
-.set-seg { grid-column: 2 / 4; justify-self: start; display: flex; flex-wrap: wrap; max-width: 100%; border: 1px solid var(--line-2); }
-/* 语音语言: the four endonyms plus the 本土语言 switch. A flex wrap left 한국어 on a row of its own (four .8rem
-   minima squeezed by the switch). The group wraps its four buttons four across or two by two, never 3 + 1: each
-   button's basis is clamp(25 %, (2.4rem − 100 %) × 999, 50 %) of the group — hugely negative (→ 25 %, four across)
-   while the group is wider than 2.4rem, hugely positive (→ 50 %, two by two) below it. The group's 1 px gaps over
-   its line-coloured background draw the dividers in both layouts. No container query (the CSS stays within the
-   supported browsers, test/client-static.test.js).
-   [ASSUMED] 2.4rem of the group (about 0.6rem a button): the usual control column (desktop, and a phone around
-   844 px where 1rem is 40 px) is wider, so the four names stay on one row beside 本土语言. */
-.set-voice { grid-column: 2 / 4; justify-self: stretch; display: flex; flex-wrap: nowrap; align-items: stretch; gap: .08rem; max-width: 100%; min-width: 0; }
-.set-voice .set-seg { grid-column: auto; flex: 1 1 auto; display: flex; flex-wrap: wrap; gap: 1px; min-width: 0; background: var(--line-2); }
-.set-voice .set-seg button { min-width: 0; padding: 0 .04rem; overflow-wrap: anywhere; border-right: 0; flex: 1 1 clamp(calc(25% - 1px), (2.4rem - 100%) * 999, calc(50% - 1px)); }
-.set-native { flex: none; display: inline-flex; align-items: center; justify-content: center; min-height: .38rem; padding: 0 .12rem; background: #0a0d0c; border: 1px solid var(--line-2); color: var(--text-lo); font-size: calc(.16 * var(--t)); cursor: pointer; }
-.set-native.is-on { background: var(--mint-500); color: var(--text-on-mint); font-weight: 700; }
-.set-seg button { flex: 1 1 auto; min-width: .8rem; min-height: .38rem; height: auto; white-space: normal; background: #0a0d0c; border: 0; border-right: 1px solid var(--line-2); color: var(--text-lo); font-size: calc(.16 * var(--t)); }
-/* 文字大小 (ui/settings.js): four steps, so its buttons are narrower than the two- and three-step groups' — at .8rem each
-   the group would be wider than the row's 1fr column on a phone (1rem = 40 px) */
-.set-seg.set-textsize button { min-width: .62rem; }
-.set-seg button:last-child { border-right: 0; }
-.set-seg button.is-on { background: var(--mint-500); color: var(--text-on-mint); font-weight: 700; }
-.set-hint { margin-top: .06rem; font-size: calc(.14 * var(--t)); color: var(--text-dim); line-height: 1.8; }
-.set-hint__help { display: inline-flex; align-items: center; gap: .03rem; padding: 0; border: 0; background: none; color: var(--text-lo); font: inherit; cursor: help; text-decoration: underline dotted; text-underline-offset: .03rem; }
-.set-hint__help .icon { width: .14rem; height: .14rem; }
-.set-hint__help:hover, .set-hint__help:focus-visible { color: var(--mint-400); }
-.set-hint kbd, .lvcard__key, .toolbtn kbd { font-family: var(--font-num); font-size: .11rem; border: 1px solid var(--line-2); padding: 0 .04rem; color: var(--text-lo); background: rgba(0, 0, 0, .3); }
-/* 快捷键 (ui/settings.js HotkeySection): each shortcut with its key — click the key, press the new one; two columns,
-   one under 768 px (phones in landscape) */
-.set-keys { display: flex; flex-direction: column; gap: .08rem; padding-top: .1rem; border-top: 1px solid var(--line); }
-/* 外观插件 (DESIGN §32 P1a, ui/settings.js CosmeticSection): laid out like 快捷键 — a head, a hint, one switch per plugin */
-.set-plugins { display: flex; flex-direction: column; gap: .08rem; padding-top: .1rem; border-top: 1px solid var(--line); }
-.set-theme-win { margin: 0; font-family: var(--font-num); color: var(--text-lo); overflow-wrap: anywhere; }
-.set-keys__head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .12rem; min-height: .44rem; }
-.set-keys__list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .06rem .14rem; margin: 0; padding: 0; list-style: none; }
-.set-keys__row { display: flex; align-items: center; justify-content: space-between; gap: .1rem; min-height: .42rem; padding: .03rem .03rem .03rem .12rem; background: rgba(0, 0, 0, .22); border: 1px solid var(--line); }
-.set-keys__name { min-width: 0; font-size: calc(.15 * var(--t)); line-height: 1.35; color: var(--text-md); overflow-wrap: anywhere; }
-.set-key { flex: none; display: inline-flex; align-items: center; justify-content: center; gap: .06rem; min-width: .9rem; height: .36rem; padding: 0 .1rem; background: #0a0d0c; border: 1px solid var(--line-2); color: var(--mint-400); font-family: var(--font-num); font-size: calc(.15 * var(--t)); cursor: pointer; }
-.set-key kbd { font: inherit; }
-.set-key:hover, .set-key:focus-visible { border-color: var(--mint-700); }
-.set-key.is-waiting { border-color: var(--amber); color: var(--amber); font-family: inherit; font-size: calc(.13 * var(--t)); animation: set-key-wait 1s ease-in-out infinite alternate; }
-.set-key.is-fixed { cursor: default; color: var(--text-lo); border-style: dashed; }
-.set-key.is-fixed small { font-family: inherit; font-size: calc(.12 * var(--t)); color: var(--text-dim); }
-.set-keys__note { min-height: 1.5em; font-size: calc(.14 * var(--t)); line-height: 1.5; color: var(--mint-400); }
-.set-keys__note.is-warn { color: var(--amber); }
-.set-keys__more > summary { padding: .06rem 0; font-size: calc(.15 * var(--t)); color: var(--mint-400); cursor: pointer; }
-.set-keys__more[open] > summary { margin-bottom: .08rem; }
-@keyframes set-key-wait { to { box-shadow: 0 0 .12rem rgba(246, 163, 41, .45); } }
-/* 素材存储 (ui/settings.js StorageSection): laid out like 问题反馈 below it — a head with its button, a hint, the answer */
-.set-storage { display: flex; flex-direction: column; gap: .08rem; padding-top: .1rem; border-top: 1px solid var(--line); }
-.set-storage__actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .08rem; }
-/* 问题反馈 (ui/settings.js DiagSection): laid out like 快捷键 — a head with its button, a hint, the result line; the
-   recorded-error count in the figure face of the slider values (amber once there is one); the report box only when the
-   clipboard refused it, styled like 干员调配's 导出 box (screens/loadout.css .lo-io__text) */
-.set-diag { display: flex; flex-direction: column; gap: .08rem; padding-top: .1rem; border-top: 1px solid var(--line); }
-.set-diag__meta { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .04rem .2rem; }
-.set-diag__stat { display: inline-flex; align-items: baseline; gap: .1rem; font-size: calc(.14 * var(--t)); color: var(--text-lo); }
-.set-diag__count { font-family: var(--font-num); font-size: calc(.2 * var(--t)); line-height: 1; color: var(--mint-400); }
-.set-diag__count.is-warn { color: var(--amber); }
-.set-diag__url { min-width: 0; font-size: calc(.13 * var(--t)); color: var(--text-dim); overflow-wrap: anywhere; -webkit-user-select: all; user-select: all; }
-.set-diag__battle-hint { margin-top: -.06rem; }
-.set-diag__text {
-  box-sizing: border-box; width: 100%; height: max(2rem, 32px, calc(140px * var(--sp-ui, 1))); min-height: 120px; resize: vertical;
-  padding: max(.1rem, calc(8px * var(--sp-ui, 1))) max(.12rem, calc(10px * var(--sp-ui, 1)));
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: max(.13rem, 11px); line-height: 1.5;
-  color: var(--text-hi); background: rgba(4, 10, 8, .55); border: 1px solid var(--line-2); border-radius: 2px; outline: none;
-  white-space: pre-wrap; overflow-wrap: anywhere; overflow-y: auto;
-}
-.set-diag__text:focus { border-color: var(--mint-700); }
-/* touch: 16 px, below which iOS zooms into the focused box (as 干员调配's 导出 box and ui/clipboard.js) */
-.sp-coarse .set-diag__text { font-size: 16px; }
-@media (max-width: 767px) { .set-keys__list { grid-template-columns: minmax(0, 1fr); } }
-@media (max-height: 600px) and (pointer: coarse), (max-height: 600px) and (any-pointer: coarse) {
-  .set-key { height: max(.38rem, 30px); }
-  .set-keys__more > summary { padding: max(.06rem, calc(8px * var(--sp-ui, 1))) 0; }
-}
->>>>>>> theirs
 
 /* ---- exit / away ------------------------------------------------------------------------------------------------------ */
 .exitm { display: flex; flex-direction: column; gap: .1rem; font-size: calc(.17 * var(--t)); line-height: 1.7; }
@@ -937,14 +789,8 @@
 .ff-piece.is-temp .ff-piece__art { border-color: var(--orange-hi); }
 .ff-piece__tier { position: absolute; left: 0; top: 0; transform: scale(.9); transform-origin: top left; }
 .ff-piece__items { position: absolute; right: 8%; bottom: 8%; display: flex; gap: 2px; }
-<<<<<<< ours
 .ff-piece__items i { width: calc(var(--tile) * .12); height: calc(var(--tile) * .12); background: var(--gold); transform: rotate(45deg); box-shadow: 0 0 3px var(--surf-0, #000); }
 .ff-piece__count { position: absolute; right: 6%; bottom: 4%; font-family: var(--font-num); font-size: calc(var(--tile) * .2); color: var(--ink-hi, #fff); text-shadow: 0 1px 2px #000; }
-=======
-.ff-piece__items i { width: calc(var(--tile) * .12); height: calc(var(--tile) * .12); background: var(--gold); transform: rotate(45deg); box-shadow: 0 0 3px #000; }
-.ff-piece__count { position: absolute; right: 6%; bottom: 4%; font-family: var(--font-num); font-size: calc(var(--tile) * .2); color: #fff; text-shadow: 0 1px 2px #000; }
-.ff-progress { position: absolute; display: grid; top: 100%; left: 50%; transform: translateX(-50%); width: max-content; pointer-events: none; color: var(--mint-500); font: 700 max(10px, calc(var(--tile) * .2)) var(--font-num); text-shadow: 0 1px 2px #000, 0 0 3px #000; white-space: nowrap; }
->>>>>>> theirs
 /* facing wedge (research 09 §1.2): an orange › on the piece's edge along its direction */
 .ff-piece__dir {
   position: absolute; left: 50%; top: 50%; width: calc(var(--tile) * .2); height: calc(var(--tile) * .26); pointer-events: none;
@@ -980,10 +826,6 @@
 .ff-float--barrier { color: #78c5ff; }
 .ff-float--block { color: #ffd65a; }
 .ff-float--crit { color: #ff2a2a; }
-.ff-float--cost { color: #fff; }
-.ff-float--costLoss { color: #ff4545; }
-.ff-float--sp { color: #6fd3e2; }
-.ff-float--cost, .ff-float--costLoss, .ff-float--sp { white-space: nowrap; font-size: .16rem; }
 .ff-float--miss { color: #ff9000; }
 @keyframes float-up { to { transform: translate(-50%, -.4rem); opacity: 0; } }
 .ff-badge { position: absolute; left: 50%; bottom: .08rem; transform: translateX(-50%); font-family: var(--font-display); font-size: .1rem; letter-spacing: .3em; color: var(--text-dim); opacity: .5; pointer-events: none; }
@@ -1000,12 +842,9 @@
 .ff-board--pen .ff-pen__enemy .ff-unit__art { border-color: rgba(255, 90, 60, .7); }
 .ff-pen__empty { position: absolute; left: 0; right: 0; top: 45%; text-align: center; color: var(--text-lo); font-size: .16rem; }
 
-/* enemy preview pen view (research 09 §2): the bond strip and the effects column step aside for the pen. #892: once
-   faded they are also visibility: hidden (flipped after the fade, back at once on return), so no browser's hit test
-   can reach a hidden disc through the pen's enemies — pointer-events alone let Chrome 155 / Windows open a bond. */
-.gm__bonds, .gm__effects { transition: opacity var(--t-med) var(--ease-out), visibility 0s linear 0s; }
-.gm.is-pen .gm__bonds, .gm.is-pen .gm__effects { opacity: 0; pointer-events: none; visibility: hidden;
-  transition: opacity var(--t-med) var(--ease-out), visibility 0s linear var(--t-med); }
+/* enemy preview pen view (research 09 §2): the bond strip and the effects column step aside for the pen */
+.gm__bonds, .gm__effects { transition: opacity var(--t-med) var(--ease-out); }
+.gm.is-pen .gm__bonds, .gm.is-pen .gm__effects { opacity: 0; pointer-events: none; }
 .gm.is-pen .gm__bonds > *, .gm.is-pen .gm__effects > *, .gm.is-pen .gm__bonds .bslot, .gm.is-pen .gm__bonds .bstrip__more { pointer-events: none; }
 
 /* solo pause overlay (screens/game.js PausedOverlay; m.public.paused): the field dims under an official matte plate */
@@ -1186,7 +1025,6 @@
 .gm__dead-close:hover,.chud__close:hover { opacity:1; background:rgba(255,84,84,.2); }
 .gm__dead,.chud__msg--dead { pointer-events:auto; }
 
-<<<<<<< ours
 /* ---- team overview (ui/teamOverview.js) ------------------------------------------------------------------- */
 .team__overview-btn {
   pointer-events: auto; align-self: flex-start; display: grid; place-items: center; width: .36rem; height: .36rem; padding: 0;
@@ -1212,20 +1050,3 @@
 .tov__items { position: absolute; right: 1px; bottom: 1px; min-width: .14rem; padding: 0 .02rem; background: rgba(0,0,0,.75); color: #fff; font-size: .1rem; text-align: center; }
 .tov__none { color: var(--text-dim); font-size: calc(.13 * var(--t)); }
 @media (max-width: 560px) { .tov__row { grid-template-columns: 1fr; } }
-=======
-.ai-vote { display:flex; flex-wrap:wrap; gap:.12rem; align-items:center; margin:.15rem 0; padding:.1rem; border:1px solid #426055; }
-.ai-participation-entry { flex:none; }
-
-/* 规程 command: the strategy badge remains the anchor for click and drag interactions. */
-.effects__row { display: flex; align-items: center; gap: .12rem; }
-.band-command { display: flex; align-items: center; gap: .08rem; padding: .06rem .1rem; max-width: 2.4rem; min-height: .5rem;
-  color: var(--mint-400); background: #122722ed; border: 1px solid #7fffc988; border-radius: .04rem; text-align: left; touch-action: none; cursor: grab; }
-.band-command > .bandicon { width: .34rem; height: .34rem; }
-.band-command b, .band-command small { display: block; font-size: calc(.11 * var(--t)); line-height: 1.35; }
-.band-command small { color: var(--text-lo); font-size: calc(.1 * var(--t)); }
-.band-command.is-unavailable { opacity: .65; cursor: default; }
-.band-command.is-dragging { box-shadow: 0 0 .12rem #7fffc9; }
-[data-shop-slot].is-command-target { outline: 2px solid #7fffc9; outline-offset: -2px; }
-.command-draft { display: flex; gap: .16rem; flex-wrap: wrap; }
-.command-draft__card { flex: 1 1 1.8rem; padding: .16rem; border: 1px solid #7fffc966; }
->>>>>>> theirs

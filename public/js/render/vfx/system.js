@@ -1,12 +1,7 @@
 // render/vfx/system.js — the official battle effects layer (设置「官方特效」; client docs: the fx layer, DESIGN §33):
 // owns the effect instances, their library (render/vfx/library.js) and the WebGL2 renderer (render/vfx/gl.js), and
 // draws them as two Pixi display objects of the field view — a ground pass under the units (flat ranges / decals) and
-<<<<<<< ours
 // an over pass for unbound effects, plus unit-attached passes sorted with their models — with the shared battle camera (render/projection.js; the prefabs are authored for it).
-=======
-// an over pass above them — with the shared battle camera (render/projection.js; the prefabs are authored for it).
-// Verified standing backgrounds can instead draw inside their owner's root, before its body but after its tile row.
->>>>>>> theirs
 //
 //   const ofx = new OfficialFx({ P, renderer, assets, cam, heightAt })
 //   ofx.ground / ofx.over                       Pixi containers to add to the layers (they draw through raw GL)
@@ -142,14 +137,10 @@ export class OfficialFx {
     this.depthDone = -1;
     this.fd = new FrameData();
     this.items = { ground: [], over: [] };
-<<<<<<< ours
     this.unitItems = new Map();
     this.unitLayers = new Map();
     this.unitBehindItems = new Map();
     this.unitBehindLayers = new Map();
-=======
-    this.unitBack = new Map(); // owner view → { container, items }: depth-sorted with that owner, not below high ground
->>>>>>> theirs
     this.needDepth = false;
     this.particles = 0;
     this.dropped = 0;
@@ -247,12 +238,6 @@ export class OfficialFx {
       this.effects[w++] = fx;
     }
     this.effects.length = w;
-    for (const [owner, bucket] of this.unitBack) {
-      if (owner.root?.destroyed || !this.effects.some(fx => fx.owner === owner)) {
-        if (!bucket.container.destroyed) bucket.container.destroy();
-        this.unitBack.delete(owner);
-      }
-    }
     this.particles = parts;
     this._pauseOthers();
   }
@@ -347,7 +332,6 @@ export class OfficialFx {
     this.effects.length = 0;
     for (const h of this.pending) h.cancelled = true;
     this.pending.length = 0;
-<<<<<<< ours
     // Preparation does not advance the battle clock. Drop the last GPU draw
     // lists too, so shader warming cannot redraw a previous battle's shield.
     this.items.ground.length = 0;
@@ -359,24 +343,6 @@ export class OfficialFx {
     this.depthDone = -1;
     this.needDepth = false;
     this.particles = 0;
-=======
-    for (const bucket of this.unitBack.values()) if (!bucket.container.destroyed) bucket.container.destroy();
-    this.unitBack.clear();
-  }
-
-  /** Raw-GL geometry already uses world coordinates; the container contributes only its owner's painter order. */
-  _unitBackground(owner) {
-    if (!owner?.root?.addChildAt || owner.root.destroyed) return null;
-    let bucket = this.unitBack.get(owner);
-    if (!bucket) {
-      const container = new this.P.Container();
-      bucket = { container, items: [] };
-      container._render = renderer => this.renderPass('unitBack', renderer, bucket.items);
-      owner.root.addChildAt(container, 0);
-      this.unitBack.set(owner, bucket);
-    }
-    return bucket.items;
->>>>>>> theirs
   }
 
   /** The board's heights for the ZTest materials' depth pre-pass (rebuilt when they change). */
@@ -401,17 +367,12 @@ export class OfficialFx {
     fd.reset();
     const g = this.items.ground, o = this.items.over;
     g.length = 0; o.length = 0;
-<<<<<<< ours
     this.unitItems.clear();
     this.unitBehindItems.clear();
-=======
-    for (const bucket of this.unitBack.values()) bucket.items.length = 0;
->>>>>>> theirs
     let seq = 0, depth = false;
     const sink = (e) => {
       e.seq = seq++;
       if (e.mat.state.zTest) depth = true;
-<<<<<<< ours
       const owner=e.effect?.depthOwner;
       // Explicit Overlay materials retain their authored screen-wide priority.
       // a unit's effect on a raised tile: not cut by that tile's own block in the board's depth, and its ground parts
@@ -448,16 +409,6 @@ export class OfficialFx {
     // geometry in draw order: neighbours of one material and kind become one draw (their ranges are contiguous)
     const frameNo = this.frameNo;
     for (const list of [g, o,...this.unitItems.values(),...this.unitBehindItems.values()]) {
-=======
-      (e.unitBack ? this._unitBackground(e.effect.owner) || g : e.ground ? g : o).push(e);
-    };
-    for (const fx of this.effects) fx.gather(basis, sink);
-    const lists = [g, ...[...this.unitBack.values()].map(bucket => bucket.items), o];
-    for (const list of lists) list.sort(byUnityOrder);
-    // geometry in draw order: neighbours of one material and kind become one draw (their ranges are contiguous)
-    const frameNo = this.frameNo;
-    for (const list of lists) {
->>>>>>> theirs
       let w = 0, prev = null;
       for (const e of list) {
         const r = e.effect.build(e, basis, fd, frameNo);
@@ -475,11 +426,7 @@ export class OfficialFx {
   }
 
   /** Draw one pass from inside Pixi's render (see the header). */
-<<<<<<< ours
   renderPass(pass, renderer, owner = null, behind = false) {
-=======
-  renderPass(pass, renderer, selectedItems = null) {
->>>>>>> theirs
     if (!this.active || (!this.effects.length && !this.warmQueue.length)) return;
     const gl = renderer.gl;
     if (!this.glr) {
@@ -494,13 +441,9 @@ export class OfficialFx {
     try {
       if (pass === 'ground' || this.prepared !== this.frameNo) this._warmStep();
       if (this.prepared !== this.frameNo) this._prepare(renderer);
-<<<<<<< ours
       const items = owner ? (behind ? this.unitBehindItems : this.unitItems).get(owner)||[] : this.items[pass];
-=======
-      const items = selectedItems || this.items[pass];
->>>>>>> theirs
       if (this.needDepth && this.depthDone !== this.frameNo) { this.glr.depthPrepass(this.vpB); this.depthDone = this.frameNo; }
-      if (items.length) this.glr.draw(items, { vp: this.vpU, cam: this.camU, time: this.time, half: this.lite, pass: this.frameNo * 3 + (pass === 'over' ? 2 : pass === 'unitBack' ? 1 : 0) });
+      if (items.length) this.glr.draw(items, { vp: this.vpU, cam: this.camU, time: this.time, half: this.lite, pass: this.frameNo * 2 + (pass === 'over' ? 1 : 0) });
     } catch (err) {
       if (!this._warned) { this._warned = true; console.error('[fx] render failed', err); }
     } finally {

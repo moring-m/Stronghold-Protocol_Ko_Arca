@@ -28,13 +28,8 @@ describe('the scouted prep board renders the hand like the own bench', () => {
   test('the game screen frames it with the prep camera in its shop-folded form (source)', () => {
     const game = read('public/js/screens/game.js');
     assert.match(game, /field\.prep \? 'prep' : \(field\.kind === 'hidden' \? 'boss' : field\.kind \|\| 'normal'\)/);
-<<<<<<< ours
     assert.match(game, /setCam\(kind, observerHalf \? \{rect:field\.rect,side:observedSide,half:true\}/);
     assert.match(game, /const scoutPid = watchingOther && field\?\.prep/);
-=======
-    assert.match(game, /field\.prep \? \{ shop: false \} : \{\}/);
-    // The camera depends on field.prep; the strategy owner also resolves in combat (chiave-progress.e2e.test.js).
->>>>>>> theirs
     assert.ok(!game.includes('ScoutedBench'), 'the floating strip is gone — the hand rides the board');
     assert.ok(!read('public/css/screens/game.css').includes('.sbench'), 'its styles too');
   });

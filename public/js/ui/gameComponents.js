@@ -6,21 +6,9 @@ import { RANDOM_BAND_ID } from '../../../shared/randomBand.js';
 import { FactionBadge } from './chatFaction.js';
 import { useState, useMemo, useEffect } from '../../vendor/hooks.module.js';
 import { html, Icon, TierChip, Tooltip } from './components.js';
-<<<<<<< ours
 import { data, matchData, useData, localAsset } from '../data.js';
 import { parseDescriptionText, rtClassName } from './richText.js';
 import { uiUrl, chessAvatarUrl, chessPortraitUrl, itemIconUrl, tokenAvatarUrl, enemyIconUrl, bondIconUrl, bandIconUrl } from './assetUrls.js';
-=======
-import { data, useData, localAsset } from '../data.js';
-import { parseRichText, rtClassName } from './richText.js';
-import { t as tr } from '../../../shared/i18n.js';
-import { useStore, store } from '../store.js';
-import { skinsStore, ownerSkin, tokenSkinShown } from './skins.js';
-import { settingsStore } from './settingsStore.js';
-import {
-  uiUrl, chessAvatarUrl, chessPortraitUrl, itemIconUrl, tokenAvatarUrl, enemyIconUrl, bondIconUrl, bandIconUrl,
-} from './assetUrls.js';
->>>>>>> theirs
 
 const cx = (...p) => p.flat().filter(Boolean).join(' ');
 
@@ -113,26 +101,8 @@ export const isGoldenPiece = (piece, chess) => !!(piece?.golden || chess?.isGold
  * @param {{ kind?: 'chess'|'item'|'token'|'enemy', id: string, golden?: boolean, size?: 'xs'|'sm'|'md'|'lg', tier?: number,
  *   showTier?: boolean, class?: string, dim?: boolean, badge?: any, title?: string }} props
  */
-<<<<<<< ours
 export function UnitThumb({ rec = null, kind = 'chess', id, golden, size = 'md', tier, showTier = true, class: cls, dim = false, badge = null, title }) {
-=======
-/** The summon outfit this viewer may see (#876; round-54 audit): read without hooks — thumbnails and the detail head are
- * also rendered as plain functions — and only when there is a skin to gate. */
-function shownTokenSkin(skin, ownerId) {
-  if (!skin) return null;
-  return tokenSkinShown(skin, { ownerId, myId: store.get()?.me?.playerId ?? null, otherSkins: settingsStore.get()?.otherSkins !== false });
-}
-
-/** A summon's avatar in its owner's outfit (#876) under the operators' 显示其他玩家的皮肤 gate (round-54 audit). */
-export function TokenAvatar({ m, tokenId, ownerId = null, skin = null, fallback = null }) {
-  return html`<${Img} src=${tokenAvatarUrl(m, tokenId, { skin: shownTokenSkin(skin, ownerId) })} fallback=${fallback} />`;
-}
-
-export function UnitThumb({ kind = 'chess', id, golden, size = 'md', tier, showTier = true, class: cls, dim = false, badge = null, title, rec = null, ownerId, skin = null }) {
->>>>>>> theirs
   const m = data.get('assets');
-  // a summon wears its owner's outfit (#876) under the operators' 显示其他玩家的皮肤 gate (round-54 audit)
-  const tokenSkin = kind === 'token' ? shownTokenSkin(skin, ownerId) : null;
   let src = null;
   let name = '';
   let t = tier;
@@ -150,7 +120,7 @@ export function UnitThumb({ kind = 'chess', id, golden, size = 'md', tier, showT
     golden = golden ?? !!it?.isGolden;
   } else if (kind === 'token') {
     const tk = data.lookup('tokens', id);
-    src = tokenAvatarUrl(m, id, { skin: tokenSkin });
+    src = tokenAvatarUrl(m, id);
     name = tk?.name || '';
   } else if (kind === 'enemy') {
     const e = data.lookup('enemies', id);

@@ -46,38 +46,6 @@ const str = (v) => (typeof v === 'string' && v ? v : null);
  */
 export const skinHasModel = (skin) => !!skin && isObj(skin.spine) && isObj(skin.spine.front) && typeof skin.spine.front.skel === 'string';
 
-<<<<<<< ours
-=======
-// B6: maintainer option A (2026-10-18), docs/history/0.3.2.md §35.4. [ASSUMED] The existing E2 and
-// illust slots count as pictures too; metadata alone never offers a selectable outfit.
-export const skinHasPictures = (skin) => !!skin && ['avatar', 'avatarE2', 'portrait', 'portraitE2', 'illust'].some((key) => str(skin[key]));
-
-/**
- * Display choice for an effective operator body. #686 keeps each seat independent; no viewer choice leaks into
- * another seat. [ASSUMED] Latest public choices (including clears) beat old unit metadata, as in render/app.js.
- * An omitted owner means the local picker; null means an unowned catalogue entry. Official skin_table.charSkins
- * groups pictures by charId; activity_table backupCharId / the DIY pick decides which charId callers pass.
- */
-/**
- * A summon's outfit as this viewer may see it (#876): the skin id its owner's operator carries (a piece's `skin`, a unit's
- * `skin`), shown for one's own summons always and for another player's only with 显示其他玩家的皮肤 — the operators' gate.
- */
-export function tokenSkinShown(skin, { ownerId = null, myId = null, otherSkins = true } = {}) {
-  const s = str(skin);
-  if (!s) return null;
-  return ownerId != null && ownerId !== myId && !otherSkins ? null : s;
-}
-
-export function ownerSkin(charId, { ownerId, myId = null, players = [], localSkins = {}, skin = null, otherSkins = true } = {}) {
-  if (!charId || ownerId === null) return null;
-  if (ownerId === undefined) return str(localSkins[charId]);
-  if (ownerId !== myId && !otherSkins) return null;
-  const owner = players.find((p) => p.playerId === ownerId);
-  if (owner) return str(owner.skins?.[charId]);
-  return str(skin);
-}
-
->>>>>>> theirs
 /**
  * A stored selection as the store holds it: `{ [charId]: skinId }`, both non-empty strings, at most
  * `SKIN_LIMITS.entries` of them.

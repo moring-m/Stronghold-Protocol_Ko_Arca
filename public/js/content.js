@@ -38,20 +38,6 @@
 //     its seat shows it not ready — a reconnect); a check that fails is said once (a toast) and told too ({ ok: false }).
 //     Leaving the room, or a room back on the original content, gives data.js the server's files again. One content set
 //     at a time (contentSet: its state for the screens — loading with its progress, ready, failed).
-<<<<<<< ours
-=======
-//   * Official versions (DESIGN §35.23, M1; versions.js): the version the page shows — the lobby's choice, a room's
-//     version — when it is not 第二期下半 is loaded the same way (loadVersionSet): the version's /cs/<cs16>/index.json
-//     (`vanilla: true`, its `version` the id expected, no plugins, no settings), every data file it lists — under
-//     /data/versions/<slug>/ only — and its official-bounds snapshot, each file's bytes against its entry, the manifest's
-//     composition against the cs (the room's room.state.content.cs in a room, welcome.versions' entry in the lobby). Then
-//     data.js shows those files, the battle runner simulates on them (simContent / contentFor: the page's own Battle,
-//     not the plugin Worker — a version set runs no script) and, in a room, the page tells the room (room.contentReady,
-//     exactly as for a content set — never from the lobby). The set on screen stays until the next one is checked (going
-//     from one version to another never shows 第二期下半 in between); gameplay compositions also retain their version.
-//     The last two checked version sets are kept, so a lobby ⇄ room round trip checks nothing twice.
-//     A version set that fails is said once per set (a toast) and told to the room ({ ok: false }).
->>>>>>> theirs
 //   * The catalogue is fetched only on a server that has plugins — `content.plugins` > 0 in /healthz (the build guard's
 //     first check, before any hello) or welcome (main.js keeps it as the store's `installedPlugins`: installedCount; a
 //     server without any sends none, and its page never asks for /plugins/index.json) — and only when something needs
@@ -471,7 +457,7 @@ export async function loadContentSet(cs, { fetch: doFetch = defaultFetch, retryD
   const i18n = Object.fromEntries(langs.map(([lang, f]) => [lang, f.sha256]));
   let again;
   try {
-    again = contentHashOf({ app: index.app, sim: index.sim, data: hashes, ...(index.version ? { version: index.version } : {}), plugins: index.plugins, settings: index.settings, ...(langs.length ? { i18n } : {}), ...(isObj(index.rules) ? { rules: index.rules } : {}) });
+    again = contentHashOf({ app: index.app, sim: index.sim, data: hashes, plugins: index.plugins, settings: index.settings, ...(langs.length ? { i18n } : {}), ...(isObj(index.rules) ? { rules: index.rules } : {}) });
   } catch { again = null; }
   if (again !== cs) throw new Error('the manifest does not hash to the room\'s cs');
   // the URLs a manifest may name: this server's data files and this set's own files
@@ -508,67 +494,10 @@ export async function loadContentSet(cs, { fetch: doFetch = defaultFetch, retryD
     if (scriptExecution(scripts) !== (sandbox ? 'sandbox' : 'trusted')) throw new Error('script execution mode mismatch');
     if (!sandbox) { await checkBrowserScripts(scripts,cs,doFetch); nativeVerified = true; }
   }
-  return { cs, index, values, bounds, ...(index.version ? { version: index.version } : {}), scripts, nativeVerified, canSim: !listed(index.scripts).length || consent || sandbox };
+  return { cs, index, values, bounds, scripts, nativeVerified, canSim: !listed(index.scripts).length || consent || sandbox };
 }
 
 /**
-<<<<<<< ours
-=======
- * Download and check an official version's set (header "Official versions"; protocol §3): its manifest (`vanilla: true`,
- * `version` the id expected, no plugins and no settings, its composition hashing to `cs`), every data file it lists —
- * each under /data/versions/<slug>/ of that version — and its official-bounds snapshot (under /cs/<cs16>/), each by its
- * bytes and size.
- * @param {string} cs @param {string} id the version expected (a registry id, not the default)
- * @param {{ fetch?: typeof fetch, retryDelays?: readonly number[], wait?: (ms: number) => Promise<void>, timeoutMs?: number,
- *   onProgress?: (loaded: number, total: number) => void }} [opts]
- * @returns {Promise<{ cs: string, index: any, values: Map<string, any>, bounds: any, version: string, scripts: [],
- *   canSim: true, nativeVerified: false }>} (rejects with the reason)
- */
-export async function loadVersionSet(cs, id, { fetch: doFetch = defaultFetch, retryDelays = CONTENT_RETRY_MS, wait = sleep, timeoutMs = CONTENT_TIMEOUT_MS, onProgress = null } = {}) {
-  if (!isContentHash(cs)) throw new Error('no content hash');
-  const entry = versionById(id);
-  if (!entry || entry.id === DEFAULT_VERSION) throw new Error(`not another official version: ${String(id)}`);
-  const own = `/cs/${csUrlPart(cs)}/`;
-  const index = await fetchChecked(`${own}index.json`, null, { fetch: doFetch, retryDelays, wait, timeoutMs });
-  if (!isObj(index) || index.cs !== cs || index.vanilla !== true || index.version !== id || !isObj(index.data)) throw new Error('the manifest is not that version\'s set');
-  if (!Array.isArray(index.plugins) || index.plugins.length || !isObj(index.settings) || Object.keys(index.settings).length) throw new Error('a version set names plugins or settings');
-  const entries = Object.entries(index.data);
-  if (!entries.length || entries.some(([, f]) => !isObj(f) || typeof f.url !== 'string' || !isContentHash(f.sha256) || !Number.isInteger(f.bytes))) throw new Error('a data entry is malformed');
-  const prefix = `/data/versions/${versionSlug(entry)}/`;
-  for (const [name, f] of entries) if (!f.url.startsWith(prefix) || f.url.includes('..')) throw new Error(`${name}: an address outside the version's data`);
-  const official = isObj(index.bounds) && isObj(index.bounds.official) ? index.bounds.official : null;
-  if (!official || typeof official.url !== 'string' || !isContentHash(official.sha256) || !official.url.startsWith(own) || official.url.includes('..')) throw new Error('bounds: missing, or an address outside this set');
-  let again;
-  try { again = contentHashOf({ app: index.app, sim: index.sim, data: Object.fromEntries(entries.map(([name, f]) => [name, f.sha256])) }); } catch { again = null; }
-  if (again !== cs) throw new Error('the manifest does not hash to the version\'s cs');
-  const total = entries.reduce((n, [, f]) => n + f.bytes, 0);
-  let loaded = 0;
-  onProgress?.(0, total);
-  const values = new Map();
-  let next = 0;
-  const worker = async () => {
-    while (next < entries.length) {
-      const [name, f] = entries[next++];
-      values.set(name, await fetchChecked(f.url, f, { fetch: doFetch, retryDelays, wait, timeoutMs, onBytes: (n) => { loaded += n; onProgress?.(loaded, total); } }));
-    }
-  };
-  await Promise.all(Array.from({ length: Math.min(CONTENT_PARALLEL, entries.length) }, worker));
-  const bounds = await fetchChecked(official.url, official, { fetch: doFetch, retryDelays, wait, timeoutMs });
-  if (!isObj(bounds) || bounds.v !== 1) throw new Error('bounds: not an official-bounds snapshot');
-  return { cs, index, values, bounds, version: id, scripts: [], canSim: true, nativeVerified: false };
-}
-
-/**
- * The official version of the data the page shows now (header "Official versions"): the version set it holds, else
- * 第二期下半 (the server's files or a legacy plugin room's set).
- */
-export const pageVersion = () => (held && typeof held.version === 'string' ? held.version : DEFAULT_VERSION);
-
-/** Load the failed set on screen again (the lobby version switch's 重试). */
-export const retryContentSet = () => { retryHook?.(); };
-
-/**
->>>>>>> theirs
  * The content set the battle runner simulates on now (public/js/battle/runner.js): `{ cs, data, bounds }` of the checked
  * set the page holds, or null (the original content: the runner loads /data/ itself).
  */
@@ -658,7 +587,7 @@ export function installContentSet({ store = appStore, data = dataStore, net = ap
         const overlay = (lang) => (isObj(i18n[lang]) ? fetchChecked(i18n[lang].url, i18n[lang], { fetch: doFetch, retryDelays, wait }) : Promise.resolve(null));
         data.setContent({ id: cs, values: set.values, overlay, langs: Object.keys(i18n) });
         const extra = store.get()?.room?.content?.kittedExtra;
-        contentSet.set({ status: 'ready', version: set.version || null, error: null, kitted: Array.isArray(extra) ? extra.filter((x) => typeof x === 'string').slice(0, 200) : null });
+        contentSet.set({ status: 'ready', error: null, kitted: Array.isArray(extra) ? extra.filter((x) => typeof x === 'string').slice(0, 200) : null });
         settleWaiting(cs);
         if (set.canSim || !store.get()?.room?.seats?.some(s => s?.playerId === store.get()?.me?.playerId)) tell(cs, true);
       }).catch((err) => {

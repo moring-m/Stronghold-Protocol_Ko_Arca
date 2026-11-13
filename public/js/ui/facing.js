@@ -14,7 +14,6 @@
 
 import { GEO } from '../../../shared/constants.js';
 import { attackRangeGrid } from '../../../shared/loadoutRecord.js';
-import { N_ } from '../../../shared/i18n.js';
 
 export const DIRS = Object.freeze(['UP', 'RIGHT', 'DOWN', 'LEFT']);
 export const DEFAULT_DIR = 'RIGHT';
@@ -30,7 +29,7 @@ export const DIR_VEC = Object.freeze({
 });
 
 /** Chinese label (for aria / tooltips). */
-export const DIR_LABEL = Object.freeze({ UP: N_('上'), RIGHT: N_('右'), DOWN: N_('下'), LEFT: N_('左') });
+export const DIR_LABEL = Object.freeze({ UP: '上', RIGHT: '右', DOWN: '下', LEFT: '左' });
 
 /** Normalise any direction spelling ('up', 'Right', 1/−1 facing) to UP|RIGHT|DOWN|LEFT; unknown → `fallback`. */
 export function normDir(d, fallback = DEFAULT_DIR) {
@@ -222,8 +221,8 @@ export function underframeActions(ctx, uid) {
   if (p.kind === 'item') return itemDestroyable(ctx, uid) ? { retreat: false, sell: null, destroy: true } : null;
   if (p.kind === 'token') return onBoard ? { retreat: true, sell: null, destroy: false } : null;
   if (p.kind !== 'chess') return null;
-  const override = Number.isFinite(p.sellPrice) ? p.sellPrice : ctx.getChess?.(p.id)?.sellPrice;
-  return { retreat: onBoard, sell: Number.isFinite(override) ? override : 1, destroy: false };
+  const price = ctx.getChess?.(p.id)?.sellPrice;
+  return { retreat: onBoard, sell: Number.isFinite(price) ? price : 1, destroy: false };
 }
 
 /**

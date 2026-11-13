@@ -79,13 +79,12 @@ export const HUD_REM = Object.freeze({
  * stays armed — less than under the unchanged official camera at 1920×1080 (13 px above the bar, ≈ 11 px over the pads).
  * @param {string} kind
  * @param {{ width: number, height: number }} size
- * @param {{ shop?: boolean|'partial' }} [opts] `shop: false` = the folded shop's band
+ * @param {{ shop?: boolean }} [opts] `shop: false` = the folded shop's band
  * @returns {{ top: number, bottom: number }|null}
  */
 export function hudBands(kind, size, opts) {
   if (kind !== 'prep' && kind !== 'bossPrep') return null;
   const folded = !!opts && opts.shop === false;
-  const partial = opts?.shop === 'partial';
   const h = size?.height || 1080;
   let rem = 100;
   let safeTop = 0;
@@ -99,30 +98,16 @@ export function hudBands(kind, size, opts) {
     const oy = (document.querySelector('.gm__field')?.getBoundingClientRect()?.top || 0)/zoom;
     // the HUD layer starts below the top safe-area inset and ends above the bottom one (css/devices.css .gm__hud)
     const hud = document.querySelector('.gm__hud')?.getBoundingClientRect();
-<<<<<<< ours
     safeTop = Math.max(0, (hud?.top || 0)/zoom);
     bondBottom = (document.querySelector('.gm__bonds')?.getBoundingClientRect()?.bottom || 0)/zoom;
     if (folded) {
       if (hud && hud.bottom/zoom - oy > 0) safeBottom = Math.max(0, h - (hud.bottom/zoom - oy));
-=======
-    safeTop = Math.max(0, (hud?.top || 0) - oy);
-    // #678 adds 44 px arrows; a native scrollbar can make the strip taller still.
-    // Keep the same minimum band before mount and while collapsed, so toggling cannot shrink it.
-    const bonds = document.querySelector('.gm__bonds')?.getBoundingClientRect();
-    if (bonds?.height > 0) bondsBottom = Math.max(0, bonds.bottom - oy);
-    if (folded || partial) {
-      if (hud && hud.bottom - oy > 0) safeBottom = Math.max(0, h - (hud.bottom - oy));
->>>>>>> theirs
       corner = cornerBand(h, oy);
     }
   } catch { /* ignore */ }
   const bottom = folded
     ? Math.max(safeBottom + rem * HUD_REM.shopTabTop + HUD_REM.shopTabBorderPx, corner || safeBottom + rem * HUD_REM.cornerTop)
-    : partial
-      // [ASSUMED] #692: CSS scales the whole bar to 70% around its bottom-right anchor (.2rem above the bottom).
-      ? Math.max(safeBottom + rem * 0.2 + (rem * (HUD_REM.shopBarTop - 0.2) + HUD_REM.shopBarBorderPx) * 0.7,
-        corner || safeBottom + rem * HUD_REM.cornerTop)
-      : rem * HUD_REM.shopBarTop + HUD_REM.shopBarBorderPx;
+    : rem * HUD_REM.shopBarTop + HUD_REM.shopBarBorderPx;
   return {
     top: Math.min(h * 0.4, bondBottom > 0 ? bondBottom + 8 : safeTop + rem * HUD_REM.bondStripBottom),
     bottom: Math.min(h * 0.4, bottom),

@@ -30,14 +30,8 @@ describe('ownerBandId — the picked 策略 of a player', () => {
 describe('the drawer shows the watched player\'s 策略 while scouting', () => {
   test('game.js derives the scouted player and hands bandId / bandOwner to the drawer (source)', () => {
     const game = read('public/js/screens/game.js');
-<<<<<<< ours
     assert.ok(game.includes('bandId=${strip.ownerId !== myId ? ownerBandId(pub, strip.ownerId) : null} bandOwner=${strip.name}'));
 
-=======
-    // chiave-progress.e2e.test.js checks the actual owner in both prep and combat; it is no longer prep-only.
-    assert.match(game, /const scoutBandId = scoutPid \? ownerBandId\(pub, scoutPid\) : null/);
-    assert.match(game, /bandId=\$\{scoutBandId\} bandOwner=\$\{scoutBandOwner\}/);
->>>>>>> theirs
   });
 
   test('InfoTab overrides the band and labels it with the owner (source); the detail card has no 策略 section', () => {

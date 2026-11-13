@@ -8,12 +8,7 @@
 // board is sized from its host element) and computes the layout root 1rem from it instead of the whole viewport. Fixed
 // overlays (dialogs, toasts) keep the full screen.
 
-<<<<<<< ours
 import { html, Button, MicroLabel } from './components.js';
-=======
-import { useState } from '../../vendor/hooks.module.js';
-import { html, Button, Icon, MicroLabel } from './components.js';
->>>>>>> theirs
 import { createStore, useStore, loadPref, savePref } from '../store.js';
 import { t, N_ } from '../../../shared/i18n.js';
 
@@ -68,16 +63,9 @@ export function ScreenFitSection() {
   const f = useStore((s) => s, Object.is, fitStore);
   const any = FIT_SIDES.some((k) => f[k] !== 0);
   return html`<section class="set-fit" aria-labelledby="set-fit-title" data-testid="screen-fit">
-<<<<<<< ours
     <div class="set-keys__head">
       <span class="set-row__label" id="set-fit-title">${t('异形屏适配')}<${MicroLabel}>SCREEN FIT<//></span>
       <${Button} variant="ghost" size="sm" icon="refresh" class="set-fit__reset" disabled=${!any} onClick=${() => updateFit(NONE)}>${t('重置')}<//>
-=======
-    <div class="set-keys__head sw-sec__head">
-      <span class="sw-sec__glyph" aria-hidden="true"><${Icon} name="expand" /></span>
-      <span class="set-row__label sw-sec__name" id="set-fit-title"><i>[</i> ${t('异形屏适配')} <i>]</i><${MicroLabel}>SCREEN FIT<//></span>
-      <${Button} variant="ghost" size="sm" icon="refresh" class="set-fit__reset" disabled=${!any} onClick=${() => { setPreview(null); updateFit(NONE); }}>${t('重置')}<//>
->>>>>>> theirs
     </div>
     <p class="set-hint">${t('全屏后界面被挖孔、刘海或曲面边缘挡住，或比例、位置不对时使用：50 为不调整，往右拉该边往里收，往左拉该边往外扩。界面会立即移动，可边看边调，只保存在这台设备上。')}</p>
     ${FIT_SIDES.map((k) => {

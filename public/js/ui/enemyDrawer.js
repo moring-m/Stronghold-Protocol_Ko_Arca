@@ -9,19 +9,13 @@ import { CustomSettingsInfo } from './customSettingsInfo.js';
 //              match's factions and the enemy leader on boss rounds. The primary enemy preview is the pen on the board
 //              (the right 🔍▶▶ pans the camera there; tapping an enemy in the pen opens its detail card) — research 09 §6.2.
 
-import { html, Icon, Tabs } from './components.js';
+import { html, Icon, Tabs, MicroLabel } from './components.js';
 import { Img, UnitThumb, BondGlyph, BandIcon, RichText, GIcon } from './gameComponents.js';
 import { groupEnemies, factionTypes, briefingBondTip } from './gameLogic.js';
 import { useEffect, useRef } from '../../vendor/hooks.module.js';
 import { matchInfoModel } from './matchInfo.js';
 import { factionIconUrl } from './assetUrls.js';
-<<<<<<< ours
 import { matchData as data } from '../data.js';
-=======
-import { data } from '../data.js';
-import { t, tParts, N_ } from '../../../shared/i18n.js';
-import { StrategyProgress } from './strategyProgress.js';
->>>>>>> theirs
 
 const cx = (...p) => p.flat().filter(Boolean).join(' ');
 const TAG = { boss: '领袖', bounty: '悬赏', escort: '护卫' };
@@ -64,7 +58,6 @@ function EnemiesTab({ pub, priv, onEnemy }) {
     </div>` : html`<p class="edrawer__empty"><${GIcon} name="target" />暂无敌方情报</p>`}
     ${boss ? html`<button type="button" class="eboss" onClick=${() => onEnemy(boss.enemyKey, 1)}>
       <${UnitThumb} kind="enemy" id=${boss.enemyKey} size="md" />
-<<<<<<< ours
       <div class="eboss__text"><${MicroLabel} tone="gold">ENEMY LEADER // 敌方领袖</${MicroLabel}><b>${boss.name}</b>
         <span class="t-lo">第 ${pub.bossRound ?? data.get('config')?.modes?.[pub.modeId]?.bossRound ?? pub.lastRound ?? 14} 回合 · 最终攻势</span>
         ${Array.isArray(boss.abilities) && boss.abilities.length ? html`<ul class="eboss__abil">${boss.abilities.map((a, i) => html`<li key=${i}><${RichText} text=${a} /></li>`)}</ul>` : null}
@@ -75,38 +68,21 @@ function EnemiesTab({ pub, priv, onEnemy }) {
 
 function InfoTab({ pub, priv, onChess, bandId = null, bandOwner = null }) {
   const { bonds, banned, bannedGroups, perBond, stateOf } = matchInfoModel(pub, {
-=======
-      <div><span class="sw-sec__name"><i>[</i> ${t('ENEMY LEADER // 敌方领袖')} <i>]</i></span><b>${boss.name}</b>
-        <span class="t-lo">${t('第 {r} 回合 · 最终攻势', { r: data.get('config')?.modes?.[pub.modeId]?.bossRound ?? pub.lastRound ?? 14 })}</span></div>
-    </div>` : null}
-  </div>`;
-}
-
-function InfoTab({ pub, priv, onChess, onBond, bandId = null, bandOwner = null, effects = null }) {
-  const model = matchInfoModel(pub, {
->>>>>>> theirs
     bonds: data.list('bonds'), chess: (id) => data.lookup('chess', id), mode: data.get('config')?.modes?.[pub?.modeId],
   });
   const disabled = new Set(bonds.filter((b) => stateOf(b.bondId)).map((b) => b.bondId));
-<<<<<<< ours
   // Show only the strategy belonging to the board currently being viewed.
   const current = bandOwner
     ? { id: bandId, label: `${bandOwner} · 관전 대상의 전략` }
     : { id: priv?.bandId, label: '나의 전략' };
   const strategies = current.id
     ? [{ ...current, band: data.lookup('bands', current.id) }].filter(s => s.band) : [];
-=======
-  // while watching a teammate's prep board or battle the drawer shows THEIR 策略 in place of one's own (user playtest #2 item 2)
-  const band = (bandId || priv?.bandId) ? data.lookup('bands', bandId || priv.bandId) : null;
-  const bandEffect = band && effects?.find(e => e.iconKind === 'band' && e.id === (band.effectId || band.bandId));
->>>>>>> theirs
   const stage = pub?.stageId ? data.lookup('stages', pub.stageId) : null;
   const withBans = bonds.filter((b) => disabled.has(b.bondId) || (perBond.get(b.bondId) || 0) > 0)
     .sort((a, b) => (disabled.has(b.bondId) - disabled.has(a.bondId)) || ((perBond.get(b.bondId) || 0) - (perBond.get(a.bondId) || 0)));
   return html`<div class="edrawer__body">
     ${strategies.map(({band, label}) => html`<div class="iband">
       <${BandIcon} bandId=${band.bandId} size="md" />
-<<<<<<< ours
       <div><${MicroLabel} tone="mint">STRATEGY // ${label}</${MicroLabel}><b>${band.name} <small class="t-lo">${band.effectName}</small></b>
         <${RichText} text=${band.descRaw || band.desc} class="iband__desc" /></div>
     </div>`)}
@@ -118,31 +94,12 @@ function InfoTab({ pub, priv, onChess, onBond, bandId = null, bandOwner = null, 
         <${BondGlyph} bondId=${b.bondId} /><span>${b.name}</span>
         ${perBond.get(b.bondId) ? html`<span class="ibond__ban num" title="该盟约中被禁用的干员数"><${Icon} name="user" />${perBond.get(b.bondId)}</span>` : null}
       </span>`) : html`<span class="t-dim">本局没有禁用盟约</span>`}
-=======
-      <div><span class="sw-sec__name"><i>[</i> STRATEGY // ${bandOwner ? t('{bandOwner} 的策略', { bandOwner }) : t('我的策略')} <i>]</i></span><b>${band.name} <small class="t-lo">${band.effectName}</small></b>
-        <${RichText} text=${band.descRaw || band.desc} class="iband__desc" /><${StrategyProgress} effect=${bandEffect} /></div>
-    </div>` : null}
-    ${stage ? html`<p class="istage"><${Icon} name="rook" />${t('战场：')}<b>${stage.name || stage.id}</b></p>` : null}
-    <h4 class="ihead"><span class="sw-sec__name"><i>[</i> ${t('本局禁用干员情况')} <i>]</i></span> <small class="num">${banned.length}</small></h4>
-    <div class=${cx('ibonds', model.regulation && 'ibonds--disc')}>
-      ${withBans.length ? withBans.map((b) => {
-        const off = disabled.has(b.bondId);
-        const bans = perBond.get(b.bondId) || 0;
-        // [ASSUMED] 规程 draws these bonds as the briefing's discs (lit first, grey when the core
-        // is absent). The chip hooks stay: .ibond, the unclassed name, .ibond__ban, data-bond.
-        return html`<button key=${b.bondId} type="button" class=${cx('ibond', model.regulation && 'ibond--disc', off && 'is-off', !off && bans > 0 && 'is-partial')} data-bond=${b.bondId} onClick=${() => onBond(b.bondId)} title=${briefingBondTip(b.name, stateOf(b.bondId), bans, model.regulation && b.isCore)}>
-          <${BondGlyph} bondId=${b.bondId} /><span>${b.name}</span>
-          ${bans ? html`<span class="ibond__ban num" title=${t('该盟约中被禁用的干员数')}><${Icon} name="user" />${bans}</span>` : null}
-        </button>`;
-      }) : html`<span class="t-dim">${t('本局没有禁用盟约')}</span>`}
->>>>>>> theirs
     </div>
     ${bannedGroups.map(g => html`<section class="brief-banned__group" key=${g.bondId}><h4><${BondGlyph} bondId=${g.bondId} /><span>${g.name}</span></h4><div class="ibanned">${g.ids.map(id => html`<button key=${id} type="button" class="ibanned__one" onClick=${() => onChess(id)}><${UnitThumb} kind="chess" id=${id} size="sm" dim=${false} /></button>`)}</div></section>`)}
   </div>`;
 }
 
 /**
-<<<<<<< ours
  * @param {{ tab:'enemies'|'info', onTab:(t:string)=>void, pub:any, priv:any, onClose:Function, onEnemy:(key:string, count:number)=>void, onChess:(id:string)=>void,
  *   bandId?: string|null, bandOwner?: string|null }} props
  *   bandId / bandOwner: while scouting a teammate's prep board, the watched player's 策略 (m.public players[].bandId)
@@ -163,23 +120,10 @@ export function EnemyDrawer({ tab, onTab, pub, priv, onClose, onEnemy, onChess, 
     };
   }, [onClose]);
   return html`<div ref=${ref} class="edrawer brackets" role="dialog" aria-label=${tab === 'info' ? '本局信息' : '敌方情报'}>
-=======
- * @param {{ tab:'enemies'|'info', onTab:(t:string)=>void, pub:any, priv:any, onClose:Function, onEnemy:(key:string, count:number)=>void, onChess:(id:string)=>void, onBond:(id:string)=>void,
- *   bandId?: string|null, bandOwner?: string|null, effects?: any[]|null }} props
- *   bandId / bandOwner: while watching a teammate's prep board or battle, the watched player's 策略 (m.public players[].bandId)
- *   replaces one's own in the 本局信息 tab (game.js scoutBandId; user playtest #2 item 2)
- */
-export function EnemyDrawer({ tab, onTab, pub, priv, onClose, onEnemy, onChess, onBond, bandId = null, bandOwner = null, effects = bandOwner ? null : priv?.effects }) {
-  return html`<div class="edrawer brackets" role="dialog" aria-label=${tab === 'info' ? t('本局信息') : t('敌方情报')}>
->>>>>>> theirs
     <div class="edrawer__top">
       <${Tabs} size="sm" value=${tab} onChange=${onTab} items=${[{ id: 'info', label: '本局信息' }, { id: 'enemies', label: '敌方情报' }, {id:'custom',label:'커스텀 설정'},...(pub.augments?[{id:'augments',label:'적 증강'}]:[]),...(pub.defaultAugments?[{id:'defaultAugments',label:'기본 증강'}]:[])]} />
       <button type="button" class="edrawer__close tapx" aria-label="关闭" onClick=${onClose}><${Icon} name="close" /></button>
     </div>
-<<<<<<< ours
     ${tab === 'defaultAugments' && pub.defaultAugments ? html`<div class="edrawer__body"><${DefaultAugments} pub=${pub}/></div>` : tab === 'augments' ? html`<div class="edrawer__body"><${EnemyAugments} pub=${pub}/></div>` : tab === 'custom' ? html`<div class="edrawer__body"><${CustomSettingsInfo} pub=${pub}/></div>` : tab === 'info' ? html`<${InfoTab} pub=${pub} priv=${priv} onChess=${onChess} bandId=${bandId} bandOwner=${bandOwner} />` : html`<${EnemiesTab} pub=${pub} priv=${priv} onEnemy=${onEnemy} />`}
-=======
-    ${tab === 'info' ? html`<${InfoTab} pub=${pub} priv=${priv} onChess=${onChess} onBond=${onBond} bandId=${bandId} bandOwner=${bandOwner} effects=${effects} />` : html`<${EnemiesTab} pub=${pub} priv=${priv} onEnemy=${onEnemy} />`}
->>>>>>> theirs
   </div>`;
 }
