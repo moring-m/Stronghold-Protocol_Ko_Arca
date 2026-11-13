@@ -39,17 +39,12 @@
 // m = own copies of that hammer + (1 if 蒸汽之心 applies and the type is on the field): burn ×m of arts damage,
 // undying duration ×m, ASPD ×m, tremble chance ×m. Granted hammers without an own copy use 蒸汽之心's blackboard.
 
-<<<<<<< ours
-import { num, itemRecord, itemKeyOf, buffsOf, isOp, onField, unitBonds, isMember, bondActive, isGroundOp, frontTile, alliesAround, passiveBuff, fxOn, battleStore, contentInfo, itemsOf, directMods } from '../support/index.js';
-import { mitigate, hasHp, periodicDamage, isHpLoss } from '../../damage.js';
-=======
 import {
   num, itemRecord, itemKeyOf, itemEffectKey, itemIdsWithEffect, isVersionData, gameData, buffsOf, isOp, onField, unitBonds,
   isMember, bondActive, activeBondIds, isGroundOp, frontTile, alliesAround, passiveBuff, fxOn, battleStore, contentInfo, itemsOf, directMods, bodyInRadius,
 } from '../support/index.js';
 import { bodyInRange } from '../../body.js';
 import { mitigate, hasHp, periodicDamage, isHpLoss, damageAttackType } from '../../attack.js';
->>>>>>> theirs
 import { hypot } from '../../detmath.js';
 
 // =====================================================================================================================
@@ -114,10 +109,6 @@ function hammerTypeOf(p) {
   if (p.attack_speed != null) return 'aspd';
   return null;
 }
-<<<<<<< ours
-/** hammer item key → { type, bbKey } */
-const HAMMERS = new Map();
-=======
 /** The steam record: 蒸汽之心 by effectId, else the equipment that carries the same buff (规程 终极维式重锤, eff_acarm155). */
 function steamRecord() {
   if (!isVersionData()) return itemRecord(`${STEAM_KEY}_a`);
@@ -136,14 +127,9 @@ function steamRecord() {
 /** hammer item key → { type, bbKey }, for the data object it was read from */
 let HAMMERS = new Map();
 let HAMMERS_DATA = null;
->>>>>>> theirs
 function hammerInfo(key) {
   if (!HAMMERS.size) {
-<<<<<<< ours
-    const steam = itemRecord(`${STEAM_KEY}_a`);
-=======
     const steam = steamRecord();
->>>>>>> theirs
     const sp = steam ? bp(steam, STEAM_BUFF) : null;
     const keys = sp ? Object.keys(sp).filter((k) => /^hammer_\d+$/.test(k)).map((k) => itemKeyOf(sp[k])) : [];
     for (const k of keys) {
@@ -1317,15 +1303,11 @@ export function addShieldLayer(battle, target, key, cap = 1) {
 /** Does this record have a battle part? (stat buffs, known buff behaviours, hammer specials, item behaviours) */
 export function hasBattleEffect(rec) {
   if (!rec || rec.itemType !== 'EQUIP') return false;
-<<<<<<< ours
+  // TODO(시즌 복원): the fork keeps item behaviours by item key (BY_ITEM); upstream keys them by effectId (BY_EFFECT) so
+  // another season's item ids resolve. Restored in the season pass (docs/merge/upstream-0.3.4-status.md).
   const key = itemKeyOf(rec.id);
   if (BY_ITEM[key] || hammerInfo(key)) return true;
-  return buffsOf(rec).some((b) => STAT_BUFFS.has(b.bbKey) || BY_BUFF[b.bbKey]);
-=======
-  if (effectBehaviour(rec.id) || hammerInfo(itemKeyOf(rec.id))) return true;
-  // STEAM_BUFF without eff_acarm079 is 规程 终极维式重锤. Default 蒸汽之心 is already true via its effect.
   return buffsOf(rec).some((b) => b.bbKey === STEAM_BUFF || STAT_BUFFS.has(b.bbKey) || BY_BUFF[b.bbKey]);
->>>>>>> theirs
 }
 
 // =====================================================================================================================
@@ -1372,27 +1354,7 @@ export function installItem(battle, u, itemId, { lent = false } = {}) {
       hammerRefresh(battle, rt, u, hs);
       S.onDispose(() => { hs.own[h.type] = Math.max(0, hs.own[h.type] - 1); hammerRelease(battle, rt, u, hs); });
     }
-<<<<<<< ours
     if (BY_ITEM[key]) BY_ITEM[key](battle, u, rec, S, grant);
-=======
-    // 规程 终极维式重锤 carries the steam buff and is not eff_acarm079. Default 蒸汽之心 enters through BY_EFFECT
-    // below; a second acquire here would count it twice.
-    const steamBuff = bp(rec, STEAM_BUFF);
-    if (steamBuff && behaviourKey(itemId) !== STEAM_EFFECT) {
-      const hs = hammerAcquire(battle, rt, u);
-      hs.regulation = true;
-      hs.steam++;
-      if (!hs.steamP) hs.steamP = steamBuff;
-      hammerRefresh(battle, rt, u, hs);
-      S.onDispose(() => {
-        hs.steam = Math.max(0, hs.steam - 1);
-        if (hs.steam <= 0) hs.regulation = false;
-        hammerRelease(battle, rt, u, hs);
-      });
-    }
-    const fx = effectBehaviour(itemId);
-    if (fx) fx(battle, u, rec, S, grant);
->>>>>>> theirs
   } catch (e) {
     battle._handlerError?.(`item:${itemId}`, u, e);
   }
