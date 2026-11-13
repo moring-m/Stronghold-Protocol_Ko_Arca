@@ -9,7 +9,7 @@ import { guardTestMessage } from '../../shared/testMode.js';
 
 export const TEST_INPUT_METHODS = Object.freeze([
   'start', 'handle', 'setLoadout', 'onDisconnect', 'onReconnect', 'onLeave', 'setHost',
-  'addSpectator', 'removeSpectator', 'requestSetupReroll', 'cancelSetupReroll', 'dispose',
+  'addSpectator', 'removeSpectator', 'requestSetupReroll', 'cancelSetupReroll', 'dispose', 'externalReply',
 ]);
 /** Lines of one match's [test-input] journal, including chunks and the capped marker. */
 export const TEST_JOURNAL_CAP = 4096;
@@ -74,7 +74,7 @@ export function installTestTrace(m, opts) {
     }
   };
   const options = {};
-  for (const key of ['roomCode', 'mode', 'difficulty', 'modeId', 'seats', 'spectators', 'seed', 'matchNo', 'hostId', 'aiPicksLast', 'cs', 'vs', 'requireCs', 'kitted', 'rules', 'offers']) {
+  for (const key of ['roomCode', 'mode', 'difficulty', 'modeId', 'seats', 'spectators', 'seed', 'matchNo', 'hostId', 'aiPicksLast', 'soloUnlimited', 'cs', 'vs', 'requireCs', 'kitted', 'rules', 'offers', 'version']) {
     if (opts[key] !== undefined) options[key] = clone(opts[key]);
   }
   Object.assign(options, {

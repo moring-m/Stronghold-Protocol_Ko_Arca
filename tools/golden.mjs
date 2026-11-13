@@ -8,7 +8,7 @@
 // Usage:
 //   node tools/golden.mjs                 compare the corpus with test/golden/*.json (exit 1 on a difference)
 //   node tools/golden.mjs --update        recompute and rewrite test/golden/*.json   (npm run golden:update)
-//   options: --family roster,bonds,fields,matches   --fast (the test's default subset)   --only <id,id>
+//   options: --family roster,bonds,fields,matches,standins   --fast (the test's default subset)   --only <id,id>
 //            --jobs N (worker threads, default: up to 4)   --list   --coverage (skills cast, stages, enemies…)
 //            --version <id> historical data and test/golden/<slug>/ (default: act2autochess)
 //            --twice  determinism: compute twice in this process (the second pass in reverse order) and compare
@@ -23,13 +23,26 @@
 //            turn; bonds from the board (bondsMeta.computeBonds) with 0–120 layers
 //   bonds    46 battles: every bond at its activation threshold (1 layer) and at its top tier (999 layers), 8 operators
 //   fields   22 battles: every Final Assault / Hidden Core leader on its pair and its solo template (a shared boss pool,
-//            ended at 200 game s) and 联防 fields (1 and 2 helpers, carried HP / SP, a knocked-out operator, two
-//            leakers' enemies with a summoned-only kind and a bounty)
-//   matches  16 bot-only matches (solo 标准 / 险境 / 绝境 / 终极 ×2 seeds, co-op 2 / 3 / 4, one server-run combat match,
-//            two with LP and layers raised at the first prep so they reach the Hidden Core) run to the end in virtual
-//            time with the match's default bot rehearsal
+//            ended at 200 game s) and 联防 fields (1 and 2 helpers on a battle stage, both halves, carried HP / SP, a
+//            knocked-out operator, two leakers' enemies with a summoned-only kind and a bounty)
+//   matches  18 matches run to the end in virtual time with the match's default bot rehearsal: 16 bot-only (solo 标准 /
+//            险境 / 绝境 / 终极 ×2 seeds, co-op 2 / 3 / 4, one server-run combat match, two with LP and layers raised at the
+//            first prep so they reach the Hidden Core), one co-op match whose human seat (AI 托管, offline: its
+//            battles run on the server) does not own a few NORMAL chess — they fight as their 补位 stand-ins (0.2.0) — and
+//            one whose human seat slots 自选 picks (推进之王 and prototypes; its 调度中心 at level 5 from the first prep):
+//            its shop sells them and its AI fields them (0.2.0 自选编队, the digest's `diy`)
+//   standins 10 battles: every NORMAL chess record (normal + elite, 110) fielded as its 补位 stand-in (PlayerBattleInput
+//            standIn: true — DATA.md §18: the stand-in's body, its backup skill / module, its kit by charId; all 17
+//            stand-ins and every skill a chess names for them), 12 per battle by strength band, laid out by the stand-in's
+//            position on a real stage, against the round's real wave three times over, an item each, bonds from the board
+//   diy      自选 pieces (PlayerBattleInput `diy`, shared/diy.js): every owned 6★ with an operator kit (kits/index.js
+//            OPERATOR_KITS) in each form of tiers 5 and 6 — normal, elite with no module and with each module — under
+//            each of its skills, then every prototype pick with a kit at its locked selection, both forms of each tier;
+//            12 pieces per battle on a real stage against the round's real wave three times over (diyScenarios)
 // Battles run through the production BattleSpec path (server/sim/spec.js buildBattleSpec → createBattleFromSpec, the
-// path browsers and the server's headless fields use) with every option explicit; matches construct Match directly
+// path browsers and the server's headless fields use) with every option explicit — every operator the player owns at
+// the default player's settings, 潜能 6 and 练度 精英2 Lv.60 (PlayerBattleInput `potential` / `cultivate`, as
+// PlayerState.battleInput states them, 0.2.2; a stand-in and a prototype 自选 pick neither); matches construct Match directly
 // with a VirtualScheduler (as tools/botbench.mjs) — test-harness defaults never move a digest.
 //
 // Digest (battle): end time, ticks, reason, kills / total / leaks, per player (kills, leaks, coins, damage, boss
@@ -59,7 +72,7 @@ import { DataSource } from '../server/sim/simdata.js';
 import { buildBattleSpec, createBattleFromSpec } from '../server/sim/spec.js';
 import { createRng, deriveSeed } from '../server/sim/rng.js';
 import { GameData } from '../server/match/gamedata.js';
-import { setupMatchWaves, buildNormalWave, buildBossWave, buildUniteWave, isFlyKey, routeByMotion } from '../server/match/waves.js';
+import { setupMatchWaves, buildNormalWave, buildBossWave, buildUniteWave, isFlyKey, routeByMotion, roundMods } from '../server/match/waves.js';
 import { buildDeployMap, positionClass, canPlace, ownerRangeKeys, tileKey } from '../server/match/board.js';
 import { computeBonds, bondSnapshot } from '../server/match/bondsMeta.js';
 import { Match } from '../server/match/Match.js';
@@ -72,8 +85,10 @@ import { OPERATOR_KITS, KITTED_CHARS } from '../server/sim/content/kits/index.js
 import { GEO } from '../shared/constants.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-export const GOLDEN_DIR = join(ROOT, 'test', 'golden');
-export const FAMILY_NAMES = Object.freeze(['roster', 'bonds', 'fields', 'matches']);
+/** The default player's 潜能 / 练度 of every owned operator (shared/potential.js; the owner's decision of 2026-10-08). */
+const DEFAULT_CULTIVATION = Object.freeze({ potential: POTENTIAL_DEFAULT, cultivate: CULTIVATE_DEFAULT });
+export const GOLDEN_DIR = join(ROOT, 'test', 'golden', ...(toolVersion === DEFAULT_VERSION ? [] : [versionSlug(versionById(toolVersion))]));
+export const FAMILY_NAMES = Object.freeze(['roster', 'bonds', 'fields', 'matches', 'standins', 'diy']);
 
 const QUIET = Object.freeze({ warn() {}, error() {}, info() {}, log() {}, debug() {} });
 const data = getData({ log: QUIET });
@@ -245,7 +260,8 @@ const ENEMY_COLS = Object.freeze(['spawned', 'killed', 'leaked', 'dmg', 'taken']
 
 const CHESS = Object.values(data.chess).sort((a, b) => byId(a.chessId, b.chessId));
 const VISIBLE = CHESS.filter((c) => c.visible);
-const STAGES = Object.keys(data.stages).sort(byId);
+// the battle stages (data/stages.json also keeps the escaped levels' two maps, kind 'unite', which no field uses)
+const STAGES = Object.keys(data.stages).filter((id) => data.stages[id].kind !== 'unite').sort(byId);
 const BANDS = Object.keys(data.bands).sort(byId);
 const EQUIPS = Object.values(data.items).filter((i) => i.itemType === 'EQUIP').map((i) => i.id).sort(byId);
 const BOSSES = Object.keys(data.bosses).sort((a, b) => Number(a.replace(/\D/g, '')) - Number(b.replace(/\D/g, '')));
@@ -335,11 +351,13 @@ function layout(gd, stageId, wanted, { field = 'normal', colOffset = 0, max = 12
     const rank = (r, c) => { const d = dist(r, c); return d === 0 ? 1.5 : d; }; // beside a path first, then on it
     return out.sort((a, b) => rank(a[0], a[1]) - rank(b[0], b[1]));
   };
-  const isMelee = (w) => positionClass(data.chess[w.chessId]) === 'melee';
-  const order = wanted.slice().sort((a, b) => (isMelee(b) - isMelee(a)) || (isMelee(a) ? (data.chess[b.chessId].stats.blockCnt || 0) - (data.chess[a.chessId].stats.blockCnt || 0) : 0));
+  // a 补位 unit (`standIn`) is laid out by its stand-in's body (position, block count); every other by its chess record
+  const recOf = (w) => (w.standIn ? gd.standIn(w.chessId) || data.chess[w.chessId] : data.chess[w.chessId]);
+  const isMelee = (w) => positionClass(recOf(w)) === 'melee';
+  const order = wanted.slice().sort((a, b) => (isMelee(b) - isMelee(a)) || (isMelee(a) ? (recOf(b).stats.blockCnt || 0) - (recOf(a).stats.blockCnt || 0) : 0));
   let uid = uid0;
   for (const w of order) {
-    const rec = data.chess[w.chessId];
+    const rec = recOf(w);
     const free = units.length < max ? tiles(positionClass(rec)) : [];
     if (!free.length) { rest.push(w); continue; }
     const [r, c] = free[0];
@@ -353,7 +371,7 @@ function layout(gd, stageId, wanted, { field = 'normal', colOffset = 0, max = 12
     if (w.carryState) u.carryState = w.carryState;
     units.push(u);
   }
-  // placeable summons of the placed operators
+  // placeable summons of the placed operators (a stand-in makes none: none of the 17 has one)
   const tokens = [];
   for (const u of units) {
     if (u.standIn) continue;
@@ -404,7 +422,7 @@ function extraSpawns(gd, routes, keys, round, pid, t0 = 8, step = 5) {
     const fly = isFlyKey(gd, key);
     let routeIndex = routeByMotion(routes, fly);
     if (!(routeIndex >= 0)) routeIndex = 0;
-    const s = { time: t0 + i * step, enemyKey: key, routeIndex, count: 1, interval: 0, mods: { hpMul: scale.hpMul, atkMul: scale.atkMul, speedMul: scale.speedMul, slot: fly ? 'NF' : 'N' }, ownerPlayerId: pid };
+    const s = { time: t0 + i * step, enemyKey: key, routeIndex, count: 1, interval: 0, mods: { ...roundMods(scale), slot: fly ? 'NF' : 'N' }, ownerPlayerId: pid };
     if (i % 2 === 0) { s.tag = 'bounty'; s.bounty = { coins: 2, ownerPlayerId: pid }; s.mods.bountyCoins = 2; }
     return s;
   });
@@ -592,7 +610,7 @@ export function fieldScenarios() {
       scenarios.push({
         id: `${hidden ? 'hidden' : 'boss'}-${bossId}-${solo ? 'solo' : 'pair'}`, family: 'fields', kind: hidden ? 'hidden' : 'boss', modeId, round, stageId, seed,
         rect: { ...GEO.BOSS_RECT }, timeLimit: Infinity, routes: wave.routes, waveId: wave.templateId, enemyOverrides: wave.overrides,
-        flags: { layerGainsEnabled: false, ...gd.dp }, bossId, boss: { poolHp: pool, poolMax: pool }, fieldId: 'b1', cap: 200,
+        flags: { layerGainsEnabled: false, ...gd.dp, enemyScale: gd.enemyScale(round) }, bossId, boss: { poolHp: pool, poolMax: pool }, fieldId: 'b1', cap: 200,
         players, spawns: wave.spawns.map((s) => ({ ...s })),
         about: `${data.bosses[bossId].name} ${solo ? 'solo' : 'pair'} pool ${pool}: ${players.map((p) => placeName(p.units).join(' ')).join(' | ')}`,
       });
@@ -709,7 +727,22 @@ export function matchScenarios() {
   // match reaches the Final Assault and — Σ activated layers over the threshold — the Hidden Core
   out.push({ id: 'solo-HARD-9-boosted', mode: 'solo', difficulty: 'HARD', bots: 1, seed: 9, boost: { lp: 400, layers: 300 } });
   out.push({ id: 'coop2-ABYSS-10-boosted', mode: 'coop', difficulty: 'ABYSS', bots: 2, seed: 10, boost: { lp: 400, layers: 300 } });
-  return out.map((m) => ({ ...m, family: 'matches', kind: 'match', about: `${m.mode} ${m.difficulty}, ${m.bots} bot seat(s), seed ${m.seed}${m.clientCombat === false ? ', server-run combat' : ''}${m.boost ? `, LP ${m.boost.lp} and ${m.boost.layers} layers per bond from the first prep` : ''}` }));
+  // 0.2.0 补位: a human seat (AI 托管, offline: its battles run on the server) that does not own a few NORMAL chess
+  out.push({ id: 'coop2-NORMAL-14-standins', mode: 'coop', difficulty: 'NORMAL', bots: 1, seed: 14, human: { notOwned: MATCH_NOT_OWNED } });
+  // 0.2.0 自选编队: a human seat (AI 托管, offline) that slots 推进之王 and prototypes into the four DIY slots
+  // (its 调度中心 starts at level 5, like the boosted runs' raised LP: the 自选 pieces are sold from level 5 / 6, which the
+  // AI otherwise reaches only with a full board, where a single new operator rarely improves its lineup)
+  out.push({ id: `coop2-NORMAL-${MATCH_DIY_SEED}-diy`, mode: 'coop', difficulty: 'NORMAL', bots: 1, seed: MATCH_DIY_SEED, human: { diy: MATCH_DIY, shopLevel: 5 } });
+  // The measured shared-stock changes leave the original seeds without a fielded DIY/stand-in operator. Keep those
+  // original outcomes, and add companion seeds that still exercise the complete shop → deployment → battle path.
+  out.push({ id: 'coop2-NORMAL-1-coverage-standins', mode: 'coop', difficulty: 'NORMAL', bots: 1, seed: 1, human: { notOwned: MATCH_NOT_OWNED } });
+  out.push({ id: 'coop2-NORMAL-5-coverage-diy', mode: 'coop', difficulty: 'NORMAL', bots: 1, seed: 5, human: { diy: MATCH_DIY, shopLevel: 5 } });
+  // A player without any NORMAL operators must use stand-ins regardless of which operators its AI buys.
+  out.push({ id: 'coop2-NORMAL-1-unowned-roster', mode: 'coop', difficulty: 'NORMAL', bots: 1, seed: 1,
+    human: { notOwned: STANDIN_CHESS.filter((c) => !c.isGolden).map((c) => c.chessId) } });
+  const humanAbout = (h) => (h.notOwned ? ` + 1 human seat (AI 托管) without ${h.notOwned.length} operators (补位 stand-ins)`
+    : ` + 1 human seat (AI 托管) with ${Object.keys(h.diy || {}).length} 自选 picks${h.shopLevel ? ` and its 调度中心 at level ${h.shopLevel} from the first prep` : ''}`);
+  return out.filter((m) => data.config.modes[`mode_${m.mode === 'solo' ? 'single' : 'multi'}_${m.difficulty.toLowerCase()}`]).map((m) => ({ ...m, family: 'matches', kind: 'match', about: `${m.mode} ${m.difficulty}, ${m.bots} bot seat(s)${m.human ? humanAbout(m.human) : ''}, seed ${m.seed}${m.clientCombat === false ? ', server-run combat' : ''}${m.boost ? `, LP ${m.boost.lp} and ${m.boost.layers} layers per bond from the first prep` : ''}` }));
 }
 
 /**
@@ -749,7 +782,16 @@ const MATCH_ROW_COLS = Object.freeze(['alive', 'lp', 'prepFunds', 'funds', 'pend
 export function runMatch(cfg) {
   const sched = new VirtualScheduler();
   const seats = [];
-  for (let i = 0; i < cfg.bots; i++) seats.push({ seat: i, playerId: `ai_${i}`, name: `AI-${i + 1}`, isBot: true, connected: true });
+  // a human seat (cfg.human): offline (its battles run on the server) and on AI 托管 from the start; its not-owned chess
+  // fight as their 补位 stand-ins, its 自选 picks join its shop
+  if (cfg.human) {
+    seats.push({
+      seat: 0, playerId: 'h_0', name: 'H-1', isBot: false, connected: false,
+      ...(cfg.human.notOwned ? { notOwned: [...cfg.human.notOwned] } : null),
+      ...(cfg.human.diy ? { diy: JSON.parse(JSON.stringify(cfg.human.diy)) } : null),
+    });
+  }
+  for (let i = 0; i < cfg.bots; i++) seats.push({ seat: seats.length, playerId: `ai_${i}`, name: `AI-${i + 1}`, isBot: true, connected: true });
   let summary = null;
   const logged = [];
   const log = { info() {}, debug() {}, warn() {}, error: (...a) => logged.push(a.map(String).join(' ').slice(0, 120)) };
@@ -990,19 +1032,22 @@ export function diyScenarios() {
 // ---------------------------------------------------------------------------------------------------------------
 // families, fast subset, comparison
 
-const GENERATORS = { roster: rosterScenarios, bonds: bondScenarios, fields: fieldScenarios, matches: matchScenarios };
+const GENERATORS = { roster: rosterScenarios, bonds: bondScenarios, fields: fieldScenarios, matches: matchScenarios, standins: standInScenarios, diy: diyScenarios };
 const ABOUT = {
   roster: 'every visible chess record × every selectable skill / module, every stage, every non-leader enemy kind, items, bands, 机变 cards, map cards, placeable summons',
   bonds: 'every bond at its activation threshold (layers 1) and at its top tier (layers 999)',
   fields: 'Final Assault / Hidden Core leaders (pair + solo templates, shared pool, 200 s cap) and 联防 fields (1 / 2 helpers)',
-  matches: 'bot-only matches run to the end in virtual time (solo ×4 difficulties ×2 seeds, co-op 2/3/4, one server-run, two boosted to the Hidden Core)',
+  matches: 'matches run to the end in virtual time: bot-only (solo ×4 difficulties ×2 seeds, co-op 2/3/4, one server-run, two boosted to the Hidden Core) and one co-op match whose human seat fields 补位 stand-ins',
+  standins: 'every NORMAL chess record (normal + elite) fielded as its 补位 stand-in (all 17 stand-ins and the skills the chess name for them), 12 per battle on real stages and waves',
+  diy: '自选 pieces: every kitted owned 6★ × form (tiers 5 / 6, normal / elite × module) × skill, every kitted prototype at its locked selection',
 };
 /**
  * The default test subset (GOLDEN_FULL=1 runs everything): the pass-0 roster battles (every chess record with its
  * default loadout, every stage, every non-leader enemy kind), every bond at its top tier, both 联防 fields, four leader
- * fields (one of them a Hidden Core) and five matches (solo 标准 / 绝境, co-op 2 / 4, the boosted Hidden Core run).
+ * fields (one of them a Hidden Core), six matches (solo 标准 / 绝境, co-op 2 / 4, the boosted Hidden Core run, the 补位
+ * match) and the normal-record stand-in battles.
  */
-const FAST_MATCHES = new Set(['solo-FUNNY-1', 'solo-HARD-1', 'coop2-NORMAL-3', 'coop4-ABYSS-7', 'solo-HARD-9-boosted']);
+const FAST_MATCHES = new Set(['solo-FUNNY-1', 'solo-HARD-1', 'coop2-NORMAL-3', 'coop4-ABYSS-7', 'solo-HARD-9-boosted', 'coop2-NORMAL-14-standins', `coop2-NORMAL-${MATCH_DIY_SEED}-diy`, 'coop2-NORMAL-1-coverage-standins', 'coop2-NORMAL-5-coverage-diy', 'coop2-NORMAL-1-unowned-roster']);
 const FAST_FIELDS = new Set(['boss-boss_1-pair', 'boss-boss_4-solo', 'boss-boss_7-pair', 'hidden-boss_9-pair', 'unite-1', 'unite-2']);
 export function isFast(sc) {
   if (sc.family === 'matches') return FAST_MATCHES.has(sc.id);
@@ -1019,7 +1064,10 @@ export function scenariosOf(family) {
     const gen = GENERATORS[family];
     if (!gen) throw new Error(`unknown golden family ${family}`);
     const list = gen();
-    for (const sc of list) sc.fast = isFast(sc);
+    for (const sc of list) {
+      if (sc.modeId) sc.modeId = availableMode(sc.modeId);
+      sc.fast = isFast(sc);
+    }
     scenarioCache.set(family, list);
   }
   return scenarioCache.get(family);
@@ -1107,7 +1155,7 @@ export function compareFamily(stored, computed) {
 }
 
 export function formatDiffs(family, list, { maxScenarios = 12, maxDiffs = 8 } = {}) {
-  const fmt = (v) => { const s = typeof v === 'string' ? v : JSON.stringify(v); return s.length > 160 ? `${s.slice(0, 157)}…` : s; };
+  const fmt = (v) => { const s = typeof v === 'string' ? v : (JSON.stringify(v) ?? String(v)); return s.length > 160 ? `${s.slice(0, 157)}…` : s; };
   const lines = [`golden ${family}: ${list.length} scenario(s) differ`];
   for (const { scenario, diffs } of list.slice(0, maxScenarios)) {
     lines.push(`  ${scenario}:`);
@@ -1163,7 +1211,7 @@ export async function computeDigests(families, { select = () => true, jobs = 1, 
     let failed = null;
     const n = Math.min(jobs, queue.length);
     for (let w = 0; w < n; w++) {
-      const worker = new Worker(fileURLToPath(import.meta.url), { workerData: { golden: true } });
+      const worker = new Worker(fileURLToPath(import.meta.url), { workerData: { golden: true, version: toolVersion } });
       live++;
       const feed = () => { const t = queue.shift(); if (t) worker.postMessage(t); else worker.postMessage(null); };
       worker.on('message', (msg) => {
@@ -1274,7 +1322,15 @@ if (isMain) {
   const select = (sc) => (!only || only.has(sc.id)) && (!opt.fast || sc.fast);
   const jobs = Math.max(1, Number(opt.jobs) || Math.min(4, Math.max(1, availableParallelism() - 1)));
   if (opt.list) {
-    for (const f of families) for (const sc of scenariosOf(f)) if (select(sc)) console.log(`${f}\t${sc.id}\t${sc.fast ? 'fast' : ''}\t${sc.about ?? ''}`.slice(0, 220));
+    const lines = [];
+    for (const f of families) for (const sc of scenariosOf(f)) if (select(sc)) lines.push(`${f}\t${sc.id}\t${sc.fast ? 'fast' : ''}\t${sc.about ?? ''}`.slice(0, 220));
+    // A POSIX pipe takes stdout asynchronously, and process.exit() abandons writes still queued in
+    // userland (Node's documented pipe behaviour). Ubuntu's Node 22 job lost the tail of this list for
+    // act2autochess@V2_1: the child exited 0 and the captured lines stopped at diy-103, while the same
+    // commit's smaller version lists, Windows (pipes write synchronously) and Node 24 printed diy-126.
+    // writeSync blocks until the kernel has accepted every byte. The list is generated from the version
+    // directory's tracked JSON and the kit sources; it does not read data/local-assets.json, data/local-fx.json or .cache.
+    if (lines.length) writeStdoutSync(`${lines.join('\n')}\n`);
     process.exit(0);
   }
   const t0 = performance.now();

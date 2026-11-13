@@ -2,6 +2,7 @@
 // Conventions of the tier-5 kits: ../shared/tier5.js; kit contract and rules: ../README.md.
 
 import { num, on, talent, batPct, mods, inFaction, isOp, selectedId, lazySkills, skillRange } from '../shared/tier5.js';
+import { damageApplyWay } from '../../../attack.js';
 
 const isLaterano = (u) => inFaction(u, 'lateranoShip', ['laterano']);
 

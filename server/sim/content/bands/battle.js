@@ -39,6 +39,8 @@ import { num, buffsOf, bandRecord, isOp, onField, isElite, tierOf, unitBonds, ac
 import { weaknessRetype, addShieldLayer, reviveNow } from '../items/battle.js';
 import { spawnMapChar } from '../tokens.js';
 import { installCommandMarks } from './commands.js';
+import { isFirstPeriod } from '../support/index.js';
+import { isVersionData } from '../support/index.js';
 
 export const AMEDIC_BAND = 'band_amedic';
 /** 'fatal' priority of 埃芒加德: after the operators' own items (PRIO_REVIVE / PRIO_RESPAWN) and every talent / skill saver. */

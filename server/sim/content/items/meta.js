@@ -41,6 +41,9 @@
 import { itemKeyOf, isCoreBond } from '../support/index.js';
 import { metaBonds } from '../support/meta.js';
 import { msg, dn } from '../../../../shared/i18n.js';
+import { isVersionData } from '../support/index.js';
+import { itemIdsWithEffect } from '../support/index.js';
+import { itemRecord } from '../support/index.js';
 
 const int = (v, d = 0) => (Number.isFinite(v) ? Math.trunc(v) : d);
 

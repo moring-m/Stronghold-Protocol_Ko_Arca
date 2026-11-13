@@ -137,7 +137,7 @@ export const PLAYER_TOOLS = ['tools/crop-board-atlas.mjs', 'tools/doctor.mjs', '
 export const PLAYER_TOOL_DIRS = ['tools/assets/', 'tools/local-extract/'];
 /** Whole runtime directories (their tracked files). */
 export const RUNTIME_DIRS = ['server/', 'shared/', 'data/', 'public/', 'packs/', 'schemas/'];
-/** Written into the stage, never taken from the checkout: the pack index of the shipped packs. */
+/** Written into the stage, never taken from the checkout: the pack index of the shipped packs, and the release marker. */
 export const GENERATED_PACK_INDEX = 'packs/index.json';
 /** Whether shipped files include a content pack (then the stage gets GENERATED_PACK_INDEX). @param {string[]} files */
 export const shipsPacks = (files) => files.some((f) => /^public\/i18n\/[^/]+\.json$/.test(f) || /^packs\/[^/]+\/pack\.json$/.test(f));
@@ -572,7 +572,7 @@ export function plan(root, opts = {}) {
   const art = artPlan(root, { lite, jpVoice: opts.jpVoice ?? FULL_ZIP_JP_VOICE, optionalVoice: opts.optionalVoice ?? FULL_ZIP_OPTIONAL_VOICE });
   const pkg = readJson(path.join(root, 'package.json')) || {};
   const lock = readJson(path.join(root, 'package-lock.json')) || {};
-  const generated = shipsPacks(keep) ? [GENERATED_PACK_INDEX] : [];
+  const generated = [...(shipsPacks(keep) ? [GENERATED_PACK_INDEX] : []), LLM_RELEASE_MARKER];
   const files = [...keep, ...art.files, ...generated];
   const problems = [];
   for (const f of files) if (isRefused(f) || isJunk(f)) problems.push(`refused: ${f}`);
@@ -639,7 +639,12 @@ export function formatSummary(p) {
       lines.push('battlefield scenes: none on this machine (the full bundle ships the metal board; fetch_scenes.py then extract.py --only scene before packaging to include the 11 official scenes)');
     }
   }
-  if (p.generated?.length) lines.push(`generated: ${p.generated.join(', ')} (the pack index of the shipped packs, for a static host)`);
+  if (p.generated?.length) {
+    const bits = [];
+    if (p.generated.includes(GENERATED_PACK_INDEX)) bits.push('the pack index of the shipped packs, for a static host');
+    if (p.generated.includes(LLM_RELEASE_MARKER)) bits.push('the release marker that keeps external AI off the package');
+    lines.push(`generated: ${p.generated.join(', ')} (${bits.join('; ')})`);
+  }
   lines.push(`production node_modules: ${MB(p.bytes.modules)} · public/vendor: ${MB(p.bytes.vendor)} (npm ci --omit=dev and its postinstall)`);
   lines.push(`uncompressed: ${MB(p.bytes.total)}; a 0.1.x whole-tree copy would add ${MB(p.bytes.leftOut)}`);
   const groups = Object.entries(p.dropped).sort((a, b) => b[1].bytes - a[1].bytes);

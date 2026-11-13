@@ -7,7 +7,7 @@
 //   node tools/ci.mjs --list             print the steps and the ci.yml step each one mirrors
 //   npm run ci                           the same as the first line
 //
-// Steps, in the order of ci.yml (job `test`, then job `tooling`):
+// Steps, in the order of ci.yml (job `test`, then job `node24`, then job `tooling`):
 //   setup      node tools/setup.mjs --check --no-local
 //   test       npm test: node --test over TEST_FILES (package.json "test")
 //   smoke      the server on a free port on 127.0.0.1: GET /healthz, / (must contain <html) and /vendor/pixi.min.js,
@@ -58,7 +58,7 @@ export const SMOKE_PATHS = ['/healthz', '/', '/vendor/pixi.min.js'];
  */
 export const TEST_FILES = ['test/**/*.test.js', 'test/e2e/coop.e2e.mjs', 'plugins/_template/**/*.test.js'];
 
-/** ci.yml steps that only make sense on a GitHub runner, by `uses:` action or by step name. */
+/** Runner setup / install steps, and the full Golden check run separately (scoped to its job and command). */
 export const SKIPPED_CI_STEPS = [
   { uses: 'actions/checkout', why: 'GitHub runner: the checkout is this folder' },
   { uses: 'actions/setup-node', why: 'GitHub runner: the Node.js of this machine is used' },
@@ -74,9 +74,8 @@ export const SKIPPED_CI_STEPS = [
  */
 export const STEPS = [
   { id: 'setup', ci: { job: 'test', name: 'Setup check (no downloads)' }, describe: 'node tools/setup.mjs --check --no-local' },
-  // (the globs quoted: no shell expands them — Node's test runner does, the same on every OS)
-  { id: 'test', ci: { job: 'test', name: 'Unit & integration tests' }, npm: 'test',
-    describe: `node --test ${TEST_FILES.map((g) => `"${g}"`).join(' ')}` },
+  // tools/test-run.mjs: the whole suite here (SHARD unset); one shard of it on CI, where the matrix sets SHARD
+  { id: 'test', ci: { job: 'test', name: 'Unit & integration tests' }, npm: 'test', describe: 'node tools/test-run.mjs' },
   { id: 'smoke', ci: { job: 'test', name: 'Server smoke test (boot, /healthz, index.html, doctor)' },
     describe: `server on a free port: GET ${SMOKE_PATHS.join(', ')}; node tools/doctor.mjs` },
   // The node 24 lane runs the CI guards and nothing heavy: the full suite on 24 is exactly the 20-minute job the shards
@@ -229,9 +228,10 @@ export function parseWorkflow(text) {
   return { jobs };
 }
 
-/** Is a ci.yml step one of SKIPPED_CI_STEPS? @param {{ name?: string, uses?: string }} s */
+/** Is a ci.yml step one of SKIPPED_CI_STEPS? @param {{ job?: string, name?: string, uses?: string, run?: string }} s */
 export function isSkippedCiStep(s) {
-  return SKIPPED_CI_STEPS.some((k) => (k.uses ? (s.uses || '').split('@')[0] === k.uses : s.name === k.name));
+  return SKIPPED_CI_STEPS.some((k) => (!k.job || s.job === k.job) && (!k.run || s.run === k.run)
+    && (k.uses ? (s.uses || '').split('@')[0] === k.uses : s.name === k.name));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -400,14 +400,15 @@ async function smoke(env) {
 }
 
 /** @param {Step} step @param {Record<string, string | undefined>} env */
-function runStep(step, env) {
+export function runStep(step, env, runNode = node) {
   switch (step.id) {
-    case 'setup': return node(['tools/setup.mjs', '--check', '--no-local'], env);
-    case 'test': return node(['--test', ...TEST_FILES], env);
+    case 'setup': return runNode(['tools/setup.mjs', '--check', '--no-local'], env);
+    case 'test': return runNode(['tools/test-run.mjs'], env);
+    case 'guards': return runNode(['--test', 'test/ci.test.js', 'test/ci-shards.test.js', 'test/test-run.test.js'], env);
     case 'smoke': return smoke(env);
-    case 'lint': return node([binPath('eslint', 'eslint'), '.'], env);
-    case 'imports': return node(['tools/check-imports.mjs'], env);
-    case 'typecheck': return node([binPath('typescript', 'tsc'), '--noEmit', '--checkJs', '-p', 'jsconfig.json'], env);
+    case 'lint': return runNode([binPath('eslint', 'eslint'), '.'], env);
+    case 'imports': return runNode(['tools/check-imports.mjs'], env);
+    case 'typecheck': return runNode([binPath('typescript', 'tsc'), '--noEmit', '--checkJs', '-p', 'jsconfig.json'], env);
     default: throw new Error(`no runner for step ${step.id}`);
   }
 }

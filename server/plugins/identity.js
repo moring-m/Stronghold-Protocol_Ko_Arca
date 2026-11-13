@@ -138,9 +138,9 @@ export function computeVanillaContent({ simDir, sharedDir, dataDir, shim, app = 
  * @param {VanillaContent} content
  * @param {{ dataUrl?: string, version?: string | null, bounds?: { url: string, sha256: string, bytes: number } | null }} [opts]
  */
-export function contentIndexOf(content) {
+export function contentIndexOf(content, { dataUrl = '/data/', version = null, bounds = null } = {}) {
   const data = {};
-  for (const [name, f] of Object.entries(content.data)) data[name] = { url: `/data/${encodeURIComponent(f.file)}?v=${f.sha256.slice(0, 8)}`, sha256: f.sha256, bytes: f.bytes };
+  for (const [name, f] of Object.entries(content.data)) data[name] = { url: `${dataUrl}${encodeURIComponent(f.file)}?v=${f.sha256.slice(0, 8)}`, sha256: f.sha256, bytes: f.bytes };
   return {
     v: CONTENT_HASH_VERSION, cs: content.cs, app: content.app, vanilla: true,
     ...(version ? { version } : {}),

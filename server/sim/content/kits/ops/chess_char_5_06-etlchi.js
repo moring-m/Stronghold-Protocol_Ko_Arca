@@ -4,6 +4,7 @@
 import { mitigate } from '../../../damage.js';
 import { skillMotionSpeed } from '../../../motionSpeed.js';
 import { RING1, num, on, talent, talentRec, skillGrid, mods, dist, lazySkills, instantKind } from '../shared/tier5.js';
+import { damageAttackType } from '../../../attack.js';
 
 /** 隐德来希 S3 "每次攻击对心烛至少造成35%攻击力的伤害". */
 const CANDLE_MIN_ATK = 0.35;

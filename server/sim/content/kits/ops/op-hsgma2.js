@@ -58,6 +58,7 @@ import { bodyInRadius } from '../../../body.js';
 import { hasHp } from '../../../damage.js';
 import { COLS } from '../../../constants.js';
 import { sin, cos, atan2 } from '../../../detmath.js';
+import { byEnemyDamage } from '../shared/tier1.js';
 
 const S1 = 'skchr_hsgma2_1';
 const S2 = 'skchr_hsgma2_2';

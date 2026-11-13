@@ -185,7 +185,7 @@ export async function startServer(opts = {}) {
   buildTag();
 
   const traffic = createTrafficCounter();
-  const server = http.createServer(createRequestHandler({ serveStatic, csp: process.env.SP_CSP === 'off' ? null : siteCsp(publicDir,{release}), health: { startedAt, network, registry, lobby, content, traffic, assetIndex, views, trusted:trustedRuntime?.health }, log, trustProxy: network.opts.trustProxy, studio, trustedRuntime, handleRequest: async(req,res)=>{if(releaseControl&&await releaseControl(req,res))return true;if(localMaintenance&&await localMaintenance(req,res))return true;if(opts.handleRequest){res.setHeader('Service-Worker-Allowed','/');return await opts.handleRequest(req,res);}return false;} }));
+  const server = http.createServer(createRequestHandler({ serveStatic, csp: process.env.SP_CSP === 'off' ? null : siteCsp(publicDir,{release}), health: { startedAt, network, registry, lobby, content, traffic, assetIndex, views, trusted:trustedRuntime?.health, versions, versionHosts }, log, trustProxy: network.opts.trustProxy, studio, trustedRuntime, handleRequest: async(req,res)=>{if(releaseControl&&await releaseControl(req,res))return true;if(localMaintenance&&await localMaintenance(req,res))return true;if(opts.handleRequest){res.setHeader('Service-Worker-Allowed','/');return await opts.handleRequest(req,res);}return false;} }));
   server.on('clientError', answerClientError);
   const wss = attachWebSocket(server, { network, log, traffic });
 

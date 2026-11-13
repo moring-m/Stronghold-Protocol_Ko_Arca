@@ -114,7 +114,7 @@ export function netOptionsFrom(opts) {
 }
 
 /** lobby.js Lobby options out of the startServer() options. */
-export function lobbyOptionsFrom(opts) {
+export function lobbyOptionsFrom(opts, log = null) {
   const lobbyOptions = {};
   for (const k of LOBBY_OPTION_KEYS) {
     if (opts[k] != null) lobbyOptions[k] = opts[k];
