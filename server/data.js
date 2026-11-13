@@ -132,7 +132,12 @@ export const VERSION_DATA_FILES = Object.freeze(DATA_FILES.filter((f) => f !== '
 export function versionDataDir(id = DEFAULT_VERSION, root = DATA_DIR) {
   const entry = versionById(id);
   if (!entry) return null;
-  return entry.dir ? path.join(root, ...entry.dir.split('/').filter(Boolean)) : root;
+  if (!entry.dir) return root;
+  const dir = path.join(root, ...entry.dir.split('/').filter(Boolean));
+  // the fork's prepared catalogue (content/production/data) holds the default season only: another season's data is
+  // the repository's data/versions/<slug>/
+  if (root !== DATA_DIR && !fs.existsSync(dir)) return path.join(DATA_DIR, ...entry.dir.split('/').filter(Boolean));
+  return dir;
 }
 
 /** @type {Map<string, Readonly<Record<string, any>>>} */
