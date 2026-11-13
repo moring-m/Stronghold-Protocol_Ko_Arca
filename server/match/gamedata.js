@@ -64,6 +64,9 @@ export const itemKey = (id) => (typeof id === 'string' ? id.replace(/_[ab]$/, ''
 
 const COOP8_COMMUNICATION_ITEMS = new Set(['chess_item_2_06_e_a','chess_item_4_01_e_a','chess_item_5_04_e_a']);
 
+/** The one common strategy (커스텀 공통 적용 전략) that changes the starting HP: 歌利亚 (골리앗). */
+const HP_COMMON_BAND = 'band_sarkazb';
+
 export class GameData {
   /**
    * @param {Readonly<Record<string, any>>} data server/data.js getData() (may be partial)
@@ -513,8 +516,9 @@ export class GameData {
   startLp(bandId) {
     const b = this.band(bandId);
     const hp = b && Number.isInteger(b.totalHp) && b.totalHp > 0 ? b.totalHp : this.defaultStartLp;
-    // a common strategy adds its extra starting HP only: one with less than the default never lowers the start
-    const extra = (this.config.commonBands || []).reduce((n,id)=>{const h=this.band(id)?.totalHp;return n+(Number.isInteger(h)&&h>this.defaultStartLp?h-this.defaultStartLp:0);},0);
+    // common strategies leave the starting HP alone, except 歌利亚 (골리앗, 坚不可摧) whose effect IS its extra HP;
+    // never a reduction, and not twice when it is also the player's own strategy
+    const extra = (this.config.commonBands || []).filter((id)=>id===HP_COMMON_BAND&&id!==bandId).reduce((n,id)=>{const h=this.band(id)?.totalHp;return n+(Number.isInteger(h)&&h>this.defaultStartLp?h-this.defaultStartLp:0);},0);
     return Math.max(1,hp+extra);
   }
 
