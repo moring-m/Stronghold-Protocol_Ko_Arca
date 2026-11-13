@@ -88,6 +88,8 @@ export const initialState = Object.freeze({
   testMode: false,
   /** welcome.versions: the seasons this server offers (versions.js), null = the default season only */
   versions: null,
+  /** the lobby's season choice (versions.js setLobbyVersion; a browser preference), null = the server's default */
+  lobbyVersion: (() => { try { const v = JSON.parse(localStorage.getItem('sp.pref.lobby.version') ?? 'null'); return typeof v === 'string' ? v : null; } catch { return null; } })(),
   // 점검 안내 (server/maintenance.js): welcome.maintenance, then sys.maintenance updates; null when none
   maintenance: null,
   match: emptyMatch(),

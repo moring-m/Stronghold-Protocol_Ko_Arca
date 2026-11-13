@@ -434,19 +434,20 @@ function artsBarrier(amount, { key = 'ab:artsBarrier', whileUp = null } = {}) {
     refresh(b, e, a) {
       a.left = amount;
       b.fx('phase', { x: e.x, y: e.y, id: e.id, kind: 'artsBarrier', value: amount });
-      b.addBuff(e, { key, persist: true, visible: true, mods: whileUp, injury(c) {
-        if (c.type !== 'arts' || !(a.left > 0)) return;
-        const take = Math.min(a.left, c.amount);
-        a.left -= take;
-        c.amount -= take;
-        if (a.left > 1e-6) return;
-        a.left = 0;
-        b.fx('shieldBreak', { x: e.x, y: e.y, id: e.id });
-        // Remove HP-changing bonuses after the breaking instance, even if a later effect dodges its overflow.
-        c.defer(() => b.removeBuff(e, c.buff));
-      } });
+      if (whileUp) b.addBuff(e, { key, persist: true, visible: true, mods: whileUp });
     },
     spawn(b, e, a) { if (amount > 0) a.refresh(b, e, a); },
+    hitIn(c, b, e, a) {
+      if (!(a.left > 0)) return;
+      a.left -= absorbArts(c, a.left);
+      if (a.left > 1e-6) return;
+      a.left = 0;
+      b.fx('shieldBreak', { x: e.x, y: e.y, id: e.id });
+      // the bonus it grants ends once the overflow of the breaking hit has landed (never before: an HP bonus removed
+      // first would rescale HP and make the overflow count twice)
+      if (c.dmg.cancel) b.removeBuff(e, key); else a.breaking = true;
+    },
+    taken(c, b, e, a) { if (a.breaking) { a.breaking = false; b.removeBuff(e, key); } },
   };
 }
 

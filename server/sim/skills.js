@@ -368,7 +368,7 @@ export class SkillRuntime {
       if (this.charges >= this.maxCharges && this.sp >= cost) return 0;
     }
     if (cost <= 0) return 0; // free skills never recharge (see reset)
-    const before = this.spTotal;
+    const before = this.charges >= this.maxCharges ? this.maxCharges * cost : this.charges * cost + this.sp;
     this.sp += amt;
     // within 1e-9 of the cost is the cost (the timer tolerance of `timeLeft` below; PR #402): 300 time gains of 1/30 SP
     // add up to 9.999999999999975 in floating point, which held a 10-SP charge one tick
@@ -378,10 +378,10 @@ export class SkillRuntime {
       else this.sp = cost;
     }
     if (this.charges >= this.maxCharges) this.sp = cost;
-    // #657: only extra recovery, after hooks, charge rollover and the cap; never the mutable spGain request.
-    if (reason === 'bond' || reason === 'talent' || reason === 'skill') {
-      b.resourceNumber?.(this.unit, 'sp', this.spTotal - before, reason);
-    }
+    const after = this.charges >= this.maxCharges ? this.maxCharges * cost : this.charges * cost + this.sp;
+    const recovered = Math.max(0,after-before);
+    if (!silent && recovered > 0 && !['time','attack','hurt','init'].includes(reason))
+      b.fx('spRecovered',{id:this.unit.id,x:this.unit.x,y:this.unit.y,n:recovered});
     return amt;
   }
 
@@ -419,15 +419,6 @@ export class SkillRuntime {
       if (rate > 0) this.gainSp(rate * dt, 'time');
     }
     if (!u.canAct) return;
-    // PRTS 卫戍协议/帮助, removed 2026-03-14: 斩业星熊 S3 closes after half its duration
-    // when an enemy is in its running range. Use the manual close so the kit enters 临死模式.
-    if (this.rule === 'AUTO_STOP' && this.active && this.timeLeft < this.duration / 2 && !this._opCooling() && !u.s.flags.silence) {
-      if (this.battle.rangeChanged(u)) this.battle._refreshRange(u);
-      if (this.battle.anyEnemyInKeys(u.rangeKeys, u)) {
-        this.opReadyAt = this.battle.time + AUTO_OP_COOLDOWN;
-        this.end('manual');
-      }
-    }
     // a DEFAULT cast bound to an ally condition (塞雷娅 S1) replaces the attack about to be made: should the condition
     // have failed before that attack (the ally healed meanwhile), the cast is withdrawn — no heal mode stays behind
     if (this.pending && this.triggerAllies && this.rule !== 'SKILL_RANGE' && !this._allyTriggerSatisfied()) {

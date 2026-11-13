@@ -9,7 +9,7 @@ import { ChatPanel } from '../ui/chat.js';
 
 import { useState } from '../../vendor/hooks.module.js';
 import { html, Button, Icon, MicroLabel } from '../ui/components.js';
-import { useGameData, Img, RichText } from '../ui/gameComponents.js';
+import { useGameData, Img, RichText, BondGlyph } from '../ui/gameComponents.js';
 import { StepHeader, ExitModal } from '../ui/matchChrome.js';
 import { MatchInfo, matchInfoModel } from '../ui/matchInfo.js';
 import { LoadoutButton } from '../ui/loadoutEntry.js';
@@ -58,6 +58,7 @@ export function BriefingScreen() {
         <${BriefingOverview} pub=${pub} />
       </section>
       <section class="brief__right">
+        <${BondGroupPicker} pub=${pub} canPick=${!!me && !me.ready} />
         <${MatchInfo} model=${info} />
       </section>
     </main>
@@ -74,6 +75,34 @@ export function BriefingScreen() {
     </footer>
     ${solo ? null : html`<${ChatPanel} />`}
     <${ExitModal} open=${exit} onClose=${() => setExit(false)} solo=${solo} />
+  </div>`;
+}
+
+/**
+ * 규정 단독: the two groups of core bonds the match drew (pub.bondChoice); the player plays the one picked and the other
+ * is banned (g.bondGroup). Unpicked at the end of the briefing, the first group plays.
+ */
+function BondGroupPicker({ pub, canPick }) {
+  const gd = useGameData();
+  const [busy, setBusy] = useState(false);
+  const choice = pub?.bondChoice;
+  if (!choice || !Array.isArray(choice.groups)) return null;
+  const pick = async (idx) => {
+    if (busy || !canPick || choice.picked === idx) return;
+    setBusy(true);
+    await actions.bondGroup(idx, pub.setupRevision ?? 0);
+    setBusy(false);
+  };
+  return html`<div class="brief-groups" data-testid="bond-groups">
+    <h3 class="brief-h"><span>${t('핵심 맹약 그룹 선택')}</span><${MicroLabel}>CORE BOND GROUP<//></h3>
+    <p class="t-dim brief-groups__hint">${t('고른 그룹의 핵심 맹약만 이번 시뮬레이션에 등장합니다. 고르지 않으면 첫 번째 그룹으로 진행합니다.')}</p>
+    <div class="brief-groups__row">
+      ${choice.groups.map((g, idx) => html`<button key=${idx} type="button" class=${cx('brief-group', choice.picked === idx && 'is-on')}
+          aria-pressed=${choice.picked === idx} disabled=${busy || !canPick} onClick=${() => pick(idx)}>
+        <span class="brief-group__label">${t('그룹')} ${idx === 0 ? 'A' : 'B'}</span>
+        <span class="brief-group__bonds">${g.map((b) => html`<span key=${b} class="brief-group__bond"><${BondGlyph} bondId=${b} /><span>${gd.bond?.(b)?.name || b}</span></span>`)}</span>
+      </button>`)}
+    </div>
   </div>`;
 }
 

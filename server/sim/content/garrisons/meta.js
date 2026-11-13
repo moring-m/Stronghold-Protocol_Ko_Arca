@@ -13,7 +13,7 @@
 // Decisions (documented, see research 02 §4 / 03 §5.5):
 //   * "同一行有3名干员" / "同一行每有1名干员" count the trait's owner (board chess of that row, self included).
 //   * POSITION "使自身及身后/身前一格干员的已激活盟约分别各层数+N": per target operator (a shared bond gets +N twice).
-//   * 瑰盐 "优先…更靠上的和更靠右的": highest row first (DESIGN §3: row 0 is the bottom), then highest column.
+//   * 瑰盐 "优先…更靠上的和更靠右的": highest row first (DESIGN §3.1: row 0 is the bottom), then highest column.
 //   * 购买价格为N (SERVER_CHESS_PRICE): bb.price is a discount off the tier price — 至简 (Ⅲ, 3) has 2 → 1, 红豆 (Ⅰ, 2)
 //     has 1 → 1, exactly the N both official texts give (user playtest #5: 至简 costs 1). The dispatcher runs it before
 //     every other onPrice modifier, so 远见's discount (to 0 at 150 layers since 0.1.3) and strategy caps act on the
@@ -91,36 +91,8 @@ function rowCondition(ctx, me) {
 
 const H = {};
 
-H.SERVER_GAIN_CHAR = {
-  run(ctx) {
-    for (let i = 0; i < Math.min(10, num(ctx.source.bb.count, 1)); i++) ctx.grantChess(ctx.source.bbStr.chess);
-  },
-};
-
-H.SERVER_ADD_BOND_ACTIVATED_RANDOM = {
-  run(ctx) {
-    const active = bondOrder(ctx).filter((id) => ctx.bondActive(id));
-    if (!active.length) return;
-    for (let i = 0; i < Math.min(10, num(ctx.source.bb.rand_count, 1)); i++) ctx.addLayers(ctx.rng.pick(active), num(ctx.source.bb.count), { requireActive: true });
-  },
-};
-
-H.SERVER_ADD_BOND_FRONT_ALL_LAYER = {
-  run(ctx) {
-    const me = selfView(ctx);
-    if (!onBoard(me)) return;
-    const dir = me.dir || 'RIGHT';
-    for (const p of chessOnBoard(ctx)) {
-      const ahead = dir === 'UP' ? p.col === me.col && p.row > me.row : dir === 'DOWN' ? p.col === me.col && p.row < me.row
-        : dir === 'LEFT' ? p.row === me.row && p.col < me.col : p.row === me.row && p.col > me.col;
-      if (ahead) addAll(ctx, metaBonds(ctx, p), num(ctx.source.bb.count), true);
-    }
-  },
-};
-
 H.SERVER_ADD_BOND = {
   run(ctx) {
-    if (!rowCondition(ctx, selfView(ctx))) return;
     const { bb, bbStr, garrison, piece } = ctx.source;
     const bonds = ids(bbStr.bond);
     // 录武官 (hidden 4_15) carries garrison_157 (【奇迹】+3) next to garrison_156 (【炎】+6、【奇迹】+3) with the same text:
@@ -149,17 +121,13 @@ H.SERVER_ADD_BOND_METHOD = {
     const bonds = ids(bbStr.bond);
     const ra = requireActiveOf(garrison);
     const me = selfView(ctx);
-    // [ASSUMED] `max` caps this trigger's grant to each listed bond. Absent on 盟约 rows: those amounts stay as they were.
-    const capped = (n) => ('max' in bb ? Math.min(n, num(bb.max, 0)) : n);
     switch (bbStr.add_method) {
-      case 'shoplv': addAll(ctx, bonds, capped(ctx.shopLevel() * multi), ra); break;
-      case 'round_gain_char': addAll(ctx, bonds, capped((ctx.roundStats().gainedChess | 0) * multi), ra); break;
-      case 'hand_count': addAll(ctx, bonds, capped(ctx.hand().filter((p) => p && p.kind === 'chess').length * multi), ra); break;
-      case 'same_row': addAll(ctx, bonds, capped(sameRowCount(ctx, me) * multi), ra); break;
+      case 'shoplv': addAll(ctx, bonds, ctx.shopLevel() * multi, ra); break;
+      case 'round_gain_char': addAll(ctx, bonds, (ctx.roundStats().gainedChess | 0) * multi, ra); break;
+      case 'hand_count': addAll(ctx, bonds, ctx.hand().filter((p) => p && p.kind === 'chess').length * multi, ra); break;
+      case 'same_row': addAll(ctx, bonds, sameRowCount(ctx, me) * multi, ra); break;
       case 'same_bond_diff_lv':
-        // V1's garrison_53 text names both bonds although its blackboard names only Victoria.
-        if (ctx.data.config?.season === 'act1autochess' && /^garrison_53_[ab]$/.test(ctx.source.garrisonId)) bonds.push('miraShip');
-        for (const b of bonds) addAll(ctx, [b], capped(distinctTiers(ctx, (p) => metaBonds(ctx, p).includes(b)).size * multi), ra);
+        for (const b of bonds) addAll(ctx, [b], distinctTiers(ctx, (p) => metaBonds(ctx, p).includes(b)).size * multi, ra);
         break;
       default: break;
     }
@@ -220,10 +188,7 @@ H.SERVER_ADD_BOND_ROUND_COIN_COST = {
   run(ctx) {
     const { bb, bbStr, garrison } = ctx.source;
     const per = Math.max(1, num(bb.count, 1));
-    let n = Math.floor((ctx.roundStats().spent | 0) / per) * num(bb.layer);
-    // [ASSUMED] same `max` guard as SERVER_ADD_BOND_METHOD: 盟约 rows have no max and are not clamped.
-    if ('max' in bb) n = Math.min(n, num(bb.max, 0));
-    addAll(ctx, ids(bbStr.bond), n, requireActiveOf(garrison));
+    addAll(ctx, ids(bbStr.bond), Math.floor((ctx.roundStats().spent | 0) / per) * num(bb.layer), requireActiveOf(garrison));
   },
 };
 
@@ -400,7 +365,7 @@ export function triggerGainEffects(ctx, piece) {
 
 // 铃兰 60_a: "<进入休整期时>触发身前一格的其他干员的“获得时”类效果" (scope front)
 // 瑰盐 82: "<售出时>触发场上一名拥有“休整期结束时”的干员的特质（优先触发部署位置更靠上的和更靠右的）" (scope farright).
-// DESIGN §3: row 0 is the bottom, so "更靠上" = the highest row; then the highest column ("更靠右").
+// DESIGN §3.1: row 0 is the bottom, so "更靠上" = the highest row; then the highest column ("更靠右").
 H.SERVER_TRIGGER_ANOTHER = {
   run(ctx) {
     const { bbStr } = ctx.source;
@@ -453,241 +418,6 @@ H.SERVER_FRONT_SAME_EFFECT_PREP_FIN = {
 };
 H.SERVER_FRONT_SAME_EFFECT_PREP_START = {
   run(ctx) { copyFront(ctx, 'SERVER_PREP_START', 'SERVER_FRONT_SAME_EFFECT_PREP_START'); },
-};
-
-// ---------------------------------------------------------------------------------------------------------------------
-// 规程·序列Ⅰ (act3autochess@V3_1). These effect keys are absent from the default tables.
-
-const realPiece = (ctx) => (ctx.source && ctx.source.piece) || null;
-
-/** "至多为N" in the description. null when the text has no such cap. */
-function textCapOf(g) {
-  const m = /至多为(\d+)/.exec((g && g.desc) || '');
-  return m ? +m[1] : null;
-}
-
-/**
- * How many this trigger grants, and how much of the lifetime sum is still free.
- * `'n' in bb` (免费刷新): the first n triggers grant `count`, later ones grant `count + delta_count`.
- * Otherwise each trigger n grants `count + (n − 1) × delta_count`.
- * [ASSUMED] the sum stops at `count + max_count` when max_count is present (the text's 至多), else uncapped.
- */
-function nextUpgrade(piece, gid, bb) {
-  const bag = piece.meta.gar || (piece.meta.gar = {});
-  const st = bag[gid] || (bag[gid] = { fired: 0, sum: 0 });
-  st.fired += 1;
-  const base = num(bb.count, 0);
-  const delta = num(bb.delta_count, 0);
-  const cap = base + (('max_count' in bb) ? num(bb.max_count, 0) : Infinity);
-  const want = ('n' in bb)
-    ? (st.fired <= num(bb.n, 0) ? base : base + delta)
-    : base + (st.fired - 1) * delta;
-  const room = Math.max(0, cap - st.sum);
-  const give = Math.max(0, Math.min(want, room));
-  st.sum += give;
-  return give;
-}
-
-/** Piece count when the blackboard has no `count`: 两 / 二 → 2, otherwise 1 (一件). */
-function equipCount(g, bb) {
-  if (bb && 'count' in bb) return num(bb.count, 1);
-  const d = (g && g.desc) || '';
-  if (/两|二/.test(d)) return 2;
-  return 1;
-}
-
-function livingOperators(ctx, ev) {
-  const units = ev && ev.result && Array.isArray(ev.result.unitsEnd) ? ev.result.unitsEnd : [];
-  let n = 0;
-  for (const u of units) {
-    if (!u || u.alive !== true) continue;
-    if (u.defId && ctx.chessRecord(u.defId)) n++;
-  }
-  return n;
-}
-
-// 至多为4 / 8. count stacks onto the table sell price; max caps the bonus; the text cap never lowers a higher price.
-H.SERVER_SELF_SELL_PRICE_DELTA = {
-  run(ctx) {
-    const piece = realPiece(ctx);
-    if (!piece || !onBoard(selfView(ctx))) return;
-    if (!piece.meta) piece.meta = {};
-    const bb = ctx.source.bb || {};
-    const cur = Number.isFinite(piece.meta.sellPrice) ? piece.meta.sellPrice : ctx.gd.sellPrice(piece.id);
-    let add = num(bb.count, 0);
-    if ('max' in bb) add = Math.min(add, Math.max(0, num(bb.max, 0) - (piece.meta.sellBonus || 0)));
-    add = Math.max(0, add);
-    let next = cur + add;
-    const textCap = textCapOf(ctx.source.garrison);
-    if (textCap != null) next = Math.min(textCap, next);
-    if (next < cur) next = cur;
-    piece.meta.sellBonus = (piece.meta.sellBonus || 0) + (next - cur);
-    piece.meta.sellPrice = next;
-  },
-};
-
-// [ASSUMED] a fixed price replaces the table price and clears the bonus, so a later delta starts from the fixed price.
-H.SERVER_SELF_SELL_PRICE_FIXED = {
-  run(ctx) {
-    const piece = realPiece(ctx);
-    if (!piece) return;
-    if (!piece.meta) piece.meta = {};
-    piece.meta.sellPrice = num(ctx.source.bb.price, 0);
-    piece.meta.sellBonus = 0;
-    piece.meta.sellFixed = true;
-  },
-};
-
-// 进入休整期. No count on the blackboard: the text's 一件 / 两件. Not above the current shop level.
-H.SERVER_GAIN_RANDOM_EQUIP = {
-  run(ctx) {
-    const n = Math.min(10, Math.max(0, equipCount(ctx.source.garrison, ctx.source.bb)));
-    for (let i = 0; i < n; i++) {
-      const id = ctx.rollItem({ maxTier: ctx.shopLevel() });
-      if (id) ctx.grantItem(id);
-    }
-  },
-};
-
-// One charge. count is how many chess slots that refresh must show of the bond, not how many refreshes.
-H.SERVER_GAIN_SPECIAL_REFRESH_BOND_CHAR = {
-  run(ctx) {
-    const bond = ctx.source.bbStr.bond;
-    const count = num(ctx.source.bb.count, 1);
-    if (bond && count > 0) ctx.grantBondRefresh(bond, count);
-  },
-};
-
-// [ASSUMED] a non-golden carried item becomes upgradeChessId, else goldenId, in place. No second shop copy is taken.
-H.SERVER_UPGRADE_SELF_EQUIP = {
-  run(ctx) {
-    const piece = realPiece(ctx);
-    if (!piece || !onBoard(selfView(ctx)) || !Array.isArray(piece.items)) return;
-    for (const it of piece.items) {
-      const rec = ctx.gd.item(it.id);
-      if (!rec || rec.isGolden) continue;
-      const next = rec.upgradeChessId || rec.goldenId;
-      if (next && ctx.gd.item(next)) it.id = next;
-    }
-  },
-};
-
-H.SERVER_ADD_BOND_UPGRADE_LAYER = {
-  run(ctx) {
-    const piece = realPiece(ctx);
-    if (!piece) return;
-    const { bb, bbStr, garrison, garrisonId } = ctx.source;
-    const give = nextUpgrade(piece, garrisonId, bb);
-    if (give > 0) addAll(ctx, ids(bbStr.bond), give, requireActiveOf(garrison));
-  },
-};
-
-H.SERVER_GAIN_FREE_REFRESH_UPGRADE_COUNT = {
-  run(ctx) {
-    const piece = realPiece(ctx);
-    if (!piece) return;
-    const give = nextUpgrade(piece, ctx.source.garrisonId, ctx.source.bb);
-    if (give > 0) ctx.grantFreeRefresh(give);
-  },
-};
-
-// [ASSUMED] max_count, when present, caps how many living operators this trigger counts. bond SELF is the carrier's
-// already-activated bonds. Listed bonds each receive the amount, and only while activated. Tokens and the knocked-out do not count.
-H.SERVER_ADD_ACTIVATED_BOND_BY_ALIVE_CHAR = {
-  onBattleResult(ctx, ev) {
-    const { bb, bbStr, piece } = ctx.source;
-    const living = livingOperators(ctx, ev);
-    if (!(living > 0)) return;
-    const counted = ('max_count' in bb) ? Math.min(living, num(bb.max_count, 0)) : living;
-    const n = counted * num(bb.count, 0);
-    if (!(n > 0)) return;
-    const listed = ids(bbStr.bond);
-    const bonds = listed.length === 1 && listed[0] === 'SELF'
-      ? metaBonds(ctx, piece).filter((b) => ctx.bondActive(b))
-      : listed.filter((b) => ctx.bondActive(b));
-    addAll(ctx, bonds, n, true);
-  },
-};
-
-// [ASSUMED] SERVER_BATTLE_FIN is the 进入休整期 conversion. Temp layers need not be on an active bond.
-// Several converters in one settle share the pool; each consumes what it takes.
-H.SERVER_CONVERT_TEMP_BOND = {
-  onBattleResult(ctx) {
-    const bond = ctx.source.bbStr.bond;
-    const n = num(ctx.source.bb.count, 0);
-    if (!bond || !(n > 0)) return;
-    const take = ctx.convertTempLayers(bond, n);
-    if (take > 0) ctx.addLayers(bond, take, { requireActive: false });
-  },
-};
-
-// bond is the temp pool. bond2 filters on-board operators (a member of that bond). count per such operator.
-H.SERVER_CONVERT_TEMP_BOND_BY_BOND_CHAR = {
-  onBattleResult(ctx) {
-    const { bb, bbStr } = ctx.source;
-    const pool = bbStr.bond;
-    const filter = bbStr.bond2 || pool;
-    if (!pool) return;
-    const members = chessOnBoard(ctx).filter((p) => metaBonds(ctx, p).includes(filter)).length;
-    const want = members * num(bb.count, 0);
-    if (!(want > 0)) return;
-    const take = ctx.convertTempLayers(pool, want);
-    if (take > 0) ctx.addLayers(pool, take, { requireActive: false });
-  },
-};
-
-// [ASSUMED] the carrier is included, each chess once. max caps this garrison's grant this round.
-H.SERVER_ADD_BOND_BOARD_SELL_PRICE = {
-  run(ctx) {
-    const { bb, bbStr, garrison } = ctx.source;
-    const bond = bbStr.bond;
-    if (!bond) return;
-    if (requireActiveOf(garrison) && !ctx.bondActive(bond)) return;
-    const seen = new Set();
-    let sum = 0;
-    for (const p of chessOnBoard(ctx)) {
-      if (!p || seen.has(p.uid)) continue;
-      seen.add(p.uid);
-      sum += ctx.sellPrice(p.uid);
-    }
-    let n = sum * num(bb.multi, 1);
-    if ('max' in bb) n = Math.min(n, num(bb.max, 0));
-    if (n > 0) ctx.addLayers(bond, n, { requireActive: requireActiveOf(garrison) });
-  },
-};
-
-// count is not the layer amount. Each of the carrier and the operator one tile in `dir` adds sellPrice × multi
-// to that operator's activated bonds. An empty front tile is skipped; the carrier still grants.
-H.SERVER_ADD_BOND_POSITION_COUNT_SELL_PRICE = {
-  run(ctx) {
-    const me = selfView(ctx);
-    if (!onBoard(me)) return;
-    const { bb, bbStr } = ctx.source;
-    const multi = num(bb.multi, 1);
-    const other = bbStr.dir === 'behind' ? behindPiece(ctx, me) : frontPiece(ctx, me);
-    const targets = [me];
-    if (other && other.kind === 'chess' && other.uid !== me.uid) targets.push(other);
-    for (const t of targets) {
-      const n = ctx.sellPrice(t.uid) * multi;
-      if (!(n > 0)) continue;
-      for (const b of metaBonds(ctx, t)) if (ctx.bondActive(b)) ctx.addLayers(b, n, { requireActive: true });
-    }
-  },
-};
-
-// Each on-board operator who carries an item adds `count` to every listed bond, while that bond is activated.
-H.SERVER_ADD_BOND_BOARD_EQUIP_CHAR = {
-  run(ctx) {
-    const { bb, bbStr, garrison } = ctx.source;
-    const bonds = ids(bbStr.bond);
-    const n = num(bb.count, 0);
-    if (!(n > 0) || !bonds.length) return;
-    const ra = requireActiveOf(garrison);
-    for (const p of chessOnBoard(ctx)) {
-      if (!p || !Array.isArray(p.items) || !p.items.length) continue;
-      addAll(ctx, bonds, n, ra);
-    }
-  },
 };
 
 

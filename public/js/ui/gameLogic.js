@@ -77,6 +77,7 @@ export function phaseMode(phase) {
   if (phase === PHASE.INFO_CHECK) return 'briefing';
   if (phase === PHASE.BAND_DRAFT) return 'draft';
   if (phase === PHASE.RECRUIT_PICK) return 'recruit';
+  if (phase === PHASE.CUSTOM_CHECK) return 'diy';
   if (phase === PHASE.BATTLE_CHECK) return 'boot';
   if (phase === PHASE.RESULT) return 'result';
   if (phase === PHASE.SETTLE) return 'settle';

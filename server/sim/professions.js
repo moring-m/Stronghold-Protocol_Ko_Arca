@@ -19,7 +19,6 @@
 //   chain {count, falloff, radius, sluggish}              heal {mode:'single'|'multi'|'chain', count, falloff, farMul, elementHealRatio}
 //   priority 'fly'|'lowDef'|'ranged'|'lowestHp'|'highestHp'|'nearest'|'farthest'|'notBurst'|null
 //   noAttack bool (never attacks)   noAttackUnlessSkill bool (attacks only while its skill is active)
-//   selfHealFilter(dmg) → bool optional eligibility filter for native reaper output healing
 //   noHeal bool (cannot be healed by others)   blockFly bool   onHitStatus {key, duration, value}
 //   dmgMul(battle, unit, target) → number      afterHit(battle, unit, target, {dealt,x,y})
 //   funnelMul(battle, unit, target) → number (drone ramp, separate from the caster's attack multiplier)
@@ -28,7 +27,7 @@
 //   canAttack(battle, unit) → bool             afterAttack(battle, unit, targets)
 //   skipEnemy(enemy) → bool (an enemy the unit never selects — targeting.js canTargetEnemy; 嵯峨 "不攻击重伤单位")
 //   healThrough(healer, ally) → bool (a healer that selects and heals that ally through its 禁疗 — Battle
-//                             injuredAlliesInKeys, attack/heal.js heal; 凯尔希 on her Mon3tr)
+//                             injuredAlliesInKeys, damage.js heal; 凯尔希 on her Mon3tr)
 //   hitsFn(battle, unit, info) → n (info: the hit's { isSkill, index, attackId, energy })
 //   hitDmgMul n (伤害倍率 of each of the `hits` instances on the main target: DamageInfo `mul`, applied after DEF / RES
 //                and the damage multipliers, not 攻击倍率 — a 频次 enemy still loses 1 per instance; the instances after
@@ -42,7 +41,7 @@
 // (`dir`, sim/dir.js): offsets are compared in its facing-RIGHT frame.
 
 import { toLocal, frontOf } from './dir.js';
-import { isHpLoss } from './attack.js';
+import { isHpLoss } from './damage.js';
 import { absoluteRangeKeys } from './targeting.js';
 import { bodyKeys, bodyInRange, bodyInRangeTile } from './body.js';
 import { COLS, CHAIN_RADIUS } from './constants.js';
@@ -80,10 +79,12 @@ export const PROFESSION_DEFAULTS = Object.freeze({
  * `battle.time` as its window, so simultaneous hits (both 血镰, an AoE, or a normal attack) share the block-count cap.
  */
 const installMushaHeal = (battle, unit) => {
-  battle.on('damageOutput', (c) => {
-    if (c.source !== unit || !unit.alive || !c.target || c.target.side !== 'enemy' || !(c.amount > 0)) return;
+  battle.on('damaged', (c) => {
+    if (c.source !== unit || !unit.alive || !c.target || c.target.side !== 'enemy') return;
     const dmg = c.dmg;
-    if (!dmg || isHpLoss(dmg) || dmg.type === 'element') return;
+    if (!dmg || isHpLoss(dmg) || c.type === 'element') return;
+    const tags = dmg.tags || [];
+    if (tags.includes('talent') || tags.includes('dot') || tags.includes('periodic')) return;
     battle.heal(unit, unit, unit.profile.selfHeal ?? 50, { self: true, ignoreHealFree: true });
   }, { owner: unit, priority: -10 });
 };
@@ -120,10 +121,12 @@ const installSelfHealOnHit = (capByBlock) => (battle, unit) => {
  * lowest-HP ally in range.
  */
 const installIncantation = (battle, unit) => {
-  battle.on('damageApplied', c => {
-    if (c.source !== unit || !unit.alive || c.target.side !== 'enemy') return;
-    // Native AssignDamageValueToBlackboard has assignRealDelta=false: use damage, not HP removed.
-    const ally = c.dmg.traitAlly || battle.lowestHpAllyInRange(unit);
+  battle.on('damaged', (c) => {
+    const t = c.target;
+    if (c.source !== unit || !unit.alive || !t || t.side !== 'enemy' || !(c.amount > 0)) return;
+    // a gauge fill (元素损伤) removes no HP and is not "伤害" for the heal; a 流失 is not damage dealt either
+    if (c.type === 'element' || c.type === 'elemental') return;
+    const ally = (c.dmg && c.dmg.traitAlly) || battle.lowestHpAllyInRange(unit);
     if (ally) battle.heal(unit, ally, c.amount * (unit.profile.healRatio ?? 0.5), { tags: ['incantation'] });
   }, { owner: unit });
 };
@@ -149,14 +152,14 @@ const installMerchant = (battle, unit) => {
     const ctx = battle.hasHook('merchantPay') ? battle.emit('merchantPay', { unit, cost, cancel: false }) : null;
     if (!unit.alive || !unit.deployed || (ctx && ctx.cancel)) return;
     const c = ctx && Number.isFinite(ctx.cost) ? Math.max(0, ctx.cost) : cost;
-    if (pl.dp >= c) battle.addDp(unit.ownerId, -c, unit);
+    if (pl.dp >= c) battle.addDp(unit.ownerId, -c);
     else battle.retreat(unit, { reason: 'merchant' });
   }, { owner: unit });
 };
 
 const installCharger = (battle, unit) => {
   battle.on('kill', (ctx) => {
-    if (ctx.killer === unit && ctx.victim.side === 'enemy') battle.addDp(unit.ownerId, unit.profile.dpOnKill ?? 1, unit);
+    if (ctx.killer === unit && ctx.victim.side === 'enemy') battle.addDp(unit.ownerId, unit.profile.dpOnKill ?? 1);
   }, { owner: unit });
 };
 
@@ -216,7 +219,7 @@ const installDollkeeper = (battle, unit) => {
     };
     battle.addBuff(unit, {
       key: 'trait:dollSwitching', duration: DOLL_SWITCH, onExpire: ended, onRemove: done,
-      // noHeal refuses another unit's heal; healFree is 禁疗 (attack/heal.js: a self-heal is 0 too, regen excepted). The
+      // noHeal refuses another unit's heal; healFree is 禁疗 (damage.js: a self-heal is 0 too, regen excepted). The
       // window still ends at full HP — onExpire writes it, it does not heal.
       flags: { invulnerable: true, noSp: true, noHeal: true, healFree: true, isolated: true, disarm: true },
     });
@@ -424,7 +427,7 @@ export const BARD_REGEN_DUR = 0.5;
  * 来增加受益者的“生命回复速度”属性" — an hpRegen buff of `value` (the bard's ATK × ratio) on `ally`, one per bard (two bards
  * add up), which the caller refreshes before it lapses (`duration`, default BARD_REGEN_DUR). No heal: 禁疗 and 无法被友方
  * 治疗 (收割者 / 不屈者 / 武者 noHeal) do not stop it — PRTS 异常效果 禁疗 "增减生命回复速度…的效果不会被识别为治疗类能力"; the
- * regeneration tick is the ally's own (attack/heal.js heal `regen`, no 治疗加成). The `bardRegen` hook { unit (the bard),
+ * regeneration tick is the ally's own (damage.js heal `regen`, no 治疗加成). The `bardRegen` hook { unit (the bard),
  * target, value } may scale one ally's share (魔王's 微尘: "使该干员受到魔王特性效果提升至1.5倍"). Also the 海嗣 range of
  * 浊心斯卡蒂 (content/tokens.js, kits/ops/chess_char_6_04-skadi2.js).
  */

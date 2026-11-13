@@ -401,7 +401,8 @@ export class Match {
   constructor(opts) {
     // 규정(规程) seasons play upstream's whole match flow (선택자편, 핵심 맹약 그룹, 전략 명령 …): the fork's methods below
     // are written for the 맹약 seasons only
-    if (new.target === Match && (versionById(opts?.version)?.family === 'regulation' || opts?.data?.config?.version?.family === 'regulation')) return new UpstreamMatch(opts);
+    // (a subclass — the match host's ContentMatch, a test's — gets the upstream match too; its constructor goes on with it)
+    if (versionById(opts?.version)?.family === 'regulation' || opts?.data?.config?.version?.family === 'regulation') return new UpstreamMatch(opts);
     if (!opts || !Array.isArray(opts.seats) || opts.seats.length === 0) throw new TypeError('Match: seats required');
     if (typeof opts.send !== 'function' || typeof opts.broadcast !== 'function' || typeof opts.onEnd !== 'function') {
       throw new TypeError('Match: send/broadcast/onEnd callbacks required');

@@ -3681,5 +3681,14 @@
   "후보 {0}": "Candidate {0}",
   "각 단계에 최대 {0}명까지 선발 후보로 지정합니다. 전략 선택 후 선발 선택 단계에서 후보 중 단계별 최대 {1}명을 고르며, 고른 오퍼레이터만 본인의 모집·보상에 등장합니다. 특질은 없습니다. 원형 오퍼레이터는 각 단계에 한 번씩 지정할 수 있습니다.": "Set up to {0} recruit candidates per tier. After the strategy draft, pick up to {1} per tier from them in Recruit Selection; only picked operators appear in your recruitment and rewards. They have no trait. A prototype operator can be set once per tier.",
   "시즌": "Season",
-  "규정 등급": "Regulation level"
+  "규정 등급": "Regulation level",
+  "선택자편": "Choose Custom Squad",
+  "박사": "Doctor",
+  "단계": " Tier",
+  "자선 편성 중 이번 시뮬레이션에 데려갈 오퍼레이터를 단계별로 고릅니다. 아무도 고르지 않으면 자선 오퍼레이터 없이 진행합니다.": "Choose, per tier, which of your custom squad operators join this simulation. Choosing none plays without them.",
+  "자선 편성이 비어 있습니다. 확인을 누르면 진행합니다.": "Your custom squad is empty. Confirm to continue.",
+  "금지된 맹약의 오퍼레이터입니다": "This operator belongs to a banned bond",
+  "핵심 맹약 그룹 선택": "Choose a core bond group",
+  "고른 그룹의 핵심 맹약만 이번 시뮬레이션에 등장합니다. 고르지 않으면 첫 번째 그룹으로 진행합니다.": "Only the chosen group's core bonds appear in this simulation. Without a choice, the first group plays.",
+  "그룹": "Group"
 }

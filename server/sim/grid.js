@@ -90,11 +90,6 @@ export const DEFAULT_LEGEND = Object.freeze({
   i: { height: 'LOW', build: 'ALL', pass: 'ALL', key: 'tile_infection', terrain: 'infection' },
   // 덤불 (the fork's 설원 battlefield): 隐匿 for the operators and the enemies on it (content/devices.js thicket)
   k: { height: 'LOW', build: 'ALL', pass: 'ALL', key: 'tile_custom_thicket', terrain: 'thicket' },
-  // 规程 (act3autochess): m12 tile_speedup — a ground unit standing on it gains ASPD +attack_speed and move ×move_speed
-  // (devices.js reads stage.special.speedup, official 25 / 1.5). Flyers skip it like every other ground terrain.
-  // m09 tile_duel_grassland has no blackboard [ASSUMED] plain deployable ground, no extra mechanism.
-  z: { height: 'LOW', build: 'ALL', pass: 'ALL', key: 'tile_speedup', terrain: 'speedup' },
-  w: { height: 'LOW', build: 'ALL', pass: 'ALL', key: 'tile_duel_grassland' },
 });
 
 /**
@@ -106,7 +101,7 @@ export const DEFAULT_LEGEND = Object.freeze({
  */
 export const DEPLOY_REFUSED_TILES = Object.freeze(new Set(['tile_deepsea']));
 
-const TERRAIN_BY_KEY = { tile_mire: 'mire', tile_smog: 'smog', tile_deepsea: 'deepsea', tile_infection: 'infection', tile_deepwater: 'deepsea', tile_speedup: 'speedup', tile_custom_thicket: 'thicket' };
+const TERRAIN_BY_KEY = { tile_mire: 'mire', tile_smog: 'smog', tile_deepsea: 'deepsea', tile_infection: 'infection', tile_deepwater: 'deepsea', tile_custom_thicket: 'thicket' };
 const SPECIAL_BY_KEY = { tile_start: 'start', tile_end: 'end', tile_telin: 'telin', tile_telout: 'telout' };
 
 function normPass(v) {

@@ -77,6 +77,10 @@ export async function act(t, fields = {}, opts = {}) {
 export const actions = {
   reroll: (matchNo) => act('room.reroll', { matchNo }, { sfx: 'confirm' }),
   recruitPick: (picks, ready) => act('g.recruitPick', { picks, ready }, { sfx: ready ? 'confirm' : null }),
+  // 규정 시즌: the core-bond group of a solo briefing, 선택자편, and the strategy commands
+  bondGroup: (idx, setupRevision) => act('g.bondGroup', { idx, setupRevision }, { sfx: 'confirm' }),
+  diyBring: (slots) => act('g.diyBring', { slots }, { sfx: 'confirm' }),
+  command: (effectId, target = {}) => act('g.command', { effectId, target }, { sfx: 'confirm' }),
   infoReady: (setupRevision = 0) => act('g.infoReady', { matchNo: store.get().room?.matchNo, setupRevision }),
   rerollSetup: (setupRevision)=>act('room.rerollSetup',{setupRevision},{sfx:'confirm'}),
   rerollVote: (voteId,agree)=>act('g.rerollVote',{voteId,agree}),

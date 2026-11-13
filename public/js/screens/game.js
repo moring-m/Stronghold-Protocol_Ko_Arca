@@ -135,6 +135,7 @@ import { phaseMode, phaseBanner, isCombatPhase, showDeadPill, isBossPhase, place
 import { toast } from '../ui/toasts.js';
 import { LoadoutButton } from './loadout.js';
 import { BriefingScreen } from './briefing.js';
+import { DiyCheckScreen } from './diyCheck.js';
 import { BandDraftScreen } from './bandDraft.js';
 import { RecruitPickScreen } from './recruitPick.js';
 import { ResultScreen } from './settle.js';
@@ -195,6 +196,7 @@ export function GameScreen() {
   else if (mode === 'briefing') body = html`<${BriefingScreen} />`;
   else if (mode === 'draft') body = html`<${BandDraftScreen} />`;
   else if (mode === 'recruit') body = html`<${RecruitPickScreen} />`;
+  else if (mode === 'diy') body = html`<${DiyCheckScreen} />`;
   else body = html`<${MatchScreen} />`;
   return html`${body}
     ${(away || autoplay) && !hasResult && mode !== 'result' && !ended ? html`<${AwayOverlay} />` : null}

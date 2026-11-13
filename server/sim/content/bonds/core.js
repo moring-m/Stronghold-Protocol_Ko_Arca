@@ -23,7 +23,7 @@
 //   卡西米尔 kazimierzShip every deployment of one of the player's operators (initial ones included): members ATK
 //                        +atk_when_born, total ≤ base_max_atk_when_born + max_atk_when_born_per_stack·L; 6: blocking
 //                        members pulse damage_atk_scale×ATK true damage + stun around them every damage_interval s,
-//                        non-blocking members' NORMAL damage carries source-less true ADDITION damage
+//                        non-blocking members' attacks add pure_atk_scale×ATK true damage
 //
 // Numbers: data/bonds.json buffs (support.buffParams by bbStr.key); 炎佑's 30 % is parsed from the effect text.
 // Tiers: a bond's upper tier is reached when count ≥ the blackboard threshold (power_bond_char_cnt / ex_bond_char_cnt)
@@ -35,17 +35,15 @@
 // Hook priorities: 拉特兰 skillStart −10 (after kits' own ammo changes), 阿戈尔 death 11 (5-tier revive, before 不屈's
 // death 10; every `fatal` saver runs before any death hook), layerGain −100 (after 魔王-style modifiers).
 
-import { mitigate } from '../../damage.js';
 import * as S from '../support/index.js';
+import { mitigate } from '../../damage.js';
 import { spawnYanyou } from '../tokens.js';
 import { kjeragColdWind } from '../devices.js';
 import * as items from '../items.js';
 import { FORCED_EXIT } from '../../constants.js';
-import { damageAttackType, isHpLoss } from '../../attack.js';
 import { msg } from '../../../../shared/i18n.js';
 import { bbCap } from '../../../../shared/plugins/officialBounds.js';
 import { textFinite } from '../../../../shared/plugins/textNumber.js';
-import * as reg from './regulation.js';
 
 const num = S.num;
 
@@ -76,11 +74,7 @@ export function reached(battle, pid, bondId, cnt) {
   const st = S.bondState(battle, pid, bondId);
   if (!st || !st.active) return false;
   const need = num(cnt, 0);
-  // On another version's build (S.isVersionData) a threshold the record lacks is a tier that data does not have: not
-  // reached. 上半's 炎 has no 9-member tier (no ex_bond_char_cnt); counting it as reached gave 6 炎 the 9-member tier's
-  // 2 炎佑. The default data never gets here (every core bond's main buff carries power_bond_char_cnt and 炎's
-  // ex_bond_char_cnt is 9); a plugin content set built on it keeps the old rule, reached.
-  if (!(need > 0)) return !S.isVersionData();
+  if (!(need > 0)) return true;
   if (num(st.count, 0) >= need) return true;
   const th = S.bondRecord(bondId)?.thresholds;
   const idx = Array.isArray(th) ? th.indexOf(need) : -1;
@@ -221,10 +215,7 @@ function installYan(battle, pid, bb, members) {
 function installSargon(battle, pid, bb, members) {
   const memberSet = new Set(members);
   const ps = S.player(battle, pid);
-  let share = S.buffParams(S.bondRecord('sargonShip'), SARGON_SHARE_KEY);
-  // A band can swap the effect back to bondeffect_sargon. The share blackboard lives on that effect record when the
-  // bond record was copied from another effect. Default data already has the key on the bond, so this stays unread.
-  if (!share && S.isVersionData()) share = S.buffParams(S.effectRecord(S.bondRecord('sargonShip')?.effectId), SARGON_SHARE_KEY);
+  const share = S.buffParams(S.bondRecord('sargonShip'), SARGON_SHARE_KEY);
   const band = ps?.bandId ?? null;
   const narant = !!(share && band && share.valid_in_band === band);
   const main = narant ? share : bb;
@@ -292,8 +283,8 @@ function installVictoria(battle, pid, bb, members) {
   for (const u of members) {
     const ids = S.itemsOf(u);
     if (!ids.length) continue;
-    let add = num(bb.power_atk, 0);
-    if (bb.power_atk == null) for (const id of ids) add += S.isGoldenId(id) ? golden : normal;
+    let add = 0;
+    for (const id of ids) add += S.isGoldenId(id) ? golden : normal;
     if (add > 0) S.passiveBuff(battle, u, 'bond:victoria:atk', S.directMods({ atk: add }));
   }
 }
@@ -349,25 +340,6 @@ function installLaterano(battle, pid, bb, members) {
 const boardCol = (u) => (u.player && u.player.mirror ? -u.tileC : u.tileC);
 const egirOrder = (a, b) => boardCol(a) - boardCol(b) || b.tileR - a.tileR || a.id - b.id;
 
-// 5-tier revives of the battle-start devour's knock-outs: the player's scan 「检测左下到右上哪些鱼睡着了给他复活」 (a
-// community report the owner relayed on 2026-10-07, DESIGN §25.22.5) — on the player's own board as the player sees it:
-// row 0 is the bottom of the screen (render/projection.js: nearest the camera), col 0 its left; a mirrored player from its
-// own left, the field's right, as egirOrder. [ASSUMED] the columns from the left, bottom first inside a column (the
-// act-2 positional orders — the deployment and egirOrder — go column by column from the left). The other reading, the
-// rows from the bottom with left first inside a row (act 1's deployment order), is
-// `a.tileR - b.tileR || boardCol(a) - boardCol(b) || a.id - b.id`; test/content/bonds_core.test.js '阿戈尔 5 (community
-// report, 2026-10-07) step 3: …' pins this one (its layout leaves a different member down under each reading).
-const egirReviveScan = (a, b) => boardCol(a) - boardCol(b) || a.tileR - b.tileR || a.id - b.id;
-
-/**
- * The battle-start devour window, shared by every player's 阿戈尔 on the field: `passes` = devour passes still to run
- * (one per player with the bond active, counted at install), `depth` > 0 while one resolves, `flush` = the 5-tier
- * players' revive batches, run once the last pass is over.
- */
-function egirStart(battle) {
-  return S.battleStore(battle, 'bonds:egir:start', () => ({ passes: 0, depth: 0, flush: [] }));
-}
-
 /**
  * 联防: an operator forced out at the deployment (carry.down, Battle.start, before battleStart) still stands on its
  * deploy position. It still participates in the devour.
@@ -394,8 +366,7 @@ function egirDownAtStart(battle, u) {
  * cancelled, also when it is back at once (the 5-tier 立刻复活, 不屈's 立刻重新部署, 埃芒加德 / M3茧甲): PRTS 盟约记录 "目标首次被
  * 击倒后解除自身被付与但还未触发的【吞噬】效果". Marks already placed still resolve after their marker leaves the field.
  * 联防: the operators down since the end of their own combat (forced out by Battle.start) mark, are marked and resolve
- * their marks like standing ones, but the devour resolves nothing on them (below; per players' reports, owner's
- * decision 2026-10-04). A reached 5-tier revive may still bring a down member back after every pass (installEgir).
+ * their marks like standing ones, but nothing resolves on them (below; per players' reports, owner's decision 2026-10-04).
  * Whose operator stands in front does not matter (PRTS "依次吞噬身前一格干员", no own-side limit; the owner's decision of
  * 2026-10-05 after GitHub #140 comment 4): on a shared field (联防, boss) a teammate's operator — standing, or entering
  * 联防 down — is marked like an own one, gives the same base ATK / block count, and the chain goes on through it when it
@@ -405,19 +376,17 @@ function egirDownAtStart(battle, u) {
  */
 function devour(battle, pid, bb, members) {
   // 联防: an operator down at the end of its own combat (carryState.down — Battle.start forced it out right before
-  // battleStart, FORCED_EXIT) takes part in the devour as if it stood on its tile: it marks in its turn, it is "the unit
-  // in front" of another (the chain goes on through it when it is a member), its base ATK / block count for its marker
-  // and its own marks resolve (their 物理流失 lands, credited to it as usual); only the marks ON it resolve nothing — the
-  // forced exit is not a knock-out, so the devour itself never revives it. Per players' reports (community report #3,
-  // GitHub #33 item 3), owner's decision 2026-10-04; until 0.1.2 the forced exit came first and the chain broke.
-  // The 5-tier scan after the last pass (installEgir) is separate: a down member spends this battle's first knock-out there.
+  // battleStart, FORCED_EXIT) takes part in the devour as if it stood on its tile, then stays out: it marks in its turn,
+  // it is "the unit in front" of another (the chain goes on through it when it is a member), its base ATK / block count
+  // for its marker and its own marks resolve (their 物理流失 lands, credited to it as usual); only the marks ON it resolve
+  // nothing — it is forced out, so it is never knocked out again, revived or devoured. Per players' reports (community
+  // report #3, GitHub #33 item 3), owner's decision 2026-10-04; until 0.1.2 the forced exit came first and the chain broke.
   const downAtStart = (u) => egirDownAtStart(battle, u);
-  // Historical text says bottom then left; [ASSUMED] season one's unspecified order follows its deployment.
-  const order = members.filter((u) => S.onField(u) || downAtStart(u)).sort(S.isVersionData()
-    ? (a, b) => a.tileR - b.tileR || boardCol(a) - boardCol(b) || a.id - b.id : egirOrder);
+  const order = members.filter((u) => S.onField(u) || downAtStart(u)).sort(egirOrder);
   // the operator in front, whoever owns it (until 0.1.3 only the player's own): a living one, else one lying there since
   // the 联防 start (carry.down, forced out) — a teammate's included
-  const opAtTile = (r, c) => {
+  const opAt = (u) => {
+    const [r, c] = S.frontTile(u);
     const a = S.allyAt(battle, r, c);
     if (a) return S.isOp(a) && a.alive ? a : null;
     const d = battle.downOn(r, c);
@@ -426,32 +395,24 @@ function devour(battle, pid, bb, members) {
   const markedBy = new Map(); // marker → [targets]
   const marks = [];
   for (const m of order) {
-    const trench = S.itemsOf(m).map((id) => S.buffParams(S.itemRecord(id), 'act1autochess_equip_acarm078_global_buff')).find(Boolean);
-    const targets = (u) => S.itemsOf(u).some((id) => S.buffParams(S.itemRecord(id), 'act1autochess_equip_acarm078_global_buff'))
-      ? S.N4.map(([dr, dc]) => opAtTile(u.tileR + dr, u.tileC + dc)).filter(Boolean) : [opAtTile(...S.frontTile(u))].filter(Boolean);
     const mine = [];
     const seen = new Set([m]);
     const queue = [m];
     for (let guard = 0; queue.length && guard < 64; guard++) {
       const x = queue.shift();
-      for (const t of targets(x)) {
-        if (seen.has(t)) continue;
-        if ((markedBy.get(t) ?? []).includes(m)) continue;
-        seen.add(t);
-        mine.push(t);
-        // through a marked 阿戈尔 (for the player's own operators: exactly its members; a teammate's by its own bonds)
-        if (S.isMember(battle, t, 'egirShip')) queue.push(t);
-      }
+      const t = opAt(x);
+      if (!t || seen.has(t)) continue;
+      if ((markedBy.get(t) ?? []).includes(m)) continue;
+      seen.add(t);
+      mine.push(t);
+      // through a marked 阿戈尔 (for the player's own operators: exactly its members; a teammate's by its own bonds)
+      if (S.isMember(battle, t, 'egirShip')) queue.push(t);
     }
     markedBy.set(m, mine);
     if (!mine.length) continue;
     let atk = 0, block = 0;
     for (const t of mine) { atk += num(t.base.atk, 0); block += num(t.base.blockCnt, 0); marks.push([m, t]); }
     const mods = {};
-    if (trench && S.itemsOf(m).some((id) => id.replace(/_[ab]$/, '') === trench.equip_chess_id)) {
-      // [ASSUMED] "等量生命值" uses the victims' base max HP, matching the devour's base ATK/block inheritance.
-      mods.hpFlat = mine.reduce((n, t) => n + num(t.base.maxHp), 0);
-    }
     if (atk > 0) mods.atkFinal = atk; // 最终加算 (units.js _recalc)
     if (block > 0) mods.blockCnt = block;
     if (Object.keys(mods).length) {
@@ -462,9 +423,8 @@ function devour(battle, pid, bb, members) {
   const amount = num(bb.damage_value, 0);
   const layered = new Set();
   // a target knocked out during the pass = off the field, or in another deployment than when the marks were placed (items
-  // deploymentOf: 不屈 and the 复活 of 埃芒加德 / M3茧甲 redeploy it at once; the 5-tier revive did until 0.2.0) — a
-  // revived member was standing again when its pending marks used to knock it out a second time and spend every revive
-  // at t = 0 (GitHub #33)
+  // deploymentOf: the 5-tier revive and 不屈 redeploy it, 埃芒加德 / M3茧甲 revive it in place) — a revived member was
+  // standing again when its pending marks used to knock it out a second time and spend every revive at t = 0 (GitHub #33)
   const dep = new Map();
   for (const [, t] of marks) if (!dep.has(t)) dep.set(t, items.deploymentOf(t));
   const knocked = (t) => !t.alive || items.deploymentOf(t) !== dep.get(t);
@@ -485,21 +445,14 @@ function devour(battle, pid, bb, members) {
   }
 }
 
-function installEgir(battle, pid, bb, members, opts = {}) {
-  // HP (every tier): a match-long buff put on the members when the battle is built, so each one is deployed with it
-  // (Battle._deploy: full HP of the raised max HP) and the battle-start devour finds it — the community report's step 1,
-  // 「第一步给所有鱼加盟约的血量」 (DESIGN §25.22.5: an elite 深巡, 2904 HP and DEF 655, loses 5000 − 655 = 4345 to a mark and
-  // stands from 15 layers on, 2904 × 1.50 = 4356). The layers the devour adds raise it one tick later (onLayers; the HP
-  // ratio is kept).
+function installEgir(battle, pid, bb, members) {
   const apply = () => {
     const mods = S.directMods({ hp: num(bb.base_max_hp, 0) + num(bb.max_hp_per_stack, 0) * S.bondLayers(battle, pid, 'egirShip') });
     for (const u of members) S.passiveBuff(battle, u, 'bond:egir', mods);
   };
   apply();
   onLayers(battle, pid, 'egirShip', apply);
-  // egir_2 (规程) keeps the HP buff and the devour, and replaces the free redeploy with a bench switch (opts.respawn false)
-  const max = opts.respawn === false ? 0
-    : (reached(battle, pid, 'egirShip', bb.power_bond_char_cnt) ? Math.max(0, Math.floor(num(bb.max_free_respawn_cnt, 0))) : 0);
+  const max = reached(battle, pid, 'egirShip', bb.power_bond_char_cnt) ? Math.max(0, Math.floor(num(bb.max_free_respawn_cnt, 0))) : 0;
   const holders = new Map(members.filter(x => S.isOp(x)).map(u => [u,u.mem.revives | 0]));
   battle.on('battleStart', () => {
     // Unite continues the same round. Carry the completed devour, not a fresh battle-start pass.
@@ -626,8 +579,7 @@ function installKazimierz(battle, pid, bb, members) {
         const amount = scale * m.s.atk;
         for (const e of hits) {
           if (!e.alive) continue;
-          battle.dealDamage({ source: m, target: e, amount, type: 'true', attackType: 'NORMAL',
-            applyWay: 'NONE', dodgeMode: 'ignore', isSplash: true, tags: ['bond:kazimierz'] });
+          battle.dealDamage(m, e, { amount, type: 'true', canDodge: false, isSplash: true, tags: ['bond:kazimierz'] });
           if (e.alive && stun > 0) battle.applyStatus(e, 'stun', { duration: stun, source: m });
         }
         S.fxOn(battle, 'aoe', m, 'bond:kazimierzShip', 'pulse', { radius, dmgType: 'true', n: hits.length });
@@ -638,13 +590,9 @@ function installKazimierz(battle, pid, bb, members) {
   if (!(pure > 0)) return;
   const onDmg = (ctx) => {
     const u = ctx.source, t = ctx.target, dmg = ctx.dmg;
-    if (!dmg || isHpLoss(dmg) || damageAttackType(dmg) !== 'NORMAL' || dmg.type === 'element'
-      || !isEnemyTarget(t) || ownTag(dmg, 'bond:kazimierz')) return;
+    if (!dmg || !dmg.isAttack || !isEnemyTarget(t) || ownTag(dmg, 'bond:kazimierz')) return;
     if (u.blocking && u.blocking.length) return;
-    // [ASSUMED] Retain the legacy damaged-listener timing; PRTS settles class/source, not this relative phase.
-    battle.dealDamage({ source: null, credit: u, target: t, amount: pure * u.s.atk, type: 'true',
-      attackType: 'ADDITION', applyWay: 'NONE', calculation: 'precomputed', dodgeMode: 'ignore',
-      origin: dmg, tags: ['bond:kazimierz'] });
+    battle.dealDamage(u, t, { amount: pure * u.s.atk, type: 'true', canDodge: false, tags: ['bond:kazimierz'] });
   };
   for (const u of members) onUnitDamaged(battle, u, onDmg);
 }
@@ -665,42 +613,18 @@ const INSTALLERS = Object.freeze({
 
 export function install(battle) {
   if (!battle || !Array.isArray(battle.players)) return;
-  const version = S.isVersionData();
   for (const p of battle.players) {
     const pid = p.playerId;
     if (!p.bonds || typeof p.bonds !== 'object') continue;
     for (const [bondId, fn] of Object.entries(INSTALLERS)) {
       if (!S.bondActive(battle, pid, bondId)) continue;
+      const bb = bondBb(bondId);
+      if (!bb) continue;
       const members = S.bondMembers(battle, pid, bondId);
       if (!members.length) continue;
-      if (version) {
-        // the player's record: a 规程 strategy's 指令 may replace the effect (auto_chess_effect_replace →
-        // input.bondEffectOverrides, bandCommands.js; support playerBondRecord swaps effectId and buffs)
-        const bondRec = S.playerBondRecord(battle, pid, bondId);
-        const effectId = bondRec?.effectId ?? null;
-        if (reg.installEffect(battle, pid, bondId, effectId, members)) continue;
-        // The bond record wins when it still carries the 盟约 key (上半 炎 has no ex_bond_char_cnt). A band
-        // swap only changes effectId, so the copied season buffs lack that key and the effect record is used.
-        const legacyKey = BUFF_KEYS[bondId];
-        const effectRec = S.effectRecord(effectId);
-        const onBond = legacyKey ? S.buffParams(bondRec, legacyKey) : null;
-        let swapped = onBond || (legacyKey ? S.buffParams(effectRec, legacyKey) : null);
-        if (swapped) {
-          // bondeffect_yan keeps 炎佑's counts on a second buff. The main buff is only the ATK ratio.
-          if (bondId === 'yanShip' && !(num(swapped.power_bond_char_cnt) > 0)) {
-            const spawn = S.buffParams(onBond ? bondRec : effectRec, 'act1autochess_bond_eff_yan[spawn]');
-            if (spawn) swapped = { ...swapped, ...spawn };
-          }
-          fn(battle, pid, swapped, members);
-          continue;
-        }
-      }
-      const bb = p.input?.bondEffectOverrides ? S.buffParams(S.playerBondRecord(battle, pid, bondId), BUFF_KEYS[bondId]) : bondBb(bondId);
-      if (!bb) continue;
       fn(battle, pid, bb, members);
     }
   }
-  if (version) reg.installExtra(battle);
 }
 
 /**
@@ -733,7 +657,7 @@ export function payHammers(ctx) {
       if (id && ctx.grantItem(id, { source: 'bond:victoriaShip' })) granted++;
     }
   }
-  if (granted && typeof ctx.toast === 'function') ctx.toast(msg('【维多利亚】获得{n}件维式重锤', { n: granted }), 'info');
+  if (granted && typeof ctx.toast === 'function') ctx.toast(`【维多利亚】获得${granted}件维式重锤`, 'info');
   return granted;
 }
 
@@ -756,27 +680,4 @@ export function registerMeta(registry) {
     };
   }
   registry.bond('victoriaShip', handler);
-  // 谢拉格不融冰 uses the same reward buff, only on the effect that carries it (kjerag_2). payKjeragIce no-ops without
-  // that key, so a 盟约 谢拉格 and a swap back to bondeffect_kjerag pay nothing.
-  const prevIce = typeof registry.get === 'function' ? registry.get('bond:kjeragShip') : null;
-  const ice = { ...(prevIce || {}) };
-  for (const hook of HAMMER_HOOKS) {
-    const before = prevIce && typeof prevIce[hook] === 'function' ? prevIce[hook] : null;
-    ice[hook] = function kjeragIce(ctx, ev) {
-      if (before) before.call(this, ctx, ev);
-      if (hook === 'onLayers' && !(ev && ev.bondId === 'kjeragShip')) return;
-      reg.payKjeragIce(ctx);
-    };
-  }
-  registry.bond('kjeragShip', ice);
 }
-
-reg.bindLegacy({
-  yan: installYan,
-  sargon: installSargon,
-  kjerag: installKjerag,
-  siracusa: installSiracusa,
-  kazimierz: installKazimierz,
-  egir: installEgir,
-  victoria: installVictoria,
-});

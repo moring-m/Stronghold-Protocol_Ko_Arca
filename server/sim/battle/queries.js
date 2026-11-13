@@ -162,7 +162,7 @@ export class BattleQueries {
   /**
    * Allies (not devices) within tiles `keys`, sorted by HP ratio (lowest first) that need healing. A `noHeal` (禁疗) ally
    * is left out unless the healer's profile heals it through its 禁疗 (`healThrough(healer, ally)`: 凯尔希's Mon3tr —
-   * attack/heal.js heal).
+   * damage.js heal).
    */
   injuredAlliesInKeys(keys, healer, includeElement = false) {
     const out = [];
