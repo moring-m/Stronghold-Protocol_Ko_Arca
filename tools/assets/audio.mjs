@@ -481,7 +481,14 @@ export function pickUnitSfx(banks, opts = {}) {
   };
   const exact = (event) => ['attack', 'combat'].map((ab) => banks.get(`${event}.${ab}`)).find((p) => p?.length && ok(p)) ?? null;
   const own = (p) => (p?.length && ok(p) ? p : null);
-  // operators: the plain ability of either event before any numbered variant
+  // operators: the plain ability of either event before any numbered variant, then the default mode's banks (attack.0,
+  // attack.0.1 …) before any other number (upstream DESIGN §35.38)
+  const mode0 = (event) => {
+    if (!opts.operator) return null;
+    const keys = [...banks.keys()].filter((k) => new RegExp(`^${event}\\.(attack|combat)\\.0(\\.\\d+)*$`).test(k)).sort(abilityOrder);
+    for (const k of keys) if (banks.get(k)?.length && ok(banks.get(k))) return banks.get(k);
+    return null;
+  };
   const plain = opts.operator ? exact('ON_ABILITY_START') ?? exact('ON_ABILITY_ON') : null;
   const attack = plain ?? mode0('ON_ABILITY_START') ?? mode0('ON_ABILITY_ON')
     ?? firstMatching(banks, 'ON_ABILITY_START', ['attack', 'combat'], ok)

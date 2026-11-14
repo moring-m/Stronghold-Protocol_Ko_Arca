@@ -82,14 +82,16 @@ def export_audio(ab_root, stage, destination, jobs, log):
     return count
 
 
-def export(ab_root, out_root, groups, log, root):
+def export(ab_root, out_root, groups, log, root, jobs=None):
+    """`jobs`: a precomputed tools/assets/versions.mjs job list (a standalone kit has no Node or repository)."""
     import aklz4  # noqa: F401
     import UnityPy
     import operators
     from extract import export_enemy_spines, export_token_spines
 
     root, out_root, ab_root = Path(root), Path(out_root), Path(ab_root)
-    jobs = json.loads(subprocess.check_output(['node', str(root / 'tools/assets/versions.mjs'), str(root)], timeout=30))
+    if jobs is None:
+        jobs = json.loads(subprocess.check_output(['node', str(root / 'tools/assets/versions.mjs'), str(root)], timeout=30))
     count = 0
     with tempfile.TemporaryDirectory(prefix='sp-version-art-') as tmp:
         stage, staged_groups = Path(tmp), {}
