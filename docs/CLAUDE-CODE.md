@@ -34,6 +34,14 @@ npm run dev:local
 
 접속: `http://localhost:3000`. 다른 포트가 필요하면 실행 전에 `$env:PORT='3045'`를 설정한다.
 `.cache/local-production/`가 없는 새 PC에서는 공식 리소스 캐시가 비어 있다는 안내가 나올 수 있다.
+이때 전투 이펙트(`/assets/local/fx/prefabs/*.json`)가 404로 빠진다. 운영 Docker 빌드와 같은 공식 시각 자료를 한 번 설치한다
+(약 333MB, `public/assets/local/`에 설치되며 Git에서 제외됨). 설치 후 바뀐 `content/production/data/local-*.json`은 되돌린다.
+
+```powershell
+node tools/import-official-v030.mjs --download
+node tools/fx-supplement.mjs install
+git checkout -- content/production/data/local-assets.json content/production/data/local-fx.json
+```
 운영용 리소스 목록을 줄이거나 다른 카탈로그로 바꾸지 말고, 기존 리소스 다운로드 절차를 사용한다.
 
 ## 다른 PC로 현재 작업 옮기기
