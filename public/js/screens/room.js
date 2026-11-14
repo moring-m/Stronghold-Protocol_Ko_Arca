@@ -401,7 +401,7 @@ export function RoomScreen() {
         ? html`<span class="t-mint">已就绪 · 等待创建者开始模拟</span>`
         : html`<span class="t-lo">准备就绪后，创建者即可开始模拟</span>`;
 
-  return html`<div class="screen room-screen">
+  return html`<div class=${`screen room-screen${roomVersion(room) !== DEFAULT_VERSION ? " is-season" : ""}`}>
     <header class="topbar app-topbar">
       <div class="topbar__left">
         <${Tooltip} text="离开同盟" placement="bottom">
