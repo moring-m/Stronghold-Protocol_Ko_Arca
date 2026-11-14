@@ -92,4 +92,23 @@ for (const def of [snowfield()]) {
   stages[def.id] = stage;
   console.log(`${def.id}: ${Object.keys(stage.groundPaths).length} ground paths, ${stage.deployTiles.normal.melee.length} melee / ${stage.deployTiles.normal.rangedOnly.length} ranged tiles`);
 }
+// 규정 battlefields with no 맹약 counterpart (m09–m12: the snow / church maps, m10's 盐坨子炮, m12's 加速 tiles) as
+// 맹약 "전장 추가" options: the season's record as is (its own layout, devices, tiles and special), the 맹약 modes of a base
+// stage, drawn by its converted native map (render/board3d/scene.js nativeStageId → map/original act3autochess_m*).
+// m01–m06 are 맹약 maps with small changes and are left out.
+const REGULATION = JSON.parse(await readFile(join(root, 'data/versions/act3autochess-v3_1/stages.json'), 'utf8'));
+const REGULATION_EXTRA = ['act3autochess_m09', 'act3autochess_m10', 'act3autochess_m11', 'act3autochess_m12'];
+for (const id of REGULATION_EXTRA) {
+  const src = Object.values(REGULATION).find((s) => s.id === id);
+  if (!src) throw Error(`${id}: missing from the 규정 stages`);
+  const stage = {
+    ...structuredClone(src),
+    modes: structuredClone(stages.act1autochess_m01.modes),
+    weight: 50, active: true,
+    customExtension: { category: 'stages', description: '규정 시즌의 전장입니다. 선택하면 이번 게임의 전장 추첨 목록에 추가됩니다.' },
+  };
+  Object.assign(stage, computeGroundPaths(stage), { deployTiles: computeDeployTiles(stage) });
+  stages[id] = stage;
+  console.log(`${id}: ${Object.keys(stage.groundPaths).length} ground paths, ${stage.deployTiles.normal.melee.length} melee tiles`);
+}
 await writeFile(file, JSON.stringify(stages));

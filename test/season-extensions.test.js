@@ -13,7 +13,9 @@ test('the catalogue lists only the season categories, from the season tables', (
   const cat = seasonExtensionCatalog(raw);
   for (const k of SEASON_EXTENSION_CATEGORIES.filter((k) => !['allies', 'enemyStats', 'bossStats', 'augmentSettings'].includes(k))) assert.ok(cat[k].length > 0, k);
   assert.deepEqual(cat.rules.map((r) => r.id).sort(), [...SEASON_RULES].sort());
-  for (const k of ['bonds', 'stages']) assert.deepEqual(cat[k] ?? [], [], k);
+  assert.deepEqual(cat.bonds ?? [], [], 'bonds');
+  // 전장 추가: the 맹약 maps copied into the season's stages (tools/build-season-extra-stages.mjs)
+  assert.ok(cat.stages.every((e) => raw.stages[e.id]?.customExtension?.source === 'covenant'), 'stages');
   assert.ok(cat.defaultAllyAugments.length > 0 && cat.defaultEnemyAugments.length > 0);
   assert.ok(cat.bannedOperators.every((e) => raw.chess[e.id]));
   assert.ok(cat.disabledStages.every((e) => raw.stages[e.id]));
@@ -156,4 +158,17 @@ test('common strategies: kept in the selection, carried as customRules.commonBan
   const sel = seasonExtensionSelection({ commonBands: [band, 'no_such_band'] }, raw);
   assert.deepEqual(sel.commonBands, [band]);
   assert.deepEqual(applySeasonExtensions(raw, sel).config.customRules.commonBands, [band]);
+});
+
+test('전장 추가 in 규정: the 맹약 maps are offered and join every multi-map mode when picked', async () => {
+  const { getVersionData } = await import('../server/data.js');
+  const { seasonExtensionCatalog, seasonExtensionSelection, applySeasonExtensions } = await import('../shared/seasonExtensions.js');
+  const d = getVersionData('act3autochess@V3_1');
+  const ids = seasonExtensionCatalog(d).stages.map((s) => s.id);
+  for (const id of ['act1autochess_m01', 'act2autochess_m03', 'custom_snowfield']) assert.ok(ids.includes(id), id);
+  const plain = applySeasonExtensions(d, seasonExtensionSelection({}, d));
+  assert.ok(!plain.config.modes.mode_multi_normal.stages.includes('custom_snowfield'), 'not drawn unless picked');
+  const a = applySeasonExtensions(d, seasonExtensionSelection({ stages: ['custom_snowfield'] }, d));
+  assert.ok(a.config.modes.mode_multi_normal.stages.includes('custom_snowfield'));
+  assert.deepEqual(a.config.modes.mode_single_funny.stages, ['act3autochess_m01'], 'one-map modes keep their map');
 });

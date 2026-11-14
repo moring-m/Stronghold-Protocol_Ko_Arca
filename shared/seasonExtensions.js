@@ -4,6 +4,8 @@
 //
 //   bannedOperators  the operator never enters the shared pool (its chess records are hidden)
 //   disabledBonds    the core bond is off in every mode (mode.inactiveBondIds): its operators leave the pool as in a draw
+//   stages           전장 추가: another season's maps copied into this season's stages as custom stages
+//                    (tools/build-season-extra-stages.mjs) join the draw of every mode that draws among several maps
 //   disabledStages   the map leaves every mode's stage list
 //   disabledBosses   the boss leaves every mode's boss / hidden-boss weights
 //   disabledBands    the strategy leaves the draft
@@ -14,7 +16,7 @@
 //                    boss hit limit and the ally / enemy / boss stat percentages (allies, enemyStats, bossStats tabs)
 import { customExtensionCatalog, normalizeRuleValues, RULE_VALUES } from './customExtensions.js';
 
-export const SEASON_EXTENSION_CATEGORIES = Object.freeze(['rules', 'augmentSettings', 'defaultAllyAugments', 'defaultEnemyAugments', 'commonBands', 'allies', 'enemyStats', 'bossStats', 'forcedBonds', 'forcedAuxBonds', 'bannedOperators', 'disabledBonds', 'disabledStages', 'disabledBosses', 'disabledBands']);
+export const SEASON_EXTENSION_CATEGORIES = Object.freeze(['stages', 'rules', 'augmentSettings', 'defaultAllyAugments', 'defaultEnemyAugments', 'commonBands', 'allies', 'enemyStats', 'bossStats', 'forcedBonds', 'forcedAuxBonds', 'bannedOperators', 'disabledBonds', 'disabledStages', 'disabledBosses', 'disabledBands']);
 /** The rule switches a season match honours (match-upstream reads config.customRules). */
 export const SEASON_RULES = Object.freeze(['augments', 'unlimitedHpLoss', 'sharedHp', 'defaultHarmony', 'duplicateBands', 'unlimitedLayers', 'unlimitedAspd']);
 /** The rule values a season match honours. */
@@ -61,12 +63,14 @@ export function applySeasonExtensions(raw, sel) {
   const rules = (sel.rules || []).filter((id) => SEASON_RULES.includes(id));
   const values = Object.fromEntries(Object.entries(sel.ruleValues || {}).filter(([id]) => SEASON_RULE_VALUES.includes(id)));
   const policy = Object.fromEntries(BAN_KEYS.filter((k) => (sel[k] || []).length).map((k) => [k, [...sel[k]]]));
-  if (!banned.size && !bonds.size && !stages.size && !bosses.size && !bands.size && !rules.length && !Object.keys(values).length && !Object.keys(policy).length && !(sel.commonBands || []).length) return raw;
+  const extraStages = (sel.stages || []).filter((id) => raw.stages?.[id]);
+  if (!extraStages.length && !banned.size && !bonds.size && !stages.size && !bosses.size && !bands.size && !rules.length && !Object.keys(values).length && !Object.keys(policy).length && !(sel.commonBands || []).length) return raw;
   const chess = banned.size ? Object.fromEntries(Object.entries(raw.chess || {}).map(([id, c]) => [id, banned.has(id) ? { ...c, visible: false } : c])) : raw.chess;
   const dropKeys = (o, set) => (o && typeof o === 'object' ? Object.fromEntries(Object.entries(o).filter(([k]) => !set.has(k))) : o);
   const modes = Object.fromEntries(Object.entries(raw.config?.modes || {}).map(([id, m]) => [id, {
     ...m,
-    ...(Array.isArray(m.stages) ? { stages: m.stages.filter((s) => !stages.has(s)) } : {}),
+    // a mode drawing among several maps also draws the added ones (the one-map tutorial / 娱乐 modes keep theirs)
+    ...(Array.isArray(m.stages) ? { stages: [...m.stages, ...(m.stages.length > 1 ? extraStages.filter((s) => !m.stages.includes(s)) : [])].filter((s) => !stages.has(s)) } : {}),
     ...(bonds.size ? { inactiveBondIds: [...new Set([...(m.inactiveBondIds || []), ...bonds])], ...(Array.isArray(m.activeBondIds) ? { activeBondIds: m.activeBondIds.filter((b) => !bonds.has(b)) } : {}) } : {}),
     ...(m.bossWeights ? { bossWeights: dropKeys(m.bossWeights, bosses) } : {}),
     ...(m.hiddenBossWeights ? { hiddenBossWeights: dropKeys(m.hiddenBossWeights, bosses) } : {}),
