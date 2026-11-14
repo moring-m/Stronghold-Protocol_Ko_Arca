@@ -1,5 +1,6 @@
 import {LangButton} from '../i18n/LangButton.js';
 import {useLang} from '../ui/lang.js';
+import { markEntered } from '../ui/betaNotice.js';
 import { t } from '../../../shared/i18n.js';
 import { ResourceRedownloadButton } from '../ui/resourceRedownload.js';
 import { openStats } from '../ui/statsEntry.js';
@@ -62,6 +63,7 @@ export function enterSession(rawName) {
   identity.setEntered(true);
   store.set((s) => ({ me: { ...s.me, name }, session: { ...s.session, entered: true } }));
   net.setName(name);
+  markEntered();
   return true;
 }
 

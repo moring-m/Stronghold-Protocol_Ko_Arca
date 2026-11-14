@@ -1,5 +1,6 @@
 import {RichText} from '../ui/gameComponents.js';
 import {lang}from'../i18n/i18n.js';
+import { betaNoticePending, clearBetaNotice } from '../ui/betaNotice.js';
 import {PublicRoomsScreen} from './publicRooms.js';
 import { confirmDialog } from "../ui/components.js";
 import { openStats } from '../ui/statsEntry.js';
@@ -36,8 +37,6 @@ import { loadCustomExtensionPrefs } from '../ui/customExtensionPrefs.js';
 import { lobbyVersion, setLobbyVersion, DEFAULT_VERSION, ladderModes } from '../versions.js';
 
 /** Official mode texts (activity_table act2autochess.modeDataDict), fallback when config.json is absent. */
-/** 이번 페이지 로드에서 규정 베타 안내를 닫았는지 (새로 접속하면 다시 안내). */
-let betaNoticeShown = false;
 
 export const MODE_TEXT = {
   single: {
@@ -343,10 +342,10 @@ export function LobbyScreen() {
   // a 규정 season (chosen on the title screen) plays solo and 4-seat co-op rooms only
   const regSeason = season !== DEFAULT_VERSION;
   // 규정 is a beta: say so once per page session when the lobby opens on it
-  // 규정 베타 안내: 접속(페이지 로드)마다 한 번. 로비를 다시 열 때는 다시 띄우지 않는다.
-  const [betaOpen, setBetaOpen] = useState(() => regSeason && !betaNoticeShown);
-  useEffect(() => { if (regSeason && !betaNoticeShown) setBetaOpen(true); }, [regSeason]);
-  const closeBeta = () => { setBetaOpen(false); betaNoticeShown = true; };
+  // 규정 베타 안내: 닉네임 입력 화면에서 접속한 직후의 로비에서만 (ui/betaNotice.js)
+  const [betaOpen, setBetaOpen] = useState(() => regSeason && betaNoticePending());
+  useEffect(() => { if (regSeason && betaNoticePending()) setBetaOpen(true); }, [regSeason]);
+  const closeBeta = () => { setBetaOpen(false); clearBetaNotice(); };
   useEffect(() => { if (regSeason && !seasonModes.includes(roomMode)) pickMode('coop'); }, [regSeason, roomMode]);
   // a laddered season picks its difficulty by 규정 등급 only
   const ladder = regSeason && seasonModes.includes(roomMode) ? ladderModes(getConfig(), roomMode) : null;
