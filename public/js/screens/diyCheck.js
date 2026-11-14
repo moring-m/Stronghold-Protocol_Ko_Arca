@@ -59,7 +59,7 @@ export function DiyCheckScreen() {
   const players = sortedPlayers(pub);
   return html`<div class="screen rsel">
     <div class="brief__bg" aria-hidden="true"></div>
-    <${StepHeader} step=${3} of=${3} title=${t('선택자편')} micro="CUSTOM // CHECK" pub=${pub}
+    <${StepHeader} step=${3} of=${3} title=${t('선발 설정')} micro="CUSTOM // CHECK" pub=${pub}
       total=${phaseTotalSeconds(pub, gd.config) ?? 30} onExit=${() => setExit(true)} />
     <main class="rsel__main">
       <aside class="rsel__players" aria-label=${t('참가자')}>
@@ -70,12 +70,12 @@ export function DiyCheckScreen() {
         </div>`)}
       </aside>
       <section class="rsel__body">
-        <p class="rsel__hint"><${Icon} name="info" /><span>${t('자선 편성 중 이번 시뮬레이션에 데려갈 오퍼레이터를 단계별로 고릅니다. 아무도 고르지 않으면 자선 오퍼레이터 없이 진행합니다.')}</span></p>
-        ${!order.length ? html`<p class="t-dim">${t('자선 편성이 비어 있습니다. 확인을 누르면 진행합니다.')}</p>` : tiers.map((tier) => {
+        <p class="rsel__hint"><${Icon} name="info" /><span>${t('선발한 오퍼레이터 중 이번 시뮬레이션에 데려갈 오퍼레이터를 티어별로 고릅니다. 아무도 고르지 않으면 선발 오퍼레이터 없이 진행합니다.')}</span></p>
+        ${!order.length ? html`<p class="t-dim">${t('선발한 오퍼레이터가 없습니다. 확인을 누르면 진행합니다.')}</p>` : tiers.map((tier) => {
           const list = order.filter((id) => tierOf(id) === tier);
           const n = shown.filter((id) => tierOf(id) === tier).length;
           return html`<div key=${tier} class="rsel__tier">
-            <h2 class="brief-h"><span>${tier}${t('단계')}</span><b class="num rsel__count">${n}/${capOf(tier)}</b><${MicroLabel}>TIER ${tier}<//></h2>
+            <h2 class="brief-h"><span>${t('티어')} ${tier}</span><b class="num rsel__count">${n}/${capOf(tier)}</b><${MicroLabel}>TIER ${tier}<//></h2>
             <div class="rsel__grid" role="listbox" aria-multiselectable="true">
               ${list.map((id) => {
                 const on = shown.includes(id);

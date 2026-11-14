@@ -3708,5 +3708,9 @@
   "규정": "Regulation",
   "위수 협의: 맹약": "Stronghold Protocol: Covenant",
   "이전 등급": "Previous level",
-  "다음 등급": "Next level"
+  "다음 등급": "Next level",
+  "선발 설정": "Squad Setup",
+  "선발한 오퍼레이터 중 이번 시뮬레이션에 데려갈 오퍼레이터를 티어별로 고릅니다. 아무도 고르지 않으면 선발 오퍼레이터 없이 진행합니다.": "Choose, by tier, which of your picked operators to bring to this simulation. If you choose none, you proceed without picked operators.",
+  "선발한 오퍼레이터가 없습니다. 확인을 누르면 진행합니다.": "You have no picked operators. Press confirm to continue.",
+  "티어": "Tier"
 }
