@@ -12,7 +12,7 @@ const target = join(root, 'data/versions/act3autochess-v3_1/stages.json');
 const covenant = JSON.parse(await readFile(join(root, 'content/production/data/stages.json'), 'utf8'));
 const season = JSON.parse(await readFile(target, 'utf8'));
 const IDS = ['act1autochess_m01', 'act1autochess_m02', 'act1autochess_m03', 'act1autochess_m04',
-  'act2autochess_m01', 'act2autochess_m02', 'act2autochess_m03', 'act2autochess_m04', 'custom_snowfield'];
+  'act2autochess_m01', 'act2autochess_m02', 'act2autochess_m03', 'act2autochess_m04'];
 for (const id of Object.keys(season)) if (season[id]?.customExtension?.source === 'covenant') delete season[id];
 for (const id of IDS) {
   const s = covenant[id];
