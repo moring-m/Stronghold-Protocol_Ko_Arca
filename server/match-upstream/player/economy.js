@@ -64,7 +64,7 @@ export class PlayerEconomy {
     if (!slot) return 0;
     const ev = { slot, kind: slot.kind, id: slot.id, price: slot.basePrice };
     this.m.dispatch(this, 'onPrice', ev, { quiet: true });
-    const p = Number(ev.price);
+    const p = Number(ev.price) - (slot.kind === 'chess' ? (this.m.augments?.price(this, this.gd.chess(slot.id)) || 0) : 0); // 커스텀 증강 할인
     return Number.isFinite(p) ? Math.max(0, Math.round(p)) : slot.basePrice;
   }
 

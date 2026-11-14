@@ -269,6 +269,7 @@ export class MatchPlatform {
         return;
       }
       this._quit(ps);
+      if (this.augments?.ready()) this.augments.settle();
     });
   }
 

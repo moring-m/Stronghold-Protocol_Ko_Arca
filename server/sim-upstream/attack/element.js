@@ -107,6 +107,9 @@ export function applyElement(battle, ctx) {
   const { source, credit, target, dmg } = ctx;
   const el = dmg.element;
   if (!el || !(el in target.elem)) return 0;
+  // 증강 원소 피해 (content/augments.js augmentElementMultiplier; absent on an official battle)
+  const augmentMul = battle.augmentElementMultiplier?.(source) || 1;
+  if (augmentMul !== 1) dmg.amount *= augmentMul;
   if (!hasHp(target)) return 0; // a killing blow's rider: the target is dead, nothing fills or bursts (header)
   if (target.s.flags.invulnerable || sleepBlocks(target, source, dmg)) return 0;
   if (liftoffEvades(target, source, dmg)) return 0;

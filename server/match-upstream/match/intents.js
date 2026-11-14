@@ -22,6 +22,8 @@ export class MatchIntents {
       case 'g.bondGroup': return this.pickBondGroup(ps, msg.idx, msg.setupRevision);
       case 'g.rerollVote': return this.voteSetupReroll(ps, msg.voteId, msg.agree);
       case 'g.band': return this.pickBand(ps, msg.bandId);
+      case 'g.augmentPick': return this.augments ? this.augments.select(ps, msg) : fail(ERR.WRONG_PHASE);
+      case 'g.augmentReroll': return this.augments ? this.augments.select(ps, msg, true) : fail(ERR.WRONG_PHASE);
       case 'g.diyBring': return this.confirmDiyBring(ps, msg.slots);
       case 'g.bandSkip': return this.skipBand(ps);
       // the strategy highlighted in the draft screen (what a timed-out turn takes, timeoutBand)

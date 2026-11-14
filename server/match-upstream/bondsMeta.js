@@ -109,7 +109,7 @@ export function computeBonds(gd, ps) {
   const bonusOf = (id) => (Number.isInteger(bonus[id]) ? bonus[id] : 0);
 
   // 커스텀 조화 기본 활성화 (customRules.defaultHarmony, the 맹약 season's rule): 调和 counts as active at its first tier
-  const defaultHarmony = !!gd.config?.customRules?.defaultHarmony;
+  const defaultHarmony = !!gd.config?.customRules?.defaultHarmony || !!ps.m?.augments?.allyCards?.(ps)?.some((a) => a.effect.kind === 'harmony');
   // first pass: raw counts
   const raw = {};
   for (const id of gd.bondIds) {

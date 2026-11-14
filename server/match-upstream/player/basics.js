@@ -307,5 +307,5 @@ export class PlayerBasics {
     return moved;
   }
 
-  dirty() { this.m.markPrivate(this); }
+  dirty() { this.m.augments?.drain(this); this.m.markPrivate(this); }
 }

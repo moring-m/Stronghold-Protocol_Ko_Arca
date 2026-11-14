@@ -1,6 +1,7 @@
 import {AUGMENT_ITEM_NAMES} from './augmentItemNames.js';
 import {AUGMENT_SOURCES} from './augmentSources.js';
 import {AUGMENT_ICON_ASSIGNMENTS} from './augmentIcons.js';
+import {SEASON_AUGMENT_ITEMS} from './seasonAugments.js';
 import {CHAT_FACTIONS} from './chat.js';
 export const AUGMENT_ROUNDS=Object.freeze([4,7,10]);
 /**
@@ -70,6 +71,9 @@ function effectOf(source,dataForStarter={}){
  return effects[base];
 }
 export function createAugmentCatalog(data,round){
+ // another season (shared/seasonAugments.js): its item ids name other items, so the augments' items are mapped by name
+ const season=SEASON_AUGMENT_ITEMS[data?.config?.version?.id]||null;
+ const itemName=id=>season?(season.names[id]||data.items?.[id]?.name):(AUGMENT_ITEM_NAMES[id]||data.items?.[id]?.name);
  const out=[];const baseSources=AUGMENT_SOURCES.filter(s=>s.rounds.includes(round));
  for(const s of baseSources){
   const prefix=`augment_${s.side}_${s.grade}_`;
@@ -79,20 +83,35 @@ export function createAugmentCatalog(data,round){
     if(['maniShip','investShip','miraShip','visiShip'].includes(bondId))continue;
     let effect,description;
     if(equipment){
-     const basic=Object.entries(data.items||{}).filter(([,i])=>!i.isGolden&&i.giveBondId===bondId&&i.itemType==='EQUIP').sort((a,b)=>a[1].tier-b[1].tier)[0]?.[0],advanced=ADVANCED[bondId];
-     if(!basic||s.grade!=='silver'&&(!bond.isCore||!data.items?.[advanced]))continue;
-     effect={kind:'items',items:s.grade==='silver'?[basic]:s.grade==='gold'?[advanced]:[advanced,basic],counts:s.grade==='prism'?[1,2]:[s.grade==='silver'?2:1]};
-     description=effect.items.map((id,i)=>`${AUGMENT_ITEM_NAMES[id]||data.items[id].name} ${effect.counts[i]}개`).join('와 ')+' 획득';
+     const basic=Object.entries(data.items||{}).filter(([,i])=>!i.isGolden&&i.giveBondId===bondId&&i.itemType==='EQUIP').sort((a,b)=>a[1].tier-b[1].tier)[0]?.[0],advanced=season?season.advanced[bondId]:ADVANCED[bondId];
+     if(!basic||s.grade!=='silver'&&!bond.isCore)continue;
+     if(s.grade!=='silver'&&!data.items?.[advanced]){
+      // a season bond with no advanced equipment: its basic equipment, more of it (II 3, III 4 against I's 2)
+      if(!season)continue;
+      effect={kind:'items',items:[basic],counts:[s.grade==='gold'?3:4]};
+     }else effect={kind:'items',items:s.grade==='silver'?[basic]:s.grade==='gold'?[advanced]:[advanced,basic],counts:s.grade==='prism'?[1,2]:[s.grade==='silver'?2:1]};
+     description=effect.items.map((id,i)=>`${itemName(id)} ${effect.counts[i]}개`).join('와 ')+' 획득';
     }else{
      const tier=Number(s.description.match(/(\d)등급/)?.[1]),candidates=Object.entries(data.chess||{}).filter(([,c])=>!c.isGolden&&!c.isHidden&&!c.isDiy&&!c.optionalRecruit&&c.visible!==false&&c.tier===tier&&(c.bonds||[]).includes(bondId)).map(([id])=>id);
      if(!candidates.length)continue;
-     const count=s.grade==='prism'?2:1;effect={kind:'chess',tier,count,bondId,candidates};description=`무작위 ${tier}등급 [${BASIC_NAMES[bondId]||bond.name}] 오퍼레이터 ${count}명 획득`;
+     const count=s.grade==='prism'?2:1;effect={kind:'chess',tier,count,bondId,candidates};description=`무작위 ${tier}등급 [${BASIC_NAMES[bondId]||season?.bondNames?.[bondId]||bond.name}] 오퍼레이터 ${count}명 획득`;
     }
-    const suffix=s.grade==='silver'?'I':s.grade==='gold'?'II':'III',name=`${BASIC_NAMES[bondId]||bond.name} ${equipment?'장비 지원':'지원'} ${suffix}`;
+    const suffix=s.grade==='silver'?'I':s.grade==='gold'?'II':'III',name=`${BASIC_NAMES[bondId]||season?.bondNames?.[bondId]||bond.name} ${equipment?'장비 지원':'지원'} ${suffix}`;
     out.push({id:prefix+(equipment?'equipment_':'support_')+bondId,name,grade:s.grade,side:s.side,rounds:s.rounds,description,bondId,iconBond:bondId,effect});
    }
   }else out.push({id:prefix+(s.identity??s.source),name:s.name,grade:s.grade,side:s.side,rounds:s.rounds,description:s.description,notes:s.notes,...(s.name==='라이타니엔'?{bondId:'leithanienShip'}:{}),iconBond:({...Object.fromEntries(Object.entries(BASIC_NAMES).map(([id,name])=>[name,id])),신속:"swiftShip",기습:"raidShip",정밀:"preciShip",예견:"visiShip",사르곤:"sargonShip",시라쿠사:"siracusaShip",조화:"maniShip"})[s.name.replace(/ (?:I|II|III)$/,"")]||null,effect:effectOf(s,data)});
  }
+ if(season)return out.flatMap(a=>{
+  // the fixed augments name 맹약-season item ids (ITEM_GRANTS, the 캐서린 hammers): map them; an item with no
+  // counterpart is left out, and an augment left with none is not offered
+  if(a.bondId&&/_(?:equipment|support)_/.test(a.id)||!Array.isArray(a.effect?.items))return [a];
+  const keep=a.effect.items.map((id,i)=>[season.items[id],i]).filter(([id])=>id&&data.items?.[id]);
+  if(!keep.length)return [];
+  const effect={...a.effect,items:keep.map(([id])=>id),...(Array.isArray(a.effect.counts)?{counts:keep.map(([,i])=>a.effect.counts[i])}:{})};
+  let description=a.description||'';
+  for(const [id,i] of keep){const from=AUGMENT_ITEM_NAMES[a.effect.items[i]],to=season.names[id];if(from&&to&&from!==to)description=description.split(from).join(to);}
+  return [{...a,effect,description}];
+ });
  return out;
 }
 export function augmentView(a){return {id:a.id,name:a.name,grade:a.grade,side:a.side,description:a.description,iconBond:a.iconBond||null,kind:a.effect.kind,icon:augmentIcon(a)};}

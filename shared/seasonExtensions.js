@@ -14,14 +14,16 @@
 //                    boss hit limit and the ally / enemy / boss stat percentages (allies, enemyStats, bossStats tabs)
 import { customExtensionCatalog, normalizeRuleValues, RULE_VALUES } from './customExtensions.js';
 
-export const SEASON_EXTENSION_CATEGORIES = Object.freeze(['rules', 'allies', 'enemyStats', 'bossStats', 'forcedBonds', 'forcedAuxBonds', 'bannedOperators', 'disabledBonds', 'disabledStages', 'disabledBosses', 'disabledBands']);
+export const SEASON_EXTENSION_CATEGORIES = Object.freeze(['rules', 'augmentSettings', 'defaultAllyAugments', 'defaultEnemyAugments', 'commonBands', 'allies', 'enemyStats', 'bossStats', 'forcedBonds', 'forcedAuxBonds', 'bannedOperators', 'disabledBonds', 'disabledStages', 'disabledBosses', 'disabledBands']);
 /** The rule switches a season match honours (match-upstream reads config.customRules). */
-export const SEASON_RULES = Object.freeze(['unlimitedHpLoss', 'sharedHp', 'defaultHarmony', 'duplicateBands', 'unlimitedLayers', 'unlimitedAspd']);
+export const SEASON_RULES = Object.freeze(['augments', 'unlimitedHpLoss', 'sharedHp', 'defaultHarmony', 'duplicateBands', 'unlimitedLayers', 'unlimitedAspd']);
 /** The rule values a season match honours. */
 export const SEASON_RULE_VALUES = Object.freeze(['normalBattleTime', 'bossBattleTime', 'bossBattleSpeed', 'stockPlayers', 'roundCount', 'deployCap', 'maxDamage',
-  // battle stats (sim-upstream reads them from the BattleSpec flags: customRules.js); the augment-driven ones are not here
-  ...RULE_VALUES.filter((r) => ['allies', 'enemyStats', 'bossStats'].includes(r.category) && !/ByAugment$/.test(r.id)).map((r) => r.id)]);
+  // battle stats (sim-upstream reads them from the BattleSpec flags: customRules.js) and the augment settings
+  ...RULE_VALUES.filter((r) => ['allies', 'enemyStats', 'bossStats', 'augments'].includes(r.category)).map((r) => r.id)]);
 const BAN_KEYS = ['forcedBonds', 'protectedBonds', 'forcedAuxBonds', 'protectedAuxBonds'];
+// 증강 (custom 증강 모드 / default augments): match-upstream/augments.js and sim-upstream/content/augments.js run them, on
+// the season's own augment catalogue (shared/augments.js with shared/seasonAugments.js mapping the items)
 const DEFAULT_VALUES = Object.freeze(Object.fromEntries(RULE_VALUES.map((r) => [r.id, r.default])));
 
 const EMPTY = Object.freeze({ bonds: [], stages: [], rules: [] });
@@ -59,7 +61,7 @@ export function applySeasonExtensions(raw, sel) {
   const rules = (sel.rules || []).filter((id) => SEASON_RULES.includes(id));
   const values = Object.fromEntries(Object.entries(sel.ruleValues || {}).filter(([id]) => SEASON_RULE_VALUES.includes(id)));
   const policy = Object.fromEntries(BAN_KEYS.filter((k) => (sel[k] || []).length).map((k) => [k, [...sel[k]]]));
-  if (!banned.size && !bonds.size && !stages.size && !bosses.size && !bands.size && !rules.length && !Object.keys(values).length && !Object.keys(policy).length) return raw;
+  if (!banned.size && !bonds.size && !stages.size && !bosses.size && !bands.size && !rules.length && !Object.keys(values).length && !Object.keys(policy).length && !(sel.commonBands || []).length) return raw;
   const chess = banned.size ? Object.fromEntries(Object.entries(raw.chess || {}).map(([id, c]) => [id, banned.has(id) ? { ...c, visible: false } : c])) : raw.chess;
   const dropKeys = (o, set) => (o && typeof o === 'object' ? Object.fromEntries(Object.entries(o).filter(([k]) => !set.has(k))) : o);
   const modes = Object.fromEntries(Object.entries(raw.config?.modes || {}).map(([id, m]) => [id, {
@@ -71,7 +73,8 @@ export function applySeasonExtensions(raw, sel) {
   }]));
   const roundCount = values.roundCount;
   if (Number.isInteger(roundCount) && roundCount !== DEFAULT_VALUES.roundCount) for (const [id, m] of Object.entries(modes)) modes[id] = withRoundCount(m, raw.config.modes, roundCount);
-  const customRules = { ...values, ...Object.fromEntries(rules.map((id) => [id, true])), ...(values.stockPlayers === -1 ? { unlimitedStock: true } : {}) };
+  const common = (sel.commonBands || []).filter((id) => raw.bands?.[id]);
+  const customRules = { ...values, ...Object.fromEntries(rules.map((id) => [id, true])), ...(values.stockPlayers === -1 ? { unlimitedStock: true } : {}), ...(common.length ? { commonBands: common } : {}) };
   return { ...raw, chess, bands: dropKeys(raw.bands, bands), config: { ...raw.config, modes,
     ...(Object.keys(customRules).length ? { customRules } : {}),
     ...(Object.keys(policy).length ? { bondPolicy: policy } : {}),

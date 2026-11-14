@@ -231,6 +231,7 @@ import { createRng, deriveSeed } from '../sim-upstream/rng.js';
 import { GameData } from './gamedata.js';
 import { RealScheduler } from './scheduler.js';
 import { SharedPool, SharedItemPool, drawDisabledBonds } from './pool.js';
+import { AugmentMode } from './augments.js';
 import { PlayerState } from './PlayerState.js';
 import { EffectDispatcher, getDefaultRegistry } from './effectsMeta.js';
 import { setupMatchWaves } from './waves.js';
@@ -492,6 +493,12 @@ export class Match {
     this.staticInactiveBonds = bans.staticOff;
     this.bannedChess = bans.banned;
     this.pool = new SharedPool(this.gd, { banned: bans.banned });
+    // 커스텀 증강 (opts.seasonExtensions, shared/seasonExtensions.js): an AugmentMode only when the custom selection turns
+    // augments on or picks default ones; null on every other match, so each hook (`this.augments?.`) is skipped
+    const ext = opts.seasonExtensions;
+    this.customExtensions = ext || { rules: [] };
+    this.gameplayMode = ext ? (opts.gameplayMode === 'augment' ? 'augment' : 'custom') : 'classic';
+    this.augments = ext && (ext.rules?.includes('augments') || ext.defaultAllyAugments?.length || ext.defaultEnemyAugments?.length) ? new AugmentMode(this) : null;
     this.itemPool = new SharedItemPool(this.gd, () => this.order);
     // Each human's 自选 stock uses the same exclusion rule (player/diy.js initDiyStock), without randomness.
     // A bring-limited season stocks nothing until 选择自编 confirms; diyBanned is still the bond-excluded slots.

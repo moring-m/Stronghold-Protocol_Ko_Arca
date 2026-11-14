@@ -21,7 +21,7 @@ export class PlayerRound {
     this.pendingFunds = 0;
     this.m.dispatch(this, 'onIncome', ev);
     const nonNeg = (v) => (Number.isFinite(v) && v > 0 ? Math.trunc(v) : 0);
-    this.addFunds(nonNeg(ev.income) + nonNeg(ev.pending), { reason: 'income' });
+    this.addFunds(nonNeg(ev.income) + nonNeg(ev.pending) + (this.m.augments?.income(this) || 0), { reason: 'income' });
     // temp is NOT wiped here: the last prep's deadline resolved what the player could act on (endPrep); what overflowed
     // after it (battle-result grants, SETTLE merges, returned equipment) is shown and usable in this prep (tempDue).
     // Queued reward offers (a promotion's pick, a strategy's special refresh, an item offer) are kept until picked —

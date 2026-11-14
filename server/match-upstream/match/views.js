@@ -53,6 +53,7 @@ export class MatchViews {
         if (this.draft && this.draft.picks[ps.playerId]) return 'ready';
         return this.draft && this.draftTurn() === ps.playerId ? 'deciding' : 'acting';
       case PHASE.SP_DRAFT:
+        if (this.augments?.current) return this.augments.current.side === 'ally' ? (this.augments.current.slots.get(ps.playerId)?.picked != null ? 'ready' : 'deciding') : (this.augments.host() === ps.playerId ? 'deciding' : 'acting');
         if (this.sp && this.sp.picks[ps.playerId] != null) return 'ready';
         return this.sp && this.spTurn() === ps.playerId ? 'deciding' : 'acting';
       case PHASE.PREP: return ps.ready ? 'ready' : 'acting';
@@ -199,6 +200,8 @@ export class MatchViews {
         ...(e.detail ? { detail: e.detail } : {}),
       }));
     }
+    if (this.augments?.enabled) v.augments = this.augments.publicView();
+    { const d = this.augments?.defaultView(); if (d) v.defaultAugments = d; }
     return v;
   }
 

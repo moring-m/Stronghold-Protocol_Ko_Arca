@@ -317,8 +317,10 @@ export class Match {
     // class is the 맹약 seasons'. A subclass (the match host's ContentMatch, a test's) gets the upstream match too.
     if (versionById(opts?.version)?.family === 'regulation' || opts?.data?.config?.version?.family === 'regulation') {
       // 커스텀 설정 of that season (shared/seasonExtensions.js): plain filters of its own tables, before the match reads them
-      const sel = normalizeGameplayMode(opts?.gameplayMode) === 'custom' ? seasonExtensionSelection(opts?.customExtensions, opts?.data) : null;
-      return new UpstreamMatch(sel ? { ...opts, data: applySeasonExtensions(opts.data, sel) } : opts);
+      // (the room's selection: custom, or 증강 모드's preset — the lobby keeps it in season form)
+      const gm = normalizeGameplayMode(opts?.gameplayMode);
+      const sel = gm === 'custom' || gm === 'augment' ? seasonExtensionSelection(opts?.customExtensions, opts?.data) : null;
+      return new UpstreamMatch(sel ? { ...opts, data: applySeasonExtensions(opts.data, sel), seasonExtensions: sel } : opts);
     }
     if (!opts || !Array.isArray(opts.seats) || opts.seats.length === 0) throw new TypeError('Match: seats required');
     if (typeof opts.send !== 'function' || typeof opts.broadcast !== 'function' || typeof opts.onEnd !== 'function') {

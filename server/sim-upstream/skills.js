@@ -223,7 +223,9 @@ export class SkillRuntime {
   get spCost() {
     const c = Math.floor(this.baseSpCost * this.spCostMul + (this.unit.s ? this.unit.s.spCostFlat : 0));
     // content writes spCostMul / spCostFlat: a NaN/Infinity cost would freeze SP forever — use the base cost instead
-    return Number.isFinite(c) ? Math.max(0, c) : this.baseSpCost;
+    const value = Number.isFinite(c) ? Math.max(0, c) : this.baseSpCost;
+    // 증강 SP 감소 (content/augments.js mem.augmentSpCost; never set on an official battle)
+    return this.unit.mem?.augmentSpCost != null ? Math.ceil(value * this.unit.mem.augmentSpCost) : value;
   }
 
   /** SP cost multiplier (content-writable). Invalid values count as 1; SP/charges are re-normalised immediately. */

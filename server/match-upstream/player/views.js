@@ -3,6 +3,7 @@
 // Installed on PlayerState.prototype by server/match/PlayerState.js (a method container: never instantiated; `this` is
 // the player state).
 
+import { augmentEffectEntries } from '../../../shared/augments.js';
 import { itemProgress } from '../itemProgress.js';
 import { PHASE } from '../../../shared/constants.js';
 import { boardOrder, pieceDir } from '../board.js';
@@ -61,6 +62,8 @@ export class PlayerViews {
     const out = [];
     const band = this.bandId ? this.gd.band(this.bandId) : null;
     if (band) out.push({ id: band.effectId || band.bandId, name: band.effectName || band.name, desc: band.desc || '', iconKind: 'band', iconId: band.iconId || band.bandId, ...this.bandProgressView() });
+    // 커스텀 증강: the chosen augments in the effects list (the 맹약 season's PlayerState effectsView)
+    if (this.m.augments?.enabled) out.push(...augmentEffectEntries(this.m.augments.allyCards(this), this.m.augments.enemies));
     for (const e of this.effects) {
       if (e.hidden) continue;
       const v = { id: e.id, name: e.name || e.id, desc: e.desc || '', iconKind: e.iconKind || 'choice', iconId: e.iconId || e.id };
@@ -92,6 +95,7 @@ export class PlayerViews {
     return {
       t: 'm.private',
       playerId: this.playerId,
+      ...(this.m.augments?.enabled ? { augments: this.m.augments.privateView(this) } : {}),
       ...(Number.isInteger(this.aiTakeoverRound) ? { aiTakeoverRound: this.aiTakeoverRound } : {}),
       seat: this.seat,
       alive: this.alive,

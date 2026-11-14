@@ -1,5 +1,5 @@
 import {isRoomTitle,defaultRoomTitle} from '../shared/roomTitle.js';
-import {isGameplayMode,normalizeGameplayMode,gameplayExtensions,canSwitchPublicMode} from '../shared/gameplayModes.js';
+import {isGameplayMode,normalizeGameplayMode,gameplayExtensions,canSwitchPublicMode,AUGMENT_MODE_VALUES} from '../shared/gameplayModes.js';
 import {KITTED_CHARS} from './sim/content/kits/index.js';
 
 // server/lobby.js — rooms, seats, host, AI seats, ready/start, reconnect, and room → Match wiring
@@ -1038,7 +1038,6 @@ export class Lobby {
     if(room.match)return fail(ERR.ROOM_STARTED);
     if(!isGameplayMode(gameplayMode))return fail(ERR.BAD_MSG);
     if(!canSwitchPublicMode(room.gameplayMode,gameplayMode,room.isPublic))return fail(ERR.BAD_MSG,'공개 후에는 게임 모드를 변경할 수 없습니다.');
-    if(room.version!==DEFAULT_VERSION&&gameplayMode==='augment')return fail(ERR.BAD_MSG,'이 시즌은 증강 모드를 지원하지 않습니다.');
     const selected=this.extSelection(room.version,room.savedCustomExtensions,room.mode,gameplayMode);
     const errors=this.extErrors(room.version,selected,{mode:room.mode,difficulty:room.difficulty,modeId:room.modeId});
     if(errors.length)return fail(ERR.BAD_MSG,errors.join(' '));
@@ -1337,7 +1336,6 @@ export class Lobby {
     if (next !== before) { this.holdContent(next); this.releaseContent(before); }
     room.replay = null;
     // 커스텀 설정 follows the season: its own catalogue; a selection of the other season's ids is dropped
-    if (version !== DEFAULT_VERSION && room.gameplayMode === 'augment') room.gameplayMode = 'classic';
     room.customExtensionCatalog = this.extCatalog(version);
     room.savedCustomExtensions = version !== DEFAULT_VERSION ? seasonExtensionSelection(room.savedCustomExtensions, this.extData(version))
       : modeExtensionSelection(normalizeCustomExtensions(room.savedCustomExtensions, this.safeData()), room.mode);
@@ -2194,7 +2192,8 @@ export class Lobby {
   /** The room's effective selection for a gameplay mode (another season: its own categories, classic = none). */
   extSelection(version, saved, mode, gameplayMode) {
     if (version === DEFAULT_VERSION) return gameplayExtensions(saved, this.safeData(), mode, gameplayMode);
-    return seasonExtensionSelection(normalizeGameplayMode(gameplayMode) === 'custom' ? saved : {}, this.extData(version));
+    const gm = normalizeGameplayMode(gameplayMode);
+    return seasonExtensionSelection(gm === 'custom' ? saved : gm === 'augment' ? { rules: ['augments'], ruleValues: { ...AUGMENT_MODE_VALUES } } : {}, this.extData(version));
   }
 
   extErrors(version, selection, { mode, difficulty, modeId }) {

@@ -468,7 +468,7 @@ export class MatchPhases {
       this.wave = buildNormalWave(this.gd, this.rngWaves, this.factions, r);
     }
     for (const ps of alive) ps.startRound(r);
-    for (const ps of alive) this.dispatch(ps, 'onRoundStart', { round: r });
+    for (const ps of alive) { this.dispatch(ps, 'onRoundStart', { round: r }); this.augments?.roundStart(ps); }
     // an eliminated player's pending 信标 gift still goes to its teammate (effects flagged afterElimination; GitHub #86)
     for (const ps of this.order) {
       if (ps.alive) continue;
@@ -504,6 +504,8 @@ export class MatchPhases {
   }
 
   afterRoundStart() {
+    // 커스텀 증강: its offer comes first; AugmentMode.settle calls back here for the season's own draft
+    if (this.augments?.enter()) return;
     if (this.gd.spRounds().includes(this.round)) this.enterSpDraft();
     else this.beforePrepOffers();
   }

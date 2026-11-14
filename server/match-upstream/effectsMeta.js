@@ -256,6 +256,12 @@ export class EffectDispatcher {
         const h = commandMetaHandler(ps) ?? reg.get(key) ?? reg.get(`band:${this.m.gd.band(ps.bandId)?.effectRef}`);
         if (h) this._call(ps, key, h, hook, { kind: 'band', key, bandId: ps.bandId, band: this.m.gd.band(ps.bandId) }, ev);
       }
+      // 2b. 커스텀 공통 적용 전략 (config.customRules.commonBands): every player also runs these strategies' effects
+      for (const bandId of this.m.gd.config.customRules?.commonBands || []) {
+        const key = `band:${bandId}`;
+        const h = reg.get(key) ?? reg.get(`band:${this.m.gd.band(bandId)?.effectRef}`);
+        if (h) this._call(ps, key, h, hook, { kind: 'band', key, bandId, band: this.m.gd.band(bandId), common: true }, ev);
+      }
       // 3. bonds
       for (const bondId of this.m.gd.bondIds) {
         const key = `bond:${bondId}`;

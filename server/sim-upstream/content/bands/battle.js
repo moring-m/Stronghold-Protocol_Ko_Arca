@@ -39,6 +39,7 @@
 //                                               aggroSeq precedes ordinary initial operators; deploySeq stays the runtime spawn
 // Prep-only bands (economy / shop / grants / layers at prep end or round start) live in bands/meta.js.
 
+import { customRules } from '../../customRules.js';
 import {
   num, buffsOf, bandRecord, isOp, onField, isElite, tierOf, unitBonds, activeBondIds, playerOps, passiveBuff, fxOn,
   matchBands, gainLayers, alliesAround, N4, baseChessId, isGroundOp, directMods, isVersionData, isFirstPeriod,
@@ -299,6 +300,17 @@ export function install(battle) {
       const f = b.bbKey ? BY_KEY[b.bbKey] : null;
       if (!f) continue;
       try { f(battle, ps, b.p, ps.bandId); } catch (e) { battle._handlerError?.(`band:${ps.bandId}`, null, e); }
+    }
+  }
+  // 커스텀 공통 적용 전략 (the match's customRules.commonBands, carried by the BattleSpec flags): every player's battle
+  // effects of these strategies too
+  for (const bandId of customRules(battle)?.commonBands || []) {
+    const band = bandRecord(bandId);
+    if (!band) continue;
+    for (const ps of battle.players) for (const b of buffsOf(band)) {
+      const f = b.bbKey ? BY_KEY[b.bbKey] : null;
+      if (!f) continue;
+      try { f(battle, ps, b.p, bandId); } catch (e) { battle._handlerError?.(`band:${bandId}`, null, e); }
     }
   }
   installMapChars(battle);
