@@ -503,8 +503,9 @@ export function SweepReport({ onClose }) {
   const [enemySel, setEnemySel] = useState(null);
   const [augmentSel, setAugmentSel] = useState(null);
   const [codex, setCodex] = useState(null);
-  const bondData = data.get('bonds'), chessData = data.get('chess'), itemData = data.get('items');
-  const augments = useMemo(() => ready ? reportAugments({ bonds: bondData || {}, chess: chessData || {}, items: itemData || {} }) : [], [ready, bondData, chessData, itemData]);
+  const bondData = data.get('bonds'), chessData = data.get('chess'), itemData = data.get('items'), configData = data.get('config');
+  // config: the season's version id picks its bond / item names (shared/seasonAugments.js), not the raw Chinese names
+  const augments = useMemo(() => ready ? reportAugments({ bonds: bondData || {}, chess: chessData || {}, items: itemData || {}, config: configData || {} }) : [], [ready, bondData, chessData, itemData, configData]);
   const augment = augments.find((a) => a.id === augmentSel) || augments[0];
 
   // defaults once the data is there: the first tile of each tab
