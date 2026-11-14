@@ -53,7 +53,56 @@ def chunks_of(doc, buf):
         yield c, pos, uv, uv1, nrm, col, idx
 
 
-def convert(public, stage, materials, out_rows):
+def components(pos, idx):
+    """Connected triangle groups of a chunk (vertices welded by position): [(triangle ids, bbox x0,x1,y0,y1,z1)]."""
+    tri = idx.reshape(-1, 3)
+    key = {}
+    weld = np.empty(len(pos), dtype=np.int64)
+    for i, p in enumerate(np.round(pos, 4)):
+        weld[i] = key.setdefault((p[0], p[1], p[2]), i)
+    parent = np.arange(len(pos))
+    def find(i):
+        while parent[i] != i:
+            parent[i] = parent[parent[i]]; i = parent[i]
+        return i
+    for a, b, c in weld[tri]:
+        ra, rb, rc = find(a), find(b), find(c)
+        parent[rb] = ra; parent[find(rc)] = ra
+    roots = np.array([find(weld[t[0]]) for t in tri])
+    out = []
+    for r in np.unique(roots):
+        ids = np.nonzero(roots == r)[0]
+        p = pos[tri[ids].ravel()]
+        out.append((ids, p[:, 0].min(), p[:, 0].max(), p[:, 1].min(), p[:, 1].max(), p[:, 2].max()))
+    return out
+
+
+def blocks_board(box, rows):
+    """A decoration standing on a cell the player uses: the bench / equipment rows (7, 8) or a drawn field cell.
+    A tile itself (about one cell wide and deep, low) always stays. [ASSUMED] a prop is under 0.85 tile in either
+    direction, or taller than 0.7 tile; on the field only props whose centre is on a non-wall cell. Landscape (over
+    2.5 tiles, or outside the 21 columns) stays."""
+    _, x0, x1, y0, y1, z1 = box
+    w, d = x1 - x0, y1 - y0
+    cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
+    # a tall rock / ice shard rising in front of the bench (its centre on the separator / bench rows 5–9, ≤ 6 tiles)
+    if 5.0 <= cy <= 9.0 and 0 <= cx <= 20 and w <= 6 and d <= 6 and z1 > 1.0:
+        return True
+    if w > 2.5 or d > 2.5 or x0 < -0.5 or x1 > 20.5:
+        return False
+    prop = min(w, d) < 0.85 or z1 > 0.7
+    if not prop:
+        return False
+    cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
+    r, c = int(round(cy)), int(round(cx))
+    if 6.5 <= cy <= 8.5:
+        return z1 > 0.25
+    if not rows or not (0 <= r < len(rows)) or not (0 <= c < len(rows[r])):
+        return False
+    return rows[r][c] not in '#X' and z1 > 0.6
+
+
+def convert(public, stage, materials, out_rows, rows=None):
     sdir = public / 'assets/local/scene' / stage
     doc = json.loads((sdir / 'scene.json').read_text(encoding='utf-8'))
     used = set(doc['materials'])
@@ -85,6 +134,13 @@ def convert(public, stage, materials, out_rows):
         b = buckets.setdefault(key, {'material': c['material'], 'platform': False,
                                      'lightMap': pages.get(page), 'position': [], 'normal': [], 'uv': [], 'uv1': [],
                                      'color': [], 'index': []})
+        # props on the bench / field cells hide the pieces in the web camera: drop them (the scene renderer's prefab
+        # pieces were cut by row in regulation_scenes, not by what stands on a cell)
+        keep = np.ones(len(idx) // 3, dtype=bool)
+        for box in components(pos, idx):
+            if blocks_board(box, rows):
+                keep[box[0]] = False
+        idx = idx.reshape(-1, 3)[keep].ravel()
         base = len(b['position']) // 3
         n = nrm[:, :3].astype(np.float64) / 127.0
         n /= np.maximum(1e-12, np.linalg.norm(n, axis=1))[:, None]
@@ -101,7 +157,8 @@ def convert(public, stage, materials, out_rows):
                  # scene.json dir is (x, y, z-up); the native table stores (x, z, y) — the same sun reads
                  # [.361, .446, .819] in a 규정 scene and [.361, .819, .446] in act1autochess_m01's native record
                  'dir': doc['light']['dir'] and [doc['light']['dir'][0], doc['light']['dir'][2], doc['light']['dir'][1]]},
-             'stageId': stage, 'sourceBundle': doc.get('bundle'), 'md5': None, 'buckets': buckets,
+             # converted from a 규정 scene: its lightmap carries the shadows, so the renderer casts none in real time
+             'converted': True, 'stageId': stage, 'sourceBundle': doc.get('bundle'), 'md5': None, 'buckets': buckets,
              'stats': {'renderers': len(doc['chunks']), 'triangles': tris,
                        'bounds': [allp.min(0).tolist(), allp.max(0).tolist()],
                        'materials': {m: 1 for m in sorted(used)}, 'source': 'regulation scene/' + stage}}
@@ -156,6 +213,12 @@ def main():
     public, materials_path, out_manifest = Path(sys.argv[1]), Path(sys.argv[2]), Path(sys.argv[3])
     materials = json.loads(materials_path.read_text(encoding='utf-8'))
     rows, report = {}, []
+    # REG_STAGES: the season's stages.json (cell glyphs for the prop filter)
+    import os
+    stage_rows = None
+    if os.environ.get('REG_STAGES'):
+        st = json.loads(Path(os.environ['REG_STAGES']).read_text(encoding='utf-8'))
+        stage_rows = {v['id']: v.get('rows') for v in (st.values() if isinstance(st, dict) else st)}
     # optional 4th argument: write the native table extended with the 규정 materials there
     if len(sys.argv) > 4:
         added = add_materials(public, materials, rows)
@@ -164,7 +227,7 @@ def main():
         print('materials added:', added, flush=True)
     for stage in REGULATION_IDS:
         if stage not in SKIP and (public / 'assets/local/scene' / stage / 'scene.json').exists():
-            r = convert(public, stage, materials, rows)
+            r = convert(public, stage, materials, rows, (stage_rows or {}).get(stage))
             report.append(r); print(json.dumps(r, ensure_ascii=False), flush=True)
     out_manifest.write_text(json.dumps({'map/original': rows, 'report': report}, ensure_ascii=False, indent=2), encoding='utf-8')
 

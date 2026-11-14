@@ -350,7 +350,7 @@ export function buildBoard(stage, opts = {}) {
   const topZ = (t) => (t.glyph === 'd' ? -BASIN : t.h);
   const board = new Geom(), decal = new Geom(), pipe = new Geom(), glass = new Geom();
   const raised = new Geom(), raisedDecal = new Geom();
-  const gates = [], terrain = { water: [], mire: [], smog: [], infection: [] };
+  const gates = [], terrain = { water: [], mire: [], smog: [], infection: [], speedup: [] };
   // S / E gates come from the whole grid, not from the drawn tiles: the enemy half's start gate sits outside the
   // current area and the `t.drawn` filter below would drop it, so watching one half lost the other side's red gate.
   // A boss field is framed on its own arena, where the other gates would sit on top of the arena's own, so there
@@ -424,6 +424,7 @@ export function buildBoard(stage, opts = {}) {
       case 'm': terrain.mire.push([r, c]); break;
       case 'g': terrain.smog.push([r, c]); break;
       case 'i': terrain.infection.push([r, c]); break;
+      case 'z': terrain.speedup.push([r, c]); break; // 규정 加速 tile (sim content/devices.js TERRAIN.speedup)
       default: break;
     }
   }

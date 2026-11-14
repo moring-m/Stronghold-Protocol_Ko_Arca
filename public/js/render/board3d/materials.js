@@ -313,6 +313,24 @@ export function infectionGlowMaterial(THREE, tex, focus) {
   });
 }
 
+/** 규정 加速 tile: a cyan frame and chevrons running along the tile (ASPD / move speed up for whoever stands on it). */
+export function speedupMaterial(THREE, focus) {
+  return new THREE.ShaderMaterial({
+    uniforms:{uTime:{value:0},...focus},vertexShader:TERRAIN_VERT,
+    fragmentShader:[
+      'uniform float uTime;',FOCUS_GLSL,'varying vec2 vUv; varying vec3 vWorld;',
+      'void main(){',
+      'float edge=min(min(vUv.x,1.0-vUv.x),min(vUv.y,1.0-vUv.y));',
+      'float border=(1.0-smoothstep(0.0,0.07,edge))*smoothstep(0.0,0.015,edge);',
+      'float y=fract(vUv.y*2.0-uTime*0.9); float x=abs(vUv.x-0.5);',
+      'float chev=smoothstep(0.10,0.02,abs(y-0.5-x*0.9))*step(x,0.32);',
+      'float a=(border*0.55+chev*0.45)*focusMask(vWorld.xy);',
+      'gl_FragColor=vec4(0.25,0.95,1.0,a);',
+      '#include <colorspace_fragment>', '}'
+    ].join('\n'),transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
+  });
+}
+
 /** Rising red glow over Originium/rage tiles, in world space. */
 export function infectionRiseMaterial(THREE, focus) {
  return new THREE.ShaderMaterial({uniforms:{uTime:{value:0},...focus},vertexShader:TERRAIN_VERT,

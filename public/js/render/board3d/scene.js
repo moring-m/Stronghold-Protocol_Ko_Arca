@@ -29,7 +29,7 @@ import { applyNativeStageBlend } from './materials.js';
 
 import { buildBoard, buildDeviceSlabs, objToBoard, boxProjectUV, ROWS, COLS, DEVICE_H, AREAS, heightOf } from './layout.js';
 import { surfaceUV } from './atlas.js';
-import { focusUniforms, addFocus, makeTexture, boardMaterial, glassMaterial, decalMaterial, pipeMaterial, unlitMaterial, gateMaterial, glowMaterial, waterMaterial, mireMaterial, infectionMaterial, infectionGlowMaterial, infectionRiseMaterial, thicketRiseMaterial, smogMaterial, dashTexture, environmentMap, nativePhysicalLighting, addShadowContrast, sceneMaterial, sceneWaterMaterial, sceneEnvTexture, sceneWaterDecalMaterial, applyWaterMaterial, trapMaterial } from './materials.js';
+import { focusUniforms, addFocus, makeTexture, boardMaterial, glassMaterial, decalMaterial, pipeMaterial, unlitMaterial, gateMaterial, glowMaterial, waterMaterial, mireMaterial, infectionMaterial, infectionGlowMaterial, infectionRiseMaterial, speedupMaterial, thicketRiseMaterial, smogMaterial, dashTexture, environmentMap, nativePhysicalLighting, addShadowContrast, sceneMaterial, sceneWaterMaterial, sceneEnvTexture, sceneWaterDecalMaterial, applyWaterMaterial, trapMaterial } from './materials.js';
 import { syncThreeCamera } from '../projection.js';
 import { TILE_H } from '../style.js';
 import {officialRangeHeight,raisedRangeTiles} from '../rangeHeight.js';
@@ -417,6 +417,7 @@ export class BoardScene {
       water: waterMaterial(T, this.tex, this.focus),
       mire: mireMaterial(T, this.tex, this.focus),
       infection: infectionMaterial(T, this.tex, this.focus),
+      speedup: speedupMaterial(T, this.focus),
       infectionGlow: infectionGlowMaterial(T, this.tex, this.focus),
       infectionRise: infectionRiseMaterial(T, this.focus),
       thicketRise: thicketRiseMaterial(T, this.tex, this.focus),
@@ -1042,7 +1043,7 @@ export class BoardScene {
           // of the same boundary blocks on top of the native boss rim.
           const rear=surfaceForArea(environment,[{c0:-100,c1:100,r0:14,r1:100}]);
           const movedRear=translateEnvironment(rear,structuralStage.previewLayout.offset);
-          M[`cooperative:${material}`]=this._mesh(movedRear,runtimeMaterial,{cast:!runtimeMaterial.isShaderMaterial});
+          M[`cooperative:${material}`]=this._mesh(movedRear,runtimeMaterial,{cast:!runtimeMaterial.isShaderMaterial && !original.converted});
           if(!waterSurface){borderSurfaces.push(sceneryForArea(movedRear,[{r0:6,r1:7,c0:-1,c1:21}],{decorationOnly:true}));borderSources.push({geometry:movedRear,ornamentGeometry:translateEnvironment(environment,structuralStage.previewLayout.offset),sourceArea:{r0:7,r1:100,c0:-100,c1:100},material:runtimeMaterial,platform:false});}
           visibleGeometry=waterSurface ? {...geometry,index:[]} : surfaceForArea(sceneryForArea(geometry,AREAS.boss),[{r0:-100,r1:6,c0:-100,c1:100}]);
         } else {
@@ -1053,16 +1054,16 @@ export class BoardScene {
           visibleGeometry=surfaceForArea(visibleGeometry,outsideTileAreas(patches));
           const sourceAreas=patches.map(a=>({...a,r0:a.r0+worldOffset,r1:a.r1+worldOffset}));
           const replacement=translateEnvironment(surfaceForArea(geometry,sourceAreas),worldOffset);
-          M[`cooperative-functional:${material}`]=this._mesh(replacement,runtimeMaterial,{cast:!runtimeMaterial.isShaderMaterial});
+          M[`cooperative-functional:${material}`]=this._mesh(replacement,runtimeMaterial,{cast:!runtimeMaterial.isShaderMaterial && !original.converted});
         }
         nativeParts.push({key:`original:${material}`,geometry:visibleGeometry,source:geometry,material:runtimeMaterial});
-        M[`original:${material}`] = this._mesh(visibleGeometry, runtimeMaterial, { cast: !runtimeMaterial.isShaderMaterial });
+        M[`original:${material}`] = this._mesh(visibleGeometry, runtimeMaterial, { cast: !runtimeMaterial.isShaderMaterial && !original.converted });
         if(!waterSurface){borderSurfaces.push(geometry.platform ? {...visibleGeometry,footprints:[]} : sceneryForArea(visibleGeometry,[{r0:6,r1:7,c0:-1,c1:21}],{decorationOnly:true}));borderSources.push({geometry:stage.previewLayout ? surfaceForArea(geometry,[{r0:-100,r1:6,c0:-100,c1:100}]) : visibleGeometry,ornamentGeometry:geometry,sourceArea:stage.previewLayout ? {r0:-100,r1:6,c0:-100,c1:100} : null,material:runtimeMaterial,platform:!!geometry.platform});}
         if (stage.previewLayout && geometry.platform) {
           const {source,offset}=structuralStage.previewLayout;
           const floor=surfaceForArea(geometry,[{...source,c0:source.c0-1,c1:source.c1+1}]);
           const moved={...floor,position:floor.position.map((v,i)=>i%3===1?v-offset:v)};
-          M[`preview:${material}`]=this._mesh(moved,runtimeMaterial,{cast:!runtimeMaterial.isShaderMaterial});
+          M[`preview:${material}`]=this._mesh(moved,runtimeMaterial,{cast:!runtimeMaterial.isShaderMaterial && !original.converted});
           borderSurfaces.push({...moved,footprints:[]});
         }
         yield;
@@ -1518,6 +1519,8 @@ export class BoardScene {
       }
       this.meshes.infectionRise=this._mesh({position:new Float32Array(position),normal:new Float32Array(position.length),uv:new Float32Array(uv),index:new Uint16Array(index)},this.mat.infectionRise,{cast:false,receive:false,order:4});
     }
+    // 규정 加速 tiles: drawn over native and procedural boards alike (the converted scenes carry no marking of their own)
+    if (board.terrain.speedup?.length) this.meshes.speedup = this._mesh(quads(board.terrain.speedup, (r,c)=>((this.originalStage || this.official) ? this._nativeTileHeight(board,r,c) : 0)+.02, 0.02), this.mat.speedup, {cast:false,receive:false,order:3});
     // Native stage meshes already contain these environmental tile surfaces.
     if ((this.originalStage || this.official)) return;
     const T = board.terrain;
@@ -1752,7 +1755,7 @@ export class BoardScene {
     let flash = 0;
     for (let i = this.flashes.length - 1; i >= 0; i--) { const f = this.flashes[i]; f.t += dt; if (f.t > 1.2) this.flashes.splice(i, 1); else flash = Math.max(flash, 1 - f.t / 1.2); }
     for (const m of [this.mat.gateEndAdd, this.mat.gateEndAb]) if (m) m.uniforms.uFlash.value.setRGB(flash, flash * 0.12, flash * 0.1);
-    for (const k of ['water', 'mire', 'infection', 'infectionGlow', 'infectionRise', 'thicketRise', 'smog']) this.mat[k].uniforms.uTime.value = t;
+    for (const k of ['water', 'mire', 'infection', 'infectionGlow', 'infectionRise', 'thicketRise', 'smog', 'speedup']) this.mat[k].uniforms.uTime.value = t;
     for (const m of Object.values(this.originalMaterials)) if (m.uniforms?.uTime) m.uniforms.uTime.value = t;
     for (const k of ['water', 'mire', 'infection', 'smog']) this.mat[k].uniforms.uTime.value = t;
     if (this.official) for (const m of this.sceneWater || []) m.uniforms.uTime.value = t;
