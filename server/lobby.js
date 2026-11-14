@@ -184,6 +184,7 @@ import { Match as DefaultMatch } from './match/Match.js';
 const VANILLA_KITTED = new Set(KITTED_CHARS);
 import { isContentHash } from '../shared/plugins/identity.js';
 import { DEFAULT_VERSION } from '../shared/versions.js';
+import { seasonExtensionCatalog, seasonExtensionSelection, validateSeasonExtensions } from '../shared/seasonExtensions.js';
 import { ruleOption } from '../shared/plugins/rules.js';
 import { msg, wireMessage } from '../shared/i18n.js';
 import { parseTestModeEnv, testModeGate, unrecognizedTestMode } from './testMode.js';
@@ -834,8 +835,8 @@ export class Lobby {
     }
     const code = this.genCode();
     if (!code) return fail(ERR.INTERNAL, 'no room code available');
-    const initialSelection=gameplayExtensions(customExtensions,this.safeData(),mode,gameplayMode);
-    const minimumErrors=validateExtensionMinimums(this.safeData(),initialSelection,{mode,difficulty});
+    const initialSelection=this.extSelection(version,customExtensions,mode,gameplayMode);
+    const minimumErrors=this.extErrors(version,initialSelection,{mode,difficulty,modeId:null});
     if(minimumErrors.length)return fail(ERR.BAD_MSG,minimumErrors.join(' '));
     if (cur) this.removeMember(cur, session.playerId);
     // Cooperative rooms always offer eight spectator seats; the legacy request field cannot disable them.
@@ -850,11 +851,11 @@ export class Lobby {
     if (mode === 'solo' && soloUnlimited === true && this.versionSoloTimed(version)) room.soloUnlimited = true;
     if(test===true&&!this.testEnabled)return fail(ERR.TEST_DISABLED);
     room.test=test===true;
-    room.customExtensionCatalog = customExtensionCatalog(this.safeData());
+    room.customExtensionCatalog = this.extCatalog(room.version);
     room.gameplayMode=normalizeGameplayMode(gameplayMode);
     room.sync=sync===true;
     room.titleLocale=titleLocale||'ko';room.title=title?.trim()||defaultRoomTitle(mode,session.name,room.titleLocale,room.sync);room.isPublic=isPublic===true;
-    room.savedCustomExtensions=modeExtensionSelection(normalizeCustomExtensions(customExtensions,this.safeData()),mode);
+    room.savedCustomExtensions=room.version!==DEFAULT_VERSION?seasonExtensionSelection(customExtensions,this.extData(room.version)):modeExtensionSelection(normalizeCustomExtensions(customExtensions,this.safeData()),mode);
     room.customExtensions = initialSelection;
     room.customFactions = room.customExtensions.bonds.includes('ursus') && !(room.customExtensions.disabledBonds||[]).includes('ursusShip');
     room.content = this.baseContent(version);
@@ -1037,8 +1038,9 @@ export class Lobby {
     if(room.match)return fail(ERR.ROOM_STARTED);
     if(!isGameplayMode(gameplayMode))return fail(ERR.BAD_MSG);
     if(!canSwitchPublicMode(room.gameplayMode,gameplayMode,room.isPublic))return fail(ERR.BAD_MSG,'공개 후에는 게임 모드를 변경할 수 없습니다.');
-    const selected=gameplayExtensions(room.savedCustomExtensions,this.safeData(),room.mode,gameplayMode);
-    const errors=validateExtensionMinimums(this.safeData(),selected,{mode:room.mode,difficulty:room.difficulty});
+    if(room.version!==DEFAULT_VERSION&&gameplayMode==='augment')return fail(ERR.BAD_MSG,'이 시즌은 증강 모드를 지원하지 않습니다.');
+    const selected=this.extSelection(room.version,room.savedCustomExtensions,room.mode,gameplayMode);
+    const errors=this.extErrors(room.version,selected,{mode:room.mode,difficulty:room.difficulty,modeId:room.modeId});
     if(errors.length)return fail(ERR.BAD_MSG,errors.join(' '));
     this.dropReplay(room,session.playerId);
     room.gameplayMode=gameplayMode;room.customExtensions=selected;
@@ -1057,14 +1059,15 @@ export class Lobby {
     if (room.match) return fail(ERR.ROOM_STARTED);
     if(room.gameplayMode!=='custom')return fail(ERR.BAD_MSG,'커스텀 모드에서만 설정을 변경할 수 있습니다.');
     if (!extensionSelectionShape(selection)) return fail(ERR.BAD_MSG);
-    let selected = normalizeCustomExtensions(selection, this.safeData());
+    const season = room.version !== DEFAULT_VERSION;
+    let selected = season ? seasonExtensionSelection(selection, this.extData(room.version)) : normalizeCustomExtensions(selection, this.safeData());
     if (Object.keys(selection).some(k => Array.isArray(selection[k])&&selection[k].some(id => !selected[k]?.includes(id)))) return fail(ERR.BAD_MSG);
-    selected=modeExtensionSelection(selected,room.mode);
-    const errors=validateExtensionMinimums(this.safeData(),selected,{mode:room.mode,difficulty:room.difficulty});
+    if (!season) selected=modeExtensionSelection(selected,room.mode);
+    const errors=this.extErrors(room.version,selected,{mode:room.mode,difficulty:room.difficulty,modeId:room.modeId});
     if(errors.length)return fail(ERR.BAD_MSG,errors.join(' '));
     this.dropReplay(room, session.playerId);
     room.savedCustomExtensions=structuredClone(selected);
-    room.customExtensions = modeExtensionSelection(selected,room.mode);
+    room.customExtensions = season ? selected : modeExtensionSelection(selected,room.mode);
     room.customFactions = selected.bonds.includes('ursus') && !(selected.disabledBonds||[]).includes('ursusShip');
     if (!room.customExtensions.bonds.includes('leithanien')) for (const member of room.chatMembers.values()) if (member.faction === '라이타니엔') member.faction = null;
     if (!room.customFactions) for (const member of room.chatMembers.values()) if (member.faction === '우르수스') member.faction = null;
@@ -1080,7 +1083,7 @@ export class Lobby {
     if (room.hostId !== session.playerId) return fail(ERR.NOT_HOST);
     if (room.match) return fail(ERR.ROOM_STARTED);
     if (!this.offered(room.version, this.seasonMode(room)).includes(difficulty)) return fail(ERR.BAD_TARGET, 'not a mode of this version');
-    const minimumErrors=validateExtensionMinimums(this.safeData(),room.customExtensions,{mode:room.mode,difficulty});
+    const minimumErrors=this.extErrors(room.version,room.customExtensions,{mode:room.mode,difficulty,modeId:null});
     if(minimumErrors.length)return fail(ERR.BAD_MSG,minimumErrors.join(' '));
     this.dropReplay(room, session.playerId);
     const ladderId = this.laddered(room.version, this.seasonMode(room)) ? this.ladderMode(room.version, this.seasonMode(room), difficulty, null) : null;
@@ -1333,6 +1336,13 @@ export class Lobby {
     room.content = next;
     if (next !== before) { this.holdContent(next); this.releaseContent(before); }
     room.replay = null;
+    // 커스텀 설정 follows the season: its own catalogue; a selection of the other season's ids is dropped
+    if (version !== DEFAULT_VERSION && room.gameplayMode === 'augment') room.gameplayMode = 'classic';
+    room.customExtensionCatalog = this.extCatalog(version);
+    room.savedCustomExtensions = version !== DEFAULT_VERSION ? seasonExtensionSelection(room.savedCustomExtensions, this.extData(version))
+      : modeExtensionSelection(normalizeCustomExtensions(room.savedCustomExtensions, this.safeData()), room.mode);
+    room.customExtensions = this.extSelection(version, room.savedCustomExtensions, room.mode, room.gameplayMode);
+    room.customFactions = false;
     for (const s of [...room.seats, ...room.spectators]) if (s && !s.isBot) { s.content = null; s.consentCs = null; }
     for (const s of room.seats) {
       if (!s || s.isBot) continue;
@@ -1510,7 +1520,7 @@ export class Lobby {
     if (room.hostId !== session.playerId) return fail(ERR.NOT_HOST);
     if (room.test && !this.testEnabled) return fail(ERR.TEST_DISABLED);
     if (room.match) return fail(ERR.ROOM_STARTED);
-    const minimumErrors=validateExtensionMinimums(this.safeData(),room.customExtensions,{mode:room.mode,difficulty:room.difficulty});
+    const minimumErrors=this.extErrors(room.version,room.customExtensions,{mode:room.mode,difficulty:room.difficulty,modeId:room.modeId});
     if(minimumErrors.length)return fail(ERR.BAD_MSG,minimumErrors.join(' '));
     const humans = room.activeHumans();
     if (room.content?.trusted && humans.some(s => s.consentCs !== room.content.cs)) return fail(ERR.PLUGIN_CONSENT);
@@ -2173,6 +2183,27 @@ export class Lobby {
     ctx.disposed = true;
     ctx.live = false;
     try { ctx.match?.dispose?.(); } catch (e) { this.log.error('[lobby] match.dispose threw', e); }
+  }
+
+  /** The tables 커스텀 설정 reads for a season: the default season's (getData), else that version's data. */
+  extData(version) {
+    if (version === DEFAULT_VERSION || !this.versions) return this.safeData();
+    try { return this.versions.data(version) || this.safeData(); } catch { return this.safeData(); }
+  }
+
+  /** The room's effective selection for a gameplay mode (another season: its own categories, classic = none). */
+  extSelection(version, saved, mode, gameplayMode) {
+    if (version === DEFAULT_VERSION) return gameplayExtensions(saved, this.safeData(), mode, gameplayMode);
+    return seasonExtensionSelection(normalizeGameplayMode(gameplayMode) === 'custom' ? saved : {}, this.extData(version));
+  }
+
+  extErrors(version, selection, { mode, difficulty, modeId }) {
+    if (version === DEFAULT_VERSION) return validateExtensionMinimums(this.safeData(), selection, { mode, difficulty });
+    return validateSeasonExtensions(this.extData(version), selection, { mode: mode === 'solo' ? 'solo' : 'coop', difficulty, modeId });
+  }
+
+  extCatalog(version) {
+    return version === DEFAULT_VERSION ? customExtensionCatalog(this.safeData()) : seasonExtensionCatalog(this.extData(version));
   }
 
   safeData() {

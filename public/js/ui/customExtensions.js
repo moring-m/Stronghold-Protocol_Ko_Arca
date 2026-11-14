@@ -8,6 +8,8 @@ import { builtinExtensionPresets, loadExtensionPresets, saveExtensionPresets, co
 import { data } from '../data.js';
 import { useEffect, useRef, useState } from '../../vendor/hooks.module.js';
 import { html, Button, Modal, Fragment, Icon, TierChip } from './components.js';
+import { DEFAULT_VERSION } from '../versions.js';
+import { SEASON_EXTENSION_CATEGORIES, seasonExtensionCatalog, validateSeasonExtensions } from '../../../shared/seasonExtensions.js';
 import { Switch, Stepper, NavCount, ChangeCount, MenuButton } from './settingsFrame.js';
 import { AUGMENT_STAT_BASES,isAugmentStatActive,extensionSelectionCount, RULE_VALUES, normalizeRuleValues, EXTENSION_CATEGORIES, validateExtensionMinimums, modeExtensionSelection, customExtensionCatalog, isBannableOperator, isCustomStage, additionalStagesForDifficulty, OPTIONAL_FIRST_STAGE } from '../../../shared/customExtensions.js';
 
@@ -88,7 +90,10 @@ function optionDescription(entry,tab) {
 }
 
 export function CustomExtensionsDialog({ open, room, isHost, disabled, onClose, onSave, additionsOnly = false }) {
-  const [tab,setTab] = useState('bonds');
+  // another season (규정): only its own data filters (shared/seasonExtensions.js), listed from its own tables
+  const season = !!room?.version && room.version !== DEFAULT_VERSION;
+  const [tab,setTab] = useState(season ? 'bannedOperators' : 'bonds');
+  useEffect(()=>{if(open&&season&&!SEASON_EXTENSION_CATEGORIES.includes(tab))setTab('bannedOperators');},[open,season]);
   const [initial,setInitial]=useState(null),[tierFilter,setTierFilter]=useState(0),[bondFilter,setBondFilter]=useState('');
   const [query,setQuery]=useState('');
   const [notice,setNotice]=useState('');
@@ -99,14 +104,15 @@ export function CustomExtensionsDialog({ open, room, isHost, disabled, onClose, 
   const [draft,setDraft] = useState({ bonds: [], stages: [] });
   const numericCount=category=>category==='augmentSettings'&&!draft.rules?.includes('augments')?0:RULE_VALUES.filter(r=>(r.category||'rules')===(category==='augmentSettings'?'augments':category)&&normalizeRuleValues(draft.ruleValues)[r.id]!==r.default).length;
   const banTab=tab==='forcedBonds'||tab==='forcedAuxBonds', protectKey=tab==='forcedAuxBonds'?'protectedAuxBonds':'protectedBonds';
-  const errors=tables&&!additionsOnly?validateExtensionMinimums(tables,draft,{mode:room.mode,difficulty:room.difficulty}):[];
+  const errors=tables&&!additionsOnly?(season?validateSeasonExtensions(tables,draft,{mode:room.mode==='solo'?'solo':'coop',difficulty:room.difficulty,modeId:room.modeId}):validateExtensionMinimums(tables,draft,{mode:room.mode,difficulty:room.difficulty})):[];
   useEffect(() => {
     if (open) {if(room.mode==='coop8'&&['forcedBonds','forcedAuxBonds','disabledBonds','protectedOperators'].includes(tab))setTab('rules');const selection=room.customExtensions || { bonds: room.customFactions ? ['ursus'] : [], stages: [] };const start=additionsOnly?{bonds:selection.bonds||[],stages:selection.stages||[],rules:selection.rules||[],commonBands:selection.commonBands||[],...(selection.ruleValues?{ruleValues:selection.ruleValues}:{})}:modeExtensionSelection(selection,room.mode);setDraft(start);setInitial(start);setQuery('');}
   }, [open,room.code,isHost]);
   useEffect(() => {
     if (open && !isHost) setDraft(room.customExtensions || {bonds:room.customFactions ? ['ursus'] : [],stages:[]});
   }, [open,isHost,room.customExtensions,room.customFactions]);
-  const catalog = room.customExtensionCatalog ? {...customExtensionCatalog(tables||{}),...room.customExtensionCatalog} : customExtensionCatalog(tables||{});
+  const baseCatalog = season ? seasonExtensionCatalog(tables||{}) : customExtensionCatalog(tables||{});
+  const catalog = room.customExtensionCatalog ? {...baseCatalog,...room.customExtensionCatalog} : baseCatalog;
   catalog.stages=additionalStagesForDifficulty(catalog.stages||[],room.difficulty);
   const customEntry=e=>tab.includes('Stages')||tab==='stages' ? isCustomStage(e.id,tables?.stages?.[e.id]) : ['ursus','ursusShip','leithanien','leithanienShip'].includes(e.id)||e.id.includes('custom_')||!!tables?.bonds?.[e.id]?.customExtension;
   const grouped=['bonds','stages','disabledBonds','disabledStages','forcedBonds','forcedAuxBonds'].includes(tab);
@@ -143,13 +149,13 @@ export function CustomExtensionsDialog({ open, room, isHost, disabled, onClose, 
   const matchCount=id=>!query||!tables?0:(['rules','allies','enemyStats','bossStats','augmentSettings'].includes(id)?ruleRows(id).length:0)+(catalog[id]||[]).filter(e=>typeof e.name==='string'&&(matchesKoreanSearch(tr(e.name),query)||matchesKoreanSearch(e.name,query))).length;
   const changes=initial?countSelectionChanges(initial,draft):0;
   const presetMenu0=html`<${MenuButton} label=${selectedPreset?selectedPreset.name:'프리셋'} icon="star" class="extension-presets-menu"><div class="extension-presets"><select aria-label="확장 프리셋" value=${presetId} onChange=${e=>{const id=e.target.value;setPresetId(id);setPresetName(presets.find(p=>p.id===id)?.name||'');}}><option value="">새 프리셋</option>${presets.map(p=>html`<option value=${p.id}>${p.name}</option>`)}</select><input aria-label="확장 프리셋 이름" placeholder="프리셋 이름" maxlength="40" disabled=${selectedPreset?.builtIn} value=${presetName} onInput=${e=>setPresetName(e.target.value)}/><div class="extension-presets__actions"><${Button} variant="secondary" disabled=${disabled||selectedPreset?.builtIn||!presetName.trim()||(!selectedPreset&&presets.filter(p=>!p.builtIn).length>=30)} onClick=${savePreset}>${selectedPreset?'덮어쓰기':'저장'}<//><${Button} variant="secondary" data-close disabled=${disabled||!selectedPreset||!tables} onClick=${()=>applyDraft(resolveExtensionPreset(selectedPreset,catalog))}>불러오기<//><${Button} variant="ghost" disabled=${disabled||!selectedPreset||selectedPreset?.builtIn} onClick=${()=>{if(selectedPreset?.builtIn)return;setPresets(saveExtensionPresets(presets.filter(p=>p.id!==presetId)));setPresetId('');setPresetName('');}}>삭제<//></div>${selectedPreset&&!selectedPreset.builtIn?html`<button type="button" class="extension-presets__saveas" disabled=${disabled||!presetName.trim()||presets.filter(p=>!p.builtIn).length>=30} onClick=${()=>{const id=`extension-${Date.now()}`;setPresets(saveExtensionPresets([...presets,{id,name:presetName.trim()===selectedPreset.name?presetName.trim()+' 복사':presetName.trim(),selection:copyExtensionSelection(draft)}]));setPresetId(id);}}>다른 이름으로 저장</button>`:null}</div><//>`;
-  const presetMenu=isHost&&!additionsOnly?html`<span class="extension-mode-loads" role="group" aria-label="모드 기본 설정 불러오기">${builtinExtensionPresets().map(p=>html`<${Button} key=${p.id} variant="ghost" size="sm" icon="load" title=${p.name+' 기본 설정으로 바꿉니다. 적용을 눌러야 방에 반영됩니다.'} disabled=${disabled||!tables} onClick=${()=>{applyDraft(resolveExtensionPreset(p,catalog));setPresetId('');setPresetName('');}}>${p.name} 불러오기<//>`)}</span>${presetMenu0}`:null;
+  const presetMenu=isHost&&!additionsOnly&&!season?html`<span class="extension-mode-loads" role="group" aria-label="모드 기본 설정 불러오기">${builtinExtensionPresets().map(p=>html`<${Button} key=${p.id} variant="ghost" size="sm" icon="load" title=${p.name+' 기본 설정으로 바꿉니다. 적용을 눌러야 방에 반영됩니다.'} disabled=${disabled||!tables} onClick=${()=>{applyDraft(resolveExtensionPreset(p,catalog));setPresetId('');setPresetName('');}}>${p.name} 불러오기<//>`)}</span>${presetMenu0}`:null;
   return html`<${Modal} open=${open} title="커스텀 설정" micro="CUSTOM EXTENSIONS" class="custom-ext ui-editor" width="min(15rem,96vw)" onClose=${onClose}
     actions=${html`<${ChangeCount} count=${changes}/><span class="editor-status" aria-live="polite">${notice || (errors.length?errors.join(' '):loadError||(!tables?'목록 불러오는 중…':(additionsOnly?'실험실에 추가할 커스텀 콘텐츠를 선택하세요.':'최소 구성 조건 충족')))}</span>${isHost?html`<${Button} variant="ghost" disabled=${disabled||!tables} onClick=${resetSettings}>초기화<//>`:null}<${Button} variant="secondary" onClick=${onClose} disabled=${disabled}>${isHost ? '취소' : '닫기'}<//>
       ${isHost ? html`<${Button} variant="primary" disabled=${disabled || !tables || errors.length>0} onClick=${()=>onSave(additionsOnly?{bonds:draft.bonds,stages:draft.stages,rules:draft.rules||[],commonBands:draft.commonBands||[],...(draft.ruleValues?{ruleValues:draft.ruleValues}:{})}:draft)}>적용<//>` : null}`}>
     <div class="settings-head"><p class="lo-note">${additionsOnly?'선택한 커스텀 콘텐츠를 실험실에 추가합니다. 전장·전략 목록과 전투에 함께 적용됩니다.':isHost?'설정은 방 전체에 적용됩니다. 초기화 후 적용을 누르면 기본 설정으로 변경됩니다.':'방장이 선택한 구성이 방 전체에 적용됩니다.'}</p>${presetMenu}</div>
     <div class="extensions-layout"><nav class="extensions-nav" aria-label="설정 분류"><input class="editor-search extensions-search" type="search" aria-label="설정 목록 검색" placeholder="전체 설정 검색" value=${query} onInput=${e=>setQuery(e.target.value)}/><div class="extensions-menu"><h3>규칙</h3>
-      ${EXTENSION_CATEGORIES.filter(c=>additionsOnly?['rules','allies','enemyStats','bossStats','commonBands','bonds','stages'].includes(c.id):!['protectedBonds','protectedAuxBonds',...(room.mode==='coop8'?['forcedBonds','forcedAuxBonds','disabledBonds']:[])].includes(c.id)).map((c,i)=>html`<${Fragment}>${c.id==='bonds'?html`<h3>추가 확장</h3>`:c.id==='forcedBonds'?html`<h3>금지 단계</h3>`:c.id==='disabledBonds'?html`<h3>콘텐츠 비활성화</h3>`:null}<button type="button" id=${'ext-tab-'+c.id} aria-controls=${'ext-panel-'+c.id} aria-pressed=${tab===c.id} class=${tab===c.id?'is-on':''} onClick=${()=>setTab(c.id)} data-dim=${!!query&&!matchCount(c.id)}><${Icon} name=${CATEGORY_ICONS[c.id]} /><span class="extensions-nav__label">${c.name}</span>${query?html`<span class="num num--match" title="검색 결과">${matchCount(c.id)||''}</span>`:html`<${NavCount} n=${tabCount(c.id)}/>`}</button><//>`)}
+      ${EXTENSION_CATEGORIES.filter(c=>!season||SEASON_EXTENSION_CATEGORIES.includes(c.id)).filter(c=>additionsOnly?['rules','allies','enemyStats','bossStats','commonBands','bonds','stages'].includes(c.id):!['protectedBonds','protectedAuxBonds',...(room.mode==='coop8'?['forcedBonds','forcedAuxBonds','disabledBonds']:[])].includes(c.id)).map((c,i)=>html`<${Fragment}>${c.id==='bonds'?html`<h3>추가 확장</h3>`:c.id==='forcedBonds'?html`<h3>금지 단계</h3>`:c.id==='disabledBonds'?html`<h3>콘텐츠 비활성화</h3>`:null}<button type="button" id=${'ext-tab-'+c.id} aria-controls=${'ext-panel-'+c.id} aria-pressed=${tab===c.id} class=${tab===c.id?'is-on':''} onClick=${()=>setTab(c.id)} data-dim=${!!query&&!matchCount(c.id)}><${Icon} name=${CATEGORY_ICONS[c.id]} /><span class="extensions-nav__label">${c.name}</span>${query?html`<span class="num num--match" title="검색 결과">${matchCount(c.id)||''}</span>`:html`<${NavCount} n=${tabCount(c.id)}/>`}</button><//>`)}
       </div>
 
     </nav><section class="extensions-editor" id=${'ext-panel-'+tab} aria-labelledby=${'ext-tab-'+tab}>

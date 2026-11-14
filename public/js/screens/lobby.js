@@ -358,7 +358,7 @@ export function LobbyScreen() {
     mode:syncMode(roomMode)?roomMode.replace('sync','coop'):roomMode,difficulty,gameplayMode:'custom',titleLocale:lang,
     ...(seasonFor(roomMode)!==DEFAULT_VERSION?{version:seasonFor(roomMode)}:{}),
     ...(ladderMode?{modeId:ladderMode.id,difficulty:DIFFICULTIES.includes(ladderMode.difficulty)?ladderMode.difficulty:difficulty}:{}),
-    customExtensions:loadCustomExtensionPrefs(),
+    customExtensions:loadCustomExtensionPrefs(seasonFor(roomMode)),
     ...(syncMode(roomMode)?{sync:true}:{}),
     ...(['coop','coop8','sync','sync8'].includes(roomMode)?{isPublic:publicOn,spectators:MAX_SPECTATOR_SEATS}:{})
   }));

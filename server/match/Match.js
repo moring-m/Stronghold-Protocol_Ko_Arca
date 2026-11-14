@@ -1,4 +1,5 @@
 import { Match as UpstreamMatch } from '../match-upstream/Match.js';
+import { applySeasonExtensions, seasonExtensionSelection } from '../../shared/seasonExtensions.js';
 import { versionById } from '../../shared/versions.js';
 import { recruitCandidates, checkRecruitPicks } from '../../shared/recruitPick.js';
 /** 선발 선택 time when config.timers.recruitPick is not set (seconds). */
@@ -314,7 +315,11 @@ export class Match {
   constructor(opts) {
     // 규정(规程) seasons play upstream's whole match (server/match-upstream/: 선택자편, 핵심 맹약 그룹, 전략 명령 …); this
     // class is the 맹약 seasons'. A subclass (the match host's ContentMatch, a test's) gets the upstream match too.
-    if (versionById(opts?.version)?.family === 'regulation' || opts?.data?.config?.version?.family === 'regulation') return new UpstreamMatch(opts);
+    if (versionById(opts?.version)?.family === 'regulation' || opts?.data?.config?.version?.family === 'regulation') {
+      // 커스텀 설정 of that season (shared/seasonExtensions.js): plain filters of its own tables, before the match reads them
+      const sel = normalizeGameplayMode(opts?.gameplayMode) === 'custom' ? seasonExtensionSelection(opts?.customExtensions, opts?.data) : null;
+      return new UpstreamMatch(sel ? { ...opts, data: applySeasonExtensions(opts.data, sel) } : opts);
+    }
     if (!opts || !Array.isArray(opts.seats) || opts.seats.length === 0) throw new TypeError('Match: seats required');
     if (typeof opts.send !== 'function' || typeof opts.broadcast !== 'function' || typeof opts.onEnd !== 'function') {
       throw new TypeError('Match: send/broadcast/onEnd callbacks required');
