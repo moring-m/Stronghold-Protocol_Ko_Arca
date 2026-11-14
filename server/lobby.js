@@ -1044,7 +1044,7 @@ export class Lobby {
     this.dropReplay(room,session.playerId);
     room.gameplayMode=gameplayMode;room.customExtensions=selected;
     room.customFactions=selected.bonds.includes('ursus')&&!(selected.disabledBonds||[]).includes('ursusShip');
-    for(const member of room.chatMembers.values())if((member.faction==='라이타니엔'&&!selected.bonds.includes('leithanien'))||(member.faction==='우르수스'&&!room.customFactions))member.faction=null;
+    if(room.version===DEFAULT_VERSION)for(const member of room.chatMembers.values())if((member.faction==='라이타니엔'&&!selected.bonds.includes('leithanien'))||(member.faction==='우르수스'&&!room.customFactions))member.faction=null;
     for(const seat of room.seats)if(seat&&!seat.isBot&&seat.playerId!==room.hostId)seat.ready=false;
     this.broadcastState(room);
     this.broadcastRoom(room,{t:'m.chatHistory',messages:room.chatHistory,factions:Object.fromEntries([...room.chatMembers].map(([id,m])=>[id,m.faction]))});
@@ -1068,8 +1068,8 @@ export class Lobby {
     room.savedCustomExtensions=structuredClone(selected);
     room.customExtensions = season ? selected : modeExtensionSelection(selected,room.mode);
     room.customFactions = selected.bonds.includes('ursus') && !(selected.disabledBonds||[]).includes('ursusShip');
-    if (!room.customExtensions.bonds.includes('leithanien')) for (const member of room.chatMembers.values()) if (member.faction === '라이타니엔') member.faction = null;
-    if (!room.customFactions) for (const member of room.chatMembers.values()) if (member.faction === '우르수스') member.faction = null;
+    if (!season && !room.customExtensions.bonds.includes('leithanien')) for (const member of room.chatMembers.values()) if (member.faction === '라이타니엔') member.faction = null;
+    if (!season && !room.customFactions) for (const member of room.chatMembers.values()) if (member.faction === '우르수스') member.faction = null;
     for (const s of room.seats) if (s && !s.isBot && s.playerId !== room.hostId) s.ready = false;
     this.broadcastState(room);
     this.broadcastRoom(room, {t:'m.chatHistory',messages:room.chatHistory,factions:Object.fromEntries([...room.chatMembers].map(([id,m])=>[id,m.faction]))});
@@ -2092,8 +2092,10 @@ export class Lobby {
     const seat = room?.seatOf(session.playerId) || spectator;
     if (!seat || seat.isBot || seat.left) return fail(ERR.NOT_IN_ROOM);
     const selecting = msg.t === 'g.chatFaction';
-    if (selecting && msg.faction === '라이타니엔' && !room.customExtensions.bonds.includes('leithanien')) return fail(ERR.BAD_MSG);
-    if (selecting && msg.faction === '우르수스' && !room.customFactions) return fail(ERR.BAD_MSG);
+    // another season (규정): 우르수스 / 라이타니엔 are its official bonds, always selectable there
+    const season = room.version !== DEFAULT_VERSION;
+    if (selecting && msg.faction === '라이타니엔' && !season && !room.customExtensions.bonds.includes('leithanien')) return fail(ERR.BAD_MSG);
+    if (selecting && msg.faction === '우르수스' && !season && !room.customFactions) return fail(ERR.BAD_MSG);
     const text = selecting ? (msg.faction === null ? '진영 선택 취소' : chatFaction(msg.faction) ? `진영 선택: ${msg.faction}` : '') : normalizeChatText(msg.text);
     if (!text) return fail(ERR.BAD_MSG);
     const member = room.chatMembers.get(session.playerId) || {faction:null,lastChatAt:-Infinity,lastFactionAt:-Infinity};

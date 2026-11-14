@@ -11,6 +11,7 @@ import { net } from '../net.js';
 import { audio } from '../audio.js';
 import { settingsStore, SettingsModal } from './settings.js';
 import { toastError } from './toasts.js';
+import { DEFAULT_VERSION } from '../../../shared/versions.js';
 import { CHAT_MAX_LENGTH, CHAT_FACTIONS, chatFaction, normalizeChatText } from '../../../shared/chat.js';
 
 /** A server system line (점검 안내): fixed Korean text the page translates, then the owner's own note as written. */
@@ -24,7 +25,10 @@ export function ChatPanel({room = false, docked = false}) {
   const messages = useStore((s) => s.chat);
   const online = useStore((s) => s.connection.status === 'online');
   const leithanien = useStore(s => (s.room?.inMatch ? s.match.public?.customExtensions : s.room?.customExtensions)?.bonds?.includes('leithanien') === true);
-  const customFactions = useStore(s => !!(s.room?.inMatch ? s.match.public?.customFactions : s.room?.customFactions));
+  // another season (규정): 우르수스 / 라이타니엔 are its official bonds — always offered, drawn with the official icons
+  const season = useStore(s => !!s.room?.version && s.room.version !== DEFAULT_VERSION);
+  const customFactions = useStore(s => !!(s.room?.inMatch ? s.match.public?.customFactions : s.room?.customFactions)) || season;
+  const factionBond = (f) => (season && f?.bondId === 'leithanienShip' ? 'lethaniaShip' : f?.bondId);
   const faction = useStore((s) => s.chatFaction);
   const [expanded, setOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -135,13 +139,13 @@ export function ChatPanel({room = false, docked = false}) {
     ${open ? html`<section class="game-chat__panel" id="game-chat-panel" aria-label="게임 채팅창">
       <header><strong>${room ? '대기실 채팅' : '게임 채팅'}</strong><button type="button" class="game-chat__faction-toggle"
         aria-expanded=${choosingFaction} aria-controls="game-chat-factions" disabled=${!online || sending}
-        style=${faction ? { color: chatFaction(faction)?.color } : null} onClick=${() => setChoosingFaction(!choosingFaction)}>${faction ? html`<img src=${bondIconUrl(m,chatFaction(faction)?.bondId)} class="game-chat__faction-icon" />${faction}` : '진영 선택'}</button>
+        style=${faction ? { color: chatFaction(faction)?.color } : null} onClick=${() => setChoosingFaction(!choosingFaction)}>${faction ? html`<img src=${bondIconUrl(m,factionBond(chatFaction(faction)))} class="game-chat__faction-icon" />${faction}` : '진영 선택'}</button>
         ${!room ? html`<button type="button" class="game-chat__visibility" aria-label=${previewVisible ? '채팅 완전히 숨기기' : '최근 채팅 표시'} title=${previewVisible ? '채팅 완전히 숨기기' : '최근 채팅 표시'} aria-pressed=${!previewVisible} onClick=${() => { const next = !previewVisible; setPreviewVisible(next); savePref('chatPreview', next); if (!next) setOpen(false); }}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>${previewVisible ? html`<path d="M3 3l18 18"/>` : null}</svg></button>` : null}
         <button type="button" class="game-chat__settings" aria-label="채팅 설정 열기" title="채팅 설정" onClick=${() => setSettingsOpen(true)}>⚙</button>
         <button type="button" class="game-chat__close" aria-label="채팅 닫기" onClick=${() => setOpen(false)}>×</button></header>
       ${choosingFaction ? html`<div id="game-chat-factions" class="game-chat__factions" role="group" aria-label="채팅 진영 선택">
-        ${CHAT_FACTIONS.filter(f => (f.name !== '우르수스' || customFactions) && (f.name !== '라이타니엔' || leithanien)).map((f) => html`<button key=${f.name} type="button" style=${{ '--faction-color': f.color }}
-          aria-pressed=${faction === f.name} disabled=${sending} onClick=${() => selectFaction(f.name)}><img src=${bondIconUrl(m,f.bondId)} class="game-chat__faction-icon" />${f.name}</button>`)}
+        ${CHAT_FACTIONS.filter(f => (f.name !== '우르수스' || customFactions) && (f.name !== '라이타니엔' || leithanien || season)).map((f) => html`<button key=${f.name} type="button" style=${{ '--faction-color': f.color }}
+          aria-pressed=${faction === f.name} disabled=${sending} onClick=${() => selectFaction(f.name)}><img src=${bondIconUrl(m,factionBond(f))} class="game-chat__faction-icon" />${f.name}</button>`)}
         ${faction ? html`<button type="button" class="game-chat__faction-clear" disabled=${sending || !online} onClick=${() => selectFaction(null)}>진영 선택 취소</button>` : null}
       </div>` : null}
       <div class="game-chat__messages" ref=${list} onScroll=${e => { const el=e.currentTarget; followLatest.current=el.scrollHeight-el.clientHeight-el.scrollTop <= 24; }} role="log" aria-live="polite" aria-relevant="additions" data-i18n-skip>
