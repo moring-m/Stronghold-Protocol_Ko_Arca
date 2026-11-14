@@ -45,6 +45,8 @@ import { SettingsModal } from '../ui/settings.js';
 import { installedCount } from '../content.js';
 import { NoticesButton } from '../ui/notices.js';
 import { sanitizeName, isValidName } from '../ui/playerName.js';
+import { setLobbyVersion, DEFAULT_VERSION, versionById } from '../versions.js';
+import { VERSIONS } from '../../../shared/versions.js';
 
 export { stripLoneSurrogates, sanitizeName, isValidName } from '../ui/playerName.js';
 
@@ -183,6 +185,7 @@ export function TitleScreen() {
     import('../ui/pluginPanel.js').then((m) => setInstalled(() => m.InstalledPlugins), (err) => console.warn('[plugins] the list did not load', err));
   };
   const installed = useStore(installedCount);
+  const regSeason = useStore((s) => versionById(s.lobbyVersion)?.family === 'regulation');
   const assetsSettled = useData('assets');
   const assets = data.get('assets');
   const backdrop = findUiAsset(assets, BACKDROP_KEYS);
@@ -242,7 +245,7 @@ export function TitleScreen() {
         <span class="title-en__a">STRONGHOLD PROTOCOL</span>
         <span class="title-en__b">ALLIANCE</span>
       </div>
-      <h1 class="title-cn">卫戍协议<span class="title-cn__colon">：</span><em>盟约</em></h1>
+      <h1 class="title-cn">卫戍协议<span class="title-cn__colon">：</span><em>${regSeason ? t('规程') : '盟约'}</em></h1>
       <p class="title-tag">调配资金与干员，与同伴协同布防，抵御多波次进攻，直至击败敌方领袖。</p>
 
       <div class="title-login">
@@ -253,6 +256,7 @@ export function TitleScreen() {
         <${TextField} label="博士代号" micro="CALLSIGN" size="lg" icon="user" value=${name} maxLength=${NAME_MAX_LEN}
           placeholder=${t('输入你的代号（最多 {max} 字）',{max:NAME_MAX_LEN})} autoFocus=${!touchUi}
           onInput=${setName} onEnter=${start} />
+        <${SeasonChoice} />
         <${Button} variant="primary" size="xl" block=${true} iconRight="chevrons" disabled=${!valid} onClick=${start}>开始<//>
         <div class="title-conn">
           <span class=${`status-dot ${dotClass}`}></span>
@@ -283,5 +287,34 @@ export function TitleScreen() {
         ${DEV_BUILD ? html`<span class="title-dev" role="note">${t('开发版 · 不稳定，请勿用于公开服务器')}</span>` : null}
       </span>
     </footer>
+  </div>`;
+}
+
+/**
+ * The season this page plays (맹약 or 규정), chosen before entering: the lobby, the operator settings and the rooms it
+ * creates all use that season's data (versions.js setLobbyVersion; content.js loads the season's data set). Shown only
+ * when the server offers a 규정 season (welcome.versions).
+ */
+function SeasonChoice() {
+  // before the welcome (this screen) the server's list is not known yet: the shared registry names the seasons; a
+  // choice the server does not offer falls back to its default in the lobby (versions.js lobbyVersion)
+  const versions = useStore((s) => s.versions);
+  const pref = useStore((s) => s.lobbyVersion);
+  const current = pref || DEFAULT_VERSION;
+  const regulation = (Array.isArray(versions) ? versions : VERSIONS).filter((v) => v.family === 'regulation').at(-1) || null;
+  if (!regulation) return null;
+  const options = [
+    { id: DEFAULT_VERSION, name: t('맹약'), sub: t('위수 협의: 맹약') },
+    { id: regulation.id, name: t('규정'), sub: t(regulation.label) },
+  ];
+  const isReg = versionById(current)?.family === 'regulation';
+  return html`<div class="title-season" role="radiogroup" aria-label=${t('시즌')} data-testid="title-season">
+    ${options.map((o) => {
+      const on = o.id === DEFAULT_VERSION ? !isReg : isReg;
+      return html`<button key=${o.id} type="button" role="radio" aria-checked=${on ? 'true' : 'false'}
+          class=${`title-season__opt${on ? ' is-on' : ''}`} onClick=${() => setLobbyVersion(o.id)}>
+        <b>${o.name}</b><span>${o.sub}</span>
+      </button>`;
+    })}
   </div>`;
 }

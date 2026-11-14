@@ -62,6 +62,7 @@
 // an empty manifest.
 // Files go out through files.js serveFile.
 
+import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
 import { MEDIA_PREFIX } from '../../shared/media.js';
@@ -145,7 +146,11 @@ export function createStaticHandler({ publicDir, dataDir, sharedDir, simDir = pa
   const sets = visual || (typeof registry.pluginFile === 'function' ? createVisualSets({ registry, log }) : null);
   let vanilla = content;
   const vanillaContent = () => (vanilla ||= computeVanillaContent({ simDir, sharedDir, dataDir, shim: DATA_SHIM_JS, log: /** @type {any} */ (log) }));
+  const versionsRoot = fs.existsSync(path.join(path.resolve(dataDir), 'versions')) ? path.join(path.resolve(dataDir), 'versions') : path.join(ROOT, 'data', 'versions');
   const mounts = [
+    // another season's data: the prepared catalogue (content/production/data) holds the default season only, so its
+    // data/versions/ comes from the repository's data/versions/ (server/data.js versionDataDir does the same)
+    { prefix: '/data/versions/', name: 'data', dir: versionsRoot },
     { prefix: '/data/', name: 'data', dir: path.resolve(dataDir) },
     { prefix: '/shared/', name: 'shared', dir: path.resolve(sharedDir) },
     // the simulation: ES modules only (no directory listings, no other file types, no Node-only loader)
@@ -170,7 +175,7 @@ export function createStaticHandler({ publicDir, dataDir, sharedDir, simDir = pa
   let servedReal = null;
   /** Is `abs` another version's data that may not be served (under data/versions/, outside every served directory)? */
   const isVersionData = async (abs) => {
-    versionsReal ||= await fsp.realpath(path.join(path.resolve(dataDir), 'versions')).catch(() => null);
+    versionsReal ||= await fsp.realpath(versionsRoot).catch(() => null);
     if (!versionsReal) return false;
     const real = await fsp.realpath(abs).catch(() => null);
     if (!real || !real.startsWith(versionsReal + path.sep)) return false;

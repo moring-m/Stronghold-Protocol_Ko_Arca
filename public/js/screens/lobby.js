@@ -334,6 +334,9 @@ export function LobbyScreen() {
   const season = useStore((s) => lobbyVersion(s));
   const seasonModes = ['solo', 'coop'];
   const seasonFor = (mode) => (seasonModes.includes(mode) ? season : DEFAULT_VERSION);
+  // a 규정 season (chosen on the title screen) plays solo and 4-seat co-op rooms only
+  const regSeason = season !== DEFAULT_VERSION;
+  useEffect(() => { if (regSeason && !seasonModes.includes(roomMode)) pickMode('coop'); }, [regSeason, roomMode]);
 
   const run = async (kind, fn) => {
     if (inFlight.current) return;
@@ -431,7 +434,7 @@ export function LobbyScreen() {
         <div class="section-label lg-label lg-label--modes"><span class="section-label__idx num">01</span>模拟方式<${MicroLabel}>MODE<//></div>
         <div class="lg-modes">
         <div class="mode-cards mode-cards--main">
-          ${MODE_CARDS.filter((c) => MAIN_MODES.includes(c.id)).map((c) => html`<${ModeCard} key=${c.id} card=${c} selected=${roomMode === c.id || roomMode===c.id+'8'} onSelect=${pickMode} coopSize=${coopSize} onCoopSize=${n=>{setCoopSize(n);pickMode((c.id==='sync'?'sync':'coop')+(n===8?'8':''));}} publicOn=${publicOn} onPublicChange=${on=>{setPublicOn(on);savePref('lobby.publicOn',on);}} />`)}
+          ${MODE_CARDS.filter((c) => MAIN_MODES.includes(c.id) && (!regSeason || seasonModes.includes(c.id))).map((c) => html`<${ModeCard} key=${c.id} card=${c} selected=${roomMode === c.id || roomMode===c.id+'8'} onSelect=${pickMode} coopSize=${coopSize} onCoopSize=${n=>{setCoopSize(n);pickMode((c.id==='sync'?'sync':'coop')+(n===8?'8':''));}} publicOn=${publicOn} onPublicChange=${on=>{setPublicOn(on);savePref('lobby.publicOn',on);}} />`)}
         </div>
 
         </div>
@@ -460,13 +463,10 @@ export function LobbyScreen() {
         <div class="lobby-quick lg-quick">
           <button type="button" class="public-rooms-entry mode-card brackets" onClick=${()=>setPublicOpen(true)}><span class="mode-card__bg" aria-hidden="true"></span><span class="mode-card__icon"><${Icon} name="users"/></span><span class="mode-card__text"><${MicroLabel}>PUBLIC ROOMS<//><span class="mode-card__name">탐색</span><span class="mode-card__desc">공개된 연합 방에 참가하거나 관전합니다.</span></span><span class="public-rooms-entry__total"><span class="public-rooms-entry__count" aria-label="참가 가능한 방 수">${conn.status==='online'&&publicRoomCount!==null?publicRoomCount.joinable:'—'}</span><span class="public-rooms-entry__all" aria-label="전체 방 수">/${conn.status==='online'&&publicRoomCount!==null?publicRoomCount.total:'—'}</span></span></button>
           <div class="lobby-quick__labs">
-          ${MODE_CARDS.filter((c) => !MAIN_MODES.includes(c.id)).map((c) => html`<${ModeCard} key=${c.id} full=${true} card=${c} selected=${roomMode === c.id || roomMode===c.id+'8'} onSelect=${pickMode} coopSize=${coopSize} onCoopSize=${n=>{setCoopSize(n);pickMode((c.id==='sync'?'sync':'coop')+(n===8?'8':''));}} publicOn=${publicOn} onPublicChange=${on=>{setPublicOn(on);savePref('lobby.publicOn',on);}} />`)}
+          ${regSeason ? null : MODE_CARDS.filter((c) => !MAIN_MODES.includes(c.id)).map((c) => html`<${ModeCard} key=${c.id} full=${true} card=${c} selected=${roomMode === c.id || roomMode===c.id+'8'} onSelect=${pickMode} coopSize=${coopSize} onCoopSize=${n=>{setCoopSize(n);pickMode((c.id==='sync'?'sync':'coop')+(n===8?'8':''));}} publicOn=${publicOn} onPublicChange=${on=>{setPublicOn(on);savePref('lobby.publicOn',on);}} />`)}
           </div>
         </div>
         <div class="lg-diff">
-        ${Array.isArray(versions) && versions.length > 1 && seasonModes.includes(roomMode) ? html`<div class="diff-tabs season-tabs" role="radiogroup" aria-label=${t('시즌')} data-testid="season-tabs">
-          ${versions.map((v) => html`<button key=${v.id} type="button" role="radio" aria-checked=${season === v.id} class=${`diff-tab season-tab${season === v.id ? ' is-selected' : ''}`} onClick=${() => setLobbyVersion(v.id)}><span>${t(v.label)}</span></button>`)}
-        </div>` : null}
         <div class="diff-tabs" role="radiogroup" aria-label="난이도">
           ${DIFFICULTIES.map((d) => html`<button key=${d} type="button" role="radio" aria-checked=${difficulty === d} class=${`diff-tab${difficulty === d ? ' is-selected' : ''}`} style=${`--d-color:${DIFFICULTY_COLORS[d]}`} onClick=${() => pickDifficulty(d)}><${DifficultyIcon} difficulty=${d} class="diff-tab__glyph" /><span>${t(DIFFICULTY_NAMES[d]||'').replace(/\s*시뮬레이션$/,'')}</span></button>`)}
         </div>

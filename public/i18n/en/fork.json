@@ -59,7 +59,7 @@
   "삭제": "Delete",
   "공통 적용 전략": "Shared Strategies",
   "선발": "Recruitment",
-  "맹약": "Alliance",
+  "맹약": "Covenant",
   "증강 보고": "Augment Report",
   "맹약 보고": "Alliance Report",
   "음소거": "Mute",
@@ -3704,5 +3704,7 @@
   "재사용 대기 중": "On cooldown",
   "사용 횟수를 모두 썼습니다": "No uses left",
   "특별 모집 중에는 사용할 수 없습니다": "Unavailable during a special recruit",
-  "자금이 부족합니다": "Not enough funds"
+  "자금이 부족합니다": "Not enough funds",
+  "규정": "Regulation",
+  "위수 협의: 맹약": "Stronghold Protocol: Covenant"
 }

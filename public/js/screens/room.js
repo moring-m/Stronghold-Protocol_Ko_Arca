@@ -247,7 +247,8 @@ function SeasonPicker({ room, isHost, busy, run }) {
   const config = getConfig();
   const ladderMode = room.mode === 'solo' || room.mode === 'coop' ? room.mode : null;
   const ladder = ladderMode && current !== DEFAULT_VERSION ? ladderModes(config, ladderMode) : null;
-  const canSwitch = isHost && Array.isArray(versions) && versions.length > 1 && (room.mode === 'solo' || room.mode === 'coop') && !room.sync;
+  // the season is chosen on the title screen (before entering): the room shows it
+  const canSwitch = false;
   if (!canSwitch && current === DEFAULT_VERSION) return null;
   return html`<div class="dpick season-pick" data-testid="season-pick">
     <select class="season-pick__select" aria-label=${t('시즌')} disabled=${!canSwitch || !!busy} value=${current}
@@ -256,7 +257,7 @@ function SeasonPicker({ room, isHost, busy, run }) {
     </select>
     ${ladder ? html`<select class="season-pick__select" aria-label=${t('규정 등급')} disabled=${!isHost || !!busy} value=${room.modeId || ''}
         onChange=${(e) => run('season', () => net.request('room.setMode', { modeId: e.currentTarget.value }))}>
-      ${ladder.map((m) => html`<option key=${m.id} value=${m.id}>${m.name || m.id}</option>`)}
+      ${ladder.map((m) => html`<option key=${m.id} value=${m.id}>${t(m.name || m.id)}</option>`)}
     </select>` : null}
   </div>`;
 }
@@ -412,7 +413,7 @@ export function RoomScreen() {
       </div>
       <div class="topbar__center">
         <${MicroLabel} tone="mint">${coop ? 'ALLIANCE LOBBY' : 'SOLO SIMULATION'}<//>
-        <h1 class="topbar__title">${room.sync ? html`<${Tooltip} placement="bottom" text=${t('동기화 시뮬레이션 소개')}><${Button} variant="secondary" size="sm" square=${true} icon="info" class="sync-info-btn" aria-label=${t('동기화 시뮬레이션 소개')} onClick=${()=>setSyncInfoOpen(true)} /><//>` : null}${room.sync ? t('동기화 시뮬레이션') : coop ? t('同盟模拟') : t('独立模拟')}${room.test ? html` <${TestMark} />` : null}<span class="topbar__sep"></span><${DifficultyTag} difficulty=${room.difficulty} size="lg" />${roomVersion(room) !== DEFAULT_VERSION ? html`<span class="room-mode room-season" data-testid="room-season">${versionLabel(roomVersion(room))}${room.modeId ? ` · ${(ladderModes(getConfig(), room.mode) || []).find((m) => m.id === room.modeId)?.name || ""}` : ""}</span>` : null}
+        <h1 class="topbar__title">${room.sync ? html`<${Tooltip} placement="bottom" text=${t('동기화 시뮬레이션 소개')}><${Button} variant="secondary" size="sm" square=${true} icon="info" class="sync-info-btn" aria-label=${t('동기화 시뮬레이션 소개')} onClick=${()=>setSyncInfoOpen(true)} /><//>` : null}${room.sync ? t('동기화 시뮬레이션') : coop ? t('同盟模拟') : t('独立模拟')}${room.test ? html` <${TestMark} />` : null}<span class="topbar__sep"></span><${DifficultyTag} difficulty=${room.difficulty} size="lg" />${roomVersion(room) !== DEFAULT_VERSION ? html`<span class="room-mode room-season" data-testid="room-season">${versionLabel(roomVersion(room))}${room.modeId ? ` · ${(ladderModes(getConfig(), room.mode) || []).find((m) => m.id === room.modeId)?.name ? t((ladderModes(getConfig(), room.mode) || []).find((m) => m.id === room.modeId).name) : ""}` : ""}</span>` : null}
           ${room.content?.modeId ? html`<span class="room-mode" data-testid="room-mode">${(room.content.modes || []).find((m) => m.id === room.content.modeId)?.name || room.content.modeId}</span>` : null}</h1>
 
       </div>
