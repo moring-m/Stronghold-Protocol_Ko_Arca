@@ -27,6 +27,12 @@
 //   “双眼皮”   turrets (`trap_1104_aclasert`, band 机械援助 / `deviceOverrides` alias on): ranged arts shooter on its data
 //              range; ASPD + attack_speed_per_stack × L (≤ max_attack_speed), hits apply fragile 1 + damage_scale_per_stack
 //              × L (≤ max_damage_scale) for the text's duration; L = the owner's highest bond layers (live)
+//   盐坨子炮   规程 m10 (`trap_196_cnnon`, PRTS 盐坨子炮): every 6 s (skill 吃盐坨子吧！, cost 6, charge 0) it fires a shell at
+//              the tile 4 ahead along its dir (level 1/4 落点: 身前第四格) — 100% ATK (1200) physical to every ally within
+//              1.5, flyers included; one ground enemy of weight ≤ 3 within 1.1 of the cannon rides the shell and lands on
+//              that point (its route is recomputed from there). The cannon itself is not a unit here: PRTS gives it 不死,
+//              不容易受到我方单位的攻击 and immunity to stun / cold / freeze / silence / sleep, so nothing can stop it [ASSUMED:
+//              the 1-HP last-shot rule never comes into play]
 //   盟约寒风   `startColdWind` / `kjeragColdWind` helpers for the 谢拉格 bond (every interval s all enemies cold)
 // Device overrides: a player's battle input `deviceOverrides` ({ alias: bool }) and `alias` keys in its playerEffects
 // params (auto_chess_change_map effects: band 机械援助, 机变 map cards) switch the devices on that player's half of
@@ -265,6 +271,48 @@ function tickTurret(battle, u, dt) {
   T.cd = u.s.interval;
 }
 
+// ---------------------------------------------------------------------------------------------------------------
+// 盐坨子炮 (규정 m10)
+
+const CANNON_KEY = 'trap_196_cnnon';
+const CANNON = Object.freeze({ interval: 6, reach: 4, splash: 1.5, carry: 1.1, maxWeight: 3 });
+
+function startCannons(battle, st, devices) {
+  for (const d of devices) {
+    if (d.key !== CANNON_KEY || !isActive(battle, st, d)) continue;
+    const [dr, dc] = DIR_VEC[d.dir ?? d.raw?.dir] ?? DIR_VEC.DOWN; // DIR_VEC (above): [dRow, dCol], UP = +row
+    const tr = d.row + dr * CANNON.reach, tc = d.col + dc * CANNON.reach;
+    if (!battle.grid.inRect(tr, tc)) continue; // its shells land on another field
+    const atk = num(d.raw?.stats?.atk ?? d.stats?.atk, 1200);
+    st.cannons.push({ row: d.row, col: d.col, tr, tc, atk, cd: CANNON.interval });
+  }
+}
+
+function fireCannon(battle, c) {
+  // the passenger: one ground enemy of weight ≤ 3 next to the cannon
+  const rider = battle.enemiesInRadius(c.col, c.row, CANNON.carry, true)
+    .find((e) => e.alive && !e.isFlying && e.weight <= CANNON.maxWeight + 1e-9);
+  battle.fx('cannonShot', { x: c.col, y: c.row, tx: c.tc, ty: c.tr });
+  for (const a of battle.alliesInRadius(c.tc, c.tr, CANNON.splash)) {
+    battle.dealDamage({ source: null, target: a, amount: c.atk, type: 'phys', tags: ['device', 'cannon'] });
+  }
+  if (rider && rider.alive) {
+    const fromX = rider.x, fromY = rider.y;
+    rider.x = c.tc; rider.y = c.tr;
+    if (rider.route) rider.route.pts = null;
+    battle.fx('teleport', { x: rider.x, y: rider.y, fromX, fromY, id: rider.id, kind: 'cannon' });
+  }
+}
+
+function tickCannons(battle, st, dt) {
+  for (const c of st.cannons) {
+    c.cd -= dt;
+    if (c.cd > 1e-9) continue;
+    c.cd += CANNON.interval;
+    fireCannon(battle, c);
+  }
+}
+
 /** Activate “双眼皮” turrets on this field (all known aliases by default; idempotent). Returns the turret units. */
 export function activateTurrets(battle, { aliases = null } = {}) {
   const st = stateOf(battle);
@@ -493,7 +541,7 @@ function refreshUnit(battle, st, u) {
 
 function ensureTick(battle, st) {
   if (st.ticking) return;
-  if (!st.hasTerrain && !st.flow.size && !st.turrets.size) return;
+  if (!st.hasTerrain && !st.flow.size && !st.turrets.size && !st.cannons.length) return;
   st.ticking = true;
   battle.on('tick', ({ dt }) => {
     if (st.hasTerrain || st.flow.size) {
@@ -501,6 +549,7 @@ function ensureTick(battle, st) {
       for (const e of battle.enemies) refreshUnit(battle, st, e);
     }
     for (const u of st.turrets.values()) tickTurret(battle, u, dt);
+    if (st.started && st.cannons.length) tickCannons(battle, st, dt);
   });
   // a unit that (re)deploys / spawns starts fresh (death drops its buffs) and gets its tile's terrain at once: smog
   // must already hide an operator from the first enemy shot of the battle. A 【移动】 (ctx.move: 乌尔比安 S3,
@@ -532,6 +581,7 @@ export function install(battle) {
     hasTerrain: false,
     flow: new Map(),
     turrets: new Map(),
+    cannons: [],
     platformOn: new Set(),
     platformOff: new Set(),
     crateOff: new Set(),
@@ -596,6 +646,7 @@ export function install(battle) {
     }
     // “双眼皮” turrets switched on (band 机械援助 / overrides)
     for (const d of devices) if ((d.key === TURRET_KEY || d.role === 'turret') && isActive(battle, st, d)) spawnTurret(battle, st, d);
+    startCannons(battle, st, devices);
     ensureTick(battle, st);
   }, { priority: 50 });
 }
