@@ -1124,3 +1124,10 @@
 .cmdx-pick__name { font-size: .2rem; color: #f0c35a; }
 .cmdx-pick__meta { font-size: .13rem; color: var(--text-md); }
 .cmdx-pick__body p { margin: 0; font-size: .15rem; line-height: 1.45; }
+
+/* 규정 command drag: a gold arrow from the command tile to the pointer */
+.cmdx__arrow { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 60; pointer-events: none; overflow: visible; }
+.cmdx__arrow line { stroke: #f0c35a; stroke-width: 5; stroke-linecap: round; stroke-dasharray: 14 8; filter: drop-shadow(0 0 4px rgba(240,195,90,.8)); animation: cmdx-march .5s linear infinite; }
+.cmdx__arrow polygon, .cmdx__arrow circle { fill: #f0c35a; filter: drop-shadow(0 0 4px rgba(240,195,90,.8)); }
+@keyframes cmdx-march { to { stroke-dashoffset: -22; } }
+@media (prefers-reduced-motion: reduce) { .cmdx__arrow line { animation: none; } }

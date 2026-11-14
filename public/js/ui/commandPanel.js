@@ -164,8 +164,21 @@ export function CommandPanel({ priv, editable, getView }) {
         ${cost != null && view.type === 'ACTIVE' ? html`<b class="effect__n num">${cost}</b>` : null}
       </button>
     <//>` : null}
-    ${ghost ? html`<div class="cmdx__ghost" style=${`left:${ghost.x}px;top:${ghost.y}px`} aria-hidden="true">
-      <${Img} src=${bandIconUrl(m, priv?.bandId)} fallback=${html`<${GIcon} name="bolt" />`} /></div>` : null}
+    ${ghost ? (() => {
+      // drag: an arrow from the command tile to the pointer (not a copy of the icon)
+      const r = tileRef.current?.getBoundingClientRect();
+      if (!r) return null;
+      const x0 = r.left + r.width / 2, y0 = r.top + r.height / 2, dx = ghost.x - x0, dy = ghost.y - y0, len = Math.hypot(dx, dy);
+      if (len < 4) return null;
+      const ux = dx / len, uy = dy / len, head = 18, wing = 10;
+      const bx = ghost.x - ux * head, by = ghost.y - uy * head;
+      const pts = `${ghost.x},${ghost.y} ${bx - uy * wing},${by + ux * wing} ${bx + uy * wing},${by - ux * wing}`;
+      return html`<svg class="cmdx__arrow" aria-hidden="true">
+        <line x1=${x0} y1=${y0} x2=${bx} y2=${by} />
+        <polygon points=${pts} />
+        <circle cx=${x0} cy=${y0} r="5" />
+      </svg>`;
+    })() : null}
     ${aiming ? html`<div class="cmdx__hint" role="status">${t('강조된 대상을 선택하세요 (Esc: 취소)')}</div>` : null}
     <${Modal} open=${info} onClose=${() => setInfo(false)} title=${t('전략 명령')} micro="COMMAND" class="cmdx-dlg"
       actions=${html`<${Button} variant="secondary" icon="close" data-autofocus onClick=${() => setInfo(false)}>${t('닫기')}<//>`}>
