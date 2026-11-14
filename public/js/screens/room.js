@@ -247,18 +247,21 @@ function SeasonPicker({ room, isHost, busy, run }) {
   const config = getConfig();
   const ladderMode = room.mode === 'solo' || room.mode === 'coop' ? room.mode : null;
   const ladder = ladderMode && current !== DEFAULT_VERSION ? ladderModes(config, ladderMode) : null;
-  // the season is chosen on the title screen (before entering): the room shows it
-  const canSwitch = false;
-  if (!canSwitch && current === DEFAULT_VERSION) return null;
+  // the season is chosen on the title screen (before entering); a laddered season picks its difficulty by 규정 등급 only
+  if (current === DEFAULT_VERSION || !ladder) return null;
+  if (!isHost) {
+    const m = ladder.find((x) => x.id === room.modeId) || ladder[0];
+    return html`<div class="dpick dpick--ro"><span class="dpick__opt is-active" style=${`--d-color:${DIFFICULTY_COLORS[m.difficulty] || DIFFICULTY_COLORS.NORMAL}`}>${t(m.name || m.id)}</span>
+      <span class="t-dim">由创建者选择</span></div>`;
+  }
+  const i = Math.max(0, ladder.findIndex((x) => x.id === room.modeId));
+  const m = ladder[i];
+  const step = (d) => { const n = ladder[Math.min(ladder.length - 1, Math.max(0, i + d))]; if (n && n.id !== room.modeId) run('season', () => net.request('room.setMode', { modeId: n.id })); };
   return html`<div class="dpick season-pick" data-testid="season-pick">
-    <select class="season-pick__select" aria-label=${t('시즌')} disabled=${!canSwitch || !!busy} value=${current}
-        onChange=${(e) => run('season', () => net.request('room.proposeVersion', { version: e.currentTarget.value }))}>
-      ${(canSwitch ? versions : [{ id: current, label: null }]).map((v) => html`<option key=${v.id} value=${v.id}>${v.label ? t(v.label) : versionLabel(v.id)}</option>`)}
-    </select>
-    ${ladder ? html`<select class="season-pick__select" aria-label=${t('규정 등급')} disabled=${!isHost || !!busy} value=${room.modeId || ''}
-        onChange=${(e) => run('season', () => net.request('room.setMode', { modeId: e.currentTarget.value }))}>
-      ${ladder.map((m) => html`<option key=${m.id} value=${m.id}>${t(m.name || m.id)}</option>`)}
-    </select>` : null}
+    <button type="button" class="dpick__opt season-pick__step" aria-label=${t('이전 등급')} disabled=${!!busy || i <= 0} onClick=${() => step(-1)}>‹</button>
+    <span class="dpick__opt is-active season-pick__cur" style=${`--d-color:${DIFFICULTY_COLORS[m.difficulty] || DIFFICULTY_COLORS.NORMAL}`}>
+      ${DIFFICULTIES.includes(m.difficulty) ? html`<${DifficultyIcon} difficulty=${m.difficulty} />` : null}${t(m.name || m.id)}</span>
+    <button type="button" class="dpick__opt season-pick__step" aria-label=${t('다음 등급')} disabled=${!!busy || i >= ladder.length - 1} onClick=${() => step(1)}>›</button>
   </div>`;
 }
 
@@ -448,7 +451,7 @@ export function RoomScreen() {
       <div class="room-bar__left">
         <div class="room-bar__difficulty">
           <span class="room-bar__label">模拟难度<${MicroLabel}>DIFFICULTY<//></span>
-          <${DifficultyPicker} room=${room} isHost=${facts.isHost} busy=${busy} onPick=${setDifficulty} />
+          ${roomVersion(room) !== DEFAULT_VERSION && ladderModes(getConfig(), room.mode === 'solo' || room.mode === 'coop' ? room.mode : null) ? null : html`<${DifficultyPicker} room=${room} isHost=${facts.isHost} busy=${busy} onPick=${setDifficulty} />`}
           <${SeasonPicker} room=${room} isHost=${facts.isHost} busy=${busy} run=${run} />
         </div>
         <div class="room-bar__reroll">

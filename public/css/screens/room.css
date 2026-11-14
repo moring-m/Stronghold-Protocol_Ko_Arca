@@ -417,3 +417,7 @@ html body .room-screen header.app-topbar .invite__btns .btn { height:24px; min-h
   background: rgba(var(--dim-rgb, 0, 0, 0), .35); border: 1px solid var(--line-2); font: inherit; font-size: 13px; }
 .season-pick__select:disabled { opacity: .75; }
 .room-season { margin-left: 8px; }
+/* 규정 등급: one level shown, the arrows step through the season's ladder */
+.room-screen .room-bar__left .dpick.season-pick { display: flex; width: auto; margin-top: 0; gap: 0; border: 1px solid var(--line-2); background: rgba(var(--dim-rgb, 0, 0, 0), .3); }
+.room-screen .room-bar__left .season-pick__cur { min-width: 9em; white-space: nowrap; justify-content: center; }
+.room-screen .room-bar__left .season-pick__step { min-width: 2.2em; font-size: 1.2em; }

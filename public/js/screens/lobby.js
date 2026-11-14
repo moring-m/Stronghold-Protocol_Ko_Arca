@@ -33,7 +33,7 @@ import { net, identity } from '../net.js';
 import { store, useStore, shallowEqual, loadPref, savePref } from '../store.js';
 import { getConfig, getMode, getStage, useData } from '../data.js';
 import { loadCustomExtensionPrefs } from '../ui/customExtensionPrefs.js';
-import { lobbyVersion, setLobbyVersion, DEFAULT_VERSION } from '../versions.js';
+import { lobbyVersion, setLobbyVersion, DEFAULT_VERSION, ladderModes } from '../versions.js';
 
 /** Official mode texts (activity_table act2autochess.modeDataDict), fallback when config.json is absent. */
 export const MODE_TEXT = {
@@ -337,6 +337,11 @@ export function LobbyScreen() {
   // a 규정 season (chosen on the title screen) plays solo and 4-seat co-op rooms only
   const regSeason = season !== DEFAULT_VERSION;
   useEffect(() => { if (regSeason && !seasonModes.includes(roomMode)) pickMode('coop'); }, [regSeason, roomMode]);
+  // a laddered season picks its difficulty by 규정 등급 only
+  const ladder = regSeason && seasonModes.includes(roomMode) ? ladderModes(getConfig(), roomMode) : null;
+  const [ladderPick, setLadderPick] = useState(() => loadPref('lobby.ladder', null));
+  const ladderMode = ladder ? (ladder.find((m) => m.id === ladderPick) || ladder[0]) : null;
+  const pickLadder = (id) => { setLadderPick(id); savePref('lobby.ladder', id); };
 
   const run = async (kind, fn) => {
     if (inFlight.current) return;
@@ -352,6 +357,7 @@ export function LobbyScreen() {
     // 동기화 시뮬레이션: an alliance room (4 / 8 seats) with the sync rules
     mode:syncMode(roomMode)?roomMode.replace('sync','coop'):roomMode,difficulty,gameplayMode:'custom',titleLocale:lang,
     ...(seasonFor(roomMode)!==DEFAULT_VERSION?{version:seasonFor(roomMode)}:{}),
+    ...(ladderMode?{modeId:ladderMode.id,difficulty:DIFFICULTIES.includes(ladderMode.difficulty)?ladderMode.difficulty:difficulty}:{}),
     customExtensions:loadCustomExtensionPrefs(),
     ...(syncMode(roomMode)?{sync:true}:{}),
     ...(['coop','coop8','sync','sync8'].includes(roomMode)?{isPublic:publicOn,spectators:MAX_SPECTATOR_SEATS}:{})
@@ -467,8 +473,11 @@ export function LobbyScreen() {
           </div>
         </div>
         <div class="lg-diff">
-        <div class="diff-tabs" role="radiogroup" aria-label="난이도">
-          ${DIFFICULTIES.map((d) => html`<button key=${d} type="button" role="radio" aria-checked=${difficulty === d} class=${`diff-tab${difficulty === d ? ' is-selected' : ''}`} style=${`--d-color:${DIFFICULTY_COLORS[d]}`} onClick=${() => pickDifficulty(d)}><${DifficultyIcon} difficulty=${d} class="diff-tab__glyph" /><span>${t(DIFFICULTY_NAMES[d]||'').replace(/\s*시뮬레이션$/,'')}</span></button>`)}
+        <div class=${`diff-tabs${ladder ? ' diff-tabs--ladder' : ''}`} role="radiogroup" aria-label="난이도">
+          ${ladder ? (() => { const i = Math.max(0, ladder.indexOf(ladderMode)); const step = (d) => pickLadder(ladder[Math.min(ladder.length - 1, Math.max(0, i + d))].id); const m = ladderMode;
+            return html`<button type="button" class="diff-tab diff-step" aria-label=${t('이전 등급')} disabled=${i <= 0} onClick=${() => step(-1)}>‹</button>
+              <div class="diff-tab is-selected diff-step__cur" role="status" style=${`--d-color:${DIFFICULTY_COLORS[m.difficulty] || DIFFICULTY_COLORS.NORMAL}`}>${DIFFICULTIES.includes(m.difficulty) ? html`<${DifficultyIcon} difficulty=${m.difficulty} class="diff-tab__glyph" />` : null}<span>${t(m.name || m.id)}</span></div>
+              <button type="button" class="diff-tab diff-step" aria-label=${t('다음 등급')} disabled=${i >= ladder.length - 1} onClick=${() => step(1)}>›</button>`; })() : DIFFICULTIES.map((d) => html`<button key=${d} type="button" role="radio" aria-checked=${difficulty === d} class=${`diff-tab${difficulty === d ? ' is-selected' : ''}`} style=${`--d-color:${DIFFICULTY_COLORS[d]}`} onClick=${() => pickDifficulty(d)}><${DifficultyIcon} difficulty=${d} class="diff-tab__glyph" /><span>${t(DIFFICULTY_NAMES[d]||'').replace(/\s*시뮬레이션$/,'')}</span></button>`)}
         </div>
 
         <div class="create-box">

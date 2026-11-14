@@ -530,3 +530,8 @@ html:not([lang="ko"]) .mode-cards .mode-card--lab .mode-card__name{font-size:.24
 .lobby-quick .mode-card__text { min-width: 0; }
 .lobby-quick .public-rooms-entry .public-rooms-entry__total { margin: 0 0 0 auto; align-self: center; }
 .lobby-quick .mode-card__desc { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+/* 규정 등급: ‹ level › stepper in the difficulty tabs' style */
+.diff-tabs.diff-tabs--ladder { grid-template-columns: auto minmax(0, 1fr) auto; }
+.diff-tabs--ladder .diff-step { min-width: 3em; font-size: 1.3em; justify-content: center; }
+.diff-tabs--ladder .diff-step:disabled { opacity: .35; cursor: default; }
+.diff-tabs--ladder .diff-step__cur { justify-content: center; cursor: default; }
