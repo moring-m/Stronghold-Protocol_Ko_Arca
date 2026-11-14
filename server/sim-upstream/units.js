@@ -9,6 +9,7 @@
 //   massLevel     = max(0, base + ΣmassFlat)                (重量: displacement, 浮空 halving; 失重 = massFlat −1)
 // Changing maxHp keeps the HP ratio. The sim keeps floats; rounding happens only in snapshots.
 
+import { customRules, rulePct } from './customRules.js';
 import { aggregateMods } from './buffs.js';
 import { flagsOf } from './snapshot.js';
 import { ASPD_MIN, ASPD_MAX, ELEMENT_GAUGE_MAX, ELEMENT_GAUGE_MAX_LEADER } from './constants.js';
@@ -27,7 +28,7 @@ export class Unit {
    */
   constructor(init) {
     // Heavy references are non-enumerable so assertion diffs / logs never walk the whole battle graph.
-    for (const k of ['def', 'player', 'ownerUnit', 'kit', 'profile', 'skill', 'route', 'bossPool', 'blockedBy', 'blocking', 'carry', 'mem', 'trait']) {
+    for (const k of ['def', 'player', 'ownerUnit', 'kit', 'profile', 'skill', 'route', 'bossPool', 'blockedBy', 'blocking', 'carry', 'mem', 'trait', 'battle']) {
       Object.defineProperty(this, k, { value: null, writable: true, enumerable: false, configurable: true });
     }
     this.id = init.id;
@@ -155,12 +156,14 @@ export class Unit {
     const atk = Math.max(0, fin(((b.atk + a('atkFlat')) * Math.max(0, 1 + a('atkPct')) + a('atkFinal')) * m('atkMul') * cm.atk, fin(b.atk, 0)));
     const def = Math.max(0, fin((b.def + a('defFlat')) * Math.max(0, 1 + a('defPct')) * m('defMul') * cm.def, fin(b.def, 0)));
     const res = clamp(fin((b.res + a('resFlat')) * m('resMul'), fin(b.res, 0)), 0, 100);
-    const aspd = clamp(fin(b.aspd + a('aspd'), 100), ASPD_MIN, ASPD_MAX);
+    // 커스텀 공격속도 상한 해제 (customRules.unlimitedAspd): no 600 cap
+    const aspdUncapped = !!(this.battle && customRules(this.battle)?.unlimitedAspd);
+    const aspd = clamp(fin(b.aspd + a('aspd'), 100), ASPD_MIN, aspdUncapped ? Infinity : ASPD_MAX);
     const bBat = fin(b.bat, 1) > 0 ? fin(b.bat, 1) : 1;
     const bat = fin(bBat * Math.max(0.1, 1 + a('batPct')), bBat);
     const s = {
       maxHp, atk, def, res, aspd, bat,
-      interval: (bat * 100) / aspd,
+      interval: aspdUncapped ? Math.max(0.1, (bat * 100) / aspd) : (bat * 100) / aspd, // uncapped: floored at 0.1 s
       blockCnt: Math.max(0, fin(Math.round(b.blockCnt + a('blockCnt')), 0)),
       moveSpeed: Math.max(this.mem.moveSpeedFloor ?? 0, fin((b.moveSpeed + a('moveFlat')) * m('moveMul'), fin(b.moveSpeed, 0))),
       rangeExtend: Math.max(0, Math.round(a('rangeExtend'))),

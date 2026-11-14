@@ -505,7 +505,9 @@ export class GameData {
   }
   get dp() {
     const d = this.config.dp && typeof this.config.dp === 'object' ? this.config.dp : {};
-    return { dpInit: numOr(d.init, 10), dpPerSec: numOr(d.perSec, 1), dpMax: numOr(d.max, 99) };
+    // 커스텀 설정 (config.customRules): every battle of the match carries them in its flags (sim-upstream customRules)
+    const rules = this.config.customRules;
+    return { dpInit: numOr(d.init, 10), dpPerSec: numOr(d.perSec, 1), dpMax: numOr(d.max, 99), ...(rules ? { customRules: rules } : {}) };
   }
   get unite() {
     const u = this.config.unite && typeof this.config.unite === 'object' ? this.config.unite : {};

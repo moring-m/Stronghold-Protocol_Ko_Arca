@@ -4,6 +4,7 @@
 // and the list compaction.
 // Installed on Battle.prototype by server/sim/Battle.js (a method container: never instantiated; `this` is the battle).
 
+import { customRules, rulePct } from '../customRules.js';
 import { MAX_ALIVE_ENEMIES, FIELD_EDGE_INSET } from '../constants.js';
 import { Unit } from '../units.js';
 import { compileRoute } from '../ai.js';
@@ -112,15 +113,20 @@ export class BattleSpawns {
     const mm = (v, pos = false) => { const n = fin(v, 1); return n < 0 || (pos && n <= 0) ? 1 : n; };
     const m0 = opts.mods || {};
     const m = { hpMul: mm(m0.hpMul, true), atkMul: mm(m0.atkMul), defMul: mm(m0.defMul), resMul: mm(m0.resMul), speedMul: mm(m0.speedMul) };
+    // 커스텀 적·보스 능력치 (customRules enemy* / boss*: the leader and its parts of a boss battle use the boss values)
+    const rules = customRules(this);
+    const bossStats = (this.kind === 'boss' || this.kind === 'hidden') && (opts.tag === 'boss' || opts.tag === 'part');
+    const percent = (id) => rulePct(rules, bossStats ? id.replace(/^enemy/, 'boss') : id);
     const e = new Unit({
       id: ++this._idSeq, side: 'enemy', kind: 'enemy', def, defId: def.key ?? enemyKey, name: def.name,
       x: start[1], y: start[0], motion: def.motion,
       base: {
-        maxHp: def.maxHp * (m.hpMul ?? 1), atk: def.atk * (m.atkMul ?? 1), def: def.def * (m.defMul ?? 1), res: def.res * (m.resMul ?? 1),
-        aspd: def.aspd, bat: def.bat, blockCnt: 0, moveSpeed: def.moveSpeed * (m.speedMul ?? 1), spRecovery: 0,
+        maxHp: def.maxHp * (m.hpMul ?? 1) * percent('enemyHp'), atk: def.atk * (m.atkMul ?? 1) * percent('enemyAtk'), def: def.def * (m.defMul ?? 1) * percent('enemyDef'), res: def.res * (m.resMul ?? 1) * percent('enemyRes'),
+        aspd: def.aspd * percent('enemyAspd'), bat: def.bat, blockCnt: 0, moveSpeed: def.moveSpeed * (m.speedMul ?? 1) * percent('enemySpeed'), spRecovery: 0,
         tauntLevel: def.tauntLevel, massLevel: def.massLevel, hpRecoveryPerSec: def.hpRecoveryPerSec, rangeRadius: def.rangeRadius,
       },
     });
+    if (rules?.unlimitedAspd) e.battle = this; // units.js reads the uncapped ASPD rule through it
     e.alive = true;
     e.deployed = true;
     e.blockWeight = def.blockCnt ?? 1;

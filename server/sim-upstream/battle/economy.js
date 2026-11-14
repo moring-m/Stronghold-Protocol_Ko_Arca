@@ -2,6 +2,7 @@
 // coins.
 // Installed on Battle.prototype by server/sim/Battle.js (a method container: never instantiated; `this` is the battle).
 
+import { customRules, rulePct } from '../customRules.js';
 import { layerGainRoom } from '../../../shared/constants.js';
 
 export class BattleEconomy {
@@ -37,11 +38,12 @@ export class BattleEconomy {
     if (!pp) return 0;
     const ps = this.getPlayer(playerId);
     const live = ps && ps.bonds[bondId] ? (ps.bonds[bondId].layers ?? 0) : (pp.layerGains[bondId] ?? 0);
-    if (!(layerGainRoom(live, Infinity) > 0)) return 0;
+    const layerCap = customRules(this)?.unlimitedLayers ? Infinity : undefined; // 커스텀 중첩 상한선 해제
+    if (!(layerGainRoom(live, Infinity, layerCap) > 0)) return 0;
     const source = opts.source ?? null;
     const ctx = { playerId, bondId, n, reason, source, tile: Array.isArray(opts.tile) ? opts.tile : this._sourceTile(source) };
     if (this._hooks.layerGain) { this.emit('layerGain', ctx); if (!(ctx.n > 0) || !Number.isFinite(ctx.n)) return 0; }
-    const add = layerGainRoom(live, ctx.n);
+    const add = layerGainRoom(live, ctx.n, layerCap);
     if (!(add > 0)) return 0;
     pp.layerGains[bondId] = (pp.layerGains[bondId] ?? 0) + add;
     if (ps && ps.bonds[bondId]) ps.bonds[bondId].layers = (ps.bonds[bondId].layers ?? 0) + add;

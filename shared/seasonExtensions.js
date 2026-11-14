@@ -10,14 +10,17 @@
 //   forcedBonds / protectedBonds        core 항상 밴 / 밴 제외 of the random core draw (co-op; solo picks a group)
 //   forcedAuxBonds / protectedAuxBonds  add-on ones (solo and co-op): config.bondPolicy, read by match-upstream/pool.js
 //   rules            the match rules the season's code reads from config.customRules (SEASON_RULES)
-//   ruleValues       the match values (SEASON_RULE_VALUES): round count, deploy cap, stock, battle times, boss speed
+//   ruleValues       the match values (SEASON_RULE_VALUES): round count, deploy cap, stock, battle times, boss speed,
+//                    boss hit limit and the ally / enemy / boss stat percentages (allies, enemyStats, bossStats tabs)
 import { customExtensionCatalog, normalizeRuleValues, RULE_VALUES } from './customExtensions.js';
 
-export const SEASON_EXTENSION_CATEGORIES = Object.freeze(['rules', 'forcedBonds', 'forcedAuxBonds', 'bannedOperators', 'disabledBonds', 'disabledStages', 'disabledBosses', 'disabledBands']);
+export const SEASON_EXTENSION_CATEGORIES = Object.freeze(['rules', 'allies', 'enemyStats', 'bossStats', 'forcedBonds', 'forcedAuxBonds', 'bannedOperators', 'disabledBonds', 'disabledStages', 'disabledBosses', 'disabledBands']);
 /** The rule switches a season match honours (match-upstream reads config.customRules). */
-export const SEASON_RULES = Object.freeze(['unlimitedHpLoss', 'sharedHp', 'defaultHarmony', 'duplicateBands']);
+export const SEASON_RULES = Object.freeze(['unlimitedHpLoss', 'sharedHp', 'defaultHarmony', 'duplicateBands', 'unlimitedLayers', 'unlimitedAspd']);
 /** The rule values a season match honours. */
-export const SEASON_RULE_VALUES = Object.freeze(['normalBattleTime', 'bossBattleTime', 'bossBattleSpeed', 'stockPlayers', 'roundCount', 'deployCap']);
+export const SEASON_RULE_VALUES = Object.freeze(['normalBattleTime', 'bossBattleTime', 'bossBattleSpeed', 'stockPlayers', 'roundCount', 'deployCap', 'maxDamage',
+  // battle stats (sim-upstream reads them from the BattleSpec flags: customRules.js); the augment-driven ones are not here
+  ...RULE_VALUES.filter((r) => ['allies', 'enemyStats', 'bossStats'].includes(r.category) && !/ByAugment$/.test(r.id)).map((r) => r.id)]);
 const BAN_KEYS = ['forcedBonds', 'protectedBonds', 'forcedAuxBonds', 'protectedAuxBonds'];
 const DEFAULT_VALUES = Object.freeze(Object.fromEntries(RULE_VALUES.map((r) => [r.id, r.default])));
 

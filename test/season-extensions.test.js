@@ -11,9 +11,9 @@ const raw = getVersionData(VERSION);
 
 test('the catalogue lists only the season categories, from the season tables', () => {
   const cat = seasonExtensionCatalog(raw);
-  for (const k of SEASON_EXTENSION_CATEGORIES) assert.ok(cat[k].length > 0, k);
+  for (const k of SEASON_EXTENSION_CATEGORIES.filter((k) => !['allies', 'enemyStats', 'bossStats'].includes(k))) assert.ok(cat[k].length > 0, k);
   assert.deepEqual(cat.rules.map((r) => r.id).sort(), [...SEASON_RULES].sort());
-  for (const k of ['allies', 'enemyStats', 'bossStats', 'commonBands', 'bonds', 'stages']) assert.deepEqual(cat[k] ?? [], [], k);
+  for (const k of ['commonBands', 'bonds', 'stages', 'defaultAllyAugments', 'defaultEnemyAugments']) assert.deepEqual(cat[k] ?? [], [], k);
   assert.ok(cat.bannedOperators.every((e) => raw.chess[e.id]));
   assert.ok(cat.disabledStages.every((e) => raw.stages[e.id]));
 });
@@ -48,10 +48,10 @@ test('a custom 규정 match never offers a banned operator', () => {
 
 test('rules and values reach config.customRules; the round count rebuilds the rounds; no setting = the season tables', () => {
   assert.equal(applySeasonExtensions(raw, seasonExtensionSelection({}, raw)), raw);
-  const sel = seasonExtensionSelection({ rules: ['sharedHp', 'duplicateBands', 'augments'], ruleValues: { roundCount: 5, deployCap: 10, stockPlayers: -1, bossBattleSpeed: 1, maxDamage: 1 },
+  const sel = seasonExtensionSelection({ rules: ['sharedHp', 'duplicateBands', 'augments'], ruleValues: { roundCount: 5, deployCap: 10, stockPlayers: -1, bossBattleSpeed: 1, maxDamage: 1, augmentGold: 9, enemyHpByAugment: 1 },
     forcedAuxBonds: [Object.keys(raw.bonds).find((id) => !raw.bonds[id].isCore && raw.bonds[id].weight > 0)] }, raw);
   assert.deepEqual(sel.rules, ['sharedHp', 'duplicateBands']);
-  assert.deepEqual(sel.ruleValues, { stockPlayers: -1, roundCount: 5, deployCap: 10 }, 'default and non-season values dropped');
+  assert.deepEqual(sel.ruleValues, { stockPlayers: -1, roundCount: 5, deployCap: 10, maxDamage: 1 }, 'default and non-season values dropped');
   const d = applySeasonExtensions(raw, sel);
   assert.equal(d.config.customRules.sharedHp, true); assert.equal(d.config.customRules.deployCap, 10); assert.equal(d.config.customRules.unlimitedStock, true);
   assert.deepEqual(d.config.bondPolicy.forcedAuxBonds, sel.forcedAuxBonds);
@@ -74,4 +74,35 @@ test('match-upstream reads the rules: deploy cap, stock, duplicate strategies, a
   assert.ok(off.has(addon[0])); assert.ok(!off.has(addon[1]));
   assert.equal(m.disabledBonds.filter((id) => !raw.bonds[id].isCore).length, plain.disabledBonds.filter((id) => !raw.bonds[id].isCore).length, 'same add-on quota');
   m.dispose?.(); plain.dispose?.();
+});
+
+// ---- battle stats (sim-upstream reads the match's customRules from the BattleSpec flags) ----
+import { makeBattle, chessRec, enemyRec } from './helpers/battleHarnessUpstream.js';
+
+const statBattle = (customRules, kind = 'normal') => makeBattle({
+  kind, units: [{ chessId: 'c1', row: 10, col: 4 }],
+  defs: { chess: { c1: chessRec({ id: 'c1', stats: { maxHp: 2000, atk: 500, aspd: 100, bat: 1 } }) }, enemies: { enemy_t: enemyRec({ key: 'enemy_t', hp: 5000, atk: 100 }) } },
+  enemies: [{ key: 'enemy_t', time: 0 }], flags: customRules ? { customRules } : {},
+});
+
+test('sim-upstream: ally / enemy stat percentages from customRules; none = the upstream stats', () => {
+  const plain = statBattle(null); plain.runUntil(() => plain.enemies().length > 0, 10);
+  const h = statBattle({ allyHp: 200, allyAtk: 50, enemyHp: 300, enemySpeed: 50 }); h.runUntil(() => h.enemies().length > 0, 10);
+  const a0 = plain.allies()[0], a1 = h.allies()[0], e0 = plain.enemies()[0], e1 = h.enemies()[0];
+  assert.ok(a0 && a1 && e0 && e1);
+  assert.equal(a1.base.maxHp, a0.base.maxHp * 2); assert.equal(a1.base.atk, a0.base.atk / 2);
+  assert.equal(e1.base.maxHp, e0.base.maxHp * 3); assert.equal(e1.base.moveSpeed, e0.base.moveSpeed / 2);
+});
+
+test('sim-upstream: unlimitedAspd lifts the 600 cap; the boss hit limit follows maxDamage', async () => {
+  const { leaderHitCancelled } = await import('../server/sim-upstream/attack/health.js');
+  const boss = { isBoss: true, x: 0, y: 0, id: 1 };
+  const b = (rules) => ({ kind: 'boss', flags: rules ? { customRules: rules } : {}, fx: () => {} });
+  assert.equal(leaderHitCancelled(b(null), boss, 300000), true);
+  assert.equal(leaderHitCancelled(b({ maxDamage: 1000 }), boss, 2000), true);
+  assert.equal(leaderHitCancelled(b({ maxDamage: 0 }), boss, 9e9), false);
+  const h = statBattle({ unlimitedAspd: true, allyAspd: 1000 }); h.runUntil(() => h.allies().length > 0, 10);
+  assert.ok(h.allies()[0].s.aspd > 600);
+  const c = statBattle({ allyAspd: 1000 }); c.runUntil(() => c.allies().length > 0, 10);
+  assert.equal(c.allies()[0].s.aspd, 600);
 });

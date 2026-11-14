@@ -70,6 +70,7 @@
 // fx kinds: 'beam' 'shell' 'explode' 'telegraph' 'charge' 'link' 'dash' 'column' 'tide' 'rockfall' 'tentacle' 'equip'
 //   'sword' 'vest' 'blink' 'summon' 'grow' 'phase' 'lpLoss' (x, y + extra {id, r, tiles, kind, tx, ty …}).
 
+import { customRules, rulePct } from '../customRules.js';
 import { MOVE_SCALE, MAX_ALIVE_ENEMIES } from '../constants.js';
 import { aggroCmp, areaSelectable } from '../targeting.js';
 import { compileRoute } from '../ai.js';
@@ -370,7 +371,10 @@ const nearestOf = (b, e, pred) => {
 function aspdFloor(b, e, extra = 0) {
   const rawAspd = e.def.raw && e.def.raw.stats ? Number(e.def.raw.stats.aspd) : NaN;
   if (!(rawAspd === 0)) return;
-  b.addBuff(e, { key: 'boss:aspd', persist: true, mods: { aspd: Math.max(ASPD_FLOOR, rawAspd + extra) - e.base.aspd } });
+  // 커스텀 적·보스 공격 속도 (customRules enemyAspd / bossAspd) scales the floor too
+  const rules = customRules(b), bossStats = (b.kind === 'boss' || b.kind === 'hidden') && (e.tag === 'boss' || e.tag === 'part');
+  const ratio = rulePct(rules, bossStats ? 'bossAspd' : 'enemyAspd');
+  b.addBuff(e, { key: 'boss:aspd', persist: true, mods: { aspd: Math.max(ASPD_FLOOR * ratio, rawAspd * ratio + extra) - e.base.aspd } });
 }
 /**
  * Engine target priority (blocker → taunt → latest deployed), made fair for two players on one boss field: within the top

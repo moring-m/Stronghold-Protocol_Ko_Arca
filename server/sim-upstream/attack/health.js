@@ -1,4 +1,5 @@
 // Final HP application and HP loss (流失). Shared by damage and the explicit HP-loss entry.
+import { customRules, rulePct } from '../customRules.js';
 import { BOSS_HIT_LIMIT } from '../../../shared/constants.js';
 import { mitigate } from './calculation.js';
 
@@ -16,8 +17,11 @@ import { mitigate } from './calculation.js';
  * 'element') removes no HP and is never checked. Deterministic (Math.ceil of the same double on every engine).
  */
 export function leaderHitCancelled(battle, target, amount) {
-  if (!(BOSS_HIT_LIMIT > 0) || !target || !target.isBoss || (battle.kind !== 'boss' && battle.kind !== 'hidden')) return false;
-  if (!(Math.ceil(amount) >= BOSS_HIT_LIMIT)) return false;
+  // 커스텀 보스 단일 피해 상한 (customRules.maxDamage; 0 = none): the official whole-hit cancel at that value
+  const custom = customRules(battle)?.maxDamage;
+  const limit = Number.isFinite(custom) ? custom : BOSS_HIT_LIMIT;
+  if (!(limit > 0) || !target || !target.isBoss || (battle.kind !== 'boss' && battle.kind !== 'hidden')) return false;
+  if (!(Math.ceil(amount) >= limit)) return false;
   battle.fx('hitCap', { x: target.x, y: target.y, id: target.id, n: Math.ceil(amount) });
   return true;
 }

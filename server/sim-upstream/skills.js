@@ -52,6 +52,7 @@
 //   also carries `noAmmo` (set it to true: this attack spends no ammo). onEnd runs while the skill's mods / range are
 //   still applied (`active` is already false); they are removed right after it (unless onEnd re-activated the skill).
 
+import { customRules, rulePct } from './customRules.js';
 import { absoluteRangeKeys, canTargetEnemy } from './targeting.js';
 import { AUTO_OP_COOLDOWN, COLS, ROWS } from './constants.js';
 import { boundedCount } from '../../shared/plugins/limits.js';
@@ -94,6 +95,12 @@ export class SkillRuntime {
     this.ammo = Math.max(0, Math.floor(+s.ammo || 0));
     this.baseSpCost = Math.max(0, Number.isFinite(+s.spCost) ? +s.spCost : (d.spCost ?? 0));
     this.initSp = Math.max(0, Number.isFinite(+s.initSp) ? +s.initSp : (d.initSp ?? 0));
+    // 커스텀 최대 SP / 초기 SP (customRules allySpCost / allyInitSp) of operators and their summons
+    const rules = customRules(this.battle);
+    if (rules && unit.side === 'ally' && (unit.kind === 'op' || unit.kind === 'token')) {
+      if (this.baseSpCost > 0) this.baseSpCost = Math.max(1, this.baseSpCost * rulePct(rules, 'allySpCost'));
+      this.initSp *= rulePct(rules, 'allyInitSp');
+    }
     this.maxCharges = Math.max(1, Math.floor(boundedCount(s.charges ?? d.maxCharges ?? 1, fieldCap('skill.maxCharges'), 1)));
     this.spType = s.spType ?? d.spType ?? 'time';
     const trig = typeof s.trigger === 'string' ? { rule: s.trigger } : (s.trigger || d.trigger || {});

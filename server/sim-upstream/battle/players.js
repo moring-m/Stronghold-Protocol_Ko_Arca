@@ -2,6 +2,7 @@
 // from the PlayerBattleInput, token defs for an owner's loadout, and the kit / profile / skill setup of a unit.
 // Installed on Battle.prototype by server/sim/Battle.js (a method container: never instantiated; `this` is the battle).
 
+import { customRules, rulePct } from '../customRules.js';
 import { COLS, BOSS_ROW_OFFSET } from '../constants.js';
 import { GEO } from '../../../shared/constants.js';
 import { Unit } from '../units.js';
@@ -194,7 +195,12 @@ export class BattlePlayers {
   }
 
   _makeAlly(ps, def, kind, r, c, extra = {}) {
-    const st = def.stats;
+    const original = def.stats, rules = customRules(this);
+    // 커스텀 아군 능력치 (customRules ally*, the 맹약 season's Battle._makeAlly)
+    const st = !rules ? original : { ...original, maxHp: original.maxHp * rulePct(rules, 'allyHp'), atk: original.atk * rulePct(rules, 'allyAtk'),
+      def: original.def * rulePct(rules, 'allyDef'), res: original.res * rulePct(rules, 'allyRes'), aspd: original.aspd * rulePct(rules, 'allyAspd'),
+      bat: original.bat * rulePct(rules, 'allyBat'), blockCnt: original.blockCnt * rulePct(rules, 'allyBlock'), cost: original.cost * rulePct(rules, 'allyCost'),
+      respawnTime: original.respawnTime * rulePct(rules, 'allyRedeploy'), spRecovery: original.spRecovery * rulePct(rules, 'allySpRecovery') };
     const u = new Unit({
       id: ++this._idSeq, side: 'ally', kind, def, defId: def.id, name: def.name, ownerId: ps ? ps.playerId : null,
       uid: extra.uid ?? null, ownerUnit: extra.ownerUnit ?? null, skin: extra.skin ?? null, x: c, y: r, tileR: r, tileC: c,
@@ -205,6 +211,7 @@ export class BattlePlayers {
         hpRecoveryPerSec: st.hpRecoveryPerSec, cost: st.cost, respawnTime: st.respawnTime,
       },
     });
+    if (rules?.unlimitedAspd) u.battle = this; // units.js reads the uncapped ASPD rule through it
     u.alive = false;
     u.deployed = false;
     u.items = [];
