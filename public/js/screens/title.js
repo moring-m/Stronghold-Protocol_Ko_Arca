@@ -245,7 +245,7 @@ export function TitleScreen() {
       <${Emblem} />
       <div class="title-en">
         <span class="title-en__a">STRONGHOLD PROTOCOL</span>
-        <span class="title-en__b">ALLIANCE</span>
+        <span class="title-en__b">${regSeason ? 'REGULATION' : 'ALLIANCE'}</span>
       </div>
       <h1 class="title-cn">卫戍协议<span class="title-cn__colon">：</span><em>${regSeason ? t('规程') : '盟约'}</em></h1>
       <p class="title-tag">调配资金与干员，与同伴协同布防，抵御多波次进攻，直至击败敌方领袖。</p>
