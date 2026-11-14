@@ -539,3 +539,4 @@ html:not([lang="ko"]) .mode-cards .mode-card--lab .mode-card__name{font-size:.24
 /* 규정 (beta): a mode the season does not support yet stays visible, greyed out */
 .mode-card.is-disabled { opacity: .42; filter: grayscale(.8); cursor: not-allowed; }
 .mode-card.is-disabled .mode-card__controls { pointer-events: none; }
+.mode-card__sizes button:disabled { opacity: .35; cursor: not-allowed; }

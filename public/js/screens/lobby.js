@@ -250,7 +250,8 @@ function TipsPanel() {
   </div>`;
 }
 
-function ModeCard({ card, selected, onSelect, coopSize=4, onCoopSize, publicOn, onPublicChange, full=false, disabled=false }) {
+function ModeCard({ card, selected, onSelect, coopSize=4, onCoopSize, publicOn, onPublicChange, full=false, disabled=false, no8=false }) {
+  if(no8&&coopSize===8)coopSize=4;
   // 규정 (beta): modes it does not support stay visible but cannot be picked
   if(disabled){onSelect=()=>{};selected=false;}
   if(card.id==='coop'&&coopSize===8)card={...card,desc:'최대 8명의 박사가 오퍼레이터 풀을 공유하며 함께 전투합니다.',points:['박사 1–8명 · 빈자리는 AI 팀원으로','협력방어 최대 4명']};
@@ -268,7 +269,7 @@ function ModeCard({ card, selected, onSelect, coopSize=4, onCoopSize, publicOn, 
     </span>
     <span class="mode-card__check" aria-hidden="true"><${Icon} name="check" />已选定</span>
     ${sized?html`<div class="mode-card__controls">
-      <span class="mode-card__sizes" role="group" aria-label="협동 인원">${[4,8].map(n=>html`<button type="button" aria-pressed=${coopSize===n} onClick=${e=>{e.stopPropagation();onCoopSize(n);}}>${t('{0}인',[n])}</button>`)}</span>
+      <span class="mode-card__sizes" role="group" aria-label="협동 인원">${[4,8].map(n=>html`<button type="button" aria-pressed=${coopSize===n} disabled=${no8&&n===8} title=${no8&&n===8?t('규정 시즌(베타)에서는 아직 사용할 수 없습니다'):undefined} onClick=${e=>{e.stopPropagation();if(no8&&n===8)return;onCoopSize(n);}}>${t('{0}인',[n])}</button>`)}</span>
       <label class="mode-card__spectate mode-card__public create-box__check" onClick=${e=>e.stopPropagation()} onKeyDown=${e=>e.stopPropagation()}>
         <input type="checkbox" role="switch" class="ui-switch" aria-label="공개" checked=${publicOn} onChange=${e=>onPublicChange(!!e.currentTarget.checked)}/><${Icon} name="users"/><span>공개</span>
       </label>
@@ -451,7 +452,7 @@ export function LobbyScreen() {
         <div class="section-label lg-label lg-label--modes"><span class="section-label__idx num">01</span>模拟方式<${MicroLabel}>MODE<//></div>
         <div class="lg-modes">
         <div class="mode-cards mode-cards--main">
-          ${MODE_CARDS.filter((c) => MAIN_MODES.includes(c.id)).map((c) => html`<${ModeCard} key=${c.id} card=${c} disabled=${regSeason && !seasonModes.includes(c.id)} selected=${roomMode === c.id || roomMode===c.id+'8'} onSelect=${pickMode} coopSize=${coopSize} onCoopSize=${n=>{setCoopSize(n);pickMode((c.id==='sync'?'sync':'coop')+(n===8?'8':''));}} publicOn=${publicOn} onPublicChange=${on=>{setPublicOn(on);savePref('lobby.publicOn',on);}} />`)}
+          ${MODE_CARDS.filter((c) => MAIN_MODES.includes(c.id)).map((c) => html`<${ModeCard} key=${c.id} card=${c} disabled=${regSeason && !seasonModes.includes(c.id)} no8=${regSeason} selected=${roomMode === c.id || roomMode===c.id+'8'} onSelect=${pickMode} coopSize=${coopSize} onCoopSize=${n=>{setCoopSize(n);pickMode((c.id==='sync'?'sync':'coop')+(n===8?'8':''));}} publicOn=${publicOn} onPublicChange=${on=>{setPublicOn(on);savePref('lobby.publicOn',on);}} />`)}
         </div>
 
         </div>

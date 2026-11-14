@@ -604,3 +604,19 @@ select option, select optgroup { background-color: var(--bg-2, var(--surf-2, #11
 :root[data-ui-light] .bpop__pill :is(b, small, span) { color: inherit; }
 :root[data-ui-light] .bpop__pill.is-on .bpop__state { color: #6ff0c8; }
 :root[data-ui-light] .bpop__stack, :root[data-ui-light] .bpop__stack b { color: #f4f6f5; }
+
+/* 규정 season with the default look: the accents turn crimson (an explicit UI theme keeps its own colours) */
+:root[data-season="regulation"]:not([data-ui-theme]) {
+  --accent-rgb: 214, 64, 64;
+  --glow-rgb: 255, 72, 72;
+  --mint-500: #d64040;
+  --mint-350: #f05a50;
+  --mint-400: #ff6a5c;
+  --mint-600: #c83838;
+  --mint-glow: #ff4848;
+  --mint-700: #9e2a2a;
+  --mint-800: #561818;
+  --mint-900: #2c0d0d;
+  --bg-tint: #1b1010;
+  --text-on-mint: #150606;
+}

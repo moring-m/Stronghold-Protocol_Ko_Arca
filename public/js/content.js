@@ -363,7 +363,16 @@ export function installContent({ store = appStore, data = dataStore, layers = co
 
   // the server's plugin count arrives with welcome (or changes on a reconnect): the personal plugins follow it
   let installed = installedCount(store.get());
+  // <html data-season>: the shown season's family (규정 = 'regulation'), so its default look can take its own palette
+  // (css/theme.css :root[data-season="regulation"])
+  const markSeason = (s) => {
+    if (typeof document === 'undefined') return;
+    const family = versionById(shownVersion(s))?.family || 'covenant';
+    if (document.documentElement.dataset.season !== family) document.documentElement.dataset.season = family;
+  };
+  markSeason(store.get());
   const offStore = store.subscribe((s) => {
+    markSeason(s);
     syncRoom(s);
     const n = installedCount(s);
     if (n !== installed) { installed = n; if (personal.get().ids.length) syncPersonal(); }
