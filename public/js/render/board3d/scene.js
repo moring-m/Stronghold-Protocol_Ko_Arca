@@ -957,7 +957,7 @@ export class BoardScene {
     // runtime screenshot has short wall shadows and illuminated floor faces.
     // Preserve the azimuth, but match that elevation only for the city theme.
     this.stageLightDir = original?.lighting?.dir || null;
-    if (original && nativeStageId(stage) === 'act2autochess_m01' && this.stageLightDir) {
+    if (original && tuningStageId(stage) === 'act2autochess_m01' && this.stageLightDir) {
       this.stageLightDir = [this.stageLightDir[0], this.stageLightDir[1], 1.05];
     }
     // Retain a restrained sky contribution for the native reflection/probe
@@ -1024,7 +1024,7 @@ export class BoardScene {
         const waterSurface = /Dosshore_UI/i.test(sourceName) || !!runtimeMaterial.uniforms?.uDeep;
         // City scenery beside the preview pen is environment, not a second field.
         // Retain it only for normal/cooperative framing; never add platform tiles.
-        const scenicArea = nativeStageId(stage) === 'act2autochess_m01' && this.area.some(a=>a.r1 >= 13)
+        const scenicArea = tuningStageId(stage) === 'act2autochess_m01' && this.area.some(a=>a.r1 >= 13)
           ? [...this.area, {r0:14,r1:18,c0:0,c1:5}] : this.area;
         const nativeArea = stage.previewLayout ? AREAS.boss : this.area;
         let visibleGeometry;
@@ -1035,7 +1035,7 @@ export class BoardScene {
         } else if (structuralStage.previewLayout && !geometry.platform) {
           // Reuse the cooperative environment as one layout, translated into
           // boss world space. Combat tiles and simulation coordinates stay put.
-          const environmentArea=nativeStageId(stage)==='act2autochess_m01'
+          const environmentArea=tuningStageId(stage)==='act2autochess_m01'
             ? [...AREAS.unite,{r0:14,r1:18,c0:0,c1:5}] : AREAS.unite;
           const environment=waterSurface ? surfaceForArea(geometry,environmentArea) : sceneryForArea(geometry,environmentArea,{surroundOnly:true});
           // Native boss geometry owns the boundary through row 6.5.
@@ -1089,7 +1089,7 @@ export class BoardScene {
       for(const[key,list]of Object.entries(buckets))if(list.length)M[key]=this._mesh(mergeInto(list),key==='board'&&themed||this.mat[key],{cast:key!=='decal'});
     }
     if (themed && !original) this._buildThemeScenery(stage, board);
-    if (original && !stage.coopEightStage && !['act2autochess_m01','act2autochess_m03'].includes(nativeStageId(stage)) && this.area.some(a=>a.c1>=20)) {
+    if (original && !stage.coopEightStage && !['act2autochess_m01','act2autochess_m03'].includes(tuningStageId(stage)) && this.area.some(a=>a.c1>=20)) {
       // The sand island has a water notch outside its right rim. Extend the
       // opposite authored hill strip only into uncovered cells; keep the sea
       // beyond the rim and the existing stairs/props intact in both modes.
@@ -1814,9 +1814,14 @@ export class BoardScene {
  */
 export const REGULATION_NATIVE_ALIAS = Object.freeze({
   act3autochess_m01: 'act1autochess_m01', act3autochess_m02: 'act1autochess_m02', act3autochess_m03: 'act1autochess_m03',
-  act3autochess_m04: 'act1autochess_m04', act3autochess_m05: 'act2autochess_m01', act3autochess_m06: 'act2autochess_m02',
+  act3autochess_m04: 'act1autochess_m04', act3autochess_m06: 'act2autochess_m02',
+  // m05 is act2 m01 with four field cells turned into ground: its own patched copy (tools/local-extract/patch_native_map.py),
+  // drawn as act2 m01 otherwise (the stage-specific tuning below reads nativeStageId)
 });
 export const nativeStageId = (stage) => stage?.originalStageId || REGULATION_NATIVE_ALIAS[stage?.id] || stage?.id;
+/** The 맹약 map a stage's native tuning follows (act2 m01's city light / rear scenery for 규정 m05 too). */
+const NATIVE_TUNING = Object.freeze({ act3autochess_m05: 'act2autochess_m01' });
+const tuningStageId = (stage) => NATIVE_TUNING[stage?.id] || nativeStageId(stage);
 
 export function boxData(size, height) {
   const a = size / 2, pos = [], nrm = [], uv = [], idx = [];
