@@ -167,7 +167,9 @@ export function bondReportDescription(bond) {
   const up = (text) => `<@ba.vup>${text}</>`;
   const scaling = '<@autochess.gray>(중첩 수에 따라 변경)</>';
   const tier = (n) => `<전장에 서로 다른 [${bond.name}] 오퍼레이터 <@autochess.dgreen>${n}</>명>`;
-  if (bond.bondId === 'ursusShip') return `전투 시작 시 ${up('제국 드론')} 소환. 제국 드론과 [우르수스] 오퍼레이터의 ${up('공격력·최대 HP 증가')}${scaling}. 제국 드론의 이동 속도 ${up('+50%')}\n${tier(6)} 제국 드론의 공격 속도 ${up('+50')}. 제국 드론의 공격 범위 내 적의 은신 무효화. 전장에 있는 서로 다른 [우르수스] 오퍼레이터의 총 공격력의 ${up('일정 비율')}을 제국 드론의 기본 공격력에 가산${scaling}`;
+  // another season (규정): its ursusShip is the official bond, described by its own data
+  const season = !!data.get('config')?.version;
+  if (bond.bondId === 'ursusShip' && !season) return `전투 시작 시 ${up('제국 드론')} 소환. 제국 드론과 [우르수스] 오퍼레이터의 ${up('공격력·최대 HP 증가')}${scaling}. 제국 드론의 이동 속도 ${up('+50%')}\n${tier(6)} 제국 드론의 공격 속도 ${up('+50')}. 제국 드론의 공격 범위 내 적의 은신 무효화. 전장에 있는 서로 다른 [우르수스] 오퍼레이터의 총 공격력의 ${up('일정 비율')}을 제국 드론의 기본 공격력에 가산${scaling}`;
   if (bond.bondId === 'leithanienShip') return `[라이타니엔] 오퍼레이터가 피해를 입힐 때마다 목표에게 ${up('5초')}간 '${up('속세의 음')}' 부여 (동일 오퍼레이터가 동일 목표에게 부여 시 재발동 대기 시간 0.1초)\n'${up('속세의 음')}': 매초 ${up('80')} + 시전자 공격력의 ${up('일정 비율')}에 해당하는 마법 대미지${scaling} (무한 중첩 가능, 지속시간 개별 적용)\n${tier(6)} [라이타니엔] 오퍼레이터의 공격력 ${up('+40%')}, '${up('속세의 음')}'이 적용된 적의 이동 속도 ${up('-25%')}, '${up('속세의 음')}' ${up('지속시간 증가')}${scaling}`;
   return bond.descRaw || bond.desc || '';
 }
@@ -182,7 +184,7 @@ function BondPanel({ bond, m, notOwned, augments, onBand, onAugment }) {
   const equipment = bondReportEquipment(bond.bondId, data.list('items'));
   const strategies = data.list('bands').filter((b) => b.bondIds?.includes(bond.bondId));
   const relatedAugments = augments.filter((a) => a.iconBond === bond.bondId);
-  const summon = bond.bondId === 'ursusShip' ? data.lookup('tokens', 'token_custom_ursus_drone') : null;
+  const summon = bond.bondId === 'ursusShip' && !data.get('config')?.version ? data.lookup('tokens', 'token_custom_ursus_drone') : null;
   return html`<div class="sw-detail">
     <${Hero} src=${bondIconUrl(m, bond.bondId)} glyph=${true} name=${bond.name}
       fallback=${html`<span class="sw-hero__txt">${[...tr(bond.name || '?')][0]}</span>`} />

@@ -317,7 +317,7 @@ function Detail({ m, chess, golden, entries, ops, onChange, onReset, locked }) {
       <div class="lo-dhead__info">
         <div class="lo-dhead__chips"><${TierChip} tier=${chess.tier} size="md" />
           ${choice.changed ? html`<span class="lo-badge lo-badge--changed">已调整</span>` : html`<span class="lo-badge lo-badge--plain">默认配置</span>`}</div>
-        ${[['ursusShip','우르수스'],['leithanienShip','라이타니엔']].filter(([id])=>(chess.bonds||[]).includes(id)).map(([id,name])=>html`<span key=${id} class="lo-badge">커스텀 진영 · ${name}</span>`)}
+        ${(data.get('config')?.version?[]:[['ursusShip','우르수스'],['leithanienShip','라이타니엔']]).filter(([id])=>(chess.bonds||[]).includes(id)).map(([id,name])=>html`<span key=${id} class="lo-badge">커스텀 진영 · ${name}</span>`)}
         <h2 class="lo-dhead__name">${chess.name}</h2>
         <span class="lo-dhead__en">${chess.appellation || ''}</span>
         <span class="lo-dhead__class">

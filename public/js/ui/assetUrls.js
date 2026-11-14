@@ -107,8 +107,13 @@ export function subProfIconUrl(m, chess) {
 
 /** Bond glyph (white; tint in CSS). */
 export function bondIconUrl(m, bondId) {
+  // another season (규정): its ursusShip is the official 乌萨斯 bond, not the 맹약 season's custom 우르수스 faction that
+  // the manifest's bonds.ursusShip draws — that season shows the official icon
+  if (bondId && SEASON_BOND_ICONS[bondId] && inOtherSeason()) return SEASON_BOND_ICONS[bondId];
   return bondId ? str(obj(obj(m)?.bonds)?.[bondId]) : null;
 }
+const SEASON_BOND_ICONS = Object.freeze({ ursusShip: '/assets/bond/ursusShip.png' });
+const inOtherSeason = () => !!globalThis.__SP__?.data?.get?.('config')?.version;
 
 /** Band (strategy) icon. */
 export function bandIconUrl(m, bandId) {

@@ -70,6 +70,8 @@ function effectOf(source,dataForStarter={}){
  if(!effects[base])throw Error(`Unknown augment: ${side} ${name}`);
  return effects[base];
 }
+/** Augments a season does not offer at all (their items have no counterpart there). */
+const SEASON_DROPPED=new Set(['이샤믈라의 축복']);
 export function createAugmentCatalog(data,round){
  // another season (shared/seasonAugments.js): its item ids name other items, so the augments' items are mapped by name
  const season=SEASON_AUGMENT_ITEMS[data?.config?.version?.id]||null;
@@ -85,11 +87,9 @@ export function createAugmentCatalog(data,round){
     if(equipment){
      const basic=Object.entries(data.items||{}).filter(([,i])=>!i.isGolden&&i.giveBondId===bondId&&i.itemType==='EQUIP').sort((a,b)=>a[1].tier-b[1].tier)[0]?.[0],advanced=season?season.advanced[bondId]:ADVANCED[bondId];
      if(!basic||s.grade!=='silver'&&!bond.isCore)continue;
-     if(s.grade!=='silver'&&!data.items?.[advanced]){
-      // a season bond with no advanced equipment: its basic equipment, more of it (II 3, III 4 against I's 2)
-      if(!season)continue;
-      effect={kind:'items',items:[basic],counts:[s.grade==='gold'?3:4]};
-     }else effect={kind:'items',items:s.grade==='silver'?[basic]:s.grade==='gold'?[advanced]:[advanced,basic],counts:s.grade==='prism'?[1,2]:[s.grade==='silver'?2:1]};
+     // II / III need the bond's advanced equipment; a season bond without one has no such augment
+     if(s.grade!=='silver'&&!data.items?.[advanced])continue;
+     effect={kind:'items',items:s.grade==='silver'?[basic]:s.grade==='gold'?[advanced]:[advanced,basic],counts:s.grade==='prism'?[1,2]:[s.grade==='silver'?2:1]};
      description=effect.items.map((id,i)=>`${itemName(id)} ${effect.counts[i]}개`).join('와 ')+' 획득';
     }else{
      const tier=Number(s.description.match(/(\d)등급/)?.[1]),candidates=Object.entries(data.chess||{}).filter(([,c])=>!c.isGolden&&!c.isHidden&&!c.isDiy&&!c.optionalRecruit&&c.visible!==false&&c.tier===tier&&(c.bonds||[]).includes(bondId)).map(([id])=>id);
@@ -104,6 +104,7 @@ export function createAugmentCatalog(data,round){
  if(season)return out.flatMap(a=>{
   // the fixed augments name 맹약-season item ids (ITEM_GRANTS, the 캐서린 hammers): map them; an item with no
   // counterpart is left out, and an augment left with none is not offered
+  if(SEASON_DROPPED.has(a.name.replace(/ (?:I|II|III)$/,'')))return [];
   if(a.bondId&&/_(?:equipment|support)_/.test(a.id)||!Array.isArray(a.effect?.items))return [a];
   const keep=a.effect.items.map((id,i)=>[season.items[id],i]).filter(([id])=>id&&data.items?.[id]);
   if(!keep.length)return [];

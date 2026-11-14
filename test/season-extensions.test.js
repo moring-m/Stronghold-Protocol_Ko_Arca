@@ -117,8 +117,9 @@ test('augments: the season catalogue maps items by name and names bonds in Korea
   assert.equal(raw.items[gamble.effect.items[0]].name, '驮兽储蓄罐', '기사 저금통 → 버든비스트 저금통');
   assert.ok(cat.some((a) => a.name === '이베리아 지원 I'));
   assert.ok(!cat.some((a) => /[一-鿿]/.test(a.name + a.description)));
-  const egir = cat.find((a) => a.name === '에기르 장비 지원 II');
-  assert.deepEqual(egir.effect.counts, [3]);
+  assert.ok(!cat.some((a) => a.name === '에기르 장비 지원 II'), 'no advanced equipment: no II / III');
+  assert.ok(cat.some((a) => a.name === '빅토리아 장비 지원 II'));
+  assert.ok(!cat.some((a) => a.name.startsWith('이샤믈라의 축복')));
 });
 
 test('augments: a custom 규정 match offers them at round 4 before the season draft, and the battles carry them', () => {
