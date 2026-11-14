@@ -30,6 +30,7 @@ import { GIcon } from './gameComponents.js';
 import { useTileScreen } from './facingWheel.js';
 import { localAsset } from '../data.js';
 import { GEO } from '../../../shared/constants.js';
+import { t as tr } from '../../../shared/i18n.js';
 
 const cx = (...p) => p.flat().filter(Boolean).join(' ');
 
@@ -151,26 +152,27 @@ export function tempRowRule(ready) {
 /**
  * The temp row's notice: dashed red frame + label (count, what to do, what happens at the end of the prep — tempRowRule).
  * `label` false (a piece is being dragged / placed): the frame only, nothing over the pieces the player is moving.
- * @param {{ view: any, count: number, items?: number, label?: boolean, ready?: boolean }} props
+ * @param {{ view: any, count: number, items?: number, label?: boolean, ready?: boolean, equipHand?: boolean }} props
  */
-export function TempRowNotice({ view, count, items = 0, label = true, ready = false }) {
+export function TempRowNotice({ view, count, items = 0, label = true, ready = false, equipHand = false }) {
   const a = useTileScreen(view, GEO.TEMP_ROW, GEO.TEMP_C0);
   const b = useTileScreen(view, GEO.TEMP_ROW, GEO.TEMP_C0 + GEO.TEMP_SIZE - 1);
   let rem = 100;
   try { rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 100; } catch { /* default */ }
   const zoom=uiCssZoom();rem*=zoom;
   const vw = globalThis.innerWidth || 1920;
-  const f = count > 0 ? tempRowFrame(a, b, { labelW: rem * 2.9, gap: rem * 0.1, vw }) : null;
+  const f = equipHand || count > 0 ? tempRowFrame(a, b, { labelW: rem * 2.9, gap: rem * 0.1, vw }) : null;
   if (!f) return null;
   const pts = f.quad.map((p) => `${(p[0]/zoom).toFixed(1)},${(p[1]/zoom).toFixed(1)}`).join(' ');
   const pad = rem * 0.1;
   const style = f.side === 'left' ? `left:${((f.left - pad)/zoom).toFixed(1)}px;top:${(f.y/zoom).toFixed(1)}px` : `left:${((f.right + pad)/zoom).toFixed(1)}px;top:${(f.y/zoom).toFixed(1)}px`;
   const what = items > 0 && items === count ? '件道具' : '个单位';
-  return html`<div class="tempnote" aria-hidden="false" data-testid="temp-notice">
-    <svg class="tempnote__frame" aria-hidden="true"><polygon points=${pts} /></svg>
+  return html`<div class=${equipHand ? 'tempnote tempnote--equipment' : 'tempnote'} aria-hidden="false" data-testid="temp-notice">
+    ${!equipHand ? html`<svg class="tempnote__frame" aria-hidden="true"><polygon points=${pts} /></svg>` : null}
     ${label ? html`<div class=${`tempnote__label is-${f.side}`} style=${style} role="status">
-      <b class="tempnote__title" data-i18n-ctx="tempwarn"><${Icon} name="warn" />临时整备区 <span class="num">${count}</span> ${what}待处理</b>
-      <span class="tempnote__rule">${tempRowRule(ready)}</span>
+      ${equipHand ? html`<b class="tempnote__title">${tr('装备区')}</b>${count > 0 ? html`<span class="tempnote__rule">${tr('暂存 {count} 个单位：{rule}', { count, rule: tr('有空位时自动移入；休整期结束时仍在暂存的单位将被销毁') })}</span>` : null}`
+        : html`<b class="tempnote__title" data-i18n-ctx="tempwarn"><${Icon} name="warn" />临时整备区 <span class="num">${count}</span> ${what}待处理</b>
+      <span class="tempnote__rule">${tempRowRule(ready)}</span>`}
     </div>` : null}
   </div>`;
 }

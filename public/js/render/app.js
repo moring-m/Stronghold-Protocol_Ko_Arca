@@ -1740,9 +1740,9 @@ export async function createFieldView(host, options = {}) {
       }
     }
     // the drop target (p.target, highlighted) is the tile under the pointer
-    if (p.target && p.target.area !== 'temp') {
-      const r = p.target.area === 'board' ? p.target.row : GEO.HAND_ROW;
-      const c = p.target.area === 'board' ? p.target.col : p.target.idx;
+    if (p.target && (p.target.area !== 'temp' || p.legal)) {
+      const r = p.target.area === 'board' ? p.target.row : p.target.area === 'temp' ? GEO.TEMP_ROW : GEO.HAND_ROW;
+      const c = p.target.area === 'board' ? p.target.col : p.target.area === 'temp' ? GEO.TEMP_C0 + p.target.idx : p.target.idx;
       // (a legal target shows the official marks alone — the green wash and the range — no frame of its own)
       if (p.legal && settings.tileMarkStyle === 'official') clearHl('dragTarget'); else drawHighlight([[r, c]], p.legal ? 'target' : 'illegal', 'dragTarget');
     } else clearHl('dragTarget');
@@ -1752,9 +1752,10 @@ export async function createFieldView(host, options = {}) {
     if (!dragState) return;
     const v = dragState.view;
     const t = p.target;
-    if (t && (t.area === 'board' || t.area === 'hand')) {
-      const row = t.area === 'board' ? t.row : GEO.HAND_ROW, col = t.area === 'board' ? t.col : t.idx;
-      const w = boardWorld(row, col, t.area === 'hand');
+    if (t && (t.area === 'board' || t.area === 'hand' || t.area === 'temp')) {
+      const row = t.area === 'board' ? t.row : t.area === 'temp' ? GEO.TEMP_ROW : GEO.HAND_ROW;
+      const col = t.area === 'board' ? t.col : t.area === 'temp' ? GEO.TEMP_C0 + t.idx : t.idx;
+      const w = boardWorld(row, col, t.area !== 'board');
       v._tween = { fx: v.x, fy: v.y, fz: v.z, tx: w.x, ty: w.y, tz: w.z, t: 0 };
       pending.set(dragState.key, { t: performance.now(), view: v, board: t.area === 'board' ? { row, col } : null });
     } else {

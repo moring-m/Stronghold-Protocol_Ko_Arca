@@ -759,3 +759,6 @@ button.eboss:hover { border-color: rgba(255, 110, 40, .8); }
 .downm__btns{display:flex;gap:10px;justify-content:flex-end;padding:12px clamp(14px,3vw,20px) 16px;flex-wrap:wrap}
 @keyframes downm-knock{0%{transform:translateX(0)}30%{transform:translateX(-5px) rotate(-4deg)}60%{transform:translateX(4px) rotate(3deg)}100%{transform:none}}
 @media (prefers-reduced-motion:reduce){.downm__face.is-out{animation:none}}
+/* 규정 (equipHand): the permanent equipment row's label — a neutral tag, not the overflow warning */
+.tempnote--equipment .tempnote__label { border-color: #a7cabd; color: #dceee8; background: rgba(18, 33, 30, .92); }
+.tempnote--equipment .tempnote__rule { color: #dceee8; }

@@ -1,5 +1,6 @@
 import {mobileUiScale} from './mobileScale.js';
 import { grantedBondsByMorph } from '../../../shared/plugins/rules.js';
+import { t } from '../../../shared/i18n.js';
 import {chessLoadout} from './gameLogic/loadout.js';
 function prepPair(pub, myId) {
   const alive = (Array.isArray(pub?.players) ? pub.players : []).filter(p => isObj(p) && p.alive !== false);
@@ -740,7 +741,12 @@ export function mergeTarget(priv, chessId, getChess = () => null) {
 }
 
 /** Whether every hand slot is taken (the server refuses a purchase / reward that needs a slot: HAND_FULL). */
-export function handFull(priv) {
+export function handFull(priv, kind = 'chess', config = null) {
+  // 规程 (config.version.rules.equipHand): equipment goes to the 5-slot equipment row (temp), never the hand
+  if (kind === 'item' && config?.version?.rules?.equipHand === true) {
+    const row = Array.isArray(priv?.temp) ? priv.temp.slice(0, GEO.TEMP_SIZE) : [];
+    return row.length >= GEO.TEMP_SIZE && row.every((p) => p != null);
+  }
   const hand = Array.isArray(priv?.hand) ? priv.hand : [];
   return hand.length >= GEO.HAND_SIZE && hand.every((p) => p != null);
 }
@@ -806,10 +812,12 @@ export function offerHeader(offer) {
  * @param {{ priv:any, editable:boolean, slot?:any, getChess?:(id:string)=>any, getItem?:(id:string)=>any }} ctx
  * @returns {string|null} Chinese reason
  */
-export function shopBlockReason(kind, { priv, editable, slot, getChess, getItem } = {}) {
+export function shopBlockReason(kind, { priv, editable, slot, getChess, getItem, config = null } = {}) {
   if (!priv) return '尚未就绪';
   if (priv.alive === false) return '你已被淘汰';
-  if (kind === 'ready') return priv.canReady === false ? '临时整备区不为空，请先处理溢出的资源' : null;
+  if (kind === 'ready') return priv.canReady === false ? (config?.version?.rules?.equipHand === true
+    ? t('暂存 {count} 个单位：{rule}', { count: priv.stashCount || 0, rule: t('有空位时自动移入；休整期结束时仍在暂存的单位将被销毁') })
+    : '临时整备区不为空，请先处理溢出的资源') : null;
   if (!editable) {
     if (kind === 'reward') return '当前无法选择';
     return priv.ready ? '已准备就绪，取消准备后才能操作' : '当前阶段无法进行该操作';
@@ -819,7 +827,7 @@ export function shopBlockReason(kind, { priv, editable, slot, getChess, getItem 
   if (kind === 'buy' || kind === 'reward') {
     if (!isObj(slot) || slot.sold) return kind === 'reward' ? '已选择' : '已售出';
     if ((Number(slot.price) || 0) > funds) return '资金不足';
-    if (handFull(priv) && !completesMerge(priv, slot, { getChess, getItem })) return '整备区已满';
+    if (handFull(priv, slot.kind, config) && !completesMerge(priv, slot, { getChess, getItem })) return slot.kind === 'item' && config?.version?.rules?.equipHand === true ? '装备区已满' : '整备区已满';
     return null;
   }
   if (kind === 'refresh') return (Number(shop.refreshPrice) || 0) > funds ? '资金不足' : null;
@@ -1041,7 +1049,7 @@ export function indexPieces(priv) {
  * @param {{ priv:any, stage:any, editable:boolean, field?:'normal'|'bossL'|'bossR', getChess?:(id:string)=>any,
  *   getToken?:(id:string)=>any, getItem?:(id:string)=>any, getEffect?:(id:string)=>any }} o
  */
-export function placementContext({ priv, stage, editable, field = 'normal', getChess = () => null, getToken = () => null, getItem = () => null, getEffect = () => null, backups = null, morphMode = 'official' }) {
+export function placementContext({ priv, stage, editable, field = 'normal', getChess = () => null, getToken = () => null, getItem = () => null, getEffect = () => null, backups = null, morphMode = 'official', config = null }) {
   const pieces = indexPieces(priv);
   const boardAt = new Map();
   for (const e of pieces.values()) if (e.area === 'board') boardAt.set(tileKey(e.row, e.col), e);
@@ -1057,7 +1065,7 @@ export function placementContext({ priv, stage, editable, field = 'normal', getC
   const deploy = field === 'bossL' || field === 'bossR'
     ? deploySets(stage, field, ov)
     : deploySets(effectiveStage(stage, ov));
-  return { priv, pieces, boardAt, handAt, deploy, cap, count, field, editable: !!editable, getChess, getToken, getItem, backups, morphMode: morphMode === 'plus' ? 'plus' : 'official' };
+  return { priv, pieces, boardAt, handAt, deploy, cap, count, field, editable: !!editable, getChess, getToken, getItem, backups, equipHand: config?.version?.rules?.equipHand === true, morphMode: morphMode === 'plus' ? 'plus' : 'official' };
 }
 
 /**
@@ -1139,11 +1147,20 @@ export function canPlace(ctx, uid, target) {
   const piece = src.piece;
   const isMagic = piece.kind === 'item' && ctx.getItem(piece.id)?.itemType === 'MAGIC';
 
+  // 规程 (equipHand): the 8th row's 5 slots are the equipment row — items only, and an item never goes to the hand
+  if (target.area === 'temp' && ctx.equipHand) {
+    if (piece.kind !== 'item') return no('BAD_TILE', '装备区只能放入装备');
+    if (!Number.isInteger(target.idx) || target.idx < 0 || target.idx >= GEO.TEMP_SIZE) return no('BAD_TILE', '无法放置在该位置');
+    if (src.area === 'temp' && src.idx === target.idx) return no('ALREADY', '位置未变化');
+    return { ok: true, action: ctx.priv.temp?.[target.idx] ? 'swap' : 'move' };
+  }
+
   if (target.area === 'hand') {
     const idx = target.idx;
     if (!Number.isInteger(idx) || idx < 0 || idx >= GEO.HAND_SIZE) return no('BAD_TILE', '无法放置在该位置');
     if (src.area === 'hand' && src.idx === idx) return no('ALREADY', '位置未变化');
     const occ = ctx.handAt.get(idx);
+    if (ctx.equipHand && piece.kind === 'item' && occ?.piece.kind !== 'chess') return no('BAD_TILE', '装备只能放入装备区');
     if (!occ) return { ok: true, action: 'move' };
     if (piece.kind === 'item') {
       if (occ.piece.kind === 'chess') return isMagic ? no('BAD_TARGET', '该道具需要放置在战场上使用') : equipCheck(ctx, piece, occ.piece);
@@ -1279,7 +1296,7 @@ export function dropIntent(ctx, uid, target) {
       && !equipMerges(ctx, uid);
     return { t: 'g.equip', fields: { itemUid: uid, targetUid: occ.piece.uid }, confirmReplace: full };
   }
-  const to = target.area === 'hand' ? { area: 'hand', idx: target.idx } : { area: 'board', row: target.row, col: target.col };
+  const to = target.area === 'hand' || target.area === 'temp' ? { area: target.area, idx: target.idx } : { area: 'board', row: target.row, col: target.col };
   return { t: 'g.move', fields: { uid, to } };
 }
 
@@ -1297,7 +1314,10 @@ export function dropFailureReason(ctx, uid, tile) {
   let target = null;
   if (tile.area === 'board') target = { area: 'board', row: tile.row, col: tile.col };
   else if (tile.area === 'hand') target = { area: 'hand', idx: Number.isInteger(tile.idx) ? tile.idx : tile.col };
-  else if (tile.area === 'temp') return ctx.pieces.get(uid).area === 'temp' ? null : '临时整备区无法放入单位';
+  else if (tile.area === 'temp') {
+    if (!ctx.equipHand) return ctx.pieces.get(uid).area === 'temp' ? null : '临时整备区无法放入单位';
+    target = { area: 'temp', idx: Number.isInteger(tile.idx) ? tile.idx : tile.col - GEO.TEMP_C0 };
+  }
   else if (Number.isInteger(tile.row) && tile.row >= GEO.FIELD.r0 && tile.row <= GEO.FIELD.r1) return '无法部署在该位置';
   else return null;
   const res = canPlace(ctx, uid, target);
