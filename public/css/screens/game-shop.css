@@ -333,3 +333,8 @@
 .shopbar__command { grid-column: 1 / -1; justify-self: end; pointer-events: auto; }
 .shopbar-tab .shopbar__command { align-self: flex-end; margin-bottom: .06rem; }
 .shopbar__command .cmdx { display: flex; flex-direction: row; align-items: flex-end; gap: .06rem; }
+/* the command above the shop is a main control: a large tile, the 돋보기 as tall as it */
+.shopbar__command .cmdx__tile.effect { width: .86rem; height: .86rem; }
+.shopbar__command .cmdx__tile .effect__n { min-width: .28rem; font-size: .18rem; }
+.shopbar__command .cmdx__info { width: .44rem; height: .86rem; }
+.shopbar__command .cmdx__info .icon { width: .28rem; height: .28rem; }
