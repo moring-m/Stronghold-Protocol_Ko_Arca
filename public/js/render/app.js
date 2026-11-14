@@ -2655,6 +2655,13 @@ export async function createFieldView(host, options = {}) {
       // redirect a destructive shortcut to a different operator.
       return pieceAt(p.x, p.y)?.uid ?? null;
     },
+    /** The board tile under a client point (board, bench and temp rows; null off the board or under another element). */
+    tileAtClientPoint(clientX, clientY) {
+      if (destroyed || !Number.isFinite(clientX) || !Number.isFinite(clientY) || document.elementFromPoint(clientX, clientY) !== canvas) return null;
+      const p = canvasPoint({ clientX, clientY });
+      const t = pickBoardTile(p.x, p.y);
+      return t ? { row: t.row, col: t.col } : null;
+    },
     pieceScreenRect(uid) {
       let v = views.get('p:' + uid);
       if (!v) for (const x of views.values()) if (x.uid === uid || x.info?.uid === uid || x.id === uid) { v = x; break; }

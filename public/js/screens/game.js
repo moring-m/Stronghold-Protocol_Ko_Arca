@@ -1758,14 +1758,13 @@ function MatchScreen() {
         self=${Number.isFinite(priv?.lp) ? { lp: priv.lp, pending: liveLpNow.pending, unite: liveLpNow.unite, left: liveLpNow.left } : null}
         observe=${cc ? { canObserve: (p) => observeTarget(p, pub, myId, { observing: watchingOther, ownDone: localDone }), observing: watchingOther, onBack: alive ? backHome : null } : null} />
 
-      <div class="gm__effects"><${EffectsList} augmentsOnly=${true} pub=${pub} ownerId=${strip.ownerId||myId}/><${EffectsList} pub=${pub} ownerId=${strip.ownerId||myId} effects=${watchingOther && field ? (field.effects ?? null) : priv?.effects} /></div>
+      <div class="gm__effects">${!watchingOther ? html`<${CommandPanel} priv=${priv} editable=${editable} getView=${() => live.current.view} />` : null}<${EffectsList} augmentsOnly=${true} pub=${pub} ownerId=${strip.ownerId||myId}/><${EffectsList} pub=${pub} ownerId=${strip.ownerId||myId} effects=${watchingOther && field ? (field.effects ?? null) : priv?.effects} /></div>
 
       ${watchingOther && !combat && !prepLayers.length ? html`<div class="gm__watching" role="status">
         <${GIcon} name="eye" /><span data-i18n-ctx="watching">正在查看 <b>${watchedName}</b>的阵地（只读）</span>
         ${spectator || !alive ? null : html`<${Button} size="sm" variant="primary" icon="back" onClick=${() => watchPlayer({ playerId: myId })}>返回自己<//>`}
       </div>` : null}
 
-      ${showShop ? html`<${CommandPanel} priv=${priv} editable=${editable} />` : null}
       ${showShop ? html`<${ShopBar} priv=${priv} editable=${editable} collapsed=${barCollapsed} refreshBusy=${refreshBusy} onCollapse=${setCollapsed}
         barRef=${barRef} offBonds=${offBonds}
         onBuy=${buy} onLevel=${() => actions.levelUp()} onRefresh=${() => actions.refresh()} onFreeze=${() => actions.freeze()}

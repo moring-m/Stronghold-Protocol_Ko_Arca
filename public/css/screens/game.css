@@ -1067,12 +1067,7 @@
 @media (max-width: 560px) { .brief-groups__row { grid-template-columns: 1fr; } }
 
 /* 전략 명령 (규정 시즌, ui/commandPanel.js): a folded button above the shop that opens the command's card */
-.cmdp { position: absolute; right: 24px; bottom: 236px; z-index: 30; max-width: min(360px, calc(100vw - 32px)); }
-.cmdp__head { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; color: inherit; font: inherit; font-weight: 700;
   background: rgba(10, 22, 20, .88); border: 1px solid var(--mint-400, #5fd3b6); cursor: pointer; }
-.cmdp__cost { margin-left: 4px; color: var(--gold-400, #f0c35a); }
-.cmdp__badge { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: #e0524a; color: #fff; font-size: 12px; }
-.cmdp__body { position: absolute; right: 0; bottom: calc(100% + 6px); width: min(360px, calc(100vw - 32px)); padding: 10px 12px; background: rgba(10, 22, 20, .94); border: 1px solid var(--line-2); display: grid; gap: 8px; }
 .cmdp__desc { font-size: 13px; line-height: 1.5; }
 .cmdp__meta { display: flex; flex-wrap: wrap; gap: 10px; font-size: 12px; color: var(--text-2, #9fb7b0); }
 .cmdp__why { color: #f09a8a; }
@@ -1081,12 +1076,8 @@
 .cmdp__card { display: flex; justify-content: space-between; gap: 8px; padding: 8px; text-align: left; color: inherit; font: inherit; font-size: 13px;
   background: rgba(var(--dim-rgb, 0, 0, 0), .35); border: 1px solid var(--line-2); cursor: pointer; }
 .cmdp__card:hover { border-color: var(--mint-400, #5fd3b6); }
-@media (max-width: 560px) { .cmdp { right: 8px; bottom: 190px; } }
-/* short screens (phones in landscape): the command card and the bond groups stay compact */
+/* short screens (phones in landscape): the command dialog text and the bond groups stay compact */
 @media (max-height: 500px) {
-  .cmdp { bottom: 132px; right: 10px; }
-  .cmdp__head { padding: 3px 8px; font-size: 11px; }
-  .cmdp__body { width: min(300px, calc(100vw - 24px)); max-height: 52vh; overflow: auto; padding: 6px 8px; gap: 5px; }
   .cmdp__desc, .cmdp__card { font-size: 10px; line-height: 1.4; }
   .cmdp__meta { font-size: 10px; }
   .brief-groups { margin-bottom: 6px; }
@@ -1094,5 +1085,29 @@
   .brief-group { padding: 5px 8px; gap: 4px; }
   .brief-group__label { font-size: 11px; }
   .brief-group__bond { font-size: 10px; gap: 2px; }
-  .brief-group__bond .bond-glyph, .brief-group__bond svg, .brief-group__bond img { width: 14px; height: 14px; }
 }
+
+/* ---- 전략 명령 (규정, ui/commandPanel.js): in the effects column, above the effect icons ------------------------- */
+.gm__effects .cmdx { display: flex; flex-direction: column; align-items: flex-end; gap: .08rem; margin-bottom: .08rem; }
+.cmdx__info { position: relative; width: .5rem; height: .36rem; display: grid; place-items: center; padding: 0; color: var(--mint-400);
+  background: rgba(var(--shade-rgb),.85); border: 1px solid var(--line-2); cursor: pointer; }
+.cmdx__info .icon { width: .24rem; height: .24rem; }
+.cmdx__info:hover { border-color: var(--mint-400); }
+.cmdx__info.is-pending { border-color: #f0c35a; animation: cmdx-pulse 1.2s ease-in-out infinite; }
+.cmdx__badge { position: absolute; right: -.06rem; top: -.06rem; width: .18rem; height: .18rem; border-radius: 50%; display: grid; place-items: center;
+  background: #e0524a; color: #fff; font-size: .12rem; font-weight: 700; }
+.cmdx__tile { padding: 0; cursor: default; touch-action: none; }
+.cmdx__tile.is-usable { cursor: grab; border-color: #f0c35a; box-shadow: 0 0 .06rem rgba(240,195,90,.9), 0 0 .16rem rgba(240,195,90,.55);
+  animation: cmdx-glow 1.6s ease-in-out infinite; }
+.cmdx__tile.is-aiming { outline: 2px solid #f0c35a; outline-offset: 2px; }
+.cmdx__tile.is-dragging { opacity: .45; cursor: grabbing; }
+.cmdx__tile:disabled { opacity: .8; }
+.cmdx__ghost { position: fixed; z-index: 60; width: .56rem; height: .56rem; margin: -.28rem 0 0 -.28rem; pointer-events: none; display: grid; place-items: center;
+  background: rgba(var(--shade-rgb),.9); border: 1px solid #f0c35a; box-shadow: 0 0 .16rem rgba(240,195,90,.7); }
+.cmdx__ghost img { width: 86%; height: 86%; object-fit: contain; }
+.cmdx__hint { max-width: 2.6rem; padding: .04rem .08rem; font-size: .13rem; color: #1d1400; background: #f0c35a; }
+.scard.is-cmd-target { outline: 3px solid #f0c35a; outline-offset: -3px; box-shadow: 0 0 .18rem rgba(240,195,90,.7); }
+.cmdx-dlg__how { margin-top: .08rem; font-size: .14rem; }
+@keyframes cmdx-glow { 0%, 100% { box-shadow: 0 0 .05rem rgba(240,195,90,.8), 0 0 .12rem rgba(240,195,90,.4); } 50% { box-shadow: 0 0 .09rem rgba(240,195,90,1), 0 0 .24rem rgba(240,195,90,.7); } }
+@keyframes cmdx-pulse { 0%, 100% { box-shadow: none; } 50% { box-shadow: 0 0 .14rem rgba(240,195,90,.8); } }
+@media (prefers-reduced-motion: reduce) { .cmdx__tile.is-usable, .cmdx__info.is-pending { animation: none; } }

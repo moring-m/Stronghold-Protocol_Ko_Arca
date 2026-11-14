@@ -120,7 +120,7 @@ export function ChessCardView({ slot, idx, priv, frozen = false, reason = null, 
   const mod=lo?.module && !lo.module.none ? lo.module : null;
   const tap = () => { if (onTap) onTap(idx); else if (!disabled) onBuy(idx); else onDetail(slot.id, 'chess', hint); };
   const name = c?.name || t('干员');
-  const card = html`<button type="button" class=${cx('scard', `scard--t${tier}`, favorite && 'is-favorite', recruit && 'is-recruit', frozen && 'is-frozen', disabled && 'is-disabled', willMerge && 'is-merge', armed && 'is-armed')}
+  const card = html`<button type="button" data-shop-slot=${idx} class=${cx('scard', `scard--t${tier}`, favorite && 'is-favorite', recruit && 'is-recruit', frozen && 'is-frozen', disabled && 'is-disabled', willMerge && 'is-merge', armed && 'is-armed')}
       data-shop-slot=${free ? undefined : idx} aria-keyshortcuts=${free ? undefined : hotkeyLabelOf('buy')}
       title=${free || reason ? undefined : t('购买鼠标指向的商品 · {key}', { key: hotkeyLabelOf('buy') })}
       onClick=${tap} onContextMenu=${(e) => { e.preventDefault(); onDetail(slot.id, 'chess', hint); }}
@@ -173,7 +173,7 @@ export function ItemCardView({ slot, idx, frozen = false, reason = null, free = 
   const m = data.get('assets');
   const disabled = !!reason;
   const tap = () => { if (onTap) onTap(idx); else if (!disabled) onBuy(idx); else onDetail(slot.id, 'item'); };
-  const card = html`<button type="button" class=${cx('scard', 'scard--item', isFavorite('item',slot.id) && 'is-favorite', frozen && 'is-frozen', disabled && 'is-disabled', armed && 'is-armed')}
+  const card = html`<button type="button" data-shop-slot=${idx} class=${cx('scard', 'scard--item', isFavorite('item',slot.id) && 'is-favorite', frozen && 'is-frozen', disabled && 'is-disabled', armed && 'is-armed')}
       data-shop-slot=${free ? undefined : idx} aria-keyshortcuts=${free ? undefined : hotkeyLabelOf('buy')}
       title=${free || reason ? undefined : t('购买鼠标指向的商品 · {key}', { key: hotkeyLabelOf('buy') })}
       onClick=${tap} onContextMenu=${(e) => { e.preventDefault(); onDetail(slot.id, 'item'); }}
