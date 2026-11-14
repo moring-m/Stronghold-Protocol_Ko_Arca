@@ -196,7 +196,10 @@ export function commandDraftView(ps) {
   if (!draft) return null;
   return { ...draft, cards: draft.cards.map(id => {
     const s = skillRows(ps).find(row => row.effectId === id);
-    return { effectId: id, desc: s.desc, descRaw: s.descRaw, cost: s.cost };
+    // the owning strategy (its icon on the forced choice dialog) and the command's 【name】
+    const band = Object.values(ps.gd.raw.bands || {}).find(b => (b.skills || []).some(row => row.effectId === id));
+    const name = /^【([^】]+)】/.exec(s.desc || '')?.[1] || null;
+    return { effectId: id, desc: s.desc, descRaw: s.descRaw, cost: s.cost, type: s.type, name, bandId: band?.bandId || null };
   }) };
 }
 

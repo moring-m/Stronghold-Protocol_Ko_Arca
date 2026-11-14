@@ -1111,3 +1111,16 @@
 @keyframes cmdx-glow { 0%, 100% { box-shadow: 0 0 .05rem rgba(240,195,90,.8), 0 0 .12rem rgba(240,195,90,.4); } 50% { box-shadow: 0 0 .09rem rgba(240,195,90,1), 0 0 .24rem rgba(240,195,90,.7); } }
 @keyframes cmdx-pulse { 0%, 100% { box-shadow: none; } 50% { box-shadow: 0 0 .14rem rgba(240,195,90,.8); } }
 @media (prefers-reduced-motion: reduce) { .cmdx__tile.is-usable, .cmdx__info.is-pending { animation: none; } }
+
+/* 규정: a command choice (“追随者们” etc.) is forced: the dialog opens at once and has no close */
+.cmdx-pick__lead { margin: 0 0 .12rem; font-size: .15rem; }
+.cmdx-pick__cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(2.6rem, 1fr)); gap: .12rem; }
+.cmdx-pick__card { display: flex; align-items: flex-start; gap: .12rem; padding: .14rem; text-align: left; color: var(--text-hi);
+  background: rgba(var(--shade-rgb), .9); border: 2px solid var(--line-2); cursor: pointer; }
+.cmdx-pick__card:hover:not(:disabled), .cmdx-pick__card:focus-visible { border-color: #f0c35a; box-shadow: 0 0 .12rem rgba(240,195,90,.5); }
+.cmdx-pick__icon { flex: 0 0 .72rem; width: .72rem; height: .72rem; display: grid; place-items: center; background: rgba(0,0,0,.35); border: 1px solid var(--line-2); }
+.cmdx-pick__icon img { width: 100%; height: 100%; object-fit: contain; }
+.cmdx-pick__body { display: flex; flex-direction: column; gap: .04rem; min-width: 0; }
+.cmdx-pick__name { font-size: .2rem; color: #f0c35a; }
+.cmdx-pick__meta { font-size: .13rem; color: var(--text-md); }
+.cmdx-pick__body p { margin: 0; font-size: .15rem; line-height: 1.45; }

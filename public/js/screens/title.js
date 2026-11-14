@@ -313,7 +313,7 @@ function SeasonChoice() {
       const on = o.id === DEFAULT_VERSION ? !isReg : isReg;
       return html`<button key=${o.id} type="button" role="radio" aria-checked=${on ? 'true' : 'false'}
           class=${`title-season__opt${on ? ' is-on' : ''}`} onClick=${() => setLobbyVersion(o.id)}>
-        <b>${o.name}</b><span>${o.sub}</span>
+        <b>${o.name}${o.id !== DEFAULT_VERSION ? html`<i class="beta-tag">BETA</i>` : null}</b><span>${o.sub}</span>
       </button>`;
     })}
   </div>`;

@@ -170,7 +170,7 @@ export function TempRowNotice({ view, count, items = 0, label = true, ready = fa
   return html`<div class=${equipHand ? 'tempnote tempnote--equipment' : 'tempnote'} aria-hidden="false" data-testid="temp-notice">
     ${!equipHand ? html`<svg class="tempnote__frame" aria-hidden="true"><polygon points=${pts} /></svg>` : null}
     ${label ? html`<div class=${`tempnote__label is-${f.side}`} style=${style} role="status">
-      ${equipHand ? html`<b class="tempnote__title">${tr('装备区')}</b>${count > 0 ? html`<span class="tempnote__rule">${tr('暂存 {count} 个单位：{rule}', { count, rule: tr('有空位时自动移入；休整期结束时仍在暂存的单位将被销毁') })}</span>` : null}`
+      ${equipHand ? html`${count > 0 ? html`<span class="tempnote__rule">${tr('暂存 {count} 个单位：{rule}', { count, rule: tr('有空位时自动移入；休整期结束时仍在暂存的单位将被销毁') })}</span>` : null}`
         : html`<b class="tempnote__title" data-i18n-ctx="tempwarn"><${Icon} name="warn" />临时整备区 <span class="num">${count}</span> ${what}待处理</b>
       <span class="tempnote__rule">${tempRowRule(ready)}</span>`}
     </div>` : null}

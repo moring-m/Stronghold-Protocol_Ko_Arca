@@ -359,3 +359,7 @@
 .title-season__opt b { font-size: 15px; letter-spacing: .04em; }
 .title-season__opt span { font-size: 11px; color: var(--text-2, #9fb7b0); }
 .title-season__opt.is-on { border-color: var(--mint-400, #5fd3b6); box-shadow: inset 0 0 0 1px var(--mint-400, #5fd3b6); }
+
+/* 규정 season: beta tag on its title button */
+.beta-tag { display: inline-block; margin-left: .06rem; padding: .01rem .05rem; font-style: normal; font-size: .1rem; font-weight: 800;
+  letter-spacing: .08em; line-height: 1.3; vertical-align: .04rem; color: #1d1400; background: #f0c35a; }

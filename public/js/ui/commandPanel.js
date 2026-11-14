@@ -148,7 +148,7 @@ export function CommandPanel({ priv, editable, getView }) {
     <${RichText} as="p" text=${view.descRaw || view.desc || ''} />
     ${view.reason && view.reason !== 'passive' ? html`<span class="efftip__kind cmdp__why">${t(REASON[view.reason] || view.reason)}</span>` : null}</div>` : null;
   const onInfo = () => {
-    if (draft || !view) { setInfo(true); return; }
+    if (!view) { setInfo(true); return; }
     if (pinned.current) { pinned.current(); pinned.current = null; return; }
     pinned.current = showTooltipAt(tileRef.current, tip, 'bottom');
   };
@@ -179,12 +179,21 @@ export function CommandPanel({ priv, editable, getView }) {
         ${view.type === 'ACTIVE' ? html`<p class="t-dim cmdx-dlg__how">${choices.length
           ? t('전략 표시의 명령 아이콘을 대상으로 드래그하거나, 클릭한 뒤 강조된 대상을 선택해 사용합니다.')
           : t('전략 표시의 명령 아이콘을 클릭해 사용합니다.')}</p>` : null}` : null}
-      ${draft ? html`<div class="cmdp__draft"><${MicroLabel}>${t('명령 선택')}<//>
-        ${(draft.cards || []).map((c, idx) => html`<button key=${c.effectId} type="button" class="cmdp__card" disabled=${busy}
-            onClick=${() => send(() => actions.commandChoice(draft.id, idx))}>
-          <${RichText} text=${c.descRaw || c.desc || c.effectId} /><b class="num">${c.cost ?? ''}</b>
-        </button>`)}
-      </div>` : null}
     <//>
+    ${draft && editable ? html`<${Modal} open=${true} onClose=${null} closeOnBackdrop=${false} title=${t('명령 선택')} micro="COMMAND" class="cmdx-pick"
+      tone="gold">
+      <p class="t-dim cmdx-pick__lead">${t('새 명령을 하나 선택하세요. 선택하면 현재 명령이 교체됩니다.')}</p>
+      <div class="cmdx-pick__cards">
+        ${(draft.cards || []).map((c, idx) => { const full = tr(c.descRaw || c.desc || c.effectId); const head = /^\s*[【\[]([^】\]]+)[】\]]\s*\n?/.exec(full); const name = head?.[1] || (c.name ? tr(c.name) : ''); return html`<button key=${c.effectId} type="button" class="cmdx-pick__card" disabled=${busy}
+            data-testid="command-choice" onClick=${() => send(() => actions.commandChoice(draft.id, idx))}>
+          <span class="cmdx-pick__icon"><${Img} src=${bandIconUrl(m, c.bandId)} fallback=${html`<${GIcon} name="bolt" />`} /></span>
+          <span class="cmdx-pick__body">
+            ${name ? html`<b class="cmdx-pick__name">${name}</b>` : null}
+            <span class="cmdx-pick__meta">${c.type === 'ACTIVE' ? `${t('비용')} ${c.cost ?? 0}` : t(REASON.passive)}</span>
+            <${RichText} as="p" text=${head ? full.slice(head[0].length) : full} />
+          </span>
+        </button>`; })}
+      </div>
+    <//>` : null}
   </div>`;
 }

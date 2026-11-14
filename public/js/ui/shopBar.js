@@ -315,7 +315,7 @@ export function ShopBar(props) {
   return store.get().match.public?.laboratory ? html`<${LaboratoryBar} ...${props}/>` : html`<${RegularShopBar} ...${props}/>`;
 }
 function RegularShopBar({ priv, editable, collapsed, refreshBusy = false, onCollapse, onBuy, onLevel, onRefresh, onFreeze, onDetail, onDetailClose, onRefuse, barRef,
-  reward = null, onReward, onRewardLater, onArm = null, offBonds = null }) {
+  reward = null, onReward, onRewardLater, onArm = null, offBonds = null, command = null }) {
   const preferences = useSettings();
   const keyLabel = action => hotkeyLabel(preferences.keys[action]);
   const shop = priv?.shop || {};
@@ -367,6 +367,7 @@ function RegularShopBar({ priv, editable, collapsed, refreshBusy = false, onColl
 
   if (collapsed) {
     return html`<div class="shopbar-tab" ref=${barRef}>
+      ${command ? html`<div class="shopbar__command">${command}</div>` : null}
       <div class="shopbar-tab__funds"><${CoinGlyph} /><b class="num">${store.get().match.public?.practice?'∞':funds}</b></div>
       <button type="button" class="shopbar-tab__btn" onClick=${() => onCollapse(false)}><${Icon} name="chevronLeft" />展开商店 <kbd>${keyLabel('collapseShop')}</kbd></button>
     </div>`;
@@ -374,6 +375,7 @@ function RegularShopBar({ priv, editable, collapsed, refreshBusy = false, onColl
 
   return html`<section style=${shopSpriteVars()} class=${cx('shopbar', frozen && 'is-frozen', !editable && 'is-locked', showReward && 'has-reward', armed && 'has-armed', preferences.shopItemLeft && 'shopbar--item-left')} ref=${barRef} aria-label="调度中心">
     <div class="shopbar__tools">
+      ${command ? html`<div class="shopbar__command">${command}</div>` : null}
       <span class="shopbar__remain">剩余可放置角色：<b class=${cx('num', remaining === 0 && 't-orange')}>${remaining}</b></span>
       <${FavoritesButton}/>
       <button type="button" class=${cx('toolbtn', 'toolbtn--ice', 'obtn', frozen && 'is-on')} disabled=${!!frzReason} onClick=${onFreeze}

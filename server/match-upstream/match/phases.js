@@ -35,11 +35,16 @@ export class MatchPhases {
   }
 
   pickBondGroup(ps, idx, revision) {
-    if (this.phase !== PHASE.INFO_CHECK || this.setupVote || !this.bondChoice || this.bondChoice.picked !== null) return fail(ERR.WRONG_PHASE);
+    // The fork lets the pick change until the briefing ends (the player is not ready yet); each pick rebuilds from the
+    // bans the match drew before any pick (bondChoice.baseDisabled), so switching back and forth never stacks bans.
+    if (this.phase !== PHASE.INFO_CHECK || this.setupVote || !this.bondChoice) return fail(ERR.WRONG_PHASE);
     if (ps.left || !this.players.has(ps.playerId)) return fail(ERR.NOT_IN_ROOM);
+    if (this.bondChoice.picked !== null && ps.infoReady && !ps.isBot) return fail(ERR.WRONG_PHASE);
     if (revision !== this.setupRevision || !Number.isInteger(idx) || idx < 0 || idx > 1) return fail(ERR.BAD_TARGET);
+    if (this.bondChoice.picked === idx) return OK;
+    this.bondChoice.baseDisabled ??= [...this.disabledBonds];
     // INFO_CHECK has no shop roll or opening grants. Rebuild its provisional stock before the strategy draft.
-    const drawn = [...this.disabledBonds, ...this.bondChoice.groups[1 - idx]].sort();
+    const drawn = [...this.bondChoice.baseDisabled, ...this.bondChoice.groups[1 - idx]].sort();
     const banned = bannedChessForBonds(this.gd, drawn, this.staticInactiveBonds);
     const pool = new SharedPool(this.gd, { banned });
     const off = new Set([...drawn, ...this.staticInactiveBonds]);

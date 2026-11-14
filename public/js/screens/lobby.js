@@ -250,11 +250,13 @@ function TipsPanel() {
   </div>`;
 }
 
-function ModeCard({ card, selected, onSelect, coopSize=4, onCoopSize, publicOn, onPublicChange, full=false }) {
+function ModeCard({ card, selected, onSelect, coopSize=4, onCoopSize, publicOn, onPublicChange, full=false, disabled=false }) {
+  // 규정 (beta): modes it does not support stay visible but cannot be picked
+  if(disabled){onSelect=()=>{};selected=false;}
   if(card.id==='coop'&&coopSize===8)card={...card,desc:'최대 8명의 박사가 오퍼레이터 풀을 공유하며 함께 전투합니다.',points:['박사 1–8명 · 빈자리는 AI 팀원으로','협력방어 최대 4명']};
   if(card.id==='sync'&&coopSize===8)card={...card,points:['박사 1–8명 · HP 공유','연합 방어 없음 · HP 감소 상한 × 인원']};
   const sized=card.id==='coop'||card.id==='sync';
-  return html`<div class="mode-card-tip"><div role="button" tabindex="0" class=${`mode-card brackets${['laboratory','practice'].includes(card.id)&&!full?' mode-card--lab':''}${selected ? ' is-selected' : ''}`} onClick=${() => onSelect(sized&&coopSize===8?card.id+'8':card.id)} onKeyDown=${e=>{if(e.target===e.currentTarget&&['Enter',' '].includes(e.key)){e.preventDefault();onSelect(sized&&coopSize===8?card.id+'8':card.id);}}}
+  return html`<div class="mode-card-tip"><div role="button" tabindex="0" class=${`mode-card brackets${['laboratory','practice'].includes(card.id)&&!full?' mode-card--lab':''}${selected ? ' is-selected' : ''}${disabled ? ' is-disabled' : ''}`} aria-disabled=${disabled ? 'true' : undefined} title=${disabled ? t('규정 시즌(베타)에서는 아직 사용할 수 없습니다') : undefined} onClick=${() => onSelect(sized&&coopSize===8?card.id+'8':card.id)} onKeyDown=${e=>{if(e.target===e.currentTarget&&['Enter',' '].includes(e.key)){e.preventDefault();onSelect(sized&&coopSize===8?card.id+'8':card.id);}}}
       aria-pressed=${selected ? 'true' : 'false'}>
     <span class="mode-card__bg" aria-hidden="true"></span>
     <span class="mode-card__icon"><${Icon} name=${card.icon} /></span>
@@ -336,6 +338,10 @@ export function LobbyScreen() {
   const seasonFor = (mode) => (seasonModes.includes(mode) ? season : DEFAULT_VERSION);
   // a 규정 season (chosen on the title screen) plays solo and 4-seat co-op rooms only
   const regSeason = season !== DEFAULT_VERSION;
+  // 규정 is a beta: say so once per page session when the lobby opens on it
+  const [betaOpen, setBetaOpen] = useState(() => { try { return regSeason && !sessionStorage.getItem('sp.betaNotice'); } catch { return regSeason; } });
+  useEffect(() => { if (regSeason) { try { if (!sessionStorage.getItem('sp.betaNotice')) setBetaOpen(true); } catch { /* private mode */ } } }, [regSeason]);
+  const closeBeta = () => { setBetaOpen(false); try { sessionStorage.setItem('sp.betaNotice', '1'); } catch { /* private mode */ } };
   useEffect(() => { if (regSeason && !seasonModes.includes(roomMode)) pickMode('coop'); }, [regSeason, roomMode]);
   // a laddered season picks its difficulty by 규정 등급 only
   const ladder = regSeason && seasonModes.includes(roomMode) ? ladderModes(getConfig(), roomMode) : null;
@@ -425,7 +431,12 @@ export function LobbyScreen() {
       </div>
 `;
   if(publicOpen)return html`<${PublicRoomsScreen} onCounts=${setPublicRoomCount} headerLeft=${headerLeft(()=>setPublicOpen(false))} headerRight=${headerRight} onJoin=${join} onSpectate=${spectate}/>${sweepOpen?html`<${SweepReport} onClose=${()=>setSweepOpen(false)}/>`:null}`;
-  return html`<div class="screen lobby-screen">
+  const betaNotice = html`<${Modal} open=${betaOpen} onClose=${closeBeta} title=${t('규정 시즌 베타 안내')} micro="BETA" class="beta-dlg"
+    actions=${html`<${Button} variant="primary" data-autofocus onClick=${closeBeta}>${t('확인')}<//>`}>
+    <p>${t('규정 시즌은 현재 베타 버전입니다. 일부 기능·리소스·번역이 완성되지 않았고, 동작이 바뀌거나 오류가 있을 수 있습니다.')}</p>
+    <p class="t-dim">${t('동기화 시뮬레이션·실험실·연습실은 아직 사용할 수 없습니다. 문제를 발견하면 알려 주세요.')}</p>
+  <//>`;
+  return html`<div class="screen lobby-screen">${betaNotice}
     <header class="topbar app-topbar">
       ${headerLeft(backToTitle)}
       <div class="topbar__center">
@@ -440,7 +451,7 @@ export function LobbyScreen() {
         <div class="section-label lg-label lg-label--modes"><span class="section-label__idx num">01</span>模拟方式<${MicroLabel}>MODE<//></div>
         <div class="lg-modes">
         <div class="mode-cards mode-cards--main">
-          ${MODE_CARDS.filter((c) => MAIN_MODES.includes(c.id) && (!regSeason || seasonModes.includes(c.id))).map((c) => html`<${ModeCard} key=${c.id} card=${c} selected=${roomMode === c.id || roomMode===c.id+'8'} onSelect=${pickMode} coopSize=${coopSize} onCoopSize=${n=>{setCoopSize(n);pickMode((c.id==='sync'?'sync':'coop')+(n===8?'8':''));}} publicOn=${publicOn} onPublicChange=${on=>{setPublicOn(on);savePref('lobby.publicOn',on);}} />`)}
+          ${MODE_CARDS.filter((c) => MAIN_MODES.includes(c.id)).map((c) => html`<${ModeCard} key=${c.id} card=${c} disabled=${regSeason && !seasonModes.includes(c.id)} selected=${roomMode === c.id || roomMode===c.id+'8'} onSelect=${pickMode} coopSize=${coopSize} onCoopSize=${n=>{setCoopSize(n);pickMode((c.id==='sync'?'sync':'coop')+(n===8?'8':''));}} publicOn=${publicOn} onPublicChange=${on=>{setPublicOn(on);savePref('lobby.publicOn',on);}} />`)}
         </div>
 
         </div>
@@ -469,7 +480,7 @@ export function LobbyScreen() {
         <div class="lobby-quick lg-quick">
           <button type="button" class="public-rooms-entry mode-card brackets" onClick=${()=>setPublicOpen(true)}><span class="mode-card__bg" aria-hidden="true"></span><span class="mode-card__icon"><${Icon} name="users"/></span><span class="mode-card__text"><${MicroLabel}>PUBLIC ROOMS<//><span class="mode-card__name">탐색</span><span class="mode-card__desc">공개된 연합 방에 참가하거나 관전합니다.</span></span><span class="public-rooms-entry__total"><span class="public-rooms-entry__count" aria-label="참가 가능한 방 수">${conn.status==='online'&&publicRoomCount!==null?publicRoomCount.joinable:'—'}</span><span class="public-rooms-entry__all" aria-label="전체 방 수">/${conn.status==='online'&&publicRoomCount!==null?publicRoomCount.total:'—'}</span></span></button>
           <div class="lobby-quick__labs">
-          ${regSeason ? null : MODE_CARDS.filter((c) => !MAIN_MODES.includes(c.id)).map((c) => html`<${ModeCard} key=${c.id} full=${true} card=${c} selected=${roomMode === c.id || roomMode===c.id+'8'} onSelect=${pickMode} coopSize=${coopSize} onCoopSize=${n=>{setCoopSize(n);pickMode((c.id==='sync'?'sync':'coop')+(n===8?'8':''));}} publicOn=${publicOn} onPublicChange=${on=>{setPublicOn(on);savePref('lobby.publicOn',on);}} />`)}
+          ${MODE_CARDS.filter((c) => !MAIN_MODES.includes(c.id)).map((c) => html`<${ModeCard} key=${c.id} full=${true} card=${c} disabled=${regSeason} selected=${roomMode === c.id || roomMode===c.id+'8'} onSelect=${pickMode} coopSize=${coopSize} onCoopSize=${n=>{setCoopSize(n);pickMode((c.id==='sync'?'sync':'coop')+(n===8?'8':''));}} publicOn=${publicOn} onPublicChange=${on=>{setPublicOn(on);savePref('lobby.publicOn',on);}} />`)}
           </div>
         </div>
         <div class="lg-diff">

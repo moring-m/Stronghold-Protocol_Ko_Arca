@@ -1758,7 +1758,7 @@ function MatchScreen() {
         self=${Number.isFinite(priv?.lp) ? { lp: priv.lp, pending: liveLpNow.pending, unite: liveLpNow.unite, left: liveLpNow.left } : null}
         observe=${cc ? { canObserve: (p) => observeTarget(p, pub, myId, { observing: watchingOther, ownDone: localDone }), observing: watchingOther, onBack: alive ? backHome : null } : null} />
 
-      <div class="gm__effects">${!watchingOther ? html`<${CommandPanel} priv=${priv} editable=${editable} getView=${() => live.current.view} />` : null}<${EffectsList} augmentsOnly=${true} pub=${pub} ownerId=${strip.ownerId||myId}/><${EffectsList} pub=${pub} ownerId=${strip.ownerId||myId} hideBand=${!watchingOther && !!priv?.command} effects=${watchingOther && field ? (field.effects ?? null) : priv?.effects} /></div>
+      <div class="gm__effects">${!watchingOther && !showShop ? html`<${CommandPanel} priv=${priv} editable=${editable} getView=${() => live.current.view} />` : null}<${EffectsList} augmentsOnly=${true} pub=${pub} ownerId=${strip.ownerId||myId}/><${EffectsList} pub=${pub} ownerId=${strip.ownerId||myId} hideBand=${!watchingOther && !!priv?.command} effects=${watchingOther && field ? (field.effects ?? null) : priv?.effects} /></div>
 
       ${watchingOther && !combat && !prepLayers.length ? html`<div class="gm__watching" role="status">
         <${GIcon} name="eye" /><span data-i18n-ctx="watching">正在查看 <b>${watchedName}</b>的阵地（只读）</span>
@@ -1772,7 +1772,8 @@ function MatchScreen() {
         onDetailClose=${() => setDetail((d) => (d?.kind === 'chess' || d?.kind === 'item' ? null : d))}
         onRefuse=${(reason) => { toast(reason, 'warn'); audio.sfx('error', { volume: 0.5 }); }}
         reward=${phase === PHASE.PREP && !rewardMin ? priv?.shop?.rewardOffer || null : null}
-        onReward=${(i) => actions.reward(i)} onRewardLater=${() => setRewardMin(true)} onArm=${setArmedCard} />` : null}
+        onReward=${(i) => actions.reward(i)} onRewardLater=${() => setRewardMin(true)} onArm=${setArmedCard}
+        command=${priv?.command ? html`<${CommandPanel} priv=${priv} editable=${editable} getView=${() => live.current.view} />` : null} />` : null}
 
       ${phase === PHASE.PREP && priv?.shop?.rewardOffer ? html`<${RewardOverlay} priv=${priv} minimized=${rewardMin || barCollapsed}
         onMinimize=${(m) => { setRewardMin(m); if (!m) setCollapsed(false); }} />` : null}

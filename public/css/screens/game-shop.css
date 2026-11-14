@@ -328,3 +328,8 @@
 .shopbar .obtn__plate { inset: auto; left: -8.66%; top: -3.7%; width: 115.75%; height: 142.6%; }
 .shopbar .shopbar__tools { align-items: center; }
 .shopbar .shopbar__tools .toolbtn--favorite, .shopbar .shopbar__tools .toolbtn--icon { height: .55rem; width: .55rem; }
+
+/* 규정 strategy command: always above the shop's tools (right-aligned, 확대경 + tile in one row) */
+.shopbar__command { grid-column: 1 / -1; justify-self: end; pointer-events: auto; }
+.shopbar-tab .shopbar__command { align-self: flex-end; margin-bottom: .06rem; }
+.shopbar__command .cmdx { display: flex; flex-direction: row; align-items: flex-end; gap: .06rem; }

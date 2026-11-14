@@ -8,13 +8,13 @@ export const LANGUAGE_PACKS = {
     },
     {
       "path": "/i18n/en/fork.json",
-      "bytes": 346874,
-      "hash": "0e5c94a75a14766b879d09d286963ba24ecf967bc1361a85034845a61b0d9695"
+      "bytes": 347781,
+      "hash": "c17a80a1d600c7cd1a4928125cdaceed81f05baa8e5e08fb43f619aeb0b5fdff"
     },
     {
       "path": "/i18n/ko/compiled.json",
-      "bytes": 3073386,
-      "hash": "cf5e358adaa34f31edb8f885d462e1c391b92bffe2de3253c3110e09fcf6c3c6"
+      "bytes": 3074202,
+      "hash": "d68e23b9cf05cf9450156b41d7b686d7dead56667b4b3979f957983bf1b128fd"
     },
     {
       "path": "/i18n/en.json",
@@ -35,13 +35,13 @@ export const LANGUAGE_PACKS = {
     },
     {
       "path": "/i18n/ja/fork.json",
-      "bytes": 375402,
-      "hash": "d2050f2b4522920c3327d89ed6a104a6d8278274fb9c8ee5a08bf3762ecb36c4"
+      "bytes": 376461,
+      "hash": "a841c90286381e20b803c98f78ca180721f25aa23ae977db50320fead3fa9439"
     },
     {
       "path": "/i18n/ko/compiled.json",
-      "bytes": 3073386,
-      "hash": "cf5e358adaa34f31edb8f885d462e1c391b92bffe2de3253c3110e09fcf6c3c6"
+      "bytes": 3074202,
+      "hash": "d68e23b9cf05cf9450156b41d7b686d7dead56667b4b3979f957983bf1b128fd"
     },
     {
       "path": "/i18n/ja.json",
@@ -60,8 +60,8 @@ export const LANGUAGE_PACKS = {
     },
     {
       "path": "/i18n/en/fork.json",
-      "bytes": 346874,
-      "hash": "0e5c94a75a14766b879d09d286963ba24ecf967bc1361a85034845a61b0d9695"
+      "bytes": 347781,
+      "hash": "c17a80a1d600c7cd1a4928125cdaceed81f05baa8e5e08fb43f619aeb0b5fdff"
     },
     {
       "path": "/i18n/en.json",
@@ -82,13 +82,13 @@ export const LANGUAGE_PACKS = {
     },
     {
       "path": "/i18n/zh/fork.json",
-      "bytes": 345771,
-      "hash": "54d8da9f6ae04364a0015349817f315d11833eae6045decf0461c5ece0c507cd"
+      "bytes": 346627,
+      "hash": "0a2890b972878d7a379f7fcb7335d88c41fcee74a5652285ac5307d5c3fedb5f"
     },
     {
       "path": "/i18n/ko/compiled.json",
-      "bytes": 3073386,
-      "hash": "cf5e358adaa34f31edb8f885d462e1c391b92bffe2de3253c3110e09fcf6c3c6"
+      "bytes": 3074202,
+      "hash": "d68e23b9cf05cf9450156b41d7b686d7dead56667b4b3979f957983bf1b128fd"
     }
   ]
 };

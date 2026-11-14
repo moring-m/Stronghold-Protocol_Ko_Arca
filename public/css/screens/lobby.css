@@ -535,3 +535,7 @@ html:not([lang="ko"]) .mode-cards .mode-card--lab .mode-card__name{font-size:.24
 .diff-tabs--ladder .diff-step { min-width: 3em; font-size: 1.3em; justify-content: center; }
 .diff-tabs--ladder .diff-step:disabled { opacity: .35; cursor: default; }
 .diff-tabs--ladder .diff-step__cur { justify-content: center; cursor: default; }
+
+/* 규정 (beta): a mode the season does not support yet stays visible, greyed out */
+.mode-card.is-disabled { opacity: .42; filter: grayscale(.8); cursor: not-allowed; }
+.mode-card.is-disabled .mode-card__controls { pointer-events: none; }
