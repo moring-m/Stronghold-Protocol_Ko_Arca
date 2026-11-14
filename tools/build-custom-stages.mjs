@@ -56,7 +56,7 @@ function snowfield() {
     // official maps
     crates: [[10, 9], [11, 9], [10, 17], [11, 17]],
     boardTheme: 'snow',
-    retired: true,
+    hidden: true,
     // the boss field's fence tiles (rows 3–4, cols 8 and 12): the cooperative defense keeps its wall there (render/pen.js)
     bossOnlyTiles: [[3, 8], [4, 8], [3, 12], [4, 12]],
     rows,
@@ -87,8 +87,8 @@ for (const def of [snowfield()]) {
       ...(def.crates || []).map((pos) => ({ ...structuredClone(base.devices.find((d) => d.role === 'crate')), pos, active: true, hidden: false })),
     ],
     special: {},
-    // 규정 m09 (act3autochess_m09) is the official snow battlefield: 설원 stays as data only (shared/customExtensions.js isRetiredStage)
-    ...(def.retired ? { retired: true, active: false } : {}),
+    // 규정 m09 is the official snow battlefield: 설원 stays in the data, not shown (active false)
+    ...(def.hidden ? { active: false } : {}),
   };
   delete stage.legend;
   Object.assign(stage, computeGroundPaths(stage), { deployTiles: computeDeployTiles(stage) });
