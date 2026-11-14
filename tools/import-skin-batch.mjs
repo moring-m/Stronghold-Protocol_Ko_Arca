@@ -262,7 +262,8 @@ async function connectFx(repo, tag, commit) {
   const resPath = resolve(root, 'content/production/resources.json'), res = await read(resPath);
   const rows = new Map(res.files.map((f) => [f.path, f]));
   const base = 'moring-m/Stronghold-Protocol_Ko_Arca_assets';
-  for (const f of meta.files) rows.set(f.path, { ...(rows.get(f.path)?.local ? { local: true } : {}), path: f.path, sources: [
+  // no `local`: tools/resource-origin.mjs rewrites a local row to the configured origin commit, which predates this batch
+  for (const f of meta.files) rows.set(f.path, { path: f.path, sources: [
     `https://raw.githubusercontent.com/${base}/${commit}/public${f.path}`, `https://cdn.jsdelivr.net/gh/${base}@${commit}/public${f.path}`], sha256: f.sha256, bytes: f.bytes });
   res.files = [...rows.values()];
   res.version = createHash('sha256').update(JSON.stringify(res.files)).digest('hex').slice(0, 20);
