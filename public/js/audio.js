@@ -581,7 +581,7 @@ export class AudioManager {
     this.chatLastStartedAt = null;
     this.chatLastDurationMs = 0;
     this.chatCooldown = defaultChatCooldown('emote');
-    this.volumes = { bgm: 0.6, sfx: 0.8, voice: 0.6, voiceLanguage:'kr', chatVolume: 0.5, muted: false };
+    this.volumes = { bgm: 0.6, sfx: 0.8, voice: 0.6, voiceLanguage:'kr', chatVolume: 0.5, muted: false, muteOnBlur: true };
     this.buffers = new Map(); // url → Promise<AudioBuffer|null> (insertion order = LRU)
     this.bufBytes = new Map(); // url → decoded PCM bytes (the byte budget of the LRU, see _buffer)
     this.warned = new Set();
@@ -634,6 +634,9 @@ export class AudioManager {
       // (pageshow / focus) resumes it (plus the next gesture, below)
       this.win.addEventListener?.('pageshow', this._onVis);
       this.win.addEventListener?.('focus', this._onVis);
+      // 포커스 아웃 시 음소거 (settings muteOnBlur): the master gain goes to 0 while the window has no focus
+      this.blurred = typeof this.win.document?.hasFocus === 'function' ? !this.win.document.hasFocus() : false;
+      this.win.addEventListener?.('blur', () => { this.blurred = true; this._applyVolumes(); });
     } catch { /* ignore */ }
   }
 
@@ -729,7 +732,9 @@ export class AudioManager {
     } catch { /* ignore */ }
   }
 
-  _onVis() {
+  _onVis(e) {
+    // the window has the focus again (its 'focus' listener is this one): lift 포커스 아웃 시 음소거
+    if (e?.type === 'focus' && this.blurred) { this.blurred = false; this._applyVolumes(); }
     try {
       if (!this.ctx) return;
       if(this.ctx.state==='closed'){this._armUnlock();if(!this.win?.document?.hidden)this._unlock();return;}
@@ -767,6 +772,7 @@ export class AudioManager {
       chatVolume: n(v?.chatVolume, this.volumes.chatVolume),
       voiceLanguage: ['jp','kr'].includes(v?.voiceLanguage) ? v.voiceLanguage : this.volumes.voiceLanguage,
       muted: typeof v?.muted === 'boolean' ? v.muted : this.volumes.muted,
+      muteOnBlur: typeof v?.muteOnBlur === 'boolean' ? v.muteOnBlur : this.volumes.muteOnBlur !== false,
     };
     if (previousLanguage !== this.volumes.voiceLanguage || v?.muted || v?.voice === 0) this._stopVoice();
     if (v?.muted || v?.chatVolume === 0 || v?.chatSound === 'off') this.stopChatNotification();
@@ -814,7 +820,7 @@ export class AudioManager {
     if (!this.ctx) return;
     try {
       const t = this.ctx.currentTime;
-      this.master.gain.setTargetAtTime(this.volumes.muted ? 0 : 1, t, 0.03);
+      this.master.gain.setTargetAtTime(this.volumes.muted || (this.volumes.muteOnBlur !== false && this.blurred) ? 0 : 1, t, 0.03);
       // perceptual curve
       this.bgmGain.gain.setTargetAtTime(this.volumes.bgm ** 2 * 0.55, t, 0.05);
       this.sfxGain.gain.setTargetAtTime(this.volumes.sfx ** 2 * 0.9, t, 0.03);

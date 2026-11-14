@@ -350,6 +350,7 @@ export function SettingsModal({ open, onClose }) {
       <${Slider} label="音效" micro="SFX" icon="signal" value=${s.sfx}
         onInput=${(v) => { updateSettings({ sfx: v }); if (!tested) { setTested(true); setTimeout(() => setTested(false), 400); audio.sfx('click'); } }} />
       <${Toggle} label="静音" micro="MUTE" value=${s.muted} onChange=${(v) => updateSettings({ muted: v })} />
+      <${Toggle} label="失去焦点时静音" micro="MUTE ON BLUR" value=${s.muteOnBlur !== false} onChange=${(v) => updateSettings({ muteOnBlur: v })} />
     </section><section hidden=${category!=='chat'} class="set-category" data-category="chat">
       <div class="set-row set-row--chat-sound" data-i18n-skip>
         <label class="set-row__label" for="chat-notification-sound">채팅 알림음<${MicroLabel}>CHAT SOUND<//></label>

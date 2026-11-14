@@ -1601,7 +1601,7 @@ export function shortcutBlocked(act, { modal = false, drawer = false } = {}) {
 
 // ---- settings ------------------------------------------------------------------------------------------------------
 
-export const DEFAULT_SETTINGS = Object.freeze({ keys: DEFAULT_HOTKEYS, shopItemLeft: true, hpBarStyle: 'default', tileMarkStyle: 'default', bgm: 0.6, sfx: 0.8, voice: 0.6, voiceLanguage: 'kr', voiceOverrides: Object.freeze({}), textSize: 'sm', uiTheme: 'default', chatVolume: 0.5, chatSound: 'emote', chatSoundCustomized: false, chatFactionNotifications: false, chatCooldown: defaultChatCooldown('emote'), muted: false, damageNumbers: true, damageNumberMode: 'basic', officialDamageNumbers:false, ammoCount:false, showFps:false, combatMetrics:false, deployCameraZoom:true, tileMagnet:true, mysticEnergy:false, officialFx:'auto', quality: 'high', mapQuality: 'high', renderScale: 1, mobileUiScale: 1, effectsQuality: 'high', shadows: true, skillRanges: true, unitRanges: true, animationQuality: 'high', frameLimit: 60, adaptiveQuality: true });
+export const DEFAULT_SETTINGS = Object.freeze({ keys: DEFAULT_HOTKEYS, muteOnBlur: true, shopItemLeft: true, hpBarStyle: 'default', tileMarkStyle: 'default', bgm: 0.6, sfx: 0.8, voice: 0.6, voiceLanguage: 'kr', voiceOverrides: Object.freeze({}), textSize: 'sm', uiTheme: 'default', chatVolume: 0.5, chatSound: 'emote', chatSoundCustomized: false, chatFactionNotifications: false, chatCooldown: defaultChatCooldown('emote'), muted: false, damageNumbers: true, damageNumberMode: 'basic', officialDamageNumbers:false, ammoCount:false, showFps:false, combatMetrics:false, deployCameraZoom:true, tileMagnet:true, mysticEnergy:false, officialFx:'auto', quality: 'high', mapQuality: 'high', renderScale: 1, mobileUiScale: 1, effectsQuality: 'high', shadows: true, skillRanges: true, unitRanges: true, animationQuality: 'high', frameLimit: 60, adaptiveQuality: true });
 const QUALITIES = ['high', 'medium', 'low'];
 
 /**
@@ -1629,6 +1629,8 @@ export function sanitizeSettings(raw) {
     chatCooldown: Number.isFinite(r.chatCooldown) ? clamp(Math.round(r.chatCooldown), 1, 5) : defaultChatCooldown(chatSound),
     voiceLanguage: VOICE_LANGS.includes(r.voiceLanguage)?r.voiceLanguage:'kr',
     muted: typeof r.muted === 'boolean' ? r.muted : DEFAULT_SETTINGS.muted,
+    // 포커스 아웃 시 음소거 (기본 켜짐): the window losing focus (another app / window in front) silences the game
+    muteOnBlur: r.muteOnBlur !== false,
     officialDamageNumbers:r.officialDamageNumbers===true,
     hpBarStyle:r.hpBarStyle==='official'?'official':'default',
     ammoCount:r.ammoCount===true,

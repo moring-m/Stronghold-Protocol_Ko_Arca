@@ -441,8 +441,22 @@ describe('AudioManager', () => {
     assert.equal(a.unit('char_x', 'attack', 1), false);
     a.handleBattleEvents([['atk', 1, 2, 'arrow'], 'junk', null]);
     a.setVolumes({ bgm: 5, sfx: -1, muted: true });
-    assert.deepEqual(a.volumes, { bgm: 1, sfx: 0, voice: 0.6, voiceLanguage:'kr', chatVolume: 0.5, muted: true });
+    assert.deepEqual(a.volumes, { bgm: 1, sfx: 0, voice: 0.6, voiceLanguage:'kr', chatVolume: 0.5, muted: true, muteOnBlur: true });
     assert.equal(a.unlocked, false);
+  });
+  test('포커스 아웃 시 음소거: the master gain is 0 while the window has no focus (setting on by default), 1 again on focus', () => {
+    const fw = fakeWindow();
+    const a = new AudioManager({ win: fw.win, getManifest: () => null });
+    a.install();
+    fw.fire('pointerdown');
+    assert.equal(a.master.gain.value, 1);
+    fw.fire('blur');
+    assert.equal(a.master.gain.value, 0, 'muted while unfocused');
+    a._onVis({ type: 'focus' });
+    assert.equal(a.master.gain.value, 1, 'audible again on focus');
+    a.setVolumes({ muteOnBlur: false });
+    fw.fire('blur');
+    assert.equal(a.master.gain.value, 1, 'the option off: no mute on blur');
   });
   test('unlocks on the first gesture, then plays BGM and SFX from the manifest', async () => {
     const fw = fakeWindow();
