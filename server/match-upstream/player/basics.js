@@ -31,7 +31,9 @@ export class PlayerBasics {
   get deployCap() { return Math.max(1, this.gd.deployCap + this.deployCapBonus, this.deployCapMin); }
   get deployCount() { let n = 0; for (const p of this.board.values()) if (p.kind === 'chess') n++; return n; }
   get equipHand() { return this.gd.config.version?.rules?.equipHand === true; }
-  get tempEmpty() { return this.temp.every((x, i) => (this.equipHand && i < TEMP_SIZE) || x == null); }
+  // 규정 equipment row (equipHand): the five slots are permanent storage, and the hidden overflow behind them no longer
+  // blocks Ready (the fork's rule, 2026-11-14) — it still moves in when a slot frees and is destroyed at the prep end.
+  get tempEmpty() { return this.equipHand || this.temp.every((x) => x == null); }
 
   /**
    * Index of the prep whose deadline resolves a temp piece (compare with `prepsEnded`): recorded when the piece entered

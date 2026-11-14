@@ -348,7 +348,8 @@ export const TEMP_RULE = '放入整备区或战场、配发或使用后才能准
 /** Why 准备就绪 is refused while the temp row holds pieces (null when it is empty). */
 export function tempReadyReason(priv, config = data.get('config')) {
   const info = tempInfo(priv, config);
-  if (config?.version?.rules?.equipHand === true) return info.count ? t('暂存 {count} 个单位：{rule}', { count: info.count, rule: t('有空位时自动移入；休整期结束时仍在暂存的单位将被销毁') }) : null;
+  // 규정: the hidden overflow does not block Ready (server tempEmpty); ReadyToggle still shows its warning
+  if (config?.version?.rules?.equipHand === true) return null;
   return info.count ? `临时整备区还有 ${info.count} 个单位：${TEMP_RULE}` : null;
 }
 
@@ -374,7 +375,7 @@ export function ReadyToggle({ priv, onToggle, busy, readyCount, total, keyHint=h
   return html`<div class="readywrap">
     ${reason ? html`<${Tooltip} text=${reason} placement="bottom">${btn}<//>` : btn}
     ${!ready && temp.count ? html`<span class="readywrap__why" id="readywrap-why" role="status" data-testid="ready-why">
-      <${Icon} name="warn" />${data.get('config')?.version?.rules?.equipHand === true ? html`<span>${reason}</span>` : html`<span data-i18n-ctx="tempwarn">临时整备区 <b class="num">${temp.count}</b> 个单位待处理</span>`}</span>` : null}
+      <${Icon} name="warn" />${data.get('config')?.version?.rules?.equipHand === true ? html`<span>${t('暂存 {count} 个单位：{rule}', { count: temp.count, rule: t('有空位时自动移入；休整期结束时仍在暂存的单位将被销毁') })}</span>` : html`<span data-i18n-ctx="tempwarn">临时整备区 <b class="num">${temp.count}</b> 个单位待处理</span>`}</span>` : null}
     ${Number.isFinite(total) && total > 1 ? html`<span class="readywrap__count">已就绪 <b class="num">${readyCount}</b>/<span class="num">${total}</span></span>` : null}
   </div>`;
 }

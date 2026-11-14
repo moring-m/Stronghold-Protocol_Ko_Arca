@@ -73,7 +73,8 @@ test('forced overflow is private, notifies its owner, and refills each kind in a
   assert.equal(notices.length, 8); assert.ok(notices.every(([id]) => id === ps.playerId));
   assert.ok(notices.some(([, msg]) => msg.msgid === '装备区已满，{name}进入暂存'));
   assert.ok(notices.some(([, msg]) => msg.msgid === '手牌已满，{name}进入暂存'));
-  assert.deepEqual(ps.setReady(true), { error: ERR.TEMP_NOT_EMPTY });
+  // the fork's rule: the hidden overflow does not block Ready (it still refills and expires as before)
+  assert.equal(ps.privateView().canReady, true); assert.deepEqual(ps.setReady(true), { ok: true }); ps.setReady(false);
   const due = ps.tempDue(c1);
   ps.destroy(ps.temp[4].uid); assert.equal(ps.temp[4], i1); assert.deepEqual(ps.tempPieces(), [c1, c2, i2]);
   assert.equal(ps.tempDue(c1), due); assert.equal(ps._tempDue.has(i1.uid), false);
@@ -195,7 +196,8 @@ test('client placement, drag, shop and Ready use the loaded equipHand rule', t =
   assert.deepEqual(tempInfo(ps.privateView(), config), { count: 0, items: 0 }); assert.equal(tempReadyReason(ps.privateView(), config), null);
   fill('item'); item(7);
   const priv = ps.privateView(); assert.equal(tempInfo(priv, config).count, 1);
-  assert.match(tempReadyReason(priv, config), /暂存 1 个单位/);
+  // the overflow is counted (the warning under Ready) but is not a Ready refusal (the fork's rule)
+  assert.equal(tempReadyReason(priv, config), null); assert.equal(priv.canReady, true);
   assert.equal(shopBlockReason('buy', { priv, config, editable: true, slot: { kind: 'item', price: 0 } }), '装备区已满');
   assert.equal(shopBlockReason('buy', { priv, config, editable: true, slot: { kind: 'chess', price: 0 } }), null);
 });
