@@ -43,6 +43,7 @@ import { straightClear } from './grid.js';
 import { moveFeared, endFear } from './fear.js';
 import { hypot, powi } from './detmath.js';
 import { PLUGIN_TIMES_MAX } from '../../shared/plugins/limits.js';
+import { attackWindup as clipWindup } from '../../shared/attackTiming.js';
 
 // ---------------------------------------------------------------------------------------------------------------
 // profiles
@@ -92,14 +93,43 @@ export function attackCountdown(cd, dt) {
 export function updateAlly(b, u, dt) {
   if (u.atkCd > 0 && u.canAct) u.atkCd = attackCountdown(u.atkCd, dt);
   if (u.blocking.length) enforceBlockCapacity(b, u);
-  if (!u.canAct || !u.profile) return;
+  if (!u.canAct || !u.profile) { cancelWindup(b, u); return; }
+  // a fixed-motion skill cast (skills.js, the 맹약 season's timing rule) owns its animation
+  if (b.time < (u.mem.skillCastUntil || 0)) return;
   // a rangeExtend change (buff added / expired) rebuilds the range — also for units that never attack (auras)
   if (b.rangeChanged(u)) b._refreshRange(u);
   const sk = u.skill;
   let prof = effectiveProfile(u);
-  if (prof.noAttack) return;
-  if (prof.noAttackUnlessSkill && !(sk && sk.active)) return;
-  if (u.s.flags.disarm) return;
+  if (prof.noAttack) { cancelWindup(b, u); return; }
+  if (prof.noAttackUnlessSkill && !(sk && sk.active)) { cancelWindup(b, u); return; }
+  if (u.s.flags.disarm) { cancelWindup(b, u); return; }
+  // 공격 타격 시점 (the 맹약 season's timing rule, server/sim/ai.js): an attack strikes at its clip's damage frame after
+  // the swing starts; the swing keeps its targets (a dead / untargetable one is replaced before the strike)
+  if (u.mem.attackWindup) {
+    const pending = u.mem.attackWindup;
+    if (pending.seq !== u.deploySeq) { cancelWindup(b, u); return; }
+    if (pending.skillActive !== !!sk?.active) {
+      if (!!pending.profile.heal !== !!prof.heal) { cancelWindup(b, u); return; }
+      pending.profile = prof;
+      pending.skillActive = !!sk?.active;
+    }
+    const candidates = acquireTargets(b, u, pending.profile);
+    const previous = pending.targets;
+    let targets = previous.filter((t) => pending.profile.heal ? (t.alive && t.deployed && !t.hidden) : (b.isAllyTarget?.(t) ? t.alive && t.deployed && !t.hidden : canTargetEnemy(u, t, pending.profile)));
+    if (b.time + 1e-9 < pending.until) {
+      for (const t of candidates) {
+        if (targets.length >= previous.length) break;
+        if (!targets.includes(t)) targets.push(t);
+      }
+      if (targets.length && targets[0] !== previous[0]) b._ev(['atkRetarget', u.id, targets[0].id, !!pending.profile.allInRange]);
+      pending.targets = targets;
+    }
+    if (!targets.length) { cancelWindup(b, u); return; }
+    if (b.time + 1e-9 < pending.until) return;
+    delete u.mem.attackWindup;
+    performAttack(b, u, pending.profile, targets);
+    return;
+  }
   if (u.atkCd > 0) return;
   // (a 秘术师's `canAttack` is its own target rule: false = no valid target — 深靛's bound enemies, 维伊's marked ones)
   if (prof.canAttack && !prof.canAttack(b, u)) { if (prof.storeEnergy) { u.trait.hadTarget = false; storeEnergy(b, u, prof); } return; }
@@ -123,9 +153,21 @@ export function updateAlly(b, u, dt) {
     if (prof.noAttack || !u.alive) return;
     targets = acquireTargets(b, u, prof);
     if (!targets.length) { storeEnergy(b, u, prof); return; }   // the cast left none (a range change): still this check
+    if (b.time < (u.mem.skillCastUntil || 0)) { u.atkCd = Math.max(u.atkCd, u.s.interval); return; } // a cast motion started
   }
-  performAttack(b, u, prof, targets);
+  const wind = clipWindup(u);
+  if (wind > 0) {
+    u.mem.attackWindup = { until: b.time + wind, targets, profile: prof, seq: u.deploySeq, skillActive: !!sk?.active };
+    b._ev(['atkStart', u.id, targets[0]?.id ?? u.id, wind, u.s.interval, !!prof.allInRange || !targets.length, prof._fortressMelee ? 'melee' : 'ranged', prof._fortressMelee ? 'none' : (prof.visualProjectile || prof.projectile || 'none')]);
+  } else performAttack(b, u, prof, targets);
   u.atkCd = Math.max(u.atkCd, u.s.interval);
+}
+
+/** An interrupted wind-up never strikes (the 맹약 season's server/sim/ai.js cancelWindup). */
+function cancelWindup(b, u) {
+  if (!u.mem.attackWindup) return;
+  delete u.mem.attackWindup;
+  b._ev(['atkCancel', u.id]);
 }
 
 /**
@@ -891,8 +933,9 @@ const clipSpeed = (e, a) => { const iv = e.s.interval; return iv > 0 && iv < a.d
  * (the strike as the swing starts — the rule before 0.2.0).
  */
 export function attackWindup(e) {
-  const a = e.def?.attackAnim;
-  return a && a.dur > 0 ? clipHit(a) / clipSpeed(e, a) : 0;
+  // the 맹약 season's timing rule (shared/attackTiming.js): the attack clip of the unit's model (attackTiming, read from
+  // its Spine animation), else its data attackAnim — the same wind-up the 맹약 season's battles use
+  return clipWindup(e);
 }
 
 /**

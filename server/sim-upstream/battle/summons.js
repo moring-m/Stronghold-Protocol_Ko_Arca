@@ -107,6 +107,8 @@ export class BattleSummons {
     u.deploySeq = ++this._deploySeq;
     u.aggroSeq = u.deploySeq;
     u.deployedAt = this.time;
+    u.deployRemaining = Math.max(0, ((u.dir === 'UP' && u.def.attackTiming?.back) || u.def.attackTiming?.front)?.deploy || 0);
+    u.deployUntil = this.time + u.deployRemaining;
     u.rangeKeys = [];
     this._occ[row * COLS + col] = u;
     if (u.obstacle) this.grid.setObstacle(row, col, true, u.obstacleKind);

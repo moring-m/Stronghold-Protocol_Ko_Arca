@@ -105,6 +105,7 @@ export class BattleLifecycle {
           const u = list[i];
           if (!u.alive || !u.deployed) continue;
           try {
+            u.deployRemaining = Math.max(0, (u.deployUntil || 0) - this.time);
             if (u.skill) u.skill.tick(dt);
             if (u.alive && u.kind !== 'device') updateAlly(this, u, dt);
           } catch (err) { this._internalError('updateAlly', err); }

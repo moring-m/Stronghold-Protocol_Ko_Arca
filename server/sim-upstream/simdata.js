@@ -200,6 +200,7 @@ export function normalizeChess(rec) {
     rangeGrid: toArrayOfPairs(rec.rangeGrid ?? rec.range?.grid) ?? [[0, 0], [0, 1]],
     dmgType: rec.dmgType ? normDmgType(rec.dmgType) : null,
     attackKind: rec.attackKind ?? null,
+    attackTiming: rec.attackTiming ?? null, // the 맹약 season's clip timing (shared/attackTiming.js attachAttackTimings)
     projectile: rec.projectile ?? null,
     canHitFly: rec.canHitFly ?? null,
     targetPriority: rec.targetPriority ?? null,
@@ -294,6 +295,7 @@ export function normalizeEnemy(key, e) {
     notCountInTotal: !!(e.notCountInTotal),
     hitArea: normHitArea(e.hitArea),   // huge units only (body.js); null = a point
     staticBody: !!e.staticBody,        // 静态刚体: pushes / pulls never move it (Battle._displaceable)
+    attackTiming: e.attackTiming ?? null,
     attackAnim: normAttackAnim(e.attackAnim),   // its attack clip { dur, hit } (ai.js attackStand); null = none known
     attackMoves: !!e.attackMoves,      // 「不停止移动」: never stops to attack (ai.js attackStand)
     tags: e.tags ?? [],
@@ -332,6 +334,7 @@ export function normalizeToken(id, t0, ownerChessId = null, variantOverride = nu
     rangeGrid: toArrayOfPairs(t.rangeGrid) ?? [[0, 0], [0, 1]],
     dmgType: t.dmgType ? normDmgType(t.dmgType) : (/法术/.test(desc) ? 'arts' : /真实/.test(desc) ? 'true' : /恢复|治疗/.test(desc) ? 'heal' : 'phys'),
     attackKind: ak,
+    attackTiming: t.attackTiming ?? null,
     projectile: t.projectile ?? null,
     canHitFly: t.canHitFly ?? null,
     targetPriority: t.targetPriority ?? null,

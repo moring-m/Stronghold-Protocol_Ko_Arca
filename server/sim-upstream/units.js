@@ -87,6 +87,9 @@ export class Unit {
     this.lastAttackAt = -Infinity;
     this.lastHitAt = -Infinity;
     this.deployedAt = -Infinity;
+    // the 맹약 season's deploy rule: no action while the deploy clip plays (attackTiming deploy seconds; Battle deploy)
+    this.deployRemaining = 0;
+    this.deployUntil = 0;
     this.deathAt = -Infinity;
     this.respawnAt = Infinity;
     this.deploySeq = 0;         // deployment counter; also the identity of one deployment (content: `seq === u.deploySeq`)
@@ -217,7 +220,7 @@ export class Unit {
   get flags() { return this.s.flags; }
 
   /** Can act at all this tick (not stunned/frozen/sleeping/levitated). */
-  get canAct() { return this.alive && this.deployed && !this.hidden && !this.s.flags.stun; }
+  get canAct() { return this.alive && this.deployed && !this.hidden && !(this.deployRemaining > 1e-9) && !this.s.flags.stun; }
 
   hasFlag(k) { return !!this.s.flags[k]; }
 

@@ -52,6 +52,7 @@
 //   also carries `noAmmo` (set it to true: this attack spends no ammo). onEnd runs while the skill's mods / range are
 //   still applied (`active` is already false); they are removed right after it (unless onEnd re-activated the skill).
 
+import { skillImpactTiming } from '../../shared/attackTiming.js';
 import { customRules, rulePct } from './customRules.js';
 import { absoluteRangeKeys, canTargetEnemy } from './targeting.js';
 import { AUTO_OP_COOLDOWN, COLS, ROWS } from './constants.js';
@@ -579,14 +580,30 @@ export class SkillRuntime {
       // (a targeting-only instant skill must still switch to its skill range for the pending attack)
       if (this.spec.mods || this.spec.flags || this.spec.targeting) this._applyMods();
     }
-    b._ev(['skill', u.id, 1]);
+    // 스킬 타격 시점 (the 맹약 season's timing rule, server/sim/skills.js): a one-shot cast with a fixed motion
+    // (shared/attackTiming.js IMPACT_CAST_SKILLS) resolves at its clip's impact frame; the motion holds the unit's attacks
+    const cast = !this.isTimed ? skillImpactTiming(u) : null;
+    b._ev(cast ? ['skill', u.id, 1, { cast: true }] : ['skill', u.id, 1]);
     u.skillAnimUntil = b.time + SKILL_ANIM_WINDOW;
-    this._call('onStart', { reason });
+    if (cast) {
+      const seq = u.deploySeq, activation = this.activations;
+      u.mem.skillCastUntil = b.time + cast.dur;
+      u.mem.skillCastDuration = cast.dur;
+      if (u.mem.attackWindup) { delete u.mem.attackWindup; b._ev(['atkCancel', u.id]); }
+      u.skillAnimUntil = b.time + cast.dur;
+      b.after(cast.hit, () => {
+        if (!u.alive || !u.deployed || u.deploySeq !== seq || this.activations !== activation || !this.active) return;
+        if (u.s.flags.stun || u.s.flags.frozen || u.s.flags.sleep) { delete u.mem.skillCastUntil; this.end('interrupted'); return; }
+        b._ev(['skillImpact', u.id]);
+        this._call('onStart', { reason });
+        if (!this.isTimed && !this.pending) this.end('instant');
+      }, { owner: u });
+    } else this._call('onStart', { reason });
     if (b._hooks.skillStart) b.emit('skillStart', { unit: u, skill: this, reason });
     // bullets added in skillStart (拉特兰's ×(1.05 + 0.015 × layers), 逃犯引渡手续, talents): the bar's full mark
     // (community report #35: the extra bullets sat above a full bar until fewer than the base count were left)
     if (this.active && this.ammoLeft > this.ammoMax) this.ammoMax = this.ammoLeft;
-    if (!this.isTimed && !this.pending) {
+    if (!cast && !this.isTimed && !this.pending) {
       this.end('instant');
       // an instant / charge skill with no attack of its own (no spec.attack: a throw, a heal, a buff, DP …) waits one
       // attack interval of its unit before it is cast again from the tick (GitHub #298: 引星棘刺 S1 度算浪波, an SP_FULL

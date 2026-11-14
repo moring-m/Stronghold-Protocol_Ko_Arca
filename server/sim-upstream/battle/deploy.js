@@ -41,6 +41,9 @@ export class BattleDeploy {
     // Its deploySeq remains the identity of this actual deployment for scheduled effects and redeploy checks.
     u.aggroSeq = preBattleAggroSeq ?? u.deploySeq;
     u.deployedAt = this.time;
+    // 배치 모션 (the 맹약 season's timing rule): the deploy clip's length before the unit acts
+    u.deployRemaining = Math.max(0, ((u.dir === 'UP' && u.def.attackTiming?.back) || u.def.attackTiming?.front)?.deploy || 0);
+    u.deployUntil = this.time + u.deployRemaining;
     u.atkCd = 0;
     u.lastAttackAt = -Infinity;
     u.elem.burn = u.elem.neural = u.elem.necrosis = u.elem.apoptosis = u.elem.erosion = 0;
