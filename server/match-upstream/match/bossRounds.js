@@ -150,6 +150,8 @@ export class MatchBoss {
    * current LP, not a leftover after a fight that did not happen.
    */
   _openTeamLp() {
+    // 커스텀 아군 HP 공유: the pool opened at the first round stays (it is the team's LP since then)
+    if (this.gd.config.customRules?.sharedHp && this.teamLp != null) return;
     const alive = this.alivePlayers();
     this.teamLp = alive.reduce((s, p) => s + Math.max(0, p.lp), 0);
     for (const ps of alive) ps.lpAtFinal = Math.max(0, ps.lp);

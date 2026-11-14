@@ -290,7 +290,8 @@ export class GameData {
   get refreshPrice() { return Math.max(0, numOr(this.economy.refreshPrice, DEFAULTS.refreshPrice)); }
   get benchSize() { return posIntOr(this.economy.benchSize, DEFAULTS.benchSize); }
   get tempSize() { return posIntOr(this.economy.tempSize, DEFAULTS.tempSize); }
-  get deployCap() { return posIntOr(this.economy.deployCap, DEFAULTS.deployCap); }
+  // 커스텀 설정 (shared/seasonExtensions.js → config.customRules, the 맹약 season's rule values): absent on every official match
+  get deployCap() { return posIntOr(this.config.customRules?.deployCap ?? this.economy.deployCap, DEFAULTS.deployCap); }
   get equipPerChess() { return posIntOr(this.economy.equipPerChess, DEFAULTS.equipPerChess); }
   get maxArtsPerRound() { return posIntOr(this.economy.maxArtsPerRound, DEFAULTS.maxArtsPerRound); }
   get goldenCopies() { return posIntOr(this.economy.goldenCopies, DEFAULTS.goldenCopies); }
@@ -330,15 +331,21 @@ export class GameData {
     // size) and each player's private 自选 stock alike — the maintainer's decision of 2026-10-15 (GitHub #650): with
     // the shared pool doubled and the 自选 stock not, a 自选 operator was diluted in the copy-weighted rolls.
     const multiplier = this.isSolo ? 1 : posIntOr(this.economy.coopPoolMultiplier, 1);
+    // 커스텀 상점 재고 (customRules.stockPlayers): -1 unlimited, n > 0 the 4-player stock scaled to n players
+    const stock = this.config.customRules?.stockPlayers ?? 0;
+    if (stock === -1) return Number.MAX_SAFE_INTEGER;
+    if (stock > 0 && !this.chess(baseId)?.isDiy) return Math.ceil(base * posIntOr(this.economy.coopPoolMultiplier, 1) * stock / 4);
     return base * multiplier;
   }
 
   /** Normal equipment copies in the shared pool; effect-only items have no shop stock limit. */
   itemPoolCopies(id) {
+    if (this.config.customRules?.unlimitedStock) return null;
     const base = this.baseIdOf(id), rec = this.item(base);
     if (!rec || !isShopItem(rec)) return null;
     const count = this.economy.itemPoolCopiesOverrides?.[base] ?? this.economy.itemPoolCopies?.[rec.tier];
-    return Number.isInteger(count) && count >= 0 ? count : null;
+    const stock = this.config.customRules?.stockPlayers ?? 0;
+    return Number.isInteger(count) && count >= 0 ? (stock > 0 ? Math.ceil(count * stock / 4) : count) : null;
   }
 
   /** Whether a fixed trait gift may be produced beyond stock (including the advanced version of that item). */
@@ -404,6 +411,8 @@ export class GameData {
 
   /** The round level's `maxPlayTime` (config rounds[r].combatTimeLimit) as data gives it — REAL seconds. */
   combatTimeLimitReal(r) {
+    const custom = this.config.customRules?.normalBattleTime;
+    if (Number.isInteger(custom) && custom > 0) return custom;
     const rc = this.roundCfg(r);
     const v = rc ? rc.combatTimeLimit : undefined;
     if (typeof v === 'number' && Number.isFinite(v) && v > 0) return v;
@@ -434,6 +443,8 @@ export class GameData {
    * when the data has none.
    */
   bossLevelTime(r) {
+    const custom = this.config.customRules?.bossBattleTime;
+    if (Number.isInteger(custom) && custom > 0 && custom !== 120) return custom;
     const rc = this.roundCfg(r);
     const v = rc ? rc.levelMaxPlayTime : undefined;
     return typeof v === 'number' && Number.isFinite(v) && v > 0 ? v : null;
@@ -475,7 +486,9 @@ export class GameData {
    * drains 1 per real second from the 150 s mark (research 01 §10, 06 §11.7). Read as game seconds the drain would
    * start at 75 real s (45 s before the countdown ends) at 2 LP per real second.
    */
-  get bossOvertimeAfterReal() { return Math.max(0, numOr(this.config.bossOvertimeAfter, DEFAULTS.bossOvertimeAfter)); }
+  get bossOvertimeAfterReal() { return Math.max(0, numOr(this.config.bossOvertimeAfter, DEFAULTS.bossOvertimeAfter) + (this.config.customRules?.bossBattleTime || 120) - 120); }
+  /** 커스텀 보스전 진행 속도 (customRules.bossBattleSpeed): 2 = the boss rounds run at twice the speed. */
+  get bossTimeScale() { return this.config.customRules?.bossBattleSpeed === 2 ? 2 : 1; }
   /** Team LP drained per REAL second of overtime. */
   get bossOvertimeDrainReal() { return Math.max(0, numOr(this.config.bossOvertimeDrainPerSec, DEFAULTS.bossOvertimeDrainPerSec)); }
   /** Overtime start in GAME seconds of a boss field clock (150 real s × the forced 2× = 300). */

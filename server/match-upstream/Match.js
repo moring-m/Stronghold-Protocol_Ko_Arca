@@ -291,6 +291,15 @@ function dataSourceFor(data) {
 }
 
 export class Match {
+  // 커스텀 보스전 진행 속도 (customRules.bossBattleSpeed, the 맹약 season's rule): boss phases run at that clock (1× or
+  // 2×). Without the rule (every official match) the clock is GAME_SPEED in every phase, as upstream.
+  get gameSpeed() {
+    if (this._combatSpeedOverride != null) return this._combatSpeedOverride;
+    const boss = this.gd?.config?.customRules?.bossBattleSpeed;
+    return boss && [PHASE.FINAL_ASSAULT, PHASE.HIDDEN_CORE].includes(this.phase) ? boss : GAME_SPEED;
+  }
+  set gameSpeed(value) { this._combatSpeedOverride = value; }
+
   /** @param {object} opts see MATCH INTERFACE above */
   constructor(opts) {
     if (!opts || !Array.isArray(opts.seats) || opts.seats.length === 0) throw new TypeError('Match: seats required');
@@ -352,7 +361,7 @@ export class Match {
     this.BattleClass = typeof opts.BattleClass === 'function' ? opts.BattleClass : Battle;
     this.battleContent = opts.battleContent || 'full';
     this.timerScale = Number.isFinite(opts.timerScale) && opts.timerScale >= 0 ? opts.timerScale : 1;
-    this.gameSpeed = Number.isFinite(opts.combatSpeed) && opts.combatSpeed > 0 ? Math.min(opts.combatSpeed, 200) : GAME_SPEED;
+    this._combatSpeedOverride = Number.isFinite(opts.combatSpeed) && opts.combatSpeed > 0 ? Math.min(opts.combatSpeed, 200) : null;
     /** layouts a bot rehearses per prep with the real simulation (bot.js; 0 = heuristic placement only) */
     this.botRehearsal = Number.isInteger(opts.botRehearsal) && opts.botRehearsal >= 0 ? Math.min(opts.botRehearsal, 8) : BOT_REHEARSAL_DEFAULT;
     this.bot = getBotStrategy(opts.botStrategy ?? env('SP_BOT_STRATEGY'));

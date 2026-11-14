@@ -46,8 +46,13 @@ export function drawDisabledBonds(gd, rng) {
     const half = Math.floor(core.length / 2);
     const shuffled = sample(core, core.length, rng);
     const choice = gd.isSolo ? { groups: [shuffled.slice(0, half), shuffled.slice(half, half * 2)], picked: null } : null;
-    const coreOff = choice ? [] : shuffled.slice(0, nCore);
-    const drawn = [...coreOff, ...sample(addon, nAddon, rng)].sort();
+    // 커스텀 맹약 밴 (config.bondPolicy, shared/seasonExtensions.js): core 항상 밴 / 밴 제외 only where the draw is random
+    // (co-op; solo picks a group), add-on ones in both. The same random calls are made, so no policy = upstream draw.
+    const policy = gd.config?.bondPolicy || null;
+    const coreOff = choice ? [] : policy ? policyDraw(shuffled, nCore, policy.forcedBonds, policy.protectedBonds, 5) : shuffled.slice(0, nCore);
+    const addonShuffled = policy ? sample(addon, addon.length, rng) : null;
+    const addonOff = policy ? policyDraw(addonShuffled, nAddon, policy.forcedAuxBonds, policy.protectedAuxBonds, 0) : sample(addon, nAddon, rng);
+    const drawn = [...coreOff, ...addonOff].sort();
     return { drawn, staticOff, banned: bannedChessForBonds(gd, drawn, staticOff), ...(choice ? { choice } : {}) };
   }
   const drawn = [...sample(core, nCore, rng), ...sample(addon, nAddon, rng)].sort();
@@ -58,6 +63,14 @@ export function drawDisabledBonds(gd, rng) {
 export function bannedChessForBonds(gd, drawn, staticOff) {
   const off = new Set([...drawn, ...staticOff]);
   return gd.visibleChess.filter(id => gd.bondsExclude(gd.chess(id), off));
+}
+
+/** Off-set from a shuffled list: every forced id, then the shuffled others not protected, up to max(n, forced) and keeping `keep`. */
+function policyDraw(shuffled, n, forced = [], protectedIds = [], keep = 0) {
+  const f = shuffled.filter((id) => forced.includes(id));
+  const quota = Math.min(Math.max(n, f.length), Math.max(0, shuffled.length - keep));
+  const rest = shuffled.filter((id) => !forced.includes(id) && !protectedIds.includes(id));
+  return [...f, ...rest.slice(0, Math.max(0, quota - f.length))];
 }
 
 function sample(arr, n, rng) {

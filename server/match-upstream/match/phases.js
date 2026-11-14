@@ -187,6 +187,8 @@ export class MatchPhases {
    * see timeoutBand / defaultBand.
    */
   bandTaken(bandId, playerId) {
+    // 커스텀 전략 중복 선택 허용 (customRules.duplicateBands)
+    if (this.gd.config.customRules?.duplicateBands) return false;
     const picks = this.draft?.picks || {};
     for (const [pid, id] of Object.entries(picks)) if (pid !== playerId && id === bandId) return true;
     return false;
@@ -438,6 +440,12 @@ export class MatchPhases {
   }
 
   _startRoundAfterOffers(r) {
+    // 커스텀 아군 HP 공유 (customRules.sharedHp): one team pool from the first round on (the boss rounds' own pool, earlier)
+    if (this.gd.config.customRules?.sharedHp && this.teamLp == null) {
+      const players = this.alivePlayers(); this.teamLp = players.reduce((n, p) => n + Math.max(0, p.lp), 0);
+      for (const ps of players) ps.lpAtFinal = Math.max(0, ps.lp);
+      this._syncTeamLp();
+    }
     this.phase = PHASE.ROUND_START;
     this.round = r;
     this.fields = [];

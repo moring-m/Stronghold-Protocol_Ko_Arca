@@ -40,7 +40,9 @@ export class MatchSettle {
       const counted = (r.leaked || []).filter((l) => l && l.counted !== false).length;
       const loss = uniteRan && plan.leakers.includes(ps) ? Math.min(cap, survivors.get(ps.playerId) || 0) : Math.min(cap, counted);
       if (this.uniteResultView) this.uniteResultView.losses[ps.playerId] = loss;
-      ps.lp -= loss;
+      // 커스텀 아군 HP 공유 (customRules.sharedHp): the team's pool takes the loss
+      if (this.gd.config.customRules?.sharedHp) this.teamLp = Math.max(0, this.teamLp - loss);
+      else ps.lp -= loss;
       ps.stats.lpLost += loss;
       ps.stats.leaks += counted;
       ps.stats.kills += Number(r.killed) || 0;
@@ -66,7 +68,7 @@ export class MatchSettle {
       for (const [bondId, n] of Object.entries(r.layerGains || {})) {
         if (!this.gd.bond(bondId) || !(n > 0)) continue;
         const before = ps.layers[bondId] || 0;
-        const add = layerGainRoom(before, Math.floor(n));
+        const add = layerGainRoom(before, Math.floor(n), this.gd.config.customRules?.unlimitedLayers ? Infinity : undefined);
         if (!(add > 0)) continue;
         ps.layers[bondId] = before + add;
         this.dispatch(ps, 'onLayers', { bondId, from: before, to: ps.layers[bondId], reason: 'battle' });
@@ -89,6 +91,7 @@ export class MatchSettle {
       }
       ps.recompute();
     }
+    if (this.gd.config.customRules?.sharedHp) this._syncTeamLp();
     this.eliminateBroken();
     this.fields = [];
     this.watchers.clear();
@@ -127,7 +130,7 @@ export class MatchSettle {
    */
   eliminateBroken() {
     for (const ps of this.alivePlayers()) {
-      if (ps.lp <= 0) {
+      if (this.gd.config.customRules?.sharedHp && this.teamLp != null ? this.teamLp <= 0 : ps.lp <= 0) {
         ps.lp = 0;
         ps.eliminate(this.round);
         this.toast(ps, 'error', '你的目标生命值耗尽，已被淘汰');

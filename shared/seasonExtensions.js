@@ -7,9 +7,19 @@
 //   disabledStages   the map leaves every mode's stage list
 //   disabledBosses   the boss leaves every mode's boss / hidden-boss weights
 //   disabledBands    the strategy leaves the draft
-import { customExtensionCatalog } from './customExtensions.js';
+//   forcedBonds / protectedBonds        core 항상 밴 / 밴 제외 of the random core draw (co-op; solo picks a group)
+//   forcedAuxBonds / protectedAuxBonds  add-on ones (solo and co-op): config.bondPolicy, read by match-upstream/pool.js
+//   rules            the match rules the season's code reads from config.customRules (SEASON_RULES)
+//   ruleValues       the match values (SEASON_RULE_VALUES): round count, deploy cap, stock, battle times, boss speed
+import { customExtensionCatalog, normalizeRuleValues, RULE_VALUES } from './customExtensions.js';
 
-export const SEASON_EXTENSION_CATEGORIES = Object.freeze(['bannedOperators', 'disabledBonds', 'disabledStages', 'disabledBosses', 'disabledBands']);
+export const SEASON_EXTENSION_CATEGORIES = Object.freeze(['rules', 'forcedBonds', 'forcedAuxBonds', 'bannedOperators', 'disabledBonds', 'disabledStages', 'disabledBosses', 'disabledBands']);
+/** The rule switches a season match honours (match-upstream reads config.customRules). */
+export const SEASON_RULES = Object.freeze(['unlimitedHpLoss', 'sharedHp', 'defaultHarmony', 'duplicateBands']);
+/** The rule values a season match honours. */
+export const SEASON_RULE_VALUES = Object.freeze(['normalBattleTime', 'bossBattleTime', 'bossBattleSpeed', 'stockPlayers', 'roundCount', 'deployCap']);
+const BAN_KEYS = ['forcedBonds', 'protectedBonds', 'forcedAuxBonds', 'protectedAuxBonds'];
+const DEFAULT_VALUES = Object.freeze(Object.fromEntries(RULE_VALUES.map((r) => [r.id, r.default])));
 
 const EMPTY = Object.freeze({ bonds: [], stages: [], rules: [] });
 
@@ -17,7 +27,8 @@ const EMPTY = Object.freeze({ bonds: [], stages: [], rules: [] });
 export function seasonExtensionCatalog(raw = {}) {
   const full = customExtensionCatalog(raw);
   const out = {};
-  for (const [k, v] of Object.entries(full)) out[k] = SEASON_EXTENSION_CATEGORIES.includes(k) ? v : [];
+  for (const [k, v] of Object.entries(full)) out[k] = SEASON_EXTENSION_CATEGORIES.includes(k) || BAN_KEYS.includes(k) ? v : [];
+  out.rules = (full.rules || []).filter((r) => SEASON_RULES.includes(r.id));
   return out;
 }
 
@@ -25,11 +36,15 @@ export function seasonExtensionCatalog(raw = {}) {
 export function seasonExtensionSelection(value, raw = {}) {
   const cat = seasonExtensionCatalog(raw);
   const out = { ...EMPTY };
-  for (const k of SEASON_EXTENSION_CATEGORIES) {
+  for (const k of [...SEASON_EXTENSION_CATEGORIES, ...BAN_KEYS]) {
     const known = new Set((cat[k] || []).map((e) => e.id));
     const ids = Array.isArray(value?.[k]) ? value[k].filter((id) => known.has(id)) : [];
     out[k] = [...new Set(ids)];
   }
+  // only the season's values, and only those that differ from the default (a default value changes nothing)
+  const v = normalizeRuleValues(value?.ruleValues || {});
+  const kept = Object.fromEntries(SEASON_RULE_VALUES.filter((id) => v[id] !== DEFAULT_VALUES[id]).map((id) => [id, v[id]]));
+  if (Object.keys(kept).length) out.ruleValues = kept;
   return out;
 }
 
@@ -38,7 +53,10 @@ export function applySeasonExtensions(raw, sel) {
   if (!raw || !sel) return raw;
   const banned = new Set(sel.bannedOperators || []), bonds = new Set(sel.disabledBonds || []);
   const stages = new Set(sel.disabledStages || []), bosses = new Set(sel.disabledBosses || []), bands = new Set(sel.disabledBands || []);
-  if (!banned.size && !bonds.size && !stages.size && !bosses.size && !bands.size) return raw;
+  const rules = (sel.rules || []).filter((id) => SEASON_RULES.includes(id));
+  const values = Object.fromEntries(Object.entries(sel.ruleValues || {}).filter(([id]) => SEASON_RULE_VALUES.includes(id)));
+  const policy = Object.fromEntries(BAN_KEYS.filter((k) => (sel[k] || []).length).map((k) => [k, [...sel[k]]]));
+  if (!banned.size && !bonds.size && !stages.size && !bosses.size && !bands.size && !rules.length && !Object.keys(values).length && !Object.keys(policy).length) return raw;
   const chess = banned.size ? Object.fromEntries(Object.entries(raw.chess || {}).map(([id, c]) => [id, banned.has(id) ? { ...c, visible: false } : c])) : raw.chess;
   const dropKeys = (o, set) => (o && typeof o === 'object' ? Object.fromEntries(Object.entries(o).filter(([k]) => !set.has(k))) : o);
   const modes = Object.fromEntries(Object.entries(raw.config?.modes || {}).map(([id, m]) => [id, {
@@ -48,7 +66,30 @@ export function applySeasonExtensions(raw, sel) {
     ...(m.bossWeights ? { bossWeights: dropKeys(m.bossWeights, bosses) } : {}),
     ...(m.hiddenBossWeights ? { hiddenBossWeights: dropKeys(m.hiddenBossWeights, bosses) } : {}),
   }]));
-  return { ...raw, chess, bands: dropKeys(raw.bands, bands), config: { ...raw.config, modes } };
+  const roundCount = values.roundCount;
+  if (Number.isInteger(roundCount) && roundCount !== DEFAULT_VALUES.roundCount) for (const [id, m] of Object.entries(modes)) modes[id] = withRoundCount(m, raw.config.modes, roundCount);
+  const customRules = { ...values, ...Object.fromEntries(rules.map((id) => [id, true])), ...(values.stockPlayers === -1 ? { unlimitedStock: true } : {}) };
+  return { ...raw, chess, bands: dropKeys(raw.bands, bands), config: { ...raw.config, modes,
+    ...(Object.keys(customRules).length ? { customRules } : {}),
+    ...(Object.keys(policy).length ? { bondPolicy: policy } : {}),
+    ...(rules.includes('unlimitedHpLoss') ? { lpCapPerRound: Number.MAX_SAFE_INTEGER } : {}) } };
+}
+
+/**
+ * A mode with `n` normal rounds (the 맹약 season's 일반 라운드 수, shared/customExtensions.js applyCustomExtensions): round r
+ * plays the season's round min(r, 13) (a boss / hidden round's slot plays round 13), then its boss and hidden rounds.
+ */
+function withRoundCount(m, allModes, n) {
+  const fallback = Object.values(allModes).find((x) => x.type === m.type && x.rounds?.['13'] && !x.rounds['13'].isBoss);
+  const regular = m.rounds?.['13'] || fallback?.rounds?.['13'];
+  if (!regular || !m.bossRound) return m;
+  const rounds = {}, enemyScale = {}, roundSource = {};
+  const copy = (to, from, cfg) => { rounds[to] = { ...cfg }; enemyScale[to] = { ...(m.enemyScale?.[from] || fallback?.enemyScale?.[from] || {}) }; roundSource[to] = from; };
+  for (let r = 1; r <= n; r++) { const from = Math.min(r, 13), cfg = m.rounds?.[from]; copy(r, from, cfg && !cfg.isBoss && !cfg.isHidden ? cfg : regular); }
+  copy(n + 1, m.bossRound, m.rounds?.[m.bossRound]);
+  if (m.hiddenRound) copy(n + 2, m.hiddenRound, m.rounds?.[m.hiddenRound]);
+  return { ...m, rounds, enemyScale, roundSource, bossRound: n + 1, lastRound: n + 1, hiddenRound: m.hiddenRound ? n + 2 : null,
+    spRounds: (m.spRounds || []).filter((r) => r <= n) };
 }
 
 /** Korean reasons a selection cannot start (empty when it can), per the room's mode type and difficulty. */
@@ -64,7 +105,10 @@ export function validateSeasonExtensions(raw, sel, { mode = 'coop', difficulty =
     const core = Object.entries(data.bonds || {}).filter(([id, b]) => b.isCore && Number(b.weight) > 0 && !(m.inactiveBondIds || []).includes(id));
     if (core.length < 5) errors.push('핵심 맹약을 최소 5개 남겨야 합니다.');
   }
-  const bandCount = Object.keys(data.bands || {}).length;
-  if (bandCount < (mode === 'solo' ? 1 : 4)) errors.push(`전략을 최소 ${mode === 'solo' ? 1 : 4}개 남겨야 합니다.`);
+  const bandCount = Object.keys(data.bands || {}).length, need = mode === 'solo' || (sel.rules || []).includes('duplicateBands') ? 1 : 4;
+  if (bandCount < need) errors.push(`전략을 최소 ${need}개 남겨야 합니다.`);
+  for (const [f, p, label] of [['forcedBonds', 'protectedBonds', '맹약'], ['forcedAuxBonds', 'protectedAuxBonds', '부가 맹약']]) {
+    if ((sel[f] || []).some((id) => (sel[p] || []).includes(id))) errors.push(`같은 ${label}에 항상 밴과 밴 제외를 함께 설정할 수 없습니다.`);
+  }
   return [...new Set(errors)];
 }
