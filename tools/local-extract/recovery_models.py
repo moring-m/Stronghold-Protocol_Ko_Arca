@@ -1,6 +1,7 @@
 """Export all active/inactive Spine and mesh renderers below selected client prefab roots."""
 import hashlib
 import json
+import os
 from pathlib import Path
 import fx
 from skin_fx import matching_skins, skin_components
@@ -9,6 +10,15 @@ from skin_fx import matching_skins, skin_components
 def resolve_obj(env, owner, ptr):
     sf,obj=env.resolve(owner.assets_file,ptr)
     return obj if obj is not None and sf!='builtin' else None
+
+
+def long_path(path):
+    """Windows: the extended-length form, so a deep skin folder (kit + output + recovery/spine/<key>/<node>/<stem>.skel) is
+    not cut at MAX_PATH (260) — the 2026-11-15 model run failed every .skel write there."""
+    path=Path(path)
+    if os.name!='nt':return path
+    text=str(path.resolve())
+    return Path(text if text.startswith('\\\\?\\') else '\\\\?\\'+text)
 
 
 def write_skeleton(env,sda,out,sub,groups):
@@ -41,7 +51,7 @@ def write_skeleton(env,sda,out,sub,groups):
         leaf=name.replace('\\','/').rsplit('/',1)[-1]
         safe=fx.fx_file(leaf.removesuffix('.png'))+'.png'
         atlas=atlas.replace(name,safe);safe_pages[safe]=image
-    dest=Path(out)/sub;dest.mkdir(parents=True,exist_ok=True)
+    dest=long_path(Path(out)/sub);dest.mkdir(parents=True,exist_ok=True)
     stem=fx.fx_file(getattr(skeleton.read(),'m_Name','skeleton').removesuffix('.skel'))
     files={stem+'.skel':_text_bytes(skeleton.read()),stem+'.atlas':normalize_atlas(atlas,{k:v.size for k,v in safe_pages.items()}).encode()}
     for name,data in files.items():(dest/name).write_bytes(data)
@@ -92,7 +102,7 @@ def export_models(game,out,catalog,base_ids,log=print):
                 key=fx.fx_file((skins[0]['skinId'] if skins else base)+'-'+hashlib.sha256((rel+container).encode()).hexdigest()[:10])
                 components,_=skin_components(env,root,set())
                 raw=out/'components'/(key+'.json');raw.parent.mkdir(parents=True,exist_ok=True)
-                raw.write_text(json.dumps({'bundle':rel,'container':container,'components':components},ensure_ascii=False),encoding='utf-8')
+                long_path(raw).write_text(json.dumps({'bundle':rel,'container':container,'components':components},ensure_ascii=False),encoding='utf-8')
                 row={'bundle':rel,'container':container,'skinIds':[s['skinId'] for s in skins],
                      'baseCharId':base,'components':str(raw.relative_to(out)),'skeletons':[]}
                 # Captures meshes/materials/AnimationClips even when there is no ParticleEffect component.
