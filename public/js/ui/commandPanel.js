@@ -1,7 +1,9 @@
 // 전략 명령 (규정 시즌, server/match-upstream/bandCommands.js commandView): the strategy's command, in the right-hand
 // effects column (game.js .gm__effects) instead of a panel over the shop.
-//   - 돋보기 button on top: the command's text, cost, cooldown / uses, why it cannot be used, and a pending command draft
-//     (strategy upgrade / 交换, commandDraftView → g.commandChoice). It pulses while a draft waits.
+//   - The tile is the strategy itself (the effects list leaves its band entry out while a command exists): its tooltip
+//     has the strategy's effect and the command's text, cost, cooldown / uses and why it cannot be used.
+//   - 돋보기 button on top: shows that tooltip as a hover would (again / anywhere else: hides it); while a command draft
+//     (strategy upgrade / 交换, commandDraftView → g.commandChoice) waits it pulses and opens the draft instead.
 //   - The command tile: a glowing frame while it can be used (ACTIVE, usable, own prep). Click: a command without a target
 //     is used at once; one with targets highlights them (board / bench tiles through the render view, shop cards through
 //     their data-shop-slot) and the next click on a highlighted target uses it (anything else cancels, as Esc does).
@@ -10,7 +12,8 @@
 // { row, col } = a tile. Only shown when the private view carries a command (a 맹약 season never does).
 
 import { useEffect, useRef, useState } from '../../vendor/hooks.module.js';
-import { html, Button, Icon, MicroLabel, Modal, Tooltip } from './components.js';
+import { html, Button, Icon, MicroLabel, Modal, Tooltip, showTooltipAt } from './components.js';
+import { tr } from '../i18n/i18n.js';
 import { RichText, Img, GIcon } from './gameComponents.js';
 import { actions } from './gameActions.js';
 import { bandIconUrl } from './assetUrls.js';
@@ -54,6 +57,8 @@ export function CommandPanel({ priv, editable, getView }) {
   const [aiming, setAiming] = useState(false); // targets highlighted, waiting for the click on one
   const [ghost, setGhost] = useState(null);    // { x, y } while dragging
   const press = useRef(null);
+  const tileRef = useRef(null);
+  const pinned = useRef(null); // hide() of the tooltip the 돋보기 shows
   const dragEnded = useRef(0); // the click the browser fires after a drag's pointerup is not a tap
   const view = priv?.command;
   const draft = priv?.commandDraft;
@@ -95,6 +100,12 @@ export function CommandPanel({ priv, editable, getView }) {
     return () => { document.removeEventListener('click', onClick, true); document.removeEventListener('keydown', onKey); };
   }, [aiming, priv]);
   useEffect(() => { if (!usable) setAiming(false); }, [usable]);
+  // the 돋보기's tooltip goes away with the next click anywhere else, or when the panel goes
+  useEffect(() => {
+    const away = (e) => { if (pinned.current && !e.target.closest?.('.cmdx__info')) { pinned.current(); pinned.current = null; } };
+    document.addEventListener('pointerdown', away, true);
+    return () => { document.removeEventListener('pointerdown', away, true); pinned.current?.(); };
+  }, []);
 
   if (!view && !draft) return null;
   const m = data.get('assets');
@@ -129,13 +140,23 @@ export function CommandPanel({ priv, editable, getView }) {
   };
   const onClick = (e) => { if (ghost || Date.now() - dragEnded.current < 400) { e.preventDefault(); return; } tap(); };
   const cost = view ? (view.currentCost ?? view.baseCost ?? 0) : null;
-  const tip = view ? html`<div class="efftip"><b>${t('전략 명령')}</b><${RichText} as="p" text=${view.descRaw || view.desc || ''} />
-    ${view.reason ? html`<span class="efftip__kind">${t(REASON[view.reason] || view.reason)}</span>` : null}</div>` : null;
+  const band = (Array.isArray(priv?.effects) ? priv.effects : []).find((e) => e && e.iconKind === 'band');
+  const tip = view ? html`<div class="efftip">
+    ${band ? html`<b>${tr(band.name || '')}</b><span class="efftip__kind">${tr('策略')}</span><${RichText} as="p" text=${band.desc || ''} />` : null}
+    <b>${t('전략 명령')}</b>
+    <span class="efftip__kind">${view.type === 'ACTIVE' ? `${t('비용')} ${cost}` : t(REASON.passive)}${view.cooldown ? ` · ${t('재사용 대기')} ${view.cooldown}${t('라운드')}` : ''}${view.usesLeft != null ? ` · ${t('남은 횟수')} ${view.usesLeft}` : ''}</span>
+    <${RichText} as="p" text=${view.descRaw || view.desc || ''} />
+    ${view.reason && view.reason !== 'passive' ? html`<span class="efftip__kind cmdp__why">${t(REASON[view.reason] || view.reason)}</span>` : null}</div>` : null;
+  const onInfo = () => {
+    if (draft || !view) { setInfo(true); return; }
+    if (pinned.current) { pinned.current(); pinned.current = null; return; }
+    pinned.current = showTooltipAt(tileRef.current, tip, 'bottom');
+  };
   return html`<div class="cmdx" data-testid="command-panel">
     <button type="button" class=${`cmdx__info${draft ? ' is-pending' : ''}`} aria-label=${t('전략 명령 효과 보기')} title=${t('전략 명령 효과 보기')}
-      onClick=${() => setInfo(true)}><${Icon} name="search" />${draft ? html`<span class="cmdx__badge">!</span>` : null}</button>
+      onClick=${onInfo}><${Icon} name="search" />${draft ? html`<span class="cmdx__badge">!</span>` : null}</button>
     ${view ? html`<${Tooltip} placement="bottom" text=${tip}>
-      <button type="button" data-testid="command-tile" class=${`cmdx__tile effect${usable ? ' is-usable' : ''}${aiming ? ' is-aiming' : ''}${ghost ? ' is-dragging' : ''}`}
+      <button type="button" ref=${tileRef} data-testid="command-tile" class=${`cmdx__tile effect${usable ? ' is-usable' : ''}${aiming ? ' is-aiming' : ''}${ghost ? ' is-dragging' : ''}`}
         aria-label=${t('전략 명령')} aria-pressed=${aiming} disabled=${view.type !== 'ACTIVE'}
         onClick=${onClick} onPointerDown=${onPointerDown} onPointerMove=${onPointerMove} onPointerUp=${onPointerUp}
         onPointerCancel=${() => { press.current = null; setGhost(null); }}>

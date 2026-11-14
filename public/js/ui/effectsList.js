@@ -13,8 +13,9 @@ import { data } from '../data.js';
 const KIND = { band: '策略', choice: '机变', team: '团队增益', item: '道具', garrison: '特质',augment:'증강' };
 
 /** @param {{ effects: any[] }} props */
-export function EffectsList({ effects,pub=null,ownerId=null,augmentsOnly=false }) {
-  const list = augmentsOnly?augmentEffectEntries(pub?.augments?.selectedAllies?.[ownerId]||[]):(Array.isArray(effects)?effects:[]).filter(e=>e&&e.iconKind!=='augment'&&(e.name||e.desc));
+export function EffectsList({ effects,pub=null,ownerId=null,augmentsOnly=false,hideBand=false }) {
+  // hideBand: the strategy is drawn by the 규정 command tile above (ui/commandPanel.js), not twice
+  const list = augmentsOnly?augmentEffectEntries(pub?.augments?.selectedAllies?.[ownerId]||[]):(Array.isArray(effects)?effects:[]).filter(e=>e&&e.iconKind!=='augment'&&!(hideBand&&e.iconKind==='band')&&(e.name||e.desc));
   if (!list.length) return null;
   const m = data.get('assets');
   return html`<div class="effects" aria-label="生效中的效果">

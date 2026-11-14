@@ -561,6 +561,18 @@ const tipListeners = new Set();
 const setTip = (s) => { tipState = s; for (const fn of [...tipListeners]) fn(); };
 
 /**
+ * Show `content` as the tooltip of `el`, exactly as a hover would (a button that "shows the tooltip" — the 규정 command
+ * column's 돋보기). Returns a function that hides it again (if it is still the one shown).
+ */
+export function showTooltipAt(el, content, placement = 'bottom') {
+  if (!el || !el.isConnected || content == null || content === '') return () => {};
+  const id = ++tipSeq;
+  const hide = () => { if (tipState?.id === id) setTip(null); };
+  setTip({ id, content, aside: null, rect: el.getBoundingClientRect(), placement, hold: () => {}, hide });
+  return hide;
+}
+
+/**
  * Hover/focus tooltip around its children. Content renders in <TooltipLayer/> (fixed, viewport-clamped).
  * `aside`: a second section in the same clamped, scrollable box; stacked on narrow screens.
  * @param {{ text: any, aside?: any, placement?: 'top'|'bottom', delay?: number, block?: boolean, class?: string, children?: any }} props
