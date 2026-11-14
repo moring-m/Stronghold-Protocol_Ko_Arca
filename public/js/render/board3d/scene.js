@@ -832,7 +832,7 @@ export class BoardScene {
       ((roles[bucket.role] ||= [])[bucket.variant] ||= []).push(bucket);
     }
     for (const k of Object.keys(roles)) roles[k] = roles[k].filter(Boolean);
-    const FIELD = new Set(['r', 'k', 'h', 'f', 'b', 'S', 'E', 'O', 'R']);
+    const FIELD = new Set(['r', 'k', 'w', 'z', 'h', 'f', 'b', 'S', 'E', 'O', 'R']);
     const glyph = (r, c) => grid[r]?.[c]?.glyph;
     const slots = new Set((stage.mapChars || []).map((m) => `${m.pos?.[0]},${m.pos?.[1]}`));
     // raised kit blocks take the height the board gives the glyph (units, map characters and benches stand on it)

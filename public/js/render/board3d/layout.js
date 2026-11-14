@@ -458,7 +458,8 @@ export function buildBoard(stage, opts = {}) {
   // 덤불 (thicket 'k'): a glowing pink frame on every cell — its outer border and the seams between its cells (a shared
   // seam once: the S / W side always, the N / E side only on the region's border)
   const thicket = [];
-  const isK = (r, c) => { const n = at(r, c); return !!n && n.drawn && n.glyph === 'k'; };
+  // 규정 m09 隐匿模块 (w) hides units the same way: the same pink frame
+  const isK = (r, c) => { const n = at(r, c); return !!n && n.drawn && (n.glyph === 'k' || n.glyph === 'w'); };
   for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
     if (!isK(r, c)) continue;
     const z = topZ(grid[r][c]);

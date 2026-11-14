@@ -43,3 +43,16 @@ test('a light ground enemy beside the cannon rides the shell to the landing poin
   h.run(5.5);
   assert.ok(Math.abs(e.x - 6) < 1e-6 && Math.abs(e.y - 9) < 1e-6, `moved to the landing point, at ${e.x},${e.y}`);
 });
+
+test('m09 隐匿模块 (w): an operator standing on it is hidden (隐匿)', () => {
+  const st = Object.values(raw.stages).find((s) => s.id === 'act3autochess_m09');
+  let cell = null;
+  st.rows.forEach((row, r) => { const c = row.indexOf('w'); if (!cell && c >= 0 && r >= 9 && r <= 12) cell = [r, c]; });
+  assert.ok(cell, 'a w tile on the normal field');
+  setGameData(raw);
+  const data = new DataSource({ ...raw, chess: { ...raw.chess, test_a: chessRec({ id: 'test_a', skill: null }) } }, null);
+  const h = makeBattle({ data, content: 'full', autoFinish: false, timeLimit: 5, stageId: 'act3autochess_m09',
+    players: [{ playerId: 'p1', seat: 0, side: 'L', units: [{ uid: 1, kind: 'chess', chessId: 'test_a', row: cell[0], col: cell[1] }], bonds: {} }] });
+  h.step();
+  assert.equal(h.unit(1).s.flags.stealth, true);
+});

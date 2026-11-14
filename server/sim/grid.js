@@ -92,6 +92,8 @@ export const DEFAULT_LEGEND = Object.freeze({
   k: { height: 'LOW', build: 'ALL', pass: 'ALL', key: 'tile_custom_thicket', terrain: 'thicket' },
   // 규정 m12 加速 (a 규정 map added in the 맹약 season's custom settings): content/devices.js speedup
   z: { height: 'LOW', build: 'ALL', pass: 'ALL', key: 'tile_speedup', terrain: 'speedup' },
+  // 규정 m09 隐匿模块 (tile_duel_grassland): the thicket's 隐匿 for operators and enemies
+  w: { height: 'LOW', build: 'ALL', pass: 'ALL', key: 'tile_duel_grassland', terrain: 'thicket' },
 });
 
 /**
@@ -103,7 +105,7 @@ export const DEFAULT_LEGEND = Object.freeze({
  */
 export const DEPLOY_REFUSED_TILES = Object.freeze(new Set(['tile_deepsea']));
 
-const TERRAIN_BY_KEY = { tile_mire: 'mire', tile_smog: 'smog', tile_deepsea: 'deepsea', tile_infection: 'infection', tile_deepwater: 'deepsea', tile_custom_thicket: 'thicket', tile_speedup: 'speedup' };
+const TERRAIN_BY_KEY = { tile_mire: 'mire', tile_smog: 'smog', tile_deepsea: 'deepsea', tile_infection: 'infection', tile_deepwater: 'deepsea', tile_custom_thicket: 'thicket', tile_speedup: 'speedup', tile_duel_grassland: 'thicket' };
 const SPECIAL_BY_KEY = { tile_start: 'start', tile_end: 'end', tile_telin: 'telin', tile_telout: 'telout' };
 
 function normPass(v) {

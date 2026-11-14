@@ -20,6 +20,7 @@
 //   活性源石 i  a unit on it (allies and ground enemies) gets a timed effect: damage true dmg/s, ATK + atk, ASPD +
 //              attack_speed for `duration` s from its last contact — an enemy keeps it after walking off; one effect
 //              per unit, its time starts again while the unit is on the tile; the tiles never switch off
+//   隐匿模块 w  规程 m09 tile_duel_grassland (PRTS 战场一览 #09 "位于其上的单位和敌人获得隐匿"): 隐匿 for every unit on it
 //   加速 z      规程 tile_speedup: a ground unit standing on it (allies and enemies) gets ASPD +attack_speed (flat,
 //              official 25) and move ×move_speed (official 1.5), from stage.special.speedup when that block is present.
 //              Cleared on leaving. Flyers skip it (terrainFor). 草地 w (tile_duel_grassland, no blackboard) is plain
@@ -54,9 +55,9 @@ const num = (v, d = 0) => (typeof v === 'number' && Number.isFinite(v) ? v : (ty
 /** ASPD blackboard values: a fraction (|v| < 1, e.g. −0.6 / −0.05) is ×100 ASPD, otherwise flat (+20). */
 const aspdOf = (v) => (Math.abs(v) < 1 ? v * 100 : v);
 
-export const TERRAIN = Object.freeze({ mire: 1, smog: 2, deepsea: 3, infection: 4, speedup: 5 });
-const TERRAIN_NAME = ['', 'mire', 'smog', 'deepsea', 'infection', 'speedup'];
-const BUFF = { 1: 'terrain:mire', 2: 'terrain:smog', 3: 'terrain:deepsea', 4: 'terrain:infection', 5: 'terrain:speedup' };
+export const TERRAIN = Object.freeze({ mire: 1, smog: 2, deepsea: 3, infection: 4, speedup: 5, stealth: 6 });
+const TERRAIN_NAME = ['', 'mire', 'smog', 'deepsea', 'infection', 'speedup', 'stealth'];
+const BUFF = { 1: 'terrain:mire', 2: 'terrain:smog', 3: 'terrain:deepsea', 4: 'terrain:infection', 5: 'terrain:speedup', 6: 'terrain:stealth' };
 const AIRFLOW = 'terrain:airflow';
 const CRATE_KEY = 'trap_1105_accrate';
 const TURRET_KEY = 'trap_1104_aclasert';
@@ -416,7 +417,8 @@ function enterTerrain(battle, st, u, code) {
   m.mireStacks = 0;
   m.mireTriggers = 0;
   if (!code) return;
-  if (code === TERRAIN.smog) battle.addBuff(u, { key: BUFF[code], flags: { stealth: true } });
+  // 隐匿模块 (m09 w): 隐匿 for operators and enemies alike (PRTS 规程 战场一览 #09)
+  if (code === TERRAIN.smog || code === TERRAIN.stealth) battle.addBuff(u, { key: BUFF[code], flags: { stealth: true } });
   else if (code === TERRAIN.deepsea) {
     const D = st.deepsea;
     battle.addBuff(u, { key: BUFF[code], mods: { aspd: D.aspd, moveMul: D.moveMul }, interval: 1, onTick: deepWaterDamage(battle, D.damage) });
