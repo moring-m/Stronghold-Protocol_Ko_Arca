@@ -429,6 +429,9 @@
 .extension-presets__actions > .btn { width:100%; min-width:0; box-sizing:border-box; }
 
 .extension-band-grid { flex:none; grid-template-columns:repeat(auto-fill,minmax(90px,1fr)); overflow:visible; }
+/* the operator grid (.lo-grid, screens/loadout.css) is its own scroller with overscroll contain: here the list grows inside
+   .extension-settings-scroll, so the wheel must reach that scroller (a contained, non-overflowing grid swallowed it) */
+.custom-ext .lo-grid.extension-band-grid { overflow:visible; overscroll-behavior:auto; max-height:none; }
 .extension-band-card .lo-card__art { aspect-ratio:1; }
 .extension-band-card .lo-card__art img { object-fit:contain; }
 .extension-band-card .lo-card__kit { display:block; padding:4px; text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:10px; }
