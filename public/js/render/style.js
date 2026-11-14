@@ -31,13 +31,15 @@ export const GLYPH = Object.freeze({
   d: { mat: 'deepsea', h: null },
   i: { mat: 'infection', h: null },
   k: { mat: 'road', h: null },   // 덤불 (thicket): road ground, the pink frame drawn on top (board3d / tiles.js)
+  w: { mat: 'road', h: null },   // 규정 m09 隐匿模块 (tile_duel_grassland): as the thicket, pink frame
+  z: { mat: 'road', h: null },   // 규정 m12 加速 (tile_speedup): road ground, the cyan chevrons drawn on top
 });
 
 /** tileKey (when a stage uses glyphs outside the legend) → glyph. */
 export const TILEKEY_GLYPH = Object.freeze({
   tile_forbidden: '#', tile_road: 'r', tile_floor: 'f', tile_wall: 'h', tile_fence_bound: 'b', tile_fence: 'b',
   tile_achand: 'a', tile_start: 'S', tile_end: 'E', tile_telin: 'I', tile_telout: 'O', tile_mire: 'm',
-  tile_smog: 'g', tile_deepsea: 'd', tile_infection: 'i', tile_grass: 'r', tile_hole: '#', tile_custom_thicket: 'k',
+  tile_smog: 'g', tile_deepsea: 'd', tile_infection: 'i', tile_grass: 'r', tile_hole: '#', tile_custom_thicket: 'k', tile_duel_grassland: 'w', tile_speedup: 'z',
 });
 
 export const COLORS = Object.freeze({

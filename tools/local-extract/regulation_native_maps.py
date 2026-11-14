@@ -37,6 +37,10 @@ from regulation_scenes import REGULATION_IDS  # noqa: E402
 SKIP = {'act3autochess_m01', 'act3autochess_m02', 'act3autochess_m03', 'act3autochess_m04', 'act3autochess_m05', 'act3autochess_m06'}
 
 VERSION = 16
+# 규정 m10 / m12 (the 라이타니엔 church tower) looked washed out in the native renderer: their baked light is scaled down
+# [ASSUMED] by eye against the other maps. Bump LM_TAG with any change so cached pages are not reused.
+LIGHT_SCALE = {'act3autochess_m10': 0.72, 'act3autochess_m12': 0.72}
+LM_TAG = 'scene-rgbm-v2'
 VERTEX_BYTES = 36
 
 
@@ -113,7 +117,7 @@ def convert(public, stage, materials, out_rows, rows=None):
     out = public / 'assets/local/map/original'
     out.mkdir(parents=True, exist_ok=True)
     rng = float(doc.get('lightRange') or 3.0)
-    alpha = max(1, min(255, round(255 * rng / 5)))
+    alpha = max(1, min(255, round(255 * rng / 5 * LIGHT_SCALE.get(stage, 1.0))))
     pages = {}
     for i in range(int(doc.get('lightmaps') or 0)):
         src = sdir / f'lm{i}.webp'
@@ -121,7 +125,7 @@ def convert(public, stage, materials, out_rows, rows=None):
             continue
         img = Image.open(src).convert('RGB')
         rgba = Image.merge('RGBA', (*img.split(), Image.new('L', img.size, alpha)))
-        name = f'{stage}-Lightmap-{i}-scene-rgbm-v1'
+        name = f'{stage}-Lightmap-{i}-{LM_TAG}'
         path = out / (name + '.png')
         bio = io.BytesIO(); rgba.save(bio, 'PNG', optimize=True); path.write_bytes(bio.getvalue())
         pages[i] = name
