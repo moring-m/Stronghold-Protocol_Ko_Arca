@@ -3,6 +3,7 @@
 // 문장마다 수치(# — <@..>..</> 강조 포함), 맹약명(@ — 연속된 【】 묶음), 물품명($ — “”)을 토큰으로 바꿔 문형을 찾는다.
 // --site FILE: 위수협의(arknights1234.github.io, js/act3autochess/data.js 를 JSON으로 바꾼 것)의 오퍼레이터 특질 번역을
 //   우선 쓴다. 사이트는 "2(4)"처럼 기본(정예) 값을 함께 적으므로 해당 등급 값을 고르고, 같은 수치의 원문 토큰(강조 태그 포함)으로 바꾼다.
+// 그 밖의 문장: tools/i18n/regulation-extra-ko.json (직접 번역 + 한국판 enemy_handbook_table 대응).
 // Usage: node tools/build-regulation-garrison-ko.mjs [--site act3.json] [--check]
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
@@ -289,6 +290,9 @@ for (const g of G) for (const s of [g.desc, g.descRaw]) {
   const ko = siteTr[s] ?? translate(s);
   if (ko == null || /[一-鿿]/.test(ko.replace(/<@[^>]*>|<\/>/g, ''))) fail.push(s); else add[s] = ko;
 }
+// 직접 번역(배지·지령·맹약 효과·적 능력 등)과 공식 한국판 적 도감에서 맞춘 문장: tools/i18n/regulation-extra-ko.json
+const MANUAL = JSON.parse(readFileSync(resolve(root, 'tools/i18n/regulation-extra-ko.json'), 'utf8'));
+for (const [k, v] of Object.entries(MANUAL)) if (!(k in D) && !(k in add)) add[k] = v;
 const extraFail = [];
 for (const s of EXTRA) {
   if (s in D || s.trim() in D || s in add) continue;
