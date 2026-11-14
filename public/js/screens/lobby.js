@@ -36,6 +36,9 @@ import { loadCustomExtensionPrefs } from '../ui/customExtensionPrefs.js';
 import { lobbyVersion, setLobbyVersion, DEFAULT_VERSION, ladderModes } from '../versions.js';
 
 /** Official mode texts (activity_table act2autochess.modeDataDict), fallback when config.json is absent. */
+/** 이번 페이지 로드에서 규정 베타 안내를 닫았는지 (새로 접속하면 다시 안내). */
+let betaNoticeShown = false;
+
 export const MODE_TEXT = {
   single: {
     FUNNY: { code: 'AC-1', desc: '时长较短的模拟训练', effects: ['可以快速完成作战', '常规奖励'] },
@@ -340,9 +343,10 @@ export function LobbyScreen() {
   // a 규정 season (chosen on the title screen) plays solo and 4-seat co-op rooms only
   const regSeason = season !== DEFAULT_VERSION;
   // 규정 is a beta: say so once per page session when the lobby opens on it
-  const [betaOpen, setBetaOpen] = useState(() => { try { return regSeason && !sessionStorage.getItem('sp.betaNotice'); } catch { return regSeason; } });
-  useEffect(() => { if (regSeason) { try { if (!sessionStorage.getItem('sp.betaNotice')) setBetaOpen(true); } catch { /* private mode */ } } }, [regSeason]);
-  const closeBeta = () => { setBetaOpen(false); try { sessionStorage.setItem('sp.betaNotice', '1'); } catch { /* private mode */ } };
+  // 규정 베타 안내: 접속(페이지 로드)마다 한 번. 로비를 다시 열 때는 다시 띄우지 않는다.
+  const [betaOpen, setBetaOpen] = useState(() => regSeason && !betaNoticeShown);
+  useEffect(() => { if (regSeason && !betaNoticeShown) setBetaOpen(true); }, [regSeason]);
+  const closeBeta = () => { setBetaOpen(false); betaNoticeShown = true; };
   useEffect(() => { if (regSeason && !seasonModes.includes(roomMode)) pickMode('coop'); }, [regSeason, roomMode]);
   // a laddered season picks its difficulty by 규정 등급 only
   const ladder = regSeason && seasonModes.includes(roomMode) ? ladderModes(getConfig(), roomMode) : null;
