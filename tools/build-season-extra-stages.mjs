@@ -1,5 +1,5 @@
 // The 맹약 battlefields as 규정 "전장 추가" options (data/versions/act3autochess-v3_1/stages.json): every active 맹약 map
-// (act1 m01–m04, act2 m01–m04, the fork's 설원), copied from content/production/data/stages.json with
+// (act2 m03–m04: the others are 규정 m01–m06 already), copied from content/production/data/stages.json with
 // customExtension { category: 'stages' }. A copy joins the season's draw only when a room picks it
 // (shared/seasonExtensions.js applySeasonExtensions); the 규정 m01–m06 that are versions of these maps stay as they are.
 // Usage: node tools/build-season-extra-stages.mjs   (idempotent: rewrites the copies only)
@@ -11,8 +11,8 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const target = join(root, 'data/versions/act3autochess-v3_1/stages.json');
 const covenant = JSON.parse(await readFile(join(root, 'content/production/data/stages.json'), 'utf8'));
 const season = JSON.parse(await readFile(target, 'utf8'));
-const IDS = ['act1autochess_m01', 'act1autochess_m02', 'act1autochess_m03', 'act1autochess_m04',
-  'act2autochess_m01', 'act2autochess_m02', 'act2autochess_m03', 'act2autochess_m04'];
+// 규정 m01–m06 are 맹약 act1 m01–m04 / act2 m02 / act2 m01 (m05, a few cells changed): those duplicates are not offered
+const IDS = ['act2autochess_m03', 'act2autochess_m04'];
 for (const id of Object.keys(season)) if (season[id]?.customExtension?.source === 'covenant') delete season[id];
 for (const id of IDS) {
   const s = covenant[id];

@@ -165,7 +165,8 @@ test('전장 추가 in 규정: the 맹약 maps are offered and join every multi-
   const { seasonExtensionCatalog, seasonExtensionSelection, applySeasonExtensions } = await import('../shared/seasonExtensions.js');
   const d = getVersionData('act3autochess@V3_1');
   const ids = seasonExtensionCatalog(d).stages.map((s) => s.id);
-  for (const id of ['act1autochess_m01', 'act2autochess_m03']) assert.ok(ids.includes(id), id);
+  for (const id of ['act2autochess_m03', 'act2autochess_m04']) assert.ok(ids.includes(id), id);
+  for (const id of ['act1autochess_m01', 'act1autochess_m04', 'act2autochess_m01', 'act2autochess_m02']) assert.ok(!ids.includes(id), `${id} duplicates a 규정 map`);
   assert.ok(!ids.includes('custom_snowfield'), '설원 is not shown');
   const plain = applySeasonExtensions(d, seasonExtensionSelection({}, d));
   assert.ok(!plain.config.modes.mode_multi_normal.stages.includes('act2autochess_m03'), 'not drawn unless picked');
