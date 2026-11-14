@@ -77,6 +77,8 @@ import { toast } from '../ui/toasts.js';
 
 export { openLoadout, closeLoadout };
 
+/** The page shows the 규정 season (content.js markSeason on <html data-season>). */
+const regulationSeason = () => globalThis.document?.documentElement?.dataset?.season === 'regulation';
 const cx = (...p) => p.flat().filter(Boolean).join(' ');
 const ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI'];
 
@@ -500,6 +502,11 @@ function LoadoutScreen({ st }) {
       .sort((a, b) => (b.isCore ? 1 : 0) - (a.isCore ? 1 : 0) || (a.bondOrder ?? 0) - (b.bondOrder ?? 0) || String(a.name).localeCompare(String(b.name), 'zh'));
   }, [ready, roster]);
   const [tab, setTab] = useState('standard');
+  // 규정: 선발 설정 is the season's own 自选编队 (backups.json diy slots, picked again at 선택자편 — screens/diyCheck.js), not
+  // the 맹약 선발 candidates (chess optionalRecruit), which that season's data does not have
+  const diyLegal = ready && regulationSeason() ? sanitizeDiyPicks(st.diy, diyData(), st.diyKitted || []) : {};
+  const setDiySlot = (slotId, pick) => setDiyPicks(setPick(loadoutStore.get().diy, slotId, pick));
+  const diyLost = ready && regulationSeason() ? missingGameData('diy') : [];
   const [recruitPicker,setRecruitPicker]=useState(null);
   const [recruitQuery,setRecruitQuery]=useState('');
   const [listView,setListView]=useState(()=>loadPref('loadout.listView',false)===true);
@@ -641,7 +648,9 @@ function LoadoutScreen({ st }) {
       </div>
     </header>
     <p class=${cx('lo-note', locked && 'is-locked')}><${Icon} name="info" />${locked ? '本局的调配已锁定（确认本局信息后无法修改），修改将在下一局生效' : fromText}</p>
-    ${!ready ? html`<div class="lo-loading"><${Spinner} size="sm" />正在载入干员数据（打开页面后仅载入一次）…</div>` : html`<main class=${cx('lo-body', listView&&'lo-body--list',narrowDetail && 'is-detail')}>
+    ${!ready ? html`<div class="lo-loading"><${Spinner} size="sm" />正在载入干员数据（打开页面后仅载入一次）…</div>` : tab === 'recruits' && regulationSeason() ? html`<main class="lo-body lo-body--diy" id="lo-roster-panel" role="tabpanel" aria-labelledby="lo-tab-recruits">
+      ${diyLost.length ? html`<${DataMissing} files=${diyLost} />` : html`<${DiyPanel} m=${m} picks=${st.diy || {}} legal=${diyLegal} kitted=${st.diyKitted} onSet=${setDiySlot} ops=${st.ops} onOps=${(id,patch)=>setOpsMap(setOps(loadoutStore.get().ops,id,patch))} />`}
+    </main>` : html`<main class=${cx('lo-body', listView&&'lo-body--list',narrowDetail && 'is-detail')}>
       <section class="lo-roster" style=${`--lo-name-length:${nameLength}`} id="lo-roster-panel" role="tabpanel" aria-labelledby=${`lo-tab-${tab}`}>
         ${html`<${Filters} m=${m} filters=${st.filters} bonds=${bonds} presetAction=${tab==='recruits'?null:html`<${FavoritesButton} view="editor"/>`} listView=${listView} onView=${()=>{savePref("loadout.listView",!listView);setListView(!listView);setNarrowDetail(false);}} onFilters=${(filters) => loadoutStore.set({ filters })} />`}${tab === 'recruits' ? html`<div class="lo-recruit-note">
           <div class="lo-recruit-selected">${[5,6].map(t=>{const list=candidates.filter(c=>selectedAt(c,t)).map(c=>getChess(c.chessId.replace(/_[56]_a$/,`_${t}_a`))).filter(Boolean);return html`<section class=${`lo-recruit-selected__tier lo-recruit-selected__tier--${t}`} aria-label=${t+'단계 선발 후보'}><h2>${t + '단계 후보'} <b class="num">${list.length}/${RECRUIT_CANDIDATES}</b></h2><div class="lo-rchips">${list.map(c=>html`<${RosterRow} key=${c.chessId} m=${m} chess=${c} golden=${c.goldenId?getChess(c.goldenId):null} entries=${st.entries} selected=${c.chessId===selId} onPick=${pick} tier=${t} locked=${locked} getBond=${getBond} recruitControl=${html`<button class="lo-recruit-remove" type="button" disabled=${locked} title="후보 해제" aria-label=${c.name+' '+t+'단계 후보 해제'} onClick=${()=>recruit(c,t)}><${Icon} name="close"/></button>`} onChange=${patch=>setEntries(setRecruitChoice(loadoutStore.get().entries,c,patch,getChess))}/>`)}${list.length<RECRUIT_CANDIDATES?html`<button type="button" class="lo-rchip lo-rchip--add" disabled=${locked} aria-label=${t+'단계 후보 추가'} onClick=${()=>{setRecruitQuery('');setRecruitPicker(t);}}><${Icon} name="plus"/><span>추가</span></button>`:null}</div></section>`;})}</div><p>${`각 단계에 최대 ${RECRUIT_CANDIDATES}명까지 선발 후보로 지정합니다. 전략 선택 후 선발 선택 단계에서 후보 중 단계별 최대 ${RECRUIT_PICKS}명을 고르며, 고른 오퍼레이터만 본인의 모집·보상에 등장합니다. 특질은 없습니다. 원형 오퍼레이터는 각 단계에 한 번씩 지정할 수 있습니다.`}</p></div>` : null}
