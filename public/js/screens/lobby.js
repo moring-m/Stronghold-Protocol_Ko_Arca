@@ -343,8 +343,9 @@ export function LobbyScreen() {
   const regSeason = season !== DEFAULT_VERSION;
   // 규정 is a beta: say so once per page session when the lobby opens on it
   // 규정 베타 안내: 닉네임 입력 화면에서 접속한 직후의 로비에서만 (ui/betaNotice.js)
-  const [betaOpen, setBetaOpen] = useState(() => regSeason && betaNoticePending());
-  useEffect(() => { if (regSeason && betaNoticePending()) setBetaOpen(true); }, [regSeason]);
+  // 플래그는 규정 로비가 처음 열릴 때 바로 소진한다: 시뮬레이션 뒤 대기실로 돌아오는 로비는 다시 띄우지 않는다.
+  const [betaOpen, setBetaOpen] = useState(() => { const on = regSeason && betaNoticePending(); if (on) clearBetaNotice(); return on; });
+  useEffect(() => { if (regSeason && betaNoticePending()) { clearBetaNotice(); setBetaOpen(true); } }, [regSeason]);
   const closeBeta = () => { setBetaOpen(false); clearBetaNotice(); };
   useEffect(() => { if (regSeason && !seasonModes.includes(roomMode)) pickMode('coop'); }, [regSeason, roomMode]);
   // a laddered season picks its difficulty by 규정 등급 only
