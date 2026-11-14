@@ -543,7 +543,9 @@ export function tube(g, a, b, rad, seg = 8, col = [1, 1, 1]) {
 
 // ---- devices ----------------------------------------------------------------------------------------------------
 
-const DEVICE_KINDS = new Set(['crate', 'platform', 'mound', 'blower', 'turret', 'waterPlatform', 'bush', 'sealedFloor']);
+const DEVICE_KINDS = new Set(['crate', 'platform', 'mound', 'blower', 'turret', 'waterPlatform', 'bush', 'sealedFloor', 'cannon']);
+// devices the season data gives no role: their kind by key (규정 m10's 盐坨子炮 — drawn with its official map model)
+const KEY_KINDS = Object.freeze({ trap_196_cnnon: 'cannon' });
 
 /**
  * Active stage devices standing on drawn tiles: `{ kind, r, c, dir, z0, key, alias, rangeTiles }`. Every visible
@@ -558,13 +560,15 @@ export function stageDevices(stage, grid) {
   const out = [];
   for (const d of list) {
     if (!d || !Array.isArray(d.pos) || !Number.isInteger(d.pos[0]) || !Number.isInteger(d.pos[1])) continue;
-    if (!DEVICE_KINDS.has(d.role)) continue;
+    const kind = d.role || KEY_KINDS[d.key] || null;
+    if (!DEVICE_KINDS.has(kind)) continue;
     const active = typeof d.active === 'boolean' ? d.active : !d.hidden;
     if (!active) continue;
     const [r, c] = d.pos;
     const t = grid?.[r]?.[c];
-    if (!t || !t.drawn) continue;
-    out.push({ kind: d.role, r, c, dir: ['UP', 'DOWN', 'LEFT', 'RIGHT'].includes(d.dir) ? d.dir : 'UP', z0: t.h, key: d.key || null, alias: d.alias || null, rangeTiles: Array.isArray(d.rangeTiles) ? d.rangeTiles : null });
+    // the 盐坨子炮 stands on the separator wall (rows 6 / 13), a cell the board does not draw: ground height there
+    if (!t || (!t.drawn && kind !== 'cannon')) continue;
+    out.push({ kind, r, c, dir: ['UP', 'DOWN', 'LEFT', 'RIGHT'].includes(d.dir) ? d.dir : 'UP', z0: t.drawn ? t.h : 0, key: d.key || null, alias: d.alias || null, rangeTiles: Array.isArray(d.rangeTiles) ? d.rangeTiles : null });
   }
   return out;
 }

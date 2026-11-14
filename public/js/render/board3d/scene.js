@@ -600,11 +600,11 @@ export class BoardScene {
     if(!current())return;
     for(const {stage,area} of entries){
       await idle();if(!current())return;
-      if(this.mapQuality!=='low' && this.pack?.original?.loadStage && !this.pack.original.scenes[stage.originalStageId || stage.id]){
-        await this.pack.original.loadStage(stage.originalStageId || stage.id);if(!current())return;
+      if(this.mapQuality!=='low' && this.pack?.original?.loadStage && !this.pack.original.scenes[nativeStageId(stage)]){
+        await this.pack.original.loadStage(nativeStageId(stage));if(!current())return;
       }
       const stageKey=`${stage.id || ''}|${(stage.rows || []).join('/')}|${JSON.stringify((stage.devices || []).map(d=>[d.key,d.pos,d.active,d.dir]))}|${stage.previewLayout ? stage.previewLayout.worldOffset || 0 : 'native'}`;
-      const layoutKey=`${stageKey}|${areaKey(area)}|${this.mapQuality}|${!!this.pack?.original?.scenes?.[stage.originalStageId || stage.id]}`;
+      const layoutKey=`${stageKey}|${areaKey(area)}|${this.mapQuality}|${!!this.pack?.original?.scenes?.[nativeStageId(stage)]}`;
       if(layoutKey===this.activeLayoutKey || this.layoutCache.has(layoutKey))continue;
       const scratch=Object.assign(Object.create(Object.getPrototypeOf(this)),this,{
         root:new this.THREE.Group(),key:this.key.clone(),hemi:this.hemi.clone(),
@@ -902,7 +902,7 @@ export class BoardScene {
     if (area) this.setArea(area, { rebuild: false });
     // The custom native stage owns its terrain/material treatment. A late static
     // scene pack must not replace it with the upstream shader path.
-    const native = this.mapQuality !== 'low' && stage ? this.pack?.original?.scenes?.[stage.originalStageId || stage.id] : null;
+    const native = this.mapQuality !== 'low' && stage ? this.pack?.original?.scenes?.[nativeStageId(stage)] : null;
     const nativeReady = native && Object.keys(native.buckets).length > 0
       && Object.entries(native.buckets).every(([k,g]) => this.originalMaterials[g.material || k]);
     // 'low' (단순 3D) never draws the official scene pack (the original map's mesh): the procedural board stands alone
@@ -910,7 +910,7 @@ export class BoardScene {
     const themed = stage ? this._themeMaterial(stage) : null;
     const key = stage ? `${stage.id || ''}|${official ? official.key : ''}|${themed ? stage.boardTheme + (this._themeScenery(stage) ? '+scenery' : '') : ''}|${stage.previewLayout ? stage.previewLayout.worldOffset || 0 : 'native'}|${(stage.rows || []).join('/')}|${JSON.stringify((stage.devices || []).map((d) => [d.key, d.pos, d.active, d.dir]))}` : '';
     if (key === this.stageKey) return;
-    const layoutKey=stage ? `${key}|${this.areaKey}|${this.mapQuality}|${!!this.pack?.original?.scenes?.[stage.originalStageId || stage.id]}` : null;
+    const layoutKey=stage ? `${key}|${this.areaKey}|${this.mapQuality}|${!!this.pack?.original?.scenes?.[nativeStageId(stage)]}` : null;
     const cached=this.layoutCache.get(layoutKey);
     if(cached)this.layoutCache.delete(layoutKey);
     this._stashLayout();
@@ -930,8 +930,8 @@ export class BoardScene {
       this.renderer.shadowMap.needsUpdate=true;this.layoutCacheHits++;
       return;
     }
-    if (this.mapQuality !== 'low' && this.pack?.original?.loadStage && !this.pack.original.scenes[stage.originalStageId || stage.id]) {
-      this.pack.original.loadStage(stage.originalStageId || stage.id).then((scene) => {
+    if (this.mapQuality !== 'low' && this.pack?.original?.loadStage && !this.pack.original.scenes[nativeStageId(stage)]) {
+      this.pack.original.loadStage(nativeStageId(stage)).then((scene) => {
         if (scene && !this.destroyed && this.stage?.id === stage.id) {
           this.stageKey = null;
           this.setStage(this.stage);
@@ -948,7 +948,7 @@ export class BoardScene {
     this._applyActiveWater();
     if(this.official){if(board.buckets.raised?.vertexCount)M.raised=this._mesh(board.buckets.raised,this.mat.board);if(board.buckets.raisedDecal?.vertexCount)M.raisedDecal=this._mesh(board.buckets.raisedDecal,this.mat.decal,{cast:false});}
     const borderSurfaces=[], borderSources=[], nativeParts=[];
-    const candidate = this.official || this.mapQuality === 'low' ? null : this.pack?.original?.scenes?.[stage.originalStageId || stage.id];
+    const candidate = this.official || this.mapQuality === 'low' ? null : this.pack?.original?.scenes?.[nativeStageId(stage)];
     // Missing/invalid material metadata must retain the working reconstructed board.
     const original = candidate && Object.entries(candidate.buckets).every(([k,g]) => this.originalMaterials[g.material || k]) ? candidate : null;
     this.originalStage = original?.stageId || null;
@@ -956,7 +956,7 @@ export class BoardScene {
     // runtime screenshot has short wall shadows and illuminated floor faces.
     // Preserve the azimuth, but match that elevation only for the city theme.
     this.stageLightDir = original?.lighting?.dir || null;
-    if (original && (stage.originalStageId||stage.id) === 'act2autochess_m01' && this.stageLightDir) {
+    if (original && nativeStageId(stage) === 'act2autochess_m01' && this.stageLightDir) {
       this.stageLightDir = [this.stageLightDir[0], this.stageLightDir[1], 1.05];
     }
     // Retain a restrained sky contribution for the native reflection/probe
@@ -1023,7 +1023,7 @@ export class BoardScene {
         const waterSurface = /Dosshore_UI/i.test(sourceName) || !!runtimeMaterial.uniforms?.uDeep;
         // City scenery beside the preview pen is environment, not a second field.
         // Retain it only for normal/cooperative framing; never add platform tiles.
-        const scenicArea = stage.id === 'act2autochess_m01' && this.area.some(a=>a.r1 >= 13)
+        const scenicArea = nativeStageId(stage) === 'act2autochess_m01' && this.area.some(a=>a.r1 >= 13)
           ? [...this.area, {r0:14,r1:18,c0:0,c1:5}] : this.area;
         const nativeArea = stage.previewLayout ? AREAS.boss : this.area;
         let visibleGeometry;
@@ -1034,7 +1034,7 @@ export class BoardScene {
         } else if (structuralStage.previewLayout && !geometry.platform) {
           // Reuse the cooperative environment as one layout, translated into
           // boss world space. Combat tiles and simulation coordinates stay put.
-          const environmentArea=stage.id==='act2autochess_m01'
+          const environmentArea=nativeStageId(stage)==='act2autochess_m01'
             ? [...AREAS.unite,{r0:14,r1:18,c0:0,c1:5}] : AREAS.unite;
           const environment=waterSurface ? surfaceForArea(geometry,environmentArea) : sceneryForArea(geometry,environmentArea,{surroundOnly:true});
           // Native boss geometry owns the boundary through row 6.5.
@@ -1088,7 +1088,7 @@ export class BoardScene {
       for(const[key,list]of Object.entries(buckets))if(list.length)M[key]=this._mesh(mergeInto(list),key==='board'&&themed||this.mat[key],{cast:key!=='decal'});
     }
     if (themed && !original) this._buildThemeScenery(stage, board);
-    if (original && !stage.coopEightStage && !['act2autochess_m01','act2autochess_m03'].includes(stage.id) && this.area.some(a=>a.c1>=20)) {
+    if (original && !stage.coopEightStage && !['act2autochess_m01','act2autochess_m03'].includes(nativeStageId(stage)) && this.area.some(a=>a.c1>=20)) {
       // The sand island has a water notch outside its right rim. Extend the
       // opposite authored hill strip only into uncovered cells; keep the sea
       // beyond the rim and the existing stairs/props intact in both modes.
@@ -1333,7 +1333,7 @@ export class BoardScene {
     const crates = [], blowers = [], platforms = [];
     this.staticCrates = [];
     const wind = this.pack?.meshes?.blower ? objToBoard(this.pack.meshes.blower, 1) : null;
-    const nativePlatforms=[];
+    const nativePlatforms=[], cannons=[];
     const plat = this.platformGeometry();
     for (const mat of [this.mat.platform, this.mat.crate]) if (mat) {
       // lit by the official scene's own key light when one is drawn, else by the procedural board's
@@ -1347,6 +1347,12 @@ export class BoardScene {
         nativePlatforms.push(placeMesh(native.geometry,{x:d.c,y:d.r,z:d.z0,sz:DEVICE_H.platform/height,rot:DIR_TURNS[d.dir]??0}));
         continue;
       }
+      // 규정 m10's 盐坨子炮: its official model (map/original cannon), turned to face its firing direction
+      if (d.kind === 'cannon') {
+        if (this.pack?.original?.cannon && this.originalMaterials.MT_trap_196_cnnon) cannons.push(placeMesh(this.pack.original.cannon, { x: d.c, y: d.r, z: d.z0, rot: DIR_TURNS[d.dir] ?? 0 }));
+        else crates.push(placeMesh(boxWithTop(this.pack?.uv, 'turret'), { x: d.c, y: d.r, z: d.z0 }));
+        continue;
+      }
       if (d.kind === 'crate') this.staticCrates.push(d);
       else if (d.kind === 'platform' && plat) platforms.push(placeMesh(plat, { x: d.c, y: d.r, z: d.z0 }));
       else if (d.kind === 'blower' && wind && this.mat.wind) blowers.push(placeMesh(wind, { x: d.c, y: d.r, z: d.z0 + 0.078, rot: DIR_TURNS[d.dir] ?? 0 }));
@@ -1354,6 +1360,7 @@ export class BoardScene {
       else if (d.kind === 'mound') crates.push(placeMesh(this.boxGeometry(), { x: d.c, y: d.r, z: d.z0, s: 0.95, sz: 0.55 }));
       else if (d.kind === 'bush') crates.push(placeMesh(bushData(), { x: d.c, y: d.r, z: d.z0 }));
     }
+    if(cannons.length)this.meshes.cannons=this._mesh(mergeInto(cannons),this.originalMaterials.MT_trap_196_cnnon);
     if(nativePlatforms.length)this.meshes.platforms=this._mesh(mergeInto(nativePlatforms),this.originalMaterials.MT_trap_1106_achplat);
     if (blowers.length) this.meshes.blowers = this._mesh(mergeInto(blowers), this.mat.wind, { receive: false });
     if (crates.length) this.meshes.props = this._mesh(mergeInto(crates), this.mat.board);
@@ -1797,6 +1804,17 @@ export class BoardScene {
 // ---- small procedural meshes (fallbacks / rare devices) ------------------------------------------------------------
 
 /** Axis-aligned box on the ground, centred on the origin: size × size × height. */
+/**
+ * 규정 battlefields that are the 맹약 maps with a rearranged board (same pieces, ~95% of the rows): drawn with the fork's
+ * existing native map of that stage (its full scenery, devices and tuning), not a converted copy. The new maps
+ * (m09–m12) keep their own native conversion.
+ */
+export const REGULATION_NATIVE_ALIAS = Object.freeze({
+  act3autochess_m01: 'act1autochess_m01', act3autochess_m02: 'act1autochess_m02', act3autochess_m03: 'act1autochess_m03',
+  act3autochess_m04: 'act1autochess_m04', act3autochess_m05: 'act2autochess_m01', act3autochess_m06: 'act2autochess_m02',
+});
+export const nativeStageId = (stage) => stage?.originalStageId || REGULATION_NATIVE_ALIAS[stage?.id] || stage?.id;
+
 export function boxData(size, height) {
   const a = size / 2, pos = [], nrm = [], uv = [], idx = [];
   const faces = [

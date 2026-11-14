@@ -33,6 +33,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from pack_native_maps import pack  # noqa: E402
 from regulation_scenes import REGULATION_IDS  # noqa: E402
 
+# m01–m06 are the 맹약 maps (board3d/scene.js REGULATION_NATIVE_ALIAS draws their existing native map): not converted
+SKIP = {'act3autochess_m01', 'act3autochess_m02', 'act3autochess_m03', 'act3autochess_m04', 'act3autochess_m05', 'act3autochess_m06'}
+
 VERSION = 16
 VERTEX_BYTES = 36
 
@@ -160,7 +163,7 @@ def main():
         rows['materials'] = {'path': '/' + str(target.relative_to(public)).replace('\\', '/'), 'kind': 'original-unity-materials'}
         print('materials added:', added, flush=True)
     for stage in REGULATION_IDS:
-        if (public / 'assets/local/scene' / stage / 'scene.json').exists():
+        if stage not in SKIP and (public / 'assets/local/scene' / stage / 'scene.json').exists():
             r = convert(public, stage, materials, rows)
             report.append(r); print(json.dumps(r, ensure_ascii=False), flush=True)
     out_manifest.write_text(json.dumps({'map/original': rows, 'report': report}, ensure_ascii=False, indent=2), encoding='utf-8')
