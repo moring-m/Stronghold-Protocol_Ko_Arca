@@ -526,7 +526,9 @@ export function skillTags(rec) {
 }
 
 /** Display shared multi-effect trait descriptions once without touching their gameplay effects. */
-export function garrisonTexts(chess,getGarrison,translate=tr) {
+/** The page shows the 규정 season (content.js markSeason). */
+const isRegulationPage=()=>globalThis.document?.documentElement?.dataset?.season==='regulation';
+export function garrisonTexts(chess,getGarrison,translate=tr,{covered=isRegulationPage()}={}) {
   const seen=new Set(),groups=new Map();
   const key=text=>text.replace(/<@[^>]+>|<\/>/g,'').replace(/[【】]/g,c=>c==='【'?'[':']')
     .replace(/맹약의\s*중첩/g,'맹약 중첩').replace(/\s+/g,'');
@@ -539,6 +541,14 @@ export function garrisonTexts(chess,getGarrison,translate=tr) {
     const grantOwner=ids.map(getGarrison).find(r=>r?.bbStr?.give_garrison_id===id &&
       key(translate(r.descRaw||r.desc||'')).includes(key(translate(rec?.descRaw||rec?.desc||''))));
     if(grantOwner) return [];
+    // 규정 data lists an operator's implementation records after its full description (圣聆初雪: 「…陷入冻结自身回复1点技力，
+    // 并使…【谢拉格】层数+1（…24层）」, then 「自身获得1点sp」 and 「…进入冻结使…【谢拉格】层数+1（…24层）」): a later record
+    // whose every bond name and number is already in the first one repeats it (in another wording) and is not shown.
+    // In the 규정 season (`covered`, the page's <html data-season>) and behind a description record (bbStr.garrison_type
+    // garrison_trigger_buff); the 맹약 records keep the clause rules below.
+    const tokens=r=>(String(r?.desc||r?.descRaw||'').replace(/<@[^>]+>|<\/>/g,'').match(/【[^】]+】|\[[^\]]+\]|\d+(?:\.\d+)?%?/g)||[]).map(t=>t.replace(/^\[|^【|\]$|】$/g,''));
+    const head=getGarrison(ids[0]),first=ids[0]===id||!(covered||head?.bbStr?.garrison_type==='garrison_trigger_buff')?null:head;
+    if(first){const own=tokens(rec),all=new Set(tokens(first));if(own.length&&own.every(t=>all.has(t)))return [];}
     const ref=(rec?.descRaw||rec?.desc||'').match(/^【(\d+)】/);
     const owner=ref&&ids.map(getGarrison).find(r=>r?.garrisonId?.match(/^garrison_(\d+)_/)?.[1]===ref[1]);
     if(owner&&(owner.battleRuneKey==='give_garrison_to_front'||owner.effectKey===rec.effectKey)) return [];

@@ -248,7 +248,10 @@ if (si > 0) {
     if (!o?.traitDescription) continue;
     const text = o.traitDescription.replace(/<br\s*\/?>/g, '\n').replace(/<\/?span[^>]*>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
     for (const [lvl, cc] of [[0, c], [1, byId.get(c.goldenId)]]) {
-      for (const gid of cc?.garrisonIds || []) {
+      // the site writes a changed elite effect as a second line 「[정예] …」 (메커니스트): each level keeps its own line
+      const lines = text.split('\n'), elite = lines.filter((l) => /^\[정예\]\s*/.test(l)).map((l) => l.replace(/^\[정예\]\s*/, ''));
+      const text0 = elite.length ? (lvl ? elite : lines.filter((l) => !/^\[정예\]/.test(l))).join('\n') : text;
+      for (const gid of (cc?.garrisonIds || []).slice(0, 1)) {   // the site text is the operator's whole trait: its first (description) record only
         const g = gmap[gid];
         if (!g) continue;
         for (const src of [g.desc, g.descRaw]) {
@@ -256,7 +259,7 @@ if (si > 0) {
           const toks = (src.match(/<@[^>]*>[^<]*?<\/>|[+\-]?\d+(?:\.\d+)?%?/g) || []).slice();
           // 사이트 수치: "a(b)" 쌍을 먼저, 남은 원문 토큰은 단독 숫자 중 오른쪽 것부터 대응시킨다("1명당"의 1 같은 고정 수 보호).
           const RE = /([+\-]?)(\d+(?:\.\d+)?)(%?)(?:\(([+\-]?)(\d+(?:\.\d+)?)(%?)\))?/g;
-          const ms = [...text.matchAll(RE)].map((m) => {
+          const ms = [...text0.matchAll(RE)].map((m) => {
             const pair = m[5] != null;
             const v = lvl && pair ? m[5] : m[2];
             return { m, pair, v, sign: (lvl && pair ? m[4] || m[1] : m[1]), pct: (lvl && pair ? m[6] || m[3] : m[3]), tok: null };
@@ -270,12 +273,12 @@ if (si > 0) {
           for (const x of [...ms].reverse()) if (!x.pair && toks.some((t, k) => !used.has(k) && t.startsWith('<@'))) take(x, fwd.filter((k) => toks[k].startsWith('<@')).reverse());
           let ko = '', last = 0;
           for (const x of ms) {
-            ko += text.slice(last, x.m.index);
+            ko += text0.slice(last, x.m.index);
             const t = x.tok;
             ko += t == null ? x.sign + x.v + x.pct : (/^[+\-]/.test(t.replace(/<[^>]*>/g, '')) || !x.sign ? t : x.sign + t);
             last = x.m.index + x.m[0].length;
           }
-          ko += text.slice(last);
+          ko += text0.slice(last);
           if (!/[\u4e00-\u9fff]/.test(ko)) siteTr[src] = ko.trim();
         }
       }
