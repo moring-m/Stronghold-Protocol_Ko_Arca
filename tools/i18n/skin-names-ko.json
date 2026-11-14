@@ -1,0 +1,18 @@
+{
+ "_comment": "Korean names for CN costumes the Korean client does not have yet (tools/import-skin-batch.mjs). Replace with the official name once released.",
+ "char_1045_svash2@sale#20": "눈 덮인 런디니움",
+ "char_4177_brigid@epoque#53": "꿈결의 속삭임",
+ "char_4198_christ@epoque#56": "솜털 무도회",
+ "char_4098_vvana@epoque#59": "서원의 예식",
+ "char_4039_horn@epoque#59": "첫 칼날의 빛",
+ "char_219_meteo@summer#22": "서머 그라스 FA240",
+ "char_328_cammou@summer#22": "한가로운 휴일 HD59",
+ "char_185_frncat@marthe#12": "수분 보충 시간",
+ "char_1036_fang2@snow#8": "순수한 악절",
+ "char_1027_greyy2@wild#12": "천 길 아래를 굽어보며",
+ "char_4162_cathy@kitchen#5": "따뜻한 겨울 교실",
+ "char_325_bison@yun#7": "구름을 넘는 뜻",
+ "char_4165_ctrail@yun#11": "맑은 하늘을 건너",
+ "char_4147_mitm@breaker#1": "무영등 아래",
+ "char_1027_greyy2@breaker#1": "생화학 침잠"
+}
