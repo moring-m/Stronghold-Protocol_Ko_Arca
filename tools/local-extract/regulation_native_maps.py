@@ -109,10 +109,56 @@ def convert(public, stage, materials, out_rows):
     return {'stage': stage, 'buckets': len(buckets), 'triangles': tris, 'lightmaps': len(pages)}
 
 
+def add_materials(public, materials, rows):
+    """Materials a 규정 scene uses that the native table lacks (MT_Syracuse_metro_BG, the MT_church_tower family):
+    their record in the native form (textures by image name, gammaLighting) and the images they name — base colour /
+    emission as PNG, the normal map as is (both stores keep an RGB normal), Unity metallic-gloss → three.js
+    metal-roughness (extract.derive_rough_from_gloss: G = 1 − smoothness)."""
+    out = public / 'assets/local/map/original'
+    tex = public / 'assets/local/scene/tex'
+    added = []
+    for stage in REGULATION_IDS:
+        sj = public / 'assets/local/scene' / stage / 'scene.json'
+        if not sj.exists():
+            continue
+        for name, rec in json.loads(sj.read_text(encoding='utf-8'))['materials'].items():
+            if name in materials:
+                continue
+            textures = {}
+            for slot, ref in (rec.get('textures') or {}).items():
+                src = ref.get('texture')
+                if not src or not (tex / (src + '.webp')).exists():
+                    continue
+                img = Image.open(tex / (src + '.webp'))
+                if slot == '_MetallicGlossMap':
+                    a = img.convert('RGBA').getchannel('A').point(lambda v: 255 - v)
+                    img, image = Image.merge('RGB', (Image.new('L', img.size, 255), a, Image.new('L', img.size, 0))), src + '_metalrough-v2'
+                elif slot == '_BumpMap':
+                    img, image = img.convert('RGB'), src + '_normal-rgb-v2'
+                else:
+                    image = src
+                path = out / (image + '.png')
+                if not path.exists():
+                    img.save(path, 'PNG', optimize=True)
+                rows[image] = {'path': '/assets/local/map/original/' + path.name, 'kind': 'Texture2D'}
+                textures[slot] = {'name': image, 'scale': ref.get('scale', [1, 1]), 'offset': ref.get('offset', [0, 0])}
+            materials[name] = {'shader': rec.get('shader') or 'Torappu/Scene/Unlit Texture', 'keywords': rec.get('keywords') or [],
+                               'textures': textures, 'colors': rec.get('colors') or {}, 'floats': rec.get('floats') or {},
+                               'gammaLighting': True}
+            added.append(name)
+    return added
+
+
 def main():
     public, materials_path, out_manifest = Path(sys.argv[1]), Path(sys.argv[2]), Path(sys.argv[3])
     materials = json.loads(materials_path.read_text(encoding='utf-8'))
     rows, report = {}, []
+    # optional 4th argument: write the native table extended with the 규정 materials there
+    if len(sys.argv) > 4:
+        added = add_materials(public, materials, rows)
+        target = Path(sys.argv[4]); target.write_text(json.dumps(materials, ensure_ascii=False), encoding='utf-8')
+        rows['materials'] = {'path': '/' + str(target.relative_to(public)).replace('\\', '/'), 'kind': 'original-unity-materials'}
+        print('materials added:', added, flush=True)
     for stage in REGULATION_IDS:
         if (public / 'assets/local/scene' / stage / 'scene.json').exists():
             r = convert(public, stage, materials, rows)
