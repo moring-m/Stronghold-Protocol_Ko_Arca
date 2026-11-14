@@ -16,7 +16,9 @@ ROOT = Path(__file__).resolve().parents[1]
 LX = ROOT / 'tools/local-extract'
 SEASONS = {'covenant': 'content/production/data', 'regulation': 'data/versions/act3autochess-v3_1'}
 MODULES = ['skin_recovery.py', 'recovery_models.py', 'skin_fx.py', 'complete_skin_fx.py', 'cn_skins.py', 'skin_audio.py',
-           'fx.py', 'aklz4.py', 'extract.py', 'operators.py', 'scenes.py', 'requirements.txt', 'LICENSE-Ark-Unpacker.txt']
+           'fx.py', 'aklz4.py', 'extract.py', 'operators.py', 'scenes.py', 'regulation_scenes.py', 'autochess_themes.py',
+           'bundles.py', 'ui_components.py', 'versions.py', 'client-candidates.json', 'requirements.txt', 'LICENSE-Ark-Unpacker.txt']
+LOCAL = None   # filled in build(): every kit module that another kit module imports must be in the kit
 TABLES = ('audio_data', 'range_table', 'battle_equip_table', 'uniequip_table')
 
 
@@ -109,6 +111,9 @@ def build(output, tables):
     p, table = plan(tables)
     start = (LX / 'targeted-START.ps1').read_text(encoding='utf-8-sig')
     start = start.replace("'tools/local-extract/targeted_recovery.py')", "'tools/local-extract/skin_recovery.py')")
+    start = start.replace('param([string]$ClientView,[string]$ClientPath)', 'param([string]$ClientView,[string]$ClientPath,[switch]$ModelsOnly)')
+    start = start.replace("$argsForPython = @('-X','utf8','-u','tools/local-extract/skin_recovery.py')", "$argsForPython = @('-X','utf8','-u','tools/local-extract/skin_recovery.py')\n    if ($ModelsOnly) { $argsForPython += '--models-only' }")
+    assert '--models-only' in start, 'START script template changed'
     start = start.replace("'targeted-'", "'skins-'").replace('targeted-report.json', 'recovery-report.json')
     assert 'skin_recovery.py' in start and 'targeted' not in start.replace('targeted_recovery', ''), 'START script template changed'
     character = read(tables / 'character_table.json')
@@ -139,6 +144,14 @@ def build(output, tables):
                 src = ROOT / folder / f'{name}.json'
                 if src.exists():
                     z.write(src, f'{target}/{name}.json')
+    # a kit module importing another local module that the kit lacks fails only on the client (regulation_scenes, 2026-11-15)
+    local = {p.stem for p in LX.glob('*.py')}
+    shipped = {Path(n).stem for n in MODULES if n.endswith('.py')} | {'prepare_client'}
+    for name in MODULES:
+        if name.endswith('.py'):
+            imports = set(re.findall(r'^\s*(?:from|import) ([a-z_0-9]+)', (LX / name).read_text(encoding='utf-8'), re.M))
+            lacking = (imports & local) - shipped
+            assert not lacking, f'{name} imports {sorted(lacking)}, not in the kit'
     with zipfile.ZipFile(output) as z:
         assert z.testzip() is None
         for name in MODULES:
