@@ -109,8 +109,8 @@ export async function buildUrsus(){
 
  const bandId='band_custom_ursus_kaschey';
  const bandDesc='[영광과 번영]<우르수스> 오퍼레이터를 승급할 때마다 레벨업 비용 -4 (라운드당 최대 1회)';
- bands[bandId]={...structuredClone(bands.band_bldsk),bandId,sortId:90,name:'카셰이',iconId:'icon_custom_ursus_kaschey',totalHp:22,effectId:'effect_custom_ursus_kaschey',effectName:'영광과 번영',desc:bandDesc,descRaw:bandDesc,bondIds:['ursusShip'],buffs:[{key:'custom_ursus_merge_level_discount',bb:{count:4,max_count:1},bbStr:{}}],params:{count:4,max_count:1}};
- assets.bands[bandId]='/assets/custom/ursus/band/kaschey-portrait-v3.png';
+ bands[bandId]={...structuredClone(bands.band_bldsk),bandId,sortId:90,name:'지마 더 레이징 타이드',iconId:'icon_custom_ursus_kaschey',totalHp:22,effectId:'effect_custom_ursus_kaschey',effectName:'영광과 번영',desc:bandDesc,descRaw:bandDesc,bondIds:['ursusShip'],buffs:[{key:'custom_ursus_merge_level_discount',bb:{count:4,max_count:1},bbStr:{}}],params:{count:4,max_count:1}};
+ assets.bands[bandId]='/assets/band/band_ursus.png';
  await writeFile(join(ROOT,'.cache/ursus-band-resources.json'),JSON.stringify({files:[{path:assets.bands[bandId],local:true,sources:[]}]}));
  for(const [id,rec]of Object.entries(chess)){const old=previousChess[id]?.charId===rec.charId&&previousChess[id]?.skins?.length?previousChess[id]:Object.values(previousChess).find(c=>c.charId===rec.charId&&c.skins?.length);if(old?.skins)rec.skins=old.skins;}
  // Cosmetic catalogues are prepared independently; rebuilding gameplay must retain their model and voice mappings.

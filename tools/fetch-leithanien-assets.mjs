@@ -21,7 +21,7 @@ for(const [rel,source]of misc)jobs.push(job('custom/leithanien/'+rel,RAW.aa2+sou
 assets.bonds.leithanienShip='/assets/custom/leithanien/icon-full.png';assets.items.leithanien_bell='/assets/custom/leithanien/item/bell.png';assets.items.leithanien_score='/assets/custom/leithanien/item/score.png';
 // Use the original Witch King's enemy portrait, rather than a placeholder faction icon.
 const witch=RAW.yuanyan+'enemy/enemy_1548_ltniak.png';
-jobs.push(job('custom/leithanien/witchking.png',witch));assets.bands.band_custom_leithanien_witchking='/assets/custom/leithanien/witchking-npc-strategy.png';
+jobs.push(job('custom/leithanien/witchking.png',witch));assets.bands.band_custom_leithanien_witchking='/assets/band/band_lethania.png'; // 규정 체르니 (band_lethania)
 const result=await dl.run(jobs,'Leithanien artwork');
 const missing=[...result].filter(([,v])=>['miss','error'].includes(v.status));
 if(missing.length)console.log('Missing artwork:',missing.map(([k])=>k));

@@ -84,7 +84,7 @@ export function ruleDescription(rule,category,draft) {
  return '';
 }
 function optionDescription(entry,tab) {
- if(tab==='bonds')return entry.id==='leithanien'?'속세의 음 · 위치킹 포함':'우르수스 · 카셰이 포함';
+ if(tab==='bonds')return entry.id==='leithanien'?'속세의 음 · 체르니 포함':'우르수스 · 지마 더 레이징 타이드 포함';
  if(tab!=='rules')return entry.description||'';
  return {augments:'기본 4·7·10라운드에 선택',unlimitedHpLoss:'라운드당 HP 감소 상한 10 해제',sharedHp:'참가자 HP·손실 합산',scarecrow:'일반·히든 보스 → 비공격 제셀톤',unlimitedLayers:'999중첩 상한 해제',defaultHarmony:'조화 오퍼레이터 없이도 활성화',duplicateBands:'',unlimitedAspd:'공격속도 600 상한 해제 · 간격 최소 0.1초',skillMotionAspd:'고정 시전 스킬에 공격속도 적용'}[entry.id]||'';
 }
