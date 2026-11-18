@@ -120,7 +120,6 @@ import { EffectsList } from '../ui/effectsList.js';
 import { CombatHud } from '../ui/combatHud.js';
 import { CombatMetricsPanel } from '../ui/combatMetrics.js';
 import { SettingsModal, settingsStore, useSettings } from '../ui/settings.js';
-import { BugReportButton } from '../ui/bugReport.js';
 import { ExitModal, AwayOverlay, awayStore } from '../ui/matchChrome.js';
 import { RoundPopup, PhasePopup, phasePopupOf, roundsToBoss, preloadPopupArt } from '../ui/matchPopups.js';
 import { openGuide } from '../ui/guide.js';
@@ -1807,7 +1806,6 @@ function MatchScreen() {
           ? html`<${LoadoutButton} from="prep" size="sm" />` : null}
         <button type="button" class="gm__gear" aria-label="设置" title="设置" onClick=${() => setSettingsOpen(true)}><${GIcon} name="gear" /></button>
         <button type="button" class="gm__gear gm__guide" aria-label="玩法说明" title="玩法说明" onClick=${() => openGuide(0)}><${Icon} name="book" /></button>
-        <${BugReportButton} />
         ${showMetrics && metricsOpen ? html`<${CombatMetricsPanel} myId=${myId} practice=${!!pub?.practice} preparing=${['ROUND_START','SP_DRAFT','PREP'].includes(pub?.phase)} round=${pub?.round} onClose=${() => setMetricsOpen(false)} />` : null}
         <${FullscreenButton} class="gm__gear gm__fs" />
       </div>

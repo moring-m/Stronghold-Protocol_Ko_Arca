@@ -529,9 +529,6 @@ export const C2S = {
   hello: { name: (v) => isStr(v, NAME_MAX_LEN) && v.trim().length > 0, token: (v) => v == null || isStr(v, 64), version: (v) => v == null || isInt(v, 0, 1e6),
     noReplace: isBool, claimAt: (v) => isNum(v, 0, Number.MAX_SAFE_INTEGER), $optional: ['token', 'version', 'noReplace', 'claimAt'] },
   ping: { c: (v) => typeof v === 'number' && Number.isFinite(v) },
-  // 인게임 버그 제보 (server/bugReports.js): the player's text, the page's recent console lines, a small context object
-  'bug.report': { text: (v) => isStr(v, 4000) && v.trim().length > 0, logs: (v) => isList(v, 300, (x) => isStr(x, 1200)),
-    ctx: (v) => isPlain(v) && (() => { try { return JSON.stringify(v).length <= 8000; } catch { return false; } })(), $optional: ['logs', 'ctx'] },
   'room.create': { titleLocale:v=>['ko','en','ja','zh'].includes(v),isPublic:v=>typeof v==='boolean',title:isRoomTitle, gameplayMode:isGameplayMode, mode: (v) => v === 'solo' || v === 'coop' || v === 'coop8', sync: (v) => v === true, difficulty: (v) => DIFFICULTIES.includes(v), spectators: isSpectatorCap, customExtensions: extensionSelectionShape, test: (v) => v === true, version: isVersionId, soloUnlimited: isBool, modeId: isId, $optional: ['spectators','customExtensions','test','gameplayMode','title','titleLocale','isPublic','sync','version','soloUnlimited','modeId'] },
   'room.join': { testAck: (v) => v === true, $optional: ['testAck'], code: (v) => isStr(v, ROOM_CODE_LEN + 2) && /^[A-Za-z0-9]+$/.test(v) },
   'p2p.enable': { enabled: isBool },
