@@ -199,8 +199,8 @@ trap cleanup EXIT
 allocation=$(rebalance_memory "$release")
 candidate_memory=$(python3 -c 'import json,sys;print(json.load(sys.stdin)["limit"])' <<<"$allocation")
 candidate_reservation=$(python3 -c 'import json,sys;print(json.load(sys.stdin)["pool"]*6//10)' <<<"$allocation")
-# 인게임 버그 제보 (server/bugReports.js): an optional GitHub token file files each report as an issue; the reports
-# directory keeps the full reports (with their logs) across releases.
+# 인게임 버그 제보 (server/bugReports.js): the reports directory keeps the full reports (with their logs) across
+# releases. GitHub issues stay off (no SP_GITHUB_ISSUES=1) until the next hotfix; the token file is only mounted.
 report_args=(-v "$root/reports:/reports" -e SP_REPORT_DIR=/reports)
 mkdir -p "$root/reports" && chown 1000:1000 "$root/reports" 2>/dev/null || true  # the image runs as node (uid 1000)
 if [[ -s "$root/state/github-token" ]]; then report_args+=(-v "$root/state/github-token:/run/stronghold/github-token:ro" -e SP_GITHUB_TOKEN_FILE=/run/stronghold/github-token); fi

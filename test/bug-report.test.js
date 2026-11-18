@@ -77,12 +77,14 @@ test('bug.report → GitHub issue: text and context only, never the logs / nickn
   const calls = [];
   const fetchFn = async (url, init) => { calls.push([url, JSON.parse(init.body), init.headers.Authorization]); return calls.length === 1 ? { status: 422, ok: false } : { status: 201, ok: true, json: async () => ({ html_url: 'https://github.com/x/y/issues/1' }) }; };
   assert.equal(_fileIssue('id1', record, null, { env: {}, fetchFn }), null, 'no token, no call');
-  const url = await _fileIssue('id1', record, null, { env: { SP_GITHUB_TOKEN: 't0k' }, fetchFn, now: () => 0 });
+  assert.equal(_fileIssue('id1', record, null, { env: { SP_GITHUB_TOKEN: 't0k' }, fetchFn }), null, 'switched off without SP_GITHUB_ISSUES=1');
+  assert.equal(calls.length, 0);
+  const url = await _fileIssue('id1', record, null, { env: { SP_GITHUB_TOKEN: 't0k', SP_GITHUB_ISSUES: '1' }, fetchFn, now: () => 0 });
   assert.equal(url, 'https://github.com/x/y/issues/1');
   assert.equal(calls[0][0], 'https://api.github.com/repos/moring-m/Stronghold-Protocol_Ko_Arca/issues');
   assert.equal(calls[0][2], 'Bearer t0k');
   assert.equal(calls[1][1].labels, undefined, 'retried without the label');
-  for (let i = 1; i < ISSUES_PER_HOUR; i++) _fileIssue(`id${i}`, record, null, { env: { SP_GITHUB_TOKEN: 't' }, fetchFn: async () => ({ status: 201, ok: true, json: async () => ({}) }), now: () => 0 });
-  assert.equal(_fileIssue('over', record, null, { env: { SP_GITHUB_TOKEN: 't' }, fetchFn, now: () => 0 }), null, 'hourly cap');
+  for (let i = 1; i < ISSUES_PER_HOUR; i++) _fileIssue(`id${i}`, record, null, { env: { SP_GITHUB_TOKEN: 't', SP_GITHUB_ISSUES: '1' }, fetchFn: async () => ({ status: 201, ok: true, json: async () => ({}) }), now: () => 0 });
+  assert.equal(_fileIssue('over', record, null, { env: { SP_GITHUB_TOKEN: 't', SP_GITHUB_ISSUES: '1' }, fetchFn, now: () => 0 }), null, 'hourly cap');
   _resetIssueLimit();
 });

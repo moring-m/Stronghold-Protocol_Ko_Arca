@@ -4,7 +4,7 @@
 // Where: SP_REPORT_DIR, else <cwd>/.reports. A production game container is replaced on every release, so its deploy
 // mounts a host directory there (deploy/ec2/rolling-update.sh: $root/reports → /reports). Every report is also logged
 // (`[bug-report] <id> …`), so `docker logs` of the release still shows it without the mount.
-// GitHub: with a token (SP_GITHUB_TOKEN, or SP_GITHUB_TOKEN_FILE — a file holding it; the deploy mounts
+// GitHub: when SP_GITHUB_ISSUES=1 and with a token (SP_GITHUB_TOKEN, or SP_GITHUB_TOKEN_FILE — a file holding it; the deploy mounts
 // $root/state/github-token) each report also becomes an issue of SP_GITHUB_REPO (default moring-m/Stronghold-Protocol_Ko_Arca)
 // labelled `bug-report`: the text and the version / phase / round context only — never the logs, the nickname or the
 // room code (others can read the repository; those stay in the file / log, found by the report id). At most
@@ -85,6 +85,9 @@ export function issueOf(id, r) {
 }
 
 function fileIssue(id, record, log, { env = process.env, fetchFn = globalThis.fetch, now = Date.now } = {}) {
+  // switched on explicitly (SP_GITHUB_ISSUES=1): the token alone files nothing — the owner's decision of 2026-11-18,
+  // GitHub issues from the next hotfix on (the deploy sets the switch then)
+  if (String(env.SP_GITHUB_ISSUES ?? '') !== '1') return null;
   const token = githubToken(env);
   if (!token || typeof fetchFn !== 'function') return null;
   const t = now();
