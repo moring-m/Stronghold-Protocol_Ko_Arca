@@ -1,3 +1,5 @@
+import { installLogCapture } from './logCapture.js';
+installLogCapture();
 import './ui/compat.js';
 import { lazyComponent, loadScreenStyles } from './ui/lazyComponent.js';
 import { loadoutStore } from './ui/loadoutSync.js';

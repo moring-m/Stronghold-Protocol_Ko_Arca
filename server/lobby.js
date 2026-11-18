@@ -191,6 +191,7 @@ import { DEFAULT_VERSION, versionById } from '../shared/versions.js';
 import { seasonExtensionCatalog, seasonExtensionSelection, validateSeasonExtensions } from '../shared/seasonExtensions.js';
 import { ruleOption } from '../shared/plugins/rules.js';
 import { msg, wireMessage } from '../shared/i18n.js';
+import { saveBugReport, REPORT_GAP_MS, REPORT_SESSION_MAX } from './bugReports.js';
 import { parseTestModeEnv, testModeGate, unrecognizedTestMode } from './testMode.js';
 
 /** Room code alphabet: uppercase letters without I and O (and no digits, so no 0/1). */
@@ -709,6 +710,7 @@ export class Lobby {
     switch (msg.t) {
       case 'g.chat': case 'g.chatFaction': return this.chat(session, msg);
       case 'room.list': return this.listPublicRooms();
+      case 'bug.report': return this.bugReport(session, msg);
       case 'room.publish': return this.publishRoom(session,msg);
       case 'room.setTitle': return this.setRoomTitle(session,msg);
       case 'room.inspect': return this.inspectRoom(session,msg);
@@ -2115,6 +2117,32 @@ export class Lobby {
   }
 
   // Room-scoped chat survives waiting → match → result → waiting transitions.
+  /**
+   * bug.report (인게임 버그 제보): stored with the room and match the reporter is in (server/bugReports.js). One per
+   * REPORT_GAP_MS and REPORT_SESSION_MAX per session. Answers { ok, id }.
+   */
+  bugReport(session, { text, logs = [], ctx = {} }) {
+    const now = this.now();
+    if (session._bugAt && now - session._bugAt < REPORT_GAP_MS) return fail(ERR.RATE, 'too soon');
+    if ((session._bugCount || 0) >= REPORT_SESSION_MAX) return fail(ERR.RATE, 'too many');
+    session._bugAt = now;
+    session._bugCount = (session._bugCount || 0) + 1;
+    const room = this.roomOf(session);
+    const m = room?.match;
+    const num = (v) => (Number.isFinite(v) ? v : null);
+    const record = {
+      release: process.env.SP_RELEASE_ID || null,
+      player: { id: session.playerId ?? null, name: session.name ?? null },
+      room: room ? { code: room.code, version: room.version ?? null, mode: room.mode, difficulty: room.difficulty, gameplayMode: room.gameplayMode ?? null,
+        inMatch: !!m, hosted: m?.hosted === true, phase: typeof m?.phase === 'string' ? m.phase : null, round: num(m?.round),
+        seats: room.seats.filter(Boolean).map((x) => ({ name: x.name, bot: !!x.isBot, left: !!x.left })) } : null,
+      text: String(text).trim(),
+      ctx,
+      logs,
+    };
+    return { ok: true, id: saveBugReport(record, { log: this.log }) };
+  }
+
   chat(session, msg) {
     const room = this.roomOf(session);
     const spectator = room?.spectatorOf(session.playerId);
