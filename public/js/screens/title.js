@@ -30,7 +30,7 @@ import { openStats } from '../ui/statsEntry.js';
 import { ResumeMatchButton } from '../ui/resumeMatch.js';
 import { useEffect, useMemo, useState } from '../../vendor/hooks.module.js';
 import { NAME_MAX_LEN, APP_VERSION, DEV_BUILD } from '../../../shared/constants.js';
-import { html, Button, Icon, MicroLabel, TextField, PingPill } from '../ui/components.js';
+import { html, Button, Icon, MicroLabel, TextField, PingPill, Modal } from '../ui/components.js';
 import { SettingsButton } from '../ui/settings.js';
 import { PatchNotesButton } from '../ui/patchNotes.js';
 import { GuideButton } from '../ui/guide.js';
@@ -181,6 +181,8 @@ export function TitleScreen() {
     if (currentName) setName((draft) => draft || currentName);
   }, [currentName]);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  // 서비스 종료 안내 (운영자 결정 2026-11-18): 닉네임 입력 화면에 들어올 때마다
+  const [endOpen, setEndOpen] = useState(true);
   // the list of the server's plugins once loaded (ui/pluginPanel.js — a component in state: set through an updater)
   const [Installed, setInstalled] = useState(null);
   const openPlugins = () => {
@@ -274,6 +276,14 @@ export function TitleScreen() {
     </main>
 
     <${SettingsModal} open=${settingsOpen} onClose=${() => setSettingsOpen(false)} />
+    <${Modal} open=${endOpen} onClose=${() => setEndOpen(false)} title="서비스 종료 안내" micro="NOTICE" class="service-end-dlg"
+      actions=${html`<${Button} variant="primary" onClick=${() => setEndOpen(false)}>확인<//>`}>
+      <div class="service-end" data-i18n-skip>
+        <p>운영자의 개인적인 사정으로 더 이상의 운영이 어려워짐에 따라 업데이트 중단 및 서비스 종료를 결정하게 되었습니다.</p>
+        <p>2026/11/30 까지 서버를 유지할 예정이며, 이후에는 플레이할 수 없습니다.</p>
+        <p>지금까지 방문해주신 모든 박사님께 진심으로 감사드립니다.</p>
+      </div>
+    <//>
     ${Installed ? html`<${Installed} open=${true} onClose=${() => setInstalled(null)} />` : null}
 
     <footer class="title-foot">
