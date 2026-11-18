@@ -52,9 +52,16 @@ export function diyRecordFor(chess, pick, data) {
   const pot = Number.isInteger(pick.potential) ? pick.potential : null;
   const key = `${chess.chessId}|${pick.charId}|${pick.skillIndex ?? ''}|${pick.uniEquipId ?? ''}|${pot ?? ''}`;
   if (m.has(key)) return m.get(key);
-  let rec;
-  try { rec = diyRecordOf(chess, pick, data, { potential: pot }); } catch { rec = null; }
+  let rec, err = null;
+  try { rec = diyRecordOf(chess, pick, data, { potential: pot }); } catch (e) { rec = null; err = e; }
   m.set(key, rec);
+  // 규정 선발 shown as 甄选干员 on the owner's page only (user reports 2026-11-18, not reproduced locally): say why, once
+  if (!rec && typeof console !== 'undefined') {
+    const b = data.backups;
+    console.warn('[diy] no 自选 record', JSON.stringify({ slot: chess.chessId, pick, potential: pot,
+      unit: !!b?.units?.[pick.charId], operator: !!b?.diy?.operators?.[pick.charId], units: Object.keys(b?.units || {}).length,
+      slotInChess: !!data.chess?.[chess.chessId], error: err ? String(err?.message || err) : null }));
+  }
   return rec;
 }
 
