@@ -27,4 +27,8 @@ test('the 雪山巨人 of 6 谢拉格 walks to a distant enemy and sits down nex
   h.step(30 * 30); // 30 s
   assert.notDeepEqual([giant.tileR, giant.tileC], start, 'it moved');
   assert.ok(Math.abs(giant.tileC - far[1]) < Math.abs(start[1] - far[1]), 'towards the enemy');
+  // it attacks as the record says, not as a 1-tile physical melee unit (user report 2026-11-18)
+  assert.equal(giant.profile.dmgType, 'arts');
+  assert.ok(giant.rangeGrid.length > 2, 'a reach beyond the tile in front');
+  assert.ok(e.hp < e.s.maxHp, 'it hit the enemy');
 });

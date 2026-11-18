@@ -333,14 +333,34 @@ function runGiantModes(battle, giant, raw, tb) {
   const stepEvery = 1 / Math.max(0.05, num(raw.stats?.moveSpeed, 0.4));
   const frozenScale = num(tb['FrozenBreak.atk_scale'], 3.5);
   let snowy = false, since = 0, lastStep = 0;
+  // the attack of each form (the token was built from the enemy record and attacked as a 1-tile physical melee unit —
+  // standing still out of reach, "it does not move / does nothing", user report 2026-11-18): 【覆雪苏醒】 "远程法术溅射" in
+  // the record's rangeRadius (2.4), 【覆雪坐定】 "法术溅射" in BlockEnemy.attack@ability_range_radius (1.5); the splash radius
+  // is PowerAttack's range_radius (1.1) [ASSUMED for both forms]
+  const awakeReach = num(raw.stats?.rangeRadius, 2.4);
+  const snowyReach = num(tb['BlockEnemy.attack@ability_range_radius'], 1.5);
+  const splash = num((raw.skills || []).find((k) => k.prefabKey === 'PowerAttack')?.bb?.range_radius, 1.1);
+  const circle = (R) => {
+    const out = [];
+    const n = Math.ceil(R);
+    for (let dr = -n; dr <= n; dr++) for (let dc = -n; dc <= n; dc++) if (dr * dr + dc * dc <= R * R + 1e-9) out.push([dr, dc]);
+    return out;
+  };
+  const baseProfile = { ...(giant.profile || {}) };
+  const setForm = (awake) => {
+    giant.rangeGrid = circle(awake ? awakeReach : snowyReach);
+    giant.profile = { ...baseProfile, attack: awake ? 'ranged' : 'melee', dmgType: 'arts', splashRadius: splash, canHitFly: awake, maxTargets: 1 };
+    battle._refreshRange(giant);
+  };
   const near = (e, d) => Math.max(Math.abs(Math.round(e.y) - giant.tileR), Math.abs(Math.round(e.x) - giant.tileC)) <= d;
   const enemies = () => battle.enemies.filter((e) => e.alive && !e.s?.flags?.untargetable);
   const wake = () => {
     snowy = false; since = battle.time;
     battle.addBuff(giant, { key: AWAKE, persist: true, refresh: 'replace', mods: { blockCnt: -99 } });
     battle.releaseBlocked(giant);
+    setForm(true);
   };
-  const sit = () => { snowy = true; since = battle.time; battle.removeBuff(giant, AWAKE); };
+  const sit = () => { snowy = true; since = battle.time; battle.removeBuff(giant, AWAKE); setForm(false); };
   wake();
   battle.every(0.2, () => {
     if (!giant.alive) return;
@@ -349,8 +369,7 @@ function runGiantModes(battle, giant, raw, tb) {
     if (!snowy && close) { sit(); return; }
     if (snowy) { if (!close && battle.time - since >= interval) wake(); return; }
     // awake: hold while an enemy is within the ranged attack (rangeRadius), else step towards the nearest enemy
-    const reach = num(giant.s?.rangeRadius, num(raw.stats?.rangeRadius, 2.4));
-    if (!list.length || list.some((e) => Math.hypot(e.x - giant.tileC, e.y - giant.tileR) <= reach)) return;
+    if (!list.length || list.some((e) => (giant.profile.canHitFly || !e.isFlying) && Math.hypot(e.x - giant.tileC, e.y - giant.tileR) <= awakeReach)) return;
     if (battle.time - lastStep < stepEvery) return;
     const target = list.reduce((a, e) => (Math.hypot(e.x - giant.tileC, e.y - giant.tileR) < Math.hypot(a.x - giant.tileC, a.y - giant.tileR) ? e : a));
     let best = null, bestD = Math.hypot(target.x - giant.tileC, target.y - giant.tileR);

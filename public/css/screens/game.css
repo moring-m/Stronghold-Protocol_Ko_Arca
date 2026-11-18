@@ -1113,3 +1113,12 @@
 .cmdx__arrow polygon, .cmdx__arrow circle { fill: #f0c35a; filter: drop-shadow(0 0 4px rgba(240,195,90,.8)); }
 @keyframes cmdx-march { to { stroke-dashoffset: -22; } }
 @media (prefers-reduced-motion: reduce) { .cmdx__arrow line { animation: none; } }
+
+/* 인게임 버그 제보 (ui/bugReport.js) */
+.bugreport { display: flex; flex-direction: column; gap: .6rem; }
+.bugreport__hint { margin: 0; font-size: .82rem; opacity: .8; line-height: 1.5; }
+.bugreport__text { width: 100%; box-sizing: border-box; min-height: 9rem; resize: vertical; padding: .55rem .65rem; font: inherit; font-size: .9rem;
+  color: var(--text, #e8e8e8); background: var(--surface-2, rgba(0, 0, 0, .35)); border: 1px solid var(--line, rgba(255, 255, 255, .18)); border-radius: 4px; }
+.bugreport__text:focus { outline: 2px solid var(--accent, #4fd1c5); outline-offset: 1px; }
+.bugreport__logs { display: flex; align-items: center; gap: .45rem; font-size: .82rem; cursor: pointer; }
+.bugreport__logs small { opacity: .65; }
