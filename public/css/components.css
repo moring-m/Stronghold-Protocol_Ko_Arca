@@ -1305,3 +1305,7 @@ img[src*="/assets/custom/augments/is_choice_personnel_office.png"][src] { object
 .hbond .bond__ban { top: calc(-6 * var(--u)); right: calc(4 * var(--u)); width: calc(22 * var(--u)); height: calc(22 * var(--u)); }
 .brief-bond .hbond { --u: .0098rem; cursor: default; }
 .brief-bond .hbond .hbond__name { white-space: nowrap; overflow-wrap: normal; max-width: none; font-size: calc(15 * var(--u)); }
+
+/* 서비스 종료 안내 (screens/title.js) */
+.service-end p { margin: 0 0 .9em; line-height: 1.6; }
+.service-end p:last-child { margin-bottom: 0; }
