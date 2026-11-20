@@ -1,5 +1,7 @@
 # DESIGN §6, §16 — The match and meta engine (server/match), operator loadouts
 
+Korean-fork extension: [restart-vote contract](restart-vote.md). Voting never freezes gameplay, choices or match timers.
+
 Part of [DESIGN.md](../DESIGN.md) (the index; section numbers are global).
 
 ## 6. Match & meta (server/match)

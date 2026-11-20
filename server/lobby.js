@@ -174,7 +174,7 @@ import { randomBytes, randomInt } from 'node:crypto';
 import { ERR, MAX_SEATS, roomSeatCap, MAX_SPECTATORS, MAX_SPECTATOR_SEATS, ROOM_CODE_LEN, modeIdFor, DIFFICULTIES } from '../shared/constants.js';
 import { normalizeChatText, chatFaction, CHAT_COOLDOWN_MS, CHAT_HISTORY_LIMIT } from '../shared/chat.js';
 import { checkLoadout, checkLoadoutOps, cultivationCharIds, checkNotOwned, checkDiyPicks, charPotentialChanges,checkSkinSelection,operatorCharIds } from '../shared/protocol.js';
-import { handleRestart, cancelVote, sendVotes, voteFrame } from './restartVote.js';
+import { handleRestart, cancelVote, sendVotes, voteFrame, restartMemberLeaving } from './restartVote.js';
 
 
 
@@ -2291,7 +2291,6 @@ export class Lobby {
    * @param {Room} room @param {string} playerId
    */
   removeMember(room, playerId) {
-    if (room.seatOf(playerId)) cancelVote(this, room);
     const session = this.registry.byId(playerId);
     if (session && session.roomCode === room.code) session.roomCode = null;
     this.clearGrace(playerId);
@@ -2304,6 +2303,7 @@ export class Lobby {
       seat.left = true;
       seat.connected = false;
       seat.ready = false;
+      restartMemberLeaving(this, room, playerId);
       this.callMatch(room, 'onLeave', playerId);
     } else {
       room.seats[seat.seat] = null;

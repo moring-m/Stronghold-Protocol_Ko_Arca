@@ -599,6 +599,14 @@ export class Match {
     });
   }
 
+  /** Snapshot eligible restart voters without interrupting gameplay. */
+  restartVoteRoster(includeEliminated, requester) {
+    if (this.disposed || this.ended || ['LOBBY', 'INFO_CHECK', 'ENDED', 'RESULT'].includes(this.phase)) return fail(ERR.WRONG_PHASE);
+    const players = this.humans().filter(p => includeEliminated || p.alive).map(p => ({ playerId: p.playerId, alive: p.alive }));
+    if (!players.some(p => p.playerId === requester)) return fail(ERR.ELIMINATED);
+    return { ok: true, players };
+  }
+
   /**
    * @param {string} playerId
    * @param {{ t: string }} msg validated intent

@@ -9,6 +9,8 @@
 Claude Code 개발 안내: [설정·실행](docs/CLAUDE-CODE.md) · [현재 작업 인계](docs/CLAUDE-HANDOFF.md).
 중국 신규 오퍼레이터 추출: [실행·결과 안내](docs/CN-NEW-OPERATORS-EXTRACTION.md).
 
+리방 투표 중에도 게임은 계속 진행됩니다. 투표창은 접고 펼칠 수 있으며 증강·현상금 선택 화면과 함께 사용할 수 있습니다. 방 커스텀 설정에서 투표 시간과 동의 기준 등을 변경할 수 있습니다. [투표 규칙](docs/design/restart-vote.md).
+
 ## 고지사항
 
 > [!IMPORTANT]

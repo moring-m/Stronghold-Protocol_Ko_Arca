@@ -2,6 +2,9 @@
 
 Part of [DESIGN.md](../DESIGN.md) (the index; section numbers are global).
 
+Korean-fork restart voting uses a centered, manually collapsible themed popup above selection screens.
+It has no veil or focus trap and leaves choice layouts unchanged; see [the contract](restart-vote.md).
+
 ## 9. Client rendering contract (public/js/render)
 
 Match-information bond entries (#915, history §37.98) open the existing `BondPopup` directly: the in-game chips,

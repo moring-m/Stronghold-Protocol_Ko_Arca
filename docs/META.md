@@ -32,6 +32,13 @@ server/match/
 
 ---
 
+### Korean-fork restart voting
+
+`restartVoteRoster(includeEliminated, requester)` reads eligible humans and validates the current phase in both
+match engines and across the match-host proxy. It does not pause, reject gameplay intents, hold combat reports or
+change any clock. The lobby owns the separate vote deadline and cooldowns. The client shows a centered,
+manually collapsible popup above choice screens without moving their layout. See [the contract](design/restart-vote.md).
+
 ## 1. Match flow
 
 ```

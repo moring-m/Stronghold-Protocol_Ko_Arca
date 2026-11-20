@@ -199,6 +199,8 @@ const SKIP_TAGS = new Set(['SCRIPT', 'STYLE', 'TEXTAREA', 'INPUT', 'CODE', 'PRE'
 
 function skipNode(el) {
   for (let e = el; e && e.nodeType === 1; e = e.parentNode) {
+    // Native t() output is already localized; legacy patterns must not translate it again.
+    if (e.hasAttribute?.('data-i18n-native')) return true;
     if (e.matches?.('.me-chip__name') || SKIP_TAGS.has(e.tagName) || (e.hasAttribute && e.hasAttribute('data-i18n-skip') && !(lang !== 'ko' && e.closest?.('.settings-modal') && !e.closest('.language-entry')))) return true;
   }
   return false;
@@ -221,6 +223,7 @@ function fixText(node) {
 }
 
 function fixAttrs(el) {
+  if (el.closest?.('[data-i18n-native]')) return;
   if(el.hasAttribute?.('data-room-title'))return;
   for (const a of ATTRS) {
     const v = el.getAttribute(a);

@@ -78,6 +78,31 @@ const frames = () => { const out = { sent: [], broadcast: [], ended: [] }; out.e
 const bots = (n) => Array.from({ length: n }, (_, i) => ({ seat: i, playerId: `ai_${i}`, name: `AI ${i}`, isBot: true, connected: true }));
 
 describe('match hosts (P1c): a content set\'s matches in a match host of its own', () => {
+  test('restart roster snapshots preserve gameplay over process and worker transports', { timeout: 60000 }, async () => {
+    const contents = setsOf(pluginsDir({ restart: [{ data: ['patch.json'] }, { 'patch.json': bondPatch(.35) }] }));
+    const resolved = contents.resolve(['restart']);
+    assert.equal(resolved.ok, true);
+    contents.hold(resolved.set.cs);
+    try {
+      for (const transport of ['process', 'worker']) {
+        const hosts = createMatchHosts({ contents, log: quiet, options: { transport, matchOptions: { botRehearsal: 0 } } });
+        try {
+          const out = frames(), seats = [0, 1].map(i => ({ seat: i, playerId: 'p' + i, name: 'P' + i, connected: true }));
+          const m = hosts.create(resolved.set.cs, matchOpts(resolved.set.cs, seats, out));
+          m.start();
+          for (const p of seats) assert.equal((await m.handle(p.playerId, { t: 'g.infoReady' })).ok, true);
+          for (let i = 0; i < 100 && (await m.diag()).phase === 'INFO_CHECK'; i++) await delay(20);
+          const roster = await m.restartVoteRoster(true, 'p0');
+          assert.equal(roster.ok, true);
+          assert.equal(roster.players.length, 2);
+          assert.equal((await m.handle('p0', { t: 'g.bandFocus', bandId: null })).ok, true);
+          assert.equal((await m.diag()).errorCount, 0);
+          assert.ok(out.broadcast.some(f => f.t === 'm.public' && f.paused === false));
+          m.dispose();
+        } finally { hosts.close(); }
+      }
+    } finally { contents.release(resolved.set.cs); }
+  });
   test('the transport: a child process by default; a worker thread only with SP_MATCH_HOST=worker', { timeout: 60_000 }, async () => {
     const was = process.env.SP_MATCH_HOST;
     try {

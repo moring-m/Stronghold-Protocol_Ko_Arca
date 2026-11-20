@@ -1,3 +1,4 @@
+import { N_ } from './i18n.js';
 import {withLaboratoryDummy,LAB_DUMMY_BOSS} from './laboratoryDummy.js';
 import {RANDOM_BAND_ID,withRandomBands} from './randomBand.js';
 import {eightUniteStage} from './cooperativeEight.js';
@@ -8,6 +9,12 @@ export const AUGMENT_STAT_BASES=Object.freeze({enemyHp:100,bossHp:100,enemyAtk:1
 export const isAugmentStatActive=(selection,id)=>selection.rules?.includes('augments')&&selection.ruleValues?.[id+'ByAugment']===1;
 
 export const RULE_VALUES = Object.freeze([
+ {id:'restartAgreement',name:N_('同意条件'),category:'restart',default:0,min:0,max:1,step:1,unit:'',options:[{value:0,label:N_('全员同意')},{value:1,label:N_('过半数同意')}]},
+ {id:'restartIncludeEliminated',name:N_('已淘汰玩家参与投票'),category:'restart',default:1,min:0,max:1,step:1,unit:'',options:[{value:1,label:N_('包含')},{value:0,label:N_('不包含')}]},
+ {id:'restartVoteSeconds',name:N_('投票时限'),category:'restart',default:45,min:15,max:90,step:1,unit:N_('秒')},
+ {id:'restartRoomCooldown',name:N_('房间重新投票冷却'),category:'restart',default:120,min:0,max:3600,step:1,unit:N_('秒')},
+ {id:'restartPlayerCooldown',name:N_('个人重新投票冷却'),category:'restart',default:180,min:0,max:3600,step:1,unit:N_('秒')},
+ {id:'restartRequestLimit',name:N_('每局个人请求上限'),category:'restart',default:2,min:1,max:10,step:1,unit:N_('次')},
  {id:"augmentEnemyVote",name:"적 증강 선택 방식",category:"augments",default:0,min:0,max:2,step:1,unit:"",options:[{value:0,label:"방장 선택"},{value:1,label:"참가자 투표"},{value:2,label:"가중치 투표"}]},
  ...[["augmentSilver","실버 가중치",2,1000],["augmentGold","골드 가중치",5,1000],["augmentPrism","프리즘 가중치",3,1000],["augmentAllyRerolls","아군 리롤",1,10],["augmentEnemyRerolls","적 리롤",1,10]].map(([id,name,value,max])=>({id,name,category:"augments",default:value,min:0,max,step:1,unit:id.includes("Rerolls")?"회":""})),
  // the augment schedule: first round, interval, number of augments (4 / 3 / 3 = the official 4·7·10); an offer draws from the
@@ -47,7 +54,7 @@ export function extensionSelectionCount(selection){
  return Object.entries(saved).reduce((n,[key,value])=>n+(Array.isArray(value)?value.length:Object.keys(value).filter(id=>augmentsEnabled||RULE_VALUES.find(r=>r.id===id)?.category!=='augments').length),0);
 }
 export const EXTENSION_CATEGORIES = Object.freeze([
-  {id:'rules',name:'게임 규칙'}, {id:'augmentSettings',name:'증강 설정'}, {id:'defaultAllyAugments',name:'기본 활성화 아군 증강'}, {id:'defaultEnemyAugments',name:'기본 활성화 적 증강'}, {id:'commonBands',name:'공통 적용 전략'}, {id:'allies',name:'아군 스펙 조정'}, {id:'enemyStats',name:'일반 적 스펙 조정'}, {id:'bossStats',name:'보스 스펙 조정'},
+  {id:'restartSettings',name:N_('重新开局投票')}, {id:'rules',name:'게임 규칙'}, {id:'augmentSettings',name:'증강 설정'}, {id:'defaultAllyAugments',name:'기본 활성화 아군 증강'}, {id:'defaultEnemyAugments',name:'기본 활성화 적 증강'}, {id:'commonBands',name:'공통 적용 전략'}, {id:'allies',name:'아군 스펙 조정'}, {id:'enemyStats',name:'일반 적 스펙 조정'}, {id:'bossStats',name:'보스 스펙 조정'},
   { id: 'bonds', name: '맹약 추가' }, { id: 'stages', name: '전장 추가' },
   {id:'forcedBonds',name:'맹약 금지'}, {id:'protectedBonds',name:'맹약 밴 제외'},
   {id:'forcedAuxBonds',name:'부가 맹약 금지'}, {id:'protectedAuxBonds',name:'부가 맹약 밴 제외'},
@@ -78,7 +85,7 @@ export function customExtensionCatalog(raw = {}) {
     bannedOperators:Object.entries(raw.chess||{}).filter(([,c])=>isBannableOperator(c)).sort(([a,x],[b,y])=>(x.tier||0)-(y.tier||0)||(x.shopSortId||0)-(y.shopSortId||0)||a.localeCompare(b)).map(([id,c])=>({id,name:c.name||id,description:'이번 게임의 상점과 오퍼레이터 획득 대상에서 제외합니다.'})),
     // combat augments only (shared/augments.js COMBAT_AUGMENT_KINDS): active from the first battle, augment mode or not
     defaultAllyAugments:combatAugmentCatalog(raw,'ally').map(a=>({...augmentView(a),description:a.description||''})),defaultEnemyAugments:combatAugmentCatalog(raw,'enemy').map(a=>({...augmentView(a),description:a.description||''})),
-    augmentSettings:[],allies:[],enemyStats:[],bossStats:[],commonBands:Object.entries(raw.bands||{}).filter(([id])=>id!==RANDOM_BAND_ID).map(([id,b])=>({id,name:b.name||id,description:b.desc||''})),
+    restartSettings:[],augmentSettings:[],allies:[],enemyStats:[],bossStats:[],commonBands:Object.entries(raw.bands||{}).filter(([id])=>id!==RANDOM_BAND_ID).map(([id,b])=>({id,name:b.name||id,description:b.desc||''})),
     rules:[{id:'augments',name:'증강 모드',description:'아군·적 증강을 선택합니다. 기본은 4·7·10라운드이며 증강 설정에서 바꿀 수 있습니다.'},{id:'unlimitedHpLoss',name:'HP 감소 상한 해제',description:'한 라운드에 감소하는 HP의 10 상한을 해제합니다.'},{id:'sharedHp',name:'아군 HP 공유',description:'모든 참가자의 HP를 합산해 공유합니다. 전투 종료 시 감소 예정 HP를 합산해 차감합니다.'},{id:'scarecrow',name:'허수아비 모드',description:'일반 보스와 히든 보스를 공격하지 않는 제셀톤 윌리엄스로 교체합니다.'},{id:'unlimitedLayers',name:'중첩 상한선 해제',description:'맹약의 999중첩 상한선을 해제합니다.'},{id:'defaultHarmony',name:'조화 기본 활성화',description:'조화 오퍼레이터가 없어도 조화 맹약을 활성화합니다.'},{id:'duplicateBands',name:'전략 중복 선택 허용',description:'여러 참가자가 같은 전략을 선택할 수 있습니다.'},{id:'unlimitedAspd',name:'공격속도 상한 해제',description:'공격속도 600 상한을 해제합니다. 공격 간격은 0.1초보다 짧아지지 않습니다.'},{id:'skillMotionAspd',name:'스킬 모션 공격속도 적용',description:'시전 모션 시간이 고정된 스킬과 일정 간격으로 타격하는 스킬(탈룰라 3스킬 등), 유키 마코토의 대역 전환에도 공격속도를 적용합니다. 이미 공격속도의 영향을 받는 스킬은 그대로입니다.'}],
     forcedAuxBonds:auxCatalog,protectedAuxBonds:auxCatalog,
     forcedBonds:banCatalog,protectedBonds:banCatalog,

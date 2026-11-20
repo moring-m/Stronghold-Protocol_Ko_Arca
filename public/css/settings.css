@@ -620,4 +620,6 @@
  .recruit-preset-status { margin-left:0; }
  .recruit-preset-actions .btn { min-height:36px; }
 }
+/* Restart policy has no content minimums. */
+.custom-ext .editor-minimums[hidden]{display:none}
 .set-row--ui-theme .ui-theme-picker { margin-top: 0; grid-column: 2 / -1; }

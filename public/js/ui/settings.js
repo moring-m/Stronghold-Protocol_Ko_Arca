@@ -337,7 +337,7 @@ export function SettingsModal({ open, onClose }) {
   const [tested, setTested] = useState(false);
   const [touchUi] = useState(() => detectFeatures().coarse && !detectFeatures().fine);
   return html`<${Modal} open=${open} onClose=${onClose} title="设置" micro="SETTINGS" class="settings-modal" width="7.4rem"
-    actions=${html`<${ResourceRedownloadButton} /><${RestartVoteControls} voteVisible=${false} onRequested=${onClose} label="리방 투표" /><${Button} variant="secondary" icon="book" class="set-guide" onClick=${() => openGuide(0)}>玩法说明<//>
+    actions=${html`<${ResourceRedownloadButton} /><${RestartVoteControls} voteVisible=${false} onRequested=${onClose} label=${t('重新开局投票')} /><${Button} variant="secondary" icon="book" class="set-guide" onClick=${() => openGuide(0)}>玩法说明<//>
       <${Button} variant="primary" icon="check" onClick=${onClose}>完成<//>`}>
     <nav class="set-categories" aria-label="설정 종류" data-i18n-skip>
       ${[['graphics','그래픽'],['audio','소리'],['chat','채팅'],['controls','조작·단축키'],['accessibility','접근성']].map(([id,label])=>html`<button type="button" class=${category===id?'is-on':''} aria-pressed=${category===id} onClick=${()=>setCategory(id)}>${t(label)}</button>`)}

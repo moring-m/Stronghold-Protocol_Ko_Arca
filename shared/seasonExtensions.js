@@ -16,13 +16,13 @@
 //                    boss hit limit and the ally / enemy / boss stat percentages (allies, enemyStats, bossStats tabs)
 import { customExtensionCatalog, normalizeRuleValues, RULE_VALUES } from './customExtensions.js';
 
-export const SEASON_EXTENSION_CATEGORIES = Object.freeze(['stages', 'rules', 'augmentSettings', 'defaultAllyAugments', 'defaultEnemyAugments', 'commonBands', 'allies', 'enemyStats', 'bossStats', 'forcedBonds', 'forcedAuxBonds', 'bannedOperators', 'disabledBonds', 'disabledStages', 'disabledBosses', 'disabledBands']);
+export const SEASON_EXTENSION_CATEGORIES = Object.freeze(['restartSettings', 'stages', 'rules', 'augmentSettings', 'defaultAllyAugments', 'defaultEnemyAugments', 'commonBands', 'allies', 'enemyStats', 'bossStats', 'forcedBonds', 'forcedAuxBonds', 'bannedOperators', 'disabledBonds', 'disabledStages', 'disabledBosses', 'disabledBands']);
 /** The rule switches a season match honours (match-upstream reads config.customRules). */
 export const SEASON_RULES = Object.freeze(['augments', 'unlimitedHpLoss', 'sharedHp', 'defaultHarmony', 'duplicateBands', 'unlimitedLayers', 'unlimitedAspd']);
 /** The rule values a season match honours. */
 export const SEASON_RULE_VALUES = Object.freeze(['normalBattleTime', 'bossBattleTime', 'bossBattleSpeed', 'stockPlayers', 'roundCount', 'deployCap', 'maxDamage',
   // battle stats (sim-upstream reads them from the BattleSpec flags: customRules.js) and the augment settings
-  ...RULE_VALUES.filter((r) => ['allies', 'enemyStats', 'bossStats', 'augments'].includes(r.category)).map((r) => r.id)]);
+  ...RULE_VALUES.filter((r) => ['allies', 'enemyStats', 'bossStats', 'augments', 'restart'].includes(r.category)).map((r) => r.id)]);
 const BAN_KEYS = ['forcedBonds', 'protectedBonds', 'forcedAuxBonds', 'protectedAuxBonds'];
 // 증강 (custom 증강 모드 / default augments): match-upstream/augments.js and sim-upstream/content/augments.js run them, on
 // the season's own augment catalogue (shared/augments.js with shared/seasonAugments.js mapping the items)

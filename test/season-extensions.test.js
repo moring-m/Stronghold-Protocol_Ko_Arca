@@ -11,7 +11,7 @@ const raw = getVersionData(VERSION);
 
 test('the catalogue lists only the season categories, from the season tables', () => {
   const cat = seasonExtensionCatalog(raw);
-  for (const k of SEASON_EXTENSION_CATEGORIES.filter((k) => !['allies', 'enemyStats', 'bossStats', 'augmentSettings'].includes(k))) assert.ok(cat[k].length > 0, k);
+  for (const k of SEASON_EXTENSION_CATEGORIES.filter((k) => !['allies', 'enemyStats', 'bossStats', 'augmentSettings', 'restartSettings'].includes(k))) assert.ok(cat[k].length > 0, k);
   assert.deepEqual(cat.rules.map((r) => r.id).sort(), [...SEASON_RULES].sort());
   assert.deepEqual(cat.bonds ?? [], [], 'bonds');
   // 전장 추가: the 맹약 maps copied into the season's stages (tools/build-season-extra-stages.mjs)
